@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "disciplined-coder",
+  "displayName": "Disciplined Coder",
+  "version": "0.1.0",
+  "description": "Team engineering principles + cross-project gotchas as a reusable subagent type, plus per-project issue-log scaffolding (solved/unsolved).",
+  "author": { "name": "chshin84", "email": "chshin84@gmail.com" },
+  "license": "MIT",
+  "keywords": ["principles", "gotchas", "subagent", "issue-tracking", "bootstrap"]
+}

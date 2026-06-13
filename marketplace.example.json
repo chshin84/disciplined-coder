@@ -1,0 +1,11 @@
+{
+  "name": "team-tools",
+  "owner": { "name": "chshin84", "email": "chshin84@gmail.com" },
+  "plugins": [
+    {
+      "name": "disciplined-coder",
+      "source": "./disciplined-coder",
+      "description": "Team principles + cross-project gotchas as a subagent type, plus per-project issue-log scaffolding."
+    }
+  ]
+}

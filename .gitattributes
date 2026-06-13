@@ -1,0 +1,2 @@
+# Keep shell scripts LF so the shebang and bash parsing work on POSIX hosts
+*.sh text eol=lf
