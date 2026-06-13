@@ -2,6 +2,10 @@
 
 팀 엔지니어링 원칙 + 프로젝트 간 공통 함정을 **재사용 가능한 서브에이전트 타입**으로 박아두고, 신규 프로젝트에 **이슈 로그(solved/unsolved) 스캐폴드**를 자동 생성하는 Claude Code 플러그인.
 
+## 전제 조건 (Prerequisites)
+- **Windows 사용자: [Git Bash](https://git-scm.com/downloads) 설치 필수.** SessionStart hook이 bash 스크립트(`scaffold.sh`)를 돌리는데, Windows엔 bash가 없어 Git Bash가 그 역할을 한다. 없으면 Claude Code가 PowerShell로 폴백 → 스크립트 실패. (mac/Linux는 기본 `sh`로 동작하므로 불필요.)
+- hook은 `bash "...scaffold.sh"`로 호출하므로 실행권한 비트(`chmod +x`)는 필요 없다.
+
 ## 무엇을 자동화하나
 - **일반 지식**(원칙 + 공통 gotchas) → 플러그인의 agent + skill에 baked → 모든 프로젝트에서 자동, **서브에이전트까지 도달**.
 - **프로젝트 고유 로그**(solved/unsolved) → SessionStart hook이 신규 프로젝트에 빈 파일 + CLAUDE.md `@import`를 **없으면 생성**(idempotent).
@@ -25,7 +29,7 @@ disciplined-coder/
    claude plugin install disciplined-coder@team-tools --scope project
    ```
    `--scope project`는 `.claude/settings.json`의 `enabledPlugins`에 기록 → repo를 clone한 모든 팀원에게 적용.
-3. **호스트 전제(중요)**: SessionStart hook은 컨테이너가 아니라 **호스트 셸**에서 실행된다. Windows 팀원은 **Git Bash 필수**(없으면 PowerShell로 폴백돼 bash 스크립트가 실패). hook은 `bash "...scaffold.sh"`로 호출하므로 실행권한 비트(`chmod +x`)에 의존하지 않는다.
+3. Windows 팀원은 **Git Bash 설치 확인** (위 [전제 조건](#전제-조건-prerequisites) 참고).
 4. `claude plugin validate ./disciplined-coder --strict`로 검증.
 
 ## 사용
