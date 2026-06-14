@@ -51,6 +51,14 @@ echo "[case5] no blank-line accumulation"
 check "blank lines bounded (<=1) after 3 runs" "[ \$(grep -c '^\$' '$T5/CLAUDE.md') -le 1 ]"
 check "user content preserved"              "grep -qxF 'hello' '$T5/CLAUDE.md'"
 
+# --- 케이스 6: CRLF 관리 영역 인식(멱등) ---
+T6="$(mktemp -d)"
+printf 'user line\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@coding-principles.md\r\n@solved_problems.md\r\n@unsolved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$T6/CLAUDE.md"
+CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T6" bash "$SCAFFOLD" >/dev/null
+echo "[case6] CRLF region recognized"
+check "CRLF region not duplicated"         "[ \$(grep -cF '# BEGIN disciplined-coder' '$T6/CLAUDE.md') -eq 1 ]"
+check "CRLF user line preserved"           "grep -qF 'user line' '$T6/CLAUDE.md'"
+
 echo "----"
 echo "PASS=$pass FAIL=$fail"
 [ "$fail" -eq 0 ]

@@ -15,12 +15,14 @@ CLAUDE_MD="$ROOT/CLAUDE.md"
 PRINCIPLES_DST="$ROOT/coding-principles.md"
 PRINCIPLES_SRC="$PLUGIN_ROOT/coding-principles.md"
 
-created=()
+created=""
 
 # 1) 디시플린 정본을 프로젝트로 복사(매 세션 갱신 = SSOT에서 도출).
-#    src==dst(플러그인 레포 자체에서 실행)면 복사 생략(cp same-file 오류 방지).
+#    src==dst(같은 파일)면 복사 생략 — 문자열 + inode(-ef) 양쪽 판정(cp self-truncate 방지).
 if [ -f "$PRINCIPLES_SRC" ]; then
-  if [ "$PRINCIPLES_SRC" != "$PRINCIPLES_DST" ]; then
+  if [ "$PRINCIPLES_SRC" = "$PRINCIPLES_DST" ] || { [ -e "$PRINCIPLES_DST" ] && [ "$PRINCIPLES_SRC" -ef "$PRINCIPLES_DST" ]; }; then
+    : # same file — skip copy
+  else
     cp "$PRINCIPLES_SRC" "$PRINCIPLES_DST"
   fi
 else
@@ -36,7 +38,7 @@ if [ ! -f "$SOLVED" ]; then
 일반화 가능한 항목은 디시플린(coding-principles.md)으로 승격하고 여기서는 제거(SSOT).
 (미해결·대기 항목은 `unsolved_problems.md`.)
 EOF
-  created+=("solved_problems.md")
+  created="$created solved_problems.md"
 fi
 
 if [ ! -f "$UNSOLVED" ]; then
@@ -56,20 +58,21 @@ if [ ! -f "$UNSOLVED" ]; then
 
 ## 🔵 향후 / 선택
 EOF
-  created+=("unsolved_problems.md")
+  created="$created unsolved_problems.md"
 fi
 
-# 3) CLAUDE.md 관리 영역 재생성(멱등). 기존 영역 제거 + 후행 빈 줄 정리 후 끝에 최신으로 추가.
+# 3) CLAUDE.md 관리 영역 재생성(멱등). CRLF 내성: 마커 비교 시 trailing \r 제거.
 touch "$CLAUDE_MD"
 BEGIN_MARK="# BEGIN disciplined-coder (managed — do not edit)"
 END_MARK="# END disciplined-coder (managed — do not edit)"
 
-# 3a) 본문(body) = 관리 영역을 제거한 나머지. BEGIN만 있고 END가 없으면 데이터 손실 방지 위해 strip 생략.
+# 3a) 본문 = 관리 영역 제거. BEGIN만 있고 END 없으면 데이터 손실 방지 위해 strip 생략.
 if grep -qF "$BEGIN_MARK" "$CLAUDE_MD" && grep -qF "$END_MARK" "$CLAUDE_MD"; then
   awk -v b="$BEGIN_MARK" -v e="$END_MARK" '
-    $0==b {skip=1}
+    { l=$0; sub(/\r$/,"",l) }
+    l==b {skip=1}
     skip==0 {print}
-    $0==e {skip=0}
+    l==e {skip=0}
   ' "$CLAUDE_MD" > "$CLAUDE_MD.tmp"
 elif grep -qF "$BEGIN_MARK" "$CLAUDE_MD"; then
   echo "[disciplined-coder] WARNING: CLAUDE.md has BEGIN marker but no END — skipping strip to avoid data loss" >&2
@@ -78,8 +81,8 @@ else
   cp "$CLAUDE_MD" "$CLAUDE_MD.tmp"
 fi
 
-# 3b) 후행 빈 줄 제거(블랭크 라인 누적 방지 — 멱등).
-awk 'NF{last=NR} {line[NR]=$0} END{for(i=1;i<=last;i++) print line[i]}' "$CLAUDE_MD.tmp" > "$CLAUDE_MD" && rm -f "$CLAUDE_MD.tmp"
+# 3b) 후행 빈 줄 제거(블랭크 누적 방지). \r-only 줄도 빈 줄로 간주.
+awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }' "$CLAUDE_MD.tmp" > "$CLAUDE_MD" && rm -f "$CLAUDE_MD.tmp"
 
 # 3c) 관리 영역을 끝에 추가(본문이 있으면 빈 줄 1개로 분리).
 {
@@ -95,7 +98,7 @@ if [ -f "$PRINCIPLES_DST" ]; then
 fi
 
 # 5) 생성 보고
-if [ ${#created[@]} -gt 0 ]; then
-  echo "[disciplined-coder] scaffolded: ${created[*]}"
+if [ -n "$created" ]; then
+  echo "[disciplined-coder] scaffolded:$created"
 fi
 exit 0

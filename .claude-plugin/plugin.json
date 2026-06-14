@@ -3,8 +3,8 @@
   "name": "disciplined-coder",
   "displayName": "Disciplined Coder",
   "version": "0.1.0",
-  "description": "Team engineering principles + cross-project gotchas as a reusable subagent type, plus per-project issue-log scaffolding (solved/unsolved).",
+  "description": "Team engineering discipline (coding-principles.md, SSOT) auto-injected into every project's CLAUDE.md via a SessionStart hook, plus per-project issue-log (solved/unsolved) scaffolding.",
   "author": { "name": "chshin84", "email": "chshin84@gmail.com" },
   "license": "MIT",
-  "keywords": ["principles", "gotchas", "subagent", "issue-tracking", "bootstrap"]
+  "keywords": ["principles", "discipline", "issue-tracking", "scaffold", "hooks"]
 }

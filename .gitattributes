@@ -1,2 +1,4 @@
 # Keep shell scripts LF so the shebang and bash parsing work on POSIX hosts
 *.sh text eol=lf
+# Keep markdown LF so the scaffold's managed-region markers match on all hosts
+*.md text eol=lf
