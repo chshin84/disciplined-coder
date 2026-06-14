@@ -5,8 +5,8 @@
 모든 에이전트가 동일한 디시플린을 따른다.
 
 - 디시플린 정본: `coding-principles.md` (SSOT). 직접 원칙을 추가할 땐 여기만 고친다.
-- scaffold 검증: `bash scripts/test_scaffold.sh` (PASS=22 기대).
-- 변경 후: 위 테스트 + `claude plugin validate ./ --strict`.
+- scaffold 검증: `bash scripts/test_scaffold.sh` (계약은 **FAIL=0** = 전부 통과. 기대 PASS 개수를 매직 넘버로 박지 말 것 — `SSOT`).
+- 변경 후: 위 테스트 + `claude plugin validate ./` (non-strict; `--strict`는 도그푸딩 루트 CLAUDE.md 때문에 의도적 실패).
 - 설계/계획 문서: `docs/superpowers/`.
 
 > 아래 "BEGIN/END disciplined-coder" 관리 영역은 SessionStart hook이 자동 생성·갱신한다.
