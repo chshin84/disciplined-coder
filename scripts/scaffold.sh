@@ -1,33 +1,35 @@
 #!/usr/bin/env bash
 # Idempotent. SessionStart마다 실행. 없는 것만 만들고, 관리 영역은 항상 재생성.
-# 디시플린 주입 + 프로젝트 이슈 로그 스캐폴드 + CLAUDE.md @import 배선.
+# 디시플린 + 어드바이저 인덱스 주입 + 프로젝트 이슈 로그 스캐폴드 + CLAUDE.md @import 배선.
 # 주의: 관리 영역(BEGIN/END 블록)은 항상 CLAUDE.md 끝에 위치한다.
 #       사용자 콘텐츠는 블록 위에 둘 것 — 블록 뒤 내용은 다음 실행 때 블록 앞으로 재배치된다.
 set -euo pipefail
 
 ROOT="${CLAUDE_PROJECT_DIR:-$PWD}"
-# 플러그인 루트: hook이 주는 CLAUDE_PLUGIN_ROOT, 없으면 이 스크립트의 부모(scripts/의 위).
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
 SOLVED="$ROOT/solved_problems.md"
 UNSOLVED="$ROOT/unsolved_problems.md"
 CLAUDE_MD="$ROOT/CLAUDE.md"
-PRINCIPLES_DST="$ROOT/coding-principles.md"
-PRINCIPLES_SRC="$PLUGIN_ROOT/coding-principles.md"
 
 created=""
 
-# 1) 디시플린 정본을 프로젝트로 복사(매 세션 갱신 = SSOT에서 도출).
-#    src==dst(같은 파일)면 복사 생략 — 문자열 + inode(-ef) 양쪽 판정(cp self-truncate 방지).
-if [ -f "$PRINCIPLES_SRC" ]; then
-  if [ "$PRINCIPLES_SRC" = "$PRINCIPLES_DST" ] || { [ -e "$PRINCIPLES_DST" ] && [ "$PRINCIPLES_SRC" -ef "$PRINCIPLES_DST" ]; }; then
-    : # same file — skip copy
+# 1) 플러그인 정본 파일들을 프로젝트로 복사(매 세션 갱신 = SSOT에서 도출).
+#    src==dst(같은 파일)면 생략 — 문자열 + inode(-ef) 양쪽 판정(cp self-truncate 방지).
+copy_from_plugin() {  # $1 = filename
+  local src="$PLUGIN_ROOT/$1" dst="$ROOT/$1"
+  if [ -f "$src" ]; then
+    if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then
+      : # same file — skip copy
+    else
+      cp "$src" "$dst"
+    fi
   else
-    cp "$PRINCIPLES_SRC" "$PRINCIPLES_DST"
+    echo "[disciplined-coder] WARNING: source not found at $src" >&2
   fi
-else
-  echo "[disciplined-coder] WARNING: principles source not found at $PRINCIPLES_SRC" >&2
-fi
+}
+copy_from_plugin coding-principles.md
+copy_from_plugin advisors-index.md
 
 # 2) 이슈 로그 생성(없을 때만)
 if [ ! -f "$SOLVED" ]; then
@@ -66,7 +68,6 @@ touch "$CLAUDE_MD"
 BEGIN_MARK="# BEGIN disciplined-coder (managed — do not edit)"
 END_MARK="# END disciplined-coder (managed — do not edit)"
 
-# 3a) 본문 = 관리 영역 제거. BEGIN만 있고 END 없으면 데이터 손실 방지 위해 strip 생략.
 if grep -qF "$BEGIN_MARK" "$CLAUDE_MD" && grep -qF "$END_MARK" "$CLAUDE_MD"; then
   awk -v b="$BEGIN_MARK" -v e="$END_MARK" '
     { l=$0; sub(/\r$/,"",l) }
@@ -81,21 +82,19 @@ else
   cp "$CLAUDE_MD" "$CLAUDE_MD.tmp"
 fi
 
-# 3b) 후행 빈 줄 제거(블랭크 누적 방지). \r-only 줄도 빈 줄로 간주.
 awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }' "$CLAUDE_MD.tmp" > "$CLAUDE_MD" && rm -f "$CLAUDE_MD.tmp"
 
-# 3c) 관리 영역을 끝에 추가(본문이 있으면 빈 줄 1개로 분리).
 {
   if [ -s "$CLAUDE_MD" ]; then printf '\n'; fi
   printf '%s\n' "$BEGIN_MARK"
-  printf '@coding-principles.md\n@solved_problems.md\n@unsolved_problems.md\n'
+  printf '@coding-principles.md\n@advisors-index.md\n@solved_problems.md\n@unsolved_problems.md\n'
   printf '%s\n' "$END_MARK"
 } >> "$CLAUDE_MD"
 
-# 4) 첫 세션 도달 보강: 디시플린을 stdout으로 출력(SessionStart additionalContext).
-if [ -f "$PRINCIPLES_DST" ]; then
-  cat "$PRINCIPLES_DST"
-fi
+# 4) 첫 세션 도달 보강: 디시플린 + 인덱스를 stdout으로 출력(SessionStart additionalContext).
+for f in coding-principles.md advisors-index.md; do
+  if [ -f "$ROOT/$f" ]; then cat "$ROOT/$f"; fi
+done
 
 # 5) 생성 보고
 if [ -n "$created" ]; then

@@ -19,6 +19,9 @@ check "CLAUDE.md imports solved"           "grep -qxF '@solved_problems.md' '$T1
 check "CLAUDE.md imports unsolved"         "grep -qxF '@unsolved_problems.md' '$T1/CLAUDE.md'"
 check "managed region present once"        "[ \$(grep -cF '# BEGIN disciplined-coder' '$T1/CLAUDE.md') -eq 1 ]"
 check "stdout carries a principle marker"  "printf '%s' \"\$OUT\" | grep -qF '코딩 디시플린'"
+check "index copied to project"            "[ -f '$T1/advisors-index.md' ]"
+check "CLAUDE.md imports index"            "grep -qxF '@advisors-index.md' '$T1/CLAUDE.md'"
+check "stdout carries index marker"        "printf '%s' \"\$OUT\" | grep -qF '검증 어드바이저'"
 
 # --- 케이스 2: 멱등성 (3회 실행해도 영역 1개) ---
 CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T1" bash "$SCAFFOLD" >/dev/null
@@ -38,6 +41,7 @@ check "managed region added once"          "[ \$(grep -cF '# BEGIN disciplined-c
 # --- 케이스 4: src==dst (플러그인 레포 자체) 안전 (cp same-file 비충돌) ---
 T4="$(mktemp -d)"
 cp "$PRINCIPLES_SRC" "$T4/coding-principles.md"
+cp "$HERE/advisors-index.md" "$T4/advisors-index.md"
 echo "[case4] src==dst safety"
 if CLAUDE_PLUGIN_ROOT="$T4" CLAUDE_PROJECT_DIR="$T4" bash "$SCAFFOLD" >/dev/null 2>&1; then s4ok=1; else s4ok=0; fi
 check "same-dir run does not crash"        "[ '$s4ok' -eq 1 ]"
