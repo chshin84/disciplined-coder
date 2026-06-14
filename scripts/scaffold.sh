@@ -28,7 +28,7 @@ copy_from_plugin() {  # $1 = filename
     echo "[disciplined-coder] WARNING: source not found at $src" >&2
   fi
 }
-PLUGIN_FILES="coding-principles.md advisors-index.md"
+PLUGIN_FILES="coding-principles.md domains-index.md"
 for f in $PLUGIN_FILES; do copy_from_plugin "$f"; done
 
 # 2) 이슈 로그 생성(없을 때만)
@@ -90,7 +90,7 @@ awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for
   if [ -s "$CLAUDE_MD" ]; then printf '\n'; fi
   printf '%s\n' "$BEGIN_MARK"
   # unsolved_problems.md는 의도적으로 주입 안 함(백로그 — 메인 세션만 관리). solved는 주입(반복 에러 방지).
-  for f in coding-principles.md advisors-index.md solved_problems.md; do
+  for f in coding-principles.md domains-index.md solved_problems.md; do
     if [ -f "$ROOT/$f" ]; then printf '@%s\n' "$f"; fi
   done
   printf '%s\n' "$END_MARK"

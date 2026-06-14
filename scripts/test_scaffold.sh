@@ -20,9 +20,9 @@ check "CLAUDE.md does NOT import unsolved" "! grep -qxF '@unsolved_problems.md' 
 check "unsolved file still created"        "[ -f '$T1/unsolved_problems.md' ]"
 check "managed region present once"        "[ \$(grep -cF '# BEGIN disciplined-coder' '$T1/CLAUDE.md') -eq 1 ]"
 check "stdout carries a principle marker"  "printf '%s' \"\$OUT\" | grep -qF '코딩 디시플린'"
-check "index copied to project"            "[ -f '$T1/advisors-index.md' ]"
-check "CLAUDE.md imports index"            "grep -qxF '@advisors-index.md' '$T1/CLAUDE.md'"
-check "stdout carries index marker"        "printf '%s' \"\$OUT\" | grep -qF '검증 어드바이저'"
+check "index copied to project"            "[ -f '$T1/domains-index.md' ]"
+check "CLAUDE.md imports index"            "grep -qxF '@domains-index.md' '$T1/CLAUDE.md'"
+check "stdout carries index marker"        "printf '%s' \"\$OUT\" | grep -qF '도메인'"
 
 # --- 케이스 2: 멱등성 (3회 실행해도 영역 1개) ---
 CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T1" bash "$SCAFFOLD" >/dev/null
@@ -30,7 +30,7 @@ CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T1" bash "$SCAFFOLD" >/dev/null
 echo "[case2] idempotency"
 check "still one managed region"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$T1/CLAUDE.md') -eq 1 ]"
 check "principles import not duplicated"   "[ \$(grep -cxF '@coding-principles.md' '$T1/CLAUDE.md') -eq 1 ]"
-check "index import not duplicated"        "[ \$(grep -cxF '@advisors-index.md' '$T1/CLAUDE.md') -eq 1 ]"
+check "index import not duplicated"        "[ \$(grep -cxF '@domains-index.md' '$T1/CLAUDE.md') -eq 1 ]"
 
 # --- 케이스 3: 기존 CLAUDE.md 본문 보존 + 산문 충돌 무해 ---
 T3="$(mktemp -d)"
@@ -43,13 +43,13 @@ check "managed region added once"          "[ \$(grep -cF '# BEGIN disciplined-c
 # --- 케이스 4: src==dst (플러그인 레포 자체) 안전 (cp same-file 비충돌) ---
 T4="$(mktemp -d)"
 cp "$PRINCIPLES_SRC" "$T4/coding-principles.md"
-cp "$HERE/advisors-index.md" "$T4/advisors-index.md"
+cp "$HERE/domains-index.md" "$T4/domains-index.md"
 echo "[case4] src==dst safety"
 if CLAUDE_PLUGIN_ROOT="$T4" CLAUDE_PROJECT_DIR="$T4" bash "$SCAFFOLD" >/dev/null 2>&1; then s4ok=1; else s4ok=0; fi
 check "same-dir run does not crash"        "[ '$s4ok' -eq 1 ]"
 check "same-dir CLAUDE.md has region"      "grep -qF '# BEGIN disciplined-coder' '$T4/CLAUDE.md'"
 check "same-dir principles not truncated"  "[ -s '$T4/coding-principles.md' ]"
-check "same-dir index not truncated"       "[ -s '$T4/advisors-index.md' ]"
+check "same-dir index not truncated"       "[ -s '$T4/domains-index.md' ]"
 
 # --- 케이스 5: 블랭크 라인 비누적 (멱등) ---
 T5="$(mktemp -d)"
