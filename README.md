@@ -28,14 +28,17 @@ disciplined-coder/
 ```
 
 ## 설치 (user scope 권장)
-1. 이 디렉터리를 클론하거나 다운로드한다.
-2. 플러그인을 user scope로 설치:
-   ```
-   claude plugin install ./ --scope user
-   ```
-   `--scope user`로 설치하면 모든 프로젝트에서 자동으로 활성화된다.
-3. Windows 팀원은 **Git Bash 설치 확인** (위 [전제 조건](#전제-조건-prerequisites) 참고).
-4. `claude plugin validate ./ --strict`로 검증.
+
+**A. 마켓플레이스로 (공유·배포)** — 이 레포가 곧 마켓플레이스다(`.claude-plugin/marketplace.json`).
+1. 마켓플레이스 추가: `/plugin marketplace add chshin84/disciplined-coder`
+2. 설치: `/plugin install disciplined-coder@chshin-tools`
+3. 업데이트: `/plugin marketplace update chshin-tools`
+
+**B. 로컬 클론으로 (개발·기여)**
+1. 이 디렉터리를 클론한다.
+2. user scope로 설치: `claude plugin install ./ --scope user` (모든 프로젝트에서 자동 활성화).
+
+공통: Windows는 **Git Bash 필수**(위 [전제 조건](#전제-조건-prerequisites)). `claude plugin validate ./`로 검증(루트 CLAUDE.md 도그푸딩 때문에 `--strict`는 경고로 실패 — 의도된 동작).
 
 ## 사용
 플러그인이 설치(user scope)되면 **별도 조작 없이 자동으로 동작**한다. 새 프로젝트에서 Claude Code 세션을 시작하면 SessionStart hook이 자동 실행되어:

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-marketplace.json",
+  "name": "chshin-tools",
+  "owner": { "name": "chshin84", "email": "chshin84@gmail.com" },
+  "plugins": [
+    {
+      "name": "disciplined-coder",
+      "source": "./",
+      "description": "Team engineering discipline (coding-principles.md, SSOT) auto-injected into every project's CLAUDE.md via a SessionStart hook, plus runtime LLM verification advisors and per-project issue-log scaffolding."
+    }
+  ]
+}
