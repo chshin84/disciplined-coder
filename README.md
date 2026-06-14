@@ -16,7 +16,7 @@
 
 **LLM 런타임 도메인**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(조립·리스크 선택) + `skills/advisor-{correctness,fit,nonfunctional,meta}`(구현 스펙). 이 4종 어드바이저는 Claude Code 에이전트가 아니라 제품 코드가 구현할 청사진이다.
 
-**메타 산출물 리뷰(별개 축)**: spec/plan도 Claude의 LLM 산출물이다. self-review는 작성자 편향에 약하므로, 고위험 spec/plan은 `skills/advisor-spec-review`에 따라 **독립(별도 컨텍스트) 리뷰어 1회**를 돌려 accept/regenerate/escalate로 라우팅한다. 위 4종(제품 런타임 청사진)과 달리 이건 **메인 세션이 직접 서브에이전트를 디스패치**하는 CC 워크플로이며, superpowers self-review를 대체하지 않고 뒤에 레이어를 더한다(저위험은 self-review로 충분 — 블랭킷 금지).
+**메타 산출물 리뷰(별개 축)**: spec/plan도 Claude의 LLM 산출물이다. self-review는 작성자 편향에 약하므로, `skills/advisor-spec-review`에 따라 **PREP(무엇을 볼지 지식주입과 함께 미리 준비 — TDD식) → 독립 read-only 3렌즈(factual/consistency/adversarial) → 메타 집계 → accept/regenerate/escalate**로 검증한다. 위 4종(제품 런타임 청사진)과 달리 **메인 세션이 직접 서브에이전트를 디스패치**하는 CC 워크플로이며 superpowers self-review를 대체하지 않고 뒤에 레이어를 더한다. superpowers 기본 경로에 spec/plan이 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 하드 게이트; 문서 마지막 줄의 `<!-- spec-review: passed … -->` 마커로 해제; 전역 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
 
 ## 이슈 로그 생애주기
 PC 전역 `~/.claude/disciplined-coder/solved_problems.md`/`unsolved_problems.md`는 다음 규약으로 운영된다(디시플린 "절차"에 명시, 모든 세션에 주입):
@@ -35,9 +35,11 @@ disciplined-coder/
 ├── domains-index.md                # 개발 대상(도메인) 참고서 인덱스 (동일 경로로 복사)
 ├── skills/domain-*/SKILL.md        # 도메인 참고서 (docs/plugin seed, ui/app/agent/db stub, llm-runtime) — 온디맨드
 ├── skills/advisor-*/SKILL.md       # 제품 런타임 검증 4종(correctness/fit/nonfunctional/meta) + 메타 산출물 리뷰(advisor-spec-review) — 온디맨드
-├── hooks/hooks.json                # SessionStart → scaffold.sh
+├── hooks/hooks.json                # SessionStart → scaffold.sh · PostToolUse/Stop → spec/plan 리뷰 강제
+├── hooks/spec_review_*.sh          # PostToolUse(감지·신호) · Stop(하드 게이트) — 순수 bash, jq 비의존
 ├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md 관리영역 @import
 ├── scripts/test_scaffold.sh        # scaffold 검증 테스트 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
+├── scripts/test_hooks.sh           # 훅 불변식 테스트 (경로매칭·마커·루프가드·OFF — 계약 FAIL=0)
 ├── commands/bootstrap-issues.md    # 수동 재실행 커맨드
 └── README.md
 ```

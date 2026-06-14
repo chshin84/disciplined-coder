@@ -31,6 +31,6 @@
 ## 절차 (원칙과 별개 — 어드바이저·계획 연결)
 - **런타임 LLM 절차** — LLM 콜로 끝나는 런타임 기능은 단독 결론으로 마치지 말고, `domain-llm-runtime`(+ `advisor-*`) 스킬에서 리스크에 맞는 검증 레이어를 골라 **제품 코드에 구현**한다.
 - **계획 시점 절차** — 설계/계획(brainstorming/writing-plans) 시 **`domains-index`에서 해당 개발 대상의 참고서를 확인**하고 '마땅히 그래야 하는 것'을 명세에 반영한다(명세에 못 담으면 개발 단계에서 고려). 런타임 LLM 기능은 검증 레이어를 포함한다.
-- **메타 산출물 리뷰 절차** — spec/plan도 LLM 산출물이다. self-review는 작성자 편향에 약하므로, **고위험 spec/plan**(아키텍처·비가역·미검증 외부사실·계약변경·다중 서브시스템)은 `advisor-spec-review` 스킬에 따라 **독립(별도 컨텍스트) 리뷰어 1회**를 돌리고 accept/regenerate/escalate로 라우팅한다. 저위험은 현행 self-review로 충분(블랭킷 금지).
+- **메타 산출물 리뷰 절차** — spec/plan도 LLM 산출물이다. self-review는 작성자 편향에 약하므로, `advisor-spec-review` 스킬에 따라 **PREP(검토할 것을 지식주입과 함께 미리 준비 — TDD식) → 독립 read-only 3렌즈(factual/consistency/adversarial) 병렬 → 메타 집계**로 검증하고 accept/regenerate/escalate로 라우팅한다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**(PostToolUse 감지 + Stop 게이트, 문서 마지막 줄 `spec-review` 마커로 해제; 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
 - **이슈 로그 생애주기** — 문제를 인지하면 `unsolved_problems.md`에 등록하고, 해결되면 `solved_problems.md`로 옮긴다(항목: 문제 → 원인 → 해결). 발동 시점: **검증/리뷰 작업이 끝날 때 등록**, **테스트가 통과로 바뀔 때 solved로 이동**.
 - **단일 작성자 + 보고** — 이 로그 파일들은 **메인 세션(오케스트레이터)만 쓴다**(동시 쓰기 손상 방지). 서브에이전트는 직접 쓰지 말고 발견한 문제를 **리턴값으로 보고**하면 메인이 취합·dedup해 기록한다. 세션 중 최신 항목이 필요한 서브에이전트에는 메인이 dispatch 프롬프트에 관련 항목을 실어 전달한다. (`unsolved_problems.md`의 🔴는 누구도 자율 구현하지 않는다.)
