@@ -14,7 +14,9 @@
 ## 도메인 참고서 (설계 시점) + 런타임 검증
 개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(`~/.claude/CLAUDE.md`에 자동 주입되는 목차)가 도메인 목록과 "언제·어느 참고서"를 안내하고, 각 `skills/domain-*`가 상세(온디맨드)를 제공한다 — 설계/계획 시 명세에 반영, 개발 시 폴백. 도메인 상세 일부는 아직 stub(통증 있는 것부터 채움).
 
-**LLM 런타임 도메인**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(조립·리스크 선택) + `skills/advisor-{correctness,fit,nonfunctional,meta}`(구현 스펙). 어드바이저는 Claude Code 에이전트가 아니라 제품 코드가 구현할 청사진이다.
+**LLM 런타임 도메인**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(조립·리스크 선택) + `skills/advisor-{correctness,fit,nonfunctional,meta}`(구현 스펙). 이 4종 어드바이저는 Claude Code 에이전트가 아니라 제품 코드가 구현할 청사진이다.
+
+**메타 산출물 리뷰(별개 축)**: spec/plan도 Claude의 LLM 산출물이다. self-review는 작성자 편향에 약하므로, 고위험 spec/plan은 `skills/advisor-spec-review`에 따라 **독립(별도 컨텍스트) 리뷰어 1회**를 돌려 accept/regenerate/escalate로 라우팅한다. 위 4종(제품 런타임 청사진)과 달리 이건 **메인 세션이 직접 서브에이전트를 디스패치**하는 CC 워크플로이며, superpowers self-review를 대체하지 않고 뒤에 레이어를 더한다(저위험은 self-review로 충분 — 블랭킷 금지).
 
 ## 이슈 로그 생애주기
 PC 전역 `~/.claude/disciplined-coder/solved_problems.md`/`unsolved_problems.md`는 다음 규약으로 운영된다(디시플린 "절차"에 명시, 모든 세션에 주입):
@@ -32,7 +34,7 @@ disciplined-coder/
 ├── coding-principles.md            # 디시플린 정본 (SSOT) — hook이 ~/.claude/disciplined-coder/로 복사
 ├── domains-index.md                # 개발 대상(도메인) 참고서 인덱스 (동일 경로로 복사)
 ├── skills/domain-*/SKILL.md        # 도메인 참고서 (docs/plugin seed, ui/app/agent/db stub, llm-runtime) — 온디맨드
-├── skills/advisor-*/SKILL.md       # LLM 런타임 검증 구현 스펙 4종 (온디맨드)
+├── skills/advisor-*/SKILL.md       # 제품 런타임 검증 4종(correctness/fit/nonfunctional/meta) + 메타 산출물 리뷰(advisor-spec-review) — 온디맨드
 ├── hooks/hooks.json                # SessionStart → scaffold.sh
 ├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md 관리영역 @import
 ├── scripts/test_scaffold.sh        # scaffold 검증 테스트 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
