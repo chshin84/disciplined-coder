@@ -1,6 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-marketplace.json",
   "name": "chshin-tools",
+  "description": "chshin84의 Claude Code 도구 마켓플레이스 (disciplined-coder 등).",
   "owner": { "name": "chshin84", "email": "chshin84@gmail.com" },
   "plugins": [
     {
