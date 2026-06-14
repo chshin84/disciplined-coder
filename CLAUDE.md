@@ -5,7 +5,7 @@
 모든 에이전트가 동일한 디시플린을 따른다.
 
 - 디시플린 정본: `coding-principles.md` (SSOT). 직접 원칙을 추가할 땐 여기만 고친다.
-- scaffold 검증: `bash scripts/test_scaffold.sh` (PASS=14 기대).
+- scaffold 검증: `bash scripts/test_scaffold.sh` (PASS=22 기대).
 - 변경 후: 위 테스트 + `claude plugin validate ./ --strict`.
 - 설계/계획 문서: `docs/superpowers/`.
 
