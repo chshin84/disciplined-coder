@@ -1,72 +1,65 @@
 #!/usr/bin/env bash
-# scaffold.sh 동작 검증. 실패 시 즉시 exit 1.
+# scaffold.sh(PC-레벨) 검증. 계약: FAIL=0.
 set -euo pipefail
-
-HERE="$(cd "$(dirname "$0")/.." && pwd)"   # 플러그인 루트 (scripts/의 부모)
+HERE="$(cd "$(dirname "$0")/.." && pwd)"
 SCAFFOLD="$HERE/scripts/scaffold.sh"
-PRINCIPLES_SRC="$HERE/coding-principles.md"
 
 pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
 
-# --- 케이스 1: 신규 프로젝트 ---
-T1="$(mktemp -d)"
-OUT="$(CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T1" bash "$SCAFFOLD")"
-echo "[case1] fresh project"
-check "principles copied to project"      "[ -f '$T1/coding-principles.md' ]"
-check "CLAUDE.md imports principles"       "grep -qxF '@coding-principles.md' '$T1/CLAUDE.md'"
-check "CLAUDE.md imports solved"           "grep -qxF '@solved_problems.md' '$T1/CLAUDE.md'"
-check "CLAUDE.md does NOT import unsolved" "! grep -qxF '@unsolved_problems.md' '$T1/CLAUDE.md'"
-check "unsolved file still created"        "[ -f '$T1/unsolved_problems.md' ]"
-check "managed region present once"        "[ \$(grep -cF '# BEGIN disciplined-coder' '$T1/CLAUDE.md') -eq 1 ]"
-check "stdout carries a principle marker"  "printf '%s' \"\$OUT\" | grep -qF '코딩 디시플린'"
-check "index copied to project"            "[ -f '$T1/domains-index.md' ]"
-check "CLAUDE.md imports index"            "grep -qxF '@domains-index.md' '$T1/CLAUDE.md'"
-check "stdout carries index marker"        "printf '%s' \"\$OUT\" | grep -qF '도메인'"
+run() {  # $1=HOME dir, $2=project dir  → echoes scaffold stdout
+  CLAUDE_HOME_DIR="$1/.claude" CLAUDE_PROJECT_DIR="$2" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"
+}
 
-# --- 케이스 2: 멱등성 (3회 실행해도 영역 1개) ---
-CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T1" bash "$SCAFFOLD" >/dev/null
-CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T1" bash "$SCAFFOLD" >/dev/null
-echo "[case2] idempotency"
-check "still one managed region"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$T1/CLAUDE.md') -eq 1 ]"
-check "principles import not duplicated"   "[ \$(grep -cxF '@coding-principles.md' '$T1/CLAUDE.md') -eq 1 ]"
-check "index import not duplicated"        "[ \$(grep -cxF '@domains-index.md' '$T1/CLAUDE.md') -eq 1 ]"
+# --- 케이스 1: 신규 PC ---
+H1="$(mktemp -d)"; P1="$(mktemp -d)"
+OUT="$(run "$H1" "$P1")"
+K="$H1/.claude/disciplined-coder"; UC="$H1/.claude/CLAUDE.md"
+echo "[case1] fresh PC"
+check "principles in PC dir"          "[ -f '$K/coding-principles.md' ]"
+check "domains-index in PC dir"       "[ -f '$K/domains-index.md' ]"
+check "solved created in PC dir"      "[ -f '$K/solved_problems.md' ]"
+check "unsolved created in PC dir"    "[ -f '$K/unsolved_problems.md' ]"
+check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/coding-principles.md' '$UC'"
+check "user CLAUDE.md imports domains"    "grep -qxF '@disciplined-coder/domains-index.md' '$UC'"
+check "user CLAUDE.md imports solved"     "grep -qxF '@disciplined-coder/solved_problems.md' '$UC'"
+check "user CLAUDE.md does NOT import unsolved" "! grep -qxF '@disciplined-coder/unsolved_problems.md' '$UC'"
+check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
+check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '코딩 디시플린'"
 
-# --- 케이스 3: 기존 CLAUDE.md 본문 보존 + 산문 충돌 무해 ---
-T3="$(mktemp -d)"
-printf 'preexisting line\nSee @coding-principles.md in prose.\n' > "$T3/CLAUDE.md"
-CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T3" bash "$SCAFFOLD" >/dev/null
-echo "[case3] preserve existing content"
-check "existing prose preserved"           "grep -qF 'preexisting line' '$T3/CLAUDE.md'"
-check "managed region added once"          "[ \$(grep -cF '# BEGIN disciplined-coder' '$T3/CLAUDE.md') -eq 1 ]"
+# --- 케이스 2: 프로젝트 폴더 무오염 ---
+echo "[case2] project untouched"
+check "no principles in project"      "[ ! -f '$P1/coding-principles.md' ]"
+check "no solved in project"          "[ ! -f '$P1/solved_problems.md' ]"
+check "no CLAUDE.md in project"       "[ ! -f '$P1/CLAUDE.md' ]"
 
-# --- 케이스 4: src==dst (플러그인 레포 자체) 안전 (cp same-file 비충돌) ---
-T4="$(mktemp -d)"
-cp "$PRINCIPLES_SRC" "$T4/coding-principles.md"
-cp "$HERE/domains-index.md" "$T4/domains-index.md"
-echo "[case4] src==dst safety"
-if CLAUDE_PLUGIN_ROOT="$T4" CLAUDE_PROJECT_DIR="$T4" bash "$SCAFFOLD" >/dev/null 2>&1; then s4ok=1; else s4ok=0; fi
-check "same-dir run does not crash"        "[ '$s4ok' -eq 1 ]"
-check "same-dir CLAUDE.md has region"      "grep -qF '# BEGIN disciplined-coder' '$T4/CLAUDE.md'"
-check "same-dir principles not truncated"  "[ -s '$T4/coding-principles.md' ]"
-check "same-dir index not truncated"       "[ -s '$T4/domains-index.md' ]"
+# --- 케이스 3: 멱등성 (3회) ---
+run "$H1" "$P1" >/dev/null; run "$H1" "$P1" >/dev/null
+echo "[case3] idempotency"
+check "still one region"              "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
+check "principles import not dup"     "[ \$(grep -cxF '@disciplined-coder/coding-principles.md' '$UC') -eq 1 ]"
 
-# --- 케이스 5: 블랭크 라인 비누적 (멱등) ---
-T5="$(mktemp -d)"
-printf 'hello\n' > "$T5/CLAUDE.md"
-for _ in 1 2 3; do CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T5" bash "$SCAFFOLD" >/dev/null; done
-echo "[case5] no blank-line accumulation"
-check "blank lines bounded (<=1) after 3 runs" "[ \$(grep -c '^\$' '$T5/CLAUDE.md') -le 1 ]"
-check "user content preserved"              "grep -qxF 'hello' '$T5/CLAUDE.md'"
+# --- 케이스 4: solved 누적 보존 ---
+echo "[case4] solved preserved"
+printf '\n- 기존 항목 보존 확인\n' >> "$K/solved_problems.md"
+run "$H1" "$P1" >/dev/null
+check "solved entry preserved"        "grep -qF '기존 항목 보존 확인' '$K/solved_problems.md'"
 
-# --- 케이스 6: CRLF 관리 영역 인식(멱등) ---
-T6="$(mktemp -d)"
-printf 'user line\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@coding-principles.md\r\n@solved_problems.md\r\n@unsolved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$T6/CLAUDE.md"
-CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T6" bash "$SCAFFOLD" >/dev/null
+# --- 케이스 5: 기존 user CLAUDE.md 내용 보존 + 블랭크 비누적 ---
+H5="$(mktemp -d)"; P5="$(mktemp -d)"
+mkdir -p "$H5/.claude"; printf 'my personal global note\n' > "$H5/.claude/CLAUDE.md"
+for _ in 1 2 3; do run "$H5" "$P5" >/dev/null; done
+UC5="$H5/.claude/CLAUDE.md"
+echo "[case5] preserve user content + no blank accumulation"
+check "personal note preserved"      "grep -qxF 'my personal global note' '$UC5'"
+check "one region after 3 runs"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC5') -eq 1 ]"
+check "blank lines bounded (<=1)"    "[ \$(grep -c '^\$' '$UC5') -le 1 ]"
+
+# --- 케이스 6: CRLF 관리영역 인식 ---
+H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
+printf 'note\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/coding-principles.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H6/.claude/CLAUDE.md"
+run "$H6" "$P6" >/dev/null
 echo "[case6] CRLF region recognized"
-check "CRLF region not duplicated"         "[ \$(grep -cF '# BEGIN disciplined-coder' '$T6/CLAUDE.md') -eq 1 ]"
-check "CRLF user line preserved"           "grep -qF 'user line' '$T6/CLAUDE.md'"
+check "CRLF region not duplicated"   "[ \$(grep -cF '# BEGIN disciplined-coder' '$H6/.claude/CLAUDE.md') -eq 1 ]"
 
-echo "----"
-echo "PASS=$pass FAIL=$fail"
-[ "$fail" -eq 0 ]
+echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
