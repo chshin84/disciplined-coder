@@ -16,5 +16,4 @@
 @coding-principles.md
 @advisors-index.md
 @solved_problems.md
-@unsolved_problems.md
 # END disciplined-coder (managed — do not edit)
