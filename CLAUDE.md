@@ -1,19 +1,10 @@
 # disciplined-coder (개발 노트)
 
-이 레포는 disciplined-coder 플러그인 자체다. 플러그인을 **자기 자신에게 적용(도그푸딩)**한다 —
-아래 관리 영역이 `coding-principles.md`(SSOT)와 이슈 로그를 @import 하므로, 이 레포에서 작업하는
-모든 에이전트가 동일한 디시플린을 따른다.
+이 레포는 disciplined-coder 플러그인 자체다. 디시플린은 **PC-레벨**로 적용된다
+(설치 후 SessionStart hook이 `~/.claude/disciplined-coder/` + `~/.claude/CLAUDE.md`를 셋업).
+따라서 이 레포 루트엔 프로젝트-레벨 사본을 두지 않는다(coding-principles.md·domains-index.md는 플러그인 SSOT 원본).
 
-- 디시플린 정본: `coding-principles.md` (SSOT). 직접 원칙을 추가할 땐 여기만 고친다.
-- scaffold 검증: `bash scripts/test_scaffold.sh` (계약은 **FAIL=0** = 전부 통과. 기대 PASS 개수를 매직 넘버로 박지 말 것 — `SSOT`).
-- 변경 후: 위 테스트 + `claude plugin validate ./` (non-strict; `--strict`는 도그푸딩 루트 CLAUDE.md 때문에 의도적 실패).
-- 설계/계획 문서: `docs/superpowers/`.
-
-> 아래 "BEGIN/END disciplined-coder" 관리 영역은 SessionStart hook이 자동 생성·갱신한다.
-> **직접 편집 금지.** 프로젝트 콘텐츠는 항상 이 관리 영역 **위**에 둘 것.
-
-# BEGIN disciplined-coder (managed — do not edit)
-@coding-principles.md
-@domains-index.md
-@solved_problems.md
-# END disciplined-coder (managed — do not edit)
+- 디시플린 정본: `coding-principles.md` (SSOT, ID 글로서리·무순서). 도메인 목차: `domains-index.md`.
+- scaffold 검증: `bash scripts/test_scaffold.sh` (계약 **FAIL=0**. 매직 넘버 금지 — `SSOT`).
+- 변경 후: 위 테스트 + `claude plugin validate ./` (non-strict).
+- 설계/계획: `docs/superpowers/`.
