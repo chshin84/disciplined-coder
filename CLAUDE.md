@@ -14,6 +14,6 @@
 
 # BEGIN disciplined-coder (managed — do not edit)
 @coding-principles.md
-@advisors-index.md
+@domains-index.md
 @solved_problems.md
 # END disciplined-coder (managed — do not edit)

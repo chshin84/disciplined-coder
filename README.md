@@ -10,8 +10,10 @@
 - **일반 지식**(원칙 + 공통 gotchas) → 디시플린(`coding-principles.md`, SSOT) → SessionStart hook이 각 프로젝트의 CLAUDE.md에 `@import`로 자동 주입(+ 첫 세션 stdout 보강) → 메인 + 모든 서브에이전트 도달.
 - **프로젝트 고유 로그**(solved/unsolved) → SessionStart hook이 신규 프로젝트에 빈 파일 + CLAUDE.md `@import`를 **없으면 생성**(idempotent).
 
-## 런타임 LLM 검증 (어드바이저)
-제품이 런타임에 LLM을 호출하는 기능은 단독 콜로 끝내지 않는다. `advisors-index.md`(모든 프로젝트 CLAUDE.md에 자동 주입)가 4종 어드바이저(정합성·적합성·비기능·메타)와 리스크별 선택·조립을 안내하고, 각 `skills/advisor-*`가 구현 스펙(렌즈·레퍼런스 프롬프트·출력 스키마·배선)을 온디맨드로 제공한다. 어드바이저는 Claude Code 에이전트가 아니라 **제품 코드가 구현할 청사진**이다.
+## 도메인 참고서 (설계 시점) + 런타임 검증
+개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(모든 프로젝트 CLAUDE.md에 자동 주입되는 목차)가 도메인 목록과 "언제·어느 참고서"를 안내하고, 각 `skills/domain-*`가 상세(온디맨드)를 제공한다 — 설계/계획 시 명세에 반영, 개발 시 폴백. 도메인 상세 일부는 아직 stub(통증 있는 것부터 채움).
+
+**LLM 런타임 도메인**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(조립·리스크 선택) + `skills/advisor-{correctness,fit,nonfunctional,meta}`(구현 스펙). 어드바이저는 Claude Code 에이전트가 아니라 제품 코드가 구현할 청사진이다.
 
 ## 이슈 로그 생애주기
 프로젝트별 `solved_problems.md`/`unsolved_problems.md`는 다음 규약으로 운영된다(디시플린 "절차"에 명시, 모든 세션에 주입):
@@ -27,8 +29,9 @@
 disciplined-coder/
 ├── .claude-plugin/plugin.json      # 매니페스트
 ├── coding-principles.md            # 디시플린 정본 (SSOT) — hook이 프로젝트로 복사
-├── advisors-index.md               # 런타임 LLM 검증 어드바이저 인덱스 (@import)
-├── skills/advisor-*/SKILL.md       # 어드바이저 4종 스펙 (온디맨드)
+├── domains-index.md                # 개발 대상(도메인) 참고서 인덱스 (@import)
+├── skills/domain-*/SKILL.md        # 도메인 참고서 (docs/plugin seed, ui/app/agent/db stub, llm-runtime)
+├── skills/advisor-*/SKILL.md       # LLM 런타임 검증 구현 스펙 4종 (온디맨드)
 ├── hooks/hooks.json                # SessionStart → scaffold.sh
 ├── scripts/scaffold.sh             # 멱등: principles 복사 + CLAUDE.md 관리영역 @import + stdout
 ├── scripts/test_scaffold.sh        # scaffold 검증 테스트
