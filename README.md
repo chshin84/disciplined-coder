@@ -10,11 +10,16 @@
 - **일반 지식**(원칙 + 공통 gotchas) → 디시플린(`coding-principles.md`, SSOT) → SessionStart hook이 각 프로젝트의 CLAUDE.md에 `@import`로 자동 주입(+ 첫 세션 stdout 보강) → 메인 + 모든 서브에이전트 도달.
 - **프로젝트 고유 로그**(solved/unsolved) → SessionStart hook이 신규 프로젝트에 빈 파일 + CLAUDE.md `@import`를 **없으면 생성**(idempotent).
 
+## 런타임 LLM 검증 (어드바이저)
+제품이 런타임에 LLM을 호출하는 기능은 단독 콜로 끝내지 않는다. `advisors-index.md`(모든 프로젝트 CLAUDE.md에 자동 주입)가 4종 어드바이저(정합성·적합성·비기능·메타)와 리스크별 선택·조립을 안내하고, 각 `skills/advisor-*`가 구현 스펙(렌즈·레퍼런스 프롬프트·출력 스키마·배선)을 온디맨드로 제공한다. 어드바이저는 Claude Code 에이전트가 아니라 **제품 코드가 구현할 청사진**이다.
+
 ## 구성
 ```
 disciplined-coder/
 ├── .claude-plugin/plugin.json      # 매니페스트
 ├── coding-principles.md            # 디시플린 정본 (SSOT) — hook이 프로젝트로 복사
+├── advisors-index.md               # 런타임 LLM 검증 어드바이저 인덱스 (@import)
+├── skills/advisor-*/SKILL.md       # 어드바이저 4종 스펙 (온디맨드)
 ├── hooks/hooks.json                # SessionStart → scaffold.sh
 ├── scripts/scaffold.sh             # 멱등: principles 복사 + CLAUDE.md 관리영역 @import + stdout
 ├── scripts/test_scaffold.sh        # scaffold 검증 테스트
