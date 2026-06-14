@@ -29,6 +29,7 @@ CLAUDE_PLUGIN_ROOT="$HERE" CLAUDE_PROJECT_DIR="$T1" bash "$SCAFFOLD" >/dev/null
 echo "[case2] idempotency"
 check "still one managed region"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$T1/CLAUDE.md') -eq 1 ]"
 check "principles import not duplicated"   "[ \$(grep -cxF '@coding-principles.md' '$T1/CLAUDE.md') -eq 1 ]"
+check "index import not duplicated"        "[ \$(grep -cxF '@advisors-index.md' '$T1/CLAUDE.md') -eq 1 ]"
 
 # --- 케이스 3: 기존 CLAUDE.md 본문 보존 + 산문 충돌 무해 ---
 T3="$(mktemp -d)"
@@ -46,6 +47,8 @@ echo "[case4] src==dst safety"
 if CLAUDE_PLUGIN_ROOT="$T4" CLAUDE_PROJECT_DIR="$T4" bash "$SCAFFOLD" >/dev/null 2>&1; then s4ok=1; else s4ok=0; fi
 check "same-dir run does not crash"        "[ '$s4ok' -eq 1 ]"
 check "same-dir CLAUDE.md has region"      "grep -qF '# BEGIN disciplined-coder' '$T4/CLAUDE.md'"
+check "same-dir principles not truncated"  "[ -s '$T4/coding-principles.md' ]"
+check "same-dir index not truncated"       "[ -s '$T4/advisors-index.md' ]"
 
 # --- 케이스 5: 블랭크 라인 비누적 (멱등) ---
 T5="$(mktemp -d)"

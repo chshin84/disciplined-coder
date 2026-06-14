@@ -28,8 +28,8 @@ copy_from_plugin() {  # $1 = filename
     echo "[disciplined-coder] WARNING: source not found at $src" >&2
   fi
 }
-copy_from_plugin coding-principles.md
-copy_from_plugin advisors-index.md
+PLUGIN_FILES="coding-principles.md advisors-index.md"
+for f in $PLUGIN_FILES; do copy_from_plugin "$f"; done
 
 # 2) 이슈 로그 생성(없을 때만)
 if [ ! -f "$SOLVED" ]; then
@@ -87,12 +87,14 @@ awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for
 {
   if [ -s "$CLAUDE_MD" ]; then printf '\n'; fi
   printf '%s\n' "$BEGIN_MARK"
-  printf '@coding-principles.md\n@advisors-index.md\n@solved_problems.md\n@unsolved_problems.md\n'
+  for f in coding-principles.md advisors-index.md solved_problems.md unsolved_problems.md; do
+    if [ -f "$ROOT/$f" ]; then printf '@%s\n' "$f"; fi
+  done
   printf '%s\n' "$END_MARK"
 } >> "$CLAUDE_MD"
 
 # 4) 첫 세션 도달 보강: 디시플린 + 인덱스를 stdout으로 출력(SessionStart additionalContext).
-for f in coding-principles.md advisors-index.md; do
+for f in $PLUGIN_FILES; do
   if [ -f "$ROOT/$f" ]; then cat "$ROOT/$f"; fi
 done
 
