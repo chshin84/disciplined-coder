@@ -39,6 +39,7 @@ if [ ! -f "$SOLVED" ]; then
 작업 중 발견·해결된 문제 기록. 각 항목: 문제 → 원인 → 해결.
 일반화 가능한 항목은 디시플린(coding-principles.md)으로 승격하고 여기서는 제거(SSOT).
 (미해결·대기 항목은 `unsolved_problems.md`.)
+등록·이동은 메인 세션이 수행한다(생애주기 규약: coding-principles.md "절차").
 EOF
   created="$created solved_problems.md"
 fi
@@ -52,6 +53,7 @@ if [ ! -f "$UNSOLVED" ]; then
 > 참고만 하고, 필요하면 메인 세션에 결정 요청을 올려라.
 
 발견됐으나 안 끝난 것 + 사용자 결정이 필요한 것. (해결되면 `solved_problems.md`로 이동.)
+등록은 검증/리뷰 종료 시, solved 이동은 테스트 통과 시 — 메인 세션이 수행(coding-principles.md "절차").
 범례: 🔴 사용자 결정 필요(에이전트 자율 구현 금지) · 🟡 방향 정해짐·구현 대기 · 🔵 향후/선택.
 
 ## 🔴 결정 필요
