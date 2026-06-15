@@ -67,7 +67,7 @@ awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for
 {
   if [ -s "$UC" ]; then printf '\n'; fi
   printf '%s\n' "$BEGIN_MARK"
-  # unsolved는 미주입(백로그). 스킬(domain-*/advisor-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
+  # unsolved는 미주입(백로그). 스킬(domain-*/reviewer-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
   printf '@disciplined-coder/agent-principles.md\n@disciplined-coder/domains-index.md\n@disciplined-coder/solved_problems.md\n'
   printf '%s\n' "$END_MARK"
 } >> "$UC"

@@ -10,7 +10,7 @@
 | 앱 | 애플리케이션 | 설계·개발 | `domain-app` | stub |
 | 에이전트 | 에이전트 시스템 | 설계·개발 | `domain-agent` | stub |
 | DB | 스키마·쿼리·마이그레이션 | 설계·개발 | `domain-db` | stub |
-| LLM 런타임 | 제품이 런타임에 LLM 호출 | **런타임** | `domain-llm-runtime` (+ `advisor-*`) | done |
+| LLM 런타임 | 제품이 런타임에 LLM 호출 | **런타임** | `domain-llm-runtime` (+ `reviewer-*`·`meta-aggregate`) | done |
 
 ## 사용
 - **설계/계획 시**: 만들 대상이 위 도메인이면 해당 스킬을 열어 "마땅히 그래야 하는 것"을 명세에 반영.

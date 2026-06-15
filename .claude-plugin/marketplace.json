@@ -7,7 +7,7 @@
     {
       "name": "disciplined-coder",
       "source": "./",
-      "description": "Team engineering discipline (agent-principles.md, SSOT) auto-injected into every project's CLAUDE.md via a SessionStart hook, plus runtime LLM verification advisors and per-project issue-log scaffolding."
+      "description": "Team engineering discipline (agent-principles.md, SSOT) auto-injected into every project's CLAUDE.md via a SessionStart hook, plus runtime LLM verification reviewers and per-project issue-log scaffolding."
     }
   ]
 }

@@ -9,14 +9,14 @@
 ## 무엇을 자동화하나
 - **일반 지식**(원칙 + 공통 gotchas + 도메인 목차) → 디시플린(`agent-principles.md`, SSOT) → SessionStart hook이 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선(+ 첫 세션 stdout 보강) → 메인 + 모든 서브에이전트 도달. **프로젝트 폴더는 건드리지 않는다.**
 - **이슈 로그**(solved/unsolved) → `~/.claude/disciplined-coder/`에 없으면 생성(PC 전역, idempotent). 프로젝트별 분리가 아닌 PC 전역 누적.
-- **스킬**(domain-*/advisor-*) → 플러그인에서 온디맨드 로드. 복사·주입 안 함.
+- **스킬**(domain-*/reviewer-*/meta-aggregate) → 플러그인에서 온디맨드 로드. 복사·주입 안 함.
 
 ## 도메인 참고서 (설계 시점) + 런타임 검증
 개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(`~/.claude/CLAUDE.md`에 자동 주입되는 목차)가 도메인 목록과 "언제·어느 참고서"를 안내하고, 각 `skills/domain-*`가 상세(온디맨드)를 제공한다 — 설계/계획 시 명세에 반영, 개발 시 폴백. 도메인 상세 일부는 아직 stub(통증 있는 것부터 채움).
 
-**LLM 런타임 도메인**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(조립·리스크 선택) + `skills/advisor-{correctness,fit,nonfunctional,meta}`(구현 스펙). 이 4종 어드바이저는 Claude Code 에이전트가 아니라 제품 코드가 구현할 청사진이다.
+**LLM 런타임 도메인**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(호출자 — 리스크 선택·조립·비기능 체크리스트)이 리스크에 따라 `skills/reviewer-{grounding,fit}`(렌즈)와 `skills/meta-aggregate`(집계)를 제품 코드의 리뷰 콜로 구현하게 한다. 리뷰어는 Claude Code 에이전트가 아니라 제품 코드가 구현할 청사진이다.
 
-**메타 산출물 리뷰(별개 축)**: spec/plan도 Claude의 LLM 산출물이다. self-review는 작성자 편향에 약하므로, `skills/advisor-spec-review`에 따라 **PREP(무엇을 볼지 지식주입과 함께 미리 준비 — TDD식) → 독립 read-only 3렌즈(factual/consistency/adversarial) → 메타 집계 → accept/regenerate/escalate**로 검증한다. 위 4종(제품 런타임 청사진)과 달리 **메인 세션이 직접 서브에이전트를 디스패치**하는 CC 워크플로이며 superpowers self-review를 대체하지 않고 뒤에 레이어를 더한다. superpowers 기본 경로에 spec/plan이 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 하드 게이트; 문서 마지막 줄의 `<!-- spec-review: passed … -->` 마커로 해제; 전역 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
+**메타 산출물 리뷰(별개 축)**: spec/plan도 Claude의 LLM 산출물이다. self-review는 작성자 편향에 약하므로, `skills/domain-spec-review`에 따라 **PREP(무엇을 볼지 지식주입과 함께 미리 준비 — TDD식) → 독립 read-only 3렌즈(reviewer-grounding/consistency/adversarial) → meta-aggregate 집계 → accept/regenerate/escalate**로 검증한다. 위 런타임 리뷰어(제품 청사진)와 달리 **메인 세션이 직접 서브에이전트를 디스패치**하는 CC 워크플로이며 superpowers self-review를 대체하지 않고 뒤에 레이어를 더한다. superpowers 기본 경로에 spec/plan이 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 하드 게이트; 문서 마지막 줄의 `<!-- spec-review: passed … -->` 마커로 해제; 전역 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
 
 ## 이슈 로그 생애주기
 PC 전역 `~/.claude/disciplined-coder/solved_problems.md`/`unsolved_problems.md`는 다음 규약으로 운영된다(디시플린 "절차"에 명시, 모든 세션에 주입):
@@ -33,8 +33,9 @@ disciplined-coder/
 ├── .claude-plugin/plugin.json      # 매니페스트
 ├── agent-principles.md            # 디시플린 정본 (SSOT) — hook이 ~/.claude/disciplined-coder/로 복사
 ├── domains-index.md                # 개발 대상(도메인) 참고서 인덱스 (동일 경로로 복사)
-├── skills/domain-*/SKILL.md        # 도메인 참고서 (docs/plugin seed, ui/app/agent/db stub, llm-runtime) — 온디맨드
-├── skills/advisor-*/SKILL.md       # 제품 런타임 검증 4종(correctness/fit/nonfunctional/meta) + 메타 산출물 리뷰(advisor-spec-review) — 온디맨드
+├── skills/domain-*/SKILL.md        # 도메인 참고서(docs/plugin/llm-runtime) + 호출자 domain-spec-review — 온디맨드
+├── skills/reviewer-*/SKILL.md      # 리뷰어 렌즈(grounding/fit/consistency/adversarial) — 온디맨드
+├── skills/meta-aggregate/SKILL.md  # 리뷰어 집계·결정(코드 설계도) — 온디맨드
 ├── hooks/hooks.json                # SessionStart → scaffold.sh · PostToolUse/Stop → spec/plan 리뷰 강제
 ├── hooks/spec_review_*.sh          # PostToolUse(감지·신호) · Stop(하드 게이트) — 순수 bash, jq 비의존
 ├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md 관리영역 @import

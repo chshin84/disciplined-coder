@@ -33,7 +33,7 @@ while IFS= read -r f; do
 done < <(git status --porcelain --untracked-files=all -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null | cut -c4-)
 
 if [ -n "$unreviewed" ]; then
-  reason="미리뷰 spec/plan:$unreviewed — disciplined-coder advisor-spec-review(3렌즈+PREP)를 수행하고 문서 마지막 줄에 spec-review 마커(passed 또는 escalated, HTML 주석)를 남긴 뒤 종료하라."
+  reason="미리뷰 spec/plan:$unreviewed — disciplined-coder domain-spec-review(3렌즈+PREP)를 수행하고 문서 마지막 줄에 spec-review 마커(passed 또는 escalated, HTML 주석)를 남긴 뒤 종료하라."
   esc="$(printf '%s' "$reason" | sed 's/\\/\\\\/g; s/"/\\"/g')"
   printf '{"decision":"block","reason":"%s"}\n' "$esc"
 fi

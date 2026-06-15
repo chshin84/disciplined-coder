@@ -20,7 +20,7 @@ if [ -f "$FILE" ]; then
   esac
 fi
 base="$(basename "$FILE")"
-msg="📋 spec/plan(${base}) 작성됨 — 진행 전 반드시 disciplined-coder advisor-spec-review 스킬로 3렌즈+PREP 독립 리뷰를 수행하고, 완료 시 문서 마지막 줄에 spec-review passed 마커(HTML 주석)를 남겨라."
+msg="📋 spec/plan(${base}) 작성됨 — 진행 전 반드시 disciplined-coder domain-spec-review 스킬로 3렌즈+PREP 독립 리뷰를 수행하고, 완료 시 문서 마지막 줄에 spec-review passed 마커(HTML 주석)를 남겨라."
 esc="$(printf '%s' "$msg" | sed 's/\\/\\\\/g; s/"/\\"/g')"
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0
