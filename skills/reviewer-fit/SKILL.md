@@ -25,6 +25,6 @@ description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "fit", "issues": [ { "severity": "critical|major|minor", "type": "schema|format|style|constraint|compat", "where": "...", "detail": "..." } ], "verdict": "ok|revise", "notes": "" }
+{ "lens": "fit", "issues": [ { "severity": "critical|major|minor", "type": "schema|format|style|constraint|compat", "where": "...", "detail": "..." } ], "notes": "" }
 ```
-critical(스키마 깨짐)은 즉시 regenerate 또는 폴백.
+통과/실패 신호는 이슈의 `severity` 하나다(별도 verdict 필드를 두지 않는다 — `SSOT`). 라우팅(critical→regenerate/폴백 등)은 `meta-aggregate`의 결정 정책을 따른다.
