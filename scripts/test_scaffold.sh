@@ -16,20 +16,20 @@ H1="$(mktemp -d)"; P1="$(mktemp -d)"
 OUT="$(run "$H1" "$P1")"
 K="$H1/.claude/disciplined-coder"; UC="$H1/.claude/CLAUDE.md"
 echo "[case1] fresh PC"
-check "principles in PC dir"          "[ -f '$K/coding-principles.md' ]"
+check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
 check "domains-index in PC dir"       "[ -f '$K/domains-index.md' ]"
 check "solved created in PC dir"      "[ -f '$K/solved_problems.md' ]"
 check "unsolved created in PC dir"    "[ -f '$K/unsolved_problems.md' ]"
-check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/coding-principles.md' '$UC'"
+check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/agent-principles.md' '$UC'"
 check "user CLAUDE.md imports domains"    "grep -qxF '@disciplined-coder/domains-index.md' '$UC'"
 check "user CLAUDE.md imports solved"     "grep -qxF '@disciplined-coder/solved_problems.md' '$UC'"
 check "user CLAUDE.md does NOT import unsolved" "! grep -qxF '@disciplined-coder/unsolved_problems.md' '$UC'"
 check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
-check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '코딩 디시플린'"
+check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '디시플린'"
 
 # --- 케이스 2: 프로젝트 폴더 무오염 ---
 echo "[case2] project untouched"
-check "no principles in project"      "[ ! -f '$P1/coding-principles.md' ]"
+check "no principles in project"      "[ ! -f '$P1/agent-principles.md' ]"
 check "no solved in project"          "[ ! -f '$P1/solved_problems.md' ]"
 check "no CLAUDE.md in project"       "[ ! -f '$P1/CLAUDE.md' ]"
 
@@ -37,7 +37,7 @@ check "no CLAUDE.md in project"       "[ ! -f '$P1/CLAUDE.md' ]"
 run "$H1" "$P1" >/dev/null; run "$H1" "$P1" >/dev/null
 echo "[case3] idempotency"
 check "still one region"              "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
-check "principles import not dup"     "[ \$(grep -cxF '@disciplined-coder/coding-principles.md' '$UC') -eq 1 ]"
+check "principles import not dup"     "[ \$(grep -cxF '@disciplined-coder/agent-principles.md' '$UC') -eq 1 ]"
 
 # --- 케이스 4: solved 누적 보존 ---
 echo "[case4] solved preserved"
@@ -57,7 +57,7 @@ check "blank lines bounded (<=1)"    "[ \$(grep -c '^\$' '$UC5') -le 1 ]"
 
 # --- 케이스 6: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
-printf 'note\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/coding-principles.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H6/.claude/CLAUDE.md"
+printf 'note\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H6/.claude/CLAUDE.md"
 run "$H6" "$P6" >/dev/null
 echo "[case6] CRLF region recognized"
 check "CRLF region not duplicated"   "[ \$(grep -cF '# BEGIN disciplined-coder' '$H6/.claude/CLAUDE.md') -eq 1 ]"

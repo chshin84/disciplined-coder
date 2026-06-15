@@ -1,5 +1,5 @@
 ---
-description: 현재 프로젝트에 solved_problems.md / unsolved_problems.md를 만들고 CLAUDE.md @import를 배선한다(이미 있으면 건너뜀).
+description: PC 전역(~/.claude/disciplined-coder/)에 solved_problems.md / unsolved_problems.md를 만들고 ~/.claude/CLAUDE.md @import를 배선한다(이미 있으면 건너뜀).
 ---
 
 다음 스크립트를 실행해 이 프로젝트의 이슈 로그를 스캐폴드하라:
