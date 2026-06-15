@@ -1,13 +1,13 @@
 # disciplined-coder
 
-팀 엔지니어링 원칙 + 프로젝트 간 공통 함정을 **coding-principles.md(SSOT)** 에 박아두고, SessionStart hook이 **PC-레벨(~/.claude/disciplined-coder/)** 에 자동 셋업하는 Claude Code 플러그인. **프로젝트 폴더엔 아무것도 안 생긴다** — 지식은 `~/.claude/CLAUDE.md` 관리블록이 @import해 메인 세션 + 모든 서브에이전트에 도달한다.
+팀 엔지니어링 원칙 + 프로젝트 간 공통 함정을 **agent-principles.md(SSOT)** 에 박아두고, SessionStart hook이 **PC-레벨(~/.claude/disciplined-coder/)** 에 자동 셋업하는 Claude Code 플러그인. **프로젝트 폴더엔 아무것도 안 생긴다** — 지식은 `~/.claude/CLAUDE.md` 관리블록이 @import해 메인 세션 + 모든 서브에이전트에 도달한다.
 
 ## 전제 조건 (Prerequisites)
 - **Windows 사용자: [Git Bash](https://git-scm.com/downloads) 설치 필수.** SessionStart hook이 bash 스크립트(`scaffold.sh`)를 돌리는데, Windows엔 bash가 없어 Git Bash가 그 역할을 한다. 없으면 Claude Code가 PowerShell로 폴백 → 스크립트 실패. (mac/Linux는 기본 `sh`로 동작하므로 불필요.)
 - hook은 `bash "...scaffold.sh"`로 호출하므로 실행권한 비트(`chmod +x`)는 필요 없다.
 
 ## 무엇을 자동화하나
-- **일반 지식**(원칙 + 공통 gotchas + 도메인 목차) → 디시플린(`coding-principles.md`, SSOT) → SessionStart hook이 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선(+ 첫 세션 stdout 보강) → 메인 + 모든 서브에이전트 도달. **프로젝트 폴더는 건드리지 않는다.**
+- **일반 지식**(원칙 + 공통 gotchas + 도메인 목차) → 디시플린(`agent-principles.md`, SSOT) → SessionStart hook이 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선(+ 첫 세션 stdout 보강) → 메인 + 모든 서브에이전트 도달. **프로젝트 폴더는 건드리지 않는다.**
 - **이슈 로그**(solved/unsolved) → `~/.claude/disciplined-coder/`에 없으면 생성(PC 전역, idempotent). 프로젝트별 분리가 아닌 PC 전역 누적.
 - **스킬**(domain-*/advisor-*) → 플러그인에서 온디맨드 로드. 복사·주입 안 함.
 
@@ -31,7 +31,7 @@ PC 전역 `~/.claude/disciplined-coder/solved_problems.md`/`unsolved_problems.md
 ```
 disciplined-coder/
 ├── .claude-plugin/plugin.json      # 매니페스트
-├── coding-principles.md            # 디시플린 정본 (SSOT) — hook이 ~/.claude/disciplined-coder/로 복사
+├── agent-principles.md            # 디시플린 정본 (SSOT) — hook이 ~/.claude/disciplined-coder/로 복사
 ├── domains-index.md                # 개발 대상(도메인) 참고서 인덱스 (동일 경로로 복사)
 ├── skills/domain-*/SKILL.md        # 도메인 참고서 (docs/plugin seed, ui/app/agent/db stub, llm-runtime) — 온디맨드
 ├── skills/advisor-*/SKILL.md       # 제품 런타임 검증 4종(correctness/fit/nonfunctional/meta) + 메타 산출물 리뷰(advisor-spec-review) — 온디맨드
@@ -44,7 +44,7 @@ disciplined-coder/
 └── README.md
 ```
 
-> `~/.claude/disciplined-coder/`에 생성되는 파일: `coding-principles.md`, `domains-index.md`, `solved_problems.md`, `unsolved_problems.md`. 스킬은 플러그인에서 온디맨드로 로드 — 복사하지 않는다.
+> `~/.claude/disciplined-coder/`에 생성되는 파일: `agent-principles.md`, `domains-index.md`, `solved_problems.md`, `unsolved_problems.md`. 스킬은 플러그인에서 온디맨드로 로드 — 복사하지 않는다.
 
 ## 설치 (user scope 권장)
 
@@ -61,7 +61,7 @@ disciplined-coder/
 
 ## 사용
 플러그인이 설치(user scope)되면 **별도 조작 없이 자동으로 동작**한다. 설치 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어:
-- `~/.claude/disciplined-coder/`에 `coding-principles.md`, `domains-index.md`, `solved_problems.md`, `unsolved_problems.md` 셋업
+- `~/.claude/disciplined-coder/`에 `agent-principles.md`, `domains-index.md`, `solved_problems.md`, `unsolved_problems.md` 셋업
 - `~/.claude/CLAUDE.md` 관리블록에 `@import` 배선(없으면 생성, 있으면 멱등 갱신)
 
 **프로젝트 폴더는 전혀 건드리지 않는다.** 이후 어느 프로젝트에서 열어도 메인 세션과 모든 서브에이전트가 원칙 + 도메인 목차 + 이슈 로그를 자동으로 보유한다.
@@ -79,4 +79,4 @@ disciplined-coder/
 - **호스트 셸 의존**: hook은 호스트에서 돈다(컨테이너 아님). Windows는 Git Bash 필요(설치 단계 3 참고). `MSYS_NO_PATHCONV` 등 Git Bash 전용 gotcha는 mac/Linux/PowerShell 호스트엔 무관하니 보편 규칙으로 적용 금지.
 - **🔴 자동구현 금지**: scaffold가 `unsolved_problems.md` 상단에 "모든 에이전트는 🔴 자율 구현 금지" 명령을 심어두므로, 이 지시는 @import를 타고 모든 서브에이전트에 함께 전달된다. 다만 **CLAUDE.md는 강제가 아닌 가이드**이므로(공식 문서), 진짜로 막아야 한다면 `PreToolUse` hook로 강제하라.
 - **SessionStart hook은 `matcher: startup`으로 새 세션에서만 실행**된다. 스크립트는 멱등이지만 무거운 작업을 넣지 말 것.
-- **원칙 갱신 주기**: `coding-principles.md`(SSOT)를 수정하면 다음 세션부터 `~/.claude/disciplined-coder/`에 새 버전이 복사된다. **소유자와 갱신 주기를 정하라**(권장: 분기 1회 검토). 일반화 가능한 `solved` 항목만 원칙으로 승격하고, 승격 시 PC 전역 사본을 반드시 삭제(양쪽 복제 금지 = SSOT).
+- **원칙 갱신 주기**: `agent-principles.md`(SSOT)를 수정하면 다음 세션부터 `~/.claude/disciplined-coder/`에 새 버전이 복사된다. **소유자와 갱신 주기를 정하라**(권장: 분기 1회 검토). 일반화 가능한 `solved` 항목만 원칙으로 승격하고, 승격 시 PC 전역 사본을 반드시 삭제(양쪽 복제 금지 = SSOT).

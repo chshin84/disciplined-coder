@@ -12,7 +12,7 @@ mkdir -p "$KDIR"
 created=""
 
 # 1) 정본(static) 복사·갱신: principles, domains-index. src==dst면 생략.
-for f in coding-principles.md domains-index.md; do
+for f in agent-principles.md domains-index.md; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
   if [ -f "$src" ]; then
     if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else cp "$src" "$dst"; fi
@@ -21,13 +21,16 @@ for f in coding-principles.md domains-index.md; do
   fi
 done
 
+# 1b) 구 파일명 정리(멱등): 이전 버전이 남긴 coding-principles.md orphan 제거.
+[ -f "$KDIR/coding-principles.md" ] && rm -f "$KDIR/coding-principles.md" || true
+
 # 2) solved/unsolved 누적 파일: 없을 때만 생성.
 if [ ! -f "$KDIR/solved_problems.md" ]; then
   cat > "$KDIR/solved_problems.md" <<'EOF'
 # 해결된 문제 로그 (solved_problems) — PC 전역
 
 작업 중 발견·해결된 문제. 각 항목: 문제 → 원인 → 해결. 등록·이동은 메인 세션이 수행.
-일반화 가능한 항목은 디시플린(coding-principles.md)으로 승격하고 여기서는 제거(SSOT).
+일반화 가능한 항목은 디시플린(agent-principles.md)으로 승격하고 여기서는 제거(SSOT).
 EOF
   created="$created solved_problems.md"
 fi
@@ -65,12 +68,12 @@ awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for
   if [ -s "$UC" ]; then printf '\n'; fi
   printf '%s\n' "$BEGIN_MARK"
   # unsolved는 미주입(백로그). 스킬(domain-*/advisor-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
-  printf '@disciplined-coder/coding-principles.md\n@disciplined-coder/domains-index.md\n@disciplined-coder/solved_problems.md\n'
+  printf '@disciplined-coder/agent-principles.md\n@disciplined-coder/domains-index.md\n@disciplined-coder/solved_problems.md\n'
   printf '%s\n' "$END_MARK"
 } >> "$UC"
 
 # 4) 첫 세션 도달 보강: principles + domains-index를 stdout으로.
-for f in coding-principles.md domains-index.md; do
+for f in agent-principles.md domains-index.md; do
   if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
 done
 
