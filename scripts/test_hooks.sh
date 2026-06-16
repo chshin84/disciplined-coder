@@ -4,10 +4,14 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 PTU="$HERE/hooks/spec_review_posttooluse.sh"
 STOP="$HERE/hooks/spec_review_stop.sh"
+FPRE="$HERE/hooks/doc_format_pretooluse.sh"
+DREV="$HERE/hooks/doc_review_posttooluse.sh"
 pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
 ptu() { printf '%s' "$1" | bash "$PTU"; }
 stop() { printf '%s' "$1" | bash "$STOP"; }
+fpre() { printf '%s' "$1" | bash "$FPRE"; }
+drev() { printf '%s' "$1" | bash "$DREV"; }
 J() { printf '{"tool_input":{"file_path":"%s"}}' "$1"; }
 
 T="$(mktemp -d)"; SP="$T/docs/superpowers/specs"; PL="$T/docs/superpowers/plans"; mkdir -p "$SP" "$PL" "$T/src"
@@ -44,5 +48,20 @@ printf 'draft\n<!-- spec-review: passed lenses=3 date=2026-06-14 -->\n' > "$G/do
 check "passed 마커 후 → 통과"            "[ -z \"\$(stop '{\"cwd\":\"$G\"}')\" ]"
 printf 'draft\n<!-- spec-review: escalated lenses=3 date=2026-06-14 -->\n' > "$G/docs/superpowers/specs/new.md"
 check "escalated 마커 후 → 통과"         "[ -z \"\$(stop '{\"cwd\":\"$G\"}')\" ]"
+
+echo "[doc-format-pre]"
+printf 'x\n' > "$T/existing.md"
+check "새 문서(.md) → 양식 제안"         "fpre '$(J "$T/newdoc.md")' | grep -q additionalContext"
+check "기존 문서(.md) → 무출력"          "[ -z \"\$(fpre '$(J "$T/existing.md")')\" ]"
+check "spec 경로 새 .md → 무출력"        "[ -z \"\$(fpre '$(J "$SP/brandnew.md")')\" ]"
+check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/new.py")')\" ]"
+check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off fpre '$(J "$T/newdoc.md")')\" ]"
+
+echo "[doc-review-post]"
+check "문서(.md) → 검진 넛지"            "drev '$(J "$T/existing.md")' | grep -q additionalContext"
+check "spec 경로 → 무출력"               "[ -z \"\$(drev '$(J "$SP/nomark.md")')\" ]"
+check "plan 경로 → 무출력"               "[ -z \"\$(drev '$(J "$PL/nomark.md")')\" ]"
+check "비문서(.py) → 무출력"             "[ -z \"\$(drev '$(J "$T/src/main.py")')\" ]"
+check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off drev '$(J "$T/existing.md")')\" ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
