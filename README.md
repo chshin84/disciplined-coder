@@ -2,10 +2,13 @@
 
 팀 엔지니어링 원칙 + 프로젝트 간 공통 함정을 `agent-principles.md`(SSOT)에 박아두고, SessionStart hook이 **PC-레벨**(`~/.claude/disciplined-coder/`)에 자동 셋업하는 Claude Code 플러그인.
 
+**대상** — 팀 디시플린을 모든 프로젝트와 서브에이전트에 걸쳐 PC 전역으로 강제하되, 프로젝트 폴더는 더럽히고 싶지 않은 Claude Code 사용자.
+
 ## Highlights
 - **프로젝트 폴더 footprint zero** — 지식은 `~/.claude/CLAUDE.md` 관리블록이 `@import`로 주입한다. 어느 프로젝트를 열어도 작업 폴더엔 아무 파일도 안 생긴다.
 - **메인 + 모든 서브에이전트 도달** — PC-레벨 주입이라 메인 세션과 커스텀 서브에이전트가 같은 원칙·이슈 로그를 자동으로 보유한다.
 - **설치 후 무조작** — 새 세션을 시작하면 hook이 알아서 셋업·배선한다(멱등).
+- **글쓰기·문서 디시플린** — 답변 표현(명확·짧게·리듬)은 `CLEAR-COMM`이 상시 잡고, 문서는 사람의 작성 흐름을 흉내 낸다 — 쓰기 전 양식 제안, 다 쓰면 검진 넛지.
 
 ## 무엇을·왜 자동화하나
 모든 세션·서브에이전트가 같은 디시플린을 들고 일하게 하되, **프로젝트 폴더는 건드리지 않는다.** 그래서 지식을 프로젝트가 아니라 **PC-레벨**(`~/.claude/`)에 두고, `~/.claude/CLAUDE.md`의 관리블록이 그것을 `@import`한다. Claude Code 서브에이전트는 시작 시 이 메모리 계층을 함께 로드하므로, 한 곳에 배선하면 메인과 서브에이전트 모두에 도달한다(상세·예외는 [DESIGN-NOTES](docs/DESIGN-NOTES.md)).
@@ -19,6 +22,7 @@
 개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(자동 주입되는 목차)가 도메인과 참고서를 안내하고, 각 `skills/domain-*`가 상세를 온디맨드로 제공한다 — 설계 시 명세 반영, 개발 시 폴백.
 - **LLM 런타임**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(호출자)이 리스크에 따라 `skills/reviewer-*`(렌즈)와 `skills/meta-aggregate`(집계)를 **제품 코드의 리뷰 콜**로 구현하게 한다(Claude Code 에이전트가 아니라 제품이 구현할 청사진).
 - **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 PREP → 독립 3렌즈(grounding/consistency/adversarial) → meta-aggregate → accept/regenerate/escalate로 검증한다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 게이트; 문서 마지막 줄 `<!-- spec-review: passed … -->` 마커로 해제; 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
+- **문서 작성 워크플로**: 일반 문서(README 등)는 사람이 글 쓰는 흐름을 흉내 낸다 — 작성 **전** `PreToolUse` 훅이 새 `.md`에 `domain-docs` 양식을 제안하고, 작성 **후** `PostToolUse` 훅이 독립 검진(`reviewer-grounding`+`reviewer-fit`)을 넛지한다. 셀프 퇴고만으로 끝내지 않되, 발행물엔 마커를 안 박으므로 spec/plan과 달리 **비블로킹**(권유)이다. 같은 OFF 토글을 쓴다.
 
 ## 설치 (user scope 권장)
 **전제 조건 — Windows 사용자는 [Git Bash](https://git-scm.com/downloads) 필수.** SessionStart hook이 `bash "...scaffold.sh"`로 스크립트를 돌리는데 Windows엔 bash가 없다(없으면 PowerShell 폴백 → 실패). 실행권한 비트(`chmod +x`)는 불필요. mac/Linux는 기본 `sh`로 동작하므로 별도 설치 불필요.
@@ -41,6 +45,15 @@
 
 이후 어느 프로젝트에서 열어도 메인 세션과 모든 서브에이전트가 원칙 + 도메인 목차 + 이슈 로그를 자동으로 보유한다. **프로젝트 폴더는 전혀 건드리지 않는다.**
 
+### 커맨드 (수동 트리거 — 평소엔 불필요)
+설치 후 평소엔 손댈 게 없지만, 활성화된 내용을 확인하거나 셋업을 다시 돌리고 싶을 때 쓴다.
+```text
+/show-principles     # 현재 활성 디시플린 정본(agent-principles.md 사본) 보기
+/show-solved         # 해결된 문제 로그 보기
+/show-unsolved       # 미해결 백로그 보기(세션에 자동 주입되지 않음)
+/bootstrap-issues    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
+```
+
 ## 구성
 ```
 disciplined-coder/
@@ -50,8 +63,9 @@ disciplined-coder/
 ├── skills/domain-*/SKILL.md        # 도메인 참고서(docs/plugin/llm-runtime) + 호출자 domain-spec-review
 ├── skills/reviewer-*/SKILL.md      # 리뷰어 렌즈(grounding/fit/consistency/adversarial)
 ├── skills/meta-aggregate/SKILL.md  # 리뷰어 집계·결정(코드 설계도)
-├── hooks/hooks.json                # SessionStart → scaffold.sh · PostToolUse/Stop → spec/plan 리뷰 강제
-├── hooks/spec_review_*.sh          # PostToolUse(감지) · Stop(하드 게이트) — 순수 bash, jq 비의존
+├── hooks/hooks.json                # SessionStart→scaffold · Pre/PostToolUse·Stop→문서·spec/plan 워크플로
+├── hooks/spec_review_*.sh          # spec/plan: PostToolUse(감지) · Stop(하드 게이트) — 순수 bash, jq 비의존
+├── hooks/doc_*tooluse.sh           # 문서: 양식 제안(Pre) · 검진 넛지(Post) — 비블로킹
 ├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md @import
 ├── scripts/test_scaffold.sh        # scaffold 검증 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
 ├── scripts/test_hooks.sh           # 훅 불변식 테스트 (계약 FAIL=0)
@@ -71,3 +85,9 @@ disciplined-coder/
 - 디시플린 정본: [`agent-principles.md`](agent-principles.md) · 도메인 목차: [`domains-index.md`](domains-index.md)
 - 설계 근거·한계: [docs/DESIGN-NOTES.md](docs/DESIGN-NOTES.md)
 - 도메인별 상세: `skills/domain-*` (온디맨드)
+
+## 메인테이너
+- chshin84 \<chshin84@gmail.com\> · 이슈/제안은 [chshin84/disciplined-coder](https://github.com/chshin84/disciplined-coder) 저장소로.
+
+<!-- 라이선스: 미정(추후 결정 시 LICENSE 파일 + 본 섹션에 표기). 현재는 별도 명시 전까지 저작자가 모든 권리 보유. -->
+
