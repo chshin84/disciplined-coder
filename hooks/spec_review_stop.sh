@@ -22,7 +22,10 @@ marker_ok() {  # $1=파일 → 마지막 비공백 줄이 terminal 마커면 0
 }
 
 unreviewed=""
-while IFS= read -r f; do
+# -z: NUL 종료 + 따옴표/이스케이프 없는 raw 경로(공백·비ASCII 안전). --no-renames: 리네임을
+# del+add 로 분해해 'old -> new' 합침 레코드를 없앤다. 각 레코드는 'XY ' 3글자 프리픽스 + 경로.
+while IFS= read -r -d '' entry; do
+  f="${entry:3}"
   [ -n "$f" ] || continue
   case "$f" in
     *docs/superpowers/specs/*.md|*docs/superpowers/plans/*.md) ;;
@@ -30,7 +33,7 @@ while IFS= read -r f; do
   esac
   [ -f "$f" ] || continue
   marker_ok "$f" || unreviewed="$unreviewed $f"
-done < <(git status --porcelain --untracked-files=all -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null | cut -c4-)
+done < <(git status -z --porcelain --untracked-files=all --no-renames -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null)
 
 if [ -n "$unreviewed" ]; then
   reason="미리뷰 spec/plan:$unreviewed — disciplined-coder domain-spec-review(3렌즈+PREP)를 수행하고 문서 마지막 줄에 spec-review 마커(passed 또는 escalated, HTML 주석)를 남긴 뒤 종료하라."

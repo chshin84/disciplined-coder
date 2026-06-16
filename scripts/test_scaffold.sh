@@ -62,4 +62,25 @@ run "$H6" "$P6" >/dev/null
 echo "[case6] CRLF region recognized"
 check "CRLF region not duplicated"   "[ \$(grep -cF '# BEGIN disciplined-coder' '$H6/.claude/CLAUDE.md') -eq 1 ]"
 
+# --- 케이스 7: 깨진 관리영역(BEGIN 있고 END 없음) → 비파괴 스킵(strip 안 함) ---
+H7="$(mktemp -d)"; P7="$(mktemp -d)"; mkdir -p "$H7/.claude"
+{ printf 'note before\n'; printf '# BEGIN disciplined-coder (managed — do not edit)\n'; \
+  printf '@disciplined-coder/agent-principles.md\n'; printf 'IMPORTANT user content after malformed begin\n'; } > "$H7/.claude/CLAUDE.md"
+ERR7="$(run "$H7" "$P7" 2>&1 >/dev/null)" || true
+UC7="$H7/.claude/CLAUDE.md"
+echo "[case7] malformed region (BEGIN w/o END) → non-destructive"
+check "malformed: user content preserved"  "grep -qxF 'IMPORTANT user content after malformed begin' '$UC7'"
+check "malformed: pre-region note preserved" "grep -qxF 'note before' '$UC7'"
+check "malformed: warns BEGIN without END"  "printf '%s' \"\$ERR7\" | grep -qF 'BEGIN but no END'"
+check "malformed: complete region appended" "[ \$(grep -cF '# END disciplined-coder' '$UC7') -ge 1 ]"
+
+# --- 케이스 8: 정본 소스 부재 → FAIL-LOUD 경고(stderr) + 계속 진행(exit 0) ---
+H8="$(mktemp -d)"; P8="$(mktemp -d)"; ED="$(mktemp -d)"   # ED = 정본 없는 빈 plugin root
+set +e
+ERR8="$(CLAUDE_HOME_DIR="$H8/.claude" CLAUDE_PROJECT_DIR="$P8" CLAUDE_PLUGIN_ROOT="$ED" bash "$SCAFFOLD" 2>&1 >/dev/null)"; rc8=$?
+set -e
+echo "[case8] missing source → FAIL-LOUD warning, exit 0"
+check "missing source warns to stderr"      "printf '%s' \"\$ERR8\" | grep -qF 'WARNING: source not found'"
+check "missing source still exit 0"         "[ $rc8 -eq 0 ]"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

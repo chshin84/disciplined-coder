@@ -69,7 +69,7 @@ disciplined-coder/
 ├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md @import
 ├── scripts/test_scaffold.sh        # scaffold 검증 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
 ├── scripts/test_hooks.sh           # 훅 불변식 테스트 (계약 FAIL=0)
-├── commands/bootstrap-issues.md    # 수동 재실행 커맨드
+├── commands/*.md                  # /bootstrap-issues · /show-principles · /show-solved · /show-unsolved
 ├── docs/DESIGN-NOTES.md            # 개발자용 내부 근거(주입 메커니즘·한계·업그레이드)
 └── README.md
 ```

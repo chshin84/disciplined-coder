@@ -48,6 +48,22 @@ printf 'draft\n<!-- spec-review: passed lenses=3 date=2026-06-14 -->\n' > "$G/do
 check "passed 마커 후 → 통과"            "[ -z \"\$(stop '{\"cwd\":\"$G\"}')\" ]"
 printf 'draft\n<!-- spec-review: escalated lenses=3 date=2026-06-14 -->\n' > "$G/docs/superpowers/specs/new.md"
 check "escalated 마커 후 → 통과"         "[ -z \"\$(stop '{\"cwd\":\"$G\"}')\" ]"
+# 파일명 파싱 강건성: git porcelain이 따옴표로 감싸거나(공백·비ASCII) 리네임 화살표로 합치면
+# 게이트가 조용히 우회되면 안 된다(FAIL-LOUD). new.md 는 위에서 escalated(리뷰됨)이므로 차단 안 됨.
+printf 'draft\n' > "$G/docs/superpowers/specs/my spec.md"
+check "공백 파일명 미리뷰 spec → block"  "stop '{\"cwd\":\"$G\"}' | grep -q '\"block\"'"
+rm "$G/docs/superpowers/specs/my spec.md"
+printf 'draft\n' > "$G/docs/superpowers/specs/명세.md"
+check "한글 파일명 미리뷰 spec → block"  "stop '{\"cwd\":\"$G\"}' | grep -q '\"block\"'"
+rm "$G/docs/superpowers/specs/명세.md"
+printf 'draft\n' > "$G/docs/superpowers/specs/torename.md"
+( cd "$G" && git add -A && git commit -qm init )
+( cd "$G" && git mv docs/superpowers/specs/torename.md docs/superpowers/specs/renamed.md )
+check "리네임된 미리뷰 spec → block"     "stop '{\"cwd\":\"$G\"}' | grep -q '\"block\"'"
+# FAIL-OPEN(문서화된 한계): git/디렉터리 부재 시 차단하지 말고 통과해야 한다(작업불능 방지).
+NG="$(mktemp -d)"   # git 저장소 아님
+check "non-git cwd → FAIL-OPEN(통과)"    "[ -z \"\$(stop '{\"cwd\":\"$NG\"}')\" ]"
+check "존재하지 않는 cwd → FAIL-OPEN(통과)" "[ -z \"\$(stop '{\"cwd\":\"$NG/nope/x\"}')\" ]"
 
 echo "[doc-format-pre]"
 printf 'x\n' > "$T/existing.md"
