@@ -46,4 +46,13 @@ run "$H5" >/dev/null
 echo "[case5] CRLF region recognized"
 check "CRLF region not duplicated"  "[ \$(grep -cF '# BEGIN disciplined-coder' '$H5/.codex/AGENTS.md') -eq 1 ]"
 
+echo "[manifest + session hook]"
+SS="$HERE/hooks/session-start-codex"
+check "session-start-codex emits additionalContext" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$HERE\" bash '$SS' | grep -q additionalContext"
+check "session-start-codex warns about trust review" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$HERE\" bash '$SS' | grep -qF '신뢰'"
+check ".codex-plugin manifest is valid JSON" "python3 -c 'import json;json.load(open(\"$HERE/.codex-plugin/plugin.json\"))'"
+check "hooks-codex.json is valid JSON"       "python3 -c 'import json;json.load(open(\"$HERE/hooks/hooks-codex.json\"))'"
+check "hooks-codex wires apply_patch matcher" "grep -qF 'apply_patch' '$HERE/hooks/hooks-codex.json'"
+check "manifest points skills + codex hooks"  "grep -qF 'hooks-codex.json' '$HERE/.codex-plugin/plugin.json'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
