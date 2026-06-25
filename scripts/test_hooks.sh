@@ -38,6 +38,7 @@ check "Codex apply_patch update → 경로 1개" "[ \"\$(extract '$(AP1 "$T/src/
 check "Codex apply_patch delete → 경로 1개" "[ \"\$(extract '$(APDEL "$T/src/c.md")')\" = '$T/src/c.md' ]"
 check "Codex 다중 파일 → 두 경로 모두"      "[ \"\$(extract '$(AP2 "$T/src/d.py" "$T/src/e.md")' | tr '\n' ',')\" = '$T/src/d.py,$T/src/e.md,' ]"
 check "빈 입력 → 무출력"                    "[ -z \"\$(extract '{}')\" ]"
+check "Claude backslash path → normalized" "[ \"\$(extract '$(J 'C:\\\\dir\\\\f.md')')\" = 'C:/dir/f.md' ]"
 
 echo "[ptu]"
 check "spec 미마커 → 리뷰 지시"          "ptu '$(J "$SP/nomark.md")' | grep -q additionalContext"
