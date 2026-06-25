@@ -1,0 +1,15 @@
+{
+  "name": "disciplined-coder",
+  "version": "0.1.0",
+  "description": "Team engineering discipline (SSOT principles) + per-domain design references + spec/plan & doc review gates, for Codex. Mirrors the Claude Code plugin via shared skills and hook logic.",
+  "author": { "name": "chshin84", "email": "chshin84@gmail.com" },
+  "license": "MIT",
+  "keywords": ["principles", "discipline", "issue-tracking", "scaffold", "hooks"],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks-codex.json",
+  "interface": {
+    "displayName": "Disciplined Coder",
+    "shortDescription": "Engineering discipline, domain references, and spec/plan & doc review gates",
+    "category": "Coding"
+  }
+}

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Codex SessionStart hook: codex-scaffold(파일 셋업)를 실행하고, 원칙 본문을 additionalContext로 주입한다.
+# 첫 줄에 신뢰검토 경고(FAIL-LOUD): Codex는 신뢰검토 후에만 플러그인 훅을 켠다.
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$DIR/.." && pwd)}"
+principles="$(CLAUDE_PLUGIN_ROOT="$PLUGIN_ROOT" bash "$DIR/../scripts/codex-scaffold.sh" 2>/dev/null || printf '[disciplined-coder] scaffold error')"
+warn="⚠️ disciplined-coder: 강제 게이트(spec/plan·문서 리뷰)는 이 플러그인 훅을 Codex에서 '신뢰'한 뒤에만 작동합니다. 설치 후 한 번 신뢰검토를 완료하세요."
+context="$(printf '%s\n\n%s' "$warn" "$principles")"
+escape_for_json() {
+  local s="$1"
+  s="${s//\\/\\\\}"; s="${s//\"/\\\"}"; s="${s//$'\n'/\\n}"; s="${s//$'\r'/\\r}"; s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
+esc="$(escape_for_json "$context")"
+printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' "$esc"
+exit 0

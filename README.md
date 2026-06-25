@@ -38,6 +38,14 @@
 
 검증: `claude plugin validate ./` (루트 CLAUDE.md 도그푸딩 때문에 `--strict`는 경고로 실패 — 의도된 동작).
 
+### Codex에서 쓰기 (동일 디시플린)
+이 레포는 Claude Code 플러그인이자 **Codex 플러그인**이다(`.codex-plugin/plugin.json`). Codex도 같은 원칙·스킬·강제 게이트(spec/plan·문서 리뷰)를 받는다.
+1. 이 레포를 Codex 플러그인으로 설치한다(`codex plugin` 설치 경로).
+2. **신뢰검토 필수** — Codex는 플러그인 훅을 *신뢰*하기 전엔 조용히 건너뛴다. 설치 후 한 번 훅을 신뢰해야 게이트가 작동한다(세션 시작 시 경고가 뜬다).
+3. 새 Codex 세션을 시작하면 `session-start-codex` 훅이 `~/.codex/disciplined-coder/` 셋업 + `~/.codex/AGENTS.md` 관리블록 배선 + 원칙 주입을 자동 수행한다.
+
+차이(정직): Codex는 `@import` 미지원이라 원칙을 AGENTS.md 인라인 + 세션 주입의 이중 경로로 전달한다. 파일 편집은 `apply_patch`로 가므로 게이트 훅이 그 입력을 읽는다. 동작은 Claude와 동일하되, 위 신뢰검토 단계가 추가된다.
+
 ## 사용
 설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어:
 - `~/.claude/disciplined-coder/`에 `agent-principles.md`·`domains-index.md`·`solved_problems.md`·`unsolved_problems.md` 셋업
@@ -67,6 +75,12 @@ disciplined-coder/
 ├── hooks/spec_review_*.sh          # spec/plan: PostToolUse(감지) · Stop(하드 게이트) — 순수 bash, jq 비의존
 ├── hooks/doc_*tooluse.sh           # 문서: 양식 제안(Pre) · 검진 넛지(Post) — 비블로킹
 ├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md @import
+├── .codex-plugin/plugin.json       # Codex 매니페스트(skills/hooks/interface)
+├── hooks/hooks-codex.json          # Codex 훅 배선(apply_patch matcher · session-start-codex)
+├── hooks/session-start-codex       # Codex SessionStart: codex-scaffold 실행 + 원칙 주입 + 신뢰검토 경고
+├── hooks/_extract_path.sh          # 공용 경로 추출(file_path + apply_patch, 다중 경로)
+├── scripts/codex-scaffold.sh       # 멱등: ~/.codex/ 셋업 + ~/.codex/AGENTS.md 관리블록
+├── scripts/test_codex_scaffold.sh  # Codex 셋업·매니페스트·세션훅 검증 (FAIL=0)
 ├── scripts/test_scaffold.sh        # scaffold 검증 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
 ├── scripts/test_hooks.sh           # 훅 불변식 테스트 (계약 FAIL=0)
 ├── commands/*.md                  # /bootstrap-issues · /show-principles · /show-solved · /show-unsolved
