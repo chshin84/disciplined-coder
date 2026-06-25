@@ -86,6 +86,15 @@ spec/plan과 달리 **비블로킹(권유)**으로 둔 이유는 셋이다.
 반쯤 쓰다 만 초안에 뜨는 것과 같은 부류의 한계). 비블로킹이라 실해는 없고, 객관적 검진은 Post 넛지가
 보완한다. 같은 OFF 토글(`DISCIPLINED_CODER_REVIEW_GATE=off`)로 둘 다 끌 수 있다.
 
+## Codex 패리티 레이어
+- **SSOT 보존**: `agent-principles.md`·`domains-index.md`·`skills/**`·게이트 로직은 두 런타임 공유. Codex 산출물(`.codex-plugin/`·`hooks-codex.json`·`session-start-codex`·`codex-scaffold.sh`)은 가산형.
+- **단일 분기점**: 파일 편집 도구가 Claude=Write/Edit(`file_path`) vs Codex=`apply_patch`(패치 헤더). `hooks/_extract_path.sh`가 양쪽을 흡수해 3개 Pre/Post 훅이 공유한다(다중 파일도 전부 추출).
+- **상시 원칙**: Claude는 `~/.claude/CLAUDE.md @import`. Codex는 `@import` 미지원이라 `~/.codex/AGENTS.md` 관리블록에 정본을 **인라인**(생성된 사본, 매 세션 멱등 갱신) + `session-start-codex`가 additionalContext로 주입(이중 경로).
+- **강제 게이트**: Stop 게이트(`spec_review_stop.sh`, git 기반)가 진짜 차단이며 도구 형태와 무관하게 변경된 spec/plan을 전부 스캔. Pre/Post는 비블로킹 넛지.
+- **신뢰검토 갭(FAIL-LOUD)**: Codex는 신뢰검토 전 훅을 침묵 스킵 → `session-start-codex` 주입 첫 줄 경고 + README에 명시.
+- **version 동기화**: `.codex-plugin/plugin.json`만 `version`을 갖는다. `.claude-plugin/plugin.json`이 version을 도입하면 둘을 맞춘다.
+- **후속(YAGNI)**: Cursor 등 다른 런타임은 같은 per-runtime-manifest 패턴으로 확장하되, 통증·이벤트 차이를 측정한 뒤 추가한다.
+
 ## 업그레이드 노트
 - **사전 릴리스(구 sentinel) 버전에서 올라온 경우만 해당.** 구 버전은 CLAUDE.md에
   `## 프로젝트 이슈 로그 (자동 주입)` 헤더 + `@solved_problems.md`/`@unsolved_problems.md`를 직접 붙였다.

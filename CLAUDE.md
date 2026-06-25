@@ -6,5 +6,5 @@
 
 - 디시플린 정본: `agent-principles.md` (SSOT, ID 글로서리·무순서). 도메인 목차: `domains-index.md`.
 - scaffold 검증: `bash scripts/test_scaffold.sh` (계약 **FAIL=0**. 매직 넘버 금지 — `SSOT`).
-- 변경 후: 위 테스트 + `bash scripts/test_hooks.sh` (계약 **FAIL=0**) + `claude plugin validate ./` (non-strict).
+- 변경 후: 위 테스트 + `bash scripts/test_hooks.sh` + `bash scripts/test_codex_scaffold.sh` (각 계약 **FAIL=0**) + `claude plugin validate ./` (non-strict).
 - 설계/계획: `docs/superpowers/`.
