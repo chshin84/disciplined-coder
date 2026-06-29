@@ -43,7 +43,7 @@ JSON을 돌려준다.
 메인이 취합·반영·마커 기록.
 
 ## 라우팅 → 반영 → 재작업
-- **accept**(critical 0): major·minor는 부분 수정(부분 수정이 기본 — `NON-DESTRUCTIVE`) → 마커(passed).
+- **accept**(critical 0): major·minor는 부분 수정(부분 수정이 기본 — `SURGICAL`) → 마커(passed).
 - **regenerate**(critical ≥1): 지적된 섹션만 재작성 → 그 섹션만 재리뷰. 상한 1회, 잔존 시 escalate.
 - **escalate**(상충·방향성·사용자 부재): 🔴 `unsolved_problems.md` 등록 + 마커(escalated). 게이트 해제
   (사람 결정 대기). 자동 루프 금지.
