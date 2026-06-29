@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Stop: 미리뷰 spec/plan이 남으면 종료 차단(하드 게이트). 루프가드: stop_hook_active.
-# 탐지: git 변경분(미추적 디렉터리 포함 -uall) 중 마지막 줄이 terminal 마커가 아닌 spec/plan.
+# 탐지: git 신규(미추적·추가) spec/plan 중 마지막 줄이 terminal 마커가 아닌 것. 기존 파일 수정은 제외(Fix A).
 # 순수 bash(jq 비의존). git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
@@ -27,6 +27,8 @@ unreviewed=""
 while IFS= read -r -d '' entry; do
   f="${entry:3}"
   [ -n "$f" ] || continue
+  # Fix A: 신규(미추적 ??·추가 A)만 하드게이트 — 기존 spec 수정(상태 strip 등)엔 안 건다(넛지는 PostToolUse가).
+  case "${entry:0:2}" in '??'|A*) ;; *) continue ;; esac
   case "$f" in
     *docs/superpowers/specs/*.md|*docs/superpowers/plans/*.md) ;;
     *) continue ;;

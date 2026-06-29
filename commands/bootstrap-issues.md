@@ -1,5 +1,5 @@
 ---
-description: PC 전역(~/.claude/disciplined-coder/)을 셋업한다 — 이슈 로그(solved/unsolved, 없을 때만 생성) + 디시플린 정본(agent-principles.md·domains-index.md) 복사·갱신 + ~/.claude/CLAUDE.md @import 블록 재생성(멱등).
+description: PC 전역(~/.claude/disciplined-coder/)을 셋업한다 — solved 오답노트(없을 때만 생성) + 디시플린 정본(agent-principles.md·domains-index.md) 복사·갱신 + ~/.claude/CLAUDE.md @import 블록 재생성(멱등).
 ---
 
 다음 스크립트를 실행해 PC 전역 디시플린 환경(~/.claude/disciplined-coder/)을 스캐폴드하라:

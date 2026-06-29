@@ -24,31 +24,16 @@ done
 # 1b) 구 파일명 정리(멱등): 이전 버전이 남긴 coding-principles.md orphan 제거.
 [ -f "$KDIR/coding-principles.md" ] && rm -f "$KDIR/coding-principles.md" || true
 
-# 2) solved/unsolved 누적 파일: 없을 때만 생성.
+# 2) solved 누적 파일(append-only 오답노트): 없을 때만 생성. (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
 if [ ! -f "$KDIR/solved_problems.md" ]; then
   cat > "$KDIR/solved_problems.md" <<'EOF'
-# 해결된 문제 로그 (solved_problems) — PC 전역
+# 해결된 문제 로그 (solved_problems) — PC 전역 · append-only 오답노트
 
-작업 중 발견·해결된 문제. 각 항목: 문제 → 원인 → 해결. 등록·이동은 메인 세션이 수행.
-일반화 가능한 항목은 디시플린(agent-principles.md)으로 승격하고 여기서는 제거(SSOT).
+완결된 문제의 교훈 모음 — 차후 비슷한 작업에서 recall해 참고한다. 각 항목: 문제 → 원인 → 해결.
+**완결 후 등록하는 기록이라 '상태'가 아니다** — "문서에 상태 금지"의 예외(append-only, 과거를 지우지 않는다).
+일반화 가능한 항목은 디시플린(agent-principles.md)으로 승격하고 여기서는 제거(SSOT). 메인 세션만 기록.
 EOF
   created="$created solved_problems.md"
-fi
-if [ ! -f "$KDIR/unsolved_problems.md" ]; then
-  cat > "$KDIR/unsolved_problems.md" <<'EOF'
-# 미해결 / 대기 문제 (unsolved_problems) — PC 전역
-
-> ⚠️ 🔴 항목은 사용자 결정 대기 — 어떤 에이전트도 자율 구현·수정 금지. 참고만.
-등록은 검증/리뷰 종료 시, solved 이동은 테스트 통과 시 — 메인 세션이 수행.
-범례: 🔴 결정 필요 · 🟡 구현 대기 · 🔵 향후.
-
-## 🔴 결정 필요
-
-## 🟡 구현 대기
-
-## 🔵 향후 / 선택
-EOF
-  created="$created unsolved_problems.md"
 fi
 
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
@@ -67,7 +52,7 @@ awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for
 {
   if [ -s "$UC" ]; then printf '\n'; fi
   printf '%s\n' "$BEGIN_MARK"
-  # unsolved는 미주입(백로그). 스킬(domain-*/reviewer-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
+  # 스킬(domain-*/reviewer-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
   printf '@disciplined-coder/agent-principles.md\n@disciplined-coder/domains-index.md\n@disciplined-coder/solved_problems.md\n'
   printf '%s\n' "$END_MARK"
 } >> "$UC"

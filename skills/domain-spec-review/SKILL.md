@@ -17,8 +17,9 @@ brainstorming·writing-plans의 self-review는 작성자가 자기 글을 보는
 superpowers 기본 경로(`docs/superpowers/{specs,plans}/*.md`)에 spec/plan이 쓰이면:
 - **PostToolUse**가 즉시 감지해 이 스킬 수행을 지시한다(비블로킹).
 - **Stop**이 미리뷰 spec/plan이 남은 채 턴이 끝나는 것을 차단한다(하드 게이트).
-- 완료 후 문서 **마지막 줄**에 마커를 남기면 해제: `<!-- spec-review: passed lenses=3 date=YYYY-MM-DD -->`
-  (escalate면 `escalated`). terminal(passed/escalated)만 마커다 — pending은 마커가 아니다.
+- 완료 후 문서 **마지막 줄**에 마커를 남기면 해제: `<!-- spec-review: passed -->` (escalate면 `escalated`).
+  **날짜·개수는 안 박는다** — 마커는 게이트 계약 토큰이지 상태가 아니다("문서에 상태 금지"). 기존 dated
+  마커도 인식한다(prefix 매칭, 하위호환). terminal(passed/escalated)만 마커다 — pending은 마커가 아니다.
 - 끄기: env `DISCIPLINED_CODER_REVIEW_GATE=off`. (전역 훅 — `hooks/hooks.json`.)
 
 ## 절차 (공통 방법 — `agent-principles.md` "절차 가" 참조)
@@ -45,7 +46,7 @@ JSON을 돌려준다.
 ## 라우팅 → 반영 → 재작업
 - **accept**(critical 0): major·minor는 부분 수정(부분 수정이 기본 — `SURGICAL`) → 마커(passed).
 - **regenerate**(critical ≥1): 지적된 섹션만 재작성 → 그 섹션만 재리뷰. 상한 1회, 잔존 시 escalate.
-- **escalate**(상충·방향성·사용자 부재): 🔴 `unsolved_problems.md` 등록 + 마커(escalated). 게이트 해제
+- **escalate**(상충·방향성·사용자 부재): 🔴 사용자에게 surface + 마커(escalated). 게이트 해제
   (사람 결정 대기). 자동 루프 금지.
 
 ## 한계 (정직히 — FAIL-LOUD)
