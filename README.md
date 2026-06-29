@@ -6,7 +6,7 @@
 
 ## Highlights
 - **프로젝트 폴더 footprint zero** — 지식은 `~/.claude/CLAUDE.md` 관리블록이 `@import`로 주입한다. 어느 프로젝트를 열어도 작업 폴더엔 아무 파일도 안 생긴다.
-- **메인 + 모든 서브에이전트 도달** — PC-레벨 주입이라 메인 세션과 커스텀 서브에이전트가 같은 원칙·이슈 로그를 자동으로 보유한다.
+- **메인 + 모든 서브에이전트 도달** — PC-레벨 주입이라 메인 세션과 커스텀 서브에이전트가 같은 원칙·오답노트를 자동으로 보유한다.
 - **설치 후 무조작** — 새 세션을 시작하면 hook이 알아서 셋업·배선한다(멱등).
 - **글쓰기·문서 디시플린** — 답변 표현(명확·짧게·리듬)은 `CLEAR-COMM`이 상시 잡고, 문서는 사람의 작성 흐름을 흉내 낸다 — 쓰기 전 양식 제안, 다 쓰면 검진 넛지.
 
@@ -15,7 +15,7 @@
 
 자동화 대상:
 - **일반 지식**(원칙 + 공통 gotchas + 도메인 목차) — `agent-principles.md`·`domains-index.md`(SSOT)를 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import` 배선.
-- **이슈 로그**(solved/unsolved) — `~/.claude/disciplined-coder/`에 없으면 생성(PC 전역 누적, 멱등). 운영 규약(등록→solved 이동, 단일 작성자, 🔴 자율구현 금지)은 `agent-principles.md`의 "절차"가 SSOT.
+- **오답노트**(solved) — `~/.claude/disciplined-coder/solved_problems.md`에 없으면 생성(PC 전역 누적, 멱등, append-only). 운영 규약(완결 후 등록이라 상태 아님, 단일 작성자, 🔴 surface·자율구현 금지, **이슈 트래킹 안 함**)은 `agent-principles.md`의 "절차 다"가 SSOT.
 - **스킬**(domain-*/reviewer-*/meta-aggregate) — 플러그인에서 온디맨드 로드. 복사·주입하지 않는다.
 
 ### 도메인 참고서 + 런타임/메타 검증
@@ -48,17 +48,16 @@
 
 ## 사용
 설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어:
-- `~/.claude/disciplined-coder/`에 `agent-principles.md`·`domains-index.md`·`solved_problems.md`·`unsolved_problems.md` 셋업
+- `~/.claude/disciplined-coder/`에 `agent-principles.md`·`domains-index.md`·`solved_problems.md` 셋업
 - `~/.claude/CLAUDE.md` 관리블록에 `@import` 배선(없으면 생성, 있으면 멱등 갱신)
 
-이후 어느 프로젝트에서 열어도 메인 세션과 모든 서브에이전트가 원칙 + 도메인 목차 + 이슈 로그를 자동으로 보유한다. **프로젝트 폴더는 전혀 건드리지 않는다.**
+이후 어느 프로젝트에서 열어도 메인 세션과 모든 서브에이전트가 원칙 + 도메인 목차 + 오답노트를 자동으로 보유한다. **프로젝트 폴더는 전혀 건드리지 않는다.**
 
 ### 커맨드 (수동 트리거 — 평소엔 불필요)
 설치 후 평소엔 손댈 게 없지만, 활성화된 내용을 확인하거나 셋업을 다시 돌리고 싶을 때 쓴다.
 ```text
 /show-principles     # 현재 활성 디시플린 정본(agent-principles.md 사본) 보기
-/show-solved         # 해결된 문제 로그 보기
-/show-unsolved       # 미해결 백로그 보기(세션에 자동 주입되지 않음)
+/show-solved         # 해결된 문제 오답노트 보기
 /bootstrap-issues    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
 ```
 
@@ -83,11 +82,11 @@ disciplined-coder/
 ├── scripts/test_codex_scaffold.sh  # Codex 셋업·매니페스트·세션훅 검증 (FAIL=0)
 ├── scripts/test_scaffold.sh        # scaffold 검증 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
 ├── scripts/test_hooks.sh           # 훅 불변식 테스트 (계약 FAIL=0)
-├── commands/*.md                  # /bootstrap-issues · /show-principles · /show-solved · /show-unsolved
+├── commands/*.md                  # /bootstrap-issues · /show-principles · /show-solved
 ├── docs/DESIGN-NOTES.md            # 개발자용 내부 근거(주입 메커니즘·한계·업그레이드)
 └── README.md
 ```
-> `~/.claude/disciplined-coder/`에 생성되는 파일: `agent-principles.md`, `domains-index.md`, `solved_problems.md`, `unsolved_problems.md`. 스킬은 플러그인에서 온디맨드 로드 — 복사하지 않는다.
+> `~/.claude/disciplined-coder/`에 생성되는 파일: `agent-principles.md`, `domains-index.md`, `solved_problems.md`. 스킬은 플러그인에서 온디맨드 로드 — 복사하지 않는다.
 
 ## 주의
 - **플러그인 루트 `CLAUDE.md`는 컨텍스트로 로드되지 않는다** — 주입 경로는 `~/.claude/CLAUDE.md`의 `@import`다.
