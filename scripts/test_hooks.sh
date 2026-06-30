@@ -52,11 +52,13 @@ check "본문 예시만(마지막 일반) → 지시"  "ptu '$(J "$SP/example.md
 check "pending(마커 아님) → 지시"        "ptu '$(J "$SP/pending.md")' | grep -q additionalContext"
 
 echo "[stop]"
-check "loop guard(active) → 통과"        "[ -z \"\$(stop '{\"stop_hook_active\":true,\"cwd\":\"$T\"}')\" ]"
-check "OFF → 통과"                       "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off stop '{\"cwd\":\"$T\"}')\" ]"
+# $G = git 저장소 + 미리뷰 spec. 게이트 ON이면 block 이므로, loop guard/OFF가 깨지면
+# 빈 출력이 아니라 block이 나와 변별된다(비-git $T는 FAIL-OPEN으로 항상 빈 출력 → 변별 불가).
 G="$(mktemp -d)"; ( cd "$G" && git init -q && git config user.email t@t && git config user.name t )
 mkdir -p "$G/docs/superpowers/specs"
 printf 'draft\n' > "$G/docs/superpowers/specs/new.md"
+check "loop guard(active) → 통과"        "[ -z \"\$(stop '{\"stop_hook_active\":true,\"cwd\":\"$G\"}')\" ]"
+check "OFF → 통과"                       "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off stop '{\"cwd\":\"$G\"}')\" ]"
 check "미리뷰 spec → block"              "stop '{\"cwd\":\"$G\"}' | grep -q '\"block\"'"
 printf 'draft\n<!-- spec-review: passed lenses=3 date=2026-06-14 -->\n' > "$G/docs/superpowers/specs/new.md"
 check "passed 마커 후 → 통과"            "[ -z \"\$(stop '{\"cwd\":\"$G\"}')\" ]"

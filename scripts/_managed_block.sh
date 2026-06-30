@@ -15,7 +15,7 @@ managed_block_inject() {
   else
     cp "$uc" "$uc.tmp"
   fi
-  awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }' "$uc.tmp" > "$uc" && rm -f "$uc.tmp"
+  awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }' "$uc.tmp" > "$uc.norm" && mv "$uc.norm" "$uc" && rm -f "$uc.tmp"
   {
     if [ -s "$uc" ]; then printf '\n'; fi
     printf '%s\n' "$begin"

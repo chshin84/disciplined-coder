@@ -40,7 +40,8 @@ for s in $STALE_MANAGED; do [ -f "$KDIR/$s" ] && rm -f "$KDIR/$s" || true; done
 for f in "$KDIR"/*; do
   [ -e "$f" ] || continue
   b="$(basename "$f")"
-  case " $WHITELIST " in *" $b "*) continue ;; esac
+  keep=0; for w in $WHITELIST; do [ "$b" = "$w" ] && { keep=1; break; }; done
+  [ "$keep" = 1 ] && continue
   if [ -s "$f" ]; then
     echo "[disciplined-coder] note: 비관리 파일 '$b' 잔존(내용 있음 — 자동삭제 안 함, 확인 요)" >&2
   else

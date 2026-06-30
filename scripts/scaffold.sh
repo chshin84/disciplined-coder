@@ -16,8 +16,8 @@ elif [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then
   CLAUDE_HOME="$CLAUDE_CONFIG_DIR"
 elif [ -n "${USERPROFILE:-}" ]; then
   CLAUDE_HOME="$(cygpath -u "$USERPROFILE" 2>/dev/null || printf '%s' "$USERPROFILE")/.claude"
-  if [ "$CLAUDE_HOME" != "$HOME/.claude" ]; then
-    echo "[disciplined-coder] note: 설정 홈을 USERPROFILE 기준 $CLAUDE_HOME 로 잡음 (bash \$HOME=$HOME 와 다름)" >&2
+  if [ "$CLAUDE_HOME" != "${HOME:-}/.claude" ]; then
+    echo "[disciplined-coder] note: 설정 홈을 USERPROFILE 기준 $CLAUDE_HOME 로 잡음 (bash \$HOME=${HOME:-} 와 다름)" >&2
   fi
 else
   CLAUDE_HOME="$HOME/.claude"
@@ -48,7 +48,8 @@ for s in $STALE_MANAGED; do [ -f "$KDIR/$s" ] && rm -f "$KDIR/$s" || true; done
 for f in "$KDIR"/*; do
   [ -e "$f" ] || continue
   b="$(basename "$f")"
-  case " $WHITELIST " in *" $b "*) continue ;; esac
+  keep=0; for w in $WHITELIST; do [ "$b" = "$w" ] && { keep=1; break; }; done
+  [ "$keep" = 1 ] && continue
   if [ -s "$f" ]; then
     echo "[disciplined-coder] note: 비관리 파일 '$b' 잔존(내용 있음 — 자동삭제 안 함, 확인 요)" >&2
   else
@@ -87,5 +88,5 @@ for f in agent-principles.md domains-index.md solved_problems.md; do
 done
 
 # 5) 보고
-if [ -n "$created" ]; then echo "[disciplined-coder] PC knowledge initialized:$created (at $KDIR)"; fi
+if [ -n "$created" ]; then echo "[disciplined-coder] PC knowledge initialized:$created (at $KDIR)" >&2; fi
 exit 0
