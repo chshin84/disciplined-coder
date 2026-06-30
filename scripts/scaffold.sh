@@ -38,8 +38,23 @@ for f in agent-principles.md domains-index.md; do
   fi
 done
 
-# 1b) 구 파일명 정리(멱등): 이전 버전이 남긴 coding-principles.md orphan 제거.
-[ -f "$KDIR/coding-principles.md" ] && rm -f "$KDIR/coding-principles.md" || true
+# 1b) 관리 디렉터리 위생(멱등): 화이트리스트=현 정본 세트. 과거 plugin이 만든 구 관리
+#     파일(STALE)은 안전 제거한다. 그 외 비화이트리스트는 사용자 데이터일 수 있어(머신로컬
+#     기록) — 비었으면 제거, 내용 있으면 삭제 않고 stderr로 surface(FAIL-LOUD). solved는
+#     화이트리스트라 항상 보존(append-only). 미래에 정본이 rename되면 self-clean된다.
+WHITELIST="agent-principles.md domains-index.md solved_problems.md"
+STALE_MANAGED="coding-principles.md"
+for s in $STALE_MANAGED; do [ -f "$KDIR/$s" ] && rm -f "$KDIR/$s" || true; done
+for f in "$KDIR"/*; do
+  [ -e "$f" ] || continue
+  b="$(basename "$f")"
+  case " $WHITELIST " in *" $b "*) continue ;; esac
+  if [ -s "$f" ]; then
+    echo "[disciplined-coder] note: 비관리 파일 '$b' 잔존(내용 있음 — 자동삭제 안 함, 확인 요)" >&2
+  else
+    rm -f "$f"
+  fi
+done
 
 # 2) solved 누적 파일(append-only 오답노트): 없을 때만 생성. (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
 if [ ! -f "$KDIR/solved_problems.md" ]; then

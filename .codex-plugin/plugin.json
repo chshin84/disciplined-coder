@@ -4,7 +4,7 @@
   "description": "Team engineering discipline (SSOT principles) + per-domain design references + spec/plan & doc review gates, for Codex. Mirrors the Claude Code plugin via shared skills and hook logic.",
   "author": { "name": "chshin84", "email": "chshin84@gmail.com" },
   "license": "MIT",
-  "keywords": ["principles", "discipline", "issue-tracking", "scaffold", "hooks"],
+  "keywords": ["principles", "discipline", "doc-review", "scaffold", "hooks"],
   "skills": "./skills/",
   "hooks": "./hooks/hooks-codex.json",
   "interface": {

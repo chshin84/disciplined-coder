@@ -92,4 +92,20 @@ check "CLAUDE_CONFIG_DIR honored (KDIR)"     "[ -f '$H9/disciplined-coder/agent-
 check "CLAUDE_CONFIG_DIR honored (CLAUDE.md)" "[ -f '$H9/CLAUDE.md' ]"
 check "did not fall back to bash \$HOME"      "[ ! -d '$HJUNK/.claude' ]"
 
+# --- 케이스 10: 관리 디렉터리 위생 — 구 관리파일 제거·정본/사용자데이터 보존·빈 고아 제거 ---
+H10="$(mktemp -d)"; P10="$(mktemp -d)"
+run "$H10" "$P10" >/dev/null
+K10="$H10/.claude/disciplined-coder"
+printf 'old canon\n'    > "$K10/coding-principles.md"     # 구 관리파일(STALE) → 제거
+printf '내 미해결 메모\n' > "$K10/unsolved_problems.md"   # 사용자 데이터(내용 있음) → 보존 + surface
+: > "$K10/orphan_empty.md"                                 # 빈 고아 → 제거
+ERR10="$(run "$H10" "$P10" 2>&1 >/dev/null)" || true
+echo "[case10] managed-dir hygiene (whitelist pruning)"
+check "stale coding-principles pruned"  "[ ! -f '$K10/coding-principles.md' ]"
+check "canon preserved"                 "[ -f '$K10/agent-principles.md' ]"
+check "solved preserved"                "[ -f '$K10/solved_problems.md' ]"
+check "user data (unsolved) preserved"  "[ -f '$K10/unsolved_problems.md' ]"
+check "empty orphan removed"            "[ ! -f '$K10/orphan_empty.md' ]"
+check "non-empty orphan surfaced"       "printf '%s' \"\$ERR10\" | grep -qF 'unsolved_problems.md'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

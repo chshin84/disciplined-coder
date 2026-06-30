@@ -32,6 +32,22 @@ for f in agent-principles.md domains-index.md; do
   fi
 done
 
+# 1b) 관리 디렉터리 위생(멱등) — scaffold.sh와 동일 정책(패리티). 화이트리스트=현 정본 세트,
+#     구 관리파일(STALE) 안전 제거, 그 외 비화이트리스트는 비었으면 제거·내용 있으면 surface.
+WHITELIST="agent-principles.md domains-index.md solved_problems.md"
+STALE_MANAGED="coding-principles.md"
+for s in $STALE_MANAGED; do [ -f "$KDIR/$s" ] && rm -f "$KDIR/$s" || true; done
+for f in "$KDIR"/*; do
+  [ -e "$f" ] || continue
+  b="$(basename "$f")"
+  case " $WHITELIST " in *" $b "*) continue ;; esac
+  if [ -s "$f" ]; then
+    echo "[disciplined-coder] note: 비관리 파일 '$b' 잔존(내용 있음 — 자동삭제 안 함, 확인 요)" >&2
+  else
+    rm -f "$f"
+  fi
+done
+
 # 2) solved 누적 파일(append-only 오답노트): 없을 때만 생성. (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
 if [ ! -f "$KDIR/solved_problems.md" ]; then
   cat > "$KDIR/solved_problems.md" <<'EOF'

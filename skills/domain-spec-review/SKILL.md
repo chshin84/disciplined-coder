@@ -36,7 +36,7 @@ superpowers 기본 경로(`docs/superpowers/{specs,plans}/*.md`)에 spec/plan이
 JSON을 돌려준다.
 - `reviewer-grounding` — 외부 사실·비용·API·환경 주장의 근거, 근거 없는 단정·환각.
 - `reviewer-consistency` — 내부 모순, spec↔plan 커버리지 공백, 이름·타입 드리프트, 스코프.
-- `reviewer-adversarial` — 실패 모드·과설계·비가역·자기모순(기능 추가 제안 금지 가드).
+- `reviewer-adversarial` — 실패 모드·과설계·비가역(기능 추가 제안 금지 가드).
 
 ### 3) 메타 집계 — `meta-aggregate` 재사용
 심각도 정렬·출처 태깅·상충 감지(코드 로직, LLM 불필요) 후 decision. spec/plan 리뷰에서는 메인 세션이

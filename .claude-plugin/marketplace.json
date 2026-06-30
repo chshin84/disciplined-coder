@@ -7,7 +7,7 @@
     {
       "name": "disciplined-coder",
       "source": "./",
-      "description": "PC-global engineering discipline (agent-principles.md, SSOT) + issue-log scaffolding, auto-wired into ~/.claude on session start. See the plugin manifest for full details."
+      "description": "PC-global engineering discipline (agent-principles.md, SSOT) + solved-log scaffolding, auto-wired into ~/.claude on session start. See the plugin manifest for full details."
     }
   ]
 }
