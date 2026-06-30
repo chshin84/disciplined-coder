@@ -61,26 +61,14 @@ EOF
 fi
 
 # 3) ~/.codex/AGENTS.md 관리블록 재생성(멱등, CRLF 내성). @import 미지원 → 정본 본문 인라인.
-touch "$AG"
+. "$(dirname "$0")/_managed_block.sh"
 BEGIN_MARK="# BEGIN disciplined-coder (managed — do not edit)"
 END_MARK="# END disciplined-coder (managed — do not edit)"
-if grep -qF "$BEGIN_MARK" "$AG" && grep -qF "$END_MARK" "$AG"; then
-  awk -v b="$BEGIN_MARK" -v e="$END_MARK" '{ l=$0; sub(/\r$/,"",l) } l==b{skip=1} skip==0{print} l==e{skip=0}' "$AG" > "$AG.tmp"
-elif grep -qF "$BEGIN_MARK" "$AG"; then
-  echo "[disciplined-coder] WARNING: ~/.codex/AGENTS.md has BEGIN but no END — skipping strip" >&2
-  cp "$AG" "$AG.tmp"
-else
-  cp "$AG" "$AG.tmp"
-fi
-awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }' "$AG.tmp" > "$AG" && rm -f "$AG.tmp"
 {
-  if [ -s "$AG" ]; then printf '\n'; fi
-  printf '%s\n' "$BEGIN_MARK"
   for f in agent-principles.md domains-index.md; do
     if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; printf '\n'; fi
   done
-  printf '%s\n' "$END_MARK"
-} >> "$AG"
+} | managed_block_inject "$AG" "$BEGIN_MARK" "$END_MARK"
 
 # 4) 세션 주입용 stdout: principles + domains-index + solved 본문(session-start-codex가 캡처해 additionalContext로).
 #    AGENTS.md 인라인(섹션 3)은 principles+domains만(안정적). 자주 커지는 solved는 주입 경로로(spec 3.5).

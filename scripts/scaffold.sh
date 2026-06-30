@@ -69,25 +69,15 @@ EOF
 fi
 
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
-touch "$UC"
+. "$(dirname "$0")/_managed_block.sh"
 BEGIN_MARK="# BEGIN disciplined-coder (managed — do not edit)"
 END_MARK="# END disciplined-coder (managed — do not edit)"
-if grep -qF "$BEGIN_MARK" "$UC" && grep -qF "$END_MARK" "$UC"; then
-  awk -v b="$BEGIN_MARK" -v e="$END_MARK" '{ l=$0; sub(/\r$/,"",l) } l==b{skip=1} skip==0{print} l==e{skip=0}' "$UC" > "$UC.tmp"
-elif grep -qF "$BEGIN_MARK" "$UC"; then
-  echo "[disciplined-coder] WARNING: ~/.claude/CLAUDE.md has BEGIN but no END — skipping strip" >&2
-  cp "$UC" "$UC.tmp"
-else
-  cp "$UC" "$UC.tmp"
-fi
-awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }' "$UC.tmp" > "$UC" && rm -f "$UC.tmp"
-{
-  if [ -s "$UC" ]; then printf '\n'; fi
-  printf '%s\n' "$BEGIN_MARK"
-  # 스킬(domain-*/reviewer-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
-  printf '@disciplined-coder/agent-principles.md\n@disciplined-coder/domains-index.md\n@disciplined-coder/solved_problems.md\n'
-  printf '%s\n' "$END_MARK"
-} >> "$UC"
+# 스킬(domain-*/reviewer-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
+managed_block_inject "$UC" "$BEGIN_MARK" "$END_MARK" <<'EOF'
+@disciplined-coder/agent-principles.md
+@disciplined-coder/domains-index.md
+@disciplined-coder/solved_problems.md
+EOF
 
 # 4) 첫 세션 도달 보강: principles + domains-index + solved를 stdout으로.
 #    @import는 홈 경로가 어긋나면 끊기지만, stdout은 additionalContext라 홈 독립적이다.
