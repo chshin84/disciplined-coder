@@ -73,8 +73,8 @@ solved 오답노트가 **PC 전역 한 곳뿐**이다(`~/.claude/disciplined-cod
 ## 불변식·경계 (정직히)
 
 - **footprint-zero 동기화(3곳 전부)** — 자동 계층(`scaffold`·훅)은 프로젝트에 **아무것도 쓰지 않는다**
-  (넛지만). 프로젝트 쓰기는 **사용자가 명시 호출한 `/add-pointer` 하나뿐.** README의 절대 단정 **3곳
-  (L8 Highlights·L57·L95)을 빠짐없이** *"자동 footprint-zero + 명시 `/add-pointer` 옵트인"*으로 동기화한다
+  (넛지만). 프로젝트 쓰기는 **사용자가 명시 호출한 `/add-pointer` 하나뿐.** README의 footprint 절대 단정
+  **전부(grep으로 식별 — 현재 L5·L8·L15·L57 등; L95는 footprint 아님)를 빠짐없이** *"자동 footprint-zero + 명시 `/add-pointer` 옵트인"*으로 동기화한다
   (한 곳이라도 누락 시 간판 약속이 거짓 — 성공 기준이 신규 거짓 0을 검증). 이는 '범주적 0 → 옵트인 예외 0'
   으로 간판 개념을 **의식적으로 한 번** 약화하는 일방문이며, 근거(프로젝트-국소 교훈의 홈 필요)를 남긴다(`REVERSIBLE`).
 - **`/init` 충돌** — `/init`이 포인터를 덮어도 **자동 복구 안 함·복구 넛지**로 표면화 → 사용자가
@@ -105,7 +105,7 @@ solved 오답노트가 **PC 전역 한 곳뿐**이다(`~/.claude/disciplined-cod
   파일 안 씀**, **경로 감지 정규화 + `CLAUDE_PROJECT_DIR` 미설정 시 no-op**.
 - `§다` 듀얼 recall 문구 존재(검증), `domain-docs` solved 행 스코프 축 존재(검증), **두 scaffold solved
   템플릿이 append-only와 정합**(검증).
-- **README footprint 단정 3곳이 옵트인 동기화**(신규 거짓 0). `claude plugin validate ./` 통과(신규 경고 0).
+- **README footprint 절대 단정 전부(grep 식별)가 옵트인 동기화**(미한정 단정 0 = 신규 거짓 0). `claude plugin validate ./` 통과(신규 경고 0).
 - **dogfood**: 이 레포에 `docs/solved_problems.md` + `./CLAUDE.md` 포인터 존재.
 
 ## 변경 대상 (이 설계가 박힐 곳)
