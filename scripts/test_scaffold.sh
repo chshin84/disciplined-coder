@@ -108,4 +108,26 @@ check "user data (unsolved) preserved"  "[ -f '$K10/unsolved_problems.md' ]"
 check "empty orphan removed"            "[ ! -f '$K10/orphan_empty.md' ]"
 check "non-empty orphan surfaced"       "printf '%s' \"\$ERR10\" | grep -qF 'unsolved_problems.md'"
 
+# --- 케이스 11: /add-pointer (프로젝트 오답노트 + 포인터) ---
+AP="$HERE/scripts/add-pointer.sh"
+PA="$(mktemp -d)"   # 가짜 프로젝트
+ERR11="$(CLAUDE_PROJECT_DIR="$PA" bash "$AP" 2>&1)" || true
+echo "[case11] add-pointer creates log + pointer (idempotent)"
+check "log created in docs/"            "[ -f '$PA/docs/solved_problems.md' ]"
+check "CLAUDE.md created with pointer"   "grep -qF 'docs/solved_problems.md' '$PA/CLAUDE.md'"
+check "pointer has recall instruction"   "grep -qF '먼저 확인' '$PA/CLAUDE.md'"
+check "pointer has single-writer rule"   "grep -qF '메인 세션' '$PA/CLAUDE.md'"
+check "pointer in managed region"        "[ \$(grep -cF '# BEGIN disciplined-coder' '$PA/CLAUDE.md') -eq 1 ]"
+printf '\n- 내 프로젝트 교훈\n' >> "$PA/docs/solved_problems.md"
+CLAUDE_PROJECT_DIR="$PA" bash "$AP" >/dev/null 2>&1
+check "idempotent: one managed region"   "[ \$(grep -cF '# BEGIN disciplined-coder' '$PA/CLAUDE.md') -eq 1 ]"
+check "idempotent: log append preserved"  "grep -qF '내 프로젝트 교훈' '$PA/docs/solved_problems.md'"
+PB="$(mktemp -d)"; printf 'my project note\n' > "$PB/CLAUDE.md"
+CLAUDE_PROJECT_DIR="$PB" bash "$AP" >/dev/null 2>&1
+check "existing CLAUDE.md preserved"     "grep -qxF 'my project note' '$PB/CLAUDE.md'"
+PC="$(mktemp -d)"; mkdir -p "$PC/docs"; : > "$PC/docs/solved_problems.md"
+printf 'note\n# BEGIN disciplined-coder (managed — do not edit)\nstale\n' > "$PC/CLAUDE.md"
+CLAUDE_PROJECT_DIR="$PC" bash "$AP" >/dev/null 2>&1
+check "half-broken block normalized"     "[ \$(grep -cF '# END disciplined-coder' '$PC/CLAUDE.md') -ge 1 ]"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
