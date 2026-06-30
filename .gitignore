@@ -1,2 +1,5 @@
 # session-specific Claude Code local settings (not plugin content)
 .claude/settings.local.json
+
+# git worktrees (isolated workspaces — not plugin content)
+.claude/worktrees/
