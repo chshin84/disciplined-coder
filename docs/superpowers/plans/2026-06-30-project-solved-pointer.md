@@ -464,3 +464,9 @@ git commit -m "chore(dogfood): apply /add-pointer to this repo (project solved l
 - **타입/이름 일관**: `managed_block_inject`(헬퍼) · `_managed_block.sh` · `add-pointer.sh` · `/add-pointer` 무인자 — 전 작업 일관. BEGIN/END 마커 문자열 동일.
 - **플레이스홀더 0**: 모든 코드 step에 실제 코드/명령/기대출력. Task3 분기는 `doc_review_posttooluse.sh`의 실제 변수(`match`·`base`)·line 5 OFF 토글·line 19(`msg=`) 삽입 지점을 그대로 쓴다(3렌즈 grounding으로 검증됨).
 - **codex byte 주의**: Task1의 codex 헬퍼 치환은 END 마커 직전 빈 줄 1개가 사라진다(원본 `printf '\n'` 잔여). `test_codex_scaffold`가 그 빈 줄을 검사하지 않아 회귀 0이나(무해), Claude scaffold와 달리 codex는 byte-동일이 아님을 인지(구현자가 놀라지 않게).
+
+## 리뷰 이력 (3렌즈 — 해소)
+
+plan 3렌즈 독립 리뷰 1회(critical 0) 반영: **Windows 경로 정규화 버그**($match만 슬래시화되고 $proj는 안 됨 → 주 플랫폼에서 넛지 조용히 실패; $proj도 정규화), **반깨짐 미감지**(BEGIN만 검사 → BEGIN·END 둘 다 검사 + 픽스처), **README footprint 줄 오지정**(L95는 footprint 아님 → grep 기반 전체 동기화), **테스트 공백**(단일넛지·문서내용존재·훅무쓰기 단언 추가). minor: codex byte 비동일·stale 산문(run_post·`p`) 정정.
+
+<!-- spec-review: passed -->
