@@ -4,7 +4,19 @@
 # scaffold.sh(Claude)의 Codex 쌍둥이 — 정본 소스 동일(PLUGIN_ROOT의 agent-principles.md 등).
 set -euo pipefail
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
-CODEX_HOME="${CODEX_HOME_DIR:-$HOME/.codex}"   # 테스트는 CODEX_HOME_DIR로 오버라이드
+
+# Codex 홈 해석(scaffold.sh와 동일 사유 — 도메인 PC의 네트워크 홈 리다이렉트로 bash $HOME이
+# 어긋날 수 있음). 우선순위: CODEX_HOME_DIR(테스트) → CODEX_HOME(Codex CLI 자체 env) →
+#           USERPROFILE/.codex(Windows) → $HOME/.codex(mac·Linux 폴백).
+if [ -n "${CODEX_HOME_DIR:-}" ]; then
+  CODEX_HOME="$CODEX_HOME_DIR"
+elif [ -n "${CODEX_HOME:-}" ]; then
+  CODEX_HOME="$CODEX_HOME"   # Codex CLI가 내보낸 값을 그대로 존중
+elif [ -n "${USERPROFILE:-}" ]; then
+  CODEX_HOME="$(cygpath -u "$USERPROFILE" 2>/dev/null || printf '%s' "$USERPROFILE")/.codex"
+else
+  CODEX_HOME="$HOME/.codex"
+fi
 KDIR="$CODEX_HOME/disciplined-coder"
 AG="$CODEX_HOME/AGENTS.md"
 mkdir -p "$KDIR"

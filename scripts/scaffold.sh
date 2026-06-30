@@ -4,7 +4,24 @@
 set -euo pipefail
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
-CLAUDE_HOME="${CLAUDE_HOME_DIR:-$HOME/.claude}"   # 테스트는 CLAUDE_HOME_DIR로 오버라이드
+
+# Claude Code 설정 홈 해석. Claude Code(Node os.homedir)는 Windows에서 USERPROFILE을 쓰는데,
+# 도메인 PC는 네트워크 홈 리다이렉트(HOMEDRIVE=U:)로 bash $HOME이 USERPROFILE과 어긋날 수 있다.
+# 그러면 scaffold가 Claude Code가 안 읽는 곳에 써서 @import·solved가 조용히 누락된다(FAIL-LOUD 위반).
+# 우선순위: CLAUDE_HOME_DIR(테스트) → CLAUDE_CONFIG_DIR(Claude Code 자체 오버라이드) →
+#           USERPROFILE/.claude(Windows = os.homedir) → $HOME/.claude(mac·Linux 폴백).
+if [ -n "${CLAUDE_HOME_DIR:-}" ]; then
+  CLAUDE_HOME="$CLAUDE_HOME_DIR"
+elif [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then
+  CLAUDE_HOME="$CLAUDE_CONFIG_DIR"
+elif [ -n "${USERPROFILE:-}" ]; then
+  CLAUDE_HOME="$(cygpath -u "$USERPROFILE" 2>/dev/null || printf '%s' "$USERPROFILE")/.claude"
+  if [ "$CLAUDE_HOME" != "$HOME/.claude" ]; then
+    echo "[disciplined-coder] note: 설정 홈을 USERPROFILE 기준 $CLAUDE_HOME 로 잡음 (bash \$HOME=$HOME 와 다름)" >&2
+  fi
+else
+  CLAUDE_HOME="$HOME/.claude"
+fi
 KDIR="$CLAUDE_HOME/disciplined-coder"
 UC="$CLAUDE_HOME/CLAUDE.md"
 
@@ -57,8 +74,10 @@ awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for
   printf '%s\n' "$END_MARK"
 } >> "$UC"
 
-# 4) 첫 세션 도달 보강: principles + domains-index를 stdout으로.
-for f in agent-principles.md domains-index.md; do
+# 4) 첫 세션 도달 보강: principles + domains-index + solved를 stdout으로.
+#    @import는 홈 경로가 어긋나면 끊기지만, stdout은 additionalContext라 홈 독립적이다.
+#    solved도 여기 포함해 codex-scaffold.sh와 패리티를 맞춘다(@import 단일 경로 의존 제거).
+for f in agent-principles.md domains-index.md solved_problems.md; do
   if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
 done
 

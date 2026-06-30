@@ -45,6 +45,13 @@ run "$H5" >/dev/null
 echo "[case5] CRLF region recognized"
 check "CRLF region not duplicated"  "[ \$(grep -cF '# BEGIN disciplined-coder' '$H5/.codex/AGENTS.md') -eq 1 ]"
 
+# --- 케이스 6: 홈 해석이 bash $HOME에 의존하지 않음 (CODEX_HOME env 우선) ---
+H6C="$(mktemp -d)/ch"; HJUNK="$(mktemp -d)"
+OUT6="$(HOME="$HJUNK" CODEX_HOME="$H6C" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD")"
+echo "[case6] home resolution honors CODEX_HOME, not bash \$HOME"
+check "CODEX_HOME honored (KDIR)"    "[ -f '$H6C/disciplined-coder/agent-principles.md' ]"
+check "did not fall back to bash \$HOME" "[ ! -d '$HJUNK/.codex' ]"
+
 echo "[manifest + session hook]"
 SS="$HERE/hooks/session-start-codex"
 check "session-start-codex emits additionalContext" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$HERE\" bash '$SS' | grep -q additionalContext"

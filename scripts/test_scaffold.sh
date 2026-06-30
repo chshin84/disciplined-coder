@@ -24,6 +24,7 @@ check "user CLAUDE.md imports domains"    "grep -qxF '@disciplined-coder/domains
 check "user CLAUDE.md imports solved"     "grep -qxF '@disciplined-coder/solved_problems.md' '$UC'"
 check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
 check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '디시플린'"
+check "stdout has solved marker"      "printf '%s' \"\$OUT\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 
 # --- 케이스 2: 프로젝트 폴더 무오염 ---
 echo "[case2] project untouched"
@@ -80,5 +81,15 @@ set -e
 echo "[case8] missing source → FAIL-LOUD warning, exit 0"
 check "missing source warns to stderr"      "printf '%s' \"\$ERR8\" | grep -qF 'WARNING: source not found'"
 check "missing source still exit 0"         "[ $rc8 -eq 0 ]"
+
+# --- 케이스 9: 홈 해석이 bash $HOME에 의존하지 않음 (CLAUDE_CONFIG_DIR 우선) ---
+# AD 리다이렉트 홈(예: $HOME=U:\ 네트워크 드라이브)에서 Claude Code 실제 홈(USERPROFILE/CLAUDE_CONFIG_DIR)과
+# 어긋나던 버그 회귀 방지. 임시 HOME을 줘서 실패 시에도 실제 ~/.claude를 오염시키지 않는다.
+H9="$(mktemp -d)/cfg"; P9="$(mktemp -d)"; HJUNK="$(mktemp -d)"
+OUT9="$(HOME="$HJUNK" CLAUDE_CONFIG_DIR="$H9" CLAUDE_PROJECT_DIR="$P9" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD")"
+echo "[case9] home resolution honors CLAUDE_CONFIG_DIR, not bash \$HOME"
+check "CLAUDE_CONFIG_DIR honored (KDIR)"     "[ -f '$H9/disciplined-coder/agent-principles.md' ]"
+check "CLAUDE_CONFIG_DIR honored (CLAUDE.md)" "[ -f '$H9/CLAUDE.md' ]"
+check "did not fall back to bash \$HOME"      "[ ! -d '$HJUNK/.claude' ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
