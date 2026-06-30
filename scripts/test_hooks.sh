@@ -113,4 +113,27 @@ check "fpre: apply_patch 새 .md → 양식 제안"          "fpre '$(AP1 "$T/co
 check "drev: apply_patch 기존 .md → 검진 넛지"        "drev '$(AP1 "$T/existing.md")' | grep -q additionalContext"
 check "drev: apply_patch 비문서(.py) → 무출력"        "[ -z \"\$(drev '$(AP1 "$T/src/main.py")')\" ]"
 
+echo "[project-solved nudge]"
+in_claudemd() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s/CLAUDE.md"}}' "$1"; }
+PN="$(mktemp -d)"   # 로그 없는 프로젝트
+OUT_DISC="$(in_claudemd "$PN" | CLAUDE_PROJECT_DIR="$PN" bash "$DREV" 2>&1)" || true
+check "discovery nudge when no log"      "printf '%s' \"\$OUT_DISC\" | grep -qF 'add-pointer'"
+check "single fire (no generic nudge)"   "! printf '%s' \"\$OUT_DISC\" | grep -qF 'reviewer-grounding'"
+check "hook writes no project file"      "[ ! -f '$PN/docs/solved_problems.md' ]"
+PO="$(mktemp -d)"; mkdir -p "$PO/docs"; : > "$PO/docs/solved_problems.md"
+printf '# BEGIN disciplined-coder (managed — do not edit)\nx\n# END disciplined-coder (managed — do not edit)\n' > "$PO/CLAUDE.md"
+OUT_OK="$(in_claudemd "$PO" | CLAUDE_PROJECT_DIR="$PO" bash "$DREV" 2>&1)" || true
+check "no nudge when log+pointer ok"     "! printf '%s' \"\$OUT_OK\" | grep -qF 'add-pointer'"
+PR="$(mktemp -d)"; mkdir -p "$PR/docs"; : > "$PR/docs/solved_problems.md"; printf 'note\n' > "$PR/CLAUDE.md"
+OUT_REC="$(in_claudemd "$PR" | CLAUDE_PROJECT_DIR="$PR" bash "$DREV" 2>&1)" || true
+check "recovery nudge when pointer gone" "printf '%s' \"\$OUT_REC\" | grep -qF 'add-pointer'"
+PH="$(mktemp -d)"; mkdir -p "$PH/docs"; : > "$PH/docs/solved_problems.md"
+printf '# BEGIN disciplined-coder (managed — do not edit)\nx\n' > "$PH/CLAUDE.md"
+OUT_HALF="$(in_claudemd "$PH" | CLAUDE_PROJECT_DIR="$PH" bash "$DREV" 2>&1)" || true
+check "recovery nudge on half-broken"    "printf '%s' \"\$OUT_HALF\" | grep -qF 'add-pointer'"
+OUT_OFF="$(in_claudemd "$PN" | CLAUDE_PROJECT_DIR="$PN" DISCIPLINED_CODER_REVIEW_GATE=off bash "$DREV" 2>&1)" || true
+check "off toggle silences nudge"        "! printf '%s' \"\$OUT_OFF\" | grep -qF 'add-pointer'"
+OUT_UNSET="$(in_claudemd "$PN" | bash "$DREV" 2>&1)" || true
+check "unset PROJECT_DIR no add-pointer" "! printf '%s' \"\$OUT_UNSET\" | grep -qF 'add-pointer'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
