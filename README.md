@@ -61,7 +61,7 @@
 ```text
 /show-principles     # 현재 활성 디시플린 정본(agent-principles.md 사본) 보기
 /show-solved         # 해결된 문제 오답노트 보기
-/bootstrap-issues    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
+/setup-discipline    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
 ```
 
 ## 구성
@@ -85,7 +85,7 @@ disciplined-coder/
 ├── scripts/test_codex_scaffold.sh  # Codex 셋업·매니페스트·세션훅 검증 (FAIL=0)
 ├── scripts/test_scaffold.sh        # scaffold 검증 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
 ├── scripts/test_hooks.sh           # 훅 불변식 테스트 (계약 FAIL=0)
-├── commands/*.md                  # /bootstrap-issues · /show-principles · /show-solved
+├── commands/*.md                  # /setup-discipline · /show-principles · /show-solved · /add-pointer
 ├── docs/DESIGN-NOTES.md            # 개발자용 내부 근거(주입 메커니즘·한계·업그레이드)
 └── README.md
 ```
