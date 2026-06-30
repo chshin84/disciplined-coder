@@ -130,4 +130,41 @@ printf 'note\n# BEGIN disciplined-coder (managed — do not edit)\nstale\n' > "$
 CLAUDE_PROJECT_DIR="$PC" bash "$AP" >/dev/null 2>&1
 check "half-broken block normalized"     "[ \$(grep -cF '# END disciplined-coder' '$PC/CLAUDE.md') -ge 1 ]"
 
+# --- 케이스 12: 오답노트 처분 모드 (issue-mode) ---
+IM="$HERE/scripts/issue-mode.sh"
+H12="$(mktemp -d)"; P12="$(mktemp -d)"; K12="$H12/.claude/disciplined-coder"
+echo "[case12] issue-mode default + inject + toggle"
+# 12a) 부재 → surface 결정론적 생성 + 모드 주입 + 첫설치 안내
+OUT12a="$(run "$H12" "$P12")"
+check "issue-mode created = surface"      "[ \"\$(cat '$K12/issue-mode')\" = surface ]"
+check "mode line injected (surface)"      "printf '%s' \"\$OUT12a\" | grep -qF '처분 모드: surface'"
+check "first-install note injected"       "printf '%s' \"\$OUT12a\" | grep -qF '시작했다'"
+# 12b) 2회차 → 안내 미반복 + issue-mode 위생 무경고(화이트리스트)
+ERR12b="$(run "$H12" "$P12" 2>&1 >/dev/null)" || true
+OUT12b="$(run "$H12" "$P12")"
+check "note not repeated (config exists)" "! printf '%s' \"\$OUT12b\" | grep -qF '시작했다'"
+check "issue-mode not hygiene-flagged"    "! printf '%s' \"\$ERR12b\" | grep -qF '비관리 파일'"
+# 12c) issues 모드 → issues 주입
+printf 'issues\n' > "$K12/issue-mode"
+OUT12c="$(run "$H12" "$P12")"
+check "issues mode injected"              "printf '%s' \"\$OUT12c\" | grep -qF '처분 모드: issues'"
+# 12d) 불명값 → surface 폴백 + 경고
+printf 'xyz\n' > "$K12/issue-mode"
+ERR12d="$(run "$H12" "$P12" 2>&1 >/dev/null)" || true
+OUT12d="$(run "$H12" "$P12")"
+check "unknown value warns"               "printf '%s' \"\$ERR12d\" | grep -qF '불명값'"
+check "unknown falls back to surface"     "printf '%s' \"\$OUT12d\" | grep -qF '처분 모드: surface'"
+# 12e) /issue-mode set/show/reject/자기완결
+HC="$(mktemp -d)/cfg"
+CLAUDE_HOME_DIR="$HC" bash "$IM" issues >/dev/null
+check "/issue-mode issues writes config"  "[ \"\$(cat '$HC/disciplined-coder/issue-mode')\" = issues ]"
+check "/issue-mode (no arg) shows mode"   "CLAUDE_HOME_DIR='$HC' bash '$IM' | grep -qF issues"
+CLAUDE_HOME_DIR="$HC" bash "$IM" surface >/dev/null
+check "/issue-mode surface writes config" "[ \"\$(cat '$HC/disciplined-coder/issue-mode')\" = surface ]"
+set +e; CLAUDE_HOME_DIR="$HC" bash "$IM" bogus >/dev/null 2>&1; rc12=$?; set -e
+check "/issue-mode rejects invalid arg"   "[ $rc12 -ne 0 ]"
+HF="$(mktemp -d)/fresh"
+CLAUDE_HOME_DIR="$HF" bash "$IM" issues >/dev/null
+check "/issue-mode self-contained mkdir"  "[ -f '$HF/disciplined-coder/issue-mode' ]"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

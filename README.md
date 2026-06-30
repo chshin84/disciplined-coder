@@ -62,6 +62,7 @@
 /show-principles     # 현재 활성 디시플린 정본(agent-principles.md 사본) 보기
 /show-solved         # 해결된 문제 오답노트 보기
 /setup-discipline    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
+/issue-mode [모드]   # 오답노트 미해결 처분 모드 토글: surface(기본)|issues (없으면 현재 표시)
 ```
 
 ## 구성

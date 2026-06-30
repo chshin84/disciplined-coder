@@ -52,6 +52,19 @@ echo "[case6] home resolution honors CODEX_HOME, not bash \$HOME"
 check "CODEX_HOME honored (KDIR)"    "[ -f '$H6C/disciplined-coder/agent-principles.md' ]"
 check "did not fall back to bash \$HOME" "[ ! -d '$HJUNK/.codex' ]"
 
+# --- 케이스 7: 오답노트 처분 모드 미러(codex 자기 홈) ---
+H7="$(mktemp -d)"; K7="$H7/.codex/disciplined-coder"
+echo "[case7] issue-mode mirror"
+OUT7a="$(run "$H7")"
+check "issue-mode created = surface"   "[ \"\$(cat '$K7/issue-mode')\" = surface ]"
+check "mode line injected (surface)"   "printf '%s' \"\$OUT7a\" | grep -qF '처분 모드: surface'"
+check "first-install note injected"    "printf '%s' \"\$OUT7a\" | grep -qF '시작했다'"
+printf 'issues\n' > "$K7/issue-mode"
+OUT7b="$(run "$H7")"
+check "issues mode injected"           "printf '%s' \"\$OUT7b\" | grep -qF '처분 모드: issues'"
+ERR7="$(run "$H7" 2>&1 >/dev/null)" || true
+check "issue-mode not hygiene-flagged" "! printf '%s' \"\$ERR7\" | grep -qF '비관리 파일'"
+
 echo "[manifest + session hook]"
 SS="$HERE/hooks/session-start-codex"
 check "session-start-codex emits additionalContext" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$HERE\" bash '$SS' | grep -q additionalContext"

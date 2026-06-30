@@ -34,7 +34,7 @@ done
 
 # 1b) 관리 디렉터리 위생(멱등) — scaffold.sh와 동일 정책(패리티). 화이트리스트=현 정본 세트,
 #     구 관리파일(STALE) 안전 제거, 그 외 비화이트리스트는 비었으면 제거·내용 있으면 surface.
-WHITELIST="agent-principles.md domains-index.md solved_problems.md"
+WHITELIST="agent-principles.md domains-index.md solved_problems.md issue-mode"
 STALE_MANAGED="coding-principles.md"
 for s in $STALE_MANAGED; do [ -f "$KDIR/$s" ] && rm -f "$KDIR/$s" || true; done
 for f in "$KDIR"/*; do
@@ -61,6 +61,23 @@ EOF
   created="$created solved_problems.md"
 fi
 
+# 2b) 오답노트 처분 모드(scaffold.sh와 동일 정책·미러) — 자기 홈 config. 부재면 surface 생성(+1회 안내).
+MODE_FILE="$KDIR/issue-mode"
+mode_note=""
+if [ ! -f "$MODE_FILE" ]; then
+  printf 'surface\n' > "$MODE_FILE"
+  mode_note="🔵 disciplined-coder: 처분 모드를 surface(기본)로 시작했다 — GitHub Issues 위임을 켜려면 /issue-mode issues."
+fi
+MODE="$(tr -d ' \t\r\n' < "$MODE_FILE" 2>/dev/null || printf surface)"
+if [ "$MODE" = "issues" ]; then
+  mode_line="오답노트 처분 모드: issues — must-keep을 자동 close 트래커(GitHub Issues)에 위임 ON"
+elif [ "$MODE" = "surface" ]; then
+  mode_line="오답노트 처분 모드: surface+메모리 — GitHub 이슈 위임 OFF"
+else
+  echo "[disciplined-coder] WARNING: issue-mode 불명값 '$MODE' — surface로 폴백" >&2
+  mode_line="오답노트 처분 모드: surface+메모리 — GitHub 이슈 위임 OFF (불명 config 폴백)"
+fi
+
 # 3) ~/.codex/AGENTS.md 관리블록 재생성(멱등, CRLF 내성). @import 미지원 → 정본 본문 인라인.
 . "$(dirname "$0")/_managed_block.sh"
 BEGIN_MARK="# BEGIN disciplined-coder (managed — do not edit)"
@@ -76,6 +93,8 @@ END_MARK="# END disciplined-coder (managed — do not edit)"
 for f in agent-principles.md domains-index.md solved_problems.md; do
   if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
 done
+printf '%s\n' "$mode_line"
+if [ -n "$mode_note" ]; then printf '%s\n' "$mode_note"; fi
 
 # 5) 보고(진단은 stderr — stdout은 주입 본문 전용).
 if [ -n "$created" ]; then echo "[disciplined-coder] Codex knowledge initialized:$created (at $KDIR)" >&2; fi
