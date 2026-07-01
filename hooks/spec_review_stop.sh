@@ -4,6 +4,7 @@
 # 순수 bash(jq 비의존). git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
+. "$(cd "$(dirname "$0")" && pwd)/_spec_marker.sh"   # terminal 마커 판정(SSOT) 공유
 INPUT="$(cat)"
 case "$INPUT" in *'"stop_hook_active":true'*|*'"stop_hook_active": true'*) exit 0 ;; esac  # 루프가드
 command -v git >/dev/null 2>&1 || exit 0
@@ -11,15 +12,6 @@ cwd="$(printf '%s' "$INPUT" | sed -n 's/.*"cwd"[[:space:]]*:[[:space:]]*"\([^"]*
 cwd="$(printf '%s' "$cwd" | tr -s '\\' '/')"
 if [ -n "$cwd" ]; then cd "$cwd" 2>/dev/null || exit 0; fi
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
-
-marker_ok() {  # $1=파일 → 마지막 비공백 줄이 terminal 마커면 0
-  local last
-  last="$(grep -v '^[[:space:]]*$' "$1" 2>/dev/null | tail -n 1 || true)"
-  case "$last" in
-    *'<!-- spec-review: passed'*|*'<!-- spec-review: escalated'*) return 0 ;;
-    *) return 1 ;;
-  esac
-}
 
 unreviewed=""
 # -z: NUL 종료 + 따옴표/이스케이프 없는 raw 경로(공백·비ASCII 안전). --no-renames: 리네임을
@@ -34,7 +26,7 @@ while IFS= read -r -d '' entry; do
     *) continue ;;
   esac
   [ -f "$f" ] || continue
-  marker_ok "$f" || unreviewed="$unreviewed $f"
+  marker_is_terminal "$f" || unreviewed="$unreviewed $f"
 done < <(git status -z --porcelain --untracked-files=all --no-renames -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null)
 
 if [ -n "$unreviewed" ]; then

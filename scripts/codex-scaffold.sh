@@ -5,18 +5,9 @@
 set -euo pipefail
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
-# Codex 홈 해석(scaffold.sh와 동일 사유 — 도메인 PC의 네트워크 홈 리다이렉트로 bash $HOME이
-# 어긋날 수 있음). 우선순위: CODEX_HOME_DIR(테스트) → CODEX_HOME(Codex CLI 자체 env) →
-#           USERPROFILE/.codex(Windows) → $HOME/.codex(mac·Linux 폴백).
-if [ -n "${CODEX_HOME_DIR:-}" ]; then
-  CODEX_HOME="$CODEX_HOME_DIR"
-elif [ -n "${CODEX_HOME:-}" ]; then
-  CODEX_HOME="$CODEX_HOME"   # Codex CLI가 내보낸 값을 그대로 존중
-elif [ -n "${USERPROFILE:-}" ]; then
-  CODEX_HOME="$(cygpath -u "$USERPROFILE" 2>/dev/null || printf '%s' "$USERPROFILE")/.codex"
-else
-  CODEX_HOME="$HOME/.codex"
-fi
+# Codex 홈 해석 — scaffold.sh와 같은 공유 헬퍼(SSOT). 런타임만 codex로(홈은 ~/.codex).
+. "$(dirname "$0")/_resolve_home.sh"
+CODEX_HOME="$(resolve_home codex)"
 KDIR="$CODEX_HOME/disciplined-coder"
 AG="$CODEX_HOME/AGENTS.md"
 mkdir -p "$KDIR"
@@ -80,13 +71,12 @@ fi
 
 # 3) ~/.codex/AGENTS.md 관리블록 재생성(멱등, CRLF 내성). @import 미지원 → 정본 본문 인라인.
 . "$(dirname "$0")/_managed_block.sh"
-BEGIN_MARK="# BEGIN disciplined-coder (managed — do not edit)"
-END_MARK="# END disciplined-coder (managed — do not edit)"
+# 마커는 _managed_block.sh의 MANAGED_BEGIN/END(SSOT).
 {
   for f in agent-principles.md domains-index.md; do
     if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; printf '\n'; fi
   done
-} | managed_block_inject "$AG" "$BEGIN_MARK" "$END_MARK"
+} | managed_block_inject "$AG" "$MANAGED_BEGIN" "$MANAGED_END"
 
 # 4) 세션 주입용 stdout: principles + domains-index + solved 본문(session-start-codex가 캡처해 additionalContext로).
 #    AGENTS.md 인라인(섹션 3)은 principles+domains만(안정적). 자주 커지는 solved는 주입 경로로(spec 3.5).

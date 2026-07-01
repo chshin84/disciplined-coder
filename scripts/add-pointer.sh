@@ -22,9 +22,8 @@ EOF
   created="$created docs/solved_problems.md"
 fi
 
-BEGIN_MARK="# BEGIN disciplined-coder (managed — do not edit)"
-END_MARK="# END disciplined-coder (managed — do not edit)"
-managed_block_inject "$UC" "$BEGIN_MARK" "$END_MARK" <<'EOF'
+# 마커는 _managed_block.sh의 MANAGED_BEGIN/END(SSOT).
+managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" <<'EOF'
 ## 오답노트 (solved_problems)
 디버깅·이슈 처리·중요한 결정을 시작하기 전에 `docs/solved_problems.md`를 **먼저 확인**한다 —
 이 프로젝트에서 해결한 문제의 증상→교훈 기록이다. 문제를 완결하면 **메인 세션이** 거기에

@@ -3,6 +3,9 @@
 # Usage: managed_block_inject <target_file> <begin_mark> <end_mark>   (본문은 stdin)
 # - 기존 BEGIN..END 영역 strip(CRLF 내성) → 사용자 내용 보존 → 말미 공백 정규화 → 새 블록 append.
 # - BEGIN만 있고 END 없음 = WARN + strip 생략(비파괴).
+# 표준 관리블록 마커(SSOT). 소비자(scaffold·codex-scaffold·add-pointer)는 이 값을 인자로 넘긴다.
+MANAGED_BEGIN="# BEGIN disciplined-coder (managed — do not edit)"
+MANAGED_END="# END disciplined-coder (managed — do not edit)"
 managed_block_inject() {
   local uc="$1" begin="$2" end="$3" body
   body="$(cat)"

@@ -4,6 +4,7 @@
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$DIR/_spec_marker.sh"   # terminal 마커 판정(SSOT) 공유
 INPUT="$(cat)"
 match=""
 while IFS= read -r FILE; do
@@ -12,12 +13,7 @@ while IFS= read -r FILE; do
     */docs/superpowers/specs/*.md|*/docs/superpowers/plans/*.md) ;;
     *) continue ;;
   esac
-  if [ -f "$FILE" ]; then
-    last="$(grep -v '^[[:space:]]*$' "$FILE" 2>/dev/null | tail -n 1 || true)"
-    case "$last" in
-      *'<!-- spec-review: passed'*|*'<!-- spec-review: escalated'*) continue ;;
-    esac
-  fi
+  if [ -f "$FILE" ] && marker_is_terminal "$FILE"; then continue; fi
   match="$FILE"; break
 done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")

@@ -5,23 +5,11 @@ set -euo pipefail
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
-# Claude Code 설정 홈 해석. Claude Code(Node os.homedir)는 Windows에서 USERPROFILE을 쓰는데,
-# 도메인 PC는 네트워크 홈 리다이렉트(HOMEDRIVE=U:)로 bash $HOME이 USERPROFILE과 어긋날 수 있다.
-# 그러면 scaffold가 Claude Code가 안 읽는 곳에 써서 @import·solved가 조용히 누락된다(FAIL-LOUD 위반).
-# 우선순위: CLAUDE_HOME_DIR(테스트) → CLAUDE_CONFIG_DIR(Claude Code 자체 오버라이드) →
-#           USERPROFILE/.claude(Windows = os.homedir) → $HOME/.claude(mac·Linux 폴백).
-if [ -n "${CLAUDE_HOME_DIR:-}" ]; then
-  CLAUDE_HOME="$CLAUDE_HOME_DIR"
-elif [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then
-  CLAUDE_HOME="$CLAUDE_CONFIG_DIR"
-elif [ -n "${USERPROFILE:-}" ]; then
-  CLAUDE_HOME="$(cygpath -u "$USERPROFILE" 2>/dev/null || printf '%s' "$USERPROFILE")/.claude"
-  if [ "$CLAUDE_HOME" != "${HOME:-}/.claude" ]; then
-    echo "[disciplined-coder] note: 설정 홈을 USERPROFILE 기준 $CLAUDE_HOME 로 잡음 (bash \$HOME=${HOME:-} 와 다름)" >&2
-  fi
-else
-  CLAUDE_HOME="$HOME/.claude"
-fi
+# Claude 설정 홈 해석 — 공유 헬퍼(SSOT). 도메인 PC의 네트워크 홈 리다이렉트로 bash $HOME이
+# os.homedir(USERPROFILE)과 어긋나면 조용한 누락(@import·solved)이 나므로 우선순위 해석을
+# _resolve_home.sh 한 곳에 두고 issue-mode.sh·codex-scaffold.sh와 공유한다.
+. "$(dirname "$0")/_resolve_home.sh"
+CLAUDE_HOME="$(resolve_home claude)"
 KDIR="$CLAUDE_HOME/disciplined-coder"
 UC="$CLAUDE_HOME/CLAUDE.md"
 
@@ -88,10 +76,9 @@ fi
 
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
 . "$(dirname "$0")/_managed_block.sh"
-BEGIN_MARK="# BEGIN disciplined-coder (managed — do not edit)"
-END_MARK="# END disciplined-coder (managed — do not edit)"
+# 마커는 _managed_block.sh의 MANAGED_BEGIN/END(SSOT)를 쓴다.
 # 스킬(domain-*/reviewer-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
-managed_block_inject "$UC" "$BEGIN_MARK" "$END_MARK" <<'EOF'
+managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" <<'EOF'
 @disciplined-coder/agent-principles.md
 @disciplined-coder/domains-index.md
 @disciplined-coder/solved_problems.md

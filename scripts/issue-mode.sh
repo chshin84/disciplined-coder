@@ -3,11 +3,9 @@
 # surface(기본·메모리+surface) ↔ issues(must-keep을 GitHub Issues 등 외부 트래커에 위임).
 set -euo pipefail
 
-# 홈 해석(scaffold.sh와 동일 우선순위 — 네트워크 홈 PC에서 bash $HOME 불신).
-if [ -n "${CLAUDE_HOME_DIR:-}" ]; then CLAUDE_HOME="$CLAUDE_HOME_DIR"
-elif [ -n "${CLAUDE_CONFIG_DIR:-}" ]; then CLAUDE_HOME="$CLAUDE_CONFIG_DIR"
-elif [ -n "${USERPROFILE:-}" ]; then CLAUDE_HOME="$(cygpath -u "$USERPROFILE" 2>/dev/null || printf '%s' "$USERPROFILE")/.claude"
-else CLAUDE_HOME="${HOME:-}/.claude"; fi
+# 홈 해석 — scaffold.sh와 같은 공유 헬퍼(SSOT). 손복제 제거로 드리프트 방지.
+. "$(dirname "$0")/_resolve_home.sh"
+CLAUDE_HOME="$(resolve_home claude)"
 KDIR="$CLAUDE_HOME/disciplined-coder"
 MODE_FILE="$KDIR/issue-mode"
 
