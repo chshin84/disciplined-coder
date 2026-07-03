@@ -180,4 +180,14 @@ HF="$(mktemp -d)/fresh"
 CLAUDE_HOME_DIR="$HF" bash "$IM" issues >/dev/null
 check "/issue-mode self-contained mkdir"  "[ -f '$HF/disciplined-coder/issue-mode' ]"
 
+# --- 케이스 13: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (SSOT — 열거는 사용 절 한 곳) ---
+# 파일 전체가 아니라 '### 커맨드' 절만 검사한다 — /add-pointer 등이 다른 문단에 등장해
+# 목록 누락이 vacuous 통과하는 것을 막는다.
+CMD_SECTION="$(awk '/^### 커맨드/{f=1} f&&/^## /{exit} f' "$HERE/README.md")"
+echo "[case13] README commands section covers commands/ dir"
+for c in "$HERE"/commands/*.md; do
+  n="/$(basename "$c" .md)"
+  check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
+done
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

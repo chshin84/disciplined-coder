@@ -9,7 +9,7 @@
 - **메인 + 모든 서브에이전트 도달** — PC-레벨 주입이라 메인 세션과 커스텀 서브에이전트가 같은 원칙·오답노트를 자동으로 보유한다.
 - **설치 후 무조작** — 새 세션을 시작하면 hook이 알아서 셋업·배선한다(멱등).
 - **홈경로 어긋나도 도달** — 도메인/네트워크 홈 PC(`$HOME`이 Claude Code의 `USERPROFILE`과 다른 경우)에서도 정본을 주입 컨텍스트로 함께 전달해 조용한 누락을 막는다(`FAIL-LOUD`).
-- **글쓰기·문서 디시플린** — 답변 표현(명확·짧게·리듬)은 `CLEAR-COMM`이 상시 잡고, 문서는 사람의 작성 흐름을 흉내 낸다 — 쓰기 전 양식 제안, 다 쓰면 검진 넛지.
+- **글쓰기·문서 디시플린** — 답변 표현(명확·저피로·리듬 — 짧은 답보다 피로도 낮은 답)은 `CLEAR-COMM`이 상시 잡고, 문서는 사람의 작성 흐름을 흉내 낸다 — 쓰기 전 양식 제안, 다 쓰면 검진 넛지.
 
 ## 무엇을·왜 자동화하나
 모든 세션·서브에이전트가 같은 디시플린을 들고 일하게 하되, **자동 계층(scaffold·훅)은 프로젝트 폴더를 건드리지 않는다**(사용자가 명시 호출한 `/add-pointer`만 옵트인으로 프로젝트에 쓴다). 그래서 지식을 프로젝트가 아니라 **PC-레벨**(`~/.claude/`)에 두고, `~/.claude/CLAUDE.md`의 관리블록이 그것을 `@import`한다. Claude Code 서브에이전트는 시작 시 이 메모리 계층을 함께 로드하므로, 한 곳에 배선하면 메인과 서브에이전트 모두에 도달한다(상세·예외는 [DESIGN-NOTES](docs/DESIGN-NOTES.md)).
@@ -22,13 +22,13 @@
 ### 도메인 참고서 + 런타임/메타 검증
 개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(자동 주입되는 목차)가 도메인과 참고서를 안내하고, 각 `skills/domain-*`가 상세를 온디맨드로 제공한다 — 설계 시 명세 반영, 개발 시 폴백.
 - **LLM 런타임**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(호출자)이 리스크에 따라 `skills/reviewer-*`(렌즈)와 `skills/meta-aggregate`(집계)를 **제품 코드의 리뷰 콜**로 구현하게 한다(Claude Code 에이전트가 아니라 제품이 구현할 청사진).
-- **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 PREP → 독립 3렌즈(grounding/consistency/adversarial) → meta-aggregate → accept/regenerate/escalate로 검증한다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 게이트; 문서 마지막 줄 `<!-- spec-review: passed … -->` 마커로 해제; 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
+- **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 PREP → 독립 3렌즈(grounding/consistency/adversarial) → meta-aggregate → accept/regenerate/escalate로 검증한다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 게이트; 문서 마지막 줄 `<!-- spec-review: passed -->` 또는 `escalated` 마커로 해제; 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
 - **문서 작성 워크플로**: 일반 문서(README 등)는 사람이 글 쓰는 흐름을 흉내 낸다 — 작성 **전** `PreToolUse` 훅이 새 `.md`에 `domain-docs` 양식을 제안하고, 작성 **후** `PostToolUse` 훅이 독립 검진(`reviewer-grounding`+`reviewer-fit`)을 넛지한다. 셀프 퇴고만으로 끝내지 않되, 발행물엔 마커를 안 박으므로 spec/plan과 달리 **비블로킹**(권유)이다. 같은 OFF 토글을 쓴다.
 
 ## 설치 (user scope 권장)
 > **왜 user scope인가** — scaffold 출력은 어느 스코프로 깔든 PC 전역(`~/.claude/`)에 쓴다. 그러나 SessionStart hook이 **발동**하는 곳은 플러그인이 활성인 세션뿐이다. user scope면 모든 프로젝트의 모든 새 세션에서 hook이 돌아 reach + 정본 refresh가 함께 보장된다(project scope는 그 프로젝트 세션에서만 발동·갱신).
 
-**전제 조건 — Windows 사용자는 [Git Bash](https://git-scm.com/downloads) 필수.** SessionStart hook이 `bash "...scaffold.sh"`로 스크립트를 돌리는데 Windows엔 bash가 없다(없으면 PowerShell 폴백 → 실패). 실행권한 비트(`chmod +x`)는 불필요. mac/Linux는 기본 `sh`로 동작하므로 별도 설치 불필요.
+**전제 조건 — Windows 사용자는 [Git Bash](https://git-scm.com/downloads) 필수.** SessionStart hook이 `bash "...scaffold.sh"`로 스크립트를 돌리는데 Windows엔 bash가 없다(없으면 PowerShell 폴백 → 실패). 실행권한 비트(`chmod +x`)는 불필요. mac/Linux는 bash가 기본 탑재라 별도 설치 불필요(훅은 sh가 아니라 bash를 호출한다).
 
 **A. 마켓플레이스로 (공유·배포)** — 이 레포가 곧 마켓플레이스다(`.claude-plugin/marketplace.json`).
 1. `/plugin marketplace add chshin84/disciplined-coder`
@@ -51,7 +51,7 @@
 
 ## 사용
 설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어:
-- `~/.claude/disciplined-coder/`에 `agent-principles.md`·`domains-index.md`·`solved_problems.md` 셋업
+- `~/.claude/disciplined-coder/`에 정본 사본과 오답노트·설정 파일 셋업(정확한 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다)
 - `~/.claude/CLAUDE.md` 관리블록에 `@import` 배선(없으면 생성, 있으면 멱등 갱신)
 
 이후 어느 프로젝트에서 열어도 메인 세션과 모든 서브에이전트가 원칙 + 도메인 목차 + 오답노트를 자동으로 보유한다. **자동 계층은 프로젝트 폴더를 건드리지 않는다**(옵트인 `/add-pointer` 제외).
@@ -63,6 +63,7 @@
 /show-solved         # 해결된 문제 오답노트 보기
 /setup-discipline    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
 /issue-mode [모드]   # 오답노트 미해결 처분 모드 토글: surface(기본)|issues (없으면 현재 표시)
+/add-pointer         # 이 프로젝트에 오답노트(docs/solved_problems.md) + CLAUDE.md 포인터 추가(옵트인)
 ```
 
 ## 구성
@@ -86,11 +87,11 @@ disciplined-coder/
 ├── scripts/test_codex_scaffold.sh  # Codex 셋업·매니페스트·세션훅 검증 (FAIL=0)
 ├── scripts/test_scaffold.sh        # scaffold 검증 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
 ├── scripts/test_hooks.sh           # 훅 불변식 테스트 (계약 FAIL=0)
-├── commands/*.md                  # /setup-discipline · /show-principles · /show-solved · /add-pointer
+├── commands/*.md                  # 수동 커맨드(전체 목록은 '사용 > 커맨드' 절이 정본)
 ├── docs/DESIGN-NOTES.md            # 개발자용 내부 근거(주입 메커니즘·한계·업그레이드)
 └── README.md
 ```
-> `~/.claude/disciplined-coder/`에 생성되는 파일: `agent-principles.md`, `domains-index.md`, `solved_problems.md`. 스킬은 플러그인에서 온디맨드 로드 — 복사하지 않는다.
+> `~/.claude/disciplined-coder/`에 생성되는 파일 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다. 스킬은 플러그인에서 온디맨드 로드 — 복사하지 않는다.
 
 ## 주의
 - **플러그인 루트 `CLAUDE.md`는 컨텍스트로 로드되지 않는다** — 주입 경로는 `~/.claude/CLAUDE.md`의 `@import`다.
