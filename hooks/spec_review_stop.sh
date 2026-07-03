@@ -22,10 +22,7 @@ while IFS= read -r -d '' entry; do
   [ -n "$f" ] || continue
   # Fix A: 신규(미추적 ??·추가 A)만 하드게이트 — 기존 spec 수정(상태 strip 등)엔 안 건다(넛지는 PostToolUse가).
   case "${entry:0:2}" in '??'|A*) ;; *) continue ;; esac
-  case "$f" in
-    *docs/superpowers/specs/*.md|*docs/superpowers/plans/*.md) ;;
-    *) continue ;;
-  esac
+  path_is_specplan "$f" || continue
   [ -f "$f" ] || continue
   marker_is_terminal "$f" || unreviewed="$unreviewed $f"
 done < <(git status -z --porcelain --untracked-files=all --no-renames -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null)
@@ -36,10 +33,7 @@ done < <(git status -z --porcelain --untracked-files=all --no-renames -- docs/su
 # ·머지 커밋(-m 미사용)·다중 커밋 우회는 알려진 한계(레거시 임포트 오차단 회피와 같은 근거).
 while IFS= read -r -d '' f; do
   [ -n "$f" ] || continue
-  case "$f" in
-    *docs/superpowers/specs/*.md|*docs/superpowers/plans/*.md) ;;
-    *) continue ;;
-  esac
+  path_is_specplan "$f" || continue
   [ -f "$f" ] || continue
   dup=0; for u in $unreviewed; do [ "$u" = "$f" ] && { dup=1; break; }; done
   [ "$dup" = 1 ] && continue

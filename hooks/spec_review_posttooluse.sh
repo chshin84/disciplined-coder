@@ -9,10 +9,7 @@ INPUT="$(cat)"
 match=""
 while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
-  case "$FILE" in
-    */docs/superpowers/specs/*.md|*/docs/superpowers/plans/*.md) ;;
-    *) continue ;;
-  esac
+  path_is_specplan "$FILE" || continue
   if [ -f "$FILE" ] && marker_is_terminal "$FILE"; then continue; fi
   match="$FILE"; break
 done <<EOF

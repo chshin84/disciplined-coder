@@ -4,12 +4,13 @@
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan) 공유(SSOT)
 INPUT="$(cat)"
 match=""
 while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
   case "$FILE" in *.md) ;; *) continue ;; esac          # 문서(.md)만
-  case "$FILE" in */docs/superpowers/specs/*|*/docs/superpowers/plans/*) continue ;; esac  # spec/plan은 하드 게이트
+  if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
   match="$FILE"; break
 done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")
