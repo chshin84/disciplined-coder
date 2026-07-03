@@ -9,6 +9,7 @@ PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 # os.homedir(USERPROFILE)과 어긋나면 조용한 누락(@import·solved)이 나므로 우선순위 해석을
 # _resolve_home.sh 한 곳에 두고 issue-mode.sh·codex-scaffold.sh와 공유한다.
 . "$(dirname "$0")/_resolve_home.sh"
+. "$(dirname "$0")/_scaffold_common.sh"
 CLAUDE_HOME="$(resolve_home claude)"
 KDIR="$CLAUDE_HOME/disciplined-coder"
 UC="$CLAUDE_HOME/CLAUDE.md"
@@ -26,57 +27,16 @@ for f in agent-principles.md domains-index.md; do
   fi
 done
 
-# 1b) 관리 디렉터리 위생(멱등): 화이트리스트=현 정본 세트. 과거 plugin이 만든 구 관리
-#     파일(STALE)은 안전 제거한다. 그 외 비화이트리스트는 사용자 데이터일 수 있어(머신로컬
-#     기록) — 비었으면 제거, 내용 있으면 삭제 않고 stderr로 surface(FAIL-LOUD). solved는
-#     화이트리스트라 항상 보존(append-only). 미래에 정본이 rename되면 self-clean된다.
-WHITELIST="agent-principles.md domains-index.md solved_problems.md issue-mode"
-STALE_MANAGED="coding-principles.md"
-for s in $STALE_MANAGED; do [ -f "$KDIR/$s" ] && rm -f "$KDIR/$s" || true; done
-for f in "$KDIR"/*; do
-  [ -e "$f" ] || continue
-  b="$(basename "$f")"
-  keep=0; for w in $WHITELIST; do [ "$b" = "$w" ] && { keep=1; break; }; done
-  [ "$keep" = 1 ] && continue
-  if [ -d "$f" ]; then
-    echo "[disciplined-coder] note: 비관리 디렉터리 '$b' 잔존(자동삭제 안 함, 확인 요)" >&2
-    continue
-  fi
-  if [ -s "$f" ]; then
-    echo "[disciplined-coder] note: 비관리 파일 '$b' 잔존(내용 있음 — 자동삭제 안 함, 확인 요)" >&2
-  else
-    rm -f "$f" || echo "[disciplined-coder] WARNING: 빈 고아 '$b' 삭제 실패(권한·잠금?) — 계속 진행" >&2
-  fi
-done
+# 1b) 관리 디렉터리 위생(멱등): 정책 정본은 _scaffold_common.sh(SCAFFOLD_WHITELIST·STALE).
+#     비화이트리스트는 사용자 데이터일 수 있어 — 비었으면 제거, 내용 있으면 surface(FAIL-LOUD).
+scaffold_hygiene "$KDIR"
 
-# 2) solved 누적 파일(append-only 오답노트): 없을 때만 생성. (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
-if [ ! -f "$KDIR/solved_problems.md" ]; then
-  cat > "$KDIR/solved_problems.md" <<'EOF'
-# 해결된 문제 로그 (solved_problems) — PC 전역 · append-only 오답노트
+# 2) solved 누적 파일(append-only 오답노트): 없을 때만 생성 — 템플릿 정본은 _scaffold_common.sh.
+#    (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
+if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; fi
 
-완결된 문제의 교훈 모음 — 차후 비슷한 작업에서 recall해 참고한다. 각 항목: 문제 → 원인 → 해결.
-**완결 후 등록하는 기록이라 '상태'가 아니다** — "문서에 상태 금지"의 예외(append-only, 과거를 지우지 않는다).
-일반화 가능한 항목은 디시플린(agent-principles.md)으로 **재기술해 승격**한다(원문은 append-only로 보존 — 이동이 아니라 상위 계층 재작성). 메인 세션만 기록.
-EOF
-  created="$created solved_problems.md"
-fi
-
-# 2b) 오답노트 처분 모드: 부재면 surface(기본)로 결정론적 생성(+첫설치 1회 안내). 읽어서 모드 결정.
-MODE_FILE="$KDIR/issue-mode"
-mode_note=""
-if [ ! -f "$MODE_FILE" ]; then
-  printf 'surface\n' > "$MODE_FILE"
-  mode_note="🔵 disciplined-coder: 처분 모드를 surface(기본)로 시작했다 — GitHub Issues 위임을 켜려면 /issue-mode issues."
-fi
-MODE="$(tr -d ' \t\r\n' < "$MODE_FILE" 2>/dev/null || printf surface)"
-if [ "$MODE" = "issues" ]; then
-  mode_line="오답노트 처분 모드: issues — must-keep을 자동 close 트래커(GitHub Issues)에 위임 ON"
-elif [ "$MODE" = "surface" ]; then
-  mode_line="오답노트 처분 모드: surface+메모리 — GitHub 이슈 위임 OFF"
-else
-  echo "[disciplined-coder] WARNING: issue-mode 불명값 '$MODE' — surface로 폴백" >&2
-  mode_line="오답노트 처분 모드: surface+메모리 — GitHub 이슈 위임 OFF (불명 config 폴백)"
-fi
+# 2b) 오답노트 처분 모드: 판정 정본은 _scaffold_common.sh — mode_line/mode_note를 셋한다.
+scaffold_resolve_issue_mode "$KDIR"
 
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
 . "$(dirname "$0")/_managed_block.sh"
