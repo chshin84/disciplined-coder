@@ -215,5 +215,17 @@ ERR14d="$(run "$H14" "$P14" 2>&1 >/dev/null)" || true
 OUT14d="$(run "$H14" "$P14")"
 check "ucr unknown value warns"               "printf '%s' \"\$ERR14d\" | grep -qF '불명값'"
 check "ucr unknown falls back to discretion"  "printf '%s' \"\$OUT14d\" | grep -qF '검증 모드: discretion'"
+# 14e) /ultracode-review set/show/reject/자기완결 — issue-mode 12e 미러
+HC14="$(mktemp -d)/cfg"
+CLAUDE_HOME_DIR="$HC14" bash "$UR" required >/dev/null
+check "/ultracode-review required writes"     "[ \"\$(cat '$HC14/disciplined-coder/ultracode-review')\" = required ]"
+check "/ultracode-review (no arg) shows mode" "CLAUDE_HOME_DIR='$HC14' bash '$UR' | grep -qF required"
+CLAUDE_HOME_DIR="$HC14" bash "$UR" discretion >/dev/null
+check "/ultracode-review discretion writes"   "[ \"\$(cat '$HC14/disciplined-coder/ultracode-review')\" = discretion ]"
+set +e; CLAUDE_HOME_DIR="$HC14" bash "$UR" bogus >/dev/null 2>&1; rc14=$?; set -e
+check "/ultracode-review rejects invalid arg" "[ $rc14 -ne 0 ]"
+HF14="$(mktemp -d)/fresh"
+CLAUDE_HOME_DIR="$HF14" bash "$UR" required >/dev/null
+check "/ultracode-review self-contained mkdir" "[ -f '$HF14/disciplined-coder/ultracode-review' ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

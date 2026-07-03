@@ -64,6 +64,7 @@
 /setup-discipline    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
 /issue-mode [모드]   # 오답노트 미해결 처분 모드 토글: surface(기본)|issues (없으면 현재 표시)
 /add-pointer         # 이 프로젝트에 오답노트(docs/solved_problems.md) + CLAUDE.md 포인터 추가(옵트인)
+/ultracode-review [모드] # ultracode 워크플로 검증 모드 토글: discretion(기본)|required (없으면 현재 표시)
 ```
 
 ## 구성
