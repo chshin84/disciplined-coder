@@ -33,6 +33,8 @@ if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; f
 
 # 2b) 오답노트 처분 모드(scaffold.sh와 동일 정책) — 판정 정본은 _scaffold_common.sh.
 scaffold_resolve_issue_mode "$KDIR"
+# (의도적 비대칭) ultracode 검증 모드는 여기서 다루지 않는다 — Codex에는 Workflow 도구가 없어
+# 주입이 무동작이다. 공유 화이트리스트 덕에 파일이 생겨도 위생 오탐은 없다(spec 2026-07-03).
 
 # 3) ~/.codex/AGENTS.md 관리블록 재생성(멱등, CRLF 내성). @import 미지원 → 정본 본문 인라인.
 . "$(dirname "$0")/_managed_block.sh"

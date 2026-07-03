@@ -65,7 +65,7 @@
 - `commands/ultracode-review.md` — issue-mode 커맨드를 미러한다(완결 문장 description).
 - `scripts/test_scaffold.sh` — issue-mode 케이스(12)의 패턴을 미러하는 케이스를 추가한다: 부재 시
   discretion 생성·주입·1회 안내, 토글 후 required 주입, 불명값 폴백+경고, 커맨드 스크립트의
-  set/show/reject/자기완결. codex 테스트에도 모드 미러 체크를 추가한다.
+  set/show/reject/자기완결. codex 테스트에는 미러 부재(파일 미생성)를 계약으로 확인한다(미러 제거 결정과 정합).
 - `README.md` — 커맨드 절(정본 열거 한 곳)에 `/ultracode-review` 한 줄을 추가한다(케이스 13 가드가
   누락을 잡는다).
 - `docs/DESIGN-NOTES.md` — R5의 강제 한계(주입 지시 기반 — 무시를 막을 수 없음, 훅 표면 문서화 시

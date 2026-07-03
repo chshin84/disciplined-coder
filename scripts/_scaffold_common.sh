@@ -3,7 +3,7 @@
 # 두 스크립트는 홈 위치·주입 방식만 다르고 관리 디렉터리 정책은 동일해야 한다 — 여기가 정본.
 
 # 관리 디렉터리 화이트리스트(=현 정본 세트)와 구 관리파일(STALE). 여기만 고친다.
-SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md issue-mode"
+SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md issue-mode ultracode-review"
 SCAFFOLD_STALE="coding-principles.md"
 
 # 위생(멱등): STALE 제거 → 비화이트리스트는 디렉터리/내용파일 surface·빈 파일 제거.
@@ -60,5 +60,27 @@ scaffold_resolve_issue_mode() {  # $1=KDIR  → sets: mode_line, mode_note
   else
     echo "[disciplined-coder] WARNING: issue-mode 불명값 '$mode' — surface로 폴백" >&2
     mode_line="오답노트 처분 모드: surface+메모리 — GitHub 이슈 위임 OFF (불명 config 폴백)"
+  fi
+}
+
+# ultracode 검증 모드: 부재면 discretion 생성(+1회 안내), 읽어서 ucr_mode_line/ucr_mode_note를 셋한다.
+# issue-mode의 mode_line/mode_note와 변수를 공유하지 않는다 — 공유하면 나중 resolve가 먼저 값을
+# 덮어써 첫 토글의 라인·안내가 조용히 유실된다(spec 2026-07-03).
+scaffold_resolve_ultracode_review() {  # $1=KDIR  → sets: ucr_mode_line, ucr_mode_note
+  local kdir="$1" mode_file mode
+  mode_file="$kdir/ultracode-review"
+  ucr_mode_note=""
+  if [ ! -f "$mode_file" ]; then
+    printf 'discretion\n' > "$mode_file"
+    ucr_mode_note="🔵 disciplined-coder: ultracode 검증 모드를 discretion(기본)으로 시작했다 — 워크플로 렌즈 검증을 강제하려면 /ultracode-review required."
+  fi
+  mode="$(tr -d ' \t\r\n' < "$mode_file" 2>/dev/null || printf discretion)"
+  if [ "$mode" = "required" ]; then
+    ucr_mode_line="ultracode(멀티에이전트 워크플로) 검증 모드: required — 워크플로에 reviewer-* 렌즈 검증 단계를 반드시 포함한다"
+  elif [ "$mode" = "discretion" ]; then
+    ucr_mode_line="ultracode(멀티에이전트 워크플로) 검증 모드: discretion(기본) — 리스크에 비례해 판단하되 보고서에 검증 내역을 명시한다"
+  else
+    echo "[disciplined-coder] WARNING: ultracode-review 불명값 '$mode' — discretion으로 폴백" >&2
+    ucr_mode_line="ultracode(멀티에이전트 워크플로) 검증 모드: discretion(기본) — 리스크에 비례해 판단하되 보고서에 검증 내역을 명시한다 (불명 config 폴백)"
   fi
 }

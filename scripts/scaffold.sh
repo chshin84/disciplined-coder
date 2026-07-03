@@ -38,6 +38,9 @@ if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; f
 # 2b) 오답노트 처분 모드: 판정 정본은 _scaffold_common.sh — mode_line/mode_note를 셋한다.
 scaffold_resolve_issue_mode "$KDIR"
 
+# 2c) ultracode 검증 모드: 판정 정본은 _scaffold_common.sh — ucr_mode_line/ucr_mode_note를 셋한다.
+scaffold_resolve_ultracode_review "$KDIR"
+
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
 . "$(dirname "$0")/_managed_block.sh"
 # 마커는 _managed_block.sh의 MANAGED_BEGIN/END(SSOT)를 쓴다.
@@ -56,6 +59,8 @@ for f in agent-principles.md domains-index.md solved_problems.md; do
 done
 printf '%s\n' "$mode_line"
 if [ -n "$mode_note" ]; then printf '%s\n' "$mode_note"; fi
+printf '%s\n' "$ucr_mode_line"
+if [ -n "$ucr_mode_note" ]; then printf '%s\n' "$ucr_mode_note"; fi
 
 # 5) 보고
 if [ -n "$created" ]; then echo "[disciplined-coder] PC knowledge initialized:$created (at $KDIR)" >&2; fi

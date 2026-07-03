@@ -190,4 +190,30 @@ for c in "$HERE"/commands/*.md; do
   check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
 done
 
+# --- 케이스 14: ultracode 검증 모드 (ultracode-review) — spec 2026-07-03 ---
+UR="$HERE/scripts/ultracode-review.sh"
+H14="$(mktemp -d)"; P14="$(mktemp -d)"; K14="$H14/.claude/disciplined-coder"
+echo "[case14] ultracode-review default + inject + toggle"
+# 14a) 부재 → discretion 결정론 생성 + 모드 주입 + 첫설치 안내 + issue-mode와 공존(변수 분리)
+OUT14a="$(run "$H14" "$P14")"
+check "ultracode-review created = discretion" "[ \"\$(cat '$K14/ultracode-review')\" = discretion ]"
+check "ucr mode line injected (discretion)"   "printf '%s' \"\$OUT14a\" | grep -qF '검증 모드: discretion'"
+check "ucr first-install note injected"       "printf '%s' \"\$OUT14a\" | grep -qF 'ultracode 검증 모드를 discretion'"
+check "both toggles injected (issue-mode too)" "printf '%s' \"\$OUT14a\" | grep -qF '처분 모드: surface'"
+# 14b) 2회차 → 안내 미반복 + 위생 무경고(화이트리스트)
+ERR14b="$(run "$H14" "$P14" 2>&1 >/dev/null)" || true
+OUT14b="$(run "$H14" "$P14")"
+check "ucr note not repeated"                 "! printf '%s' \"\$OUT14b\" | grep -qF 'ultracode 검증 모드를 discretion'"
+check "ucr file not hygiene-flagged"          "! printf '%s' \"\$ERR14b\" | grep -qF '비관리 파일'"
+# 14c) required → required 주입
+printf 'required\n' > "$K14/ultracode-review"
+OUT14c="$(run "$H14" "$P14")"
+check "required mode injected"                "printf '%s' \"\$OUT14c\" | grep -qF '검증 모드: required'"
+# 14d) 불명값 → discretion 폴백 + 경고
+printf 'zzz\n' > "$K14/ultracode-review"
+ERR14d="$(run "$H14" "$P14" 2>&1 >/dev/null)" || true
+OUT14d="$(run "$H14" "$P14")"
+check "ucr unknown value warns"               "printf '%s' \"\$ERR14d\" | grep -qF '불명값'"
+check "ucr unknown falls back to discretion"  "printf '%s' \"\$OUT14d\" | grep -qF '검증 모드: discretion'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

@@ -89,6 +89,8 @@ set -e
 echo "[case8] hygiene: subdir must not abort"
 check "subdir does not abort codex scaffold" "[ $rc8c -eq 0 ]"
 check "subdir surfaced to stderr"            "printf '%s' \"\$ERR8c\" | grep -qF 'rogue_dir'"
+# 의도적 비대칭(spec 2026-07-03): Codex에는 Workflow 도구가 없어 ultracode-review를 미러하지 않는다.
+check "ultracode-review not mirrored to codex" "[ ! -f '$K/ultracode-review' ]"
 
 echo "[manifest + session hook]"
 SS="$HERE/hooks/session-start-codex"
