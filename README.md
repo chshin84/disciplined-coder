@@ -15,9 +15,9 @@
 모든 세션·서브에이전트가 같은 디시플린을 들고 일하게 하되, **자동 계층(scaffold·훅)은 프로젝트 폴더를 건드리지 않는다**(사용자가 명시 호출한 `/add-pointer`만 옵트인으로 프로젝트에 쓴다). 그래서 지식을 프로젝트가 아니라 **PC-레벨**(`~/.claude/`)에 두고, `~/.claude/CLAUDE.md`의 관리블록이 그것을 `@import`한다. Claude Code 서브에이전트는 시작 시 이 메모리 계층을 함께 로드하므로, 한 곳에 배선하면 메인과 서브에이전트 모두에 도달한다(상세·예외는 [DESIGN-NOTES](docs/DESIGN-NOTES.md)).
 
 자동화 대상:
-- **일반 지식**(원칙 + 공통 gotchas + 도메인 목차) — `agent-principles.md`·`domains-index.md`(SSOT)를 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import` 배선.
-- **오답노트**(solved) — `~/.claude/disciplined-coder/solved_problems.md`에 없으면 생성(PC 전역 누적, 멱등, append-only). 운영 규약(완결 후 등록이라 상태 아님, 단일 작성자, 🔴 surface·자율구현 금지, **이슈 트래킹 안 함**)은 `agent-principles.md`의 "절차 다"가 SSOT.
-- **스킬**(domain-*/reviewer-*/meta-aggregate) — 플러그인에서 온디맨드 로드. 복사·주입하지 않는다.
+- **일반 지식**(원칙 + 공통 gotchas + 도메인 목차) — `agent-principles.md`·`domains-index.md`(SSOT)를 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선한다.
+- **오답노트**(solved) — `~/.claude/disciplined-coder/solved_problems.md`가 없으면 생성한다(PC 전역 누적, 멱등, append-only). 운영 규약(완결 후 등록이라 상태 아님, 단일 작성자, 🔴 surface·자율구현 금지, **이슈 트래킹 안 함**)은 `agent-principles.md`의 "절차 다"가 SSOT다.
+- **스킬**(domain-*/reviewer-*/meta-aggregate) — 플러그인에서 온디맨드로 로드한다. 복사·주입하지 않는다.
 
 ### 도메인 참고서 + 런타임/메타 검증
 개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(자동 주입되는 목차)가 도메인과 참고서를 안내하고, 각 `skills/domain-*`가 상세를 온디맨드로 제공한다 — 설계 시 명세 반영, 개발 시 폴백.
@@ -39,7 +39,7 @@
 1. 이 디렉터리를 클론한다.
 2. `claude plugin install ./ --scope user` (모든 프로젝트에서 자동 활성화).
 
-검증: `claude plugin validate ./` (루트 CLAUDE.md 도그푸딩 때문에 `--strict`는 경고로 실패 — 의도된 동작).
+검증: `claude plugin validate ./`. `--strict`는 version 미지정 경고 때문에 실패하는데, 이는 의도된 트레이드오프다 — 활성 개발 중엔 version을 비워야 커밋 SHA 기반 자동 업데이트가 유지된다(상세는 `skills/domain-plugin`).
 
 ### Codex에서 쓰기 (동일 디시플린)
 이 레포는 Claude Code 플러그인이자 **Codex 플러그인**이다(`.codex-plugin/plugin.json`). Codex도 같은 원칙·스킬·강제 게이트(spec/plan·문서 리뷰)를 받는다.
@@ -51,8 +51,8 @@
 
 ## 사용
 설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어:
-- `~/.claude/disciplined-coder/`에 정본 사본과 오답노트·설정 파일 셋업(정확한 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다)
-- `~/.claude/CLAUDE.md` 관리블록에 `@import` 배선(없으면 생성, 있으면 멱등 갱신)
+- `~/.claude/disciplined-coder/`에 정본 사본과 오답노트·설정 파일을 셋업한다(정확한 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다)
+- `~/.claude/CLAUDE.md` 관리블록에 `@import`를 배선한다(없으면 생성하고, 있으면 멱등 갱신한다)
 
 이후 어느 프로젝트에서 열어도 메인 세션과 모든 서브에이전트가 원칙 + 도메인 목차 + 오답노트를 자동으로 보유한다. **자동 계층은 프로젝트 폴더를 건드리지 않는다**(옵트인 `/add-pointer` 제외).
 

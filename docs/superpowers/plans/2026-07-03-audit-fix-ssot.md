@@ -34,6 +34,10 @@
 
 ### Task 1: plugin.json에 version을 추가한다
 
+> **superseded(같은 날 번복됨)**: 실행 후 공식 문서 확인 결과, version을 설정하면 마켓플레이스 업데이트가
+> 버전 비교로 전환되어 활성 개발 중 커밋 갱신이 사용자에게 배포되지 않는다. version은 다시 제거했고
+> validate 경고는 의도된 트레이드오프로 수용한다 — 현행 정본은 `skills/domain-plugin`의 '버전 핀 주의' 항목이다.
+
 배경: `claude plugin validate ./`의 유일한 경고이고, 플러그인 갱신이 커밋 해시로만 식별된다. 최초 semver를 붙인다.
 
 **Files:**
