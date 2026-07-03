@@ -228,4 +228,13 @@ HF14="$(mktemp -d)/fresh"
 CLAUDE_HOME_DIR="$HF14" bash "$UR" required >/dev/null
 check "/ultracode-review self-contained mkdir" "[ -f '$HF14/disciplined-coder/ultracode-review' ]"
 
+# --- 케이스 15: §가 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
+# 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(reviewer-*)과
+# 강제 방식 열이 같은 행에 있음을 보장한다(다른 행·다른 파일의 문자열로 vacuous 통과 방지).
+WF_ROW="$(grep -F '멀티에이전트 워크플로 작성·실행' "$HERE/agent-principles.md" || true)"
+echo "[case15] principles table has workflow verification row"
+check "row exists (trigger)"       "[ -n \"\$WF_ROW\" ]"
+check "row caller = reviewer-*"    "printf '%s' \"\$WF_ROW\" | grep -qF 'reviewer-*'"
+check "row enforcement = toggle"   "printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode 검증 모드'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
