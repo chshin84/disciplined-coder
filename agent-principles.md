@@ -1,8 +1,9 @@
 # 디시플린 (팀 원칙)
 
 모든 작업에 항상 적용한다. 이 파일이 **단일 출처(SSOT)**이며, disciplined-coder 플러그인이
-각 프로젝트의 CLAUDE.md에 `@import`로 자동 주입한다. 프로젝트의 사본은 직접 수정하지 말 것
-(매 세션 이 정본에서 다시 복사된다).
+사본을 `~/.claude/disciplined-coder/`에 두고 `~/.claude/CLAUDE.md` 관리블록의 `@import`로
+모든 프로젝트에 자동 주입한다(프로젝트 폴더에는 아무것도 쓰지 않는다). `~/.claude`의 사본은
+직접 수정하지 말 것 — 매 세션 이 정본에서 다시 갱신된다.
 
 각 원칙은 짧은 ID로 참조한다(예: `SSOT`). 우선순위 규칙은 아래 `NO-PRIORITY` 항목을 보라.
 
@@ -41,7 +42,7 @@ LLM이 만든 결과는 — 제품 출력이든 Claude 자신의 설계 문서�
 | 제품이 런타임에 LLM 호출 | 제품의 LLM 출력 | `domain-llm-runtime` | 제품 코드로 구현 |
 | spec 작성 | Claude의 설계 문서 | `domain-spec-review` | 훅이 강제 |
 | plan 작성 | Claude의 계획 문서 | `domain-spec-review` | 훅이 강제 |
-| 문서(README 등) 작성 | Claude의 문서 | `reviewer-grounding`+`reviewer-fit` | 훅이 제안·넛지 |
+| 문서(README 등) 작성 | Claude의 문서 | `reviewer-grounding`+`reviewer-fit` (방법 상세는 `domain-docs`) | 훅이 제안·넛지 |
 
 각 행의 *방법 상세*는 `호출자` 열의 스킬이 SSOT다 — 그 스킬을 열어라. 상시 로드 본문엔 중복하지 않는다.
 
