@@ -73,6 +73,13 @@ check "malformed: pre-region note preserved" "grep -qxF 'note before' '$UC7'"
 check "malformed: warns BEGIN without END"  "printf '%s' \"\$ERR7\" | grep -qF 'BEGIN but no END'"
 check "malformed: complete region appended" "[ \$(grep -cF '# END disciplined-coder' '$UC7') -ge 1 ]"
 
+# --- 케이스 7b: 깨진 관리영역 2회차 실행 — 1회차가 다음 실행의 파괴를 준비하면 안 된다 ---
+ERR7b="$(run "$H7" "$P7" 2>&1 >/dev/null)" || true
+echo "[case7b] malformed region 2nd run → still non-destructive"
+check "2nd run: user content preserved"    "grep -qxF 'IMPORTANT user content after malformed begin' '$UC7'"
+check "2nd run: pre-region note preserved" "grep -qxF 'note before' '$UC7'"
+check "2nd run: single managed region"     "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC7') -eq 1 ]"
+
 # --- 케이스 8: 정본 소스 부재 → FAIL-LOUD 경고(stderr) + 계속 진행(exit 0) ---
 H8="$(mktemp -d)"; P8="$(mktemp -d)"; ED="$(mktemp -d)"   # ED = 정본 없는 빈 plugin root
 set +e
