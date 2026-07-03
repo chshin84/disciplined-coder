@@ -1,0 +1,29 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: scaffold 계약 (FAIL=0)
+        run: bash scripts/test_scaffold.sh
+      - name: hooks 계약 (FAIL=0)
+        run: bash scripts/test_hooks.sh
+      - name: codex scaffold 계약 (FAIL=0)
+        run: bash scripts/test_codex_scaffold.sh
+
+  plugin-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Claude Code CLI 설치
+        run: npm install -g @anthropic-ai/claude-code
+      - name: plugin validate
+        run: claude plugin validate ./
