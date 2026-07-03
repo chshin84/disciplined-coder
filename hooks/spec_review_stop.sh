@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Stop: 미리뷰 spec/plan이 남으면 종료 차단(하드 게이트). 루프가드: stop_hook_active.
-# 탐지: git 신규(미추적·추가) spec/plan 중 마지막 줄이 terminal 마커가 아닌 것. 기존 파일 수정은 제외(Fix A).
+# 탐지: git 신규(미추적·추가) spec/plan + HEAD 커밋이 추가한 spec/plan 중 마지막 줄이 terminal
+# 마커가 아닌 것(Fix C — 같은 턴 커밋 우회 차단). 기존 파일 수정은 제외(Fix A).
 # 순수 bash(jq 비의존). git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
@@ -28,6 +29,22 @@ while IFS= read -r -d '' entry; do
   [ -f "$f" ] || continue
   marker_is_terminal "$f" || unreviewed="$unreviewed $f"
 done < <(git status -z --porcelain --untracked-files=all --no-renames -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null)
+
+# Fix C: 같은 턴 커밋 우회 차단 — HEAD 커밋이 추가(A)한 spec/plan도 검사한다.
+# 경계는 직전 커밋 하나: 과거 이력을 소급 차단하지 않는다(훅 도입 전 무마커 레거시가 있는
+# 레포에서 상시 차단 → 게이트 영구 off라는 더 나쁜 드리프트를 피한다). 루트 커밋(--root 미사용)
+# ·머지 커밋(-m 미사용)·다중 커밋 우회는 알려진 한계(레거시 임포트 오차단 회피와 같은 근거).
+while IFS= read -r -d '' f; do
+  [ -n "$f" ] || continue
+  case "$f" in
+    *docs/superpowers/specs/*.md|*docs/superpowers/plans/*.md) ;;
+    *) continue ;;
+  esac
+  [ -f "$f" ] || continue
+  dup=0; for u in $unreviewed; do [ "$u" = "$f" ] && { dup=1; break; }; done
+  [ "$dup" = 1 ] && continue
+  marker_is_terminal "$f" || unreviewed="$unreviewed $f"
+done < <(git diff-tree -z --no-commit-id --name-only --diff-filter=A -r HEAD 2>/dev/null || true)
 
 if [ -n "$unreviewed" ]; then
   reason="미리뷰 spec/plan:$unreviewed — disciplined-coder domain-spec-review(3렌즈+PREP)를 수행하고 문서 마지막 줄에 spec-review 마커(passed 또는 escalated, HTML 주석)를 남긴 뒤 종료하라."

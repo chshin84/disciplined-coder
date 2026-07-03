@@ -91,6 +91,18 @@ printf 'fresh\n<!-- spec-review: passed -->\n' > "$G2/docs/superpowers/specs/fre
 check "신규 spec + dateless 마커 → 무차단(Fix B 인식)"  "[ -z \"\$(stop '{\"cwd\":\"$G2\"}')\" ]"
 printf 'brandnew\n' > "$G2/docs/superpowers/specs/brandnew.md"
 check "수정+신규 미리뷰 동시 → 신규로 차단(Fix A)"      "stop '{\"cwd\":\"$G2\"}' | grep -q '\"block\"'"
+# Fix C: 같은 턴 '커밋'으로 하드게이트가 조용히 열리면 안 된다 — HEAD가 추가한 spec도 검사.
+G3="$(mktemp -d)"; ( cd "$G3" && git init -q && git config user.email t@t && git config user.name t )
+mkdir -p "$G3/docs/superpowers/specs"
+printf 'seed\n' > "$G3/README.md"
+( cd "$G3" && git add -A && git commit -qm seed )
+printf 'draft committed\n' > "$G3/docs/superpowers/specs/sneaky.md"
+( cd "$G3" && git add -A && git commit -qm 'add spec' )
+check "커밋된 미리뷰 spec(HEAD) → block(Fix C)"   "stop '{\"cwd\":\"$G3\"}' | grep -q '\"block\"'"
+printf 'draft committed\n<!-- spec-review: passed -->\n' > "$G3/docs/superpowers/specs/sneaky.md"
+check "HEAD spec에 마커 추가 후 → 통과(Fix C)"    "[ -z \"\$(stop '{\"cwd\":\"$G3\"}')\" ]"
+( cd "$G3" && git add -A && git commit -qm 'mark reviewed' )
+check "마커 커밋 후(HEAD=수정 커밋) → 통과(Fix C)" "[ -z \"\$(stop '{\"cwd\":\"$G3\"}')\" ]"
 
 echo "[doc-format-pre]"
 printf 'x\n' > "$T/existing.md"
