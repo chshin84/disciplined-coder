@@ -99,5 +99,13 @@ check ".codex-plugin manifest is valid JSON" "json_valid_stdin < '$HERE/.codex-p
 check "hooks-codex.json is valid JSON"       "json_valid_stdin < '$HERE/hooks/hooks-codex.json'"
 check "hooks-codex wires apply_patch matcher" "grep -qF 'apply_patch' '$HERE/hooks/hooks-codex.json'"
 check "manifest points skills + codex hooks"  "grep -qF 'hooks-codex.json' '$HERE/.codex-plugin/plugin.json'"
+# FAIL-LOUD: scaffold의 stderr 진단이 훅에서 삼켜지면 안 된다.
+EDIR="$(mktemp -d)"   # 정본 없는 plugin root → scaffold가 WARNING을 stderr로 낸다
+check "session hook relays scaffold stderr" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$EDIR\" bash '$SS' 2>&1 >/dev/null | grep -qF 'WARNING'"
+# 실패 시 원인 문자열이 주입 컨텍스트에 포함되고, 출력은 여전히 유효한 JSON이어야 한다.
+TF="$(mktemp)"        # 파일 아래 경로 → mkdir -p 실패 → scaffold 비정상 종료
+OUTF="$(CODEX_HOME_DIR="$TF/.codex" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SS" 2>/dev/null)"
+check "session hook surfaces failure cause"    "printf '%s' \"\$OUTF\" | grep -qF 'scaffold error:'"
+check "failure output is still valid JSON"     "printf '%s' \"\$OUTF\" | json_valid_stdin"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
