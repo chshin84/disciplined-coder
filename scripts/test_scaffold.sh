@@ -106,7 +106,10 @@ K10="$H10/.claude/disciplined-coder"
 printf 'old canon\n'    > "$K10/coding-principles.md"     # 구 관리파일(STALE) → 제거
 printf '내 미해결 메모\n' > "$K10/unsolved_problems.md"   # 사용자 데이터(내용 있음) → 보존 + surface
 : > "$K10/orphan_empty.md"                                 # 빈 고아 → 제거
-ERR10="$(run "$H10" "$P10" 2>&1 >/dev/null)" || true
+mkdir -p "$K10/rogue_dir"                                  # 하위 디렉터리 → 중단 없이 surface
+set +e
+ERR10="$(run "$H10" "$P10" 2>&1 >/dev/null)"; rc10=$?
+set -e
 echo "[case10] managed-dir hygiene (whitelist pruning)"
 check "stale coding-principles pruned"  "[ ! -f '$K10/coding-principles.md' ]"
 check "canon preserved"                 "[ -f '$K10/agent-principles.md' ]"
@@ -114,6 +117,9 @@ check "solved preserved"                "[ -f '$K10/solved_problems.md' ]"
 check "user data (unsolved) preserved"  "[ -f '$K10/unsolved_problems.md' ]"
 check "empty orphan removed"            "[ ! -f '$K10/orphan_empty.md' ]"
 check "non-empty orphan surfaced"       "printf '%s' \"\$ERR10\" | grep -qF 'unsolved_problems.md'"
+check "subdir does not abort scaffold"  "[ $rc10 -eq 0 ]"
+check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rogue_dir'"
+check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
 
 # --- 케이스 11: /add-pointer (프로젝트 오답노트 + 포인터) ---
 AP="$HERE/scripts/add-pointer.sh"

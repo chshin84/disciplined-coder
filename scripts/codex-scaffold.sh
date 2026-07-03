@@ -33,10 +33,14 @@ for f in "$KDIR"/*; do
   b="$(basename "$f")"
   keep=0; for w in $WHITELIST; do [ "$b" = "$w" ] && { keep=1; break; }; done
   [ "$keep" = 1 ] && continue
+  if [ -d "$f" ]; then
+    echo "[disciplined-coder] note: 비관리 디렉터리 '$b' 잔존(자동삭제 안 함, 확인 요)" >&2
+    continue
+  fi
   if [ -s "$f" ]; then
     echo "[disciplined-coder] note: 비관리 파일 '$b' 잔존(내용 있음 — 자동삭제 안 함, 확인 요)" >&2
   else
-    rm -f "$f"
+    rm -f "$f" || echo "[disciplined-coder] WARNING: 빈 고아 '$b' 삭제 실패(권한·잠금?) — 계속 진행" >&2
   fi
 done
 

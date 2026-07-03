@@ -81,6 +81,15 @@ check "issues mode injected"           "printf '%s' \"\$OUT7b\" | grep -qF '처�
 ERR7="$(run "$H7" 2>&1 >/dev/null)" || true
 check "issue-mode not hygiene-flagged" "! printf '%s' \"\$ERR7\" | grep -qF '비관리 파일'"
 
+# --- 케이스 8: 관리 디렉터리 위생 — 하위 디렉터리에서 중단되지 않는다 ---
+mkdir -p "$K/rogue_dir"
+set +e
+ERR8c="$(run "$H1" 2>&1 >/dev/null)"; rc8c=$?
+set -e
+echo "[case8] hygiene: subdir must not abort"
+check "subdir does not abort codex scaffold" "[ $rc8c -eq 0 ]"
+check "subdir surfaced to stderr"            "printf '%s' \"\$ERR8c\" | grep -qF 'rogue_dir'"
+
 echo "[manifest + session hook]"
 SS="$HERE/hooks/session-start-codex"
 check "session-start-codex emits additionalContext" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$HERE\" bash '$SS' | grep -q additionalContext"
