@@ -20,7 +20,7 @@ superpowers 기본 경로(`docs/superpowers/{specs,plans}/*.md`)에 spec/plan이
 - 완료 후 문서 **마지막 줄**에 마커를 남기면 해제: `<!-- spec-review: passed -->` (escalate면 `escalated`).
   **날짜·개수는 안 박는다** — 마커는 게이트 계약 토큰이지 상태가 아니다("문서에 상태 금지"). 기존 dated
   마커도 인식한다(prefix 매칭, 하위호환). terminal(passed/escalated)만 마커다 — pending은 마커가 아니다.
-- 끄기: env `DISCIPLINED_CODER_REVIEW_GATE=off`. (전역 훅 — `hooks/hooks.json`.)
+- 끄려면 env `DISCIPLINED_CODER_REVIEW_GATE=off`를 설정한다(전역 훅 — `hooks/hooks.json`).
 
 ## 절차 (공통 방법 — `agent-principles.md` "절차 가" 참조)
 
@@ -39,7 +39,7 @@ JSON을 돌려준다.
 - `reviewer-adversarial` — 실패 모드·과설계·비가역(기능 추가 제안 금지 가드).
 
 ### 3) 메타 집계 — `meta-aggregate` 재사용
-심각도 정렬·출처 태깅·상충 감지(코드 로직, LLM 불필요) 후 decision. spec/plan 리뷰에서는 메인 세션이
+심각도 정렬·출처 태깅·상충 감지(코드 로직 — LLM 불필요)를 거쳐 decision을 내린다. spec/plan 리뷰에서는 메인 세션이
 `meta-aggregate`의 좁은 절차를 직접 수행한다(제품 코드 없음). 단일 작성자: 리뷰어는 JSON 리턴만,
 메인이 취합·반영·마커 기록.
 
