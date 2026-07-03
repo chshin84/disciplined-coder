@@ -7,6 +7,22 @@ pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
 run() { CODEX_HOME_DIR="$1/.codex" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"; }
 
+# JSON 유효성 검사기 — stdin의 JSON을 파싱한다. python3가 존재해도 실행 불능인 머신
+# (Windows Store 스텁 등)이 있으므로 프로브는 존재 확인이 아니라 실제 실행으로 한다.
+# 폴백 체인: python3 → python → node. 셋 다 없으면 FAIL(조용한 SKIP 금지 — FAIL-LOUD).
+json_valid_stdin() {
+  if python3 -c 'import sys' >/dev/null 2>&1; then
+    python3 -c 'import json,sys; json.load(sys.stdin)'
+  elif python -c 'import sys' >/dev/null 2>&1; then
+    python -c 'import json,sys; json.load(sys.stdin)'
+  elif command -v node >/dev/null 2>&1; then
+    node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{JSON.parse(d)})'
+  else
+    echo "  (json_valid_stdin: python3/python/node 모두 없음 — 검증 불능은 FAIL로 계상)" >&2
+    return 1
+  fi
+}
+
 # --- 케이스 1: 신규 PC ---
 H1="$(mktemp -d)"
 OUT="$(run "$H1")"
@@ -69,9 +85,9 @@ echo "[manifest + session hook]"
 SS="$HERE/hooks/session-start-codex"
 check "session-start-codex emits additionalContext" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$HERE\" bash '$SS' | grep -q additionalContext"
 check "session-start-codex warns about trust review" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$HERE\" bash '$SS' | grep -qF '신뢰'"
-check "session-start-codex stdout is valid JSON" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$HERE\" bash '$SS' | python3 -c 'import json,sys; json.load(sys.stdin)'"
-check ".codex-plugin manifest is valid JSON" "python3 -c 'import json;json.load(open(\"$HERE/.codex-plugin/plugin.json\"))'"
-check "hooks-codex.json is valid JSON"       "python3 -c 'import json;json.load(open(\"$HERE/hooks/hooks-codex.json\"))'"
+check "session-start-codex stdout is valid JSON" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$HERE\" bash '$SS' | json_valid_stdin"
+check ".codex-plugin manifest is valid JSON" "json_valid_stdin < '$HERE/.codex-plugin/plugin.json'"
+check "hooks-codex.json is valid JSON"       "json_valid_stdin < '$HERE/hooks/hooks-codex.json'"
 check "hooks-codex wires apply_patch matcher" "grep -qF 'apply_patch' '$HERE/hooks/hooks-codex.json'"
 check "manifest points skills + codex hooks"  "grep -qF 'hooks-codex.json' '$HERE/.codex-plugin/plugin.json'"
 
