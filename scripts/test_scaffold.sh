@@ -237,4 +237,12 @@ check "row exists (trigger)"       "[ -n \"\$WF_ROW\" ]"
 check "row caller = reviewer-*"    "printf '%s' \"\$WF_ROW\" | grep -qF 'reviewer-*'"
 check "row enforcement = toggle"   "printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode 검증 모드'"
 
+# --- 케이스 16: §마 병렬 오케스트레이션 넛지(정본 계약 가드) ---
+# §마 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다(vacuous 통과 방지).
+PO_BLOCK="$(awk '/^### 마\./{f=1} f&&/^### /&&!/^### 마\./{exit} f&&/^## /&&!/^### /{exit} f' "$HERE/agent-principles.md")"
+echo "[case16] principles §마 nested-orchestration nudge"
+check "§마 heading exists"            "printf '%s' \"\$PO_BLOCK\" | grep -qF '### 마.'"
+check "§마 points to skill (SSOT)"    "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
+check "§마 routes single-task to 2층" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'dispatching-parallel-agents'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
