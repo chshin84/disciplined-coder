@@ -76,6 +76,7 @@ disciplined-coder/
 ├── skills/domain-*/SKILL.md        # 도메인 참고서(docs/plugin/llm-runtime) + 호출자 domain-spec-review
 ├── skills/reviewer-*/SKILL.md      # 리뷰어 렌즈(grounding/fit/consistency/adversarial)
 ├── skills/meta-aggregate/SKILL.md  # 리뷰어 집계·결정(코드 설계도)
+├── skills/nested-orchestration/SKILL.md # 3층 병렬 오케스트레이션 방법(§마 트리거)
 ├── hooks/hooks.json                # SessionStart→scaffold · Pre/PostToolUse·Stop→문서·spec/plan 워크플로
 ├── hooks/spec_review_*.sh          # spec/plan: PostToolUse(감지) · Stop(하드 게이트) — 순수 bash, jq 비의존
 ├── hooks/doc_*tooluse.sh           # 문서: 양식 제안(Pre) · 검진 넛지(Post) — 비블로킹

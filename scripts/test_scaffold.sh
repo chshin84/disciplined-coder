@@ -245,4 +245,15 @@ check "§마 heading exists"            "printf '%s' \"\$PO_BLOCK\" | grep -qF '
 check "§마 points to skill (SSOT)"    "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
 check "§마 routes single-task to 2층" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'dispatching-parallel-agents'"
 
+# --- 케이스 17: nested-orchestration 스킬 존재 + 핵심 절(정본 계약 가드) ---
+# 단일 목적 파일이라 파일 전역 존재 검사로 충분하다(섹션 경합 없음 — Global Constraint 참조).
+NO_SKILL="$HERE/skills/nested-orchestration/SKILL.md"
+echo "[case17] nested-orchestration skill present + structured"
+check "skill file exists"             "[ -f '$NO_SKILL' ]"
+check "frontmatter name correct"      "grep -qE '^name: *nested-orchestration' '$NO_SKILL'"
+check "has routing (2층 위임)"         "grep -qF 'dispatching-parallel-agents' '$NO_SKILL'"
+check "has L2 template ownership blk"  "grep -qF '구간 소유권' '$NO_SKILL'"
+check "has output contract blk"        "grep -qF '산출 계약' '$NO_SKILL'"
+check "points to SDD (no reimpl)"      "grep -qF 'subagent-driven-development' '$NO_SKILL'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
