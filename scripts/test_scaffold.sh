@@ -237,6 +237,51 @@ check "row exists (trigger)"       "[ -n \"\$WF_ROW\" ]"
 check "row caller = reviewer-*"    "printf '%s' \"\$WF_ROW\" | grep -qF 'reviewer-*'"
 check "row enforcement = toggle"   "printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode 검증 모드'"
 
+# --- 케이스 16: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
+# 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
+# 계약: 관리영역 1개, 고아 주석 0, 짝 없는 마커 0, 사용자 줄 보존, 본문 줄은 삭제 대상 아님.
+H16="$(mktemp -d)"; P16="$(mktemp -d)"; mkdir -p "$H16/.claude"
+{ printf '\n\n'
+  printf '# END disciplined-coder (managed — do not edit)\n\n'
+  printf '@disciplined-coder/agent-principles.md\n'
+  printf '# END disciplined-coder (managed — do not edit)\n\n'
+  printf '# (disciplined-coder: orphan BEGIN neutralized — END missing)\n'
+  printf '@disciplined-coder/agent-principles.md\n'
+  printf '# END disciplined-coder (managed — do not edit)\n\n'
+  printf 'MY OWN GLOBAL NOTE\n'
+  printf '# BEGIN disciplined-coder (managed — do not edit)\n'
+  printf '@disciplined-coder/agent-principles.md\n'
+  printf '# END disciplined-coder (managed — do not edit)\n'
+} > "$H16/.claude/CLAUDE.md"
+run "$H16" "$P16" >/dev/null
+UC16="$H16/.claude/CLAUDE.md"
+echo "[case16] corrupted region self-heals"
+check "one BEGIN after heal"          "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC16') -eq 1 ]"
+check "one END after heal"            "[ \$(grep -cF '# END disciplined-coder' '$UC16') -eq 1 ]"
+check "no orphan marker left"         "! grep -qF 'orphan BEGIN neutralized' '$UC16'"
+check "user note preserved"           "grep -qxF 'MY OWN GLOBAL NOTE' '$UC16'"
+run "$H16" "$P16" >/dev/null
+check "still one BEGIN (idempotent)"  "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC16') -eq 1 ]"
+check "user note still there"         "grep -qxF 'MY OWN GLOBAL NOTE' '$UC16'"
+
+# --- 케이스 17: 고아 여는 마커 뒤 본문은 한 줄도 지우지 않는다 (빈 줄 포함) ---
+H17="$(mktemp -d)"; P17="$(mktemp -d)"; mkdir -p "$H17/.claude"
+{ printf 'head note\n'
+  printf '# BEGIN disciplined-coder (managed — do not edit)\n'
+  printf 'para one\n'
+  printf '\n'
+  printf 'para two\n'
+} > "$H17/.claude/CLAUDE.md"
+ERR17="$(run "$H17" "$P17" 2>&1 >/dev/null)" || true
+UC17="$H17/.claude/CLAUDE.md"
+echo "[case17] orphan opener drops only its own line"
+check "orphan: head preserved"        "grep -qxF 'head note' '$UC17'"
+check "orphan: para one preserved"    "grep -qxF 'para one' '$UC17'"
+check "orphan: para two preserved"    "grep -qxF 'para two' '$UC17'"
+check "orphan: blank line preserved"  "[ \$(grep -c '^\$' '$UC17') -ge 1 ]"
+check "orphan: warns BEGIN w/o END"   "printf '%s' \"\$ERR17\" | grep -qF 'BEGIN but no END'"
+check "orphan: marker line gone"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC17') -eq 1 ]"
+
 # --- 케이스 16: §마 병렬 오케스트레이션 넛지(정본 계약 가드) ---
 # §마 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다(vacuous 통과 방지).
 PO_BLOCK="$(awk '/^### 마\./{f=1} f&&/^### /&&!/^### 마\./{exit} f&&/^## /&&!/^### /{exit} f' "$HERE/agent-principles.md")"
