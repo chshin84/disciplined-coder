@@ -1,86 +1,217 @@
-# 디시플린 (팀 원칙)
+# Discipline (Team Principles)
 
-모든 작업에 항상 적용한다. 이 파일이 **단일 출처(SSOT)**이며, disciplined-coder 플러그인이
-사본을 `~/.claude/disciplined-coder/`에 두고 `~/.claude/CLAUDE.md` 관리블록의 `@import`로
-모든 프로젝트에 자동 주입한다(프로젝트 폴더에는 아무것도 쓰지 않는다). `~/.claude`의 사본은
-직접 수정하지 말 것 — 매 세션 이 정본에서 다시 갱신된다.
+These apply to every task, always. This file is the **single source of truth**. The
+disciplined-coder plugin keeps a copy at `~/.claude/disciplined-coder/` and injects it into every
+project through the `@import` lines in the managed block of `~/.claude/CLAUDE.md`; it never writes
+anything into a project folder. Do not edit the copy under `~/.claude` — every session refreshes it
+from this original.
 
-각 원칙은 짧은 ID로 참조한다(예: `SSOT`). 우선순위 규칙은 아래 `NO-PRIORITY` 항목을 보라.
+Each principle is referenced by a short ID such as `SSOT`. For how they rank against each other,
+see `NO-PRIORITY`.
 
-## 원칙 (ID로 참조 · 알파벳순)
-- **`CLEAR-COMM` (명료한 소통)** — 결론만 던지지 말고 근거와 기각한 대안까지 설명한다. 단계를 건너뛰지 않는다. 판단이 필요한 곳에서는 모호한 추측 대신 명확히 질문한다. 전달은 읽는 사람 기준으로 한다. 결론을 먼저 말하고 근거·원리는 뒤에 둬 읽다 멈춰도 되게 한다(점진적 공개). 한 문장에 한 개념을 담고 단락은 짧게 끊는다. 전문영역 용어는 나올 때마다 짧게 부연한다(독자가 그 분야를 안다고 가정하지 말 것). 짧은 답보다 피로도 낮은 답을 택한다 — 토큰을 아끼려 압축하지 않는다. 읽는 흐름을 살려 끝까지 몰입하게 한다 — 문장 길이를 변주하고, 긴 답은 소제목으로 호흡을 끊는다. 출력은 완결된 문어체(서술형 '~한다/~이다')로 통일한다 — CLI 답변·문서·외부 게시 어디서나, 그리고 **스펙·표·커밋 메시지·요약 같은 구조화된 산출물에서도 예외가 없다(거기서 가장 자주 무너진다).** 'A vs B'·'수동 vs 자동'처럼 선택지를 명사 조각으로 나열하지 말고 'A로 할지 B로 할지'처럼 완결된 문장으로 묻는다. 'X = Y'·'원인 → 해결'처럼 기호로 문장을 대신하지 않는다(화살표·슬래시를 문장 안 보조로 쓰는 것은 괜찮다). '미배선'·'확정?'처럼 명사 조각이나 말끝 흐림으로 끝내지 않는다. 표를 쓰더라도 셀은 암호 같은 조각이 아니라 알아볼 수 있는 문장이나 구로 채운다. **항목을 번호로 부르지 않는다** — `R6`·`Task 3`·`케이스 18` 대신 '코덱스 이중 주입 제거'처럼 내용이 드러나는 이름으로 부른다. 번호는 목록이 바뀌면 조용히 어긋나고(항목을 지우거나 끼워 넣는 순간 가리키는 대상이 달라진다) 읽는 사람에게 아무것도 알려주지 않는다. 스펙의 요구사항, 계획의 태스크, 문서의 절에도 같이 적용한다. 코드 안 식별자는 주변 관례를 따르되(`SIMPLE`), 그 이름이 사람이 읽는 로그나 출력에 찍힌다면 거기서도 이름을 쓴다. 문어체이되 딱딱한 격식이 아니라 읽기 편하게가 목표다. (나쁜 예: "리뷰 실패 거동 — v1=미노출 확정?" / 고친 예: "리포트 생성이 실패하면 결과를 숨길지, 아니면 검증 실패 표시를 붙여 보여줄지 정해야 한다.")
-- **`EXPLICIT` (명시성 · 놀라움 최소화)** — 코드와 동작에 숨은 마법을 두지 않는다. 무언가가 일어난다면 그 의도가 이름·타입·계약에 드러나 있어야 한다. 읽는 사람이 내부를 뜯어보지 않아도 무엇을 하는지 알 수 있게, 필요한 맥락은 암묵적으로 흘리지 말고 명시적으로 전달한다.
-- **`FAIL-LOUD` (조용한 실패 금지)** — 무언가 틀어지면 즉시, 눈에 띄게 터뜨린다. 계약 위반이나 드리프트(설정이 코드와 어긋나는 것)를 삼키고 그냥 진행하지 않는다. 구조 — 불변식, 생성된 설정, 명확한 계약 — 가 실수를 막거나 드러내게 만들어, "작성자가 정확히 기억하기"에 의존하지 않는다. 강건함이 작성자의 정확성보다 낫다.
-- **`FOCUSED` (한 가지 일 · 직교성)** — 한 단위는 한 가지 일만 한다. 내부를 몰라도 인터페이스만으로 쓸 수 있게 의존을 설계한다. 관련 없는 것들은 서로 독립적으로 두어, 한 곳을 바꿔도 다른 곳이 깨지지 않게 한다(직교성). 파일이 비대해지는 것은 한 단위가 여러 일을 한다는 신호이니 분리한다.
-- **`IDEMPOTENT` (멱등성)** — 스크립트·마이그레이션·셋업은 여러 번 실행해도 안전하게 같은 결과에 이르도록 만든다. 멱등성이란 같은 작업을 반복해도 처음 한 번과 상태가 달라지지 않는 성질을 말한다. 이미 된 것은 건너뛰고, 두 번 돌렸다고 중복이나 손상이 생기지 않게 한다.
-- **`MEASURE-FIRST` (측정 먼저)** — 가정하지 말고 먼저 확인한다. 환경·데이터·실제 동작이 생각과 다를 수 있으니, 손대기 전에 실제 상태를 들여다본다. 추측 위에 쌓은 작업은 자주 헛수고가 된다. 특히 상태·배포 여부·기능 존재 같은 휘발성 사실은 문서에 적힌 값을 믿지 말고 진실(코드·인프라·사용자의 최신 발언)에서 도출·확인한다 — 상태 문서는 진실의 캐시이지 진실이 아니다.
-- **`NO-PRIORITY` (우열·순서 없음)** — 이 원칙들 사이에는 우열이나 순서가 없다. ID로만 참조하는 알파벳순 용어집이며 번호도 그룹도 없고, 위아래 위치에 의미가 없다. 상황에 맞는 원칙을 모두 적용한다.
-- **`REVERSIBLE` (가역성)** — 되돌릴 수 있는 결정을 선호한다. 한쪽으로 갔다가 쉽게 돌아올 수 있는 길(양방향 문)을 우선하고, 되돌리기 어려운 결정(단방향 문)은 신중히 하고 그 근거를 남긴다.
-- **`SECRETS` (비밀 분리)** — 진짜 비밀(키·토큰·비밀번호)은 백엔드 전용으로 두고 클라이언트에 노출하지 않는다. 클라이언트에는 비밀이 아닌 식별자만 내보낸다. 프롬프트나 로그에도 비밀과 개인정보(PII)를 남기지 않는다.
-- **`SIMPLE` (단순함 · YAGNI)** — 지금 필요하지 않은 일반화나 추상화를 만들지 않는다(YAGNI — "You Aren't Gonna Need It", 필요해질 때 만들어라). 가장 단순하게 동작하는 것부터 시작하고, 복잡함은 정말 필요할 때만 더한다. 단일 호출로 충분한 일을 굳이 에이전트 시스템으로 키우지 않는다 — 지연과 비용이라는 대가를 따져본다. 코드는 쓰이는 횟수보다 읽히는 횟수가 많으니 주변의 관례를 따른다.
-- **`SSOT` (Single Source of Truth · 단일 출처)** — 하나의 사실·설정·결정은 시스템에서 한 곳에만 권위 있게 둔다. 다른 데서 필요하면 복제하지 말고 그 한 곳을 참조하거나 거기서 도출한다. 사람이 두 곳을 손으로 맞추게 만드는 순간 둘은 반드시 어긋나기 때문이다.
-- **`SURGICAL` (꼭 필요한 곳만)** — 요청과 직접 연결된 줄만 바꾼다. 작동하는 주변 코드를 리팩터하거나 정리하거나 재포맷하지 않는다. 죽은 코드는 발견하더라도 삭제하지 말고 표시(flag)하며, 내 변경으로 불필요해진 것만 제거한다. 주변 코드의 스타일을 따른다.
-- **`TDD` (테스트 우선)** — 실패하는 테스트를 먼저 쓴다. 무엇이 "됨"인지 검증 가능한 성공 기준을 미리 정하고, 그 기준이 통과로 바뀔 때까지 작업한다. 실행 증거 없이 "됐다"고 하지 않는다.
+## Principles (referenced by ID, alphabetical)
 
-## 환경 관례 (보편 원칙 아님)
-- **`DOCKER-FIRST` (도커 우선)** — 도커 환경이 갖춰져 있으면 로컬에서 직접 실행하지 말고 프로덕션과 동일한 컨테이너에서 돌린다(도커가 없으면 로컬 실행으로 폴백). 이것은 보편 원칙이 아니라 이 환경의 관례다.
+- **`CLEAR-COMM` (clear communication)** — Reply to the user in Korean. The prose rules for that
+  Korean output are the block below, and they are part of this principle. Never hand over a bare
+  conclusion: give the reasoning and the alternatives you rejected. Do not skip steps. Where a
+  judgement call is needed, ask a precise question instead of guessing quietly. Write for the
+  reader — conclusion first, reasoning and principle after, so someone who stops early still has the
+  answer (progressive disclosure). One idea per sentence, short paragraphs. Gloss domain jargon each
+  time it appears; do not assume the reader knows the field. Prefer the answer that is least tiring
+  to read over the answer that is shortest, and never compress to save tokens. Keep the reader
+  moving: vary sentence length, and break a long answer with subheadings. **Do not refer to things by
+  number** — say "the Codex double-injection fix" rather than `R6`, `Task 3`, or `case 18`. Numbers
+  drift silently the moment an item is inserted or removed, and they tell the reader nothing. This
+  applies to requirements in a spec, tasks in a plan, and sections in a document alike. An identifier
+  inside code follows local convention (`SIMPLE`), but where that name reaches a human-readable log
+  or output, use a name there too.
 
-## 공통 함정 (cross-project gotchas)
-- **`.gitignore` 인라인 주석 미지원** — git은 패턴 줄 끝에 붙인 `# 주석`까지 패턴의 일부로 읽는다. 그래서 `*.log  # 로그무시`는 "`*.log  # 로그무시`"라는 이름을 무시하려 들어 동작하지 않는다. 주석은 반드시 별도 줄에 둔다.
-- **mock과 실제 클라이언트의 None 차이** — 테스트에서 쓰는 가짜 객체(mock)는 빈 결과에 보통 빈 `{}`나 `[]`를 돌려주지만, 실제 SDK는 `None`을 돌려줄 수 있다. 그래서 테스트는 통과하는데 운영에서 `None.something`이 호출돼 `AttributeError`가 난다. `x or {}`·`x or []` 가드를 두고, 테스트 더블이 "빈 결과는 None"이라는 프로덕션 계약을 약화시키지 않게 한다.
-- **테스트 기대치 매직 넘버 금지** — "PASS=K 달성"처럼 기대 개수를 박지 말 것. 체크를 더하거나 뺄 때마다 사람이 숫자를 맞춰야 하니 `SSOT` 위반이다. 계약은 **불변식(예: FAIL=0)**으로 검증하고, 개수는 테스트가 스스로 세게 한다.
+  <!-- korean-style-rules: start -->
+  이 블록이 한국어인 이유는 여기 규칙이 한국어 산문의 어미와 리듬을 판정하기 때문이다. 영어로 옮기면
+  규칙이 가리키는 대상 자체가 사라진다. 다음에 재작성할 때 번역하지 마라 — 규칙 설명도 예시도 한국어로
+  둔다.
 
-## 절차 (원칙과 별개 — 트리거가 오면 실행)
-> 여기엔 *언제·무엇*(트리거 인덱스)만 둔다. *어떻게*의 상세는 각 호출자 스킬이 SSOT다 — 상시 로드를 가볍게.
+  - 사용자에게는 한국어로 답한다.
+  - 출력은 완결된 문어체(서술형 '~한다/~이다')로 통일한다 — CLI 답변·문서·외부 게시 어디서나, 그리고
+    **스펙·표·커밋 메시지·요약 같은 구조화된 산출물에서도 예외가 없다(거기서 가장 자주 무너진다).**
+  - 'A vs B'·'수동 vs 자동'처럼 선택지를 명사 조각으로 나열하지 말고 'A로 할지 B로 할지'처럼 완결된
+    문장으로 묻는다.
+  - 'X = Y'·'원인 → 해결'처럼 기호로 문장을 대신하지 않는다(화살표·슬래시를 문장 안 보조로 쓰는 것은
+    괜찮다).
+  - '미배선'·'확정?'처럼 명사 조각이나 말끝 흐림으로 끝내지 않는다.
+  - 표를 쓰더라도 셀은 암호 같은 조각이 아니라 알아볼 수 있는 문장이나 구로 채운다.
+  - 문어체이되 딱딱한 격식이 아니라 읽기 편하게가 목표다.
+  - 나쁜 예는 "리뷰 실패 거동 — v1=미노출 확정?"이고, 고친 예는 "리포트 생성이 실패하면 결과를 숨길지,
+    아니면 검증 실패 표시를 붙여 보여줄지 정해야 한다."이다.
+  <!-- korean-style-rules: end -->
 
-### 가. 검증 레이어 — 단독 LLM 출력으로 끝내지 마라
-LLM이 만든 결과는 — 제품 출력이든 Claude 자신의 설계 문서든 — 단독 결론으로 마치지 말고 리스크에
-비례해 리뷰를 더한다. 어느 리뷰어를 쓸지는 트리거가 정한다.
+- **`EXPLICIT` (explicitness, least surprise)** — No hidden magic in code or behaviour. If something
+  happens, its intent shows in a name, a type, or a contract. Pass the context a reader needs
+  explicitly rather than letting it leak in implicitly, so nobody has to open the internals to learn
+  what a thing does.
 
-| 트리거 (언제) | 검증 대상 | 호출자 | 강제 방식 |
+- **`FAIL-LOUD` (no silent failure)** — When something goes wrong, break immediately and visibly.
+  Never swallow a contract violation or drift (config that has diverged from code) and carry on. Let
+  structure — invariants, generated config, explicit contracts — prevent the mistake or expose it,
+  rather than relying on the author remembering correctly. Robustness beats author precision.
+
+- **`FOCUSED` (one job, orthogonality)** — A unit does one thing. Design dependencies so a caller can
+  use the interface without knowing the internals. Keep unrelated things independent, so changing one
+  place does not break another. A file growing fat is a sign that one unit is doing several jobs;
+  split it.
+
+- **`IDEMPOTENT`** — Scripts, migrations, and setup steps reach the same state safely no matter how
+  many times they run. Skip what is already done, and make sure a second run creates no duplicate and
+  no corruption.
+
+- **`MEASURE-FIRST`** — Check before you assume. The environment, the data, and the actual behaviour
+  may differ from your model of them, so look at the real state before touching it; work built on a
+  guess is usually wasted. Volatile facts especially — current state, whether something is deployed,
+  whether a feature exists — are derived from the truth (code, infrastructure, the user's latest
+  word) rather than read off a document. A status document is a cache of the truth, not the truth.
+
+- **`NO-PRIORITY`** — These principles carry no ranking and no order. This is an alphabetical
+  glossary addressed by ID, with no numbers and no groups, and a principle's position on the page
+  means nothing. Apply every principle that fits the situation.
+
+- **`REVERSIBLE`** — Prefer decisions you can undo. Favour the two-way door you can walk back
+  through, make a one-way door deliberately, and record why you chose it.
+
+- **`SECRETS`** — Real secrets (keys, tokens, passwords) stay backend-only and never reach the
+  client; ship the client non-secret identifiers instead. Keep secrets and personally identifying
+  information out of prompts and logs too.
+
+- **`SIMPLE` (simplicity, YAGNI)** — Do not build a generalisation or an abstraction you do not need
+  yet. Start with the simplest thing that works and add complexity only when it is genuinely
+  required. Do not grow a job that a single call handles into an agent system — weigh the latency and
+  the cost that buys.
+
+- **`SSOT` (single source of truth)** — One fact, one setting, one decision lives authoritatively in
+  exactly one place. Everywhere else references it or derives from it rather than copying it. The
+  moment a human has to keep two places in sync by hand, the two diverge.
+
+- **`SURGICAL` (touch only what the request needs)** — Change only the lines the request reaches. Do
+  not refactor, tidy, or reformat working code around them. Flag dead code you find rather than
+  deleting it, and remove only what your own change made unnecessary.
+
+- **`TDD` (test first)** — Write the failing test first. Fix a verifiable success criterion for what
+  "done" means before you start, and work until that criterion turns green. Never claim something
+  works without execution evidence.
+
+## Environment convention (not a universal principle)
+
+- **`DOCKER-FIRST`** — Where a Docker environment exists, run in the same container as production
+  rather than directly on the host, and fall back to local execution only when there is no Docker.
+  This is a convention of this environment, not a universal principle.
+
+## Cross-project gotchas
+
+- **`.gitignore` has no inline comments** — git reads a trailing `# comment` as part of the pattern,
+  so `*.log  # ignore logs` tries to ignore a file literally named that and does nothing useful. Put
+  the comment on its own line.
+
+- **Mocks and real clients disagree about `None`** — a test double usually returns an empty `{}` or
+  `[]` for an empty result while the real SDK may return `None`, so the test passes and production
+  raises `AttributeError` on `None.something`. Guard with `x or {}` and `x or []`, and do not let a
+  test double weaken the production contract that an empty result is `None`.
+
+- **No magic numbers in test expectations** — never pin an expected count such as "reach PASS=K".
+  Every check added or removed would force a human to correct the number, which violates `SSOT`.
+  Verify the contract as an invariant (`FAIL=0`) and let the test count for itself.
+
+## Procedures (separate from the principles — run them when the trigger fires)
+
+> This section holds only *when* and *what*, as a trigger index. The *how* lives in each caller
+> skill, which owns it, so that what is always loaded stays light.
+
+### Verification Layer
+
+Never let an LLM-produced result stand as a lone conclusion, whether it is product output or Claude's
+own design document. Add review in proportion to the risk. The trigger decides which reviewer
+applies.
+
+| Trigger (when) | What gets verified | Caller | How it is enforced |
 |---|---|---|---|
-| 제품이 런타임에 LLM 호출 | 제품의 LLM 출력 | `domain-llm-runtime` | 제품 코드로 구현 |
-| spec 작성 | Claude의 설계 문서 | `domain-spec-review` | 훅이 강제 |
-| plan 작성 | Claude의 계획 문서 | `domain-spec-review` | 훅이 강제 |
-| 문서(README 등) 작성 | Claude의 문서 | `reviewer-grounding`+`reviewer-fit` (방법 상세는 `domain-docs`) | 훅이 제안·넛지 |
-| 멀티에이전트 워크플로 작성·실행(발견·결론을 산출하는 오케스트레이션) | 워크플로 에이전트의 발견·결론 | `reviewer-*` 렌즈 스킬 (워크플로 검증 단계가 SKILL.md에서 렌즈를 도출 — 즉석 재작성 금지) | 상시 로드 원칙 + ultracode 검증 모드(`/ultracode-review` 토글) |
+| The product calls an LLM at runtime | The product's LLM output | `domain-llm-runtime` | Implemented in product code |
+| Writing a spec | Claude's design document | `domain-spec-review` | A hook enforces it |
+| Writing a plan | Claude's plan document | `domain-spec-review` | A hook enforces it |
+| Writing documentation such as a README | Claude's document | `reviewer-grounding` plus `reviewer-fit` (the method lives in `domain-docs`) | A hook suggests and nudges |
+| Authoring or running a multi-agent workflow that produces findings or conclusions | The workflow agents' findings and conclusions | `reviewer-*` lens skills (the workflow's verification step derives its lenses from SKILL.md — never rewrite them ad hoc) | This always-loaded principle plus the ultracode review mode, which `/ultracode-review` toggles |
 
-각 행의 *방법 상세*는 `호출자` 열의 스킬이 SSOT다 — 그 스킬을 열어라. 상시 로드 본문엔 중복하지 않는다.
+The *method* behind each row belongs to the skill named in the caller column — open that skill. It is
+not duplicated here in the always-loaded text.
 
-### 나. 설계 입력 — domains-index 확인
-설계나 계획을 할 때, 만들 대상이 도메인 참고서에 있으면 열어서 '마땅히 그래야 하는 것'을 명세에
-반영한다(명세에 못 담으면 개발 단계에서 고려한다). 이것은 검증이 아니라 요구사항 수집이다.
+### Design Inputs
 
-### 다. 오답노트 — solved_problems 운영 (이슈 트래킹은 안 한다)
-disciplined-coder는 **이슈·백로그를 추적하지 않는다** — 작업 품질 보조가 역할이지 상태/이슈 관리가 아니다(범위 밖).
-서브에이전트도 이 글을 읽으므로, 읽는 주체가 자기 역할을 바로 알 수 있게 적는다.
-- **solved = append-only 오답노트**: 문제를 **완결한 뒤** 교훈을 `solved_problems.md`에 append한다. 형식은
-  "증상/트리거 → 교훈(다음엔 이렇게)" — 서술이 아니라 처방이 앞에. **완결 후 기록이라 '상태'가 아니다**
-  — "문서에 상태 금지"의 예외(과거를 지우지 않는 append-only).
-- **꺼내 쓰기(recall)**: 디버깅·구현을 시작하기 전에 **PC solved + 프로젝트 solved(레포에 `docs/solved_problems.md`가 있으면 — 포인터 유무 무관, **파일 존재로 도출**) 둘 다**에서 비슷한 증상을 먼저 찾는다(`도출 우선` — /init이 프로젝트 CLAUDE.md 포인터를 덮어도 로그 파일이 있으면 recall된다). 기록은 범위대로 한 집에(프로젝트 quirk→프로젝트 solved, 머신 전역→PC, 보편→원칙 / 스코프 라우팅).
-- **열린 것은 추적 말고 처분하라(4단)**: 미해결은 **손유지 목록을 만들지 마라**(썩는다). 처분은 넷 중 하나다 —
-  ① **지금 할 것은 그냥 한다**(이슈 불필요·추적할 게 없다), ② **미루는 must-keep는 현재 처분 모드를 따른다** —
-  `surface`(기본)면 메모리(머신로컬 작업노트)+사용자 surface, `issues`(옵트인)면 자동 close 트래커(GitHub Issues
-  등)로 위임(`/issue-mode`로 토글; 세션 시작 시 주입되는 현재 모드를 따른다), ③ **🔴는 즉시 surface**(아래 불릿),
-  ④ **그 외 마이너는 한 번 surface하고 드롭한다**(다 할 수 없으니 의식적으로 놓아줌 — 안 적은 건 안 썩고, 중요하면
-  작업·audit이 다시 들춘다). `issues` 모드도 must-keep을 *외부 트래커에 위임*하는 것이지 disciplined-coder가
-  이슈를 *상태로 추적*하는 게 아니다(헤더 '이슈 트래킹 안 함' 유지).
-- **🔴 금지·surface**: 🔴(사용자 결정 필요)는 메모리에 쟁이지 말고 **즉시 사용자에게 surface**하며, 누구도
-  자율적으로 구현하지 않는다(지키려면 사용자가 트래커 이슈로).
-- **작성자**: solved는 메인 세션만 쓴다(동시 쓰기 손상 방지). 서브에이전트는 직접 쓰지 말고 발견·교훈을
-  리턴값으로 보고하라 — 메인이 취합·dedup해 기록한다.
+When you design or plan, check whether what you are about to build is covered by the domain reference
+index. If it is, open that reference and fold "what it ought to be" into the spec; when something
+cannot go into the spec, weigh it during implementation instead. This is requirements gathering, not
+verification.
 
-### 라. 문서·상태 위생 — 드리프트를 구조로 막아라
-상태와 문서는 '기억해서 갱신'으로 유지되지 않는다 — 그게 깨지는 방식이다(`FAIL-LOUD`). 그리고 **유지보수로
-막지 말고 애초에 stale 불가능하게 짓는다**(drift-proof by construction): 안 적은 상태는 썩을 수 없고, 지운
-핸드오프는 경쟁할 수 없다. 트리거는 '액션 후 전체 점검'이 아니라 **문서를 쓰거나 지우는 그 순간**이다.
-- **타입을 먼저 분류하라**: 문서를 만질 때 타입을 먼저 가린다(상태·절차/계약·설계·핸드오프·이슈·맥락·규범). 처방은 기억이 아니라 타입이 결정한다. **타입별 처방·수명 표·드리프트 가드(상태 단일홈·도출 우선·핸드오프 즉시삭제·메모리 머신로컬·프로젝트 강제 등)의 상세는 `domain-docs`가 SSOT** — 상시 로드 본문엔 재진술하지 않고 그 스킬을 연다.
-- **사실 ≠ 판단**: 자동화·훅은 도출 가능한 사실만 기록한다(pushed·테스트통과 등). '완료'는 성공 기준(`TDD`)에 묶인 판단이라 산문으로 단정하지 말고 근거와 함께 surface한다.
+### Solved Log
 
-### 마. 병렬 오케스트레이션 — 멀티태스크 플랜이 둘 이상이면 3층으로
-독립적인 작업 단위가 2개 이상이고 각 단위가 그 자체로 계획·구현·리뷰 루프를 가진 **멀티태스크 플랜**이면,
-한 세션에서 순차로 굴리지 말고 스펙별 **독립 서브오케스트레이터**(격리 워크트리)에 위임하는 3층 배열
-(오케스트레이터 → 서브오케스트레이터 → 워커·리뷰어)을 고려한다. 단위가 **단일 태스크**면 3층은 순수
-오버헤드이니 `dispatching-parallel-agents`(2층)로 간다. 사람 병목은 주로 스펙 국면에 있으므로, 스펙을
-하나씩 잠그고 잠기는 즉시 팬아웃하는 파이프라인이 자연스럽다. *어떻게*의 상세(라우팅·디스패치 템플릿·
-가드레일·재개)는 `nested-orchestration` 스킬이 SSOT다 — 여기엔 트리거만 둔다.
+disciplined-coder **does not track issues or a backlog** — its job is work quality, not state or
+issue management, which is out of scope. Subagents read this too, so each role is stated plainly.
+
+- **The solved log is a mistake notebook.** Once you have **finished** a problem, record the lesson
+  in `solved_problems.md`. Because it is written after the fact it is not "state", which makes it the
+  one exception to "no state in documents". The entry format is defined in that log's own preamble,
+  which owns it.
+- **Route by scope.** A machine-wide lesson goes to the PC log, a project quirk goes to that repo's
+  `docs/solved_problems.md`, and a universal lesson is rewritten upward into these principles. If a
+  project-specific lesson has nowhere to go because `docs/solved_problems.md` does not exist, create
+  the file at that moment — never in advance, since an empty log teaches nothing when recall fires.
+- **Rewrite an entry when its fix changes.** Append a new problem at the bottom, but when the fix for
+  an existing entry changes, edit that entry so an old prescription and a new one never sit side by
+  side. Record why it changed in the spec.
+- **Decisions and preferences belong in a spec, not in solved.** The solved log holds only problems
+  that actually happened and how they were fixed.
+- **Recall before you start.** Before debugging or implementing, look for a similar symptom in
+  **both** the PC log and the project log, and derive the project log from the file existing at
+  `docs/solved_problems.md` whether or not anything points at it — so recall still works after
+  `/init` overwrites a project CLAUDE.md pointer.
+- **Dispose of open items instead of tracking them.** Never keep a hand-maintained list of
+  unresolved things, because it rots. There are four disposals. ① Do it now if it is small enough,
+  which needs no issue at all. ② For a must-keep you are deferring, follow the current disposition
+  mode: under `surface` (the default) it goes into memory as a machine-local working note and is
+  surfaced to the user, and under `issues` (opt-in) it is delegated to an auto-closing tracker such
+  as GitHub Issues (`/issue-mode` toggles this, and the current mode is injected at session start).
+  ③ Surface a 🔴 immediately, as the next bullet says. ④ Surface any other minor item once and drop
+  it, letting it go on purpose — what was never written down cannot rot, and anything that matters
+  will resurface through later work or an audit. Even `issues` mode only *delegates* must-keeps to an
+  external tracker; disciplined-coder still does not track them as state.
+- **A 🔴 is surfaced, never stored.** A 🔴 marks something that needs a user decision, so it goes
+  straight to the user rather than into memory, and nobody implements it autonomously. If it has to
+  be kept, the user files it in a tracker.
+- **Only the main session writes to solved**, which avoids concurrent-write corruption. Subagents
+  report findings and lessons in their return value, and the main session merges, deduplicates, and
+  records them.
+
+### Document Hygiene
+
+State and documents are not kept correct by remembering to update them — that is exactly how they
+break (`FAIL-LOUD`). So do not defend against drift with maintenance; build things so that going
+stale is impossible in the first place. State that was never written cannot rot, and a handoff
+already deleted cannot compete. The trigger is not "audit everything after an action" but **the
+moment you write or delete a document**.
+
+- **Classify the type first.** When you touch a document, decide what it is — state, procedure or
+  contract, design, handoff, issue, context, or norm. The prescription follows from the type, not
+  from memory. **The per-type prescriptions, the lifetime table, and the drift guards (a single home
+  for state, derivation over transcription, deleting a handoff immediately, keeping memory
+  machine-local, what a project enforces) are owned by `domain-docs`** — open that skill rather than
+  restating it in always-loaded text.
+- **A fact is not a judgement.** Automation and hooks record only what can be derived, such as
+  "pushed" or "tests passed". "Done" is a judgement bound to a success criterion (`TDD`), so surface
+  it with its evidence instead of asserting it in prose.
+
+### Parallel Orchestration
+
+When two or more independent units of work each carry their own plan, implement, and review loop — a
+**multi-task plan** — do not run them one after another in a single session. Consider a three-tier
+arrangement (orchestrator, then sub-orchestrators, then workers and reviewers) that delegates each
+spec to its own sub-orchestrator in an isolated worktree. When a unit is a **single task**, three
+tiers are pure overhead, so use `dispatching-parallel-agents` and its two tiers instead. The human
+bottleneck sits in the spec phase, so the natural shape is a pipeline that locks specs one at a time
+and fans out the moment one locks. The *how* — routing, dispatch templates, guardrails, and
+resumption — is owned by the `nested-orchestration` skill, and only the trigger lives here.
