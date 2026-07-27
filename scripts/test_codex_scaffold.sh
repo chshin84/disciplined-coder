@@ -7,6 +7,12 @@ pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
 run() { CODEX_HOME_DIR="$1/.codex" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"; }
 
+# 이웃 관계 검사: 파일에서 pattern과 정확히 일치하는 첫 줄 '바로 다음 줄'이 빈 줄인지 확인한다.
+# 전역 빈 줄 카운트는 관리블록이 항상 넣는 구분 빈 줄과 뒤섞여 무조건 참이 되므로 쓰지 않는다.
+blank_follows() {  # $1=file $2=exact-line-pattern
+  awk -v pat="$2" 'matched && !verified { verified=1; if ($0=="") ok=1 } $0==pat { matched=1 } END { exit (ok==1 ? 0 : 1) }' "$1"
+}
+
 # JSON 유효성 검사기 — stdin의 JSON을 파싱한다. python3가 존재해도 실행 불능인 머신
 # (Windows Store 스텁 등)이 있으므로 프로브는 존재 확인이 아니라 실제 실행으로 한다.
 # 폴백 체인: python3 → python → node. 셋 다 없으면 FAIL(조용한 SKIP 금지 — FAIL-LOUD).
@@ -40,12 +46,17 @@ run "$H1" >/dev/null; run "$H1" >/dev/null
 echo "[case2] idempotency"
 check "still one managed region"    "[ \$(grep -cF '# BEGIN disciplined-coder' '$AG') -eq 1 ]"
 
-# --- 케이스 3: 기존 AGENTS.md 내용 보존 + 블랭크 비누적 ---
-H3="$(mktemp -d)"; mkdir -p "$H3/.codex"; printf 'my codex note\n' > "$H3/.codex/AGENTS.md"
+# --- 케이스 3: 기존 AGENTS.md 내용 보존 + 블랭크 비누적 (문단 사이 빈 줄 포함) ---
+# 픽스처가 한 줄짜리면 빈 줄 삭제 회귀를 구조적으로 통과시키므로, 문단 둘 사이에 빈 줄을 끼운다
+# (design spec 2026-07-27 테스트 절 — codex-scaffold.sh 경로도 scaffold.sh와 같은 것을 검증).
+H3="$(mktemp -d)"; mkdir -p "$H3/.codex"
+printf 'para one\n\npara two\n' > "$H3/.codex/AGENTS.md"
 for _ in 1 2 3; do run "$H3" >/dev/null; done
 AG3="$H3/.codex/AGENTS.md"
-echo "[case3] preserve user content"
-check "user note preserved"         "grep -qxF 'my codex note' '$AG3'"
+echo "[case3] preserve user content (blank line between paragraphs)"
+check "para one preserved"          "grep -qxF 'para one' '$AG3'"
+check "para two preserved"          "grep -qxF 'para two' '$AG3'"
+check "blank line right after para one preserved" "blank_follows '$AG3' 'para one'"
 check "one region after 3 runs"     "[ \$(grep -cF '# BEGIN disciplined-coder' '$AG3') -eq 1 ]"
 
 # --- 케이스 4: solved 누적 보존 ---

@@ -19,6 +19,9 @@ README에서 분리한 개발자용 내부 근거다. 사용자 설치·사용�
 - **플러그인 루트 `CLAUDE.md`는 컨텍스트로 로드되지 않는다.** 주입 경로는 `~/.claude/CLAUDE.md` →
   `@disciplined-coder/...` @import이며, 이 플러그인이 SessionStart hook으로 자동 배선한다. 프로젝트
   폴더에는 아무 파일도 생성하지 않는다.
+- **정본 stdout 보강은 첫 세션 1회뿐이다.** 관리 블록을 방금 만든 세션에 한해 정본을 stdout으로 함께
+  보내는데, 그 세션에서 자동 압축이 돌면 요약으로 뭉개질 수 있다. 다음 세션부터는 `@import`가 매 요청
+  정본을 실어 준다.
 - **호스트 셸 의존**: hook은 호스트에서 돈다(컨테이너 아님). Windows는 Git Bash 필요. `MSYS_NO_PATHCONV`
   등 Git Bash 전용 gotcha는 mac/Linux/PowerShell 호스트엔 무관하니 보편 규칙으로 적용 금지.
 - **🔴 자동구현 금지·surface**: 이 규칙은 `agent-principles.md`(@import 대상 — scaffold.sh가 배선)에 박혀 있어
