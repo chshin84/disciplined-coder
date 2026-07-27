@@ -38,8 +38,8 @@ check "principles in codex dir"     "[ -f '$K/agent-principles.md' ]"
 check "domains-index in codex dir"  "[ -f '$K/domains-index.md' ]"
 check "solved created"              "[ -f '$K/solved_problems.md' ]"
 check "AGENTS.md has managed begin" "[ \$(grep -cF '# BEGIN disciplined-coder' '$AG') -eq 1 ]"
-check "AGENTS.md inlines principles" "grep -qF '# Discipline (Team Principles)' '$AG'"
-check "stdout injects principles"   "printf '%s' \"\$OUT\" | grep -qF '# Discipline (Team Principles)'"
+check "AGENTS.md inlines principles" "grep -qF '# 디시플린 (팀 원칙)' '$AG'"
+check "stdout injects principles"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
 
 # --- 케이스 2: 멱등성(3회) ---
 run "$H1" >/dev/null; run "$H1" >/dev/null
@@ -128,11 +128,11 @@ H9="$(mktemp -d)"; K9="$H9/.codex/disciplined-coder"; AG9="$H9/.codex/AGENTS.md"
 OUT9a="$(run "$H9")"
 OUT9b="$(run "$H9")"
 echo "[case9] no duplicate injection after first install"
-check "first run stdout has principles"       "printf '%s' \"\$OUT9a\" | grep -qF '# Discipline (Team Principles)'"
-check "second run stdout lacks principles"    "! printf '%s' \"\$OUT9b\" | grep -qF '# Discipline (Team Principles)'"
-check "second run stdout lacks domains-index" "! printf '%s' \"\$OUT9b\" | grep -qF '# Domain Reference Index'"
+check "first run stdout has principles"       "printf '%s' \"\$OUT9a\" | grep -qF '# 디시플린 (팀 원칙)'"
+check "second run stdout lacks principles"    "! printf '%s' \"\$OUT9b\" | grep -qF '# 디시플린 (팀 원칙)'"
+check "second run stdout lacks domains-index" "! printf '%s' \"\$OUT9b\" | grep -qF '# 개발 대상(도메인) 참고서 — 인덱스'"
 check "second run stdout still has solved"    "printf '%s' \"\$OUT9b\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "second run stdout still has mode line" "printf '%s' \"\$OUT9b\" | grep -qF '처분 모드:'"
-check "AGENTS.md still inlines principles after 2nd run" "grep -qF '# Discipline (Team Principles)' '$AG9'"
+check "AGENTS.md still inlines principles after 2nd run" "grep -qF '# 디시플린 (팀 원칙)' '$AG9'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

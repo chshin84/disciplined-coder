@@ -26,7 +26,7 @@ README에서 분리한 개발자용 내부 근거다. 사용자 설치·사용�
   등 Git Bash 전용 gotcha는 mac/Linux/PowerShell 호스트엔 무관하니 보편 규칙으로 적용 금지.
 - **🔴 자동구현 금지·surface**: 이 규칙은 `agent-principles.md`(@import 대상 — scaffold.sh가 배선)에 박혀 있어
   모든 서브에이전트에 전달된다. 🔴(사용자 결정 필요)는 어딘가에 쟁여 두지 말고 발견 즉시 사용자에게
-  surface하며, 누구도 자율 구현하지 않는다(disciplined-coder는 이슈·백로그를 추적하지 않는다 — §다).
+  surface하며, 누구도 자율 구현하지 않는다(disciplined-coder는 이슈·백로그를 추적하지 않는다 — 오답노트 절).
   다만 **CLAUDE.md는 강제가 아닌 가이드**이므로(공식 문서), 진짜로 막아야 한다면 `PreToolUse` hook로 강제하라.
 - **SessionStart hook은 `matcher: startup`으로 새 세션에서만 실행**된다. 스크립트는 멱등이지만 무거운
   작업을 넣지 말 것.
@@ -43,7 +43,7 @@ README에서 분리한 개발자용 내부 근거다. 사용자 설치·사용�
 
 설계 문서(spec/plan)도 Claude가 만든 LLM 산출물이라, 작성자 자기 검토만으로는 확증 편향에 약하다.
 그래서 고위험 설계 문서는 독립 렌즈(grounding·consistency·adversarial) 리뷰를 거치게 강제한다
-(`agent-principles.md` 절차 가). 설계 문서는 구현의 입력이므로, 결함을 설계 단계에서 잡는 편이
+(`agent-principles.md`의 검증 레이어 절). 설계 문서는 구현의 입력이므로, 결함을 설계 단계에서 잡는 편이
 구현까지 번진 뒤 잡는 것보다 싸다.
 
 문제는 "강제"를 거는 시점이다. 초기 MVP는 메인 세션이 *절차로* 리뷰를 호출했는데, 이는 작성자

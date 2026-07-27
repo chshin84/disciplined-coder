@@ -17,7 +17,7 @@ done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")
 EOF
 [ -n "$match" ] || exit 0
-msg="📝 새 문서 작성 — 쓰기 전에 domain-docs의 'Forms for each kind of writing' 절에서 목적에 맞는 양식을 고르고(README·버그리포트·작업보고·기술블로그), 결론/요약을 앞에 두고 내용을 양식대로 배치하라."
+msg="📝 새 문서 작성 — 쓰기 전에 domain-docs의 '글 유형별 적용' 절에서 목적에 맞는 양식을 고르고(README·버그리포트·작업보고·기술블로그), 결론/요약을 앞에 두고 내용을 양식대로 배치하라."
 esc="$(printf '%s' "$msg" | sed 's/\\/\\\\/g; s/"/\\"/g')"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

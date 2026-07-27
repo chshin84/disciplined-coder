@@ -29,7 +29,7 @@ check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/agent-p
 check "user CLAUDE.md imports domains"    "grep -qxF '@disciplined-coder/domains-index.md' '$UC'"
 check "user CLAUDE.md imports solved"     "grep -qxF '@disciplined-coder/solved_problems.md' '$UC'"
 check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
-check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# Discipline (Team Principles)'"
+check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "stdout has solved marker"      "printf '%s' \"\$OUT\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 
 # --- 케이스 2: 프로젝트 폴더 무오염 ---
@@ -212,14 +212,14 @@ HF14="$(mktemp -d)/fresh"
 CLAUDE_HOME_DIR="$HF14" bash "$UR" required >/dev/null
 check "/ultracode-review self-contained mkdir" "[ -f '$HF14/disciplined-coder/ultracode-review' ]"
 
-# --- 케이스 15: Verification Layer 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
+# --- 케이스 15: 검증 레이어 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
 # 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(reviewer-*)과
 # 강제 방식 열이 같은 행에 있음을 보장한다(다른 행·다른 파일의 문자열로 vacuous 통과 방지).
-WF_ROW="$(grep -F 'Authoring or running a multi-agent workflow' "$HERE/agent-principles.md" || true)"
+WF_ROW="$(grep -F '멀티에이전트 워크플로 작성·실행' "$HERE/agent-principles.md" || true)"
 echo "[case15] principles table has workflow verification row"
 check "row exists (trigger)"       "[ -n \"\$WF_ROW\" ]"
 check "row caller = reviewer-*"    "printf '%s' \"\$WF_ROW\" | grep -qF 'reviewer-*'"
-check "row enforcement = toggle"   "printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode review mode'"
+check "row enforcement = toggle"   "printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode 검증 모드'"
 
 # --- 케이스 18: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
 # 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
@@ -271,9 +271,9 @@ H20="$(mktemp -d)"; P20="$(mktemp -d)"
 OUT20a="$(run "$H20" "$P20")"
 OUT20b="$(run "$H20" "$P20")"
 echo "[case20] canon dumped on first run only"
-check "1st run dumps principles"      "printf '%s' \"\$OUT20a\" | grep -qF '# Discipline (Team Principles)'"
+check "1st run dumps principles"      "printf '%s' \"\$OUT20a\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "1st run dumps solved"          "printf '%s' \"\$OUT20a\" | grep -qF '해결된 문제 로그 (solved_problems)'"
-check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# Discipline (Team Principles)'"
+check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "2nd run omits solved"          "! printf '%s' \"\$OUT20b\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "2nd run keeps issue mode line" "printf '%s' \"\$OUT20b\" | grep -qF '처분 모드:'"
 check "2nd run keeps ucr mode line"   "printf '%s' \"\$OUT20b\" | grep -qF '검증 모드:'"
@@ -283,18 +283,18 @@ H21="$(mktemp -d)"; P21="$(mktemp -d)"; mkdir -p "$H21/.claude"
 printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
 OUT21="$(run "$H21" "$P21")"
 echo "[case21] CRLF import line still counts as present"
-check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# Discipline (Team Principles)'"
+check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "CRLF: no solved re-dump"       "! printf '%s' \"\$OUT21\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "CRLF: mode line still sent"    "printf '%s' \"\$OUT21\" | grep -qF '처분 모드:'"
 
-# --- 케이스 16: Parallel Orchestration 넛지(정본 계약 가드) ---
-# Parallel Orchestration 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
+# --- 케이스 16: 병렬 오케스트레이션 넛지(정본 계약 가드) ---
+# 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
 # (vacuous 통과 방지).
-PO_BLOCK="$(awk '/^### Parallel Orchestration/{f=1} f&&/^### /&&!/^### Parallel Orchestration/{exit} f&&/^## /&&!/^### /{exit} f' "$HERE/agent-principles.md")"
-echo "[case16] principles Parallel Orchestration nested-orchestration nudge"
-check "Parallel Orchestration heading exists"      "printf '%s' \"\$PO_BLOCK\" | grep -qF '### Parallel Orchestration'"
-check "Parallel Orchestration points to skill (SSOT)" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
-check "Parallel Orchestration routes single-task to 2층" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'dispatching-parallel-agents'"
+PO_BLOCK="$(awk '/^### 병렬 오케스트레이션/{f=1} f&&/^### /&&!/^### 병렬 오케스트레이션/{exit} f&&/^## /&&!/^### /{exit} f' "$HERE/agent-principles.md")"
+echo "[case16] principles 병렬 오케스트레이션 nested-orchestration nudge"
+check "병렬 오케스트레이션 heading exists"      "printf '%s' \"\$PO_BLOCK\" | grep -qF '### 병렬 오케스트레이션'"
+check "병렬 오케스트레이션 points to skill (SSOT)" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
+check "병렬 오케스트레이션 routes single-task to 2층" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'dispatching-parallel-agents'"
 
 # --- 케이스 17: nested-orchestration 스킬 존재 + 핵심 절(정본 계약 가드) ---
 # 단일 목적 파일이라 파일 전역 존재 검사로 충분하다(섹션 경합 없음 — Global Constraint 참조).
@@ -303,8 +303,8 @@ echo "[case17] nested-orchestration skill present + structured"
 check "skill file exists"             "[ -f '$NO_SKILL' ]"
 check "frontmatter name correct"      "grep -qE '^name: *nested-orchestration' '$NO_SKILL'"
 check "has routing (2층 위임)"         "grep -qF 'dispatching-parallel-agents' '$NO_SKILL'"
-check "has L2 template ownership blk"  "grep -qF 'Ownership boundary (strictly observed)' '$NO_SKILL'"
-check "has output contract blk"        "grep -qF 'Output contract' '$NO_SKILL'"
+check "has L2 template ownership blk"  "grep -qF '구간 소유권(엄수)' '$NO_SKILL'"
+check "has output contract blk"        "grep -qF '산출 계약' '$NO_SKILL'"
 check "points to SDD (no reimpl)"      "grep -qF 'subagent-driven-development' '$NO_SKILL'"
 
 # --- 케이스 22: 인접 여는 마커 가드 — 첫 BEGIN이 뒤쪽 닫는 마커까지 훑어 사용자 줄을 삼키면 안 된다 ---
@@ -324,26 +324,24 @@ echo "[case22] adjacent opening-marker guard: inner scan must not skip past a se
 check "user line between two openers preserved" "grep -qxF 'USER LINE BETWEEN TWO OPENERS' '$UC22'"
 check "single managed region after run"         "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC22') -eq 1 ]"
 
-# --- canon-english: 영문 재작성이 지켜야 할 정본 계약 ---
+# --- canon-sections: 절차 절을 번호가 아니라 이름으로 부른다 (CLEAR-COMM) ---
+# 번호는 항목을 지우거나 끼워 넣는 순간 가리키는 대상이 달라져 조용히 어긋난다. 제목에 이미 이름이
+# 있으므로 그 이름으로 부르고, 옛 서수 제목이 되살아나지 않는지 함께 본다.
 CANON="$HERE/agent-principles.md"
-echo "[canon-english] rewritten canon keeps its contracts"
-check "canon: reply-in-Korean directive"   "grep -qF '한국어로 답한다' '$CANON'"
-check "canon: style block stays Korean"    "grep -qF '~한다' '$CANON'"
-check "canon: style rule prose in Korean"  "grep -qF '명사 조각' '$CANON'"
-for s in "Verification Layer" "Design Inputs" "Solved Log" "Document Hygiene" "Parallel Orchestration"; do
+echo "[canon-sections] procedure sections are named, not numbered"
+for s in "검증 레이어" "설계 입력" "오답노트" "문서·상태 위생" "병렬 오케스트레이션"; do
   check "canon: section '$s' present"      "grep -qF '### $s' '$CANON'"
 done
-check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
 # 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
-# em 대시(—) 같은 비한글 멀티바이트 문자까지 범위 안으로 넣고, 그러면 순수 영문 본문에서도 이 검사가
-# 항상 FAIL해 계약을 증명하지 못한다.
-check "canon: Korean confined to style blk" "[ \$(awk '/korean-style-rules: start/{s=1} /korean-style-rules: end/{s=0; next} !s' '$CANON' | LC_ALL=C.UTF-8 grep -c '[가-힣]') -eq 0 ]"
+# 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
+check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
 
 # --- section-refs: 옛 절 참조가 남지 않았다 (git 추적 파일, 스펙 아카이브 제외) ---
-# 이 검사는 Task 8에서 되살린다. 지금 시점에는 스킬 본문이 아직 한국어라 §가류 참조가 그대로 남아 있어
-# 반드시 FAIL하기 때문이다. 모든 참조를 새 영문 이름으로 옮기는 것이 Task 8의 일이다.
-# echo "[section-refs] no dangling ordinal references"
-# STALE="$(cd "$HERE" && git ls-files -z | xargs -0 grep -l '§[가나다라마]\|절차 [가나다라마]' 2>/dev/null | grep -v '^docs/superpowers/' || true)"
-# check "refs: none dangling"                "[ -z \"\$STALE\" ]"
+# 절을 한글 순서 기호로 가리키던 옛 참조는 어디에도 남으면 안 된다. 이름이 바뀌었기 때문이다.
+# 이 검사도 위와 같은 로케일 함정을 밟으므로 반드시 UTF-8 로케일에서 돌린다.
+# 이 주석 자체가 검색 패턴과 겹치지 않게 쓴다 — 겹치면 검사가 스스로를 잡아 영원히 FAIL한다.
+echo "[section-refs] no dangling ordinal references"
+STALE="$(cd "$HERE" && export LC_ALL=C.UTF-8 && git ls-files -z | xargs -0 grep -l '§[가나다라마]\|절차 [가나다라마]' 2>/dev/null | grep -v '^docs/superpowers/' || true)"
+check "refs: none dangling"                "[ -z \"\$STALE\" ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

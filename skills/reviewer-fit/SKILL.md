@@ -1,38 +1,32 @@
 ---
 name: reviewer-fit
-description: Reviewer lens that checks an LLM output against its consumer contract — format, schema, length, style, and prohibitions — screening it for shape before anything downstream parses and uses it. Use it when the question is whether the shape is usable, not whether the content is true (that belongs to reviewer-grounding). Run deterministic verification first wherever it applies, and spend this lens only on what deterministic checks cannot catch.
+description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일·금지사항)을 지키는지 보는 리뷰어 렌즈. 다운스트림이 파싱·사용하기 전에 형식 적합성을 거른다. 가능하면 결정론 검증을 먼저.
 ---
-# reviewer-fit — contract fitness lens (prompt blueprint)
+# reviewer-fit — 계약 적합성 렌즈 (프롬프트 설계도)
 
-> This is **one lens**. How it runs is the caller's decision — for example, the runtime review call
-> in `domain-llm-runtime`, or the document-review nudge that pairs `reviewer-grounding` with
-> `reviewer-fit`. This document defines only what it looks at and what issue list it returns.
+> 이것은 **렌즈 하나**다. 어떻게 실행되는지는 호출자가 정한다(예: `domain-llm-runtime`의 런타임
+> 리뷰 콜, 문서 검진의 `reviewer-grounding`+`reviewer-fit` 넛지). 이 문서는 "무엇을 보고 어떤 문제
+> 목록을 돌려주는가"만 정의한다.
 
-## What it looks at
-Whether the output honours the format, schema, style, and constraints it was given, as other code, a
-user, or another system consumes it. It does not judge whether the content is accurate; that belongs
-to `reviewer-grounding`.
+## 무엇을 보나
+출력을 다른 코드·사용자·시스템이 소비할 때, 정해진 형식·스키마·스타일·제약을 지키는가. 내용의
+정확성은 보지 않는다(그건 `reviewer-grounding`의 몫).
 
-## Checklist
-- Does it honour the required format and schema (valid JSON, required keys, correct types)?
-- Does it honour the style and constraints — length, language, tone, forbidden words?
-- Can downstream parse and use it as it stands, with no contamination such as stray text or markdown
-  fences?
-- Is it backward compatible with the existing output contract?
+## 체크리스트
+- 요구된 형식·스키마를 지키는가(JSON 유효성, 필수 키, 타입).
+- 길이·언어·톤·금지어 등 스타일·제약을 지키는가.
+- 다운스트림이 바로 파싱·사용 가능한가(여분 텍스트·마크다운 펜스 같은 오염이 없는가).
+- 기존 출력 계약과 하위 호환되는가.
 
-> Run **deterministic verification first** wherever it applies — a JSON schema validator, a regular
-> expression. Spend the LLM review only on the style and the fuzzy constraints that deterministic
-> checks cannot catch, which keeps the cost down.
+> 가능하면 **결정론적 검증을 먼저** 돌린다(JSON 스키마 validator, 정규식). LLM 리뷰는 결정론으로
+> 못 잡는 스타일·모호 제약에만 쓴다(비용 절약).
 
-## Reference prompt (language-neutral)
-- system: "You are a fitness reviewer. Look only at whether the candidate honours the stated output contract — format, schema, style, constraints. Do not judge the accuracy of the content."
-- user: "[output contract]\n{contract}\n\n[candidate]\n{candidate}\n\nReport the violations in the JSON schema below."
+## 레퍼런스 프롬프트 (언어 중립)
+- system: "너는 적합성 검수자다. 후보가 명시된 출력 계약(형식·스키마·스타일·제약)을 지키는지만 본다. 내용 정확성은 보지 않는다."
+- user: "[출력 계약]\n{contract}\n\n[후보]\n{candidate}\n\n위반을 아래 JSON 스키마로."
 
-## Output schema (shared)
+## 출력 스키마 (공통)
 ```
-{ "lens": "fit", "issues": [ { "severity": "critical|major|minor", "type": "schema|format|style|constraint|compat", "where": "location in the candidate", "detail": "which contract clause is violated and how" } ], "notes": "" }
+{ "lens": "fit", "issues": [ { "severity": "critical|major|minor", "type": "schema|format|style|constraint|compat", "where": "...", "detail": "..." } ], "notes": "" }
 ```
-
-The pass or fail signal is the issue `severity` alone, and there is no separate verdict field
-(`SSOT`). Routing — critical leading to regenerate or a fallback, and so on — follows the decision
-policy in `meta-aggregate`.
+통과/실패 신호는 이슈의 `severity` 하나다(별도 verdict 필드를 두지 않는다 — `SSOT`). 라우팅(critical→regenerate/폴백 등)은 `meta-aggregate`의 결정 정책을 따른다.

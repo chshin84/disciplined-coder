@@ -81,7 +81,7 @@ const REVIEWERS = [
   { key: 'lens-consistency', prompt: `${COMMON}
 렌즈: ${REPO}/skills/reviewer-consistency/SKILL.md 를 읽고 그대로 적용하라. 검토 대상: agent-principles.md, domains-index.md, README.md, CLAUDE.md, skills/*/SKILL.md 상호간(reviewer-*·meta-aggregate 포함). 내부 모순, 커버리지 공백, 이름/참조 드리프트를 찾아라.` },
   { key: 'lens-adversarial', prompt: `${COMMON}
-렌즈: ${REPO}/skills/reviewer-adversarial/SKILL.md 를 읽고 그대로 적용하라(가드 포함: 기능 추가 제안 금지·근거 필수). 검토 대상: 절차(§가~라)·hooks/·scripts/·skills/ 설계 전체. 실패 모드, 과설계·YAGNI, 비가역, 자기모순을 공격적으로 찾아라.` },
+렌즈: ${REPO}/skills/reviewer-adversarial/SKILL.md 를 읽고 그대로 적용하라(가드 포함: 기능 추가 제안 금지·근거 필수). 검토 대상: 절차 네 절(검증 레이어, 설계 입력, 오답노트, 문서·상태 위생)과 hooks/·scripts/·skills/ 설계 전체. 실패 모드, 과설계·YAGNI, 비가역, 자기모순을 공격적으로 찾아라.` },
   { key: 'ssot-audit', prompt: `${COMMON}
 차원: SSOT 전수 조사 — agent-principles.md ↔ skills ↔ scripts ↔ hooks ↔ README ↔ CLAUDE.md ↔ commands 사이의 권위 있는 이중 기술(손 동기화 쌍)을 찾아라. 정당한 참조/도출은 위반이 아니다.` },
   { key: 'shell-audit', prompt: `${COMMON}
