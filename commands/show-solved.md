@@ -1,5 +1,5 @@
 ---
-description: PC 전역 solved_problems.md(해결된 문제 로그)를 읽어 그대로 보여준다.
+description: Reads the machine-wide solved_problems.md (the log of solved problems) and shows it verbatim.
 ---
 
 `~/.claude/disciplined-coder/solved_problems.md` 파일을 Read해서 내용을 그대로 보여줘라

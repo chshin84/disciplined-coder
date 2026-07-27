@@ -1,5 +1,5 @@
 ---
-description: PC 전역 agent-principles.md(현재 활성화된 디시플린 정본 사본)를 읽어 그대로 보여준다.
+description: Reads the machine-wide agent-principles.md (the currently active copy of the discipline canon) and shows it verbatim.
 ---
 
 `~/.claude/disciplined-coder/agent-principles.md` 파일을 Read해서 내용을 그대로 보여줘라

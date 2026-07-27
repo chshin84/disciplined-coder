@@ -1,5 +1,5 @@
 ---
-description: PC 전역(~/.claude/disciplined-coder/)을 셋업한다 — solved 오답노트를 없을 때만 생성하고, 디시플린 정본(agent-principles.md·domains-index.md)을 복사·갱신하며, ~/.claude/CLAUDE.md의 @import 블록을 재생성한다(멱등).
+description: Sets up the machine-wide discipline environment (~/.claude/disciplined-coder/) — creates the solved log only if it does not already exist, copies and refreshes the discipline canon (agent-principles.md, domains-index.md), and regenerates the @import block in ~/.claude/CLAUDE.md (idempotent).
 ---
 
 다음 스크립트를 실행해 PC 전역 디시플린 환경(~/.claude/disciplined-coder/)을 스캐폴드하라:
