@@ -15,7 +15,7 @@
 
 - **validate의 "version 미지정" 경고를 없애려 plugin.json에 version을 추가했다가 같은 날 번복했다.**
   - 원인: 공식 문서상 version 설정은 마켓플레이스 업데이트를 버전 비교로 전환해 활성 개발 중 커밋 배포가 끊긴다.
-  - 해결: 다음엔 경고·린트 해소 수정이라도 동작을 바꾸는지 해당 도메인 참고서(`skills/domain-plugin` 등)를 먼저 연다 — 설계 입력 절을 건너뛰면 3렌즈 리뷰도 이런 충돌을 못 잡는다(리뷰어는 계획 내부 정합을 보지, 안 연 참고서와의 충돌은 못 본다). 이 레포의 version 정책 정본은 `domain-plugin`의 `Watch the version pin` 절이다.
+  - 해결: 다음엔 경고·린트 해소 수정이라도 동작을 바꾸는지 해당 도메인 참고서(`skills/domain-plugin` 등)를 먼저 연다 — 설계 입력 절을 건너뛰면 3렌즈 리뷰도 이런 충돌을 못 잡는다(리뷰어는 계획 내부 정합을 보지, 안 연 참고서와의 충돌은 못 본다). 이 레포의 version 정책 정본은 `domain-plugin`의 '버전 핀 주의' 절이다.
 - **워크플로 스크립트(`.claude/workflows/self-audit.js` 등)를 ESM으로(`node --input-type=module --check`) 검증하면 톱레벨 `return`에서 "Illegal return statement"로 실패한다.**
   - 원인: 워크플로 스크립트 본문은 하니스가 async 함수로 감싸 실행하므로 톱레벨 `return`이 정상이다.
   - 해결: 문법 검증은 같은 방식으로 감싼다 — `{ echo 'const __wrap = async () => {'; sed 's/^export const meta/const meta/' <파일>; echo '};'; } | node --check`.
