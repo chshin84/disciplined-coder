@@ -7,11 +7,9 @@ description: Reviewer lens that attacks a design document — failure modes, ove
 > This is **one lens**. `domain-spec-review` runs it as a read-only subagent.
 
 ## What it looks at
-
 Where the design breaks, where it goes further than it needs to, and where it is hard to undo.
 
 ## Checklist
-
 - Failure modes: what can go wrong — edge cases, races, partial failure.
 - Over-engineering: has a generalisation, an abstraction, or a flexibility nobody needs yet crept in
   (a `SIMPLE` and YAGNI violation)?
@@ -22,12 +20,10 @@ Where the design breaks, where it goes further than it needs to, and where it is
 > mitigate, and every one of them must carry its evidence without exception.
 
 ## Reference prompt (language-neutral)
-
 - system: "You are an adversarial YAGNI reviewer. Find failure modes, over-engineering, and irreversible decisions. Never propose adding a feature — that would contradict the review itself. Propose only simplifications or risk mitigations, and give the evidence for each."
 - user: "[document]\n{document}\n\n[background]\n{background}\n\nReport the issues from the checklist above in the JSON schema below."
 
 ## Output schema (shared)
-
 ```
 { "lens": "adversarial", "issues": [ { "severity": "critical|major|minor", "type": "failure-mode|over-engineering|irreversible|risk", "where": "location in the document", "detail": "the risk and why it is a risk; for a simplification, the evidence for it" } ], "notes": "" }
 ```

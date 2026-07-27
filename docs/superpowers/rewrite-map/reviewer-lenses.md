@@ -64,7 +64,7 @@ unsupported|mismatch`류의 `type` 값이 재작성 전후로 동일하다. 영�
 | description — 내부 모순 | description 첫 문장 | 옮김 |
 | description — 커버리지 공백 | description 첫 문장 | 옮김 — spec과 plan 사이의 공백이라고 명시했다 |
 | description — 이름/타입 드리프트 | description 첫 문장 | 옮김 |
-| description — 스코프 | description 첫 문장 | 옮김 — 처음엔 "한 계획에 담기엔 큰 스코프"라고만 적어 원문의 두 층위 가운데 한쪽만 남았다. 검진에서 드러나 "한 구현 계획에 맞지 않아 쪼개야 한다"로 두 층위를 되살렸다 |
+| description — 스코프 | description 첫 문장 | 옮김 — 처음엔 "한 구현 계획에 맞지 않아 쪼개야 한다"라고만 적어, 원문의 방향 없는 '스코프'와 달리 너무 커서 쪼개는 방향 하나만 남았다(같은 파일 `## Checklist`의 "is this the right size ... or does it need splitting?"는 두 방향을 열어 두는데 description만 좁았다). 리뷰에서 드러나 "너무 넓어 쪼개야 하는 경우(`needs splitting`)와 지나치게 잘게 쪼개져 합쳐야 하는 경우(`needs merging`)"를 모두 적어 양방향을 되살렸다 |
 | description — `domain-spec-review`가 읽기 전용 서브에이전트로 호출한다 | description 마지막 문장 | 옮김 |
 | (원문 없음) 이 렌즈를 언제 고르는가 | description 둘째 문장 | 신설 — "문서가 스스로 아귀가 맞는가"를 묻는 자리이며 근거 충실성이나 실패 모드를 묻는 자리가 아니라고 적어 다른 셋과 갈랐다 |
 | H1 `reviewer-consistency — 내부 정합성·커버리지 렌즈 (프롬프트 설계도)` | H1 `reviewer-consistency — internal consistency and coverage lens (prompt blueprint)` | 옮김 |
@@ -150,7 +150,7 @@ unsupported|mismatch`류의 `type` 값이 재작성 전후로 동일하다. 영�
 | H1 `reviewer-fit — 계약 적합성 렌즈 (프롬프트 설계도)` | H1 `reviewer-fit — contract fitness lens (prompt blueprint)` | 옮김 |
 | 인용 블록 — 이것은 렌즈 하나다 | 인용 블록 첫 문장 | 옮김 |
 | 인용 블록 — 실행 방식은 호출자가 정한다 | 인용 블록 둘째 문장 | 옮김 |
-| 인용 블록 — 예: `domain-llm-runtime`의 런타임 리뷰 콜 | 인용 블록 둘째 문장 | 옮김 |
+| 인용 블록 — 예: `domain-llm-runtime`의 런타임 리뷰 콜 | 인용 블록 둘째 문장 | 옮김 — 처음엔 `예:` 표지 없이 두 실행 형태를 그냥 나열해, 이 둘이 예시가 아니라 허용되는 전부인 닫힌 목록처럼 읽혔다. 리뷰에서 드러나 `for example`을 넣어 예시임을 되살렸다(같은 자리의 `reviewer-grounding`은 원문에도 예시 표지가 없었으므로 그대로 두었다) |
 | 인용 블록 — 예: 문서 검진의 `reviewer-grounding`+`reviewer-fit` 넛지 | 인용 블록 둘째 문장 | 옮김 — 훅이 실제로 띄우는 그 짝을 그대로 남겼다 |
 | 인용 블록 — 이 문서는 무엇을 보고 어떤 목록을 돌려주는가만 정의한다 | 인용 블록 셋째 문장 | 옮김 |
 | `## 무엇을 보나` — 다른 코드·사용자·시스템이 소비할 때 형식·스키마·스타일·제약을 지키는가 | `## What it looks at` 첫 문장 | 옮김 — 소비 주체 셋을 그대로 나열했다 |
