@@ -1,14 +1,21 @@
-# 개발 대상(도메인) 참고서 — 인덱스
+# Domain Reference Index
 
-개발 대상에 따라 **마땅히 그래야 하는 것 / 그랬으면 하는 것**이 있다. 설계/계획 단계에서 해당 도메인 참고서를 확인해 **명세에 반영**하고(1순위), 명세에 못 담았으면 개발 단계에서 고려한다(폴백). 이 파일은 목차일 뿐이고 상세는 각 스킬에 있다(온디맨드).
+What a build target *ought to be* differs by domain. During design or planning, open the matching
+domain reference and fold it into the spec (first priority); when it does not fit the spec, weigh it
+during implementation instead (fallback). This file is only a table of contents — the detail lives
+on-demand in each skill.
 
-| 도메인 | 언제(트리거) | 적용 시점 | 참조 스킬 |
+| Domain | Trigger (when) | When it applies | Caller skill |
 |---|---|---|---|
-| 문서 관리 | 문서 작성·구조화 (Claude Code 핵심 — 문서 to 문서) | 설계·개발 | `domain-docs` |
-| 플러그인 관리 | CC 플러그인/마켓플레이스 제작 | 설계·개발 | `domain-plugin` |
-| LLM 런타임 | 제품이 런타임에 LLM 호출 | **런타임** | `domain-llm-runtime` (+ `reviewer-*`·`meta-aggregate`) |
+| Document management | Writing or structuring documentation (a core Claude Code activity — document to document) | Design, development | `domain-docs` |
+| Plugin management | Building a Claude Code plugin or marketplace | Design, development | `domain-plugin` |
+| LLM runtime | The product calls an LLM at runtime | **Runtime** | `domain-llm-runtime` (plus `reviewer-*`, `meta-aggregate`) |
 
-## 사용
-- **설계/계획 시**: 만들 대상이 위 도메인이면 해당 스킬을 열어 "마땅히 그래야 하는 것"을 명세에 반영한다.
-- **개발 시**: 명세에 없으면 그때 참조한다.
-- **통증이 확인된 도메인만 등재한다.** 새 도메인은 필요할 때 신설한다(YAGNI·측정 먼저). 비어 있는 스텁을 두지 않는다 — 없는 것이 "다뤄진 척"보다 정직하다.
+## How to use this
+
+- **At design or planning time**: if the build target matches a domain above, open that skill and
+  fold "what it ought to be" into the spec.
+- **At development time**: consult it then, if it did not make it into the spec.
+- **List only a domain whose pain is confirmed.** Add a new domain only when it is actually needed
+  (YAGNI, measure first), and do not leave an empty stub in place — an absent entry is more honest
+  than one that only pretends to be handled.
