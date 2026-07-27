@@ -303,8 +303,8 @@ echo "[case17] nested-orchestration skill present + structured"
 check "skill file exists"             "[ -f '$NO_SKILL' ]"
 check "frontmatter name correct"      "grep -qE '^name: *nested-orchestration' '$NO_SKILL'"
 check "has routing (2층 위임)"         "grep -qF 'dispatching-parallel-agents' '$NO_SKILL'"
-check "has L2 template ownership blk"  "grep -qF '구간 소유권' '$NO_SKILL'"
-check "has output contract blk"        "grep -qF '산출 계약' '$NO_SKILL'"
+check "has L2 template ownership blk"  "grep -qF 'Ownership boundary' '$NO_SKILL'"
+check "has output contract blk"        "grep -qF 'Output contract' '$NO_SKILL'"
 check "points to SDD (no reimpl)"      "grep -qF 'subagent-driven-development' '$NO_SKILL'"
 
 # --- 케이스 22: 인접 여는 마커 가드 — 첫 BEGIN이 뒤쪽 닫는 마커까지 훑어 사용자 줄을 삼키면 안 된다 ---

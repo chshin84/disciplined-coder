@@ -1,90 +1,128 @@
 ---
 name: nested-orchestration
-description: 멀티태스크 플랜이 둘 이상일 때 3층(오케스트레이터→서브오케스트레이터→워커·리뷰어)으로 병렬 실행하는 방법. 스펙별 독립 워크트리·자율 L2·기계적 소유권 강제·무상태 재개. agent-principles §마가 트리거.
+description: How to run two or more multi-task plans in parallel across three tiers — an orchestrator, then sub-orchestrators, then workers and reviewers. Covers one isolated worktree per spec, an autonomous L2, mechanically enforced ownership boundaries, and stateless resumption. The Parallel Orchestration section of agent-principles is what triggers it.
 ---
-# nested-orchestration — 3층 병렬 오케스트레이션 (방법 SSOT)
+# nested-orchestration — three-tier parallel orchestration (the SSOT for the method)
 
-> `agent-principles.md` §마가 트리거 인덱스다. 여기가 *어떻게*의 SSOT다. 이 스킬은 기존 스킬을
-> 재구현하지 않고 조합한다 — 각 메커니즘의 상세는 그 스킬을 연다.
+> The `Parallel Orchestration` section of `agent-principles.md` is the trigger index. This document
+> is the SSOT for *how*. This skill does not reimplement the existing skills but composes them — for
+> the detail of each mechanism, open that skill.
 
-## 언제 쓰나 — 라우팅 결정 트리
-독립적인 작업 단위가 2개 이상일 때:
-- 각 단위가 **단일 태스크**(자기 계획·리뷰 루프가 없음) → `dispatching-parallel-agents`(2층)로 간다. 여기서 끝.
-- 각 단위가 **멀티태스크 플랜**(자기 계획·구현·리뷰 루프를 가진 덩어리) → 이 스킬(3층)을 쓴다.
+## When to use it — the routing decision tree
+Once there are two or more independent units of work:
+- Each unit is a **single task** (it carries no plan-and-review loop of its own) — go to
+  `dispatching-parallel-agents` and its two tiers. That is the end of it.
+- Each unit is a **multi-task plan** (a chunk carrying its own plan, implement, and review loop) —
+  use this skill and its three tiers.
 
-3층이 값을 하는 이유: 2층 워커는 한 태스크만 풀고, 순차 SDD는 N개 루프를 한 컨텍스트에 쌓는다. 3층만이
-**N개 SDD 루프를 각자 격리 컨텍스트에서 동시에** 돌린다. 그 격리와 동시성이 조율 층 하나를 얹는 값이다.
-단일 태스크에는 그 값이 없으니 붙이지 않는다.
+Why the third tier earns its place: a two-tier worker solves exactly one task, and a sequential SDD
+run stacks N loops into one context. Only three tiers run **N SDD loops at once, each in its own
+isolated context**. That isolation and that concurrency are what the one extra coordination tier
+buys. A single task gets none of it, so do not bolt the tier on.
 
-## 흐름 — 파이프라인 3단계 (batch 아님)
-사람 병목은 주로 스펙 국면에 산다. 그러니 스펙을 하나씩 잠그고, 잠기는 즉시 팬아웃한다.
+## The flow — a three-stage pipeline (not a batch)
+The human bottleneck lives mostly in the spec phase. So lock the specs one at a time, and fan out the
+moment one locks.
 
-1. **L1(메인, 사람과 함께)**: 스펙을 하나씩 `brainstorming`으로 잠근다. 잠기는 즉시 워크트리를 만들고
-   (`using-git-worktrees`, 또는 `Agent`의 `isolation:'worktree'`) L2를 **백그라운드로** 디스패치한다.
-   그 사이 L1은 다음 스펙을 계속 브레인스토밍한다.
-2. **L2(자율 서브오케스트레이터, 사람 대화 불가)**: 잠긴 스펙으로 `writing-plans`(계획부터) →
-   `subagent-driven-development`(구현)를 자기 워크트리에서 실행한다. L2의 SDD 루프가 L3(구현자·리뷰어)를 띄운다.
-   **검증은 세 지점에 배선한다** — 스펙 국면은 L1이 이미 `domain-spec-review`(훅 강제)로 마쳤고, **플랜 국면은
-   L2가 자율로 `domain-spec-review`를 돌려 accept/regenerate까지 처리**하되(사람 대화 불가라 escalate 상황이면
-   아래 BLOCKED로 버블업), 실행 국면은 SDD 태스크 리뷰어와 리스크 비례 `reviewer-*` 렌즈가 맡는다.
-3. **L1 통합**: L2들의 완료 통지를 받아 리포트를 취합하고, 소유권을 기계로 검증한 뒤 병합하고 최종 브랜치
-   리뷰를 돌린다. 이 통합은 가벼운 일이 아니며 L1에서 벌어진다 — 병목은 제거가 아니라 축소된다. 통합을
-   브레인스토밍이 다 끝난 뒤로 미루거나, 규모가 크면 통합 자체를 별도 서브에이전트에 위임해도 된다.
+1. **L1 (the main session, working with the human)**: lock the specs one at a time with
+   `brainstorming`. The moment one locks, create a worktree (`using-git-worktrees`, or
+   `isolation: 'worktree'` on `Agent`) and dispatch an L2 **in the background**. Meanwhile L1 carries
+   on brainstorming the next spec.
+2. **L2 (the autonomous sub-orchestrator, which cannot talk to a human)**: take the locked spec
+   through `writing-plans` (starting from the plan) and then `subagent-driven-development` (the
+   implementation), inside its own worktree. L2's SDD loop is what spawns L3, the implementers and
+   reviewers. **Verification is wired in at three points.** For the spec phase L1 has already
+   finished with `domain-spec-review` (hook-enforced). **For the plan phase L2 runs
+   `domain-spec-review` autonomously and handles it through accept and regenerate itself**, but since
+   it cannot talk to a human, an escalate situation bubbles up as the BLOCKED state below. The
+   execution phase belongs to the SDD task reviewer plus whichever `reviewer-*` lenses the risk
+   warrants.
+3. **L1 integration**: take the completion notices from the L2s, gather their reports, verify the
+   ownership mechanically, then merge and run a final branch review. This integration is not a light
+   job and it happens at L1 — the bottleneck is narrowed, not removed. You may defer the integration
+   until all the brainstorming is done, or, at scale, delegate the integration itself to its own
+   subagent.
 
-## L2 디스패치 템플릿 — 여섯 블록
-L2는 자기 부모(L1) 외 누구와도 대화할 수 없다. 프롬프트는 자기완결이어야 한다. 용어 고정: L2=서브오케스트레이터,
-L3=구현자·리뷰어('워커'는 2층 용어).
+## The L2 dispatch template — six blocks
+L2 can talk to nobody but its own parent, L1. Its prompt therefore has to be self-contained. Fixed
+vocabulary: L2 is the sub-orchestrator, and L3 is the implementers and reviewers ("worker" is
+two-tier vocabulary).
 
-1. **역할 선언** — "너는 자율 서브오케스트레이터다. 나(오케스트레이터)와 추가 왕복 없이 스펙을 완결하고
-   브랜치까지 만든다. 너는 격리된 git 워크트리에 있다."
-2. **임무** — 스펙 경로(SSOT임을 명시) + 산출물 열거.
-3. **구간 소유권(엄수)** — 소유하는 파일·디렉터리 경로 + 타 워크스트림 소유 파일의 **명시적 금지**.
-4. **방식(TDD + 3층)** — 구현자로 구현(같은 파일은 순차 편집·병렬 mutate 금지), 프로젝트 테스트 규약, 그리고
-   **읽기전용 리뷰어 서브에이전트**가 diff를 읽고 findings를 반환 → L2가 수정(리뷰어는 파일 불변). 리스크에
-   비례해 리뷰어를 고른다(§가) — SDD 태스크 리뷰어, 필요하면 `reviewer-grounding`·`reviewer-adversarial` 렌즈.
-5. **주입 컨텍스트** — solved_problems에서 recall한 해당 도메인 gotcha들(반복 재발견 금지).
-6. **산출 계약(브랜치까지만 — 머지·배포·main push 금지)** — 상세는 **리포트 파일**에 쓰고(변경 파일·테스트
-   최종 결과·발행 스키마 실제 모양·스펙 이탈·브랜치명), **L1으로 리턴하는 것은 상태·블로커·한 줄 요약과
-   리포트 경로뿐**이다. 리포트는 **제품 트리 밖의 워크스트림별 고유 경로**(예: `report-<workstream>.md`)에 쓰고
-   **병합될 브랜치에는 커밋하지 않는다**(고정 경로로 커밋하면 워크스트림끼리 병합 충돌 — 실측). 서브에이전트
-   `Write`가 `.md`를 훅으로 막을 수 있으니 리포트는 Bash로 스크래치에 기록한다(실측 gotcha).
+1. **Role declaration** — "You are an autonomous sub-orchestrator. You will finish this spec and
+   produce a branch without another round trip to me, the orchestrator. You are in an isolated git
+   worktree."
+2. **The mission** — the spec path (stated to be the SSOT) plus an enumeration of the deliverables.
+3. **Ownership boundary (strictly observed)** — the file and directory paths this workstream owns,
+   plus an **explicit prohibition** on the files another workstream owns.
+4. **The method (`TDD` plus three tiers)** — implement through implementers (edit the same file
+   sequentially, and never mutate it in parallel), follow the project's test conventions, and have a
+   **read-only reviewer subagent** read the diff and return findings for L2 to act on (the reviewer
+   leaves the files unchanged). Pick the reviewers in proportion to the risk (the `Verification
+   Layer` section) — the SDD task reviewer, and the `reviewer-grounding` and `reviewer-adversarial`
+   lenses where they are needed.
+5. **Injected context** — the gotchas for this domain recalled from `solved_problems`, so that the
+   same thing is not rediscovered twice.
+6. **Output contract (up to the branch and no further — never merge, deploy, or push to main)** —
+   write the detail into a **report file** (the changed files, the final test results, the actual
+   shape of any published schema, any departure from the spec, and the branch name), and **return to
+   L1 nothing but the status, the blockers, a one-line summary, and the report path**. Write the
+   report to **a per-workstream unique path outside the product tree** (`report-<workstream>.md`, for
+   example) and **do not commit it to the branch that will be merged** — committing it at a fixed
+   path makes the workstreams collide on merge, as measured. A subagent's `Write` can be stopped from
+   writing a `.md` by a hook, so record the report through Bash into scratch instead (a measured
+   gotcha).
 
-## 사람 대화 불가 — BLOCKED와 재개
-- L2가 사람 결정(🔴)에 부딪히면 mid-run으로 surface하려 하지 말고(백그라운드라 즉시 채널이 없다) **그
-  지점에서 조기 종료하고 상태 `BLOCKED`와 질문을 리턴**한다(지금까지 커밋은 브랜치에 남긴 채). 절대 추측으로
-  지나가지 않는다(§다의 "🔴 즉시 surface").
-- L1이 그 질문을 사용자에게 surface한다. 사용자가 답하면 L1은 정지된 L2를 되살리지 않는다 — **답을
-  스펙에 접어 넣어(🔴 해소) 그 워크트리에 새 L2를 재디스패치**한다. 새 L2는 기존 커밋 위에서 이어간다(무상태 재개).
-- **잔존 위험(정직히)**: BLOCKED 버블업은 자율 LLM에 대한 프롬프트 넛지이지 하드 컨트롤이 아니다. L2가 🔴를
-  못 알아채고 추측하면 완결된 브랜치까지 가서야 L1이 본다. 최종 방벽은 L1의 통합검증·최종 브랜치 리뷰다.
+## No human channel — BLOCKED and resumption
+- When L2 hits a decision that needs a human (a 🔴), it must not try to surface it mid-run, since a
+  background agent has no immediate channel. It **stops early at that point and returns the status
+  `BLOCKED` together with the question**, leaving everything committed so far on the branch. It never
+  guesses its way past (the "surface a 🔴 immediately" rule of the `Solved Log` section).
+- L1 surfaces that question to the user. Once the user answers, L1 does not revive the halted L2 —
+  it **folds the answer into the spec (resolving the 🔴) and re-dispatches a fresh L2 into that
+  worktree**. The new L2 continues on top of the existing commits, which is what makes the resumption
+  stateless.
+- **Residual risk (stated honestly)**: bubbling BLOCKED up is a prompt nudge to an autonomous LLM,
+  not a hard control. If L2 fails to notice a 🔴 and guesses instead, L1 only sees it once a finished
+  branch arrives. The last line of defence is L1's integration check and the final branch review.
 
-## 가드레일 (FAIL-LOUD)
-- **구간 소유권 강제(선언 + 기계적 탐지)**: L1은 취합 때 각 브랜치의 변경 파일 집합
-  (`git diff --name-only base..branch`)을 구해 **두 집합의 교집합이 비면 안전, 비지 않으면 병합 전에
-  멈추고 surface**한다. 리포트 핸드오프는 브랜치 밖이라 이 집합은 제품 파일만 담는다. 겹침이 "조용한 병합
-  충돌"이 아니라 병합 *이전*의 명시적 FAIL로 드러난다.
-- **크래시·행 복구**: L1은 디스패치한 워크스트림을 인플라이트로 들고 있다가, 완료 통지가 안 오는 L2는 CLI
-  드릴인(더블클릭)으로 생사를 확인하고 죽었으면 마지막 커밋 위에서 재디스패치한다. 한계: 타임아웃·헬스체크
-  툴링이 없어 L1의 주의에 의존한다.
-- **비용(정직히)**: task 알맹이는 순차·병렬이 대체로 같지만 병렬은 공짜가 아니다 — L2마다 컨텍스트 재확립
-  (스펙 재독·gotcha 재recall·코드베이스 재독)과 에이전트 팬아웃이 N배 오버헤드다. 사는 것은 벽시계 단축과
-  컨텍스트 격리다. 실측 참고: 사소한 워크스트림 하나당 약 40k 토큰(L3 포함).
+## Guardrails (`FAIL-LOUD`)
+- **Ownership boundary enforcement (declared, then mechanically detected)**: while gathering, L1
+  computes each branch's set of changed files (`git diff --name-only base..branch`). **An empty
+  intersection between two sets is safe; anything else stops the merge and gets surfaced.** The
+  report handoff lives outside the branch, so these sets hold product files only. An overlap then
+  shows up as an explicit FAIL *before* the merge rather than as a silent merge conflict.
+- **Crash and hang recovery**: L1 holds its dispatched workstreams as in-flight, and for an L2 whose
+  completion notice never arrives it drills into the CLI (double-click) to check whether it is alive,
+  re-dispatching from the last commit if it died. The limit: there is no timeout or health-check
+  tooling, so this rests on L1 paying attention.
+- **Cost (stated honestly)**: the substance of the tasks costs about the same sequentially or in
+  parallel, but parallel is not free — every L2 re-establishes its context (re-reading the spec,
+  re-recalling the gotchas, re-reading the codebase) and fans out its own agents, which is N times
+  the overhead. What you buy is wall-clock time and context isolation. A measured reference point:
+  roughly 40k tokens for one minor workstream, L3 included.
 
-## 관측성 — 무엇을 보고 무엇을 못 보나
-수동 `Agent` 중첩은 `/workflows` 집계 대시보드에 뜨지 않는다(그건 `Workflow` 툴 전용). 대신 CLI가
-서브에이전트를 표시하고 더블클릭으로 각 L2의 라이브 세션에 드릴인된다 — "각 L2가 지금 뭐 하나"는 이걸로
-본다. 못 보는 것: 집계뷰·메트릭, 워크트리 배정 표면 표시. 메인 컨텍스트 bloat는 위 리포트-파일 분리로 완화한다.
+## Observability — what you see and what you do not
+Manual `Agent` nesting does not appear on the `/workflows` aggregate dashboard, which belongs to the
+`Workflow` tool alone. What you do get is the CLI showing the subagents, where a double-click drills
+into each L2's live session — that is how you answer "what is each L2 doing right now". What you do
+not get is the aggregate view, the metrics, or any surfaced display of the worktree assignment.
+Bloat in the main context is mitigated by the report-file separation above.
 
-## 재구현 금지 (SSOT 포인터)
-- 아이디어에서 스펙까지: `brainstorming` · 계획: `writing-plans` · 실행 루프: `subagent-driven-development`
-- 병렬 디스패치 메커니즘: `dispatching-parallel-agents`(단일태스크 경로이자 디스패치 기초)
-- 워크트리 격리: `using-git-worktrees` · 리뷰 렌즈: `reviewer-*`
+## Do not reimplement (SSOT pointers)
+- `brainstorming` takes an idea to a spec, `writing-plans` turns that spec into a plan, and
+  `subagent-driven-development` owns the execution loop.
+- `dispatching-parallel-agents` owns the parallel dispatch mechanism, which is both the single-task
+  route and the foundation dispatch rests on.
+- `using-git-worktrees` owns worktree isolation, and the `reviewer-*` skills own the review lenses.
 
-## 한계 (정직히)
-3층은 조율 층을 얹으므로 멀티태스크 플랜에만 값을 한다(라우팅). BLOCKED 정직성·소유권 강제는 스파이크에서
-검증됐으나, 크래시 복구와 대형 워크스트림은 아직 미검증이다. 자율(L2 판단)을 관측·재현성(Workflow 결정론)보다
-택한 결과이니, 그 대가(집계 UI 부재·추측 잔존 위험)를 감수한다.
+## Limits (stated honestly)
+Three tiers add a coordination tier, so they earn their keep only on a multi-task plan — which is
+what the routing is for. BLOCKED honesty and ownership enforcement were verified in a spike, but
+crash recovery and large workstreams are still unverified. This is the result of choosing autonomy
+(L2's own judgement) over observability and reproducibility (`Workflow` determinism), so the price —
+no aggregate UI, and the residual risk of a guess — is accepted.
 
-**비목표**: `Workflow` 결정론 버전·집계 UI 대시보드·**영속되는 오케스트레이션 상태 문서**는 만들지 않는다 —
-인플라이트 상태는 세션 대화 상태로만 든다(disciplined-coder 무상태 정체성). L4 이상 더 깊은 중첩도 다루지
-않는다(3층 한정). 단일 태스크 병렬은 `dispatching-parallel-agents`가 SSOT다.
+**Non-goals**: no deterministic `Workflow` version, no aggregate UI dashboard, and **no persisted
+orchestration state document** — in-flight state is held in the session conversation alone
+(disciplined-coder's stateless identity). Nesting at L4 or deeper is not covered either (three tiers
+only). For single-task parallelism, `dispatching-parallel-agents` is the SSOT.
