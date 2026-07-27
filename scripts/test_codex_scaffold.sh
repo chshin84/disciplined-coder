@@ -121,4 +121,18 @@ OUTF="$(CODEX_HOME_DIR="$TF/.codex" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SS" 2>/dev
 check "session hook surfaces failure cause"    "printf '%s' \"\$OUTF\" | grep -qF 'scaffold error:'"
 check "failure output is still valid JSON"     "printf '%s' \"\$OUTF\" | json_valid_stdin"
 
+# --- 케이스 9: 이중 주입 회귀 가드 — 2회차 stdout은 AGENTS.md 인라인분(principles+domains)을 재전송하지 않는다 ---
+# 배경: 섹션 3(AGENTS.md 인라인)과 섹션 4(stdout 주입)가 같은 두 파일을 중복 전송하던 결함의 회귀 가드.
+# had_inline 판정 덕에 첫 설치 세션만 stdout에도 실리고, 그 다음부터는 인라인(AGENTS.md)에만 남는다.
+H9="$(mktemp -d)"; K9="$H9/.codex/disciplined-coder"; AG9="$H9/.codex/AGENTS.md"
+OUT9a="$(run "$H9")"
+OUT9b="$(run "$H9")"
+echo "[case9] no duplicate injection after first install"
+check "first run stdout has principles"       "printf '%s' \"\$OUT9a\" | grep -qF '# 디시플린 (팀 원칙)'"
+check "second run stdout lacks principles"    "! printf '%s' \"\$OUT9b\" | grep -qF '# 디시플린 (팀 원칙)'"
+check "second run stdout lacks domains-index" "! printf '%s' \"\$OUT9b\" | grep -qF '개발 대상(도메인) 참고서'"
+check "second run stdout still has solved"    "printf '%s' \"\$OUT9b\" | grep -qF '해결된 문제 로그 (solved_problems)'"
+check "second run stdout still has mode line" "printf '%s' \"\$OUT9b\" | grep -qF '처분 모드:'"
+check "AGENTS.md still inlines principles after 2nd run" "grep -qF '디시플린' '$AG9'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

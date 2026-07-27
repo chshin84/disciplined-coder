@@ -93,6 +93,13 @@
   로드한다) 영구히 남는다. 사용자 내용이 없음을 실측으로 확인했으므로 한 번 손으로 치운다. 재발은 R2가
   구조로 막으므로 이것은 기존 잔해에 대한 일회성 조치다.
 
+- **R6. Codex 쪽(`codex-scaffold.sh`)도 같은 이중 주입을 하고 있었으므로 함께 고친다.** Codex 런타임은
+  `@import`를 지원하지 않아 관리 블록에 정본을 인라인하는데, 그러면서 stdout으로도 같은 두 파일을 다시
+  보냈다. 주석이 선언한 분업(인라인은 principles와 domains, stdout은 solved)을 코드가 지키지 않던
+  것이라 주석 쪽이 옳다. 판정 변수는 `had_inline`이며 관리 블록 마커의 존재로 첫 설치를 가린다. Claude
+  쪽 `had_import`가 `@import` 줄로 판정하는 것과 대상만 다르고 역할은 같다. `solved_problems.md`는
+  Codex에서 인라인 대상이 아니므로 매 세션 stdout으로 계속 보낸다.
+
 ## 설계 (파일별)
 
 - **`scripts/_managed_block.sh`** — R2를 구현한다. 고아 무해화 주석 문자열을 `MANAGED_ORPHAN` 상수로
