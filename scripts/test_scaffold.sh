@@ -237,7 +237,7 @@ check "row exists (trigger)"       "[ -n \"\$WF_ROW\" ]"
 check "row caller = reviewer-*"    "printf '%s' \"\$WF_ROW\" | grep -qF 'reviewer-*'"
 check "row enforcement = toggle"   "printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode 검증 모드'"
 
-# --- 케이스 16: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
+# --- 케이스 18: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
 # 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
 # 계약: 관리영역 1개, 고아 주석 0, 짝 없는 마커 0, 사용자 줄 보존, 본문 줄은 삭제 대상 아님.
 H16="$(mktemp -d)"; P16="$(mktemp -d)"; mkdir -p "$H16/.claude"
@@ -255,7 +255,7 @@ H16="$(mktemp -d)"; P16="$(mktemp -d)"; mkdir -p "$H16/.claude"
 } > "$H16/.claude/CLAUDE.md"
 run "$H16" "$P16" >/dev/null
 UC16="$H16/.claude/CLAUDE.md"
-echo "[case16] corrupted region self-heals"
+echo "[case18] corrupted region self-heals"
 check "one BEGIN after heal"          "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC16') -eq 1 ]"
 check "one END after heal"            "[ \$(grep -cF '# END disciplined-coder' '$UC16') -eq 1 ]"
 check "no orphan marker left"         "! grep -qF 'orphan BEGIN neutralized' '$UC16'"
@@ -264,7 +264,7 @@ run "$H16" "$P16" >/dev/null
 check "still one BEGIN (idempotent)"  "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC16') -eq 1 ]"
 check "user note still there"         "grep -qxF 'MY OWN GLOBAL NOTE' '$UC16'"
 
-# --- 케이스 17: 고아 여는 마커 뒤 본문은 한 줄도 지우지 않는다 (빈 줄 포함) ---
+# --- 케이스 19: 고아 여는 마커 뒤 본문은 한 줄도 지우지 않는다 (빈 줄 포함) ---
 H17="$(mktemp -d)"; P17="$(mktemp -d)"; mkdir -p "$H17/.claude"
 { printf 'head note\n'
   printf '# BEGIN disciplined-coder (managed — do not edit)\n'
@@ -274,13 +274,33 @@ H17="$(mktemp -d)"; P17="$(mktemp -d)"; mkdir -p "$H17/.claude"
 } > "$H17/.claude/CLAUDE.md"
 ERR17="$(run "$H17" "$P17" 2>&1 >/dev/null)" || true
 UC17="$H17/.claude/CLAUDE.md"
-echo "[case17] orphan opener drops only its own line"
+echo "[case19] orphan opener drops only its own line"
 check "orphan: head preserved"        "grep -qxF 'head note' '$UC17'"
 check "orphan: para one preserved"    "grep -qxF 'para one' '$UC17'"
 check "orphan: para two preserved"    "grep -qxF 'para two' '$UC17'"
 check "orphan: blank line preserved"  "[ \$(grep -c '^\$' '$UC17') -ge 1 ]"
 check "orphan: warns BEGIN w/o END"   "printf '%s' \"\$ERR17\" | grep -qF 'BEGIN but no END'"
 check "orphan: marker line gone"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC17') -eq 1 ]"
+
+# --- 케이스 20: 정본 stdout 덤프는 첫 설치 세션에만 (이중 주입 회귀 가드) ---
+H18="$(mktemp -d)"; P18="$(mktemp -d)"
+OUT18a="$(run "$H18" "$P18")"
+OUT18b="$(run "$H18" "$P18")"
+echo "[case20] canon dumped on first run only"
+check "1st run dumps principles"      "printf '%s' \"\$OUT18a\" | grep -qF '디시플린'"
+check "1st run dumps solved"          "printf '%s' \"\$OUT18a\" | grep -qF '해결된 문제 로그 (solved_problems)'"
+check "2nd run omits principles"      "! printf '%s' \"\$OUT18b\" | grep -qF '디시플린'"
+check "2nd run omits solved"          "! printf '%s' \"\$OUT18b\" | grep -qF '해결된 문제 로그 (solved_problems)'"
+check "2nd run keeps issue mode line" "printf '%s' \"\$OUT18b\" | grep -qF '처분 모드:'"
+check "2nd run keeps ucr mode line"   "printf '%s' \"\$OUT18b\" | grep -qF '검증 모드:'"
+
+# --- 케이스 21: CRLF 관리영역에서도 재주입하지 않는다 (had_import의 CR 내성) ---
+H19="$(mktemp -d)"; P19="$(mktemp -d)"; mkdir -p "$H19/.claude"
+printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H19/.claude/CLAUDE.md"
+OUT19="$(run "$H19" "$P19")"
+echo "[case21] CRLF import line still counts as present"
+check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT19\" | grep -qF '디시플린'"
+check "CRLF: mode line still sent"    "printf '%s' \"\$OUT19\" | grep -qF '처분 모드:'"
 
 # --- 케이스 16: §마 병렬 오케스트레이션 넛지(정본 계약 가드) ---
 # §마 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다(vacuous 통과 방지).
