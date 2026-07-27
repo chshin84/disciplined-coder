@@ -121,28 +121,6 @@ check "subdir does not abort scaffold"  "[ $rc10 -eq 0 ]"
 check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rogue_dir'"
 check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
 
-# --- 케이스 11: /add-pointer (프로젝트 오답노트 + 포인터) ---
-AP="$HERE/scripts/add-pointer.sh"
-PA="$(mktemp -d)"   # 가짜 프로젝트
-ERR11="$(CLAUDE_PROJECT_DIR="$PA" bash "$AP" 2>&1)" || true
-echo "[case11] add-pointer creates log + pointer (idempotent)"
-check "log created in docs/"            "[ -f '$PA/docs/solved_problems.md' ]"
-check "CLAUDE.md created with pointer"   "grep -qF 'docs/solved_problems.md' '$PA/CLAUDE.md'"
-check "pointer has recall instruction"   "grep -qF '먼저 확인' '$PA/CLAUDE.md'"
-check "pointer has single-writer rule"   "grep -qF '메인 세션' '$PA/CLAUDE.md'"
-check "pointer in managed region"        "[ \$(grep -cF '# BEGIN disciplined-coder' '$PA/CLAUDE.md') -eq 1 ]"
-printf '\n- 내 프로젝트 교훈\n' >> "$PA/docs/solved_problems.md"
-CLAUDE_PROJECT_DIR="$PA" bash "$AP" >/dev/null 2>&1
-check "idempotent: one managed region"   "[ \$(grep -cF '# BEGIN disciplined-coder' '$PA/CLAUDE.md') -eq 1 ]"
-check "idempotent: log append preserved"  "grep -qF '내 프로젝트 교훈' '$PA/docs/solved_problems.md'"
-PB="$(mktemp -d)"; printf 'my project note\n' > "$PB/CLAUDE.md"
-CLAUDE_PROJECT_DIR="$PB" bash "$AP" >/dev/null 2>&1
-check "existing CLAUDE.md preserved"     "grep -qxF 'my project note' '$PB/CLAUDE.md'"
-PC="$(mktemp -d)"; mkdir -p "$PC/docs"; : > "$PC/docs/solved_problems.md"
-printf 'note\n# BEGIN disciplined-coder (managed — do not edit)\nstale\n' > "$PC/CLAUDE.md"
-CLAUDE_PROJECT_DIR="$PC" bash "$AP" >/dev/null 2>&1
-check "half-broken block normalized"     "[ \$(grep -cF '# END disciplined-coder' '$PC/CLAUDE.md') -ge 1 ]"
-
 # --- 케이스 12: 오답노트 처분 모드 (issue-mode) ---
 IM="$HERE/scripts/issue-mode.sh"
 H12="$(mktemp -d)"; P12="$(mktemp -d)"; K12="$H12/.claude/disciplined-coder"
@@ -181,7 +159,7 @@ CLAUDE_HOME_DIR="$HF" bash "$IM" issues >/dev/null
 check "/issue-mode self-contained mkdir"  "[ -f '$HF/disciplined-coder/issue-mode' ]"
 
 # --- 케이스 13: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (SSOT — 열거는 사용 절 한 곳) ---
-# 파일 전체가 아니라 '### 커맨드' 절만 검사한다 — /add-pointer 등이 다른 문단에 등장해
+# 파일 전체가 아니라 '### 커맨드' 절만 검사한다 — 커맨드명이 다른 문단에 등장해
 # 목록 누락이 vacuous 통과하는 것을 막는다.
 CMD_SECTION="$(awk '/^### 커맨드/{f=1} f&&/^## /{exit} f' "$HERE/README.md")"
 echo "[case13] README commands section covers commands/ dir"
