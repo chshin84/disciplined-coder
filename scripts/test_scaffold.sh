@@ -303,7 +303,7 @@ echo "[case17] nested-orchestration skill present + structured"
 check "skill file exists"             "[ -f '$NO_SKILL' ]"
 check "frontmatter name correct"      "grep -qE '^name: *nested-orchestration' '$NO_SKILL'"
 check "has routing (2층 위임)"         "grep -qF 'dispatching-parallel-agents' '$NO_SKILL'"
-check "has L2 template ownership blk"  "grep -qF 'Ownership boundary' '$NO_SKILL'"
+check "has L2 template ownership blk"  "grep -qF 'Ownership boundary (strictly observed)' '$NO_SKILL'"
 check "has output contract blk"        "grep -qF 'Output contract' '$NO_SKILL'"
 check "points to SDD (no reimpl)"      "grep -qF 'subagent-driven-development' '$NO_SKILL'"
 

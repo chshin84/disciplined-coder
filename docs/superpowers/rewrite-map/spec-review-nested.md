@@ -25,7 +25,13 @@
 
 **테스트가 지키는 두 소제목의 새 이름은 이렇다.** `구간 소유권`은 `Ownership boundary`가 되었고
 `산출 계약`은 `Output contract`가 되었다. `scripts/test_scaffold.sh`의 `check` 둘이 이 두 문자열을
-찾도록 함께 고쳤고, 각각을 지웠을 때 해당 `check`가 실제로 FAIL하는지 뮤테이션으로 확인했다.
+찾도록 함께 고쳤다.
+
+리뷰가 뮤테이션으로 확인한 결과 `Output contract`는 정상 작동했지만 `Ownership boundary`는 무력했다.
+그 문자열이 L2 템플릿 블록(`Ownership boundary (strictly observed)`)과 가드레일 항목
+(`Ownership boundary enforcement`) 두 곳에 나와서, 템플릿 블록만 지워도 가드레일 쪽이 남아 초록으로
+통과했기 때문이다. 같은 약점이 한국어 원문 시절에도 있었다(`구간 소유권`이 같은 두 자리에 있었다).
+가드가 L2 템플릿 블록만 물도록 `Ownership boundary (strictly observed)` 전체를 찾게 좁혔다.
 
 ## domain-spec-review
 
