@@ -1,45 +1,59 @@
 ---
 name: domain-llm-runtime
-description: 제품이 런타임에 LLM을 호출하는 기능을 만들 때의 검증 호출자. 단독 콜로 끝내지 말고 리스크에 비례해 리뷰어(reviewer-*)를 골라 제품 코드의 리뷰 콜로 구현하고, 비기능 체크리스트는 항상 적용한다. 리뷰어 렌즈와 meta-aggregate는 별도 스킬 참조.
+description: Verification caller for building a feature where the product calls an LLM at runtime. Never let a single call stand as the answer — pick reviewers (reviewer-*) in proportion to the risk and implement them as review calls inside the product code, and apply the non-functional checklist every time. For the reviewer lenses and for meta-aggregate, see their own skills.
 ---
-# domain-llm-runtime — 런타임 LLM 검증 호출자
+# domain-llm-runtime — runtime LLM verification caller
 
-제품이 **런타임에 LLM을 호출**하는 기능은 단독 콜로 끝내지 말고 **검증 레이어**를 코드에 구현한다.
-리뷰어는 Claude Code 에이전트가 아니라 **제품 코드가 구현할 청사진**이다. 공통 방법(PREP → 독립 렌즈 →
-메타 집계 → 라우팅)은 `agent-principles.md` "절차 가"를 따른다.
+A feature where the product **calls an LLM at runtime** must not end at that single call. Implement a
+**verification layer** in the code. The reviewers here are not Claude Code agents but **a blueprint
+the product code implements**. The shared method — PREP, then independent lenses, then meta
+aggregation, then routing — follows the `Verification Layer` section of `agent-principles.md`.
 
-## 리뷰어 선택 (리스크 비례)
-리스크 점수: 외부 호출 +1 / LLM 컴포넌트 +1 / 인터페이스 계약 변경 +1 / HITL·컴플라이언스 +1 / 명세 3섹션+ +1
+## Choosing reviewers (in proportion to the risk)
+Score the risk by adding one point for each of these that holds. There is an external call. There is
+an LLM component. An interface contract changes. Human-in-the-loop or compliance is involved. The
+spec runs to three sections or more.
 
-| 점수 | 리뷰어 | 메타 |
+| Score | Reviewers | Meta |
 |---|---|---|
-| 0–1 | 없음(비기능 체크리스트만) | 불필요 |
-| 2–3 | `reviewer-grounding` | 단일 리뷰어면 불필요 |
-| 4–5 | `reviewer-grounding` + `reviewer-fit` | `meta-aggregate` 필요(리뷰어 2개 이상) |
+| 0–1 | No reviewer applies, and only the non-functional checklist does | Not needed |
+| 2–3 | `reviewer-grounding` | Not needed with a single reviewer |
+| 4–5 | `reviewer-grounding` plus `reviewer-fit` | `meta-aggregate` is required (two or more reviewers) |
 
-- `reviewer-grounding`의 "출처"는 여기서 **원래 요청과 제공된 맥락**이다.
-- `reviewer-fit`는 다운스트림 계약을 본다. 스키마·형식은 **코드 validator를 먼저** 돌리고 실패 시에만 리뷰 콜(비용 절약).
-- `meta-aggregate`는 여기서 **결정론적 파이썬 함수**로 구현한다(LLM 콜 아님).
+- The "source" for `reviewer-grounding` is, here, **the original request together with the context
+  that was supplied**.
+- `reviewer-fit` looks at the downstream contract. For schema and format, run **a code validator
+  first** and spend a review call only where that validator fails, which keeps the cost down.
+- `meta-aggregate` is, here, implemented as **a deterministic Python function** rather than an LLM
+  call.
 
-## 조립
-1차 콜을 받은 뒤 리스크에 따라 리뷰어 리뷰 콜을 병렬로 돌리고, `meta-aggregate`가 집계해
-accept/regenerate/escalate를 결정한다. 비기능 체크리스트는 단계가 아니라 호출 코드 전체가 항상
-만족해야 할 속성으로 바깥을 감싼다.
+## Assembly
+Once the first call returns, run the reviewer review calls in parallel according to the risk, and let
+`meta-aggregate` aggregate them and decide accept, regenerate, or escalate. The non-functional
+checklist is not a stage in that sequence; it wraps around the outside as a set of properties the
+whole calling code must satisfy at all times.
 
-## 비기능 체크리스트 (런타임 전용 — 코드 설계도)
-이건 리뷰어가 아니고 LLM 콜도 아니다. 호출 코드가 갖춰야 할 요건이며, 구현 시 코드 가드와 그것을
-검증하는 테스트로 확정한다. 결정론적이라 정적 점검·테스트로 검증한다.
-- **외부 호출 timeout** — 없으면 무한 대기. (critical)
-- **retry 정책** — 일시 실패·레이트리밋 대비 지수 백오프. (major)
-- **빈/실패 응답 None 가드** — 실제 SDK는 빈 결과에 None을 반환할 수 있으니 `x or {}` 가드로 AttributeError를 막는다. (major)
-- **에러 응답 형식** — 호출자가 처리할 수 있는 구조화된 에러. (major)
-- **비용·토큰 상한** — 입력·출력 토큰 한도, 재시도 횟수 상한. (major)
-- **관측** — 요청·지연·토큰·실패율 로깅(원칙: `MEASURE-FIRST`). (minor~major)
-- **HITL 게이트** — 비가역·고위험 액션은 사람 승인. 컴플라이언스 접점이면 (critical), 아니면 정책에 따름.
-- **민감정보** — 프롬프트·로그에 비밀·PII 노출 금지(원칙: `SECRETS`).
+## Non-functional checklist (runtime only — a code blueprint)
+These are not reviewers and not LLM calls. They are requirements the calling code has to meet, and
+during implementation you nail each one down with a code guard plus a test that verifies the guard.
+They are deterministic, so verify them with static checks and tests.
+- **Timeout on external calls** — without one the call waits forever. (critical)
+- **Retry policy** — retry with exponential backoff against transient failures and rate limits.
+  (major)
+- **None guard on empty or failed responses** — a real SDK can return None for an empty result, so an
+  `x or {}` guard keeps the AttributeError from firing. (major)
+- **Error response shape** — return a structured error the caller can handle. (major)
+- **Cost and token ceilings** — cap the input and the output tokens, and cap the number of retries.
+  (major)
+- **Observability** — log the requests, the latency, the tokens, and the failure rate (principle
+  `MEASURE-FIRST`). (minor to major)
+- **Human-in-the-loop gate** — an irreversible or high-risk action needs human approval. Where
+  compliance is involved this is critical, and otherwise it follows policy.
+- **Sensitive data** — never expose secrets or PII in prompts or logs (principle `SECRETS`).
 
-누락 항목은 severity대로 처리한다(critical은 머지·배포 차단).
+Handle a missing item by its severity, where a critical one blocks the merge and the deploy.
 
-## 비용
-리뷰 콜은 추가 비용·지연이다. 리스크에 비례해서만 더한다. 결정론으로 검증 가능한 것(스키마·정규식)은
-코드로 먼저. critical만 regenerate를 강제한다.
+## Cost
+A review call is extra cost and extra latency. Add it only in proportion to the risk. Whatever a
+deterministic check can verify — a schema, a regular expression — goes in code first. Only critical
+issues force a regenerate.
