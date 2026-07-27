@@ -45,18 +45,26 @@ scaffold_resolve_ultracode_review "$KDIR"
 . "$(dirname "$0")/_managed_block.sh"
 # 마커는 _managed_block.sh의 MANAGED_BEGIN/END(SSOT)를 쓴다.
 # 스킬(domain-*/reviewer-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
+# 첫 설치 판정은 반드시 주입 '전에' 한다 — 주입 후엔 항상 존재해 판정이 무의미해진다.
+# -x(줄 전체 일치)를 쓰지 않는 이유: CRLF 파일에서 줄 끝 CR 때문에 영원히 거짓이 되어
+# 이중 주입이 조용히 되살아난다(이 레포는 CRLF를 실재 문제로 이미 다룬다).
+had_import=0
+if [ -f "$UC" ] && grep -qF '@disciplined-coder/agent-principles.md' "$UC"; then had_import=1; fi
 managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" <<'EOF'
 @disciplined-coder/agent-principles.md
 @disciplined-coder/domains-index.md
 @disciplined-coder/solved_problems.md
 EOF
 
-# 4) 첫 세션 도달 보강: principles + domains-index + solved를 stdout으로.
-#    @import는 홈 경로가 어긋나면 끊기지만, stdout은 additionalContext라 홈 독립적이다.
-#    solved도 여기 포함해 codex-scaffold.sh와 패리티를 맞춘다(@import 단일 경로 의존 제거).
-for f in agent-principles.md domains-index.md solved_problems.md; do
-  if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
-done
+# 4) 첫 세션 도달 보강: CLAUDE.md는 이 훅보다 먼저 로드되므로, 블록을 방금 만든 세션은
+#    @import만으로 정본에 닿지 못한다. 그 세션에만 stdout(additionalContext)으로 보강한다.
+#    이후 세션은 @import 한 경로로만 로드한다 — 같은 내용을 두 번 싣지 않는다.
+if [ "$had_import" -eq 0 ]; then
+  for f in agent-principles.md domains-index.md solved_problems.md; do
+    if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
+  done
+fi
+# 토글 모드 라인은 @import 대상 파일에 없는 휘발성 상태라 매 세션 보낸다(조건 밖).
 printf '%s\n' "$mode_line"
 if [ -n "$mode_note" ]; then printf '%s\n' "$mode_note"; fi
 printf '%s\n' "$ucr_mode_line"

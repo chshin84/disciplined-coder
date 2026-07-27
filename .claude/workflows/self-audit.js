@@ -85,7 +85,7 @@ const REVIEWERS = [
   { key: 'ssot-audit', prompt: `${COMMON}
 차원: SSOT 전수 조사 — agent-principles.md ↔ skills ↔ scripts ↔ hooks ↔ README ↔ CLAUDE.md ↔ commands 사이의 권위 있는 이중 기술(손 동기화 쌍)을 찾아라. 정당한 참조/도출은 위반이 아니다.` },
   { key: 'shell-audit', prompt: `${COMMON}
-차원: 셸 코드 품질 — scripts/*.sh 전부(issue-mode.sh·add-pointer.sh 포함), hooks/*.sh, hooks/*.json, hooks/session-start-codex. FAIL-LOUD(오류 삼킴), IDEMPOTENT(재실행 안전 — 코드로 추적), EXPLICIT, 테스트 매직 넘버, Git Bash 홈 리다이렉트 함정. 실제 코드 라인을 인용하라.` },
+차원: 셸 코드 품질 — scripts/*.sh 전부(issue-mode.sh 포함), hooks/*.sh, hooks/*.json, hooks/session-start-codex. FAIL-LOUD(오류 삼킴), IDEMPOTENT(재실행 안전 — 코드로 추적), EXPLICIT, 테스트 매직 넘버, Git Bash 홈 리다이렉트 함정. 실제 코드 라인을 인용하라.` },
   { key: 'clear-comm-audit', prompt: `${COMMON}
 차원: CLEAR-COMM 자기준수 — agent-principles.md, skills/*/SKILL.md 전부(reviewer-*·meta-aggregate 포함), commands/*.md, README.md, domains-index.md. 산문과 표에서 명사 조각 종결, 기호 문장(X = Y, 원인 → 해결)을 찾아라. 원칙 정의 안의 '나쁜 예' 인용문과 코드 블록·필드 스키마 표기는 위반이 아니다.` },
   { key: 'plugin-compliance', prompt: `${COMMON}

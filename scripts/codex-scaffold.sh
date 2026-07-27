@@ -39,17 +39,27 @@ scaffold_resolve_issue_mode "$KDIR"
 # 3) ~/.codex/AGENTS.md 관리블록 재생성(멱등, CRLF 내성). @import 미지원 → 정본 본문 인라인.
 . "$(dirname "$0")/_managed_block.sh"
 # 마커는 _managed_block.sh의 MANAGED_BEGIN/END(SSOT).
+# 첫 설치 판정은 반드시 주입 '전에' 한다 — 주입 후엔 항상 존재해 판정이 무의미해진다.
+# scaffold.sh의 had_import와 같은 역할이며, 판정 대상만 다르다(Claude는 @import 줄, Codex는 관리블록 마커).
+had_inline=0
+if [ -f "$AG" ] && grep -qF "$MANAGED_BEGIN" "$AG"; then had_inline=1; fi
 {
   for f in agent-principles.md domains-index.md; do
     if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; printf '\n'; fi
   done
 } | managed_block_inject "$AG" "$MANAGED_BEGIN" "$MANAGED_END"
 
-# 4) 세션 주입용 stdout: principles + domains-index + solved 본문(session-start-codex가 캡처해 additionalContext로).
-#    AGENTS.md 인라인(섹션 3)은 principles+domains만(안정적). 자주 커지는 solved는 주입 경로로(spec 3.5).
-for f in agent-principles.md domains-index.md solved_problems.md; do
-  if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
-done
+# 4) 세션 주입용 stdout(session-start-codex가 캡처해 additionalContext로 넣는다).
+#    분업 — principles+domains는 섹션 3이 AGENTS.md에 이미 인라인했으므로 여기서 다시 보내지 않는다.
+#    자주 커지는 solved만 매 세션 주입 경로로 보낸다(spec 3.5). 예외는 첫 설치 세션뿐이다 —
+#    AGENTS.md는 이 훅보다 먼저 로드되므로 블록을 방금 만든 세션은 인라인만으로 정본에 닿지 못한다
+#    (scaffold.sh의 had_import와 같은 이유).
+if [ "$had_inline" -eq 0 ]; then
+  for f in agent-principles.md domains-index.md; do
+    if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
+  done
+fi
+if [ -f "$KDIR/solved_problems.md" ]; then cat "$KDIR/solved_problems.md"; fi
 printf '%s\n' "$mode_line"
 if [ -n "$mode_note" ]; then printf '%s\n' "$mode_note"; fi
 
