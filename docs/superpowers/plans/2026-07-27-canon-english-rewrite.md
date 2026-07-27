@@ -412,6 +412,10 @@ Run: `git ls-files -z | xargs -0 grep -n '§[가나다라마]\|절차 [가나다
 
 Task 1 Step 6에서 주석 처리해 둔 검사를 되살린다. 이제 모든 참조가 고쳐졌으므로 통과해야 한다.
 
+이 검사의 패턴 `§[가나다라마]`도 `canon: no ordinal sections left`와 같은 로케일 함정을 밟는다 — 대괄호
+문자 집합이 기본 C 로케일에서는 바이트로 대조되어 한글을 문자 단위로 매치하지 못한다. 되살릴 때
+`grep`이 아니라 `LC_ALL=C.UTF-8 grep`으로 실행해야 이 검사가 실제로 한글 잔여 참조를 잡아낸다.
+
 - [ ] **Step 6: 세 스위트와 validate를 돌린다**
 
 Run: `bash scripts/test_scaffold.sh 2>&1 | tail -2 && bash scripts/test_hooks.sh 2>&1 | tail -2 && bash scripts/test_codex_scaffold.sh 2>&1 | tail -2 && claude plugin validate ./ 2>&1 | tail -2`

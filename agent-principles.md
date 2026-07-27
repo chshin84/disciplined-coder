@@ -84,7 +84,8 @@ see `NO-PRIORITY`.
 - **`SIMPLE` (simplicity, YAGNI)** — Do not build a generalisation or an abstraction you do not need
   yet. Start with the simplest thing that works and add complexity only when it is genuinely
   required. Do not grow a job that a single call handles into an agent system — weigh the latency and
-  the cost that buys.
+  the cost that buys. Code is read far more often than it is written, so follow the convention already
+  established around it.
 
 - **`SSOT` (single source of truth)** — One fact, one setting, one decision lives authoritatively in
   exactly one place. Everywhere else references it or derives from it rather than copying it. The

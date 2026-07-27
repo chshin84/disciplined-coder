@@ -284,6 +284,7 @@ printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-code
 OUT21="$(run "$H21" "$P21")"
 echo "[case21] CRLF import line still counts as present"
 check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# Discipline (Team Principles)'"
+check "CRLF: no solved re-dump"       "! printf '%s' \"\$OUT21\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "CRLF: mode line still sent"    "printf '%s' \"\$OUT21\" | grep -qF '처분 모드:'"
 
 # --- 케이스 16: Parallel Orchestration 넛지(정본 계약 가드) ---
@@ -332,7 +333,7 @@ check "canon: style rule prose in Korean"  "grep -qF '명사 조각' '$CANON'"
 for s in "Verification Layer" "Design Inputs" "Solved Log" "Document Hygiene" "Parallel Orchestration"; do
   check "canon: section '$s' present"      "grep -qF '### $s' '$CANON'"
 done
-check "canon: no ordinal sections left"    "! grep -qE '^### [가나다라마]\.' '$CANON'"
+check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
 # 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
 # em 대시(—) 같은 비한글 멀티바이트 문자까지 범위 안으로 넣고, 그러면 순수 영문 본문에서도 이 검사가
 # 항상 FAIL해 계약을 증명하지 못한다.

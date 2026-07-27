@@ -6,9 +6,11 @@
 세 번째 칸의 값은 `옮김`, `합침`, `**지움**`, `신설` 중 하나이며 지움에는 반드시 근거를 붙인다.
 `신설`은 원문에 없던 것을 스펙이 요구해 새로 넣은 항목이라 왼쪽 칸이 `(원문 없음)`으로 시작한다.
 
-지움은 다섯 개다 — `SURGICAL`의 주변 스타일 따르기, `SIMPLE`의 주변 관례 따르기, `IDEMPOTENT`의 멱등성
-정의, `SIMPLE`의 YAGNI 약어 풀이, 오답노트의 옛 형식 서술이다. 앞의 넷은 Opus 5가 기본으로 하거나 영어
-용어 자체가 설명하는 것이고, 마지막 하나는 스펙이 지우라고 지시한 것이다.
+지움은 네 개다 — `SURGICAL`의 주변 스타일 따르기, `IDEMPOTENT`의 멱등성 정의, `SIMPLE`의 YAGNI 약어
+풀이, 오답노트의 옛 형식 서술이다. 앞의 셋은 Opus 5가 기본으로 하거나 영어 용어 자체가 설명하는 것이고,
+마지막 하나는 스펙이 지우라고 지시한 것이다. `SIMPLE`의 주변 관례 따르기는 처음엔 지움으로 처리했으나
+리뷰에서 `CLEAR-COMM`이 `(SIMPLE)`로 그 지시를 참조하고 있음이 드러나 옮김으로 정정했다 — 아래 표를
+보라.
 
 | 원문 항목 | 새 문서 위치 | 처리와 근거 |
 |---|---|---|
@@ -72,14 +74,14 @@
 | `SIMPLE` — YAGNI 약어 풀이("You Aren't Gonna Need It") | (없음) | **지움** — 한국어 독자용 약어 풀이다. 영어권 개발 문서에서 널리 통용되는 약어이고, 같은 항목의 첫 문장이 그 뜻을 이미 행동 지시로 적는다 |
 | `SIMPLE` — 가장 단순한 것부터 시작하고 복잡함은 필요할 때만 더한다 | `SIMPLE` | 옮김 |
 | `SIMPLE` — 단일 호출로 될 일을 에이전트 시스템으로 키우지 않는다(지연·비용) | `SIMPLE` | 옮김 |
-| `SIMPLE` — 코드는 읽히는 횟수가 많으니 주변 관례를 따른다 | (없음) | **지움** — Opus 5 기본 프롬프트의 "Write code that reads like the surrounding code"와 겹치고, 같은 지시가 `SURGICAL`에도 있어 정본 안에서도 중복이었다 |
+| `SIMPLE` — 코드는 읽히는 횟수가 많으니 주변 관례를 따른다 | `SIMPLE` | 옮김 — 최초엔 `SURGICAL`과 중복이라 지웠으나, `CLEAR-COMM`의 "An identifier inside code follows local convention (`SIMPLE`)"가 이 지시를 괄호로 참조하고 있어 지우면 참조가 허공을 가리킨다. 그래서 `SIMPLE` 항목에 한 문장으로 복원했다 |
 | `SSOT` — 하나의 사실·설정·결정은 한 곳에만 권위 있게 둔다 | `SSOT` | 옮김 |
 | `SSOT` — 다른 데서는 복제하지 말고 참조하거나 도출한다 | `SSOT` | 옮김 |
 | `SSOT` — 사람이 두 곳을 손으로 맞추면 반드시 어긋난다 | `SSOT` | 옮김 |
 | `SURGICAL` — 요청과 직접 연결된 줄만 바꾼다 | `SURGICAL` | 옮김 |
 | `SURGICAL` — 작동하는 주변 코드를 리팩터·정리·재포맷하지 않는다 | `SURGICAL` | 옮김 |
 | `SURGICAL` — 죽은 코드는 표시만 하고, 내 변경으로 불필요해진 것만 지운다 | `SURGICAL` | 옮김 |
-| `SURGICAL` — 주변 코드의 스타일을 따른다 | (없음) | **지움** — Opus 5 기본 프롬프트의 "Write code that reads like the surrounding code"와 겹친다 |
+| `SURGICAL` — 주변 코드의 스타일을 따른다 | (없음) | **지움** — Opus 5 기본 프롬프트와 겹치는 데다, 같은 지시가 `SIMPLE`에 남아 있어("Code is read far more often than it is written, so follow the convention already established around it") 정본 안에서 중복이다 |
 | `TDD` — 실패하는 테스트를 먼저 쓴다 | `TDD` | 옮김 |
 | `TDD` — 검증 가능한 성공 기준을 미리 정한다 | `TDD` | 옮김 |
 | `TDD` — 실행 증거 없이 "됐다"고 하지 않는다 | `TDD` | 옮김 |
