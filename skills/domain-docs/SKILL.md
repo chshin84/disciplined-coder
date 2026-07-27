@@ -1,117 +1,170 @@
 ---
 name: domain-docs
-description: 임의 프로젝트의 문서(원칙·참조 문서·README·스킬 SKILL.md·CLAUDE.md 관리영역 등)를 어떻게 쓰고 구조화하는가의 저작 규칙. 설계·개발 시 참조. superpowers가 소유하는 spec·plan은 제외.
+description: Authoring rules for how documentation is written and structured in any project — principle documents, reference documents, READMEs, skill SKILL.md files, the managed regions of a CLAUDE.md, and the like. Consult it during design and during development. Specs and plans, which superpowers owns, are out of scope.
 ---
-# domain-docs — 문서 작성·구조화 규칙
+# domain-docs — rules for writing and structuring documentation
 
-## 범위
-어느 프로젝트에서든 문서를 쓰고 구조화할 때의 규칙이다(이 플러그인 자신의 문서 포함). superpowers가
-spec·plan(설계 문서의 핵심)을 이미 소유하므로, 여기서는 그 밖의 문서를 다룬다 — 원칙 문서, 도메인
-참고서, 사용자용 `README`, 스킬 `SKILL.md`, `CLAUDE.md` 관리영역 등.
+## Scope
+These are the rules for writing and structuring documentation in any project, this plugin's own
+documents included. superpowers already owns specs and plans, which are the heart of design
+documentation, so what is handled here is everything else — principle documents, domain references,
+user-facing `README` files, skill `SKILL.md` files, the managed regions of a `CLAUDE.md`, and so on.
 
-## 규칙 (문서 일반)
-- **ID로 참조, 서수 번호 금지** — 목차나 번호(A/B/C, 1·2·3)는 거짓 우선순위를 암시한다. 안정적 ID와
-  무순서(알파벳 용어집)를 쓴다(`NO-PRIORITY` 참조).
-- **문서 SSOT** — 같은 사실은 한 문서에만 둔다. 다른 문서는 참조한다(@import·링크). 복제 금지. 외부
-  관례·표준을 인용할 때도 본문을 베끼지 말고 distill(핵심만 요약)한 뒤 출처를 링크한다(`SSOT`).
-- **관리 영역 패턴** — 자동 생성 구간은 BEGIN/END 마커로 감싸 멱등 재생성한다. 사용자 콘텐츠는 그 바깥에 둔다.
-- **어디에 둘까** — 항상 필요하면 `CLAUDE.md`/@import, 온디맨드면 skill, 경로 한정이면 rules.
-- **enrich** — ID만 던지지 말고 완결된 문장으로 충분히 설명한다(`CLEAR-COMM`).
-- **추상→구체** — 모호한 표현은 구체적 정보로 바꾼다(무엇이·언제·얼마나·어떤 결과). "느리다"가 아니라
-  "로딩 12초". 《글 잘 쓰고 싶은 개발자》가 꼽는 핵심 *방법*이다.
-- **팩트·근거** — 의견과 사실을 구분하고, 확인 안 된 것은 단정 말고 "가능성"으로 표시하며, 주장에는 확인
-  가능한 근거(로그·수치·재현 조건)를 붙인다.
+## Rules for documents in general
+- **Refer by ID, never by an ordinal number** — a table of contents or a numbering scheme (A/B/C, or
+  1, 2, 3) implies a priority that does not exist. Use stable IDs and an unordered, alphabetical
+  glossary instead (see `NO-PRIORITY`).
+- **Document SSOT** — the same fact lives in one document only, and every other document refers to it
+  through an `@import` or a link. Never duplicate it. The same holds when you cite an outside
+  convention or standard: do not copy its text, distill it down to what matters, and then link the
+  source (`SSOT`).
+- **The managed-region pattern** — wrap an automatically generated section in BEGIN and END markers
+  so it can be regenerated idempotently, and keep user content outside those markers.
+- **Where to put it** — what is needed at all times goes in `CLAUDE.md` or an `@import`, what is
+  needed on demand goes in a skill, and what applies only to certain paths goes in rules.
+- **Enrich** — do not toss out a bare ID; explain it fully, in complete sentences (`CLEAR-COMM`).
+- **From abstract to concrete** — replace a vague expression with concrete information: what, when,
+  how much, and with what result. Not "it is slow" but "it takes 12 seconds to load". This is the
+  central *method* named by 《글 잘 쓰고 싶은 개발자》, a Korean book on writing for developers.
+- **Facts and evidence** — separate opinion from fact, mark what is unconfirmed as a possibility
+  instead of asserting it, and attach checkable evidence to every claim: a log, a number, a
+  reproduction condition.
 
-## README (사용자용 문서 — 타입 한정 규칙)
-README는 프로젝트의 첫인상이자 종종 유일한 접점이다. 위 "문서 일반" 규칙에 더해 다음을 적용한다. 보편
-원칙(`SIMPLE`·`SSOT`·`FOCUSED`·`CLEAR-COMM`)은 여기서 다시 쓰지 않고 ID로 참조한다 — README 고유 항목만 둔다.
+## README (a user-facing document — rules specific to this type)
+A README is a project's first impression and often its only point of contact. Apply the following on
+top of the general document rules above. The universal principles (`SIMPLE`, `SSOT`, `FOCUSED`,
+`CLEAR-COMM`) are not restated here but referenced by ID — only what is specific to a README belongs
+here.
 
-- **독자가 빨리 4가지에 답하게** — ① 내 문제를 푸나? ② 쓸 수 있나? ③ 누가 만들었나? ④ 더 배우려면?
-  이 동선을 막는 것은 군더더기다.
-- **독자 분리(가장 흔한 함정)** — 사용자 설치·사용 경로와 개발자 내부 근거(설계 정당화·전체 API·검증 메모)를
-  한 문서에 섞지 않는다. 후자는 별도 문서나 skill로 뺀다(`FOCUSED` + "어디에 둘까").
-- **권장 동선(순위 아님)** — 제목+한 줄 설명 → Highlights(핵심 셀링포인트 불릿) → Overview(무엇을·왜)
-  → 설치(한 줄 설치 명령 지향) → 사용 예시 → 주의/한계 → 더 읽기·기여. 이는 독자 동선이지 `NO-PRIORITY`가
-  금지하는 우선순위 번호가 아니다 — **섹션에 번호를 매기지 말 것**.
-- **필요한 것만(`SIMPLE`/YAGNI)** — 일반 OSS 가이드가 권하는 badge·TOC·스크린샷/GIF·changelog는 프로젝트가
-  실제로 필요로 할 때만 넣는다. 작은 도구에 과식 금지. 자기설명적 제목·한 줄 설치가 GIF보다 가치 있을 때가 많다.
+- **Let the reader answer four questions quickly** — ① Does this solve my problem? ② Can I use it?
+  ③ Who built it? ④ Where do I learn more? Anything that blocks that path is padding.
+- **Separate the audiences (the most common trap)** — do not mix the user's install-and-use path with
+  the developer's internal rationale (design justifications, the full API, verification notes) in one
+  document. Move the latter into a separate document or a skill (`FOCUSED` plus "where to put it").
+- **A suggested reading path (not a ranking)** — the title and a one-line description, then
+  Highlights as bullets of the core selling points, then an Overview of what it is and why. From
+  there it runs on to installation, aiming at a one-line install command, then usage examples, then
+  caveats and limits, and finally further reading and contributing. This is a path for the reader to
+  walk, not the priority numbering that `NO-PRIORITY` forbids — **do not number the sections**.
+- **Only what is needed (`SIMPLE` and YAGNI)** — the badges, table of contents, screenshots or GIFs,
+  and changelog that general open-source guides recommend go in only when the project actually needs
+  them. Do not overfeed a small tool. A self-explanatory title and a one-line install are often worth
+  more than a GIF.
 
-출처(distill 대상 — 본문 복제 말고 링크): [banesullivan/README](https://github.com/banesullivan/README),
+Sources (material to distill — link them rather than copying their text):
+[banesullivan/README](https://github.com/banesullivan/README),
 [awesome-readme](https://github.com/matiassingers/awesome-readme),
 [Make a README](https://www.makeareadme.com/),
-[글 잘 쓰고 싶은 개발자](https://wikidocs.net/book/20224) (제목·첫 설명은 10초 안에 정체성·대상 독자가 드러나게; 한 문장 한 뜻·결론 먼저·군더더기 삭제),
-[좋은 README 작성법 (InfoGrab)](https://insight.infograb.net/blog/2023/08/23/good-readme/) (구성요소 체크리스트: 사용 예시·트러블슈팅·메인테이너·라이선스).
+[글 잘 쓰고 싶은 개발자](https://wikidocs.net/book/20224) (the title and the opening description should
+reveal the identity and the intended reader within ten seconds, each sentence should carry one
+meaning, the conclusion should come first, and padding should be deleted),
+[좋은 README 작성법 (InfoGrab)](https://insight.infograb.net/blog/2023/08/23/good-readme/) (a checklist
+of components: usage examples, troubleshooting, maintainers, license).
 
-## 글 유형별 적용 (작성 시점)
-유형마다 목적에 맞는 양식이 있다 — 쓰는 시점에 그 양식으로 짠다. 보편 규칙은 위 "문서 일반"을 따르고,
-유형별 템플릿은 필요할 때 《글 잘 쓰고 싶은 개발자》(위 출처 목록의 wikidocs 책) 부록 C~G를 distill해 쓴다. 핵심만 적는다:
-- **버그 리포트** — 남이 그대로 재현할 수 있게 쓴다(환경·재현 순서·기대와 실제의 차이).
-- **코드 리뷰** — 사람이 아니라 코드를 지적하고, 이유를 함께 적는다.
-- **작업 보고** — 완료한 일·남은 일·다음 행동의 주체를 분리해 적는다.
-- **README·기술 블로그** — 요약과 목적을 맨 앞에 두고, 독자가 따라 할 수 있게 쓴다.
-- **외부 공개 문서(GitHub 이슈·PR 등)** — 작성자 맥락 없이 메인테이너가 이해할 수 있게, 결론을 먼저 두고 용어를 부연하며, 버그면 버그 리포트 양식을 따른다.
+## Forms for each kind of writing (applied as you write)
+Every kind of writing has a form suited to its purpose, and you frame the piece in that form at the
+moment you write it. Follow the general document rules above for anything universal, and when you
+need a per-kind template, distill appendices C through G of 《글 잘 쓰고 싶은 개발자》, the wikidocs book
+in the source list above. Only the essentials are recorded here:
+- **A bug report** — write it so that someone else can reproduce it exactly (the environment, the
+  steps to reproduce, and the gap between what was expected and what happened).
+- **A code review** — point at the code rather than the person, and give the reason alongside.
+- **A work report** — separate what is finished, what remains, and who owns the next action.
+- **A README or a technical blog post** — put the summary and the purpose at the very front, and
+  write it so the reader can follow along.
+- **A publicly posted document such as a GitHub issue or pull request** — write it so a maintainer
+  can understand it without the author's context, put the conclusion first, gloss the terminology as
+  it appears, and follow the bug-report form when it is a bug.
 
-> 외부에 공개되는 문서(GitHub 이슈·PR 설명 등)는 **게시 전 `reviewer-grounding`(주장↔코드 근거)·`reviewer-fit`(양식·계약 적합) 검수**를 거친다(§가 — LLM 단독 출력을 그대로 외부에 올리지 마라). 감사·분석 노트를 그대로 덤프하지 말 것.
+> A document that goes out publicly, such as a GitHub issue or a pull request description, **passes
+> through `reviewer-grounding` (are the claims grounded in the code) and `reviewer-fit` (does it fit
+> the form and the contract) before it is posted** (the `Verification Layer` section — never put a
+> lone LLM output straight in front of an outside audience). Do not dump audit or analysis notes
+> verbatim.
 
-## 문서 타입과 수명 — 타입이 처방을 결정한다 (상태 위생 SSOT)
-`agent-principles.md` §라의 상세 정본이다. **stale 방지는 한 규칙이 아니라 타입별 전략**이다 — 타입을 정하면
-처방이 따라 나온다. 핵심 원칙: **drift-proof by construction** — 유지보수로 막지 말고 애초에 stale 불가능하게
-짓는다(안 적은 상태는 썩지 않고, 지운 핸드오프는 경쟁하지 않는다). 타입은 세 축으로 갈린다 — ① 휘발성 상태를
-담는가 ② 수명 ③ SSOT인가/사본·전령인가.
+## Document types and lifetimes — the type decides the prescription (the SSOT for state hygiene)
+This is the detailed canon behind the `Document Hygiene` section of `agent-principles.md`.
+**Preventing staleness is not one rule but a strategy per type** — once you settle the type, the
+prescription follows. The governing idea is **drift-proof by construction**: do not hold the line
+with maintenance, build the thing so that going stale is impossible from the start (state that was
+never written cannot rot, and a handoff already deleted cannot compete). Types divide along three
+axes — ① does it hold volatile state, ② how long does it live, and ③ is it the SSOT or merely a copy
+or a courier.
 
-| 타입 | 담는 것 | 수명 | stale 방지 전략 | 이빨(프로젝트 가드) |
+| Type | What it holds | Lifetime | How it is kept from going stale | Teeth (the project's guard) |
 |---|---|---|---|---|
-| **상태** (roadmap) | 무엇이 끝/다음·현 단계 | 살아있음·단일 홈 | 도출 우선 + 한 곳만 + 나머지는 링크 | 코드·인프라 대조 |
-| **절차·계약** (operations·setup·contract) | HOW·스키마 계약 | 살아있음 | 상태 금지(HOW만) — 안 적으면 안 썩음 | doc↔code 테스트(예: mode↔런북) |
-| **설계** (analysis-design / spec·plan) | 왜·어떻게-설계 | rationale=살아있음 / spec=shipped 후 삭제 | 상태 금지 + superseded 표시 / shipped는 git 갈음 | 코드 주석 포인터 동기화 |
-| **핸드오프** (HANDOFF-*) | 1회성 인계 | until-consumed → 삭제 | 즉시 삭제 — 없으면 썩을 수 없다 | 핸드오프 잔존 패턴 린트 |
-| **이슈** (solved 오답노트) | 완결된 교훈 | append-only(이동 없음) | 완결 후 기록이라 상태가 아니다(예외) · 이슈 트래킹은 트래커에 위임한다 | recall · `agent-principles` §다 |
-| **맥락** (Claude 메모리) | 세션 간 결정·맥락 | 살아있음·PC-local | 코드와 어긋나면 코드 우선 + PC-local 한계 인지 | 사실 주장에 코드 근거 표기 |
-| **규범·인덱스** (CLAUDE.md / 문서 맵) | 어디에 무엇·작업법 | 살아있음 | 포인터·규칙만, 상태 금지 / 맵은 가볍게·도출 우선 | — |
+| **State** (a roadmap) | What is finished, what is next, and the current stage | Living, with a single home | Derive it first, keep it in one place only, and link to that place from everywhere else | Check it against the code and the infrastructure |
+| **Procedure and contract** (operations, setup, contract) | The how, and schema contracts | Living | No state, only the how — what is never written cannot rot | A doc-to-code test, such as one tying a mode to its runbook |
+| **Design** (analysis and design, or a spec or plan) | The why, and how the design works | The rationale keeps living, while a spec is deleted once it ships | No state, plus a superseded marking; for anything shipped, git stands in its place | Keep the pointers in code comments in sync |
+| **Handoff** (`HANDOFF-*`) | A one-time handover | Until consumed, then deleted | Delete it immediately — what is gone cannot rot | Lint for leftover handoff patterns |
+| **Issue** (the solved mistake notebook) | A lesson from a problem already finished | Append-only, with nothing moved | Recorded after the problem was finished, so it is not state (the exception); issue tracking is delegated to a tracker | Recall before you start, plus the `Solved Log` section of `agent-principles` |
+| **Context** (Claude's memory) | Decisions and context carried across sessions | Living, and local to one PC | Where it disagrees with the code the code wins, and its PC-local limit is understood | Cite code evidence for every claim of fact |
+| **Norm and index** (a `CLAUDE.md`, or a document map) | Where things are, and how the work is done | Living | Pointers and rules only, never state; keep a map light and derive it first | — |
 
-> solved는 **계층별**(프로젝트 `docs/solved_problems.md` · PC `~/.claude/…`)로 둔다(스코프 라우팅). append-only는 **한 계층 안에서** 불변이고, 더 넓게 쓰이는 교훈은 상위 계층에 **재기술**(승격)한다 — 바이트 이동이 아니라 더 일반적 표현으로 다시 쓰는 것이라 '이동 없음'과 모순이 아니다.
+> The solved log is kept **per layer** — the project's `docs/solved_problems.md` and the PC's
+> `~/.claude/…` (scope routing). Append-only means immutable **within one layer**, and a lesson that
+> applies more widely is **rewritten** into the layer above it (a promotion) — that is not moving
+> bytes but writing it again in more general terms, so it does not contradict "nothing moved".
 
-세로로 읽으면 stale 전략의 절반이 **"상태를 담지 마라 / 지워라 / 도출하라"**로 수렴한다 — 손유지가 필요한 건
-사실상 상태 문서 한 종류뿐이고, 그것마저 도출로 밀면 손댈 게 없어진다. "작업 전후 전체 문서
-업데이트"라는 흔한 고통은 SSOT 위반의 증상이지 본질 비용이 아니다.
+Read the table down its columns and half of the staleness strategies converge on **"do not hold
+state, delete it, or derive it"** — in practice only one type of document, the state document, needs
+maintaining by hand, and pushing even that one toward derivation leaves nothing to touch. The common
+pain of "update all the documents before and after the work" is a symptom of an `SSOT` violation,
+not an intrinsic cost.
 
-### 수정 규율 — 어떻게 바뀌어도 되나 (둘째 축)
-내용 타입(무엇을 담나)에 더해, 문서가 **어떻게 바뀌어도 되는지**를 분류하면 처방이 선명해진다. 문서가 자기
-수정 규율을 *선언*하면(`EXPLICIT`) 그 선언이 곧 기계 강제의 계약이 된다(BEGIN/END 관리블록이 한 사례).
+### Modification discipline — how a document is allowed to change (the second axis)
+On top of the content type (what a document holds), classifying **how it is allowed to change**
+sharpens the prescription. When a document *declares* its own modification discipline (`EXPLICIT`),
+that declaration becomes the contract for machine enforcement — the BEGIN and END managed block is
+one instance of this.
 
-| 수정 규율 | 어떻게 | 유지 의무 | 실패 모드 | 기계 강제 |
+| Modification discipline | How it changes | Maintenance obligation | Failure mode | Machine enforcement |
 |---|---|---|---|---|
-| append-only | 추가만, 과거 불변 | 없음 | 비대(주기적 distill) | 이전 줄 편집/삭제 거부 |
-| generated | 진실에서 재생성, 손 안 댐 | 없음(자동 동기) | 생성기 버그 | 재생성→diff 가드 |
-| living | 제자리 손편집 | 있음(최고 위험) | 드리프트·거짓양성 | 상태 금지(HOW만) 또는 doc↔code 가드 |
-| ephemeral | 1회 쓰고 삭제 | 삭제 의무 | 잔존하면 거짓 경쟁이 된다 | 잔존 패턴 린트 |
+| append-only | Additions only, with the past left untouched | None | It bloats (distill it periodically) | Refuse edits or deletions of earlier lines |
+| generated | Regenerated from the truth, never touched by hand | None, since it syncs automatically | A bug in the generator | Regenerate, then guard on the diff |
+| living | Hand-edited in place | Yes, and it carries the highest risk | Drift and false positives | No state, only the how; or a doc-to-code guard |
+| ephemeral | Written once, then deleted | An obligation to delete | If it survives it becomes a false competitor | Lint for leftover patterns |
 
-가능한 문서를 **append-only·generated로 민다**(유지 의무 0). 핵심 통찰: **상태를 적는 건 그게 바뀔 때마다
-갱신할 의무(=부채)를 지는 것**이다 — 의무는 안 적기·도출·FAIL-LOUD 가드로 없애거나 갚되, 기억(후보정)으로
-갚지 않는다.
+Push a document toward **append-only or generated** wherever you can, since both carry zero
+maintenance obligation. The core insight is that **writing state down takes on an obligation — a
+debt — to update it every time that state changes**. Clear the debt or pay it by not writing the
+state down, by deriving it, or by a `FAIL-LOUD` guard, and never pay it with memory, meaning
+correction after the fact.
 
-### 메모리 · 오답노트 · 백로그 (특수 케이스)
-- **메모리(auto memory)는 머신로컬**이다(공식 문서 — 머신 간 비공유, 암묵 학습 없음). Claude 작업맥락의
-  일회용 스크래치패드로 자유롭게 쓰되, 공유·이식돼야 하는 건 git-추적 문서(프로젝트 CLAUDE.md·커밋 파일)에 둔다.
-- **solved 오답노트는 "상태 금지"의 예외**다 — 완결 *뒤* 등록하는 append-only 교훈이라 현재 상태가 아니다.
-- **이슈·백로그 트래킹은 하지 않는다.** must-keep 백로그는 프로젝트의 진짜 트래커(자동 close 있는 GitHub
-  Issues 등)로 위임한다 — 손유지 백로그 파일은 만들지 마라(unsolved처럼 썩는다). 🔴는 즉시 surface.
+### Memory, the solved log, and the backlog (special cases)
+- **Auto memory is machine-local** — the official documentation says it is not shared across machines
+  and involves no implicit learning. Use it freely as a disposable scratchpad for Claude's working
+  context, but anything that has to be shared or carried elsewhere belongs in a git-tracked document,
+  such as the project `CLAUDE.md` or a committed file.
+- **The solved log is the exception to "no state"** — it is an append-only lesson registered *after*
+  the problem is finished, so it is not current state.
+- **Issues and backlogs are not tracked.** A must-keep backlog is delegated to the project's real
+  tracker, such as GitHub Issues with its automatic closing — never create a hand-maintained backlog
+  file, because it rots the way an "unsolved" list does. A 🔴, which marks something that needs a
+  user decision, is surfaced immediately.
 
-### 적용 — 스윕이 아니라 분류 (문서를 쓰거나 지울 때)
-'액션 후 관련 문서 전체 점검'(기억 의존)이 아니라, **만지는 그 문서 한 개**에 대한 국소 결정이다.
-1. 무슨 타입인가? (위 표)
-2. 상태를 담나? → 담으면 안 되는 타입이면 빼서 상태 홈으로. 담아도 되는 타입이면 거기 한 곳만.
-3. 핸드오프인가? → 영속처에 박고 삭제.
-4. 도출로 대체 가능한가? → 적지 말고 진실(코드·인프라)을 가리킨다.
-5. 이 타입의 드리프트 가드가 있나? 없으면 프로젝트에 추가 권고(`FAIL-LOUD`).
+### Applying this — classification, not a sweep (when you write or delete a document)
+This is not "audit every related document after an action", which depends on memory, but a local
+decision about **the single document you are touching**.
+1. What type is it? (See the table above.)
+2. Does it hold state? If the type must not hold state, take it out and move it to the home for
+   state. If the type may hold it, keep it in that one place only.
+3. Is it a handoff? Then drive it into its permanent home and delete it.
+4. Can derivation replace it? Then do not write it down; point at the truth in the code or the
+   infrastructure.
+5. Does a drift guard exist for this type? If not, recommend adding one to the project
+   (`FAIL-LOUD`).
 
-### 문서 맵 (가볍게)
-프로젝트마다 '관심사 → SSOT 문서' 맵을 둘 수 있다(규범·인덱스 타입). 단 **손유지 맵은 그 자체로 또
-드리프트**하니, 포인터만 가볍게 두고 가능하면 도출로 대체한다. 새 문서를 만들기 전에 기존 SSOT에 귀속될 수
-있는지 먼저 본다(`SIMPLE`/YAGNI — 문서 증식 방지).
+### The document map (kept light)
+A project may keep a map from each concern to the SSOT document that owns it (the norm-and-index
+type). A hand-maintained map is itself one more thing that drifts, so keep only light pointers and
+replace them with derivation where you can. Before creating a new document, check first whether it
+could belong to an existing SSOT (`SIMPLE` and YAGNI — this is how document sprawl is prevented).
 
-## 문서 검진 방법 (§가 '문서 작성' 행의 방법 상세 — 여기가 소유자)
-일반 문서를 쓰거나 고친 뒤에는 `reviewer-grounding`(사실·정확)과 `reviewer-fit`(양식·계약) 두 렌즈를
-**읽기 전용 서브에이전트**로 각각 호출해 비자가 검진을 받는다(셀프 퇴고만으로 끝내지 않는다).
-호출자가 렌즈에 source(검증할 사실·지켜야 할 계약)를 주입하고, 렌즈는 JSON으로 지적을 리턴하며,
-반영은 메인 세션이 한다. spec/plan과 달리 마커 게이트는 없다(넛지·비블로킹).
+## How a document is reviewed (the method behind the documentation row of `Verification Layer` — owned here)
+After writing or revising an ordinary document, call two lenses — `reviewer-grounding` (is it true
+and accurate) and `reviewer-fit` (does it fit the form and the contract) — each as its own
+**read-only subagent**, so the document gets a review by someone other than its author (self-editing
+alone is not the end of it). The caller injects the source into each lens (the facts to verify and
+the contract to hold to), each lens returns its findings as JSON, and the main session is what
+applies them. Unlike a spec or a plan there is no marker gate here, so this nudges without blocking.
