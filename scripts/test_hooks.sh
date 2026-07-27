@@ -111,6 +111,11 @@ check "기존 문서(.md) → 무출력"          "[ -z \"\$(fpre '$(J "$T/exist
 check "spec 경로 새 .md → 무출력"        "[ -z \"\$(fpre '$(J "$SP/brandnew.md")')\" ]"
 check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/new.py")')\" ]"
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off fpre '$(J "$T/newdoc.md")')\" ]"
+# 넛지가 인용한 domain-docs 절이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로
+# 그 절 이름이 바뀌자 넛지가 없는 절을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD).
+NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*domain-docs의 '\([^']*\)' 절.*/\1/p")"
+check "넛지가 인용한 절 이름 추출됨"       "[ -n \"\$NUDGE_SEC\" ]"
+check "그 절이 domain-docs에 실재"        "grep -qF \"## \$NUDGE_SEC\" '$HERE/skills/domain-docs/SKILL.md'"
 
 echo "[doc-review-post]"
 check "문서(.md) → 검진 넛지"            "drev '$(J "$T/existing.md")' | grep -q additionalContext"

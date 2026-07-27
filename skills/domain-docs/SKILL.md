@@ -157,7 +157,7 @@ decision about **the single document you are touching**.
 
 ### The document map (kept light)
 A project may keep a map from each concern to the SSOT document that owns it (the norm-and-index
-type). A hand-maintained map is itself one more thing that drifts, so keep only light pointers and
+type). **A hand-maintained map is itself one more thing that drifts**, so keep only light pointers and
 replace them with derivation where you can. Before creating a new document, check first whether it
 could belong to an existing SSOT (`SIMPLE` and YAGNI — this is how document sprawl is prevented).
 
