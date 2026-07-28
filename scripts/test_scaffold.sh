@@ -401,4 +401,85 @@ for l in grounding fit consistency adversarial; do
 done
 check "meta-aggregate: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/meta-aggregate/SKILL.md'"
 
+# --- solved-rules: 형식 규칙이 낡았으면 알리기만 한다 (읽기 전용 넛지) ---
+# 픽스처는 상수(SCAFFOLD_SOLVED_RULES)에서 만들지 않고 리터럴로 적는다 — 상수에서 만들면 상수에 오타가
+# 나도 검사가 초록으로 남는 항진 검사가 된다. 옛 로그 픽스처는 실측된 PC 전역 로그의 머리말 모양이다.
+NUDGE='형식 규칙 서술이 현행과 다르다'
+LOGTITLE='해결된 문제 로그 (solved_problems)'
+
+# (가) 갓 만든 로그는 신호를 내지 않는다 — 생성 템플릿이 곧 현행 규칙이어야 한다.
+HR1="$(mktemp -d)"; PR1="$(mktemp -d)"
+OUTR1="$(run "$HR1" "$PR1")"
+echo "[solved-rules] freshly created log is not flagged"
+check "fresh: 신호 없음"                 "! printf '%s' \"\$OUTR1\" | grep -qF '$NUDGE'"
+OUTR1b="$(run "$HR1" "$PR1")"
+check "fresh: 재실행도 신호 없음"        "! printf '%s' \"\$OUTR1b\" | grep -qF '$NUDGE'"
+
+# (나) 형식 규칙 블록이 없는 옛 로그는 신호를 내고, 파일은 바이트 단위로 그대로다.
+HR2="$(mktemp -d)"; PR2="$(mktemp -d)"; mkdir -p "$HR2/.claude/disciplined-coder"
+OLDLOG="$HR2/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '작업 중 발견·해결된 문제. 각 항목: 증상/트리거 → 교훈(다음엔 이렇게 — 처방이 앞). 등록은 메인 세션이 수행.\n\n'
+  printf -- '- **옛 형식 항목** → 원인: 무엇 → 해결: 무엇\n'
+  printf '\n'
+  printf -- '- **여러 줄 항목**\n  - 원인: 둘째 줄\n  - 해결: 셋째 줄\n'
+  printf '\n'
+} > "$OLDLOG"
+BEFORE2="$(cksum < "$OLDLOG")"
+OUTR2="$(run "$HR2" "$PR2")"
+echo "[solved-rules] legacy log (no rule block) is flagged, file untouched"
+check "legacy: 신호 있음"                 "printf '%s' \"\$OUTR2\" | grep -qF '$NUDGE'"
+check "legacy: 파일 불변(바이트)"         "[ \"\$(cksum < '$OLDLOG')\" = '$BEFORE2' ]"
+# 제목 줄 검사는 stdout 전체가 아니라 '신호 문안 그 줄'만 본다 — 첫 설치 세션은 로그 전문을 stdout으로
+# 덤프하므로 전체를 보면 그 덤프의 제목 줄에 걸려, 신호와 무관한 이유로 붉어진다.
+SIG2="$(printf '%s\n' "$OUTR2" | grep -F "$NUDGE" || true)"
+check "legacy: 신호 문안에 제목 줄 없음"  "[ -n \"\$SIG2\" ] && ! printf '%s' \"\$SIG2\" | grep -qF '$LOGTITLE'"
+check "legacy: 신호 문안에 원인 단정 없음" "! printf '%s' \"\$SIG2\" | grep -qF '플러그인 업데이트로 바뀌었다'"
+check "legacy: 임시 파일 잔해 없음"       "[ -z \"\$(find '$HR2/.claude/disciplined-coder' -name '*.tmp' -o -name '*.norm' 2>/dev/null)\" ]"
+
+# (다) 불릿을 하나 지운 로그도 낡은 것으로 잡는다 — 줄 단위 grep이면 통과해 버리는 자리다.
+HR3="$(mktemp -d)"; PR3="$(mktemp -d)"; mkdir -p "$HR3/.claude/disciplined-coder"
+run "$HR3" "$PR3" >/dev/null
+sed -i '/^- 한 항목은 세 줄을 넘기지 않는다\.$/d' "$HR3/.claude/disciplined-coder/solved_problems.md"
+OUTR3="$(run "$HR3" "$PR3")"
+echo "[solved-rules] a log missing one rule bullet is flagged"
+check "partial: 신호 있음"                "printf '%s' \"\$OUTR3\" | grep -qF '$NUDGE'"
+
+# (라) 스코프 문구가 달라도, 줄 끝이 CRLF여도 오탐하지 않는다.
+HR4="$(mktemp -d)"; PR4="$(mktemp -d)"; mkdir -p "$HR4/.claude/disciplined-coder"
+run "$HR4" "$PR4" >/dev/null
+L4="$HR4/.claude/disciplined-coder/solved_problems.md"
+sed -i '1s/.*/# 해결된 문제 로그 — 이 프로젝트 전용 (스코프 문구가 다르다)/' "$L4"
+awk '{ printf "%s\r\n", $0 }' "$L4" > "$L4.crlf" && mv "$L4.crlf" "$L4"
+OUTR4="$(run "$HR4" "$PR4")"
+echo "[solved-rules] different scope prose and CRLF do not false-positive"
+check "scope+CRLF: 신호 없음"             "! printf '%s' \"\$OUTR4\" | grep -qF '$NUDGE'"
+
+# (마) 읽을 수 없는 로그를 줘도 훅 전체가 0으로 끝난다(리턴값만 보면 함수 안 실패를 놓친다).
+HR5="$(mktemp -d)"; PR5="$(mktemp -d)"; mkdir -p "$HR5/.claude/disciplined-coder"
+printf 'x\n' > "$HR5/.claude/disciplined-coder/solved_problems.md"
+chmod 000 "$HR5/.claude/disciplined-coder/solved_problems.md" 2>/dev/null || true
+set +e; run "$HR5" "$PR5" >/dev/null 2>&1; rc5=$?; set -e
+chmod 644 "$HR5/.claude/disciplined-coder/solved_problems.md" 2>/dev/null || true
+echo "[solved-rules] hook exits 0 even on unreadable log"
+check "unreadable: exit 0"                "[ '$rc5' = '0' ]"
+
+# (바) 위생 검사가 backups/ 를 비관리 디렉터리로 오탐하지 않는다.
+HR6="$(mktemp -d)"; PR6="$(mktemp -d)"; mkdir -p "$HR6/.claude/disciplined-coder/backups"
+printf 'old\n' > "$HR6/.claude/disciplined-coder/backups/solved_problems-20260728.md"
+ERR6="$(CLAUDE_HOME_DIR="$HR6/.claude" CLAUDE_PROJECT_DIR="$PR6" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
+echo "[solved-rules] backups/ is whitelisted"
+check "backups: 오탐 없음"                "! printf '%s' \"\$ERR6\" | grep -qF 'backups'"
+check "backups: 사본 보존"                "[ -f '$HR6/.claude/disciplined-coder/backups/solved_problems-20260728.md' ]"
+
+# (사) 정본 트리거와 domain-docs 방법이 실제로 들어갔다.
+echo "[solved-rules] canon trigger and domain-docs method exist"
+check "canon: 넛지 트리거 구"             "grep -qF '형식 규칙이 낡았다는 신호를 받으면' '$CANON'"
+check "canon: 방법 스킬을 가리킴"         "grep -qF 'domain-docs' '$CANON'"
+DD="$HERE/skills/domain-docs/SKILL.md"
+check "domain-docs: 방법 절 존재"         "grep -qF '관리되는 문서의 형식 규칙이 낡았을 때' '$DD'"
+check "domain-docs: 사본 경로"            "grep -qF 'backups/' '$DD'"
+check "domain-docs: 항목 불가침"          "grep -qF '항목은 한 줄도 건드리지 않는다' '$DD'"
+check "domain-docs: 자동 수정 금지"       "grep -qF '자동으로 고치지 않는다' '$DD'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

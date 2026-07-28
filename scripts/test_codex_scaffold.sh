@@ -135,4 +135,22 @@ check "second run stdout still has solved"    "printf '%s' \"\$OUT9b\" | grep -q
 check "second run stdout still has mode line" "printf '%s' \"\$OUT9b\" | grep -qF '처분 모드:'"
 check "AGENTS.md still inlines principles after 2nd run" "grep -qF '# 디시플린 (팀 원칙)' '$AG9'"
 
+# --- solved-rules(Codex): 쌍둥이 스크립트가 같은 넛지를 낸다 ---
+# 쌍둥이는 한쪽만 고치면 반드시 어긋나므로 Claude 쪽과 같은 계약을 여기서도 건다.
+NUDGE_C='형식 규칙 서술이 현행과 다르다'
+HC1="$(mktemp -d)"; mkdir -p "$HC1/.codex/disciplined-coder"
+OLDC="$HC1/.codex/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '작업 중 발견·해결된 문제. 각 항목: 증상/트리거 → 교훈(다음엔 이렇게 — 처방이 앞).\n\n'
+  printf -- '- **옛 형식 항목** → 원인: 무엇 → 해결: 무엇\n'
+} > "$OLDC"
+BEFORE_C="$(cksum < "$OLDC")"
+OUTC1="$(run "$HC1")"
+echo "[solved-rules] codex twin emits the same nudge and writes nothing"
+check "codex legacy: 신호 있음"           "printf '%s' \"\$OUTC1\" | grep -qF '$NUDGE_C'"
+check "codex legacy: 파일 불변(바이트)"   "[ \"\$(cksum < '$OLDC')\" = '$BEFORE_C' ]"
+HC2="$(mktemp -d)"
+OUTC2="$(run "$HC2")"
+check "codex fresh: 신호 없음"            "! printf '%s' \"\$OUTC2\" | grep -qF '$NUDGE_C'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

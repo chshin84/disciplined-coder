@@ -3,8 +3,22 @@
 # 두 스크립트는 홈 위치·주입 방식만 다르고 관리 디렉터리 정책은 동일해야 한다 — 여기가 정본.
 
 # 관리 디렉터리 화이트리스트(=현 정본 세트)와 구 관리파일(STALE). 여기만 고친다.
-SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md issue-mode ultracode-review"
+SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md issue-mode ultracode-review backups"
 SCAFFOLD_STALE="coding-principles.md"
+
+# 오답노트 형식 규칙 블록(정본). 이 문자열이 로그 안에 그대로 있으면 그 로그의 형식 규칙이 최신이다.
+# 도입 문장·빈 줄·불릿 여섯으로 여덟 줄이다. 스코프 문구(로그마다 다르다)와 나눠 두는 이유는,
+# 템플릿 전문과 비교하면 도입부가 다른 프로젝트 로그가 영원히 '다름'으로 판정돼 매 세션 오탐이 되기 때문이다.
+# 작은따옴표로 감쌀 수 있는 것은 이 여덟 줄에 ASCII 어포스트로피가 없기 때문이다
+# (어포스트로피가 든 '상태'는 그 위 스코프 문단이라 블록 밖이다).
+SCAFFOLD_SOLVED_RULES='항목을 적는 형식은 이렇다.
+
+- 증상은 굵게 한 줄로 띄운다.
+- 원인과 해결은 그 아래 들여쓰기로 내린다.
+- 한 항목은 세 줄을 넘기지 않는다.
+- 순서는 시간순이고 아래에 추가한다.
+- 항목이 스무 개를 넘으면 그때 영역별로 묶는다.
+- 안 쓰이는 항목도 지우지 않는다.'
 
 # 위생(멱등): STALE 제거 → 비화이트리스트는 디렉터리/내용파일 surface·빈 파일 제거.
 scaffold_hygiene() {  # $1=KDIR
@@ -33,6 +47,9 @@ scaffold_hygiene() {  # $1=KDIR
 scaffold_ensure_solved() {  # $1=KDIR
   local kdir="$1"
   [ -f "$kdir/solved_problems.md" ] && return 1
+  # 스코프 문구와 형식 규칙 블록을 조립한다. 히어독을 확장형으로 바꾸지 않는 이유는 리터럴
+  # 히어독이 본문의 $와 백틱을 보호하기 때문이다 — 지금은 확장 대상 문자가 없어 테스트가 초록이라
+  # 함정이 잠복한다. 그래서 스코프 문구만 리터럴 히어독으로 내고 블록은 printf로 붙인다.
   cat > "$kdir/solved_problems.md" <<'EOF'
 # 해결된 문제 로그 (solved_problems) — PC 전역 · append-only 오답노트
 
@@ -40,15 +57,28 @@ scaffold_ensure_solved() {  # $1=KDIR
 **완결 후 등록하는 기록이라 '상태'가 아니다** — "문서에 상태 금지"의 예외(append-only, 과거를 지우지 않는다).
 일반화 가능한 항목은 디시플린(agent-principles.md)으로 **재기술해 승격**한다(원문은 append-only로 보존 — 이동이 아니라 상위 계층 재작성). 메인 세션만 기록.
 
-항목을 적는 형식은 이렇다.
-
-- 증상은 굵게 한 줄로 띄운다.
-- 원인과 해결은 그 아래 들여쓰기로 내린다.
-- 한 항목은 세 줄을 넘기지 않는다.
-- 순서는 시간순이고 아래에 추가한다.
-- 항목이 스무 개를 넘으면 그때 영역별로 묶는다.
-- 안 쓰이는 항목도 지우지 않는다.
 EOF
+  printf '%s\n' "$SCAFFOLD_SOLVED_RULES" >> "$kdir/solved_problems.md"
+  return 0
+}
+
+# 오답노트 형식 규칙이 낡았는지 본다. 읽기만 하고 어떤 파일에도 쓰지 않는다.
+# 어떤 경우에도 0을 리턴하고, 결과는 이 함수 전용 고정 이름에 셋한다 — 호출자가 이름을 정하게 하면
+# 함수 안의 지역 선언과 겹쳐 대입이 지역 변수로 흡수되고 조용히 유실된다(모드 라인 변수 분리와 같은 이유).
+# 판정은 구간 추출이 아니라 포함 검사다. 사람이 쓴 로그에서 규칙 불릿과 항목 불릿은 같은 모양이라
+# 경계를 떼어 내려 하면 사용자가 빈 줄을 빼거나 메모를 끼운 순간 흔들린다.
+# grep -F를 쓰지 않는 이유: 그것은 패턴의 각 줄을 별개 후보로 보는 줄 단위 검사라 여덟 줄 중 하나만
+# 있어도 참이 된다. case의 리터럴 부분일치는 여러 줄을 통째로 본다.
+# 줄 끝은 양쪽 다 정규화하고, 명령 치환이 후행 개행을 먹으므로 블록이 파일 끝에 놓여도 일치한다.
+scaffold_check_solved_rules() {  # $1=로그 경로 → sets: solved_rules_stale (1=낡음, 0=최신이거나 판정 안 함)
+  local f="$1" body
+  solved_rules_stale=0
+  [ -f "$f" ] || return 0
+  body="$(tr -d '\r' < "$f" 2>/dev/null)" || return 0
+  case "$body" in
+    *"$SCAFFOLD_SOLVED_RULES"*) solved_rules_stale=0 ;;
+    *) solved_rules_stale=1 ;;
+  esac
   return 0
 }
 
