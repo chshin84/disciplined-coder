@@ -344,4 +344,61 @@ echo "[section-refs] no dangling ordinal references"
 STALE="$(cd "$HERE" && export LC_ALL=C.UTF-8 && git ls-files -z | xargs -0 grep -l '§[가나다라마]\|절차 [가나다라마]' 2>/dev/null | grep -v '^docs/superpowers/' || true)"
 check "refs: none dangling"                "[ -z \"\$STALE\" ]"
 
+# --- reach-claims: 무조건적 도달 단정과 @import 오해 표현이 남지 않았다 ---
+# 정확 문자열 하나만 보면 나머지가 거짓인 채로 초록이 되므로 실측한 표현을 배열로 모두 검사한다.
+# 이 배열이 금지 표현군의 정본이다(스펙의 표는 당시 기록일 뿐 대조 대상이 아니다).
+# 패턴에 백틱이 들어가므로 반드시 작은따옴표 배열로 두고 grep -qF -- 로 넘긴다.
+REACH_DOCS=("$HERE/README.md" "$HERE/docs/DESIGN-NOTES.md")
+REACH_BANNED=(
+  '모든 프로젝트와 서브에이전트에 걸쳐'
+  '메인 + 모든 서브에이전트 도달'
+  '모든 세션·서브에이전트가 같은 디시플린'
+  '메인과 서브에이전트 모두에 도달한다'
+  '메인 세션과 모든 서브에이전트가'
+  '모든 서브에이전트에 전달된다'
+  '모든 서브에이전트가 그 오답노트를'
+  '매 요청 실어 나른다'
+  '매 요청 정본을 실어 준다'
+  '새 세션에서만 실행'
+)
+echo "[reach-claims] no unconditional reach claims remain"
+for d in "${REACH_DOCS[@]}"; do
+  for p in "${REACH_BANNED[@]}"; do
+    check "$(basename "$d"): banned '$p' absent"  "! grep -qF -- '$p' '$d'"
+  done
+done
+
+# --- reach-facts: 실측 표와 그 대응이 실제로 들어갔다 (지우기만 해도 통과하지 않게 짝을 맞춘다) ---
+DN="$HERE/docs/DESIGN-NOTES.md"
+echo "[reach-facts] measured table and its consequences are present"
+check "DESIGN-NOTES: Explore 미도달"        "grep -qF 'Explore' '$DN' && grep -qF '실리지 않는다' '$DN'"
+check "DESIGN-NOTES: Plan 행 존재"          "grep -qF '| \`Plan\` |' '$DN'"
+check "DESIGN-NOTES: 재현 절차 존재"        "grep -qF '재현 절차' '$DN'"
+check "DESIGN-NOTES: 측정 맥락 명시"        "grep -qF '실측 (' '$DN' && grep -qF 'Claude Code' '$DN'"
+check "DESIGN-NOTES: 옛 근거 문장 제거"     "! grep -qF '공식 문서의 서브에이전트 메모리 로딩 규칙' '$DN'"
+check "DESIGN-NOTES: 갱신 시점 항목"        "grep -qF '리로드가 아니라 새 세션' '$DN'"
+check "DESIGN-NOTES: 훅 계기는 matcher 정본" "grep -qF 'matcher가 정본' '$DN'"
+check "DESIGN-NOTES: 리뷰어 경로 관례"      "grep -qF '실행 시점에 도출한 관리 디렉터리' '$DN'"
+check "README: 갈림을 요약하고 링크"        "grep -qF '종류에 따라 갈린다' '$HERE/README.md' && grep -qF 'docs/DESIGN-NOTES.md' '$HERE/README.md'"
+check "canon: 옛 도달 전제 제거"            "! grep -qF '서브에이전트도 이 글을 읽으므로' '$CANON'"
+check "canon: 도달을 전제하지 않는다"       "grep -qF '도달을 전제하지 않는다' '$CANON'"
+
+# --- reviewer-contract: 읽기 전용 리뷰어를 띄우는 호출자 셋이 같은 계약을 규정한다 ---
+echo "[reviewer-contract] callers inject canon path and require principles_applied"
+for s in domain-spec-review domain-docs nested-orchestration; do
+  F="$HERE/skills/$s/SKILL.md"
+  check "$s: 메모리 미가정"                 "grep -qF '메모리 계층을 받는다고 가정하지 마라' '$F'"
+  check "$s: 경로를 실행 시점에 도출"       "grep -qF '실행 시점에 도출' '$F'"
+  check "$s: principles_applied 요구"       "grep -qF 'principles_applied' '$F'"
+  # Codex 패리티: Claude 전용 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
+  check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
+  check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
+done
+for l in grounding fit consistency adversarial; do
+  F="$HERE/skills/reviewer-$l/SKILL.md"
+  check "reviewer-$l: principles_applied"   "grep -qF 'principles_applied' '$F'"
+  check "reviewer-$l: 제품 구현 제외 단서"  "grep -qF '제품 런타임 구현에는 요구하지 않는다' '$F'"
+done
+check "meta-aggregate: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/meta-aggregate/SKILL.md'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

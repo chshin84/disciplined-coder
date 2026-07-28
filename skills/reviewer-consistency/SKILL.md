@@ -24,3 +24,5 @@ description: 설계 문서(spec/plan)의 내부 모순·커버리지 공백·이
 { "lens": "consistency", "issues": [ { "severity": "critical|major|minor", "type": "contradiction|gap|drift|scope", "where": "문서 내 위치", "detail": "무엇이 왜" } ], "notes": "" }
 ```
 통과/실패 신호는 이슈의 `severity` 하나다(별도 verdict 필드를 두지 않는다 — `SSOT`). 라우팅은 `meta-aggregate`의 결정 정책을 따른다.
+
+**Claude 서브에이전트로 띄운 리뷰에서만** 호출자가 `principles_applied`(읽고 적용한 원칙 ID 목록)를 함께 요구한다 — 그 종류에는 원칙 정본이 안 실릴 수 있어 읽었다는 흔적을 산출물에 남기기 위해서다. **제품 런타임 구현에는 요구하지 않는다.** 위 공통 스키마 자체는 실행 방식에 중립이다.
