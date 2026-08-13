@@ -3,6 +3,7 @@
 #
 # 두 불변식을 단언한다. 어느 쪽도 개수를 박지 않고 두 집합의 일치를 본다.
 #   전체 열거   — README의 렌즈 나열 == skills/reviewer-* 디렉터리 집합
+#   집계 태깅   — meta-aggregate가 source 값으로 적은 렌즈 == 같은 디렉터리 집합
 #   디스패치 셋 — README·DESIGN-NOTES가 spec 리뷰 구성을 적은 줄에 이름이 있다
 #                 == domain-spec-review가 디스패치 목록에 적은 렌즈다
 # 두 번째의 권위 있는 출처는 호출자 스킬이고 산문의 열거는 그 캐시다(SSOT).
@@ -14,6 +15,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 README="$HERE/README.md"
 NOTES="$HERE/docs/DESIGN-NOTES.md"
 CALLER="$HERE/skills/domain-spec-review/SKILL.md"
+AGG="$HERE/skills/meta-aggregate/SKILL.md"
 pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
 
@@ -31,6 +33,10 @@ TREE="$(printf '%s' "$TREE_LINE" | sed -n 's/.*(\([^)]*\)).*/\1/p' | tr '/' '\n'
 README_SET_LINE="$(grep -F 'domain-spec-review' "$README" | grep -F 'meta-aggregate' || true)"
 NOTES_SET_LINE="$(grep -F '독립 렌즈' "$NOTES" || true)"
 
+# 캐시 3 — meta-aggregate가 집계 항목의 출처를 태깅하는 렌즈 이름 열거.
+AGG_LINE="$(grep -F '"source"' "$AGG" || true)"
+AGGSET="$(printf '%s' "$AGG_LINE" | sed -n 's/.*"source"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | tr '|' '\n' | sed 's/^ *//; s/ *$//' | grep -v '^$' | sort || true)"
+
 echo "[앵커가 실제로 잡히는가 — 못 잡으면 아래 단언이 헛돈다]"
 check "렌즈 디렉터리가 하나 이상 있다"          "[ -n \"\$ALL\" ]"
 check "호출자 디스패치 목록을 읽어냈다"          "[ -n \"\$DISPATCH\" ]"
@@ -44,6 +50,15 @@ check "README 트리 주석이 렌즈 전부를 적는다"    "[ \"\$TREE\" = \"
 if [ "$TREE" != "$ALL" ]; then
   echo "    디렉터리: $(printf '%s' "$ALL" | tr '\n' ' ')"
   echo "    README  : $(printf '%s' "$TREE" | tr '\n' ' ')"
+fi
+
+echo "[집계 태깅 == 실제 디렉터리]"
+# meta-aggregate의 출력 스키마가 이슈의 출처를 렌즈 이름으로 태깅한다. 그 열거도 렌즈가 늘면 낡는다.
+check "meta-aggregate source 줄을 찾았다"        "[ -n \"\$AGG_LINE\" ]"
+check "meta-aggregate가 렌즈 전부를 태깅한다"    "[ \"\$AGGSET\" = \"\$ALL\" ]"
+if [ "$AGGSET" != "$ALL" ]; then
+  echo "    디렉터리      : $(printf '%s' "$ALL" | tr '\n' ' ')"
+  echo "    meta-aggregate: $(printf '%s' "$AGGSET" | tr '\n' ' ')"
 fi
 
 echo "[산문의 spec 리뷰 셋 == 호출자의 디스패치 셋]"

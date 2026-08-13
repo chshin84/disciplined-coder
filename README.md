@@ -88,6 +88,7 @@ disciplined-coder/
 ├── scripts/test_codex_scaffold.sh  # Codex 셋업·매니페스트·세션훅 검증 (FAIL=0)
 ├── scripts/test_scaffold.sh        # scaffold 검증 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
 ├── scripts/test_hooks.sh           # 훅 불변식 테스트 (계약 FAIL=0)
+├── scripts/test_docs_drift.sh      # 문서의 렌즈 열거가 실제와 어긋나지 않는지 (계약 FAIL=0)
 ├── commands/*.md                  # 수동 커맨드(전체 목록은 '사용 > 커맨드' 절이 정본)
 ├── docs/DESIGN-NOTES.md            # 개발자용 내부 근거(주입 메커니즘·한계·업그레이드)
 └── README.md
