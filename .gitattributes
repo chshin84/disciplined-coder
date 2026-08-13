@@ -2,3 +2,6 @@
 *.sh text eol=lf
 # Keep markdown LF so the scaffold's managed-region markers match on all hosts
 *.md text eol=lf
+# Keep workflow scripts LF so the Workflow permission dialog does not reject the
+# carriage returns as hidden control characters on autocrlf checkouts
+*.js text eol=lf
