@@ -109,5 +109,5 @@ disciplined-coder/
 ## 메인테이너
 - chshin84 \<chshin84@gmail.com\> · 이슈/제안은 [chshin84/disciplined-coder](https://github.com/chshin84/disciplined-coder) 저장소로.
 
-<!-- 라이선스: 미정(추후 결정 시 LICENSE 파일 + 본 섹션에 표기). 현재는 별도 명시 전까지 저작자가 모든 권리 보유. -->
-
+## 라이선스
+라이선스를 아직 정하지 않았다. 별도로 명시하기 전까지는 저작자가 모든 권리를 보유한다(두 매니페스트가 선언하는 `UNLICENSED`와 같은 뜻이다). 정해지면 `LICENSE` 파일을 두고 이 절에 적는다.
