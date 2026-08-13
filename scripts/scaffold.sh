@@ -65,7 +65,12 @@ EOF
 #    이후 세션은 @import 한 경로로만 로드한다 — 같은 내용을 두 번 싣지 않는다.
 if [ "$had_import" -eq 0 ]; then
   for f in agent-principles.md domains-index.md solved_problems.md; do
-    if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
+    [ -f "$KDIR/$f" ] || continue
+    # 읽기가 거부돼도 훅 전체를 죽이지 않는다. set -e 아래에서 cat 실패는 스캐폴드를 그 자리에서
+    # 끝내 @import 배선까지 못 하게 만든다. 대신 못 읽었다는 사실을 stderr로 드러낸다(FAIL-LOUD).
+    if ! cat "$KDIR/$f" 2>/dev/null; then
+      echo "[disciplined-coder] WARNING: cannot read $KDIR/$f — 이 세션의 stdout 보강에서 빠진다" >&2
+    fi
   done
 fi
 # 토글 모드 라인은 @import 대상 파일에 없는 휘발성 상태라 매 세션 보낸다(조건 밖).

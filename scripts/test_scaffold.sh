@@ -489,12 +489,19 @@ check "scope+CRLF: 신호 없음"             "! printf '%s' \"\$OUTR4\" | grep 
 
 # (마) 읽을 수 없는 로그를 줘도 훅 전체가 0으로 끝난다(리턴값만 보면 함수 안 실패를 놓친다).
 HR5="$(mktemp -d)"; PR5="$(mktemp -d)"; mkdir -p "$HR5/.claude/disciplined-coder"
-printf 'x\n' > "$HR5/.claude/disciplined-coder/solved_problems.md"
-chmod 000 "$HR5/.claude/disciplined-coder/solved_problems.md" 2>/dev/null || true
+RL5="$HR5/.claude/disciplined-coder/solved_problems.md"
+printf 'x\n' > "$RL5"
+chmod 000 "$RL5" 2>/dev/null || true
+# Windows에서는 chmod가 무시돼 파일이 그대로 읽힌다. 그 사실을 드러내지 않으면 이 검사는 그 플랫폼에서
+# 항진이 된다 — 실제로 CI(Linux)에서만 붉어지고 로컬에서는 늘 초록이던 결함이 여기 숨어 있었다.
+if cat "$RL5" >/dev/null 2>&1; then unreadable_effective=0; else unreadable_effective=1; fi
 set +e; run "$HR5" "$PR5" >/dev/null 2>&1; rc5=$?; set -e
-chmod 644 "$HR5/.claude/disciplined-coder/solved_problems.md" 2>/dev/null || true
+chmod 644 "$RL5" 2>/dev/null || true
 echo "[solved-rules] hook exits 0 even on unreadable log"
 check "unreadable: exit 0"                "[ '$rc5' = '0' ]"
+if [ "$unreadable_effective" -eq 0 ]; then
+  echo "    (참고: 이 플랫폼에서는 chmod 000이 먹지 않아 위 검사가 읽기 거부 경로를 밟지 못했다)"
+fi
 
 # (바) 위생 검사가 backups/ 를 비관리 디렉터리로 오탐하지 않는다.
 HR6="$(mktemp -d)"; PR6="$(mktemp -d)"; mkdir -p "$HR6/.claude/disciplined-coder/backups"
