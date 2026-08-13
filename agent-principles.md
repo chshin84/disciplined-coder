@@ -42,7 +42,7 @@ LLM이 만든 결과는 — 제품 출력이든 Claude 자신의 설계 문서�
 | 제품이 런타임에 LLM 호출 | 제품의 LLM 출력 | `domain-llm-runtime` | 제품 코드로 구현 |
 | spec 작성 | Claude의 설계 문서 | `domain-spec-review` | 훅이 강제 |
 | plan 작성 | Claude의 계획 문서 | `domain-spec-review` | 훅이 강제 |
-| 문서(README 등) 작성 | Claude의 문서 | `reviewer-grounding`+`reviewer-fit` (방법 상세는 `domain-docs`) | 훅이 제안·넛지 |
+| 문서(README 등) 작성 | Claude의 문서 | `domain-docs` (어느 렌즈를 쓸지도 그 스킬의 문서 검진 절이 정한다) | 훅이 제안·넛지 |
 | 멀티에이전트 워크플로 작성·실행(발견·결론을 산출하는 오케스트레이션) | 워크플로 에이전트의 발견·결론 | `reviewer-*` 렌즈 스킬 (워크플로 검증 단계가 SKILL.md에서 렌즈를 도출 — 즉석 재작성 금지) | 상시 로드 원칙 + ultracode 검증 모드(`/ultracode-review` 토글) |
 
 각 행의 *방법 상세*는 `호출자` 열의 스킬이 SSOT다 — 그 스킬을 열어라. 상시 로드 본문엔 중복하지 않는다.

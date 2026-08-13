@@ -137,7 +137,9 @@ PN="$(mktemp -d)"
 in_claudemd() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s/CLAUDE.md"}}' "$1"; }
 OUT_GONE="$(in_claudemd "$PN" | CLAUDE_PROJECT_DIR="$PN" bash "$DREV" 2>&1)" || true
 check "no add-pointer nudge anymore"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'add-pointer'"
-check "generic nudge fires instead"   "printf '%s' \"\$OUT_GONE\" | grep -qF 'reviewer-grounding'"
+# 렌즈 이름이 아니라 위임 대상을 단언한다 — 이름을 단언하면 이 테스트가 네 번째 사본이 된다(SSOT).
+check "generic nudge fires instead"   "printf '%s' \"\$OUT_GONE\" | grep -qF 'domain-docs'"
+check "nudge names no lens directly"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'reviewer-'"
 check "hook writes no project file"   "[ ! -f '$PN/docs/solved_problems.md' ]"
 
 . "$HERE/scripts/_json_valid.sh"   # JSON 유효성 검사기(공유)

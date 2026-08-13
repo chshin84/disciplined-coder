@@ -9,14 +9,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: scaffold 계약 (FAIL=0)
-        run: bash scripts/test_scaffold.sh
-      - name: hooks 계약 (FAIL=0)
-        run: bash scripts/test_hooks.sh
-      - name: codex scaffold 계약 (FAIL=0)
-        run: bash scripts/test_codex_scaffold.sh
-      - name: 문서 드리프트 계약 (FAIL=0)
-        run: bash scripts/test_docs_drift.sh
+      # 목록을 여기 열거하지 않는다 — scripts/ 디렉터리가 정본이고, 열거하면 새 테스트가 조용히 빠진다.
+      - name: 계약 테스트 전부 (각 FAIL=0)
+        run: |
+          set -e
+          ran=0
+          for t in scripts/test_*.sh; do
+            echo "::group::$t"
+            bash "$t"
+            echo "::endgroup::"
+            ran=$((ran+1))
+          done
+          [ "$ran" -gt 0 ] || { echo "계약 테스트를 하나도 찾지 못했다 — 글롭이 빗나갔다"; exit 1; }
+          echo "계약 테스트 $ran개 통과"
 
   plugin-validate:
     runs-on: ubuntu-latest

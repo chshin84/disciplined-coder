@@ -62,7 +62,9 @@ Claude Code 버전을 함께 둔다.
   고쳤을 때를 다루고, 이 항목은 배포본을 쓰는 사람 관점이다.
 - **원칙 갱신 주기**: `agent-principles.md`(SSOT)를 수정하면 다음 세션부터 `~/.claude/disciplined-coder/`에
   새 버전이 복사된다. **소유자와 갱신 주기를 정하라**(권장: 분기 1회 검토). 일반화 가능한 `solved` 항목만
-  원칙으로 승격하고, 승격 시 PC 전역 사본을 반드시 삭제(양쪽 복제 금지 = `SSOT`).
+  원칙으로 승격한다. **승격 절차의 정본은 오답노트 머리말과 `domain-docs`이며 여기서 다시 정하지 않는다** —
+  그 로그는 append-only이고 원문을 보존하므로, 승격은 원칙 쪽에 재기술해 올리는 것이지 로그에서 지우는
+  것이 아니다.
 - 테스트 통과를 결정론적으로 감지하는 PostToolUse hook 보조는 의도적으로 넣지 않았다(판별 취약·이득 적음).
   필요 시 후속 추가.
 - **ultracode 검증 모드(required)는 주입 지시 기반**이라 훅 차단이 아니다 — 모드 라인은 메인 세션에만
@@ -113,12 +115,12 @@ spec의 *실질 재설계*는 자동 재리뷰가 보장되지 않는다(관례�
 
 일반 문서 작성도 사람의 글쓰기 흐름을 흉내 낸다 — 쓰기 전에 양식을 고르고, 쓴 뒤 남의 눈으로 본다.
 이를 훅 둘로 구현했다: `doc_format_pretooluse.sh`(PreToolUse — 새 `.md`에 `domain-docs` 양식 제안)와
-`doc_review_posttooluse.sh`(PostToolUse — 작성/수정 후 `reviewer-grounding`+`reviewer-fit` 검진 넛지).
+`doc_review_posttooluse.sh`(PostToolUse — 작성/수정 후 검진 넛지. 어느 렌즈로 검진할지는 `domain-docs`가 정한다).
 둘 다 spec/plan 경로(`docs/superpowers/{specs,plans}`)는 제외한다 — 그쪽은 자체 하드 게이트가 맡는다.
 
 spec/plan과 달리 **비블로킹(권유)**으로 둔 이유는 셋이다.
-- **발행물이라 마커가 부적합하다.** spec/plan은 문서 끝에 `<!-- spec-review: passed … -->` 터미널 마커를
-  박아 Stop 게이트를 해제한다. 그러나 README 같은 발행물에 리뷰 마커를 남기면 산출물 자체가 오염된다.
+- **발행물이라 마커가 부적합하다.** spec/plan은 문서 끝에 `<!-- spec-review: passed -->` 터미널 마커를
+  박아 Stop 게이트를 해제한다(마커의 형식은 `domain-spec-review`가 정본이며 날짜나 개수를 담지 않는다). 그러나 README 같은 발행물에 리뷰 마커를 남기면 산출물 자체가 오염된다.
   마커가 없으면 Stop 게이트는 통과/미통과를 판별할 수단이 없으니, 애초에 하드 게이트로 만들 수 없다.
 - **위험·비용이 다르다.** 설계 문서는 구현의 입력이라 결함이 하류로 번지지만, 일반 문서는 발행 후에도
   고치기 쉽다(`REVERSIBLE`). 하드 블록의 마찰을 정당화할 만큼 위험이 크지 않다.
@@ -131,13 +133,13 @@ spec/plan과 달리 **비블로킹(권유)**으로 둔 이유는 셋이다.
 보완한다. 같은 OFF 토글(`DISCIPLINED_CODER_REVIEW_GATE=off`)로 둘 다 끌 수 있다.
 
 ## Codex 패리티 레이어
-- **SSOT 보존**: `agent-principles.md`·`domains-index.md`·`skills/**`·게이트 로직은 두 런타임 공유. Codex 산출물(`.codex-plugin/`·`hooks-codex.json`·`session-start-codex`·`codex-scaffold.sh`)은 가산형.
-- **단일 분기점**: 파일 편집 도구가 Claude=Write/Edit(`file_path`) vs Codex=`apply_patch`(패치 헤더). `hooks/_extract_path.sh`가 양쪽을 흡수해 3개 Pre/Post 훅이 공유한다(다중 파일도 전부 추출).
-- **상시 원칙**: Claude는 `~/.claude/CLAUDE.md @import`. Codex는 `@import` 미지원이라 `~/.codex/AGENTS.md` 관리블록에 정본을 **인라인**(생성된 사본, 매 세션 멱등 갱신) + `session-start-codex`가 additionalContext로 주입(이중 경로).
-- **강제 게이트**: Stop 게이트(`spec_review_stop.sh`, git 기반)가 진짜 차단이며 도구 형태와 무관하게 **신규** spec/plan을 스캔(Fix A — 기존 파일 수정은 넛지). Pre/Post는 비블로킹 넛지.
-- **신뢰검토 갭(FAIL-LOUD)**: Codex는 신뢰검토 전 훅을 침묵 스킵 → `session-start-codex` 주입 첫 줄 경고 + README에 명시.
-- **version 동기화**: `.codex-plugin/plugin.json`만 `version`을 갖는다. `.claude-plugin/plugin.json`이 version을 도입하면 둘을 맞춘다.
-- **후속(YAGNI)**: Cursor 등 다른 런타임은 같은 per-runtime-manifest 패턴으로 확장하되, 통증·이벤트 차이를 측정한 뒤 추가한다.
+- **무엇을 공유하고 무엇을 더하는가.** 원칙 정본과 도메인 목차, `skills/` 전부, 그리고 게이트 로직은 두 런타임이 그대로 공유한다. Codex를 위해 만든 것(`.codex-plugin/`, `hooks-codex.json`, `session-start-codex`, `codex-scaffold.sh`)은 기존 것을 고치지 않고 더하기만 한다.
+- **갈라지는 지점은 하나뿐이다.** 파일 편집 도구가 런타임마다 다르다 — Claude에서는 Write와 Edit이 `file_path`로 경로를 주고, Codex에서는 `apply_patch`가 패치 헤더로 준다. `hooks/_extract_path.sh`가 양쪽을 흡수해 Pre와 Post 훅들이 그것을 함께 쓰며, 한 번에 여러 파일이 와도 모두 추출한다.
+- **상시 원칙을 어떻게 싣는가.** Claude는 `~/.claude/CLAUDE.md`의 `@import`로 싣는다. Codex는 `@import`를 지원하지 않으므로 `~/.codex/AGENTS.md` 관리블록에 정본을 인라인으로 넣고 매 세션 멱등하게 갱신한다. `session-start-codex`가 정본을 세션 컨텍스트로 함께 보내는 것은 **관리블록을 방금 만든 첫 세션 한 번뿐이며**, 그다음부터는 인라인 한 경로만 쓴다(이중 전송은 커밋 `1ea92f8`에서 의도적으로 제거했다).
+- **무엇이 실제로 차단하는가.** 진짜 차단은 git 기반의 Stop 게이트(`spec_review_stop.sh`) 하나이고, 도구 형태와 무관하게 **신규** spec과 plan을 훑는다. 기존 파일을 수정하는 경우는 차단하지 않고 넛지만 띄운다. PreToolUse와 PostToolUse는 모두 비블로킹 넛지다.
+- **신뢰검토 갭을 어떻게 드러내는가**(`FAIL-LOUD`). Codex는 신뢰검토를 마치기 전에는 훅을 조용히 건너뛴다. 그래서 `session-start-codex`가 주입하는 첫 줄에 경고를 넣고 README에도 명시한다.
+- **version은 한쪽만 갖는다.** `.codex-plugin/plugin.json`만 `version`을 갖고 `.claude-plugin/plugin.json`은 비워 둔다. 이 계약은 `scripts/test_scaffold.sh`가 양쪽을 단언해 지킨다. Claude 매니페스트에 version을 도입하기로 결정하면 그 테스트와 함께 둘을 맞춘다.
+- **다른 런타임은 필요해지면 더한다**(YAGNI). Cursor 같은 런타임도 같은 per-runtime-manifest 패턴으로 확장하되, 통증과 이벤트 차이를 실제로 측정한 뒤에 추가한다.
 
 ## 업그레이드 노트
 - **사전 릴리스(구 sentinel) 버전에서 올라온 경우만 해당.** 구 버전은 CLAUDE.md에

@@ -23,7 +23,7 @@
 개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(자동 주입되는 목차)가 도메인과 참고서를 안내하고, 각 `skills/domain-*`가 상세를 온디맨드로 제공한다 — 설계 시 명세 반영, 개발 시 폴백.
 - **LLM 런타임**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(호출자)이 리스크에 따라 `skills/reviewer-*`(렌즈)와 `skills/meta-aggregate`(집계)를 **제품 코드의 리뷰 콜**로 구현하게 한다(Claude Code 에이전트가 아니라 제품이 구현할 청사진).
 - **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 PREP → 독립 렌즈(grounding/consistency/adversarial, 그리고 spec이 미지의 영역을 다룰 때만 조건부로 웹에 나가는 prior-art) → meta-aggregate → accept/regenerate/escalate로 검증한다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 게이트; 문서 마지막 줄 `<!-- spec-review: passed -->` 또는 `escalated` 마커로 해제; 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
-- **문서 작성 워크플로**: 일반 문서(README 등)는 사람이 글 쓰는 흐름을 흉내 낸다 — 작성 **전** `PreToolUse` 훅이 새 `.md`에 `domain-docs` 양식을 제안하고, 작성 **후** `PostToolUse` 훅이 독립 검진(`reviewer-grounding`+`reviewer-fit`)을 넛지한다. 셀프 퇴고만으로 끝내지 않되, 발행물엔 마커를 안 박으므로 spec/plan과 달리 **비블로킹**(권유)이다. 같은 OFF 토글을 쓴다.
+- **문서 작성 워크플로**: 일반 문서(README 등)는 사람이 글 쓰는 흐름을 흉내 낸다 — 작성 **전** `PreToolUse` 훅이 새 `.md`에 `domain-docs` 양식을 제안하고, 작성 **후** `PostToolUse` 훅이 독립 검진을 넛지한다(어느 렌즈로 검진할지는 `domain-docs`의 문서 검진 절이 정한다). 셀프 퇴고만으로 끝내지 않되, 발행물엔 마커를 안 박으므로 spec/plan과 달리 **비블로킹**(권유)이다. 같은 OFF 토글을 쓴다.
 
 ## 설치 (user scope 권장)
 > **왜 user scope인가** — scaffold 출력은 어느 스코프로 깔든 PC 전역(`~/.claude/`)에 쓴다. 그러나 SessionStart hook이 **발동**하는 곳은 플러그인이 활성인 세션뿐이다. user scope면 모든 프로젝트의 모든 새 세션에서 hook이 돌아 reach + 정본 refresh가 함께 보장된다(project scope는 그 프로젝트 세션에서만 발동·갱신).
@@ -47,12 +47,14 @@
 2. **신뢰검토 필수** — Codex는 플러그인 훅을 *신뢰*하기 전엔 조용히 건너뛴다. 설치 후 한 번 훅을 신뢰해야 게이트가 작동한다(세션 시작 시 경고가 뜬다).
 3. 새 Codex 세션을 시작하면 `session-start-codex` 훅이 `~/.codex/disciplined-coder/` 셋업 + `~/.codex/AGENTS.md` 관리블록 배선 + 원칙 주입을 자동 수행한다.
 
-차이(정직): Codex는 `@import` 미지원이라 원칙을 AGENTS.md 인라인 + 세션 주입의 이중 경로로 전달한다. 파일 편집은 `apply_patch`로 가므로 게이트 훅이 그 입력을 읽는다. 동작은 Claude와 동일하되, 위 신뢰검토 단계가 추가된다.
+차이를 정직하게 적는다. Codex는 `@import`를 지원하지 않으므로 원칙을 `~/.codex/AGENTS.md` 관리블록에 인라인으로 넣는다. 관리블록을 방금 만든 첫 세션에서만 정본을 세션 컨텍스트로 한 번 더 보내고, 그다음부터는 인라인 한 경로만 쓴다(이중 전송은 의도적으로 제거했다). 파일 편집은 `apply_patch`로 가므로 게이트 훅이 그 입력을 읽는다. 동작은 Claude와 같고, 위 신뢰검토 단계가 하나 더 붙는다.
 
 ## 사용
 설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어:
 - `~/.claude/disciplined-coder/`에 정본 사본과 오답노트·설정 파일을 셋업한다(정확한 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다)
 - `~/.claude/CLAUDE.md` 관리블록에 `@import`를 배선한다(없으면 생성하고, 있으면 멱등 갱신한다)
+- 현재 토글 모드 두 줄(오답노트 처분 모드와 ultracode 검증 모드)을 매 세션 알린다
+- 오답노트의 형식 규칙 서술이 현행과 달라지면 🔵 알림을 띄운다(고치는 것은 사용자 승인을 받은 뒤다)
 
 이후 어느 프로젝트에서 열어도 메인 세션이 원칙 + 도메인 목차 + 오답노트를 자동으로 보유한다. 서브에이전트는 종류에 따라 갈린다([DESIGN-NOTES](docs/DESIGN-NOTES.md)의 실측 표를 보라). **자동 계층은 프로젝트 폴더를 건드리지 않는다.**
 
@@ -85,15 +87,13 @@ disciplined-coder/
 ├── hooks/session-start-codex       # Codex SessionStart: codex-scaffold 실행 + 원칙 주입 + 신뢰검토 경고
 ├── hooks/_extract_path.sh          # 공용 경로 추출(file_path + apply_patch, 다중 경로)
 ├── scripts/codex-scaffold.sh       # 멱등: ~/.codex/ 셋업 + ~/.codex/AGENTS.md 관리블록
-├── scripts/test_codex_scaffold.sh  # Codex 셋업·매니페스트·세션훅 검증 (FAIL=0)
-├── scripts/test_scaffold.sh        # scaffold 검증 (CLAUDE_HOME_DIR 임시홈, 실제 ~/.claude 미오염)
-├── scripts/test_hooks.sh           # 훅 불변식 테스트 (계약 FAIL=0)
-├── scripts/test_docs_drift.sh      # 문서의 렌즈 열거가 실제와 어긋나지 않는지 (계약 FAIL=0)
+├── scripts/test_*.sh               # 계약 테스트(각 FAIL=0). 어떤 것이 있는지는 이 디렉터리가 정본이다
+├── scripts/_*.sh                   # 공유 헬퍼(홈 해석·관리블록·JSON 유효성 등)
 ├── commands/*.md                  # 수동 커맨드(전체 목록은 '사용 > 커맨드' 절이 정본)
 ├── docs/DESIGN-NOTES.md            # 개발자용 내부 근거(주입 메커니즘·한계·업그레이드)
 └── README.md
 ```
-> `~/.claude/disciplined-coder/`에 생성되는 파일 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다. 스킬은 플러그인에서 온디맨드 로드 — 복사하지 않는다.
+> **위 트리는 주요 파일만 적은 부분 목록이다.** 전체는 저장소를 보라 — 여기에 전부 열거하면 파일이 늘 때마다 이 목록이 먼저 낡는다. `~/.claude/disciplined-coder/`에 생성되는 파일 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다. 스킬은 플러그인에서 온디맨드로 로드하며 복사하지 않는다.
 
 ## 주의
 - **플러그인 루트 `CLAUDE.md`는 컨텍스트로 로드되지 않는다** — 주입 경로는 `~/.claude/CLAUDE.md`의 `@import`다.

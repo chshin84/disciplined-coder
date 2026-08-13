@@ -98,11 +98,9 @@ phase('테스트')
 const testPromise = agent(
   `${COMMON}
 너만 예외적으로 실행 권한이 있다(파일 수정은 여전히 금지). ${REPO} 에서 다음을 실행하고 결과를 보고하라:
-- bash scripts/test_scaffold.sh
-- bash scripts/test_hooks.sh
-- bash scripts/test_codex_scaffold.sh
-- bash scripts/test_docs_drift.sh
+- scripts/test_*.sh 를 전부 (목록을 여기 적지 않는다 — 그 디렉터리가 정본이다. \`for t in scripts/test_*.sh; do bash "$t"; done\`)
 - claude plugin validate ./ (non-strict)
+어떤 스크립트를 실제로 돌렸는지 이름을 모두 보고에 적어라. 하나도 못 찾았으면 그 사실 자체가 FAIL이다.
 각각 PASS/FAIL 카운트와, FAIL이 있으면 어떤 체크가 왜 실패했는지 출력에서 인용하라. 계약은 FAIL=0이다.
 환경 원인(도구 부재 등)으로 보이는 실패는 그 사실 자체를 보고하라(수정 시도 금지).`,
   { label: 'run-tests', phase: '테스트', schema: TEST_SCHEMA }
