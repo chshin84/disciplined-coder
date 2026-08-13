@@ -5,7 +5,9 @@
 # 순수 bash(jq 비의존). git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
-. "$(cd "$(dirname "$0")" && pwd)/_spec_marker.sh"   # terminal 마커 판정(SSOT) 공유
+HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOKDIR/_spec_marker.sh"    # terminal 마커 판정(SSOT) 공유
+. "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프(SSOT) 공유
 INPUT="$(cat)"
 case "$INPUT" in *'"stop_hook_active":true'*|*'"stop_hook_active": true'*) exit 0 ;; esac  # 루프가드
 command -v git >/dev/null 2>&1 || exit 0
@@ -14,7 +16,8 @@ cwd="$(printf '%s' "$cwd" | tr -s '\\' '/')"
 if [ -n "$cwd" ]; then cd "$cwd" 2>/dev/null || exit 0; fi
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
 
-unreviewed=""
+# 경로는 배열에 모은다 — 공백으로 이어 붙이면 NUL 종료로 얻은 안전성이 그 자리에서 무너진다.
+unreviewed=()
 # -z: NUL 종료 + 따옴표/이스케이프 없는 raw 경로(공백·비ASCII 안전). --no-renames: 리네임을
 # del+add 로 분해해 'old -> new' 합침 레코드를 없앤다. 각 레코드는 'XY ' 3글자 프리픽스 + 경로.
 while IFS= read -r -d '' entry; do
@@ -24,7 +27,7 @@ while IFS= read -r -d '' entry; do
   case "${entry:0:2}" in '??'|A*) ;; *) continue ;; esac
   path_is_specplan "$f" || continue
   [ -f "$f" ] || continue
-  marker_is_terminal "$f" || unreviewed="$unreviewed $f"
+  marker_is_terminal "$f" || unreviewed+=("$f")
 done < <(git status -z --porcelain --untracked-files=all --no-renames -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null)
 
 # Fix C: 같은 턴 커밋 우회 차단 — HEAD 커밋이 추가(A)한 spec/plan도 검사한다.
@@ -35,14 +38,16 @@ while IFS= read -r -d '' f; do
   [ -n "$f" ] || continue
   path_is_specplan "$f" || continue
   [ -f "$f" ] || continue
-  dup=0; for u in $unreviewed; do [ "$u" = "$f" ] && { dup=1; break; }; done
+  dup=0; for u in ${unreviewed+"${unreviewed[@]}"}; do [ "$u" = "$f" ] && { dup=1; break; }; done
   [ "$dup" = 1 ] && continue
-  marker_is_terminal "$f" || unreviewed="$unreviewed $f"
+  marker_is_terminal "$f" || unreviewed+=("$f")
 done < <(git diff-tree -z --no-commit-id --name-only --diff-filter=A -r HEAD 2>/dev/null || true)
 
-if [ -n "$unreviewed" ]; then
-  reason="미리뷰 spec/plan:$unreviewed — disciplined-coder domain-spec-review(PREP+독립 렌즈, 렌즈 구성은 그 스킬이 정한다)를 수행하고 문서 마지막 줄에 spec-review 마커(passed 또는 escalated, HTML 주석)를 남긴 뒤 종료하라."
-  esc="$(printf '%s' "$reason" | sed 's/\\/\\\\/g; s/"/\\"/g')"
-  printf '{"decision":"block","reason":"%s"}\n' "$esc"
+if [ "${#unreviewed[@]}" -gt 0 ]; then
+  list=""; for u in "${unreviewed[@]}"; do list="$list
+  - $u"; done
+  reason="미리뷰 spec/plan:$list
+disciplined-coder domain-spec-review(PREP+독립 렌즈, 렌즈 구성은 그 스킬이 정한다)를 수행하고 문서 마지막 줄에 spec-review 마커(passed 또는 escalated, HTML 주석)를 남긴 뒤 종료하라."
+  printf '{"decision":"block","reason":"%s"}\n' "$(escape_for_json "$reason")"
 fi
 exit 0

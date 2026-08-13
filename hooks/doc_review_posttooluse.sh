@@ -5,6 +5,7 @@ set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan) 공유(SSOT)
+. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 INPUT="$(cat)"
 match=""
 while IFS= read -r FILE; do
@@ -22,6 +23,6 @@ base="$(basename "$match")"
 # 권유였는데, 빈 파일은 recall이 발화해도 얻는 교훈이 0이다. 이제 교훈이 생긴 시점에 만든다.
 
 msg="🔎 문서(${base}) 작성/수정됨 — done 하기 전에 reviewer-grounding(사실·정확)+reviewer-fit(양식·계약) 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 넛지일 뿐 차단은 아니다."
-esc="$(printf '%s' "$msg" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

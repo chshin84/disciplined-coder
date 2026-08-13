@@ -140,4 +140,46 @@ check "no add-pointer nudge anymore"  "! printf '%s' \"\$OUT_GONE\" | grep -qF '
 check "generic nudge fires instead"   "printf '%s' \"\$OUT_GONE\" | grep -qF 'reviewer-grounding'"
 check "hook writes no project file"   "[ ! -f '$PN/docs/solved_problems.md' ]"
 
+. "$HERE/scripts/_json_valid.sh"   # JSON 유효성 검사기(공유)
+
+echo "[차단 사유의 셸·JSON 안전]"
+# 공백 든 경로가 사유에 정확히 한 번 온전하게 들어가야 한다. 공백으로 이어 붙이던 판본은 중복 제거가
+# 성립하지 않아 같은 파일을 두 번 나열했고, 글롭 문자가 있으면 파일명 확장까지 일어났다.
+WS="$(mktemp -d)"; mkdir -p "$WS/docs/superpowers/specs"
+# 커밋이 하나뿐이면 루트 커밋이라 diff-tree 경로(Fix C)가 돌지 않는다 — 두 커밋을 만들어 둘 다 밟게 한다.
+# 인덱스에서만 빼면 그 파일은 미추적(??)이면서 동시에 HEAD가 추가(A)한 파일이라 두 탐지 경로에 모두 걸린다.
+( cd "$WS" && git init -q . && git config user.email t@t && git config user.name t \
+  && printf 'seed\n' > seed.txt && git add -A && git commit -qm seed \
+  && printf 'x\n' > "docs/superpowers/specs/my spec.md" \
+  && printf 'y\n' > "docs/superpowers/specs/plain.md" \
+  && git add -A && git commit -qm specs && git rm -q --cached "docs/superpowers/specs/my spec.md" >/dev/null )
+WSOUT="$(printf '{"cwd":"%s"}' "$WS" | bash "$STOP" || true)"
+check "차단이 실제로 났다"                  "printf '%s' \"\$WSOUT\" | grep -qF '\"decision\":\"block\"'"
+check "공백 든 경로가 정확히 한 번"          "[ \"\$(printf '%s' \"\$WSOUT\" | grep -o 'my spec.md' | wc -l)\" = 1 ]"
+check "차단 응답이 유효한 JSON"              "printf '%s' \"\$WSOUT\" | json_valid_stdin"
+
+echo "[hooks.json 배선 — 이 파일이 깨지면 게이트가 통째로 죽는다]"
+# 배선 파일 자체를 아무 테스트도 안 보던 구멍을 막는다. 이름을 손으로 적지 않고 디렉터리와 파일에서 도출한다.
+HJ="$HERE/hooks/hooks.json"
+check "hooks.json이 유효한 JSON"          "json_valid_stdin < '$HJ'"
+check "이벤트를 하나 이상 배선한다"        "[ -n \"\$(json_hook_events '$HJ')\" ]"
+
+# 배선이 가리키는 경로가 실제로 존재하는가. ${CLAUDE_PLUGIN_ROOT}는 레포 루트로 치환해 확인한다.
+missing=""
+for rel in $(sed -n 's|.*\${CLAUDE_PLUGIN_ROOT}/\([^"]*\)\\".*|\1|p' "$HJ"); do
+  [ -f "$HERE/$rel" ] || missing="$missing $rel"
+done
+check "배선이 가리키는 스크립트가 모두 존재" "[ -z \"\$missing\" ]"
+[ -n "$missing" ] && echo "    없는 파일:$missing"
+
+# 훅 스크립트를 만들어 놓고 배선을 잊는 것을 막는다. 밑줄로 시작하는 것은 공유 헬퍼라 제외한다.
+unwired=""
+for f in "$HERE"/hooks/*.sh; do
+  b="$(basename "$f")"
+  case "$b" in _*) continue ;; esac
+  grep -qF "$b" "$HJ" || unwired="$unwired $b"
+done
+check "모든 훅 스크립트가 배선되어 있다"    "[ -z \"\$unwired\" ]"
+[ -n "$unwired" ] && echo "    배선 안 된 훅:$unwired"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

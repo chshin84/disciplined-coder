@@ -4,9 +4,9 @@ export const meta = {
   whenToUse: '큰 변경(정본·훅·스캐폴드 수정) 후 회귀 감사가 필요할 때, 레포 루트에서 실행한다(다른 위치면 args로 레포 경로를 넘긴다). 결과는 확정 발견 목록과 집계 판정이다.',
   phases: [
     { title: '테스트', detail: '테스트 스크립트 전부 + plugin validate 실행 (FAIL=0 계약)' },
-    { title: '리뷰', detail: '8개 렌즈 병렬 감사 (자기 리뷰어 스킬 3종 + 원칙 차원 5종)' },
+    { title: '리뷰', detail: '자기 리뷰어 스킬과 원칙 차원 렌즈를 병렬로 감사한다 (개수는 REVIEWERS 배열이 정본)' },
     { title: '중복제거', detail: '렌즈 간 중복 발견 병합' },
-    { title: '반박검증', detail: '발견별 사실성·실질성 2관점 반박 (불확실하면 기각)' },
+    { title: '반박검증', detail: '발견별 사실성·실질성 2관점 반박 (불확실하면 기각, 표가 모자라면 미판정)' },
     { title: '집계', detail: 'meta-aggregate 방식 구조 건강성 점검 + 최종 정리' },
   ],
 }
@@ -109,14 +109,21 @@ const testPromise = agent(
 )
 
 phase('리뷰')
+// 죽은 렌즈와 깨끗한 렌즈를 구별한다 — 빈 배열로 뭉개면 감사가 조용히 좁아진 것을 아무도 모른다(FAIL-LOUD).
+const deadLenses = []
 const reviews = await parallel(
   REVIEWERS.map(r => () =>
     agent(r.prompt, { label: r.key, phase: '리뷰', schema: FINDINGS_SCHEMA })
-      .then(res => (res ? res.findings.map(f => ({ ...f, lens: r.key })) : []))
+      .then(res => {
+        if (!res) { deadLenses.push(r.key); return [] }
+        return res.findings.map(f => ({ ...f, lens: r.key }))
+      })
+      .catch(() => { deadLenses.push(r.key); return [] })
   )
 )
 const all = reviews.filter(Boolean).flat()
 log(`리뷰 완료: ${REVIEWERS.length}개 렌즈에서 원시 발견 ${all.length}건`)
+if (deadLenses.length > 0) log(`⚠️ 응답하지 않은 렌즈 ${deadLenses.length}개: ${deadLenses.join(', ')} — 이 감사의 커버리지가 그만큼 좁다`)
 
 phase('중복제거')
 let deduped = all
@@ -147,14 +154,22 @@ const judged = await parallel(
         { label: `verify-merit:${i}`, phase: '반박검증', schema: VERDICT_SCHEMA }
       ),
     ]).then(vs => {
-      const ok = vs.filter(Boolean).filter(v => v.isReal).length === 2
-      return { ...f, confirmed: ok, verdicts: vs.filter(Boolean).map(v => v.reason) }
+      // 검증자가 죽어 null이 온 것과 실제로 반박한 것은 다르다. 둘을 뭉치면 죽은 표가 '기각'으로 오염된다.
+      // 그래서 상태를 셋으로 가른다 — 두 표가 모두 살아 있고 둘 다 진짜라면 confirmed, 둘 다 살아 있는데
+      // 하나라도 반박하면 rejected, 표가 모자라면 undetermined다.
+      const alive = vs.filter(Boolean)
+      const status = alive.length < 2
+        ? 'undetermined'
+        : (alive.filter(v => v.isReal).length === 2 ? 'confirmed' : 'rejected')
+      return { ...f, status, confirmed: status === 'confirmed', missingVotes: 2 - alive.length, verdicts: alive.map(v => v.reason) }
     })
   )
 )
-const confirmed = judged.filter(Boolean).filter(j => j.confirmed)
-const rejected = judged.filter(Boolean).filter(j => !j.confirmed)
-log(`반박 검증 완료: 확정 ${confirmed.length}건 · 기각 ${rejected.length}건`)
+const confirmed = judged.filter(Boolean).filter(j => j.status === 'confirmed')
+const rejected = judged.filter(Boolean).filter(j => j.status === 'rejected')
+const undetermined = judged.filter(Boolean).filter(j => j.status === 'undetermined')
+log(`반박 검증 완료: 확정 ${confirmed.length}건 · 기각 ${rejected.length}건 · 미판정 ${undetermined.length}건`)
+if (undetermined.length > 0) log(`⚠️ 미판정 ${undetermined.length}건은 검증자가 응답하지 않은 것이지 반박당한 것이 아니다`)
 
 const test = await testPromise
 
@@ -163,8 +178,18 @@ const aggregate = await agent(
   `너는 집계자다. ${REPO}/skills/meta-aggregate/SKILL.md 를 읽고 그 방식대로, 아래 자기감사 결과의 구조적 건강성을 점검하라 — 확정 발견 간 상충, 커버리지 공백, 전체 판정. 발견 내용 재판단은 금지(검증 단계가 끝냈다). 출력은 완결된 문어체 한국어로: (1) 전체 판정 한 단락, (2) 확정 발견 심각도순 정리(red 먼저), (3) 상충 명시, (4) 커버리지 공백.
 결정론 테스트 결과: ${JSON.stringify(test)}
 확정 발견 (${confirmed.length}건): ${JSON.stringify(confirmed)}
-기각 발견 제목들 (${rejected.length}건): ${JSON.stringify(rejected.map(r => ({ title: r.title, why: r.verdicts })))}`,
+기각 발견 제목들 (${rejected.length}건): ${JSON.stringify(rejected.map(r => ({ title: r.title, why: r.verdicts })))}
+미판정 (${undetermined.length}건 — 검증자가 응답하지 않아 판정에 이르지 못했다. 반박당한 것이 아니므로 커버리지 공백으로 다뤄라): ${JSON.stringify(undetermined.map(r => ({ title: r.title, file: r.file })))}
+응답하지 않은 렌즈 (${deadLenses.length}개): ${JSON.stringify(deadLenses)}`,
   { label: 'meta-aggregate', phase: '집계' }
 )
 
-return { test, confirmedCount: confirmed.length, rejectedCount: rejected.length, confirmed, rejectedTitles: rejected.map(r => r.title), aggregate }
+return {
+  test,
+  confirmedCount: confirmed.length, rejectedCount: rejected.length, undeterminedCount: undetermined.length,
+  deadLenses,
+  confirmed,
+  rejectedTitles: rejected.map(r => r.title),
+  undetermined: undetermined.map(r => ({ title: r.title, file: r.file, missingVotes: r.missingVotes })),
+  aggregate,
+}

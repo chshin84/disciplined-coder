@@ -371,10 +371,18 @@ done
 # --- reach-facts: 실측 표와 그 대응이 실제로 들어갔다 (지우기만 해도 통과하지 않게 짝을 맞춘다) ---
 DN="$HERE/docs/DESIGN-NOTES.md"
 echo "[reach-facts] measured table and its consequences are present"
-check "DESIGN-NOTES: Explore 미도달"        "grep -qF 'Explore' '$DN' && grep -qF '실리지 않는다' '$DN'"
-check "DESIGN-NOTES: Plan 행 존재"          "grep -qF '| \`Plan\` |' '$DN'"
+# 두 문자열이 파일 어딘가에 각각 있는지 보면 항진이 된다 — Explore 행을 뒤집어도 옆 행의 문자열이 참을 만든다.
+# 그래서 그 행 한 줄을 먼저 뽑고 그 줄 안에서 확인한다(이 파일의 다른 절이 쓰는 방식과 같게).
+EXPLORE_ROW="$(grep -F '| `Explore` |' "$DN" || true)"
+PLAN_ROW="$(grep -F '| `Plan` |' "$DN" || true)"
+check "DESIGN-NOTES: Explore 행을 찾았다"   "[ -n \"\$EXPLORE_ROW\" ]"
+check "DESIGN-NOTES: Explore 미도달"        "printf '%s' \"\$EXPLORE_ROW\" | grep -qF '실리지 않는다'"
+check "DESIGN-NOTES: Explore 행에 도달 주장 없음" "! printf '%s' \"\$EXPLORE_ROW\" | grep -qE '(^|[^지])실린다'"
+check "DESIGN-NOTES: Plan 행 존재"          "[ -n \"\$PLAN_ROW\" ]"
+check "DESIGN-NOTES: Plan 미도달"           "printf '%s' \"\$PLAN_ROW\" | grep -qF '실리지 않는다'"
 check "DESIGN-NOTES: 재현 절차 존재"        "grep -qF '재현 절차' '$DN'"
-check "DESIGN-NOTES: 측정 맥락 명시"        "grep -qF '실측 (' '$DN' && grep -qF 'Claude Code' '$DN'"
+# 측정 맥락은 한 줄에 날짜와 런타임 이름이 함께 있어야 한다 — 파일 전역 grep 두 번은 서로를 보증하지 못한다.
+check "DESIGN-NOTES: 측정 맥락 한 줄에"     "grep -qE '실측 \(.*Claude Code' '$DN'"
 check "DESIGN-NOTES: 옛 근거 문장 제거"     "! grep -qF '공식 문서의 서브에이전트 메모리 로딩 규칙' '$DN'"
 check "DESIGN-NOTES: 갱신 시점 항목"        "grep -qF '리로드가 아니라 새 세션' '$DN'"
 check "DESIGN-NOTES: 훅 계기는 matcher 정본" "grep -qF 'matcher가 정본' '$DN'"
@@ -403,6 +411,27 @@ for D in "$HERE"/skills/reviewer-*/; do
   check "reviewer-$l: 제품 구현 제외 단서"  "grep -qF '제품 런타임 구현에는 요구하지 않는다' '$F'"
 done
 check "meta-aggregate: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/meta-aggregate/SKILL.md'"
+
+# --- 동시 진입: 창을 여럿 열면 SessionStart가 같은 ~/.claude/CLAUDE.md를 동시에 고친다 ---
+# 락이 없던 판본은 사용자 본문을 통째로 잃고 관리블록을 여러 벌 남겼다(실측: 사용자 2줄 → 0줄, 블록 6~11개).
+# 순차 멱등성 테스트는 이 경로를 구조적으로 밟지 못하므로 별도로 동시 실행한다.
+CT="$(mktemp -d)"; CU="$CT/CLAUDE.md"
+printf 'user line one\n\nuser line two\n' > "$CU"
+for i in 1 2 3 4 5 6 7 8 9 10; do
+  ( . "$HERE/scripts/_managed_block.sh"; printf 'body-%s\n' "$i" | managed_block_inject "$CU" "# BEGIN t" "# END t" ) &
+done
+wait
+check "동시 주입: 사용자 본문 두 줄 보존"   "[ \"\$(grep -c '^user line' '$CU')\" = 2 ]"
+check "동시 주입: 관리블록이 정확히 하나"   "[ \"\$(grep -c '^# BEGIN t\$' '$CU')\" = 1 ]"
+check "동시 주입: 닫는 마커도 하나"         "[ \"\$(grep -c '^# END t\$' '$CU')\" = 1 ]"
+check "동시 주입: 임시 파일 잔여 없음"      "[ -z \"\$(ls '$CT' | grep -v '^CLAUDE.md\$')\" ]"
+
+# --- 매니페스트 version 계약 ---
+# Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin·DESIGN-NOTES).
+# 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다
+# 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다. Codex 매니페스트는 반대로 version을 갖는다.
+check "Claude 매니페스트에 version 없음"  "! grep -qE '\"version\"[[:space:]]*:' '$HERE/.claude-plugin/plugin.json'"
+check "Codex 매니페스트에 version 있음"   "grep -qE '\"version\"[[:space:]]*:' '$HERE/.codex-plugin/plugin.json'"
 
 # --- solved-rules: 형식 규칙이 낡았으면 알리기만 한다 (읽기 전용 넛지) ---
 # 픽스처는 상수(SCAFFOLD_SOLVED_RULES)에서 만들지 않고 리터럴로 적는다 — 상수에서 만들면 상수에 오타가

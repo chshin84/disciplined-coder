@@ -6,6 +6,7 @@ set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$DIR/_spec_marker.sh"   # terminal 마커 판정(SSOT) 공유
+. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 INPUT="$(cat)"
 match=""
 while IFS= read -r FILE; do
@@ -19,6 +20,6 @@ EOF
 [ -n "$match" ] || exit 0
 base="$(basename "$match")"
 msg="📋 spec/plan(${base}) 작성됨 — 진행 전 반드시 disciplined-coder domain-spec-review 스킬로 PREP+독립 렌즈 리뷰를 수행하고(어느 렌즈를 돌릴지는 그 스킬이 정한다), 완료 시 문서 마지막 줄에 spec-review 마커(passed 또는 escalated, HTML 주석)를 남겨라."
-esc="$(printf '%s' "$msg" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

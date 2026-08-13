@@ -13,7 +13,7 @@ description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 �
 brainstorming·writing-plans의 self-review는 작성자가 자기 글을 보는 것이라 확증 편향에 약하다. 고위험
 설계는 자기가 안 쓴 신선한 리뷰어가 편향을 깬다.
 
-## 강제 (훅) — 건너뛸 수 없음
+## 훅이 거는 강제 — 무엇이 실제로 막히나
 superpowers 기본 경로(`docs/superpowers/{specs,plans}/*.md`)에 spec/plan이 쓰이면:
 - **PostToolUse**가 즉시 감지해 이 스킬 수행을 지시한다(비블로킹).
 - **Stop**이 미리뷰 spec/plan이 남은 채 턴이 끝나는 것을 차단한다(하드 게이트).
@@ -75,11 +75,11 @@ JSON을 돌려준다.
 `meta-aggregate`의 좁은 절차를 직접 수행한다(제품 코드 없음). 단일 작성자: 리뷰어는 JSON 리턴만,
 메인이 취합·반영·마커 기록.
 
-## 라우팅 → 반영 → 재작업
+## 라우팅한 결과를 어떻게 반영하고 언제 재작업하나
 `meta-aggregate`가 내는 `decision`은 심각도 계수에서 나온 **입력**이고, 최종 라우팅을 정하는 것은 이
 표다(`SSOT` — 두 곳에 같은 규칙을 복제하지 않는다).
-- **accept**(critical 0): major·minor는 부분 수정(부분 수정이 기본 — `SURGICAL`) → 마커(passed).
-- **regenerate**(critical ≥1): 지적된 섹션만 재작성 → 그 섹션만 재리뷰. 상한 1회, 잔존 시 escalate.
+- **accept**(critical이 하나도 없을 때): major와 minor를 부분 수정한 뒤 passed 마커를 남긴다(부분 수정이 기본이다 — `SURGICAL`).
+- **regenerate**(critical이 하나 이상일 때): 지적된 섹션만 다시 쓰고 그 섹션만 다시 리뷰한다. 상한은 한 번이고 그래도 남으면 escalate한다.
 - **escalate**(상충·방향성·사용자 부재): 🔴 사용자에게 surface + 마커(escalated). 게이트 해제
   (사람 결정 대기). 자동 루프 금지.
 - **예외** — `reviewer-prior-art`의 `crowded`와 `refuted-premise`는 critical이어도 재작성으로 가지 않고
@@ -105,6 +105,15 @@ JSON을 돌려준다.
 `search_status`, 검증하지 못한 인용, 그리고 리뷰어가 `disclosures`와 `not_found`에 적은 것 가운데 결론에
 영향을 주는 것이다.
 
-## 한계 (정직히 — FAIL-LOUD)
-훅은 마커 존재만 검사한다 — 리뷰 없이 마커만 달면 못 막는다. 구조적 완화(읽기 전용 리뷰어 JSON 리턴)는
-있으나 완벽 강제는 불가하다. 탐지 밖(커스텀 경로·비-git)에선 FAIL-OPEN(작업 불능 방지).
+## 한계 — 정직히 적는다 (`FAIL-LOUD`)
+**차단은 한 턴에 한 번이다.** Stop 훅은 `stop_hook_active` 루프가드로 시작하는데, 이 값은 훅의 차단
+때문에 세션이 이어지는 동안 참이 된다. 그래서 첫 종료 시도에서 한 번 막히고 나면 그다음 종료에서는
+마커 검사가 아예 돌지 않는다. **리뷰를 하지 않고 그냥 다시 끝내려 하면 통과한다.** 이 게이트는 실질적으로
+'차단'이 아니라 '턴당 한 번의 강한 환기'다. 무한 차단을 막으려면 루프가드가 필요하므로 이것은 감수한
+대가이지 고칠 결함이 아니다.
+
+**마커는 위조할 수 있다.** 훅은 마커가 있는지만 본다. 리뷰 없이 마커만 달면 막지 못한다. 읽기 전용
+리뷰어가 JSON을 돌려주게 한 구조적 완화는 있으나 완벽한 강제는 불가능하다.
+
+**탐지 밖에서는 열어 둔다.** 커스텀 경로나 git이 아닌 곳에서는 FAIL-OPEN으로 통과시킨다(작업 불능
+방지). 기존 커밋된 spec을 *수정*하는 경우도 하드 게이트가 아니라 넛지만 뜬다.

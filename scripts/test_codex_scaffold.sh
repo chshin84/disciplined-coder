@@ -13,21 +13,8 @@ blank_follows() {  # $1=file $2=exact-line-pattern
   awk -v pat="$2" 'matched && !verified { verified=1; if ($0=="") ok=1 } $0==pat { matched=1 } END { exit (ok==1 ? 0 : 1) }' "$1"
 }
 
-# JSON 유효성 검사기 — stdin의 JSON을 파싱한다. python3가 존재해도 실행 불능인 머신
-# (Windows Store 스텁 등)이 있으므로 프로브는 존재 확인이 아니라 실제 실행으로 한다.
-# 폴백 체인: python3 → python → node. 셋 다 없으면 FAIL(조용한 SKIP 금지 — FAIL-LOUD).
-json_valid_stdin() {
-  if python3 -c 'import sys' >/dev/null 2>&1; then
-    python3 -c 'import json,sys; json.load(sys.stdin)'
-  elif python -c 'import sys' >/dev/null 2>&1; then
-    python -c 'import json,sys; json.load(sys.stdin)'
-  elif command -v node >/dev/null 2>&1; then
-    node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{JSON.parse(d)})'
-  else
-    echo "  (json_valid_stdin: python3/python/node 모두 없음 — 검증 불능은 FAIL로 계상)" >&2
-    return 1
-  fi
-}
+# JSON 유효성 검사기는 공유 헬퍼가 정본이다 — 같은 구현을 두 스위트가 복제하지 않는다(SSOT).
+. "$HERE/scripts/_json_valid.sh"
 
 # --- 케이스 1: 신규 PC ---
 H1="$(mktemp -d)"
@@ -111,7 +98,14 @@ check "session-start-codex stdout is valid JSON" "CODEX_HOME_DIR=\"$(mktemp -d)/
 check ".codex-plugin manifest is valid JSON" "json_valid_stdin < '$HERE/.codex-plugin/plugin.json'"
 check "hooks-codex.json is valid JSON"       "json_valid_stdin < '$HERE/hooks/hooks-codex.json'"
 check "hooks-codex wires apply_patch matcher" "grep -qF 'apply_patch' '$HERE/hooks/hooks-codex.json'"
-check "manifest points skills + codex hooks"  "grep -qF 'hooks-codex.json' '$HERE/.codex-plugin/plugin.json'"
+# 자기 문자열을 자기가 찾는 순환 검사를 쓰지 않는다 — 매니페스트가 가리키는 경로를 실제로 따라가 본다.
+CODEX_HOOKS_REL="$(sed -n 's/.*"hooks"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$HERE/.codex-plugin/plugin.json")"
+CODEX_SKILLS_REL="$(sed -n 's/.*"skills"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$HERE/.codex-plugin/plugin.json")"
+check "manifest hooks 값을 읽어냈다"           "[ -n \"\$CODEX_HOOKS_REL\" ]"
+check "manifest가 가리키는 훅 파일이 존재"     "[ -f \"\$HERE/\$CODEX_HOOKS_REL\" ]"
+check "manifest가 가리키는 스킬 폴더가 존재"   "[ -d \"\$HERE/\$CODEX_SKILLS_REL\" ]"
+# 두 런타임이 같은 이벤트를 배선해야 패리티가 성립한다. 이벤트 이름을 손으로 적지 않고 두 파일에서 도출해 맞댄다.
+check "Codex와 Claude가 같은 이벤트를 배선"    "[ \"\$(json_hook_events \"\$HERE/\$CODEX_HOOKS_REL\")\" = \"\$(json_hook_events '$HERE/hooks/hooks.json')\" ]"
 # FAIL-LOUD: scaffold의 stderr 진단이 훅에서 삼켜지면 안 된다.
 EDIR="$(mktemp -d)"   # 정본 없는 plugin root → scaffold가 WARNING을 stderr로 낸다
 check "session hook relays scaffold stderr" "CODEX_HOME_DIR=\"$(mktemp -d)/.codex\" CLAUDE_PLUGIN_ROOT=\"$EDIR\" bash '$SS' 2>&1 >/dev/null | grep -qF 'WARNING'"

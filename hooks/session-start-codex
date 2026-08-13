@@ -16,11 +16,7 @@ if [ -s "$errfile" ]; then cat "$errfile" >&2; fi
 rm -f "$errfile"
 warn="⚠️ disciplined-coder: 강제 게이트(spec/plan·문서 리뷰)는 이 플러그인 훅을 Codex에서 '신뢰'한 뒤에만 작동합니다. 설치 후 한 번 신뢰검토를 완료하세요."
 context="$(printf '%s\n\n%s' "$warn" "$principles")"
-escape_for_json() {
-  local s="$1"
-  s="${s//\\/\\\\}"; s="${s//\"/\\\"}"; s="${s//$'\n'/\\n}"; s="${s//$'\r'/\\r}"; s="${s//$'\t'/\\t}"
-  printf '%s' "$s"
-}
+. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT) — 이 구현이 정본이었고 이제 공유 파일이다
 esc="$(escape_for_json "$context")"
 printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' "$esc"
 exit 0
