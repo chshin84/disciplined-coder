@@ -23,7 +23,7 @@ description: 리뷰어 둘 이상의 출력을 모아 구조적 건강성(상충
 
 ## 출력 스키마
 ```
-{ "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "severity": "...", "type": "...", "source": "grounding|fit|consistency|adversarial", "where": "...", "detail": "..." } ], "retry_count": 0 }
+{ "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "severity": "...", "type": "...", "source": "grounding|fit|consistency|adversarial|prior-art", "where": "...", "detail": "..." } ], "retry_count": 0 }
 ```
 렌즈 리턴의 `principles_applied`는 **집계 대상이 아니다** — 호출자가 리뷰어의 정본 도달을 관측하려고 보는 값이라 위 스키마에 넣지 않는다. 비어 있으면 호출자가 자기 보고에 적는다.
 

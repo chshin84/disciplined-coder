@@ -394,8 +394,11 @@ for s in domain-spec-review domain-docs nested-orchestration; do
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
 done
-for l in grounding fit consistency adversarial; do
-  F="$HERE/skills/reviewer-$l/SKILL.md"
+# 렌즈 목록은 손으로 적지 않고 디렉터리에서 도출한다 — 렌즈를 더해도 사람이 목록을 맞출 필요가 없다(SSOT).
+for D in "$HERE"/skills/reviewer-*/; do
+  l="$(basename "$D" | sed 's/^reviewer-//')"
+  F="$D/SKILL.md"
+  check "reviewer-$l: SKILL.md 존재"        "[ -f '$F' ]"
   check "reviewer-$l: principles_applied"   "grep -qF 'principles_applied' '$F'"
   check "reviewer-$l: 제품 구현 제외 단서"  "grep -qF '제품 런타임 구현에는 요구하지 않는다' '$F'"
 done

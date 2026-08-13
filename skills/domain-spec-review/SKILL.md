@@ -1,6 +1,6 @@
 ---
 name: domain-spec-review
-description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 리뷰어들(reviewer-grounding·consistency·adversarial)로 검증하고 meta-aggregate로 accept/regenerate/escalate 라우팅하는 호출자. superpowers spec/plan 작성 시 훅이 강제. 제품 런타임 콜이 아니라 Claude 자신의 설계 문서 리뷰다.
+description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 리뷰어들(reviewer-grounding·consistency·adversarial, 그리고 spec에 한해 조건부로 reviewer-prior-art)로 검증하고 meta-aggregate로 accept/regenerate/escalate 라우팅하는 호출자. superpowers spec/plan 작성 시 훅이 강제. 제품 런타임 콜이 아니라 Claude 자신의 설계 문서 리뷰다.
 ---
 # domain-spec-review — spec/plan 독립 리뷰 호출자
 
@@ -48,6 +48,27 @@ JSON을 돌려준다.
 - `reviewer-grounding` — 외부 사실·비용·API·환경 주장의 근거, 근거 없는 단정·환각.
 - `reviewer-consistency` — 내부 모순, spec↔plan 커버리지 공백, 이름·타입 드리프트, 스코프.
 - `reviewer-adversarial` — 실패 모드·과설계·비가역(기능 추가 제안 금지 가드).
+- `reviewer-prior-art` — 조건부다. spec에만, 그리고 아래 발동 기준을 만족할 때만 붙인다. 이 렌즈만 스스로 웹에 나간다.
+
+**한 서브에이전트에 여러 검토 대상을 몰아주지 않는다.** 대상이 여럿이면 대상마다 따로 띄운다.
+
+### 2-1) `reviewer-prior-art`를 붙일지 정한다 (spec에만)
+
+**spec인지 plan인지부터 가른다.** 훅이 넘긴 경로가 `docs/superpowers/specs`면 spec이고 `plans`면 plan이다.
+훅 밖에서 호출됐다면 경로로 도출되지 않으므로 **무엇으로 판정했는지 보고에 적는다.** plan에는 이 렌즈를
+붙이지 않는다 — plan은 무엇을 만들지 정해진 뒤 어떻게 만들지를 적는 문서라 "남이 해봤는가"의 답이
+작업 목록을 바꾸지 않는다.
+
+**웹 도구가 없으면 붙이지 않는다.** 이것이 아래 기준보다 앞서는 상위 조건이다. 띄우려는 서브에이전트가
+웹 검색과 웹 페치를 갖는지 확인하고, 없으면 붙이지 않은 채 그 이유를 보고에 적는다.
+
+> **발동 기준** — 이 spec이 이미 하던 일을 자동화하거나 정리하는 것이면 붙이지 않는다. 아직 해본 적 없는
+> 것을 해내려 하고 그것이 되는지 자체가 미지수이면 붙인다. **판단이 갈리면 붙인다** — 안 붙여서 잃는 것은
+> 남이 이미 실패한 길을 통째로 다시 걷는 것이고, 붙여서 잃는 것은 서브에이전트 한 대와 인용 검증이다.
+
+**붙였든 안 붙였든 그 판정과 이유를 리뷰 보고에 적는다.** 기준이 사람 판단이라 건너뛰는 것을 막을 수는
+없지만, 건너뛰는 것이 **조용히** 일어나는 것은 막는다(`FAIL-LOUD`). 안 붙였다는 사실은 어떤 산출물도
+남기지 않으므로 적지 않으면 빠진 것 자체가 관측되지 않는다.
 
 ### 3) 메타 집계 — `meta-aggregate` 재사용
 심각도 정렬·출처 태깅·상충 감지(코드 로직 — LLM 불필요)를 거쳐 decision을 내린다. spec/plan 리뷰에서는 메인 세션이
@@ -55,10 +76,34 @@ JSON을 돌려준다.
 메인이 취합·반영·마커 기록.
 
 ## 라우팅 → 반영 → 재작업
+`meta-aggregate`가 내는 `decision`은 심각도 계수에서 나온 **입력**이고, 최종 라우팅을 정하는 것은 이
+표다(`SSOT` — 두 곳에 같은 규칙을 복제하지 않는다).
 - **accept**(critical 0): major·minor는 부분 수정(부분 수정이 기본 — `SURGICAL`) → 마커(passed).
 - **regenerate**(critical ≥1): 지적된 섹션만 재작성 → 그 섹션만 재리뷰. 상한 1회, 잔존 시 escalate.
 - **escalate**(상충·방향성·사용자 부재): 🔴 사용자에게 surface + 마커(escalated). 게이트 해제
   (사람 결정 대기). 자동 루프 금지.
+- **예외** — `reviewer-prior-art`의 `crowded`와 `refuted-premise`는 critical이어도 재작성으로 가지 않고
+  곧바로 escalate한다. 섹션을 다시 쓴다고 남이 이미 팔고 있다는 사실이 바뀌지 않아 왕복이 헛돈다. 이
+  예외는 웹에서 읽어 온 내용이 설계 문서를 자동으로 고치는 경로도 함께 좁힌다(나머지 두 유형에서는 열린
+  채 남는다 — 그 둘은 재작성으로 실제 해소되는 유형이다).
+
+## 웹에 나가는 렌즈를 쓸 때 (`reviewer-prior-art` 전용)
+**인용 검증은 호출자 책임이다.** 리뷰어가 문서 밖 사실을 물고 오므로, 그 근거가 틀리면 이 레포에 없는
+위험이 들어온다.
+- **값싼 검사를 먼저 한다.** `citations`의 URL이 응답하는지부터 확인한다(`reviewer-fit`의 "결정론 검증
+  먼저"와 같은 규범). 이 확인은 메인 세션이 자기 도구로 하며 **플러그인에 스크립트를 싣지 않는다**
+  (훅의 순수 bash 무의존 이식성 유지).
+- **그다음 확인하는 것은 "열리는가"가 아니라 "뒷받침하는가"다.** 딥리서치 에이전트의 인용을 잰 측정에서
+  링크 유효성은 94%를 넘지만 그 출처가 주장을 사실로 뒷받침하는 비율은 39~77%였다. 여는 것만으로는 이미
+  거의 안 깨지는 축을 확인하는 데 그친다.
+- **범위는 critical과 문서를 실제로 고치게 만든 major다.** critical만으로 좁히지 않는 이유는 심각도를
+  매기는 주체가 리뷰어 자신이라 검증 경계선을 검증 대상이 스스로 긋게 되기 때문이다. 그리고 삭제는 추가와
+  달리 되돌아오지 않는다.
+- **`search_status`가 `ok`가 아니면 이 렌즈의 결과를 판정으로 쓰지 않는다.** 그 값을 보고에 적는다.
+
+**보고에 적을 것** — 이 렌즈를 붙였는지와 그 판정 이유, spec과 plan을 무엇으로 갈랐는지, `ok`가 아닌
+`search_status`, 검증하지 못한 인용, 그리고 리뷰어가 `disclosures`와 `not_found`에 적은 것 가운데 결론에
+영향을 주는 것이다.
 
 ## 한계 (정직히 — FAIL-LOUD)
 훅은 마커 존재만 검사한다 — 리뷰 없이 마커만 달면 못 막는다. 구조적 완화(읽기 전용 리뷰어 JSON 리턴)는
