@@ -3,7 +3,7 @@ export const meta = {
   description: 'disciplined-coder 저장소를 자기 원칙·자기 리뷰어 렌즈로 자기검증한다',
   whenToUse: '큰 변경(정본·훅·스캐폴드 수정) 후 회귀 감사가 필요할 때, 레포 루트에서 실행한다(다른 위치면 args로 레포 경로를 넘긴다). 결과는 확정 발견 목록과 집계 판정이다.',
   phases: [
-    { title: '테스트', detail: '테스트 스크립트 3종 + plugin validate 실행 (FAIL=0 계약)' },
+    { title: '테스트', detail: '테스트 스크립트 전부 + plugin validate 실행 (FAIL=0 계약)' },
     { title: '리뷰', detail: '8개 렌즈 병렬 감사 (자기 리뷰어 스킬 3종 + 원칙 차원 5종)' },
     { title: '중복제거', detail: '렌즈 간 중복 발견 병합' },
     { title: '반박검증', detail: '발견별 사실성·실질성 2관점 반박 (불확실하면 기각)' },
@@ -98,10 +98,11 @@ phase('테스트')
 const testPromise = agent(
   `${COMMON}
 너만 예외적으로 실행 권한이 있다(파일 수정은 여전히 금지). ${REPO} 에서 다음을 실행하고 결과를 보고하라:
-1. bash scripts/test_scaffold.sh
-2. bash scripts/test_hooks.sh
-3. bash scripts/test_codex_scaffold.sh
-4. claude plugin validate ./ (non-strict)
+- bash scripts/test_scaffold.sh
+- bash scripts/test_hooks.sh
+- bash scripts/test_codex_scaffold.sh
+- bash scripts/test_docs_drift.sh
+- claude plugin validate ./ (non-strict)
 각각 PASS/FAIL 카운트와, FAIL이 있으면 어떤 체크가 왜 실패했는지 출력에서 인용하라. 계약은 FAIL=0이다.
 환경 원인(도구 부재 등)으로 보이는 실패는 그 사실 자체를 보고하라(수정 시도 금지).`,
   { label: 'run-tests', phase: '테스트', schema: TEST_SCHEMA }

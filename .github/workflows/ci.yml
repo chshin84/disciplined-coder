@@ -15,6 +15,8 @@ jobs:
         run: bash scripts/test_hooks.sh
       - name: codex scaffold 계약 (FAIL=0)
         run: bash scripts/test_codex_scaffold.sh
+      - name: 문서 드리프트 계약 (FAIL=0)
+        run: bash scripts/test_docs_drift.sh
 
   plugin-validate:
     runs-on: ubuntu-latest
