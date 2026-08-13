@@ -17,11 +17,11 @@ run() {  # $1=HOME dir, $2=project dir  → echoes scaffold stdout
   CLAUDE_HOME_DIR="$1/.claude" CLAUDE_PROJECT_DIR="$2" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"
 }
 
-# --- 케이스 1: 신규 PC ---
+# --- fresh-pc: 신규 PC ---
 H1="$(mktemp -d)"; P1="$(mktemp -d)"
 OUT="$(run "$H1" "$P1")"
 K="$H1/.claude/disciplined-coder"; UC="$H1/.claude/CLAUDE.md"
-echo "[case1] fresh PC"
+echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
 check "domains-index in PC dir"       "[ -f '$K/domains-index.md' ]"
 check "solved created in PC dir"      "[ -f '$K/solved_problems.md' ]"
@@ -32,80 +32,80 @@ check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder'
 check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "stdout has solved marker"      "printf '%s' \"\$OUT\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 
-# --- 케이스 2: 프로젝트 폴더 무오염 ---
-echo "[case2] project untouched"
+# --- project-untouched: 프로젝트 폴더 무오염 ---
+echo "[project-untouched] project untouched"
 check "no principles in project"      "[ ! -f '$P1/agent-principles.md' ]"
 check "no solved in project"          "[ ! -f '$P1/solved_problems.md' ]"
 check "no CLAUDE.md in project"       "[ ! -f '$P1/CLAUDE.md' ]"
 
-# --- 케이스 3: 멱등성 (3회) ---
+# --- idempotency: 멱등성 (3회) ---
 run "$H1" "$P1" >/dev/null; run "$H1" "$P1" >/dev/null
-echo "[case3] idempotency"
+echo "[idempotency] idempotency"
 check "still one region"              "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
 check "principles import not dup"     "[ \$(grep -cxF '@disciplined-coder/agent-principles.md' '$UC') -eq 1 ]"
 
-# --- 케이스 4: solved 누적 보존 ---
-echo "[case4] solved preserved"
+# --- solved-preserved: solved 누적 보존 ---
+echo "[solved-preserved] solved preserved"
 printf '\n- 기존 항목 보존 확인\n' >> "$K/solved_problems.md"
 run "$H1" "$P1" >/dev/null
 check "solved entry preserved"        "grep -qF '기존 항목 보존 확인' '$K/solved_problems.md'"
 
-# --- 케이스 5: 기존 user CLAUDE.md 내용 보존 + 블랭크 비누적 ---
+# --- user-content-preserved: 기존 user CLAUDE.md 내용 보존 + 블랭크 비누적 ---
 H5="$(mktemp -d)"; P5="$(mktemp -d)"
 mkdir -p "$H5/.claude"; printf 'my personal global note\n' > "$H5/.claude/CLAUDE.md"
 for _ in 1 2 3; do run "$H5" "$P5" >/dev/null; done
 UC5="$H5/.claude/CLAUDE.md"
-echo "[case5] preserve user content + no blank accumulation"
+echo "[user-content-preserved] preserve user content + no blank accumulation"
 check "personal note preserved"      "grep -qxF 'my personal global note' '$UC5'"
 check "one region after 3 runs"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC5') -eq 1 ]"
 check "blank lines bounded (<=1)"    "[ \$(grep -c '^\$' '$UC5') -le 1 ]"
 
-# --- 케이스 6: CRLF 관리영역 인식 ---
+# --- crlf-region: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
 printf 'note\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H6/.claude/CLAUDE.md"
 run "$H6" "$P6" >/dev/null
-echo "[case6] CRLF region recognized"
+echo "[crlf-region] CRLF region recognized"
 check "CRLF region not duplicated"   "[ \$(grep -cF '# BEGIN disciplined-coder' '$H6/.claude/CLAUDE.md') -eq 1 ]"
 
-# --- 케이스 7: 깨진 관리영역(BEGIN 있고 END 없음) → 비파괴 스킵(strip 안 함) ---
+# --- malformed-region: 깨진 관리영역(BEGIN 있고 END 없음) → 비파괴 스킵(strip 안 함) ---
 H7="$(mktemp -d)"; P7="$(mktemp -d)"; mkdir -p "$H7/.claude"
 { printf 'note before\n'; printf '# BEGIN disciplined-coder (managed — do not edit)\n'; \
   printf '@disciplined-coder/agent-principles.md\n'; printf 'IMPORTANT user content after malformed begin\n'; } > "$H7/.claude/CLAUDE.md"
 ERR7="$(run "$H7" "$P7" 2>&1 >/dev/null)" || true
 UC7="$H7/.claude/CLAUDE.md"
-echo "[case7] malformed region (BEGIN w/o END) → non-destructive"
+echo "[malformed-region] malformed region (BEGIN w/o END) → non-destructive"
 check "malformed: user content preserved"  "grep -qxF 'IMPORTANT user content after malformed begin' '$UC7'"
 check "malformed: pre-region note preserved" "grep -qxF 'note before' '$UC7'"
 check "malformed: warns BEGIN without END"  "printf '%s' \"\$ERR7\" | grep -qF 'BEGIN but no END'"
 check "malformed: complete region appended" "[ \$(grep -cF '# END disciplined-coder' '$UC7') -ge 1 ]"
 
-# --- 케이스 7b: 깨진 관리영역 2회차 실행 — 1회차가 다음 실행의 파괴를 준비하면 안 된다 ---
+# --- malformed-region-rerun: 깨진 관리영역 2회차 실행 — 1회차가 다음 실행의 파괴를 준비하면 안 된다 ---
 ERR7b="$(run "$H7" "$P7" 2>&1 >/dev/null)" || true
-echo "[case7b] malformed region 2nd run → still non-destructive"
+echo "[malformed-region-rerun] malformed region 2nd run → still non-destructive"
 check "2nd run: user content preserved"    "grep -qxF 'IMPORTANT user content after malformed begin' '$UC7'"
 check "2nd run: pre-region note preserved" "grep -qxF 'note before' '$UC7'"
 check "2nd run: single managed region"     "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC7') -eq 1 ]"
 
-# --- 케이스 8: 정본 소스 부재 → FAIL-LOUD 경고(stderr) + 계속 진행(exit 0) ---
+# --- missing-canon: 정본 소스 부재 → FAIL-LOUD 경고(stderr) + 계속 진행(exit 0) ---
 H8="$(mktemp -d)"; P8="$(mktemp -d)"; ED="$(mktemp -d)"   # ED = 정본 없는 빈 plugin root
 set +e
 ERR8="$(CLAUDE_HOME_DIR="$H8/.claude" CLAUDE_PROJECT_DIR="$P8" CLAUDE_PLUGIN_ROOT="$ED" bash "$SCAFFOLD" 2>&1 >/dev/null)"; rc8=$?
 set -e
-echo "[case8] missing source → FAIL-LOUD warning, exit 0"
+echo "[missing-canon] missing source → FAIL-LOUD warning, exit 0"
 check "missing source warns to stderr"      "printf '%s' \"\$ERR8\" | grep -qF 'WARNING: source not found'"
 check "missing source still exit 0"         "[ $rc8 -eq 0 ]"
 
-# --- 케이스 9: 홈 해석이 bash $HOME에 의존하지 않음 (CLAUDE_CONFIG_DIR 우선) ---
+# --- home-resolution: 홈 해석이 bash $HOME에 의존하지 않음 (CLAUDE_CONFIG_DIR 우선) ---
 # AD 리다이렉트 홈(예: $HOME=U:\ 네트워크 드라이브)에서 Claude Code 실제 홈(USERPROFILE/CLAUDE_CONFIG_DIR)과
 # 어긋나던 버그 회귀 방지. 임시 HOME을 줘서 실패 시에도 실제 ~/.claude를 오염시키지 않는다.
 H9="$(mktemp -d)/cfg"; P9="$(mktemp -d)"; HJUNK="$(mktemp -d)"
 OUT9="$(HOME="$HJUNK" CLAUDE_CONFIG_DIR="$H9" CLAUDE_PROJECT_DIR="$P9" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD")"
-echo "[case9] home resolution honors CLAUDE_CONFIG_DIR, not bash \$HOME"
+echo "[home-resolution] home resolution honors CLAUDE_CONFIG_DIR, not bash \$HOME"
 check "CLAUDE_CONFIG_DIR honored (KDIR)"     "[ -f '$H9/disciplined-coder/agent-principles.md' ]"
 check "CLAUDE_CONFIG_DIR honored (CLAUDE.md)" "[ -f '$H9/CLAUDE.md' ]"
 check "did not fall back to bash \$HOME"      "[ ! -d '$HJUNK/.claude' ]"
 
-# --- 케이스 10: 관리 디렉터리 위생 — 구 관리파일 제거·정본/사용자데이터 보존·빈 고아 제거 ---
+# --- managed-dir-hygiene: 관리 디렉터리 위생 — 구 관리파일 제거·정본/사용자데이터 보존·빈 고아 제거 ---
 H10="$(mktemp -d)"; P10="$(mktemp -d)"
 run "$H10" "$P10" >/dev/null
 K10="$H10/.claude/disciplined-coder"
@@ -116,7 +116,7 @@ mkdir -p "$K10/rogue_dir"                                  # 하위 디렉터리
 set +e
 ERR10="$(run "$H10" "$P10" 2>&1 >/dev/null)"; rc10=$?
 set -e
-echo "[case10] managed-dir hygiene (whitelist pruning)"
+echo "[managed-dir-hygiene] managed-dir hygiene (whitelist pruning)"
 check "stale coding-principles pruned"  "[ ! -f '$K10/coding-principles.md' ]"
 check "canon preserved"                 "[ -f '$K10/agent-principles.md' ]"
 check "solved preserved"                "[ -f '$K10/solved_problems.md' ]"
@@ -127,10 +127,10 @@ check "subdir does not abort scaffold"  "[ $rc10 -eq 0 ]"
 check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rogue_dir'"
 check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
 
-# --- 케이스 12: 오답노트 처분 모드 (issue-mode) ---
+# --- issue-mode: 오답노트 처분 모드 (issue-mode) ---
 IM="$HERE/scripts/issue-mode.sh"
 H12="$(mktemp -d)"; P12="$(mktemp -d)"; K12="$H12/.claude/disciplined-coder"
-echo "[case12] issue-mode default + inject + toggle"
+echo "[issue-mode] issue-mode default + inject + toggle"
 # 12a) 부재 → surface 결정론적 생성 + 모드 주입 + 첫설치 안내
 OUT12a="$(run "$H12" "$P12")"
 check "issue-mode created = surface"      "[ \"\$(cat '$K12/issue-mode')\" = surface ]"
@@ -164,20 +164,20 @@ HF="$(mktemp -d)/fresh"
 CLAUDE_HOME_DIR="$HF" bash "$IM" issues >/dev/null
 check "/issue-mode self-contained mkdir"  "[ -f '$HF/disciplined-coder/issue-mode' ]"
 
-# --- 케이스 13: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (SSOT — 열거는 사용 절 한 곳) ---
+# --- readme-commands-drift: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (SSOT — 열거는 사용 절 한 곳) ---
 # 파일 전체가 아니라 '### 커맨드' 절만 검사한다 — 커맨드명이 다른 문단에 등장해
 # 목록 누락이 vacuous 통과하는 것을 막는다.
 CMD_SECTION="$(awk '/^### 커맨드/{f=1} f&&/^## /{exit} f' "$HERE/README.md")"
-echo "[case13] README commands section covers commands/ dir"
+echo "[readme-commands-drift] README commands section covers commands/ dir"
 for c in "$HERE"/commands/*.md; do
   n="/$(basename "$c" .md)"
   check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
 done
 
-# --- 케이스 14: ultracode 검증 모드 (ultracode-review) — spec 2026-07-03 ---
+# --- ultracode-mode: ultracode 검증 모드 (ultracode-review) — spec 2026-07-03 ---
 UR="$HERE/scripts/ultracode-review.sh"
 H14="$(mktemp -d)"; P14="$(mktemp -d)"; K14="$H14/.claude/disciplined-coder"
-echo "[case14] ultracode-review default + inject + toggle"
+echo "[ultracode-mode] ultracode-review default + inject + toggle"
 # 14a) 부재 → discretion 결정론 생성 + 모드 주입 + 첫설치 안내 + issue-mode와 공존(변수 분리)
 OUT14a="$(run "$H14" "$P14")"
 check "ultracode-review created = discretion" "[ \"\$(cat '$K14/ultracode-review')\" = discretion ]"
@@ -212,16 +212,16 @@ HF14="$(mktemp -d)/fresh"
 CLAUDE_HOME_DIR="$HF14" bash "$UR" required >/dev/null
 check "/ultracode-review self-contained mkdir" "[ -f '$HF14/disciplined-coder/ultracode-review' ]"
 
-# --- 케이스 15: 검증 레이어 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
+# --- workflow-verification-row: 검증 레이어 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
 # 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(reviewer-*)과
 # 강제 방식 열이 같은 행에 있음을 보장한다(다른 행·다른 파일의 문자열로 vacuous 통과 방지).
 WF_ROW="$(grep -F '멀티에이전트 워크플로 작성·실행' "$HERE/agent-principles.md" || true)"
-echo "[case15] principles table has workflow verification row"
+echo "[workflow-verification-row] principles table has workflow verification row"
 check "row exists (trigger)"       "[ -n \"\$WF_ROW\" ]"
 check "row caller = reviewer-*"    "printf '%s' \"\$WF_ROW\" | grep -qF 'reviewer-*'"
 check "row enforcement = toggle"   "printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode 검증 모드'"
 
-# --- 케이스 18: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
+# --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
 # 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
 # 계약: 관리영역 1개, 고아 주석 0, 짝 없는 마커 0, 사용자 줄 보존, 본문 줄은 삭제 대상 아님.
 H18="$(mktemp -d)"; P18="$(mktemp -d)"; mkdir -p "$H18/.claude"
@@ -239,7 +239,7 @@ H18="$(mktemp -d)"; P18="$(mktemp -d)"; mkdir -p "$H18/.claude"
 } > "$H18/.claude/CLAUDE.md"
 run "$H18" "$P18" >/dev/null
 UC18="$H18/.claude/CLAUDE.md"
-echo "[case18] corrupted region self-heals"
+echo "[managed-region-heal] corrupted region self-heals"
 check "one BEGIN after heal"          "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC18') -eq 1 ]"
 check "one END after heal"            "[ \$(grep -cF '# END disciplined-coder' '$UC18') -eq 1 ]"
 check "no orphan marker left"         "! grep -qF 'orphan BEGIN neutralized' '$UC18'"
@@ -248,7 +248,7 @@ run "$H18" "$P18" >/dev/null
 check "still one BEGIN (idempotent)"  "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC18') -eq 1 ]"
 check "user note still there"         "grep -qxF 'MY OWN GLOBAL NOTE' '$UC18'"
 
-# --- 케이스 19: 고아 여는 마커 뒤 본문은 한 줄도 지우지 않는다 (빈 줄 포함) ---
+# --- orphan-opener: 고아 여는 마커 뒤 본문은 한 줄도 지우지 않는다 (빈 줄 포함) ---
 H19="$(mktemp -d)"; P19="$(mktemp -d)"; mkdir -p "$H19/.claude"
 { printf 'head note\n'
   printf '# BEGIN disciplined-coder (managed — do not edit)\n'
@@ -258,7 +258,7 @@ H19="$(mktemp -d)"; P19="$(mktemp -d)"; mkdir -p "$H19/.claude"
 } > "$H19/.claude/CLAUDE.md"
 ERR19="$(run "$H19" "$P19" 2>&1 >/dev/null)" || true
 UC19="$H19/.claude/CLAUDE.md"
-echo "[case19] orphan opener drops only its own line"
+echo "[orphan-opener] orphan opener drops only its own line"
 check "orphan: head preserved"        "grep -qxF 'head note' '$UC19'"
 check "orphan: para one preserved"    "grep -qxF 'para one' '$UC19'"
 check "orphan: para two preserved"    "grep -qxF 'para two' '$UC19'"
@@ -266,11 +266,11 @@ check "orphan: blank line right after para one preserved" "blank_follows '$UC19'
 check "orphan: warns BEGIN w/o END"   "printf '%s' \"\$ERR19\" | grep -qF 'BEGIN but no END'"
 check "orphan: marker line gone"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC19') -eq 1 ]"
 
-# --- 케이스 20: 정본 stdout 덤프는 첫 설치 세션에만 (이중 주입 회귀 가드) ---
+# --- canon-first-run-only: 정본 stdout 덤프는 첫 설치 세션에만 (이중 주입 회귀 가드) ---
 H20="$(mktemp -d)"; P20="$(mktemp -d)"
 OUT20a="$(run "$H20" "$P20")"
 OUT20b="$(run "$H20" "$P20")"
-echo "[case20] canon dumped on first run only"
+echo "[canon-first-run-only] canon dumped on first run only"
 check "1st run dumps principles"      "printf '%s' \"\$OUT20a\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "1st run dumps solved"          "printf '%s' \"\$OUT20a\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# 디시플린 (팀 원칙)'"
@@ -278,28 +278,28 @@ check "2nd run omits solved"          "! printf '%s' \"\$OUT20b\" | grep -qF '�
 check "2nd run keeps issue mode line" "printf '%s' \"\$OUT20b\" | grep -qF '처분 모드:'"
 check "2nd run keeps ucr mode line"   "printf '%s' \"\$OUT20b\" | grep -qF '검증 모드:'"
 
-# --- 케이스 21: CRLF 관리영역에서도 재주입하지 않는다 (had_import의 CR 내성) ---
+# --- crlf-import-line: CRLF 관리영역에서도 재주입하지 않는다 (had_import의 CR 내성) ---
 H21="$(mktemp -d)"; P21="$(mktemp -d)"; mkdir -p "$H21/.claude"
 printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
 OUT21="$(run "$H21" "$P21")"
-echo "[case21] CRLF import line still counts as present"
+echo "[crlf-import-line] CRLF import line still counts as present"
 check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "CRLF: no solved re-dump"       "! printf '%s' \"\$OUT21\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "CRLF: mode line still sent"    "printf '%s' \"\$OUT21\" | grep -qF '처분 모드:'"
 
-# --- 케이스 16: 병렬 오케스트레이션 넛지(정본 계약 가드) ---
+# --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(정본 계약 가드) ---
 # 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
 # (vacuous 통과 방지).
 PO_BLOCK="$(awk '/^### 병렬 오케스트레이션/{f=1} f&&/^### /&&!/^### 병렬 오케스트레이션/{exit} f&&/^## /&&!/^### /{exit} f' "$HERE/agent-principles.md")"
-echo "[case16] principles 병렬 오케스트레이션 nested-orchestration nudge"
+echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
 check "병렬 오케스트레이션 heading exists"      "printf '%s' \"\$PO_BLOCK\" | grep -qF '### 병렬 오케스트레이션'"
 check "병렬 오케스트레이션 points to skill (SSOT)" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
 check "병렬 오케스트레이션 routes single-task to 2층" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'dispatching-parallel-agents'"
 
-# --- 케이스 17: nested-orchestration 스킬 존재 + 핵심 절(정본 계약 가드) ---
+# --- nested-orchestration-skill: nested-orchestration 스킬 존재 + 핵심 절(정본 계약 가드) ---
 # 단일 목적 파일이라 파일 전역 존재 검사로 충분하다(섹션 경합 없음 — Global Constraint 참조).
 NO_SKILL="$HERE/skills/nested-orchestration/SKILL.md"
-echo "[case17] nested-orchestration skill present + structured"
+echo "[nested-orchestration-skill] nested-orchestration skill present + structured"
 check "skill file exists"             "[ -f '$NO_SKILL' ]"
 check "frontmatter name correct"      "grep -qE '^name: *nested-orchestration' '$NO_SKILL'"
 check "has routing (2층 위임)"         "grep -qF 'dispatching-parallel-agents' '$NO_SKILL'"
@@ -307,7 +307,7 @@ check "has L2 template ownership blk"  "grep -qF '구간 소유권(엄수)' '$NO
 check "has output contract blk"        "grep -qF '산출 계약' '$NO_SKILL'"
 check "points to SDD (no reimpl)"      "grep -qF 'subagent-driven-development' '$NO_SKILL'"
 
-# --- 케이스 22: 인접 여는 마커 가드 — 첫 BEGIN이 뒤쪽 닫는 마커까지 훑어 사용자 줄을 삼키면 안 된다 ---
+# --- solved-rules-nudge: 인접 여는 마커 가드 — 첫 BEGIN이 뒤쪽 닫는 마커까지 훑어 사용자 줄을 삼키면 안 된다 ---
 # 모양: 여는마커 / 사용자줄 / 여는마커 / 본문 / 닫는마커. _managed_block.sh 내부 while 루프의
 # "다음 여는 마커를 만나면 멈춘다" 가드가 없으면, 첫 BEGIN(고아)이 END 탐색을 두 번째 BEGIN 너머까지
 # 계속해 사이에 낀 사용자 줄까지 완결 영역으로 오판해 통째로 삭제한다.
@@ -320,7 +320,7 @@ H22="$(mktemp -d)"; P22="$(mktemp -d)"; mkdir -p "$H22/.claude"
 } > "$H22/.claude/CLAUDE.md"
 run "$H22" "$P22" >/dev/null
 UC22="$H22/.claude/CLAUDE.md"
-echo "[case22] adjacent opening-marker guard: inner scan must not skip past a second opener"
+echo "[solved-rules-nudge] adjacent opening-marker guard: inner scan must not skip past a second opener"
 check "user line between two openers preserved" "grep -qxF 'USER LINE BETWEEN TWO OPENERS' '$UC22'"
 check "single managed region after run"         "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC22') -eq 1 ]"
 
