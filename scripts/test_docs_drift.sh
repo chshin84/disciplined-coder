@@ -106,4 +106,10 @@ check "런타임 파일을 찾았다"                "[ -f \"\$RUNTIME\" ]"
 check "등급 기반 재생성이 남아 있지 않다"    "! grep -qF 'critical만 regenerate' \"\$RUNTIME\""
 check "type 기반 처분 표를 적는다"          "grep -qF '값으로 행동을 정하는 표' \"\$RUNTIME\""
 
+PTU="$HERE/hooks/spec_review_posttooluse.sh"
+STOPH="$HERE/hooks/spec_review_stop.sh"
+echo "[훅 안내문 — 마커를 개선보다 먼저]"
+check "PostToolUse 안내문이 마커 선기록을 지시한다" "grep -qF '마커를 먼저 남기고' \"\$PTU\""
+check "Stop 안내문이 마커 선기록을 지시한다"        "grep -qF '마커를 먼저 남기고' \"\$STOPH\""
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

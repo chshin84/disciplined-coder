@@ -47,7 +47,7 @@ if [ "${#unreviewed[@]}" -gt 0 ]; then
   list=""; for u in "${unreviewed[@]}"; do list="$list
   - $u"; done
   reason="미리뷰 spec/plan:$list
-disciplined-coder domain-spec-review(PREP+독립 렌즈, 렌즈 구성은 그 스킬이 정한다)를 수행하고 문서 마지막 줄에 spec-review 마커(passed 또는 escalated, HTML 주석)를 남긴 뒤 종료하라."
+disciplined-coder domain-spec-review(PREP+독립 렌즈, 렌즈 구성은 그 스킬이 정한다)를 수행하고, 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영한 뒤 종료하라."
   printf '{"decision":"block","reason":"%s"}\n' "$(escape_for_json "$reason")"
 fi
 exit 0
