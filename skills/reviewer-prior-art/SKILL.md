@@ -24,6 +24,11 @@ description: 설계가 하려는 것을 누가 이미 해봤는지, 결과가 �
 같은지 다른지를 적는다. 네 축이 모두 같아야 같은 사례이고, 하나라도 다르면 그 차이를 `detail`에 적는다.
 **축을 나누지 않으면 겉만 닮은 것을 선행 사례로 오인한다.**
 
+## 읽기 범위
+웹으로 나간다. 다섯 렌즈 가운데 이것만 외부에 질의하므로 아래 가드를 그대로 지킨다. 연 URL은
+`read`와 `citations` 양쪽에 남는다 — `read`는 무엇을 열었는지의 기록이고 `citations`는 어느 주장을
+어느 출처가 받치는지의 연결이다.
+
 ## 가드 (이 렌즈에만 있다)
 
 > **참신함을 채점하지 않는다.** "새롭다"는 그 자체로 이슈가 아니다. 이슈가 되는 순간은 선행 결과가 이
@@ -33,8 +38,8 @@ description: 설계가 하려는 것을 누가 이미 해봤는지, 결과가 �
 > 함께 적고, 독창성의 근거로 삼지 않는다.
 
 > **오인도 못 찾음만큼 막는다.** `crowded`와 `refuted-premise`는 문서를 다시 쓰게 만드는 유형이므로, 네
-> 축 대조에서 하나라도 다르면 그 차이를 명시하고 심각도를 한 단계 낮춘다. **못 찾음은 아무것도 바꾸지
-> 않지만 오인은 멀쩡한 설계를 지운다.**
+> 축 대조에서 하나라도 다르면 그 차이를 명시하고 **같은 사례라고 단정하지 않는다.** **못 찾음은 아무것도
+> 바꾸지 않지만 오인은 멀쩡한 설계를 지운다.**
 
 > **`weak-baseline`은 비교를 요구하되 구현을 요구하지 않는다.** 그 유형의 `detail`은 "이 기준선과
 > 비교되지 않았다"까지만 적고 무엇을 만들라고 적지 않는다. 그래야 `reviewer-adversarial`의 기능 추가 금지
@@ -49,19 +54,19 @@ description: 설계가 하려는 것을 누가 이미 해봤는지, 결과가 �
 > 확인하지 못했다"고 적는다.
 
 ## 레퍼런스 프롬프트 (언어 중립)
-- system: "너는 선행연구 대조 검수자다. 이 설계를 누가 이미 해봤는지, 결과가 무엇이었는지, 실패 원인이 이 설계에도 있는지 찾아라. 참신함을 채점하지 마라. 못 찾은 것은 `not_found`에 적고 독창성의 근거로 삼지 마라. 선행 사례는 목적·메커니즘·평가·응용 네 축으로 대조하라. 모든 주장에 출처 URL과 그 성격을 달고 실제로 열어 확인하라. 질의에 고유명사·경로·사내 식별자를 넣지 마라."
+- system: "너는 선행연구 대조 검수자다. 이 설계를 누가 이미 해봤는지, 결과가 무엇이었는지, 실패 원인이 이 설계에도 있는지 찾아라. 참신함을 채점하지 마라. 못 찾은 것은 `not_found`에 적고 독창성의 근거로 삼지 마라. 선행 사례는 목적·메커니즘·평가·응용 네 축으로 대조하라. 모든 주장에 출처 URL과 그 성격을 달고 실제로 열어 확인하라. 질의에 고유명사·경로·사내 식별자를 넣지 마라. 등급을 매기지 마라. 발견마다 이대로 두면 무엇이 어떻게 잘못되는지(consequence)와 그렇게 본 근거(evidence)를 적어라. 결과를 구체적으로 못 적는 것은 올리지 마라. 찾은 것이 없으면 빈 목록이 정상이다."
 - user: "[원문]\n{document}\n\n[관련 배경]\n{background}\n\n위 체크리스트로 이슈를 아래 JSON 스키마로."
 
 ## 출력 스키마 (공통 + 이 렌즈의 넷)
 ```
-{ "lens": "prior-art", "search_status": "ok|no-results|failed|not-attempted", "issues": [ { "severity": "critical|major|minor", "type": "refuted-premise|known-failure|crowded|weak-baseline", "where": "문서 내 위치", "detail": "선행 사례와 그 결말, 이 설계에 왜 문제인가, 네 축의 같고 다름", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|reviewer-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "리뷰어 자신의 불확실성" ], "notes": "" }
+{ "lens": "prior-art", "search_status": "ok|no-results|failed|not-attempted", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "refuted-premise|known-failure|crowded|weak-baseline", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "선행 사례와 그 결말, 네 축의 같고 다름", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|reviewer-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "리뷰어 자신의 불확실성" ], "notes": "" }
 ```
-통과/실패 신호는 이슈의 `severity` 하나다(별도 verdict 필드를 두지 않는다 — `SSOT`). 라우팅은
-`meta-aggregate`의 결정 정책을 따르되, `crowded`와 `refuted-premise`의 critical은 호출자가 재작성을
-건너뛰고 사람에게 올린다(그 예외는 `domain-spec-review`가 SSOT다).
+필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 여기에 복제하지 않는다.
+처분은 이 렌즈가 정하지 않는다. **이 렌즈의 발견은 호출자가 전부 `🔴`로 처분한다** — 웹에서 읽어 온
+내용이 설계 문서를 자동으로 고치는 경로를 닫기 위해서이며, 그 규칙은 `domain-spec-review`가 SSOT다.
 
 **`search_status`는 조용한 통과를 막는다.** 빈 `issues`는 네 가지 다른 사정에서 나오는데 집계 단계는 넷을
-구별하지 못하고 모두 critical 0으로 읽는다.
+구별하지 못하고 모두 발견 없음으로 읽는다.
 
 | 값 | 무슨 뜻인가 | 빈 `issues`를 어떻게 읽나 |
 |---|---|---|

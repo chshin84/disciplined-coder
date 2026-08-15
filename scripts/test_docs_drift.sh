@@ -84,4 +84,14 @@ check "계약이 빈손을 정상으로 적는다"           "grep -qF '빈 배�
 check "계약에 등급 라벨이 없다"                 "! grep -qF 'severity' \"\$AGG\""
 check "spec 리뷰에 결정 단계가 없음을 적는다"   "grep -qF 'spec 리뷰에서는 결정 단계가 없다' \"\$AGG\""
 
+echo "[렌즈 계약 — 등급 없음, 근거 필수]"
+for d in "$HERE"/skills/reviewer-*/; do
+  n="$(basename "$d")"; f="$d/SKILL.md"
+  check "$n 에 등급 라벨이 없다"          "! grep -qF 'severity' \"$f\""
+  check "$n 이 consequence 를 요구한다"   "grep -qF 'consequence' \"$f\""
+  check "$n 이 read 를 요구한다"          "grep -qF '\"read\"' \"$f\""
+  check "$n 이 빈손을 정상으로 적는다"    "grep -qF '빈 목록이 정상' \"$f\""
+  check "$n 이 읽기 범위를 적는다"        "grep -qF '읽기 범위' \"$f\""
+done
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
