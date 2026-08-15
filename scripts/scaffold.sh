@@ -7,7 +7,7 @@ PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
 # Claude 설정 홈 해석 — 공유 헬퍼(SSOT). 도메인 PC의 네트워크 홈 리다이렉트로 bash $HOME이
 # os.homedir(USERPROFILE)과 어긋나면 조용한 누락(@import·solved)이 나므로 우선순위 해석을
-# _resolve_home.sh 한 곳에 두고 issue-mode.sh·codex-scaffold.sh와 공유한다.
+# _resolve_home.sh 한 곳에 두고 codex-scaffold.sh와 공유한다.
 . "$(dirname "$0")/_resolve_home.sh"
 . "$(dirname "$0")/_scaffold_common.sh"
 CLAUDE_HOME="$(resolve_home claude)"
@@ -35,13 +35,7 @@ scaffold_hygiene "$KDIR"
 #    (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
 if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; fi
 
-# 2b) 오답노트 처분 모드: 판정 정본은 _scaffold_common.sh — mode_line/mode_note를 셋한다.
-scaffold_resolve_issue_mode "$KDIR"
-
-# 2c) ultracode 검증 모드: 판정 정본은 _scaffold_common.sh — ucr_mode_line/ucr_mode_note를 셋한다.
-scaffold_resolve_ultracode_review "$KDIR"
-
-# 2d) 오답노트 형식 규칙 넛지: 낡았는지 읽어 보기만 한다 — 어떤 파일에도 쓰지 않는다.
+# 2b) 오답노트 형식 규칙 넛지: 낡았는지 읽어 보기만 한다 — 어떤 파일에도 쓰지 않는다.
 #     고치는 것은 사용자 승인을 받아 메인 세션이 한다(방법 정본은 domain-docs 스킬).
 scaffold_check_solved_rules "$KDIR/solved_problems.md"
 
@@ -73,11 +67,6 @@ if [ "$had_import" -eq 0 ]; then
     fi
   done
 fi
-# 토글 모드 라인은 @import 대상 파일에 없는 휘발성 상태라 매 세션 보낸다(조건 밖).
-printf '%s\n' "$mode_line"
-if [ -n "$mode_note" ]; then printf '%s\n' "$mode_note"; fi
-printf '%s\n' "$ucr_mode_line"
-if [ -n "$ucr_mode_note" ]; then printf '%s\n' "$ucr_mode_note"; fi
 # 형식 규칙 넛지. 로그의 제목 줄이나 머리말 문구를 인용하지 않는다 — 인용하면 2회차 stdout에 정본
 # 헤더가 되살아나 이중 주입 회귀 가드가 뒤집힌다. 원인도 단정하지 않는다(사용자가 규칙을 손봤을 수도 있다).
 if [ "${solved_rules_stale:-0}" -eq 1 ]; then

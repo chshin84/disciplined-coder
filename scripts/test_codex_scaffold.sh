@@ -66,18 +66,17 @@ echo "[case6] home resolution honors CODEX_HOME, not bash \$HOME"
 check "CODEX_HOME honored (KDIR)"    "[ -f '$H6C/disciplined-coder/agent-principles.md' ]"
 check "did not fall back to bash \$HOME" "[ ! -d '$HJUNK/.codex' ]"
 
-# --- 케이스 7: 오답노트 처분 모드 미러(codex 자기 홈) ---
+# --- 케이스 7: 토글 제거 패리티(codex 자기 홈) — scaffold.sh와 같은 정책이어야 한다 ---
 H7="$(mktemp -d)"; K7="$H7/.codex/disciplined-coder"
-echo "[case7] issue-mode mirror"
+echo "[case7] 토글 제거 패리티"
 OUT7a="$(run "$H7")"
-check "issue-mode created = surface"   "[ \"\$(cat '$K7/issue-mode')\" = surface ]"
-check "mode line injected (surface)"   "printf '%s' \"\$OUT7a\" | grep -qF '처분 모드: surface'"
-check "first-install note injected"    "printf '%s' \"\$OUT7a\" | grep -qF '시작했다'"
-printf 'issues\n' > "$K7/issue-mode"
-OUT7b="$(run "$H7")"
-check "issues mode injected"           "printf '%s' \"\$OUT7b\" | grep -qF '처분 모드: issues'"
+check "처분 모드 줄을 주입하지 않는다"  "! printf '%s' \"\$OUT7a\" | grep -qF '처분 모드'"
+check "issue-mode 파일을 만들지 않는다" "[ ! -f '$K7/issue-mode' ]"
+printf 'issues\n' > "$K7/issue-mode"; printf 'required\n' > "$K7/ultracode-review"
 ERR7="$(run "$H7" 2>&1 >/dev/null)" || true
-check "issue-mode not hygiene-flagged" "! printf '%s' \"\$ERR7\" | grep -qF '비관리 파일'"
+check "잔존 issue-mode 를 지운다"       "[ ! -f '$K7/issue-mode' ]"
+check "잔존 ultracode-review 를 지운다" "[ ! -f '$K7/ultracode-review' ]"
+check "잔존 파일에 경고를 남기지 않는다" "! printf '%s' \"\$ERR7\" | grep -qF '비관리 파일'"
 
 # --- 케이스 8: 관리 디렉터리 위생 — 하위 디렉터리에서 중단되지 않는다 ---
 mkdir -p "$K/rogue_dir"
@@ -87,8 +86,7 @@ set -e
 echo "[case8] hygiene: subdir must not abort"
 check "subdir does not abort codex scaffold" "[ $rc8c -eq 0 ]"
 check "subdir surfaced to stderr"            "printf '%s' \"\$ERR8c\" | grep -qF 'rogue_dir'"
-# 의도적 비대칭(spec 2026-07-03): Codex에는 Workflow 도구가 없어 ultracode-review를 미러하지 않는다.
-check "ultracode-review not mirrored to codex" "[ ! -f '$K/ultracode-review' ]"
+check "ultracode-review 파일을 만들지 않는다" "[ ! -f '$K/ultracode-review' ]"
 
 echo "[manifest + session hook]"
 SS="$HERE/hooks/session-start-codex"
@@ -126,7 +124,6 @@ check "first run stdout has principles"       "printf '%s' \"\$OUT9a\" | grep -q
 check "second run stdout lacks principles"    "! printf '%s' \"\$OUT9b\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "second run stdout lacks domains-index" "! printf '%s' \"\$OUT9b\" | grep -qF '# 개발 대상(도메인) 참고서 — 인덱스'"
 check "second run stdout still has solved"    "printf '%s' \"\$OUT9b\" | grep -qF '해결된 문제 로그 (solved_problems)'"
-check "second run stdout still has mode line" "printf '%s' \"\$OUT9b\" | grep -qF '처분 모드:'"
 check "AGENTS.md still inlines principles after 2nd run" "grep -qF '# 디시플린 (팀 원칙)' '$AG9'"
 
 # --- solved-rules(Codex): 쌍둥이 스크립트가 같은 넛지를 낸다 ---
