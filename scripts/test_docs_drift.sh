@@ -100,4 +100,10 @@ check "🔴 진입 기준을 적는다"                 "grep -qF '되돌리기 
 check "기본값이 고치기임을 적는다"            "grep -qF '기본값이 고치기' \"\$CALLER\""
 check "마커를 개선보다 먼저 남기라고 적는다"  "grep -qF '마커를 먼저 남긴다' \"\$CALLER\""
 
+RUNTIME="$HERE/skills/domain-llm-runtime/SKILL.md"
+echo "[런타임 — 등급이 아니라 type 으로 행동을 정한다]"
+check "런타임 파일을 찾았다"                "[ -f \"\$RUNTIME\" ]"
+check "등급 기반 재생성이 남아 있지 않다"    "! grep -qF 'critical만 regenerate' \"\$RUNTIME\""
+check "type 기반 처분 표를 적는다"          "grep -qF '값으로 행동을 정하는 표' \"\$RUNTIME\""
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
