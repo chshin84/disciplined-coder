@@ -127,42 +127,25 @@ check "subdir does not abort scaffold"  "[ $rc10 -eq 0 ]"
 check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rogue_dir'"
 check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
 
-# --- issue-mode: 오답노트 처분 모드 (issue-mode) ---
-IM="$HERE/scripts/issue-mode.sh"
+# --- toggles-removed: 토글 둘(issue-mode·ultracode-review)을 없애고 동작을 하나로 고정했다 ---
+# 모르면 안 쓰게 되는 설정이라 없앴다. 처분은 surface로 고정하고, ultracode 검증은 정본 원칙만 남겼다.
+# 이미 만들어진 상태 파일은 STALE로 지운다 — 화이트리스트에서 빼기만 하면 매 세션 경고가 남는다.
 H12="$(mktemp -d)"; P12="$(mktemp -d)"; K12="$H12/.claude/disciplined-coder"
-echo "[issue-mode] issue-mode default + inject + toggle"
-# 12a) 부재 → surface 결정론적 생성 + 모드 주입 + 첫설치 안내
+echo "[toggles-removed] 토글 커맨드·스크립트·모드 주입이 모두 사라졌다"
+check "issue-mode 스크립트가 없다"           "[ ! -f '$HERE/scripts/issue-mode.sh' ]"
+check "ultracode-review 스크립트가 없다"     "[ ! -f '$HERE/scripts/ultracode-review.sh' ]"
+check "issue-mode 커맨드가 없다"             "[ ! -f '$HERE/commands/issue-mode.md' ]"
+check "ultracode-review 커맨드가 없다"       "[ ! -f '$HERE/commands/ultracode-review.md' ]"
 OUT12a="$(run "$H12" "$P12")"
-check "issue-mode created = surface"      "[ \"\$(cat '$K12/issue-mode')\" = surface ]"
-check "mode line injected (surface)"      "printf '%s' \"\$OUT12a\" | grep -qF '처분 모드: surface'"
-check "first-install note injected"       "printf '%s' \"\$OUT12a\" | grep -qF '시작했다'"
-# 12b) 2회차 → 안내 미반복 + issue-mode 위생 무경고(화이트리스트)
+check "처분 모드 줄을 주입하지 않는다"       "! printf '%s' \"\$OUT12a\" | grep -qF '처분 모드'"
+check "검증 모드 줄을 주입하지 않는다"       "! printf '%s' \"\$OUT12a\" | grep -qF '검증 모드'"
+check "issue-mode 파일을 만들지 않는다"      "[ ! -f '$K12/issue-mode' ]"
+check "ultracode-review 파일을 만들지 않는다" "[ ! -f '$K12/ultracode-review' ]"
+printf 'issues\n' > "$K12/issue-mode"; printf 'required\n' > "$K12/ultracode-review"
 ERR12b="$(run "$H12" "$P12" 2>&1 >/dev/null)" || true
-OUT12b="$(run "$H12" "$P12")"
-check "note not repeated (config exists)" "! printf '%s' \"\$OUT12b\" | grep -qF '시작했다'"
-check "issue-mode not hygiene-flagged"    "! printf '%s' \"\$ERR12b\" | grep -qF '비관리 파일'"
-# 12c) issues 모드 → issues 주입
-printf 'issues\n' > "$K12/issue-mode"
-OUT12c="$(run "$H12" "$P12")"
-check "issues mode injected"              "printf '%s' \"\$OUT12c\" | grep -qF '처분 모드: issues'"
-# 12d) 불명값 → surface 폴백 + 경고
-printf 'xyz\n' > "$K12/issue-mode"
-ERR12d="$(run "$H12" "$P12" 2>&1 >/dev/null)" || true
-OUT12d="$(run "$H12" "$P12")"
-check "unknown value warns"               "printf '%s' \"\$ERR12d\" | grep -qF '불명값'"
-check "unknown falls back to surface"     "printf '%s' \"\$OUT12d\" | grep -qF '처분 모드: surface'"
-# 12e) /issue-mode set/show/reject/자기완결
-HC="$(mktemp -d)/cfg"
-CLAUDE_HOME_DIR="$HC" bash "$IM" issues >/dev/null
-check "/issue-mode issues writes config"  "[ \"\$(cat '$HC/disciplined-coder/issue-mode')\" = issues ]"
-check "/issue-mode (no arg) shows mode"   "CLAUDE_HOME_DIR='$HC' bash '$IM' | grep -qF issues"
-CLAUDE_HOME_DIR="$HC" bash "$IM" surface >/dev/null
-check "/issue-mode surface writes config" "[ \"\$(cat '$HC/disciplined-coder/issue-mode')\" = surface ]"
-set +e; CLAUDE_HOME_DIR="$HC" bash "$IM" bogus >/dev/null 2>&1; rc12=$?; set -e
-check "/issue-mode rejects invalid arg"   "[ $rc12 -ne 0 ]"
-HF="$(mktemp -d)/fresh"
-CLAUDE_HOME_DIR="$HF" bash "$IM" issues >/dev/null
-check "/issue-mode self-contained mkdir"  "[ -f '$HF/disciplined-coder/issue-mode' ]"
+check "잔존 issue-mode 를 지운다"            "[ ! -f '$K12/issue-mode' ]"
+check "잔존 ultracode-review 를 지운다"      "[ ! -f '$K12/ultracode-review' ]"
+check "잔존 파일에 경고를 남기지 않는다"     "! printf '%s' \"\$ERR12b\" | grep -qF '비관리 파일'"
 
 # --- readme-commands-drift: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (SSOT — 열거는 사용 절 한 곳) ---
 # 파일 전체가 아니라 '### 커맨드' 절만 검사한다 — 커맨드명이 다른 문단에 등장해
@@ -174,44 +157,6 @@ for c in "$HERE"/commands/*.md; do
   check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
 done
 
-# --- ultracode-mode: ultracode 검증 모드 (ultracode-review) — spec 2026-07-03 ---
-UR="$HERE/scripts/ultracode-review.sh"
-H14="$(mktemp -d)"; P14="$(mktemp -d)"; K14="$H14/.claude/disciplined-coder"
-echo "[ultracode-mode] ultracode-review default + inject + toggle"
-# 14a) 부재 → discretion 결정론 생성 + 모드 주입 + 첫설치 안내 + issue-mode와 공존(변수 분리)
-OUT14a="$(run "$H14" "$P14")"
-check "ultracode-review created = discretion" "[ \"\$(cat '$K14/ultracode-review')\" = discretion ]"
-check "ucr mode line injected (discretion)"   "printf '%s' \"\$OUT14a\" | grep -qF '검증 모드: discretion'"
-check "ucr first-install note injected"       "printf '%s' \"\$OUT14a\" | grep -qF 'ultracode 검증 모드를 discretion'"
-check "both toggles injected (issue-mode too)" "printf '%s' \"\$OUT14a\" | grep -qF '처분 모드: surface'"
-# 14b) 2회차 → 안내 미반복 + 위생 무경고(화이트리스트)
-ERR14b="$(run "$H14" "$P14" 2>&1 >/dev/null)" || true
-OUT14b="$(run "$H14" "$P14")"
-check "ucr note not repeated"                 "! printf '%s' \"\$OUT14b\" | grep -qF 'ultracode 검증 모드를 discretion'"
-check "ucr file not hygiene-flagged"          "! printf '%s' \"\$ERR14b\" | grep -qF '비관리 파일'"
-# 14c) required → required 주입
-printf 'required\n' > "$K14/ultracode-review"
-OUT14c="$(run "$H14" "$P14")"
-check "required mode injected"                "printf '%s' \"\$OUT14c\" | grep -qF '검증 모드: required'"
-# 14d) 불명값 → discretion 폴백 + 경고
-printf 'zzz\n' > "$K14/ultracode-review"
-ERR14d="$(run "$H14" "$P14" 2>&1 >/dev/null)" || true
-OUT14d="$(run "$H14" "$P14")"
-check "ucr unknown value warns"               "printf '%s' \"\$ERR14d\" | grep -qF '불명값'"
-check "ucr unknown falls back to discretion"  "printf '%s' \"\$OUT14d\" | grep -qF '검증 모드: discretion'"
-# 14e) /ultracode-review set/show/reject/자기완결 — issue-mode 12e 미러
-HC14="$(mktemp -d)/cfg"
-CLAUDE_HOME_DIR="$HC14" bash "$UR" required >/dev/null
-check "/ultracode-review required writes"     "[ \"\$(cat '$HC14/disciplined-coder/ultracode-review')\" = required ]"
-check "/ultracode-review (no arg) shows mode" "CLAUDE_HOME_DIR='$HC14' bash '$UR' | grep -qF required"
-CLAUDE_HOME_DIR="$HC14" bash "$UR" discretion >/dev/null
-check "/ultracode-review discretion writes"   "[ \"\$(cat '$HC14/disciplined-coder/ultracode-review')\" = discretion ]"
-set +e; CLAUDE_HOME_DIR="$HC14" bash "$UR" bogus >/dev/null 2>&1; rc14=$?; set -e
-check "/ultracode-review rejects invalid arg" "[ $rc14 -ne 0 ]"
-HF14="$(mktemp -d)/fresh"
-CLAUDE_HOME_DIR="$HF14" bash "$UR" required >/dev/null
-check "/ultracode-review self-contained mkdir" "[ -f '$HF14/disciplined-coder/ultracode-review' ]"
-
 # --- workflow-verification-row: 검증 레이어 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
 # 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(reviewer-*)과
 # 강제 방식 열이 같은 행에 있음을 보장한다(다른 행·다른 파일의 문자열로 vacuous 통과 방지).
@@ -219,7 +164,8 @@ WF_ROW="$(grep -F '멀티에이전트 워크플로 작성·실행' "$HERE/agent-
 echo "[workflow-verification-row] principles table has workflow verification row"
 check "row exists (trigger)"       "[ -n \"\$WF_ROW\" ]"
 check "row caller = reviewer-*"    "printf '%s' \"\$WF_ROW\" | grep -qF 'reviewer-*'"
-check "row enforcement = toggle"   "printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode 검증 모드'"
+check "row enforcement = 미실행 이유 기재" "printf '%s' \"\$WF_ROW\" | grep -qF '보고서에 그 판정과 이유를 적는다'"
+check "row에 사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode 검증 모드'"
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
 # 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
@@ -275,8 +221,9 @@ check "1st run dumps principles"      "printf '%s' \"\$OUT20a\" | grep -qF '# �
 check "1st run dumps solved"          "printf '%s' \"\$OUT20a\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "2nd run omits solved"          "! printf '%s' \"\$OUT20b\" | grep -qF '해결된 문제 로그 (solved_problems)'"
-check "2nd run keeps issue mode line" "printf '%s' \"\$OUT20b\" | grep -qF '처분 모드:'"
-check "2nd run keeps ucr mode line"   "printf '%s' \"\$OUT20b\" | grep -qF '검증 모드:'"
+# 토글이 사라져 2회차에는 보낼 것이 없다. 빈 문자열을 단언해 두면 무엇이 새로 새어 나와도 붉어진다
+# — 부정 단언만 남기면 스크립트가 아무것도 못 내도 통과하는 vacuous 구멍이 생긴다.
+check "2nd run sends nothing"         "[ -z \"\$OUT20b\" ]"
 
 # --- crlf-import-line: CRLF 관리영역에서도 재주입하지 않는다 (had_import의 CR 내성) ---
 H21="$(mktemp -d)"; P21="$(mktemp -d)"; mkdir -p "$H21/.claude"
@@ -285,7 +232,7 @@ OUT21="$(run "$H21" "$P21")"
 echo "[crlf-import-line] CRLF import line still counts as present"
 check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "CRLF: no solved re-dump"       "! printf '%s' \"\$OUT21\" | grep -qF '해결된 문제 로그 (solved_problems)'"
-check "CRLF: mode line still sent"    "printf '%s' \"\$OUT21\" | grep -qF '처분 모드:'"
+check "CRLF: sends nothing"           "[ -z \"\$OUT21\" ]"
 
 # --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(정본 계약 가드) ---
 # 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다

@@ -31,12 +31,7 @@ scaffold_hygiene "$KDIR"
 #    (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
 if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; fi
 
-# 2b) 오답노트 처분 모드(scaffold.sh와 동일 정책) — 판정 정본은 _scaffold_common.sh.
-scaffold_resolve_issue_mode "$KDIR"
-# (의도적 비대칭) ultracode 검증 모드는 여기서 다루지 않는다 — Codex에는 Workflow 도구가 없어
-# 주입이 무동작이다. 공유 화이트리스트 덕에 파일이 생겨도 위생 오탐은 없다(spec 2026-07-03).
-
-# 2c) 오답노트 형식 규칙 넛지(scaffold.sh와 동일 정책): 읽어 보기만 하고 파일은 쓰지 않는다.
+# 2b) 오답노트 형식 규칙 넛지(scaffold.sh와 동일 정책): 읽어 보기만 하고 파일은 쓰지 않는다.
 #     쌍둥이 스크립트는 한쪽만 고치면 반드시 어긋나므로 같이 둔다.
 scaffold_check_solved_rules "$KDIR/solved_problems.md"
 
@@ -64,8 +59,6 @@ if [ "$had_inline" -eq 0 ]; then
   done
 fi
 if [ -f "$KDIR/solved_problems.md" ]; then cat "$KDIR/solved_problems.md"; fi
-printf '%s\n' "$mode_line"
-if [ -n "$mode_note" ]; then printf '%s\n' "$mode_note"; fi
 # 형식 규칙 넛지. 로그의 제목 줄이나 머리말 문구를 인용하지 않고 원인도 단정하지 않는다.
 if [ "${solved_rules_stale:-0}" -eq 1 ]; then
   printf '🔵 disciplined-coder: %s 의 형식 규칙 서술이 현행과 다르다 — 고칠지는 사용자가 정한다(방법은 domain-docs 스킬).\n' "$KDIR/solved_problems.md"

@@ -51,9 +51,8 @@
 
 ## 사용
 설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어:
-- `~/.claude/disciplined-coder/`에 정본 사본과 오답노트·설정 파일을 셋업한다(정확한 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다)
+- `~/.claude/disciplined-coder/`에 정본 사본과 오답노트를 셋업한다(정확한 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다)
 - `~/.claude/CLAUDE.md` 관리블록에 `@import`를 배선한다(없으면 생성하고, 있으면 멱등 갱신한다)
-- 현재 토글 모드 두 줄(오답노트 처분 모드와 ultracode 검증 모드)을 매 세션 알린다
 - 오답노트의 형식 규칙 서술이 현행과 달라지면 🔵 알림을 띄운다(고치는 것은 사용자 승인을 받은 뒤다)
 
 이후 어느 프로젝트에서 열어도 메인 세션이 원칙 + 도메인 목차 + 오답노트를 자동으로 보유한다. 서브에이전트는 종류에 따라 갈린다([DESIGN-NOTES](docs/DESIGN-NOTES.md)의 실측 표를 보라). **자동 계층은 프로젝트 폴더를 건드리지 않는다.**
@@ -64,8 +63,6 @@
 /show-principles     # 현재 활성 디시플린 정본(agent-principles.md 사본) 보기
 /show-solved         # 해결된 문제 오답노트 보기
 /setup-discipline    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
-/issue-mode [모드]   # 오답노트 미해결 처분 모드 토글: surface(기본)|issues (없으면 현재 표시)
-/ultracode-review [모드] # ultracode 워크플로 검증 모드 토글: discretion(기본)|required (없으면 현재 표시)
 ```
 
 ## 구성

@@ -3,8 +3,10 @@
 # 두 스크립트는 홈 위치·주입 방식만 다르고 관리 디렉터리 정책은 동일해야 한다 — 여기가 정본.
 
 # 관리 디렉터리 화이트리스트(=현 정본 세트)와 구 관리파일(STALE). 여기만 고친다.
-SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md issue-mode ultracode-review backups"
-SCAFFOLD_STALE="coding-principles.md"
+SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md backups"
+# 구 관리파일은 매 세션 조용히 지운다. issue-mode·ultracode-review는 토글이던 상태 파일인데,
+# 토글을 없애면서 화이트리스트에서만 빼면 내용이 있어 '비관리 파일' 경고로 영원히 남는다.
+SCAFFOLD_STALE="coding-principles.md issue-mode ultracode-review"
 
 # 오답노트 형식 규칙 블록(정본). 이 문자열이 로그 안에 그대로 있으면 그 로그의 형식 규칙이 최신이다.
 # 도입 문장·빈 줄·불릿 여섯으로 여덟 줄이다. 스코프 문구(로그마다 다르다)와 나눠 두는 이유는,
@@ -82,44 +84,6 @@ scaffold_check_solved_rules() {  # $1=로그 경로 → sets: solved_rules_stale
   return 0
 }
 
-# issue-mode: 부재면 surface 생성(+1회 안내), 읽어서 mode_line/mode_note를 셋한다(호출측 변수).
-scaffold_resolve_issue_mode() {  # $1=KDIR  → sets: mode_line, mode_note
-  local kdir="$1" mode_file mode
-  mode_file="$kdir/issue-mode"
-  mode_note=""
-  if [ ! -f "$mode_file" ]; then
-    printf 'surface\n' > "$mode_file"
-    mode_note="🔵 disciplined-coder: 처분 모드를 surface(기본)로 시작했다 — GitHub Issues 위임을 켜려면 /issue-mode issues."
-  fi
-  mode="$(tr -d ' \t\r\n' < "$mode_file" 2>/dev/null || printf surface)"
-  if [ "$mode" = "issues" ]; then
-    mode_line="오답노트 처분 모드: issues — must-keep을 자동 close 트래커(GitHub Issues)에 위임 ON"
-  elif [ "$mode" = "surface" ]; then
-    mode_line="오답노트 처분 모드: surface+메모리 — GitHub 이슈 위임 OFF"
-  else
-    echo "[disciplined-coder] WARNING: issue-mode 불명값 '$mode' — surface로 폴백" >&2
-    mode_line="오답노트 처분 모드: surface+메모리 — GitHub 이슈 위임 OFF (불명 config 폴백)"
-  fi
-}
-
-# ultracode 검증 모드: 부재면 discretion 생성(+1회 안내), 읽어서 ucr_mode_line/ucr_mode_note를 셋한다.
-# issue-mode의 mode_line/mode_note와 변수를 공유하지 않는다 — 공유하면 나중 resolve가 먼저 값을
-# 덮어써 첫 토글의 라인·안내가 조용히 유실된다(spec 2026-07-03).
-scaffold_resolve_ultracode_review() {  # $1=KDIR  → sets: ucr_mode_line, ucr_mode_note
-  local kdir="$1" mode_file mode
-  mode_file="$kdir/ultracode-review"
-  ucr_mode_note=""
-  if [ ! -f "$mode_file" ]; then
-    printf 'discretion\n' > "$mode_file"
-    ucr_mode_note="🔵 disciplined-coder: ultracode 검증 모드를 discretion(기본)으로 시작했다 — 워크플로 렌즈 검증을 강제하려면 /ultracode-review required."
-  fi
-  mode="$(tr -d ' \t\r\n' < "$mode_file" 2>/dev/null || printf discretion)"
-  if [ "$mode" = "required" ]; then
-    ucr_mode_line="ultracode(멀티에이전트 워크플로) 검증 모드: required — 워크플로에 reviewer-* 렌즈 검증 단계를 반드시 포함한다"
-  elif [ "$mode" = "discretion" ]; then
-    ucr_mode_line="ultracode(멀티에이전트 워크플로) 검증 모드: discretion(기본) — 리스크에 비례해 판단하되 보고서에 검증 내역을 명시한다"
-  else
-    echo "[disciplined-coder] WARNING: ultracode-review 불명값 '$mode' — discretion으로 폴백" >&2
-    ucr_mode_line="ultracode(멀티에이전트 워크플로) 검증 모드: discretion(기본) — 리스크에 비례해 판단하되 보고서에 검증 내역을 명시한다 (불명 config 폴백)"
-  fi
-}
+# (제거됨) 오답노트 처분 모드·ultracode 검증 모드 토글. 둘 다 훅이 강제하지 못하는 문장 주입일 뿐이었고,
+# 기본값이 사실상 무동작이라 옵트인 플래그 하나에 지나지 않았다 — 모르면 안 쓰게 되는 설정이다.
+# 처분은 surface로 고정하고, ultracode 검증 요구는 agent-principles.md 검증 레이어 표에만 둔다.
