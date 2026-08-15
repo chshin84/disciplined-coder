@@ -76,4 +76,12 @@ for name in $ALL; do
   done
 done
 
+echo "[산출물 계약 — meta-aggregate가 소유한다]"
+check "계약이 consequence 를 필수로 적는다"     "grep -qF 'consequence' \"\$AGG\""
+check "계약이 evidence 를 필수로 적는다"        "grep -qF 'evidence' \"\$AGG\""
+check "계약이 read 필드를 정의한다"             "grep -qF '\"read\"' \"\$AGG\""
+check "계약이 빈손을 정상으로 적는다"           "grep -qF '빈 배열인 것은 정상' \"\$AGG\""
+check "계약에 등급 라벨이 없다"                 "! grep -qF 'severity' \"\$AGG\""
+check "spec 리뷰에 결정 단계가 없음을 적는다"   "grep -qF 'spec 리뷰에서는 결정 단계가 없다' \"\$AGG\""
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
