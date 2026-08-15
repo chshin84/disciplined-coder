@@ -74,7 +74,7 @@ Claude Code 버전을 함께 둔다.
 ## 왜 spec/plan 리뷰 게이트를 Stop(턴 종료)에 두는가
 
 설계 문서(spec/plan)도 Claude가 만든 LLM 산출물이라, 작성자 자기 검토만으로는 확증 편향에 약하다.
-그래서 고위험 설계 문서는 독립 렌즈(grounding·consistency·adversarial, 그리고 spec이 미지의 영역을 다룰 때만 조건부로 붙는 prior-art) 리뷰를 거치게 강제한다
+그래서 고위험 설계 문서는 독립 렌즈(grounding·consistency·adversarial) 리뷰를 거치게 강제한다. 선행연구 대조는 기본 묶음이 아니라 제안과 승인을 거쳐 따로 돈다
 (`agent-principles.md`의 검증 레이어 절). 설계 문서는 구현의 입력이므로, 결함을 설계 단계에서 잡는 편이
 구현까지 번진 뒤 잡는 것보다 싸다.
 
