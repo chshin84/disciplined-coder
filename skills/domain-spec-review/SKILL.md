@@ -1,6 +1,6 @@
 ---
 name: domain-spec-review
-description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 리뷰어들(reviewer-grounding·consistency·adversarial, 그리고 spec에 한해 조건부로 reviewer-prior-art)로 검증하고 meta-aggregate로 accept/regenerate/escalate 라우팅하는 호출자. superpowers spec/plan 작성 시 훅이 강제. 제품 런타임 콜이 아니라 Claude 자신의 설계 문서 리뷰다.
+description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 리뷰어들(reviewer-grounding·consistency·adversarial, 그리고 spec에 한해 제안·승인 뒤 붙는 reviewer-prior-art)로 검증하고, 발견을 🔴와 고칠 것으로 가르는 호출자. 리뷰는 한 번만 돈다. superpowers spec/plan 작성 시 훅이 강제. 제품 런타임 콜이 아니라 Claude 자신의 설계 문서 리뷰다.
 ---
 # domain-spec-review — spec/plan 독립 리뷰 호출자
 
@@ -17,7 +17,8 @@ brainstorming·writing-plans의 self-review는 작성자가 자기 글을 보는
 superpowers 기본 경로(`docs/superpowers/{specs,plans}/*.md`)에 spec/plan이 쓰이면:
 - **PostToolUse**가 즉시 감지해 이 스킬 수행을 지시한다(비블로킹).
 - **Stop**이 미리뷰 spec/plan이 남은 채 턴이 끝나는 것을 차단한다(하드 게이트).
-- 완료 후 문서 **마지막 줄**에 마커를 남기면 해제: `<!-- spec-review: passed -->` (escalate면 `escalated`).
+- 리뷰와 처분 분류가 끝나면 개선보다 **먼저** 문서 **마지막 줄**에 마커를 남겨 해제한다:
+  `<!-- spec-review: passed -->` (`🔴`가 있으면 `escalated`). 순서의 근거는 아래 작업 순서 절에 있다.
   **날짜·개수는 안 박는다** — 마커는 게이트 계약 토큰이지 상태가 아니다("문서에 상태 금지"). 기존 dated
   마커도 인식한다(prefix 매칭, 하위호환). terminal(passed/escalated)만 마커다 — pending은 마커가 아니다.
 - 끄려면 env `DISCIPLINED_CODER_REVIEW_GATE=off`를 설정한다(전역 훅 — `hooks/hooks.json`).
@@ -71,21 +72,35 @@ JSON을 돌려준다.
 남기지 않으므로 적지 않으면 빠진 것 자체가 관측되지 않는다.
 
 ### 3) 메타 집계 — `meta-aggregate` 재사용
-심각도 정렬·출처 태깅·상충 감지(코드 로직 — LLM 불필요)를 거쳐 decision을 내린다. spec/plan 리뷰에서는 메인 세션이
+출처 태깅과 상충 감지(코드 로직 — LLM 불필요)까지만 한다. **spec 리뷰에서는 결정 단계가 없으므로**
+`decision`을 내지 않고, 병합한 목록을 아래 처분 절로 넘긴다. spec/plan 리뷰에서는 메인 세션이
 `meta-aggregate`의 좁은 절차를 직접 수행한다(제품 코드 없음). 단일 작성자: 리뷰어는 JSON 리턴만,
 메인이 취합·반영·마커 기록.
 
-## 라우팅한 결과를 어떻게 반영하고 언제 재작업하나
-`meta-aggregate`가 내는 `decision`은 심각도 계수에서 나온 **입력**이고, 최종 라우팅을 정하는 것은 이
-표다(`SSOT` — 두 곳에 같은 규칙을 복제하지 않는다).
-- **accept**(critical이 하나도 없을 때): major와 minor를 부분 수정한 뒤 passed 마커를 남긴다(부분 수정이 기본이다 — `SURGICAL`).
-- **regenerate**(critical이 하나 이상일 때): 지적된 섹션만 다시 쓰고 그 섹션만 다시 리뷰한다. 상한은 한 번이고 그래도 남으면 escalate한다.
-- **escalate**(상충·방향성·사용자 부재): 🔴 사용자에게 surface + 마커(escalated). 게이트 해제
-  (사람 결정 대기). 자동 루프 금지.
-- **예외** — `reviewer-prior-art`의 `crowded`와 `refuted-premise`는 critical이어도 재작성으로 가지 않고
-  곧바로 escalate한다. 섹션을 다시 쓴다고 남이 이미 팔고 있다는 사실이 바뀌지 않아 왕복이 헛돈다. 이
-  예외는 웹에서 읽어 온 내용이 설계 문서를 자동으로 고치는 경로도 함께 좁힌다(나머지 두 유형에서는 열린
-  채 남는다 — 그 둘은 재작성으로 실제 해소되는 유형이다).
+## 처분 — 발견을 둘로 가른다
+**리뷰는 한 번만 돈다.** 재작성 왕복을 두지 않는 이유는, 반복 리뷰가 새로 찾아내는 것이 적은데 왕복
+비용은 매번 온전히 들기 때문이다. 깊이는 왕복이 아니라 렌즈 프롬프트의 근거 요구로 확보한다.
+
+병합한 발견을 메인 세션이 둘로 가른다. `🔴`로 올리는 기준은 셋이다.
+- 되돌리기 어려운 결정인가(`REVERSIBLE`).
+- 사용자의 가치판단이 필요한가.
+- 고치는 방향이 둘 이상으로 갈리고 근거만으로는 고를 수 없는가.
+
+셋 중 어디에도 걸리지 않으면 전부 고친다 — **기본값이 고치기이고 `🔴`가 예외다.** 고칠 때는 지적된
+곳만 손댄다(`SURGICAL`). `🔴`는 `agent-principles.md`가 정한 대로 즉시 사용자에게 surface하며 누구도
+자율적으로 구현하지 않는다.
+
+`reviewer-prior-art`의 발견은 판정 내용과 무관하게 **전부 `🔴`로 간다.** 웹에서 읽어 온 내용이 설계
+문서를 자동으로 고치는 경로를 닫기 위해서다.
+
+## 작업 순서 (마커가 개선보다 앞에 온다)
+렌즈를 돌린 뒤 결과를 병합하고, 처분을 가르고, **마커를 먼저 남긴다.** 그다음 고칠 것을 반영하고,
+마지막에 `🔴`를 사용자에게 드린다.
+
+마커가 개선보다 앞에 오는 것이 재발동을 끊는 장치다. 개선 편집 시점에 이미 마커가 마지막 줄에 있으므로
+PostToolUse 훅이 조용하다. 기억해서 참는 것이 아니라 발동 조건 자체가 없다.
+
+마커의 뜻은 "리뷰가 한 번 돌았다"이다. `🔴`가 하나라도 있으면 `escalated`, 없으면 `passed`다.
 
 ## 웹에 나가는 렌즈를 쓸 때 (`reviewer-prior-art` 전용)
 **인용 검증은 호출자 책임이다.** 리뷰어가 문서 밖 사실을 물고 오므로, 그 근거가 틀리면 이 레포에 없는

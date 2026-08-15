@@ -94,4 +94,10 @@ for d in "$HERE"/skills/reviewer-*/; do
   check "$n 이 읽기 범위를 적는다"        "grep -qF '읽기 범위' \"$f\""
 done
 
+echo "[spec 리뷰 — 한 번만 돌고 처분은 호출자가 정한다]"
+check "재작성 라우팅이 남아 있지 않다"        "! grep -qF 'regenerate' \"\$CALLER\""
+check "🔴 진입 기준을 적는다"                 "grep -qF '되돌리기 어려운 결정인가' \"\$CALLER\""
+check "기본값이 고치기임을 적는다"            "grep -qF '기본값이 고치기' \"\$CALLER\""
+check "마커를 개선보다 먼저 남기라고 적는다"  "grep -qF '마커를 먼저 남긴다' \"\$CALLER\""
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
