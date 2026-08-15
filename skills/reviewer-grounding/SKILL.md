@@ -18,14 +18,19 @@ description: LLM 출력·주장이 그 출처(런타임=요청+맥락 / spec리�
 - 출처에 없는 사실을 지어냈는가(환각, 근거 없음).
 - 숫자·인용·식별자가 출처와 일치하는가.
 
+## 읽기 범위
+**문서 밖을 반드시 읽는다.** 주입된 사실, 문서가 주장하는 대상 코드, 기존 구현을 열어 대조하고 연 것을
+`read`에 적는다. 문서 안만 보고 끝내면 이 렌즈가 잡아야 할 모순이 첫 패스에서 빠진다.
+
 ## 레퍼런스 프롬프트 (언어 중립)
-- system: "너는 근거 충실성 검수자다. 제공된 출처만을 기준으로, 후보의 누락·모순·근거 없는 주장을 찾아라. 고치지 말고 지적만 하라. 출처에 없으면 '근거 없음'으로 표시."
+- system: "너는 근거 충실성 검수자다. 제공된 출처만을 기준으로, 후보의 누락·모순·근거 없는 주장을 찾아라. 고치지 말고 지적만 하라. 출처에 없으면 '근거 없음'으로 표시. 등급을 매기지 마라. 발견마다 이대로 두면 무엇이 어떻게 잘못되는지(consequence)와 그렇게 본 근거(evidence)를 적어라. 결과를 구체적으로 못 적는 것은 올리지 마라. 찾은 것이 없으면 빈 목록이 정상이다."
 - user: "[출처]\n{source}\n\n[후보]\n{candidate}\n\n위 체크리스트로 이슈를 아래 JSON 스키마로 출력."
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "grounding", "issues": [ { "severity": "critical|major|minor", "type": "omission|contradiction|unsupported|mismatch", "where": "출처/후보 내 위치", "detail": "무엇이 왜" } ], "notes": "" }
+{ "lens": "grounding", "read": [ "..." ], "issues": [ { "where": "출처/후보 내 위치", "type": "omission|contradiction|unsupported|mismatch", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거" } ], "notes": "" }
 ```
-통과/실패 신호는 이슈의 `severity` 하나다(별도 verdict 필드를 두지 않는다 — `SSOT`). 라우팅(critical→regenerate 등)은 `meta-aggregate`의 결정 정책을 따른다.
+필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 여기에 복제하지 않는다.
+처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 **Claude 서브에이전트로 띄운 리뷰에서만** 호출자가 `principles_applied`(읽고 적용한 원칙 ID 목록)를 함께 요구한다 — 그 종류에는 원칙 정본이 안 실릴 수 있어 읽었다는 흔적을 산출물에 남기기 위해서다. **제품 런타임 구현에는 요구하지 않는다.** 위 공통 스키마 자체는 실행 방식에 중립이다.

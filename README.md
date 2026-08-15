@@ -22,7 +22,7 @@
 ### 도메인 참고서 + 런타임/메타 검증
 개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(자동 주입되는 목차)가 도메인과 참고서를 안내하고, 각 `skills/domain-*`가 상세를 온디맨드로 제공한다 — 설계 시 명세 반영, 개발 시 폴백.
 - **LLM 런타임**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(호출자)이 리스크에 따라 `skills/reviewer-*`(렌즈)와 `skills/meta-aggregate`(집계)를 **제품 코드의 리뷰 콜**로 구현하게 한다(Claude Code 에이전트가 아니라 제품이 구현할 청사진).
-- **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 PREP → 독립 렌즈(grounding/consistency/adversarial, 그리고 spec이 미지의 영역을 다룰 때만 조건부로 웹에 나가는 prior-art) → meta-aggregate → accept/regenerate/escalate로 검증한다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 게이트; 문서 마지막 줄 `<!-- spec-review: passed -->` 또는 `escalated` 마커로 해제; 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
+- **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 PREP → 독립 렌즈(grounding/consistency/adversarial) → meta-aggregate → 🔴와 고칠 것으로 처분한다. 리뷰는 한 번만 돈다. 선행연구 대조는 기본 묶음이 아니라 제안과 승인을 거쳐 따로 돈다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 게이트; 문서 마지막 줄 `<!-- spec-review: passed -->` 또는 `escalated` 마커로 해제; 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
 - **문서 작성 워크플로**: 일반 문서(README 등)는 사람이 글 쓰는 흐름을 흉내 낸다 — 작성 **전** `PreToolUse` 훅이 새 `.md`에 `domain-docs` 양식을 제안하고, 작성 **후** `PostToolUse` 훅이 독립 검진을 넛지한다(어느 렌즈로 검진할지는 `domain-docs`의 문서 검진 절이 정한다). 셀프 퇴고만으로 끝내지 않되, 발행물엔 마커를 안 박으므로 spec/plan과 달리 **비블로킹**(권유)이다. 같은 OFF 토글을 쓴다.
 
 ## 설치 (user scope 권장)

@@ -76,4 +76,40 @@ for name in $ALL; do
   done
 done
 
+echo "[산출물 계약 — meta-aggregate가 소유한다]"
+check "계약이 consequence 를 필수로 적는다"     "grep -qF 'consequence' \"\$AGG\""
+check "계약이 evidence 를 필수로 적는다"        "grep -qF 'evidence' \"\$AGG\""
+check "계약이 read 필드를 정의한다"             "grep -qF '\"read\"' \"\$AGG\""
+check "계약이 빈손을 정상으로 적는다"           "grep -qF '빈 배열인 것은 정상' \"\$AGG\""
+check "계약에 등급 라벨이 없다"                 "! grep -qF 'severity' \"\$AGG\""
+check "spec 리뷰에 결정 단계가 없음을 적는다"   "grep -qF 'spec 리뷰에서는 결정 단계가 없다' \"\$AGG\""
+
+echo "[렌즈 계약 — 등급 없음, 근거 필수]"
+for d in "$HERE"/skills/reviewer-*/; do
+  n="$(basename "$d")"; f="$d/SKILL.md"
+  check "$n 에 등급 라벨이 없다"          "! grep -qF 'severity' \"$f\""
+  check "$n 이 consequence 를 요구한다"   "grep -qF 'consequence' \"$f\""
+  check "$n 이 read 를 요구한다"          "grep -qF '\"read\"' \"$f\""
+  check "$n 이 빈손을 정상으로 적는다"    "grep -qF '빈 목록이 정상' \"$f\""
+  check "$n 이 읽기 범위를 적는다"        "grep -qF '읽기 범위' \"$f\""
+done
+
+echo "[spec 리뷰 — 한 번만 돌고 처분은 호출자가 정한다]"
+check "재작성 라우팅이 남아 있지 않다"        "! grep -qF 'regenerate' \"\$CALLER\""
+check "🔴 진입 기준을 적는다"                 "grep -qF '되돌리기 어려운 결정인가' \"\$CALLER\""
+check "기본값이 고치기임을 적는다"            "grep -qF '기본값이 고치기' \"\$CALLER\""
+check "마커를 개선보다 먼저 남기라고 적는다"  "grep -qF '마커를 먼저 남긴다' \"\$CALLER\""
+
+RUNTIME="$HERE/skills/domain-llm-runtime/SKILL.md"
+echo "[런타임 — 등급이 아니라 type 으로 행동을 정한다]"
+check "런타임 파일을 찾았다"                "[ -f \"\$RUNTIME\" ]"
+check "등급 기반 재생성이 남아 있지 않다"    "! grep -qF 'critical만 regenerate' \"\$RUNTIME\""
+check "type 기반 처분 표를 적는다"          "grep -qF '값으로 행동을 정하는 표' \"\$RUNTIME\""
+
+PTU="$HERE/hooks/spec_review_posttooluse.sh"
+STOPH="$HERE/hooks/spec_review_stop.sh"
+echo "[훅 안내문 — 마커를 개선보다 먼저]"
+check "PostToolUse 안내문이 마커 선기록을 지시한다" "grep -qF '마커를 먼저 남기고' \"\$PTU\""
+check "Stop 안내문이 마커 선기록을 지시한다"        "grep -qF '마커를 먼저 남기고' \"\$STOPH\""
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

@@ -21,14 +21,18 @@ description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일
 > 가능하면 **결정론적 검증을 먼저** 돌린다(JSON 스키마 validator, 정규식). LLM 리뷰는 결정론으로
 > 못 잡는 스타일·모호 제약에만 쓴다(비용 절약).
 
+## 읽기 범위
+출력 계약과 후보만 본다. 문서 밖으로 나가지 않으므로 `read`는 대개 빈 배열이다.
+
 ## 레퍼런스 프롬프트 (언어 중립)
-- system: "너는 적합성 검수자다. 후보가 명시된 출력 계약(형식·스키마·스타일·제약)을 지키는지만 본다. 내용 정확성은 보지 않는다."
+- system: "너는 적합성 검수자다. 후보가 명시된 출력 계약(형식·스키마·스타일·제약)을 지키는지만 본다. 내용 정확성은 보지 않는다. 등급을 매기지 마라. 발견마다 이대로 두면 무엇이 어떻게 잘못되는지(consequence)와 그렇게 본 근거(evidence)를 적어라. 결과를 구체적으로 못 적는 것은 올리지 마라. 찾은 것이 없으면 빈 목록이 정상이다."
 - user: "[출력 계약]\n{contract}\n\n[후보]\n{candidate}\n\n위반을 아래 JSON 스키마로."
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "fit", "issues": [ { "severity": "critical|major|minor", "type": "schema|format|style|constraint|compat", "where": "...", "detail": "..." } ], "notes": "" }
+{ "lens": "fit", "read": [ "..." ], "issues": [ { "where": "...", "type": "schema|format|style|constraint|compat", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거" } ], "notes": "" }
 ```
-통과/실패 신호는 이슈의 `severity` 하나다(별도 verdict 필드를 두지 않는다 — `SSOT`). 라우팅(critical→regenerate/폴백 등)은 `meta-aggregate`의 결정 정책을 따른다.
+필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 여기에 복제하지 않는다.
+처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 **Claude 서브에이전트로 띄운 리뷰에서만** 호출자가 `principles_applied`(읽고 적용한 원칙 ID 목록)를 함께 요구한다 — 그 종류에는 원칙 정본이 안 실릴 수 있어 읽었다는 흔적을 산출물에 남기기 위해서다. **제품 런타임 구현에는 요구하지 않는다.** 위 공통 스키마 자체는 실행 방식에 중립이다.

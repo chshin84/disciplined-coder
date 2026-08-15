@@ -19,7 +19,7 @@ $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")
 EOF
 [ -n "$match" ] || exit 0
 base="$(basename "$match")"
-msg="📋 spec/plan(${base}) 작성됨 — 진행 전 반드시 disciplined-coder domain-spec-review 스킬로 PREP+독립 렌즈 리뷰를 수행하고(어느 렌즈를 돌릴지는 그 스킬이 정한다), 완료 시 문서 마지막 줄에 spec-review 마커(passed 또는 escalated, HTML 주석)를 남겨라."
+msg="📋 spec/plan(${base}) 작성됨 — 진행 전 반드시 disciplined-coder domain-spec-review 스킬로 PREP+독립 렌즈 리뷰를 수행하라(어느 렌즈를 돌릴지는 그 스킬이 정한다). 리뷰와 처분 분류가 끝나면 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영하라."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0
