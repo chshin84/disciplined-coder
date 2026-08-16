@@ -110,7 +110,7 @@ H10="$(mktemp -d)"; P10="$(mktemp -d)"
 run "$H10" "$P10" >/dev/null
 K10="$H10/.claude/disciplined-coder"
 printf 'old canon\n'    > "$K10/coding-principles.md"     # 구 관리파일(STALE) → 제거
-printf '내 미해결 메모\n' > "$K10/unsolved_problems.md"   # 사용자 데이터(내용 있음) → 보존 + surface
+printf '내 개인 메모\n'   > "$K10/my_notes.md"             # 정체 모를 사용자 파일(내용 있음) → 보존 + surface
 : > "$K10/orphan_empty.md"                                 # 빈 고아 → 제거
 mkdir -p "$K10/rogue_dir"                                  # 하위 디렉터리 → 중단 없이 surface
 set +e
@@ -120,9 +120,9 @@ echo "[managed-dir-hygiene] managed-dir hygiene (whitelist pruning)"
 check "stale coding-principles pruned"  "[ ! -f '$K10/coding-principles.md' ]"
 check "canon preserved"                 "[ -f '$K10/agent-principles.md' ]"
 check "solved preserved"                "[ -f '$K10/solved_problems.md' ]"
-check "user data (unsolved) preserved"  "[ -f '$K10/unsolved_problems.md' ]"
+check "unknown user file preserved"     "[ -f '$K10/my_notes.md' ]"
 check "empty orphan removed"            "[ ! -f '$K10/orphan_empty.md' ]"
-check "non-empty orphan surfaced"       "printf '%s' \"\$ERR10\" | grep -qF 'unsolved_problems.md'"
+check "non-empty orphan surfaced"       "printf '%s' \"\$ERR10\" | grep -qF 'my_notes.md'"
 check "subdir does not abort scaffold"  "[ $rc10 -eq 0 ]"
 check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rogue_dir'"
 check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
@@ -394,7 +394,7 @@ check "fresh: 신호 없음"                 "! printf '%s' \"\$OUTR1\" | grep -
 OUTR1b="$(run "$HR1" "$PR1")"
 check "fresh: 재실행도 신호 없음"        "! printf '%s' \"\$OUTR1b\" | grep -qF '$NUDGE'"
 
-# (나) 형식 규칙 블록이 없는 옛 로그는 신호를 내고, 파일은 바이트 단위로 그대로다.
+# (나) 형식 규칙 블록이 없는 옛 로그는 백업을 뜨고 머리말만 갈아끼운다 — 항목은 그대로다.
 HR2="$(mktemp -d)"; PR2="$(mktemp -d)"; mkdir -p "$HR2/.claude/disciplined-coder"
 OLDLOG="$HR2/.claude/disciplined-coder/solved_problems.md"
 { printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
@@ -406,23 +406,33 @@ OLDLOG="$HR2/.claude/disciplined-coder/solved_problems.md"
 } > "$OLDLOG"
 BEFORE2="$(cksum < "$OLDLOG")"
 OUTR2="$(run "$HR2" "$PR2")"
-echo "[solved-rules] legacy log (no rule block) is flagged, file untouched"
-check "legacy: 신호 있음"                 "printf '%s' \"\$OUTR2\" | grep -qF '$NUDGE'"
-check "legacy: 파일 불변(바이트)"         "[ \"\$(cksum < '$OLDLOG')\" = '$BEFORE2' ]"
-# 제목 줄 검사는 stdout 전체가 아니라 '신호 문안 그 줄'만 본다 — 첫 설치 세션은 로그 전문을 stdout으로
-# 덤프하므로 전체를 보면 그 덤프의 제목 줄에 걸려, 신호와 무관한 이유로 붉어진다.
-SIG2="$(printf '%s\n' "$OUTR2" | grep -F "$NUDGE" || true)"
-check "legacy: 신호 문안에 제목 줄 없음"  "[ -n \"\$SIG2\" ] && ! printf '%s' \"\$SIG2\" | grep -qF '$LOGTITLE'"
-check "legacy: 신호 문안에 원인 단정 없음" "! printf '%s' \"\$SIG2\" | grep -qF '플러그인 업데이트로 바뀌었다'"
-check "legacy: 임시 파일 잔해 없음"       "[ -z \"\$(find '$HR2/.claude/disciplined-coder' -name '*.tmp' -o -name '*.norm' 2>/dev/null)\" ]"
+BK2="$(find "$HR2/.claude/disciplined-coder/backups" -type f -name 'solved_problems.*' 2>/dev/null | head -1 || true)"
+echo "[solved-rules] legacy log gets its header replaced, entries untouched"
+check "legacy: 규칙 블록이 생겼다"        "grep -qF '증상은 굵게 한 줄로 띄운다' '$OLDLOG'"
+check "legacy: 옛 규칙 문장이 사라졌다"   "! grep -qF '등록은 메인 세션이 수행' '$OLDLOG'"
+check "legacy: 첫 항목 보존"              "grep -qF '옛 형식 항목' '$OLDLOG'"
+check "legacy: 여러 줄 항목 보존"         "grep -qF '해결: 셋째 줄' '$OLDLOG'"
+check "legacy: 백업이 생겼다"             "[ -n '$BK2' ]"
+check "legacy: 백업은 손대기 전 원본"     "[ \"\$(cksum < '$BK2')\" = '$BEFORE2' ]"
+check "legacy: 무엇을 했는지 알린다"      "printf '%s' \"\$OUTR2\" | grep -qF '머리말을 현행 형식으로 갱신'"
+check "legacy: 임시 파일 잔해 없음"       "[ -z \"\$(find '$HR2/.claude/disciplined-coder' -maxdepth 1 -name 'solved_problems.md.*' 2>/dev/null)\" ]"
+# 두 번째 실행은 이미 최신이라 아무 일도 하지 않는다(멱등) — 백업이 세션마다 쌓이면 안 된다.
+AFTER2="$(cksum < "$OLDLOG")"
+run "$HR2" "$PR2" >/dev/null
+check "legacy: 재실행은 무변경"           "[ \"\$(cksum < '$OLDLOG')\" = \"\$AFTER2\" ]"
+check "legacy: 백업이 늘지 않는다"        "[ \$(find '$HR2/.claude/disciplined-coder/backups' -type f | wc -l) -eq 1 ]"
 
-# (다) 불릿을 하나 지운 로그도 낡은 것으로 잡는다 — 줄 단위 grep이면 통과해 버리는 자리다.
+# (다) 불릿을 하나 지운 로그도 낡은 것으로 잡아 규칙 블록을 통째로 복원한다. 남아 있던 규칙
+# 불릿을 항목으로 오인해 아래에 다시 붙이면 블록이 두 벌이 되므로, 중복이 없는지도 함께 본다.
 HR3="$(mktemp -d)"; PR3="$(mktemp -d)"; mkdir -p "$HR3/.claude/disciplined-coder"
 run "$HR3" "$PR3" >/dev/null
-sed -i '/^- 한 항목은 세 줄을 넘기지 않는다\.$/d' "$HR3/.claude/disciplined-coder/solved_problems.md"
-OUTR3="$(run "$HR3" "$PR3")"
-echo "[solved-rules] a log missing one rule bullet is flagged"
-check "partial: 신호 있음"                "printf '%s' \"\$OUTR3\" | grep -qF '$NUDGE'"
+LOG3="$HR3/.claude/disciplined-coder/solved_problems.md"
+sed -i '/^- 한 항목은 세 줄을 넘기지 않는다\.$/d' "$LOG3"
+run "$HR3" "$PR3" >/dev/null
+echo "[solved-rules] a log missing one rule bullet gets the whole block restored"
+check "partial: 지운 불릿 복원"            "grep -qF '한 항목은 세 줄을 넘기지 않는다' '$LOG3'"
+check "partial: 규칙 불릿 중복 없음"       "[ \$(grep -cF '증상은 굵게 한 줄로 띄운다' '$LOG3') -eq 1 ]"
+check "partial: 도입 문장 중복 없음"       "[ \$(grep -cF '항목을 적는 형식은 이렇다' '$LOG3') -eq 1 ]"
 
 # (라) 스코프 문구가 달라도, 줄 끝이 CRLF여도 오탐하지 않는다.
 HR4="$(mktemp -d)"; PR4="$(mktemp -d)"; mkdir -p "$HR4/.claude/disciplined-coder"
@@ -466,6 +476,89 @@ DD="$HERE/skills/domain-docs/SKILL.md"
 check "domain-docs: 방법 절 존재"         "grep -qF '관리되는 문서의 형식 규칙이 낡았을 때' '$DD'"
 check "domain-docs: 사본 경로"            "grep -qF 'backups/' '$DD'"
 check "domain-docs: 항목 불가침"          "grep -qF '항목은 한 줄도 건드리지 않는다' '$DD'"
-check "domain-docs: 자동 수정 금지"       "grep -qF '자동으로 고치지 않는다' '$DD'"
+check "domain-docs: 자동 갱신 정책"       "grep -qF '머리말은 플러그인이 갈아끼운다' '$DD'"
+check "domain-docs: 경계 규칙 명시"       "grep -qF '첫 구조 요소' '$DD'"
+
+# (아) 머리말 뒤에 사람이 만든 절이 오는 로그는 그 절을 살려 둔다.
+# 실측 사례(newsstore)의 모양이다 — 머리말 다음이 항목이 아니라 '## 핵심 gotchas' 절이었고,
+# 그 절은 다른 문서가 서브에이전트 주입 재료로 참조한다. 경계를 항목으로만 잡으면 여기서 날아간다.
+HR7="$(mktemp -d)"; PR7="$(mktemp -d)"; mkdir -p "$HR7/.claude/disciplined-coder"
+LOG7="$HR7/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems)\n\n'
+  printf '작업 중 발견·해결된 문제 기록. 각 항목: 문제 → 원인 → 해결.\n\n'
+  printf '## 핵심 gotchas (서브에이전트 주입용 다이제스트)\n'
+  printf '*반복되는 함정*만 추림.\n'
+  printf -- '- **Docker-only**: 테스트는 컨테이너에서 돌린다.\n\n'
+  printf '## 아카이브\n\n'
+  printf -- '- **옛 항목** → 원인 → 해결\n'
+} > "$LOG7"
+run "$HR7" "$PR7" >/dev/null
+echo "[solved-rules] a hand-written section after the header survives"
+check "절 보존: gotchas 제목"             "grep -qF '## 핵심 gotchas' '$LOG7'"
+check "절 보존: gotchas 본문"             "grep -qF 'Docker-only' '$LOG7'"
+check "절 보존: 아카이브 절"              "grep -qF '## 아카이브' '$LOG7'"
+check "절 보존: 규칙 블록이 생겼다"       "grep -qF '증상은 굵게 한 줄로 띄운다' '$LOG7'"
+check "절 보존: 옛 규칙 문장 제거"        "! grep -qF '각 항목: 문제 → 원인 → 해결' '$LOG7'"
+
+# (자) 목록도 제목도 없어 머리말의 끝을 못 찾는 로그는 손대지 않고 알리기만 한다.
+# 이 안전장치가 없으면 파일 전체를 머리말로 보고 통째로 갈아엎는다.
+HR8="$(mktemp -d)"; PR8="$(mktemp -d)"; mkdir -p "$HR8/.claude/disciplined-coder"
+LOG8="$HR8/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그\n\n'
+  printf '산문으로만 적어 둔 기록이다.\n\n'
+  printf '어제 겪은 문제는 이러이러했고 이렇게 풀었다.\n'
+} > "$LOG8"
+BEFORE8="$(cksum < "$LOG8")"
+OUTR8="$(run "$HR8" "$PR8")"
+echo "[solved-rules] a log with no structural marker is refused, not guessed"
+check "구조 없음: 파일 불변(바이트)"      "[ \"\$(cksum < '$LOG8')\" = '$BEFORE8' ]"
+check "구조 없음: 신호 있음"              "printf '%s' \"\$OUTR8\" | grep -qF '$NUDGE'"
+check "구조 없음: 백업 안 뜬다"           "[ ! -d '$HR8/.claude/disciplined-coder/backups' ] || [ -z \"\$(find '$HR8/.claude/disciplined-coder/backups' -type f)\" ]"
+
+# (차) 프로젝트 오답노트도 같은 처리를 받고, 백업은 프로젝트가 아니라 전역에 쌓인다.
+HR9="$(mktemp -d)"; PR9="$(mktemp -d)"; mkdir -p "$PR9/docs"
+PLOG9="$PR9/docs/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — 이 프로젝트\n\n'
+  printf '이 레포에서 겪은 문제. 각 항목: 문제 → 원인 → 해결.\n\n'
+  printf -- '- **프로젝트 항목** → 원인 → 해결\n'
+} > "$PLOG9"
+OUTR9="$(run "$HR9" "$PR9")"
+echo "[solved-rules] the opened project's log is handled too"
+check "프로젝트: 규칙 블록이 생겼다"      "grep -qF '증상은 굵게 한 줄로 띄운다' '$PLOG9'"
+check "프로젝트: 항목 보존"               "grep -qF '프로젝트 항목' '$PLOG9'"
+check "프로젝트: 스코프 문구가 프로젝트용" "grep -qF '이 프로젝트에 한정된 교훈만 둔다' '$PLOG9'"
+check "프로젝트: 백업은 전역에 쌓인다"    "[ -n \"\$(find '$HR9/.claude/disciplined-coder/backups' -type f 2>/dev/null)\" ]"
+check "프로젝트: 폴더에 백업 안 남긴다"   "[ \$(find '$PR9' -type f | wc -l) -eq 1 ]"
+
+# (카) 이름이 바뀌거나 없앤 옛 관리파일은 관리 디렉터리에서 치운다. 내용이 있으면 지우지 않고
+# 백업으로 옮긴다 — 그 안에 사용자가 적어 둔 줄이 있을 수 있어서다(되돌릴 수 있게 남긴다).
+HRS="$(mktemp -d)"; PRS="$(mktemp -d)"; mkdir -p "$HRS/.claude/disciplined-coder"
+KS="$HRS/.claude/disciplined-coder"
+printf 'old index\n' > "$KS/advisors-index.md"; printf '내 백로그 한 줄\n' > "$KS/unsolved_problems.md"
+ERRS="$(CLAUDE_HOME_DIR="$HRS/.claude" CLAUDE_PROJECT_DIR="$PRS" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
+echo "[stale] renamed and retired managed files are cleared out"
+check "stale: advisors-index 치움"        "[ ! -f '$KS/advisors-index.md' ]"
+check "stale: unsolved_problems 치움"     "[ ! -f '$KS/unsolved_problems.md' ]"
+check "stale: 잔존 경고 없음"             "! printf '%s' \"\$ERRS\" | grep -qF '비관리 파일'"
+check "stale: 내용은 백업에 남는다"       "grep -rqF '내 백로그 한 줄' '$KS/backups'"
+
+# (타) 없앤 기능이 프로젝트 CLAUDE.md에 심어 둔 옛 관리블록을 걷어낸다. 전역 블록은 건드리지 않는다.
+HR11="$(mktemp -d)"; PR11="$(mktemp -d)"
+{ printf '# 내 프로젝트 지침\n\n'
+  printf '이 줄은 사용자 것이라 남아야 한다.\n\n'
+  printf '# BEGIN disciplined-coder (managed — do not edit)\n'
+  printf '## 오답노트 (solved_problems)\n'
+  printf '옛 포인터 본문.\n'
+  printf '# END disciplined-coder (managed — do not edit)\n'
+} > "$PR11/CLAUDE.md"
+OUTR11="$(run "$HR11" "$PR11")"
+echo "[stale] the retired project pointer block is removed"
+check "포인터: 블록 제거"                 "! grep -qF 'BEGIN disciplined-coder' '$PR11/CLAUDE.md'"
+check "포인터: 본문도 제거"               "! grep -qF '옛 포인터 본문' '$PR11/CLAUDE.md'"
+check "포인터: 사용자 줄 보존"            "grep -qF '이 줄은 사용자 것이라 남아야 한다' '$PR11/CLAUDE.md'"
+check "포인터: 제거를 알린다"             "printf '%s' \"\$OUTR11\" | grep -qF '옛 관리블록'"
+check "포인터: 전역 블록은 그대로"        "[ \$(grep -cF '# BEGIN disciplined-coder' '$HR11/.claude/CLAUDE.md') -eq 1 ]"
+run "$HR11" "$PR11" >/dev/null
+check "포인터: 재실행도 사용자 줄 보존"   "grep -qF '이 줄은 사용자 것이라 남아야 한다' '$PR11/CLAUDE.md'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

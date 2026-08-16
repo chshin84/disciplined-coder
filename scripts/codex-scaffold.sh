@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Idempotent. Codex SessionStart마다 실행. 지식을 ~/.codex/disciplined-coder에 두고
-# ~/.codex/AGENTS.md 관리블록에 정본을 인라인(Codex는 @import 미지원). 프로젝트 폴더는 안 건드린다.
+# ~/.codex/AGENTS.md 관리블록에 정본을 인라인(Codex는 @import 미지원). 프로젝트 폴더에 파일을
+# 새로 만들지는 않는다 — 이미 있는 오답노트의 머리말만 손본다.
 # scaffold.sh(Claude)의 Codex 쌍둥이 — 정본 소스 동일(PLUGIN_ROOT의 agent-principles.md 등).
 set -euo pipefail
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
@@ -31,9 +32,21 @@ scaffold_hygiene "$KDIR"
 #    (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
 if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; fi
 
-# 2b) 오답노트 형식 규칙 넛지(scaffold.sh와 동일 정책): 읽어 보기만 하고 파일은 쓰지 않는다.
+# 2b) 오답노트 머리말 동기화(scaffold.sh와 동일 정책): 낡았으면 사본을 뜨고 정본 머리말로 갈아끼운다.
 #     쌍둥이 스크립트는 한쪽만 고치면 반드시 어긋나므로 같이 둔다.
-scaffold_check_solved_rules "$KDIR/solved_problems.md"
+scaffold_sync_solved "$KDIR/solved_problems.md" pc "$KDIR/backups" pc
+pc_note="$solved_sync_note"
+
+# 2c) 세션을 연 프로젝트의 오답노트도 같은 처리를 받는다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
+#     프로젝트 CLAUDE.md의 옛 관리블록 정리는 여기 없다 — 그것은 Claude 쪽 파일이라 그쪽이 소유한다.
+PROJ="${CLAUDE_PROJECT_DIR:-$PWD}"
+PLOG="$PROJ/docs/solved_problems.md"
+proj_note=""
+if [ -f "$PLOG" ] && [ "$PLOG" != "$KDIR/solved_problems.md" ]; then
+  plabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
+  scaffold_sync_solved "$PLOG" project "$KDIR/backups" "$plabel"
+  proj_note="$solved_sync_note"
+fi
 
 # 3) ~/.codex/AGENTS.md 관리블록 재생성(멱등, CRLF 내성). @import 미지원 → 정본 본문 인라인.
 . "$(dirname "$0")/_managed_block.sh"
@@ -59,10 +72,11 @@ if [ "$had_inline" -eq 0 ]; then
   done
 fi
 if [ -f "$KDIR/solved_problems.md" ]; then cat "$KDIR/solved_problems.md"; fi
-# 형식 규칙 넛지. 로그의 제목 줄이나 머리말 문구를 인용하지 않고 원인도 단정하지 않는다.
-if [ "${solved_rules_stale:-0}" -eq 1 ]; then
-  printf '🔵 disciplined-coder: %s 의 형식 규칙 서술이 현행과 다르다 — 고칠지는 사용자가 정한다(방법은 domain-docs 스킬).\n' "$KDIR/solved_problems.md"
-fi
+# 무엇을 했는지 알린다. 로그의 제목 줄이나 머리말 문구는 인용하지 않는다(주입 본문에 정본 헤더가
+# 한 번 더 실리는 것을 막는다).
+for note in "$pc_note" "$proj_note"; do
+  if [ -n "$note" ]; then printf '%s\n' "$note"; fi
+done
 
 # 5) 보고(진단은 stderr — stdout은 주입 본문 전용).
 if [ -n "$created" ]; then echo "[disciplined-coder] Codex knowledge initialized:$created (at $KDIR)" >&2; fi

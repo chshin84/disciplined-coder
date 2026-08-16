@@ -126,7 +126,7 @@ check "second run stdout lacks domains-index" "! printf '%s' \"\$OUT9b\" | grep 
 check "second run stdout still has solved"    "printf '%s' \"\$OUT9b\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "AGENTS.md still inlines principles after 2nd run" "grep -qF '# 디시플린 (팀 원칙)' '$AG9'"
 
-# --- solved-rules(Codex): 쌍둥이 스크립트가 같은 넛지를 낸다 ---
+# --- solved-rules(Codex): 쌍둥이 스크립트가 같은 갱신을 한다 ---
 # 쌍둥이는 한쪽만 고치면 반드시 어긋나므로 Claude 쪽과 같은 계약을 여기서도 건다.
 NUDGE_C='형식 규칙 서술이 현행과 다르다'
 HC1="$(mktemp -d)"; mkdir -p "$HC1/.codex/disciplined-coder"
@@ -137,11 +137,23 @@ OLDC="$HC1/.codex/disciplined-coder/solved_problems.md"
 } > "$OLDC"
 BEFORE_C="$(cksum < "$OLDC")"
 OUTC1="$(run "$HC1")"
-echo "[solved-rules] codex twin emits the same nudge and writes nothing"
-check "codex legacy: 신호 있음"           "printf '%s' \"\$OUTC1\" | grep -qF '$NUDGE_C'"
-check "codex legacy: 파일 불변(바이트)"   "[ \"\$(cksum < '$OLDC')\" = '$BEFORE_C' ]"
+BKC="$(find "$HC1/.codex/disciplined-coder/backups" -type f -name 'solved_problems.*' 2>/dev/null | head -1 || true)"
+echo "[solved-rules] codex twin replaces the header the same way"
+check "codex legacy: 규칙 블록이 생겼다"  "grep -qF '증상은 굵게 한 줄로 띄운다' '$OLDC'"
+check "codex legacy: 항목 보존"           "grep -qF '옛 형식 항목' '$OLDC'"
+check "codex legacy: 백업이 손대기 전 원본" "[ -n '$BKC' ] && [ \"\$(cksum < '$BKC')\" = '$BEFORE_C' ]"
+check "codex legacy: 무엇을 했는지 알린다" "printf '%s' \"\$OUTC1\" | grep -qF '머리말을 현행 형식으로 갱신'"
 HC2="$(mktemp -d)"
 OUTC2="$(run "$HC2")"
 check "codex fresh: 신호 없음"            "! printf '%s' \"\$OUTC2\" | grep -qF '$NUDGE_C'"
+
+# 구조 요소가 없어 경계를 못 잡는 로그는 Codex 쪽에서도 손대지 않고 알리기만 한다.
+HC3="$(mktemp -d)"; mkdir -p "$HC3/.codex/disciplined-coder"
+PROSEC="$HC3/.codex/disciplined-coder/solved_problems.md"
+printf '# 해결된 문제 로그\n\n산문으로만 적어 둔 기록이다.\n' > "$PROSEC"
+BEFORE_C3="$(cksum < "$PROSEC")"
+OUTC3="$(run "$HC3")"
+check "codex 구조 없음: 파일 불변(바이트)" "[ \"\$(cksum < '$PROSEC')\" = '$BEFORE_C3' ]"
+check "codex 구조 없음: 신호 있음"         "printf '%s' \"\$OUTC3\" | grep -qF '$NUDGE_C'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

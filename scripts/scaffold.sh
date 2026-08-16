@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Idempotent. SessionStart마다 실행. 지식을 PC(~/.claude/disciplined-coder)에 두고
-# ~/.claude/CLAUDE.md 관리블록이 @import. 프로젝트 폴더는 건드리지 않는다.
+# ~/.claude/CLAUDE.md 관리블록이 @import. 프로젝트 폴더에 파일을 새로 만들지는 않는다 —
+# 이미 있는 오답노트의 머리말과 없앤 기능이 남긴 관리블록만 손본다(둘 다 사본을 남기거나 되돌릴 수 있다).
 set -euo pipefail
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
@@ -35,12 +36,38 @@ scaffold_hygiene "$KDIR"
 #    (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
 if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; fi
 
-# 2b) 오답노트 형식 규칙 넛지: 낡았는지 읽어 보기만 한다 — 어떤 파일에도 쓰지 않는다.
-#     고치는 것은 사용자 승인을 받아 메인 세션이 한다(방법 정본은 domain-docs 스킬).
-scaffold_check_solved_rules "$KDIR/solved_problems.md"
+# 2b) 오답노트 머리말 동기화: 형식 규칙이 낡았으면 사본을 뜨고 정본 머리말로 갈아끼운다.
+#     항목은 한 줄도 건드리지 않고, 머리말의 끝을 알아볼 수 없는 로그는 손대지 않는다(방법 정본은
+#     domain-docs 스킬). 오답노트는 플러그인이 형식을 정하는 파일이라 사람 승인 없이 맞춘다.
+scaffold_sync_solved "$KDIR/solved_problems.md" pc "$KDIR/backups" pc
+pc_note="$solved_sync_note"
+
+# 2c) 세션을 연 프로젝트의 오답노트도 같은 처리를 받는다. 프로젝트마다 형식이 갈리면 recall이
+#     읽는 모양이 제각각이 되기 때문이다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다 —
+#     이 플러그인은 프로젝트 폴더에 파일을 남기지 않는다.
+PROJ="${CLAUDE_PROJECT_DIR:-$PWD}"
+PLOG="$PROJ/docs/solved_problems.md"
+proj_note=""
+if [ -f "$PLOG" ] && [ "$PLOG" != "$KDIR/solved_problems.md" ]; then
+  plabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
+  scaffold_sync_solved "$PLOG" project "$KDIR/backups" "$plabel"
+  proj_note="$solved_sync_note"
+fi
 
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
 . "$(dirname "$0")/_managed_block.sh"
+
+# 3a) 없앤 기능(/add-pointer)이 프로젝트 CLAUDE.md에 심어 두던 옛 관리블록을 걷어낸다. 지금은
+#     아무것도 그 블록을 다시 만들지 않으므로 남아 있으면 갱신되지 않는 고아다. 마커가 같으니
+#     전역 CLAUDE.md와 같은 파일이면 건너뛴다 — 그건 이 훅이 매 세션 다시 만드는 정상 블록이다.
+pointer_note=""
+PCLAUDE="$PROJ/CLAUDE.md"
+if [ -f "$PCLAUDE" ] && [ "$PCLAUDE" != "$UC" ]; then
+  if managed_block_remove "$PCLAUDE" "$MANAGED_BEGIN" "$MANAGED_END"; then
+    pointer_note="🔵 disciplined-coder: $PCLAUDE 에 남아 있던 옛 관리블록을 걷어냈다(사용자가 쓴 줄은 그대로 두었다)."
+  fi
+fi
+
 # 마커는 _managed_block.sh의 MANAGED_BEGIN/END(SSOT)를 쓴다.
 # 스킬(domain-*/reviewer-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
 # 첫 설치 판정은 반드시 주입 '전에' 한다 — 주입 후엔 항상 존재해 판정이 무의미해진다.
@@ -67,11 +94,11 @@ if [ "$had_import" -eq 0 ]; then
     fi
   done
 fi
-# 형식 규칙 넛지. 로그의 제목 줄이나 머리말 문구를 인용하지 않는다 — 인용하면 2회차 stdout에 정본
-# 헤더가 되살아나 이중 주입 회귀 가드가 뒤집힌다. 원인도 단정하지 않는다(사용자가 규칙을 손봤을 수도 있다).
-if [ "${solved_rules_stale:-0}" -eq 1 ]; then
-  printf '🔵 disciplined-coder: %s 의 형식 규칙 서술이 현행과 다르다 — 고칠지는 사용자가 정한다(방법은 domain-docs 스킬).\n' "$KDIR/solved_problems.md"
-fi
+# 무엇을 했는지 알린다. 파일을 고쳤으면 조용히 넘기지 않는다 — 사용자가 열어 둔 레포가 바뀌었을 수
+# 있고, 그 사실은 사본 경로와 함께 눈에 보여야 한다(FAIL-LOUD).
+for note in "$pc_note" "$proj_note" "$pointer_note"; do
+  if [ -n "$note" ]; then printf '%s\n' "$note"; fi
+done
 
 # 5) 보고
 if [ -n "$created" ]; then echo "[disciplined-coder] PC knowledge initialized:$created (at $KDIR)" >&2; fi

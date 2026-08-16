@@ -18,27 +18,11 @@ MANAGED_ORPHAN="# (disciplined-coder: orphan BEGIN neutralized — END missing)"
 # startup·resume·clear마다 돈다. 창을 둘 이상 동시에 열면 두 프로세스의 read-modify-write가 겹쳐
 # 사용자가 손으로 적은 지침이 조각날 수 있다. 그래서 대상 파일마다 락을 잡고 직렬화하며, 임시 파일도
 # 결정론적 이름 대신 mktemp로 유일하게 만든다(PC 오답노트 — 결정론적 파일명과 공유 스크래치의 조합).
-managed_block_inject() {
-  local uc="$1" begin="$2" end="$3" body tmp norm lock
-  body="$(cat)"
-  touch "$uc"
-
-  lock="$uc.lock"
-  local waited=0
-  while ! mkdir "$lock" 2>/dev/null; do
-    waited=$((waited+1))
-    # 죽은 프로세스가 남긴 락에 영원히 갇히지 않는다 — 10초를 넘기면 빼앗고 경고한다(FAIL-LOUD).
-    if [ "$waited" -gt 100 ]; then
-      echo "[disciplined-coder] WARNING: stale lock at $lock — 10s 대기 후 강제로 진행한다" >&2
-      rm -rf "$lock"; mkdir "$lock" 2>/dev/null || true
-      break
-    fi
-    sleep 0.1
-  done
-  tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
-  # 중간에 죽어도 임시 파일과 락을 남기지 않는다.
-  trap 'rm -f "$tmp" "$norm"; rmdir "$lock" 2>/dev/null || true' RETURN
-  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" '
+# 마커 영역을 걷어내는 awk 프로그램(정본). 주입과 제거가 같은 규칙을 쓰도록 문자열로 떼어 둔다 —
+# 두 벌로 두면 한쪽만 고쳐져 '주입은 지우는데 제거는 남기는' 어긋남이 조용히 생긴다(SSOT).
+# 함수로 떼지 않고 문자열로 두는 이유는, 락을 푸는 RETURN 트랩이 중첩 함수 반환에서 먼저 터질 수
+# 있어 append 전에 락이 풀리는 조용한 회귀를 만들기 때문이다.
+MANAGED_STRIP_AWK='
     { line[NR]=$0; l=$0; sub(/\r$/,"",l); norm[NR]=l }
     END {
       n=NR
@@ -60,8 +44,56 @@ managed_block_inject() {
       for (i=1;i<=n;i++) if (!del[i]) print line[i]
       if (orphan) print "[disciplined-coder] WARNING: " f " has BEGIN but no END — orphan marker line dropped (content preserved)" > "/dev/stderr"
     }
-  ' "$uc" > "$tmp"
-  awk '{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }' "$tmp" > "$norm" && mv "$norm" "$uc"
+'
+# 끝의 빈 줄을 걷어낸다(블록을 뗀 자리에 빈 줄이 쌓이는 것을 막는다).
+MANAGED_TRIM_AWK='{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }'
+
+# 관리블록을 걷어내기만 한다(본문을 다시 넣지 않는다). 없앤 기능이 남긴 고아 블록 정리용.
+# 리턴: 0=걷어냄, 1=대상이 없어 아무것도 안 함. 호출은 반드시 if로 감싼다(set -e).
+managed_block_remove() {
+  local uc="$1" begin="$2" end="$3" tmp norm lock
+  [ -f "$uc" ] || return 1
+  grep -qF "$begin" "$uc" 2>/dev/null || return 1
+  lock="$uc.lock"
+  local waited=0
+  while ! mkdir "$lock" 2>/dev/null; do
+    waited=$((waited+1))
+    if [ "$waited" -gt 100 ]; then
+      echo "[disciplined-coder] WARNING: stale lock at $lock — 10s 대기 후 강제로 진행한다" >&2
+      rm -rf "$lock"; mkdir "$lock" 2>/dev/null || true
+      break
+    fi
+    sleep 0.1
+  done
+  tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
+  trap 'rm -f "$tmp" "$norm"; rmdir "$lock" 2>/dev/null || true' RETURN
+  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp"
+  awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" && mv "$norm" "$uc"
+  return 0
+}
+
+managed_block_inject() {
+  local uc="$1" begin="$2" end="$3" body tmp norm lock
+  body="$(cat)"
+  touch "$uc"
+
+  lock="$uc.lock"
+  local waited=0
+  while ! mkdir "$lock" 2>/dev/null; do
+    waited=$((waited+1))
+    # 죽은 프로세스가 남긴 락에 영원히 갇히지 않는다 — 10초를 넘기면 빼앗고 경고한다(FAIL-LOUD).
+    if [ "$waited" -gt 100 ]; then
+      echo "[disciplined-coder] WARNING: stale lock at $lock — 10s 대기 후 강제로 진행한다" >&2
+      rm -rf "$lock"; mkdir "$lock" 2>/dev/null || true
+      break
+    fi
+    sleep 0.1
+  done
+  tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
+  # 중간에 죽어도 임시 파일과 락을 남기지 않는다.
+  trap 'rm -f "$tmp" "$norm"; rmdir "$lock" 2>/dev/null || true' RETURN
+  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp"
+  awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" && mv "$norm" "$uc"
   {
     if [ -s "$uc" ]; then printf '\n'; fi
     printf '%s\n' "$begin"
