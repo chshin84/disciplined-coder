@@ -12,6 +12,9 @@ while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
   case "$FILE" in *.md) ;; *) continue ;; esac          # 문서(.md)만
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
+  # 리뷰 기록은 검진 대상이 아니다. 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생기고,
+  # 그 순환을 매번 무시하다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.
+  case "$FILE" in *docs/superpowers/reviews/*.md) continue ;; esac
   match="$FILE"; break
 done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")

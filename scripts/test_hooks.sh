@@ -132,6 +132,12 @@ check "fpre: apply_patch 새 .md → 양식 제안"          "fpre '$(AP1 "$T/co
 check "drev: apply_patch 기존 .md → 검진 넛지"        "drev '$(AP1 "$T/existing.md")' | grep -q additionalContext"
 check "drev: apply_patch 비문서(.py) → 무출력"        "[ -z \"\$(drev '$(AP1 "$T/src/main.py")')\" ]"
 
+echo "[리뷰 기록은 검진 대상이 아니다]"
+# 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
+J2() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s"}}' "$1"; }
+check "리뷰 기록에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/superpowers/reviews/x-review.md")')\" ]"
+check "다른 문서에는 넛지가 뜬다"  "drev '$(J2 "$T/docs/guide.md")' | grep -q additionalContext"
+
 echo "[project-solved nudge removed]"
 PN="$(mktemp -d)"
 in_claudemd() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s/CLAUDE.md"}}' "$1"; }

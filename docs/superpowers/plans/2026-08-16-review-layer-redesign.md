@@ -2,6 +2,10 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **일부 superseded** — 같은 날 `docs/superpowers/specs/2026-08-16-review-procedure-design.md`가 "리뷰는
+> 한 번만 돈다"를 뒤집었다. 지금은 렌즈를 2회씩 돌리고, 기능적 변화가 있으면 한 번까지 자동으로 다시
+> 리뷰한다. 등급을 없앤 부분은 그대로다.
+
 **Goal:** 리뷰어가 등급을 매기는 대신 근거를 적게 하고, 리뷰가 한 번만 돌게 만들어 리뷰에 드는 시간을 줄인다.
 
 **Architecture:** 리뷰 산출물의 계약을 `meta-aggregate` 한 곳에 세우고 다섯 렌즈는 참조만 하게 한다. 렌즈 출력에서 등급 라벨을 걷어내고 결과와 근거를 필수 필드로 만든다. 처분은 렌즈가 아니라 호출자가 정하되, spec 리뷰는 사람이 근거를 읽고 가르고 제품 런타임은 코드가 `type`으로 맵핑한다. 재작성 왕복을 없애고 마커를 개선보다 먼저 남겨 훅 재발동을 구조적으로 끊는다.
