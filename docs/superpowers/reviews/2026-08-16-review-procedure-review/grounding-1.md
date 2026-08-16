@@ -1,0 +1,16 @@
+# reviewer-grounding 1회차 원본 (2026-08-16, 1회차 리뷰)
+
+리뷰어가 돌려준 것을 그대로 옮긴다. 고치지 않는다.
+
+```json
+{"lens":"grounding","issues":[
+{"where":"세 호출자 표, 제품 런타임 행(96)과 그 아래 문장(98)","type":"mismatch","claim":"제품 런타임의 렌즈 구성을 두 경우로만 적고 'reviewer-grounding만 세 자리 전부에서 돈다'고 단정한다. 실물 표에는 리스크 0–1에서 '없음(비기능 체크리스트만)'인 세 번째 경우가 있어 grounding조차 돌지 않는다.","consequence":"이 표를 청사진으로 런타임을 구현하면 저리스크 경로에도 grounding 리뷰 콜을 넣게 되어 리스크 비례 원칙이 깨진다. 또 '세 자리 전부에서 돈다'가 렌즈 변경의 영향 범위 근거로 쓰이는데 실제로는 저리스크 경로가 영향권 밖이다.","evidence":"specs/...design.md:96,98 vs skills/domain-llm-runtime/SKILL.md:17"},
+{"where":"세 호출자 표, spec·plan 리뷰 행(94)","type":"omission","claim":"한 행에 spec과 plan을 묶어 렌즈 구성에 prior-art을 적어, plan에도 제안되는 것처럼 읽힌다. 실물은 plan에는 제안하지 않는다고 명시한다.","consequence":"plan 리뷰에서도 선행연구를 제안하게 되고, 승인되면 가장 비싼 웹 렌즈가 불필요하게 돌며 그 발견은 전부 🔴로 사용자를 멈춰 세운다.","evidence":"specs/...design.md:94 vs skills/domain-spec-review/SKILL.md:75-78, frontmatter:3"},
+{"where":"기각된 첫째 안의 근거(10-12)","type":"unsupported","claim":"외부 측정 셋을 인용하면서 출처를 한 곳도 적지 않았다. 문서 전체와 변경분 어디에도 이 인용의 출처가 없다.","consequence":"이 세 문장이 '절차를 나열하는 안'을 기각한 유일한 근거인데 검증 경로가 없어, 나중에 재검토할 때 근거의 진위와 적용 범위를 확인할 수 없다. 이 레포의 저작 규칙에도 어긋난다.","evidence":"specs/...design.md:10-12 vs skills/domain-docs/SKILL.md:23"},
+{"where":"오늘 잰 값 표(40-44)와 그 요약","type":"unsupported","claim":"표의 '두 번째가 더 건진 몫'이 행마다 다른 분모로 계산돼 있다. grounding 5/12=42%, consistency 4/14=29%는 2회차 산출이 분모인데, adversarial 8/15=53%를 '4할 반'으로 적으려면 합집합 18을 분모로 써야 한다.","consequence":"같은 분모로 통일하면 adversarial의 이득은 5할을 넘어, domain-spec-review가 인용하는 '3할에서 4할 반'이라는 상한이 실제보다 낮게 박힌다. 2회 표집을 정당화하는 유일한 수치와 그 요약이 어긋난 채 정본으로 남는다.","evidence":"specs/...design.md:42-44, skills/domain-spec-review/SKILL.md:44"},
+{"where":"오늘 잰 값 표(38-44) 및 합산 기록 절(57-67)","type":"unsupported","claim":"실측 표의 숫자와 '4할이 다른 렌즈와 같은 결함'은 문서 밖 어디에도 원자료가 없다. 이 spec이 신설하라고 정한 docs/superpowers/reviews/ 디렉터리 자체가 존재하지 않는다.","consequence":"2회 표집·범위 밖 칸이라는 두 결정 전부가 재현 불가능한 단일 관측에 걸린다. 기록의 존재 이유로 든 기준선이 이 결정을 만든 회차에서 기록되지 않은 채 규칙만 정본에 박혔다.","evidence":"specs/...design.md:27-28,38-44,66-67 / ls docs/superpowers/ (reviews 없음)"},
+{"where":"합산 기록 절(71)과 표의 일반 문서 검진 칸(95)","type":"mismatch","claim":"일반 문서 검진의 합산 기록을 '문서로 남긴다'고 적고 런타임만 로그라고 구분했지만, 실물 domain-docs에는 어디에 어떤 형태로 남기는지가 없다.","consequence":"문서 검진 기록의 집이 정해지지 않아 매번 다른 곳에 남거나 대화 안에서 소멸하고, 이 절이 내세운 목적이 문서 검진 경로에서는 달성되지 않는다.","evidence":"specs/...design.md:71,95 vs skills/domain-docs/SKILL.md:134-135"},
+{"where":"검증 절(119-123)이 가리키는 scripts/test_docs_drift.sh","type":"mismatch","claim":"'리뷰는 한 번만 돈다가 남아 있지 않다'를 단언으로 넣었고 통과한다. 그러나 그 단언을 담은 테스트 파일 자신의 섹션 헤더가 여전히 옛 규칙을 출력한다.","consequence":"테스트를 돌린 사람이 출력 헤더를 보고 현행 규칙을 1회로 오인하고, 이 잔존 서술은 계속 초록으로 통과해 스스로 드러나지 않는다.","evidence":"scripts/test_docs_drift.sh:97 vs 130-131"},
+{"where":"결정 넷 / 안 하는 것 — 변경 대상 목록","type":"omission","claim":"이 변경은 README.md의 메타 산출물 리뷰 불릿도 다시 썼는데, spec 본문 어디에도 README를 고친다는 서술이 없다.","consequence":"spec만 읽고 이 변경을 재현·되돌리는 사람은 README를 손대지 않아, 사용자 접점 문서와 호출자 스킬이 서로 다른 절차를 설명하는 상태가 된다.","evidence":"README.md:25 vs specs/...design.md:20-106"}
+],"notes":"확인해서 참으로 판명된 것: 안 하는 것 다섯 중 '렌즈 파일 다섯 미변경'과 'meta-aggregate 계약 미변경'은 git status로 확인했다. PREP에 추가된 칸은 '범위 밖' 하나뿐이다. 재리뷰 상한 없음·3회 이상 없음도 실물과 일치한다. 검증 절이 나열한 단언 여섯 묶음은 모두 스크립트에 실재하며 PASS=73 FAIL=0으로 초록이다. 확인하지 못한 것: 실측 표의 모든 수치."}
+```
