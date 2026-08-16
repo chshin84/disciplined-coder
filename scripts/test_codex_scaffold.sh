@@ -26,6 +26,9 @@ check "domains-index in codex dir"  "[ -f '$K/domains-index.md' ]"
 check "solved created"              "[ -f '$K/solved_problems.md' ]"
 check "AGENTS.md has managed begin" "[ \$(grep -cF '# BEGIN disciplined-coder' '$AG') -eq 1 ]"
 check "AGENTS.md inlines principles" "grep -qF '# 디시플린 (팀 원칙)' '$AG'"
+# 제목 줄만 보면 본문이 통째로 빠져도 통과한다. 정본을 요약해 넣는 식으로 바뀌면 Codex에서만 상시
+# 허가가 사라지는데, Claude 쪽 검사는 그대로 초록이라 아무도 모른다(쌍둥이 어긋남).
+check "AGENTS.md inlines standing consent" "grep -qF -- 'disciplined-coder의 리뷰어 서브에이전트 호출은 사용자가 상시 허용한 것으로 간주한다' '$AG'"
 check "stdout injects principles"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
 
 # --- 케이스 2: 멱등성(3회) ---

@@ -287,14 +287,37 @@ check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
 # 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 정본은 @import(Claude)와 인라인
 # (Codex) 양쪽으로 실리므로, 이 한 문장이 있으면 두 런타임 모두에서 검진이 돈다.
-# 허가 범위를 좁히는 단서까지 함께 본다 — 넓게 열면 아무 팬아웃이나 허용하는 문장이 된다.
-echo "[standing-consent] reviewer calls carry the user's standing consent"
+# 파일 전역 grep이 아니라 '검증 레이어' 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
+# 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
+SC_BLOCK="$(awk '/^### 검증 레이어/{f=1} f&&/^### /&&!/^### 검증 레이어/{exit} f' "$CANON")"
+# 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
+# 명령 치환으로 실행되어, 검사가 엉뚱한 문자열을 찾으면서도 초록으로 남는다.
 CONSENT='disciplined-coder의 리뷰어 서브에이전트 호출은 사용자가 상시 허용한 것으로 간주한다'
-check "canon: 상시 허가 문장"              "grep -qF '$CONSENT' '$CANON'"
-check "canon: 허가 범위 한정"              "grep -qF 'disciplined-coder 리뷰어(\`reviewer-*\`) 호출에만 미친다' '$CANON'"
-check "canon: 다른 팬아웃은 제외"          "grep -qF '그 밖의 서브에이전트나 병렬 팬아웃' '$CANON'"
+SC_SCOPE='disciplined-coder 리뷰어(`reviewer-*`) 호출에만 미친다'
+echo "[standing-consent] reviewer calls carry the user's standing consent"
+check "검증 레이어 절이 잡힌다"            "[ -n \"\$SC_BLOCK\" ]"
+check "canon: 상시 허가 문장"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '$CONSENT'"
+check "canon: 허가 범위 한정"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- \"\$SC_SCOPE\""
+check "canon: 다른 팬아웃은 제외"          "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '그 밖의 서브에이전트나 병렬 팬아웃'"
+# 선행연구 렌즈는 이름을 대서 예외로 못 박아야 한다. 이름이 reviewer-*라 허가에 들면서 동시에 웹에
+# 나가는 유일한 렌즈라, 뭉뚱그린 말로 제외하면 같은 렌즈를 열고 닫는 문장이 된다. 그 상태에서는
+# 렌즈를 범위 밖으로 판단해 조용히 건너뛰게 되고, '막히면 알린다'는 안전장치도 발동하지 않는다.
+check "canon: 선행연구 렌즈를 이름으로 예외" "printf '%s' \"\$SC_BLOCK\" | grep -qF -- 'reviewer-prior-art'"
+check "canon: 뭉뚱그린 심층조사 표현 없음"   "! printf '%s' \"\$SC_BLOCK\" | grep -qF -- '심층조사'"
 # 정본이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 문장이 실려야 한다.
-check "설치본에도 상시 허가 문장"          "grep -qF '$CONSENT' '$K/agent-principles.md'"
+check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$K/agent-principles.md'"
+
+# --- canon-refresh: 이미 옛 정본을 갖고 있는 PC도 갱신을 받는다 ---
+# 갓 설치한 경로만 검사하면, 정본 복사를 '없을 때만'으로 바꿔도 초록이 유지된다. 바로 이웃한 두
+# 블록(오답노트 생성·머리말 동기화)이 일부러 비덮어쓰기라 통일하자며 그렇게 고치기 쉬운 자리다.
+# 그 순간 이미 깔린 모든 설치가 옛 정본에 멈추는데, 새 문장이 필요한 쪽은 정확히 그 설치들이다.
+HRU="$(mktemp -d)"; PRU="$(mktemp -d)"; mkdir -p "$HRU/.claude/disciplined-coder"
+OLDCANON="$HRU/.claude/disciplined-coder/agent-principles.md"
+printf '# 디시플린 (팀 원칙)\n\n옛 사본이라 새 문장이 없다.\n' > "$OLDCANON"
+run "$HRU" "$PRU" >/dev/null
+echo "[canon-refresh] an existing older canon copy is refreshed, not left behind"
+check "옛 사본이 갱신된다"                 "grep -qF -- '$CONSENT' '$OLDCANON'"
+check "옛 내용이 남지 않는다"              "! grep -qF '옛 사본이라 새 문장이 없다' '$OLDCANON'"
 
 # --- section-refs: 옛 절 참조가 남지 않았다 (git 추적 파일, 스펙 아카이브 제외) ---
 # 절을 한글 순서 기호로 가리키던 옛 참조는 어디에도 남으면 안 된다. 이름이 바뀌었기 때문이다.
