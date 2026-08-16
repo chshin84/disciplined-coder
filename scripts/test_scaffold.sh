@@ -283,6 +283,19 @@ done
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
 check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
 
+# --- standing-consent: 리뷰어 호출에 대한 상시 허가가 정본에 있다 ---
+# 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
+# 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 정본은 @import(Claude)와 인라인
+# (Codex) 양쪽으로 실리므로, 이 한 문장이 있으면 두 런타임 모두에서 검진이 돈다.
+# 허가 범위를 좁히는 단서까지 함께 본다 — 넓게 열면 아무 팬아웃이나 허용하는 문장이 된다.
+echo "[standing-consent] reviewer calls carry the user's standing consent"
+CONSENT='disciplined-coder의 리뷰어 서브에이전트 호출은 사용자가 상시 허용한 것으로 간주한다'
+check "canon: 상시 허가 문장"              "grep -qF '$CONSENT' '$CANON'"
+check "canon: 허가 범위 한정"              "grep -qF 'disciplined-coder 리뷰어(\`reviewer-*\`) 호출에만 미친다' '$CANON'"
+check "canon: 다른 팬아웃은 제외"          "grep -qF '그 밖의 서브에이전트나 병렬 팬아웃' '$CANON'"
+# 정본이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 문장이 실려야 한다.
+check "설치본에도 상시 허가 문장"          "grep -qF '$CONSENT' '$K/agent-principles.md'"
+
 # --- section-refs: 옛 절 참조가 남지 않았다 (git 추적 파일, 스펙 아카이브 제외) ---
 # 절을 한글 순서 기호로 가리키던 옛 참조는 어디에도 남으면 안 된다. 이름이 바뀌었기 때문이다.
 # 이 검사도 위와 같은 로케일 함정을 밟으므로 반드시 UTF-8 로케일에서 돌린다.
