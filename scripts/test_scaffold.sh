@@ -271,7 +271,7 @@ echo "[solved-rules-nudge] adjacent opening-marker guard: inner scan must not sk
 check "user line between two openers preserved" "grep -qxF 'USER LINE BETWEEN TWO OPENERS' '$UC22'"
 check "single managed region after run"         "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC22') -eq 1 ]"
 
-# --- canon-sections: 절차 절을 번호가 아니라 이름으로 부른다 (CLEAR-COMM) ---
+# --- canon-sections: 절차 절을 번호가 아니라 이름으로 부른다 (NAME-ITEMS) ---
 # 번호는 항목을 지우거나 끼워 넣는 순간 가리키는 대상이 달라져 조용히 어긋난다. 제목에 이미 이름이
 # 있으므로 그 이름으로 부르고, 옛 서수 제목이 되살아나지 않는지 함께 본다.
 CANON="$HERE/agent-principles.md"
@@ -311,15 +311,15 @@ check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$
 # 이 규칙이 리뷰 스킬 한 곳에만 있으면 그 스킬을 열지 않은 세션에는 닿지 않는다. 실제로 문서 검진
 # 세션이 다시 돌릴지를 평문으로 물어 선택 대화창이 뜨지 않았다. 묻는 방식은 특정 절차의 성질이 아니라
 # 소통 규칙이므로 상시 로드되는 항목에 두고, 리뷰 스킬은 그것을 가리키기만 한다(SSOT).
-CC_LINE="$(grep -F '**`CLEAR-COMM`' "$CANON" || true)"
+CC_LINE="$(grep -F '**`ASK-FORK`' "$CANON" || true)"
 SR="$HERE/skills/domain-spec-review/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
-check "CLEAR-COMM 항목이 잡힌다"            "[ -n \"\$CC_LINE\" ]"
-check "CLEAR-COMM: 질문 도구 규칙"          "printf '%s' \"\$CC_LINE\" | grep -qF -- '질문 도구로 선택지를 띄운다'"
-check "CLEAR-COMM: 평문이 안 되는 이유"     "printf '%s' \"\$CC_LINE\" | grep -qF -- '답할 자리인지'"
+check "ASK-FORK 항목이 잡힌다"              "[ -n \"\$CC_LINE\" ]"
+check "ASK-FORK: 질문 도구 규칙"            "printf '%s' \"\$CC_LINE\" | grep -qF -- '질문 도구로 선택지를 띄운다'"
+check "ASK-FORK: 평문이 안 되는 이유"       "printf '%s' \"\$CC_LINE\" | grep -qF -- '답할 자리인지'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
-check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'CLEAR-COMM'"
+check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'ASK-FORK'"
 
 # --- canon-refresh: 이미 옛 정본을 갖고 있는 PC도 갱신을 받는다 ---
 # 갓 설치한 경로만 검사하면, 정본 복사를 '없을 때만'으로 바꿔도 초록이 유지된다. 바로 이웃한 두
