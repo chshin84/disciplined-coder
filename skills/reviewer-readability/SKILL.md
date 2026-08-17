@@ -174,10 +174,10 @@ description: 문서가 전달하려는 것을 무엇이 방해하는지 보는 �
 ## 출력 스키마 (공통 + 이 렌즈의 둘)
 
 ```
-{ "lens": "readability", "purpose": "판정에 쓴 목적 한 줄 — 못 받았거나 읽는 사람과 할 수 있어야 하는 것 중 하나라도 빠졌으면 null", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "friction|narrative|language|scope|structure|wrong-job", "claim": "무엇이 방해하는가", "consequence": "이대로 두면 전달이 어떻게 막히는가", "evidence": "문제 문장을 그대로 인용", "rewrite": "고친 것 — 문장이든 옮긴 절이든 새로 쓴 문장이든. 손대지 않는 것에 걸리는 자리만 null" } ], "notes": "" }
+{ "lens": "readability", "purpose": "판정에 쓴 목적 한 줄 — 못 받았거나 읽는 사람과 할 수 있어야 하는 것 중 하나라도 빠졌으면 null", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "friction|narrative|language|scope|structure|wrong-job", "claim": "무엇이 방해하는가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가 — 이 렌즈에서는 전달이 어떻게 막히는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 문제 문장을 그대로 인용한다", "rewrite": "고친 것 — 문장이든 옮긴 절이든 새로 쓴 문장이든. 손대지 않는 것에 걸리는 자리만 null" } ], "notes": "" }
 ```
 
-필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 여기에 복제하지 않는다.
+필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 위 블록은 그 계약을 이 렌즈의 값으로 채워 보인 사본이고, 뜻풀이가 정본과 어긋나면 계약 테스트가 잡는다.
 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 **`purpose`는 조용한 통과를 막는다.** 빈 `issues`가 두 가지 다른 사정에서 나오는데 집계 단계는 둘을
@@ -193,4 +193,4 @@ description: 문서가 전달하려는 것을 무엇이 방해하는지 보는 �
 정했더라도 그 목적이 문서와 안 맞았을 수 있는데, 그때 생기는 오류는 문장이 매끄러워 읽어서는 안
 걸린다.
 
-**Claude 서브에이전트로 띄운 리뷰에서만** 호출자가 `principles_applied`(읽고 적용한 원칙 ID 목록)를 함께 요구한다 — 그 종류에는 원칙 정본이 안 실릴 수 있어 읽었다는 흔적을 산출물에 남기기 위해서다. **제품 런타임 구현에는 요구하지 않는다.** 위 공통 스키마 자체는 실행 방식에 중립이다.
+`principles_applied`를 언제 요구하는지는 `meta-aggregate`의 리뷰 산출물 계약이 정한다 — 여기서 다시 정하지 않는다.

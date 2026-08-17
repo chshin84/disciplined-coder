@@ -25,9 +25,9 @@ description: 설계 문서(spec/plan)의 내부 모순·커버리지 공백·이
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "consistency", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "contradiction|gap|drift|scope", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거" } ], "notes": "" }
+{ "lens": "consistency", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "contradiction|gap|drift|scope", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL" } ], "notes": "" }
 ```
-필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 여기에 복제하지 않는다.
+필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 위 블록은 그 계약을 이 렌즈의 값으로 채워 보인 사본이고, 뜻풀이가 정본과 어긋나면 계약 테스트가 잡는다.
 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
-**Claude 서브에이전트로 띄운 리뷰에서만** 호출자가 `principles_applied`(읽고 적용한 원칙 ID 목록)를 함께 요구한다 — 그 종류에는 원칙 정본이 안 실릴 수 있어 읽었다는 흔적을 산출물에 남기기 위해서다. **제품 런타임 구현에는 요구하지 않는다.** 위 공통 스키마 자체는 실행 방식에 중립이다.
+`principles_applied`를 언제 요구하는지는 `meta-aggregate`의 리뷰 산출물 계약이 정한다 — 여기서 다시 정하지 않는다.

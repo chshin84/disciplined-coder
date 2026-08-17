@@ -59,9 +59,9 @@ description: 설계가 하려는 것을 누가 이미 해봤는지, 결과가 �
 
 ## 출력 스키마 (공통 + 이 렌즈의 넷)
 ```
-{ "lens": "prior-art", "search_status": "ok|no-results|failed|not-attempted", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "refuted-premise|known-failure|crowded|weak-baseline", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "선행 사례와 그 결말, 네 축의 같고 다름", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|reviewer-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "리뷰어 자신의 불확실성" ], "notes": "" }
+{ "lens": "prior-art", "search_status": "ok|no-results|failed|not-attempted", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "refuted-premise|known-failure|crowded|weak-baseline", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 선행 사례와 그 결말, 네 축의 같고 다름을 적는다", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|reviewer-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "리뷰어 자신의 불확실성" ], "notes": "" }
 ```
-필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 여기에 복제하지 않는다.
+필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 위 블록은 그 계약을 이 렌즈의 값으로 채워 보인 사본이고, 뜻풀이가 정본과 어긋나면 계약 테스트가 잡는다.
 처분은 이 렌즈가 정하지 않는다. **이 렌즈의 발견은 호출자가 전부 `🔴`로 처분한다** — 웹에서 읽어 온
 내용이 설계 문서를 자동으로 고치는 경로를 닫기 위해서이며, 그 규칙은 `domain-spec-review`가 SSOT다.
 
@@ -80,8 +80,7 @@ description: 설계가 하려는 것을 누가 이미 해봤는지, 결과가 �
 `sources`가 아니라 `citations`로 둔 것은 `meta-aggregate`가 어느 렌즈에서 나왔는지를 `source`로 태깅하기
 때문이다. `not_found`와 `disclosures`도 집계 대상이 아니다.
 
-**Claude 서브에이전트로 띄운 리뷰에서만** 호출자가 `principles_applied`(읽고 적용한 원칙 ID 목록)를 함께
-요구한다 — 그 종류에는 원칙 정본이 안 실릴 수 있어 읽었다는 흔적을 산출물에 남기기 위해서다.
-**제품 런타임 구현에는 요구하지 않는다** — 이 렌즈는 spec 리뷰 전용이며 제품 런타임 검증에는 쓰지 않는다. 런타임
-리뷰는 제품이 방금 만든 출력을 보는 것이고 선행연구 대조는 설계를 보는 것이라 대상이 다르다. 위 공통
-스키마 자체는 실행 방식에 중립이다.
+`principles_applied`를 언제 요구하는지는 `meta-aggregate`의 리뷰 산출물 계약이 정한다 — 여기서 다시
+정하지 않는다. 다만 이 렌즈에는 그 규칙이 언제나 걸린다는 사정이 하나 있다 — **이 렌즈는 spec 리뷰
+전용이며 제품 런타임 검증에는 쓰지 않는다.** 런타임 리뷰는 제품이 방금 만든 출력을 보는 것이고
+선행연구 대조는 설계를 보는 것이라 대상이 다르다.

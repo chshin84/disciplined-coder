@@ -405,7 +405,11 @@ for D in "$HERE"/skills/reviewer-*/; do
   F="$D/SKILL.md"
   check "reviewer-$l: SKILL.md 존재"        "[ -f '$F' ]"
   check "reviewer-$l: principles_applied"   "grep -qF 'principles_applied' '$F'"
-  check "reviewer-$l: 제품 구현 제외 단서"  "grep -qF '제품 런타임 구현에는 요구하지 않는다' '$F'"
+  # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 정본으로 넘긴다. 예전에는 일곱 파일이
+  # 같은 문단을 복제해 지켰는데, 그 사이 정본의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
+  # 필수 여부가 두 곳에서 갈렸다. 지금은 정본 한 곳만 규정하고 렌즈는 가리키기만 한다(`SSOT`).
+  PA_POINTER='`meta-aggregate`의 리뷰 산출물 계약이 정한다'
+  check "reviewer-$l: 규칙을 정본으로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
 done
 check "meta-aggregate: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/meta-aggregate/SKILL.md'"
 
