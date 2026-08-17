@@ -1,6 +1,6 @@
 ---
 name: domain-spec-review
-description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 리뷰어들(reviewer-grounding·consistency·adversarial, 그리고 spec에 한해 제안·승인 뒤 붙는 reviewer-prior-art)로 검증하고, 발견을 🔴와 고칠 것으로 가르는 호출자. 렌즈마다 2회씩 띄워 리뷰 기록으로 남긴다. superpowers spec/plan 작성 시 훅이 강제. 제품 런타임 콜이 아니라 Claude 자신의 설계 문서 리뷰다.
+description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 리뷰어들(reviewer-grounding·consistency·adversarial, 그리고 spec에 한해 제안·승인 뒤 붙는 reviewer-prior-art)로 검증하고, 발견을 🔴와 고칠 것으로 가르는 호출자. 렌즈마다 2회씩 띄워 리뷰 기록으로 남긴다. superpowers 경로에 spec이나 plan을 쓰면 훅이 강제한다. 제품 런타임 콜이 아니라 Claude 자신의 설계 문서 리뷰다.
 ---
 # domain-spec-review — spec/plan 독립 리뷰 호출자
 

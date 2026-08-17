@@ -1,6 +1,6 @@
 ---
 name: meta-aggregate
-description: 리뷰어 둘 이상의 출력을 모아 구조적 건강성(상충·공백)을 점검하고 accept/regenerate/escalate를 결정하는 집계 단계. 리뷰어가 아니다(렌즈 아님). 코드 설계도이며 내용 재판단은 하지 않는다.
+description: 리뷰어 둘 이상의 출력을 모아 구조적 건강성(상충·공백)을 점검하고 accept/regenerate/escalate를 결정하는 집계 단계. 리뷰어가 아니다(렌즈가 아니다). 코드 설계도이며 내용 재판단은 하지 않는다.
 ---
 # meta-aggregate — 집계·결정 (코드 설계도)
 
