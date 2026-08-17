@@ -49,11 +49,23 @@ MANAGED_STRIP_AWK='
 MANAGED_TRIM_AWK='{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }'
 
 # 관리블록을 걷어내기만 한다(본문을 다시 넣지 않는다). 없앤 기능이 남긴 고아 블록 정리용.
-# 리턴: 0=걷어냄, 1=대상이 없어 아무것도 안 함. 호출은 반드시 if로 감싼다(set -e).
+# 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에 끼워 넣은 줄도 함께 사라진다. 그 파일은
+# git 밖일 수 있어 사본이 유일한 복구 수단이다 — 그래서 사본 경로를 인자로 받아 여기서 직접 뜨고,
+# 못 뜨면 아예 걷어내지 않는다(오답노트 머리말과 같은 규율. 호출자가 기억하게 두지 않으려고 함수
+# 안에 둔다 — `FAIL-LOUD`).
+# 리턴: 0=걷어냄, 1=대상이 없어 아무것도 안 함, 2=사본을 못 떠서 걷어내지 않음.
+# 호출은 반드시 `|| rc=$?`로 감싼다(set -e).
 managed_block_remove() {
-  local uc="$1" begin="$2" end="$3" tmp norm lock
+  local uc="$1" begin="$2" end="$3" bk="${4:-}" tmp norm lock
+  managed_block_backup=""
   [ -f "$uc" ] || return 1
   grep -qF "$begin" "$uc" 2>/dev/null || return 1
+  if [ -n "$bk" ]; then
+    if ! mkdir -p "$(dirname "$bk")" 2>/dev/null || ! cp "$uc" "$bk" 2>/dev/null; then
+      return 2
+    fi
+    managed_block_backup="$bk"
+  fi
   lock="$uc.lock"
   local waited=0
   while ! mkdir "$lock" 2>/dev/null; do

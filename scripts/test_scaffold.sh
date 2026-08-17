@@ -160,7 +160,7 @@ done
 # --- workflow-verification-row: 검증 레이어 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
 # 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(reviewer-*)과
 # 강제 방식 열이 같은 행에 있음을 보장한다(다른 행·다른 파일의 문자열로 vacuous 통과 방지).
-WF_ROW="$(grep -F '멀티에이전트 워크플로 작성·실행' "$HERE/agent-principles.md" || true)"
+WF_ROW="$(grep -F '멀티에이전트 워크플로를 쓰거나 돌릴 때' "$HERE/agent-principles.md" || true)"
 echo "[workflow-verification-row] principles table has workflow verification row"
 check "row exists (trigger)"       "[ -n \"\$WF_ROW\" ]"
 check "row caller = reviewer-*"    "printf '%s' \"\$WF_ROW\" | grep -qF 'reviewer-*'"
@@ -610,5 +610,53 @@ check "포인터: 제거를 알린다"             "printf '%s' \"\$OUTR11\" | g
 check "포인터: 전역 블록은 그대로"        "[ \$(grep -cF '# BEGIN disciplined-coder' '$HR11/.claude/CLAUDE.md') -eq 1 ]"
 run "$HR11" "$PR11" >/dev/null
 check "포인터: 재실행도 사용자 줄 보존"   "grep -qF '이 줄은 사용자 것이라 남아야 한다' '$PR11/CLAUDE.md'"
+
+# (파) 블록을 걷어내기 전에 사본을 뜬다. 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에
+# 끼워 넣은 줄도 함께 사라진다. 이 파일은 git 밖일 수 있어 사본이 유일한 복구 수단이다
+# (오답노트 머리말과 같은 규율 — domain-docs가 정본).
+HR12="$(mktemp -d)"; PR12="$(mktemp -d)"
+{ printf '# 내 프로젝트 지침\n\n'
+  printf '# BEGIN disciplined-coder (managed — do not edit)\n'
+  printf '## 오답노트 (solved_problems)\n'
+  printf '블록 안에 사람이 끼워 넣은 줄.\n'
+  printf '# END disciplined-coder (managed — do not edit)\n'
+} > "$PR12/CLAUDE.md"
+OUTR12="$(run "$HR12" "$PR12")"
+echo "[stale] removing the retired block leaves a copy behind"
+check "포인터: 블록 안 줄이 사본에 남는다" "grep -rqF '블록 안에 사람이 끼워 넣은 줄' '$HR12/.claude/disciplined-coder/backups'"
+check "포인터: 사본 경로를 알린다"        "printf '%s' \"\$OUTR12\" | grep -qF '사본:'"
+check "포인터: 사본은 전역에 쌓인다"      "[ ! -d '$PR12/backups' ]"
+
+# (하) 사본을 못 뜨면 블록을 걷어내지 않는다. 못 뜨는 채로 걷어내면 되돌릴 방법이 없기 때문이다.
+# backups 자리를 파일이 막고 있으면 mkdir이 실패한다 — 권한이나 백신이 막는 PC를 흉내 낸 것이다.
+HR13="$(mktemp -d)"; PR13="$(mktemp -d)"; mkdir -p "$HR13/.claude/disciplined-coder"
+printf 'backups 자리를 파일이 막고 있다\n' > "$HR13/.claude/disciplined-coder/backups"
+{ printf '# BEGIN disciplined-coder (managed — do not edit)\n'
+  printf '옛 포인터 본문.\n'
+  printf '# END disciplined-coder (managed — do not edit)\n'
+} > "$PR13/CLAUDE.md"
+OUTR13="$(run "$HR13" "$PR13")"
+echo "[stale] a block that cannot be copied is left alone"
+check "사본 실패: 블록을 안 걷어낸다"     "grep -qF 'BEGIN disciplined-coder' '$PR13/CLAUDE.md'"
+check "사본 실패: 사유를 알린다"          "printf '%s' \"\$OUTR13\" | grep -qF '사본을 뜨지 못해'"
+check "사본 실패: 나머지 셋업은 돈다"     "[ -f '$HR13/.claude/disciplined-coder/agent-principles.md' ]"
+
+# (거) 머리말을 못 고친 사유를 가려 알린다. 경계를 못 찾은 것과 사본을 못 뜬 것은 사람이 할 일이
+# 다르다 — 앞엣것은 로그를 손봐야 하고 뒤엣것은 쓰기 권한을 풀어야 한다. 한 문구로 뭉개면
+# 쓰기가 막힌 PC에서 멀쩡한 머리말을 고치려 들게 되고, 그 신호는 끄는 수단이 없다.
+HR14="$(mktemp -d)"; PR14="$(mktemp -d)"; mkdir -p "$HR14/.claude/disciplined-coder"
+printf 'backups 자리를 파일이 막고 있다\n' > "$HR14/.claude/disciplined-coder/backups"
+LOG14="$HR14/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems)\n\n'
+  printf '옛 머리말이다.\n\n'
+  printf -- '- **옛 항목** → 원인 → 해결\n'
+} > "$LOG14"
+BEFORE14="$(cksum < "$LOG14")"
+OUTR14="$(run "$HR14" "$PR14")"
+echo "[solved-rules] refusing for lack of a copy says which reason it was"
+check "사본 실패: 로그 불변(바이트)"      "[ \"\$(cksum < '$LOG14')\" = '$BEFORE14' ]"
+check "사본 실패: 공통 신호는 그대로"     "printf '%s' \"\$OUTR14\" | grep -qF '$NUDGE'"
+check "사본 실패: 사본 사유를 알린다"     "printf '%s' \"\$OUTR14\" | grep -qF '사본을 뜨지 못해'"
+check "사본 실패: 경계 문구는 안 쓴다"    "! printf '%s' \"\$OUTR14\" | grep -qF '머리말의 끝을 알아볼 수 없어'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

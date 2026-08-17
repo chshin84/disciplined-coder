@@ -1,50 +1,44 @@
 # disciplined-coder
 
-팀 엔지니어링 원칙과 프로젝트 간 공통 함정을 `agent-principles.md` 한 곳에 모아 두는 Claude Code 플러그인이다. SessionStart hook이 그 내용을 **PC-레벨**(`~/.claude/disciplined-coder/`)에 자동으로 셋업한다.
+팀 엔지니어링 원칙을 모든 Claude Code 세션에 자동으로 실어 주는 플러그인이다. 어느 프로젝트를 열어도 같은 원칙을 들고 일하게 하되, 작업 폴더에는 파일을 만들지 않는다.
 
-**대상** — 팀 디시플린을 모든 프로젝트에 걸쳐 PC 전역으로 깔되, 프로젝트 폴더는 (자동으로는) 더럽히고 싶지 않은 Claude Code 사용자.
+**대상** — 팀 디시플린을 모든 프로젝트에 걸쳐 PC 전역으로 깔되, 프로젝트 폴더는 (자동으로는) 더럽히고 싶지 않은 Claude Code 사용자를 위한 것이다.
 
-## Highlights
-- **프로젝트 폴더 footprint zero (자동)** — 지식은 `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다. 관리블록은 플러그인이 만들고 갱신하는, 시작과 끝을 표시로 구분해 둔 구간이다. 어느 프로젝트를 열어도 작업 폴더엔 자동으로는 아무 파일도 안 생긴다. 그 레포에서 문제를 해결해 적을 교훈이 생기면 그때 `docs/solved_problems.md`를 만든다. 이미 있는 그 로그의 머리말이 낡았을 때와, 없앤 기능이 남긴 관리블록이 `CLAUDE.md`에 있을 때만 자동으로 손본다. 손대기 전에 사본을 먼저 뜬다.
-- **메인 세션과 커스텀 서브에이전트에 도달** — PC-레벨 주입이라 메인 세션과 커스텀 서브에이전트가 같은 원칙·오답노트를 자동으로 보유한다. 다만 에이전트 종류에 따라 갈린다 — 빌트인 읽기 전용 종류에는 실리지 않는다. 실측 표는 [DESIGN-NOTES](docs/DESIGN-NOTES.md)에 있다.
+원칙과 프로젝트 간 공통 함정은 `agent-principles.md` 한 곳에 모아 두고, SessionStart hook이 그 내용을 **PC-레벨**(`~/.claude/disciplined-coder/`)에 자동으로 셋업한다.
+
+## 무엇이 좋은가
+- **프로젝트 폴더에 발자국을 안 남긴다** — 어느 프로젝트를 열어도 작업 폴더엔 자동으로는 아무 파일도 안 생긴다. 지식은 `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다. 관리블록은 플러그인이 만들고 갱신하는, 시작과 끝을 표시로 구분해 둔 구간이다. 자동 계층이 프로젝트 파일을 만들거나 손보는 예외 셋은 아래 「무엇을·왜 자동화하나」에 적었다.
+- **메인 세션과 커스텀 서브에이전트에 도달** — PC-레벨 주입이라 메인 세션과 커스텀 서브에이전트가 같은 원칙·오답노트를 보유한다. 다만 에이전트 종류에 따라 갈린다 — 빌트인 읽기 전용 종류에는 실리지 않는다. 그리고 우리가 실제로 잰 것은 네 종류뿐이라, 사용자가 직접 정의한 서브에이전트는 재 보지 않았다(실측 표와 그 한계는 [DESIGN-NOTES](docs/DESIGN-NOTES.md)에 있다). 자기 리뷰어를 정의해 쓴다면 원칙이 실린다고 믿지 말고 정본 경로를 프롬프트에 넣어라.
 - **설치 후 무조작** — 새 세션을 시작하면 hook이 알아서 셋업하고 배선한다. 여러 번 돌아도 결과가 같다.
 - **첫 설치 세션에서만 이중 전달** — 관리 블록이 막 생긴 세션은 아직 `@import`만으로는 정본에 닿지 못하므로, 그 세션 한 번에 한해 정본을 stdout(주입 컨텍스트)으로 함께 보내 조용한 누락을 막는다(`FAIL-LOUD`). 두 번째 세션부터는 세션 시작 때 `@import`가 읽은 내용이 그 뒤 요청에도 실린다.
 - **글쓰기·문서 디시플린** — 답변 표현은 `CLEAR-COMM`과 `READ-FLOW`가 상시 잡는다. 짧은 답보다 읽기에 덜 피로한 답을 택하라는 규율이다. 문서는 사람이 글 쓰는 흐름을 흉내 낸다 — 쓰기 전에 양식을 제안하고, 다 쓰면 검진을 넛지한다.
 
 ## 설치 (user scope 권장)
-> **왜 user scope인가** — scaffold 출력은 어느 스코프로 깔든 PC 전역(`~/.claude/`)에 쓴다. 그러나 SessionStart hook이 **발동**하는 곳은 플러그인이 활성인 세션뿐이다. user scope면 모든 프로젝트의 모든 새 세션에서 hook이 돌아 reach + 정본 refresh가 함께 보장된다(project scope는 그 프로젝트 세션에서만 발동·갱신).
+**전제 조건 — Windows 사용자는 [Git Bash](https://git-scm.com/downloads) 필수.** SessionStart hook이 `bash "...scaffold.sh"`로 스크립트를 돌리는데 Windows엔 bash가 없다(없으면 PowerShell로 넘어가 실패한다). 실행권한 비트(`chmod +x`)는 필요 없다. mac과 Linux는 bash가 기본으로 깔려 있어 따로 설치할 것이 없다(훅은 sh가 아니라 bash를 호출한다).
 
-**전제 조건 — Windows 사용자는 [Git Bash](https://git-scm.com/downloads) 필수.** SessionStart hook이 `bash "...scaffold.sh"`로 스크립트를 돌리는데 Windows엔 bash가 없다(없으면 PowerShell 폴백 → 실패). 실행권한 비트(`chmod +x`)는 불필요. mac/Linux는 bash가 기본 탑재라 별도 설치 불필요(훅은 sh가 아니라 bash를 호출한다).
-
-**A. 마켓플레이스로 (공유·배포)** — 이 레포가 곧 마켓플레이스다(`.claude-plugin/marketplace.json`).
+**마켓플레이스로 설치하기 (공유·배포)** — 이 레포가 곧 마켓플레이스다(`.claude-plugin/marketplace.json`).
 1. `/plugin marketplace add chshin84/disciplined-coder`
 2. `/plugin install disciplined-coder@chshin-tools`
 3. 업데이트: `/plugin marketplace update chshin-tools`
 
-**B. 로컬 클론으로 (개발·기여)**
+**로컬 클론으로 설치하기 (개발·기여)**
 1. 이 디렉터리를 클론한다.
 2. `claude plugin install ./ --scope user` (모든 프로젝트에서 자동 활성화).
 
-**어느 경로든 스코프가 user인지 확인한다.** `claude plugin install`의 기본 스코프는 `user`이고 `--scope`로 바꾼다. project나 local로 깔리면 그 프로젝트 세션에서만 hook이 돌아, 다른 프로젝트에서 아무 일도 안 일어난다. 그런데 그 상태가 겉으로는 정상과 똑같이 보이므로 아래 확인 단계를 거친다.
+**어느 경로든 스코프가 user인지 확인한다.** `claude plugin install`의 기본 스코프는 `user`이고 `--scope`로 바꾼다. project나 local로 깔리면 그 프로젝트 세션에서만 hook이 돌아, 다른 프로젝트에서 아무 일도 안 일어난다. 그런데 그 상태가 겉으로는 정상과 똑같이 보이므로 아래 「이렇게 보이면 성공이다」를 거친다.
 
-검증: `claude plugin validate ./`. `--strict`는 version 미지정 경고 때문에 실패하는데, 이는 의도된 트레이드오프다 — 활성 개발 중엔 version을 비워야 커밋 SHA 기반 자동 업데이트가 유지된다(상세는 `skills/domain-plugin`).
+> **왜 user scope인가** — scaffold 출력은 어느 스코프로 깔든 PC 전역(`~/.claude/`)에 쓴다. 그러나 SessionStart hook이 **발동**하는 곳은 플러그인이 활성인 세션뿐이다. user scope면 모든 프로젝트의 모든 새 세션에서 hook이 돌아, 어느 세션에나 닿는 것과 정본을 최신으로 갱신하는 것이 함께 보장된다(project scope는 그 프로젝트 세션에서만 발동·갱신).
 
-### Codex에서 쓰기 (동일 디시플린)
-이 레포는 Claude Code 플러그인이자 **Codex 플러그인**이다(`.codex-plugin/plugin.json`). Codex도 같은 원칙·스킬·강제 게이트(spec/plan·문서 리뷰)를 받는다.
-1. 이 레포를 Codex 플러그인으로 설치한다(`codex plugin` 설치 경로).
-2. **신뢰검토 필수** — Codex는 플러그인 훅을 *신뢰*하기 전엔 조용히 건너뛴다. 설치 후 한 번 훅을 신뢰해야 게이트가 작동한다(세션 시작 시 경고가 뜬다).
-3. 새 Codex 세션을 시작하면 `session-start-codex` 훅이 `~/.codex/disciplined-coder/` 셋업 + `~/.codex/AGENTS.md` 관리블록 배선 + 원칙 주입을 자동 수행한다.
-
-차이를 정직하게 적는다. Codex는 `@import`를 지원하지 않으므로 원칙을 `~/.codex/AGENTS.md` 관리블록에 인라인으로 넣는다. 관리블록을 방금 만든 첫 세션에서만 정본을 세션 컨텍스트로 한 번 더 보내고, 그다음부터는 인라인 한 경로만 쓴다(이중 전송은 의도적으로 제거했다). 파일 편집은 `apply_patch`로 가므로 게이트 훅이 그 입력을 읽는다. 동작은 Claude와 같고, 위 신뢰검토 단계가 하나 더 붙는다.
+**병렬 오케스트레이션 절차는 superpowers 플러그인을 함께 깔아야 돈다.** 원칙의 그 절과 `skills/nested-orchestration`이 `dispatching-parallel-agents`·`brainstorming` 같은 superpowers 스킬로 라우팅하는데, 그것들은 이 플러그인에 들어 있지 않다. 안 깔려 있으면 그 자리에서 조용히 건너뛰게 된다. 나머지 기능은 superpowers 없이도 그대로 돈다.
 
 ## 사용
-설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어:
-- `~/.claude/disciplined-coder/`에 정본 사본과 오답노트를 셋업한다(정확한 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다)
-- `~/.claude/CLAUDE.md` 관리블록에 `@import`를 배선한다(없으면 생성하고, 있으면 멱등 갱신한다)
-- 오답노트의 형식 규칙 서술이 현행과 달라지면 사본을 뜬 뒤 머리말을 현행 형식으로 갈아끼우고 무엇을 했는지 알린다(항목은 건드리지 않으며, 머리말의 끝을 알아볼 수 없는 로그는 손대지 않고 알리기만 한다)
-- 세션을 연 프로젝트에 `docs/solved_problems.md`가 있으면 그것도 같은 처리를 받는다(사본은 프로젝트가 아니라 전역 백업에 쌓는다)
+설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어 넷을 한다.
+- `~/.claude/disciplined-coder/`에 정본 사본과 오답노트를 셋업한다. 어떤 파일이 생기는지의 정본은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`다.
+- `~/.claude/CLAUDE.md` 관리블록에 `@import`를 배선한다. 없으면 만들고, 있으면 멱등하게 갱신한다.
+- 오답노트의 형식 규칙 서술이 현행과 달라지면 사본을 뜬 뒤 머리말을 현행 형식으로 갈아끼우고 무엇을 했는지 알린다. 항목은 건드리지 않는다. 손대지 못했으면 그 사유를 가려 알린다 — 머리말의 끝을 알아볼 수 없었는지, 사본을 뜨지 못했는지가 갈려서 나온다.
+- 세션을 연 프로젝트에 `docs/solved_problems.md`가 있으면 그것도 같은 처리를 받는다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
 
-이후 어느 프로젝트에서 열어도 메인 세션이 원칙 + 도메인 목차 + 오답노트를 자동으로 보유한다. 서브에이전트는 종류에 따라 갈린다([DESIGN-NOTES](docs/DESIGN-NOTES.md)의 실측 표를 보라). **자동 계층은 프로젝트 폴더에 파일을 새로 만들지 않는다.**
+이후 어느 프로젝트에서 열어도 메인 세션이 원칙 + 도메인 목차 + 오답노트를 자동으로 보유한다. 서브에이전트는 종류에 따라 갈린다([DESIGN-NOTES](docs/DESIGN-NOTES.md)의 실측 표를 보라).
 
 ### 이렇게 보이면 성공이다
 셋업은 조용히 돌기 때문에 성공과 실패가 겉으로 같아 보인다. 특히 Windows에서 bash가 없어 hook이 실패한 경우와 정상 동작이 화면상 구별되지 않는다. 새 세션을 한 번 연 뒤 아래 셋을 확인한다.
@@ -63,12 +57,22 @@
 /setup-discipline    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
 ```
 
+## Codex에서 쓰기 (동일 디시플린)
+이 레포는 Claude Code 플러그인이자 **Codex 플러그인**이다(`.codex-plugin/plugin.json`). Codex도 같은 원칙·스킬·강제 게이트(spec/plan·문서 리뷰)를 받는다.
+1. 이 레포를 Codex 플러그인으로 설치한다(`codex plugin` 설치 경로).
+2. **신뢰검토 필수** — Codex는 플러그인 훅을 *신뢰*하기 전엔 조용히 건너뛴다. 설치 후 한 번 훅을 신뢰해야 게이트가 작동한다(세션 시작 시 경고가 뜬다).
+3. 새 Codex 세션을 시작하면 `session-start-codex` 훅이 `~/.codex/disciplined-coder/` 셋업 + `~/.codex/AGENTS.md` 관리블록 배선 + 원칙 주입을 자동 수행한다.
+
+차이를 정직하게 적는다. Codex는 `@import`를 지원하지 않으므로 원칙과 도메인 목차를 `~/.codex/AGENTS.md` 관리블록에 인라인으로 넣는다. 그 둘은 관리블록을 방금 만든 첫 세션에서만 세션 컨텍스트로 한 번 더 보내고, 그다음부터는 인라인 한 경로만 쓴다(이중 전송은 의도적으로 제거했다). 오답노트는 인라인에 넣지 않고 매 세션 세션 컨텍스트로 보낸다 — 자주 커지는 파일이라 관리블록에 굽지 않는다. 파일 편집은 `apply_patch`로 가므로 게이트 훅이 그 입력을 읽는다. 동작은 Claude와 같고, 위 신뢰검토 단계가 하나 더 붙는다.
+
 ## 무엇을·왜 자동화하나
 모든 세션이 같은 디시플린을 들고 일하게 하되, **자동 계층(scaffold·훅)은 프로젝트 폴더에 파일을 새로 만들지 않는다**. 그래서 지식을 프로젝트가 아니라 **PC-레벨**(`~/.claude/`)에 두고, `~/.claude/CLAUDE.md`의 관리블록이 그것을 `@import`한다. **서브에이전트에 이 메모리 계층이 실리는지는 에이전트 종류에 따라 갈린다** — 한 곳에 배선하면 메인 세션과 커스텀 서브에이전트에는 도달하지만 빌트인 읽기 전용 종류에는 실리지 않는다(실측 표와 대응 방법은 [DESIGN-NOTES](docs/DESIGN-NOTES.md)).
 
+**자동 계층이 프로젝트 파일에 손대는 예외는 셋뿐이며, 여기가 그 정본이다.** 첫째, 그 레포에서 문제를 해결해 적을 교훈이 생기면 그때 `docs/solved_problems.md`를 만든다. 둘째, 이미 있는 그 로그의 머리말이 낡았으면 갈아끼운다. 셋째, 없앤 기능이 남긴 관리블록이 그 레포 `CLAUDE.md`에 있으면 걷어낸다. 뒤의 둘은 손대기 전에 사본을 먼저 뜨고, 사본을 못 뜨면 아예 손대지 않는다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
+
 자동화 대상:
-- **일반 지식**(원칙 + 공통 gotchas + 도메인 목차) — `agent-principles.md`·`domains-index.md`(SSOT)를 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선한다.
-- **오답노트**(solved) — `~/.claude/disciplined-coder/solved_problems.md`가 없으면 생성한다(PC 전역 누적, 멱등, append-only). 운영 규약(완결 후 등록이라 상태 아님, 단일 작성자, 🔴 surface·자율구현 금지, **이슈 트래킹 안 함**)은 `agent-principles.md`의 오답노트 절이 SSOT다.
+- **일반 지식**(원칙 + 공통 함정 + 도메인 목차) — `agent-principles.md`·`domains-index.md`(SSOT)를 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선한다.
+- **오답노트**(solved) — `~/.claude/disciplined-coder/solved_problems.md`가 없으면 생성한다(PC 전역 누적, 멱등, append-only). 운영 규약(완결 후 등록이라 상태 아님, 단일 작성자, 🔴는 즉시 알리고 자율구현 금지, **이슈 트래킹 안 함**)은 `agent-principles.md`의 오답노트 절이 SSOT다.
 - **스킬**(domain-*/reviewer-*/meta-aggregate) — 플러그인에서 온디맨드로 로드한다. 복사·주입하지 않는다.
 
 ### 도메인 참고서 + 런타임/메타 검증
@@ -79,9 +83,10 @@
 
 ## 주의
 - **플러그인 루트 `CLAUDE.md`는 컨텍스트로 로드되지 않는다** — 주입 경로는 `~/.claude/CLAUDE.md`의 `@import`다.
-- **호스트 셸 의존** — hook은 호스트에서 돈다(컨테이너 아님). Windows는 Git Bash 필요.
-- **CLAUDE.md는 강제가 아닌 가이드** — 🔴 자율구현 같은 지시를 진짜 막으려면 `PreToolUse` hook로 강제.
-- 주입 메커니즘·예외(Explore/Plan), 깊은 한계, 구버전 업그레이드는 → **[DESIGN-NOTES](docs/DESIGN-NOTES.md)**.
+- **호스트 셸에 기댄다** — hook은 컨테이너가 아니라 호스트에서 돌기 때문에, Windows에서는 Git Bash가 있어야 한다.
+- **CLAUDE.md는 강제가 아니라 가이드다** — 🔴 자율구현 같은 지시를 진짜로 막으려면 `PreToolUse` hook을 걸어 강제해야 한다.
+- **매니페스트 검사는 기여자용이다** — `claude plugin validate ./`는 플러그인 파일 자체가 올바른지만 본다. 셋업이 실제로 됐는지는 위 「이렇게 보이면 성공이다」로 확인한다. `--strict`는 version 미지정 경고 때문에 실패하는데, 이는 의도된 트레이드오프다 — 활성 개발 중엔 version을 비워야 커밋 SHA 기반 자동 업데이트가 유지된다(상세는 `skills/domain-plugin`).
+- 주입 메커니즘과 그 예외(Explore·Plan), 깊은 한계, 구버전 업그레이드는 **[DESIGN-NOTES](docs/DESIGN-NOTES.md)**에 있다.
 
 ## 구성
 ```

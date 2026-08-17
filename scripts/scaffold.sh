@@ -60,11 +60,20 @@ fi
 # 3a) 없앤 기능(/add-pointer)이 프로젝트 CLAUDE.md에 심어 두던 옛 관리블록을 걷어낸다. 지금은
 #     아무것도 그 블록을 다시 만들지 않으므로 남아 있으면 갱신되지 않는 고아다. 마커가 같으니
 #     전역 CLAUDE.md와 같은 파일이면 건너뛴다 — 그건 이 훅이 매 세션 다시 만드는 정상 블록이다.
+#     걷어내기 전에 사본을 뜬다 — 블록 안에 사람이 끼워 넣은 줄이 있으면 그것이 유일한 복구
+#     수단이고, 이 파일은 git 밖일 수 있다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
 pointer_note=""
 PCLAUDE="$PROJ/CLAUDE.md"
 if [ -f "$PCLAUDE" ] && [ "$PCLAUDE" != "$UC" ]; then
-  if managed_block_remove "$PCLAUDE" "$MANAGED_BEGIN" "$MANAGED_END"; then
-    pointer_note="🔵 disciplined-coder: $PCLAUDE 에 남아 있던 옛 관리블록을 걷어냈다(사용자가 쓴 줄은 그대로 두었다)."
+  pblabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
+  pbstamp="$(date +%Y%m%d-%H%M%S 2>/dev/null || echo unknown)"
+  prc=0
+  managed_block_remove "$PCLAUDE" "$MANAGED_BEGIN" "$MANAGED_END" \
+    "$KDIR/backups/CLAUDE.md.$pblabel.$pbstamp.bak" || prc=$?
+  if [ "$prc" -eq 0 ]; then
+    pointer_note="🔵 disciplined-coder: $PCLAUDE 에 남아 있던 옛 관리블록을 걷어냈다(사용자가 쓴 줄은 그대로 두었다. 사본: $managed_block_backup)."
+  elif [ "$prc" -eq 2 ]; then
+    pointer_note="🔵 disciplined-coder: $PCLAUDE 에 옛 관리블록이 남아 있는데 사본을 뜨지 못해 그대로 두었다($KDIR/backups 에 쓸 수 있게 되면 다음 세션에 다시 시도한다)."
   fi
 fi
 

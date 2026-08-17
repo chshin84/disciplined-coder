@@ -123,10 +123,14 @@ scaffold_check_solved_rules() {  # $1=로그 경로 → sets: solved_rules_stale
 # 줄 끝이 CRLF인 로그는 머리말만 LF로 바뀌어 섞이지만, 규칙 검사가 CR을 지우고 비교하므로
 # 다음 세션에 다시 발동하지는 않는다.
 # 결과는 이 함수 전용 고정 이름에 셋한다(scaffold_check_solved_rules와 같은 이유).
+# 손대지 못한 사유는 셋이고 사람이 할 일이 서로 다르다 — 경계를 못 찾으면 로그를 손봐야 하고,
+# 사본이나 임시 파일을 못 쓰면 그 자리의 쓰기 권한을 풀어야 한다. 한 문구로 뭉개면 쓰기가 막힌
+# PC에서 멀쩡한 머리말을 고치려 들게 되고, 그 신호는 끄는 수단이 없다(`FAIL-LOUD`).
 scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 $4=백업 이름표
-                                # → sets: solved_fix_result(fixed|refused|none), solved_fix_backup
+                                # → sets: solved_fix_result(fixed|refused|none),
+                                #         solved_fix_reason(boundary|backup|write|""), solved_fix_backup
   local f="$1" scope="$2" bdir="$3" label="$4" n tmp stamp bk intro
-  solved_fix_result="none"; solved_fix_backup=""
+  solved_fix_result="none"; solved_fix_reason=""; solved_fix_backup=""
   [ -f "$f" ] || return 0
   intro="${SCAFFOLD_SOLVED_RULES%%$'\n'*}"
   n="$(awk -v intro="$intro" '
@@ -149,20 +153,24 @@ scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 
       print 0
     }
   ' "$f" 2>/dev/null || true)"
-  if [ -z "$n" ] || [ "$n" = "0" ]; then solved_fix_result="refused"; return 0; fi
+  if [ -z "$n" ] || [ "$n" = "0" ]; then
+    solved_fix_result="refused"; solved_fix_reason="boundary"; return 0
+  fi
   # 사본이 유일한 복구 수단이다(이 로그들은 git 밖일 수 있다) — 뜨지 못하면 아예 고치지 않는다.
   stamp="$(date +%Y%m%d-%H%M%S 2>/dev/null || echo unknown)"
   bk="$bdir/solved_problems.$label.$stamp.md"
   if ! mkdir -p "$bdir" 2>/dev/null || ! cp "$f" "$bk" 2>/dev/null; then
-    solved_fix_result="refused"; return 0
+    solved_fix_result="refused"; solved_fix_reason="backup"; return 0
   fi
-  tmp="$(mktemp "$f.XXXXXX" 2>/dev/null)" || { solved_fix_result="refused"; return 0; }
+  tmp="$(mktemp "$f.XXXXXX" 2>/dev/null)" || {
+    solved_fix_result="refused"; solved_fix_reason="write"; solved_fix_backup="$bk"; return 0
+  }
   if { scaffold_solved_header "$scope" && printf '\n' && tail -n "+$n" "$f"; } > "$tmp" 2>/dev/null \
      && mv "$tmp" "$f" 2>/dev/null; then
     solved_fix_result="fixed"; solved_fix_backup="$bk"
   else
     rm -f "$tmp" 2>/dev/null || true
-    solved_fix_result="refused"
+    solved_fix_result="refused"; solved_fix_reason="write"; solved_fix_backup="$bk"
   fi
   return 0
 }
@@ -170,7 +178,7 @@ scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 
 # 로그 하나를 현행 형식에 맞춘다(검사 → 갱신 → 사람이 읽을 한 줄). 두 스캐폴드가 전역 로그와
 # 프로젝트 로그에 같은 절차를 쓰도록 여기 둔다. 알릴 것이 없으면 solved_sync_note는 빈 문자열이다.
 scaffold_sync_solved() {  # $1=로그 $2=스코프 $3=백업 디렉터리 $4=백업 이름표 → sets: solved_sync_note
-  local f="$1"
+  local f="$1" bdir="$3"
   solved_sync_note=""
   [ -f "$f" ] || return 0
   scaffold_check_solved_rules "$f"
@@ -178,8 +186,13 @@ scaffold_sync_solved() {  # $1=로그 $2=스코프 $3=백업 디렉터리 $4=백
   scaffold_fix_solved_header "$f" "$2" "$3" "$4"
   # 문안에 로그의 머리말 문구를 인용하지 않는다 — 인용하면 그 stdout이 정본 헤더를 한 번 더 실어
   # 이중 주입 회귀 가드가 뒤집힌다. 경로와 한 일만 적는다.
+  # 손대지 못했으면 사유를 가려 적는다. 사유마다 사람이 할 일이 다르기 때문이다.
   if [ "$solved_fix_result" = "fixed" ]; then
     solved_sync_note="🔵 disciplined-coder: $f 의 머리말을 현행 형식으로 갱신했다(항목은 그대로 두었다. 사본: $solved_fix_backup)."
+  elif [ "$solved_fix_reason" = "backup" ]; then
+    solved_sync_note="🔵 disciplined-coder: $f 의 형식 규칙 서술이 현행과 다르다 — 사본을 뜨지 못해 그대로 두었다($bdir 에 쓸 수 있게 되면 다음 세션에 다시 시도한다)."
+  elif [ "$solved_fix_reason" = "write" ]; then
+    solved_sync_note="🔵 disciplined-coder: $f 의 형식 규칙 서술이 현행과 다르다 — 사본은 떴으나 파일을 새로 쓰지 못해 그대로 두었다(사본: $solved_fix_backup)."
   else
     solved_sync_note="🔵 disciplined-coder: $f 의 형식 규칙 서술이 현행과 다르다 — 머리말의 끝을 알아볼 수 없어 그대로 두었다(방법은 domain-docs 스킬)."
   fi
