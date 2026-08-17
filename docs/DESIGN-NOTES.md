@@ -3,6 +3,37 @@
 README에서 분리한 개발자용 내부 근거다. 사용자 설치·사용에는 필요 없지만, "왜 이렇게
 동작하는가"의 근거를 보존한다. 사용자용 개요는 [README](../README.md) 참고.
 
+## 저장소 구성
+
+어느 파일이 무슨 일을 하는지 훑을 때 쓴다. 설치해 쓰는 데는 필요 없으므로 README에 두지 않는다.
+
+```
+disciplined-coder/
+├── .claude-plugin/plugin.json      # 매니페스트
+├── agent-principles.md             # 디시플린 정본 (SSOT) — hook이 ~/.claude/disciplined-coder/로 복사
+├── domains-index.md                # 도메인 참고서 인덱스 (동일 경로로 복사)
+├── skills/domain-*/SKILL.md        # 도메인 참고서(docs/plugin/llm-runtime) + 호출자 domain-spec-review
+├── skills/reviewer-*/SKILL.md      # 리뷰어 렌즈(grounding/fit/consistency/adversarial/prior-art/readability)
+├── skills/meta-aggregate/SKILL.md  # 리뷰어 집계·결정(코드 설계도)
+├── skills/nested-orchestration/SKILL.md # 3층 병렬 오케스트레이션 방법(병렬 오케스트레이션 트리거)
+├── hooks/hooks.json                # SessionStart→scaffold · Pre/PostToolUse·Stop→문서·spec/plan 워크플로
+├── hooks/spec_review_*.sh          # spec/plan: PostToolUse(감지) · Stop(하드 게이트) — 순수 bash, jq 비의존
+├── hooks/doc_*tooluse.sh           # 문서: 양식 제안(Pre) · 검진 넛지(Post) — 비블로킹
+├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md @import
+├── .codex-plugin/plugin.json       # Codex 매니페스트(skills/hooks/interface)
+├── hooks/hooks-codex.json          # Codex 훅 배선(apply_patch matcher · session-start-codex)
+├── hooks/session-start-codex       # Codex SessionStart: codex-scaffold 실행 + 원칙 주입 + 신뢰검토 경고
+├── hooks/_extract_path.sh          # 공용 경로 추출(file_path + apply_patch, 다중 경로)
+├── scripts/codex-scaffold.sh       # 멱등: ~/.codex/ 셋업 + ~/.codex/AGENTS.md 관리블록
+├── scripts/test_*.sh               # 계약 테스트(각 FAIL=0). 어떤 것이 있는지는 이 디렉터리가 정본이다
+├── scripts/_*.sh                   # 공유 헬퍼(홈 해석·관리블록·JSON 유효성 등)
+├── commands/*.md                  # 수동 커맨드(전체 목록은 README '사용 > 커맨드' 절이 정본)
+├── docs/DESIGN-NOTES.md            # 개발자용 내부 근거(주입 메커니즘·한계·업그레이드)
+└── README.md
+```
+
+**위 트리는 주요 파일만 적은 부분 목록이다.** 전체는 저장소를 보라 — 여기에 전부 열거하면 파일이 늘 때마다 이 목록이 먼저 낡는다. `~/.claude/disciplined-coder/`에 생성되는 파일 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다. 스킬은 플러그인에서 온디맨드로 로드하며 복사하지 않는다.
+
 ## 서브에이전트로의 지식 전달
 
 **메모리 계층이 서브에이전트에 실리는지는 에이전트 종류에 따라 갈린다.** 아래가 이 사실의 단일 출처다.
@@ -34,15 +65,16 @@ Claude Code 버전을 함께 둔다.
 서브에이전트는 한 종류도 재지 않았다.
 
 ### 리뷰어에게 정본을 알리는 관례
-읽기 전용 서브에이전트를 리뷰어로 띄우는 호출자는 그 리뷰어에게 메모리 계층이 실린다고 가정하면 안 된다.
-**정본 경로를 프롬프트에 넣어 리뷰어가 직접 읽게 한다.** 경로는 두 갈래로 갈린다 — 레포 안에서 도는
-워크플로는 그 레포의 정본을 가리키고, 설치본으로 도는 스킬은 실행 시점에 도출한 관리 디렉터리의 사본을
-가리킨다. 스킬 본문에 절대 경로를 박으면 홈 해석이 어긋나는 환경과 Codex에서 빗나간다.
+위 실측 표가 이 관례의 근거다 — 리뷰어에게 메모리 계층이 실린다고 가정할 수 없으니 호출자가 따로
+알려야 한다. **무엇을 지키는지는 `domain-docs`의 「리뷰어에게 정본을 알리는 법」이 소유자다.** 전에
+그 넷을 네 문서가 각자 적었다가 이 자리에서만 둘이 빠져 갈라진 적이 있어, 여기는 근거만 두고 규율은
+가리키기만 한다.
 
 ## 고치기 전에 알아야 하는 한계
 
-성격이 다른 것을 세 묶음으로 나눠 둔다. 한 줄로 늘어놓으면 자기가 고칠 대목이 여기 있는지를 여덟 개를
-다 읽어야만 알 수 있다.
+성격이 다른 것을 세 묶음으로 나눠 둔다. 한 줄로 늘어놓으면 자기가 고칠 대목이 여기 있는지를 항목을
+끝까지 다 읽어야만 알 수 있다. 개수를 적지 않는 이유는 항목이 늘 때마다 그 숫자가 먼저 낡기
+때문이다(`NAME-ITEMS`).
 
 ### 어떻게 실려서 도는가
 - **플러그인 루트 `CLAUDE.md`는 컨텍스트로 로드되지 않는다.** 주입 경로는 `~/.claude/CLAUDE.md` →
@@ -81,8 +113,8 @@ Claude Code 버전을 함께 둔다.
   적다고 봤다.
 - **ultracode 검증 모드(required)를 넛지 훅으로 승급하지 않았다.** 이 모드는 주입 지시 기반이라 훅
   차단이 아니다 — 모드 라인은 메인 세션에만 도달하고(@import 아님), 서브에이전트 작성 경로에서는
-  메인의 스펙 릴레이에 의존하며, 지시 무시를 막을 수 없다. 승급하지 않은 이유는 Workflow 도구의 훅
-  표면이 공식 문서화되지 않았기 때문이다. 이 모드를 도입한 설계 문서는
+  메인의 스펙 릴레이에 의존하며, 지시 무시를 막을 수 없다. 승급하지 않은 이유는 Workflow 도구에 훅을
+  걸 수 있는 자리가 공식 문서에 적혀 있지 않기 때문이다. 이 모드를 도입한 설계 문서는
   `docs/superpowers/specs/2026-07-03-ultracode-review-toggle-design.md`다.
 
 ## 왜 spec/plan 리뷰 게이트를 Stop(턴 종료)에 두는가

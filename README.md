@@ -8,9 +8,8 @@
 
 ## 무엇이 좋은가
 - **프로젝트 폴더에 발자국을 안 남긴다** — 어느 프로젝트를 열어도 작업 폴더엔 자동으로는 아무 파일도 안 생긴다. 지식은 `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다. 관리블록은 플러그인이 만들고 갱신하는, 시작과 끝을 표시로 구분해 둔 구간이다. 자동 계층이 프로젝트 파일을 만들거나 손보는 예외 셋은 아래 「무엇을·왜 자동화하나」에 적었다.
-- **메인 세션과 커스텀 서브에이전트에 도달** — PC-레벨 주입이라 메인 세션과 커스텀 서브에이전트가 같은 원칙·오답노트를 보유한다. 다만 에이전트 종류에 따라 갈린다 — 빌트인 읽기 전용 종류에는 실리지 않는다. 그리고 우리가 실제로 잰 것은 네 종류뿐이라, 사용자가 직접 정의한 서브에이전트는 재 보지 않았다(실측 표와 그 한계는 [DESIGN-NOTES](docs/DESIGN-NOTES.md)에 있다). 자기 리뷰어를 정의해 쓴다면 원칙이 실린다고 믿지 말고 정본 경로를 프롬프트에 넣어라.
+- **메인 세션과 커스텀 서브에이전트에 도달** — PC-레벨 주입이라 메인 세션과 커스텀 서브에이전트가 같은 원칙·오답노트를 보유한다. 다만 에이전트 종류에 따라 갈린다 — 빌트인 읽기 전용 종류에는 실리지 않는다(실측 표와 그 한계는 [DESIGN-NOTES](docs/DESIGN-NOTES.md)에 있다).
 - **설치 후 무조작** — 새 세션을 시작하면 hook이 알아서 셋업하고 배선한다. 여러 번 돌아도 결과가 같다.
-- **첫 설치 세션에서만 이중 전달** — 관리 블록이 막 생긴 세션은 아직 `@import`만으로는 정본에 닿지 못하므로, 그 세션 한 번에 한해 정본을 stdout(주입 컨텍스트)으로 함께 보내 조용한 누락을 막는다(`FAIL-LOUD`). 두 번째 세션부터는 세션 시작 때 `@import`가 읽은 내용이 그 뒤 요청에도 실린다.
 - **글쓰기·문서 디시플린** — 답변 표현은 `CLEAR-COMM`과 `READ-FLOW`가 상시 잡는다. 짧은 답보다 읽기에 덜 피로한 답을 택하라는 규율이다. 문서는 사람이 글 쓰는 흐름을 흉내 낸다 — 쓰기 전에 양식을 제안하고, 다 쓰면 검진을 넛지한다.
 
 ## 설치 (user scope 권장)
@@ -32,13 +31,13 @@
 **병렬 오케스트레이션 절차는 superpowers 플러그인을 함께 깔아야 돈다.** 원칙의 그 절과 `skills/nested-orchestration`이 `dispatching-parallel-agents`·`brainstorming` 같은 superpowers 스킬로 라우팅하는데, 그것들은 이 플러그인에 들어 있지 않다. 안 깔려 있으면 그 자리에서 조용히 건너뛰게 된다. 나머지 기능은 superpowers 없이도 그대로 돈다.
 
 ## 사용
-설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행되어 넷을 한다.
+설치(user scope) 후 **새 Claude Code 세션을 시작**하면 SessionStart hook이 자동 실행된다. 이후 어느 프로젝트에서 열어도 메인 세션이 원칙 + 도메인 목차 + 오답노트를 자동으로 보유한다. 서브에이전트는 종류에 따라 갈린다([DESIGN-NOTES](docs/DESIGN-NOTES.md)의 실측 표를 보라).
+
+훅이 그때 넷을 한다.
 - `~/.claude/disciplined-coder/`에 정본 사본과 오답노트를 셋업한다. 어떤 파일이 생기는지의 정본은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`다.
 - `~/.claude/CLAUDE.md` 관리블록에 `@import`를 배선한다. 없으면 만들고, 있으면 멱등하게 갱신한다.
-- 오답노트의 형식 규칙 서술이 현행과 달라지면 사본을 뜬 뒤 머리말을 현행 형식으로 갈아끼우고 무엇을 했는지 알린다. 항목은 건드리지 않는다. 손대지 못했으면 그 사유를 가려 알린다 — 머리말의 끝을 알아볼 수 없었는지, 사본을 뜨지 못했는지가 갈려서 나온다.
+- 오답노트의 형식 규칙 서술이 현행과 달라지면 머리말을 갈아끼우고 무엇을 했는지 알린다. 손대지 못했으면 그 사유를 가려 알리는데, 사유마다 사람이 할 일이 다르다(무엇을 하는지는 `domain-docs` 스킬이 정본이다).
 - 세션을 연 프로젝트에 `docs/solved_problems.md`가 있으면 그것도 같은 처리를 받는다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
-
-이후 어느 프로젝트에서 열어도 메인 세션이 원칙 + 도메인 목차 + 오답노트를 자동으로 보유한다. 서브에이전트는 종류에 따라 갈린다([DESIGN-NOTES](docs/DESIGN-NOTES.md)의 실측 표를 보라).
 
 ### 이렇게 보이면 성공이다
 셋업은 조용히 돌기 때문에 성공과 실패가 겉으로 같아 보인다. 특히 Windows에서 bash가 없어 hook이 실패한 경우와 정상 동작이 화면상 구별되지 않는다. 새 세션을 한 번 연 뒤 아래 셋을 확인한다.
@@ -57,6 +56,14 @@
 /setup-discipline    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
 ```
 
+## 주의
+- **플러그인 루트 `CLAUDE.md`는 컨텍스트로 로드되지 않는다** — 주입 경로는 `~/.claude/CLAUDE.md`의 `@import`다.
+- **호스트 셸에 기댄다** — hook은 컨테이너가 아니라 호스트에서 돌기 때문에, Windows에서는 Git Bash가 있어야 한다.
+- **CLAUDE.md는 강제가 아니라 가이드다** — 🔴 자율구현 같은 지시를 진짜로 막으려면 `PreToolUse` hook을 걸어 강제해야 한다.
+- **자기 서브에이전트를 정의해 쓴다면 원칙이 실린다고 믿지 마라** — 우리가 실제로 잰 것은 네 종류뿐이라 사용자가 직접 정의한 서브에이전트는 재 보지 않았다. 그런 리뷰어를 쓸 때는 정본 경로를 프롬프트에 넣어라.
+- **매니페스트 검사는 기여자용이다** — `claude plugin validate ./`는 플러그인 파일 자체가 올바른지만 본다. 셋업이 실제로 됐는지는 위 「이렇게 보이면 성공이다」로 확인한다.
+- 주입 메커니즘과 그 예외(Explore·Plan), 깊은 한계, 구버전 업그레이드는 **[DESIGN-NOTES](docs/DESIGN-NOTES.md)**에 있다.
+
 ## Codex에서 쓰기 (동일 디시플린)
 이 레포는 Claude Code 플러그인이자 **Codex 플러그인**이다(`.codex-plugin/plugin.json`). Codex도 같은 원칙·스킬·강제 게이트(spec/plan·문서 리뷰)를 받는다.
 1. 이 레포를 Codex 플러그인으로 설치한다(`codex plugin` 설치 경로).
@@ -66,9 +73,9 @@
 차이를 정직하게 적는다. Codex는 `@import`를 지원하지 않으므로 원칙과 도메인 목차를 `~/.codex/AGENTS.md` 관리블록에 인라인으로 넣는다. 그 둘은 관리블록을 방금 만든 첫 세션에서만 세션 컨텍스트로 한 번 더 보내고, 그다음부터는 인라인 한 경로만 쓴다(이중 전송은 의도적으로 제거했다). 오답노트는 인라인에 넣지 않고 매 세션 세션 컨텍스트로 보낸다 — 자주 커지는 파일이라 관리블록에 굽지 않는다. 파일 편집은 `apply_patch`로 가므로 게이트 훅이 그 입력을 읽는다. 동작은 Claude와 같고, 위 신뢰검토 단계가 하나 더 붙는다.
 
 ## 무엇을·왜 자동화하나
-모든 세션이 같은 디시플린을 들고 일하게 하되, **자동 계층(scaffold·훅)은 프로젝트 폴더에 파일을 새로 만들지 않는다**. 그래서 지식을 프로젝트가 아니라 **PC-레벨**(`~/.claude/`)에 두고, `~/.claude/CLAUDE.md`의 관리블록이 그것을 `@import`한다. **서브에이전트에 이 메모리 계층이 실리는지는 에이전트 종류에 따라 갈린다** — 한 곳에 배선하면 메인 세션과 커스텀 서브에이전트에는 도달하지만 빌트인 읽기 전용 종류에는 실리지 않는다(실측 표와 대응 방법은 [DESIGN-NOTES](docs/DESIGN-NOTES.md)).
+앞의 「무엇이 좋은가」가 결과를 적었다면 이 절은 그 결과가 어느 파일에서 나오는지를 적는다. 원칙은 하나다 — **자동 계층(scaffold·훅)은 프로젝트 폴더에 파일을 새로 만들지 않는다.**
 
-**자동 계층이 프로젝트 파일에 손대는 예외는 셋뿐이며, 여기가 그 정본이다.** 첫째, 그 레포에서 문제를 해결해 적을 교훈이 생기면 그때 `docs/solved_problems.md`를 만든다. 둘째, 이미 있는 그 로그의 머리말이 낡았으면 갈아끼운다. 셋째, 없앤 기능이 남긴 관리블록이 그 레포 `CLAUDE.md`에 있으면 걷어낸다. 뒤의 둘은 손대기 전에 사본을 먼저 뜨고, 사본을 못 뜨면 아예 손대지 않는다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
+**자동 계층이 프로젝트 파일에 손대는 예외는 셋뿐이다**(여기가 그 정본이다). 첫째, 그 레포에서 문제를 해결해 적을 교훈이 생기면 그때 `docs/solved_problems.md`를 만든다. 둘째, 이미 있는 그 로그의 머리말이 낡았으면 갈아끼운다. 셋째, 없앤 기능이 남긴 관리블록이 그 레포 `CLAUDE.md`에 있으면 걷어낸다. 뒤의 둘은 손대기 전에 사본을 먼저 뜬다 — 사본을 못 떴을 때 무엇을 하는지는 `domain-docs`가 정본이다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
 
 자동화 대상:
 - **일반 지식**(원칙 + 공통 함정 + 도메인 목차) — `agent-principles.md`·`domains-index.md`(SSOT)를 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선한다.
@@ -78,47 +85,14 @@
 ### 도메인 참고서 + 런타임/메타 검증
 개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(자동 주입되는 목차)가 도메인과 참고서를 안내하고, 각 `skills/domain-*`가 상세를 온디맨드로 제공한다 — 설계 시 명세 반영, 개발 시 폴백.
 - **LLM 런타임**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(호출자)이 리스크에 따라 `skills/reviewer-*`(렌즈)와 `skills/meta-aggregate`(집계)를 **제품 코드의 리뷰 콜**로 구현하게 한다(Claude Code 에이전트가 아니라 제품이 구현할 청사진).
-- **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 PREP → 독립 렌즈(grounding/consistency/adversarial) → meta-aggregate → 🔴와 고칠 것으로 처분한다. 렌즈마다 2회씩 띄우고, 틀린 지적은 합칠 때 거르며, 결과를 회차별 파일로 `docs/superpowers/reviews/`에 남긴다. 반영이 동작이나 계약을 바꿨으면 다시 리뷰할지 사용자에게 묻는다(자동으로 돌지 않는다). 선행연구 대조는 기본 묶음이 아니라 제안과 승인을 거쳐 따로 돈다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다(PostToolUse 감지 + Stop 게이트; 문서 마지막 줄 `<!-- spec-review: passed -->` 또는 `escalated` 마커로 해제; 끄기 `DISCIPLINED_CODER_REVIEW_GATE=off`).
+- **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 준비 단계를 거쳐 독립 렌즈 셋(grounding·consistency·adversarial)을 띄우고, 그 출력을 `meta-aggregate`가 모으면, 그것을 다시 🔴와 고칠 것으로 갈라 처분한다. 렌즈마다 2회씩 띄우고, 틀린 지적은 합칠 때 거르며, 결과를 회차별 파일로 `docs/superpowers/reviews/`에 남긴다. 반영이 동작이나 계약을 바꿨으면 다시 리뷰할지 사용자에게 묻는다 — 자동으로 돌지 않는다. 선행연구 대조는 기본 묶음이 아니라 제안과 승인을 거쳐 따로 돈다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다. 그 강제는 PostToolUse 감지와 Stop 게이트로 이뤄지고, 문서 마지막 줄에 `<!-- spec-review: passed -->` 또는 `escalated` 마커를 두면 풀리며, `DISCIPLINED_CODER_REVIEW_GATE=off`로 끈다.
 - **문서 작성 워크플로**: 일반 문서(README 등)는 사람이 글 쓰는 흐름을 흉내 낸다 — 작성 **전** `PreToolUse` 훅이 새 `.md`에 `domain-docs` 양식을 제안하고, 작성 **후** `PostToolUse` 훅이 독립 검진을 넛지한다(어느 렌즈로 검진할지는 `domain-docs`의 문서 검진 절이 정한다). 셀프 퇴고만으로 끝내지 않되, 발행물엔 마커를 안 박으므로 spec/plan과 달리 **비블로킹**(권유)이다. 같은 OFF 토글을 쓴다.
-
-## 주의
-- **플러그인 루트 `CLAUDE.md`는 컨텍스트로 로드되지 않는다** — 주입 경로는 `~/.claude/CLAUDE.md`의 `@import`다.
-- **호스트 셸에 기댄다** — hook은 컨테이너가 아니라 호스트에서 돌기 때문에, Windows에서는 Git Bash가 있어야 한다.
-- **CLAUDE.md는 강제가 아니라 가이드다** — 🔴 자율구현 같은 지시를 진짜로 막으려면 `PreToolUse` hook을 걸어 강제해야 한다.
-- **매니페스트 검사는 기여자용이다** — `claude plugin validate ./`는 플러그인 파일 자체가 올바른지만 본다. 셋업이 실제로 됐는지는 위 「이렇게 보이면 성공이다」로 확인한다. `--strict`는 version 미지정 경고 때문에 실패하는데, 이는 의도된 트레이드오프다 — 활성 개발 중엔 version을 비워야 커밋 SHA 기반 자동 업데이트가 유지된다(상세는 `skills/domain-plugin`).
-- 주입 메커니즘과 그 예외(Explore·Plan), 깊은 한계, 구버전 업그레이드는 **[DESIGN-NOTES](docs/DESIGN-NOTES.md)**에 있다.
-
-## 구성
-```
-disciplined-coder/
-├── .claude-plugin/plugin.json      # 매니페스트
-├── agent-principles.md             # 디시플린 정본 (SSOT) — hook이 ~/.claude/disciplined-coder/로 복사
-├── domains-index.md                # 도메인 참고서 인덱스 (동일 경로로 복사)
-├── skills/domain-*/SKILL.md        # 도메인 참고서(docs/plugin/llm-runtime) + 호출자 domain-spec-review
-├── skills/reviewer-*/SKILL.md      # 리뷰어 렌즈(grounding/fit/consistency/adversarial/prior-art/readability)
-├── skills/meta-aggregate/SKILL.md  # 리뷰어 집계·결정(코드 설계도)
-├── skills/nested-orchestration/SKILL.md # 3층 병렬 오케스트레이션 방법(병렬 오케스트레이션 트리거)
-├── hooks/hooks.json                # SessionStart→scaffold · Pre/PostToolUse·Stop→문서·spec/plan 워크플로
-├── hooks/spec_review_*.sh          # spec/plan: PostToolUse(감지) · Stop(하드 게이트) — 순수 bash, jq 비의존
-├── hooks/doc_*tooluse.sh           # 문서: 양식 제안(Pre) · 검진 넛지(Post) — 비블로킹
-├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md @import
-├── .codex-plugin/plugin.json       # Codex 매니페스트(skills/hooks/interface)
-├── hooks/hooks-codex.json          # Codex 훅 배선(apply_patch matcher · session-start-codex)
-├── hooks/session-start-codex       # Codex SessionStart: codex-scaffold 실행 + 원칙 주입 + 신뢰검토 경고
-├── hooks/_extract_path.sh          # 공용 경로 추출(file_path + apply_patch, 다중 경로)
-├── scripts/codex-scaffold.sh       # 멱등: ~/.codex/ 셋업 + ~/.codex/AGENTS.md 관리블록
-├── scripts/test_*.sh               # 계약 테스트(각 FAIL=0). 어떤 것이 있는지는 이 디렉터리가 정본이다
-├── scripts/_*.sh                   # 공유 헬퍼(홈 해석·관리블록·JSON 유효성 등)
-├── commands/*.md                  # 수동 커맨드(전체 목록은 '사용 > 커맨드' 절이 정본)
-├── docs/DESIGN-NOTES.md            # 개발자용 내부 근거(주입 메커니즘·한계·업그레이드)
-└── README.md
-```
-> **위 트리는 주요 파일만 적은 부분 목록이다.** 전체는 저장소를 보라 — 여기에 전부 열거하면 파일이 늘 때마다 이 목록이 먼저 낡는다. `~/.claude/disciplined-coder/`에 생성되는 파일 목록은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`가 정본이다. 스킬은 플러그인에서 온디맨드로 로드하며 복사하지 않는다.
 
 ## 더 읽기
 - 디시플린 정본: [`agent-principles.md`](agent-principles.md) · 도메인 목차: [`domains-index.md`](domains-index.md)
-- 설계 근거·한계: [docs/DESIGN-NOTES.md](docs/DESIGN-NOTES.md)
+- 설계 근거·한계·저장소 구성: [docs/DESIGN-NOTES.md](docs/DESIGN-NOTES.md)
 - 도메인별 상세: `skills/domain-*` (온디맨드)
+- 기여할 때: `claude plugin validate ./ --strict`는 version 미지정 경고 때문에 실패하는데, 이는 의도된 트레이드오프다 — 활성 개발 중엔 version을 비워야 커밋 SHA 기반 자동 업데이트가 유지된다(상세는 `skills/domain-plugin`).
 
 ## 메인테이너
 - chshin84 \<chshin84@gmail.com\> · 이슈/제안은 [chshin84/disciplined-coder](https://github.com/chshin84/disciplined-coder) 저장소로.
