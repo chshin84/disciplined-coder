@@ -2,7 +2,7 @@
 # 문서의 렌즈 열거가 진실과 어긋나지 않는지 검증. 계약: FAIL=0 (매직넘버 금지 — 개수는 테스트가 센다).
 #
 # 두 불변식을 단언한다. 어느 쪽도 개수를 박지 않고 두 집합의 일치를 본다.
-#   전체 열거   — README의 렌즈 나열 == skills/reviewer-* 디렉터리 집합
+#   전체 열거   — DESIGN-NOTES 저장소 구성 트리의 렌즈 나열 == skills/reviewer-* 디렉터리 집합
 #   집계 태깅   — meta-aggregate가 source 값으로 적은 렌즈 == 같은 디렉터리 집합
 #   디스패치 셋 — README·DESIGN-NOTES가 spec 리뷰 구성을 적은 줄에 이름이 있다
 #                 == domain-spec-review가 디스패치 목록에 적은 렌즈다
@@ -25,8 +25,9 @@ ALL="$(for d in "$HERE"/skills/reviewer-*/; do basename "$d" | sed 's/^reviewer-
 # 진실 2 — 호출자가 디스패치 목록에 적은 렌즈. 목록 항목은 "- `reviewer-이름` — 설명" 꼴이다.
 DISPATCH="$(grep -oE '^- `reviewer-[a-z-]+`' "$CALLER" | sed 's/^- `reviewer-//; s/`$//' | sort)"
 
-# 캐시 1 — README 트리 주석의 렌즈 나열. 괄호 안을 슬래시로 가른다.
-TREE_LINE="$(grep -F 'skills/reviewer-*/SKILL.md' "$README" || true)"
+# 캐시 1 — DESIGN-NOTES 트리 주석의 렌즈 나열. 괄호 안을 슬래시로 가른다.
+# 이 트리는 README에 있었으나 개발자용 내부 근거라 DESIGN-NOTES로 옮겼다(domain-docs의 README 독자 분리).
+TREE_LINE="$(grep -F 'skills/reviewer-*/SKILL.md' "$NOTES" || true)"
 TREE="$(printf '%s' "$TREE_LINE" | sed -n 's/.*(\([^)]*\)).*/\1/p' | tr '/' '\n' | sed 's/^ *//; s/ *$//' | grep -v '^$' | sort || true)"
 
 # 캐시 2 — spec 리뷰 구성을 적은 줄. 앵커를 못 찾으면 조용히 통과하지 않고 터뜨린다.
@@ -40,16 +41,16 @@ AGGSET="$(printf '%s' "$AGG_LINE" | sed -n 's/.*"source"[[:space:]]*:[[:space:]]
 echo "[앵커가 실제로 잡히는가 — 못 잡으면 아래 단언이 헛돈다]"
 check "렌즈 디렉터리가 하나 이상 있다"          "[ -n \"\$ALL\" ]"
 check "호출자 디스패치 목록을 읽어냈다"          "[ -n \"\$DISPATCH\" ]"
-check "README 트리 주석 줄을 찾았다"             "[ -n \"\$TREE_LINE\" ]"
-check "README 트리 주석에서 이름을 뽑아냈다"     "[ -n \"\$TREE\" ]"
+check "DESIGN-NOTES 트리 주석 줄을 찾았다"       "[ -n \"\$TREE_LINE\" ]"
+check "DESIGN-NOTES 트리 주석에서 이름을 뽑아냈다" "[ -n \"\$TREE\" ]"
 check "README spec 리뷰 구성 줄을 찾았다"        "[ -n \"\$README_SET_LINE\" ]"
 check "DESIGN-NOTES 독립 렌즈 줄을 찾았다"       "[ -n \"\$NOTES_SET_LINE\" ]"
 
 echo "[전체 열거 == 실제 디렉터리]"
-check "README 트리 주석이 렌즈 전부를 적는다"    "[ \"\$TREE\" = \"\$ALL\" ]"
+check "DESIGN-NOTES 트리 주석이 렌즈 전부를 적는다" "[ \"\$TREE\" = \"\$ALL\" ]"
 if [ "$TREE" != "$ALL" ]; then
-  echo "    디렉터리: $(printf '%s' "$ALL" | tr '\n' ' ')"
-  echo "    README  : $(printf '%s' "$TREE" | tr '\n' ' ')"
+  echo "    디렉터리    : $(printf '%s' "$ALL" | tr '\n' ' ')"
+  echo "    DESIGN-NOTES: $(printf '%s' "$TREE" | tr '\n' ' ')"
 fi
 
 echo "[집계 태깅 == 실제 디렉터리]"
@@ -168,6 +169,28 @@ for L in "$HERE"/skills/reviewer-*/SKILL.md; do
   check "$n: principles_applied 규칙을 되풀이하지 않는다" "! grep -qF '제품 런타임 구현에는 요구하지 않는다' '$L'"
 done
 check "정본이 principles_applied 규칙을 소유한다" "grep -qF '제품 런타임 구현에는 요구하지 않는다' \"\$MA\""
+
+echo "[리뷰어에게 정본을 알리는 법 — domain-docs 한 곳만 규율을 적는다]"
+# 전에 네 문서가 각자 적었다가 DESIGN-NOTES 쪽만 둘이 빠져 갈라졌다. 소유자를 하나로 두고
+# 나머지는 가리키기만 하게 묶는다. 앵커는 소유자의 절 제목이라 제목을 고치면 붉어진다(FAIL-LOUD).
+OWNER_DOC="$HERE/skills/domain-docs/SKILL.md"
+OWNER_ANCHOR='## 리뷰어에게 정본을 알리는 법 (여기가 소유자)'
+# 규율 넷을 알아보는 문구. 소유자에만 있어야 한다.
+RULE_MARKS=('읽기 전용 에이전트도 Read는 갖는다' '비어 있지 않은 배열' '홈 해석이 어긋나는 환경과')
+check "소유자 절이 있다" "grep -qF -- \"\$OWNER_ANCHOR\" \"\$OWNER_DOC\""
+for m in "${RULE_MARKS[@]}"; do
+  check "소유자가 규율을 적는다: $m" "grep -qF -- '$m' \"\$OWNER_DOC\""
+done
+# 가리키기만 해야 하는 문서들. 규율 문구를 다시 적으면 붉어진다.
+for D in "$HERE"/skills/domain-spec-review/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$NOTES"; do
+  # 스킬 문서는 파일 이름이 모두 SKILL.md라 부모 디렉터리로 부른다 — 안 그러면 어느 문서가 붉어졌는지
+  # 알 수 없다(`NAME-ITEMS`).
+  dn="$(basename "$D")"; [ "$dn" = "SKILL.md" ] && dn="$(basename "$(dirname "$D")")"
+  check "$dn 이 소유자를 가리킨다"        "grep -qF '리뷰어에게 정본을 알리는 법' '$D'"
+  for m in "${RULE_MARKS[@]}"; do
+    check "$dn 이 규율을 베끼지 않는다: $m" "! grep -qF -- '$m' '$D'"
+  done
+done
 
 echo "[대체된 설계 문서에 superseded 표시]"
 OLDSPEC="$HERE/docs/superpowers/specs/2026-08-16-review-layer-redesign-design.md"

@@ -383,21 +383,22 @@ check "DESIGN-NOTES: 측정 맥락 한 줄에"     "grep -qE '실측 \(.*Claude 
 check "DESIGN-NOTES: 옛 근거 문장 제거"     "! grep -qF '공식 문서의 서브에이전트 메모리 로딩 규칙' '$DN'"
 check "DESIGN-NOTES: 갱신 시점 항목"        "grep -qF '리로드가 아니라 새 세션' '$DN'"
 check "DESIGN-NOTES: 훅 계기는 matcher 정본" "grep -qF 'matcher가 정본' '$DN'"
-check "DESIGN-NOTES: 리뷰어 경로 관례"      "grep -qF '실행 시점에 도출한 관리 디렉터리' '$DN'"
+# 관례의 상세는 domain-docs가 소유자다. 여기서는 실측 표가 그 근거라는 연결만 남았는지 본다.
+check "DESIGN-NOTES: 리뷰어 관례가 소유자를 가리킨다" "grep -qF '리뷰어에게 정본을 알리는 법' '$DN'"
 check "README: 갈림을 요약하고 링크"        "grep -qF '종류에 따라 갈린다' '$HERE/README.md' && grep -qF 'docs/DESIGN-NOTES.md' '$HERE/README.md'"
 check "canon: 옛 도달 전제 제거"            "! grep -qF '서브에이전트도 이 글을 읽으므로' '$CANON'"
 check "canon: 도달을 전제하지 않는다"       "grep -qF '도달을 전제하지 않는다' '$CANON'"
 
-# --- reviewer-contract: 읽기 전용 리뷰어를 띄우는 호출자 셋이 같은 계약을 규정한다 ---
-echo "[reviewer-contract] callers inject canon path and require principles_applied"
+# --- reviewer-contract: 읽기 전용 리뷰어를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
+# 전에는 셋이 규율 넷을 각자 적고 이 검사가 그 사본들을 맞춰 세웠다. 사본이라 갈라졌다 — 한 곳에서
+# 재시도 금지 항목만 빠져 그 경로가 금지된 재시도를 허용한 채 오래 남았고, DESIGN-NOTES 쪽은 넷 중
+# 둘만 갖고 있었다. 지금은 `domain-docs`가 규율을 소유하고 나머지는 가리키기만 한다(`SSOT`).
+# 소유자가 규율을 갖는지와 다른 문서가 베끼지 않는지는 `test_docs_drift.sh`가 본다. 여기서는 호출자
+# 셋이 그 소유자에 닿는지와 Codex 패리티만 본다.
+echo "[reviewer-contract] callers reach the canon-path rules and stay runtime-neutral"
 for s in domain-spec-review domain-docs nested-orchestration; do
   F="$HERE/skills/$s/SKILL.md"
-  check "$s: 메모리 미가정"                 "grep -qF '메모리 계층을 받는다고 가정하지 마라' '$F'"
-  check "$s: 경로를 실행 시점에 도출"       "grep -qF '실행 시점에 도출' '$F'"
-  check "$s: principles_applied 요구"       "grep -qF 'principles_applied' '$F'"
-  # 이 규율은 세 곳 모두 쓰는 자리라 일부러 남긴 사본이다. 사본이므로 갈라진다 — 실제로 한 곳에서
-  # 이 항목만 빠져 그 경로만 금지된 재시도를 허용한 채 오래 남았다. 그래서 넷째 항목도 함께 건다.
-  check "$s: 자동 재시도 금지"              "grep -qF '자동 재시도는 걸지 않는다' '$F'"
+  check "$s: 정본 알리는 법에 닿는다"       "grep -qF '리뷰어에게 정본을 알리는 법' '$F'"
   # Codex 패리티: Claude 전용 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
