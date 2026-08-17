@@ -395,6 +395,9 @@ for s in domain-spec-review domain-docs nested-orchestration; do
   check "$s: 메모리 미가정"                 "grep -qF '메모리 계층을 받는다고 가정하지 마라' '$F'"
   check "$s: 경로를 실행 시점에 도출"       "grep -qF '실행 시점에 도출' '$F'"
   check "$s: principles_applied 요구"       "grep -qF 'principles_applied' '$F'"
+  # 이 규율은 세 곳 모두 쓰는 자리라 일부러 남긴 사본이다. 사본이므로 갈라진다 — 실제로 한 곳에서
+  # 이 항목만 빠져 그 경로만 금지된 재시도를 허용한 채 오래 남았다. 그래서 넷째 항목도 함께 건다.
+  check "$s: 자동 재시도 금지"              "grep -qF '자동 재시도는 걸지 않는다' '$F'"
   # Codex 패리티: Claude 전용 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
