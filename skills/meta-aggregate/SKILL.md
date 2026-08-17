@@ -17,10 +17,10 @@ description: 리뷰어 둘 이상의 출력을 모아 구조적 건강성(상충
 - **커버리지 공백**: 리스크상 필요한 차원을 아무도 안 봤으면 누락 리뷰어 추가를 권한다.
 
 ## 리뷰 산출물 계약 (렌즈 공통 — 여기가 SSOT)
-다섯 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.
+여섯 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.
 
 ```
-{ "lens": "grounding|fit|consistency|adversarial|prior-art",
+{ "lens": "grounding|fit|consistency|adversarial|prior-art|readability",
   "read": ["문서 밖에서 실제로 열어본 것 — 파일 경로나 URL"],
   "issues": [ { "where": "문서 내 위치", "type": "<렌즈가 정의한 폐쇄 집합>",
                 "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가",
@@ -46,9 +46,11 @@ description: 리뷰어 둘 이상의 출력을 모아 구조적 건강성(상충
 
 ## 출력 스키마
 ```
-{ "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "type": "...", "source": "grounding|fit|consistency|adversarial|prior-art", "where": "...", "claim": "...", "consequence": "...", "evidence": "..." } ], "retry_count": 0 }
+{ "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "type": "...", "source": "grounding|fit|consistency|adversarial|prior-art|readability", "where": "...", "claim": "...", "consequence": "...", "evidence": "..." } ], "retry_count": 0 }
 ```
 렌즈 리턴의 `principles_applied`는 **집계 대상이 아니다** — 호출자가 리뷰어의 정본 도달을 관측하려고 보는 값이라 위 스키마에 넣지 않는다. 비어 있으면 호출자가 자기 보고에 적는다.
+
+**렌즈가 자기 필드를 더할 수 있고 그것도 집계 대상이 아니다.** 집계 항목은 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 집계본이 아니라 렌즈가 돌려준 원본을 본다. `reviewer-prior-art`의 `search_status`·`citations`·`not_found`·`disclosures`와 `reviewer-readability`의 `purpose`·`rewrite`가 그렇다. 더하는 렌즈가 자기 파일에 그 이유를 적는다. **그 가운데 `search_status`와 `purpose`는 빈 `issues`를 판정으로 써도 되는지를 가르는 값이므로, 집계본만 보고 넘어가면 조용한 통과가 생긴다.**
 
 ## 구현 형태 (맥락 의존)
 - **제품 런타임**(`domain-llm-runtime`): 결정론적 파이썬 함수로 구현한다. 집계와 계수는 결정론이라
