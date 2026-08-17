@@ -51,6 +51,13 @@ description: 리뷰어 둘 이상의 출력을 모아 구조적 건강성(상충
   결정론이 유지되고 리뷰어의 주관에 의존하지 않는다. 상충이나 커버리지 공백이 있으면 사람에게 올린다.
 
 ## 출력 스키마
+
+**`decision`과 `retry_count`는 런타임 전용이다.** spec 리뷰에서는 결정 단계가 없으므로 이 둘을 내지
+않고, 병합한 목록을 `domain-spec-review`의 처분 절로 넘긴다. 이 조건을 블록 앞에 두는 이유는, 뒤에
+두면 spec 리뷰로 이 스킬을 연 세션이 블록을 그대로 채우다가 내지 말아야 할 `decision`을 지어내기
+때문이다 — 그 값은 근거 없이 `accept`로 채워지기 쉽고, 그러면 사람이 근거를 읽고 가르는 처분 단계가
+통째로 건너뛰어진다.
+
 ```
 { "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "type": "...", "source": "grounding|fit|consistency|adversarial|prior-art|readability", "where": "...", "claim": "...", "consequence": "...", "evidence": "..." } ], "retry_count": 0 }
 ```
@@ -64,6 +71,3 @@ description: 리뷰어 둘 이상의 출력을 모아 구조적 건강성(상충
 - **spec/plan 리뷰**(`domain-spec-review`): 제품 코드가 없으므로 메인 세션이 이 좁은 절차를 따라
   직접 집계한다. 단순한 일이라 스크립트를 따로 싣지 않는다(플러그인 훅의 순수 bash·무의존 이식성 유지).
 - 런타임 재시도에 상한(예: 1~2회)을 둬 무한 루프·비용 폭주를 막는다.
-
-`decision`과 `retry_count`는 **런타임 전용**이다. spec 리뷰에서는 결정 단계가 없으므로 이 둘을 내지
-않고, 병합한 목록을 `domain-spec-review`의 처분 절로 넘긴다.
