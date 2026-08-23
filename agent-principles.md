@@ -13,7 +13,7 @@
 
 | 지금 하려는 일 | 먼저 볼 원칙 |
 |---|---|
-| 답을 쓰거나 문서를 쓰기 시작할 때 | `CLEAR-COMM`·`READ-FLOW`·`PROSE-FORM` |
+| 답을 쓰거나 문서를 쓰기 시작할 때 | `CLEAR-COMM`·`READ-FLOW`·`PROSE-FORM`·`PLAIN-KO`·`KO-SYNTAX` |
 | 딱 맞는 말이 없어 표현을 새로 만들려 할 때 | `PLAIN-KO` |
 | 항목·요구사항·태스크를 가리켜야 할 때 | `NAME-ITEMS` |
 | 한 문장이 길어지거나 수식이 겹칠 때 | `KO-SYNTAX` |

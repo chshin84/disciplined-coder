@@ -31,7 +31,9 @@ TREE_LINE="$(grep -F 'skills/reviewer-*/SKILL.md' "$NOTES" || true)"
 TREE="$(printf '%s' "$TREE_LINE" | sed -n 's/.*(\([^)]*\)).*/\1/p' | tr '/' '\n' | sed 's/^ *//; s/ *$//' | grep -v '^$' | sort || true)"
 
 # 캐시 2 — spec 리뷰 구성을 적은 줄. 앵커를 못 찾으면 조용히 통과하지 않고 터뜨린다.
-README_SET_LINE="$(grep -F 'domain-spec-review' "$README" | grep -F 'meta-aggregate' || true)"
+# 이 줄이 README에 있든 DESIGN-NOTES에 있든 뜻은 같다 — 어디에 적혔는지가 아니라 적힌 렌즈 집합이
+# 실제와 어긋나지 않는지를 본다. 그래서 문서를 재배치해도 검사가 따라오도록 둘에서 함께 찾는다.
+SPEC_SET_LINE="$(grep -hF 'domain-spec-review' "$README" "$NOTES" | grep -F 'meta-aggregate' || true)"
 NOTES_SET_LINE="$(grep -F '독립 렌즈' "$NOTES" || true)"
 
 # 캐시 3 — meta-aggregate가 집계 항목의 출처를 태깅하는 렌즈 이름 열거.
@@ -43,7 +45,7 @@ check "렌즈 디렉터리가 하나 이상 있다"          "[ -n \"\$ALL\" ]"
 check "호출자 디스패치 목록을 읽어냈다"          "[ -n \"\$DISPATCH\" ]"
 check "DESIGN-NOTES 트리 주석 줄을 찾았다"       "[ -n \"\$TREE_LINE\" ]"
 check "DESIGN-NOTES 트리 주석에서 이름을 뽑아냈다" "[ -n \"\$TREE\" ]"
-check "README spec 리뷰 구성 줄을 찾았다"        "[ -n \"\$README_SET_LINE\" ]"
+check "spec 리뷰 구성 줄을 찾았다"              "[ -n \"\$SPEC_SET_LINE\" ]"
 check "DESIGN-NOTES 독립 렌즈 줄을 찾았다"       "[ -n \"\$NOTES_SET_LINE\" ]"
 
 echo "[전체 열거 == 실제 디렉터리]"
@@ -66,7 +68,7 @@ echo "[산문의 spec 리뷰 셋 == 호출자의 디스패치 셋]"
 # 렌즈마다 '디스패치되는가'와 '그 줄에 이름이 있는가'가 같아야 한다.
 for name in $ALL; do
   if printf '%s\n' "$DISPATCH" | grep -qx "$name"; then want=1; else want=0; fi
-  for pair in "README:$README_SET_LINE" "DESIGN-NOTES:$NOTES_SET_LINE"; do
+  for pair in "spec리뷰 구성 줄:$SPEC_SET_LINE" "DESIGN-NOTES 독립 렌즈 줄:$NOTES_SET_LINE"; do
     doc="${pair%%:*}"; line="${pair#*:}"
     if printf '%s' "$line" | grep -qE "(^|[^a-z-])$name([^a-z-]|$)"; then got=1; else got=0; fi
     if [ "$want" -eq 1 ]; then
@@ -144,7 +146,9 @@ check "합칠 때 세 기준으로 거른다"           "grep -qF '근거가 서
 check "기능적 변화면 다시 리뷰한다고 적는다"  "grep -qF '기능적 변화' \"\$CALLER\""
 check "다시 리뷰는 매번 사용자에게 묻는다"    "grep -qF '다시 리뷰는 매번 사용자에게 묻는다' \"\$CALLER\""
 check "물을 때 질문 도구로 띄운다"           "grep -qF '질문 도구로 선택지를 띄운다' \"\$CALLER\""
-check "README 도 사용자에게 묻는다고 적는다"  "grep -qF '다시 리뷰할지 사용자에게 묻는다' \"\$READMEF\""
+# 이 문장이 README에 있든 DESIGN-NOTES에 있든 뜻은 같다 — "재리뷰가 자동으로 돌지 않는다"가
+# 사용자용 문서에 적혀 있는지를 본다. 문서를 재배치해도 따라오도록 둘에서 함께 찾는다.
+check "사용자용 문서도 묻는다고 적는다"      "grep -qF '다시 리뷰할지 사용자에게 묻는다' \"\$READMEF\" \"\$NOTES\""
 check "🔴 반영도 다시 리뷰 대상이다"          "grep -qF '를 반영한 것도 대상이다' \"\$CALLER\""
 check "무엇이 남았는지 문서에 안 적는다"      "grep -qF '문서에 적지 않는다' \"\$CALLER\""
 check "문서 검진에 재검진 반복이 없다"        "grep -qF '다시 검진하지는 않는다' \"\$DOCS\""

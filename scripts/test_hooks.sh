@@ -173,9 +173,13 @@ check "hooks.json이 유효한 JSON"          "json_valid_stdin < '$HJ'"
 check "이벤트를 하나 이상 배선한다"        "[ -n \"\$(json_hook_events '$HJ')\" ]"
 
 # 배선이 가리키는 경로가 실제로 존재하는가. ${CLAUDE_PLUGIN_ROOT}는 레포 루트로 치환해 확인한다.
+# 배선 파일을 하나만 훑으면 나머지 런타임의 게이트가 조용히 죽는다 — 훅 파일 이름을 바꿔도
+# 그쪽 JSON은 아무도 안 보기 때문이다. 그래서 hooks*.json 전부를 디렉터리에서 도출해 훑는다.
 missing=""
-for rel in $(sed -n 's|.*\${CLAUDE_PLUGIN_ROOT}/\([^"]*\)\\".*|\1|p' "$HJ"); do
-  [ -f "$HERE/$rel" ] || missing="$missing $rel"
+for hj in "$HERE"/hooks/hooks*.json; do
+  for rel in $(sed -n 's|.*\${CLAUDE_PLUGIN_ROOT}/\([^"]*\)\\".*|\1|p' "$hj"); do
+    [ -f "$HERE/$rel" ] || missing="$missing $(basename "$hj"):$rel"
+  done
 done
 check "배선이 가리키는 스크립트가 모두 존재" "[ -z \"\$missing\" ]"
 [ -n "$missing" ] && echo "    없는 파일:$missing"
