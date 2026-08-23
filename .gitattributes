@@ -5,3 +5,6 @@
 # Keep workflow scripts LF so the Workflow permission dialog does not reject the
 # carriage returns as hidden control characters on autocrlf checkouts
 *.js text eol=lf
+# 확장자가 없는 훅 스크립트도 LF로 고정한다. 규칙이 확장자로만 걸려 있어 이 파일만 빠지면
+# Windows 체크아웃에서 줄바꿈이 CRLF로 바뀌고, 셔뱅 줄이 깨져 Codex 세션 셋업이 통째로 죽는다.
+hooks/session-start-codex text eol=lf

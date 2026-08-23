@@ -22,7 +22,12 @@ created=""
 for f in agent-principles.md domains-index.md; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
   if [ -f "$src" ]; then
-    if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else cp "$src" "$dst"; fi
+    # 복사가 실패하면 조용히 넘어가지 않는다. 이미 옛 사본이 놓여 있는 PC에서는 파일도 있고
+    # @import 배선도 남아 있어 README가 알려 준 확인 셋을 그대로 통과하므로, 정본만 낡은 채
+    # 아무도 모르게 된다(FAIL-LOUD).
+    if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else
+      cp "$src" "$dst" || { echo "[disciplined-coder] ERROR: 정본 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)" >&2; exit 1; }
+    fi
   else
     echo "[disciplined-coder] WARNING: source not found at $src" >&2
   fi
