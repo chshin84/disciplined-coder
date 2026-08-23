@@ -8,7 +8,8 @@
 - 이 레포 내용의 대부분은 `skills/` 아래 스킬 문서다. 도메인 참고서(`domain-*`), 리뷰어 렌즈(`reviewer-*`), 집계(`meta-aggregate`), 오케스트레이션(`nested-orchestration`)이 거기 있다.
 - 변경 후에는 `scripts/test_*.sh`를 **전부** 돌린다(각 계약 **FAIL=0**. 매직 넘버 금지 — `SSOT`).
   목록을 여기 적지 않는 이유는 그 디렉터리가 정본이기 때문이다:
-  `for t in scripts/test_*.sh; do bash "$t"; done`
+  `bad=""; for t in scripts/test_*.sh; do bash "$t" || bad="$bad $t"; done; [ -z "$bad" ] && echo "ALL PASS" || echo "FAILED:$bad"`
+  실패한 스크립트 이름을 모아 마지막에 알리는 형태로 적는 이유는, 그냥 이어 돌리면 **마지막 하나의 결과만 남아 앞의 실패가 묻히기** 때문이다.
   그다음 `claude plugin validate ./`를 non-strict로 돌린다.
 - 설계 문서와 계획 문서는 `docs/superpowers/`에 쓰고 읽는다. 그 경로에 새로 쓰면 Stop 리뷰 게이트가 발동한다.
 

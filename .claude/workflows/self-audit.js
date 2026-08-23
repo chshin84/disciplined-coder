@@ -27,11 +27,11 @@ const FINDINGS_SCHEMA = {
           file: { type: 'string', description: '증거 파일 경로 (file:line 형식 권장)' },
           evidence: { type: 'string', description: '실제 파일에서 인용한 증거 텍스트' },
           principle: { type: 'string', description: '위반/관련 원칙 ID 또는 렌즈 규칙' },
-          severity: { type: 'string', enum: ['red', 'major', 'minor'], description: 'red=사용자 결정 필요(🔴), major=명백한 위반·실질 피해, minor=사소' },
+          consequence: { type: 'string', description: '이대로 두면 무엇이 어떻게 잘못되는가 — 구체적으로 못 적는 발견은 올리지 않는다' },
           detail: { type: 'string', description: '왜 위반인지 — 근거를 완결된 문장으로 설명' },
           fix: { type: 'string', description: '제안하는 수정 방향 (선택)' },
         },
-        required: ['title', 'file', 'evidence', 'principle', 'severity', 'detail'],
+        required: ['title', 'file', 'evidence', 'principle', 'consequence', 'detail'],
       },
     },
   },
@@ -85,7 +85,7 @@ const REVIEWERS = [
   { key: 'ssot-audit', prompt: `${COMMON}
 차원: SSOT 전수 조사 — agent-principles.md ↔ skills ↔ scripts ↔ hooks ↔ README ↔ CLAUDE.md ↔ commands 사이의 권위 있는 이중 기술(손 동기화 쌍)을 찾아라. 정당한 참조/도출은 위반이 아니다.` },
   { key: 'shell-audit', prompt: `${COMMON}
-차원: 셸 코드 품질 — scripts/*.sh 전부(issue-mode.sh 포함), hooks/*.sh, hooks/*.json, hooks/session-start-codex. FAIL-LOUD(오류 삼킴), IDEMPOTENT(재실행 안전 — 코드로 추적), EXPLICIT, 테스트 매직 넘버, Git Bash 홈 리다이렉트 함정. 실제 코드 라인을 인용하라.` },
+차원: 셸 코드 품질 — scripts/*.sh 전부, hooks/*.sh, hooks/*.json, hooks/session-start-codex. FAIL-LOUD(오류 삼킴), IDEMPOTENT(재실행 안전 — 코드로 추적), EXPLICIT, 테스트 매직 넘버, Git Bash 홈 리다이렉트 함정. 실제 코드 라인을 인용하라.` },
   { key: 'clear-comm-audit', prompt: `${COMMON}
 차원: PROSE-FORM 자기준수 — agent-principles.md, skills/*/SKILL.md 전부(reviewer-*·meta-aggregate 포함), commands/*.md, README.md, domains-index.md. 산문과 표에서 명사 조각 종결, 기호 문장(X = Y, 원인 → 해결)을 찾아라. 원칙 정의 안의 '나쁜 예' 인용문과 코드 블록·필드 스키마 표기는 위반이 아니다.` },
   { key: 'plugin-compliance', prompt: `${COMMON}
@@ -128,7 +128,7 @@ let deduped = all
 if (all.length > 1) {
   const dd = await agent(
     `다음은 disciplined-coder 저장소 감사에서 여러 렌즈가 낸 원시 발견 목록(JSON)이다.
-같은 실체(같은 파일의 같은 문제)를 가리키는 발견들을 하나로 병합하라 — evidence는 가장 구체적인 것을 남기고, lens는 쉼표로 합치고, severity는 가장 높은 것(red>major>minor)을 취한다.
+같은 실체(같은 파일의 같은 문제)를 가리키는 발견들을 하나로 병합하라 — evidence는 가장 구체적인 것을 남기고, lens는 쉼표로 합치고, consequence는 피해를 가장 구체적으로 적은 것을 남긴다.
 서로 다른 문제는 절대 합치지 마라. 재판단·신규 발견 추가 금지 — 순수 병합만 한다.
 ${JSON.stringify(all)}`,
     { label: 'dedup', phase: '중복제거', schema: FINDINGS_SCHEMA, effort: 'low' }
@@ -173,7 +173,7 @@ const test = await testPromise
 
 phase('집계')
 const aggregate = await agent(
-  `너는 집계자다. ${REPO}/skills/meta-aggregate/SKILL.md 를 읽고 그 방식대로, 아래 자기감사 결과의 구조적 건강성을 점검하라 — 확정 발견 간 상충, 커버리지 공백, 전체 판정. 발견 내용 재판단은 금지(검증 단계가 끝냈다). 출력은 완결된 문어체 한국어로: (1) 전체 판정 한 단락, (2) 확정 발견 심각도순 정리(red 먼저), (3) 상충 명시, (4) 커버리지 공백.
+  `너는 집계자다. ${REPO}/skills/meta-aggregate/SKILL.md 를 읽고 그 방식대로, 아래 자기감사 결과의 구조적 건강성을 점검하라 — 확정 발견 간 상충, 커버리지 공백, 전체 판정. 발견 내용 재판단은 금지(검증 단계가 끝냈다). 출력은 완결된 문어체 한국어로: (1) 전체 판정 한 단락, (2) 확정 발견 정리 — 등급을 매기지 말고, 사용자 결정이 필요한 것을 따로 가려 앞에 둔다, (3) 상충 명시, (4) 커버리지 공백.
 결정론 테스트 결과: ${JSON.stringify(test)}
 확정 발견 (${confirmed.length}건): ${JSON.stringify(confirmed)}
 기각 발견 제목들 (${rejected.length}건): ${JSON.stringify(rejected.map(r => ({ title: r.title, why: r.verdicts })))}
