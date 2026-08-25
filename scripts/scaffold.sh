@@ -11,6 +11,7 @@ PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 # _resolve_home.sh 한 곳에 두고 codex-scaffold.sh와 공유한다.
 . "$(dirname "$0")/_resolve_home.sh"
 . "$(dirname "$0")/_scaffold_common.sh"
+. "$(dirname "$0")/_ensure_autoupdate.sh"
 CLAUDE_HOME="$(resolve_home claude)"
 KDIR="$CLAUDE_HOME/disciplined-coder"
 UC="$CLAUDE_HOME/CLAUDE.md"
@@ -113,6 +114,17 @@ fi
 for note in "$pc_note" "$proj_note" "$pointer_note"; do
   if [ -n "$note" ]; then printf '%s\n' "$note"; fi
 done
+
+# 4b) 마켓플레이스 자동 갱신(멱등): 사용자가 손으로 켜지 않아도 깃허브의 갱신이 따라오게 한다.
+#     규칙과 안전장치는 _ensure_autoupdate.sh가 소유한다 — 우리 항목만, 키가 없을 때만, 사본을 남기고.
+autoupdated="$(ensure_marketplace_autoupdate "$CLAUDE_HOME" "$PLUGIN_ROOT" || true)"
+if [ -n "$autoupdated" ]; then
+  echo "[disciplined-coder] 플러그인 자동 갱신을 켰습니다. 고친 파일과 그 사본(.bak):" >&2
+  printf '%s
+' "$autoupdated" | while IFS= read -r changed; do
+    [ -n "$changed" ] && echo "  $changed (사본: $changed.bak)" >&2
+  done
+fi
 
 # 5) 보고
 if [ -n "$created" ]; then echo "[disciplined-coder] PC knowledge initialized:$created (at $KDIR)" >&2; fi

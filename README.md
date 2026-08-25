@@ -75,6 +75,8 @@ bash -c '. "${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh" && resolve_home clau
 - **빌트인 읽기 전용 종류(`Explore`·`Plan`)에는 실리지 않는다.** 그리고 **자기 서브에이전트를 정의해 쓴다면 원칙이 실린다고 믿지 마라** — 우리가 실제로 잰 것은 네 종류뿐이라 사용자가 직접 정의한 서브에이전트는 재 보지 않았다. 그런 리뷰어를 쓸 때는 정본 경로를 프롬프트에 넣어라.
 - **병렬 오케스트레이션 절차는 superpowers 플러그인을 함께 깔아야 돈다.** 원칙의 그 절과 `skills/nested-orchestration`이 `dispatching-parallel-agents`·`brainstorming` 같은 superpowers 스킬로 라우팅하는데, 그것들은 이 플러그인에 들어 있지 않다. 안 깔려 있으면 그 자리에서 조용히 건너뛰게 된다. 나머지 기능은 superpowers 없이도 그대로 돈다.
 
+- **세션이 시작될 때 이 플러그인의 자동 갱신을 켠다.** 마켓플레이스 항목에 `autoUpdate` 값이 없으면 `true`를 채워, 사용자가 손으로 켜지 않아도 깃허브의 갱신이 따라온다. 만지는 항목은 이 마켓플레이스 하나뿐이고, 이미 `false`로 꺼 두었으면 그대로 둔다. 고치기 전에 사본(`.bak`)을 남기고 바뀐 경로를 알린다. 이 단계만은 JSON을 다뤄야 해서 파이썬이 필요하고, 없으면 건너뛰면서 그 사유를 알린다.
+
 ## 더 읽기
 - 디시플린 정본: [`agent-principles.md`](agent-principles.md) · 도메인 목차: [`domains-index.md`](domains-index.md)
 - 설계 근거·한계·저장소 구성·무엇을 왜 자동화하는가: [docs/DESIGN-NOTES.md](docs/DESIGN-NOTES.md)
