@@ -32,6 +32,79 @@ check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder'
 check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "stdout has solved marker"      "printf '%s' \"\$OUT\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 
+# 마켓플레이스 항목의 autoUpdate 값을 읽어 출력한다($1=파일 $2=항목 이름). 없으면 none을 찍는다.
+# grep으로 파일 전체를 훑으면 우리 항목에 붙었는지 남의 항목에 붙었는지 못 가리므로 항목을 지목해 읽는다.
+json_autoupdate() {
+  local prog='
+import json,sys,io
+d=json.load(io.open(sys.argv[1],encoding="utf-8"))
+e=d.get("extraKnownMarketplaces")
+t=(e or {}).get(sys.argv[2]) if isinstance(e,dict) else None
+if t is None: t=d.get(sys.argv[2])
+if not isinstance(t,dict) or "autoUpdate" not in t: print("none")
+else: print("true" if t["autoUpdate"] is True else "false")
+'
+  if python3 -c 'import sys' >/dev/null 2>&1; then python3 -c "$prog" "$1" "$2"
+  else python -c "$prog" "$1" "$2"; fi
+}
+
+# --- marketplace-autoupdate: 우리 마켓플레이스만, 키가 없을 때만 켠다 ---
+MKT="$(grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' "$HERE/.claude-plugin/marketplace.json" | head -1 | cut -d'"' -f4)"
+HA="$(mktemp -d)"; PA="$(mktemp -d)"; mkdir -p "$HA/.claude/plugins"
+cat > "$HA/.claude/settings.json" <<EOF
+{
+  "theme": "dark",
+  "extraKnownMarketplaces": {
+    "$MKT": { "source": { "source": "github", "repo": "chshin84/disciplined-coder" } },
+    "somebody-else": { "source": { "source": "github", "repo": "other/repo" } }
+  },
+  "hooks": { "PreToolUse": [] }
+}
+EOF
+cat > "$HA/.claude/plugins/known_marketplaces.json" <<EOF
+{ "$MKT": { "source": { "source": "github", "repo": "chshin84/disciplined-coder" } } }
+EOF
+run "$HA" "$PA" >/dev/null 2>&1
+SET_A="$HA/.claude/settings.json"; KNOWN_A="$HA/.claude/plugins/known_marketplaces.json"
+echo "[marketplace-autoupdate] 자동 갱신을 켠다"
+check "우리 항목에 autoUpdate가 켜졌다"   "[ \"\$(json_autoupdate '$SET_A' \"\$MKT\")\" = 'true' ]"
+check "알려진 마켓플레이스에도 켜졌다"     "[ \"\$(json_autoupdate '$KNOWN_A' \"\$MKT\")\" = 'true' ]"
+check "남의 마켓플레이스는 그대로다"       "[ \"\$(json_autoupdate '$SET_A' 'somebody-else')\" = 'none' ]"
+check "다른 설정이 보존된다"              "grep -qF '\"theme\"' '$SET_A' && grep -qF 'PreToolUse' '$SET_A'"
+check "사본을 남긴다"                     "[ -f '$SET_A.bak' ]"
+BEFORE_A="$(cat "$SET_A")"
+run "$HA" "$PA" >/dev/null 2>&1
+check "두 번째 실행에서 안 바뀐다"         "[ \"\$BEFORE_A\" = \"\$(cat '$SET_A')\" ]"
+
+# 사용자가 일부러 끈 것은 사용자의 결정이라 되돌리지 않는다
+HB="$(mktemp -d)"; PB="$(mktemp -d)"; mkdir -p "$HB/.claude"
+cat > "$HB/.claude/settings.json" <<EOF
+{ "extraKnownMarketplaces": { "$MKT": { "autoUpdate": false, "source": { "source": "github", "repo": "chshin84/disciplined-coder" } } } }
+EOF
+run "$HB" "$PB" >/dev/null 2>&1
+check "꺼 둔 값을 되돌리지 않는다"         "[ \"\$(json_autoupdate '$HB/.claude/settings.json' \"\$MKT\")\" = 'false' ]"
+check "꺼 둔 파일은 다시 쓰이지도 않는다"  "[ ! -f '$HB/.claude/settings.json.bak' ]"
+
+# 우리 항목이 없으면 아무것도 만지지 않는다
+HC="$(mktemp -d)"; PC2="$(mktemp -d)"; mkdir -p "$HC/.claude"
+printf '{ "extraKnownMarketplaces": { "somebody-else": { "source": { "source": "github", "repo": "other/repo" } } } }
+' > "$HC/.claude/settings.json"
+BEFORE_C="$(cat "$HC/.claude/settings.json")"
+run "$HC" "$PC2" >/dev/null 2>&1
+check "우리 항목이 없으면 안 만진다"       "[ \"\$BEFORE_C\" = \"\$(cat '$HC/.claude/settings.json')\" ]"
+check "사본도 안 만든다"                  "[ ! -f '$HC/.claude/settings.json.bak' ]"
+
+# 깨진 JSON은 손대지 않고 스캐폴드도 죽지 않는다
+HD="$(mktemp -d)"; PD="$(mktemp -d)"; mkdir -p "$HD/.claude"
+printf '{ this is not json
+' > "$HD/.claude/settings.json"
+set +e; run "$HD" "$PD" >/dev/null 2>&1; rc_d=$?; set -e
+check "깨진 설정에도 스캐폴드가 산다"      "[ $rc_d -eq 0 ]"
+check "깨진 설정을 고치지 않는다"          "grep -qF 'this is not json' '$HD/.claude/settings.json'"
+check "깨진 설정에도 정본은 깔린다"        "[ -f '$HD/.claude/disciplined-coder/agent-principles.md' ]"
+set +e; ERR_D="$(run "$HD" "$PD" 2>&1 >/dev/null)"; set -e
+check "깨진 설정을 조용히 넘기지 않는다"    "printf '%s' \"\$ERR_D\" | grep -qF 'autoUpdate 설정을 건너뛴다'"
+
 # --- project-untouched: 프로젝트 폴더 무오염 ---
 echo "[project-untouched] project untouched"
 check "no principles in project"      "[ ! -f '$P1/agent-principles.md' ]"
