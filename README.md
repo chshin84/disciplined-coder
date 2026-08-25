@@ -56,7 +56,6 @@ bash -c '. "${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh" && resolve_home clau
 설치 직후에는 셋업이 실제로 반영됐는지 눈으로 확인할 때, 그 뒤에는 활성화된 내용을 확인하거나 셋업을 다시 돌리고 싶을 때 쓴다.
 ```text
 /show-principles     # 현재 활성 디시플린 정본(agent-principles.md 사본) 보기
-/show-solved         # 해결된 문제 오답노트 보기
 /setup-discipline    # PC 전역 셋업을 수동 재실행(멱등 — 여러 번 안전)
 ```
 
