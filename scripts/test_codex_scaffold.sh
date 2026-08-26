@@ -5,7 +5,14 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 SCAFFOLD="$HERE/scripts/codex-scaffold.sh"
 pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
-run() { CODEX_HOME_DIR="$1/.codex" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"; }
+# 둘째 인자를 생략하면 빈 임시 디렉터리를 프로젝트로 쓴다. codex-scaffold.sh 는
+# PROJ="${CLAUDE_PROJECT_DIR:-$PWD}" 이므로, 이것을 안 세우면 테스트가 이 레포 자신의
+# docs/solved_problems.md 를 프로젝트 로그로 잡아 실제 파일을 고칠 수 있다.
+run() {  # $1=HOME 디렉터리, $2=프로젝트 디렉터리(생략 가능)
+  local proj="${2:-}"
+  [ -n "$proj" ] || proj="$(mktemp -d)"
+  CODEX_HOME_DIR="$1/.codex" CLAUDE_PROJECT_DIR="$proj" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"
+}
 
 # 이웃 관계 검사: 파일에서 pattern과 정확히 일치하는 첫 줄 '바로 다음 줄'이 빈 줄인지 확인한다.
 # 전역 빈 줄 카운트는 관리블록이 항상 넣는 구분 빈 줄과 뒤섞여 무조건 참이 되므로 쓰지 않는다.
@@ -158,5 +165,15 @@ BEFORE_C3="$(cksum < "$PROSEC")"
 OUTC3="$(run "$HC3")"
 check "codex 구조 없음: 파일 불변(바이트)" "[ \"\$(cksum < '$PROSEC')\" = '$BEFORE_C3' ]"
 check "codex 구조 없음: 신호 있음"         "printf '%s' \"\$OUTC3\" | grep -qF '$NUDGE_C'"
+
+# --- isolation: run 은 레포 자신을 프로젝트로 잡지 않는다 ---
+# codex-scaffold.sh 는 PROJ="${CLAUDE_PROJECT_DIR:-$PWD}" 라, 이 헬퍼가 그 값을 안 세우면
+# 테스트를 레포에서 돌릴 때마다 이 레포의 진짜 docs/solved_problems.md 가 대상이 된다.
+HI1="$(mktemp -d)"; PI1="$(mktemp -d)"; mkdir -p "$PI1/docs"
+printf '# 해결된 문제 로그\n\n- **격리 픽스처 항목**\n  - 원인: 무엇\n  - 해결: 무엇\n' > "$PI1/docs/solved_problems.md"
+OUTI1="$(run "$HI1" "$PI1")"
+echo "[isolation] run does not treat the repo itself as the project"
+check "격리: 픽스처 프로젝트를 본다" "printf '%s' \"\$OUTI1\" | grep -qF -- '$PI1'"
+check "격리: 레포 자신은 안 본다"    "! printf '%s' \"\$OUTI1\" | grep -qF -- '$HERE/docs/solved_problems.md'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
