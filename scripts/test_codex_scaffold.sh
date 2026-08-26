@@ -176,4 +176,31 @@ echo "[isolation] run does not treat the repo itself as the project"
 check "격리: 픽스처 프로젝트를 본다" "printf '%s' \"\$OUTI1\" | grep -qF -- '$PI1'"
 check "격리: 레포 자신은 안 본다"    "! printf '%s' \"\$OUTI1\" | grep -qF -- '$HERE/docs/solved_problems.md'"
 
+# --- split-rules: 형식 규칙과 머리말은 로그 형태를 따른다 (Claude 쪽과 같은 계약) ---
+# 쌍둥이 스크립트는 한쪽만 고치면 두 런타임의 오답노트 형식이 갈린다 — 그것이 애초에 머리말
+# 자동 갱신을 도입한 이유다.
+HX2="$(mktemp -d)"; PX2="$(mktemp -d)"; mkdir -p "$HX2/.codex/disciplined-coder"
+LOGX2="$HX2/.codex/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 머리말이다.\n\n'
+  printf -- '- **옛 항목** → 원인: 무엇 → 해결: 무엇\n'
+} > "$LOGX2"
+run "$HX2" "$PX2" >/dev/null
+echo "[split-rules] the rules block follows the shape of the log"
+check "codex split-rules: 안 쪼개진 로그는 옛 규칙" "grep -qF -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGX2'"
+check "codex split-rules: 새 규칙은 안 들어감"      "! grep -qF -- '이 파일은 색인이고' '$LOGX2'"
+
+HX3="$(mktemp -d)"; PX3="$(mktemp -d)"; mkdir -p "$HX3/.codex/disciplined-coder/solved_problems"
+LOGX3="$HX3/.codex/disciplined-coder/solved_problems.md"
+printf '# 무언가를 할 때는 이렇게 한다\n' > "$HX3/.codex/disciplined-coder/solved_problems/a.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 머리말이다.\n\n'
+  printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
+} > "$LOGX3"
+run "$HX3" "$PX3" >/dev/null
+check "codex split-rules: 쪼개진 로그는 새 규칙"    "grep -qF -- '이 파일은 색인이고' '$LOGX3'"
+check "codex split-rules: 지시사항 줄 보존"         "grep -qF -- '- 무언가를 할 때는 이렇게 한다.' '$LOGX3'"
+check "codex split-rules: 포인터 줄 보존"           "grep -qF -- '→ solved_problems/a.md' '$LOGX3'"
+check "codex split-rules: append-only 자기규정 없음" "! grep -qF -- '· append-only 오답노트' '$LOGX3'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

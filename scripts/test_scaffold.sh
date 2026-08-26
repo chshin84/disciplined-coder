@@ -771,4 +771,41 @@ check "count: 있는 것을 센다"  "[ \"\$(. '$COMMON'; scaffold_count_matches
 check "count: 0건도 한 줄이다" "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^zzz\$')\" = 0 ]"
 check "count: 없는 파일도 0"   "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/none.md' '^a\$')\" = 0 ]"
 
+# --- split-detect: 로그 옆에 본문 폴더가 있으면 쪼개진 로그다 ---
+# 부정 단언에 긍정 단언을 짝으로 붙인다 — 함수가 없을 때 부정 단언은 저절로 참이 된다.
+HS1="$(mktemp -d)"; touch "$HS1/solved_problems.md"
+echo "[split-detect] a body folder next to the log means the log is split"
+check "split-detect: 함수가 있다"           "(. '$COMMON'; type scaffold_solved_log_is_split)"
+check "split-detect: 폴더 없으면 안 쪼개짐" "! (. '$COMMON'; scaffold_solved_log_is_split '$HS1/solved_problems.md')"
+mkdir -p "$HS1/solved_problems"
+check "split-detect: 빈 폴더도 안 쪼개짐"   "! (. '$COMMON'; scaffold_solved_log_is_split '$HS1/solved_problems.md')"
+printf '# 무언가를 할 때는 이렇게 한다\n' > "$HS1/solved_problems/a.md"
+check "split-detect: 본문이 있으면 쪼개짐"  "(. '$COMMON'; scaffold_solved_log_is_split '$HS1/solved_problems.md')"
+
+# --- split-rules: 형식 규칙과 머리말은 로그 형태를 따른다 ---
+HS2="$(mktemp -d)"; PS2="$(mktemp -d)"; mkdir -p "$HS2/.claude/disciplined-coder"
+LOGS2="$HS2/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 머리말이다.\n\n'
+  printf -- '- **옛 항목** → 원인: 무엇 → 해결: 무엇\n'
+} > "$LOGS2"
+run "$HS2" "$PS2" >/dev/null
+echo "[split-rules] the rules block follows the shape of the log"
+check "split-rules: 안 쪼개진 로그는 옛 규칙" "grep -qF -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGS2'"
+check "split-rules: 새 규칙은 안 들어감"      "! grep -qF -- '이 파일은 색인이고' '$LOGS2'"
+
+HS3="$(mktemp -d)"; PS3="$(mktemp -d)"; mkdir -p "$HS3/.claude/disciplined-coder/solved_problems"
+LOGS3="$HS3/.claude/disciplined-coder/solved_problems.md"
+printf '# 무언가를 할 때는 이렇게 한다\n' > "$HS3/.claude/disciplined-coder/solved_problems/a.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 머리말이다.\n\n'
+  printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
+} > "$LOGS3"
+run "$HS3" "$PS3" >/dev/null
+check "split-rules: 쪼개진 로그는 새 규칙"    "grep -qF -- '이 파일은 색인이고' '$LOGS3'"
+check "split-rules: 옛 규칙은 안 들어감"      "! grep -qF -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGS3'"
+check "split-rules: 지시사항 줄 보존"         "grep -qF -- '- 무언가를 할 때는 이렇게 한다.' '$LOGS3'"
+check "split-rules: 포인터 줄 보존"           "grep -qF -- '→ solved_problems/a.md' '$LOGS3'"
+check "split-rules: append-only 자기규정 없음" "! grep -qF -- '· append-only 오답노트' '$LOGS3'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

@@ -24,6 +24,41 @@ SCAFFOLD_SOLVED_RULES='항목을 적는 형식은 이렇다.
 - 항목이 스무 개를 넘으면 그때 영역별로 묶는다.
 - 안 쓰이는 항목도 지우지 않는다 — 사용자가 직접 지시할 때만 손댄다.'
 
+# 쪼개진 로그(색인 + 본문 폴더)의 형식 규칙 블록. 안 쪼개진 로그에는 이것을 갈아끼우지 않는다 —
+# 지킬 수 없는 형식을 스스로 선언하게 되는데, 낡음 판정이 포함 검사라 그 어긋남은 어떤 신호에도
+# 안 걸린다. 굵은 줄에 관한 규칙을 넣어 둔 이유는, 쪼갠 직후와 지시사항을 다 쓴 뒤 사이의 중간
+# 상태를 사람과 기계가 함께 알아볼 수 있게 하기 위해서다.
+SCAFFOLD_SOLVED_RULES_SPLIT='항목을 적는 형식은 이렇다.
+
+- 이 파일은 색인이고 한 줄이 한 항목이다. 줄에는 지시사항만 적는다.
+- 지시사항은 언제 걸리는지와 무엇을 하라는지를 한 문장에 담는다.
+- 증상과 원인과 근거는 색인에 적지 않고 본문 파일에 적는다.
+- 각 줄은 다음 줄에서 solved_problems/ 아래의 본문 파일 하나를 가리킨다.
+- 본문 파일의 첫 줄은 그 지시사항과 같다.
+- 아직 지시사항으로 못 고친 줄은 굵게 둔다. 고치면서 굵기를 벗긴다.
+- 순서는 시간순이고 아래에 추가한다.
+- 본문 파일을 고치거나 지우기 전에 사용자에게 묻는다.
+- 사용자 요청으로 고치거나 지울 때는 색인 줄도 함께 고치거나 지운다.'
+
+# 로그가 쪼개졌는지 본다. 판정 재료는 로그 옆의 본문 폴더에 본문 파일이 하나라도 있는지다.
+# 빈 폴더를 쪼개진 것으로 보지 않는 이유는 개편을 하다 멈춘 로그가 그 모양이기 때문이다 —
+# 그것을 쪼개진 것으로 보면 빈 색인이 최신 형식을 선언하게 된다.
+scaffold_solved_log_is_split() {  # $1=로그 경로 → 종료코드 0이면 쪼개짐
+  local dir="${1%.md}" f
+  [ -d "$dir" ] || return 1
+  for f in "$dir"/*.md; do [ -f "$f" ] && return 0; done
+  return 1
+}
+
+# 그 로그에 걸어야 할 형식 규칙 블록을 고른다.
+scaffold_solved_rules_for() {  # $1=로그 경로 → stdout: 규칙 블록
+  if scaffold_solved_log_is_split "$1"; then
+    printf '%s' "$SCAFFOLD_SOLVED_RULES_SPLIT"
+  else
+    printf '%s' "$SCAFFOLD_SOLVED_RULES"
+  fi
+}
+
 # 위생(멱등): STALE 제거 → 비화이트리스트는 디렉터리/내용파일 surface·빈 파일 제거.
 scaffold_hygiene() {  # $1=KDIR
   local kdir="$1" f b w keep
@@ -58,9 +93,13 @@ scaffold_hygiene() {  # $1=KDIR
 # 쓰도록 한 곳에 둔다 — 두 곳에 두면 갓 만든 로그와 고쳐 준 로그의 머리말이 조용히 갈린다(SSOT).
 # 히어독을 확장형으로 바꾸지 않는 이유는 리터럴 히어독이 본문의 $와 백틱을 보호하기 때문이다.
 # 지금은 확장 대상 문자가 없어 테스트가 초록이라 함정이 잠복한다.
-scaffold_solved_header() {  # $1=스코프(pc|project) → stdout: 제목부터 형식 규칙 블록까지
-  case "$1" in
-    pc)
+# 쪼개진 로그에서는 제목 줄과 스코프 문단도 갈린다. 그대로 두면 한 파일이 스스로를
+# append-only 라 부르면서 그 아래 규칙 블록은 색인 줄을 고치라고 지시하는 모순이 된다.
+scaffold_solved_header() {  # $1=스코프(pc|project) $2=로그 경로 → stdout: 제목부터 형식 규칙 블록까지
+  local split=0
+  [ -n "${2:-}" ] && scaffold_solved_log_is_split "$2" && split=1
+  case "$1:$split" in
+    pc:0)
       cat <<'EOF'
 # 해결된 문제 로그 (solved_problems) — PC 전역 · append-only 오답노트
 
@@ -69,7 +108,16 @@ scaffold_solved_header() {  # $1=스코프(pc|project) → stdout: 제목부터 
 일반화 가능한 항목은 디시플린(agent-principles.md)으로 **재기술해 승격**한다(원문은 append-only로 보존 — 이동이 아니라 상위 계층 재작성). 메인 세션만 기록.
 EOF
       ;;
-    project)
+    pc:1)
+      cat <<'EOF'
+# 해결된 문제 로그 (solved_problems) — PC 전역 · 지시사항 색인
+
+완결된 문제의 교훈 모음 — 일을 시작할 때 걸리는 지시사항만 여기 두고 증상과 원인은 본문 파일에 둔다.
+**본문 파일은 append-only 이고 색인 줄은 그 본문을 따라 고친다.** 본문을 고치거나 지울 때만 색인 줄도 함께 손댄다.
+일반화 가능한 항목은 디시플린(agent-principles.md)으로 **재기술해 승격**한다(원문은 본문에 보존 — 이동이 아니라 상위 계층 재작성). 메인 세션만 기록.
+EOF
+      ;;
+    project:0)
       cat <<'EOF'
 # 해결된 문제 로그 (solved_problems) — 이 프로젝트 · append-only 오답노트
 
@@ -78,12 +126,21 @@ EOF
 이 프로젝트에 한정된 교훈만 둔다 — 머신 전역은 PC solved, 보편은 디시플린 원칙으로(스코프 라우팅).
 EOF
       ;;
+    project:1)
+      cat <<'EOF'
+# 해결된 문제 로그 (solved_problems) — 이 프로젝트 · 지시사항 색인
+
+이 레포에서 완결한 문제의 교훈 — 일을 시작할 때 걸리는 지시사항만 여기 두고 증상과 원인은 본문 파일에 둔다.
+**본문 파일은 append-only 이고 색인 줄은 그 본문을 따라 고친다.** 본문을 고치거나 지울 때만 색인 줄도 함께 손댄다.
+이 프로젝트에 한정된 교훈만 둔다 — 머신 전역은 PC solved, 보편은 디시플린 원칙으로(스코프 라우팅).
+EOF
+      ;;
     *)
       echo "[disciplined-coder] WARNING: 알 수 없는 오답노트 스코프 '$1'" >&2
       return 1
       ;;
   esac
-  printf '\n%s\n' "$SCAFFOLD_SOLVED_RULES"
+  printf '\n%s\n' "$(scaffold_solved_rules_for "${2:-}")"
 }
 
 # solved 오답노트: 없을 때만 생성(append-only). 생성했으면 0, 이미 있으면 1을 리턴.
@@ -92,7 +149,7 @@ EOF
 scaffold_ensure_solved() {  # $1=KDIR
   local kdir="$1"
   [ -f "$kdir/solved_problems.md" ] && return 1
-  scaffold_solved_header pc > "$kdir/solved_problems.md"
+  scaffold_solved_header pc "$kdir/solved_problems.md" > "$kdir/solved_problems.md"
   return 0
 }
 
@@ -105,12 +162,13 @@ scaffold_ensure_solved() {  # $1=KDIR
 # 있어도 참이 된다. case의 리터럴 부분일치는 여러 줄을 통째로 본다.
 # 줄 끝은 양쪽 다 정규화하고, 명령 치환이 후행 개행을 먹으므로 블록이 파일 끝에 놓여도 일치한다.
 scaffold_check_solved_rules() {  # $1=로그 경로 → sets: solved_rules_stale (1=낡음, 0=최신이거나 판정 안 함)
-  local f="$1" body
+  local f="$1" body rules
   solved_rules_stale=0
   [ -f "$f" ] || return 0
   body="$(tr -d '\r' < "$f" 2>/dev/null)" || return 0
+  rules="$(scaffold_solved_rules_for "$f")"
   case "$body" in
-    *"$SCAFFOLD_SOLVED_RULES"*) solved_rules_stale=0 ;;
+    *"$rules"*) solved_rules_stale=0 ;;
     *) solved_rules_stale=1 ;;
   esac
   return 0
@@ -132,7 +190,7 @@ scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 
   local f="$1" scope="$2" bdir="$3" label="$4" n tmp stamp bk rules
   solved_fix_result="none"; solved_fix_reason=""; solved_fix_backup=""
   [ -f "$f" ] || return 0
-  rules="$SCAFFOLD_SOLVED_RULES"
+  rules="$(scaffold_solved_rules_for "$f")"
   n="$(awk -v rules="$rules" '
     BEGIN {
       nr = split(rules, rl, "\n")
@@ -172,7 +230,7 @@ scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 
   tmp="$(mktemp "$f.XXXXXX" 2>/dev/null)" || {
     solved_fix_result="refused"; solved_fix_reason="write"; solved_fix_backup="$bk"; return 0
   }
-  if { scaffold_solved_header "$scope" && printf '\n' && tail -n "+$n" "$f"; } > "$tmp" 2>/dev/null \
+  if { scaffold_solved_header "$scope" "$f" && printf '\n' && tail -n "+$n" "$f"; } > "$tmp" 2>/dev/null \
      && mv "$tmp" "$f" 2>/dev/null; then
     solved_fix_result="fixed"; solved_fix_backup="$bk"
   else
