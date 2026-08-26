@@ -740,4 +740,25 @@ check "사본 실패: 공통 신호는 그대로"     "printf '%s' \"\$OUTR14\" 
 check "사본 실패: 사본 사유를 알린다"     "printf '%s' \"\$OUTR14\" | grep -qF '사본을 뜨지 못해'"
 check "사본 실패: 경계 문구는 안 쓴다"    "! printf '%s' \"\$OUTR14\" | grep -qF '머리말의 끝을 알아볼 수 없어'"
 
+# --- header-boundary: 굵지 않은 항목 줄을 머리말로 먹지 않는다 ---
+# 경계를 '모양'으로 짐작하면(굵지 않은 최상위 불릿이면 남은 규칙 불릿이다) 지시사항형 색인 줄을
+# 머리말로 삼킨다. 쪼갠 로그의 색인 줄이 정확히 그 모양이라, 이 검사가 그 손실을 막는 유일한 그물이다.
+HB1="$(mktemp -d)"; PB1="$(mktemp -d)"; mkdir -p "$HB1/.claude/disciplined-coder"
+LOGB1="$HB1/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 스코프 문단이라 머리말이 낡음으로 판정된다.\n\n'
+  printf '항목을 적는 형식은 이렇다.\n\n'
+  printf -- '- 증상은 굵게 한 줄로 띄운다.\n'
+  printf -- '- 원인과 해결은 그 아래 들여쓰기로 내린다.\n\n'
+  printf -- '- 굵지 않은 첫째 항목 줄이다.\n'
+  printf -- '- 굵지 않은 둘째 항목 줄이다.\n'
+} > "$LOGB1"
+run "$HB1" "$PB1" >/dev/null
+echo "[header-boundary] a non-bold item line is not swallowed into the header"
+check "boundary: 굵지 않은 첫째 항목 보존"  "grep -qF -- '- 굵지 않은 첫째 항목 줄이다.' '$LOGB1'"
+check "boundary: 굵지 않은 둘째 항목 보존"  "grep -qF -- '- 굵지 않은 둘째 항목 줄이다.' '$LOGB1'"
+check "boundary: 규칙 블록이 생겼다"        "grep -qF -- '항목이 스무 개를 넘으면' '$LOGB1'"
+check "boundary: 옛 스코프 문단은 사라졌다" "! grep -qF -- '옛 스코프 문단이라' '$LOGB1'"
+check "boundary: 규칙 불릿이 두 벌이 아니다" "[ \"\$(grep -c -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGB1' || true)\" = 1 ]"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

@@ -129,21 +129,28 @@ scaffold_check_solved_rules() {  # $1=로그 경로 → sets: solved_rules_stale
 scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 $4=백업 이름표
                                 # → sets: solved_fix_result(fixed|refused|none),
                                 #         solved_fix_reason(boundary|backup|write|""), solved_fix_backup
-  local f="$1" scope="$2" bdir="$3" label="$4" n tmp stamp bk intro
+  local f="$1" scope="$2" bdir="$3" label="$4" n tmp stamp bk rules
   solved_fix_result="none"; solved_fix_reason=""; solved_fix_backup=""
   [ -f "$f" ] || return 0
-  intro="${SCAFFOLD_SOLVED_RULES%%$'\n'*}"
-  n="$(awk -v intro="$intro" '
+  rules="$SCAFFOLD_SOLVED_RULES"
+  n="$(awk -v rules="$rules" '
+    BEGIN {
+      nr = split(rules, rl, "\n")
+      intro = rl[1]
+      for (k = 2; k <= nr; k++) if (rl[k] != "") known[rl[k]] = 1
+    }
     { l=$0; sub(/\r$/,"",l); line[NR]=l }
     END {
       seen=0
       for (i=1;i<=NR;i++) if (line[i]==intro) { seen=i; break }
       if (seen) {
-        # 규칙 블록이 일부만 남은 로그가 있다. 도입 문장 뒤의 빈 줄과 굵지 않은 목록 줄은 남은
-        # 규칙 불릿이므로 머리말로 센다 — 항목으로 오인해 아래에 붙이면 블록이 두 벌이 된다.
+        # 규칙 블록이 일부만 남은 로그가 있다. 도입 문장 뒤의 빈 줄과 "이 블록에 실제로 있는 줄"만
+        # 머리말로 센다 — 항목으로 오인해 아래에 붙이면 블록이 두 벌이 된다.
+        # 모양으로 짐작하지 않는 이유는, 굵지 않은 최상위 불릿이 곧 지시사항형 색인 줄의 모양이라
+        # 짐작하는 순간 그 줄들을 통째로 머리말로 먹기 때문이다(실측으로 확인했다).
         for (i=seen+1;i<=NR;i++) {
           if (line[i]=="") continue
-          if (line[i] ~ /^[-*+][ \t]/ && line[i] !~ /^[-*+][ \t]+\*\*/) continue
+          if (line[i] in known) continue
           print i; exit
         }
         print NR+1; exit
