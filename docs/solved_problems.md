@@ -16,26 +16,26 @@
 - 본문 파일을 고치거나 지우기 전에 사용자에게 묻는다.
 - 사용자 요청으로 고치거나 지울 때는 색인 줄도 함께 고치거나 지운다.
 
-- **validate의 "version 미지정" 경고를 없애려 plugin.json에 version을 추가했다가 같은 날 번복했다.**
-  → solved_problems/validate의-version-미지정-경고를-없애려-pluginjson.md
-- **워크플로 스크립트(`.claude/workflows/self-audit.js` 등)를 ESM으로(`node --input-type=module --check`) 검증하면 톱레벨 `return`에서 "Illegal return statement"로 실패한다.**
-  → solved_problems/워크플로-스크립트claudeworkflowsself-auditjs-등를.md
-- **spec/plan을 쓰면 Stop 훅이 리뷰어 완료 전에도 턴 종료를 반복 차단한다.**
-  → solved_problems/specplan을-쓰면-Stop-훅이-리뷰어-완료-전에도-턴-종료를-반복.md
-- **`~/.claude/CLAUDE.md`에 관리 블록이 네 겹으로 쌓이고 고아 마커가 박힌다.**
-  → solved_problems/claudeCLAUDEmd에-관리-블록이-네-겹으로-쌓이고-고아-마커가.md
-- **정본이 매 세션 두 번 실린다 — `@import` 관리 블록과 `scaffold.sh` stdout 양쪽이다.**
-  → solved_problems/정본이-매-세션-두-번-실린다--import-관리-블록과-scaffold.md
-- **`/add-pointer`가 빈 오답노트 템플릿을 미리 만들라고 권하고 있었다.**
-  → solved_problems/add-pointer가-빈-오답노트-템플릿을-미리-만들라고-권하고-있었다.md
-- **재사용하려던 함수의 "미관 정리" 한 줄이 사실은 유일한 커밋 경로여서 설계가 통째로 어긋났다.**
-  → solved_problems/재사용하려던-함수의-미관-정리-한-줄이-사실은-유일한-커밋-경로여서-설계.md
-- **실측 표에서 도출되지 않는 인과를 두 번이나 세워 스킬 정본에 박을 뻔했다.**
-  → solved_problems/실측-표에서-도출되지-않는-인과를-두-번이나-세워-스킬-정본에-박을-뻔했.md
-- **여러 줄 문자열 포함 검사를 `grep -F`로 짜면 한 줄만 있어도 참이 된다.**
-  → solved_problems/여러-줄-문자열-포함-검사를-grep--F로-짜면-한-줄만-있어도-참이.md
-- **워크플로를 이름으로 부르면 레포 파일이 아니라 플러그인 캐시 사본이 로드돼 권한 검증에서 막혔다.**
-  → solved_problems/워크플로를-이름으로-부르면-레포-파일이-아니라-플러그인-캐시-사본이-로드.md
+- 경고나 린트를 없애는 수정이라도 손대기 전에 그 설정이 동작을 바꾸는지 도메인 참고서를 먼저 연다.
+  → solved_problems/2026-07-03-lint-fix-check-domain-ref.md
+- 워크플로 스크립트의 문법을 검사할 때는 하니스처럼 async 함수로 감싼 뒤 node --check 에 넣는다.
+  → solved_problems/2026-07-03-workflow-syntax-check-wrap.md
+- 리뷰어를 백그라운드로 띄웠으면 결과가 올 때까지 마커를 달지 말고 차단 메시지에는 상태만 답한다.
+  → solved_problems/2026-07-03-review-marker-wait.md
+- 관리 영역을 갱신할 때는 기우지 말고 마커 줄만 지운 뒤 다시 짓는다 — 본문 줄은 절대 지우지 않는다.
+  → solved_problems/2026-07-27-managed-block-rebuild.md
+- 레일을 보험으로 이중화하기 전에 그 위험이 아직 살아 있는지 확인하고, 쌍둥이 스크립트는 한쪽을 고칠 때 반드시 같이 본다.
+  → solved_problems/2026-07-27-dual-rail-check.md
+- 오답노트는 미리 만들지 말고 적을 것이 생긴 시점에 만든다.
+  → solved_problems/2026-07-27-solved-log-on-demand.md
+- 기존 함수를 재사용하기로 정하기 전에 그 함수의 쓰기 경로를 끝까지 읽어 어느 줄이 대상 파일에 반영하는지 특정한다.
+  → solved_problems/2026-07-28-read-write-path-before-reuse.md
+- 표본이 적은 실측에서는 관측만 적고 인과는 주장하지 않는다 — 경쟁 설명이 같은 데이터를 설명하는지 먼저 센다.
+  → solved_problems/2026-07-28-no-causation-small-sample.md
+- 여러 줄 블록이 들어 있는지 검사할 때는 grep -F 가 아니라 case 의 리터럴 부분일치를 쓴다.
+  → solved_problems/2026-07-28-multiline-contains-check.md
+- 워크플로를 고쳐 바로 확인할 때는 이름이 아니라 scriptPath 로 부른다 — 이름 호출은 커밋 SHA에 핀이 박힌 플러그인 캐시를 읽는다.
+  → solved_problems/2026-08-13-workflow-scriptpath.md
 - **"같은 줄에 있는가"를 파일 전역 grep 두 번으로 검사하면 항진이 된다.**
   → solved_problems/같은-줄에-있는가를-파일-전역-grep-두-번으로-검사하면-항진이-된다.md
 - **세션 시작 훅이 사용자 전역 `CLAUDE.md`를 통째로 날릴 수 있었다.**
