@@ -20,6 +20,12 @@ for c in python3 python; do command -v "$c" >/dev/null 2>&1 && { PY="$c"; break;
 # '안 쪼개짐'으로 나와 다음 세션에 개편 권유가 다시 뜬다.
 STAMP="$(date +%Y%m%d-%H%M%S 2>/dev/null || echo unknown)"
 LABEL="$(printf '%s' "$(basename "$(dirname "$LOG")")" | tr -c 'A-Za-z0-9._-' '_')"
+# 쪼갤 것이 하나도 없으면 사본을 뜨지 않는다 — 뜨면 다시 돌릴 때마다 백업 폴더가 늘어 어느 것이
+# 어느 회차인지 가릴 수 없게 된다(멱등성은 연속 두 번 실행으로만 드러난다).
+if ! grep -qE '^[-*+][[:space:]]+\*\*' "$LOG" 2>/dev/null; then
+  echo "손으로 가를 항목 0개"
+  exit 0
+fi
 if ! mkdir -p "$BDIR" 2>/dev/null || ! cp "$LOG" "$BDIR/solved_problems.$LABEL.$STAMP.md" 2>/dev/null; then
   echo "사본을 뜨지 못해 아무것도 하지 않았다($BDIR 에 쓸 수 있게 하라)" >&2
   exit 2

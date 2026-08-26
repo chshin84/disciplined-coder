@@ -24,7 +24,7 @@ ensure_marketplace_autoupdate() {
   fi
   for f in "$home/settings.json" "$home/plugins/known_marketplaces.json"; do
     [ -f "$f" ] || continue
-    _autoupdate_patch "$f" "$mkt_json"; rc=$?
+    rc=0; _autoupdate_patch "$f" "$mkt_json" || rc=$?
     case "$rc" in
       0|10) ;;
       3) echo "[disciplined-coder] WARNING: autoUpdate 설정을 건너뛴다 — marketplace.json에 name이 없다" >&2 ;;
@@ -56,9 +56,9 @@ json.load(io.open(f+".dc-tmp",encoding="utf-8"))
 sys.exit(0)
 '
   if python3 -c 'import sys' >/dev/null 2>&1; then
-    python3 -c "$prog" "$f" "$mkt" >/dev/null 2>&1; rc=$?
+    rc=0; python3 -c "$prog" "$f" "$mkt" >/dev/null 2>&1 || rc=$?
   elif python -c 'import sys' >/dev/null 2>&1; then
-    python -c "$prog" "$f" "$mkt" >/dev/null 2>&1; rc=$?
+    rc=0; python -c "$prog" "$f" "$mkt" >/dev/null 2>&1 || rc=$?
   else
     return 4
   fi

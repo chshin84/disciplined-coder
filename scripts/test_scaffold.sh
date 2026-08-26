@@ -851,6 +851,19 @@ check "pairing: 못 고친 색인 줄을 따로 센다"   "printf '%s' \"\$OUTP4
 # --- notice-encoding: 사용자 화면에 나가는 표시가 이중 인코딩되지 않았다 ---
 # 이모지 뒤 본문 조각만 grep 하면 표시가 깨져도 통과한다 — 실제로 알림 넷의 🔵 가 latin-1 을
 # 거쳐 다시 인코딩된 채 들어왔고 검사가 못 잡았다. 표시 자체와 그 표식을 함께 단언한다.
+
+# --- stale-keep: 사본을 못 뜨면 내용이 든 구 관리파일을 지우지 않는다 ---
+# 예전에는 여기서 rm 으로 넘어가, 백업 자리에 쓸 수 없는 PC 에서 사용자가 적어 둔 줄이 조용히
+# 사라지고 되돌릴 길이 없었다. backups 자리를 파일로 막아 그 경로를 실제로 밟는다.
+HK1="$(mktemp -d)"; KK1="$HK1/.claude/disciplined-coder"; mkdir -p "$KK1"
+printf '사용자가 적어 둔 줄
+' > "$KK1/coding-principles.md"
+printf 'block
+' > "$KK1/backups"
+ERRK1="$( . "$COMMON"; scaffold_hygiene "$KK1" 2>&1 >/dev/null || true )"
+echo "[stale-keep] a stale file survives when its backup cannot be written"
+check "stale-keep: 내용이 든 파일이 남는다" "[ -f '$KK1/coding-principles.md' ]"
+check "stale-keep: 조용히 넘어가지 않는다" "printf '%s' \"$ERRK1\" | grep -qF -- '사본으로 못 옮겨 그대로 두었다'"
 echo "[notice-encoding] user-facing notices are not double-encoded"
 check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COMMON\""
 check "notice: 짝 맞춤 알림에 파란 점 접두" "printf '%s' \"$OUTP4\" | grep -qF -- '🔵 disciplined-coder:'"

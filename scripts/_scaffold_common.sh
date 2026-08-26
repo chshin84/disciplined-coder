@@ -64,16 +64,26 @@ scaffold_solved_rules_for() {  # $1=로그 경로 → stdout: 규칙 블록
 # 위생(멱등): STALE 제거 → 비화이트리스트는 디렉터리/내용파일 surface·빈 파일 제거.
 scaffold_hygiene() {  # $1=KDIR
   local kdir="$1" f b w keep
+  scaffold_stale_kept=""
   # 구 관리파일 치우기. 내용이 있으면 사용자가 적어 둔 줄이 섞여 있을 수 있으므로 지우지 않고
   # 백업으로 옮긴다 — 관리 디렉터리에서는 사라지되 되돌릴 수는 있어야 한다(REVERSIBLE).
+  # 사본을 못 뜨면 지우지 않고 그대로 두고 알린다. 예전에는 여기서 rm 으로 넘어갔는데, 그러면
+  # 백업 디렉터리에 쓸 수 없는 PC 에서 사용자가 적어 둔 줄이 조용히 사라져 되돌릴 길이 없었다.
   for f in $SCAFFOLD_STALE; do
     [ -f "$kdir/$f" ] || continue
-    if [ -s "$kdir/$f" ] && mkdir -p "$kdir/backups" 2>/dev/null; then
-      mv "$kdir/$f" "$kdir/backups/$f.$(date +%Y%m%d-%H%M%S).bak" 2>/dev/null || rm -f "$kdir/$f" || true
-    else
+    if [ ! -s "$kdir/$f" ]; then
       rm -f "$kdir/$f" || true
+      continue
     fi
+    if mkdir -p "$kdir/backups" 2>/dev/null &&
+       mv "$kdir/$f" "$kdir/backups/$f.$(date +%Y%m%d-%H%M%S).bak" 2>/dev/null; then
+      continue
+    fi
+    scaffold_stale_kept="${scaffold_stale_kept}${scaffold_stale_kept:+, }$f"
   done
+  if [ -n "${scaffold_stale_kept:-}" ]; then
+    echo "[disciplined-coder] WARNING: 구 관리파일을 사본으로 못 옮겨 그대로 두었다($kdir 안: $scaffold_stale_kept). $kdir/backups 에 쓸 수 있게 하면 다음 세션에 치운다." >&2
+  fi
   for f in "$kdir"/*; do
     [ -e "$f" ] || continue
     b="$(basename "$f")"
