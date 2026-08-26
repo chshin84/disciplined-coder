@@ -24,7 +24,7 @@
   → solved_problems/2026-07-03-review-marker-wait.md
 - 관리 영역을 갱신할 때는 기우지 말고 마커 줄만 지운 뒤 다시 짓는다 — 본문 줄은 절대 지우지 않는다.
   → solved_problems/2026-07-27-managed-block-rebuild.md
-- 레일을 보험으로 이중화하기 전에 그 위험이 아직 살아 있는지 확인하고, 쌍둥이 스크립트는 한쪽을 고칠 때 반드시 같이 본다.
+- 레일을 이중화하기 전에 그 위험이 아직 살아 있는지 확인하고, 남길 레일은 압축 생존성으로 고른다 — 판정은 주입 전에 하고 grep -x 는 쓰지 않는다.
   → solved_problems/2026-07-27-dual-rail-check.md
 - 오답노트는 미리 만들지 말고 적을 것이 생긴 시점에 만든다.
   → solved_problems/2026-07-27-solved-log-on-demand.md
@@ -32,19 +32,19 @@
   → solved_problems/2026-07-28-read-write-path-before-reuse.md
 - 표본이 적은 실측에서는 관측만 적고 인과는 주장하지 않는다 — 경쟁 설명이 같은 데이터를 설명하는지 먼저 센다.
   → solved_problems/2026-07-28-no-causation-small-sample.md
-- 여러 줄 블록이 들어 있는지 검사할 때는 grep -F 가 아니라 case 의 리터럴 부분일치를 쓴다.
+- 여러 줄 블록의 포함 검사는 grep -F 가 아니라 case 의 리터럴 부분일치로 짜고, 불릿 하나를 지운 픽스처로 뮤테이션 검증까지 돌린다.
   → solved_problems/2026-07-28-multiline-contains-check.md
-- 워크플로를 고쳐 바로 확인할 때는 이름이 아니라 scriptPath 로 부른다 — 이름 호출은 커밋 SHA에 핀이 박힌 플러그인 캐시를 읽는다.
+- 워크플로를 고쳤는데 이름 호출이 옛 사본으로 막히면 scriptPath 로 캐시를 우회하되, 근본은 .gitattributes 에 *.js text eol=lf 를 더해 CRLF 를 없애는 것이다.
   → solved_problems/2026-08-13-workflow-scriptpath.md
-- 한 줄 안에 둘이 함께 있는지 검사할 때는 그 행을 먼저 변수로 뽑고 그 안에서 확인한다 — grep 두 번은 서로 다른 줄에 있어도 참이다.
+- 한 줄 안에 둘이 함께 있는지 검사할 때는 그 행을 먼저 변수로 뽑아 그 안에서 확인하고, 그 문장을 반대로 뒤집어 FAIL 이 뜨는지 확인한 뒤 원복한다.
   → solved_problems/2026-08-13-same-line-check.md
-- 여러 세션이 동시에 건드릴 수 있는 파일을 고칠 때는 mktemp 로 임시 파일을 유일하게 만들고 mkdir 락으로 직렬화한다.
+- 여러 세션이 동시에 건드릴 수 있는 파일은 mktemp 와 mkdir 락으로 직렬화하고, 순차 멱등성 테스트로는 못 잡으므로 동시 실행 회귀 테스트를 따로 세운다.
   → solved_problems/2026-08-13-concurrent-file-write-lock.md
 - 계약 테스트가 문구로 잡는 문장은 한 줄에 붙여 두고, 문서를 다듬은 뒤에는 문체만 고쳤더라도 계약 테스트를 돌린다.
   → solved_problems/2026-08-13-contract-anchor-one-line.md
 - spec 과 plan 은 마커 없이 먼저 쓰고 훅이 뜨게 둔다 — 리뷰를 못 돌릴 사정이면 마커로 덮지 말고 문서에 적고 사용자에게 묻는다.
   → solved_problems/2026-08-16-write-spec-without-marker.md
-- 머리말의 끝은 첫 항목 앞이 아니라 첫 구조 요소로 잡는다 — 항목만 경계로 세면 사람이 그 아래 만들어 둔 절을 통째로 먹는다.
+- 머리말의 끝은 첫 항목 앞이 아니라 첫 구조 요소로 잡되, 도입 문장이 보이면 뒤따르는 목록 줄까지 머리말로 센다.
   → solved_problems/2026-08-16-preamble-boundary.md
 - 허가나 예외에서 무엇을 빼는지는 범주어 말고 이름을 대서 적고, 그 계약 검사는 파일 전역이 아니라 해당 절만 뽑아 그 안에서 본다.
   → solved_problems/2026-08-16-name-the-exception.md
