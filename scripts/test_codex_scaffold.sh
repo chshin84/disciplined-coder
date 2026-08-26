@@ -203,4 +203,22 @@ check "codex split-rules: 지시사항 줄 보존"         "grep -qF -- '- 무�
 check "codex split-rules: 포인터 줄 보존"           "grep -qF -- '→ solved_problems/a.md' '$LOGX3'"
 check "codex split-rules: append-only 자기규정 없음" "! grep -qF -- '· append-only 오답노트' '$LOGX3'"
 
+# --- index-root: 주입된 색인이 어느 뿌리에서 왔는지 본문에 남는다 ---
+# Codex 는 색인을 stdout 으로 흘려 보내므로 뿌리가 본문에 안 남으면, 세션이 색인 줄의
+# solved_problems/… 를 엉뚱한 자리에서 찾다 못 찾고 규칙대로 멀쩡한 줄을 지운다.
+HX4="$(mktemp -d)"; PX4="$(mktemp -d)"
+OUTX4="$(run "$HX4" "$PX4")"
+echo "[index-root] the injected index carries the root it came from"
+check "codex 뿌리: 표기가 있다"   "printf '%s' \"\$OUTX4\" | grep -qF -- 'solved-index-root: $HX4/.codex/disciplined-coder'"
+
+# --- unsplit: 안 쪼개진 로그는 개편을 권하고, 빈 로그에는 안 권한다 ---
+HX5="$(mktemp -d)"; PX5="$(mktemp -d)"; mkdir -p "$HX5/.codex/disciplined-coder"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf -- '- **첫째 증상**\n  - 원인: 무엇\n  - 해결: 무엇\n'
+} > "$HX5/.codex/disciplined-coder/solved_problems.md"
+OUTX5="$(run "$HX5" "$PX5")"
+echo "[unsplit] an unsplit log gets a conversion nudge with its item count"
+check "codex unsplit: 개편을 권한다"     "printf '%s' \"\$OUTX5\" | grep -qF -- '항목 1개'"
+check "codex unsplit: 빈 로그엔 안 권함" "! printf '%s' \"\$OUTX4\" | grep -qF -- '지금 개편할지'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

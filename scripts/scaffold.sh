@@ -47,17 +47,26 @@ if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; f
 #     domain-docs 스킬). 오답노트는 플러그인이 형식을 정하는 파일이라 사람 승인 없이 맞춘다.
 scaffold_sync_solved "$KDIR/solved_problems.md" pc "$KDIR/backups" pc
 pc_note="$solved_sync_note"
+# 2b-1) 색인과 본문의 짝, 그리고 아직 안 쪼개진 로그의 개편 권유. 둘 다 읽고 알리기만 한다.
+scaffold_check_solved_pairing "$KDIR/solved_problems.md"
+pc_pairing="$solved_pairing_note"
+scaffold_check_solved_unsplit "$KDIR/solved_problems.md" "$PLUGIN_ROOT"
+pc_unsplit="$solved_unsplit_note"
 
 # 2c) 세션을 연 프로젝트의 오답노트도 같은 처리를 받는다. 프로젝트마다 형식이 갈리면 recall이
 #     읽는 모양이 제각각이 되기 때문이다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다 —
 #     이 플러그인은 프로젝트 폴더에 파일을 남기지 않는다.
 PROJ="${CLAUDE_PROJECT_DIR:-$PWD}"
 PLOG="$PROJ/docs/solved_problems.md"
-proj_note=""
+proj_note=""; proj_pairing=""; proj_unsplit=""
 if [ -f "$PLOG" ] && [ "$PLOG" != "$KDIR/solved_problems.md" ]; then
   plabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
   scaffold_sync_solved "$PLOG" project "$KDIR/backups" "$plabel"
   proj_note="$solved_sync_note"
+  scaffold_check_solved_pairing "$PLOG"
+  proj_pairing="$solved_pairing_note"
+  scaffold_check_solved_unsplit "$PLOG" "$PLUGIN_ROOT"
+  proj_unsplit="$solved_unsplit_note"
 fi
 
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
@@ -111,7 +120,7 @@ if [ "$had_import" -eq 0 ]; then
 fi
 # 무엇을 했는지 알린다. 파일을 고쳤으면 조용히 넘기지 않는다 — 사용자가 열어 둔 레포가 바뀌었을 수
 # 있고, 그 사실은 사본 경로와 함께 눈에 보여야 한다(FAIL-LOUD).
-for note in "$pc_note" "$proj_note" "$pointer_note"; do
+for note in "$pc_note" "$pc_pairing" "$pc_unsplit" "$proj_note" "$proj_pairing" "$proj_unsplit" "$pointer_note"; do
   if [ -n "$note" ]; then printf '%s\n' "$note"; fi
 done
 

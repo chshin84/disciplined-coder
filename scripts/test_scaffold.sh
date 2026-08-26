@@ -808,4 +808,54 @@ check "split-rules: 지시사항 줄 보존"         "grep -qF -- '- 무언가�
 check "split-rules: 포인터 줄 보존"           "grep -qF -- '→ solved_problems/a.md' '$LOGS3'"
 check "split-rules: append-only 자기규정 없음" "! grep -qF -- '· append-only 오답노트' '$LOGS3'"
 
+# --- whitelist: 본문 폴더는 정상 산출물이라 경고를 내지 않는다 ---
+HW1="$(mktemp -d)"; PW1="$(mktemp -d)"; mkdir -p "$HW1/.claude/disciplined-coder/solved_problems"
+printf '# 무언가를 할 때는 이렇게 한다\n' > "$HW1/.claude/disciplined-coder/solved_problems/a.md"
+printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n' > "$HW1/.claude/disciplined-coder/solved_problems.md"
+ERRW1="$(CLAUDE_HOME_DIR="$HW1/.claude" CLAUDE_PROJECT_DIR="$PW1" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
+echo "[whitelist] the body folder is a normal artifact, not an orphan"
+check "whitelist: 본문 폴더에 경고 없음" "! printf '%s' \"\$ERRW1\" | grep -qF -- \"비관리 디렉터리 'solved_problems'\""
+check "whitelist: 본문 파일 보존"        "[ -f '$HW1/.claude/disciplined-coder/solved_problems/a.md' ]"
+
+# --- pairing: 색인 줄 수와 본문 파일 수를 맞댄다 ---
+HP1="$(mktemp -d)"; PP1="$(mktemp -d)"; mkdir -p "$HP1/.claude/disciplined-coder/solved_problems"
+LOGP1="$HP1/.claude/disciplined-coder/solved_problems.md"
+printf '# 가 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/solved_problems/a.md"
+printf '# 나 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/solved_problems/b.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf -- '- 가 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
+} > "$LOGP1"
+OUTP1="$(run "$HP1" "$PP1")"
+echo "[pairing] index lines and body files are counted against each other"
+check "pairing: 어긋나면 알린다"      "printf '%s' \"\$OUTP1\" | grep -qF -- '색인 줄 1개, 본문 파일 2개'"
+check "pairing: 색인을 안 고친다"     "[ \"\$(. '$COMMON'; scaffold_count_matches '$LOGP1' '→ solved_problems/')\" = 1 ]"
+check "pairing: 본문도 안 지운다"     "[ -f '$HP1/.claude/disciplined-coder/solved_problems/b.md' ]"
+
+printf -- '- 나 할 때는 이렇게 한다.\n  → solved_problems/b.md\n' >> "$LOGP1"
+OUTP2="$(run "$HP1" "$PP1")"
+check "pairing: 맞으면 조용하다"      "! printf '%s' \"\$OUTP2\" | grep -qF -- '어긋난다'"
+
+printf -- '- **옛 한 줄 항목** → 원인: 무엇 → 해결: 무엇\n' >> "$LOGP1"
+OUTP3="$(run "$HP1" "$PP1")"
+check "pairing: 안 갈린 항목을 알린다" "printf '%s' \"\$OUTP3\" | grep -qF -- '아직 안 갈린 항목 1개'"
+
+# --- unsplit: 안 쪼개진 로그는 항목 수와 함께 개편을 권한다 ---
+HU1="$(mktemp -d)"; PU1="$(mktemp -d)"; mkdir -p "$HU1/.claude/disciplined-coder"
+LOGU1="$HU1/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf -- '- **첫째 증상**\n  - 원인: 무엇\n  - 해결: 무엇\n'
+  printf -- '- **둘째 증상**\n  - 원인: 무엇\n  - 해결: 무엇\n'
+} > "$LOGU1"
+OUTU1="$(run "$HU1" "$PU1")"
+echo "[unsplit] an unsplit log gets a conversion nudge with its item count"
+check "unsplit: 개편을 권한다"       "printf '%s' \"\$OUTU1\" | grep -qF -- '개편'"
+check "unsplit: 항목 수를 보인다"    "printf '%s' \"\$OUTU1\" | grep -qF -- '항목 2개'"
+check "unsplit: 스크립트 절대경로"   "printf '%s' \"\$OUTU1\" | grep -qF -- '$HERE/scripts/split_solved_log.sh'"
+check "unsplit: 고치지는 않는다"     "grep -qF -- '- **첫째 증상**' '$LOGU1'"
+
+# 항목이 없는 갓 만든 로그에는 안 권한다 — grep -c 의 0건 함정이 여기서 드러난다.
+HU2="$(mktemp -d)"; PU2="$(mktemp -d)"
+OUTU2="$(run "$HU2" "$PU2")"
+check "unsplit: 빈 로그엔 안 권함"   "! printf '%s' \"\$OUTU2\" | grep -qF -- '개편'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

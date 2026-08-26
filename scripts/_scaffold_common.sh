@@ -3,7 +3,7 @@
 # 두 스크립트는 홈 위치·주입 방식만 다르고 관리 디렉터리 정책은 동일해야 한다 — 여기가 정본.
 
 # 관리 디렉터리 화이트리스트(=현 정본 세트)와 구 관리파일(STALE). 여기만 고친다.
-SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md backups"
+SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md solved_problems backups"
 # 구 관리파일은 매 세션 조용히 지운다. issue-mode·ultracode-review는 토글이던 상태 파일인데,
 # 토글을 없애면서 화이트리스트에서만 빼면 내용이 있어 '비관리 파일' 경고로 영원히 남는다.
 # advisors-index·unsolved_problems도 같은 이유로 여기 있다 — 앞은 domains-index로 이름이 바뀐 옛
@@ -274,4 +274,43 @@ scaffold_sync_solved() {  # $1=로그 $2=스코프 $3=백업 디렉터리 $4=백
 scaffold_count_matches() {  # $1=파일 $2=확장 정규식 → stdout: 개수 한 줄
   [ -f "$1" ] || { printf '0'; return 0; }
   printf '%s' "$(grep -c -E -- "$2" "$1" 2>/dev/null || true)"
+}
+
+# 색인 줄 수와 본문 파일 수를 맞댄다. 읽기만 하고 어떤 파일에도 쓰지 않는다.
+# 전량 대조를 안 하는 이유는 항목 수만큼 값이 들기 때문이다 — 안 쓰는 항목의 어긋남은 그 회차에
+# 해를 끼치지 않으므로, 내용 대조는 그 줄을 따라 본문을 열 때 그 자리에서 한다.
+# 색인 줄은 포인터로 센다. 머리말의 규칙 불릿과 색인 줄이 같은 모양이라 '- '로는 안 갈린다.
+# 아직 안 갈린 옛 한 줄 항목(포인터 없는 굵은 줄)은 따로 센다 — 그 부류는 포인터 셈에도 파일
+# 셈에도 안 잡혀서, 손으로 가르는 걸음을 건너뛰어도 아무 신호가 없었다.
+scaffold_check_solved_pairing() {  # $1=로그 경로 → sets: solved_pairing_note
+  local f="$1" dir lines files bold
+  solved_pairing_note=""
+  [ -f "$f" ] || return 0
+  scaffold_solved_log_is_split "$f" || return 0
+  dir="${f%.md}"
+  lines="$(scaffold_count_matches "$f" '→ solved_problems/')"
+  bold="$(scaffold_count_matches "$f" '^[-*+][[:space:]]+\*\*')"
+  files="$(ls -1 "$dir"/*.md 2>/dev/null | wc -l | tr -d ' ')"
+  if [ "$lines" != "$files" ]; then
+    solved_pairing_note="ðµ disciplined-coder: $f 의 색인 줄 ${lines}개, 본문 파일 ${files}개 — 어긋난다(고치지 않았다. 색인 줄이 가리키는 본문이 없으면 그 줄을 지우고, 본문만 있으면 첫 줄로 색인 줄을 채운다)."
+  elif [ "$bold" != "0" ]; then
+    solved_pairing_note="ðµ disciplined-coder: $f 에 아직 안 갈린 항목 ${bold}개가 남아 있다(포인터 없는 굵은 줄이다. 본문 파일로 옮기고 지시사항 줄로 바꿔라)."
+  fi
+  return 0
+}
+
+# 아직 안 쪼개진 로그를 만나면 개편을 권한다. 읽기만 한다.
+# 항목 수를 함께 내는 이유는 개편에 드는 값이 항목 수에 비례하기 때문이다 — 지시사항 줄을 새로
+# 쓰는 일은 기계가 못 하므로 승낙한 세션이 그 자리에서 항목 수만큼 다시 써야 한다.
+# 스크립트 경로를 절대경로로 적는 이유는 이 신호가 옆 프로젝트에서 뜨는데 그 cwd 에는 그 파일이
+# 없기 때문이다 — 스크립트는 플러그인 루트 안에 있고, 그 값은 호출자만 안다.
+scaffold_check_solved_unsplit() {  # $1=로그 경로 $2=플러그인 루트 → sets: solved_unsplit_note
+  local f="$1" root="$2" n
+  solved_unsplit_note=""
+  [ -f "$f" ] || return 0
+  scaffold_solved_log_is_split "$f" && return 0
+  n="$(scaffold_count_matches "$f" '^[-*+][[:space:]]+\*\*')"
+  [ "$n" = "0" ] && return 0
+  solved_unsplit_note="ðµ disciplined-coder: $f 가 아직 안 쪼개진 형식이다(항목 ${n}개). 지금 개편할지 사용자에게 물어라 — 첫 선택지가 '지금 개편한다'이고 그것이 권장값이다. 개편은 bash $root/scripts/split_solved_log.sh 로 쪼갠 뒤 지시사항 줄을 새로 쓰는 것이다."
+  return 0
 }
