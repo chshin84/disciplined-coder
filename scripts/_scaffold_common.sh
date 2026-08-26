@@ -191,11 +191,15 @@ scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 
   solved_fix_result="none"; solved_fix_reason=""; solved_fix_backup=""
   [ -f "$f" ] || return 0
   rules="$(scaffold_solved_rules_for "$f")"
-  n="$(awk -v rules="$rules" '
+  # 아는 규칙 줄은 두 블록 전부다. 그 로그에 걸 블록만 알아보면, 형태가 바뀌는 회차에 옛 블록이
+  # 본문으로 밀려나 규칙이 두 벌이 된다 — 한 파일이 서로 다른 형식을 둘 다 규정하게 되고,
+  # 낡음 판정은 새 블록이 있으니 조용하다.
+  n="$(awk -v rules="$rules" -v allrules="$SCAFFOLD_SOLVED_RULES"$'\n'"$SCAFFOLD_SOLVED_RULES_SPLIT" '
     BEGIN {
       nr = split(rules, rl, "\n")
       intro = rl[1]
-      for (k = 2; k <= nr; k++) if (rl[k] != "") known[rl[k]] = 1
+      na = split(allrules, al, "\n")
+      for (k = 1; k <= na; k++) if (al[k] != "" && al[k] != intro) known[al[k]] = 1
     }
     { l=$0; sub(/\r$/,"",l); line[NR]=l }
     END {

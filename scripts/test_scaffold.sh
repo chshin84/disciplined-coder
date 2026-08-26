@@ -858,4 +858,30 @@ HU2="$(mktemp -d)"; PU2="$(mktemp -d)"
 OUTU2="$(run "$HU2" "$PU2")"
 check "unsplit: 빈 로그엔 안 권함"   "! printf '%s' \"\$OUTU2\" | grep -qF -- '개편'"
 
+# --- rules-switch: 형태가 바뀌면 옛 규칙 블록이 남지 않는다 ---
+# 쪼개는 순간 로그는 '옛 규칙 블록을 단 쪼개진 로그'가 된다. 경계 계산이 새 블록의 줄만
+# 알아보면 옛 블록이 본문으로 밀려나 규칙이 두 벌이 된다 — 한 파일이 서로 다른 형식을 둘 다
+# 규정하게 되고, 낡음 판정은 새 블록이 있으니 조용하다.
+HZ1="$(mktemp -d)"; PZ1="$(mktemp -d)"; mkdir -p "$HZ1/.claude/disciplined-coder/solved_problems"
+LOGZ1="$HZ1/.claude/disciplined-coder/solved_problems.md"
+printf '# 가 할 때는 이렇게 한다\n' > "$HZ1/.claude/disciplined-coder/solved_problems/a.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역 · append-only 오답노트\n\n'
+  printf '옛 스코프 문단이다.\n\n'
+  printf '항목을 적는 형식은 이렇다.\n\n'
+  printf -- '- 증상은 굵게 한 줄로 띄운다.\n'
+  printf -- '- 원인과 해결은 그 아래 들여쓰기로 내린다.\n'
+  printf -- '- 한 항목은 세 줄을 넘기지 않는다.\n'
+  printf -- '- 순서는 시간순이고 아래에 추가한다.\n'
+  printf -- '- 항목이 스무 개를 넘으면 그때 영역별로 묶는다.\n'
+  printf -- '- 안 쓰이는 항목도 지우지 않는다 — 사용자가 직접 지시할 때만 손댄다.\n\n'
+  printf -- '- **가 할 때는 이렇게 한다**\n  → solved_problems/a.md\n'
+} > "$LOGZ1"
+run "$HZ1" "$PZ1" >/dev/null
+echo "[rules-switch] switching format leaves exactly one rules block"
+check "전환: 새 규칙이 들어갔다"     "grep -qF -- '이 파일은 색인이고' '$LOGZ1'"
+check "전환: 옛 규칙 블록이 없다"    "! grep -qF -- '- 원인과 해결은 그 아래 들여쓰기로 내린다.' '$LOGZ1'"
+check "전환: 항목은 그대로다"        "grep -qF -- '- **가 할 때는 이렇게 한다**' '$LOGZ1'"
+check "전환: 포인터도 그대로다"      "grep -qF -- '→ solved_problems/a.md' '$LOGZ1'"
+check "전환: 두 번 돌려도 같다"      "CK=\"\$(cksum < '$LOGZ1')\"; run '$HZ1' '$PZ1' >/dev/null; [ \"\$(cksum < '$LOGZ1')\" = \"\$CK\" ]"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
