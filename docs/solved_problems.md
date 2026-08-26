@@ -70,3 +70,7 @@
   → solved_problems/2026-08-24-no-control-group-needed.md
 - 리뷰어 렌즈의 규칙을 고칠 때는 본문과 레퍼런스 프롬프트를 한 커밋에서 같이 손보고, 그 규칙이 리뷰어용인지 띄우는 호출자용인지 먼저 가른다.
   → solved_problems/2026-08-25-lens-guard-in-prompt.md
+- 긴 것을 한 문장으로 줄여 쓸 때는 원문에 처방이 몇 개인지 먼저 세고 그 수만큼 옮겼는지 확인하며, 다시 쓴 것은 읽기 전용 서브에이전트에게 원문과 나란히 대조받는다.
+  → solved_problems/2026-08-26-count-prescriptions-before-summarizing.md
+- 신호 문구가 무엇을 센다고 밝혔으면 문구가 있는지만 보지 말고 그 값이 맞는지 픽스처로 고정하고, 사람이 할 일이 갈리는 두 몫을 한 숫자로 세고 있지 않은지 묻는다.
+  → solved_problems/2026-08-26-assert-the-counted-value.md
