@@ -3,7 +3,7 @@
 # 두 스크립트는 홈 위치·주입 방식만 다르고 관리 디렉터리 정책은 동일해야 한다 — 여기가 정본.
 
 # 관리 디렉터리 화이트리스트(=현 정본 세트)와 구 관리파일(STALE). 여기만 고친다.
-SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md backups"
+SCAFFOLD_WHITELIST="agent-principles.md domains-index.md solved_problems.md solved_problems backups"
 # 구 관리파일은 매 세션 조용히 지운다. issue-mode·ultracode-review는 토글이던 상태 파일인데,
 # 토글을 없애면서 화이트리스트에서만 빼면 내용이 있어 '비관리 파일' 경고로 영원히 남는다.
 # advisors-index·unsolved_problems도 같은 이유로 여기 있다 — 앞은 domains-index로 이름이 바뀐 옛
@@ -22,7 +22,42 @@ SCAFFOLD_SOLVED_RULES='항목을 적는 형식은 이렇다.
 - 한 항목은 세 줄을 넘기지 않는다.
 - 순서는 시간순이고 아래에 추가한다.
 - 항목이 스무 개를 넘으면 그때 영역별로 묶는다.
-- 안 쓰이는 항목도 지우지 않는다.'
+- 안 쓰이는 항목도 지우지 않는다 — 사용자가 직접 지시할 때만 손댄다.'
+
+# 쪼개진 로그(색인 + 본문 폴더)의 형식 규칙 블록. 안 쪼개진 로그에는 이것을 갈아끼우지 않는다 —
+# 지킬 수 없는 형식을 스스로 선언하게 되는데, 낡음 판정이 포함 검사라 그 어긋남은 어떤 신호에도
+# 안 걸린다. 굵은 줄에 관한 규칙을 넣어 둔 이유는, 쪼갠 직후와 지시사항을 다 쓴 뒤 사이의 중간
+# 상태를 사람과 기계가 함께 알아볼 수 있게 하기 위해서다.
+SCAFFOLD_SOLVED_RULES_SPLIT='항목을 적는 형식은 이렇다.
+
+- 이 파일은 색인이고 한 줄이 한 항목이다. 줄에는 지시사항만 적는다.
+- 지시사항은 언제 걸리는지와 무엇을 하라는지를 한 문장에 담는다.
+- 증상과 원인과 근거는 색인에 적지 않고 본문 파일에 적는다.
+- 각 줄은 다음 줄에서 solved_problems/ 아래의 본문 파일 하나를 가리킨다.
+- 본문 파일의 첫 줄은 그 지시사항과 같다.
+- 아직 지시사항으로 못 고친 줄은 굵게 둔다. 고치면서 굵기를 벗긴다.
+- 순서는 시간순이고 아래에 추가한다.
+- 본문 파일을 고치거나 지우기 전에 사용자에게 묻는다.
+- 사용자 요청으로 고치거나 지울 때는 색인 줄도 함께 고치거나 지운다.'
+
+# 로그가 쪼개졌는지 본다. 판정 재료는 로그 옆의 본문 폴더에 본문 파일이 하나라도 있는지다.
+# 빈 폴더를 쪼개진 것으로 보지 않는 이유는 개편을 하다 멈춘 로그가 그 모양이기 때문이다 —
+# 그것을 쪼개진 것으로 보면 빈 색인이 최신 형식을 선언하게 된다.
+scaffold_solved_log_is_split() {  # $1=로그 경로 → 종료코드 0이면 쪼개짐
+  local dir="${1%.md}" f
+  [ -d "$dir" ] || return 1
+  for f in "$dir"/*.md; do [ -f "$f" ] && return 0; done
+  return 1
+}
+
+# 그 로그에 걸어야 할 형식 규칙 블록을 고른다.
+scaffold_solved_rules_for() {  # $1=로그 경로 → stdout: 규칙 블록
+  if scaffold_solved_log_is_split "$1"; then
+    printf '%s' "$SCAFFOLD_SOLVED_RULES_SPLIT"
+  else
+    printf '%s' "$SCAFFOLD_SOLVED_RULES"
+  fi
+}
 
 # 위생(멱등): STALE 제거 → 비화이트리스트는 디렉터리/내용파일 surface·빈 파일 제거.
 scaffold_hygiene() {  # $1=KDIR
@@ -58,23 +93,45 @@ scaffold_hygiene() {  # $1=KDIR
 # 쓰도록 한 곳에 둔다 — 두 곳에 두면 갓 만든 로그와 고쳐 준 로그의 머리말이 조용히 갈린다(SSOT).
 # 히어독을 확장형으로 바꾸지 않는 이유는 리터럴 히어독이 본문의 $와 백틱을 보호하기 때문이다.
 # 지금은 확장 대상 문자가 없어 테스트가 초록이라 함정이 잠복한다.
-scaffold_solved_header() {  # $1=스코프(pc|project) → stdout: 제목부터 형식 규칙 블록까지
-  case "$1" in
-    pc)
+# 쪼개진 로그에서는 제목 줄과 스코프 문단도 갈린다. 그대로 두면 한 파일이 스스로를
+# append-only 라 부르면서 그 아래 규칙 블록은 색인 줄을 고치라고 지시하는 모순이 된다.
+scaffold_solved_header() {  # $1=스코프(pc|project) $2=로그 경로 → stdout: 제목부터 형식 규칙 블록까지
+  local split=0
+  [ -n "${2:-}" ] && scaffold_solved_log_is_split "$2" && split=1
+  case "$1:$split" in
+    pc:0)
       cat <<'EOF'
 # 해결된 문제 로그 (solved_problems) — PC 전역 · append-only 오답노트
 
 완결된 문제의 교훈 모음 — 차후 비슷한 작업에서 recall해 참고한다.
-**완결 후 등록하는 기록이라 '상태'가 아니다** — "문서에 상태 금지"의 예외(append-only, 과거를 지우지 않는다).
+**완결 후 등록하는 기록이라 '상태'가 아니다** — "문서에 상태 금지"의 예외(append-only — 과거 항목은 사용자가 직접 지시할 때만 손댄다).
 일반화 가능한 항목은 디시플린(agent-principles.md)으로 **재기술해 승격**한다(원문은 append-only로 보존 — 이동이 아니라 상위 계층 재작성). 메인 세션만 기록.
 EOF
       ;;
-    project)
+    pc:1)
+      cat <<'EOF'
+# 해결된 문제 로그 (solved_problems) — PC 전역 · 지시사항 색인
+
+완결된 문제의 교훈 모음 — 일을 시작할 때 걸리는 지시사항만 여기 두고 증상과 원인은 본문 파일에 둔다.
+**본문 파일은 append-only 이고 색인 줄은 그 본문을 따라 고친다.** 본문을 고치거나 지울 때만 색인 줄도 함께 손댄다.
+일반화 가능한 항목은 디시플린(agent-principles.md)으로 **재기술해 승격**한다(원문은 본문에 보존 — 이동이 아니라 상위 계층 재작성). 메인 세션만 기록.
+EOF
+      ;;
+    project:0)
       cat <<'EOF'
 # 해결된 문제 로그 (solved_problems) — 이 프로젝트 · append-only 오답노트
 
 이 레포에서 완결한 문제의 교훈 — 차후 비슷한 작업에서 recall해 참고한다.
-**완결 후 등록하는 기록이라 '상태'가 아니다**(append-only, 과거를 지우지 않는다). 메인 세션만 append.
+**완결 후 등록하는 기록이라 '상태'가 아니다**(append-only — 과거 항목은 사용자가 직접 지시할 때만 손댄다). 메인 세션만 append.
+이 프로젝트에 한정된 교훈만 둔다 — 머신 전역은 PC solved, 보편은 디시플린 원칙으로(스코프 라우팅).
+EOF
+      ;;
+    project:1)
+      cat <<'EOF'
+# 해결된 문제 로그 (solved_problems) — 이 프로젝트 · 지시사항 색인
+
+이 레포에서 완결한 문제의 교훈 — 일을 시작할 때 걸리는 지시사항만 여기 두고 증상과 원인은 본문 파일에 둔다.
+**본문 파일은 append-only 이고 색인 줄은 그 본문을 따라 고친다.** 본문을 고치거나 지울 때만 색인 줄도 함께 손댄다.
 이 프로젝트에 한정된 교훈만 둔다 — 머신 전역은 PC solved, 보편은 디시플린 원칙으로(스코프 라우팅).
 EOF
       ;;
@@ -83,7 +140,7 @@ EOF
       return 1
       ;;
   esac
-  printf '\n%s\n' "$SCAFFOLD_SOLVED_RULES"
+  printf '\n%s\n' "$(scaffold_solved_rules_for "${2:-}")"
 }
 
 # solved 오답노트: 없을 때만 생성(append-only). 생성했으면 0, 이미 있으면 1을 리턴.
@@ -92,7 +149,7 @@ EOF
 scaffold_ensure_solved() {  # $1=KDIR
   local kdir="$1"
   [ -f "$kdir/solved_problems.md" ] && return 1
-  scaffold_solved_header pc > "$kdir/solved_problems.md"
+  scaffold_solved_header pc "$kdir/solved_problems.md" > "$kdir/solved_problems.md"
   return 0
 }
 
@@ -105,12 +162,13 @@ scaffold_ensure_solved() {  # $1=KDIR
 # 있어도 참이 된다. case의 리터럴 부분일치는 여러 줄을 통째로 본다.
 # 줄 끝은 양쪽 다 정규화하고, 명령 치환이 후행 개행을 먹으므로 블록이 파일 끝에 놓여도 일치한다.
 scaffold_check_solved_rules() {  # $1=로그 경로 → sets: solved_rules_stale (1=낡음, 0=최신이거나 판정 안 함)
-  local f="$1" body
+  local f="$1" body rules
   solved_rules_stale=0
   [ -f "$f" ] || return 0
   body="$(tr -d '\r' < "$f" 2>/dev/null)" || return 0
+  rules="$(scaffold_solved_rules_for "$f")"
   case "$body" in
-    *"$SCAFFOLD_SOLVED_RULES"*) solved_rules_stale=0 ;;
+    *"$rules"*) solved_rules_stale=0 ;;
     *) solved_rules_stale=1 ;;
   esac
   return 0
@@ -129,21 +187,32 @@ scaffold_check_solved_rules() {  # $1=로그 경로 → sets: solved_rules_stale
 scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 $4=백업 이름표
                                 # → sets: solved_fix_result(fixed|refused|none),
                                 #         solved_fix_reason(boundary|backup|write|""), solved_fix_backup
-  local f="$1" scope="$2" bdir="$3" label="$4" n tmp stamp bk intro
+  local f="$1" scope="$2" bdir="$3" label="$4" n tmp stamp bk rules
   solved_fix_result="none"; solved_fix_reason=""; solved_fix_backup=""
   [ -f "$f" ] || return 0
-  intro="${SCAFFOLD_SOLVED_RULES%%$'\n'*}"
-  n="$(awk -v intro="$intro" '
+  rules="$(scaffold_solved_rules_for "$f")"
+  # 아는 규칙 줄은 두 블록 전부다. 그 로그에 걸 블록만 알아보면, 형태가 바뀌는 회차에 옛 블록이
+  # 본문으로 밀려나 규칙이 두 벌이 된다 — 한 파일이 서로 다른 형식을 둘 다 규정하게 되고,
+  # 낡음 판정은 새 블록이 있으니 조용하다.
+  n="$(awk -v rules="$rules" -v allrules="$SCAFFOLD_SOLVED_RULES"$'\n'"$SCAFFOLD_SOLVED_RULES_SPLIT" '
+    BEGIN {
+      nr = split(rules, rl, "\n")
+      intro = rl[1]
+      na = split(allrules, al, "\n")
+      for (k = 1; k <= na; k++) if (al[k] != "" && al[k] != intro) known[al[k]] = 1
+    }
     { l=$0; sub(/\r$/,"",l); line[NR]=l }
     END {
       seen=0
       for (i=1;i<=NR;i++) if (line[i]==intro) { seen=i; break }
       if (seen) {
-        # 규칙 블록이 일부만 남은 로그가 있다. 도입 문장 뒤의 빈 줄과 굵지 않은 목록 줄은 남은
-        # 규칙 불릿이므로 머리말로 센다 — 항목으로 오인해 아래에 붙이면 블록이 두 벌이 된다.
+        # 규칙 블록이 일부만 남은 로그가 있다. 도입 문장 뒤의 빈 줄과 "이 블록에 실제로 있는 줄"만
+        # 머리말로 센다 — 항목으로 오인해 아래에 붙이면 블록이 두 벌이 된다.
+        # 모양으로 짐작하지 않는 이유는, 굵지 않은 최상위 불릿이 곧 지시사항형 색인 줄의 모양이라
+        # 짐작하는 순간 그 줄들을 통째로 머리말로 먹기 때문이다(실측으로 확인했다).
         for (i=seen+1;i<=NR;i++) {
           if (line[i]=="") continue
-          if (line[i] ~ /^[-*+][ \t]/ && line[i] !~ /^[-*+][ \t]+\*\*/) continue
+          if (line[i] in known) continue
           print i; exit
         }
         print NR+1; exit
@@ -165,7 +234,7 @@ scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 
   tmp="$(mktemp "$f.XXXXXX" 2>/dev/null)" || {
     solved_fix_result="refused"; solved_fix_reason="write"; solved_fix_backup="$bk"; return 0
   }
-  if { scaffold_solved_header "$scope" && printf '\n' && tail -n "+$n" "$f"; } > "$tmp" 2>/dev/null \
+  if { scaffold_solved_header "$scope" "$f" && printf '\n' && tail -n "+$n" "$f"; } > "$tmp" 2>/dev/null \
      && mv "$tmp" "$f" 2>/dev/null; then
     solved_fix_result="fixed"; solved_fix_backup="$bk"
   else
@@ -202,3 +271,50 @@ scaffold_sync_solved() {  # $1=로그 $2=스코프 $3=백업 디렉터리 $4=백
 # (제거됨) 오답노트 처분 모드·ultracode 검증 모드 토글. 둘 다 훅이 강제하지 못하는 문장 주입일 뿐이었고,
 # 기본값이 사실상 무동작이라 옵트인 플래그 하나에 지나지 않았다 — 모르면 안 쓰게 되는 설정이다.
 # 처분은 surface로 고정하고, ultracode 검증 요구는 agent-principles.md 검증 레이어 표에만 둔다.
+
+# grep -c 는 0건일 때 stdout 에 0 을 찍고 종료코드 1 로 끝난다. 거기에 `|| echo 0` 을 붙이면
+# 값이 두 줄("0\n0")이 되어 어떤 비교와도 안 맞는다 — 실제로 그 함정을 밟아 빈 로그를 가진
+# 새 PC 마다 오탐이 뜨는 결함이 계획 리뷰에서 잡혔다. `|| true` 를 써서 stdout 한 줄만 남긴다.
+scaffold_count_matches() {  # $1=파일 $2=확장 정규식 → stdout: 개수 한 줄
+  [ -f "$1" ] || { printf '0'; return 0; }
+  printf '%s' "$(grep -c -E -- "$2" "$1" 2>/dev/null || true)"
+}
+
+# 색인 줄 수와 본문 파일 수를 맞댄다. 읽기만 하고 어떤 파일에도 쓰지 않는다.
+# 전량 대조를 안 하는 이유는 항목 수만큼 값이 들기 때문이다 — 안 쓰는 항목의 어긋남은 그 회차에
+# 해를 끼치지 않으므로, 내용 대조는 그 줄을 따라 본문을 열 때 그 자리에서 한다.
+# 색인 줄은 포인터로 센다. 머리말의 규칙 불릿과 색인 줄이 같은 모양이라 '- '로는 안 갈린다.
+# 아직 안 갈린 옛 한 줄 항목(포인터 없는 굵은 줄)은 따로 센다 — 그 부류는 포인터 셈에도 파일
+# 셈에도 안 잡혀서, 손으로 가르는 걸음을 건너뛰어도 아무 신호가 없었다.
+scaffold_check_solved_pairing() {  # $1=로그 경로 → sets: solved_pairing_note
+  local f="$1" dir lines files bold
+  solved_pairing_note=""
+  [ -f "$f" ] || return 0
+  scaffold_solved_log_is_split "$f" || return 0
+  dir="${f%.md}"
+  lines="$(scaffold_count_matches "$f" '→ solved_problems/')"
+  bold="$(scaffold_count_matches "$f" '^[-*+][[:space:]]+\*\*')"
+  files="$(ls -1 "$dir"/*.md 2>/dev/null | wc -l | tr -d ' ')"
+  if [ "$lines" != "$files" ]; then
+    solved_pairing_note="ðµ disciplined-coder: $f 의 색인 줄 ${lines}개, 본문 파일 ${files}개 — 어긋난다(고치지 않았다. 색인 줄이 가리키는 본문이 없으면 그 줄을 지우고, 본문만 있으면 첫 줄로 색인 줄을 채운다)."
+  elif [ "$bold" != "0" ]; then
+    solved_pairing_note="ðµ disciplined-coder: $f 에 아직 안 갈린 항목 ${bold}개가 남아 있다(포인터 없는 굵은 줄이다. 본문 파일로 옮기고 지시사항 줄로 바꿔라)."
+  fi
+  return 0
+}
+
+# 아직 안 쪼개진 로그를 만나면 개편을 권한다. 읽기만 한다.
+# 항목 수를 함께 내는 이유는 개편에 드는 값이 항목 수에 비례하기 때문이다 — 지시사항 줄을 새로
+# 쓰는 일은 기계가 못 하므로 승낙한 세션이 그 자리에서 항목 수만큼 다시 써야 한다.
+# 스크립트 경로를 절대경로로 적는 이유는 이 신호가 옆 프로젝트에서 뜨는데 그 cwd 에는 그 파일이
+# 없기 때문이다 — 스크립트는 플러그인 루트 안에 있고, 그 값은 호출자만 안다.
+scaffold_check_solved_unsplit() {  # $1=로그 경로 $2=플러그인 루트 → sets: solved_unsplit_note
+  local f="$1" root="$2" n
+  solved_unsplit_note=""
+  [ -f "$f" ] || return 0
+  scaffold_solved_log_is_split "$f" && return 0
+  n="$(scaffold_count_matches "$f" '^[-*+][[:space:]]+\*\*')"
+  [ "$n" = "0" ] && return 0
+  solved_unsplit_note="ðµ disciplined-coder: $f 가 아직 안 쪼개진 형식이다(항목 ${n}개). 지금 개편할지 사용자에게 물어라 — 첫 선택지가 '지금 개편한다'이고 그것이 권장값이다. 개편은 bash $root/scripts/split_solved_log.sh 로 쪼갠 뒤 지시사항 줄을 새로 쓰는 것이다."
+  return 0
+}

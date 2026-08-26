@@ -5,7 +5,14 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 SCAFFOLD="$HERE/scripts/codex-scaffold.sh"
 pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
-run() { CODEX_HOME_DIR="$1/.codex" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"; }
+# 둘째 인자를 생략하면 빈 임시 디렉터리를 프로젝트로 쓴다. codex-scaffold.sh 는
+# PROJ="${CLAUDE_PROJECT_DIR:-$PWD}" 이므로, 이것을 안 세우면 테스트가 이 레포 자신의
+# docs/solved_problems.md 를 프로젝트 로그로 잡아 실제 파일을 고칠 수 있다.
+run() {  # $1=HOME 디렉터리, $2=프로젝트 디렉터리(생략 가능)
+  local proj="${2:-}"
+  [ -n "$proj" ] || proj="$(mktemp -d)"
+  CODEX_HOME_DIR="$1/.codex" CLAUDE_PROJECT_DIR="$proj" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"
+}
 
 # 이웃 관계 검사: 파일에서 pattern과 정확히 일치하는 첫 줄 '바로 다음 줄'이 빈 줄인지 확인한다.
 # 전역 빈 줄 카운트는 관리블록이 항상 넣는 구분 빈 줄과 뒤섞여 무조건 참이 되므로 쓰지 않는다.
@@ -158,5 +165,60 @@ BEFORE_C3="$(cksum < "$PROSEC")"
 OUTC3="$(run "$HC3")"
 check "codex 구조 없음: 파일 불변(바이트)" "[ \"\$(cksum < '$PROSEC')\" = '$BEFORE_C3' ]"
 check "codex 구조 없음: 신호 있음"         "printf '%s' \"\$OUTC3\" | grep -qF '$NUDGE_C'"
+
+# --- isolation: run 은 레포 자신을 프로젝트로 잡지 않는다 ---
+# codex-scaffold.sh 는 PROJ="${CLAUDE_PROJECT_DIR:-$PWD}" 라, 이 헬퍼가 그 값을 안 세우면
+# 테스트를 레포에서 돌릴 때마다 이 레포의 진짜 docs/solved_problems.md 가 대상이 된다.
+HI1="$(mktemp -d)"; PI1="$(mktemp -d)"; mkdir -p "$PI1/docs"
+printf '# 해결된 문제 로그\n\n- **격리 픽스처 항목**\n  - 원인: 무엇\n  - 해결: 무엇\n' > "$PI1/docs/solved_problems.md"
+OUTI1="$(run "$HI1" "$PI1")"
+echo "[isolation] run does not treat the repo itself as the project"
+check "격리: 픽스처 프로젝트를 본다" "printf '%s' \"\$OUTI1\" | grep -qF -- '$PI1'"
+check "격리: 레포 자신은 안 본다"    "! printf '%s' \"\$OUTI1\" | grep -qF -- '$HERE/docs/solved_problems.md'"
+
+# --- split-rules: 형식 규칙과 머리말은 로그 형태를 따른다 (Claude 쪽과 같은 계약) ---
+# 쌍둥이 스크립트는 한쪽만 고치면 두 런타임의 오답노트 형식이 갈린다 — 그것이 애초에 머리말
+# 자동 갱신을 도입한 이유다.
+HX2="$(mktemp -d)"; PX2="$(mktemp -d)"; mkdir -p "$HX2/.codex/disciplined-coder"
+LOGX2="$HX2/.codex/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 머리말이다.\n\n'
+  printf -- '- **옛 항목** → 원인: 무엇 → 해결: 무엇\n'
+} > "$LOGX2"
+run "$HX2" "$PX2" >/dev/null
+echo "[split-rules] the rules block follows the shape of the log"
+check "codex split-rules: 안 쪼개진 로그는 옛 규칙" "grep -qF -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGX2'"
+check "codex split-rules: 새 규칙은 안 들어감"      "! grep -qF -- '이 파일은 색인이고' '$LOGX2'"
+
+HX3="$(mktemp -d)"; PX3="$(mktemp -d)"; mkdir -p "$HX3/.codex/disciplined-coder/solved_problems"
+LOGX3="$HX3/.codex/disciplined-coder/solved_problems.md"
+printf '# 무언가를 할 때는 이렇게 한다\n' > "$HX3/.codex/disciplined-coder/solved_problems/a.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 머리말이다.\n\n'
+  printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
+} > "$LOGX3"
+run "$HX3" "$PX3" >/dev/null
+check "codex split-rules: 쪼개진 로그는 새 규칙"    "grep -qF -- '이 파일은 색인이고' '$LOGX3'"
+check "codex split-rules: 지시사항 줄 보존"         "grep -qF -- '- 무언가를 할 때는 이렇게 한다.' '$LOGX3'"
+check "codex split-rules: 포인터 줄 보존"           "grep -qF -- '→ solved_problems/a.md' '$LOGX3'"
+check "codex split-rules: append-only 자기규정 없음" "! grep -qF -- '· append-only 오답노트' '$LOGX3'"
+
+# --- index-root: 주입된 색인이 어느 뿌리에서 왔는지 본문에 남는다 ---
+# Codex 는 색인을 stdout 으로 흘려 보내므로 뿌리가 본문에 안 남으면, 세션이 색인 줄의
+# solved_problems/… 를 엉뚱한 자리에서 찾다 못 찾고 규칙대로 멀쩡한 줄을 지운다.
+HX4="$(mktemp -d)"; PX4="$(mktemp -d)"
+OUTX4="$(run "$HX4" "$PX4")"
+echo "[index-root] the injected index carries the root it came from"
+check "codex 뿌리: 표기가 있다"   "printf '%s' \"\$OUTX4\" | grep -qF -- 'solved-index-root: $HX4/.codex/disciplined-coder'"
+
+# --- unsplit: 안 쪼개진 로그는 개편을 권하고, 빈 로그에는 안 권한다 ---
+HX5="$(mktemp -d)"; PX5="$(mktemp -d)"; mkdir -p "$HX5/.codex/disciplined-coder"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf -- '- **첫째 증상**\n  - 원인: 무엇\n  - 해결: 무엇\n'
+} > "$HX5/.codex/disciplined-coder/solved_problems.md"
+OUTX5="$(run "$HX5" "$PX5")"
+echo "[unsplit] an unsplit log gets a conversion nudge with its item count"
+check "codex unsplit: 개편을 권한다"     "printf '%s' \"\$OUTX5\" | grep -qF -- '항목 1개'"
+check "codex unsplit: 빈 로그엔 안 권함" "! printf '%s' \"\$OUTX4\" | grep -qF -- '지금 개편할지'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

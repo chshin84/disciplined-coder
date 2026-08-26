@@ -36,16 +36,25 @@ if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; f
 #     쌍둥이 스크립트는 한쪽만 고치면 반드시 어긋나므로 같이 둔다.
 scaffold_sync_solved "$KDIR/solved_problems.md" pc "$KDIR/backups" pc
 pc_note="$solved_sync_note"
+# 2b-1) 색인과 본문의 짝, 그리고 아직 안 쪼개진 로그의 개편 권유. 둘 다 읽고 알리기만 한다.
+scaffold_check_solved_pairing "$KDIR/solved_problems.md"
+pc_pairing="$solved_pairing_note"
+scaffold_check_solved_unsplit "$KDIR/solved_problems.md" "$PLUGIN_ROOT"
+pc_unsplit="$solved_unsplit_note"
 
 # 2c) 세션을 연 프로젝트의 오답노트도 같은 처리를 받는다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
 #     프로젝트 CLAUDE.md의 옛 관리블록 정리는 여기 없다 — 그것은 Claude 쪽 파일이라 그쪽이 소유한다.
 PROJ="${CLAUDE_PROJECT_DIR:-$PWD}"
 PLOG="$PROJ/docs/solved_problems.md"
-proj_note=""
+proj_note=""; proj_pairing=""; proj_unsplit=""
 if [ -f "$PLOG" ] && [ "$PLOG" != "$KDIR/solved_problems.md" ]; then
   plabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
   scaffold_sync_solved "$PLOG" project "$KDIR/backups" "$plabel"
   proj_note="$solved_sync_note"
+  scaffold_check_solved_pairing "$PLOG"
+  proj_pairing="$solved_pairing_note"
+  scaffold_check_solved_unsplit "$PLOG" "$PLUGIN_ROOT"
+  proj_unsplit="$solved_unsplit_note"
 fi
 
 # 3) ~/.codex/AGENTS.md 관리블록 재생성(멱등, CRLF 내성). @import 미지원 → 정본 본문 인라인.
@@ -71,10 +80,14 @@ if [ "$had_inline" -eq 0 ]; then
     if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
   done
 fi
-if [ -f "$KDIR/solved_problems.md" ]; then cat "$KDIR/solved_problems.md"; fi
+if [ -f "$KDIR/solved_problems.md" ]; then
+  printf '<!-- solved-index-root: %s -->
+' "$KDIR"
+  cat "$KDIR/solved_problems.md"
+fi
 # 무엇을 했는지 알린다. 로그의 제목 줄이나 머리말 문구는 인용하지 않는다(주입 본문에 정본 헤더가
 # 한 번 더 실리는 것을 막는다).
-for note in "$pc_note" "$proj_note"; do
+for note in "$pc_note" "$pc_pairing" "$pc_unsplit" "$proj_note" "$proj_pairing" "$proj_unsplit"; do
   if [ -n "$note" ]; then printf '%s\n' "$note"; fi
 done
 

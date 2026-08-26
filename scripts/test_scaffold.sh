@@ -740,4 +740,148 @@ check "사본 실패: 공통 신호는 그대로"     "printf '%s' \"\$OUTR14\" 
 check "사본 실패: 사본 사유를 알린다"     "printf '%s' \"\$OUTR14\" | grep -qF '사본을 뜨지 못해'"
 check "사본 실패: 경계 문구는 안 쓴다"    "! printf '%s' \"\$OUTR14\" | grep -qF '머리말의 끝을 알아볼 수 없어'"
 
+# --- header-boundary: 굵지 않은 항목 줄을 머리말로 먹지 않는다 ---
+# 경계를 '모양'으로 짐작하면(굵지 않은 최상위 불릿이면 남은 규칙 불릿이다) 지시사항형 색인 줄을
+# 머리말로 삼킨다. 쪼갠 로그의 색인 줄이 정확히 그 모양이라, 이 검사가 그 손실을 막는 유일한 그물이다.
+HB1="$(mktemp -d)"; PB1="$(mktemp -d)"; mkdir -p "$HB1/.claude/disciplined-coder"
+LOGB1="$HB1/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 스코프 문단이라 머리말이 낡음으로 판정된다.\n\n'
+  printf '항목을 적는 형식은 이렇다.\n\n'
+  printf -- '- 증상은 굵게 한 줄로 띄운다.\n'
+  printf -- '- 원인과 해결은 그 아래 들여쓰기로 내린다.\n\n'
+  printf -- '- 굵지 않은 첫째 항목 줄이다.\n'
+  printf -- '- 굵지 않은 둘째 항목 줄이다.\n'
+} > "$LOGB1"
+run "$HB1" "$PB1" >/dev/null
+echo "[header-boundary] a non-bold item line is not swallowed into the header"
+check "boundary: 굵지 않은 첫째 항목 보존"  "grep -qF -- '- 굵지 않은 첫째 항목 줄이다.' '$LOGB1'"
+check "boundary: 굵지 않은 둘째 항목 보존"  "grep -qF -- '- 굵지 않은 둘째 항목 줄이다.' '$LOGB1'"
+check "boundary: 규칙 블록이 생겼다"        "grep -qF -- '항목이 스무 개를 넘으면' '$LOGB1'"
+check "boundary: 옛 스코프 문단은 사라졌다" "! grep -qF -- '옛 스코프 문단이라' '$LOGB1'"
+check "boundary: 규칙 불릿이 두 벌이 아니다" "[ \"\$(grep -c -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGB1' || true)\" = 1 ]"
+
+# --- count: grep -c 의 0건 함정을 헬퍼가 막는다 ---
+# grep -c 는 0건일 때 stdout 에 0 을 찍고 종료코드 1 로 끝난다. 거기에 `|| echo 0` 을 붙이면
+# 값이 두 줄("0\n0")이 되어 어떤 비교와도 안 맞는다. 그 함정을 한 곳에서 막는다.
+COMMON="$HERE/scripts/_scaffold_common.sh"
+HC1="$(mktemp -d)"; printf 'a\nb\n' > "$HC1/f.md"
+echo "[count] the zero-match trap is contained in one helper"
+check "count: 있는 것을 센다"  "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^a\$')\" = 1 ]"
+check "count: 0건도 한 줄이다" "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^zzz\$')\" = 0 ]"
+check "count: 없는 파일도 0"   "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/none.md' '^a\$')\" = 0 ]"
+
+# --- split-detect: 로그 옆에 본문 폴더가 있으면 쪼개진 로그다 ---
+# 부정 단언에 긍정 단언을 짝으로 붙인다 — 함수가 없을 때 부정 단언은 저절로 참이 된다.
+HS1="$(mktemp -d)"; touch "$HS1/solved_problems.md"
+echo "[split-detect] a body folder next to the log means the log is split"
+check "split-detect: 함수가 있다"           "(. '$COMMON'; type scaffold_solved_log_is_split)"
+check "split-detect: 폴더 없으면 안 쪼개짐" "! (. '$COMMON'; scaffold_solved_log_is_split '$HS1/solved_problems.md')"
+mkdir -p "$HS1/solved_problems"
+check "split-detect: 빈 폴더도 안 쪼개짐"   "! (. '$COMMON'; scaffold_solved_log_is_split '$HS1/solved_problems.md')"
+printf '# 무언가를 할 때는 이렇게 한다\n' > "$HS1/solved_problems/a.md"
+check "split-detect: 본문이 있으면 쪼개짐"  "(. '$COMMON'; scaffold_solved_log_is_split '$HS1/solved_problems.md')"
+
+# --- split-rules: 형식 규칙과 머리말은 로그 형태를 따른다 ---
+HS2="$(mktemp -d)"; PS2="$(mktemp -d)"; mkdir -p "$HS2/.claude/disciplined-coder"
+LOGS2="$HS2/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 머리말이다.\n\n'
+  printf -- '- **옛 항목** → 원인: 무엇 → 해결: 무엇\n'
+} > "$LOGS2"
+run "$HS2" "$PS2" >/dev/null
+echo "[split-rules] the rules block follows the shape of the log"
+check "split-rules: 안 쪼개진 로그는 옛 규칙" "grep -qF -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGS2'"
+check "split-rules: 새 규칙은 안 들어감"      "! grep -qF -- '이 파일은 색인이고' '$LOGS2'"
+
+HS3="$(mktemp -d)"; PS3="$(mktemp -d)"; mkdir -p "$HS3/.claude/disciplined-coder/solved_problems"
+LOGS3="$HS3/.claude/disciplined-coder/solved_problems.md"
+printf '# 무언가를 할 때는 이렇게 한다\n' > "$HS3/.claude/disciplined-coder/solved_problems/a.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf '옛 머리말이다.\n\n'
+  printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
+} > "$LOGS3"
+run "$HS3" "$PS3" >/dev/null
+check "split-rules: 쪼개진 로그는 새 규칙"    "grep -qF -- '이 파일은 색인이고' '$LOGS3'"
+check "split-rules: 옛 규칙은 안 들어감"      "! grep -qF -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGS3'"
+check "split-rules: 지시사항 줄 보존"         "grep -qF -- '- 무언가를 할 때는 이렇게 한다.' '$LOGS3'"
+check "split-rules: 포인터 줄 보존"           "grep -qF -- '→ solved_problems/a.md' '$LOGS3'"
+check "split-rules: append-only 자기규정 없음" "! grep -qF -- '· append-only 오답노트' '$LOGS3'"
+
+# --- whitelist: 본문 폴더는 정상 산출물이라 경고를 내지 않는다 ---
+HW1="$(mktemp -d)"; PW1="$(mktemp -d)"; mkdir -p "$HW1/.claude/disciplined-coder/solved_problems"
+printf '# 무언가를 할 때는 이렇게 한다\n' > "$HW1/.claude/disciplined-coder/solved_problems/a.md"
+printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n' > "$HW1/.claude/disciplined-coder/solved_problems.md"
+ERRW1="$(CLAUDE_HOME_DIR="$HW1/.claude" CLAUDE_PROJECT_DIR="$PW1" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
+echo "[whitelist] the body folder is a normal artifact, not an orphan"
+check "whitelist: 본문 폴더에 경고 없음" "! printf '%s' \"\$ERRW1\" | grep -qF -- \"비관리 디렉터리 'solved_problems'\""
+check "whitelist: 본문 파일 보존"        "[ -f '$HW1/.claude/disciplined-coder/solved_problems/a.md' ]"
+
+# --- pairing: 색인 줄 수와 본문 파일 수를 맞댄다 ---
+HP1="$(mktemp -d)"; PP1="$(mktemp -d)"; mkdir -p "$HP1/.claude/disciplined-coder/solved_problems"
+LOGP1="$HP1/.claude/disciplined-coder/solved_problems.md"
+printf '# 가 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/solved_problems/a.md"
+printf '# 나 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/solved_problems/b.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf -- '- 가 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
+} > "$LOGP1"
+OUTP1="$(run "$HP1" "$PP1")"
+echo "[pairing] index lines and body files are counted against each other"
+check "pairing: 어긋나면 알린다"      "printf '%s' \"\$OUTP1\" | grep -qF -- '색인 줄 1개, 본문 파일 2개'"
+check "pairing: 색인을 안 고친다"     "[ \"\$(. '$COMMON'; scaffold_count_matches '$LOGP1' '→ solved_problems/')\" = 1 ]"
+check "pairing: 본문도 안 지운다"     "[ -f '$HP1/.claude/disciplined-coder/solved_problems/b.md' ]"
+
+printf -- '- 나 할 때는 이렇게 한다.\n  → solved_problems/b.md\n' >> "$LOGP1"
+OUTP2="$(run "$HP1" "$PP1")"
+check "pairing: 맞으면 조용하다"      "! printf '%s' \"\$OUTP2\" | grep -qF -- '어긋난다'"
+
+printf -- '- **옛 한 줄 항목** → 원인: 무엇 → 해결: 무엇\n' >> "$LOGP1"
+OUTP3="$(run "$HP1" "$PP1")"
+check "pairing: 안 갈린 항목을 알린다" "printf '%s' \"\$OUTP3\" | grep -qF -- '아직 안 갈린 항목 1개'"
+
+# --- unsplit: 안 쪼개진 로그는 항목 수와 함께 개편을 권한다 ---
+HU1="$(mktemp -d)"; PU1="$(mktemp -d)"; mkdir -p "$HU1/.claude/disciplined-coder"
+LOGU1="$HU1/.claude/disciplined-coder/solved_problems.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf -- '- **첫째 증상**\n  - 원인: 무엇\n  - 해결: 무엇\n'
+  printf -- '- **둘째 증상**\n  - 원인: 무엇\n  - 해결: 무엇\n'
+} > "$LOGU1"
+OUTU1="$(run "$HU1" "$PU1")"
+echo "[unsplit] an unsplit log gets a conversion nudge with its item count"
+check "unsplit: 개편을 권한다"       "printf '%s' \"\$OUTU1\" | grep -qF -- '개편'"
+check "unsplit: 항목 수를 보인다"    "printf '%s' \"\$OUTU1\" | grep -qF -- '항목 2개'"
+check "unsplit: 스크립트 절대경로"   "printf '%s' \"\$OUTU1\" | grep -qF -- '$HERE/scripts/split_solved_log.sh'"
+check "unsplit: 고치지는 않는다"     "grep -qF -- '- **첫째 증상**' '$LOGU1'"
+
+# 항목이 없는 갓 만든 로그에는 안 권한다 — grep -c 의 0건 함정이 여기서 드러난다.
+HU2="$(mktemp -d)"; PU2="$(mktemp -d)"
+OUTU2="$(run "$HU2" "$PU2")"
+check "unsplit: 빈 로그엔 안 권함"   "! printf '%s' \"\$OUTU2\" | grep -qF -- '개편'"
+
+# --- rules-switch: 형태가 바뀌면 옛 규칙 블록이 남지 않는다 ---
+# 쪼개는 순간 로그는 '옛 규칙 블록을 단 쪼개진 로그'가 된다. 경계 계산이 새 블록의 줄만
+# 알아보면 옛 블록이 본문으로 밀려나 규칙이 두 벌이 된다 — 한 파일이 서로 다른 형식을 둘 다
+# 규정하게 되고, 낡음 판정은 새 블록이 있으니 조용하다.
+HZ1="$(mktemp -d)"; PZ1="$(mktemp -d)"; mkdir -p "$HZ1/.claude/disciplined-coder/solved_problems"
+LOGZ1="$HZ1/.claude/disciplined-coder/solved_problems.md"
+printf '# 가 할 때는 이렇게 한다\n' > "$HZ1/.claude/disciplined-coder/solved_problems/a.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역 · append-only 오답노트\n\n'
+  printf '옛 스코프 문단이다.\n\n'
+  printf '항목을 적는 형식은 이렇다.\n\n'
+  printf -- '- 증상은 굵게 한 줄로 띄운다.\n'
+  printf -- '- 원인과 해결은 그 아래 들여쓰기로 내린다.\n'
+  printf -- '- 한 항목은 세 줄을 넘기지 않는다.\n'
+  printf -- '- 순서는 시간순이고 아래에 추가한다.\n'
+  printf -- '- 항목이 스무 개를 넘으면 그때 영역별로 묶는다.\n'
+  printf -- '- 안 쓰이는 항목도 지우지 않는다 — 사용자가 직접 지시할 때만 손댄다.\n\n'
+  printf -- '- **가 할 때는 이렇게 한다**\n  → solved_problems/a.md\n'
+} > "$LOGZ1"
+run "$HZ1" "$PZ1" >/dev/null
+echo "[rules-switch] switching format leaves exactly one rules block"
+check "전환: 새 규칙이 들어갔다"     "grep -qF -- '이 파일은 색인이고' '$LOGZ1'"
+check "전환: 옛 규칙 블록이 없다"    "! grep -qF -- '- 원인과 해결은 그 아래 들여쓰기로 내린다.' '$LOGZ1'"
+check "전환: 항목은 그대로다"        "grep -qF -- '- **가 할 때는 이렇게 한다**' '$LOGZ1'"
+check "전환: 포인터도 그대로다"      "grep -qF -- '→ solved_problems/a.md' '$LOGZ1'"
+check "전환: 두 번 돌려도 같다"      "CK=\"\$(cksum < '$LOGZ1')\"; run '$HZ1' '$PZ1' >/dev/null; [ \"\$(cksum < '$LOGZ1')\" = \"\$CK\" ]"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

@@ -233,4 +233,16 @@ OLDPLAN="$HERE/docs/superpowers/plans/2026-08-16-review-layer-redesign.md"
 check "옛 spec 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDSPEC\""
 check "옛 plan 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDPLAN\""
 
+# --- recall: 오답노트를 꺼내 쓰는 진입로가 둘이라는 것을 정본이 말한다 ---
+# 이 절의 문구를 지키는 계약이 하나도 없었다. 문장을 다듬다 되돌려도 어떤 신호도 안 뜨는
+# 상태였고, 이 레포는 정본 산문을 다듬다 계약 테스트를 깬 전례가 있다.
+CANON="$HERE/agent-principles.md"
+check "recall: 시작할 때 진입로"   "grep -qF -- '지금 하려는 작업에 걸리는 지시사항 줄' \"\$CANON\""
+check "recall: 증상 진입로"        "grep -qF -- '이미 증상이 난 뒤에는' \"\$CANON\""
+check "recall: 두 계층을 다 본다"  "grep -qF -- 'PC solved와 프로젝트 solved 둘 다' \"\$CANON\""
+check "recall: 본문 수정은 묻는다" "grep -qF -- '고치거나 지우기 전에 사용자에게 묻는다' \"\$CANON\""
+check "recall: 색인도 함께"        "grep -qF -- '색인 줄도 같은 걸음에서 함께' \"\$CANON\""
+check "recall: 고아 줄은 지운다"   "grep -qF -- '가리키는 본문이 없으면' \"\$CANON\""
+check "recall: 고아 본문은 채운다" "grep -qF -- '색인 줄이 없으면' \"\$CANON\""
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
