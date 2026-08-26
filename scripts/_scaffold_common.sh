@@ -284,21 +284,44 @@ scaffold_count_matches() {  # $1=파일 $2=확장 정규식 → stdout: 개수 �
 # 전량 대조를 안 하는 이유는 항목 수만큼 값이 들기 때문이다 — 안 쓰는 항목의 어긋남은 그 회차에
 # 해를 끼치지 않으므로, 내용 대조는 그 줄을 따라 본문을 열 때 그 자리에서 한다.
 # 색인 줄은 포인터로 센다. 머리말의 규칙 불릿과 색인 줄이 같은 모양이라 '- '로는 안 갈린다.
-# 아직 안 갈린 옛 한 줄 항목(포인터 없는 굵은 줄)은 따로 센다 — 그 부류는 포인터 셈에도 파일
-# 셈에도 안 잡혀서, 손으로 가르는 걸음을 건너뛰어도 아무 신호가 없었다.
+# 굵은 줄은 두 몫으로 갈라 센다. 포인터가 없으면 아직 본문으로 안 옮긴 옛 한 줄 항목이고, 포인터가
+# 있으면 옮기기는 했으나 아직 지시사항으로 안 고친 색인 줄이다. 사람이 할 일이 서로 달라서 한
+# 숫자로 뭉치면 안 된다 — 쪼갠 직후에는 손으로 가를 것이 없는데도 항목 수만큼 신호가 떠서 어느
+# 걸음이 남았는지 가려진다(실제로 그 결함을 밟았다).
 scaffold_check_solved_pairing() {  # $1=로그 경로 → sets: solved_pairing_note
-  local f="$1" dir lines files bold
+  local f="$1" dir lines files counts unmigrated unwritten
   solved_pairing_note=""
   [ -f "$f" ] || return 0
   scaffold_solved_log_is_split "$f" || return 0
   dir="${f%.md}"
   lines="$(scaffold_count_matches "$f" '→ solved_problems/')"
-  bold="$(scaffold_count_matches "$f" '^[-*+][[:space:]]+\*\*')"
+  # 이웃 관계로 갈라야 한다 — 굵은 줄 자신만 보면 포인터가 달렸는지 알 수 없다.
+  counts="$(awk '
+    {
+      l=$0
+      if (substr(l, length(l), 1) == sprintf("%c", 13)) l = substr(l, 1, length(l) - 1)
+      line[NR]=l
+    }
+    END {
+      for (i = 1; i <= NR; i++) {
+        if (line[i] !~ /^[-*+][[:space:]]+[*][*]/) continue
+        if (i < NR && index(line[i+1], "→ solved_problems/") > 0) written++; else moved++
+      }
+      print moved + 0, written + 0
+    }' "$f" 2>/dev/null)"
+  [ -n "$counts" ] || counts="0 0"
+  unmigrated="${counts%% *}"; unwritten="${counts##* }"
   files="$(ls -1 "$dir"/*.md 2>/dev/null | wc -l | tr -d ' ')"
   if [ "$lines" != "$files" ]; then
     solved_pairing_note="ðµ disciplined-coder: $f 의 색인 줄 ${lines}개, 본문 파일 ${files}개 — 어긋난다(고치지 않았다. 색인 줄이 가리키는 본문이 없으면 그 줄을 지우고, 본문만 있으면 첫 줄로 색인 줄을 채운다)."
-  elif [ "$bold" != "0" ]; then
-    solved_pairing_note="ðµ disciplined-coder: $f 에 아직 안 갈린 항목 ${bold}개가 남아 있다(포인터 없는 굵은 줄이다. 본문 파일로 옮기고 지시사항 줄로 바꿔라)."
+  else
+    solved_pairing_note=""
+    [ "$unmigrated" = "0" ] || solved_pairing_note="ðµ disciplined-coder: $f 에 아직 손으로 가를 항목 ${unmigrated}개가 남아 있다(포인터 없는 굵은 줄이다. 본문 파일로 옮기고 포인터를 달아라)."
+    if [ "$unwritten" != "0" ]; then
+      [ -z "$solved_pairing_note" ] || solved_pairing_note="$solved_pairing_note
+"
+      solved_pairing_note="${solved_pairing_note}ðµ disciplined-coder: $f 에 아직 지시사항으로 못 고친 색인 줄 ${unwritten}개가 남아 있다(굵기를 벗기며 지시사항 한 문장으로 고쳐라)."
+    fi
   fi
   return 0
 }

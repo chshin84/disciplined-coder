@@ -837,7 +837,16 @@ check "pairing: 맞으면 조용하다"      "! printf '%s' \"\$OUTP2\" | grep -
 
 printf -- '- **옛 한 줄 항목** → 원인: 무엇 → 해결: 무엇\n' >> "$LOGP1"
 OUTP3="$(run "$HP1" "$PP1")"
-check "pairing: 안 갈린 항목을 알린다" "printf '%s' \"\$OUTP3\" | grep -qF -- '아직 안 갈린 항목 1개'"
+check "pairing: 손으로 가를 항목을 알린다" "printf '%s' \"\$OUTP3\" | grep -qF -- '손으로 가를 항목 1개'"
+
+# 굵은 색인 줄(포인터가 달린 것)은 '손으로 가를 몫'이 아니라 '지시사항으로 다시 쓸 몫'이다.
+# 둘을 한 숫자로 세면 쪼갠 직후에 손으로 가를 것이 없는데도 항목 수만큼 신호가 뜬다 — 실제로
+# 그 결함을 밟았다. 픽스처의 색인 줄이 전부 굵기를 벗은 상태라 이 조합이 한 번도 안 나왔다.
+printf '# 다 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/solved_problems/c.md"
+printf -- '- **다 할 때 나는 증상**\n  → solved_problems/c.md\n' >> "$LOGP1"
+OUTP4="$(run "$HP1" "$PP1")"
+check "pairing: 손으로 가를 몫은 안 늘어난다" "printf '%s' \"\$OUTP4\" | grep -qF -- '손으로 가를 항목 1개'"
+check "pairing: 못 고친 색인 줄을 따로 센다"   "printf '%s' \"\$OUTP4\" | grep -qF -- '지시사항으로 못 고친 색인 줄 1개'"
 
 # --- unsplit: 안 쪼개진 로그는 항목 수와 함께 개편을 권한다 ---
 HU1="$(mktemp -d)"; PU1="$(mktemp -d)"; mkdir -p "$HU1/.claude/disciplined-coder"
