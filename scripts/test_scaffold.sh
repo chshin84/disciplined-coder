@@ -848,6 +848,13 @@ OUTP4="$(run "$HP1" "$PP1")"
 check "pairing: 손으로 가를 몫은 안 늘어난다" "printf '%s' \"\$OUTP4\" | grep -qF -- '손으로 가를 항목 1개'"
 check "pairing: 못 고친 색인 줄을 따로 센다"   "printf '%s' \"\$OUTP4\" | grep -qF -- '지시사항으로 못 고친 색인 줄 1개'"
 
+# --- notice-encoding: 사용자 화면에 나가는 표시가 이중 인코딩되지 않았다 ---
+# 이모지 뒤 본문 조각만 grep 하면 표시가 깨져도 통과한다 — 실제로 알림 넷의 🔵 가 latin-1 을
+# 거쳐 다시 인코딩된 채 들어왔고 검사가 못 잡았다. 표시 자체와 그 표식을 함께 단언한다.
+echo "[notice-encoding] user-facing notices are not double-encoded"
+check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COMMON\""
+check "notice: 짝 맞춤 알림에 파란 점 접두" "printf '%s' \"$OUTP4\" | grep -qF -- '🔵 disciplined-coder:'"
+
 # --- unsplit: 안 쪼개진 로그는 항목 수와 함께 개편을 권한다 ---
 HU1="$(mktemp -d)"; PU1="$(mktemp -d)"; mkdir -p "$HU1/.claude/disciplined-coder"
 LOGU1="$HU1/.claude/disciplined-coder/solved_problems.md"

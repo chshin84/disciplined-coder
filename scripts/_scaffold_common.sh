@@ -38,7 +38,9 @@ SCAFFOLD_SOLVED_RULES_SPLIT='항목을 적는 형식은 이렇다.
 - 아직 지시사항으로 못 고친 줄은 굵게 둔다. 고치면서 굵기를 벗긴다.
 - 순서는 시간순이고 아래에 추가한다.
 - 본문 파일을 고치거나 지우기 전에 사용자에게 묻는다.
-- 사용자 요청으로 고치거나 지울 때는 색인 줄도 함께 고치거나 지운다.'
+- 사용자 요청으로 고치거나 지울 때는 색인 줄도 함께 고치거나 지운다.
+
+## 지시사항 색인'
 
 # 로그가 쪼개졌는지 본다. 판정 재료는 로그 옆의 본문 폴더에 본문 파일이 하나라도 있는지다.
 # 빈 폴더를 쪼개진 것으로 보지 않는 이유는 개편을 하다 멈춘 로그가 그 모양이기 때문이다 —
@@ -112,8 +114,10 @@ EOF
       cat <<'EOF'
 # 해결된 문제 로그 (solved_problems) — PC 전역 · 지시사항 색인
 
+일을 시작하기 전에 아래 「지시사항 색인」의 줄을 훑고, 지금 하려는 작업에 걸리는 줄이 있으면 그 줄이 가리키는 본문 파일 하나만 연다. 걸리는 줄이 없으면 아무 파일도 열지 않는다.
+
 완결된 문제의 교훈 모음 — 일을 시작할 때 걸리는 지시사항만 여기 두고 증상과 원인은 본문 파일에 둔다.
-**본문 파일은 append-only 이고 색인 줄은 그 본문을 따라 고친다.** 본문을 고치거나 지울 때만 색인 줄도 함께 손댄다.
+본문 파일은 append-only 이고 색인 줄은 그 본문을 따라 고친다. 본문을 고치거나 지울 때만 색인 줄도 함께 손댄다.
 일반화 가능한 항목은 디시플린(agent-principles.md)으로 **재기술해 승격**한다(원문은 본문에 보존 — 이동이 아니라 상위 계층 재작성). 메인 세션만 기록.
 EOF
       ;;
@@ -130,8 +134,10 @@ EOF
       cat <<'EOF'
 # 해결된 문제 로그 (solved_problems) — 이 프로젝트 · 지시사항 색인
 
+일을 시작하기 전에 아래 「지시사항 색인」의 줄을 훑고, 지금 하려는 작업에 걸리는 줄이 있으면 그 줄이 가리키는 본문 파일 하나만 연다. 걸리는 줄이 없으면 아무 파일도 열지 않는다.
+
 이 레포에서 완결한 문제의 교훈 — 일을 시작할 때 걸리는 지시사항만 여기 두고 증상과 원인은 본문 파일에 둔다.
-**본문 파일은 append-only 이고 색인 줄은 그 본문을 따라 고친다.** 본문을 고치거나 지울 때만 색인 줄도 함께 손댄다.
+본문 파일은 append-only 이고 색인 줄은 그 본문을 따라 고친다. 본문을 고치거나 지울 때만 색인 줄도 함께 손댄다.
 이 프로젝트에 한정된 교훈만 둔다 — 머신 전역은 PC solved, 보편은 디시플린 원칙으로(스코프 라우팅).
 EOF
       ;;
@@ -313,14 +319,14 @@ scaffold_check_solved_pairing() {  # $1=로그 경로 → sets: solved_pairing_n
   unmigrated="${counts%% *}"; unwritten="${counts##* }"
   files="$(ls -1 "$dir"/*.md 2>/dev/null | wc -l | tr -d ' ')"
   if [ "$lines" != "$files" ]; then
-    solved_pairing_note="ðµ disciplined-coder: $f 의 색인 줄 ${lines}개, 본문 파일 ${files}개 — 어긋난다(고치지 않았다. 색인 줄이 가리키는 본문이 없으면 그 줄을 지우고, 본문만 있으면 첫 줄로 색인 줄을 채운다)."
+    solved_pairing_note="🔵 disciplined-coder: $f 의 색인 줄 ${lines}개, 본문 파일 ${files}개 — 어긋난다(고치지 않았다. 색인 줄이 가리키는 본문이 없으면 그 줄을 지우고, 본문만 있으면 첫 줄로 색인 줄을 채운다)."
   else
     solved_pairing_note=""
-    [ "$unmigrated" = "0" ] || solved_pairing_note="ðµ disciplined-coder: $f 에 아직 손으로 가를 항목 ${unmigrated}개가 남아 있다(포인터 없는 굵은 줄이다. 본문 파일로 옮기고 포인터를 달아라)."
+    [ "$unmigrated" = "0" ] || solved_pairing_note="🔵 disciplined-coder: $f 에 아직 손으로 가를 항목 ${unmigrated}개가 남아 있다(포인터 없는 굵은 줄이다. 본문 파일로 옮기고 포인터를 달아라)."
     if [ "$unwritten" != "0" ]; then
       [ -z "$solved_pairing_note" ] || solved_pairing_note="$solved_pairing_note
 "
-      solved_pairing_note="${solved_pairing_note}ðµ disciplined-coder: $f 에 아직 지시사항으로 못 고친 색인 줄 ${unwritten}개가 남아 있다(굵기를 벗기며 지시사항 한 문장으로 고쳐라)."
+      solved_pairing_note="${solved_pairing_note}🔵 disciplined-coder: $f 에 아직 지시사항으로 못 고친 색인 줄 ${unwritten}개가 남아 있다(굵기를 벗기며 지시사항 한 문장으로 고쳐라)."
     fi
   fi
   return 0
@@ -331,13 +337,16 @@ scaffold_check_solved_pairing() {  # $1=로그 경로 → sets: solved_pairing_n
 # 쓰는 일은 기계가 못 하므로 승낙한 세션이 그 자리에서 항목 수만큼 다시 써야 한다.
 # 스크립트 경로를 절대경로로 적는 이유는 이 신호가 옆 프로젝트에서 뜨는데 그 cwd 에는 그 파일이
 # 없기 때문이다 — 스크립트는 플러그인 루트 안에 있고, 그 값은 호출자만 안다.
-scaffold_check_solved_unsplit() {  # $1=로그 경로 $2=플러그인 루트 → sets: solved_unsplit_note
-  local f="$1" root="$2" n
+# 인자 둘까지 채워 적는 이유는 그 스크립트가 로그 경로와 백업 디렉터리를 요구하기 때문이다.
+# 이름만 알려 주면 받은 세션이 백업 자리를 스스로 정하게 되고, 사본이 프로젝트 폴더 같은 엉뚱한
+# 곳에 떨어져 '프로젝트 폴더에 파일을 남기지 않는다'가 그 자리에서 깨진다.
+scaffold_check_solved_unsplit() {  # $1=로그 경로 $2=플러그인 루트 $3=백업 디렉터리 → sets: solved_unsplit_note
+  local f="$1" root="$2" bdir="$3" n
   solved_unsplit_note=""
   [ -f "$f" ] || return 0
   scaffold_solved_log_is_split "$f" && return 0
   n="$(scaffold_count_matches "$f" '^[-*+][[:space:]]+\*\*')"
   [ "$n" = "0" ] && return 0
-  solved_unsplit_note="ðµ disciplined-coder: $f 가 아직 안 쪼개진 형식이다(항목 ${n}개). 지금 개편할지 사용자에게 물어라 — 첫 선택지가 '지금 개편한다'이고 그것이 권장값이다. 개편은 bash $root/scripts/split_solved_log.sh 로 쪼갠 뒤 지시사항 줄을 새로 쓰는 것이다."
+  solved_unsplit_note="🔵 disciplined-coder: $f 가 아직 안 쪼개진 형식이다(항목 ${n}개). 지금 개편할지 사용자에게 물어라 — 첫 선택지가 '지금 개편한다'이고 그것이 권장값이다. 개편은 bash $root/scripts/split_solved_log.sh \"$f\" \"$bdir\" 로 쪼갠 뒤 지시사항 줄을 새로 쓰는 것이다."
   return 0
 }

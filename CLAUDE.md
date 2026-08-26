@@ -11,11 +11,13 @@
   `bad=""; for t in scripts/test_*.sh; do bash "$t" || bad="$bad $t"; done; [ -z "$bad" ] && echo "ALL PASS" || echo "FAILED:$bad"`
   실패한 스크립트 이름을 모아 마지막에 알리는 형태로 적는 이유는, 그냥 이어 돌리면 **마지막 하나의 결과만 남아 앞의 실패가 묻히기** 때문이다.
   그다음 `claude plugin validate ./`를 non-strict로 돌린다.
-- 설계 문서와 계획 문서는 `docs/superpowers/`에 쓰고 읽는다. 그 경로에 새로 쓰면 Stop 리뷰 게이트가 발동한다.
+- 설계 문서는 `docs/superpowers/specs/`에, 계획 문서는 `docs/superpowers/plans/`에 쓰고 읽는다. 그 두 폴더에 `.md`를 새로 쓰면 Stop 리뷰 게이트가 발동한다 — 다른 하위 폴더에 쓰면 게이트가 안 걸린다.
 
 ## 오답노트 (solved_problems)
-디버깅·이슈 처리·중요한 결정을 시작하기 전에 `docs/solved_problems.md`를 **먼저 확인**한다 —
-이 프로젝트에서 겪은 문제와 그 해결법을 모아 둔 기록이다.
+이 로그는 색인과 본문 두 자리로 되어 있다. **일을 시작할 때는 `docs/solved_problems.md`**(지시사항 색인)의
+줄을 훑어 지금 하려는 작업에 걸리는 줄이 있는지 보고, 걸리면 그 줄이 가리키는 본문 파일을 연다.
+**증상이 이미 났으면** `docs/solved_problems/` 아래 본문 파일에서 그 증상을 찾는다. 어느 쪽을 언제
+여는지는 `agent-principles.md`의 recall 절이 정본이다.
 
 **이 로그를 어떻게 운영하는지는 여기서 정하지 않는다.** 누가 쓰는지, 언제 꺼내 쓰는지, 무엇을 어느
 계층에 적는지는 `agent-principles.md`의 오답노트 절이 정본이고, 항목을 적는 형식은 그 파일 자신의

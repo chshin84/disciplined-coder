@@ -14,7 +14,13 @@ while IFS= read -r FILE; do
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
   # 리뷰 기록은 검진 대상이 아니다. 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생기고,
   # 그 순환을 매번 무시하다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.
-  case "$FILE" in *docs/superpowers/reviews/*.md) continue ;; esac
+  # 오답노트도 같은 부류다 — 정본이 문제를 완결할 때마다 교훈을 적으라고 요구하는데 그때마다
+  # 검진을 묻는 걸음이 붙는다. 형식은 스캐폴드가 강제하고 사람이 처음부터 끝까지 읽는 글도 아니라
+  # 문체 검진에서 얻을 것이 거의 없다. 색인과 본문 파일을 함께 뺀다.
+  case "$FILE" in
+    *docs/superpowers/reviews/*.md) continue ;;
+    *solved_problems.md|*solved_problems/*.md) continue ;;
+  esac
   match="$FILE"; break
 done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")
