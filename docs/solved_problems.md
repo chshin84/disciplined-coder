@@ -78,3 +78,5 @@
   → solved_problems/2026-08-26-count-prescriptions-before-summarizing.md
 - 신호 문구가 무엇을 센다고 밝혔으면 문구가 있는지만 보지 말고 그 값이 맞는지 픽스처로 고정하고, 할 일이 서로 다른 두 가지를 한 숫자로 함께 세고 있지 않은지 묻는다.
   → solved_problems/2026-08-26-assert-the-counted-value.md
+- 이 레포의 check 에 명령을 넣을 때는 달러 괄호를 역슬래시로 escape 해 지연시키고, 새 검사는 반드시 실패를 한 번 보고 나서 통과시킨다.
+  → solved_problems/2026-08-26-defer-command-substitution-in-check.md
