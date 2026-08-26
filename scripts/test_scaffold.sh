@@ -761,4 +761,14 @@ check "boundary: 규칙 블록이 생겼다"        "grep -qF -- '항목이 스�
 check "boundary: 옛 스코프 문단은 사라졌다" "! grep -qF -- '옛 스코프 문단이라' '$LOGB1'"
 check "boundary: 규칙 불릿이 두 벌이 아니다" "[ \"\$(grep -c -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGB1' || true)\" = 1 ]"
 
+# --- count: grep -c 의 0건 함정을 헬퍼가 막는다 ---
+# grep -c 는 0건일 때 stdout 에 0 을 찍고 종료코드 1 로 끝난다. 거기에 `|| echo 0` 을 붙이면
+# 값이 두 줄("0\n0")이 되어 어떤 비교와도 안 맞는다. 그 함정을 한 곳에서 막는다.
+COMMON="$HERE/scripts/_scaffold_common.sh"
+HC1="$(mktemp -d)"; printf 'a\nb\n' > "$HC1/f.md"
+echo "[count] the zero-match trap is contained in one helper"
+check "count: 있는 것을 센다"  "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^a\$')\" = 1 ]"
+check "count: 0건도 한 줄이다" "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^zzz\$')\" = 0 ]"
+check "count: 없는 파일도 0"   "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/none.md' '^a\$')\" = 0 ]"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

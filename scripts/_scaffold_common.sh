@@ -209,3 +209,11 @@ scaffold_sync_solved() {  # $1=로그 $2=스코프 $3=백업 디렉터리 $4=백
 # (제거됨) 오답노트 처분 모드·ultracode 검증 모드 토글. 둘 다 훅이 강제하지 못하는 문장 주입일 뿐이었고,
 # 기본값이 사실상 무동작이라 옵트인 플래그 하나에 지나지 않았다 — 모르면 안 쓰게 되는 설정이다.
 # 처분은 surface로 고정하고, ultracode 검증 요구는 agent-principles.md 검증 레이어 표에만 둔다.
+
+# grep -c 는 0건일 때 stdout 에 0 을 찍고 종료코드 1 로 끝난다. 거기에 `|| echo 0` 을 붙이면
+# 값이 두 줄("0\n0")이 되어 어떤 비교와도 안 맞는다 — 실제로 그 함정을 밟아 빈 로그를 가진
+# 새 PC 마다 오탐이 뜨는 결함이 계획 리뷰에서 잡혔다. `|| true` 를 써서 stdout 한 줄만 남긴다.
+scaffold_count_matches() {  # $1=파일 $2=확장 정규식 → stdout: 개수 한 줄
+  [ -f "$1" ] || { printf '0'; return 0; }
+  printf '%s' "$(grep -c -E -- "$2" "$1" 2>/dev/null || true)"
+}
