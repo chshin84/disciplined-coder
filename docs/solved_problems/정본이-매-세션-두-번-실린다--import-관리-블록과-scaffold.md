@@ -1,0 +1,4 @@
+# **정본이 매 세션 두 번 실린다 — `@import` 관리 블록과 `scaffold.sh` stdout 양쪽이다.**
+
+- 원인: 이중화의 명분이던 "홈 경로 어긋나면 `@import`가 끊긴다"는 `_resolve_home.sh`가 이미 해소한 위험이었다.
+- 해결: 보험을 걸기 전에 그 위험이 아직 살아 있는지 먼저 확인하라. 남길 레일은 압축 생존성으로 고른다 — `CLAUDE.md`는 매 요청 다시 실리지만 SessionStart stdout은 `compact` matcher가 없어 요약으로 뭉개진다. 첫 설치 세션만 stdout으로 보강하되 판정은 주입 **전에** 하고 `grep -x`를 쓰지 마라(CRLF에서 영원히 거짓이 된다). 같은 결함이 `codex-scaffold.sh`에도 대칭으로 있었다 — 쌍둥이 스크립트는 한쪽을 고칠 때 반드시 같이 본다.
