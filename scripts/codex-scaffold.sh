@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Idempotent. Codex SessionStart마다 실행. 지식을 ~/.codex/disciplined-coder에 두고
 # ~/.codex/AGENTS.md 관리블록에 정본을 인라인(Codex는 @import 미지원). 프로젝트 폴더에 파일을
-# 새로 만들지는 않는다 — 이미 있는 오답노트의 머리말만 손본다.
+# 새로 만들지는 않는다 — 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 것」이
+# 정본이다(이 쌍둥이는 그 가운데 오답노트 쪽만 맡는다. 프로젝트 CLAUDE.md는 Claude 쪽이 소유한다).
 # scaffold.sh(Claude)의 Codex 쌍둥이 — 정본 소스 동일(PLUGIN_ROOT의 agent-principles.md 등).
 set -euo pipefail
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"

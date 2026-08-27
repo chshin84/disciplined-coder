@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Idempotent. SessionStart마다 실행. 지식을 PC(~/.claude/disciplined-coder)에 두고
 # ~/.claude/CLAUDE.md 관리블록이 @import. 프로젝트 폴더에 파일을 새로 만들지는 않는다 —
-# 이미 있는 오답노트의 머리말과 없앤 기능이 남긴 관리블록만 손본다(둘 다 사본을 남기거나 되돌릴 수 있다).
+# 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 것」이 정본이다.
 set -euo pipefail
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"

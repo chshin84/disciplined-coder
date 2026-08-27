@@ -235,6 +235,18 @@ OLDPLAN="$HERE/docs/superpowers/plans/2026-08-16-review-layer-redesign.md"
 check "옛 spec 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDSPEC\""
 check "옛 plan 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDPLAN\""
 
+# 영문 재작성 대응표는 그 재작성이 되돌려져 지금 구조와 안 맞는다. 표시가 없으면 정본이 영문인
+# 것처럼 읽힌다. 파일 목록은 디렉터리에서 도출한다 — 표가 늘어도 사람이 목록을 맞출 필요가 없다.
+RWDIR="$HERE/docs/superpowers/rewrite-map"
+RWN=0
+for RW in "$RWDIR"/*.md; do
+  [ -f "$RW" ] || continue
+  RWN=$((RWN+1))
+  check "$(basename "$RW") 에 superseded 표시가 있다" "head -8 '$RW' | grep -qF 'superseded'"
+  check "$(basename "$RW") 가 되돌려졌다고 말한다"     "head -8 '$RW' | grep -qF '되돌려졌다'"
+done
+check "대응표를 하나 이상 훑었다"           "[ '$RWN' -gt 0 ]"
+
 # --- recall: 오답노트를 꺼내 쓰는 진입로가 둘이라는 것을 정본이 말한다 ---
 # 이 절의 문구를 지키는 계약이 하나도 없었다. 문장을 다듬다 되돌려도 어떤 신호도 안 뜨는
 # 상태였고, 이 레포는 정본 산문을 다듬다 계약 테스트를 깬 전례가 있다.
@@ -246,5 +258,38 @@ check "recall: 본문 수정은 묻는다" "grep -qF -- '고치거나 지우기 
 check "recall: 색인도 함께"        "grep -qF -- '색인 줄도 같은 걸음에서 함께' \"\$CANON\""
 check "recall: 고아 줄은 지운다"   "grep -qF -- '가리키는 본문이 없으면' \"\$CANON\""
 check "recall: 고아 본문은 채운다" "grep -qF -- '색인 줄이 없으면' \"\$CANON\""
+
+# --- 프로젝트 파일에 손대는 예외: README 한 곳만 조건을 적는다 ---
+# 전에는 README가 스스로 정본이라고 선언해 놓고 DESIGN-NOTES와 스캐폴드 둘이 조건을 각각 다시
+# 적었다. 예외가 늘거나 조건이 바뀌면 사람이 네 곳을 손으로 맞춰야 하고, 그러면 반드시 갈라진다.
+# 가리키는 절 이름도 함께 잰다 — 전에 README 절 이름이 바뀌었는데 가리키는 쪽만 옛 이름으로 남았다.
+echo "[프로젝트 파일 예외 — README 한 곳만 조건을 적는다]"
+OWN_MARKS=('머리말이 낡았으면' '없앤 기능이 남긴 관리블록이')
+COPY_MARKS=('머리말이 낡았으면' '없앤 기능이 남긴 관리블록이' '이미 있는 오답노트의 머리말')
+check "README가 예외를 열거한다"        "grep -qF -- '자동 계층이 프로젝트 파일에 손대는 예외' \"\$README\""
+check "README가 정본임을 선언한다"      "grep -qF -- '여기가 그 정본이다' \"\$README\""
+for m in "${OWN_MARKS[@]}"; do
+  check "README가 조건을 적는다: $m"    "grep -qF -- '$m' \"\$README\""
+done
+# 이 뽑아내기는 반드시 UTF-8 로케일에서 돈다. 바이트로 보면 [^」] 가 한글 음절의 이음 바이트까지
+# 걸러 내 「프로젝트 폴더에 생기는 것」 같은 이름이 통째로 안 잡힌다(실제로 그 함정을 밟았다).
+# 괄호를 떼는 것도 tr 로 하지 않는다 — tr 은 바이트를 지워 같은 이음 바이트를 가진 한글을 망가뜨린다.
+EXC_SEC="$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$NOTES" | sed 's/^「//; s/」$//' | grep -F '프로젝트 폴더' | head -1 || true)"
+check "DESIGN-NOTES가 README 절을 가리킨다" "[ -n \"\$EXC_SEC\" ]"
+check "그 절이 README에 실재한다"            "[ -n \"\$EXC_SEC\" ] && grep -qF \"## \$EXC_SEC\" \"\$README\""
+for D in "$NOTES" "$HERE/scripts/scaffold.sh" "$HERE/scripts/codex-scaffold.sh"; do
+  dn="$(basename "$D")"
+  check "$dn 이 README 절을 가리킨다"   "grep -qF -- '프로젝트 폴더에 생기는 것' '$D'"
+  for m in "${COPY_MARKS[@]}"; do
+    check "$dn 이 조건을 베끼지 않는다: $m" "! grep -qF -- '$m' '$D'"
+  done
+done
+
+# --- 세션 시작 때 뜨는 오답노트 개편 권유가 README에 적혀 있다 ---
+# 사용자가 실제로 마주치는 신호인데 README 어디에도 없었다. 무엇이 뜨는지 모르면 그 물음이
+# 어디서 왔는지 알 수 없다.
+echo "[개편 권유 — 사용자용 문서에 적혀 있다]"
+check "README가 개편 권유를 적는다"     "grep -qF -- '개편할지' \"\$README\""
+check "권유가 물음이라는 것을 적는다"   "grep -qF -- '묻는다' \"\$README\""
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
