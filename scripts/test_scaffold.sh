@@ -504,6 +504,32 @@ check "동시 주입: 관리블록이 정확히 하나"   "[ \"\$(grep -c '^# BE
 check "동시 주입: 닫는 마커도 하나"         "[ \"\$(grep -c '^# END t\$' '$CU')\" = 1 ]"
 check "동시 주입: 임시 파일 잔여 없음"      "[ -z \"\$(ls '$CT' | grep -v '^CLAUDE.md\$')\" ]"
 
+# --- 낡은 락 빼앗기: 빼앗는 갈래도 한 번에 하나만 들어간다 ---
+# 위 동시 진입 테스트는 락이 정상으로 도는 경로만 밟는다. 죽은 프로세스가 남긴 락을 빼앗는 갈래는
+# 10초를 기다려야 열리므로 그 테스트가 구조적으로 못 밟는다. 그 갈래는 지우고 다시 잡는 두 걸음이
+# 갈라져 있어 여럿이 함께 들어갔고, 결과 파일만 보면 고아 마커 복구가 손상을 덮어 초록으로 보였다.
+# 그래서 결과가 아니라 임계 구역 출입 자체를 잰다 — 들어가며 IN, 나가며 OUT을 적고 IN이 연달아
+# 나오는지 본다. 잡은 시각을 한참 전으로 적은 락을 심어, 여섯이 동시에 빼앗으려 들게 만든다.
+LT="$(mktemp -d)"; LW="$LT/witness"; LK="$LT/x.lock"; LN=6
+: > "$LW"
+mkdir "$LK"; printf '%s\n' "$(( $(date +%s) - 600 ))" > "$LK/heldsince"
+for i in $(seq 1 "$LN"); do
+  ( . "$HERE/scripts/_managed_block.sh"
+    managed_block_lock "$LK"
+    printf 'IN\n' >> "$LW"; sleep 0.3; printf 'OUT\n' >> "$LW"
+    managed_block_unlock "$LK" ) 2>/dev/null &
+done
+wait
+echo "[stale-lock] stealing a stale lock still admits one writer at a time"
+check "낡은 락 빼앗기: 모두 들어갔다"          "[ \"\$(grep -c '^IN\$' '$LW')\" = '$LN' ]"
+check "낡은 락 빼앗기: 겹쳐 들어가지 않았다"   "awk '\$0==\"IN\" && prev==\"IN\" { bad=1 } { prev=\$0 } END { exit bad?1:0 }' '$LW'"
+check "낡은 락 빼앗기: 락이 남지 않는다"       "[ ! -e '$LK' ]"
+check "낡은 락 빼앗기: 치운 락도 남지 않는다"  "[ -z \"\$(ls '$LT' | grep -v '^witness\$')\" ]"
+# 락을 잡는 곳이 둘이라 한쪽만 고치면 다른 쪽에 옛 갈래가 남는다 — 잡는 코드는 헬퍼 한 곳에만 둔다.
+check "락을 만드는 곳이 헬퍼 한 곳뿐이다"      "[ \"\$(grep -c 'mkdir \"\$lock\"' '$HERE/scripts/_managed_block.sh')\" = 1 ]"
+check "호출자 둘 다 헬퍼를 거친다"             "[ \"\$(grep -c 'managed_block_lock \"\$lock\"' '$HERE/scripts/_managed_block.sh')\" = 2 ]"
+check "빼앗기를 문지기 안에서 한다"            "grep -qF 'gate' '$HERE/scripts/_managed_block.sh'"
+
 # --- 매니페스트 version 계약 ---
 # Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin·DESIGN-NOTES).
 # 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다

@@ -48,6 +48,66 @@ MANAGED_STRIP_AWK='
 # 끝의 빈 줄을 걷어낸다(블록을 뗀 자리에 빈 줄이 쌓이는 것을 막는다).
 MANAGED_TRIM_AWK='{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }'
 
+# 락을 잡는다. 잡을 때까지 돌아오지 않으며, 푸는 것은 managed_block_unlock 이 맡는다.
+# 죽은 프로세스가 남긴 락에 영원히 갇히지 않도록 한 락이 10초를 넘게 잡혀 있으면 빼앗고
+# 경고한다(`FAIL-LOUD`). 잡는 코드를 이 함수 한 곳에 두는 이유는 호출자가 둘이라 한쪽만 고치면
+# 옛 갈래가 남기 때문이다.
+#
+# 함께 들어가는 것을 막는 장치가 둘이다. 하나만으로는 모자란다 — 실측에서 여덟 중 셋이 함께
+# 들어갔다.
+#   첫째, 빼앗기를 이름 바꾸기 한 걸음으로 한다. 같은 경로를 옮기는 것은 한 프로세스만 성공하므로
+#   빼앗는 쪽이 여럿이어도 임계 구역에는 하나만 들어간다. 지우고 다시 잡는 두 걸음으로 하면 그
+#   사이에 남이 끼어들어 둘 다 자기가 주인이라고 여긴다.
+#   둘째, 빼앗을지를 내가 기다린 시간이 아니라 그 락이 잡혀 있던 시간으로 정한다. 잡는 쪽이 잡은
+#   시각을 락 안에 적어 두고, 기다리는 쪽은 그 시각을 읽어 나이를 잰다. 내가 기다린 시간으로 세면
+#   10초를 채운 쪽이 그새 새로 들어온 사람의 락까지 빼앗는다 — 락은 바뀌었는데 내 시계만 계속
+#   돌기 때문이다.
+# 잡은 시각이 없는 락은 표를 남기기 전에 죽었거나 옛 판본이 남긴 것이니 빼앗을 대상으로 본다.
+#
+# 문지기(`$lock.gate`)를 따로 두는 이유는 나이를 재는 것과 빼앗는 것이 갈라져 있으면 그 사이에
+# 남이 새로 잡기 때문이다. 재고 빼앗고 잡는 세 걸음을 문지기 안에 함께 넣어 한 번에 하나만
+# 하도록 만든다. 문지기는 마이크로초만 잡으므로 오래 잡혀 있으면 잡은 쪽이 죽은 것이고, 그때는
+# 30초를 기다린 뒤 치운다.
+MANAGED_LOCK_STALE_SECONDS=10
+MANAGED_GATE_STALE_TICKS=300
+managed_block_lock() {  # $1=락 디렉터리 경로
+  local lock="$1" gate="$1.gate" born now gwait=0
+  while :; do
+    if mkdir "$gate" 2>/dev/null; then
+      gwait=0
+      if mkdir "$lock" 2>/dev/null; then
+        printf '%s\n' "$(date +%s 2>/dev/null || echo 0)" 2>/dev/null > "$lock/heldsince" || true
+        rmdir "$gate" 2>/dev/null || true
+        return 0
+      fi
+      born="$(cat "$lock/heldsince" 2>/dev/null || true)"
+      now="$(date +%s 2>/dev/null || echo 0)"
+      if [ -z "$born" ] || [ "$((now - born))" -ge "$MANAGED_LOCK_STALE_SECONDS" ]; then
+        echo "[disciplined-coder] WARNING: stale lock at $lock — 오래 잡혀 있어 빼앗는다" >&2
+        rm -rf "$lock" 2>/dev/null || true
+        rmdir "$gate" 2>/dev/null || true
+        continue
+      fi
+      rmdir "$gate" 2>/dev/null || true
+    else
+      gwait=$((gwait+1))
+      if [ "$gwait" -gt "$MANAGED_GATE_STALE_TICKS" ]; then
+        echo "[disciplined-coder] WARNING: stale gate at $gate — 30s 대기 후 치운다" >&2
+        rm -rf "$gate" 2>/dev/null || true
+        gwait=0
+      fi
+    fi
+    sleep 0.1
+  done
+}
+
+# 락을 푼다. 안에 잡은 시각이 들어 있어 rmdir 로는 안 지워진다.
+managed_block_unlock() {  # $1=락 디렉터리 경로
+  [ -n "${1:-}" ] || return 0
+  rm -rf "$1" 2>/dev/null || true
+  return 0
+}
+
 # 관리블록을 걷어내기만 한다(본문을 다시 넣지 않는다). 없앤 기능이 남긴 고아 블록 정리용.
 # 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에 끼워 넣은 줄도 함께 사라진다. 그 파일은
 # git 밖일 수 있어 사본이 유일한 복구 수단이다 — 그래서 사본 경로를 인자로 받아 여기서 직접 뜨고,
@@ -67,18 +127,9 @@ managed_block_remove() {
     managed_block_backup="$bk"
   fi
   lock="$uc.lock"
-  local waited=0
-  while ! mkdir "$lock" 2>/dev/null; do
-    waited=$((waited+1))
-    if [ "$waited" -gt 100 ]; then
-      echo "[disciplined-coder] WARNING: stale lock at $lock — 10s 대기 후 강제로 진행한다" >&2
-      rm -rf "$lock"; mkdir "$lock" 2>/dev/null || true
-      break
-    fi
-    sleep 0.1
-  done
+  managed_block_lock "$lock"
   tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
-  trap 'rm -f "$tmp" "$norm"; rmdir "$lock" 2>/dev/null || true' RETURN
+  trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock"' RETURN
   awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp"
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" && mv "$norm" "$uc"
   return 0
@@ -90,20 +141,10 @@ managed_block_inject() {
   touch "$uc"
 
   lock="$uc.lock"
-  local waited=0
-  while ! mkdir "$lock" 2>/dev/null; do
-    waited=$((waited+1))
-    # 죽은 프로세스가 남긴 락에 영원히 갇히지 않는다 — 10초를 넘기면 빼앗고 경고한다(FAIL-LOUD).
-    if [ "$waited" -gt 100 ]; then
-      echo "[disciplined-coder] WARNING: stale lock at $lock — 10s 대기 후 강제로 진행한다" >&2
-      rm -rf "$lock"; mkdir "$lock" 2>/dev/null || true
-      break
-    fi
-    sleep 0.1
-  done
+  managed_block_lock "$lock"
   tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
   # 중간에 죽어도 임시 파일과 락을 남기지 않는다.
-  trap 'rm -f "$tmp" "$norm"; rmdir "$lock" 2>/dev/null || true' RETURN
+  trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock"' RETURN
   awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp"
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" && mv "$norm" "$uc"
   {
