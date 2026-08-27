@@ -42,19 +42,29 @@ SCAFFOLD_SOLVED_RULES_SPLIT='항목을 적는 형식은 이렇다.
 
 ## 지시사항 색인'
 
-# 로그가 쪼개졌는지 본다. 판정 재료는 로그 옆의 본문 폴더에 본문 파일이 하나라도 있는지다.
-# 빈 폴더를 쪼개진 것으로 보지 않는 이유는 개편을 하다 멈춘 로그가 그 모양이기 때문이다 —
-# 그것을 쪼개진 것으로 보면 빈 색인이 최신 형식을 선언하게 된다.
+# 쪼개진 로그임을 알아보는 표. 규칙 블록의 마지막 줄에서 뽑아 온다 — 손으로 한 번 더 적으면
+# 문안을 고칠 때 한쪽만 낡는다(`SSOT`).
+SCAFFOLD_SOLVED_SPLIT_MARK="$(printf '%s' "$SCAFFOLD_SOLVED_RULES_SPLIT" | tail -1)"
+
+# 로그가 쪼개졌는지 본다. 재료는 둘이고 어느 하나만 맞아도 쪼개진 것으로 본다.
+# 첫째는 머리말이 스스로 색인이라고 선언하는 표다. 갓 만든 로그는 본문이 아직 하나도 없어서
+# 이 표로만 알아볼 수 있다 — 새 로그는 처음부터 쪼개진 형식으로 태어나기 때문이다.
+# 둘째는 로그 옆 본문 폴더에 본문 파일이 하나라도 있는지다. 옛 형식으로 만들어져 나중에 쪼개진
+# 로그는 머리말이 갈아끼워지기 전에도 이쪽으로 잡힌다.
+# 빈 폴더만으로는 쪼개진 것으로 보지 않는다. 개편을 하다 멈춘 로그가 그 모양인데, 그것을 쪼개진
+# 것으로 보면 옛 형식 그대로인 색인이 최신 형식을 선언하게 된다.
 scaffold_solved_log_is_split() {  # $1=로그 경로 → 종료코드 0이면 쪼개짐
   local dir="${1%.md}" f
+  [ -f "$1" ] && grep -qF -- "$SCAFFOLD_SOLVED_SPLIT_MARK" "$1" 2>/dev/null && return 0
   [ -d "$dir" ] || return 1
   for f in "$dir"/*.md; do [ -f "$f" ] && return 0; done
   return 1
 }
 
 # 그 로그에 걸어야 할 형식 규칙 블록을 고른다.
-scaffold_solved_rules_for() {  # $1=로그 경로 → stdout: 규칙 블록
-  if scaffold_solved_log_is_split "$1"; then
+# 경로를 안 주면 새로 만드는 것으로 보고 쪼개진 형식의 규칙을 낸다(머리말과 같은 약속이다).
+scaffold_solved_rules_for() {  # $1=로그 경로(비우면 새로 만드는 것) → stdout: 규칙 블록
+  if [ -z "${1:-}" ] || scaffold_solved_log_is_split "$1"; then
     printf '%s' "$SCAFFOLD_SOLVED_RULES_SPLIT"
   else
     printf '%s' "$SCAFFOLD_SOLVED_RULES"
@@ -107,9 +117,11 @@ scaffold_hygiene() {  # $1=KDIR
 # 지금은 확장 대상 문자가 없어 테스트가 초록이라 함정이 잠복한다.
 # 쪼개진 로그에서는 제목 줄과 스코프 문단도 갈린다. 그대로 두면 한 파일이 스스로를
 # append-only 라 부르면서 그 아래 규칙 블록은 색인 줄을 고치라고 지시하는 모순이 된다.
-scaffold_solved_header() {  # $1=스코프(pc|project) $2=로그 경로 → stdout: 제목부터 형식 규칙 블록까지
-  local split=0
-  [ -n "${2:-}" ] && scaffold_solved_log_is_split "$2" && split=1
+# 로그 경로를 안 주면 새로 만드는 것으로 보고 쪼개진 형식을 낸다 — 새 로그는 처음부터 목표
+# 형식으로 태어난다.
+scaffold_solved_header() {  # $1=스코프(pc|project) $2=로그 경로(비우면 새로 만드는 것) → stdout: 제목부터 형식 규칙 블록까지
+  local split=1
+  if [ -n "${2:-}" ] && ! scaffold_solved_log_is_split "$2"; then split=0; fi
   case "$1:$split" in
     pc:0)
       cat <<'EOF'
@@ -165,7 +177,7 @@ EOF
 scaffold_ensure_solved() {  # $1=KDIR
   local kdir="$1"
   [ -f "$kdir/solved_problems.md" ] && return 1
-  scaffold_solved_header pc "$kdir/solved_problems.md" > "$kdir/solved_problems.md"
+  scaffold_solved_header pc "" > "$kdir/solved_problems.md"
   return 0
 }
 

@@ -32,6 +32,18 @@ check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder'
 check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "stdout has solved marker"      "printf '%s' \"\$OUT\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 
+# 새 로그는 처음부터 쪼개진 형식으로 태어난다. 안 쪼개진 형식으로 만들어 놓던 판본은 사용자가 첫
+# 교훈을 적는 순간부터 매 세션 개편을 권했다 — 만드는 경로가 목표 형식과 어긋나 있었던 것이다.
+check "fresh-pc: 새 로그가 색인 형식이다"     "grep -qF '지시사항 색인' '$K/solved_problems.md'"
+check "fresh-pc: 색인 형식 규칙이 실린다"     "grep -qF '이 파일은 색인이고 한 줄이 한 항목이다' '$K/solved_problems.md'"
+check "fresh-pc: 옛 형식 규칙은 없다"         "! grep -qF '증상은 굵게 한 줄로 띄운다' '$K/solved_problems.md'"
+printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n' >> "$K/solved_problems.md"
+mkdir -p "$K/solved_problems"; printf '# 무언가를 할 때는 이렇게 한다\n' > "$K/solved_problems/a.md"
+OUT1B="$(run "$H1" "$P1")"
+check "fresh-pc: 첫 교훈을 적어도 개편 권유가 없다" "! printf '%s' \"\$OUT1B\" | grep -qF '아직 안 쪼개진 형식이다'"
+check "fresh-pc: 머리말이 낡았다고도 안 한다"       "! printf '%s' \"\$OUT1B\" | grep -qF '형식 규칙 서술이 현행과 다르다'"
+check "fresh-pc: 짝도 어긋나지 않는다"              "! printf '%s' \"\$OUT1B\" | grep -qF '색인과 본문이 어긋난다'"
+
 # 마켓플레이스 항목의 autoUpdate 값을 읽어 출력한다($1=파일 $2=항목 이름). 없으면 none을 찍는다.
 # grep으로 파일 전체를 훑으면 우리 항목에 붙었는지 남의 항목에 붙었는지 못 가리므로 항목을 지목해 읽는다.
 json_autoupdate() {
@@ -584,11 +596,11 @@ check "legacy: 백업이 늘지 않는다"        "[ \$(find '$HR2/.claude/disci
 HR3="$(mktemp -d)"; PR3="$(mktemp -d)"; mkdir -p "$HR3/.claude/disciplined-coder"
 run "$HR3" "$PR3" >/dev/null
 LOG3="$HR3/.claude/disciplined-coder/solved_problems.md"
-sed -i '/^- 한 항목은 세 줄을 넘기지 않는다\.$/d' "$LOG3"
+sed -i '/^- 본문 파일의 첫 줄은 그 지시사항과 같다\.$/d' "$LOG3"
 run "$HR3" "$PR3" >/dev/null
 echo "[solved-rules] a log missing one rule bullet gets the whole block restored"
-check "partial: 지운 불릿 복원"            "grep -qF '한 항목은 세 줄을 넘기지 않는다' '$LOG3'"
-check "partial: 규칙 불릿 중복 없음"       "[ \$(grep -cF '증상은 굵게 한 줄로 띄운다' '$LOG3') -eq 1 ]"
+check "partial: 지운 불릿 복원"            "grep -qF '본문 파일의 첫 줄은 그 지시사항과 같다' '$LOG3'"
+check "partial: 규칙 불릿 중복 없음"       "[ \$(grep -cF '이 파일은 색인이고 한 줄이 한 항목이다' '$LOG3') -eq 1 ]"
 check "partial: 도입 문장 중복 없음"       "[ \$(grep -cF '항목을 적는 형식은 이렇다' '$LOG3') -eq 1 ]"
 
 # (라) 스코프 문구가 달라도, 줄 끝이 CRLF여도 오탐하지 않는다.
