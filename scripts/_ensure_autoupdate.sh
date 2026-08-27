@@ -13,7 +13,10 @@
 #
 # 종료코드를 나눠 쓰는 까닭: 파이썬은 파싱에 실패해도 1로 끝난다. '고칠 것이 없다'를 1로 두면
 # 깨진 설정이 정상 회차와 같은 값으로 들어와 경고가 죽는다. 그래서 '고칠 것이 없다'를 10으로 옮겼다.
-#   0=고쳤다  10=고칠 것이 없다  3=marketplace.json에 name이 없다  4=파이썬이 없다  그 밖=읽기·파싱 실패
+#   0=고쳤다  10=고칠 것이 없다  3=marketplace.json에 name이 없다  4=파이썬이 없다
+#   5=읽기는 됐으나 고쳐 쓰지 못했다  그 밖=읽기·파싱 실패
+# 쓰기 실패에 자리를 따로 잡는 까닭: 전에는 그것이 읽기 실패와 같은 값으로 들어와 "읽지 못했거나
+# 내용이 JSON이 아니다"라고 알렸다. 멀쩡한 설정 파일을 뜯어보게 만드는 틀린 안내였다.
 
 # $1=설정 홈(~/.claude), $2=플러그인 루트. 바뀐 파일이 있으면 그 경로를 한 줄씩 출력한다.
 ensure_marketplace_autoupdate() {
@@ -29,6 +32,7 @@ ensure_marketplace_autoupdate() {
       0|10) ;;
       3) echo "[disciplined-coder] WARNING: autoUpdate 설정을 건너뛴다 — marketplace.json에 name이 없다" >&2 ;;
       4) echo "[disciplined-coder] WARNING: autoUpdate 설정을 건너뛴다 — 파이썬이 없어 JSON을 다룰 수 없다" >&2 ;;
+      5) echo "[disciplined-coder] WARNING: autoUpdate 설정을 건너뛴다 — $f 는 읽었으나 고쳐 쓰지 못했다(그 폴더에 쓸 수 있게 되면 다음 세션에 다시 시도한다)" >&2 ;;
       *) echo "[disciplined-coder] WARNING: autoUpdate 설정을 건너뛴다 — $f 를 읽지 못했거나 내용이 JSON이 아니다" >&2 ;;
     esac
   done
@@ -51,8 +55,11 @@ def pick(o):
 t=pick(d)
 if t is None or "autoUpdate" in t: sys.exit(10)
 t["autoUpdate"]=True
-io.open(f+".dc-tmp","w",encoding="utf-8",newline="\n").write(json.dumps(d,ensure_ascii=False,indent=2)+"\n")
-json.load(io.open(f+".dc-tmp",encoding="utf-8"))
+try:
+    io.open(f+".dc-tmp","w",encoding="utf-8",newline="\n").write(json.dumps(d,ensure_ascii=False,indent=2)+"\n")
+    json.load(io.open(f+".dc-tmp",encoding="utf-8"))
+except Exception:
+    sys.exit(5)
 sys.exit(0)
 '
   if python3 -c 'import sys' >/dev/null 2>&1; then
@@ -62,9 +69,11 @@ sys.exit(0)
   else
     return 4
   fi
-  if [ "$rc" -ne 0 ]; then rm -f "$tmp"; return "$rc"; fi
-  [ -s "$tmp" ] || { rm -f "$tmp"; return 1; }
-  cp "$f" "$f.bak" || { rm -f "$tmp"; return 1; }
-  mv "$tmp" "$f" || { rm -f "$tmp"; return 1; }
+  # 치우기를 rm -rf 로 하는 까닭: 임시 자리에 폴더가 놓여 있으면 rm -f 로는 안 지워져 다음
+  # 세션마다 같은 실패가 되풀이된다. 이 이름은 우리가 정한 것이라 지워도 안전하다.
+  if [ "$rc" -ne 0 ]; then rm -rf "$tmp"; return "$rc"; fi
+  [ -s "$tmp" ] || { rm -rf "$tmp"; return 5; }
+  cp "$f" "$f.bak" || { rm -rf "$tmp"; return 5; }
+  mv "$tmp" "$f" || { rm -rf "$tmp"; return 5; }
   echo "$f"
 }

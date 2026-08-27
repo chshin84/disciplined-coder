@@ -262,6 +262,11 @@ scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 
   tmp="$(mktemp "$f.XXXXXX" 2>/dev/null)" || {
     solved_fix_result="refused"; solved_fix_reason="write"; solved_fix_backup="$bk"; return 0
   }
+  # 도중에 강제로 끝나도 임시 파일을 남기지 않는다. 남으면 사용자 레포의 docs/ 에
+  # solved_problems.md.a1B2c3 같은 것이 쌓이는데, 이 함수는 남의 프로젝트 폴더도 만진다.
+  # 트랩은 이 함수가 만든 파일 하나만 지우고, 나가기 전에 반드시 푼다 — 부르는 쪽은 EXIT 트랩을
+  # 쓰지 않으므로 여기서 풀어도 남의 트랩을 지우지 않는다.
+  trap 'rm -f "$tmp" 2>/dev/null || true' INT TERM EXIT
   if { scaffold_solved_header "$scope" "$f" && printf '\n' && tail -n "+$n" "$f"; } > "$tmp" 2>/dev/null \
      && mv "$tmp" "$f" 2>/dev/null; then
     solved_fix_result="fixed"; solved_fix_backup="$bk"
@@ -269,6 +274,7 @@ scaffold_fix_solved_header() {  # $1=로그 $2=스코프 $3=백업 디렉터리 
     rm -f "$tmp" 2>/dev/null || true
     solved_fix_result="refused"; solved_fix_reason="write"; solved_fix_backup="$bk"
   fi
+  trap - INT TERM EXIT
   return 0
 }
 

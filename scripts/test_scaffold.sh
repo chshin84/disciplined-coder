@@ -116,6 +116,20 @@ check "깨진 설정을 고치지 않는다"          "grep -qF 'this is not jso
 check "깨진 설정에도 정본은 깔린다"        "[ -f '$HD/.claude/disciplined-coder/agent-principles.md' ]"
 set +e; ERR_D="$(run "$HD" "$PD" 2>&1 >/dev/null)"; set -e
 check "깨진 설정을 조용히 넘기지 않는다"    "printf '%s' \"\$ERR_D\" | grep -qF 'autoUpdate 설정을 건너뛴다'"
+check "읽기 실패는 읽기 실패라고 말한다"    "printf '%s' \"\$ERR_D\" | grep -qF '읽지 못했거나 내용이 JSON이 아니다'"
+
+# 읽기는 되는데 쓰기가 안 되는 회차. 임시 자리에 폴더를 두어 새 내용을 쓰지 못하게 만든다.
+# 전에는 이 갈래가 읽기 실패와 같은 문구로 나와, 사람이 멀쩡한 설정 파일을 뜯어보게 만들었다.
+HE="$(mktemp -d)"; PE="$(mktemp -d)"; mkdir -p "$HE/.claude"
+MKTE="$(python -c 'import json,io,sys; print(json.load(io.open(sys.argv[1],encoding="utf-8"))["name"])' "$HERE/.claude-plugin/marketplace.json")"
+printf '{ "extraKnownMarketplaces": { "%s": { "source": { "source": "github", "repo": "chshin84/disciplined-coder" } } } }\n' "$MKTE" > "$HE/.claude/settings.json"
+mkdir -p "$HE/.claude/settings.json.dc-tmp/막는다"
+set +e; ERR_E="$(run "$HE" "$PE" 2>&1 >/dev/null)"; set -e
+echo "[marketplace-autoupdate] a write failure is reported as a write failure"
+check "쓰기 실패에 자리가 따로 있다"        "printf '%s' \"\$ERR_E\" | grep -qF '고쳐 쓰지 못했다'"
+check "쓰기 실패를 읽기 실패로 안 부른다"   "! printf '%s' \"\$ERR_E\" | grep -qF '읽지 못했거나 내용이 JSON이 아니다'"
+check "쓰기 실패에도 설정은 그대로다"       "grep -qF '\"source\": \"github\"' '$HE/.claude/settings.json'"
+check "쓰기 실패에도 임시 파일이 안 남는다" "[ ! -e '$HE/.claude/settings.json.dc-tmp' ]"
 
 # --- project-untouched: 프로젝트 폴더 무오염 ---
 echo "[project-untouched] project untouched"
@@ -602,6 +616,24 @@ echo "[solved-rules] a log missing one rule bullet gets the whole block restored
 check "partial: 지운 불릿 복원"            "grep -qF '본문 파일의 첫 줄은 그 지시사항과 같다' '$LOG3'"
 check "partial: 규칙 불릿 중복 없음"       "[ \$(grep -cF '이 파일은 색인이고 한 줄이 한 항목이다' '$LOG3') -eq 1 ]"
 check "partial: 도입 문장 중복 없음"       "[ \$(grep -cF '항목을 적는 형식은 이렇다' '$LOG3') -eq 1 ]"
+
+# (다-2) 머리말을 새로 쓰는 도중에 강제로 끝나도 임시 파일을 남기지 않는다. 남으면 사용자 레포의
+# docs/ 에 solved_problems.md.a1B2c3 같은 것이 쌓인다. 머리말을 만드는 함수를 느린 스텁으로
+# 바꿔 그 순간에 멈춰 세운다 — 그렇게 하지 않으면 이 갈래를 밟을 창이 마이크로초라 못 잡는다.
+HT="$(mktemp -d)"; LOGT="$HT/solved_problems.md"
+printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n옛 규칙 서술이다.\n\n- **증상이 났다**\n  - 원인: 무엇\n' > "$LOGT"
+(
+  . "$HERE/scripts/_scaffold_common.sh"
+  scaffold_solved_header() { sleep 3; }
+  scaffold_fix_solved_header "$LOGT" pc "$HT/backups" pc
+) >/dev/null 2>&1 &
+TPID=$!
+sleep 1
+kill -TERM "$TPID" 2>/dev/null || true
+wait "$TPID" 2>/dev/null || true
+echo "[solved-header] a killed rewrite leaves no temp file behind"
+check "강제 종료에 임시 파일이 안 남는다"   "[ -z \"\$(find '$HT' -maxdepth 1 -name 'solved_problems.md.*' 2>/dev/null)\" ]"
+check "강제 종료에도 로그는 그대로다"       "grep -qF -- '- **증상이 났다**' '$LOGT'"
 
 # (라) 스코프 문구가 달라도, 줄 끝이 CRLF여도 오탐하지 않는다.
 HR4="$(mktemp -d)"; PR4="$(mktemp -d)"; mkdir -p "$HR4/.claude/disciplined-coder"
