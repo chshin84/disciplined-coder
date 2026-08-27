@@ -1,0 +1,83 @@
+{
+  "lens": "readability",
+  "issues": [
+    {
+      "id": "jari-broad-word",
+      "where": "README.md:34 · skills/domain-docs/SKILL.md '문서를 두는 자리' 라벨과 그것을 가리키는 '독자 분리' 항목 · skills/domain-spec-review/SKILL.md 걸음 표 둘째 열 머리",
+      "type": "language",
+      "claim": "이번 회차가 네 곳에서 '자리' 를 새로 넣었는데 가리키는 대상이 셋으로 갈린다 — README 는 설정 홈 폴더, domain-docs 는 문서를 두는 곳, domain-spec-review 는 문서 안의 절이다. README 에서는 같은 문단이 같은 대상을 '설정 홈' 과 '자리' 두 이름으로 부른다. (문서 안 낱말만 바꾼 rewrite 라 새 사실 없음)",
+      "consequence": "터미널에 익숙하지 않은 독자가 '셋업이 실제로 쓴 자리' 를 앞 문장의 '설정 홈' 과 같은 것으로 볼지 판단하느라 멈춘다. 스킬 문서 쪽은 표 머리와 라벨이 이름을 붙이는 자리인데 그 이름이 폴더인지 절인지 열어 보기 전에는 안 정해진다.",
+      "rewrite": "README:34 → '…셋업이 실제로 쓴 설정 홈을 찾아 준다 — 후보를 차례로 훑어 파일이 놓인 곳만 찍으므로 홈이 어긋난 PC 에서도 맞는 경로가 나온다.' / domain-docs 라벨 → '문서를 두는 곳' (독자 분리 항목의 참조도 함께) / domain-spec-review 표 머리 → '| 걸음 | 적힌 곳 |'"
+    },
+    {
+      "id": "show-principles-not-observable",
+      "where": "README.md:42",
+      "type": "wrong-job",
+      "claim": "두 줄 이상 찍힌 사람에게 주는 판별 기준이 그 사람이 관측할 수 없는 것이다. '/show-principles 가 읽는 곳' 이라 했지만 그 커맨드는 원칙 전문을 보여줄 뿐 경로를 안 찍는다. 이 자리가 말해야 할 '어느 쪽이 맞고 나는 무엇을 하면 되는가' 를 말하지 않는다. (문서 안 내용에서 추론해 새로 쓴 rewrite — 사실 확인 필요)",
+      "consequence": "설치 확인하러 온 비개발자가 두 줄을 보고 다음 걸음이 막힌다. 어느 쪽을 열어 나머지 확인을 이어갈지 정할 수 없어 확인을 포기하거나 엉뚱한 폴더를 보고 실패로 결론 낸다.",
+      "rewrite": "아무것도 안 찍히면 셋업이 아직 안 돈 것이다. 두 줄 이상 찍히면 예전 홈에 남은 사본이 있는 것이니, 아래 셋을 두 곳에서 각각 확인해 셋이 다 갖춰진 쪽을 지금 쓰이는 설정 홈으로 본다.",
+      "overlaps_grounding": "readme-loop-vs-resolve-home"
+    },
+    {
+      "id": "git-bash-only",
+      "where": "README.md:34",
+      "type": "friction",
+      "claim": "확인 명령을 붙여 넣을 곳을 'Git Bash' 로만 지목해 mac 과 Linux 독자가 이 절차가 자기에게 해당하는지 알 수 없다. 같은 README:18 이 mac·Linux 에는 bash 가 기본으로 깔려 있다고 이미 적어 두었으므로 그 독자도 할 수 있는데 그 사실이 이 문단에 없다.",
+      "consequence": "mac·Linux 사용자가 '나는 Git Bash 가 없으니 못 한다' 로 읽고 설치 확인을 통째로 건너뛴다. 이 절이 막으려던 조용한 실패를 그 사용자만 계속 안고 간다.",
+      "rewrite": "아래를 터미널(Windows 는 Git Bash, mac 과 Linux 는 기본 터미널)에 그대로 붙여 넣으면 셋업이 실제로 쓴 설정 홈을 찾아 준다 — 후보를 차례로 훑어 파일이 놓인 곳만 찍으므로 홈이 어긋난 PC 에서도 맞는 경로가 나온다."
+    },
+    {
+      "id": "lock-dir-unexplained",
+      "where": "README.md:62",
+      "type": "language",
+      "claim": "'잠금 디렉터리' 가 부연 없이 나오고 뒤에 붙은 이유 문장은 임시 파일이 왜 필요한지만 설명한다. 잠금 디렉터리가 무엇이고 왜 관리블록을 걷어낼 때만 생기는지가 비어 있다. READ-FLOW 가 전문영역 용어는 나올 때마다 짧게 부연하라고 한다.",
+      "consequence": "개발자가 아닐 수 있는 독자가 낯선 이름의 디렉터리가 생겼다 사라지는 것을 보고도 정체를 모른 채 넘어간다. 미리 알아 놀라지 않게 한다는 절의 목적이 이름만 알려 주고 멈춘다.",
+      "rewrite": "두 경우 모두 그 파일 옆에 임시 파일이 잠깐 생겼다 사라지고, 관리블록을 걷어낼 때는 잠금 디렉터리도 함께 생긴다. 잠금 디렉터리는 두 세션이 같은 CLAUDE.md 를 동시에 고치지 못하게 막는 표식이다. 임시 파일이 필요한 것은 파일을 통째로 바꿔치기하는 방식이라 같은 폴더에 두어야 하기 때문이다(다른 곳에 두면 디스크가 다를 때 바꿔치기가 원자적이지 않다)."
+    },
+    {
+      "id": "banner-vs-required-subskill",
+      "where": "docs/superpowers/plans/2026-07-27-canon-english-rewrite.md 첫머리",
+      "type": "wrong-job",
+      "claim": "배너 바로 아래 줄이 정반대 지시를 하는데 배너가 그것을 무효로 못 박지 않는다. 배너는 '아래 태스크를 실행하지 마라' 라 하고 한 줄 건너 'REQUIRED SUB-SKILL: … implement this plan task-by-task' 가 그대로 서 있다. 첫 화면에 상반된 두 지시가 나란히 있는 것이 가장 큰 방해다.",
+      "consequence": "이 계획을 여는 것은 사람보다 에이전트일 때가 많고, 에이전트는 REQUIRED 로 표시된 명령형 지시를 우선해 서브스킬을 띄우고 태스크를 실행한다. 배너가 막으려던 그 일이 일어난다.",
+      "rewrite": "배너에 한 문장 추가 — '바로 아래 For agentic workers 줄이 이 계획을 태스크 단위로 구현하라고 하지만, 그 지시는 이 표시로 효력을 잃는다.'"
+    },
+    {
+      "id": "ultracode-banner-no-prohibition",
+      "where": "docs/superpowers/specs/2026-07-03-ultracode-review-toggle-design.md 첫머리",
+      "type": "structure",
+      "claim": "같은 회차에 같은 목적으로 단 배너 넷 가운데 이 하나만 하지 말라는 문장이 없다. 나머지 셋은 '지금 동작의 근거로 읽지 마라'·'아래 태스크를 실행하지 마라'·'실행할 계획으로 읽지 마라' 로 끝나는데 이 배너는 제거 사실과 지금 규율의 자리만 적고 끝난다.",
+      "consequence": "네 문서를 다 보는 사람은 없고 한 문서만 연다. 이 문서만 연 사람이나 에이전트는 뜯어냈다는 사실은 받지만 '이 설계대로 다시 배선하지 마라' 는 금지는 못 받아 되살리는 작업을 시작할 여지가 남는다.",
+      "rewrite": "배너 끝에 한 문장 추가 — '왜 그렇게 판단했는지만 쓸모가 있어 남겨 두는 것이니, 지금 동작의 근거로 읽거나 이 설계를 다시 배선하지 마라.'"
+    },
+    {
+      "id": "design-notes-list-ending-split",
+      "where": "docs/DESIGN-NOTES.md:122 (「안 넣기로 한 것」 목록)",
+      "type": "structure",
+      "claim": "두 항목뿐인 한 목록 안에서 라벨 말끝이 둘로 갈렸다. 앞 항목은 '…넣지 않았다' 이고 이번에 고쳐 쓴 항목은 '…두지 않는다' 이다. PROSE-FORM 이 한 목록 안에서 말끝을 맞추라고 못 박은 자리다.",
+      "consequence": "기여자가 두 라벨의 말끝 차이에 뜻이 있는지 되짚는다 — 하나는 지난 결정이고 하나는 지금도 유효한 규칙이라는 구별인지 본문을 읽어야 정해진다. 절 제목이 「안 넣기로 한 것」이라 '두지 않는다' 가 현재 상태 선언인지 결정 기록인지도 한 번에 안 갈린다.",
+      "rewrite": "- **ultracode 검증 모드(required)는 넣었다가 걷어냈고 다시 넣지 않았다.** (이하 본문 그대로)"
+    },
+    {
+      "id": "nested-orch-two-concepts-one-sentence",
+      "where": "skills/nested-orchestration/SKILL.md 2번 항목 마지막 문장",
+      "type": "narrative",
+      "claim": "성격이 다른 두 지시가 한 문장에 이어져 있다. 앞은 '결정 값을 지어내지 마라' 라는 무조건 금지이고 뒤는 '🔴 가 나오면 BLOCKED 로 버블업한다' 라는 조건부 행동인데, '지어내지 말고' 로 이어 붙여 뒤의 조건이 앞의 금지에도 걸리는 것처럼 읽힌다.",
+      "consequence": "L2 로 도는 세션이 '🔴 가 없으면 결정 값을 지어내도 된다' 로 읽을 수 있다. 그러면 이 문장이 막으려던 그 일이 일어나고, 사람 대화가 불가능한 층이라 아무도 못 잡는다.",
+      "rewrite": "spec·plan 리뷰에는 accept 나 regenerate 같은 결정 값이 없다(meta-aggregate 가 그렇게 못 박았다). L2 는 그 값을 지어내지 않는다. 🔴 가 하나라도 나오면 사람 대화가 불가능하므로 아래 BLOCKED 로 버블업한다."
+    }
+  ],
+  "observations_ok": [
+    "domain-docs 문서 타입 표의 「담는 것」 열 7칸이 모두 명사구로 맞았다(이번 회차 목표 달성). 같은 표의 다른 세 열도 열마다 말끝이 하나이고 표 머리 다섯도 모두 명사구다.",
+    "reviewer-readability 의 바뀐 소제목 둘(「목적 주입」·「고칠 순서」)은 명사구이고 부제에 있던 주장이 각각 첫 문장으로 내려간 것을 확인했다.",
+    "domain-spec-review 걸음 표와 domains-index 표도 열마다 말끝이 하나다.",
+    "관형절이 문장 가운데 낀 곳 0, 명사 앞 수식 세 겹 이상 0, 비슷한 명사구 겹침 0."
+  ],
+  "not_judged": [
+    "domains-index.md 표 머리 변경과 두 테스트 스크립트·self-audit.js 변경은 목적을 못 받아 판정하지 않았다(참고로 domains-index 표는 머리 셋이 모두 명사구이고 가운데 열이 모두 '~연다' 로 하나다)."
+  ],
+  "next_round": [
+    "skills/reviewer-readability/SKILL.md:39-40 — 앞 문장이 '둘 다' 라 한 뒤 다음 문장이 '그 세 가지가 사례로 적혀 있다' 로 받는다. 이번 회차가 고친 것은 표 이름뿐이고 '세 가지' 는 안 바뀐 줄에 있어 범위 밖으로 두었으나 선행어가 흔들리는 자리다."
+  ],
+  "principles_applied": ["PROSE-FORM","READ-FLOW","PLAIN-KO","KO-SYNTAX","CLEAR-COMM","MEASURE-FIRST","NAME-ITEMS"]
+}

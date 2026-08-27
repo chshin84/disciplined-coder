@@ -1,0 +1,97 @@
+{
+  "lens": "consistency",
+  "issues": [
+    {
+      "id": "aggregate-description-still-says-decision",
+      "where": "skills/meta-aggregate/SKILL.md:3 (프런트매터 description) ↔ 본문 55-59 ↔ skills/nested-orchestration/SKILL.md:29-31",
+      "type": "contradiction",
+      "claim": "nested-orchestration 에 'spec·plan 리뷰에는 accept 나 regenerate 같은 결정 값이 없다(meta-aggregate 가 못 박았다)' 를 새로 적었는데, meta-aggregate 의 프런트매터 description 은 그대로 'accept/regenerate/escalate 를 결정하는 집계 단계' 라고 조건 없이 선언한다. 본문만 갈라 놓았다.",
+      "consequence": "description 은 스킬을 열지 않아도 세션의 스킬 목록에 늘 실리는 유일한 문장이다. meta-aggregate 를 안 연 L2 나 메인 세션은 그 한 줄만 보고 spec 리뷰에서도 decision 을 내야 한다고 판단한다 — 본문 58행이 지목한 바로 그 실패다. 이번에 nested-orchestration 에서 막은 구멍이 스킬 목록 경로로 그대로 열려 있다.",
+      "evidence": "skills/meta-aggregate/SKILL.md:3 description; 같은 파일 55 'decision 과 retry_count 는 런타임 전용이다'; skills/nested-orchestration/SKILL.md:29-30. test_docs_drift.sh:88 은 본문 문구만 앵커로 걸고 description 은 아무 검사도 안 읽는다."
+    },
+    {
+      "id": "disposition-actor-still-split",
+      "where": "skills/meta-aggregate/SKILL.md:48-49 ↔ skills/domain-spec-review/SKILL.md 처분 절 ↔ skills/nested-orchestration/SKILL.md:27-31",
+      "type": "contradiction",
+      "claim": "처분을 누가 하는지가 세 문서에서 다르다. meta-aggregate 는 '사람이 근거를 읽고 가른다', domain-spec-review 는 '메인 세션이 가른다', 이번에 고친 nested-orchestration 은 사람 대화가 불가능한 L2 가 자율로 가른다고 적는다. 이번 회차는 결정 값 어휘만 맞췄고 처분 주체는 갈라 둔 채다.",
+      "consequence": "L2 는 자기완결 프롬프트로 돌고 셋 중 무엇을 여는지 고정되어 있지 않다. meta-aggregate 를 근거로 삼은 L2 는 사람이 없으니 처분을 못 한다고 보고 🔴 가 아니어도 BLOCKED 로 조기 종료해, 이번에 L2 에 준 '고칠 것까지 반영' 자율이 무효가 된다. 반대로 nested-orchestration 만 읽은 L2 는 사람에게 묶어 둔 판단을 기계가 대신한다. 어느 쪽으로 갈릴지 문서가 안 정한다.",
+      "evidence": "skills/meta-aggregate/SKILL.md:48; skills/domain-spec-review/SKILL.md 처분 절 첫 문장; skills/nested-orchestration/SKILL.md:28-31."
+    },
+    {
+      "id": "readme-scan-check-vacuous",
+      "where": "scripts/test_docs_drift.sh:299 (설치 확인 절)",
+      "type": "gap",
+      "claim": "새 검사 'README가 설정 홈 후보를 훑는다' 의 술어가 grep -qF 'disciplined-coder' 하나뿐이라 README 첫 줄 제목에서 이미 걸린다. 설정 홈 탐색 루프가 통째로 사라져도 초록으로 통과한다. 검사 이름이 선언한 계약과 실제로 재는 것이 다르다.",
+      "consequence": "이번에 고친 결함(사용자가 붙여 넣을 수 없는 확인 명령)이 되돌아와도 신호가 없다. 짝 검사는 옛 변수 재도입만 막을 뿐 명령이 지워지거나 다른 못 도는 형태로 바뀌는 것은 아무도 안 잡는다. 설치 확인은 README 가 주는 유일한 진단 수단이라 조용히 죽으면 Windows 에서 훅이 실패한 PC 와 정상 PC 를 다시 구별할 수 없다.",
+      "evidence": "scripts/test_docs_drift.sh:299; README.md:1 '# disciplined-coder'; 실제로 재야 할 것은 README.md:35-39 의 for 루프.",
+      "dup_of_grounding": "drift-check-too-loose"
+    },
+    {
+      "id": "count-check-scope-too-narrow",
+      "where": "scripts/test_docs_drift.sh:377 ↔ 같은 파일 149·191 ↔ skills/reviewer-readability/SKILL.md:212",
+      "type": "gap",
+      "claim": "새 검사가 훑는 범위를 meta-aggregate 와 skills/reviewer-*/SKILL.md 로만 잡았다. 범위 밖의 test_docs_drift.sh 자신이 '여섯 렌즈' 를 두 곳에 박고 있고(149 출력 라벨, 191 주석), 범위 안이어도 정규식이 '렌즈' 라는 낱말에만 걸려 reviewer-readability 의 '위 type 여섯은' 이 그대로 남는다.",
+      "consequence": "렌즈를 일곱째로 늘리면 검사는 초록인데 검사 스크립트 자신의 출력에 '여섯 렌즈' 라는 옛 값이 찍힌다 — 오답노트 2026-08-17-no-counts-in-prose.md 가 못 박은 재발이 규칙을 새로 세운 파일 안에서 일어난다. type 을 일곱째로 늘리면 reviewer-readability:212 의 '여섯' 이 조용히 틀린 값이 된다.",
+      "evidence": "scripts/test_docs_drift.sh:377,149,191; skills/reviewer-readability/SKILL.md:212; docs/solved_problems/2026-08-17-no-counts-in-prose.md:5."
+    },
+    {
+      "id": "banner-missing-on-sibling-plans",
+      "where": "docs/superpowers/plans/2026-07-03-ultracode-review-toggle.md · docs/superpowers/specs|plans/2026-06-30-project-solved-pointer*.md",
+      "type": "gap",
+      "claim": "제거·철회된 설계 가운데 ultracode 토글은 spec 에만 배너가 붙고 짝 plan 은 그대로다. canon-english 는 둘 다 붙였으므로 같은 처방이 짝 문서마다 갈렸다. 같은 부류인 project-solved-pointer spec·plan(없앤 /add-pointer 를 구현하는 문서)도 둘 다 표시가 없다.",
+      "consequence": "표시 없는 plan 은 executing-plans 가 그대로 집어 실행할 수 있는 체크박스 목록이고 첫머리에 스스로 실행을 지시한다. 그 plan 을 연 세션은 뜯어낸 토글과 커맨드 쌍을 다시 구현한다.",
+      "evidence": "docs/superpowers/plans/2026-07-03-ultracode-review-toggle.md:1-5 배너 없음; grep -rln superseded docs/superpowers/ 결과에 이 파일과 project-solved-pointer 둘이 없음; scripts/_scaffold_common.sh:305; scripts/scaffold.sh:75.",
+      "dup_of_grounding": "ultracode-plan-no-banner (project-solved-pointer 둘은 이 렌즈만 찾았다)"
+    },
+    {
+      "id": "bracket-checks-assume-undeclared-rule",
+      "where": "scripts/test_docs_drift.sh:302-327 (새 검사 둘)",
+      "type": "gap",
+      "claim": "두 검사가 문서 어디에도 선언되지 않은 규칙을 잰다. 앞은 'README 라는 낱말이 든 줄의 「」는 전부 README 의 제목이다' 를, 뒤는 'reviewer-readability 안의 「」는 전부 그 파일 자신의 제목이다' 를 전제한다. 게다가 둘 다 제목 끝까지 정확히 일치를 요구하는데, 이 레포의 관례는 절 이름 뒤에 설명절을 붙이는 것이다.",
+      "consequence": "정상적인 문장이 스위트를 붉힌다. reviewer-readability 가 남의 절을 낫표로 부르거나 DESIGN-NOTES 가 README 언급 줄에서 다른 문서 절을 함께 인용하는 순간 FAIL 이 뜬다. 원인이 드리프트가 아니라 문장이므로 고치는 압력이 실재하는 참조를 지우거나 낫표를 벗기는 쪽으로 가 참조 관례 자체가 침식된다. 이름 뒤에 설명절을 붙이는 순간에도 같은 일이 난다.",
+      "evidence": "scripts/test_docs_drift.sh:308-311, 320-326; 설명절 관례 skills/domain-docs/SKILL.md:73, skills/reviewer-prior-art/SKILL.md:32, skills/reviewer-readability/SKILL.md:66; 남의 절을 낫표로 부르는 실사용 skills/domain-spec-review/SKILL.md:84.",
+      "dup_of_grounding": "readability-bracket-scan-too-wide (설명절 문제는 이 렌즈만 찾았다)"
+    },
+    {
+      "id": "codex-hooks-json-unvalidated",
+      "where": "scripts/test_hooks.sh:173-197",
+      "type": "gap",
+      "claim": "배선 누락 검사를 hooks*.json 전부로 넓혔지만 같은 절의 앞 검사 둘(유효한 JSON, 이벤트 하나 이상)은 여전히 hooks/hooks.json 하나만 읽는다. hooks-codex.json 은 JSON 유효성도 이벤트 배선 유무도 검사를 안 받는다.",
+      "consequence": "이번 변경의 주석이 스스로 적은 실패 모드가 같은 절 안에 그대로 남는다. hooks-codex.json 에 쉼표 하나가 어긋나면 파일 이름은 다 들어 있으므로 배선 검사는 통과하고, Codex 는 훅을 통째로 못 읽어 게이트가 전부 사라지는데 스위트는 초록이다.",
+      "evidence": "scripts/test_hooks.sh:175-177 HJ 고정; 바로 아래 183·192 는 for hj in hooks*.json 으로 도출."
+    },
+    {
+      "id": "unwired-loop-forbids-runtime-specific-hooks",
+      "where": "scripts/test_hooks.sh:192-196 ↔ docs/DESIGN-NOTES.md:214 ↔ 두 배선 파일",
+      "type": "contradiction",
+      "claim": "새 unwired 루프는 hooks/*.sh 하나하나가 hooks*.json 전부에 있을 것을 요구한다. 그러나 설계는 런타임별 훅을 허용한다 — DESIGN-NOTES 는 Codex 용을 더하기만 한다고 적었고 실제로 SessionStart 는 Claude 가 scripts/scaffold.sh, Codex 가 hooks/session-start-codex 로 갈라져 있다. 지금 통과하는 것은 네 훅이 우연히 런타임 중립이고 session-start-codex 가 .sh 가 아니라 루프에서 빠지기 때문이다.",
+      "consequence": "한 런타임에만 걸어야 하는 훅을 .sh 로 하나 더하면 스위트가 붉어진다. 붉은 신호가 실재하는 누락이 아니므로 고치는 압력이 안 쓰는 런타임의 배선 파일에도 억지로 끼워 넣는 쪽으로 간다. 반대로 .sh 확장자를 떼면 검사를 피해 가므로 검사가 강제하는 것이 계약이 아니라 파일 이름이 된다.",
+      "evidence": "scripts/test_hooks.sh:188,192-194; hooks.json SessionStart=scripts/scaffold.sh, hooks-codex.json SessionStart=hooks/session-start-codex(확장자 없음); docs/DESIGN-NOTES.md:214."
+    },
+    {
+      "id": "old-rule-name-in-rewrite-map",
+      "where": "skills/domain-docs/SKILL.md 「문서를 두는 자리」 ↔ docs/superpowers/rewrite-map/domain-docs.md:94·121 ↔ docs/superpowers/plans/2026-06-14-disciplined-coder-phase4.md:116",
+      "type": "drift",
+      "claim": "규칙 이름을 「어디에 둘까」에서 「문서를 두는 자리」로 바꾸면서 같은 파일 안의 참조는 고쳤지만 레포에 남은 다른 두 자리는 옛 이름 그대로다. 그중 rewrite-map/domain-docs.md 는 이번 회차가 canon-english spec 배너로 독자를 새로 데려가는 문서다.",
+      "consequence": "배너를 따라 대응표를 연 사람은 규칙을 옛 이름으로 만나고 domain-docs 에서 그 이름을 못 찾는다. 대응표는 정본과 옮긴 문서를 짝지어 읽으라고 만든 것이라 이름이 안 맞으면 짝짓기가 끊긴다. 새로 넣은 「」 실재 검사 둘은 README 와 reviewer-readability 만 훑어 이 자리를 안 본다.",
+      "evidence": "skills/domain-docs/SKILL.md:31-32; docs/superpowers/rewrite-map/domain-docs.md:94,121; docs/superpowers/specs/2026-07-27-canon-english-rewrite-design.md:5; docs/superpowers/plans/2026-06-14-disciplined-coder-phase4.md:116."
+    },
+    {
+      "id": "claude-md-command-contract-untested",
+      "where": ".claude/workflows/self-audit.js:100 ↔ CLAUDE.md 테스트 실행 줄",
+      "type": "gap",
+      "claim": "self-audit 의 테스트 명령을 인라인에서 CLAUDE.md 를 정본으로 가리키는 형태로 바꿨는데, CLAUDE.md 가 그 명령을 실제로 담고 있는지, 그리고 그 명령이 앞 스크립트의 실패를 모으는 형태인지를 재는 테스트가 없다. 이번 변경으로 생긴 문서-코드 계약인데 지키는 것이 없다.",
+      "consequence": "CLAUDE.md 의 그 불릿이 지워지거나 명령이 실패를 삼키는 형태로 되돌아가면, 감사 에이전트는 정본을 열어도 그 명령을 그대로 돌린다 — 마지막 한 스크립트의 종료 코드만 남아 앞선 FAIL 이 묻히고 감사가 잘못된 FAIL=0 을 보고한다.",
+      "evidence": ".claude/workflows/self-audit.js:100; CLAUDE.md 해당 불릿; grep -rn 'CLAUDE.md' scripts/test_*.sh 에 이 계약을 재는 검사 없음."
+    }
+  ],
+  "not_raised": [
+    "README:63 의 '강제로 끊기면 임시 파일이 남을 수 있다' — _scaffold_common.sh:269 가 INT·TERM·EXIT 트랩으로 지우지만 SIGKILL 이면 남으므로 틀렸다고 단정 못 함.",
+    "DESIGN-NOTES 「안 넣기로 한 것」에 '넣었다가 뺀' ultracode 토글이 든 것은 절 이름과 어긋나지만 결과를 구체적으로 못 적음."
+  ],
+  "open_questions": [
+    "meta-aggregate 의 description 을 고치면 .claude-plugin/marketplace.json 등 그 문구를 복제한 자리가 있는지 — 있으면 두 곳을 손으로 맞추는 일이 된다.",
+    "domain-spec-review 의 '렌즈 셋'·'세 렌즈' 와 domain-docs 의 '두 렌즈' 는 총수가 아니라 묶음 크기라 이번 규칙 대상인지 갈린다 — 대상이면 검사 범위를 넓히고, 아니면 규칙 문장이 총수와 묶음 크기를 갈라 적어야 한다."
+  ],
+  "principles_applied": ["SSOT","MEASURE-FIRST","FAIL-LOUD","NAME-ITEMS","테스트 기대치 매직 넘버 금지","TDD"]
+}

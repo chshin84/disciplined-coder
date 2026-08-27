@@ -31,11 +31,19 @@ Windows 사용자는 [Git Bash](https://git-scm.com/downloads)가 먼저 있어�
 ### 설치 확인
 셋업은 조용히 돌기 때문에 성공과 실패가 겉으로 같아 보인다. 특히 Windows에서 bash가 없어 hook이 실패한 경우와 정상 동작이 화면상 구별되지 않는다. 새 세션을 한 번 연 뒤 아래 셋을 확인한다.
 
-먼저 설정 홈이 어디인지부터 확인한다. 스캐폴드는 그곳을 환경에 따라 다르게 잡으므로 `~/.claude`라고 넘겨짚지 않는다.
+먼저 설정 홈이 어디인지부터 확인한다. 스캐폴드는 그곳을 환경에 따라 다르게 잡으므로 `~/.claude`라고 넘겨짚지 않는다. 아래를 터미널(Windows는 Git Bash, mac과 Linux는 기본 터미널)에 그대로 붙여 넣는다. 스캐폴드가 쓰는 것과 같은 순서로 후보를 훑어 맨 먼저 걸리는 하나만 찍으므로, 홈이 어긋난 PC에서도 실제로 쓰이는 경로가 나온다.
 
 ```bash
-bash -c '. "${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh" && resolve_home claude'
+for d in "${CLAUDE_CONFIG_DIR:-}" "${USERPROFILE:+$USERPROFILE/.claude}" "$HOME/.claude"; do
+  [ -n "$d" ] || continue
+  d="$(cygpath -u "$d" 2>/dev/null || printf '%s' "$d")"
+  echo "설정 홈: $d"
+  if [ -d "$d/disciplined-coder" ]; then echo "  셋업 완료"; else echo "  셋업이 아직 안 돌았다"; fi
+  break
+done
 ```
+
+찍힌 경로가 셋업이 쓰는 설정 홈이다. 둘째 줄이 "셋업이 아직 안 돌았다"이면 새 세션을 한 번도 안 열었거나 hook이 실패한 것이다.
 
 - `/show-principles`를 치면 원칙 목록이 나온다.
 - 그 설정 홈 **아래 `disciplined-coder/`**에 `agent-principles.md`·`domains-index.md`·`solved_problems.md`가 있다.
@@ -55,7 +63,7 @@ bash -c '. "${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh" && resolve_home clau
 ## 프로젝트 폴더에 생기는 것
 자동 계층이 프로젝트 파일에 손대는 예외는 둘뿐이고, 둘 다 이미 있는 파일을 고치는 것이다(여기가 그 정본이다). 첫째, 그 레포에 `docs/solved_problems.md`가 이미 있고 그 머리말이 낡았으면 갈아끼운다. 둘째, 없앤 기능이 남긴 관리블록이 그 레포 `CLAUDE.md`에 있으면 걷어낸다. 둘 다 손대기 전에 사본을 먼저 뜬다 — 사본을 못 떴을 때 무엇을 하는지는 `domain-docs`가 정본이다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
 
-두 경우 모두 그 파일 옆에 잠금 디렉터리와 임시 파일이 잠깐 생겼다 사라진다. 파일을 통째로 바꿔치기하는 방식이라 같은 폴더에 임시 파일을 두어야 하기 때문이다(다른 곳에 두면 디스크가 다를 때 바꿔치기가 원자적이지 않다). 작업이 끝나면 지워지므로 남는 파일은 없지만, 도중에 강제로 끊기면 `CLAUDE.md.lock`이나 `solved_problems.md.a1B2c3` 같은 것이 남을 수 있다. 그때는 지워도 된다.
+두 경우 모두 그 파일 옆에 임시 파일이 잠깐 생겼다 사라지고, 관리블록을 걷어낼 때는 잠금 디렉터리도 함께 생긴다. 잠금 디렉터리는 두 세션이 같은 파일을 동시에 고치지 못하게 막는 표식이다. 임시 파일이 필요한 것은 파일을 통째로 바꿔치기하는 방식이라 같은 폴더에 두어야 하기 때문이다(다른 곳에 두면 디스크가 다를 때 바꿔치기가 원자적이지 않다). 작업이 끝나면 지워지므로 남는 파일은 없지만, 도중에 강제로 끊기면 `CLAUDE.md.lock`이나 `CLAUDE.md.lock.gate`, `solved_problems.md.a1B2c3` 같은 것이 남을 수 있다. 그때는 지워도 된다 — 남겨 두면 다음 세션 시작이 30초쯤 늦어진 뒤에야 스캐폴드가 스스로 치운다.
 
 프로젝트 오답노트를 처음 만드는 것은 자동 계층이 아니라 사람이다. 그 레포에서 문제를 해결해 적을 교훈이 생겼을 때 세션이 만든다(그 규율은 `agent-principles.md`의 오답노트 절이 정본이다). 그래서 파일이 저절로 생기기를 기다릴 것이 아니고, 설치만 해 둔 레포에는 아무 파일도 생기지 않는다.
 

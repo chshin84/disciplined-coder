@@ -1,5 +1,11 @@
 # 정본과 스킬 영문 재작성 구현 계획
 
+> **되돌린 작업의 계획이다(superseded).** 이 재작성은 되돌려졌고 정본은 지금도 한국어다. 아래
+> 태스크를 실행하지 마라 — 그대로 따라가면 사용자가 되돌리기로 정한 재작성을 다시 하게 된다.
+> 바로 아래 "For agentic workers" 줄이 이 계획을 태스크 단위로 구현하라고 하지만, 그 지시는 이
+> 표시로 효력을 잃는다. 설계는 `docs/superpowers/specs/2026-07-27-canon-english-rewrite-design.md`에
+> 있고 같은 표시가 달려 있다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 상시 로드되는 정본과 온디맨드 스킬을 영문으로 다시 써서 토큰 밀도와 지시 준수율을 높이되, 무엇이 사라졌는지 대응표로 드러나게 한다.

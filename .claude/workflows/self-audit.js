@@ -98,7 +98,7 @@ phase('테스트')
 const testPromise = agent(
   `${COMMON}
 너만 예외적으로 실행 권한이 있다(파일 수정은 여전히 금지). ${REPO} 에서 다음을 실행하고 결과를 보고하라:
-- scripts/test_*.sh 를 전부 (목록을 여기 적지 않는다 — 그 디렉터리가 정본이다. \`for t in scripts/test_*.sh; do bash "$t"; done\`)
+- scripts/test_*.sh 를 전부. 목록도 실행 명령도 여기 적지 않는다 — ${REPO}/CLAUDE.md 가 그 명령의 정본이니 그 파일을 읽고 거기 적힌 형태 그대로 돌려라. 앞 스크립트의 실패가 마지막 스크립트의 종료 코드에 묻히는 형태로 바꿔 쓰지 마라.
 - claude plugin validate ./ (non-strict)
 어떤 스크립트를 실제로 돌렸는지 이름을 모두 보고에 적어라. 하나도 못 찾았으면 그 사실 자체가 FAIL이다.
 각각 PASS/FAIL 카운트와, FAIL이 있으면 어떤 체크가 왜 실패했는지 출력에서 인용하라. 계약은 FAIL=0이다.

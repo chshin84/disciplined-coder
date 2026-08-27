@@ -1,5 +1,13 @@
 # ultracode 검증 토글(ultracode-review) 구현 계획
 
+> **되돌린 작업의 계획이다(superseded).** 여기서 구현한 ultracode 검증 토글은 뜯어냈고 지금은
+> 설정할 수 없다. 아래 태스크를 실행하지 마라 — 그대로 따라가면 제거한 토글을 되살리게 되고,
+> 지금은 `scripts/_scaffold_common.sh`의 정리 목록이 같은 이름의 상태 파일을 매 세션 지우므로
+> 스캐폴드가 만든 파일을 다음 세션 스캐폴드가 지우는 상태로 들어간다. 바로 아래
+> "For agentic workers" 줄이 이 계획을 태스크 단위로 구현하라고 하지만, 그 지시는 이 표시로
+> 효력을 잃는다. 설계는 `docs/superpowers/specs/2026-07-03-ultracode-review-toggle-design.md`에
+> 있고 같은 표시가 달려 있다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** spec(`docs/superpowers/specs/2026-07-03-ultracode-review-toggle-design.md`, 3렌즈 리뷰 passed)대로 §가 트리거 표에 멀티에이전트 워크플로 행을 추가하고, `required`/`discretion`(기본) PC 전역 토글을 issue-mode 레일 미러로 구현한다. 이름은 사용자가 `ultracode-review`로 확정했다.

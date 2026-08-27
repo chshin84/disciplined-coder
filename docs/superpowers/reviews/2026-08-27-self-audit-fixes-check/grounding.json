@@ -1,0 +1,66 @@
+{
+  "lens": "grounding",
+  "issues": [
+    {
+      "id": "ultracode-plan-no-banner",
+      "where": "docs/superpowers/plans/2026-07-03-ultracode-review-toggle.md",
+      "type": "omission",
+      "claim": "ultracode 토글은 spec에만 superseded 배너를 붙이고 그 구현 계획에는 안 붙였다. canon-english는 spec과 plan 양쪽에 붙였으므로 같은 짝을 여기서만 빠뜨렸다. 남은 계획은 첫머리에 REQUIRED SUB-SKILL 실행 지시를 달고 마지막 줄에 <!-- spec-review: passed --> 까지 있어 살아 있는 계획으로 읽힌다.",
+      "consequence": "그 계획을 연 세션이 지시대로 실행하면 이번에 제거한 토글을 되살린다. 계획의 산출물은 scripts/ultracode-review.sh 와 commands/ultracode-review.md 신설인데 지금 SCAFFOLD_STALE 이 같은 이름을 매 세션 지우고 있어, 되살리면 스캐폴드가 만든 파일을 다음 세션 스캐폴드가 지우는 상태가 된다.",
+      "evidence": "docs/superpowers/plans/2026-07-03-ultracode-review-toggle.md:1-3 배너 없음; 같은 파일 174행 Create scripts/ultracode-review.sh, commands/ultracode-review.md; 마지막 줄 <!-- spec-review: passed -->. 대조 docs/superpowers/plans/2026-07-27-canon-english-rewrite.md:3-6 에는 배너 있음. scripts/_scaffold_common.sh:11 SCAFFOLD_STALE 에 ultracode-review 포함."
+    },
+    {
+      "id": "readme-loop-vs-resolve-home",
+      "where": "README.md:34-42",
+      "type": "mismatch",
+      "claim": "README 루프의 판별 기준(디렉터리 존재)이 _resolve_home.sh 의 판별 기준(환경변수 우선순위, 존재 검사 없음)과 다르다. 여러 줄이 찍히면 어느 것이 지금 쓰이는 자리인지 루프만으로 정해지지 않는데, README 가 붙인 해결책 '/show-principles 가 읽는 곳이 지금 쓰이는 자리다' 도 작동하지 않는다 — show-principles.md 는 원칙 전문만 보여주라고 지시하고 경로를 찍으라고는 안 한다.",
+      "consequence": "홈이 어긋난 PC 에서 두 줄이 찍혔을 때 사용자가 판정할 수단이 없다. 옛 홈의 사본을 지금 쓰이는 것으로 착각해 그쪽을 읽거나 지우고, 실제로 @import 되는 사본은 손대지 못한다. 덧붙여 두 출력의 경로 표기 형태가 달라(C:\\Users\\CHSHIN/.claude 대 /c/Users/CHSHIN/.claude) 대조에 한 걸음이 더 붙는다.",
+      "evidence": "README.md:34,37-38,42; scripts/_resolve_home.sh:20-32 존재 검사 없음; commands/show-principles.md 는 내용만 보여주라고 지시."
+    },
+    {
+      "id": "drift-check-too-loose",
+      "where": "scripts/test_docs_drift.sh:304",
+      "type": "mismatch",
+      "claim": "체크 이름과 주석은 README 확인 명령이 설정 홈 후보를 훑는지 잰다고 말하는데, 실제 술어는 grep -qF 'disciplined-coder' 하나뿐이라 README 첫 줄 제목만으로 항상 걸린다. 확인 루프를 통째로 지우고 ~/.claude 로 하드코딩해도 초록이다.",
+      "consequence": "이 회차가 고친 회귀를 다시 심어도 스위트가 못 잡는다. 짝인 '훅 전용 변수를 안 쓴다' 는 CLAUDE_PLUGIN_ROOT 재도입만 막을 뿐, 후보 훑기가 사라지는 경로는 아무도 안 본다.",
+      "evidence": "scripts/test_docs_drift.sh:304; grep -c 'disciplined-coder' README.md = 9, 그 가운데 루프 안은 README.md:38 한 줄뿐."
+    },
+    {
+      "id": "design-notes-reviews-omitted",
+      "where": "docs/DESIGN-NOTES.md:194-196",
+      "type": "omission",
+      "claim": "새 문단이 PostToolUse 가 더 빼는 것으로 리뷰 기록과 오답노트 둘을 적어 코드와 맞는데, 그 갈림이 낳는 결과는 오답노트 한쪽만 적었다. 리뷰 기록도 같은 갈림에 걸린다 — doc_format_pretooluse.sh 에는 reviews 제외가 없고 path_is_specplan 도 그 경로를 안 잡는다.",
+      "consequence": "리뷰 기록은 회차마다 새로 만드는 파일이라 그 넛지가 spec/plan 리뷰를 돌 때마다 반복해 뜬다. 문서가 그 경우를 안 적어 읽는 사람이 원인을 훅 코드에서 다시 찾거나, 면제가 오답노트에만 걸린 줄 알고 리뷰 기록에 domain-docs 양식을 억지로 맞춘다.",
+      "evidence": "docs/DESIGN-NOTES.md:194-196; hooks/doc_review_posttooluse.sh:20-23 에는 reviews·solved 제외 있음; hooks/doc_format_pretooluse.sh:12-16 에는 대응 case 자체가 없음; hooks/_spec_marker.sh:17-21 path_is_specplan 은 specs·plans 만 잡음."
+    },
+    {
+      "id": "marker-esc-not-derived",
+      "where": "scripts/test_docs_drift.sh:364-371",
+      "type": "mismatch",
+      "claim": "블록 주석은 코드에서 뽑아 대조한다고 적었는데 에스컬레이트 쪽은 뽑아 놓은 MARK_ESC 를 대조에 안 쓴다. 비었는지만 확인하고 산문 대조는 손으로 적은 리터럴 'escalated' 로 한다. 통과 마커 쪽과 짝이 안 맞는다.",
+      "consequence": "산문이 코드의 에스컬레이트 마커 형태와 어긋나도 초록이다. 마커 표기를 지우고 낱말만 남겨도 통과하므로 사용자가 게이트 푸는 법을 문서에서 못 얻는데 신호가 없다.",
+      "evidence": "scripts/test_docs_drift.sh:364,366,369,370; 블록 주석 353-354."
+    },
+    {
+      "id": "readability-bracket-scan-too-wide",
+      "where": "scripts/test_docs_drift.sh:323-331",
+      "type": "mismatch",
+      "claim": "주석은 범위를 자기 절 참조로 못 박았는데 코드는 그 파일의 모든 「」를 자기 절 이름으로 간주해 실재를 요구한다. 남의 문서 절을 가리키는 것과 자기 절을 가리키는 것을 구분하는 술어가 없다. 이웃 README 검사는 grep -F 'README' 로 줄을 한 번 거르는데 이쪽에는 그 거름이 없다.",
+      "consequence": "이 레포는 문서끼리 「」로 절을 가리키는 것이 관례라, reviewer-readability 에 상호 참조를 한 줄만 더해도 스위트가 붉어진다. 고치는 사람이 정당한 상호 참조를 지우거나 쓰이지도 않는 가짜 소제목을 넣어 초록을 맞추게 된다.",
+      "evidence": "scripts/test_docs_drift.sh:325-326 주석, :329 술어, :331 히어독은 조건 없이 전부 뽑음. 대조 :333-337 README 검사는 줄을 먼저 거름."
+    }
+  ],
+  "confirmed_ok": [
+    "ultracode 토글은 실제로 코드에서 사라졌다 — scripts/ultracode-review.sh·commands/ultracode-review.md 없고 SCAFFOLD_WHITELIST 에도 없으며 SCAFFOLD_STALE 정리 대상으로만 남았다. DESIGN-NOTES 의 '토글 자체를 제거했다' 는 맞다.",
+    "README 의 새 잠금 문장은 맞다 — managed_block_remove 만 $uc.lock 을 잡고, scaffold_fix_solved_header 는 mktemp 만 쓰고 락이 없다.",
+    "agent-principles.md 가 가리킨 README 절은 비어 있지 않다 — 옛 정본이 적던 조건 둘이 README.md:60 에 그대로 있다.",
+    ".claude/workflows/self-audit.js 가 가리킨 CLAUDE.md 의 명령 정본은 실재하고, 앞 스크립트 실패를 bad 에 모으는 형태다.",
+    "test_hooks.sh 의 새 배선 검사는 주석대로 hooks.json 과 hooks-codex.json 둘을 훑는다.",
+    "test_docs_drift.sh PASS=228 FAIL=0, test_hooks.sh PASS=64 FAIL=0 재확인."
+  ],
+  "open_questions": [
+    "test_hooks.sh:196-202 의 새 검사는 hooks/*.sh 전부가 모든 배선 파일에 있어야 한다는 불변식을 세우는데, Claude 와 Codex 사이에 의도된 훅 비대칭이 앞으로 생길 수 있는지는 이번 diff 만으로 정할 수 없다(지금은 넷 다 양쪽에 있어 초록).",
+    "hooks/session-start-codex 는 확장자가 없어 이 검사가 안 훑는다 — 배선은 되어 있으나 역방향은 못 잡는다."
+  ],
+  "principles_applied": ["MEASURE-FIRST","SSOT","FAIL-LOUD","EXPLICIT","TDD","NAME-ITEMS","CLEAR-COMM","PROSE-FORM","KO-SYNTAX","PLAIN-KO"]
+}

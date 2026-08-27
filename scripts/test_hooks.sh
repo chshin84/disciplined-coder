@@ -170,11 +170,16 @@ check "차단이 실제로 났다"                  "printf '%s' \"\$WSOUT\" | g
 check "공백 든 경로가 정확히 한 번"          "[ \"\$(printf '%s' \"\$WSOUT\" | grep -o 'my spec.md' | wc -l)\" = 1 ]"
 check "차단 응답이 유효한 JSON"              "printf '%s' \"\$WSOUT\" | json_valid_stdin"
 
-echo "[hooks.json 배선 — 이 파일이 깨지면 게이트가 통째로 죽는다]"
+echo "[hooks 배선 — 이 파일이 깨지면 게이트가 통째로 죽는다]"
 # 배선 파일 자체를 아무 테스트도 안 보던 구멍을 막는다. 이름을 손으로 적지 않고 디렉터리와 파일에서 도출한다.
+# 전에는 hooks.json 하나만 유효성을 재다가, hooks-codex.json에 쉼표 하나가 어긋나도 초록인 상태였다 —
+# 파일 이름은 다 들어 있으니 아래 배선 검사는 통과하고, Codex만 훅을 통째로 못 읽는다.
 HJ="$HERE/hooks/hooks.json"
-check "hooks.json이 유효한 JSON"          "json_valid_stdin < '$HJ'"
-check "이벤트를 하나 이상 배선한다"        "[ -n \"\$(json_hook_events '$HJ')\" ]"
+for hj in "$HERE"/hooks/hooks*.json; do
+  hn="$(basename "$hj")"
+  check "$hn 이 유효한 JSON"              "json_valid_stdin < '$hj'"
+  check "$hn 이 이벤트를 하나 이상 배선한다" "[ -n \"\$(json_hook_events '$hj')\" ]"
+done
 
 # 배선이 가리키는 경로가 실제로 존재하는가. ${CLAUDE_PLUGIN_ROOT}는 레포 루트로 치환해 확인한다.
 # 배선 파일을 하나만 훑으면 나머지 런타임의 게이트가 조용히 죽는다 — 훅 파일 이름을 바꿔도
@@ -189,13 +194,27 @@ check "배선이 가리키는 스크립트가 모두 존재" "[ -z \"\$missing\"
 [ -n "$missing" ] && echo "    없는 파일:$missing"
 
 # 훅 스크립트를 만들어 놓고 배선을 잊는 것을 막는다. 밑줄로 시작하는 것은 공유 헬퍼라 제외한다.
+#
+# **어느 배선 파일에도 안 실린 것만 잡는다.** 전에는 hooks.json 하나만 읽어 Codex 배선을 빠뜨려도
+# 초록이었다. 그렇다고 모든 훅이 모든 배선 파일에 있어야 한다고 요구하면 반대로 어긋난다 — 이
+# 레포는 런타임마다 진입점이 다르고(SessionStart는 Claude가 scripts/scaffold.sh, Codex가
+# hooks/session-start-codex), 한 런타임 전용 훅을 옳게 배선해도 붉어져 안 쓰는 런타임에 억지로
+# 끼워 넣게 만든다. 그래서 "어디에도 없는 것"만 실패로 본다.
+#
+# 확장자로 훑지 않는 이유도 같다. hooks/session-start-codex 는 .sh 가 없어 *.sh 글롭에서 빠지는데,
+# 그 파일이야말로 배선에서 빠지면 Codex 게이트가 통째로 죽는 진입점이다.
 unwired=""
-for f in "$HERE"/hooks/*.sh; do
+for f in "$HERE"/hooks/*; do
+  [ -f "$f" ] || continue
   b="$(basename "$f")"
-  case "$b" in _*) continue ;; esac
-  grep -qF "$b" "$HJ" || unwired="$unwired $b"
+  case "$b" in _*|*.json) continue ;; esac
+  found=0
+  for hj in "$HERE"/hooks/hooks*.json; do
+    grep -qF "$b" "$hj" && { found=1; break; }
+  done
+  [ "$found" = 1 ] || unwired="$unwired $b"
 done
-check "모든 훅 스크립트가 배선되어 있다"    "[ -z \"\$unwired\" ]"
-[ -n "$unwired" ] && echo "    배선 안 된 훅:$unwired"
+check "모든 훅 스크립트가 어딘가에 배선되어 있다" "[ -z \"\$unwired\" ]"
+[ -n "$unwired" ] && echo "    어느 배선 파일에도 없는 훅:$unwired"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

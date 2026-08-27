@@ -119,11 +119,15 @@ Claude Code 버전을 함께 둔다.
 "나중에 다시 본다"는 약속은 적지 않는다 — 조건이 바뀌면 그때 작업이 다시 들춘다.
 - **테스트 통과를 결정론적으로 감지하는 PostToolUse hook 보조를 넣지 않았다.** 판별이 취약하고 이득이
   적다고 봤다.
-- **ultracode 검증 모드(required)를 넛지 훅으로 승급하지 않았다.** 이 모드는 주입 지시 기반이라 훅
-  차단이 아니다 — 모드 라인은 메인 세션에만 도달하고(@import 아님), 서브에이전트 작성 경로에서는
-  메인의 스펙 릴레이에 의존하며, 지시 무시를 막을 수 없다. 승급하지 않은 이유는 Workflow 도구에 훅을
-  걸 수 있는 자리가 공식 문서에 적혀 있지 않기 때문이다. 이 모드를 도입한 설계 문서는
-  `docs/superpowers/specs/2026-07-03-ultracode-review-toggle-design.md`다.
+- **ultracode 검증 모드(required)는 넣었다가 걷어냈고 다시 넣지 않았다.** 토글 자체를 제거했고,
+  멀티에이전트 워크플로에 검증을 요구하는 규율은 `agent-principles.md`의 검증 레이어 표가 소유한다
+  (3층 오케스트레이션에서 어느 국면에 무엇을 배선하는지는 `nested-orchestration`이 따로 정한다).
+  제거한 이유는 훅으로
+  승급할 길이 없어서다 — 이 모드는 주입 지시 기반이라 훅 차단이 아니고, 모드 라인은 메인 세션에만
+  도달하며(@import 아님), 서브에이전트 작성 경로에서는 메인의 스펙 릴레이에 의존하고, 지시 무시를
+  막을 수 없다. Workflow 도구에 훅을 걸 수 있는 자리도 공식 문서에 적혀 있지 않다. 이 모드를 도입했던
+  설계 문서는 `docs/superpowers/specs/2026-07-03-ultracode-review-toggle-design.md`이며 superseded로
+  표시해 두었다.
 
 ## 왜 spec/plan 리뷰 게이트를 Stop(턴 종료)에 두는가
 
@@ -189,6 +193,9 @@ spec의 *실질 재설계*는 자동 재리뷰가 보장되지 않는다(관례�
 이를 훅 둘로 구현했다: `doc_format_pretooluse.sh`(PreToolUse — 새 `.md`에 `domain-docs` 양식 제안)와
 `doc_review_posttooluse.sh`(PostToolUse — 작성/수정 후 검진 넛지. 어느 렌즈로 검진할지는 `domain-docs`가 정한다).
 둘 다 spec/plan 경로(`docs/superpowers/{specs,plans}`)는 제외한다 — 그쪽은 자체 하드 게이트가 맡는다.
+**나머지 제외는 둘이 갈린다.** PostToolUse만 리뷰 기록(`docs/superpowers/reviews/`)과 오답노트
+(`solved_problems.md`와 그 본문 폴더)를 더 뺀다. 그래서 오답노트 본문 파일을 새로 만들면 PreToolUse
+양식 제안은 그대로 뜬다 — 본문 파일의 양식은 오답노트 머리말이 정본이므로 그 제안은 흘려도 된다.
 
 spec/plan과 달리 **비블로킹(권유)**으로 둔 이유는 셋이다.
 - **발행물이라 마커가 부적합하다.** spec/plan은 문서 맨 끝에 `<!-- spec-review: passed -->`를
@@ -275,9 +282,9 @@ README에서 옮긴 내부 동작이다. 설치해 쓰는 데는 필요 없고, 
 ### 도메인 참고서 + 런타임/메타 검증
 개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(자동 주입되는 목차)가 도메인과 참고서를 안내하고, 각 `skills/domain-*`가 상세를 온디맨드로 제공한다 — 설계 시 명세 반영, 개발 시 폴백.
 - **LLM 런타임**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(호출자)이 리스크에 따라 `skills/reviewer-*`(렌즈)와 `skills/meta-aggregate`(집계)를 **제품 코드의 리뷰 콜**로 구현하게 한다(Claude Code 에이전트가 아니라 제품이 구현할 청사진).
-- **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 준비 단계를 거쳐 독립 렌즈 셋(grounding·consistency·adversarial)을 띄우고, 그 출력을 `meta-aggregate`가 모으면, 그것을 다시 🔴와 고칠 것으로 갈라 처분한다. 렌즈마다 한 번씩 띄우고, 렌즈별 결과를 한데 모으며, 틀린 지적은 합칠 때 거르고, 결과를 회차별 파일로 `docs/superpowers/reviews/`에 남긴다. 반영이 동작이나 계약을 바꿨으면 다시 리뷰할지 사용자에게 묻는다 — 자동으로 돌지 않는다. 선행연구 대조는 기본 묶음이 아니라 제안과 승인을 거쳐 따로 돈다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다. 그 강제는 PostToolUse 감지와 Stop 게이트로 이뤄지고, 문서 마지막 줄에 `<!-- spec-review: passed -->` 또는 `escalated` 마커를 두면 풀리며, `DISCIPLINED_CODER_REVIEW_GATE=off`로 끈다.
+- **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 준비 단계를 거쳐 독립 렌즈 셋(grounding·consistency·adversarial)을 띄우고, 그 출력을 `meta-aggregate`가 모으면, 그것을 다시 🔴와 고칠 것으로 갈라 처분한다. 렌즈마다 한 번씩 띄우고, 렌즈별 결과를 한데 모으며, 틀린 지적은 합칠 때 거르고, 결과를 회차별 파일로 `docs/superpowers/reviews/`에 남긴다. 반영이 동작이나 계약을 바꿨으면 다시 리뷰할지 사용자에게 묻는다 — 자동으로 돌지 않는다. 선행연구 대조는 기본 묶음이 아니라 제안과 승인을 거쳐 따로 돈다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다. 그 강제는 PostToolUse 감지와 Stop 게이트로 이뤄지고, 문서 마지막 줄에 `<!-- spec-review: passed -->` 또는 `<!-- spec-review: escalated -->` 마커를 두면 풀리며, `DISCIPLINED_CODER_REVIEW_GATE=off`로 끈다.
 - **문서 작성 워크플로**: 일반 문서(README 등)는 사람이 글 쓰는 흐름을 흉내 낸다 — 작성 **전** `PreToolUse` 훅이 새 `.md`에 `domain-docs` 양식을 제안하고, 작성 **후** `PostToolUse` 훅이 독립 검진을 넛지한다(어느 렌즈로 검진할지는 `domain-docs`의 문서 검진 절이 정한다). 셀프 퇴고만으로 끝내지 않되, 발행물엔 마커를 안 박으므로 spec/plan과 달리 **비블로킹**(권유)이다. 같은 OFF 토글을 쓴다.
 
-**기여자용 둘도 여기 둔다.** **매니페스트 검사는 기여자용이다** — `claude plugin validate ./`는 플러그인 파일 자체가 올바른지만 본다. 셋업이 실제로 됐는지는 README의 「이렇게 보이면 성공이다」로 확인한다.
+**기여자용 둘도 여기 둔다.** **매니페스트 검사는 기여자용이다** — `claude plugin validate ./`는 플러그인 파일 자체가 올바른지만 본다. 셋업이 실제로 됐는지는 README의 「설치 확인」으로 확인한다.
 
 기여할 때: `claude plugin validate ./ --strict`는 version 미지정 경고 때문에 실패하는데, 이는 의도된 트레이드오프다 — 활성 개발 중엔 version을 비워야 커밋 SHA 기반 자동 업데이트가 유지된다(상세는 `skills/domain-plugin`).

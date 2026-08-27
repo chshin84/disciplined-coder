@@ -1,5 +1,10 @@
 # 프로젝트 오답노트 포인터 (project-solved) — 설계 (2026-06-30)
 
+> **일부만 살아 있는 설계다(superseded).** 여기서 설계한 `/add-pointer` 커맨드와 그 넛지는
+> 뜯어냈고 지금은 없다. 프로젝트 오답노트(`docs/solved_problems.md`) 자체는 그대로 쓰이되
+> 포인터를 심는 대신 파일이 있으면 있는 것으로 도출한다. 지금 동작의 근거로 읽지 마라 —
+> 그 규율은 `agent-principles.md`의 오답노트 절이 정본이다.
+
 > 3렌즈 리뷰 2회 반영본. v2 majors 해소: codex 넛지 미러 제거(넛지는 Claude 전용), 포인터에 단일
 > 작성자 규약 포함, solved 템플릿 '제거' 문구를 append-only와 화해, 신규 훅 대신 기존 doc_review에
 > 통합(+OFF 토글), footprint 불변식 README 3곳 전부 동기화. self-heal은 v1→v2에서 넛지로 단순화됨.

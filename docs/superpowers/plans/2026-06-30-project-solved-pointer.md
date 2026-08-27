@@ -1,5 +1,11 @@
 # 프로젝트 오답노트 포인터 (project-solved) Implementation Plan
 
+> **일부만 살아 있는 계획이다(superseded).** 여기서 구현한 `/add-pointer` 커맨드와 그 넛지는
+> 뜯어냈고 지금은 없다. 아래 태스크를 실행하지 마라 — 그대로 따라가면 없앤 커맨드를 되살리게
+> 된다. 바로 아래 "For agentic workers" 줄이 이 계획을 태스크 단위로 구현하라고 하지만, 그
+> 지시는 이 표시로 효력을 잃는다. 프로젝트 오답노트 자체는 그대로 쓰이며 그 규율은
+> `agent-principles.md`의 오답노트 절이 정본이다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** disciplined-coder에 프로젝트별 오답노트(`docs/solved_problems.md`) + 자기완결 `./CLAUDE.md` 포인터 + `/add-pointer` 커맨드 + 발견·복구 넛지를 더한다(스코프 라우팅의 프로젝트 층).

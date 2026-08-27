@@ -235,6 +235,23 @@ OLDPLAN="$HERE/docs/superpowers/plans/2026-08-16-review-layer-redesign.md"
 check "옛 spec 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDSPEC\""
 check "옛 plan 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDPLAN\""
 
+# 제거된 기능의 설계 문서에도 표시를 요구한다. 목록을 손으로 적지 않고 스캐폴드의 정리 대상
+# (SCAFFOLD_STALE)에서 도출한다 — 그 목록이 "이 레포가 뜯어낸 기능"의 정본이라, 기능을 하나 더
+# 걷어내면 그 설계 문서에 표시가 없다는 것이 여기서 붉어진다. 표시가 없으면 그 문서는 지금도
+# 실행할 계획으로 읽히고, plan 은 첫머리에서 스스로 태스크 단위 실행을 지시한다.
+STALE_NAMES="$(sed -n 's/^SCAFFOLD_STALE="\(.*\)"$/\1/p' "$HERE/scripts/_scaffold_common.sh" | head -1)"
+check "제거된 기능 목록을 도출했다" "[ -n \"\$STALE_NAMES\" ]"
+SN=0
+for n in $STALE_NAMES; do
+  case "$n" in *.md) continue ;; esac   # 파일 이름은 기능 이름이 아니다
+  for D in "$HERE"/docs/superpowers/specs/*"$n"*.md "$HERE"/docs/superpowers/plans/*"$n"*.md; do
+    [ -f "$D" ] || continue
+    SN=$((SN+1))
+    check "$(basename "$D") 에 superseded 표시가 있다" "head -12 '$D' | grep -qF 'superseded'"
+  done
+done
+check "제거된 기능의 설계 문서를 하나 이상 훑었다" "[ '$SN' -gt 0 ]"
+
 # 영문 재작성 대응표는 그 재작성이 되돌려져 지금 구조와 안 맞는다. 표시가 없으면 정본이 영문인
 # 것처럼 읽힌다. 파일 목록은 디렉터리에서 도출한다 — 표가 늘어도 사람이 목록을 맞출 필요가 없다.
 RWDIR="$HERE/docs/superpowers/rewrite-map"
@@ -277,6 +294,16 @@ done
 EXC_SEC="$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$NOTES" | sed 's/^「//; s/」$//' | grep -F '프로젝트 폴더' | head -1 || true)"
 check "DESIGN-NOTES가 README 절을 가리킨다" "[ -n \"\$EXC_SEC\" ]"
 check "그 절이 README에 실재한다"            "[ -n \"\$EXC_SEC\" ] && grep -qF \"## \$EXC_SEC\" \"\$README\""
+# 정본만은 베끼지 말라가 아니라 README와 같은 조건을 적으라고 요구한다. 정본은 @import로 매 세션
+# 실리는데 README는 안 실리고 사본도 안 놓이므로, 정본이 가리키기만 하면 그 세션은 조건을 따라갈
+# 길이 없다. 그래서 도달 가능성을 SSOT보다 앞에 두되, 사람이 손으로 맞추지 않도록 README에서 뽑은
+# 조건 문구가 정본에도 그대로 있는지 여기서 대조한다 — README에서 조건이 바뀌면 정본이 붉어진다.
+for m in "${OWN_MARKS[@]}"; do
+  check "정본이 README와 같은 조건을 적는다: $m" "grep -qF -- '$m' \"\$CANON\""
+done
+check "정본이 README 절을 가리킨다"     "grep -qF -- '프로젝트 폴더에 생기는 것' \"\$CANON\""
+check "정본이 어느 README인지 한정한다" "grep -qF -- 'disciplined-coder 레포 README' \"\$CANON\""
+
 for D in "$NOTES" "$HERE/scripts/scaffold.sh" "$HERE/scripts/codex-scaffold.sh"; do
   dn="$(basename "$D")"
   check "$dn 이 README 절을 가리킨다"   "grep -qF -- '프로젝트 폴더에 생기는 것' '$D'"
@@ -291,5 +318,138 @@ done
 echo "[개편 권유 — 사용자용 문서에 적혀 있다]"
 check "README가 개편 권유를 적는다"     "grep -qF -- '개편할지' \"\$README\""
 check "권유가 물음이라는 것을 적는다"   "grep -qF -- '묻는다' \"\$README\""
+
+# --- 설치 확인 명령은 훅 전용 변수에 기대지 않는다 ---
+# README의 확인 명령이 CLAUDE_PLUGIN_ROOT를 썼다. 그 변수는 훅과 커맨드가 실행될 때만 채워지고
+# 사용자 셸에서는 비어 있어, 설치가 멀쩡한 사람도 경로를 못 얻고 실패로 오진했다. 커맨드 문서는
+# 세션이 대신 실행하므로 해당하지 않는다 — 사용자가 직접 치는 README만 잰다.
+echo "[설치 확인 명령 — 사용자 셸에서 그대로 돈다]"
+check "README가 훅 전용 변수를 안 쓴다"   "! grep -qF -- 'CLAUDE_PLUGIN_ROOT' \"\$README\""
+# 전에는 이 자리를 grep 'disciplined-coder' 한 줄로 재다가, README 첫 줄 제목에서 이미 걸려
+# 확인 명령을 통째로 지워도 초록인 검사가 됐다. 그래서 후보 이름을 정본에서 도출해 대조한다 —
+# resolve_home이 보는 환경변수(테스트 전용 *_HOME_DIR 제외)가 README 명령에도 다 있어야 한다.
+HOMESH="$HERE/scripts/_resolve_home.sh"
+HOME_CANDS="$(grep -oE '\$\{(CLAUDE_CONFIG_DIR|USERPROFILE|HOME):-\}' "$HOMESH" | sed 's/^\${//; s/:-}$//' | sort -u)"
+check "정본에서 홈 후보 이름을 뽑아냈다" "[ -n \"\$HOME_CANDS\" ]"
+while IFS= read -r v; do
+  [ -n "$v" ] || continue
+  check "README 확인 명령이 후보를 훑는다: $v" "grep -qE -- '[\$][{]?$v' \"\$README\""
+done <<EOF
+$HOME_CANDS
+EOF
+check "README가 셋업 여부를 함께 찍는다"   "grep -qF -- 'd/disciplined-coder' \"\$README\""
+
+# --- 「」로 가리킨 절이 실재한다 ---
+# 「이렇게 보이면 성공이다」가 README에서 이름이 바뀐 뒤에도 아무 신호 없이 남았고, 렌즈가 자기
+# 절을 다른 이름으로 불렀다. 그래서 「」 참조를 레포 전체의 제목 집합과 맞댄다.
+#
+# 자기 파일만 훑지 않는 이유는 문서끼리 「」로 절을 가리키는 것이 이 레포의 관례이기 때문이다.
+# 한 파일 안으로 좁히면 정당한 상호 참조가 붉어지고, 고치는 압력이 그 참조를 지우는 쪽으로 간다.
+# 제목 전체 일치를 요구하지 않는 이유도 같다 — 이 레포는 이름 뒤에 설명절을 다는 쪽이 다수라,
+# 전체 일치로 재면 이름은 그대로인데 설명절을 붙이는 순간 붉어진다. 이름 부분만 맞대면 원래
+# 잡으려던 것(가리키는 이름이 어디에도 없다)은 그대로 잡힌다.
+echo "[「」로 가리킨 절이 레포 어딘가에 실재한다]"
+HEADINGS="$(find "$HERE" -name '*.md' -not -path '*/.git/*' -exec grep -hE '^#+ ' {} + \
+  | sed 's/^#\+ *//' | sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
+check "레포 제목 집합을 모았다" "[ -n \"\$HEADINGS\" ]"
+BN=0
+for SRC in "$NOTES" "$HERE/skills/reviewer-readability/SKILL.md" "$CALLER" "$CANON"; do
+  sn="$(basename "$(dirname "$SRC")")/$(basename "$SRC")"
+  while IFS= read -r sec; do
+    [ -n "$sec" ] || continue
+    BN=$((BN+1))
+    check "$sn 이 가리킨 절이 있다: $sec" "printf '%s\n' \"\$HEADINGS\" | grep -qxF -- '$sec'"
+  done <<EOF
+$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$SRC" | sed 's/^「//; s/」$//; s/ *[—(].*$//; s/ *$//' | sort -u)
+EOF
+done
+check "「」 참조를 하나 이상 찾았다" "[ '$BN' -gt 0 ]"
+
+# --- 도메인 참고서 열거 == 실제 디렉터리 ---
+# 렌즈 열거는 지키면서 바로 이웃 줄의 도메인 열거는 아무도 안 봤다. 참고서를 하나 더하면
+# domains-index에는 행이 늘지만 트리 주석은 옛 집합으로 남는다.
+# 제외 목록을 검사 대상 문장에서 뽑지 않는다. 전에는 트리 줄에 적힌 '호출자 domain-spec-review'를
+# 그대로 제외 목록으로 썼는데, 그러면 그 꼬리를 지우는 순간 기대 집합이 늘어 붉어지고 실패 메시지가
+# 호출자 스킬을 사용자용 목차에 넣으라고 사람을 떠민다. 대신 트리 줄에서 참고서와 호출자를 각각
+# 뽑아 두 집합으로 다루고, 합집합이 디렉터리 전체와 같은지를 잰다 — 새 호출자를 만들면 트리 줄에
+# 적어야 하고 안 적으면 합집합이 어긋나 붉어진다.
+echo "[도메인 참고서 열거 == 실제 디렉터리]"
+DOM_TREE_LINE="$(grep -F 'skills/domain-*/SKILL.md' "$NOTES" || true)"
+# 참고서는 괄호 안에 슬래시로 나열한다. 괄호가 여럿일 수 있으므로 탐욕적으로 읽지 않는다.
+DOM_TREE="$(printf '%s' "$DOM_TREE_LINE" | grep -oE '\([^()]*\)' | head -1 | tr -d '()' | tr '/' '\n' | sed 's/^ *//; s/ *$//' | grep -v '^$' | sort || true)"
+# 호출자는 '호출자 domain-이름' 꼴로 적는다.
+DOM_CALLER="$(printf '%s' "$DOM_TREE_LINE" | grep -oE '호출자 domain-[a-z-]+' | sed 's/^호출자 domain-//' | sort -u || true)"
+DOM_DIRS="$(for d in "$HERE"/skills/domain-*/; do basename "$d" | sed 's/^domain-//'; done | sort)"
+DOM_BOTH="$(printf '%s\n%s\n' "$DOM_TREE" "$DOM_CALLER" | grep -v '^$' | sort -u)"
+DOM_INDEX="$(grep -oE '`domain-[a-z-]+`' "$HERE/domains-index.md" | tr -d '`' | sed 's/^domain-//' | sort -u || true)"
+check "DESIGN-NOTES 도메인 트리 줄을 찾았다"   "[ -n \"\$DOM_TREE_LINE\" ]"
+check "트리 줄에서 참고서를 뽑아냈다"          "[ -n \"\$DOM_TREE\" ]"
+check "트리 줄에서 호출자를 뽑아냈다"          "[ -n \"\$DOM_CALLER\" ]"
+check "트리 줄이 domain 스킬 전부를 적는다"    "[ \"\$DOM_BOTH\" = \"\$DOM_DIRS\" ]"
+check "domains-index가 참고서와 같은 집합이다" "[ \"\$DOM_INDEX\" = \"\$DOM_TREE\" ]"
+if [ "$DOM_BOTH" != "$DOM_DIRS" ] || [ "$DOM_INDEX" != "$DOM_TREE" ]; then
+  echo "    디렉터리       : $(printf '%s' "$DOM_DIRS" | tr '\n' ' ')"
+  echo "    트리(참고서)   : $(printf '%s' "$DOM_TREE" | tr '\n' ' ')"
+  echo "    트리(호출자)   : $(printf '%s' "$DOM_CALLER" | tr '\n' ' ')"
+  echo "    domains-index  : $(printf '%s' "$DOM_INDEX" | tr '\n' ' ')"
+fi
+
+# --- spec 리뷰 마커: 코드의 리터럴이 산문 둘에 그대로 있다 ---
+# 코드가 스스로 "쌍 계약"이라 부르며 사람에게 손으로 맞추라고 지시하던 자리다. 사람이 맞추는
+# 대신 코드에서 뽑아 대조한다 — 마커를 바꾸면 산문이 안 따라온 것이 여기서 붉어진다.
+echo "[spec 리뷰 마커 == 코드의 리터럴]"
+MARKER="$HERE/hooks/_spec_marker.sh"
+MARK_OK="$(grep -oE 'spec-review: passed' "$MARKER" | head -1 || true)"
+MARK_ESC="$(grep -oE 'spec-review: escalated' "$MARKER" | head -1 || true)"
+check "코드에서 통과 마커를 뽑아냈다"     "[ -n \"\$MARK_OK\" ]"
+check "코드에서 에스컬레이트 마커를 뽑아냈다" "[ -n \"\$MARK_ESC\" ]"
+# 둘 다 뽑은 값으로 대조한다. 전에는 에스컬레이트만 손으로 적은 'escalated' 리터럴로 재다가,
+# 마커 형태가 바뀌어도 낱말만 남아 있으면 통과하는 반쪽 대조가 됐다 — 절반만 기계화한 것이
+# 원래의 손 유지보다 오히려 조용했다.
+for D in "$NOTES" "$CALLER"; do
+  dn="$(basename "$D")"
+  check "$dn 이 통과 마커를 코드와 같이 적는다"       "grep -qF -- '$MARK_OK' '$D'"
+  check "$dn 이 에스컬레이트 마커를 코드와 같이 적는다" "grep -qF -- '$MARK_ESC' '$D'"
+done
+
+# --- 렌즈 전체 개수를 산문에 박지 않는다 ---
+# 렌즈를 하나 더하면 디렉터리와 source 열거는 위 검사가 잡아 주지만 산문에 박힌 수는 초록인 채
+# 옛 값으로 남는다. 이 레포가 오답노트에 적어 둔 매직 넘버 금지가 자기 문서에서 재현된 자리다.
+#
+# 처음에는 훑는 범위를 사고가 났던 파일 둘로만 잡았다가, 정작 살아 있는 '두 렌즈'·'세 렌즈'·
+# '렌즈 셋'을 하나도 못 보는 초록 검사가 됐다. 그래서 범위를 렌즈를 셀 만한 문서 전부로 넓히고
+# 수사가 앞선 것과 뒤선 것을 함께 잡는다.
+#
+# **개수를 적으려면 그 개수의 이름을 같은 줄에 함께 적는다.** 이름이 없는 개수만 금지한다.
+# '여섯 렌즈는 이 스키마로 돌려준다'는 렌즈가 늘면 조용히 틀린 값이 되지만, '`grounding`·
+# `consistency`·`adversarial` 렌즈 셋을 띄운다'는 이름이 함께 있어 어긋나면 눈에 띄고 위의 집합
+# 대조 검사들이 그 이름을 지킨다. 전체 개수와 묶음 크기를 정규식으로 가를 수는 없지만, 이름을
+# 함께 적었는지는 잴 수 있고 그 기준이 실제로 낡는 자리를 정확히 짚는다.
+echo "[이름 없는 렌즈 개수를 산문에 박지 않는다]"
+# '한'은 뺀다 — '유일한 렌즈'의 '한'이 수사로 잡히고, 한국어는 낱말 경계를 정규식으로 못 가른다.
+# 어차피 '한 렌즈'는 렌즈가 늘어도 안 낡는 표현이라 금지할 값이 없다.
+NUM='(두|세|네|다섯|여섯|일곱|여덟|아홉|열)'
+NUMB='(둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)'
+# 렌즈 이름은 디렉터리에서 도출한다 — 여기 손으로 적으면 그 목록이 먼저 낡는다.
+LENS_RE="$(printf '%s' "$ALL" | tr '\n' '|' | sed 's/|$//')"
+COUNT_SCAN="$AGG $HERE/skills/reviewer-*/SKILL.md $HERE/skills/domain-docs/SKILL.md $CALLER $NOTES $CANON $HERE/README.md"
+# shellcheck disable=SC2086
+NUMHIT="$(LC_ALL=C.UTF-8 grep -nE "$NUM[ ]?렌즈|렌즈[ ]?$NUMB|다른 $NUMB[ ]?(렌즈|은|는)|$NUMB[ ]?곳에" $COUNT_SCAN 2>/dev/null \
+  | grep -v '개수를 산문에\|이름을 같은 줄에' \
+  | LC_ALL=C.UTF-8 grep -vE "$LENS_RE" || true)"
+check "개수를 적은 자리마다 이름이 함께 있다" "[ -z \"\$NUMHIT\" ]"
+[ -n "$NUMHIT" ] && printf '    이름 없이 개수만 박힌 자리:\n%s\n' "$NUMHIT"
+
+# --- 테스트 실행 명령: 앞 스크립트의 실패를 삼키지 않는다 ---
+# 자기감사 워크플로가 실행 명령을 인라인에 적는 대신 CLAUDE.md를 정본으로 가리키게 바꿨는데,
+# 그 정본이 실제로 실패를 모으는 형태인지 재는 것이 없었다. CLAUDE.md의 그 줄이 지워지거나
+# `for t in ...; do bash "$t"; done` 으로 되돌아가면 마지막 하나의 종료 코드만 남아 앞선 FAIL이
+# 묻히고, 감사는 잘못된 FAIL=0을 보고한다.
+echo "[테스트 실행 명령 — 앞 스크립트의 실패가 안 묻힌다]"
+CMD="$HERE/CLAUDE.md"
+check "CLAUDE.md가 실행 명령을 적는다"       "grep -qF -- 'for t in scripts/test_*.sh' \"\$CMD\""
+check "실패를 모으는 형태다"                 "grep -qF -- 'bad=\"\$bad \$t\"' \"\$CMD\""
+check "모은 결과를 마지막에 알린다"           "grep -qF -- 'FAILED:' \"\$CMD\""
+check "워크플로가 그 정본을 가리킨다"         "grep -qF -- 'CLAUDE.md 가 그 명령의 정본' '$HERE/.claude/workflows/self-audit.js'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
