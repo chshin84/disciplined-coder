@@ -80,3 +80,7 @@
   → solved_problems/2026-08-26-assert-the-counted-value.md
 - 이 레포의 check 에 명령을 넣을 때는 달러 괄호를 역슬래시로 escape 해 지연시키고, 새 검사는 반드시 실패를 한 번 보고 나서 통과시킨다.
   → solved_problems/2026-08-26-defer-command-substitution-in-check.md
+- 낡은 락을 빼앗을지는 내가 기다린 시간이 아니라 그 락이 잡혀 있던 시간으로 정하고, 재고 빼앗고 잡는 세 걸음을 문지기 락 안에 함께 넣는다.
+  → solved_problems/2026-08-27-stale-lock-steal-must-be-gated.md
+- 동시성 결함은 결과 파일이 아니라 임계 구역 출입 자체를 재고, 실패를 일으키려고 만든 픽스처는 그 실패가 실제로 났는지 먼저 확인한다.
+  → solved_problems/2026-08-27-measure-critical-section-entry.md
