@@ -56,4 +56,27 @@ bash "$SPLIT" "$LOG2" "$BAD/sub" >/dev/null 2>&1 || true
 check "쪼개기: 사본 못 뜨면 안 고친다"     "! [ -d '$RO/solved_problems' ]"
 check "쪼개기: 사본 못 뜨면 로그도 그대로" "grep -qF -- '- **증상**' '$LOG2'"
 
+# 사본 이름표는 스캐폴드가 쓰는 것과 같아야 한다. 부모 폴더 이름으로 짓던 판본은 모든 레포의
+# 프로젝트 로그를 'docs' 하나로 뭉쳐 어느 레포의 사본인지 가릴 수 없었다.
+echo "[split] the copy is labelled by the caller, not by the parent folder"
+T3="$(mktemp -d)"; mkdir -p "$T3/docs"; B3="$T3/backups"; LOG3="$T3/docs/solved_problems.md"
+printf -- '- **증상이 났다**\n  - 원인: 무엇\n  - 해결: 무엇\n' > "$LOG3"
+bash "$SPLIT" "$LOG3" "$B3" my-repo >/dev/null 2>&1 || true
+check "쪼개기: 넘겨준 이름표를 쓴다"        "ls '$B3'/solved_problems.my-repo.*.md >/dev/null 2>&1"
+check "쪼개기: 부모 폴더 이름을 안 쓴다"    "! ls '$B3'/solved_problems.docs.*.md >/dev/null 2>&1"
+
+# 이름표를 안 넘기면 이름 없이 뜬다. 부모 폴더 이름으로 되돌아가면 두 규칙이 다시 갈린다.
+T4="$(mktemp -d)"; mkdir -p "$T4/docs"; B4="$T4/backups"; LOG4="$T4/docs/solved_problems.md"
+printf -- '- **증상이 났다**\n  - 원인: 무엇\n  - 해결: 무엇\n' > "$LOG4"
+bash "$SPLIT" "$LOG4" "$B4" >/dev/null 2>&1 || true
+check "쪼개기: 이름표가 없어도 사본은 뜬다" "ls '$B4'/solved_problems.*.md >/dev/null 2>&1"
+check "쪼개기: 이름표 없으면 폴더명 안 붙인다" "! ls '$B4'/solved_problems.docs.*.md >/dev/null 2>&1"
+
+# 개편을 권하는 문구가 이름표까지 채워 넘긴다 — 안 넘기면 받은 세션이 스스로 정하게 된다.
+echo "[split] the nudge passes the label through"
+NL="$(mktemp -d)"; NLOG="$NL/solved_problems.md"
+printf -- '- **증상이 났다**\n  - 원인: 무엇\n' > "$NLOG"
+NOTE="$( . "$HERE/scripts/_scaffold_common.sh"; scaffold_check_solved_unsplit "$NLOG" "$HERE" "$NL/backups" my-label; printf '%s' "$solved_unsplit_note" )"
+check "권유 문구가 이름표를 채워 넘긴다"    "printf '%s' \"\$NOTE\" | grep -qF -- '\"$NL/backups\" my-label'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

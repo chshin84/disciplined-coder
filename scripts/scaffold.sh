@@ -50,7 +50,7 @@ pc_note="$solved_sync_note"
 # 2b-1) 색인과 본문의 짝, 그리고 아직 안 쪼개진 로그의 개편 권유. 둘 다 읽고 알리기만 한다.
 scaffold_check_solved_pairing "$KDIR/solved_problems.md"
 pc_pairing="$solved_pairing_note"
-scaffold_check_solved_unsplit "$KDIR/solved_problems.md" "$PLUGIN_ROOT" "$KDIR/backups"
+scaffold_check_solved_unsplit "$KDIR/solved_problems.md" "$PLUGIN_ROOT" "$KDIR/backups" pc
 pc_unsplit="$solved_unsplit_note"
 
 # 2c) 세션을 연 프로젝트의 오답노트도 같은 처리를 받는다. 프로젝트마다 형식이 갈리면 recall이
@@ -65,7 +65,7 @@ if [ -f "$PLOG" ] && [ "$PLOG" != "$KDIR/solved_problems.md" ]; then
   proj_note="$solved_sync_note"
   scaffold_check_solved_pairing "$PLOG"
   proj_pairing="$solved_pairing_note"
-  scaffold_check_solved_unsplit "$PLOG" "$PLUGIN_ROOT" "$KDIR/backups"
+  scaffold_check_solved_unsplit "$PLOG" "$PLUGIN_ROOT" "$KDIR/backups" "$plabel"
   proj_unsplit="$solved_unsplit_note"
 fi
 

@@ -365,16 +365,18 @@ scaffold_check_solved_pairing() {  # $1=로그 경로 → sets: solved_pairing_n
 # 쓰는 일은 기계가 못 하므로 승낙한 세션이 그 자리에서 항목 수만큼 다시 써야 한다.
 # 스크립트 경로를 절대경로로 적는 이유는 이 신호가 옆 프로젝트에서 뜨는데 그 cwd 에는 그 파일이
 # 없기 때문이다 — 스크립트는 플러그인 루트 안에 있고, 그 값은 호출자만 안다.
-# 인자 둘까지 채워 적는 이유는 그 스크립트가 로그 경로와 백업 디렉터리를 요구하기 때문이다.
-# 이름만 알려 주면 받은 세션이 백업 자리를 스스로 정하게 되고, 사본이 프로젝트 폴더 같은 엉뚱한
-# 곳에 떨어져 '프로젝트 폴더에 파일을 남기지 않는다'가 그 자리에서 깨진다.
-scaffold_check_solved_unsplit() {  # $1=로그 경로 $2=플러그인 루트 $3=백업 디렉터리 → sets: solved_unsplit_note
-  local f="$1" root="$2" bdir="$3" n
+# 인자 셋을 채워 적는 이유는 그 스크립트가 로그 경로와 백업 디렉터리와 사본 이름표를 받기
+# 때문이다. 이름만 알려 주면 받은 세션이 백업 자리를 스스로 정하게 되고, 사본이 프로젝트 폴더
+# 같은 엉뚱한 곳에 떨어져 '프로젝트 폴더에 파일을 남기지 않는다'가 그 자리에서 깨진다.
+# 이름표까지 채우는 이유는 머리말 동기화가 뜨는 사본과 같은 이름 규칙으로 쌓이게 하려는 것이다 —
+# 안 넘기면 쪼개는 쪽만 다른 규칙으로 이름을 지어 같은 폴더에서 두 규칙이 섞인다.
+scaffold_check_solved_unsplit() {  # $1=로그 경로 $2=플러그인 루트 $3=백업 디렉터리 $4=사본 이름표 → sets: solved_unsplit_note
+  local f="$1" root="$2" bdir="$3" label="${4:-}" n
   solved_unsplit_note=""
   [ -f "$f" ] || return 0
   scaffold_solved_log_is_split "$f" && return 0
   n="$(scaffold_count_matches "$f" '^[-*+][[:space:]]+\*\*')"
   [ "$n" = "0" ] && return 0
-  solved_unsplit_note="🔵 disciplined-coder: $f 가 아직 안 쪼개진 형식이다(항목 ${n}개). 지금 개편할지 사용자에게 물어라 — 첫 선택지가 '지금 개편한다'이고 그것이 권장값이다. 개편은 bash $root/scripts/split_solved_log.sh \"$f\" \"$bdir\" 로 쪼갠 뒤 지시사항 줄을 새로 쓰는 것이다."
+  solved_unsplit_note="🔵 disciplined-coder: $f 가 아직 안 쪼개진 형식이다(항목 ${n}개). 지금 개편할지 사용자에게 물어라 — 첫 선택지가 '지금 개편한다'이고 그것이 권장값이다. 개편은 bash $root/scripts/split_solved_log.sh \"$f\" \"$bdir\" $label 로 쪼갠 뒤 지시사항 줄을 새로 쓰는 것이다."
   return 0
 }

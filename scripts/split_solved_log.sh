@@ -4,7 +4,7 @@
 # 갈리지 않는 항목(옛 한 줄 형식)은 그대로 두고 개수만 알린다. 뜻을 옮기는 일은 사람이 한다.
 # 색인 줄은 굵은 채로 남긴다 — 아직 지시사항으로 안 고쳤다는 표시이고, 고칠 때 굵기를 벗긴다.
 set -u
-LOG="${1:?로그 경로가 필요하다}"; BDIR="${2:?백업 디렉터리가 필요하다}"
+LOG="${1:?로그 경로가 필요하다}"; BDIR="${2:?백업 디렉터리가 필요하다}"; LABEL_IN="${3:-}"
 DIR="${LOG%.md}"
 
 [ -f "$LOG" ] || { echo "로그가 없다: $LOG" >&2; exit 2; }
@@ -19,14 +19,19 @@ for c in python3 python; do command -v "$c" >/dev/null 2>&1 && { PY="$c"; break;
 # 본문 폴더도 여기서 만들지 않는다. 파이썬이 죽었을 때 빈 폴더가 남으면 쪼개짐 판정이
 # '안 쪼개짐'으로 나와 다음 세션에 개편 권유가 다시 뜬다.
 STAMP="$(date +%Y%m%d-%H%M%S 2>/dev/null || echo unknown)"
-LABEL="$(printf '%s' "$(basename "$(dirname "$LOG")")" | tr -c 'A-Za-z0-9._-' '_')"
+# 이름표는 부르는 쪽이 준다. 스캐폴드가 이미 PC 로그에 pc 를, 프로젝트 로그에 프로젝트 폴더
+# 이름을 쓰고 있으므로 같은 값을 받아 한 규칙으로 모은다. 부모 폴더 이름으로 지으면 모든 레포의
+# 프로젝트 로그가 'docs' 하나로 뭉쳐 어느 레포의 사본인지 가릴 수 없다.
+# 안 받았으면 이름표 없이 뜬다 — 부모 폴더 이름으로 되돌아가면 두 규칙이 다시 갈린다.
+LABEL="$(printf '%s' "$LABEL_IN" | tr -c 'A-Za-z0-9._-' '_')"
+[ -n "$LABEL" ] && LABEL=".$LABEL"
 # 쪼갤 것이 하나도 없으면 사본을 뜨지 않는다 — 뜨면 다시 돌릴 때마다 백업 폴더가 늘어 어느 것이
 # 어느 회차인지 가릴 수 없게 된다(멱등성은 연속 두 번 실행으로만 드러난다).
 if ! grep -qE '^[-*+][[:space:]]+\*\*' "$LOG" 2>/dev/null; then
   echo "손으로 가를 항목 0개"
   exit 0
 fi
-if ! mkdir -p "$BDIR" 2>/dev/null || ! cp "$LOG" "$BDIR/solved_problems.$LABEL.$STAMP.md" 2>/dev/null; then
+if ! mkdir -p "$BDIR" 2>/dev/null || ! cp "$LOG" "$BDIR/solved_problems$LABEL.$STAMP.md" 2>/dev/null; then
   echo "사본을 뜨지 못해 아무것도 하지 않았다($BDIR 에 쓸 수 있게 하라)" >&2
   exit 2
 fi
