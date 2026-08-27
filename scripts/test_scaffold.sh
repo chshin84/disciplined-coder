@@ -852,8 +852,8 @@ printf '# 나 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/s
   printf -- '- 가 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
 } > "$LOGP1"
 OUTP1="$(run "$HP1" "$PP1")"
-echo "[pairing] index lines and body files are counted against each other"
-check "pairing: 어긋나면 알린다"      "printf '%s' \"\$OUTP1\" | grep -qF -- '색인 줄 1개, 본문 파일 2개'"
+echo "[pairing] index lines and body files are matched by name"
+check "pairing: 어긋나면 알린다"      "printf '%s' \"\$OUTP1\" | grep -qF -- '색인 줄이 없는 본문 파일: b.md'"
 check "pairing: 색인을 안 고친다"     "[ \"\$(. '$COMMON'; scaffold_count_matches '$LOGP1' '→ solved_problems/')\" = 1 ]"
 check "pairing: 본문도 안 지운다"     "[ -f '$HP1/.claude/disciplined-coder/solved_problems/b.md' ]"
 
@@ -873,6 +873,21 @@ printf -- '- **다 할 때 나는 증상**\n  → solved_problems/c.md\n' >> "$L
 OUTP4="$(run "$HP1" "$PP1")"
 check "pairing: 손으로 가를 몫은 안 늘어난다" "printf '%s' \"\$OUTP4\" | grep -qF -- '손으로 가를 항목 1개'"
 check "pairing: 못 고친 색인 줄을 따로 센다"   "printf '%s' \"\$OUTP4\" | grep -qF -- '지시사항으로 못 고친 색인 줄 1개'"
+
+# 개수는 같은데 서로 다른 것을 가리키는 상태. 개수만 맞대던 판본은 이 어긋남을 통째로 놓쳤다 —
+# 색인 줄 하나와 본문 파일 하나라 숫자로는 완벽하게 맞아 보인다.
+HP2="$(mktemp -d)"; PP2="$(mktemp -d)"; mkdir -p "$HP2/.claude/disciplined-coder/solved_problems"
+LOGP2="$HP2/.claude/disciplined-coder/solved_problems.md"
+printf '# 라 할 때는 이렇게 한다\n' > "$HP2/.claude/disciplined-coder/solved_problems/only-body.md"
+{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
+  printf -- '- 마 할 때는 이렇게 한다.\n  → solved_problems/only-index.md\n'
+} > "$LOGP2"
+OUTP5="$(run "$HP2" "$PP2")"
+check "pairing: 개수가 같아도 이름이 어긋나면 알린다" "printf '%s' \"\$OUTP5\" | grep -qF -- '어긋난다'"
+check "pairing: 본문 없는 색인 줄을 이름으로 짚는다"   "printf '%s' \"\$OUTP5\" | grep -qF -- '가리키는 본문이 없는 색인 줄: only-index.md'"
+check "pairing: 색인 없는 본문 파일을 이름으로 짚는다" "printf '%s' \"\$OUTP5\" | grep -qF -- '색인 줄이 없는 본문 파일: only-body.md'"
+check "pairing: 어긋나도 색인을 안 고친다"            "grep -qF 'only-index.md' '$LOGP2'"
+check "pairing: 어긋나도 본문을 안 지운다"            "[ -f '$HP2/.claude/disciplined-coder/solved_problems/only-body.md' ]"
 
 # --- notice-encoding: 사용자 화면에 나가는 표시가 이중 인코딩되지 않았다 ---
 # 이모지 뒤 본문 조각만 grep 하면 표시가 깨져도 통과한다 — 실제로 알림 넷의 🔵 가 latin-1 을
