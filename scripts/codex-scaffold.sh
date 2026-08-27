@@ -65,11 +65,31 @@ fi
 # scaffold.sh의 had_import와 같은 역할이며, 판정 대상만 다르다(Claude는 @import 줄, Codex는 관리블록 마커).
 had_inline=0
 if [ -f "$AG" ] && grep -qF "$MANAGED_BEGIN" "$AG"; then had_inline=1; fi
-{
+# 정본을 못 읽으면 반쪽짜리 블록을 쓰지 않는다. Codex는 @import가 없어 본문을 통째로 인라인하므로,
+# 읽기가 실패한 파일은 그대로 빈 자리가 된다 — 그런데 AGENTS.md에는 정상으로 보이는 관리블록이
+# 놓여 있어 원칙 없이 도는 세션을 아무도 눈치채지 못한다. 그래서 먼저 모아 보고, 한 줄도 못 모았으면
+# 블록을 아예 쓰지 않고 사유를 알린다(`FAIL-LOUD`. scaffold.sh의 정본 복사 실패와 같은 규율이다).
+inline_body="$(
   for f in agent-principles.md domains-index.md; do
-    if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; printf '\n'; fi
+    if [ -f "$KDIR/$f" ]; then
+      if ! cat "$KDIR/$f"; then
+        echo "[disciplined-coder] WARNING: 정본 읽기 실패 — $KDIR/$f" >&2
+      fi
+      printf '\n'
+    else
+      echo "[disciplined-coder] WARNING: source not found at $KDIR/$f" >&2
+    fi
   done
-} | managed_block_inject "$AG" "$MANAGED_BEGIN" "$MANAGED_END"
+)"
+if [ -z "$inline_body" ]; then
+  echo "[disciplined-coder] ERROR: 정본을 한 줄도 못 읽어 $AG 관리블록을 쓰지 않았다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열어라." >&2
+else
+  inject_rc=0
+  printf '%s\n' "$inline_body" | managed_block_inject "$AG" "$MANAGED_BEGIN" "$MANAGED_END" || inject_rc=$?
+  if [ "$inject_rc" -ne 0 ]; then
+    echo "[disciplined-coder] ERROR: $AG 관리블록을 못 썼다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열어라." >&2
+  fi
+fi
 
 # 4) 세션 주입용 stdout(session-start-codex가 캡처해 additionalContext로 넣는다).
 #    분업 — principles+domains는 섹션 3이 AGENTS.md에 이미 인라인했으므로 여기서 다시 보내지 않는다.

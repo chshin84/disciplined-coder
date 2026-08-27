@@ -45,6 +45,30 @@ CK1="$(cksum < "$LOG")"; N1="$(ls -1 "$T/solved_problems"/*.md 2>/dev/null | wc 
 bash "$SPLIT" "$LOG" "$B" >/dev/null 2>&1 || true
 check "쪼개기: 두 번 돌려도 색인이 같다"  "[ \"\$(cksum < '$LOG')\" = '$CK1' ]"
 check "쪼개기: 두 번 돌려도 파일 수 같다" "[ \"\$(ls -1 '$T/solved_problems'/*.md 2>/dev/null | wc -l | tr -d ' ')\" = '$N1' ]"
+# 백업 폴더는 안 보고 있었다. 그래서 고칠 것이 없는 회차에도 사본이 쌓이는 결함이 초록으로 남았다 —
+# 정작 복구가 필요한 순간에 손대기 전 원본이 어느 것인지 가릴 수 없게 된다. 개수는 첫 회차 값을
+# 변수로 받아 비교한다(매직 넘버 금지).
+BK1="$(ls -1 "$B" 2>/dev/null | wc -l | tr -d ' ')"
+bash "$SPLIT" "$LOG" "$B" >/dev/null 2>&1 || true
+check "쪼개기: 두 번 돌려도 사본이 안 는다" "[ \"\$(ls -1 '$B' 2>/dev/null | wc -l | tr -d ' ')\" = \"\$BK1\" ]"
+check "쪼개기: 첫 회차엔 사본을 떴다"       "[ \"\$BK1\" -ge 1 ]"
+
+# 중간에 죽으면 아무것도 남기지 않는다. 전에는 본문을 제자리에 하나씩 썼기 때문에, 죽으면 본문
+# 몇 개만 남고 색인은 옛 형식이었다 — 쪼개짐 판정은 본문 파일 하나면 참이 되므로 다음 세션이
+# 옛 형식 색인에 최신 머리말을 씌워 굳혔다. 파이썬을 실패하게 만들어 그 회차를 재현한다.
+echo "[split] a mid-run failure must leave nothing behind"
+CT="$(mktemp -d)"; CLOG="$CT/solved_problems.md"; CB="$CT/backups"
+printf -- '- **증상이 났다**\n  - 원인: 무엇\n  - 해결: 무엇\n' > "$CLOG"
+CBEFORE="$(cksum < "$CLOG")"
+FAKEPY="$(mktemp -d)"
+printf '#!/usr/bin/env bash\nexit 1\n' > "$FAKEPY/python3"; chmod +x "$FAKEPY/python3"
+cp "$FAKEPY/python3" "$FAKEPY/python"
+CRC=0; ( PATH="$FAKEPY:$PATH" bash "$SPLIT" "$CLOG" "$CB" ) >/dev/null 2>&1 || CRC=$?
+check "중간 실패: 실패로 돌아온다"          "[ '$CRC' -ne 0 ]"
+check "중간 실패: 본문 폴더가 안 생긴다"    "[ ! -d '$CT/solved_problems' ]"
+check "중간 실패: 사본도 안 뜬다"           "[ ! -d '$CB' ]"
+check "중간 실패: 로그가 그대로다"          "[ \"\$(cksum < '$CLOG')\" = '$CBEFORE' ]"
+check "중간 실패: 임시 파일이 안 남는다"    "[ -z \"\$(ls -1 '$CT' | grep -vx 'solved_problems.md')\" ]"
 
 # 백업 자리에 파일을 두어 mkdir -p 가 실패하게 만든다. 없는 절대경로를 쓰면 Git Bash 에서
 # 설치 폴더로 풀려 관리자 셸에서는 성공해 버린다.

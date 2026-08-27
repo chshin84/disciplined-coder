@@ -541,9 +541,9 @@ LT="$(mktemp -d)"; LW="$LT/witness"; LK="$LT/x.lock"; LN=6
 mkdir "$LK"; printf '%s\n' "$(( $(date +%s) - 600 ))" > "$LK/heldsince"
 for i in $(seq 1 "$LN"); do
   ( . "$HERE/scripts/_managed_block.sh"
-    managed_block_lock "$LK"
+    ltok="$(managed_block_lock "$LK")" || exit 1
     printf 'IN\n' >> "$LW"; sleep 0.3; printf 'OUT\n' >> "$LW"
-    managed_block_unlock "$LK" ) 2>/dev/null &
+    managed_block_unlock "$LK" "$ltok" ) 2>/dev/null &
 done
 wait
 echo "[stale-lock] stealing a stale lock still admits one writer at a time"
@@ -555,6 +555,46 @@ check "낡은 락 빼앗기: 치운 락도 남지 않는다"  "[ -z \"\$(ls '$LT
 check "락을 만드는 곳이 헬퍼 한 곳뿐이다"      "[ \"\$(grep -c 'mkdir \"\$lock\"' '$HERE/scripts/_managed_block.sh')\" = 1 ]"
 check "호출자 둘 다 헬퍼를 거친다"             "[ \"\$(grep -c 'managed_block_lock \"\$lock\"' '$HERE/scripts/_managed_block.sh')\" = 2 ]"
 check "빼앗기를 문지기 안에서 한다"            "grep -qF 'gate' '$HERE/scripts/_managed_block.sh'"
+
+# --- 락에 주인이 있다: 빼앗긴 옛 주인이 새 주인의 락을 지우지 않는다 ---
+# 전에는 푸는 쪽이 경로만 보고 지웠다. 그래서 낡았다고 락을 빼앗긴 프로세스가 제 일을 마치며
+# unlock을 부르면 그새 새로 들어온 쪽의 락이 사라져 임계 구역에 둘이 함께 들어갔다.
+echo "[lock-owner] a preempted holder must not delete the new holder's lock"
+OT="$(mktemp -d)"; OL="$OT/o.lock"
+OWN_TOK1="$( . "$HERE/scripts/_managed_block.sh"; managed_block_lock "$OL" )"
+rm -rf "$OL"   # 빼앗김
+OWN_TOK2="$( . "$HERE/scripts/_managed_block.sh"; managed_block_lock "$OL" )"
+( . "$HERE/scripts/_managed_block.sh"; managed_block_unlock "$OL" "$OWN_TOK1" )   # 옛 주인이 푼다
+check "락에 주인 토큰이 적힌다"                "[ -s '$OL/owner' ]"
+check "두 토큰이 서로 다르다"                  "[ \"\$OWN_TOK1\" != \"\$OWN_TOK2\" ]"
+check "옛 주인이 새 주인의 락을 안 지운다"     "[ -d '$OL' ]"
+( . "$HERE/scripts/_managed_block.sh"; managed_block_unlock "$OL" "$OWN_TOK2" )
+check "제 주인은 푼다"                         "[ ! -e '$OL' ]"
+# 토큰을 안 주면 아무것도 하지 않는다 — 주인인지 알 수 없는 락을 지우는 것이 막으려는 그 일이다.
+NT="$(mktemp -d)"; NL="$NT/n.lock"; mkdir "$NL"; date +%s > "$NL/heldsince"; echo other > "$NL/owner"
+( . "$HERE/scripts/_managed_block.sh"; managed_block_unlock "$NL" )
+check "토큰 없이 부르면 안 지운다"             "[ -d '$NL' ]"
+
+# --- 락을 못 잡으면 멈추지 않고 물러난다 ---
+# 홈에 쓸 수 없거나 남이 계속 잡고 있으면 이 반복문이 끝나지 않았다. SessionStart 훅 안에서 도므로
+# 세션 시작이 멈춘 채 끝나지 않고 사용자에게는 원인도 안 떴다. 사유를 알리고 실패로 돌아와야 한다.
+echo "[lock-timeout] an unobtainable lock must fail loudly instead of hanging"
+TT="$(mktemp -d)"; TF="$TT/CLAUDE.md"; printf 'keep\n' > "$TF"
+mkdir "$TF.lock"; date +%s > "$TF.lock/heldsince"; echo someone-else > "$TF.lock/owner"
+TERR="$TT/err"; TRC=0
+( . "$HERE/scripts/_managed_block.sh"
+  MANAGED_LOCK_TOTAL_TICKS=5
+  printf 'body\n' | managed_block_inject "$TF" "# B" "# E" ) 2>"$TERR" || TRC=$?
+check "락을 못 잡으면 실패로 돌아온다"         "[ '$TRC' -ne 0 ]"
+check "못 잡은 사유를 알린다"                  "grep -qF '락을 잡지 못했다' '$TERR'"
+check "못 잡으면 파일을 안 고친다"             "[ \"\$(cat '$TF')\" = 'keep' ]"
+check "남의 락을 안 건드린다"                  "[ -d '$TF.lock' ]"
+# 부모 디렉터리가 없어 mkdir이 늘 실패하는 경우도 같은 길로 나온다.
+NOPAR="$TT/없는폴더/x.lock"; PRC=0
+( . "$HERE/scripts/_managed_block.sh"; MANAGED_LOCK_TOTAL_TICKS=5; managed_block_lock "$NOPAR" ) >/dev/null 2>&1 || PRC=$?
+check "부모 폴더가 없어도 물러난다"            "[ '$PRC' -ne 0 ]"
+# 상한 자체가 코드에 있는지 본다 — 지우면 다시 영원히 돈다.
+check "총 대기 상한이 코드에 있다"             "grep -qF 'MANAGED_LOCK_TOTAL_TICKS' '$HERE/scripts/_managed_block.sh'"
 
 # --- 매니페스트 version 계약 ---
 # Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin·DESIGN-NOTES).

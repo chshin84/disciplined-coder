@@ -48,10 +48,20 @@ MANAGED_STRIP_AWK='
 # 끝의 빈 줄을 걷어낸다(블록을 뗀 자리에 빈 줄이 쌓이는 것을 막는다).
 MANAGED_TRIM_AWK='{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$0 } END { for (i=1;i<=last;i++) print line[i] }'
 
-# 락을 잡는다. 잡을 때까지 돌아오지 않으며, 푸는 것은 managed_block_unlock 이 맡는다.
-# 죽은 프로세스가 남긴 락에 영원히 갇히지 않도록 한 락이 10초를 넘게 잡혀 있으면 빼앗고
-# 경고한다(`FAIL-LOUD`). 잡는 코드를 이 함수 한 곳에 두는 이유는 호출자가 둘이라 한쪽만 고치면
-# 옛 갈래가 남기 때문이다.
+# 락을 잡는다. 잡으면 그 락의 주인 토큰을 stdout으로 돌려주고, 푸는 것은 managed_block_unlock 이
+# 그 토큰을 받아 맡는다. 죽은 프로세스가 남긴 락에 영원히 갇히지 않도록 한 락이 10초를 넘게 잡혀
+# 있으면 빼앗고 경고한다(`FAIL-LOUD`). 잡는 코드를 이 함수 한 곳에 두는 이유는 호출자가 둘이라
+# 한쪽만 고치면 옛 갈래가 남기 때문이다.
+#
+# **주인 토큰을 두는 이유는 빼앗긴 옛 주인이 새 주인의 락을 지우기 때문이다.** 토큰이 없으면 푸는
+# 쪽은 경로만 보고 지운다. 그래서 낡았다고 락을 빼앗긴 프로세스가 제 일을 마치며 unlock 을 부르면,
+# 그새 새로 들어온 쪽의 락이 사라져 임계 구역에 둘이 함께 들어간다. 잡을 때 자기만 아는 토큰을
+# 락 안에 적어 두고, 풀 때 그 토큰이 아직 자기 것일 때만 지운다.
+#
+# **총 대기에 상한을 두는 이유는 못 잡는 사유가 사라지지 않는 환경이 있기 때문이다.** 홈에 쓸 수
+# 없거나(권한), 같은 이름의 파일이 놓여 있으면 mkdir 이 늘 실패해 이 반복문이 끝나지 않는다. 이
+# 함수는 SessionStart 훅 안에서 도므로 그대로 두면 세션 시작이 멈춘 채 끝나지 않고, 사용자에게는
+# 원인도 안 뜬다. 상한을 넘으면 사유와 경로를 알리고 실패로 돌아간다 — 호출자는 파일을 안 고친다.
 #
 # 함께 들어가는 것을 막는 장치가 둘이다. 하나만으로는 모자란다 — 실측에서 여덟 중 셋이 함께
 # 들어갔다.
@@ -70,14 +80,26 @@ MANAGED_TRIM_AWK='{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$
 # 30초를 기다린 뒤 치운다.
 MANAGED_LOCK_STALE_SECONDS=10
 MANAGED_GATE_STALE_TICKS=300
-managed_block_lock() {  # $1=락 디렉터리 경로
-  local lock="$1" gate="$1.gate" born now gwait=0
+# 총 대기 상한. 0.1초 틱이므로 600틱은 60초다. 락 나이 상한(10초)보다 넉넉히 커야 정상적인
+# 빼앗기가 이 상한에 먼저 걸리지 않는다.
+MANAGED_LOCK_TOTAL_TICKS=600
+managed_block_lock() {  # $1=락 디렉터리 경로 → 성공하면 주인 토큰을 stdout으로, 실패하면 리턴 1
+  local lock="$1" gate="$1.gate" born now gwait=0 total=0 tok
+  # 토큰은 이 호출만 아는 값이다. 프로세스 번호와 시각과 난수를 붙여 같은 PC에서 겹치지 않게 한다.
+  tok="$$-$(date +%s 2>/dev/null || echo 0)-${RANDOM:-0}${RANDOM:-0}"
   while :; do
+    total=$((total+1))
+    if [ "$total" -gt "$MANAGED_LOCK_TOTAL_TICKS" ]; then
+      echo "[disciplined-coder] ERROR: 락을 잡지 못했다 — $lock (부모 디렉터리에 쓸 수 있는지, 같은 이름의 파일이 있는지 보라). 이 파일은 고치지 않는다." >&2
+      return 1
+    fi
     if mkdir "$gate" 2>/dev/null; then
       gwait=0
       if mkdir "$lock" 2>/dev/null; then
         printf '%s\n' "$(date +%s 2>/dev/null || echo 0)" 2>/dev/null > "$lock/heldsince" || true
+        printf '%s\n' "$tok" 2>/dev/null > "$lock/owner" || true
         rmdir "$gate" 2>/dev/null || true
+        printf '%s\n' "$tok"
         return 0
       fi
       born="$(cat "$lock/heldsince" 2>/dev/null || true)"
@@ -101,10 +123,17 @@ managed_block_lock() {  # $1=락 디렉터리 경로
   done
 }
 
-# 락을 푼다. 안에 잡은 시각이 들어 있어 rmdir 로는 안 지워진다.
-managed_block_unlock() {  # $1=락 디렉터리 경로
-  [ -n "${1:-}" ] || return 0
-  rm -rf "$1" 2>/dev/null || true
+# 락을 푼다. 안에 잡은 시각과 주인 토큰이 들어 있어 rmdir 로는 안 지워진다.
+# **자기 것일 때만 지운다.** 토큰이 다르면 그 사이에 락을 빼앗기고 남이 새로 잡은 것이므로, 지우면
+# 남을 임계 구역에 혼자 두는 것이 아니라 둘로 만든다. 토큰을 안 받았으면(옛 호출 형태) 아무것도
+# 하지 않는다 — 주인인지 알 수 없는 락을 지우는 것이 이 함수가 막으려는 바로 그 일이다.
+managed_block_unlock() {  # $1=락 디렉터리 경로, $2=managed_block_lock 이 준 토큰
+  local lock="${1:-}" tok="${2:-}" cur
+  [ -n "$lock" ] || return 0
+  [ -n "$tok" ] || return 0
+  cur="$(cat "$lock/owner" 2>/dev/null || true)"
+  [ "$cur" = "$tok" ] || return 0
+  rm -rf "$lock" 2>/dev/null || true
   return 0
 }
 
@@ -113,10 +142,11 @@ managed_block_unlock() {  # $1=락 디렉터리 경로
 # git 밖일 수 있어 사본이 유일한 복구 수단이다 — 그래서 사본 경로를 인자로 받아 여기서 직접 뜨고,
 # 못 뜨면 아예 걷어내지 않는다(오답노트 머리말과 같은 규율. 호출자가 기억하게 두지 않으려고 함수
 # 안에 둔다 — `FAIL-LOUD`).
-# 리턴: 0=걷어냄, 1=대상이 없어 아무것도 안 함, 2=사본을 못 떠서 걷어내지 않음.
+# 리턴: 0=걷어냄, 1=대상이 없어 아무것도 안 함, 2=사본을 못 떠서 걷어내지 않음,
+#       3=락을 못 잡아 걷어내지 않음.
 # 호출은 반드시 `|| rc=$?`로 감싼다(set -e).
 managed_block_remove() {
-  local uc="$1" begin="$2" end="$3" bk="${4:-}" tmp norm lock
+  local uc="$1" begin="$2" end="$3" bk="${4:-}" tmp norm lock tok
   managed_block_backup=""
   [ -f "$uc" ] || return 1
   grep -qF "$begin" "$uc" 2>/dev/null || return 1
@@ -127,24 +157,27 @@ managed_block_remove() {
     managed_block_backup="$bk"
   fi
   lock="$uc.lock"
-  managed_block_lock "$lock"
+  tok="$(managed_block_lock "$lock")" || return 3
   tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
-  trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock"' RETURN
+  trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock" "$tok"' RETURN
   awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp"
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" && mv "$norm" "$uc"
   return 0
 }
 
+# 리턴: 0=넣었음, 1=락을 못 잡아 아무것도 안 함.
+# 락을 못 잡았으면 파일을 건드리지 않고 물러난다 — 반쪽만 쓴 관리블록을 남기는 것보다 안 쓰는
+# 것이 낫고, 못 썼다는 사실은 managed_block_lock 이 이미 stderr 로 알렸다(`FAIL-LOUD`).
 managed_block_inject() {
-  local uc="$1" begin="$2" end="$3" body tmp norm lock
+  local uc="$1" begin="$2" end="$3" body tmp norm lock tok
   body="$(cat)"
   touch "$uc"
 
   lock="$uc.lock"
-  managed_block_lock "$lock"
+  tok="$(managed_block_lock "$lock")" || return 1
   tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
   # 중간에 죽어도 임시 파일과 락을 남기지 않는다.
-  trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock"' RETURN
+  trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock" "$tok"' RETURN
   awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp"
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" && mv "$norm" "$uc"
   {

@@ -15,6 +15,14 @@ cwd="$(printf '%s' "$INPUT" | sed -n 's/.*"cwd"[[:space:]]*:[[:space:]]*"\([^"]*
 cwd="$(printf '%s' "$cwd" | tr -s '\\' '/')"
 if [ -n "$cwd" ]; then cd "$cwd" 2>/dev/null || exit 0; fi
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
+# 레포 루트로 옮긴 뒤에 찾는다. 아래 두 탐색이 모두 레포 루트 기준 경로를 쓰기 때문이다 —
+# git status 의 pathspec(`docs/superpowers/...`)은 현재 폴더 기준이고, diff-tree 가 돌려주는
+# 경로와 `[ -f "$f" ]` 도 루트 기준이다. 그래서 세션의 작업 폴더가 하위 폴더이면(예: myrepo/backend)
+# 미리뷰 spec 을 하나도 못 찾고 아무 메시지 없이 통과시켰다 — 게이트가 꺼진 것을 알아챌 방법이
+# 없는 조용한 실패다(`FAIL-LOUD`).
+_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+[ -n "$_root" ] || exit 0
+cd "$_root" 2>/dev/null || exit 0
 
 # 경로는 배열에 모은다 — 공백으로 이어 붙이면 NUL 종료로 얻은 안전성이 그 자리에서 무너진다.
 unreviewed=()

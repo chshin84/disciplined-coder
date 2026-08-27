@@ -89,6 +89,8 @@ if [ -f "$PCLAUDE" ] && [ "$PCLAUDE" != "$UC" ]; then
     pointer_note="🔵 disciplined-coder: $PCLAUDE 에 남아 있던 옛 관리블록을 걷어냈다(사용자가 쓴 줄은 그대로 두었다. 사본: $managed_block_backup)."
   elif [ "$prc" -eq 2 ]; then
     pointer_note="🔵 disciplined-coder: $PCLAUDE 에 옛 관리블록이 남아 있는데 사본을 뜨지 못해 그대로 두었다($KDIR/backups 에 쓸 수 있게 되면 다음 세션에 다시 시도한다)."
+  elif [ "$prc" -eq 3 ]; then
+    pointer_note="🔵 disciplined-coder: $PCLAUDE 에 옛 관리블록이 남아 있는데 잠금을 잡지 못해 그대로 두었다(다른 창이 같은 파일을 붙들고 있거나 그 폴더에 쓸 수 없다. 다음 세션에 다시 시도한다)."
   fi
 fi
 
@@ -99,11 +101,17 @@ fi
 # 이중 주입이 조용히 되살아난다(이 레포는 CRLF를 실재 문제로 이미 다룬다).
 had_import=0
 if [ -f "$UC" ] && grep -qF '@disciplined-coder/agent-principles.md' "$UC"; then had_import=1; fi
-managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" <<'EOF'
+# 잠금을 못 잡으면 배선을 안 쓰고 물러난다. 그 사실을 여기서 알린다 — 정본 파일은 깔렸는데
+# @import만 빠지면 세션은 원칙 없이 도는데 파일이 다 있어 아무도 눈치채지 못한다(`FAIL-LOUD`).
+inject_rc=0
+managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" <<'EOF' || inject_rc=$?
 @disciplined-coder/agent-principles.md
 @disciplined-coder/domains-index.md
 @disciplined-coder/solved_problems.md
 EOF
+if [ "$inject_rc" -ne 0 ]; then
+  echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라." >&2
+fi
 
 # 4) 첫 세션 도달 보강: CLAUDE.md는 이 훅보다 먼저 로드되므로, 블록을 방금 만든 세션은
 #    @import만으로 정본에 닿지 못한다. 그 세션에만 stdout(additionalContext)으로 보강한다.
