@@ -9,10 +9,18 @@ DIR="${LOG%.md}"
 
 [ -f "$LOG" ] || { echo "로그가 없다: $LOG" >&2; exit 2; }
 
-# 이 레포 관례 — python3 를 먼저 보고 없으면 python 으로 떨어진다. 이 PC 의 python3 가 한때
-# 스토어 스텁이었던 이력이 오답노트에 있어 둘 다 시도한다.
+# 이 레포 관례 — python3 를 먼저 보고 없으면 python 으로 떨어진다.
+# **있는지가 아니라 도는지로 고른다.** 윈도우 스토어가 심어 두는 python3 는 PATH 에 있어
+# command -v 를 통과하지만, 돌리면 "Python" 한 줄을 찍고 죽는다. 존재만 보고 고르면 그 스텁을
+# 집어 쪼개기가 통째로 실패하고, 자동으로 도는 자리라 사람이 원인을 짚기 어렵다.
+# 이 레포의 _json_valid.sh 와 _ensure_autoupdate.sh 는 이미 돌려 보고 고른다 — 같은 판정이
+# 두 가지 정의로 살아 있었고 없는 쪽이 틀렸다.
 PY=""
-for c in python3 python; do command -v "$c" >/dev/null 2>&1 && { PY="$c"; break; }; done
+for c in python3 python; do
+  command -v "$c" >/dev/null 2>&1 || continue
+  "$c" -c 'import sys' >/dev/null 2>&1 || continue
+  PY="$c"; break
+done
 [ -n "$PY" ] || { echo "파이썬을 찾지 못했다" >&2; exit 2; }
 
 # 사본이 유일한 복구 수단이다(이 로그는 git 밖일 수 있다) — 못 뜨면 아무것도 하지 않는다.
@@ -121,7 +129,16 @@ if [ -z "$moved" ]; then
 fi
 
 # 여기서 처음 사본을 뜬다. 못 뜨면 아무것도 옮기지 않는다 — 사본이 유일한 복구 수단이다.
-if ! mkdir -p "$BDIR" 2>/dev/null || ! cp "$LOG" "$BDIR/solved_problems$LABEL.$STAMP.md" 2>/dev/null; then
+# 이름이 겹치면 비켜 앉는다. 타임스탬프가 초 단위라, 한 번의 세션 시작에서 이 스크립트와 머리말
+# 갱신이 잇달아 사본을 뜨면 같은 이름이 나와 손대기 전 원본이 덮인다(_scaffold_common.sh 에 같은
+# 가드가 있다 — 두 자리가 같은 폴더에 같은 규칙으로 쌓으므로 한쪽만 막으면 뚫린다).
+BK="$BDIR/solved_problems$LABEL.$STAMP.md"
+SEQ=0
+while [ -e "$BK" ]; do
+  SEQ=$((SEQ + 1))
+  BK="$BDIR/solved_problems$LABEL.$STAMP-$SEQ.md"
+done
+if ! mkdir -p "$BDIR" 2>/dev/null || ! cp "$LOG" "$BK" 2>/dev/null; then
   echo "사본을 뜨지 못해 아무것도 하지 않았다($BDIR 에 쓸 수 있게 하라)" >&2
   exit 2
 fi

@@ -96,11 +96,31 @@ bash "$SPLIT" "$LOG4" "$B4" >/dev/null 2>&1 || true
 check "쪼개기: 이름표가 없어도 사본은 뜬다" "ls '$B4'/solved_problems.*.md >/dev/null 2>&1"
 check "쪼개기: 이름표 없으면 폴더명 안 붙인다" "! ls '$B4'/solved_problems.docs.*.md >/dev/null 2>&1"
 
-# 개편을 권하는 문구가 이름표까지 채워 넘긴다 — 안 넘기면 받은 세션이 스스로 정하게 된다.
-echo "[split] the nudge passes the label through"
+# 스캐폴드가 쪼개기를 직접 부를 때 이름표까지 채워 넘긴다 — 안 넘기면 사본이 다른 규칙으로
+# 쌓여 같은 폴더에서 두 규칙이 섞이고, 어느 로그의 사본인지 가릴 수 없게 된다.
+echo "[split] the scaffold passes the label through when it splits"
 NL="$(mktemp -d)"; NLOG="$NL/solved_problems.md"
 printf -- '- **증상이 났다**\n  - 원인: 무엇\n' > "$NLOG"
-NOTE="$( . "$HERE/scripts/_scaffold_common.sh"; scaffold_check_solved_unsplit "$NLOG" "$HERE" "$NL/backups" my-label; printf '%s' "$solved_unsplit_note" )"
-check "권유 문구가 이름표를 채워 넘긴다"    "printf '%s' \"\$NOTE\" | grep -qF -- '\"$NL/backups\" my-label'"
+NOTE="$( . "$HERE/scripts/_scaffold_common.sh"; scaffold_migrate_solved_unsplit "$NLOG" "$HERE" "$NL/backups" my-label; printf '%s' "$solved_unsplit_note" )"
+check "쪼갠 사본이 이름표를 달았다"    "ls '$NL/backups'/solved_problems.my-label.*.md >/dev/null 2>&1"
+check "쪼갰다고 알린다"                "printf '%s' \"\$NOTE\" | grep -qF -- '쪼갰다'"
+check "쪼갠 결과가 실제로 갈렸다"      "grep -qF -- '→ solved_problems/' '$NLOG'"
+
+# PATH 앞자리에 있는 이름뿐인 파이썬에 걸리지 않는다. 윈도우 스토어가 심어 두는 python3 는
+# PATH 에 있고 command -v 도 통과하지만, 돌리면 "Python" 한 줄을 찍고 죽는다. 존재만 보고 고르면
+# 그 스텁을 집어 쪼개기가 통째로 실패한다 — 이 레포의 다른 두 스크립트는 이미 돌려 보고 고른다.
+echo "[split] a name-only python earlier on PATH does not win"
+SB="$(mktemp -d)"; printf '#!/bin/sh
+echo Python
+exit 49
+' > "$SB/python3"; chmod +x "$SB/python3"
+S5="$(mktemp -d)"; LOG5="$S5/solved_problems.md"; B5="$S5/backups"
+printf -- '- **증상이 났다**
+  - 원인: 무엇
+' > "$LOG5"
+PATH="$SB:$PATH" bash "$SPLIT" "$LOG5" "$B5" stub >/dev/null 2>&1 || true
+check "스텁을 건너뛰고 쪼갠다"        "grep -qF -- '→ solved_problems/' '$LOG5'"
+check "스텁이어도 본문이 생긴다"      "ls '$S5/solved_problems'/*.md >/dev/null 2>&1"
+
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

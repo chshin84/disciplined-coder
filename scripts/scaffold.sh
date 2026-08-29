@@ -42,16 +42,20 @@ scaffold_hygiene "$KDIR"
 #    (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
 if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; fi
 
-# 2b) 오답노트 머리말 동기화: 형식 규칙이 낡았으면 사본을 뜨고 정본 머리말로 갈아끼운다.
+# 2b) 아직 안 쪼개진 본오답노트를 먼저 쪼갠다. 머리말 갱신보다 앞에 두는 이유는 순서 때문이다 —
+#     뒤에 두면 그 세션의 머리말은 옛 형식으로 맞춰지고, 쪼개진 로그가 옛 규칙을 단 채 한 세션을
+#     보낸다. 그 사이 한 파일이 스스로를 두 형식으로 규정한다.
+scaffold_migrate_solved_unsplit "$KDIR/solved_problems.md" "$PLUGIN_ROOT" "$KDIR/backups" pc
+pc_unsplit="$solved_unsplit_note"
+# 2b-1) 오답노트 머리말 동기화: 형식 규칙이 낡았으면 사본을 뜨고 정본 머리말로 갈아끼운다.
 #     항목은 한 줄도 건드리지 않고, 머리말의 끝을 알아볼 수 없는 로그는 손대지 않는다(방법 정본은
 #     domain-docs 스킬). 오답노트는 플러그인이 형식을 정하는 파일이라 사람 승인 없이 맞춘다.
 scaffold_sync_solved "$KDIR/solved_problems.md" pc "$KDIR/backups" pc
 pc_note="$solved_sync_note"
-# 2b-1) 색인과 본문의 짝, 그리고 아직 안 쪼개진 로그의 개편 권유. 둘 다 읽고 알리기만 한다.
+# 2b-2) 본오답노트와 개별노트의 짝을 본다. 읽고 알리기만 한다. 쪼갠 직후에는 색인 줄이 아직
+#     지시사항이 아니므로 여기서 그 개수와 함께 migrate-solved-log 스킬을 가리킨다.
 scaffold_check_solved_pairing "$KDIR/solved_problems.md"
 pc_pairing="$solved_pairing_note"
-scaffold_check_solved_unsplit "$KDIR/solved_problems.md" "$PLUGIN_ROOT" "$KDIR/backups" pc
-pc_unsplit="$solved_unsplit_note"
 
 # 2c) 세션을 연 프로젝트의 오답노트도 같은 처리를 받는다. 프로젝트마다 형식이 갈리면 recall이
 #     읽는 모양이 제각각이 되기 때문이다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다 —
@@ -61,12 +65,12 @@ PLOG="$PROJ/docs/solved_problems.md"
 proj_note=""; proj_pairing=""; proj_unsplit=""
 if [ -f "$PLOG" ] && [ "$PLOG" != "$KDIR/solved_problems.md" ]; then
   plabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
+  scaffold_migrate_solved_unsplit "$PLOG" "$PLUGIN_ROOT" "$KDIR/backups" "$plabel"
+  proj_unsplit="$solved_unsplit_note"
   scaffold_sync_solved "$PLOG" project "$KDIR/backups" "$plabel"
   proj_note="$solved_sync_note"
   scaffold_check_solved_pairing "$PLOG"
   proj_pairing="$solved_pairing_note"
-  scaffold_check_solved_unsplit "$PLOG" "$PLUGIN_ROOT" "$KDIR/backups" "$plabel"
-  proj_unsplit="$solved_unsplit_note"
 fi
 
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).

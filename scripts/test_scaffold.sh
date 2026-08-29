@@ -630,20 +630,31 @@ OLDLOG="$HR2/.claude/disciplined-coder/solved_problems.md"
 BEFORE2="$(cksum < "$OLDLOG")"
 OUTR2="$(run "$HR2" "$PR2")"
 BK2="$(find "$HR2/.claude/disciplined-coder/backups" -type f -name 'solved_problems.*' 2>/dev/null | head -1 || true)"
+NBK2="$(find "$HR2/.claude/disciplined-coder/backups" -type f | wc -l)"
+# 이름 순서에 기대지 않는다. 한 회차에 사본이 여럿 뜨면 어느 것이 손대기 전 원본인지는 이름이
+# 아니라 내용이 정한다 — 겹침을 피하려 붙인 꼬리표 때문에 이름순 첫째가 원본이 아닐 수 있다.
+HASORIG2=no
+for b in "$HR2/.claude/disciplined-coder/backups"/solved_problems.*; do
+  [ -f "$b" ] || continue
+  [ "$(cksum < "$b")" = "$BEFORE2" ] && { HASORIG2=yes; break; }
+done
 echo "[solved-rules] legacy log gets its header replaced, entries untouched"
-check "legacy: 규칙 블록이 생겼다"        "grep -qF '증상은 굵게 한 줄로 띄운다' '$OLDLOG'"
+check "legacy: 색인 형식 규칙이 들어갔다" "grep -qF '이 파일은 색인이고' '$OLDLOG'"
+check "legacy: 옛 형식 규칙은 안 들어간다" "! grep -qF '증상은 굵게 한 줄로 띄운다' '$OLDLOG'"
 check "legacy: 옛 규칙 문장이 사라졌다"   "! grep -qF '등록은 메인 세션이 수행' '$OLDLOG'"
 check "legacy: 첫 항목 보존"              "grep -qF '옛 형식 항목' '$OLDLOG'"
-check "legacy: 여러 줄 항목 보존"         "grep -qF '해결: 셋째 줄' '$OLDLOG'"
+check "legacy: 여러 줄 항목 제목 보존"    "grep -qF '여러 줄 항목' '$OLDLOG'"
+check "legacy: 여러 줄 항목 본문이 내려갔다" "grep -rqF '해결: 셋째 줄' '$HR2/.claude/disciplined-coder/solved_problems/'"
+check "legacy: 색인엔 본문이 없다"         "! grep -qF '해결: 셋째 줄' '$OLDLOG'"
 check "legacy: 백업이 생겼다"             "[ -n '$BK2' ]"
-check "legacy: 백업은 손대기 전 원본"     "[ \"\$(cksum < '$BK2')\" = '$BEFORE2' ]"
+check "legacy: 사본 가운데 손대기 전 원본이 있다" "[ '$HASORIG2' = yes ]"
 check "legacy: 무엇을 했는지 알린다"      "printf '%s' \"\$OUTR2\" | grep -qF '머리말을 현행 형식으로 갱신'"
 check "legacy: 임시 파일 잔해 없음"       "[ -z \"\$(find '$HR2/.claude/disciplined-coder' -maxdepth 1 -name 'solved_problems.md.*' 2>/dev/null)\" ]"
 # 두 번째 실행은 이미 최신이라 아무 일도 하지 않는다(멱등) — 백업이 세션마다 쌓이면 안 된다.
 AFTER2="$(cksum < "$OLDLOG")"
 run "$HR2" "$PR2" >/dev/null
 check "legacy: 재실행은 무변경"           "[ \"\$(cksum < '$OLDLOG')\" = \"\$AFTER2\" ]"
-check "legacy: 백업이 늘지 않는다"        "[ \$(find '$HR2/.claude/disciplined-coder/backups' -type f | wc -l) -eq 1 ]"
+check "legacy: 백업이 늘지 않는다"        "[ \$(find '$HR2/.claude/disciplined-coder/backups' -type f | wc -l) -eq \$NBK2 ]"
 
 # (다) 불릿을 하나 지운 로그도 낡은 것으로 잡아 규칙 블록을 통째로 복원한다. 남아 있던 규칙
 # 불릿을 항목으로 오인해 아래에 다시 붙이면 블록이 두 벌이 되므로, 중복이 없는지도 함께 본다.
@@ -993,7 +1004,11 @@ echo "[notice-encoding] user-facing notices are not double-encoded"
 check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COMMON\""
 check "notice: 짝 맞춤 알림에 파란 점 접두" "printf '%s' \"$OUTP4\" | grep -qF -- '🔵 disciplined-coder:'"
 
-# --- unsplit: 안 쪼개진 로그는 항목 수와 함께 개편을 권한다 ---
+# --- unsplit: 안 쪼개진 로그는 세션 시작 때 그 자리에서 쪼개진다 ---
+# 예전에는 쪼개는 명령어를 글로 알려만 주었다. 그러면 받은 세션이 그 명령을 옮겨 적어야 하고,
+# 승낙을 받아도 회차마다 다른 방식으로 쪼갰다. 기계가 할 수 있는 걸음(본문 분리)은 묻지 않고
+# 하고, 사람만 할 수 있는 걸음(색인 줄을 지시사항으로 다시 쓰기)만 스킬로 넘긴다. 머리말 갱신이
+# 사람 승인 없이 도는 것과 같은 근거다 — 형식을 정하는 주체가 플러그인이다.
 HU1="$(mktemp -d)"; PU1="$(mktemp -d)"; mkdir -p "$HU1/.claude/disciplined-coder"
 LOGU1="$HU1/.claude/disciplined-coder/solved_problems.md"
 { printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
@@ -1001,16 +1016,46 @@ LOGU1="$HU1/.claude/disciplined-coder/solved_problems.md"
   printf -- '- **둘째 증상**\n  - 원인: 무엇\n  - 해결: 무엇\n'
 } > "$LOGU1"
 OUTU1="$(run "$HU1" "$PU1")"
-echo "[unsplit] an unsplit log gets a conversion nudge with its item count"
-check "unsplit: 개편을 권한다"       "printf '%s' \"\$OUTU1\" | grep -qF -- '개편'"
-check "unsplit: 항목 수를 보인다"    "printf '%s' \"\$OUTU1\" | grep -qF -- '항목 2개'"
-check "unsplit: 스크립트 절대경로"   "printf '%s' \"\$OUTU1\" | grep -qF -- '$HERE/scripts/split_solved_log.sh'"
-check "unsplit: 고치지는 않는다"     "grep -qF -- '- **첫째 증상**' '$LOGU1'"
+echo "[unsplit] an unsplit log is split in place at session start"
+check "unsplit: 본문 폴더가 생겼다"     "[ -d '$HU1/.claude/disciplined-coder/solved_problems' ]"
+check "unsplit: 본문이 두 개다"         "[ \$(ls -1 '$HU1/.claude/disciplined-coder/solved_problems'/*.md 2>/dev/null | wc -l) -eq 2 ]"
+check "unsplit: 색인에 포인터가 붙었다"  "grep -qF -- '→ solved_problems/' '$LOGU1'"
+check "unsplit: 항목 줄은 그대로다"      "grep -qF -- '- **첫째 증상**' '$LOGU1'"
+check "unsplit: 증상은 본문으로 내려갔다" "! grep -qF -- '- 원인: 무엇' '$LOGU1'"
+check "unsplit: 사본을 떴다"            "ls '$HU1/.claude/disciplined-coder/backups'/solved_problems.pc.*.md >/dev/null 2>&1"
+check "unsplit: 쪼갰다고 알린다"         "printf '%s' \"\$OUTU1\" | grep -qF -- '쪼갰다'"
+check "unsplit: 항목 수를 보인다"        "printf '%s' \"\$OUTU1\" | grep -qF -- '항목 2개'"
+# 쪼갠 그 걸음에서 머리말도 색인 형식으로 바뀌어야 한다. 한 세션 뒤로 밀리면 그 사이 한 파일이
+# 옛 형식 규칙을 달고 쪼개진 상태로 남아, 규칙과 내용이 서로 다른 것을 말한다.
+check "unsplit: 머리말도 같은 걸음에서 바뀐다" "grep -qF -- '이 파일은 색인이고' '$LOGU1'"
+# 남은 일은 사람만 할 수 있다. 그 방법을 소유한 스킬 이름을 대야 받은 세션이 지어내지 않는다.
+check "unsplit: 남은 일로 스킬을 댄다"   "printf '%s' \"\$OUTU1\" | grep -qF -- 'migrate-solved-log'"
+check "unsplit: 남은 색인 줄 수를 센다"  "printf '%s' \"\$OUTU1\" | grep -qF -- '색인 줄 2개'"
+# 두 번 돌려도 같아야 한다 — 쪼갠 로그를 또 쪼개면 본문이 두 벌이 된다.
+NBKU1="$(ls -1 "$HU1/.claude/disciplined-coder/backups"/solved_problems.pc.* | wc -l)"
+check "unsplit: 두 번 돌려도 같다"       "CKU=\"\$(cksum < '$LOGU1')\"; run '$HU1' '$PU1' >/dev/null; [ \"\$(cksum < '$LOGU1')\" = \"\$CKU\" ]"
+check "unsplit: 두 번째엔 사본이 안 는다" "[ \$(ls -1 '$HU1/.claude/disciplined-coder/backups'/solved_problems.pc.* | wc -l) -eq \$NBKU1 ]"
 
-# 항목이 없는 갓 만든 로그에는 안 권한다 — grep -c 의 0건 함정이 여기서 드러난다.
+# 항목이 없는 갓 만든 로그에는 아무 일도 하지 않는다 — grep -c 의 0건 함정이 여기서 드러난다.
 HU2="$(mktemp -d)"; PU2="$(mktemp -d)"
 OUTU2="$(run "$HU2" "$PU2")"
-check "unsplit: 빈 로그엔 안 권함"   "! printf '%s' \"\$OUTU2\" | grep -qF -- '개편'"
+check "unsplit: 빈 로그엔 안 쪼갬"      "! printf '%s' \"\$OUTU2\" | grep -qF -- '쪼갰다'"
+check "unsplit: 빈 로그엔 본문 폴더도 없다" "[ ! -d '$HU2/.claude/disciplined-coder/solved_problems' ]"
+
+# 쪼개지 못하면 조용히 넘어가지 않는다 — 사본을 뜰 자리에 쓸 수 없으면 쪼개기가 아무것도 안 하고
+# 죽는데, 그때 아무 말이 없으면 다음 세션도 같은 자리에서 같은 실패를 되풀이한다.
+# 스캐폴드 전체가 아니라 함수만 부른다. 백업 자리를 망가뜨리면 스캐폴드의 다른 걸음들도 함께
+# 죽어서 쪼개기 실패만 따로 볼 수 없기 때문이다.
+HU3="$(mktemp -d)"; LOGU3="$HU3/solved_problems.md"
+printf -- '- **어떤 증상**
+  - 원인: 무엇
+' > "$LOGU3"
+printf 'not a dir
+' > "$HU3/backups"
+NOTEU3="$( . "$COMMON"; scaffold_migrate_solved_unsplit "$LOGU3" "$HERE" "$HU3/backups" pc; printf '%s' "$solved_unsplit_note" )"
+check "unsplit: 못 쪼개면 알린다"       "printf '%s' \"\$NOTEU3\" | grep -qF -- '쪼개지 못했다'"
+check "unsplit: 못 쪼개면 사유를 싣는다" "printf '%s' \"\$NOTEU3\" | grep -qF -- '사본을'"
+check "unsplit: 못 쪼개면 로그는 그대로" "grep -qF -- '- 원인: 무엇' '$LOGU3'"
 
 # --- rules-switch: 형태가 바뀌면 옛 규칙 블록이 남지 않는다 ---
 # 쪼개는 순간 로그는 '옛 규칙 블록을 단 쪼개진 로그'가 된다. 경계 계산이 새 블록의 줄만

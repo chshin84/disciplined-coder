@@ -33,15 +33,17 @@ scaffold_hygiene "$KDIR"
 #    (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
 if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; fi
 
-# 2b) 오답노트 머리말 동기화(scaffold.sh와 동일 정책): 낡았으면 사본을 뜨고 정본 머리말로 갈아끼운다.
+# 2b) 아직 안 쪼개진 본오답노트를 먼저 쪼갠다(scaffold.sh와 동일 정책). 머리말 갱신보다 앞에
+#     두는 이유는 순서 때문이다 — 뒤에 두면 그 세션의 머리말이 옛 형식으로 맞춰진다.
 #     쌍둥이 스크립트는 한쪽만 고치면 반드시 어긋나므로 같이 둔다.
+scaffold_migrate_solved_unsplit "$KDIR/solved_problems.md" "$PLUGIN_ROOT" "$KDIR/backups" pc
+pc_unsplit="$solved_unsplit_note"
+# 2b-1) 오답노트 머리말 동기화: 낡았으면 사본을 뜨고 정본 머리말로 갈아끼운다.
 scaffold_sync_solved "$KDIR/solved_problems.md" pc "$KDIR/backups" pc
 pc_note="$solved_sync_note"
-# 2b-1) 색인과 본문의 짝, 그리고 아직 안 쪼개진 로그의 개편 권유. 둘 다 읽고 알리기만 한다.
+# 2b-2) 본오답노트와 개별노트의 짝을 본다. 읽고 알리기만 한다.
 scaffold_check_solved_pairing "$KDIR/solved_problems.md"
 pc_pairing="$solved_pairing_note"
-scaffold_check_solved_unsplit "$KDIR/solved_problems.md" "$PLUGIN_ROOT" "$KDIR/backups" pc
-pc_unsplit="$solved_unsplit_note"
 
 # 2c) 세션을 연 프로젝트의 오답노트도 같은 처리를 받는다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
 #     프로젝트 CLAUDE.md의 옛 관리블록 정리는 여기 없다 — 그것은 Claude 쪽 파일이라 그쪽이 소유한다.
@@ -50,12 +52,12 @@ PLOG="$PROJ/docs/solved_problems.md"
 proj_note=""; proj_pairing=""; proj_unsplit=""
 if [ -f "$PLOG" ] && [ "$PLOG" != "$KDIR/solved_problems.md" ]; then
   plabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
+  scaffold_migrate_solved_unsplit "$PLOG" "$PLUGIN_ROOT" "$KDIR/backups" "$plabel"
+  proj_unsplit="$solved_unsplit_note"
   scaffold_sync_solved "$PLOG" project "$KDIR/backups" "$plabel"
   proj_note="$solved_sync_note"
   scaffold_check_solved_pairing "$PLOG"
   proj_pairing="$solved_pairing_note"
-  scaffold_check_solved_unsplit "$PLOG" "$PLUGIN_ROOT" "$KDIR/backups" "$plabel"
-  proj_unsplit="$solved_unsplit_note"
 fi
 
 # 3) ~/.codex/AGENTS.md 관리블록 재생성(멱등, CRLF 내성). @import 미지원 → 정본 본문 인라인.
