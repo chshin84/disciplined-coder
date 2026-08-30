@@ -416,7 +416,7 @@ SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
 check "ASK-FORK 항목이 잡힌다"              "[ -n \"\$CC_LINE\" ]"
 check "ASK-FORK: 질문 도구 규칙"            "printf '%s' \"\$CC_LINE\" | grep -qF -- '질문 도구로 선택지를 띄운다'"
-check "ASK-FORK: 평문이 안 되는 이유"       "printf '%s' \"\$CC_LINE\" | grep -qF -- '답해야 할 물음인지'"
+check "ASK-FORK: 평문이 안 되는 이유"       "printf '%s' \"\$CC_LINE\" | grep -qF -- '답할 자리인지'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
 check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'ASK-FORK'"
 
