@@ -478,4 +478,17 @@ for d in "$HERE"/skills/*/; do
   check "$sk 이 언제 여는지 자기 설명에 적는다" "grep -m1 '^description:' '$d/SKILL.md' | grep -qE '때|연다|쓴다|한다'"
 done
 
+# --- 이독성 규칙의 출처가 세 문서에 걸쳐 이어져 있다 ---
+# 정본은 조항만 담고, writing-korean 이 상세를 담으며, reviewer-readability 가 그것을 열어 대조한다.
+# 전에 정본을 줄이면서 조항을 스킬로 통째로 내렸더니 렌즈가 가리키는 근거가 정본에서 사라졌는데,
+# 검사가 새 자리를 따라가 버려 끊긴 것을 못 잡았다. 그래서 셋을 한 줄로 함께 붙든다.
+echo "[규칙 출처] 정본 → writing-korean → reviewer-readability 가 이어져 있다"
+RDB_L="$HERE/skills/reviewer-readability/SKILL.md"
+check "정본에 이름 자리 조항이 있다"     "grep -qF '이름을 붙이는 곳은 명사구로 쓰고 주장은 본문으로 내린다' \"$CANON\""
+check "정본에 말끝 통일 조항이 있다"     "grep -qF '한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다' \"$CANON\""
+check "정본이 상세 소유자를 가리킨다"    "grep -qF 'writing-korean' \"$CANON\""
+check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'writing-korean' \"$RDB_L\""
+check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'writing-korean'"
+check "기준 문서가 자기 구실을 밝힌다"   "grep -qF 'reviewer-readability' \"$WK\""
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
