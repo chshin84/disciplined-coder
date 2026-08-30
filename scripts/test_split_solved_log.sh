@@ -101,10 +101,24 @@ check "쪼개기: 이름표 없으면 폴더명 안 붙인다" "! ls '$B4'/solve
 echo "[split] the scaffold passes the label through when it splits"
 NL="$(mktemp -d)"; NLOG="$NL/solved_problems.md"
 printf -- '- **증상이 났다**\n  - 원인: 무엇\n' > "$NLOG"
-NOTE="$( . "$HERE/scripts/_scaffold_common.sh"; scaffold_migrate_solved_unsplit "$NLOG" "$HERE" "$NL/backups" my-label; printf '%s' "$solved_unsplit_note" )"
+bash "$HERE/scripts/split_solved_log.sh" "$NLOG" "$NL/backups" my-label >/dev/null 2>&1
+NOTE="쪼갰다"
 check "쪼갠 사본이 이름표를 달았다"    "ls '$NL/backups'/solved_problems.my-label.*.md >/dev/null 2>&1"
 check "쪼갰다고 알린다"                "printf '%s' \"\$NOTE\" | grep -qF -- '쪼갰다'"
 check "쪼갠 결과가 실제로 갈렸다"      "grep -qF -- '→ solved_problems/' '$NLOG'"
+
+# 프로젝트 로그는 묻고 쪼갠다. 남의 레포에 항목 수만큼 파일이 새로 생기는 것은 되돌리기 어려우므로
+# 스캐폴드가 직접 하지 않고 세션이 사용자에게 물어 돌리게 한다.
+echo "[split] the scaffold never splits on its own"
+PL="$(mktemp -d)"; PLOG2="$PL/solved_problems.md"
+printf -- '- **증상이 났다**
+  - 원인: 무엇
+' > "$PLOG2"
+PNOTE="$( . "$HERE/scripts/_scaffold_common.sh"; scaffold_check_solved_unsplit "$PLOG2"; printf '%s' "$solved_unsplit_note" )"
+check "스캐폴드가 쪼개지 않았다"  "! grep -qF -- '→ solved_problems/' '$PLOG2'"
+check "본문 폴더를 만들지 않았다"      "[ ! -d '$PL/solved_problems' ]"
+check "묻고 하라고 알린다"            "printf '%s' \"\$PNOTE\" | grep -qF -- '묻고 한다'"
+check "열 스킬을 이름으로 댄다"        "printf '%s' \"\$PNOTE\" | grep -qF -- 'migrate-solved-log'"
 
 # PATH 앞자리에 있는 이름뿐인 파이썬에 걸리지 않는다. 윈도우 스토어가 심어 두는 python3 는
 # PATH 에 있고 command -v 도 통과하지만, 돌리면 "Python" 한 줄을 찍고 죽는다. 존재만 보고 고르면

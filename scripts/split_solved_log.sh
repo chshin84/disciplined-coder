@@ -72,7 +72,7 @@ PTR = re.compile(r"^\s*→\s*solved_problems/")
 def slug(title, taken):
     s = re.sub(r"[*`\[\]()]", "", title).strip()
     s = re.sub(r"\s+", "-", s)
-    s = re.sub(r"[^0-9A-Za-z가-힣-]", "", s)[:40].strip("-") or "item"
+    s = re.sub(r"[^0-9A-Za-z-]", "", s)[:40].strip("-") or "note"
     base, n = s, 2
     while s in taken:
         s = "%s-%d" % (base, n)

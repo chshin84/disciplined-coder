@@ -7,10 +7,10 @@ description: 설계가 하려는 것을 누가 이미 해봤는지, 결과가 �
 > 이것은 **렌즈 하나**다. 실행은 `domain-spec-review`가 읽기 전용 서브에이전트로 띄운다.
 > **리뷰어 렌즈 가운데 이것만 스스로 웹에 나간다.** 그래서 다른 렌즈에 없는 가드가 붙는다.
 
-## 무엇을 보나
-이 설계가 하려는 것을 누가 이미 해봤는가, 그 결과는 무엇이었는가, 실패했다면 그 원인이 이 설계에도 그대로
-남아 있는가. **참신성은 채점하지 않는다** — 새롭다는 것은 아무도 안 해봤다는 뜻일 수도 있지만, 해봤는데
-안 돼서 아무도 안 하고 있다는 뜻일 수도 있다.
+## 대조 대상
+이 렌즈는 이 설계가 하려는 것을 이미 해본 선행 사례를 찾아, 그 사례가 어떻게 끝났는지와 그 실패 원인이
+이 설계에 그대로 남아 있는지를 대조한다. **참신성은 채점하지 않는다** — 새롭다는 것은 아무도 안
+해봤다는 뜻일 수도 있지만, 해봤는데 목표한 성과를 내지 못해 아무도 이어서 하지 않는다는 뜻일 수도 있다.
 
 ## 체크리스트
 - **기시감** — 이 설계의 핵심 메커니즘에 대응하는 선행 사례가 연구·상용 제품·오픈소스 어디에 있는가.
@@ -79,7 +79,7 @@ description: 설계가 하려는 것을 누가 이미 해봤는지, 결과가 �
 
 ## 출력 스키마 (공통 + 이 렌즈의 넷)
 ```
-{ "lens": "prior-art", "search_status": "ok|no-results|failed|not-attempted", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "refuted-premise|known-failure|crowded|weak-baseline", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 선행 사례와 그 결말, 네 축의 같고 다름을 적는다", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|reviewer-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "리뷰어 자신의 불확실성" ], "notes": "" }
+{ "lens": "prior-art", "search_status": "ok|no-results|failed|not-attempted", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "refuted-premise|known-failure|crowded|weak-baseline", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 선행 사례와 그 결말, 네 축의 같고 다름을 적는다", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|reviewer-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "리뷰어 자신의 불확실성" ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 위 블록은 그 계약을 이 렌즈의 값으로 채워 보인 사본이고, 뜻풀이가 정본과 어긋나면 계약 테스트가 잡는다.
 처분은 이 렌즈가 정하지 않는다. **이 렌즈의 발견은 호출자가 전부 `🔴`로 처분한다** — 웹에서 읽어 온

@@ -389,25 +389,17 @@ scaffold_check_solved_pairing() {  # $1=로그 경로 → sets: solved_pairing_n
 # 아직 안 쪼개진 본오답노트를 만나면 그 자리에서 쪼갠다. 읽고 알리기만 하던 자리다.
 # 예전에는 쪼개는 명령어를 문구에 적어 넘겼는데, 그러면 받은 세션이 그것을 옮겨 적어야 하고
 # 승낙을 받아도 회차마다 다른 방식으로 쪼갰다. 기계가 할 수 있는 걸음은 여기서 끝내고, 사람만
-# 할 수 있는 걸음(색인 줄을 지시사항 한 문장으로 다시 쓰기)만 스킬로 넘긴다.
-# 사람 승인 없이 도는 근거는 머리말 갱신과 같다 — 이 파일의 형식을 정하는 주체가 플러그인이다.
-# 되돌릴 걱정이 없는 근거는 쪼개는 쪽에 있다 — 그 스크립트는 사본을 먼저 뜨고, 사본을 못 뜨면
-# 아무것도 하지 않으며, 본문을 옮기다 실패하면 옮긴 것을 도로 치운다.
+# 쪼개기는 스캐폴드가 직접 하지 않고 세션이 사용자에게 물어 돌린다. PC 전역이든 프로젝트든
+# 항목 수만큼 파일이 새로 생기는 것은 되돌리기 어려운 변경이고, 파일을 만드는 일에 예외를 두면
+# 그 예외가 기준선이 된다. 그래서 여기서는 아직 한 덩어리라는 사실과 항목 수만 알린다.
 # 항목 수를 함께 내는 이유는 남은 일의 크기가 항목 수에 비례하기 때문이다.
-scaffold_migrate_solved_unsplit() {  # $1=로그 $2=플러그인 루트 $3=백업 디렉터리 $4=사본 이름표 → sets: solved_unsplit_note
-  local f="$1" root="$2" bdir="$3" label="${4:-}" n out rc
+scaffold_check_solved_unsplit() {  # $1=로그 → sets: solved_unsplit_note
+  local f="$1" n
   solved_unsplit_note=""
   [ -f "$f" ] || return 0
   scaffold_solved_log_is_split "$f" && return 0
   n="$(scaffold_count_matches "$f" '^[-*+][[:space:]]+\*\*')"
   [ "$n" = "0" ] && return 0
-  out="$(bash "$root/scripts/split_solved_log.sh" "$f" "$bdir" "$label" 2>&1)"; rc=$?
-  # 조용히 넘어가지 않는다. 사유를 그대로 실어야 사람이 어느 자리를 손볼지 안다 — 사본을 뜰
-  # 자리와 로그가 놓인 자리는 서로 다른 디렉터리이고, 한 문구로 뭉개면 엉뚱한 자리를 고친다.
-  if [ "$rc" -ne 0 ]; then
-    solved_unsplit_note="🔵 disciplined-coder: $f 를 쪼개지 못했다(항목 ${n}개. 로그는 손대기 전 그대로다). 사유: $(printf '%s' "$out" | tr '\n' ' ')"
-    return 0
-  fi
-  solved_unsplit_note="🔵 disciplined-coder: $f 를 본오답노트와 개별노트로 쪼갰다(항목 ${n}개. 사본은 $bdir 에 있다)."
+  solved_unsplit_note="🔵 disciplined-coder: $f 가 아직 한 덩어리다(항목 ${n}개). 쪼개면 항목 수만큼 파일이 새로 생기므로 묻고 한다 — 사용자에게 지금 쪼갤지 물어 승인받은 뒤 migrate-solved-log 스킬을 열어라."
   return 0
 }
