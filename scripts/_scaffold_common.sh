@@ -2,8 +2,11 @@
 # 공유: scaffold.sh(Claude)와 codex-scaffold.sh(Codex)의 공통 로직(SSOT).
 # 두 스크립트는 홈 위치·주입 방식만 다르고 관리 디렉터리 정책은 동일해야 한다 — 여기가 정본.
 
-# 관리 디렉터리 화이트리스트(=현 정본 세트)와 구 관리파일(STALE). 여기만 고친다.
-SCAFFOLD_WHITELIST="agent-principles.md backups"
+# 관리 디렉터리에 두는 정본 파일. 두 스캐폴드가 복사하고 주입하는 것이 이 목록이다.
+SCAFFOLD_FILES="agent-principles.md"
+# 화이트리스트는 정본 파일에 backups 디렉터리를 더한 것이다. 위생 검사가 이 목록 밖을 훑는다.
+# 파일 이름을 다른 곳에 다시 적지 않는다 — 여기만 고친다.
+SCAFFOLD_WHITELIST="$SCAFFOLD_FILES backups"
 # 구 관리파일은 매 세션 조용히 지운다. issue-mode·ultracode-review는 토글이던 상태 파일인데,
 # 토글을 없애면서 화이트리스트에서만 빼면 내용이 있어 '비관리 파일' 경고로 영원히 남는다.
 # advisors-index·unsolved_problems도 같은 이유로 여기 있다 — 앞은 domains-index로 이름이 바뀐 옛

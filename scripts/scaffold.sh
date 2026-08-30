@@ -20,7 +20,7 @@ mkdir -p "$KDIR"
 created=""
 
 # 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
-for f in agent-principles.md; do
+for f in $SCAFFOLD_FILES; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
   if [ -f "$src" ]; then
     # 복사가 실패하면 조용히 넘어가지 않는다. 이미 옛 사본이 놓여 있는 PC에서는 파일도 있고
@@ -85,7 +85,7 @@ fi
 #    @import만으로 정본에 닿지 못한다. 그 세션에만 stdout(additionalContext)으로 보강한다.
 #    이후 세션은 @import 한 경로로만 로드한다 — 같은 내용을 두 번 싣지 않는다.
 if [ "$had_import" -eq 0 ]; then
-  for f in agent-principles.md; do
+  for f in $SCAFFOLD_FILES; do
     [ -f "$KDIR/$f" ] || continue
     # 읽기가 거부돼도 훅 전체를 죽이지 않는다. set -e 아래에서 cat 실패는 스캐폴드를 그 자리에서
     # 끝내 @import 배선까지 못 하게 만든다. 대신 못 읽었다는 사실을 stderr로 드러낸다(FAIL-LOUD).

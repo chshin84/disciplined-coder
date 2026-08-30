@@ -476,4 +476,19 @@ check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'writing-korean' 
 check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'writing-korean'"
 check "기준 문서가 자기 구실을 밝힌다"   "grep -qF 'reviewer-readability' \"$WK\""
 
+# --- 관리 디렉터리 파일 목록은 한 곳에서만 정한다 ---
+# _scaffold_common.sh 가 "여기만 고친다"고 선언해 놓고 두 스캐폴드가 파일 이름을 각자 다시 적던
+# 자리다. 목록이 늘면 사람이 다섯 곳을 손으로 맞춰야 하고, 그러면 반드시 갈라진다.
+echo "[관리 파일 목록 == 한 곳]"
+SC_FILES="$(grep -oE '^SCAFFOLD_FILES="[^"]*"' "$HERE/scripts/_scaffold_common.sh" | sed 's/^SCAFFOLD_FILES="//; s/"$//')"
+check "SCAFFOLD_FILES 를 뽑아냈다" "[ -n \"\$SC_FILES\" ]"
+for scf in $SC_FILES; do
+  check "스캐폴드가 '$scf' 를 하드코딩하지 않는다" \
+    "! grep -qE 'for f in .*$scf' '$HERE/scripts/scaffold.sh' '$HERE/scripts/codex-scaffold.sh'"
+done
+# 부정 단언의 짝이다 — 부정만 두면 두 스캐폴드에서 루프가 통째로 사라져도 통과한다.
+check "scaffold.sh 가 SCAFFOLD_FILES 를 쓴다"       "grep -qF 'for f in \$SCAFFOLD_FILES' '$HERE/scripts/scaffold.sh'"
+check "codex-scaffold.sh 가 SCAFFOLD_FILES 를 쓴다" "grep -qF 'for f in \$SCAFFOLD_FILES' '$HERE/scripts/codex-scaffold.sh'"
+check "화이트리스트가 그 목록에서 도출된다"          "grep -qF 'SCAFFOLD_WHITELIST=\"\$SCAFFOLD_FILES' '$HERE/scripts/_scaffold_common.sh'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

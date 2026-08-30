@@ -17,7 +17,7 @@ mkdir -p "$KDIR"
 created=""
 
 # 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
-for f in agent-principles.md; do
+for f in $SCAFFOLD_FILES; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
   if [ -f "$src" ]; then
     if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else cp "$src" "$dst"; fi
@@ -41,7 +41,7 @@ if [ -f "$AG" ] && grep -qF "$MANAGED_BEGIN" "$AG"; then had_inline=1; fi
 # 놓여 있어 원칙 없이 도는 세션을 아무도 눈치채지 못한다. 그래서 먼저 모아 보고, 한 줄도 못 모았으면
 # 블록을 아예 쓰지 않고 사유를 알린다(`FAIL-LOUD`. scaffold.sh의 정본 복사 실패와 같은 규율이다).
 inline_body="$(
-  for f in agent-principles.md; do
+  for f in $SCAFFOLD_FILES; do
     if [ -f "$KDIR/$f" ]; then
       if ! cat "$KDIR/$f"; then
         echo "[disciplined-coder] WARNING: 정본 읽기 실패 — $KDIR/$f" >&2
@@ -68,7 +68,7 @@ fi
 #    AGENTS.md는 이 훅보다 먼저 로드되므로 블록을 방금 만든 세션은 인라인만으로 정본에 닿지 못한다
 #    (scaffold.sh의 had_import와 같은 이유).
 if [ "$had_inline" -eq 0 ]; then
-  for f in agent-principles.md; do
+  for f in $SCAFFOLD_FILES; do
     if [ -f "$KDIR/$f" ]; then cat "$KDIR/$f"; fi
   done
 fi
