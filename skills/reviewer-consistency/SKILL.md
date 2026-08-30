@@ -6,8 +6,8 @@ description: 설계 문서(spec/plan)의 내부 모순·커버리지 공백·산
 
 > 이것은 **렌즈 하나**다. 실행은 `domain-spec-review`가 읽기 전용 서브에이전트로 띄운다.
 
-## 무엇을 보나
-문서가 자기 자신과, 그리고 짝 문서(spec ↔ plan)와 어긋나지 않는가. 그리고 산출물 공백은 없는가.
+## 대조 대상
+이 렌즈는 문서를 자기 자신과 대조하고 짝 문서(spec ↔ plan)와 대조하며, 산출물 공백을 함께 본다.
 
 ## 체크리스트
 - 내부 모순: 한 절이 다른 절과 부딪치는가(문서가 스스로 정한 원칙을 어기는 설계 포함). 아키텍처 설명이 기능 설명과 맞는가.
@@ -33,7 +33,7 @@ description: 설계 문서(spec/plan)의 내부 모순·커버리지 공백·산
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "consistency", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "contradiction|gap|drift|scope", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL" } ], "notes": "" }
+{ "lens": "consistency", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "contradiction|gap|drift|scope", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 위 블록은 그 계약을 이 렌즈의 값으로 채워 보인 사본이고, 뜻풀이가 정본과 어긋나면 계약 테스트가 잡는다.
 

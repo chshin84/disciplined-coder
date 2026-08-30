@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Idempotent. SessionStart마다 실행. 지식을 PC(~/.claude/disciplined-coder)에 두고
 # ~/.claude/CLAUDE.md 관리블록이 @import. 프로젝트 폴더에 파일을 새로 만들지는 않는다 —
-# 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 것」이 정본이다.
+# 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 파일」이 정본이다.
 set -euo pipefail
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
@@ -45,7 +45,7 @@ if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; f
 # 2b) 아직 안 쪼개진 본오답노트를 먼저 쪼갠다. 머리말 갱신보다 앞에 두는 이유는 순서 때문이다 —
 #     뒤에 두면 그 세션의 머리말은 옛 형식으로 맞춰지고, 쪼개진 로그가 옛 규칙을 단 채 한 세션을
 #     보낸다. 그 사이 한 파일이 스스로를 두 형식으로 규정한다.
-scaffold_migrate_solved_unsplit "$KDIR/solved_problems.md" "$PLUGIN_ROOT" "$KDIR/backups" pc
+scaffold_check_solved_unsplit "$KDIR/solved_problems.md"
 pc_unsplit="$solved_unsplit_note"
 # 2b-1) 오답노트 머리말 동기화: 형식 규칙이 낡았으면 사본을 뜨고 정본 머리말로 갈아끼운다.
 #     항목은 한 줄도 건드리지 않고, 머리말의 끝을 알아볼 수 없는 로그는 손대지 않는다(방법 정본은
@@ -65,7 +65,7 @@ PLOG="$PROJ/docs/solved_problems.md"
 proj_note=""; proj_pairing=""; proj_unsplit=""
 if [ -f "$PLOG" ] && [ "$PLOG" != "$KDIR/solved_problems.md" ]; then
   plabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
-  scaffold_migrate_solved_unsplit "$PLOG" "$PLUGIN_ROOT" "$KDIR/backups" "$plabel"
+  scaffold_check_solved_unsplit "$PLOG"
   proj_unsplit="$solved_unsplit_note"
   scaffold_sync_solved "$PLOG" project "$KDIR/backups" "$plabel"
   proj_note="$solved_sync_note"

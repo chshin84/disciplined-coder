@@ -119,7 +119,8 @@ echo "[리뷰 절차 — 렌즈를 한 번씩 띄우고 결과를 한데 모은�
 DOCS="$HERE/skills/domain-docs/SKILL.md"
 RUNTIME2="$HERE/skills/domain-llm-runtime/SKILL.md"
 READMEF="$HERE/README.md"
-check "spec 리뷰가 렌즈를 한 번씩만 띄운다"   "grep -qF '렌즈마다 한 번씩만 띄운다' \"\$CALLER\""
+check "spec 리뷰가 회차 규칙을 다시 선언하지 않는다" "! grep -qF '렌즈마다 한 번씩만 띄운다' \"\$CALLER\""
+check "spec 리뷰가 회차 규칙 소유자를 가리킨다" "grep -qF '한 번만 띄우는 리뷰어의 규율' \"\$CALLER\""
 check "옛 2회 표집 규정이 남아 있지 않다"     "! grep -qF '2회씩' \"\$CALLER\""
 check "렌즈별 결과를 한데 모으는 것은 남는다" "grep -qF '한데 모아 관리하는 것은 그대로다' \"\$CALLER\""
 check "문서 검진은 한 번씩만 띄운다"          "grep -qF '렌즈는 한 번씩만 띄운다' \"\$DOCS\""
@@ -289,7 +290,7 @@ for m in "${OWN_MARKS[@]}"; do
   check "README가 조건을 적는다: $m"    "grep -qF -- '$m' \"\$README\""
 done
 # 이 뽑아내기는 반드시 UTF-8 로케일에서 돈다. 바이트로 보면 [^」] 가 한글 음절의 이음 바이트까지
-# 걸러 내 「프로젝트 폴더에 생기는 것」 같은 이름이 통째로 안 잡힌다(실제로 그 함정을 밟았다).
+# 걸러 내 「프로젝트 폴더에 생기는 파일」 같은 이름이 통째로 안 잡힌다(실제로 그 함정을 밟았다).
 # 괄호를 떼는 것도 tr 로 하지 않는다 — tr 은 바이트를 지워 같은 이음 바이트를 가진 한글을 망가뜨린다.
 EXC_SEC="$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$NOTES" | sed 's/^「//; s/」$//' | grep -F '프로젝트 폴더' | head -1 || true)"
 check "DESIGN-NOTES가 README 절을 가리킨다" "[ -n \"\$EXC_SEC\" ]"
@@ -301,12 +302,12 @@ check "그 절이 README에 실재한다"            "[ -n \"\$EXC_SEC\" ] && gr
 for m in "${OWN_MARKS[@]}"; do
   check "정본이 README와 같은 조건을 적는다: $m" "grep -qF -- '$m' \"\$CANON\""
 done
-check "정본이 README 절을 가리킨다"     "grep -qF -- '프로젝트 폴더에 생기는 것' \"\$CANON\""
+check "정본이 README 절을 가리킨다"     "grep -qF -- '프로젝트 폴더에 생기는 파일' \"\$CANON\""
 check "정본이 어느 README인지 한정한다" "grep -qF -- 'disciplined-coder 레포 README' \"\$CANON\""
 
 for D in "$NOTES" "$HERE/scripts/scaffold.sh" "$HERE/scripts/codex-scaffold.sh"; do
   dn="$(basename "$D")"
-  check "$dn 이 README 절을 가리킨다"   "grep -qF -- '프로젝트 폴더에 생기는 것' '$D'"
+  check "$dn 이 README 절을 가리킨다"   "grep -qF -- '프로젝트 폴더에 생기는 파일' '$D'"
   for m in "${COPY_MARKS[@]}"; do
     check "$dn 이 조건을 베끼지 않는다: $m" "! grep -qF -- '$m' '$D'"
   done
@@ -317,7 +318,8 @@ done
 # 어디서 왔는지 알 수 없다. 걸음이 둘로 갈리므로 둘 다 적혀야 한다 — 묻지 않고 하는 걸음과
 # 물어보고 하는 걸음을 가려 적지 않으면, 사용자는 자기 레포에 파일이 생긴 이유를 모른다.
 echo "[오답노트 개편 — 사용자용 문서에 적혀 있다]"
-check "README가 자동으로 쪼갠다고 적는다" "grep -qF -- '묻지 않고 쪼갠다' \"\$README\""
+check "README가 PC 전역만 안 묻는다고 적는다" "grep -qF -- '묻지 않고 쪼갠다' \"\$README\""
+check "README가 프로젝트는 묻는다고 적는다"   "grep -qF -- '프로젝트 오답노트는 묻고 쪼갠다' \"\$README\""
 check "README가 무엇을 묻는지 적는다"     "grep -qF -- '묻는다' \"\$README\""
 check "README가 새로 생기는 파일을 적는다" "grep -qF -- '파일이 새로 생긴다' \"\$README\""
 
@@ -453,5 +455,34 @@ check "CLAUDE.md가 실행 명령을 적는다"       "grep -qF -- 'for t in scr
 check "실패를 모으는 형태다"                 "grep -qF -- 'bad=\"\$bad \$t\"' \"\$CMD\""
 check "모은 결과를 마지막에 알린다"           "grep -qF -- 'FAILED:' \"\$CMD\""
 check "워크플로가 그 정본을 가리킨다"         "grep -qF -- 'CLAUDE.md 가 그 명령의 정본' '$HERE/.claude/workflows/self-audit.js'"
+
+
+# --- 렌즈: 본문과 복사용 프롬프트가 갈라지지 않는다 ---
+# 실제로 도는 것은 프롬프트다. 본문에만 적힌 축이나 지시는 그대로 복사한 세션에 닿지 않으므로,
+# 셋이 갈라져 있던 것을 고친 뒤 다시 갈라지지 않게 여기서 붙든다.
+ADV="$HERE/skills/reviewer-adversarial/SKILL.md"
+GRD="$HERE/skills/reviewer-grounding/SKILL.md"
+RDB="$HERE/skills/reviewer-readability/SKILL.md"
+# 문구가 프롬프트 줄에만 나오므로 파일을 그대로 grep 한다. 프롬프트를 변수에 담아 넘기면 그 안의
+# 따옴표가 검사 문자열을 깨뜨린다.
+check "적대 렌즈: 프롬프트가 위험 축을 부른다" "grep -qF -- '완화해야 할 위험도 찾아라' \"\$ADV\""
+check "적대 렌즈: 본문도 위험 축을 센다"       "grep -qF -- '완화해야 할 위험이 남았는가' \"\$ADV\""
+check "근거 렌즈: 프롬프트가 문서 밖을 읽힌다" "grep -qF -- '문서 밖을 반드시 읽어라' \"\$GRD\""
+check "근거 렌즈: 본문도 문서 밖을 읽힌다"     "grep -qF -- '문서 밖을 반드시 읽는다' \"\$GRD\""
+# 관찰 축의 순서가 본문과 프롬프트에서 같은지 본다. 전에 「길이」 하나가 여섯째와 아홉째로 갈려
+# 프롬프트만 복사한 세션이 축 주석을 밀어 읽었다.
+RDB_LEN_LINE="$(grep -n '^- \*\*길이\*\*' "$RDB" | cut -d: -f1)"
+RDB_VAGUE_LINE="$(grep -n '^- \*\*두루뭉술한 결과\*\*' "$RDB" | cut -d: -f1)"
+check "전달 렌즈: 본문에서 길이가 두루뭉술한 결과 뒤에 온다" "[ \"\$RDB_LEN_LINE\" -gt \"\$RDB_VAGUE_LINE\" ]"
+check "전달 렌즈: 프롬프트도 같은 순서다" "grep -qF -- '두루뭉술한 결과·길이·수식' \"\$RDB\""
+
+# --- 오답노트 본문 파일 이름은 ASCII 다 ---
+# 한글 이름은 이 환경에서 도구마다 다르게 읽혀 정렬과 검색과 경로 전달에서 어긋난다.
+if [ -d "$HERE/docs/solved_problems" ]; then
+  NONASCII="$(ls "$HERE/docs/solved_problems" | LC_ALL=C grep -c '[^ -~]' || true)"
+  check "오답노트 본문 이름이 모두 ASCII 다" "[ \"\$NONASCII\" = \"0\" ]"
+fi
+check "쪼개기가 ASCII 이름만 만든다" "grep -qF -- '[^0-9A-Za-z-]' \"\$HERE/scripts/split_solved_log.sh\""
+check "migrate 스킬이 영문 이름을 요구한다" "grep -qF -- '본문 파일 이름에 한글을 쓰지 않는다' \"\$HERE/skills/migrate-solved-log/SKILL.md\""
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

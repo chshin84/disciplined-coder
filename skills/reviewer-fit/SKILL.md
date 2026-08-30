@@ -8,9 +8,11 @@ description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일
 > 리뷰 콜, 문서 검진의 `reviewer-grounding`+`reviewer-fit` 넛지). 이 문서는 "무엇을 보고 어떤 문제
 > 목록을 돌려주는가"만 정의한다.
 
-## 무엇을 보나
-출력을 다른 코드·사용자·시스템이 소비할 때, 정해진 형식·스키마·스타일·제약을 지키는가. 내용의
-정확성은 보지 않는다(그건 `reviewer-grounding`의 몫).
+## 보는 대상
+출력을 다른 코드·사용자·시스템이 소비할 때 정해진 형식·스키마·스타일·제약을 지키는지 본다. 내용의
+정확성은 보지 않는다(그건 `reviewer-grounding`의 몫). 계약은 호출자가 준다. 런타임에서는 다운스트림
+코드가 파싱할 형식과 스키마가 계약이고, 문서 검진에서는 그 문서에 정해진 형식·길이·스타일·금지사항이
+계약이다.
 
 ## 체크리스트
 - 요구된 형식·스키마를 지키는가(JSON 유효성, 필수 키, 타입).
@@ -32,7 +34,7 @@ description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "fit", "read": [ "..." ], "issues": [ { "where": "...", "type": "schema|format|style|constraint|compat", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL" } ], "notes": "" }
+{ "lens": "fit", "read": [ "..." ], "issues": [ { "where": "...", "type": "schema|format|style|constraint|compat", "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다 — 위 블록은 그 계약을 이 렌즈의 값으로 채워 보인 사본이고, 뜻풀이가 정본과 어긋나면 계약 테스트가 잡는다.
 처분은 이 렌즈가 정하지 않고 호출자가 정한다.

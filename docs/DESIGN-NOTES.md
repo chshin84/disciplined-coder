@@ -15,16 +15,22 @@ disciplined-coder/
 ├── skills/domain-*/SKILL.md        # 도메인 참고서(docs/plugin/llm-runtime) + 호출자 domain-spec-review
 ├── skills/reviewer-*/SKILL.md      # 리뷰어 렌즈(grounding/fit/consistency/adversarial/prior-art/readability)
 ├── skills/meta-aggregate/SKILL.md  # 리뷰어 집계·결정(코드 설계도)
+├── skills/migrate-solved-log/SKILL.md   # 색인 줄을 지시사항으로 다시 쓰는 방법
+├── skills/project-doc-audit/SKILL.md    # 레포 문서 전체를 렌즈 배정해 한 회차로 검진하는 방법
 ├── skills/nested-orchestration/SKILL.md # 3층 병렬 오케스트레이션 방법(병렬 오케스트레이션 트리거)
 ├── hooks/hooks.json                # SessionStart→scaffold · Pre/PostToolUse·Stop→문서·spec/plan 워크플로
 ├── hooks/spec_review_*.sh          # spec/plan: PostToolUse(감지) · Stop(하드 게이트) — 순수 bash, jq 비의존
 ├── hooks/doc_*tooluse.sh           # 문서: 양식 제안(Pre) · 검진 넛지(Post) — 비블로킹
 ├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md @import
+├── scripts/split_solved_log.sh     # 한 덩어리 오답노트를 색인과 본문 파일로 쪼갠다(세션이 승인받아 부른다)
+├── .claude-plugin/marketplace.json # 마켓플레이스 매니페스트
 ├── scripts/_ensure_autoupdate.sh   # 멱등: 이 마켓플레이스 항목에 autoUpdate를 채운다(파이썬 필요)
 ├── .codex-plugin/plugin.json       # Codex 매니페스트(skills/hooks/interface)
 ├── hooks/hooks-codex.json          # Codex 훅 배선(apply_patch matcher · session-start-codex)
 ├── hooks/session-start-codex       # Codex SessionStart: codex-scaffold 실행 + 원칙 주입 + 신뢰검토 경고
 ├── hooks/_extract_path.sh          # 공용 경로 추출(file_path + apply_patch, 다중 경로)
+├── hooks/_spec_marker.sh           # 마커·경로 규약의 코드 정본
+├── hooks/_json_escape.sh           # 훅 출력의 JSON 이스케이프
 ├── scripts/codex-scaffold.sh       # 멱등: ~/.codex/ 셋업 + ~/.codex/AGENTS.md 관리블록
 ├── scripts/test_*.sh               # 계약 테스트(각 FAIL=0). 어떤 것이 있는지는 이 디렉터리가 정본이다
 ├── scripts/_*.sh                   # 공유 헬퍼(홈 해석·관리블록·JSON 유효성 등)
@@ -104,7 +110,7 @@ Claude Code 버전을 함께 둔다.
 - **정본을 고치면 다음 세션부터 반영된다**: `agent-principles.md`(SSOT)를 수정하면 다음 세션부터
   `~/.claude/disciplined-coder/`에 새 버전이 복사된다. 소유자와 갱신 주기를 정하라(권장: 분기 1회 검토).
   일반화 가능한 `solved` 항목만 원칙으로 승격한다. 승격 절차는 여기서 정하지 않고 오답노트 머리말이
-  정본이다(`domain-docs`가 그 머리말을 갈아끼우는 방법을 소유한다) — 그 로그는 append-only이고 원문을
+  정본이다(`domain-docs`가 그 머리말을 갈아끼우는 방법을 소유한다) — 그 로그의 본문 파일은 append-only이고 원문을
   보존하므로, 승격은 원칙 쪽에 재기술해 올리는 것이지 로그에서 지우는 것이 아니다.
 
 ### 여기서 정하지 않고 다른 문서를 따르는 것
@@ -215,7 +221,7 @@ spec/plan과 달리 **비블로킹(권유)**으로 둔 이유는 셋이다.
 ## Codex는 무엇을 공유하고 어디서 갈라지는가
 - **무엇을 공유하고 무엇을 더하는가.** 원칙 정본과 도메인 목차, `skills/` 전부, 그리고 게이트 로직은 두 런타임이 그대로 공유한다. Codex를 위해 만든 것(`.codex-plugin/`, `hooks-codex.json`, `session-start-codex`, `codex-scaffold.sh`)은 기존 것을 고치지 않고 더하기만 한다.
 - **갈라지는 지점이 여럿 있다.** 첫째, 파일 편집 도구가 런타임마다 다르다 — Claude에서는 Write와 Edit이 `file_path`로 경로를 주고, Codex에서는 `apply_patch`가 패치 헤더로 준다. `hooks/_extract_path.sh`가 양쪽을 흡수해 Pre와 Post 훅들이 그것을 함께 쓰며, 한 번에 여러 파일이 와도 모두 추출한다.
-- **상시 원칙을 어떻게 싣는가.** Claude는 `~/.claude/CLAUDE.md`의 `@import`로 싣는다. Codex는 `@import`를 지원하지 않으므로 `~/.codex/AGENTS.md` 관리블록에 정본을 인라인으로 넣고 매 세션 멱등하게 갱신한다. `session-start-codex`가 정본을 세션 컨텍스트로 함께 보내는 것은 **관리블록을 방금 만든 첫 세션 한 번뿐이며**, 그다음부터는 인라인 한 경로만 쓴다(이중 전송은 커밋 `1ea92f8`에서 의도적으로 제거했다).
+- **상시 원칙을 어떻게 싣는가.** Claude는 `~/.claude/CLAUDE.md`의 `@import`로 싣는다. Codex는 `@import`를 지원하지 않으므로 `~/.codex/AGENTS.md` 관리블록에 정본을 인라인으로 넣고 매 세션 멱등하게 갱신한다. 인라인 대상은 원칙 정본과 도메인 목차 둘이고, 오답노트는 인라인하지 않고 매 세션 주입 경로로만 보낸다 — 자주 커지는 파일이라 관리블록에 넣으면 그 블록이 세션마다 길어진다. `session-start-codex`가 원칙 정본을 세션 컨텍스트로 함께 보내는 것은 **관리블록을 방금 만든 첫 세션 한 번뿐이며**, 그다음부터는 인라인 한 경로만 쓴다(이중 전송은 커밋 `1ea92f8`에서 의도적으로 제거했다).
 - **무엇이 실제로 차단하는가.** 진짜 차단은 git 기반의 Stop 게이트(`spec_review_stop.sh`) 하나이고, 도구 형태와 무관하게 **신규** spec과 plan을 훑는다. 기존 파일을 수정하는 경우는 차단하지 않고 넛지만 띄운다. PreToolUse와 PostToolUse는 모두 비블로킹 넛지다.
 - **신뢰검토 갭을 어떻게 드러내는가**(`FAIL-LOUD`). Codex는 설치한 플러그인의 훅을 사용자가 한 번 신뢰하겠다고 확인하기 전에는 조용히 건너뛴다(이 확인을 신뢰검토라 부른다). 그래서 `session-start-codex`가 주입하는 첫 줄에 경고를 넣고 README에도 명시한다.
 - **version은 한쪽만 갖는다.** `.codex-plugin/plugin.json`만 `version`을 갖고 `.claude-plugin/plugin.json`은 비워 둔다. 이 계약은 `scripts/test_scaffold.sh`가 양쪽을 단언해 지킨다. Claude 매니페스트에 version을 도입하기로 결정하면 그 테스트와 함께 둘을 맞춘다.
@@ -245,9 +251,9 @@ spec/plan과 달리 **비블로킹(권유)**으로 둔 이유는 셋이다.
 bash .claude/measure_yield.sh --since 2026-08-16 . /경로/다른레포 ...
 ```
 
-**첫 실측 (2026-08-23, 2026-08-16 이후 7일)** — 리뷰 13회차에서 지적 160건을 셌고, 산문으로 적은
+**첫 실측 (2026-08-23, 2026-08-16 이후 7일, 이 레포와 news-analytics·quant 레포를 합쳐 셌다)** — 리뷰 13회차에서 지적 160건을 셌고, 산문으로 적은
 회차는 그 기록이 스스로 적은 수를 따르므로(한 회차만 58건이다) 실제 총량은 그보다 크다. 게이트가
-턴 종료를 막은 것은 아홉 번이고, 그 한 주에 새로 쓰인 설계 문서 셋은 모두 리뷰 마커를 달았다.
+턴 종료를 막은 것은 아홉 번이고, 그 한 주에 새로 쓰인 설계 문서 넷은 모두 리뷰 마커를 달았다(스펙 셋과 계획 하나다).
 
 값이 가장 컸던 지적은 인계 문서에서 나온 것이다. 예지가 전혀 필요 없는 단순 규칙이 월 0.18%인데
 완벽 예지 상한은 월 0.09%라는 대조가 빠져 있었고, 그대로 넘어갔으면 다음 담당자가 천장이 기준선보다
@@ -265,18 +271,18 @@ README에서 옮긴 내부 동작이다. 설치해 쓰는 데는 필요 없고, 
 - `~/.claude/CLAUDE.md` 관리블록에 `@import`를 배선한다. 없으면 만들고, 있으면 멱등하게 갱신한다.
 - 오답노트의 형식 규칙 서술이 낡았으면 머리말을 갈아끼우고 무엇을 했는지 알린다. 손대지 못했으면 그 사유를 가려 알리는데, 사유마다 사람이 할 일이 다르다(무엇을 하는지는 `domain-docs` 스킬이 정본이다).
 - 관리 디렉터리를 위생 점검한다 — 구 관리파일을 백업으로 치우고 화이트리스트 밖의 것을 정리한다.
-- 프로젝트 파일에 손대는 예외 둘을 처리한다. 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 것」이 정본이라 여기 옮겨 적지 않는다.
+- 프로젝트 파일에 손대는 예외 셋을 처리한다. 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 파일」이 정본이라 여기 옮겨 적지 않는다.
 - 마켓플레이스 항목의 자동 갱신을 켠다(값이 없을 때만 채운다).
 - 쪼개진 오답노트의 색인 줄과 본문 파일 이름을 맞대어 어긋나면 어느 이름이 어긋났는지 알린다.
-- 아직 안 쪼개진 오답노트를 만나면 지금 개편할지 사용자에게 물으라고 세션에 알린다.
+- 아직 안 쪼개진 오답노트를 만나면 쪼개지 않고, 항목 수와 함께 사용자에게 물어 `migrate-solved-log` 스킬로 하라고 세션에 알린다. PC 전역이든 프로젝트든 같다 — 항목 수만큼 파일이 새로 생기는 것은 되돌리기 어려운 변경이다.
 
 ## 무엇을 왜 자동화하나
 
-`README`가 결과를 적었다면 여기는 그 결과가 어느 파일에서 나오는지를 적는다. 원칙은 하나다 — **자동 계층(scaffold·훅)은 프로젝트 폴더에 파일을 새로 만들지 않는다.** 자동 계층이 이미 있는 프로젝트 파일에 손대는 예외 둘의 정본은 README의 「프로젝트 폴더에 생기는 것」이다.
+`README`가 결과를 적었다면 여기는 그 결과가 어느 파일에서 나오는지를 적는다. 원칙은 하나다 — **자동 계층(scaffold·훅)은 프로젝트 폴더에 파일을 새로 만들지 않는다.** 자동 계층이 이미 있는 프로젝트 파일에 손대는 예외 셋의 정본은 README의 「프로젝트 폴더에 생기는 파일」이다.
 
 자동화 대상:
 - **일반 지식**(원칙 + 공통 함정 + 도메인 목차) — `agent-principles.md`·`domains-index.md`(SSOT)를 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선한다.
-- **오답노트**(solved) — `~/.claude/disciplined-coder/solved_problems.md`가 없으면 생성한다(PC 전역 누적, 멱등, append-only). 운영 규약(완결 후 등록이라 상태 아님, 단일 작성자, 🔴는 즉시 알리고 자율구현 금지, **이슈 트래킹 안 함**)은 `agent-principles.md`의 오답노트 절이 SSOT다.
+- **오답노트**(solved) — `~/.claude/disciplined-coder/solved_problems.md`가 없으면 생성한다(PC 전역 누적, 멱등). 본문 파일은 append-only 이고 색인은 본문을 따라 고쳐 쓴다. 운영 규약(완결 후 등록이라 상태 아님, 단일 작성자, 🔴는 즉시 알리고 자율구현 금지, **이슈 트래킹 안 함**)은 `agent-principles.md`의 오답노트 절이 SSOT다.
 - **스킬**(domain-*/reviewer-*/meta-aggregate) — 플러그인에서 온디맨드로 로드한다. 복사·주입하지 않는다.
 
 ### 도메인 참고서 + 런타임/메타 검증

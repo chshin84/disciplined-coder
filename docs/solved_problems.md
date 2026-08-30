@@ -84,3 +84,7 @@
   → solved_problems/2026-08-27-stale-lock-steal-must-be-gated.md
 - 동시성 결함은 결과 파일이 아니라 임계 구역 출입 자체를 재고, 실패를 일으키려고 만든 픽스처는 그 실패가 실제로 났는지 먼저 확인한다.
   → solved_problems/2026-08-27-measure-critical-section-entry.md
+- 문서 SSOT를 계약 테스트로 지킬 때는 같은 문구가 두 곳에 있는지 보지 말고, 소유자에는 규칙 문구가 있고 가리키는 쪽에는 그 문구가 없으면서 소유자 이름이 있는지를 검사한다.
+  → solved_problems/2026-08-30-drift-test-forced-copying.md
+- 렌즈 문서를 고칠 때는 본문과 레퍼런스 프롬프트를 같은 걸음에서 고치고, 실제로 도는 것은 프롬프트이므로 축 이름과 지시가 양쪽에 다 있는지 계약 테스트로 붙든다.
+  → solved_problems/2026-08-30-lens-prompt-body-drift.md
