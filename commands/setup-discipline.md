@@ -1,9 +1,9 @@
 ---
-description: PC 전역(~/.claude/disciplined-coder/)을 셋업한다. solved 오답노트는 없을 때만 새로 만들고, 디시플린 정본(agent-principles.md·domains-index.md)은 복사해 최신으로 갱신하며, ~/.claude/CLAUDE.md의 @import 블록은 다시 만든다. 여러 번 실행해도 결과가 같다(멱등).
+description: PC 전역(~/.claude/disciplined-coder/)을 셋업한다. 디시플린 정본(agent-principles.md)을 복사해 최신으로 갱신하고, ~/.claude/CLAUDE.md의 @import 블록을 다시 만든다. 여러 번 실행해도 결과가 같다(멱등).
 ---
 
-다음 스크립트를 실행해 PC 전역 디시플린 환경(~/.claude/disciplined-coder/)을 셋업하라 — 없는 파일은
-새로 만들고 이미 있는 디시플린 정본은 최신으로 갈아 두는 일이다:
+다음 스크립트를 실행해 PC 전역 디시플린 환경(~/.claude/disciplined-coder/)을 셋업하라 — 디시플린
+정본을 최신으로 갈아 두고 @import 배선을 다시 만드는 일이다:
 
 `bash "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.sh"`
 

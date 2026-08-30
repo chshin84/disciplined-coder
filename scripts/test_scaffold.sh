@@ -23,19 +23,12 @@ OUT="$(run "$H1" "$P1")"
 K="$H1/.claude/disciplined-coder"; UC="$H1/.claude/CLAUDE.md"
 echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
-check "domains-index in PC dir"       "[ -f '$K/domains-index.md' ]"
-check "solved created in PC dir"      "[ -f '$K/solved_problems.md' ]"
 check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/agent-principles.md' '$UC'"
-check "user CLAUDE.md imports domains"    "grep -qxF '@disciplined-coder/domains-index.md' '$UC'"
-check "user CLAUDE.md imports solved"     "grep -qxF '@disciplined-coder/solved_problems.md' '$UC'"
 check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
 check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
-check "stdout has solved marker"      "printf '%s' \"\$OUT\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 
 # 새 로그는 처음부터 쪼개진 형식으로 태어난다. 안 쪼개진 형식으로 만들어 놓던 판본은 사용자가 첫
 # 교훈을 적는 순간부터 매 세션 개편을 권했다 — 만드는 경로가 목표 형식과 어긋나 있었던 것이다.
-check "fresh-pc: 새 로그가 색인 형식이다"     "grep -qF '지시사항 색인' '$K/solved_problems.md'"
-check "fresh-pc: 색인 형식 규칙이 실린다"     "grep -qF '이 파일은 색인이고 한 줄이 한 항목이다' '$K/solved_problems.md'"
 check "fresh-pc: 옛 형식 규칙은 없다"         "! grep -qF '증상은 굵게 한 줄로 띄운다' '$K/solved_problems.md'"
 printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n' >> "$K/solved_problems.md"
 mkdir -p "$K/solved_problems"; printf '# 무언가를 할 때는 이렇게 한다\n' > "$K/solved_problems/a.md"
@@ -143,15 +136,10 @@ echo "[idempotency] idempotency"
 check "still one region"              "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
 check "principles import not dup"     "[ \$(grep -cxF '@disciplined-coder/agent-principles.md' '$UC') -eq 1 ]"
 
-# --- solved-preserved: solved 누적 보존 ---
-echo "[solved-preserved] solved preserved"
-printf '\n- 기존 항목 보존 확인\n' >> "$K/solved_problems.md"
-run "$H1" "$P1" >/dev/null
-check "solved entry preserved"        "grep -qF '기존 항목 보존 확인' '$K/solved_problems.md'"
-
 # --- user-content-preserved: 기존 user CLAUDE.md 내용 보존 + 블랭크 비누적 ---
 H5="$(mktemp -d)"; P5="$(mktemp -d)"
-mkdir -p "$H5/.claude"; printf 'my personal global note\n' > "$H5/.claude/CLAUDE.md"
+mkdir -p "$H5/.claude"; printf 'my personal global note
+' > "$H5/.claude/CLAUDE.md"
 for _ in 1 2 3; do run "$H5" "$P5" >/dev/null; done
 UC5="$H5/.claude/CLAUDE.md"
 echo "[user-content-preserved] preserve user content + no blank accumulation"
@@ -218,7 +206,6 @@ set -e
 echo "[managed-dir-hygiene] managed-dir hygiene (whitelist pruning)"
 check "stale coding-principles pruned"  "[ ! -f '$K10/coding-principles.md' ]"
 check "canon preserved"                 "[ -f '$K10/agent-principles.md' ]"
-check "solved preserved"                "[ -f '$K10/solved_problems.md' ]"
 check "unknown user file preserved"     "[ -f '$K10/my_notes.md' ]"
 check "empty orphan removed"            "[ ! -f '$K10/orphan_empty.md' ]"
 check "non-empty orphan surfaced"       "printf '%s' \"\$ERR10\" | grep -qF 'my_notes.md'"
@@ -259,12 +246,12 @@ done
 # --- workflow-verification-row: 검증 레이어 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
 # 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(reviewer-*)과
 # 강제 방식 열이 같은 행에 있음을 보장한다(다른 행·다른 파일의 문자열로 vacuous 통과 방지).
-WF_ROW="$(grep -F '멀티에이전트 워크플로를 쓰거나 돌릴 때' "$HERE/agent-principles.md" || true)"
-echo "[workflow-verification-row] principles table has workflow verification row"
-check "row exists (trigger)"       "[ -n \"\$WF_ROW\" ]"
-check "row caller = reviewer-*"    "printf '%s' \"\$WF_ROW\" | grep -qF 'reviewer-*'"
-check "row enforcement = 미실행 이유 기재" "printf '%s' \"\$WF_ROW\" | grep -qF '보고서에 그 판정과 이유를 적는다'"
-check "row에 사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_ROW\" | grep -qF 'ultracode 검증 모드'"
+WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agent-principles.md")"
+echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
+check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
+check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'reviewer-*'"
+check "검증 기록을 요구한다"       "printf '%s' \"\$WF_BLOCK\" | grep -qF 'docs/superpowers/reviews/'"
+check "사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_BLOCK\" | grep -qF 'ultracode 검증 모드'"
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
 # 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
@@ -317,9 +304,7 @@ OUT20a="$(run "$H20" "$P20")"
 OUT20b="$(run "$H20" "$P20")"
 echo "[canon-first-run-only] canon dumped on first run only"
 check "1st run dumps principles"      "printf '%s' \"\$OUT20a\" | grep -qF '# 디시플린 (팀 원칙)'"
-check "1st run dumps solved"          "printf '%s' \"\$OUT20a\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# 디시플린 (팀 원칙)'"
-check "2nd run omits solved"          "! printf '%s' \"\$OUT20b\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 # 토글이 사라져 2회차에는 보낼 것이 없다. 빈 문자열을 단언해 두면 무엇이 새로 새어 나와도 붉어진다
 # — 부정 단언만 남기면 스크립트가 아무것도 못 내도 통과하는 vacuous 구멍이 생긴다.
 check "2nd run sends nothing"         "[ -z \"\$OUT20b\" ]"
@@ -330,17 +315,16 @@ printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-code
 OUT21="$(run "$H21" "$P21")"
 echo "[crlf-import-line] CRLF import line still counts as present"
 check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린 (팀 원칙)'"
-check "CRLF: no solved re-dump"       "! printf '%s' \"\$OUT21\" | grep -qF '해결된 문제 로그 (solved_problems)'"
 check "CRLF: sends nothing"           "[ -z \"\$OUT21\" ]"
 
 # --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(정본 계약 가드) ---
 # 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
 # (vacuous 통과 방지).
-PO_BLOCK="$(awk '/^### 병렬 오케스트레이션/{f=1} f&&/^### /&&!/^### 병렬 오케스트레이션/{exit} f&&/^## /&&!/^### /{exit} f' "$HERE/agent-principles.md")"
+PO_BLOCK="$(awk '/^## 병렬 오케스트레이션/{f=1} f&&/^## /&&!/^## 병렬 오케스트레이션/{exit} f' "$HERE/agent-principles.md")"
 echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
-check "병렬 오케스트레이션 heading exists"      "printf '%s' \"\$PO_BLOCK\" | grep -qF '### 병렬 오케스트레이션'"
+check "병렬 오케스트레이션 heading exists"      "printf '%s' \"\$PO_BLOCK\" | grep -qF '## 병렬 오케스트레이션'"
 check "병렬 오케스트레이션 points to skill (SSOT)" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
-check "병렬 오케스트레이션 routes single-task to 2층" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'dispatching-parallel-agents'"
+check "단일 태스크는 3층이 아니라고 적는다"    "printf '%s' \"\$PO_BLOCK\" | grep -qF '단일 태스크'"
 
 # --- nested-orchestration-skill: nested-orchestration 스킬 존재 + 핵심 절(정본 계약 가드) ---
 # 단일 목적 파일이라 파일 전역 존재 검사로 충분하다(섹션 경합 없음 — Global Constraint 참조).
@@ -375,8 +359,8 @@ check "single managed region after run"         "[ \$(grep -cF '# BEGIN discipli
 # 있으므로 그 이름으로 부르고, 옛 서수 제목이 되살아나지 않는지 함께 본다.
 CANON="$HERE/agent-principles.md"
 echo "[canon-sections] procedure sections are named, not numbered"
-for s in "검증 레이어" "설계 입력" "오답노트" "문서·상태 위생" "병렬 오케스트레이션"; do
-  check "canon: section '$s' present"      "grep -qF '### $s' '$CANON'"
+for s in "원칙" "검증" "미해결의 처분" "병렬 오케스트레이션" "문서와 상태의 위생"; do
+  check "canon: section '$s' present"      "grep -qF '## $s' '$CANON'"
 done
 # 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
@@ -388,13 +372,13 @@ check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가
 # (Codex) 양쪽으로 실리므로, 이 한 문장이 있으면 두 런타임 모두에서 검진이 돈다.
 # 파일 전역 grep이 아니라 '검증 레이어' 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
 # 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
-SC_BLOCK="$(awk '/^### 검증 레이어/{f=1} f&&/^### /&&!/^### 검증 레이어/{exit} f' "$CANON")"
+SC_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$CANON")"
 # 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
 # 명령 치환으로 실행되어, 검사가 엉뚱한 문자열을 찾으면서도 초록으로 남는다.
-CONSENT='disciplined-coder의 리뷰어 서브에이전트 호출은 사용자가 상시 허용한 것으로 간주한다'
-SC_SCOPE='disciplined-coder 리뷰어(`reviewer-*`) 호출에만 미친다'
+CONSENT='리뷰어(`reviewer-*`) 호출은 사용자가 상시 허용한 것으로 간주한다'
+SC_SCOPE='허가는 `reviewer-*` 호출에만 미친다'
 echo "[standing-consent] reviewer calls carry the user's standing consent"
-check "검증 레이어 절이 잡힌다"            "[ -n \"\$SC_BLOCK\" ]"
+check "검증 절이 잡힌다"                   "[ -n \"\$SC_BLOCK\" ]"
 check "canon: 상시 허가 문장"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '$CONSENT'"
 check "canon: 허가 범위 한정"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- \"\$SC_SCOPE\""
 check "canon: 다른 팬아웃은 제외"          "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '그 밖의 서브에이전트와 워크플로는 열어 주지 않는다'"
@@ -615,181 +599,11 @@ LOGTITLE='해결된 문제 로그 (solved_problems)'
 # (가) 갓 만든 로그는 신호를 내지 않는다 — 생성 템플릿이 곧 현행 규칙이어야 한다.
 HR1="$(mktemp -d)"; PR1="$(mktemp -d)"
 OUTR1="$(run "$HR1" "$PR1")"
-echo "[solved-rules] freshly created log is not flagged"
-check "fresh: 신호 없음"                 "! printf '%s' \"\$OUTR1\" | grep -qF '$NUDGE'"
-OUTR1b="$(run "$HR1" "$PR1")"
-check "fresh: 재실행도 신호 없음"        "! printf '%s' \"\$OUTR1b\" | grep -qF '$NUDGE'"
-
-# (나) 형식 규칙 블록이 없는 옛 로그는 백업을 뜨고 머리말만 갈아끼운다 — 항목은 그대로다.
-HR2="$(mktemp -d)"; PR2="$(mktemp -d)"; mkdir -p "$HR2/.claude/disciplined-coder"
-OLDLOG="$HR2/.claude/disciplined-coder/solved_problems.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
-  printf '작업 중 발견·해결된 문제. 각 항목: 증상/트리거 → 교훈(다음엔 이렇게 — 처방이 앞). 등록은 메인 세션이 수행.\n\n'
-  printf -- '- **옛 형식 항목** → 원인: 무엇 → 해결: 무엇\n'
-  printf '\n'
-  printf -- '- **여러 줄 항목**\n  - 원인: 둘째 줄\n  - 해결: 셋째 줄\n'
-  printf '\n'
-} > "$OLDLOG"
-BEFORE2="$(cksum < "$OLDLOG")"
-OUTR2="$(run "$HR2" "$PR2")"
-BK2="$(find "$HR2/.claude/disciplined-coder/backups" -type f -name 'solved_problems.*' 2>/dev/null | head -1 || true)"
-NBK2="$(find "$HR2/.claude/disciplined-coder/backups" -type f | wc -l)"
-# 이름 순서에 기대지 않는다. 한 회차에 사본이 여럿 뜨면 어느 것이 손대기 전 원본인지는 이름이
-# 아니라 내용이 정한다 — 겹침을 피하려 붙인 꼬리표 때문에 이름순 첫째가 원본이 아닐 수 있다.
-HASORIG2=no
-for b in "$HR2/.claude/disciplined-coder/backups"/solved_problems.*; do
-  [ -f "$b" ] || continue
-  [ "$(cksum < "$b")" = "$BEFORE2" ] && { HASORIG2=yes; break; }
-done
-echo "[solved-rules] legacy log gets its header replaced, entries untouched"
-check "legacy: 비쪼갬 규칙이 들어갔다"    "grep -qF 'append-only 오답노트' '$OLDLOG'"
-check "legacy: 색인 형식 규칙은 안 들어간다" "! grep -qF '이 파일은 색인이고' '$OLDLOG'"
-check "legacy: 옛 규칙 문장이 사라졌다"   "! grep -qF '등록은 메인 세션이 수행' '$OLDLOG'"
-check "legacy: 첫 항목 보존"              "grep -qF '옛 형식 항목' '$OLDLOG'"
-check "legacy: 여러 줄 항목 제목 보존"    "grep -qF '여러 줄 항목' '$OLDLOG'"
-check "legacy: 본문은 로그에 그대로 있다" "grep -qF '해결: 셋째 줄' '$OLDLOG'"
-check "legacy: 본문 폴더를 안 만든다"     "[ ! -d '$HR2/.claude/disciplined-coder/solved_problems' ]"
-check "legacy: 백업이 생겼다"             "[ -n '$BK2' ]"
-check "legacy: 사본 가운데 손대기 전 원본이 있다" "[ '$HASORIG2' = yes ]"
-check "legacy: 무엇을 했는지 알린다"      "printf '%s' \"\$OUTR2\" | grep -qF '머리말을 현행 형식으로 갱신'"
-check "legacy: 임시 파일 잔해 없음"       "[ -z \"\$(find '$HR2/.claude/disciplined-coder' -maxdepth 1 -name 'solved_problems.md.*' 2>/dev/null)\" ]"
-# 두 번째 실행은 이미 최신이라 아무 일도 하지 않는다(멱등) — 백업이 세션마다 쌓이면 안 된다.
-AFTER2="$(cksum < "$OLDLOG")"
-run "$HR2" "$PR2" >/dev/null
-check "legacy: 재실행은 무변경"           "[ \"\$(cksum < '$OLDLOG')\" = \"\$AFTER2\" ]"
-check "legacy: 백업이 늘지 않는다"        "[ \$(find '$HR2/.claude/disciplined-coder/backups' -type f | wc -l) -eq \$NBK2 ]"
-
-# (다) 불릿을 하나 지운 로그도 낡은 것으로 잡아 규칙 블록을 통째로 복원한다. 남아 있던 규칙
-# 불릿을 항목으로 오인해 아래에 다시 붙이면 블록이 두 벌이 되므로, 중복이 없는지도 함께 본다.
-HR3="$(mktemp -d)"; PR3="$(mktemp -d)"; mkdir -p "$HR3/.claude/disciplined-coder"
-run "$HR3" "$PR3" >/dev/null
-LOG3="$HR3/.claude/disciplined-coder/solved_problems.md"
-sed -i '/^- 본문 파일의 첫 줄은 그 지시사항과 같다\.$/d' "$LOG3"
-run "$HR3" "$PR3" >/dev/null
-echo "[solved-rules] a log missing one rule bullet gets the whole block restored"
-check "partial: 지운 불릿 복원"            "grep -qF '본문 파일의 첫 줄은 그 지시사항과 같다' '$LOG3'"
-check "partial: 규칙 불릿 중복 없음"       "[ \$(grep -cF '이 파일은 색인이고 한 줄이 한 항목이다' '$LOG3') -eq 1 ]"
-check "partial: 도입 문장 중복 없음"       "[ \$(grep -cF '항목을 적는 형식은 이렇다' '$LOG3') -eq 1 ]"
-
-# (다-2) 머리말을 새로 쓰는 도중에 강제로 끝나도 임시 파일을 남기지 않는다. 남으면 사용자 레포의
-# docs/ 에 solved_problems.md.a1B2c3 같은 것이 쌓인다. 머리말을 만드는 함수를 느린 스텁으로
-# 바꿔 그 순간에 멈춰 세운다 — 그렇게 하지 않으면 이 갈래를 밟을 창이 마이크로초라 못 잡는다.
-HT="$(mktemp -d)"; LOGT="$HT/solved_problems.md"
-printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n옛 규칙 서술이다.\n\n- **증상이 났다**\n  - 원인: 무엇\n' > "$LOGT"
-(
-  . "$HERE/scripts/_scaffold_common.sh"
-  scaffold_solved_header() { sleep 3; }
-  scaffold_fix_solved_header "$LOGT" pc "$HT/backups" pc
-) >/dev/null 2>&1 &
-TPID=$!
-sleep 1
-kill -TERM "$TPID" 2>/dev/null || true
-wait "$TPID" 2>/dev/null || true
-echo "[solved-header] a killed rewrite leaves no temp file behind"
-check "강제 종료에 임시 파일이 안 남는다"   "[ -z \"\$(find '$HT' -maxdepth 1 -name 'solved_problems.md.*' 2>/dev/null)\" ]"
-check "강제 종료에도 로그는 그대로다"       "grep -qF -- '- **증상이 났다**' '$LOGT'"
-
-# (라) 스코프 문구가 달라도, 줄 끝이 CRLF여도 오탐하지 않는다.
-HR4="$(mktemp -d)"; PR4="$(mktemp -d)"; mkdir -p "$HR4/.claude/disciplined-coder"
-run "$HR4" "$PR4" >/dev/null
-L4="$HR4/.claude/disciplined-coder/solved_problems.md"
-sed -i '1s/.*/# 해결된 문제 로그 — 이 프로젝트 전용 (스코프 문구가 다르다)/' "$L4"
-awk '{ printf "%s\r\n", $0 }' "$L4" > "$L4.crlf" && mv "$L4.crlf" "$L4"
-OUTR4="$(run "$HR4" "$PR4")"
-echo "[solved-rules] different scope prose and CRLF do not false-positive"
-check "scope+CRLF: 신호 없음"             "! printf '%s' \"\$OUTR4\" | grep -qF '$NUDGE'"
-
-# (마) 읽을 수 없는 로그를 줘도 훅 전체가 0으로 끝난다(리턴값만 보면 함수 안 실패를 놓친다).
-HR5="$(mktemp -d)"; PR5="$(mktemp -d)"; mkdir -p "$HR5/.claude/disciplined-coder"
-RL5="$HR5/.claude/disciplined-coder/solved_problems.md"
-printf 'x\n' > "$RL5"
-chmod 000 "$RL5" 2>/dev/null || true
-# Windows에서는 chmod가 무시돼 파일이 그대로 읽힌다. 그 사실을 드러내지 않으면 이 검사는 그 플랫폼에서
-# 항진이 된다 — 실제로 CI(Linux)에서만 붉어지고 로컬에서는 늘 초록이던 결함이 여기 숨어 있었다.
-if cat "$RL5" >/dev/null 2>&1; then unreadable_effective=0; else unreadable_effective=1; fi
-set +e; run "$HR5" "$PR5" >/dev/null 2>&1; rc5=$?; set -e
-chmod 644 "$RL5" 2>/dev/null || true
-echo "[solved-rules] hook exits 0 even on unreadable log"
-check "unreadable: exit 0"                "[ '$rc5' = '0' ]"
-if [ "$unreadable_effective" -eq 0 ]; then
-  echo "    (참고: 이 플랫폼에서는 chmod 000이 먹지 않아 위 검사가 읽기 거부 경로를 밟지 못했다)"
-fi
-
-# (바) 위생 검사가 backups/ 를 비관리 디렉터리로 오탐하지 않는다.
-HR6="$(mktemp -d)"; PR6="$(mktemp -d)"; mkdir -p "$HR6/.claude/disciplined-coder/backups"
-printf 'old\n' > "$HR6/.claude/disciplined-coder/backups/solved_problems-20260728.md"
-ERR6="$(CLAUDE_HOME_DIR="$HR6/.claude" CLAUDE_PROJECT_DIR="$PR6" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
-echo "[solved-rules] backups/ is whitelisted"
-check "backups: 오탐 없음"                "! printf '%s' \"\$ERR6\" | grep -qF 'backups'"
-check "backups: 사본 보존"                "[ -f '$HR6/.claude/disciplined-coder/backups/solved_problems-20260728.md' ]"
-
-# (사) 정본 트리거와 domain-docs 방법이 실제로 들어갔다.
-echo "[solved-rules] canon trigger and domain-docs method exist"
-check "canon: 넛지 트리거 구"             "grep -qF '형식 규칙 갱신 신호' '$CANON'"
-check "canon: 방법 스킬을 가리킴"         "grep -qF 'domain-docs' '$CANON'"
-DD="$HERE/skills/domain-docs/SKILL.md"
-check "domain-docs: 방법 절 존재"         "grep -qF '관리되는 문서의 형식 규칙 갱신' '$DD'"
-check "domain-docs: 사본 경로"            "grep -qF 'backups/' '$DD'"
-check "domain-docs: 항목 불가침"          "grep -qF '항목은 한 줄도 건드리지 않는다' '$DD'"
-check "domain-docs: 자동 갱신 정책"       "grep -qF '머리말은 플러그인이 갈아끼운다' '$DD'"
-check "domain-docs: 경계 규칙 명시"       "grep -qF '첫 구조 요소' '$DD'"
-
-# (아) 머리말 뒤에 사람이 만든 절이 오는 로그는 그 절을 살려 둔다.
-# 실측 사례(newsstore)의 모양이다 — 머리말 다음이 항목이 아니라 '## 핵심 gotchas' 절이었고,
-# 그 절은 다른 문서가 서브에이전트 주입 재료로 참조한다. 경계를 항목으로만 잡으면 여기서 날아간다.
-HR7="$(mktemp -d)"; PR7="$(mktemp -d)"; mkdir -p "$HR7/.claude/disciplined-coder"
-LOG7="$HR7/.claude/disciplined-coder/solved_problems.md"
-{ printf '# 해결된 문제 로그 (solved_problems)\n\n'
-  printf '작업 중 발견·해결된 문제 기록. 각 항목: 문제 → 원인 → 해결.\n\n'
-  printf '## 핵심 gotchas (서브에이전트 주입용 다이제스트)\n'
-  printf '*반복되는 함정*만 추림.\n'
-  printf -- '- **Docker-only**: 테스트는 컨테이너에서 돌린다.\n\n'
-  printf '## 아카이브\n\n'
-  printf -- '- **옛 항목** → 원인 → 해결\n'
-} > "$LOG7"
-run "$HR7" "$PR7" >/dev/null
-echo "[solved-rules] a hand-written section after the header survives"
-check "절 보존: gotchas 제목"             "grep -qF '## 핵심 gotchas' '$LOG7'"
-check "절 보존: gotchas 본문"             "grep -qF 'Docker-only' '$LOG7'"
-check "절 보존: 아카이브 절"              "grep -qF '## 아카이브' '$LOG7'"
-check "절 보존: 규칙 블록이 생겼다"       "grep -qF '증상은 굵게 한 줄로 띄운다' '$LOG7'"
-check "절 보존: 옛 규칙 문장 제거"        "! grep -qF '각 항목: 문제 → 원인 → 해결' '$LOG7'"
-
-# (자) 목록도 제목도 없어 머리말의 끝을 못 찾는 로그는 손대지 않고 알리기만 한다.
-# 이 안전장치가 없으면 파일 전체를 머리말로 보고 통째로 갈아엎는다.
-HR8="$(mktemp -d)"; PR8="$(mktemp -d)"; mkdir -p "$HR8/.claude/disciplined-coder"
-LOG8="$HR8/.claude/disciplined-coder/solved_problems.md"
-{ printf '# 해결된 문제 로그\n\n'
-  printf '산문으로만 적어 둔 기록이다.\n\n'
-  printf '어제 겪은 문제는 이러이러했고 이렇게 풀었다.\n'
-} > "$LOG8"
-BEFORE8="$(cksum < "$LOG8")"
-OUTR8="$(run "$HR8" "$PR8")"
-echo "[solved-rules] a log with no structural marker is refused, not guessed"
-check "구조 없음: 파일 불변(바이트)"      "[ \"\$(cksum < '$LOG8')\" = '$BEFORE8' ]"
-check "구조 없음: 신호 있음"              "printf '%s' \"\$OUTR8\" | grep -qF '$NUDGE'"
-check "구조 없음: 백업 안 뜬다"           "[ ! -d '$HR8/.claude/disciplined-coder/backups' ] || [ -z \"\$(find '$HR8/.claude/disciplined-coder/backups' -type f)\" ]"
-
-# (차) 프로젝트 오답노트도 같은 처리를 받고, 백업은 프로젝트가 아니라 전역에 쌓인다.
-HR9="$(mktemp -d)"; PR9="$(mktemp -d)"; mkdir -p "$PR9/docs"
-PLOG9="$PR9/docs/solved_problems.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — 이 프로젝트\n\n'
-  printf '이 레포에서 겪은 문제. 각 항목: 문제 → 원인 → 해결.\n\n'
-  printf -- '- **프로젝트 항목** → 원인 → 해결\n'
-} > "$PLOG9"
-OUTR9="$(run "$HR9" "$PR9")"
-echo "[solved-rules] the opened project's log is handled too"
-check "프로젝트: 규칙 블록이 생겼다"      "grep -qF '증상은 굵게 한 줄로 띄운다' '$PLOG9'"
-check "프로젝트: 항목 보존"               "grep -qF '프로젝트 항목' '$PLOG9'"
-check "프로젝트: 스코프 문구가 프로젝트용" "grep -qF '이 프로젝트에 한정된 교훈만 둔다' '$PLOG9'"
-check "프로젝트: 백업은 전역에 쌓인다"    "[ -n \"\$(find '$HR9/.claude/disciplined-coder/backups' -type f 2>/dev/null)\" ]"
-check "프로젝트: 폴더에 백업 안 남긴다"   "[ \$(find '$PR9' -type f | wc -l) -eq 1 ]"
-
-# (카) 이름이 바뀌거나 없앤 옛 관리파일은 관리 디렉터리에서 치운다. 내용이 있으면 지우지 않고
-# 백업으로 옮긴다 — 그 안에 사용자가 적어 둔 줄이 있을 수 있어서다(되돌릴 수 있게 남긴다).
 HRS="$(mktemp -d)"; PRS="$(mktemp -d)"; mkdir -p "$HRS/.claude/disciplined-coder"
 KS="$HRS/.claude/disciplined-coder"
-printf 'old index\n' > "$KS/advisors-index.md"; printf '내 백로그 한 줄\n' > "$KS/unsolved_problems.md"
+printf 'old index
+' > "$KS/advisors-index.md"; printf '내 백로그 한 줄
+' > "$KS/unsolved_problems.md"
 ERRS="$(CLAUDE_HOME_DIR="$HRS/.claude" CLAUDE_PROJECT_DIR="$PRS" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
 echo "[stale] renamed and retired managed files are cleared out"
 check "stale: advisors-index 치움"        "[ ! -f '$KS/advisors-index.md' ]"
@@ -858,38 +672,10 @@ LOG14="$HR14/.claude/disciplined-coder/solved_problems.md"
 } > "$LOG14"
 BEFORE14="$(cksum < "$LOG14")"
 OUTR14="$(run "$HR14" "$PR14")"
-echo "[solved-rules] refusing for lack of a copy says which reason it was"
-check "사본 실패: 로그 불변(바이트)"      "[ \"\$(cksum < '$LOG14')\" = '$BEFORE14' ]"
-check "사본 실패: 공통 신호는 그대로"     "printf '%s' \"\$OUTR14\" | grep -qF '$NUDGE'"
-check "사본 실패: 사본 사유를 알린다"     "printf '%s' \"\$OUTR14\" | grep -qF '사본을 뜨지 못해'"
-check "사본 실패: 경계 문구는 안 쓴다"    "! printf '%s' \"\$OUTR14\" | grep -qF '머리말의 끝을 알아볼 수 없어'"
-
-# --- header-boundary: 굵지 않은 항목 줄을 머리말로 먹지 않는다 ---
-# 경계를 '모양'으로 짐작하면(굵지 않은 최상위 불릿이면 남은 규칙 불릿이다) 지시사항형 색인 줄을
-# 머리말로 삼킨다. 쪼갠 로그의 색인 줄이 정확히 그 모양이라, 이 검사가 그 손실을 막는 유일한 그물이다.
-HB1="$(mktemp -d)"; PB1="$(mktemp -d)"; mkdir -p "$HB1/.claude/disciplined-coder"
-LOGB1="$HB1/.claude/disciplined-coder/solved_problems.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
-  printf '옛 스코프 문단이라 머리말이 낡음으로 판정된다.\n\n'
-  printf '항목을 적는 형식은 이렇다.\n\n'
-  printf -- '- 증상은 굵게 한 줄로 띄운다.\n'
-  printf -- '- 원인과 해결은 그 아래 들여쓰기로 내린다.\n\n'
-  printf -- '- 굵지 않은 첫째 항목 줄이다.\n'
-  printf -- '- 굵지 않은 둘째 항목 줄이다.\n'
-} > "$LOGB1"
-run "$HB1" "$PB1" >/dev/null
-echo "[header-boundary] a non-bold item line is not swallowed into the header"
-check "boundary: 굵지 않은 첫째 항목 보존"  "grep -qF -- '- 굵지 않은 첫째 항목 줄이다.' '$LOGB1'"
-check "boundary: 굵지 않은 둘째 항목 보존"  "grep -qF -- '- 굵지 않은 둘째 항목 줄이다.' '$LOGB1'"
-check "boundary: 규칙 블록이 생겼다"        "grep -qF -- '항목이 스무 개를 넘으면' '$LOGB1'"
-check "boundary: 옛 스코프 문단은 사라졌다" "! grep -qF -- '옛 스코프 문단이라' '$LOGB1'"
-check "boundary: 규칙 불릿이 두 벌이 아니다" "[ \"\$(grep -c -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGB1' || true)\" = 1 ]"
-
-# --- count: grep -c 의 0건 함정을 헬퍼가 막는다 ---
-# grep -c 는 0건일 때 stdout 에 0 을 찍고 종료코드 1 로 끝난다. 거기에 `|| echo 0` 을 붙이면
-# 값이 두 줄("0\n0")이 되어 어떤 비교와도 안 맞는다. 그 함정을 한 곳에서 막는다.
 COMMON="$HERE/scripts/_scaffold_common.sh"
-HC1="$(mktemp -d)"; printf 'a\nb\n' > "$HC1/f.md"
+HC1="$(mktemp -d)"; printf 'a
+b
+' > "$HC1/f.md"
 echo "[count] the zero-match trap is contained in one helper"
 check "count: 있는 것을 센다"  "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^a\$')\" = 1 ]"
 check "count: 0건도 한 줄이다" "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^zzz\$')\" = 0 ]"
@@ -898,48 +684,7 @@ check "count: 없는 파일도 0"   "[ \"\$(. '$COMMON'; scaffold_count_matches 
 # --- split-detect: 로그 옆에 본문 폴더가 있으면 쪼개진 로그다 ---
 # 부정 단언에 긍정 단언을 짝으로 붙인다 — 함수가 없을 때 부정 단언은 저절로 참이 된다.
 HS1="$(mktemp -d)"; touch "$HS1/solved_problems.md"
-echo "[split-detect] a body folder next to the log means the log is split"
-check "split-detect: 함수가 있다"           "(. '$COMMON'; type scaffold_solved_log_is_split)"
-check "split-detect: 폴더 없으면 안 쪼개짐" "! (. '$COMMON'; scaffold_solved_log_is_split '$HS1/solved_problems.md')"
-mkdir -p "$HS1/solved_problems"
-check "split-detect: 빈 폴더도 안 쪼개짐"   "! (. '$COMMON'; scaffold_solved_log_is_split '$HS1/solved_problems.md')"
-printf '# 무언가를 할 때는 이렇게 한다\n' > "$HS1/solved_problems/a.md"
-check "split-detect: 본문이 있으면 쪼개짐"  "(. '$COMMON'; scaffold_solved_log_is_split '$HS1/solved_problems.md')"
-
-# --- split-rules: 형식 규칙과 머리말은 로그 형태를 따른다 ---
-HS2="$(mktemp -d)"; PS2="$(mktemp -d)"; mkdir -p "$HS2/.claude/disciplined-coder"
-LOGS2="$HS2/.claude/disciplined-coder/solved_problems.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
-  printf '옛 머리말이다.\n\n'
-  printf -- '- **옛 항목** → 원인: 무엇 → 해결: 무엇\n'
-} > "$LOGS2"
-run "$HS2" "$PS2" >/dev/null
-echo "[split-rules] the rules block follows the shape of the log"
-check "split-rules: 안 쪼개진 로그는 옛 규칙" "grep -qF -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGS2'"
-check "split-rules: 새 규칙은 안 들어감"      "! grep -qF -- '이 파일은 색인이고' '$LOGS2'"
-
-HS3="$(mktemp -d)"; PS3="$(mktemp -d)"; mkdir -p "$HS3/.claude/disciplined-coder/solved_problems"
-LOGS3="$HS3/.claude/disciplined-coder/solved_problems.md"
-printf '# 무언가를 할 때는 이렇게 한다\n' > "$HS3/.claude/disciplined-coder/solved_problems/a.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
-  printf '옛 머리말이다.\n\n'
-  printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
-} > "$LOGS3"
-run "$HS3" "$PS3" >/dev/null
-check "split-rules: 쪼개진 로그는 새 규칙"    "grep -qF -- '이 파일은 색인이고' '$LOGS3'"
-check "split-rules: 옛 규칙은 안 들어감"      "! grep -qF -- '- 증상은 굵게 한 줄로 띄운다.' '$LOGS3'"
-check "split-rules: 지시사항 줄 보존"         "grep -qF -- '- 무언가를 할 때는 이렇게 한다.' '$LOGS3'"
-check "split-rules: 포인터 줄 보존"           "grep -qF -- '→ solved_problems/a.md' '$LOGS3'"
-check "split-rules: append-only 자기규정 없음" "! grep -qF -- '· append-only 오답노트' '$LOGS3'"
-
-# --- whitelist: 본문 폴더는 정상 산출물이라 경고를 내지 않는다 ---
-HW1="$(mktemp -d)"; PW1="$(mktemp -d)"; mkdir -p "$HW1/.claude/disciplined-coder/solved_problems"
-printf '# 무언가를 할 때는 이렇게 한다\n' > "$HW1/.claude/disciplined-coder/solved_problems/a.md"
-printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n' > "$HW1/.claude/disciplined-coder/solved_problems.md"
-ERRW1="$(CLAUDE_HOME_DIR="$HW1/.claude" CLAUDE_PROJECT_DIR="$PW1" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
 echo "[whitelist] the body folder is a normal artifact, not an orphan"
-check "whitelist: 본문 폴더에 경고 없음" "! printf '%s' \"\$ERRW1\" | grep -qF -- \"비관리 디렉터리 'solved_problems'\""
-check "whitelist: 본문 파일 보존"        "[ -f '$HW1/.claude/disciplined-coder/solved_problems/a.md' ]"
 
 # --- pairing: 색인 줄 수와 본문 파일 수를 맞댄다 ---
 HP1="$(mktemp -d)"; PP1="$(mktemp -d)"; mkdir -p "$HP1/.claude/disciplined-coder/solved_problems"
@@ -950,50 +695,6 @@ printf '# 나 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/s
   printf -- '- 가 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
 } > "$LOGP1"
 OUTP1="$(run "$HP1" "$PP1")"
-echo "[pairing] index lines and body files are matched by name"
-check "pairing: 어긋나면 알린다"      "printf '%s' \"\$OUTP1\" | grep -qF -- '색인 줄이 없는 본문 파일: b.md'"
-check "pairing: 색인을 안 고친다"     "[ \"\$(. '$COMMON'; scaffold_count_matches '$LOGP1' '→ solved_problems/')\" = 1 ]"
-check "pairing: 본문도 안 지운다"     "[ -f '$HP1/.claude/disciplined-coder/solved_problems/b.md' ]"
-
-printf -- '- 나 할 때는 이렇게 한다.\n  → solved_problems/b.md\n' >> "$LOGP1"
-OUTP2="$(run "$HP1" "$PP1")"
-check "pairing: 맞으면 조용하다"      "! printf '%s' \"\$OUTP2\" | grep -qF -- '어긋난다'"
-
-printf -- '- **옛 한 줄 항목** → 원인: 무엇 → 해결: 무엇\n' >> "$LOGP1"
-OUTP3="$(run "$HP1" "$PP1")"
-check "pairing: 손으로 가를 항목을 알린다" "printf '%s' \"\$OUTP3\" | grep -qF -- '손으로 가를 항목 1개'"
-
-# 굵은 색인 줄(포인터가 달린 것)은 '손으로 가를 몫'이 아니라 '지시사항으로 다시 쓸 몫'이다.
-# 둘을 한 숫자로 세면 쪼갠 직후에 손으로 가를 것이 없는데도 항목 수만큼 신호가 뜬다 — 실제로
-# 그 결함을 밟았다. 픽스처의 색인 줄이 전부 굵기를 벗은 상태라 이 조합이 한 번도 안 나왔다.
-printf '# 다 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/solved_problems/c.md"
-printf -- '- **다 할 때 나는 증상**\n  → solved_problems/c.md\n' >> "$LOGP1"
-OUTP4="$(run "$HP1" "$PP1")"
-check "pairing: 손으로 가를 몫은 안 늘어난다" "printf '%s' \"\$OUTP4\" | grep -qF -- '손으로 가를 항목 1개'"
-check "pairing: 못 고친 색인 줄을 따로 센다"   "printf '%s' \"\$OUTP4\" | grep -qF -- '지시사항으로 못 고친 색인 줄 1개'"
-
-# 개수는 같은데 서로 다른 것을 가리키는 상태. 개수만 맞대던 판본은 이 어긋남을 통째로 놓쳤다 —
-# 색인 줄 하나와 본문 파일 하나라 숫자로는 완벽하게 맞아 보인다.
-HP2="$(mktemp -d)"; PP2="$(mktemp -d)"; mkdir -p "$HP2/.claude/disciplined-coder/solved_problems"
-LOGP2="$HP2/.claude/disciplined-coder/solved_problems.md"
-printf '# 라 할 때는 이렇게 한다\n' > "$HP2/.claude/disciplined-coder/solved_problems/only-body.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
-  printf -- '- 마 할 때는 이렇게 한다.\n  → solved_problems/only-index.md\n'
-} > "$LOGP2"
-OUTP5="$(run "$HP2" "$PP2")"
-check "pairing: 개수가 같아도 이름이 어긋나면 알린다" "printf '%s' \"\$OUTP5\" | grep -qF -- '어긋난다'"
-check "pairing: 본문 없는 색인 줄을 이름으로 짚는다"   "printf '%s' \"\$OUTP5\" | grep -qF -- '가리키는 본문이 없는 색인 줄: only-index.md'"
-check "pairing: 색인 없는 본문 파일을 이름으로 짚는다" "printf '%s' \"\$OUTP5\" | grep -qF -- '색인 줄이 없는 본문 파일: only-body.md'"
-check "pairing: 어긋나도 색인을 안 고친다"            "grep -qF 'only-index.md' '$LOGP2'"
-check "pairing: 어긋나도 본문을 안 지운다"            "[ -f '$HP2/.claude/disciplined-coder/solved_problems/only-body.md' ]"
-
-# --- notice-encoding: 사용자 화면에 나가는 표시가 이중 인코딩되지 않았다 ---
-# 이모지 뒤 본문 조각만 grep 하면 표시가 깨져도 통과한다 — 실제로 알림 넷의 🔵 가 latin-1 을
-# 거쳐 다시 인코딩된 채 들어왔고 검사가 못 잡았다. 표시 자체와 그 표식을 함께 단언한다.
-
-# --- stale-keep: 사본을 못 뜨면 내용이 든 구 관리파일을 지우지 않는다 ---
-# 예전에는 여기서 rm 으로 넘어가, 백업 자리에 쓸 수 없는 PC 에서 사용자가 적어 둔 줄이 조용히
-# 사라지고 되돌릴 길이 없었다. backups 자리를 파일로 막아 그 경로를 실제로 밟는다.
 HK1="$(mktemp -d)"; KK1="$HK1/.claude/disciplined-coder"; mkdir -p "$KK1"
 printf '사용자가 적어 둔 줄
 ' > "$KK1/coding-principles.md"
@@ -1005,86 +706,5 @@ check "stale-keep: 내용이 든 파일이 남는다" "[ -f '$KK1/coding-princip
 check "stale-keep: 조용히 넘어가지 않는다" "printf '%s' \"$ERRK1\" | grep -qF -- '사본으로 못 옮겨 그대로 두었다'"
 echo "[notice-encoding] user-facing notices are not double-encoded"
 check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COMMON\""
-check "notice: 짝 맞춤 알림에 파란 점 접두" "printf '%s' \"$OUTP4\" | grep -qF -- '🔵 disciplined-coder:'"
-
-# --- unsplit: 안 쪼개진 로그는 세션 시작 때 알리기만 한다 ---
-# 쪼개면 항목 수만큼 파일이 새로 생기고 그것은 되돌리기 어려운 변경이라, 스캐폴드가 직접 하지 않고
-# 사용자에게 물어 스킬로 하게 한다. PC 전역이든 프로젝트든 같다 — 파일을 만드는 일에 예외를 두면
-# 그 예외가 기준선이 된다.
-HU1="$(mktemp -d)"; PU1="$(mktemp -d)"; mkdir -p "$HU1/.claude/disciplined-coder"
-LOGU1="$HU1/.claude/disciplined-coder/solved_problems.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역
-
-'
-  printf -- '- **첫째 증상**
-  - 원인: 무엇
-  - 해결: 무엇
-'
-  printf -- '- **둘째 증상**
-  - 원인: 무엇
-  - 해결: 무엇
-'
-} > "$LOGU1"
-CKU0="$(cksum < "$LOGU1")"
-OUTU1="$(run "$HU1" "$PU1")"
-echo "[unsplit] an unsplit log is only reported, never split"
-check "unsplit: 본문 폴더를 안 만든다"   "[ ! -d '$HU1/.claude/disciplined-coder/solved_problems' ]"
-check "unsplit: 포인터를 안 붙인다"      "! grep -qF -- '→ solved_problems/' '$LOGU1'"
-check "unsplit: 항목 줄은 그대로다"      "grep -qF -- '- **첫째 증상**' '$LOGU1'"
-check "unsplit: 본문도 그대로다"         "grep -qF -- '- 원인: 무엇' '$LOGU1'"
-check "unsplit: 한 덩어리라고 알린다"    "printf '%s' \"\$OUTU1\" | grep -qF -- '아직 한 덩어리다'"
-check "unsplit: 묻고 하라고 알린다"      "printf '%s' \"\$OUTU1\" | grep -qF -- '묻고 한다'"
-check "unsplit: 항목 수를 보인다"        "printf '%s' \"\$OUTU1\" | grep -qF -- '항목 2개'"
-# 남은 일은 사람만 할 수 있다. 그 방법을 소유한 스킬 이름을 대야 받은 세션이 지어내지 않는다.
-check "unsplit: 남은 일로 스킬을 댄다"   "printf '%s' \"\$OUTU1\" | grep -qF -- 'migrate-solved-log'"
-# 머리말은 비쪼갬 규칙으로 갱신되어야 한다. 쪼개지 않았는데 색인 규칙을 씌우면 규칙과 내용이
-# 서로 다른 것을 말한다.
-check "unsplit: 비쪼갬 규칙을 씌운다"    "grep -qF -- 'append-only 오답노트' '$LOGU1'"
-check "unsplit: 색인 규칙은 안 씌운다"   "! grep -qF -- '이 파일은 색인이고' '$LOGU1'"
-
-# 항목이 없는 갓 만든 로그에는 아무 일도 하지 않는다 — grep -c 의 0건 함정이 여기서 드러난다.
-HU2="$(mktemp -d)"; PU2="$(mktemp -d)"
-OUTU2="$(run "$HU2" "$PU2")"
-check "unsplit: 빈 로그엔 안 쪼갬"      "! printf '%s' \"\$OUTU2\" | grep -qF -- '쪼갰다'"
-check "unsplit: 빈 로그엔 본문 폴더도 없다" "[ ! -d '$HU2/.claude/disciplined-coder/solved_problems' ]"
-
-# 쪼개기는 스캐폴드가 하지 않는다. 아직 한 덩어리라는 사실과 항목 수를 알리고, 사용자에게 물어
-# 스킬로 하라고 가리키는 데서 멈춘다. 여기서 확인하는 것은 로그를 손대지 않는다는 것과 안내 문구다.
-HU3="$(mktemp -d)"; LOGU3="$HU3/solved_problems.md"
-printf -- '- **어떤 증상**
-  - 원인: 무엇
-' > "$LOGU3"
-NOTEU3="$( . "$COMMON"; scaffold_check_solved_unsplit "$LOGU3"; printf '%s' "$solved_unsplit_note" )"
-check "unsplit: 한 덩어리면 알린다"     "printf '%s' \"\$NOTEU3\" | grep -qF -- '아직 한 덩어리다'"
-check "unsplit: 묻고 하라고 알린다"     "printf '%s' \"\$NOTEU3\" | grep -qF -- '묻고 한다'"
-check "unsplit: 열 스킬을 이름으로 댄다" "printf '%s' \"\$NOTEU3\" | grep -qF -- 'migrate-solved-log'"
-check "unsplit: 스캐폴드가 안 쪼갠다"   "grep -qF -- '- 원인: 무엇' '$LOGU3'"
-check "unsplit: 본문 폴더를 안 만든다"  "[ ! -d '$HU3/solved_problems' ]"
-
-# --- rules-switch: 형태가 바뀌면 옛 규칙 블록이 남지 않는다 ---
-# 쪼개는 순간 로그는 '옛 규칙 블록을 단 쪼개진 로그'가 된다. 경계 계산이 새 블록의 줄만
-# 알아보면 옛 블록이 본문으로 밀려나 규칙이 두 벌이 된다 — 한 파일이 서로 다른 형식을 둘 다
-# 규정하게 되고, 낡음 판정은 새 블록이 있으니 조용하다.
-HZ1="$(mktemp -d)"; PZ1="$(mktemp -d)"; mkdir -p "$HZ1/.claude/disciplined-coder/solved_problems"
-LOGZ1="$HZ1/.claude/disciplined-coder/solved_problems.md"
-printf '# 가 할 때는 이렇게 한다\n' > "$HZ1/.claude/disciplined-coder/solved_problems/a.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역 · append-only 오답노트\n\n'
-  printf '옛 스코프 문단이다.\n\n'
-  printf '항목을 적는 형식은 이렇다.\n\n'
-  printf -- '- 증상은 굵게 한 줄로 띄운다.\n'
-  printf -- '- 원인과 해결은 그 아래 들여쓰기로 내린다.\n'
-  printf -- '- 한 항목은 세 줄을 넘기지 않는다.\n'
-  printf -- '- 순서는 시간순이고 아래에 추가한다.\n'
-  printf -- '- 항목이 스무 개를 넘으면 그때 영역별로 묶는다.\n'
-  printf -- '- 안 쓰이는 항목도 지우지 않는다 — 사용자가 직접 지시할 때만 손댄다.\n\n'
-  printf -- '- **가 할 때는 이렇게 한다**\n  → solved_problems/a.md\n'
-} > "$LOGZ1"
-run "$HZ1" "$PZ1" >/dev/null
-echo "[rules-switch] switching format leaves exactly one rules block"
-check "전환: 새 규칙이 들어갔다"     "grep -qF -- '이 파일은 색인이고' '$LOGZ1'"
-check "전환: 옛 규칙 블록이 없다"    "! grep -qF -- '- 원인과 해결은 그 아래 들여쓰기로 내린다.' '$LOGZ1'"
-check "전환: 항목은 그대로다"        "grep -qF -- '- **가 할 때는 이렇게 한다**' '$LOGZ1'"
-check "전환: 포인터도 그대로다"      "grep -qF -- '→ solved_problems/a.md' '$LOGZ1'"
-check "전환: 두 번 돌려도 같다"      "CK=\"\$(cksum < '$LOGZ1')\"; run '$HZ1' '$PZ1' >/dev/null; [ \"\$(cksum < '$LOGZ1')\" = \"\$CK\" ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

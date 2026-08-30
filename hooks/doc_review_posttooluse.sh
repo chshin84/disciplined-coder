@@ -19,7 +19,6 @@ while IFS= read -r FILE; do
   # 문체 검진에서 얻을 것이 거의 없다. 색인과 본문 파일을 함께 뺀다.
   case "$FILE" in
     *docs/superpowers/reviews/*.md) continue ;;
-    *solved_problems.md|*solved_problems/*.md) continue ;;
   esac
   match="$FILE"; break
 done <<EOF

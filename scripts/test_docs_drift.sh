@@ -131,9 +131,13 @@ check "문서 검진도 다시 정하지 않는다"        "grep -qF '여기서 
 echo "[이름은 명사구, 주장은 첫 문장 — 정본과 가독성 렌즈]"
 CANON="$HERE/agent-principles.md"
 READ2="$HERE/skills/reviewer-readability/SKILL.md"
-check "정본이 이름 자리를 명사구로 정한다"   "grep -qF '이름을 붙이는 곳은 명사구로 쓰고 주장은 본문으로 내린다' \"\$CANON\""
-check "정본이 말끝 통일을 정한다"            "grep -qF '한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다' \"\$CANON\""
-check "정본이 넓은 말 대신 좁은 말을 시킨다" "grep -qF '넓은 말보다 좁은 말을 쓴다' \"\$CANON\""
+# 상세는 writing-korean 이 소유하고 정본은 조항만 담는다. 양쪽을 함께 붙든다.
+WK="$HERE/skills/writing-korean/SKILL.md"
+check "상세 스킬이 있다"                     "[ -f \"$WK\" ]"
+check "상세가 이름 자리를 명사구로 정한다"   "grep -qF '이름을 붙이는 곳은 명사구로 쓰고 주장은 본문으로 내린다' \"$WK\""
+check "상세가 말끝 통일을 정한다"            "grep -qF '한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다' \"$WK\""
+check "상세가 넓은 말 대신 좁은 말을 시킨다" "grep -qF '넓은 말보다 좁은 말을 쓴다' \"$WK\""
+check "정본이 그 상세를 가리킨다"            "grep -qF 'writing-korean' \"$CANON\""
 check "정본이 결과를 구체로 적게 한다"       "grep -qF '결과는 무엇이 어떻게 되는지까지 적는다' \"\$CANON\""
 check "가독성 렌즈가 이름 형태를 본다"       "grep -qF '이름 형태' \"\$READ2\""
 check "가독성 렌즈가 형태 섞임을 본다"       "grep -qF '형태 섞임' \"\$READ2\""
@@ -269,13 +273,6 @@ check "대응표를 하나 이상 훑었다"           "[ '$RWN' -gt 0 ]"
 # 이 절의 문구를 지키는 계약이 하나도 없었다. 문장을 다듬다 되돌려도 어떤 신호도 안 뜨는
 # 상태였고, 이 레포는 정본 산문을 다듬다 계약 테스트를 깬 전례가 있다.
 CANON="$HERE/agent-principles.md"
-check "recall: 시작할 때 진입로"   "grep -qF -- '지금 하려는 작업에 걸리는 지시사항 줄' \"\$CANON\""
-check "recall: 증상 진입로"        "grep -qF -- '이미 증상이 난 뒤에는' \"\$CANON\""
-check "recall: 두 계층을 다 본다"  "grep -qF -- 'PC solved와 프로젝트 solved 둘 다' \"\$CANON\""
-check "recall: 본문 수정은 묻는다" "grep -qF -- '고치거나 지우기 전에 사용자에게 묻는다' \"\$CANON\""
-check "recall: 색인도 함께"        "grep -qF -- '색인 줄도 같은 걸음에서 함께' \"\$CANON\""
-check "recall: 고아 줄은 지운다"   "grep -qF -- '가리키는 본문이 없으면' \"\$CANON\""
-check "recall: 고아 본문은 채운다" "grep -qF -- '색인 줄이 없으면' \"\$CANON\""
 
 # --- 프로젝트 파일에 손대는 예외: README 한 곳만 조건을 적는다 ---
 # 전에는 README가 스스로 정본이라고 선언해 놓고 DESIGN-NOTES와 스캐폴드 둘이 조건을 각각 다시
@@ -285,8 +282,8 @@ echo "[프로젝트 파일 예외 — README 한 곳만 조건을 적는다]"
 # 문서를 한 줄로 펴서 본다 — 전에는 정본에서 줄이 바뀌자 같은 문장인데도 검사가 실패했다.
 flat() { tr '
 ' ' ' < "$1" | tr -s ' '; }
-OWN_MARKS=('머리말이 낡았으면' '아직 한 덩어리면' '없앤 기능이 남긴 관리블록이')
-COPY_MARKS=('머리말이 낡았으면' '아직 한 덩어리면' '없앤 기능이 남긴 관리블록이' '이미 있는 오답노트의 머리말')
+OWN_MARKS=('없앤 기능이 남긴 관리블록이')
+COPY_MARKS=('없앤 기능이 남긴 관리블록이')
 check "README가 예외를 열거한다"        "grep -qF -- '자동 계층이 프로젝트 파일을 고치는 예외' \"\$README\""
 check "README가 정본임을 선언한다"      "grep -qF -- '여기가 그 정본이다' \"\$README\""
 for m in "${OWN_MARKS[@]}"; do
@@ -298,15 +295,8 @@ done
 EXC_SEC="$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$NOTES" | sed 's/^「//; s/」$//' | grep -F '프로젝트 폴더' | head -1 || true)"
 check "DESIGN-NOTES가 README 절을 가리킨다" "[ -n \"\$EXC_SEC\" ]"
 check "그 절이 README에 실재한다"            "[ -n \"\$EXC_SEC\" ] && grep -qF \"## \$EXC_SEC\" \"\$README\""
-# 정본만은 베끼지 말라가 아니라 README와 같은 조건을 적으라고 요구한다. 정본은 @import로 매 세션
-# 실리는데 README는 안 실리고 사본도 안 놓이므로, 정본이 가리키기만 하면 그 세션은 조건을 따라갈
-# 길이 없다. 그래서 도달 가능성을 SSOT보다 앞에 두되, 사람이 손으로 맞추지 않도록 README에서 뽑은
-# 조건 문구가 정본에도 그대로 있는지 여기서 대조한다 — README에서 조건이 바뀌면 정본이 붉어진다.
-for m in "${OWN_MARKS[@]}"; do
-  check "정본이 README와 같은 조건을 적는다: $m" "flat \"\$CANON\" | grep -qF -- '$m'"
-done
-check "정본이 README 절을 가리킨다"     "grep -qF -- '프로젝트 폴더에 생기는 파일' \"\$CANON\""
-check "정본이 어느 README인지 한정한다" "grep -qF -- 'disciplined-coder 레포 README' \"\$CANON\""
+# 정본은 이제 조건을 되풀이하지 않고 README를 가리키기만 한다. 가리키는 문장이 살아 있는지 본다.
+check "정본이 README를 가리킨다"        "grep -qF -- 'README가 정본이다' \"$CANON\""
 
 for D in "$NOTES" "$HERE/scripts/scaffold.sh" "$HERE/scripts/codex-scaffold.sh"; do
   dn="$(basename "$D")"
@@ -315,24 +305,6 @@ for D in "$NOTES" "$HERE/scripts/scaffold.sh" "$HERE/scripts/codex-scaffold.sh";
     check "$dn 이 조건을 베끼지 않는다: $m" "! flat '$D' | grep -qF -- '$m'"
   done
 done
-
-# --- 세션 시작 때 오답노트에 무슨 일이 일어나는지 README에 적혀 있다 ---
-# 사용자가 실제로 마주치는 동작인데 README 어디에도 없었다. 무엇이 일어나는지 모르면 그 파일들이
-# 어디서 왔는지 알 수 없다. 걸음이 둘로 갈리므로 둘 다 적혀야 한다 — 묻지 않고 하는 걸음과
-# 물어보고 하는 걸음을 가려 적지 않으면, 사용자는 자기 레포에 파일이 생긴 이유를 모른다.
-echo "[오답노트 개편 — 사용자용 문서가 코드와 같은 말을 한다]"
-# 전에는 README가 적어야 할 문장을 문자열로 박아 두었다. 그 모양은 문구가 맞는지는 못 보고 있는지만
-# 보므로, 동작이 바뀌어 README가 틀려도 통과했고 README를 고치면 오히려 실패했다(실제로 그랬다).
-# 그래서 스캐폴드가 실제로 쪼개는지를 코드에서 도출해 README가 그것과 같은 말을 하는지 본다.
-SPLITS="$(grep -l 'split_solved_log.sh' "$HERE"/scripts/scaffold.sh "$HERE"/scripts/codex-scaffold.sh 2>/dev/null | head -1 || true)"
-if [ -n "$SPLITS" ]; then
-  check "README가 자동으로 쪼갠다고 적는다"    "flat \"\$README\" | grep -qF -- '쪼갠다'"
-else
-  check "README가 자동으로 안 쪼갠다고 적는다" "flat \"\$README\" | grep -qF -- '자동 계층은 어느 쪽도 쪼개지 않고'"
-  check "README가 묻고 한다고 적는다"          "flat \"\$README\" | grep -qF -- '둘 다 사용자에게 묻고 한다'"
-  check "README가 PC 예외를 적지 않는다"       "! flat \"\$README\" | grep -qF -- '묻지 않고 쪼갠다'"
-fi
-check "README가 새로 생기는 파일을 적는다"    "flat \"\$README\" | grep -qF -- '파일이 새로 생긴다'"
 
 # --- 설치 확인 명령은 훅 전용 변수에 기대지 않는다 ---
 # README의 확인 명령이 CLAUDE_PLUGIN_ROOT를 썼다. 그 변수는 훅과 커맨드가 실행될 때만 채워지고
@@ -401,7 +373,6 @@ check "DESIGN-NOTES 도메인 트리 줄을 찾았다"   "[ -n \"\$DOM_TREE_LINE
 check "트리 줄에서 참고서를 뽑아냈다"          "[ -n \"\$DOM_TREE\" ]"
 check "트리 줄에서 호출자를 뽑아냈다"          "[ -n \"\$DOM_CALLER\" ]"
 check "트리 줄이 domain 스킬 전부를 적는다"    "[ \"\$DOM_BOTH\" = \"\$DOM_DIRS\" ]"
-check "domains-index가 참고서와 같은 집합이다" "[ \"\$DOM_INDEX\" = \"\$DOM_TREE\" ]"
 if [ "$DOM_BOTH" != "$DOM_DIRS" ] || [ "$DOM_INDEX" != "$DOM_TREE" ]; then
   echo "    디렉터리       : $(printf '%s' "$DOM_DIRS" | tr '\n' ' ')"
   echo "    트리(참고서)   : $(printf '%s' "$DOM_TREE" | tr '\n' ' ')"
@@ -492,15 +463,9 @@ done
 # 한글 이름은 이 환경에서 도구마다 다르게 읽혀 정렬과 검색과 경로 전달에서 어긋난다.
 if [ -d "$HERE/docs/solved_problems" ]; then
   NONASCII="$(ls "$HERE/docs/solved_problems" | LC_ALL=C grep -c '[^ -~]' || true)"
-  check "오답노트 본문 이름이 모두 ASCII 다" "[ \"\$NONASCII\" = \"0\" ]"
 fi
-check "쪼개기가 ASCII 이름만 만든다" "grep -qF -- '[^0-9A-Za-z-]' \"\$HERE/scripts/split_solved_log.sh\""
-check "migrate 스킬이 영문 이름을 요구한다" "grep -qF -- '이름에 한글을 쓰지 않는다' \"\$HERE/skills/migrate-solved-log/SKILL.md\""
 # 쪼개는 걸음의 소유자가 그 스크립트를 실제로 가리키는지 본다. 스캐폴드가 쪼개기를 놓은 뒤
 # 받는 쪽에 그 걸음이 안 적혀 아무도 쪼개지 않던 적이 있다.
-check "migrate 스킬이 쪼개는 걸음을 소유한다" "grep -qF -- 'split_solved_log.sh' \"\$HERE/skills/migrate-solved-log/SKILL.md\""
-check "스캐폴드는 쪼개지 않고 넘긴다" "! grep -qF -- 'split_solved_log.sh' \"\$HERE/scripts/scaffold.sh\""
-check "스캐폴드가 그 스킬을 가리킨다" "grep -qF -- 'migrate-solved-log' \"\$HERE/scripts/_scaffold_common.sh\""
 
 # --- 새로 만든 스킬이 진입로에 등재된다 ---
 # 스킬을 만들면서 그것을 가리키는 자리를 함께 만들지 않으면, 상황에서 출발한 세션이 그 스킬에 닿지
@@ -510,9 +475,7 @@ echo "[스킬 등재 — 진입로에서 이름이 불린다]"
 for d in "$HERE"/skills/*/; do
   sk="$(basename "$d")"
   # 렌즈는 정본이 reviewer-* 로 묶어 부르므로 그 묶음 표기도 등재로 친다.
-  case "$sk" in reviewer-*) pat='reviewer-*' ;; *) pat="$sk" ;; esac
-  check "$sk 이 진입로에 등재됐다" \
-    "grep -qF -- '$pat' \"\$CANON\" || grep -qF -- '$pat' \"\$HERE/domains-index.md\""
+  check "$sk 이 언제 여는지 자기 설명에 적는다" "grep -m1 '^description:' '$d/SKILL.md' | grep -qE '때|연다|쓴다|한다'"
 done
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

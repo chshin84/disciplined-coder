@@ -7,7 +7,7 @@ set -euo pipefail
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
 # Claude 설정 홈 해석 — 공유 헬퍼(SSOT). 도메인 PC의 네트워크 홈 리다이렉트로 bash $HOME이
-# os.homedir(USERPROFILE)과 어긋나면 조용한 누락(@import·solved)이 나므로 우선순위 해석을
+# os.homedir(USERPROFILE)과 어긋나면 @import 가 조용히 빠지므로 우선순위 해석을
 # _resolve_home.sh 한 곳에 두고 codex-scaffold.sh와 공유한다.
 . "$(dirname "$0")/_resolve_home.sh"
 . "$(dirname "$0")/_scaffold_common.sh"
@@ -19,8 +19,8 @@ UC="$CLAUDE_HOME/CLAUDE.md"
 mkdir -p "$KDIR"
 created=""
 
-# 1) 정본(static) 복사·갱신: principles, domains-index. src==dst면 생략.
-for f in agent-principles.md domains-index.md; do
+# 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
+for f in agent-principles.md; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
   if [ -f "$src" ]; then
     # 복사가 실패하면 조용히 넘어가지 않는다. 이미 옛 사본이 놓여 있는 PC에서는 파일도 있고
@@ -38,41 +38,6 @@ done
 #     비화이트리스트는 사용자 데이터일 수 있어 — 비었으면 제거, 내용 있으면 surface(FAIL-LOUD).
 scaffold_hygiene "$KDIR"
 
-# 2) solved 누적 파일(append-only 오답노트): 없을 때만 생성 — 템플릿 정본은 _scaffold_common.sh.
-#    (이슈·백로그 트래킹은 안 한다 — 범위 밖.)
-if scaffold_ensure_solved "$KDIR"; then created="$created solved_problems.md"; fi
-
-# 2b) 아직 안 쪼개진 본오답노트를 먼저 쪼갠다. 머리말 갱신보다 앞에 두는 이유는 순서 때문이다 —
-#     뒤에 두면 그 세션의 머리말은 옛 형식으로 맞춰지고, 쪼개진 로그가 옛 규칙을 단 채 한 세션을
-#     보낸다. 그 사이 한 파일이 스스로를 두 형식으로 규정한다.
-scaffold_check_solved_unsplit "$KDIR/solved_problems.md"
-pc_unsplit="$solved_unsplit_note"
-# 2b-1) 오답노트 머리말 동기화: 형식 규칙이 낡았으면 사본을 뜨고 정본 머리말로 갈아끼운다.
-#     항목은 한 줄도 건드리지 않고, 머리말의 끝을 알아볼 수 없는 로그는 손대지 않는다(방법 정본은
-#     domain-docs 스킬). 오답노트는 플러그인이 형식을 정하는 파일이라 사람 승인 없이 맞춘다.
-scaffold_sync_solved "$KDIR/solved_problems.md" pc "$KDIR/backups" pc
-pc_note="$solved_sync_note"
-# 2b-2) 본오답노트와 개별노트의 짝을 본다. 읽고 알리기만 한다. 쪼갠 직후에는 색인 줄이 아직
-#     지시사항이 아니므로 여기서 그 개수와 함께 migrate-solved-log 스킬을 가리킨다.
-scaffold_check_solved_pairing "$KDIR/solved_problems.md"
-pc_pairing="$solved_pairing_note"
-
-# 2c) 세션을 연 프로젝트의 오답노트도 같은 처리를 받는다. 프로젝트마다 형식이 갈리면 recall이
-#     읽는 모양이 제각각이 되기 때문이다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다 —
-#     이 플러그인은 프로젝트 폴더에 파일을 남기지 않는다.
-PROJ="${CLAUDE_PROJECT_DIR:-$PWD}"
-PLOG="$PROJ/docs/solved_problems.md"
-proj_note=""; proj_pairing=""; proj_unsplit=""
-if [ -f "$PLOG" ] && [ "$PLOG" != "$KDIR/solved_problems.md" ]; then
-  plabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
-  scaffold_check_solved_unsplit "$PLOG"
-  proj_unsplit="$solved_unsplit_note"
-  scaffold_sync_solved "$PLOG" project "$KDIR/backups" "$plabel"
-  proj_note="$solved_sync_note"
-  scaffold_check_solved_pairing "$PLOG"
-  proj_pairing="$solved_pairing_note"
-fi
-
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
 . "$(dirname "$0")/_managed_block.sh"
 
@@ -81,6 +46,7 @@ fi
 #     전역 CLAUDE.md와 같은 파일이면 건너뛴다 — 그건 이 훅이 매 세션 다시 만드는 정상 블록이다.
 #     걷어내기 전에 사본을 뜬다 — 블록 안에 사람이 끼워 넣은 줄이 있으면 그것이 유일한 복구
 #     수단이고, 이 파일은 git 밖일 수 있다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
+PROJ="${CLAUDE_PROJECT_DIR:-$PWD}"
 pointer_note=""
 PCLAUDE="$PROJ/CLAUDE.md"
 if [ -f "$PCLAUDE" ] && [ "$PCLAUDE" != "$UC" ]; then
@@ -110,8 +76,6 @@ if [ -f "$UC" ] && grep -qF '@disciplined-coder/agent-principles.md' "$UC"; then
 inject_rc=0
 managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" <<'EOF' || inject_rc=$?
 @disciplined-coder/agent-principles.md
-@disciplined-coder/domains-index.md
-@disciplined-coder/solved_problems.md
 EOF
 if [ "$inject_rc" -ne 0 ]; then
   echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라." >&2
@@ -121,7 +85,7 @@ fi
 #    @import만으로 정본에 닿지 못한다. 그 세션에만 stdout(additionalContext)으로 보강한다.
 #    이후 세션은 @import 한 경로로만 로드한다 — 같은 내용을 두 번 싣지 않는다.
 if [ "$had_import" -eq 0 ]; then
-  for f in agent-principles.md domains-index.md solved_problems.md; do
+  for f in agent-principles.md; do
     [ -f "$KDIR/$f" ] || continue
     # 읽기가 거부돼도 훅 전체를 죽이지 않는다. set -e 아래에서 cat 실패는 스캐폴드를 그 자리에서
     # 끝내 @import 배선까지 못 하게 만든다. 대신 못 읽었다는 사실을 stderr로 드러낸다(FAIL-LOUD).
@@ -132,7 +96,7 @@ if [ "$had_import" -eq 0 ]; then
 fi
 # 무엇을 했는지 알린다. 파일을 고쳤으면 조용히 넘기지 않는다 — 사용자가 열어 둔 레포가 바뀌었을 수
 # 있고, 그 사실은 사본 경로와 함께 눈에 보여야 한다(FAIL-LOUD).
-for note in "$pc_note" "$pc_pairing" "$pc_unsplit" "$proj_note" "$proj_pairing" "$proj_unsplit" "$pointer_note"; do
+for note in "$pointer_note"; do
   if [ -n "$note" ]; then printf '%s\n' "$note"; fi
 done
 

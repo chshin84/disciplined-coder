@@ -11,7 +11,6 @@ README에서 분리한 개발자용 내부 근거다. 사용자 설치·사용�
 disciplined-coder/
 ├── .claude-plugin/plugin.json      # 매니페스트
 ├── agent-principles.md             # 디시플린 정본 (SSOT) — hook이 ~/.claude/disciplined-coder/로 복사
-├── domains-index.md                # 도메인 참고서 인덱스 (동일 경로로 복사)
 ├── skills/domain-*/SKILL.md        # 도메인 참고서(docs/plugin/llm-runtime) + 호출자 domain-spec-review
 ├── skills/reviewer-*/SKILL.md      # 리뷰어 렌즈(grounding/fit/consistency/adversarial/prior-art/readability)
 ├── skills/meta-aggregate/SKILL.md  # 리뷰어 집계·결정(코드 설계도)
@@ -22,7 +21,6 @@ disciplined-coder/
 ├── hooks/spec_review_*.sh          # spec/plan: PostToolUse(감지) · Stop(하드 게이트) — 순수 bash, jq 비의존
 ├── hooks/doc_*tooluse.sh           # 문서: 양식 제안(Pre) · 검진 넛지(Post) — 비블로킹
 ├── scripts/scaffold.sh             # 멱등: ~/.claude/disciplined-coder/ 셋업 + ~/.claude/CLAUDE.md @import
-├── scripts/split_solved_log.sh     # 한 덩어리 오답노트를 색인과 본문 파일로 쪼갠다(세션이 승인받아 부른다)
 ├── .claude-plugin/marketplace.json # 마켓플레이스 매니페스트
 ├── scripts/_ensure_autoupdate.sh   # 멱등: 이 마켓플레이스 항목에 autoUpdate를 채운다(파이썬 필요)
 ├── .codex-plugin/plugin.json       # Codex 매니페스트(skills/hooks/interface)
@@ -52,14 +50,12 @@ disciplined-coder/
 표의 다섯 열은 다음을 뜻한다.
 
 - **정본** — 이 플러그인이 `~/.claude/disciplined-coder/`에 두는 원칙 정본
-- **도메인 목차** — 도메인 참고서 목차
-- **오답노트** — 오답노트
 - **자동 메모리 목차** — Claude Code가 레포별로 관리하는 자동 메모리의 목차 파일
 - **프로젝트 `CLAUDE.md`** — 프로젝트 루트의 `CLAUDE.md`
 
 각 칸은 그것이 그 에이전트의 컨텍스트에 실렸는지를 뜻한다.
 
-| 에이전트 종류 | 정본 | 도메인 목차 | 오답노트 | 자동 메모리 목차 | 프로젝트 `CLAUDE.md` |
+| 에이전트 종류 | 정본 | 자동 메모리 목차 | 프로젝트 `CLAUDE.md` |
 |---|---|---|---|---|---|
 | `general-purpose` | 실린다 | 실린다 | 실린다 | 실린다 | 실린다 |
 | `claude` (기본) | 실린다 | 실린다 | 실린다 | 실린다 | 실린다 |
@@ -97,7 +93,7 @@ Claude Code 버전을 함께 둔다.
 ### 어떻게 실려서 도는가
 - **플러그인 루트 `CLAUDE.md`는 컨텍스트로 로드되지 않는다.** 주입 경로는 `~/.claude/CLAUDE.md` →
   `@disciplined-coder/...` @import이며, 이 플러그인이 SessionStart hook으로 자동 배선한다. 프로젝트
-  폴더에는 원칙 사본을 두지 않는다(파일이 새로 생기는 예외는 README의 「프로젝트 폴더에 생기는 파일」이 적은 오답노트 쪼개기 하나이며, 그것은 사용자 승인을 받고 돈다).
+  폴더에는 원칙 사본을 두지 않고, 파일을 새로 만들지도 않는다.
 - **정본 stdout 보강은 첫 세션 1회뿐이다.** 관리 블록을 방금 만든 세션에 한해 정본을 stdout으로 함께
   보내는데, 그 세션에서 자동 압축이 돌면 요약으로 뭉개질 수 있다. 다음 세션부터는 세션 시작 때 `@import`가
   읽은 정본이 그 뒤 요청에도 실린다.
@@ -113,7 +109,7 @@ Claude Code 버전을 함께 둔다.
   고쳤을 때를 다루고, 이 항목은 배포본을 쓰는 사람 관점이다.
 - **정본을 고치면 다음 세션부터 반영된다**: `agent-principles.md`(SSOT)를 수정하면 다음 세션부터
   `~/.claude/disciplined-coder/`에 새 버전이 복사된다. 소유자와 갱신 주기를 정하라(권장: 분기 1회 검토).
-  일반화 가능한 `solved` 항목만 원칙으로 승격한다. 승격 절차는 여기서 정하지 않고 오답노트 머리말이
+  겪어서 얻은 교훈 가운데 여러 레포에 걸치는 것만 원칙으로 올린다. 그 판단은 여기서 정하지 않고 정본이
   정본이다(`domain-docs`가 그 머리말을 갈아끼우는 방법을 소유한다) — 그 로그의 본문 파일은 append-only이고 원문을
   보존하므로, 승격은 원칙 쪽에 재기술해 올리는 것이지 로그에서 지우는 것이 아니다.
 
@@ -121,7 +117,7 @@ Claude Code 버전을 함께 둔다.
 - **🔴는 쟁이지 말고 즉시 알린다**: 이 규칙은 `agent-principles.md`(@import 대상 — scaffold.sh가 배선)에
   박혀 있어 메인 세션에는 전달되지만 서브에이전트는 종류에 따라 갈린다(위 실측 표). 🔴(사용자 결정
   필요)는 어딘가에 쟁여 두지 말고 발견 즉시 사용자에게 알리며, 누구도 자율 구현하지 않는다
-  (disciplined-coder는 이슈·백로그를 추적하지 않는다 — 오답노트 절). 다만 CLAUDE.md는 강제가 아니라
+  (disciplined-coder는 이슈·백로그를 추적하지 않는다). 다만 CLAUDE.md는 강제가 아니라
   가이드이므로(공식 문서), 진짜로 막아야 한다면 `PreToolUse` hook로 강제하라.
 
 ### 안 넣기로 한 것
@@ -203,9 +199,8 @@ spec의 *실질 재설계*는 자동 재리뷰가 보장되지 않는다(관례�
 이를 훅 둘로 구현했다: `doc_format_pretooluse.sh`(PreToolUse — 새 `.md`에 `domain-docs` 양식 제안)와
 `doc_review_posttooluse.sh`(PostToolUse — 작성/수정 후 검진 넛지. 어느 렌즈로 검진할지는 `domain-docs`가 정한다).
 둘 다 spec/plan 경로(`docs/superpowers/{specs,plans}`)는 제외한다 — 그쪽은 자체 하드 게이트가 맡는다.
-**나머지 제외는 둘이 갈린다.** PostToolUse만 리뷰 기록(`docs/superpowers/reviews/`)과 오답노트
-(`solved_problems.md`와 그 본문 폴더)를 더 뺀다. 그래서 오답노트 본문 파일을 새로 만들면 PreToolUse
-양식 제안은 그대로 뜬다 — 본문 파일의 양식은 오답노트 머리말이 정본이므로 그 제안은 흘려도 된다.
+**나머지 제외는 둘이 갈린다.** PostToolUse만 리뷰 기록(`docs/superpowers/reviews/`)을 더 뺀다 —
+검진 기록에 대한 검진을 또 넛지하는 순환을 막기 위해서다.
 
 spec/plan과 달리 **비블로킹(권유)**으로 둔 이유는 셋이다.
 - **발행물이라 마커가 부적합하다.** spec/plan은 문서 맨 끝에 `<!-- spec-review: passed -->`를
@@ -223,9 +218,9 @@ spec/plan과 달리 **비블로킹(권유)**으로 둔 이유는 셋이다.
 보완한다. 같은 OFF 토글(`DISCIPLINED_CODER_REVIEW_GATE=off`)로 둘 다 끌 수 있다.
 
 ## Codex는 무엇을 공유하고 어디서 갈라지는가
-- **무엇을 공유하고 무엇을 더하는가.** 원칙 정본과 도메인 목차, `skills/` 전부, 그리고 게이트 로직은 두 런타임이 그대로 공유한다. Codex를 위해 만든 것(`.codex-plugin/`, `hooks-codex.json`, `session-start-codex`, `codex-scaffold.sh`)은 기존 것을 고치지 않고 더하기만 한다.
+- **무엇을 공유하고 무엇을 더하는가.** 원칙 정본과 `skills/` 전부, 그리고 게이트 로직은 두 런타임이 그대로 공유한다. Codex를 위해 만든 것(`.codex-plugin/`, `hooks-codex.json`, `session-start-codex`, `codex-scaffold.sh`)은 기존 것을 고치지 않고 더하기만 한다.
 - **갈라지는 지점이 여럿 있다.** 첫째, 파일 편집 도구가 런타임마다 다르다 — Claude에서는 Write와 Edit이 `file_path`로 경로를 주고, Codex에서는 `apply_patch`가 패치 헤더로 준다. `hooks/_extract_path.sh`가 양쪽을 흡수해 Pre와 Post 훅들이 그것을 함께 쓰며, 한 번에 여러 파일이 와도 모두 추출한다.
-- **상시 원칙을 어떻게 싣는가.** Claude는 `~/.claude/CLAUDE.md`의 `@import`로 싣는다. Codex는 `@import`를 지원하지 않으므로 `~/.codex/AGENTS.md` 관리블록에 정본을 인라인으로 넣고 매 세션 멱등하게 갱신한다. 인라인 대상은 원칙 정본과 도메인 목차 둘이고, 오답노트는 인라인하지 않고 매 세션 주입 경로로만 보낸다 — 자주 커지는 파일이라 관리블록에 넣으면 그 블록이 세션마다 길어진다. `session-start-codex`가 원칙 정본을 세션 컨텍스트로 함께 보내는 것은 **관리블록을 방금 만든 첫 세션 한 번뿐이며**, 그다음부터는 인라인 한 경로만 쓴다(이중 전송은 커밋 `1ea92f8`에서 의도적으로 제거했다).
+- **상시 원칙을 어떻게 싣는가.** Claude는 `~/.claude/CLAUDE.md`의 `@import`로 싣는다. Codex는 `@import`를 지원하지 않으므로 `~/.codex/AGENTS.md` 관리블록에 정본을 인라인으로 넣고 매 세션 멱등하게 갱신한다. 인라인 대상은 원칙 정본 하나다. `session-start-codex`가 원칙 정본을 세션 컨텍스트로 함께 보내는 것은 **관리블록을 방금 만든 첫 세션 한 번뿐이며**, 그다음부터는 인라인 한 경로만 쓴다(이중 전송은 커밋 `1ea92f8`에서 의도적으로 제거했다).
 - **무엇이 실제로 차단하는가.** 진짜 차단은 git 기반의 Stop 게이트(`spec_review_stop.sh`) 하나이고, 도구 형태와 무관하게 **신규** spec과 plan을 훑는다. 기존 파일을 수정하는 경우는 차단하지 않고 넛지만 띄운다. PreToolUse와 PostToolUse는 모두 비블로킹 넛지다.
 - **신뢰검토 갭을 어떻게 드러내는가**(`FAIL-LOUD`). Codex는 설치한 플러그인의 훅을 사용자가 한 번 신뢰하겠다고 확인하기 전에는 조용히 건너뛴다(이 확인을 신뢰검토라 부른다). 그래서 `session-start-codex`가 주입하는 첫 줄에 경고를 넣고 README에도 명시한다.
 - **version은 한쪽만 갖는다.** `.codex-plugin/plugin.json`만 `version`을 갖고 `.claude-plugin/plugin.json`은 비워 둔다. 이 계약은 `scripts/test_scaffold.sh`가 양쪽을 단언해 지킨다. Claude 매니페스트에 version을 도입하기로 결정하면 그 테스트와 함께 둘을 맞춘다.
@@ -236,7 +231,7 @@ spec/plan과 달리 **비블로킹(권유)**으로 둔 이유는 셋이다.
 프로젝트는 손으로 한 번 정리해야 한다. 신규 도입이면 해당 없다.
 
 - **사전 릴리스(구 sentinel) 버전에서 올라온 경우만 해당.** 구 버전은 CLAUDE.md에
-  `## 프로젝트 이슈 로그 (자동 주입)` 헤더 + `@solved_problems.md`/`@unsolved_problems.md`를 직접 붙였다.
+  `## 프로젝트 이슈 로그 (자동 주입)` 헤더와 그 아래 `@import` 줄을 직접 붙였다.
   현재 버전은 `# BEGIN/END disciplined-coder` 관리 영역을 쓰므로, 구 버전으로 이미 배선된 프로젝트는 둘이
   공존해 import가 **중복**될 수 있다(동작은 됨, 토큰 낭비). 해당 프로젝트의 CLAUDE.md에서 구 sentinel
   헤더와 그 아래 중복 `@import` 2줄만 **수동 삭제**하면 된다.
@@ -273,26 +268,22 @@ bash .claude/measure_yield.sh --since 2026-08-16 . /경로/다른레포 ...
 README에서 옮긴 내부 동작이다. 설치해 쓰는 데는 필요 없고, 무엇이 어디에 쓰이는지 뒤쫓을 때 본다.
 
 훅이 그때 아래를 한다(개수를 적지 않는 이유는 항목이 늘 때마다 그 숫자가 먼저 낡기 때문이다 — `NAME-ITEMS`).
-- `~/.claude/disciplined-coder/`에 정본 사본과 오답노트를 셋업한다. 어떤 파일이 생기는지의 정본은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`다.
+- `~/.claude/disciplined-coder/`에 정본 사본을 셋업한다. 어떤 파일이 생기는지의 정본은 scaffold 공통 헬퍼의 `SCAFFOLD_WHITELIST`다.
 - `~/.claude/CLAUDE.md` 관리블록에 `@import`를 배선한다. 없으면 만들고, 있으면 멱등하게 갱신한다.
-- 오답노트의 형식 규칙 서술이 낡았으면 머리말을 갈아끼우고 무엇을 했는지 알린다. 손대지 못했으면 그 사유를 가려 알리는데, 사유마다 사람이 할 일이 다르다(무엇을 하는지는 `domain-docs` 스킬이 정본이다).
 - 관리 디렉터리를 위생 점검한다 — 구 관리파일을 백업으로 치우고 화이트리스트 밖의 빈 파일만 지우고 내용이 든 것은 알리기만 한다.
 - 프로젝트 파일에 손대는 예외 셋을 처리한다. 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 파일」이 정본이라 여기 옮겨 적지 않는다.
 - 마켓플레이스 항목의 자동 갱신을 켠다(값이 없을 때만 채운다).
-- 쪼개진 오답노트의 색인 줄과 본문 파일 이름을 맞대어 어긋나면 어느 이름이 어긋났는지 알린다.
-- 아직 안 쪼개진 오답노트를 만나면 쪼개지 않고, 항목 수와 함께 사용자에게 물어 `migrate-solved-log` 스킬로 하라고 세션에 알린다. PC 전역이든 프로젝트든 같다 — 항목 수만큼 파일이 새로 생기는 것은 되돌리기 어려운 변경이다.
 
 ## 무엇을 왜 자동화하나
 
 `README`가 결과를 적었다면 여기는 그 결과가 어느 파일에서 나오는지를 적는다. 원칙은 하나다 — **자동 계층(scaffold·훅)은 프로젝트 폴더에 파일을 새로 만들지 않는다.** 자동 계층이 이미 있는 프로젝트 파일에 손대는 예외 셋의 정본은 README의 「프로젝트 폴더에 생기는 파일」이다.
 
 자동화 대상:
-- **일반 지식**(원칙 + 공통 함정 + 도메인 목차) — `agent-principles.md`·`domains-index.md`(SSOT)를 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선한다.
-- **오답노트**(solved) — `~/.claude/disciplined-coder/solved_problems.md`가 없으면 생성한다(PC 전역 누적, 멱등). 본문 파일은 append-only 이고 색인은 본문을 따라 고쳐 쓴다. 운영 규약(완결 후 등록이라 상태 아님, 단일 작성자, 🔴는 즉시 알리고 자율구현 금지, **이슈 트래킹 안 함**)은 `agent-principles.md`의 오답노트 절이 SSOT다.
+- **일반 지식**(원칙) — `agent-principles.md`(SSOT)를 `~/.claude/disciplined-coder/`에 복사하고 `~/.claude/CLAUDE.md` 관리블록에 `@import`로 배선한다.
 - **스킬** — `skills/` 아래 전부를 플러그인에서 온디맨드로 로드한다. 복사·주입하지 않는다. 무엇이 있는지는 그 디렉터리가 정본이라 여기 열거하지 않는다 — 열거하면 스킬이 늘 때마다 이 줄이 먼저 낡는다.
 
 ### 도메인 참고서 + 런타임/메타 검증
-개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. `domains-index.md`(자동 주입되는 목차)가 도메인과 참고서를 안내하고, 각 `skills/domain-*`가 상세를 온디맨드로 제공한다 — 설계 시 명세 반영, 개발 시 폴백.
+개발 대상(도메인)에 따라 "마땅히 그래야 하는 것"이 있다. 각 `domain-*` 스킬의 description 이 언제 그 참고서를 안내하고, 각 `skills/domain-*`가 상세를 온디맨드로 제공한다 — 설계 시 명세 반영, 개발 시 폴백.
 - **LLM 런타임**: 제품이 런타임에 LLM을 호출하면 단독 콜로 끝내지 말고 검증 레이어를 구현한다. `skills/domain-llm-runtime`(호출자)이 리스크에 따라 `skills/reviewer-*`(렌즈)와 `skills/meta-aggregate`(집계)를 **제품 코드의 리뷰 콜**로 구현하게 한다(Claude Code 에이전트가 아니라 제품이 구현할 청사진).
 - **메타 산출물 리뷰**: spec/plan도 Claude의 LLM 산출물이다. `skills/domain-spec-review`가 준비 단계를 거쳐 독립 렌즈 셋(grounding·consistency·adversarial)을 띄우고, 그 출력을 `meta-aggregate`가 모으면, 그것을 다시 🔴와 고칠 것으로 갈라 처분한다. 렌즈마다 한 번씩 띄우고, 렌즈별 결과를 한데 모으며, 틀린 지적은 합칠 때 거르고, 결과를 회차별 파일로 `docs/superpowers/reviews/`에 남긴다. 반영이 동작이나 계약을 바꿨으면 다시 리뷰할지 사용자에게 묻는다 — 자동으로 돌지 않는다. 선행연구 대조는 기본 묶음이 아니라 제안과 승인을 거쳐 따로 돈다. superpowers 기본 경로(`docs/superpowers/{specs,plans}`)에 쓰이면 **훅이 강제**한다. 그 강제는 PostToolUse 감지와 Stop 게이트로 이뤄지고, 문서 마지막 줄에 `<!-- spec-review: passed -->` 또는 `<!-- spec-review: escalated -->` 마커를 두면 풀리며, `DISCIPLINED_CODER_REVIEW_GATE=off`로 끈다.
 - **문서 작성 워크플로**: 일반 문서(README 등)는 사람이 글 쓰는 흐름을 흉내 낸다 — 작성 **전** `PreToolUse` 훅이 새 `.md`에 `domain-docs` 양식을 제안하고, 작성 **후** `PostToolUse` 훅이 독립 검진을 넛지한다(어느 렌즈로 검진할지는 `domain-docs`의 문서 검진 절이 정한다). 셀프 퇴고만으로 끝내지 않되, 발행물엔 마커를 안 박으므로 spec/plan과 달리 **비블로킹**(권유)이다. 같은 OFF 토글을 쓴다.

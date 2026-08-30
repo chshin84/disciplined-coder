@@ -144,8 +144,6 @@ J2() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s"}}' "$1"; }
 check "리뷰 기록에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/superpowers/reviews/x-review.md")')\" ]"
 # 오답노트도 기록에 대한 기록을 또 쓰게 만드는 부류다 — 교훈 한 줄을 적을 때마다 검진을 묻는
 # 순환이 생기고, 그것을 매번 건너뛰다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.
-check "오답노트 색인에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/solved_problems.md")')\" ]"
-check "오답노트 본문에도 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/solved_problems/a.md")')\" ]"
 check "다른 문서에는 넛지가 뜬다"  "drev '$(J2 "$T/docs/guide.md")' | grep -q additionalContext"
 
 echo "[project-solved nudge removed]"
