@@ -88,3 +88,9 @@
   → solved_problems/2026-08-30-drift-test-forced-copying.md
 - 렌즈 문서를 고칠 때는 본문과 레퍼런스 프롬프트를 같은 걸음에서 고치고, 실제로 도는 것은 프롬프트이므로 축 이름과 지시가 양쪽에 다 있는지 계약 테스트로 붙든다.
   → solved_problems/2026-08-30-lens-prompt-body-drift.md
+
+- 리뷰가 짚어 준 사례를 고칠 때는 그 모양을 레포 전체에서 세어 0이 되는지 확인하고, 0이 아니면 남은 것도 같은 걸음에서 고친다.
+  → solved_problems/2026-08-30-fix-hit-only-visible-cases.md
+
+- 문서가 맞는지 보는 계약 테스트는 문구의 존재를 요구하지 말고 코드나 다른 문서에서 값을 뽑아 대조한다.
+  → solved_problems/2026-08-30-check-pins-wrong-wording.md

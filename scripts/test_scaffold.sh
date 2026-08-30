@@ -397,7 +397,10 @@ echo "[standing-consent] reviewer calls carry the user's standing consent"
 check "검증 레이어 절이 잡힌다"            "[ -n \"\$SC_BLOCK\" ]"
 check "canon: 상시 허가 문장"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '$CONSENT'"
 check "canon: 허가 범위 한정"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- \"\$SC_SCOPE\""
-check "canon: 다른 팬아웃은 제외"          "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '그 밖의 서브에이전트나 여러 갈래를 동시에 띄우는 것'"
+check "canon: 다른 팬아웃은 제외"          "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '그 밖의 서브에이전트와 워크플로는 열어 주지 않는다'"
+# 한 번에 여럿 띄우기는 레포 문서 감사에서만 열어 두었다. 그 예외가 어느 절차의 것인지 함께 붙들어,
+# 예외만 남고 어느 절차인지가 지워지는 것을 막는다.
+check "canon: 여럿 띄우기는 감사에서만"    "printf '%s' \"\$SC_BLOCK\" | grep -qF -- 'project-doc-audit'"
 # 선행연구 렌즈는 이름을 대서 예외로 못 박아야 한다. 이름이 reviewer-*라 허가에 들면서 동시에 웹에
 # 나가는 유일한 렌즈라, 뭉뚱그린 말로 제외하면 같은 렌즈를 열고 닫는 문장이 된다. 그 상태에서는
 # 렌즈를 범위 밖으로 판단해 조용히 건너뛰게 되고, '막히면 알린다'는 안전장치도 발동하지 않는다.
