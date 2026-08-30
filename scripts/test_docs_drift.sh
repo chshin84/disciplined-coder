@@ -20,7 +20,7 @@ pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
 
 # 진실 1 — 실제 렌즈 디렉터리에서 짧은 이름을 도출한다.
-ALL="$(for d in "$HERE"/skills/reviewer-*/; do basename "$d" | sed 's/^reviewer-//'; done | sort)"
+ALL="$(for d in "$HERE"/skills/reviewer-*/; do [ -d "$d" ] || continue; basename "$d" | sed 's/^reviewer-//'; done | sort)"
 
 # 진실 2 — 호출자가 디스패치 목록에 적은 렌즈. 목록 항목은 "- `reviewer-이름` — 설명" 꼴이다.
 DISPATCH="$(grep -oE '^- `reviewer-[a-z-]+`' "$CALLER" | sed 's/^- `reviewer-//; s/`$//' | sort)"
