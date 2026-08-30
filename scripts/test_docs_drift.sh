@@ -269,11 +269,6 @@ for RW in "$RWDIR"/*.md; do
 done
 check "대응표를 하나 이상 훑었다"           "[ '$RWN' -gt 0 ]"
 
-# --- recall: 오답노트를 꺼내 쓰는 진입로가 둘이라는 것을 정본이 말한다 ---
-# 이 절의 문구를 지키는 계약이 하나도 없었다. 문장을 다듬다 되돌려도 어떤 신호도 안 뜨는
-# 상태였고, 이 레포는 정본 산문을 다듬다 계약 테스트를 깬 전례가 있다.
-CANON="$HERE/agent-principles.md"
-
 # --- 프로젝트 파일에 손대는 예외: README 한 곳만 조건을 적는다 ---
 # 전에는 README가 스스로 정본이라고 선언해 놓고 DESIGN-NOTES와 스캐폴드 둘이 조건을 각각 다시
 # 적었다. 예외가 늘거나 조건이 바뀌면 사람이 네 곳을 손으로 맞춰야 하고, 그러면 반드시 갈라진다.
@@ -368,16 +363,14 @@ DOM_TREE="$(printf '%s' "$DOM_TREE_LINE" | grep -oE '\([^()]*\)' | head -1 | tr 
 DOM_CALLER="$(printf '%s' "$DOM_TREE_LINE" | grep -oE '호출자 domain-[a-z-]+' | sed 's/^호출자 domain-//' | sort -u || true)"
 DOM_DIRS="$(for d in "$HERE"/skills/domain-*/; do basename "$d" | sed 's/^domain-//'; done | sort)"
 DOM_BOTH="$(printf '%s\n%s\n' "$DOM_TREE" "$DOM_CALLER" | grep -v '^$' | sort -u)"
-DOM_INDEX="$(grep -oE '`domain-[a-z-]+`' "$HERE/domains-index.md" | tr -d '`' | sed 's/^domain-//' | sort -u || true)"
 check "DESIGN-NOTES 도메인 트리 줄을 찾았다"   "[ -n \"\$DOM_TREE_LINE\" ]"
 check "트리 줄에서 참고서를 뽑아냈다"          "[ -n \"\$DOM_TREE\" ]"
 check "트리 줄에서 호출자를 뽑아냈다"          "[ -n \"\$DOM_CALLER\" ]"
 check "트리 줄이 domain 스킬 전부를 적는다"    "[ \"\$DOM_BOTH\" = \"\$DOM_DIRS\" ]"
-if [ "$DOM_BOTH" != "$DOM_DIRS" ] || [ "$DOM_INDEX" != "$DOM_TREE" ]; then
+if [ "$DOM_BOTH" != "$DOM_DIRS" ]; then
   echo "    디렉터리       : $(printf '%s' "$DOM_DIRS" | tr '\n' ' ')"
   echo "    트리(참고서)   : $(printf '%s' "$DOM_TREE" | tr '\n' ' ')"
   echo "    트리(호출자)   : $(printf '%s' "$DOM_CALLER" | tr '\n' ' ')"
-  echo "    domains-index  : $(printf '%s' "$DOM_INDEX" | tr '\n' ' ')"
 fi
 
 # --- spec 리뷰 마커: 코드의 리터럴이 산문 둘에 그대로 있다 ---
@@ -450,7 +443,6 @@ for L in "$HERE"/skills/reviewer-*/SKILL.md; do
   AXES="$(awk '/^## 체크리스트/{f=1;next} f&&/^## /{exit} f&&/^- \*\*/{print}' "$L" \
           | sed 's/^- \*\*//; s/\*\*.*$//')"
   [ -z "$AXES" ] && continue
-  PROMPT="$(grep -m1 '^- system:' "$L" || true)"
   check "$LN: 프롬프트 줄이 있다" "[ -n \"\$(grep -m1 '^- system:' '$L')\" ]"
   while IFS= read -r ax; do
     [ -z "$ax" ] && continue
@@ -459,13 +451,6 @@ for L in "$HERE"/skills/reviewer-*/SKILL.md; do
 $AXES
 AXEOF
 done
-# --- 오답노트 본문 파일 이름은 ASCII 다 ---
-# 한글 이름은 이 환경에서 도구마다 다르게 읽혀 정렬과 검색과 경로 전달에서 어긋난다.
-if [ -d "$HERE/docs/solved_problems" ]; then
-  NONASCII="$(ls "$HERE/docs/solved_problems" | LC_ALL=C grep -c '[^ -~]' || true)"
-fi
-# 쪼개는 걸음의 소유자가 그 스크립트를 실제로 가리키는지 본다. 스캐폴드가 쪼개기를 놓은 뒤
-# 받는 쪽에 그 걸음이 안 적혀 아무도 쪼개지 않던 적이 있다.
 
 # --- 새로 만든 스킬이 진입로에 등재된다 ---
 # 스킬을 만들면서 그것을 가리키는 자리를 함께 만들지 않으면, 상황에서 출발한 세션이 그 스킬에 닿지
