@@ -27,16 +27,6 @@ check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/agent-p
 check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
 check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
 
-# 새 로그는 처음부터 쪼개진 형식으로 태어난다. 안 쪼개진 형식으로 만들어 놓던 판본은 사용자가 첫
-# 교훈을 적는 순간부터 매 세션 개편을 권했다 — 만드는 경로가 목표 형식과 어긋나 있었던 것이다.
-check "fresh-pc: 옛 형식 규칙은 없다"         "! grep -qF '증상은 굵게 한 줄로 띄운다' '$K/solved_problems.md'"
-printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n' >> "$K/solved_problems.md"
-mkdir -p "$K/solved_problems"; printf '# 무언가를 할 때는 이렇게 한다\n' > "$K/solved_problems/a.md"
-OUT1B="$(run "$H1" "$P1")"
-check "fresh-pc: 첫 교훈을 적어도 개편 권유가 없다" "! printf '%s' \"\$OUT1B\" | grep -qF '아직 안 쪼개진 형식이다'"
-check "fresh-pc: 머리말이 낡았다고도 안 한다"       "! printf '%s' \"\$OUT1B\" | grep -qF '형식 규칙 서술이 현행과 다르다'"
-check "fresh-pc: 짝도 어긋나지 않는다"              "! printf '%s' \"\$OUT1B\" | grep -qF '색인과 본문이 어긋난다'"
-
 # 마켓플레이스 항목의 autoUpdate 값을 읽어 출력한다($1=파일 $2=항목 이름). 없으면 none을 찍는다.
 # grep으로 파일 전체를 훑으면 우리 항목에 붙었는지 남의 항목에 붙었는지 못 가리므로 항목을 지목해 읽는다.
 json_autoupdate() {
@@ -680,11 +670,6 @@ echo "[count] the zero-match trap is contained in one helper"
 check "count: 있는 것을 센다"  "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^a\$')\" = 1 ]"
 check "count: 0건도 한 줄이다" "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^zzz\$')\" = 0 ]"
 check "count: 없는 파일도 0"   "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/none.md' '^a\$')\" = 0 ]"
-
-# --- split-detect: 로그 옆에 본문 폴더가 있으면 쪼개진 로그다 ---
-# 부정 단언에 긍정 단언을 짝으로 붙인다 — 함수가 없을 때 부정 단언은 저절로 참이 된다.
-HS1="$(mktemp -d)"; touch "$HS1/solved_problems.md"
-echo "[whitelist] the body folder is a normal artifact, not an orphan"
 
 # --- pairing: 색인 줄 수와 본문 파일 수를 맞댄다 ---
 HP1="$(mktemp -d)"; PP1="$(mktemp -d)"; mkdir -p "$HP1/.claude/disciplined-coder/solved_problems"

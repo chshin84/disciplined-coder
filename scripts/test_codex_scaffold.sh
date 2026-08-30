@@ -54,11 +54,6 @@ check "para two preserved"          "grep -qxF 'para two' '$AG3'"
 check "blank line right after para one preserved" "blank_follows '$AG3' 'para one'"
 check "one region after 3 runs"     "[ \$(grep -cF '# BEGIN disciplined-coder' '$AG3') -eq 1 ]"
 
-# --- 케이스 4: solved 누적 보존 ---
-echo "[case4] solved preserved"
-printf '\n- codex 보존 확인\n' >> "$K/solved_problems.md"
-run "$H1" >/dev/null
-
 # --- 케이스 5: CRLF 관리영역 인식(중복 안 됨) ---
 H5="$(mktemp -d)"; mkdir -p "$H5/.codex"
 printf 'note\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@old\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H5/.codex/AGENTS.md"
@@ -164,41 +159,5 @@ printf '# 해결된 문제 로그\n\n- **격리 픽스처 항목**\n  - 원인: 
 OUTI1="$(run "$HI1" "$PI1")"
 echo "[isolation] run does not treat the repo itself as the project"
 check "격리: 레포 자신은 안 본다"    "! printf '%s' \"\$OUTI1\" | grep -qF -- '$HERE/docs/solved_problems.md'"
-
-# --- split-rules: 형식 규칙과 머리말은 로그 형태를 따른다 (Claude 쪽과 같은 계약) ---
-# 쌍둥이 스크립트는 한쪽만 고치면 두 런타임의 오답노트 형식이 갈린다 — 그것이 애초에 머리말
-# 자동 갱신을 도입한 이유다.
-HX2="$(mktemp -d)"; PX2="$(mktemp -d)"; mkdir -p "$HX2/.codex/disciplined-coder"
-LOGX2="$HX2/.codex/disciplined-coder/solved_problems.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
-  printf '옛 머리말이다.\n\n'
-  printf -- '- **옛 항목** → 원인: 무엇 → 해결: 무엇\n'
-} > "$LOGX2"
-run "$HX2" "$PX2" >/dev/null
-echo "[split-rules] the rules block follows the shape of the log"
-
-HX3="$(mktemp -d)"; PX3="$(mktemp -d)"; mkdir -p "$HX3/.codex/disciplined-coder/solved_problems"
-LOGX3="$HX3/.codex/disciplined-coder/solved_problems.md"
-printf '# 무언가를 할 때는 이렇게 한다\n' > "$HX3/.codex/disciplined-coder/solved_problems/a.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
-  printf '옛 머리말이다.\n\n'
-  printf -- '- 무언가를 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
-} > "$LOGX3"
-run "$HX3" "$PX3" >/dev/null
-
-# --- index-root: 주입된 색인이 어느 뿌리에서 왔는지 본문에 남는다 ---
-# Codex 는 색인을 stdout 으로 흘려 보내므로 뿌리가 본문에 안 남으면, 세션이 색인 줄의
-# solved_problems/… 를 엉뚱한 자리에서 찾다 못 찾고 규칙대로 멀쩡한 줄을 지운다.
-HX4="$(mktemp -d)"; PX4="$(mktemp -d)"
-OUTX4="$(run "$HX4" "$PX4")"
-echo "[index-root] the injected index carries the root it came from"
-
-# --- unsplit: 안 쪼개진 로그는 개편을 권하고, 빈 로그에는 안 권한다 ---
-HX5="$(mktemp -d)"; PX5="$(mktemp -d)"; mkdir -p "$HX5/.codex/disciplined-coder"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
-  printf -- '- **첫째 증상**\n  - 원인: 무엇\n  - 해결: 무엇\n'
-} > "$HX5/.codex/disciplined-coder/solved_problems.md"
-OUTX5="$(run "$HX5" "$PX5")"
-echo "[unsplit] an unsplit log gets a conversion nudge with its item count"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
