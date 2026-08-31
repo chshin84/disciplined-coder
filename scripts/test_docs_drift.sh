@@ -459,7 +459,18 @@ done
 echo "[스킬 등재 — 진입로에서 이름이 불린다]"
 for d in "$HERE"/skills/*/; do
   sk="$(basename "$d")"
-  # 렌즈는 정본이 reviewer-* 로 묶어 부르므로 그 묶음 표기도 등재로 친다.
+  # 진입로는 셋이다 — 정본이 이름을 부르거나, 다른 스킬이 부르거나, 렌즈면 정본의 묶음 표기에 든다.
+  # 자기 SKILL.md 안의 언급은 세지 않는다. 자기가 자기를 부르는 것은 도달이 아니다.
+  named=0
+  grep -qF -- "$sk" "$HERE/agent-principles.md" && named=1
+  if [ "$named" = 0 ]; then
+    for o in "$HERE"/skills/*/SKILL.md; do
+      case "$o" in */"$sk"/SKILL.md) continue ;; esac
+      grep -qF -- "$sk" "$o" && { named=1; break; }
+    done
+  fi
+  case "$sk" in reviewer-*) grep -qF -- 'reviewer-*' "$HERE/agent-principles.md" && named=1 ;; esac
+  check "$sk 을 정본이나 다른 스킬이 부른다" "[ '$named' = 1 ]"
   check "$sk 이 언제 여는지 자기 설명에 적는다" "grep -m1 '^description:' '$d/SKILL.md' | grep -qE '때|연다|쓴다|한다'"
 done
 
@@ -490,5 +501,37 @@ done
 check "scaffold.sh 가 SCAFFOLD_FILES 를 쓴다"       "grep -qF 'for f in \$SCAFFOLD_FILES' '$HERE/scripts/scaffold.sh'"
 check "codex-scaffold.sh 가 SCAFFOLD_FILES 를 쓴다" "grep -qF 'for f in \$SCAFFOLD_FILES' '$HERE/scripts/codex-scaffold.sh'"
 check "화이트리스트가 그 목록에서 도출된다"          "grep -qF 'SCAFFOLD_WHITELIST=\"\$SCAFFOLD_FILES' '$HERE/scripts/_scaffold_common.sh'"
+
+# --- 마켓플레이스 문안이 매니페스트에서 갈라지지 않는다 ---
+# 마켓플레이스 카드는 설치 전 사용자가 보는 첫 문안인데, 걷어낸 solved-log 스캐폴딩을 한동안 계속
+# 광고했다. 같은 사실을 두 파일이 각자 적으면 반드시 갈라지므로, 플러그인 매니페스트를 정본으로
+# 두고 마켓플레이스 항목이 그것과 글자 그대로 같은지 잰다(`SSOT`).
+# 두 파일을 JSON으로 파싱해 읽는다 — 쉼표 하나가 어긋나 있으면 여기서 붉어진다.
+echo "[매니페스트] 마켓플레이스 항목이 플러그인 매니페스트와 같은 문안을 쓴다"
+JSONPROG='
+import json,io,sys
+mk=json.load(io.open(sys.argv[1],encoding="utf-8"))
+pl=json.load(io.open(sys.argv[2],encoding="utf-8"))
+ent=[p for p in mk["plugins"] if p.get("name")==pl["name"]]
+print("MISSING" if not ent else ("SAME" if ent[0].get("description")==pl.get("description") else "DIFF"))
+'
+if python3 -c 'import sys' >/dev/null 2>&1; then PYBIN=python3; else PYBIN=python; fi
+MKCMP="$("$PYBIN" -c "$JSONPROG" "$HERE/.claude-plugin/marketplace.json" "$HERE/.claude-plugin/plugin.json" 2>&1)" || MKCMP="PARSE-ERROR"
+check "두 매니페스트가 JSON으로 파싱된다"     "[ '$MKCMP' != 'PARSE-ERROR' ]"
+check "마켓플레이스에 이 플러그인 항목이 있다" "[ '$MKCMP' != 'MISSING' ]"
+check "두 문안이 같다"                         "[ '$MKCMP' = 'SAME' ]"
+
+# --- 자기감사 실행체가 죽은 이름을 렌즈에 넘기지 않는다 ---
+# 검토 대상을 프롬프트에 손으로 열거하면 그 목록만 조용히 낡는다. 실제로 없앤 기능 이름과 이미
+# 옮겨진 파일 이름이 남아 렌즈 시간이 거기에 쓰였고, 감사 자신은 그 사실을 구조상 알아낼 수 없었다.
+# 걷어낸 기능 목록(SCAFFOLD_STALE)에서 이름을 도출해 실행체가 그것을 부르지 않는지 잰다.
+SA="$HERE/.claude/workflows/self-audit.js"
+echo "[자기감사] 실행체가 걷어낸 이름을 부르지 않는다"
+check "실행체 파일이 있다" "[ -f '$SA' ]"
+for n in $STALE_NAMES; do
+  check "self-audit.js 가 '$n' 을 안 부른다" "! grep -qF -- '$n' '$SA'"
+done
+# 부정 단언의 짝이다 — 절 이름을 파일에서 읽으라는 지시가 사라지면 열거로 되돌아간 것이다.
+check "정본 절 이름을 파일에서 읽게 한다" "grep -qF '절 제목을 파일에서 읽어' '$SA'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

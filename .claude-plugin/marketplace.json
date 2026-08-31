@@ -7,7 +7,7 @@
     {
       "name": "disciplined-coder",
       "source": "./",
-      "description": "PC-global engineering discipline (agent-principles.md, SSOT) + solved-log scaffolding, auto-wired into ~/.claude on session start. See the plugin manifest for full details."
+      "description": "Team engineering discipline (SSOT principles) + per-domain design references + runtime LLM verification reviewers + spec/plan & doc review gates, auto-injected into your global ~/.claude/CLAUDE.md (applies to all projects) via a SessionStart hook."
     }
   ]
 }
