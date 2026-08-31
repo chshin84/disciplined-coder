@@ -1,10 +1,10 @@
 export const meta = {
   name: 'self-audit',
-  description: 'disciplined-coder 저장소를 자기 원칙·자기 리뷰어 렌즈로 자기검증한다',
+  description: 'disciplined-coder 저장소를 자기 원칙·자기 렌즈로 자기검증한다',
   whenToUse: '큰 변경(정본·훅·스캐폴드 수정) 후 회귀 감사가 필요할 때, 레포 루트에서 실행한다(다른 위치면 args로 레포 경로를 넘긴다). 결과는 확정 발견 목록과 집계 판정이다.',
   phases: [
     { title: '테스트', detail: '테스트 스크립트 전부 + plugin validate 실행 (FAIL=0 계약)' },
-    { title: '리뷰', detail: '자기 리뷰어 스킬과 원칙 차원 렌즈를 병렬로 감사한다 (개수는 REVIEWERS 배열이 정본)' },
+    { title: '리뷰', detail: '자기 렌즈 스킬과 원칙 차원 렌즈를 병렬로 감사한다 (개수는 REVIEWERS 배열이 정본)' },
     { title: '중복제거', detail: '렌즈 간 중복 발견 병합' },
     { title: '반박검증', detail: '발견별 사실성·실질성 2관점 반박 (불확실하면 기각, 표가 모자라면 미판정)' },
     { title: '집계', detail: 'meta-aggregate 방식 구조 건강성 점검 + 최종 정리' },
@@ -67,7 +67,7 @@ const TEST_SCHEMA = {
   required: ['allPassed', 'results'],
 }
 
-const COMMON = `너는 disciplined-coder 플러그인 저장소(${REPO})를 감사하는 읽기 전용 리뷰어다.
+const COMMON = `너는 disciplined-coder 플러그인 저장소(${REPO})를 감사하는 읽기 전용 렌즈다.
 이 저장소는 그 플러그인 자체의 소스다 — 플러그인이 남에게 강제하는 원칙을 자기 자신이 지키는지 검증한다.
 먼저 ${REPO}/agent-principles.md (원칙 정본·규칙서)를 읽어라.
 규칙: (1) 파일을 직접 읽고 실제 인용을 증거로 제시하라 — 추측 금지. (2) 어떤 파일도 수정하지 마라.
@@ -77,11 +77,11 @@ const COMMON = `너는 disciplined-coder 플러그인 저장소(${REPO})를 감�
 
 const REVIEWERS = [
   { key: 'lens-grounding', prompt: `${COMMON}
-렌즈: ${REPO}/skills/reviewer-grounding/SKILL.md 를 읽고 그대로 적용하라. 검토 대상: README.md, CLAUDE.md, agent-principles.md, 그리고 commands/ 아래의 모든 .md — 목록은 그 디렉터리를 훑어 도출하라. source(진실): scripts/*.sh, hooks/*, skills/*/SKILL.md, .claude-plugin/*. 문서가 주장하는 동작이 실제 코드에 근거하는지 — 누락·모순·환각을 찾아라.` },
+렌즈: ${REPO}/skills/lens-grounding/SKILL.md 를 읽고 그대로 적용하라. 검토 대상: README.md, CLAUDE.md, agent-principles.md, 그리고 commands/ 아래의 모든 .md — 목록은 그 디렉터리를 훑어 도출하라. source(진실): scripts/*.sh, hooks/*, skills/*/SKILL.md, .claude-plugin/*. 문서가 주장하는 동작이 실제 코드에 근거하는지 — 누락·모순·환각을 찾아라.` },
   { key: 'lens-consistency', prompt: `${COMMON}
-렌즈: ${REPO}/skills/reviewer-consistency/SKILL.md 를 읽고 그대로 적용하라. 검토 대상: agent-principles.md, README.md, CLAUDE.md, 그리고 skills/ 아래 모든 SKILL.md 상호간 — 스킬 목록은 그 디렉터리를 훑어 도출하라. 내부 모순, 커버리지 공백, 이름/참조 드리프트를 찾아라.` },
+렌즈: ${REPO}/skills/lens-consistency/SKILL.md 를 읽고 그대로 적용하라. 검토 대상: agent-principles.md, README.md, CLAUDE.md, 그리고 skills/ 아래 모든 SKILL.md 상호간 — 스킬 목록은 그 디렉터리를 훑어 도출하라. 내부 모순, 커버리지 공백, 이름/참조 드리프트를 찾아라.` },
   { key: 'lens-adversarial', prompt: `${COMMON}
-렌즈: ${REPO}/skills/reviewer-adversarial/SKILL.md 를 읽고 그대로 적용하라(가드 포함: 기능 추가 제안 금지·근거 필수). 검토 대상: 정본의 절 전부와 hooks/·scripts/·skills/ 설계 전체 — 절 제목을 파일에서 읽어 목록을 만들고(`grep '^## ' agent-principles.md`) 그 전부를 훑어라. 실패 모드, 과설계·YAGNI, 비가역, 자기모순을 공격적으로 찾아라.` },
+렌즈: ${REPO}/skills/lens-adversarial/SKILL.md 를 읽고 그대로 적용하라(가드 포함: 기능 추가 제안 금지·근거 필수). 검토 대상: 정본의 절 전부와 hooks/·scripts/·skills/ 설계 전체 — 절 제목을 파일에서 읽어 목록을 만들고(`grep '^## ' agent-principles.md`) 그 전부를 훑어라. 실패 모드, 과설계·YAGNI, 비가역, 자기모순을 공격적으로 찾아라.` },
   { key: 'ssot-audit', prompt: `${COMMON}
 차원: SSOT 전수 조사 — agent-principles.md ↔ skills ↔ scripts ↔ hooks ↔ README ↔ CLAUDE.md ↔ commands 사이의 권위 있는 이중 기술(손 동기화 쌍)을 찾아라. 정당한 참조/도출은 위반이 아니다.` },
   { key: 'shell-audit', prompt: `${COMMON}

@@ -153,7 +153,7 @@ OUT_GONE="$(in_claudemd "$PN" | CLAUDE_PROJECT_DIR="$PN" bash "$DREV" 2>&1)" || 
 check "no add-pointer nudge anymore"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'add-pointer'"
 # 렌즈 이름이 아니라 위임 대상을 단언한다 — 이름을 단언하면 이 테스트가 네 번째 사본이 된다(SSOT).
 check "generic nudge fires instead"   "printf '%s' \"\$OUT_GONE\" | grep -qF 'domain-docs'"
-check "nudge names no lens directly"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'reviewer-'"
+check "nudge names no lens directly"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'lens-'"
 check "hook writes no project file"   "[ ! -f '$PN/docs/solved_problems.md' ]"
 
 . "$HERE/scripts/_json_valid.sh"   # JSON 유효성 검사기(공유)
@@ -202,7 +202,7 @@ check "배선이 가리키는 스크립트가 모두 존재" "[ -z \"\$missing\"
 # **어느 배선 파일에도 안 실린 것만 잡는다.** 전에는 hooks.json 하나만 읽어 Codex 배선을 빠뜨려도
 # 초록이었다. 그렇다고 모든 훅이 모든 배선 파일에 있어야 한다고 요구하면 반대로 어긋난다 — 이
 # 레포는 런타임마다 진입점이 다르고(SessionStart는 Claude가 scripts/scaffold.sh, Codex가
-# hooks/session-start-codex), 한 런타임 전용 훅을 옳게 배선해도 붉어져 안 쓰는 런타임에 억지로
+# hooks/session-start-codex), 한 런타임 전용 훅을 옳게 배선해도 실패해 안 쓰는 런타임에 억지로
 # 끼워 넣게 만든다. 그래서 "어디에도 없는 것"만 실패로 본다.
 #
 # 확장자로 훑지 않는 이유도 같다. hooks/session-start-codex 는 .sh 가 없어 *.sh 글롭에서 빠지는데,
