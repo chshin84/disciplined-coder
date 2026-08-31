@@ -486,7 +486,10 @@ check "README가 상수 자리를 가리킨다"      "grep -qF '_managed_block.s
 
 # --- 금지 표현: 살아 있는 문서에 남지 않는다 ---
 # 목록을 검사에 손으로 적지 않고 writing-korean 의 「금지 표현」 표에서 도출한다. 그 표가 정본이라
-# 낱말을 더하면 이 검사가 함께 따라온다. 정본 파일 자신은 그 낱말을 정의하므로 대상에서 뺀다.
+# 낱말을 더하면 이 검사가 함께 따라온다. 대상에서 빼는 것이 둘이고 이유가 서로 다르다 —
+# writing-korean 자신은 그 낱말을 정의하는 정본이라 빼고, docs/superpowers/ 아래는 소비하고 지우는
+# 문서(spec·plan·인수인계)와 그때 찍은 기록(리뷰·되돌린 대응표)이라 살아 있는 문서가 아니어서 뺀다.
+# 뒤의 제외는 project-doc-audit 의 「대상 아님」과 같은 규정이다.
 WK="$HERE/skills/writing-korean/SKILL.md"
 BANLIST="$(awk '/^## 금지 표현/{f=1; next} f && /^## /{exit} f' "$WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
 BAN_DOCS="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^skills/writing-korean/SKILL.md')"
