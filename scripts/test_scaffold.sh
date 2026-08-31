@@ -609,6 +609,19 @@ check "걷어내기 실패: 사본은 남는다"          "[ -s '$AT/backup.bak'
 check "스캐폴드가 4를 알린다"                 "grep -qF 'prc\" -eq 4' '$HERE/scripts/scaffold.sh'"
 
 
+# --- 커맨드가 시키는 보고를 스크립트가 실제로 낼 수 있다 ---
+# 전에는 두 스캐폴드에 값을 한 번도 안 받는 created 변수와 그것을 조건으로 삼는 보고 줄이 있었고,
+# 커맨드는 그 보고를 근거로 새로 생긴 파일과 이미 있던 파일을 알리라고 지시했다. 스크립트가 그
+# 사실을 안 내므로 지시를 따르려면 지어내야 했다. 죽은 변수가 되살아나면 여기서 붉어진다.
+echo "[setup-report] the command may only ask for facts the script actually emits"
+for S in scaffold.sh codex-scaffold.sh; do
+  check "$S: 값을 안 받는 created 가 없다" "! grep -qE '(^|[^_a-zA-Z])created' '$HERE/scripts/$S'"
+done
+SDC="$HERE/commands/setup-discipline.md"
+check "커맨드가 스크립트 출력을 전하라 한다" "grep -qF '스크립트가 낸 출력' '$SDC'"
+check "커맨드가 새 파일 목록을 안 시킨다"    "! grep -qF '새로 생성' '$SDC'"
+
+
 # --- 매니페스트 version 계약 ---
 # Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin·DESIGN-NOTES).
 # 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다
@@ -636,6 +649,19 @@ check "stale: advisors-index 치움"        "[ ! -f '$KS/advisors-index.md' ]"
 check "stale: unsolved_problems 치움"     "[ ! -f '$KS/unsolved_problems.md' ]"
 check "stale: 잔존 경고 없음"             "! printf '%s' \"\$ERRS\" | grep -qF '비관리 파일'"
 check "stale: 내용은 백업에 남는다"       "grep -rqF '내 백로그 한 줄' '$KS/backups'"
+
+# 오답노트를 폴더로 쪼갰던 PC에는 파일이 아니라 디렉터리가 남는다. 치우기 반복문이 정규 파일만
+# 보던 판본은 그것을 건너뛰었고, 뒤이은 화이트리스트 반복문이 '비관리 디렉터리 잔존' 경고를 냈다.
+# 스캐폴드에는 그 경고를 해소할 수단이 없어 사용자가 손으로 지울 때까지 매 세션 되풀이됐다.
+HSD="$(mktemp -d)"; PSD="$(mktemp -d)"; mkdir -p "$HSD/.claude/disciplined-coder/solved_problems"
+KSD="$HSD/.claude/disciplined-coder"
+printf '쪼갠 오답노트 한 줄\n' > "$KSD/solved_problems/2026-01-01.md"
+ERRSD="$(CLAUDE_HOME_DIR="$HSD/.claude" CLAUDE_PROJECT_DIR="$PSD" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
+echo "[stale-dir] a retired managed directory is filed away, not warned about forever"
+check "stale-dir: 디렉터리를 치운다"       "[ ! -d '$KSD/solved_problems' ]"
+check "stale-dir: 내용은 백업에 남는다"    "grep -rqF '쪼갠 오답노트 한 줄' '$KSD/backups'"
+check "stale-dir: 해소 못 할 경고가 없다"  "! printf '%s' \"\$ERRSD\" | grep -qF '비관리 디렉터리'"
+
 
 # (타) 없앤 기능이 프로젝트 CLAUDE.md에 심어 둔 옛 관리블록을 걷어낸다. 전역 블록은 건드리지 않는다.
 HR11="$(mktemp -d)"; PR11="$(mktemp -d)"

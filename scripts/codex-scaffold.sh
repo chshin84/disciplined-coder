@@ -14,7 +14,6 @@ CODEX_HOME="$(resolve_home codex)"
 KDIR="$CODEX_HOME/disciplined-coder"
 AG="$CODEX_HOME/AGENTS.md"
 mkdir -p "$KDIR"
-created=""
 
 # 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
 for f in $SCAFFOLD_FILES; do
@@ -73,6 +72,4 @@ if [ "$had_inline" -eq 0 ]; then
   done
 fi
 
-# 5) 보고(진단은 stderr — stdout은 주입 본문 전용).
-if [ -n "$created" ]; then echo "[disciplined-coder] Codex knowledge initialized:$created (at $KDIR)" >&2; fi
 exit 0

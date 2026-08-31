@@ -17,7 +17,6 @@ KDIR="$CLAUDE_HOME/disciplined-coder"
 UC="$CLAUDE_HOME/CLAUDE.md"
 
 mkdir -p "$KDIR"
-created=""
 
 # 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
 for f in $SCAFFOLD_FILES; do
@@ -113,6 +112,4 @@ if [ -n "$autoupdated" ]; then
   done
 fi
 
-# 5) 보고
-if [ -n "$created" ]; then echo "[disciplined-coder] PC knowledge initialized:$created (at $KDIR)" >&2; fi
 exit 0

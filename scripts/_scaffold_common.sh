@@ -11,6 +11,7 @@ SCAFFOLD_WHITELIST="$SCAFFOLD_FILES backups"
 # 토글을 없애면서 화이트리스트에서만 빼면 내용이 있어 '비관리 파일' 경고로 영원히 남는다.
 # advisors-index·unsolved_problems도 같은 이유로 여기 있다 — 앞은 domains-index로 이름이 바뀐 옛
 # 파일이고, 뒤는 손유지 백로그라 없앤 기능의 잔재다. 둘 다 내용이 있어 위생 검사가 지우지 못한다.
+# solved_problems는 파일과 디렉터리 둘로 남는다 — 로그를 쪼갠 PC에는 폴더가 남기 때문이다.
 SCAFFOLD_STALE="coding-principles.md issue-mode ultracode-review advisors-index.md unsolved_problems.md solved_problems.md solved_problems domains-index.md"
 
 # 쪼개진 로그(색인 + 본문 폴더)의 형식 규칙 블록. 안 쪼개진 로그에는 이것을 갈아끼우지 않는다 —
@@ -29,8 +30,11 @@ scaffold_hygiene() {  # $1=KDIR
   # 사본을 못 뜨면 지우지 않고 그대로 두고 알린다. 예전에는 여기서 rm 으로 넘어갔는데, 그러면
   # 백업 디렉터리에 쓸 수 없는 PC 에서 사용자가 적어 둔 줄이 조용히 사라져 되돌릴 길이 없었다.
   for f in $SCAFFOLD_STALE; do
-    [ -f "$kdir/$f" ] || continue
-    if [ ! -s "$kdir/$f" ]; then
+    [ -e "$kdir/$f" ] || continue
+    # 디렉터리로 남은 것도 같은 규율으로 치운다. 오답노트를 폴더로 쪼갰던 PC가 그 형태인데,
+    # 정규 파일만 보던 판본은 그것을 건너뛰어 해소할 수 없는 잔존 경고를 매 세션 냈다.
+    # 안을 훑지 않고 통째로 옮긴다 — 무엇이 들었든 사본 하나로 되돌릴 수 있다(`REVERSIBLE`).
+    if [ -f "$kdir/$f" ] && [ ! -s "$kdir/$f" ]; then
       rm -f "$kdir/$f" || true
       continue
     fi
