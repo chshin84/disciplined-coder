@@ -573,6 +573,42 @@ check "부모 폴더가 없어도 물러난다"            "[ '$PRC' -ne 0 ]"
 # 상한 자체가 코드에 있는지 본다 — 지우면 다시 영원히 돈다.
 check "총 대기 상한이 코드에 있다"             "grep -qF 'MANAGED_LOCK_TOTAL_TICKS' '$HERE/scripts/_managed_block.sh'"
 
+# --- 걷어내기가 실패하면 원본을 갈아치우지 않는다 ---
+# 주입과 걷어내기는 두 awk를 거쳐 원본을 바꿔치기한다. 앞 awk의 종료 코드를 안 보면 빈 임시 파일이
+# 그대로 원본을 덮어, 사용자가 손으로 적은 줄이 사라진 채 관리블록만 남고 함수는 성공으로 돌아온다.
+# 대상이 git 밖의 ~/.claude/CLAUDE.md 라 사본이 없으면 되돌릴 수단이 없다.
+echo "[strip-fail] a failing strip pass must not blank the user's file"
+AT="$(mktemp -d)"; AF="$AT/CLAUDE.md"; ABIN="$AT/bin"; mkdir -p "$ABIN"
+printf 'user keep one\nuser keep two\n' > "$AF"
+REALAWK="$(command -v awk)"
+{ printf '#!/usr/bin/env bash\n'
+  printf 'case "$*" in *"-v b="*) exit 1 ;; esac\n'
+  printf 'exec %s "$@"\n' "$REALAWK"
+} > "$ABIN/awk"; chmod +x "$ABIN/awk"
+ARC=0
+( . "$HERE/scripts/_managed_block.sh"
+  PATH="$ABIN:$PATH"
+  printf 'body\n' | managed_block_inject "$AF" "# B" "# E" ) >/dev/null 2>&1 || ARC=$?
+check "걷어내기 실패: 사용자 줄이 남는다"    "[ \"\$(grep -c '^user keep' '$AF')\" = 2 ]"
+check "걷어내기 실패: 실패로 돌아온다"       "[ '$ARC' -ne 0 ]"
+check "걷어내기 실패: 관리블록을 안 남긴다"  "! grep -qF '# B' '$AF'"
+check "걷어내기 실패: 임시 파일이 안 남는다" "[ -z \"\$(ls '$AT' | grep -v -e '^CLAUDE.md$' -e '^bin$')\" ]"
+
+
+# 걷어내기 쪽도 같은 길로 나온다. 이쪽은 사본을 이미 떠 둔 뒤라, 원본을 그대로 두고 물러나야
+# 사본과 원본이 함께 남는다.
+RRC=0
+AF2="$AT/PROJ.md"; printf 'user keep one\n# B\nold\n# E\n' > "$AF2"
+( . "$HERE/scripts/_managed_block.sh"
+  PATH="$ABIN:$PATH"
+  managed_block_remove "$AF2" "# B" "# E" "$AT/backup.bak" ) >/dev/null 2>&1 || RRC=$?
+check "걷어내기 실패: 변환 실패를 4로 알린다" "[ '$RRC' = 4 ]"
+check "걷어내기 실패: 원본을 그대로 둔다"     "[ \"\$(grep -c '^user keep one$' '$AF2')\" = 1 ]"
+check "걷어내기 실패: 사본은 남는다"          "[ -s '$AT/backup.bak' ]"
+# 호출자가 그 사유를 삼키지 않는지 본다 — 조용히 넘어가면 사용자는 옛 블록이 왜 남았는지 모른다.
+check "스캐폴드가 4를 알린다"                 "grep -qF 'prc\" -eq 4' '$HERE/scripts/scaffold.sh'"
+
+
 # --- 매니페스트 version 계약 ---
 # Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin·DESIGN-NOTES).
 # 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다

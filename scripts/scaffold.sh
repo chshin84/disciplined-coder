@@ -59,6 +59,8 @@ if [ -f "$PCLAUDE" ] && [ "$PCLAUDE" != "$UC" ]; then
     pointer_note="🔵 disciplined-coder: $PCLAUDE 에 남아 있던 옛 관리블록을 걷어냈다(사용자가 쓴 줄은 그대로 두었다. 사본: $managed_block_backup)."
   elif [ "$prc" -eq 2 ]; then
     pointer_note="🔵 disciplined-coder: $PCLAUDE 에 옛 관리블록이 남아 있는데 사본을 뜨지 못해 그대로 두었다($KDIR/backups 에 쓸 수 있게 되면 다음 세션에 다시 시도한다)."
+  elif [ "$prc" -eq 4 ]; then
+    pointer_note="🔵 disciplined-coder: $PCLAUDE 에 옛 관리블록이 남아 있는데 변환이 실패해 원본을 그대로 두었다(사본: $managed_block_backup. 다음 세션에 다시 시도한다)."
   elif [ "$prc" -eq 3 ]; then
     pointer_note="🔵 disciplined-coder: $PCLAUDE 에 옛 관리블록이 남아 있는데 잠금을 잡지 못해 그대로 두었다(다른 창이 같은 파일을 붙들고 있거나 그 폴더에 쓸 수 없다. 다음 세션에 다시 시도한다)."
   fi

@@ -143,7 +143,7 @@ managed_block_unlock() {  # $1=락 디렉터리 경로, $2=managed_block_lock �
 # 못 뜨면 아예 걷어내지 않는다(오답노트 머리말과 같은 규율. 호출자가 기억하게 두지 않으려고 함수
 # 안에 둔다 — `FAIL-LOUD`).
 # 리턴: 0=걷어냄, 1=대상이 없어 아무것도 안 함, 2=사본을 못 떠서 걷어내지 않음,
-#       3=락을 못 잡아 걷어내지 않음.
+#       3=락을 못 잡아 걷어내지 않음, 4=변환이 실패해 원본을 그대로 두었음.
 # 호출은 반드시 `|| rc=$?`로 감싼다(set -e).
 managed_block_remove() {
   local uc="$1" begin="$2" end="$3" bk="${4:-}" tmp norm lock tok
@@ -160,12 +160,15 @@ managed_block_remove() {
   tok="$(managed_block_lock "$lock")" || return 3
   tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
   trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock" "$tok"' RETURN
-  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp"
-  awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" && mv "$norm" "$uc"
+  # 두 변환의 종료 코드를 각각 본다. 앞이 실패한 채로 넘어가면 빈 임시 파일이 원본을 덮어,
+  # 사람이 적은 줄이 사라진다(`FAIL-LOUD`).
+  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 4
+  awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 4
+  mv "$norm" "$uc" || return 4
   return 0
 }
 
-# 리턴: 0=넣었음, 1=락을 못 잡아 아무것도 안 함.
+# 리턴: 0=넣었음, 1=락을 못 잡아 아무것도 안 함, 2=변환이 실패해 원본을 그대로 두었음.
 # 락을 못 잡았으면 파일을 건드리지 않고 물러난다 — 반쪽만 쓴 관리블록을 남기는 것보다 안 쓰는
 # 것이 낫고, 못 썼다는 사실은 managed_block_lock 이 이미 stderr 로 알렸다(`FAIL-LOUD`).
 managed_block_inject() {
@@ -178,8 +181,11 @@ managed_block_inject() {
   tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
   # 중간에 죽어도 임시 파일과 락을 남기지 않는다.
   trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock" "$tok"' RETURN
-  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp"
-  awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" && mv "$norm" "$uc"
+  # 걷어내기와 같은 이유로 두 변환의 종료 코드를 각각 본다. 이쪽은 사본을 뜨지 않으므로 원본을
+  # 잘못 덮으면 되돌릴 수단이 아예 없다.
+  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 2
+  awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 2
+  mv "$norm" "$uc" || return 2
   {
     if [ -s "$uc" ]; then printf '\n'; fi
     printf '%s\n' "$begin"
