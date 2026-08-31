@@ -534,4 +534,11 @@ done
 # 부정 단언의 짝이다 — 절 이름을 파일에서 읽으라는 지시가 사라지면 열거로 되돌아간 것이다.
 check "정본 절 이름을 파일에서 읽게 한다" "grep -qF '절 제목을 파일에서 읽어' '$SA'"
 
+# --- README가 잠금 상수를 베껴 적지 않는다 ---
+# 전에는 대기 시간 두 값을 README가 숫자로 적어, 상수가 바뀌면 알려 주는 것 없이 틀린 값이 됐다.
+# 값을 적지 말고 상수가 사는 자리를 가리키게 한다(`SSOT`).
+echo "[README] 잠금 시간을 값으로 적지 않고 상수 자리를 가리킨다"
+check "README가 잠금 시간을 베끼지 않는다" "! grep -qE '잠금(은|이)? *[0-9]+초' '$HERE/README.md'"
+check "README가 상수 자리를 가리킨다"      "grep -qF '_managed_block.sh' '$HERE/README.md'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
