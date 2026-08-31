@@ -66,7 +66,7 @@ if [ -f "$PCLAUDE" ] && [ "$PCLAUDE" != "$UC" ]; then
 fi
 
 # 마커는 _managed_block.sh의 MANAGED_BEGIN/END(SSOT)를 쓴다.
-# 스킬(domain-*/reviewer-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
+# 스킬(domain-*/lens-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
 # 첫 설치 판정은 반드시 주입 '전에' 한다 — 주입 후엔 항상 존재해 판정이 무의미해진다.
 # -x(줄 전체 일치)를 쓰지 않는 이유: CRLF 파일에서 줄 끝 CR 때문에 영원히 거짓이 되어
 # 이중 주입이 조용히 되살아난다(이 레포는 CRLF를 실재 문제로 이미 다룬다).

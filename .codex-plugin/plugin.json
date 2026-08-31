@@ -1,7 +1,7 @@
 {
   "name": "disciplined-coder",
   "version": "0.1.0",
-  "description": "Team engineering discipline (SSOT principles) + per-domain design references + runtime LLM verification reviewers + spec/plan & doc review gates, for Codex. Mirrors the Claude Code plugin via shared skills and hook logic.",
+  "description": "Team engineering discipline (SSOT principles) + per-domain design references + runtime LLM verification lenses + spec/plan & doc review gates, for Codex. Mirrors the Claude Code plugin via shared skills and hook logic.",
   "author": { "name": "chshin84", "email": "chshin84@gmail.com" },
   "license": "UNLICENSED",
   "keywords": ["principles", "discipline", "doc-review", "scaffold", "hooks"],

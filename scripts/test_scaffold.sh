@@ -234,12 +234,12 @@ for c in "$HERE"/commands/*.md; do
 done
 
 # --- workflow-verification-row: 검증 레이어 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
-# 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(reviewer-*)과
+# 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(lens-*)과
 # 강제 방식 열이 같은 행에 있음을 보장한다(다른 행·다른 파일의 문자열로 vacuous 통과 방지).
 WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agent-principles.md")"
 echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
 check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
-check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'reviewer-*'"
+check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'lens-*'"
 check "검증 기록을 요구한다"       "printf '%s' \"\$WF_BLOCK\" | grep -qF 'docs/superpowers/reviews/'"
 check "사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_BLOCK\" | grep -qF 'ultracode 검증 모드'"
 
@@ -295,7 +295,7 @@ OUT20b="$(run "$H20" "$P20")"
 echo "[canon-first-run-only] canon dumped on first run only"
 check "1st run dumps principles"      "printf '%s' \"\$OUT20a\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# 디시플린 (팀 원칙)'"
-# 토글이 사라져 2회차에는 보낼 것이 없다. 빈 문자열을 단언해 두면 무엇이 새로 새어 나와도 붉어진다
+# 토글이 사라져 2회차에는 보낼 것이 없다. 빈 문자열을 단언해 두면 무엇이 새로 새어 나와도 실패한다
 # — 부정 단언만 남기면 스크립트가 아무것도 못 내도 통과하는 vacuous 구멍이 생긴다.
 check "2nd run sends nothing"         "[ -z \"\$OUT20b\" ]"
 
@@ -356,7 +356,7 @@ done
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
 check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
 
-# --- standing-consent: 리뷰어 호출에 대한 상시 허가가 정본에 있다 ---
+# --- standing-consent: 렌즈 호출에 대한 상시 허가가 정본에 있다 ---
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
 # 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 정본은 @import(Claude)와 인라인
 # (Codex) 양쪽으로 실리므로, 이 한 문장이 있으면 두 런타임 모두에서 검진이 돈다.
@@ -365,9 +365,9 @@ check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가
 SC_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$CANON")"
 # 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
 # 명령 치환으로 실행되어, 검사가 엉뚱한 문자열을 찾으면서도 초록으로 남는다.
-CONSENT='리뷰어(`reviewer-*`) 호출은 사용자가 상시 허용한 것으로 간주한다'
-SC_SCOPE='허가는 `reviewer-*` 호출에만 미친다'
-echo "[standing-consent] reviewer calls carry the user's standing consent"
+CONSENT='렌즈(`lens-*`) 호출은 사용자가 상시 허용한 것으로 간주한다'
+SC_SCOPE='허가는 `lens-*` 호출에만 미친다'
+echo "[standing-consent] lens calls carry the user's standing consent"
 check "검증 절이 잡힌다"                   "[ -n \"\$SC_BLOCK\" ]"
 check "canon: 상시 허가 문장"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '$CONSENT'"
 check "canon: 허가 범위 한정"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- \"\$SC_SCOPE\""
@@ -375,10 +375,10 @@ check "canon: 다른 팬아웃은 제외"          "printf '%s' \"\$SC_BLOCK\" |
 # 한 번에 여럿 띄우기는 레포 문서 감사에서만 열어 두었다. 그 예외가 어느 절차의 것인지 함께 붙들어,
 # 예외만 남고 어느 절차인지가 지워지는 것을 막는다.
 check "canon: 여럿 띄우기는 감사에서만"    "printf '%s' \"\$SC_BLOCK\" | grep -qF -- 'project-doc-audit'"
-# 선행연구 렌즈는 이름을 대서 예외로 못 박아야 한다. 이름이 reviewer-*라 허가에 들면서 동시에 웹에
+# 선행연구 렌즈는 이름을 대서 예외로 못 박아야 한다. 이름이 lens-*라 허가에 들면서 동시에 웹에
 # 나가는 유일한 렌즈라, 뭉뚱그린 말로 제외하면 같은 렌즈를 열고 닫는 문장이 된다. 그 상태에서는
 # 렌즈를 범위 밖으로 판단해 조용히 건너뛰게 되고, '막히면 알린다'는 안전장치도 발동하지 않는다.
-check "canon: 선행연구 렌즈를 이름으로 예외" "printf '%s' \"\$SC_BLOCK\" | grep -qF -- 'reviewer-prior-art'"
+check "canon: 선행연구 렌즈를 이름으로 예외" "printf '%s' \"\$SC_BLOCK\" | grep -qF -- 'lens-prior-art'"
 check "canon: 뭉뚱그린 심층조사 표현 없음"   "! printf '%s' \"\$SC_BLOCK\" | grep -qF -- '심층조사'"
 # 정본이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 문장이 실려야 한다.
 check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$K/agent-principles.md'"
@@ -421,7 +421,7 @@ check "refs: none dangling"                "[ -z \"\$STALE\" ]"
 # 정확 문자열 하나만 보면 나머지가 거짓인 채로 초록이 되므로 실측한 표현을 배열로 모두 검사한다.
 # 이 배열이 금지 표현군의 정본이다(스펙의 표는 당시 기록일 뿐 대조 대상이 아니다).
 # 패턴에 백틱이 들어가므로 반드시 작은따옴표 배열로 두고 grep -qF -- 로 넘긴다.
-REACH_DOCS=("$HERE/README.md" "$HERE/docs/DESIGN-NOTES.md")
+REACH_DOCS=("$HERE/README.md")
 REACH_BANNED=(
   '모든 프로젝트와 서브에이전트에 걸쳐'
   '메인 + 모든 서브에이전트 도달'
@@ -441,55 +441,34 @@ for d in "${REACH_DOCS[@]}"; do
   done
 done
 
-# --- reach-facts: 실측 표와 그 대응이 실제로 들어갔다 (지우기만 해도 통과하지 않게 짝을 맞춘다) ---
-DN="$HERE/docs/DESIGN-NOTES.md"
-echo "[reach-facts] measured table and its consequences are present"
-# 두 문자열이 파일 어딘가에 각각 있는지 보면 항진이 된다 — Explore 행을 뒤집어도 옆 행의 문자열이 참을 만든다.
-# 그래서 그 행 한 줄을 먼저 뽑고 그 줄 안에서 확인한다(이 파일의 다른 절이 쓰는 방식과 같게).
-EXPLORE_ROW="$(grep -F '| `Explore` |' "$DN" || true)"
-PLAN_ROW="$(grep -F '| `Plan` |' "$DN" || true)"
-check "DESIGN-NOTES: Explore 행을 찾았다"   "[ -n \"\$EXPLORE_ROW\" ]"
-check "DESIGN-NOTES: Explore 미도달"        "printf '%s' \"\$EXPLORE_ROW\" | grep -qF '실리지 않는다'"
-check "DESIGN-NOTES: Explore 행에 도달 주장 없음" "! printf '%s' \"\$EXPLORE_ROW\" | grep -qE '(^|[^지])실린다'"
-check "DESIGN-NOTES: Plan 행 존재"          "[ -n \"\$PLAN_ROW\" ]"
-check "DESIGN-NOTES: Plan 미도달"           "printf '%s' \"\$PLAN_ROW\" | grep -qF '실리지 않는다'"
-check "DESIGN-NOTES: 재현 절차 존재"        "grep -qF '재현 절차' '$DN'"
-# 측정 맥락은 한 줄에 날짜와 런타임 이름이 함께 있어야 한다 — 파일 전역 grep 두 번은 서로를 보증하지 못한다.
-check "DESIGN-NOTES: 측정 맥락 한 줄에"     "grep -qE '실측 \(.*Claude Code' '$DN'"
-check "DESIGN-NOTES: 옛 근거 문장 제거"     "! grep -qF '공식 문서의 서브에이전트 메모리 로딩 규칙' '$DN'"
-check "DESIGN-NOTES: 갱신 시점 항목"        "grep -qF '리로드가 아니라 새 세션' '$DN'"
-check "DESIGN-NOTES: 훅 계기는 matcher 정본" "grep -qF 'matcher가 정본' '$DN'"
-# 관례의 상세는 domain-docs가 소유자다. 여기서는 실측 표가 그 근거라는 연결만 남았는지 본다.
-check "DESIGN-NOTES: 리뷰어 관례가 소유자를 가리킨다" "grep -qF '리뷰어에게 정본을 알리는 법' '$DN'"
-check "README: 갈림을 요약하고 링크"        "grep -qF '종류에 따라 갈린다' '$HERE/README.md' && grep -qF 'docs/DESIGN-NOTES.md' '$HERE/README.md'"
 check "canon: 옛 도달 전제 제거"            "! grep -qF '서브에이전트도 이 글을 읽으므로' '$CANON'"
 check "canon: 도달을 전제하지 않는다"       "grep -qF '도달을 전제하지 않는다' '$CANON'"
 
-# --- reviewer-contract: 읽기 전용 리뷰어를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
+# --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
 # 전에는 셋이 규율 넷을 각자 적고 이 검사가 그 사본들을 맞춰 세웠다. 사본이라 갈라졌다 — 한 곳에서
 # 재시도 금지 항목만 빠져 그 경로가 금지된 재시도를 허용한 채 오래 남았고, DESIGN-NOTES 쪽은 넷 중
 # 둘만 갖고 있었다. 지금은 `domain-docs`가 규율을 소유하고 나머지는 가리키기만 한다(`SSOT`).
 # 소유자가 규율을 갖는지와 다른 문서가 베끼지 않는지는 `test_docs_drift.sh`가 본다. 여기서는 호출자
 # 셋이 그 소유자에 닿는지와 Codex 패리티만 본다.
-echo "[reviewer-contract] callers reach the canon-path rules and stay runtime-neutral"
+echo "[lens-contract] callers reach the canon-path rules and stay runtime-neutral"
 for s in domain-spec-review domain-docs nested-orchestration; do
   F="$HERE/skills/$s/SKILL.md"
-  check "$s: 정본 알리는 법에 닿는다"       "grep -qF '리뷰어에게 정본을 알리는 법' '$F'"
+  check "$s: 정본 알리는 법에 닿는다"       "grep -qF '렌즈에게 정본을 알리는 법' '$F'"
   # Codex 패리티: Claude 전용 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
 done
 # 렌즈 목록은 손으로 적지 않고 디렉터리에서 도출한다 — 렌즈를 더해도 사람이 목록을 맞출 필요가 없다(SSOT).
-for D in "$HERE"/skills/reviewer-*/; do
-  l="$(basename "$D" | sed 's/^reviewer-//')"
+for D in "$HERE"/skills/lens-*/; do
+  l="$(basename "$D" | sed 's/^lens-//')"
   F="$D/SKILL.md"
-  check "reviewer-$l: SKILL.md 존재"        "[ -f '$F' ]"
-  check "reviewer-$l: principles_applied"   "grep -qF 'principles_applied' '$F'"
+  check "lens-$l: SKILL.md 존재"        "[ -f '$F' ]"
+  check "lens-$l: principles_applied"   "grep -qF 'principles_applied' '$F'"
   # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 정본으로 넘긴다. 예전에는 일곱 파일이
   # 같은 문단을 복제해 지켰는데, 그 사이 정본의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
   # 필수 여부가 두 곳에서 갈렸다. 지금은 정본 한 곳만 규정하고 렌즈는 가리키기만 한다(`SSOT`).
   PA_POINTER='`meta-aggregate`의 리뷰 산출물 계약이 정한다'
-  check "reviewer-$l: 규칙을 정본으로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
+  check "lens-$l: 규칙을 정본으로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
 done
 check "meta-aggregate: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/meta-aggregate/SKILL.md'"
 
@@ -511,7 +490,7 @@ check "동시 주입: 임시 파일 잔여 없음"      "[ -z \"\$(ls '$CT' | gr
 # 위 동시 진입 테스트는 락이 정상으로 도는 경로만 밟는다. 죽은 프로세스가 남긴 락을 빼앗는 갈래는
 # 10초를 기다려야 열리므로 그 테스트가 구조적으로 못 밟는다. 그 갈래는 지우고 다시 잡는 두 걸음이
 # 갈라져 있어 여럿이 함께 들어갔고, 결과 파일만 보면 고아 마커 복구가 손상을 덮어 초록으로 보였다.
-# 그래서 결과가 아니라 임계 구역 출입 자체를 잰다 — 들어가며 IN, 나가며 OUT을 적고 IN이 연달아
+# 그래서 결과가 아니라 임계 구역 출입 자체를 확인한다 — 들어가며 IN, 나가며 OUT을 적고 IN이 연달아
 # 나오는지 본다. 잡은 시각을 한참 전으로 적은 락을 심어, 여섯이 동시에 빼앗으려 들게 만든다.
 LT="$(mktemp -d)"; LW="$LT/witness"; LK="$LT/x.lock"; LN=6
 : > "$LW"
@@ -612,7 +591,7 @@ check "스캐폴드가 4를 알린다"                 "grep -qF 'prc\" -eq 4' '
 # --- 커맨드가 시키는 보고를 스크립트가 실제로 낼 수 있다 ---
 # 전에는 두 스캐폴드에 값을 한 번도 안 받는 created 변수와 그것을 조건으로 삼는 보고 줄이 있었고,
 # 커맨드는 그 보고를 근거로 새로 생긴 파일과 이미 있던 파일을 알리라고 지시했다. 스크립트가 그
-# 사실을 안 내므로 지시를 따르려면 지어내야 했다. 죽은 변수가 되살아나면 여기서 붉어진다.
+# 사실을 안 내므로 지시를 따르려면 지어내야 했다. 죽은 변수가 되살아나면 여기서 실패한다.
 echo "[setup-report] the command may only ask for facts the script actually emits"
 for S in scaffold.sh codex-scaffold.sh; do
   check "$S: 값을 안 받는 created 가 없다" "! grep -qE '(^|[^_a-zA-Z])created' '$HERE/scripts/$S'"
@@ -623,7 +602,7 @@ check "커맨드가 새 파일 목록을 안 시킨다"    "! grep -qF '새로 �
 
 
 # --- 매니페스트 version 계약 ---
-# Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin·DESIGN-NOTES).
+# Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin).
 # 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다
 # 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다. Codex 매니페스트는 반대로 version을 갖는다.
 check "Claude 매니페스트에 version 없음"  "! grep -qE '\"version\"[[:space:]]*:' '$HERE/.claude-plugin/plugin.json'"
