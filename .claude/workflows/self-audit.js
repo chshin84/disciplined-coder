@@ -37,6 +37,7 @@ const FINDINGS_SCHEMA = {
           consequence: { type: 'string', description: '이대로 두면 무엇이 어떻게 잘못되는가 — 구체적으로 못 적는 발견은 올리지 않는다' },
           detail: { type: 'string', description: '왜 위반인지 — 근거를 완결된 문장으로 설명' },
           fix: { type: 'string', description: '제안하는 수정 방향 (선택)' },
+          type: { type: 'string', description: '렌즈가 정한 폐쇄 집합의 값. 복제 발견은 duplication 이다(선택)' },
         },
         required: ['title', 'file', 'evidence', 'principle', 'consequence', 'detail'],
       },
@@ -44,6 +45,29 @@ const FINDINGS_SCHEMA = {
   },
   required: ['findings'],
 }
+
+// 중복제거는 병합 항목마다 그것이 덮는 원시 발견의 번호(merged_from)를 돌려준다. 개수만 견주면 발견을
+// 버려도 통과하므로, 모든 원시 발견이 정확히 한 항목에 들어갔는지를 워크플로가 확인한다.
+const DEDUP_SCHEMA = {
+  type: 'object',
+  properties: {
+    findings: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          ...FINDINGS_SCHEMA.properties.findings.items.properties,
+          lens: { type: 'string', description: '병합된 렌즈 이름들 — 쉼표로 잇는다' },
+          merged_from: { type: 'array', items: { type: 'integer' }, description: '이 항목이 덮는 원시 발견의 번호(0부터)' },
+        },
+        required: [...FINDINGS_SCHEMA.properties.findings.items.required, 'lens', 'merged_from'],
+      },
+    },
+  },
+  required: ['findings'],
+}
+// 중복제거가 lens 를 쉼표로 잇는다. 세는 쪽은 그 문자열을 목록으로 다룬다.
+function lensesOf(f) { return String(f.lens || '').split(',').map(s => s.trim()).filter(Boolean) }
 
 const VERDICT_SCHEMA = {
   type: 'object',
@@ -132,16 +156,24 @@ log(`리뷰 완료: ${REVIEWERS.length}개 렌즈에서 원시 발견 ${all.leng
 if (deadLenses.length > 0) log(`⚠️ 응답하지 않은 렌즈 ${deadLenses.length}개: ${deadLenses.join(', ')} — 이 감사의 커버리지가 그만큼 좁다`)
 
 phase('중복제거')
-let deduped = all
-if (all.length > 1) {
+const raw = all.map((f, i) => ({ raw_index: i, ...f }))
+let deduped = raw.map(f => ({ ...f, merged_from: [f.raw_index] }))
+if (raw.length > 1) {
   const dd = await agent(
-    `다음은 disciplined-coder 저장소 감사에서 여러 렌즈가 낸 원시 발견 목록(JSON)이다.
-같은 실체(같은 파일의 같은 문제)를 가리키는 발견들을 하나로 병합하라 — evidence는 가장 구체적인 것을 남기고, lens는 쉼표로 합치고, consequence는 피해를 가장 구체적으로 적은 것을 남긴다.
+    `다음은 disciplined-coder 저장소 감사에서 여러 렌즈가 낸 원시 발견 목록(JSON)이다. 항목마다 raw_index 가 있다.
+같은 실체(같은 파일의 같은 문제)를 가리키는 발견들을 하나로 병합하라 — evidence는 가장 구체적인 것을 남기고, lens는 쉼표로 합치고, consequence는 피해를 가장 구체적으로 적은 것을 남기고, type 이 있으면 그대로 옮긴다.
+병합 항목마다 그것이 덮는 원시 발견의 raw_index 전부를 merged_from 에 적어라. 모든 원시 발견은 정확히 한 항목에 들어가야 한다.
 서로 다른 문제는 절대 합치지 마라. 재판단·신규 발견 추가 금지 — 순수 병합만 한다.
-${JSON.stringify(all)}`,
-    { label: 'dedup', phase: '중복제거', schema: FINDINGS_SCHEMA, effort: 'low' }
+${JSON.stringify(raw)}`,
+    { label: 'dedup', phase: '중복제거', schema: DEDUP_SCHEMA, effort: 'low' }
   )
-  if (dd && dd.findings.length > 0 && dd.findings.length <= all.length) deduped = dd.findings
+  if (!dd) throw new Error('중복제거 에이전트가 응답하지 않았다 — 회차를 실패로 끝낸다')
+  const covered = dd.findings.flatMap(f => f.merged_from).sort((a, b) => a - b)
+  const expected = raw.map(f => f.raw_index)
+  if (JSON.stringify(covered) !== JSON.stringify(expected)) {
+    throw new Error(`중복제거가 원시 발견을 잃었다 — 기대 ${JSON.stringify(expected)}, 실제 ${JSON.stringify(covered)}`)
+  }
+  deduped = dd.findings
 }
 log(`중복 제거 후 ${deduped.length}건 — 반박 검증 시작`)
 
@@ -191,7 +223,19 @@ const aggregate = await agent(
   { label: 'meta-aggregate', phase: '집계' }
 )
 
+// run 은 spec 의 run.json 표와 같은 칸이다. 이 덩어리에서는 리턴에만 담고, 덩어리 3의 기록자가 파일로 쓴다.
+const lensKeys = [...new Set(all.map(f => f.lens))]
+const counts_by_lens = {}
+for (const k of lensKeys) counts_by_lens[k] = { raw: all.filter(f => f.lens === k).length, unique: deduped.filter(f => lensesOf(f).length === 1 && lensesOf(f)[0] === k).length }
+const run = {
+  schema: 1, executor: 'self-audit', commit: null, tree_clean: null, tree_changed: false, completed: false,
+  steps_done: [], targets: [], topic_groups: 0, counts_by_lens,
+  verdict_counts: { confirmed: confirmed.length, rejected: rejected.length, undetermined: undetermined.length, derived: 0 },
+  narrowed: 0, unlabeled: 0, dead_agents: { lenses: deadLenses }, machine_checks: null, stale_rounds: [],
+}
+
 return {
+  run,
   test,
   confirmedCount: confirmed.length, rejectedCount: rejected.length, undeterminedCount: undetermined.length,
   deadLenses,
