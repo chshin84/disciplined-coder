@@ -1,0 +1,699 @@
+[
+ {
+  "title": "CLAUDE.md는 검사 스크립트 계약을 FAIL=0으로 적지만, 작업 트리의 agent-principles.md에서 ASK-FORK의 질문 도구 규칙이 사라져 test_scaffold.sh가 두 건 실패한다.",
+  "file": "agent-principles.md:8 · scripts/test_scaffold.sh:395-401 · CLAUDE.md:11-12",
+  "evidence": "agent-principles.md:8 「판단이 필요한 경우 반드시 선택지가 존재하는 질문지를 제시하라. 평문으로 묻지 않는다.」 / test_scaffold.sh:400-401 「check \"ASK-FORK: 질문 도구 규칙\" ... grep -qF -- '질문 도구로 선택지를 띄운다'」「check \"ASK-FORK: 평문이 안 되는 이유\" ... grep -qF -- '답해야 할 물음인지'」 / 22:55 실행 결과 「FAIL: ASK-FORK: 질문 도구 규칙」「FAIL: ASK-FORK: 평문이 안 되는 이유」「PASS=218 FAIL=2」 / skills/domain-spec-review/SKILL.md:129 「물을 때는 `ASK-FORK`의 갈림길 규칙을 따른다 — 평문에 섞지 말고 질문 도구로 선택지를 띄운다」 / skills/domain-docs/SKILL.md:89 같은 문장",
+  "principle": "TDD · SSOT · FAIL-LOUD (렌즈 규칙: 모순·누락)",
+  "consequence": "이대로 커밋되면 CLAUDE.md가 약속한 FAIL=0 계약이 깨진 채 남고, domain-spec-review와 domain-docs가 「ASK-FORK의 갈림길 규칙」이라고 가리키는 문장이 정본에 없어 그 스킬을 연 세션은 존재하지 않는 규칙을 따르라는 지시를 받는다. test_scaffold.sh:391-394가 적었듯 이 규칙은 상시 로드되는 정본에 있어야 스킬을 열지 않은 세션에도 닿는데, 지금은 정본에서 빠지고 스킬 두 곳에만 남아 그 검사가 막으려던 상태로 되돌아갔다.",
+  "detail": "감사 도중 agent-principles.md가 바뀌었다. 첫 Read에서는 ASK-FORK가 「갈림길에서는 추측 대신 질문한다 ... 질문 도구로 선택지를 띄운다」였고 CLEAR-COMM 항목이 있었으나, 22:54 시점의 git diff는 ASK-FORK를 한 문장으로 줄이고 CLEAR-COMM을 EXPLAIN-STRUCTURE로 바꾼 미커밋 변경을 보였다(그 밖에도 추적 파일 25개가 수정·삭제 상태다). 이 발견은 22:55에 다시 돌린 검사 결과를 근거로 하며, 정본이 계속 움직이는 중이라면 커밋 전에 검사를 한 번 더 돌려야 한다.",
+  "fix": "ASK-FORK 항목에 질문 도구 규칙과 그 이유(긴 보고 끝 한 문장은 물음으로 안 보인다)를 되살리거나, 규칙을 정본에서 뺄 것이면 test_scaffold.sh의 question-tool 블록과 domain-spec-review:129·domain-docs:89의 참조를 같은 커밋에서 함께 고친다.",
+  "lens": "lens-grounding",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "작업 트리의 agent-principles.md:8은 인용 그대로 「판단이 필요한 경우 반드시 선택지가 존재하는 질문지를 제시하라. 평문으로 묻지 않는다.」이고 HEAD에는 질문 도구 문장이 있었으며, scripts/test_scaffold.sh를 직접 돌리니 「FAIL: ASK-FORK: 질문 도구 규칙」「FAIL: ASK-FORK: 평문이 안 되는 이유」「PASS=218 FAIL=2」로 재현됐다. domain-spec-review:129와 domain-docs:89가 「ASK-FORK의 갈림길 규칙」을 가리키는 것과 CLAUDE.md:11-12의 FAIL=0 계약, 미커밋 추적 파일 25개도 모두 실제와 일치해 반박할 근거가 없다.",
+   "재현된다 — 작업 트리에서 `bash scripts/test_scaffold.sh`가 「ASK-FORK: 질문 도구 규칙」「ASK-FORK: 평문이 안 되는 이유」 둘로 PASS=218 FAIL=2를 내고, CLAUDE.md는 변경 뒤 FAIL=0을 계약으로 적으며, domain-spec-review:129와 domain-docs:89는 정본에서 사라진 「갈림길 규칙」 문구를 가리킨다. 정본(mtime 23:10)이 검사 스크립트(22:43)와 스킬(22:50)보다 뒤에 고쳐졌는데 하류를 아무것도 따라 고치지 않았으므로 정당한 설계 선택이 아니라 TDD·SSOT 드리프트이고, 커밋 전에 정본을 되살리거나 검사·스킬 참조를 같은 커밋에서 맞추는 실질 이득이 있다. 다만 새 ASK-FORK도 「선택지가 존재하는 질문지 … 평문으로 묻지 않는다」로 규칙의 알맹이는 남아 있어 「존재하지 않는 규칙을 따르라는 지시」는 과장이며, 빠진 것은 그 이유 문장과 검사가 무는 문자열이다."
+  ]
+ },
+ {
+  "title": "정본 agent-principles.md가 자기 PLAIN-KO 조항이 금지하는 낱말 '경우'와 '부분'을 쓰고 있어 test_docs_drift.sh의 금지 표현 검사가 두 건 실패한다.",
+  "file": "agent-principles.md:8-9 · scripts/test_docs_drift.sh:489-518",
+  "evidence": "agent-principles.md:8 「판단이 필요한 경우 반드시」 / agent-principles.md:9 「어느 부분이 어느 부분을 부르게 되었고」 / agent-principles.md:17 「금지 목록의 정본은 `writing-korean`이며, 사람의 판단이 아니라 문자열 검색으로 걸러 내보낸다」 / 22:55 실행 결과 「FAIL: 금지 표현 '부분' 이 없다」「FAIL: 금지 표현 '경우' 이 없다」「PASS=300 FAIL=2」",
+  "principle": "PLAIN-KO · SSOT (렌즈 규칙: 모순)",
+  "consequence": "정본이 모든 프로젝트에 @import로 실리므로, 금지 낱말이 든 문장이 그대로 배포되어 매 세션 모델이 읽는 본보기가 되고, 검사가 빨간 채로 남으면 다음 사람은 어느 실패가 새것인지 가릴 수 없게 된다.",
+  "detail": "writing-korean의 금지 표현 표에서 도출한 낱말을 살아 있는 문서 전부에 대조하는 검사인데, 그 대조에서 걸린 곳이 규칙을 정한 정본 자신이다. 두 낱말 모두 이번 미커밋 수정으로 새로 들어온 문장(줄인 ASK-FORK와 새 EXPLAIN-STRUCTURE)에 있다.",
+  "fix": "「판단이 필요한 경우」를 「판단이 갈리는 갈림길에서는」 같은 이름 있는 말로, 「어느 부분이 어느 부분을」을 「어느 함수가 어느 함수를」처럼 가리키는 대상의 이름으로 바꾼다.",
+  "lens": "lens-grounding",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용한 문장 세 곳(agent-principles.md 8·9·17행)과 스크립트 489-518행이 그대로 있고, writing-korean 금지 표현 표에서 도출한 목록에 '경우'·'부분'이 들어 있으며, test_docs_drift.sh를 직접 돌려 PASS=300 FAIL=2와 같은 두 실패를 재현했고 git diff로 두 문장이 미커밋 수정에서 새로 들어온 것도 확인했다. 다만 발견이 빠뜨린 것이 하나 있다 — 16행 NAME-ITEMS의 「순서가 없는 경우에는」도 '경우' 적중이라 제안된 fix만으로는 한 건이 남는다.",
+   "실측으로 확인했다 — writing-korean의 금지 표현 표에 `부분`과 `경우`가 들어 있고, test_docs_drift.sh는 그 표를 도출해 살아 있는 문서 전부를 문자열로 대조하며 예외는 writing-korean 자신과 docs/superpowers/ 둘뿐이라 정본에 예외 조항이 없다. 실행 결과 PASS=300 FAIL=2이며 걸린 곳은 agent-principles.md 8행(ASK-FORK)·9행(EXPLAIN-STRUCTURE)뿐 아니라 발견이 놓친 16행(NAME-ITEMS 「순서가 없는 경우」)까지 세 문장이고, 셋 다 미커밋 수정으로 새로 들어온 문장이라(HEAD의 ASK-FORK는 「갈림길」을 썼다) 정당한 설계 선택이 아니라 회귀다. 고치면 검사가 초록으로 돌아오고 모든 프로젝트에 @import되는 정본이 자기 규칙의 반례로 배포되는 것을 막으므로 실질 이득이 있다."
+  ]
+ },
+ {
+  "title": "README의 「세션에 강제하거나 고치는 것」이 hooks.json에 배선된 PreToolUse·PostToolUse 훅 셋을 빠뜨리고, 게이트 끄기 변수의 범위도 Stop 게이트 하나로 좁혀 적는다.",
+  "file": "README.md:38-41 · hooks/hooks.json:14-39 · hooks/doc_format_pretooluse.sh:5,21 · hooks/doc_review_posttooluse.sh:5,35",
+  "evidence": "README.md:38-41은 「Stop 하드 게이트」와 「전역 설정 수정」 둘만 적는다 / hooks.json:14-23 「\"PreToolUse\": [{ \"matcher\": \"Write|Edit\", ... doc_format_pretooluse.sh }]」 / hooks.json:25-38 「\"PostToolUse\": ... spec_review_posttooluse.sh ... doc_review_posttooluse.sh」 / doc_review_posttooluse.sh:35 「🔎 문서(...) 작성/수정됨 — done 하기 전에 ... 비자가 검진을 거쳐라」 / doc_format_pretooluse.sh:21 「📝 새 문서 작성 — 쓰기 전에 domain-docs의 '글 유형별 적용' 절에서 ... 양식을 고르고」 / doc_format_pretooluse.sh:5·doc_review_posttooluse.sh:5·spec_review_posttooluse.sh:6·spec_review_stop.sh:7 모두 `[ \"${DISCIPLINED_CODER_REVIEW_GATE:-on}\" = \"off\" ] && exit 0` / README.md:40 「끄려면 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off`를 준다」(Stop 게이트 항목에만 있다)",
+  "principle": "EXPLICIT · SSOT · CLEAR-COMM (렌즈 규칙: 누락 · 커버리지 공백)",
+  "consequence": "user 스코프로 깔면 이 플러그인과 무관한 프로젝트에서도 .md를 쓰거나 고칠 때마다 「📝 새 문서 작성 —」과 「🔎 문서(...) 작성/수정됨 —」 맥락이 세션에 주입되는데, README 어디에도 그 출처가 없어 사용자는 왜 그 문장이 뜨는지 찾을 수 없고 원인을 플러그인 밖에서 찾게 된다. 반대로 Stop 게이트만 끄려고 변수를 주면 넛지 셋도 함께 꺼지는데 README는 그 사실을 적지 않아, 문서 검진 넛지가 사라진 이유를 사용자가 알 길이 없다. 넛지를 매번 무시하는 습관은 진짜 게이트인 spec 안내까지 흘려보내게 만들고, README가 '여기가 정본'이라고 적은 목록이 실제 배선보다 작아 정본 구실을 못 한다.",
+  "detail": "agent-principles.md:78이 「배포 조건과 프로젝트 폴더에 무엇이 생기는지는 이 레포 README가 정본이다」라고 하고 README 절 제목도 「세션에 강제하거나 고치는 것」인데, hooks.json에는 SessionStart·PreToolUse·PostToolUse·Stop 네 이벤트가 걸려 있고 README는 그 가운데 Stop과 SessionStart의 결과만 적었다. 차단하지 않는 넛지를 뺀 것은 의도로 읽을 수 있으나, 끄는 변수를 Stop 게이트의 속성처럼 적은 것은 코드와 어긋난다 — 변수 하나가 훅 넷을 통째로 끈다.",
+  "fix": "같은 절에 '넛지 — 모든 `.md` 생성·수정 때 양식 안내와 domain-docs 검진 안내를 넣으며 차단하지 않는다' 한 항목을 더하고, 끄기 변수 설명을 '이 플러그인의 훅 전부(Stop 게이트와 넛지 셋)를 끈다'로 고친다.",
+  "lens": "lens-grounding, lens-consistency, docs-compliance",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 증거가 모두 파일에 그대로 있다 — hooks/hooks.json:14-38에 PreToolUse(doc_format_pretooluse.sh)와 PostToolUse(spec_review_posttooluse.sh·doc_review_posttooluse.sh)가 배선돼 있고, 네 훅 스크립트 모두 5-7행에서 `DISCIPLINED_CODER_REVIEW_GATE=off`로 통째로 꺼지며, README.md:38-41 「세션에 강제하거나 고치는 것」 절은 Stop 게이트와 전역 설정 수정 둘만 적고 끄기 변수를 Stop 게이트 항목 안에만 둔다. README 전체를 읽어도 넛지 셋의 출처나 변수의 실제 범위를 적은 곳이 없어 반증을 찾지 못했다.",
+   "코드와 문서를 대조하면 두 어긋남이 실재한다. (1) hooks/hooks.json은 SessionStart·PreToolUse·PostToolUse·Stop 넷을 배선하는데, PreToolUse의 doc_format_pretooluse.sh와 PostToolUse의 doc_review_posttooluse.sh(spec/plan이 아닌 모든 .md에 양식·검진 안내를 주입)는 README뿐 아니라 skills/domain-docs/SKILL.md·domain-spec-review/SKILL.md 어디에도 적혀 있지 않고 훅 스크립트 주석에만 있다 — README 12행이 user 스코프 설치를 요구하므로 이 넛지는 무관한 모든 프로젝트의 세션에 들어가며, 절 제목 「세션에 강제하거나 고치는 것」과 agent-principles.md:78의 README 정본 선언에 비추어 EXPLICIT 공백이다. '차단하지 않으니 뺐다'는 설계 선택으로 읽을 여지는 있으나 그렇다면 그 사실을 한 줄 적는 것이 정확히 그 원칙의 요구다. (2) DISCIPLINED_CODER_REVIEW_GATE=off는 네 스크립트 모두 5~7행에서 같은 조건으로 종료시키는데, README:40과 domain-spec-review/SKILL.md:15는 이 변수를 spec 게이트의 속성으로만 적어 넛지 셋이 함께 꺼진다는 사실이 어느 문서에도 없다 — 이는 해석 여지 없는 사실 불일치(grounding)이고, 고치는 비용은 README에 항목 하나와 문장 하나라 실질 이득이 비용을 넘는다."
+  ]
+ },
+ {
+  "title": "정본이 CLEAR-COMM을 없애고 어느 커밋에도 없던 EXPLAIN-STRUCTURE를 넣었는데, 자기감사 워크플로 self-audit.js는 여전히 CLEAR-COMM을 부른다.",
+  "file": ".claude/workflows/self-audit.js:26 · agent-principles.md:9 (작업 트리) · HEAD f301689의 agent-principles.md:12",
+  "evidence": "agent-principles.md:9 (작업 트리, mtime 2026-09-02 22:53:17) — `- **\\`EXPLAIN-STRUCTURE\\` (구조로 설명한다)** — 코드 변경 시 구조의 변화를 설명하라.` / `git show HEAD:agent-principles.md` 12행 — `- **\\`CLEAR-COMM\\` (명료한 소통)** — 결론만 던지지 말고 근거와 기각한 대안까지 설명한다.` / `git log --all -S'EXPLAIN-STRUCTURE'` 결과가 비어 있다 / .claude/workflows/self-audit.js:26 — `title: { type: 'string', description: '발견 제목 — 완결된 문장으로 (CLEAR-COMM)' }` / `git grep -n 'CLEAR-COMM' -- . ':!docs/superpowers'` 결과는 self-audit.js:26 한 줄뿐 / skills/domain-docs/SKILL.md:29 작업 트리 diff — `CLEAR-COMM`을 목록에서 뺐다",
+  "principle": "SSOT · NAME-ITEMS · MEASURE-FIRST (렌즈 규칙: 불일치)",
+  "consequence": "이대로 커밋되면 정본이 정의하지 않는 원칙 ID를 자기감사 스키마가 요구해, 렌즈는 존재하지 않는 원칙을 적용하라는 스키마를 받고 결과 집계에서 그 ID를 정본과 맞댈 수 없게 된다. 정본에서 가져온 사본(`~/.claude/disciplined-coder/agent-principles.md`)과 메모리가 아는 `CLEAR-COMM`·`ASK-FORK`의 최신 문안이 옛 문안으로 되돌아가 세션마다 다른 ID 집합을 보게 되고, 이 변경은 커밋 이력에 근거가 없어 의도한 개정인지 되돌리기의 부수 효과인지 산출물만으로는 가릴 수 없다.",
+  "detail": "이 감사를 띄운 프롬프트의 출력 스키마 자체가 「완결된 문장으로 (CLEAR-COMM)」을 요구했는데, 같은 시각의 정본에는 그 ID가 없었다. 작업 트리의 diff는 Codex 계층 제거와 함께 정본 첫 네 조항(`ASK-FORK`·`CLEAR-COMM`→`EXPLAIN-STRUCTURE`·`EXPLICIT`·`FAIL-LOUD`)의 문안을 HEAD 이전 어느 커밋에도 없던 판으로 바꿔 놓았다. 정본은 `이 파일이 단일 출처`라고 선언하므로 정본의 ID 집합이 바뀌면 그 ID를 부르는 모든 곳이 함께 움직여야 하는데, `domain-docs`만 손보고 `self-audit.js`는 남았다. 사용자 확인이 필요하다.",
+  "fix": "정본 조항 개정이 의도라면 개정 근거를 커밋 메시지에 남기고 `self-audit.js:26`의 ID를 새 ID로 바꾸며, ID 집합을 정본에서 도출해 대조하는 검사를 test_docs_drift.sh에 더한다. 의도가 아니라면 `git checkout -- agent-principles.md`로 HEAD 문안을 되살리고 Codex 제거 변경만 남긴다. 어느 쪽인지는 사용자가 정한다.",
+  "lens": "lens-grounding, ssot-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 증거가 모두 실재한다 — 작업 트리 agent-principles.md:9는 `EXPLAIN-STRUCTURE`이고 HEAD f301689의 12행은 `CLEAR-COMM`이며, `git log --all -S'EXPLAIN-STRUCTURE'`는 빈 결과이고, `git grep CLEAR-COMM`(docs/superpowers 제외)은 .claude/workflows/self-audit.js:26 한 줄만 돌려주며, domain-docs/SKILL.md:29 diff는 `CLEAR-COMM`을 목록에서 뺐다. 반증은 없고 오히려 self-audit.js 자체도 같은 작업 트리에서 Codex 제거로 수정됐는데 26행의 ID는 손대지 않아 발견이 더 강해진다(사소한 차이는 mtime이 22:53:17에서 23:10:24로 바뀐 것뿐이며 9행 내용은 동일하다).",
+   "실측으로 모두 확인된다 — 작업 트리 정본은 EXPLAIN-STRUCTURE를 정의하고 CLEAR-COMM을 없앴으며 어느 커밋에도 EXPLAIN-STRUCTURE가 없고, 같은 diff가 domain-docs의 CLEAR-COMM 참조는 지웠으면서 self-audit.js:26의 CLEAR-COMM은 그대로 두어 정본이 정의하지 않는 ID를 스키마가 요구한다. 정본이 스스로 단일 출처라 선언하므로 ID 집합의 사본이 손으로 어긋난 것은 SSOT 위반이고, 그 집합을 정본에서 도출해 대조하는 검사가 없어 고치면 실질 이득이 있다."
+  ]
+ },
+ {
+  "title": "README는 /show-principles에 목록이 안 나오면 설정 홈이 어긋난 탓이라고 단정하지만, show-principles 커맨드와 scaffold.sh가 같은 resolve_home으로 경로를 도출하므로 홈 불일치는 그 증상을 만들 수 없다.",
+  "file": "README.md:18 · commands/show-principles.md:7,13-15 · scripts/scaffold.sh:12-16",
+  "evidence": "README.md:18 「목록이 안 나오면 설정 홈이 어긋난 것이다 — 회사 PC는 홈 리다이렉트로 bash의 `$HOME`과 Windows의 `USERPROFILE`이 다르다」 / commands/show-principles.md:7 「bash -c '. \"${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh\" && resolve_home claude'」 / show-principles.md:13-15 「경로를 도출하는 이유는 홈이 갈리는 PC가 있기 때문이다 ... 그때 `~/.claude`를 그대로 읽으면 scaffold가 쓴 곳과 다른 곳을 보게 된다」 / scaffold.sh:12,15 「. \"$(dirname \"$0\")/_resolve_home.sh\"」「CLAUDE_HOME=\"$(resolve_home claude)\"」 / scaffold.sh:29 「cp ... || { echo \"[disciplined-coder] ERROR: 정본 복사 실패 ...\" >&2; exit 1; }」 / scaffold.sh:82 「ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다」",
+  "principle": "MEASURE-FIRST · FAIL-LOUD (렌즈 규칙: 근거 없음)",
+  "consequence": "목록이 안 나오는 실제 원인(훅이 user 스코프가 아니어서 안 돎, 정본 복사 실패로 exit 1, 락을 못 잡아 배선 실패)은 SessionStart의 stderr에만 남아 사용자에게 안 보이는데, README는 그 원인을 홈 불일치 하나로 못 박아 사용자가 이미 코드가 해결한 문제를 뒤지게 만든다.",
+  "detail": "README의 확인 반복문은 resolve_home과 같은 우선순위(CLAUDE_CONFIG_DIR → USERPROFILE/.claude → $HOME/.claude)로 훑으므로 명령 자체는 코드와 맞는다. 어긋난 것은 앞 문장의 인과 단정이다. 두 소비자가 같은 헬퍼를 쓰는 한 홈이 갈려도 둘은 같은 곳을 보고, 그 사실을 show-principles.md 스스로 적고 있다.",
+  "fix": "「목록이 안 나오면」 뒤에 원인을 둘 이상 나열한다 — 훅 스코프가 user가 아닌 것, 세션 시작 알림에 ERROR가 찍힌 것, 그리고 홈 확인 명령 — 순서로 적고 홈 불일치는 그 가운데 하나로 내린다.",
+  "lens": "lens-grounding",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 여섯 곳은 모두 파일에 그대로 있고, README.md:18의 「목록이 안 나오면 설정 홈이 어긋난 것이다」는 단일 원인 단정이다. commands/show-principles.md:7과 scripts/scaffold.sh:12,15가 같은 `_resolve_home.sh`의 `resolve_home claude`로 경로를 잡으므로 `$HOME`/`USERPROFILE` 불일치는 두 소비자를 갈라놓지 못하며, show-principles.md:13-15가 그 사실을 스스로 적고 있다. 반증을 찾으려 git 이력을 보니 2f64d74 이전 README는 「홈이 어긋남」을 사람이 `~/.claude`를 손으로 들여다볼 때의 함정으로 적었는데, 압축하면서 `/show-principles` 실패의 원인으로 옮겨 붙어 근거가 사라졌다. 정본 복사 실패(scaffold.sh:29, exit 1)와 @import 배선 실패(:82)는 stderr로만 나가고 :107 주석이 「SessionStart의 stderr는 사용자에게 닿지 않는다」고 명시하므로, 그 원인들이 사용자에게 보이지 않는다는 결과 기술도 정확하다.",
+   "코드로 확인하면 show-principles.md:7과 scaffold.sh:12-16이 같은 `resolve_home claude`(CLAUDE_HOME_DIR → CLAUDE_CONFIG_DIR → USERPROFILE/.claude → $HOME/.claude)로 경로를 잡아 홈이 갈려도 두 소비자는 같은 곳을 보며, show-principles.md:13-15가 바로 그 이유로 \"멀쩡히 설치된 상태에서 안 됨이 뜨는 것\"을 막는다고 스스로 적고 있다. 게다가 git 이력(2f64d74 이전 README:56-58)은 원래 \"셋 중 하나라도 없으면 셋업이 안 돈 것 / show-principles만 되고 수동 확인이 안 보이면 홈 어긋남\"으로 원인을 갈랐는데, 문서를 줄이는 회차에서 이 구분이 뒤집혀 지금의 단일 인과 단정이 됐으므로 정당한 설계 선택이 아니라 압축 오류이고, 실제 원인(훅 미실행·복사 실패·배선 실패는 stderr에만 남음)을 README가 가리게 되어 원인 나열로 고치면 실질 이득이 있다."
+  ]
+ },
+ {
+  "title": "README와 domain-spec-review의 훅 절은 Stop을 「종료를 막는 하드 게이트」로 적지만, 훅은 두 번째 종료 시도와 git 밖 폴더에서 조용히 통과시키고 같은 스킬의 한계 절은 「차단이 아니라 턴당 한 번의 환기」라고 적는다.",
+  "file": "README.md:40 · skills/domain-spec-review/SKILL.md:13,144-148 · hooks/spec_review_stop.sh:12-17",
+  "evidence": "README.md:40 「**Stop 하드 게이트** — ... 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고」 / domain-spec-review:13 「**Stop**이 미리뷰 문서가 남은 채 턴이 끝나는 것을 차단한다(하드 게이트).」 / spec_review_stop.sh:12 「case \"$INPUT\" in *'\"stop_hook_active\":true'*...) exit 0 ;; esac  # 루프가드」 / spec_review_stop.sh:13,17 「command -v git >/dev/null 2>&1 || exit 0」「git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0」 / domain-spec-review:144 「첫 종료 시도에서 한 번 막히고 나면 그다음 종료에서는 마커 검사가 아예 돌지 않는다. 이 게이트는 실질적으로 차단이 아니라 턴당 한 번의 강한 환기다」 / :148 「커스텀 경로나 git이 아닌 곳에서는 FAIL-OPEN으로 통과시킨다」",
+  "principle": "FAIL-LOUD · EXPLICIT (렌즈 규칙: 누락 · 모순)",
+  "consequence": "README를 읽고 설치한 사용자는 리뷰 없는 spec이 남으면 세션이 끝나지 못한다고 믿는다. 실제로는 두 번째 종료 시도와 git이 아닌 폴더에서는 아무 메시지 없이 통과하므로, 사용자가 모르는 사이에 리뷰를 건너뛴 spec이 남고 그것을 알릴 신호도 없다. README는 스스로 이 절이 강제 목록의 정본이라고 적어 놓아 어긋남이 더 무겁다.",
+  "detail": "README가 「상세는 domain-spec-review가 정본이다」로 위임하고 있으나, 같은 스킬 안에서 훅 절(:13)은 '차단'이라 쓰고 한계 절(:144)은 '차단이 아니다'라고 쓰며 README는 그 가운데 앞쪽만 옮겨 적었다. 이름이 '하드 게이트'인데 동작은 한 번의 안내이므로 이름이 동작을 알려 주지 않는다. 한계 둘은 코드 주석(spec_review_stop.sh:5 「FAIL-OPEN(작업불능 방지 — 알려진 한계)」)과 스킬 한계 절에 이미 적혀 있다.",
+  "fix": "README:40과 domain-spec-review:13의 '하드 게이트'·'막는다'를 '첫 종료 시도를 한 번 막고 git 저장소 안에서만 돈다'로 바꾸거나, 한계 절의 사실을 README에 괄호 한 줄로 옮긴다.",
+  "lens": "lens-grounding, lens-consistency",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 일곱 곳(README.md:40, SKILL.md:13·144·148, spec_review_stop.sh:12·13·17)이 모두 원문 그대로 있고, 코드도 stop_hook_active가 참이거나 git 밖이면 아무 출력 없이 exit 0으로 통과시켜 발견의 동작 기술이 맞다. 같은 스킬이 :13에서 「차단한다(하드 게이트)」, :144에서 「실질적으로 차단이 아니라 턴당 한 번의 강한 환기」라고 적어 내부 모순이 실재하며 README:40은 앞쪽만 옮겨 적었다. 다만 consequence의 「README가 스스로 이 절을 강제 목록의 정본이라 적었다」는 부정확하다 — README:36의 「(여기가 그 정본이다)」는 프로젝트 폴더 파일 절의 예외를 가리키고, README:40은 오히려 정본을 스킬에 위임하므로 그 문장은 빼야 한다.",
+   "같은 스킬 안에서 13행은 「차단한다(하드 게이트)」, 144행은 「실질적으로 차단이 아니라 턴당 한 번의 강한 환기다」로 문자 그대로 모순이며, 코드도 stop_hook_active와 git 밖에서 메시지 없이 exit 0 하는 것이 확인된다. README는 앞쪽 표현만 옮겨 적어 「세션에 강제하는 것」 절의 계약이 실제 동작보다 강하게 읽히므로 EXPLICIT 위반이 맞고, 한 구절 교체로 고쳐지는 값싼 수정이다. 다만 「알릴 신호도 없다」는 과장이다 — 첫 종료 시도의 block 사유는 사용자에게 보이므로 신호는 한 번 있고, 그 뒤가 조용할 뿐이다."
+  ]
+ },
+ {
+  "title": "플러그인 매니페스트는 「doc review gates」를 광고하지만, 문서 검진 훅은 스스로 「비블로킹, 게이트 아님」이라고 선언한다.",
+  "file": ".claude-plugin/plugin.json:5 · .claude-plugin/marketplace.json:10 · hooks/doc_review_posttooluse.sh:2,35",
+  "evidence": "plugin.json:5 「... + spec/plan & doc review gates, auto-injected into your global ~/.claude/CLAUDE.md ...」 / doc_review_posttooluse.sh:2 「문서(.md, spec/plan 제외) 작성/수정 감지 → 비자가 검진 넛지(비블로킹, 게이트 아님)」 / doc_review_posttooluse.sh:35 「넛지일 뿐 차단은 아니다」 / doc_format_pretooluse.sh:2 「domain-docs 양식 제안(비블로킹)」",
+  "principle": "EXPLICIT (렌즈 규칙: 모순)",
+  "consequence": "마켓플레이스 카드를 보고 설치한 사용자는 문서에도 강제가 걸린다고 기대하지만 실제로는 세션 맥락에 한 줄이 끼어들 뿐이라, 검진을 건너뛴 문서가 그대로 나가도 막히는 것이 없다는 사실을 나중에야 안다.",
+  "detail": "test_docs_drift.sh:450-467이 두 매니페스트의 문안이 글자 그대로 같은지는 붙들지만, 그 문안이 훅의 실제 강도와 맞는지는 아무 검사도 보지 않는다. 그래서 두 파일이 같은 과장을 나눠 갖고 있어도 초록이다.",
+  "fix": "description의 「spec/plan & doc review gates」를 「spec/plan review gate + doc review nudges」로 바꾸고 두 매니페스트를 함께 고친다.",
+  "lens": "lens-grounding",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 넷이 모두 파일에 글자 그대로 있다 — plugin.json:5와 marketplace.json:10의 「spec/plan & doc review gates」, doc_review_posttooluse.sh:2 「비블로킹, 게이트 아님」과 :35 「넛지일 뿐 차단은 아니다」, doc_format_pretooluse.sh:2 「비블로킹」. 반증을 찾아봤으나 없다 — hooks.json의 Stop 훅(spec_review_stop.sh)은 path_is_specplan으로 spec/plan만 막고 README:40도 하드 게이트를 spec/plan에 한정해 적으며, 일반 .md에 걸리는 것은 additionalContext 한 줄뿐이고, test_docs_drift.sh:450-467은 두 매니페스트 문안의 동일성만 대조하지 훅 강도와의 일치는 보지 않는다. 환경변수 이름 DISCIPLINED_CODER_REVIEW_GATE가 문서 훅에도 붙어 있으나 이는 끄기 스위치의 이름일 뿐 차단 동작을 만들지 않는다.",
+   "매니페스트 두 파일(plugin.json:5, marketplace.json:10)은 「spec/plan & doc review gates」라고 적지만 hooks.json에서 문서(.md) 경로에 걸린 것은 PreToolUse·PostToolUse의 additionalContext 넛지뿐이고 Stop 훅은 spec/plan 전용이며, 훅 자신(doc_review_posttooluse.sh:2,35)과 README:40 모두 「게이트」를 Stop 차단이라는 뜻으로만 쓰고 문서 훅은 「게이트 아님」이라 선언하므로 같은 레포 안에서 뜻이 갈린 실제 모순이다. 유일한 반박 근거인 환경변수 이름 DISCIPLINED_CODER_REVIEW_GATE가 넛지까지 끄는 점은 내부 스위치 명명일 뿐 사용자에게 보이는 계약이 아니고, 고치는 비용은 두 파일 한 구절이며 test_docs_drift가 두 문안의 동일성을 붙들어 주므로 실질 이득이 비용을 넘는다."
+  ]
+ },
+ {
+  "title": "전문 용어를 몇 번 부연하는지의 규칙이 정본과 상세 문서와 렌즈 사이에서 '나올 때마다'와 '처음 나올 때'로 갈리고, 상세의 SSOT라는 writing-korean 안에서조차 두 문장이 서로 반대다.",
+  "file": "skills/writing-korean/SKILL.md:24,113 · agent-principles.md:19 (작업 트리) / :22 (HEAD f301689) · skills/lens-readability/SKILL.md:73",
+  "evidence": "skills/writing-korean/SKILL.md:24 — `그 분야에서 통용되는 용어는 그대로 쓰되 처음 나올 때 한 줄 부연한다.` / skills/writing-korean/SKILL.md:113 — `전문 분야의 용어는 나올 때마다 짧게 부연한다.` / agent-principles.md:19 — `전문 용어는 나올 때마다 부연한다.` (HEAD f301689의 같은 줄은 `전문 용어는 그대로 쓰되 한 답변 안에서 처음 나올 때 한 줄 부연한다`) / skills/lens-readability/SKILL.md:73 — `전문 용어를 없애지 않는다. 처음 나올 때 한 줄 풀어 준다.`",
+  "principle": "SSOT · READ-FLOW (렌즈 규칙: 모순)",
+  "consequence": "lens-readability는 판정 전에 writing-korean을 읽으라고 되어 있는데 그 기준 문서가 '처음 한 번'과 '매번'을 함께 말하므로, 같은 문서를 두고 한 회차는 반복 부연을 군더더기로 지적하고 다음 회차는 부연 누락을 지적할 수 있다. 정본을 따르는 글은 같은 용어를 나올 때마다 부연해 길어지고 렌즈는 그것을 군더더기로 지적해 서로 반대 방향으로 고치게 되며, 정본과 상세와 렌즈가 각자 한 판을 들고 있어 어느 하나를 고쳐도 나머지가 따라오지 않는다.",
+  "detail": "writing-korean의 frontmatter는 `정본은 조항만 담고 여기가 상세의 SSOT다`라고 선언한다. 그런데 PLAIN-KO 셋째(24행)와 READ-FLOW 절(113행)이 같은 규칙을 다른 값으로 적고, 정본 READ-FLOW 조항과 lens-readability의 「손대지 않는 요소」가 각각 한 쪽 값을 다시 적는다. 정본 19행은 감사 도중(2026-09-02 22:53) 작업 트리에서 바뀐 미커밋 상태이므로 그 줄의 값은 유동적이고, 설치본 사본은 '처음 나올 때'로 되어 있다.",
+  "fix": "writing-korean에서 한 값을 정해 24행과 113행을 하나로 맞추고, 정본 READ-FLOW 조항과 lens-readability:73은 횟수를 적지 말고 writing-korean을 가리키게 한다. 사용자가 최근에 고른 쪽이 어느 것인지 확인한다.",
+  "lens": "lens-consistency, ssot-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "핵심 모순은 실재한다 — skills/writing-korean/SKILL.md:24 「처음 나올 때 한 줄 부연한다」와 :113 「나올 때마다 짧게 부연한다」, agent-principles.md:19(작업 트리와 HEAD 모두) 「나올 때마다 부연한다」, skills/lens-readability/SKILL.md:73 「처음 나올 때 한 줄 풀어 준다」, 설치본 ~/.claude/disciplined-coder/agent-principles.md:22 「처음 나올 때 한 줄 부연한다」가 인용 그대로 존재한다. 다만 부속 서술 하나가 틀렸다 — HEAD f301689의 READ-FLOW 줄도 「나올 때마다」이며(「처음 나올 때」는 86dd0de에서 들어와 795357c에서 바뀐 것), 그 줄은 미커밋 변경으로 바뀐 것이 아니고 설치본만 795357c 이전 값으로 낡아 있다.",
+   "실측 결과 모순은 실재한다 — writing-korean은 스스로 상세의 SSOT라 선언하면서 24행은 \"처음 나올 때 한 줄 부연\", 113행은 \"나올 때마다 짧게 부연\"으로 같은 대상(그 분야에서 통용되는 전문 용어)에 반대 값을 적고, 정본 READ-FLOW는 \"나올 때마다\", lens-readability:73은 \"처음 나올 때\"를 각각 다시 적어 렌즈가 정본을 따른 글을 군더더기로 지적하는 구조가 성립한다. 다만 발견의 부속 서술 둘은 틀렸다 — 정본 19행의 \"나올 때마다\"는 미커밋 변경이 아니라 HEAD f301689를 포함해 최근 네 커밋(795357c 이후) 모두 같은 값이고, \"처음 나올 때 한 줄\"로 되어 있는 것은 HEAD가 아니라 설치본 사본(~/.claude/disciplined-coder/agent-principles.md)이므로 정본과 사본의 드리프트가 하나 더 있다. 핵심 지적(한 값으로 통일하고 정본·렌즈는 횟수를 적지 않고 writing-korean을 가리키게 한다)은 고치면 렌즈 판정의 왕복을 없애는 실질 이득이 있다."
+  ]
+ },
+ {
+  "title": "세 호출자 스킬이 '공통 방법'을 정본의 「검증」 절에서 가져온다고 적었는데 그 절은 방법을 담지 않고 호출자 스킬에 되돌려 보내, 공통 방법의 소유자가 없다.",
+  "file": "agent-principles.md:31-34 (HEAD) · skills/domain-spec-review/SKILL.md:17,32 · skills/domain-llm-runtime/SKILL.md:7 · skills/nested-orchestration/SKILL.md:28 · skills/domain-docs/SKILL.md:79",
+  "evidence": "skills/domain-llm-runtime/SKILL.md:7 — `공통 방법(PREP → 독립 렌즈 → 메타 집계 → 라우팅)은 \\`agent-principles.md\\`의 「검증」 절을 따른다.` / skills/domain-spec-review/SKILL.md:32 — `공통 방법은 \\`agent-principles.md\\`의 「검증」 절에` / nested-orchestration:28 「리스크에 비례해 렌즈를 고른다(정본의 「검증」 절)」 / skills/domain-docs/SKILL.md:79 — `## 문서 검진 방법 (정본의 「검증」 절 '문서 작성' 행의 상세 — 여기가 소유자)` / agent-principles.md:31-32 — `어느 렌즈를 어떻게 띄우는지는 호출자 스킬이 정본이고, 그 스킬을 언제 여는지는 각 스킬 설명에 적혀 있다.` (정본에 `PREP`·`라우팅`·'문서 작성' 행은 grep으로 한 건도 없다)",
+  "principle": "SSOT (렌즈 규칙: 커버리지 공백·드리프트)",
+  "consequence": "PREP·독립 렌즈·메타 집계·라우팅의 순서와 각 걸음의 뜻을 바꾸려는 사람이 정본을 열면 내용이 없고 스킬을 열면 정본을 가리켜, 아무 곳도 고치지 못하거나 한 스킬만 고쳐 나머지 두 스킬과 갈라진다. 리스크 점수표는 domain-llm-runtime 한 곳에만 있어 nested-orchestration의 L2가 '리스크 비례'로 렌즈를 고르려 해도 기준을 찾지 못하고, domain-docs:79의 '문서 작성 행'은 정본에 표가 없어 가리키는 대상이 없다. `scripts/test_docs_drift.sh`의 「」 참조 검사는 절 제목의 존재만 보므로 이 공백을 초록으로 통과시킨다.",
+  "detail": "정본의 「검증」 절(HEAD 31-52줄)에는 허가 범위와 기록 의무만 있고 PREP나 라우팅이나 리스크 등급이 없다. 커밋 795357c에서 정본을 31,040자에서 4,704자로 줄이며 방법이 빠졌는데, 그것을 가리키던 네 문서의 참조는 그대로 남았다. domain-docs:79의 '행'이라는 말은 예전 정본에 있던 표를 가리키던 흔적이다. 서로가 서로를 소유자로 가리키는 순환이라 한 사실에 권위 있는 곳이 0곳이다.",
+  "fix": "공통 방법의 소유자를 한 곳(정본 「검증」 절에 네 걸음을 한 문단으로 되살리거나 meta-aggregate 또는 domain-spec-review의 PREP 절)으로 정하고, 네 문서의 참조와 domain-docs:79의 제목을 그 소유자로 바꾼다. 리스크 비례 선택 기준은 domain-llm-runtime의 점수표를 범용으로 올리거나 nested-orchestration이 그 표를 직접 가리키게 한다.",
+  "lens": "lens-consistency, ssot-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용된 다섯 줄은 HEAD 파일에 그대로 있고, 정본 「검증」 절(31-52줄)에는 PREP·라우팅·리스크 점수가 없으며(grep 0건) 그 절은 방법을 호출자 스킬로 되돌려 보내고, scripts/test_docs_drift.sh 284-308줄의 「」 검사는 제목 존재만 보므로 순환 참조가 실재한다. 다만 detail의 역사 서술은 부정확하다 — 795357c 이전 정본(「검증 레이어」 절)도 \"방법 상세는 호출자 스킬이 SSOT\"라고만 적었고 PREP·라우팅은 애초에 없었으며, 그 커밋이 지운 것은 '문서 작성' 행이 있던 트리거 표뿐이다. 이 오류는 원인 서술에 그치고 발견 자체와 결과·수정안은 유지된다.",
+   "HEAD의 「검증」 절(31-49줄)에는 PREP·라우팅·리스크 등급·'문서 작성' 행이 없고 \"어느 렌즈를 어떻게 띄우는지는 호출자 스킬이 정본\"이라고 되돌려 보내는데, domain-llm-runtime:7은 네 걸음을 명시해 그 절을 가리키고 domain-spec-review:17·32는 \"이 문서 밖에서 가져올 것\"으로 그 절을 들며 domain-docs:79는 이미 지워진 표의 행을 제목에 박고 있어 세 참조가 실제로 매달려 있고 test_docs_drift의 「」 검사는 절 제목만 보아 잡지 못한다. 다만 심각도는 과장되어 있다 — PREP의 소유자는 lens-grounding:7이 domain-spec-review로 못 박고 있고 처분은 meta-aggregate가 맥락별로 소유하며, nested-orchestration:28은 정본 31줄의 '리스크에 비례'에 실제로 닿고 같은 문장에 렌즈 선택을 적어 두어 기준을 못 찾는 상황은 아니므로, 고칠 것은 '소유자 되살리기'가 아니라 세 파일의 포인터를 실제 소유자(domain-spec-review·meta-aggregate)로 바꾸고 domain-docs:79 제목의 '문서 작성 행'을 지우는 작은 수정이다."
+  ]
+ },
+ {
+  "title": "domain-docs의 기록 타입 정의는 기록에 처분을 적지 않는다고 못 박는데 같은 문서의 문서 검진 절과 실제 검진 기록은 처분을 적는다.",
+  "file": "skills/domain-docs/SKILL.md:53,103,105 · docs/superpowers/reviews/2026-08-17-canon-readme-check.md:22 · scripts/test_docs_drift.sh:137",
+  "evidence": "domain-docs:53 「| **기록** (reviews) | … | 처분과 상태를 안 적으니 낡을 것이 없다. 처분은 회차 사이 대조로 그때그때 도출한다 | 있는 기록의 수정·삭제를 거부하는 검사 |」 / domain-docs:103 「그 회차에 돌린 렌즈 전부의 지적을 한 목록으로 모아 무엇을 고쳤고 무엇을 넘겼는지 함께 적는다.」 / domain-docs:105 「**여기는 처리 결과를 함께 적고, spec·plan 리뷰 기록은 적지 않는다.**」 / docs/superpowers/reviews/2026-08-17-canon-readme-check.md:22 「**스물둘을 고쳤고, 셋은 일부만 고쳤으며, 둘은 넘겼다.**」 / scripts/test_docs_drift.sh:137 「check \"문서 검진은 처리 결과를 함께 적는다\" \"grep -qF '무엇을 고쳤고 무엇을 넘겼는지' ...\"」",
+  "principle": "SSOT · EXPLICIT · domain-docs 「문서 타입과 수명 (상태 위생 SSOT)」 (렌즈 규칙: 모순)",
+  "consequence": "이 표는 스스로 '상태 위생 SSOT'라 선언한 정본인데, 그 표를 기준으로 감사하면 `-check.md` 기록 전부가 위반으로 걸리고, 검진 절을 기준으로 하면 표가 틀린 것이 된다. 어느 쪽이 계약인지 문서만으로는 정할 수 없어 project-doc-audit이나 이 자기감사가 회차마다 다른 판정을 낸다. 계약 테스트는 검진 절 쪽 문구를 고정하고 있어 표 쪽이 조용히 낡은 채 남고, 다음에 기록 타입을 검사하는 스크립트를 만들면 검진 기록 전부가 걸린다.",
+  "detail": "기록 타입을 한 행으로 뭉쳤지만 실제로는 둘이다. spec·plan 리뷰 기록은 처분을 뺀다(domain-spec-review가 '어떻게 처리했는지는 담지 않는다'고 정한다)와 문서 검진 기록은 처분을 함께 적는다(SKILL.md:105)가 갈리는데, 표는 앞쪽만 적어 뒤쪽 규칙과 모순된다. 105줄이 '여기는 다르다'고 예외를 밝히지만 53줄의 표는 그 예외를 담지 않는다.",
+  "fix": "기록 행을 '리뷰 기록은 처분을 안 적고, 검진 기록은 한 번에 끝나므로 처분까지 적는다'로 둘로 가르거나, '낡는 것을 막는 방법' 칸을 '다음 회차의 할 일 같은 상태는 적지 않는다. 검진 기록은 그 회차의 처분까지 찍고 뒤에 고치지 않는다'로 고쳐 두 절이 같은 말을 하게 한다.",
+  "lens": "lens-consistency, docs-compliance",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 다섯 곳이 모두 파일에 그대로 있고, 표 53줄은 기록에 처분을 안 적고 회차 사이 대조로 도출한다고 적는 반면 같은 문서 103·105줄은 검진 기록에 처리 결과를 적으라 하며 107줄은 검진을 다시 돌리지 않는다고 해 도출할 다음 회차가 없다. 실제 -check.md 일곱 파일이 고침·넘김을 적고 있고 test_docs_drift.sh:137은 검진 절 문구만 고정하므로 표가 예외를 담지 않는 모순은 실재한다.",
+   "같은 파일 안에서 「문서 타입과 수명」 표(53줄)는 기록 타입 전체에 \"처분과 상태를 안 적으니 낡을 것이 없다, 처분은 회차 사이 대조로 도출한다\"고 적고, 「문서 검진 방법」(103·105줄)은 -check.md 기록에 \"무엇을 고쳤고 무엇을 넘겼는지\"를 함께 적으라고 정하며, 실제 -check 기록 12건이 그렇게 적혀 있다 — 표가 스스로 '상태 위생 SSOT'라 선언한 정본인데 105줄의 예외를 담지 않아 SSOT·EXPLICIT 위반이 실재한다. test_docs_drift.sh는 103·105줄 문구만 고정하고 표는 검사하지 않아 표가 낡은 채 남는 경로가 열려 있고, 표의 '낡는 것을 막는 방법' 한 칸을 \"검진 기록은 그 회차의 처분까지 한 번에 찍고 뒤에 고치지 않는다\"로 고치면 두 절이 같은 말을 하게 되어 고치는 비용에 비해 이득이 분명하다."
+  ]
+ },
+ {
+  "title": "리뷰 기록 파일의 회차 표기가 spec 리뷰와 레포 감사 사이에서 접미사 뒤와 앞으로 갈리고 문서 검진에는 회차 규칙이 없다.",
+  "file": "skills/domain-spec-review/SKILL.md:93, skills/project-doc-audit/SKILL.md:67, skills/domain-docs/SKILL.md:103, skills/meta-aggregate/SKILL.md:45",
+  "evidence": "domain-spec-review:93 「다시 리뷰를 돌면 `-review-2.md`로 새로 쓰고」 / project-doc-audit:67 「같은 날 두 번째 회차를 돌면 `-check` 앞에 `-2`처럼 회차를 붙여」 / domain-docs:103 「`docs/superpowers/reviews/YYYY-MM-DD-<문서이름>-check.md`에 남긴다.」(회차 규칙 없음) / meta-aggregate:45 「`docs/superpowers/reviews/YYYY-MM-DD-<주제>-check.md`에 적는다.」(회차 규칙 없음)",
+  "principle": "SSOT · NAME-ITEMS · lens-consistency 드리프트",
+  "consequence": "같은 폴더에 `…-review-2.md`와 `…-2-check.md`가 섞여 파일 이름만으로 회차를 도출하는 스크립트를 쓸 수 없다. 문서 검진과 워크플로 기록은 같은 날 두 번 돌면 이름이 겹쳐 앞 회차를 덮는다. 정본이 '기록이 없으면 0건 회차와 안 돌린 회차가 구별되지 않는다'고 한 바로 그 실패가 이름 충돌로 생긴다.",
+  "detail": "네 문서가 같은 폴더에 같은 종류의 산출물을 두면서 이름 규칙을 각자 적었다. 회차 접미사의 위치가 둘로 갈리고 두 문서는 접미사 자체가 없다. scripts/test_docs_drift.sh:140은 `-review-2.md`만 단언해 한쪽 관례만 고정한다.",
+  "fix": "기록 파일 이름 규칙을 한 곳(domain-docs의 기록 타입 행이 자연스럽다)에 적고 네 문서는 그곳을 가리킨다. 회차 접미사 위치를 하나로 정한다.",
+  "lens": "lens-consistency",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "네 인용(domain-spec-review:93, project-doc-audit:67, domain-docs:103, meta-aggregate:45)과 scripts/test_docs_drift.sh:140의 `-review-2.md` 단언이 모두 파일에 그대로 있고, 이름 규칙을 한 곳에 모은 정본은 어디에도 없다. docs/superpowers/reviews/ 실제 파일에 `…-review-2.md`와 `…-project-doc-audit-3-check.md`와 규칙 밖의 `…-recheck.md`가 함께 있어 드리프트가 이미 결과로 드러나 있다.",
+   "인용된 네 줄은 실제로 그렇게 적혀 있고, docs/superpowers/reviews/ 폴더에 이미 `-review-2.md`·`-review-3.md`(접미사 뒤)와 `project-doc-audit-3-check.md`(접미사 앞)와 규칙 밖의 `project-doc-audit-recheck.md`가 같은 날짜로 섞여 있어 SSOT 드리프트가 가정이 아니라 실측이다. 반박 가능한 부분은 둘뿐이다 — NAME-ITEMS는 순서 없는 항목에 관한 조항이라 회차에는 걸리지 않고, \"앞 회차를 덮는다\"는 test_docs_drift.sh의 기록 읽기 전용 검사가 잡으므로 조용한 실패가 아니라 이름 규칙이 없어 즉흥 작명으로 흐르는 문제다. 그래도 회차 규칙을 한 곳에 두고 세 문서가 가리키게 하는 고침은 몇 줄로 끝나며 실질 이득(이름만으로 회차 구별, 테스트가 한 관례만 단언하는 상태 해소)이 있다."
+  ]
+ },
+ {
+  "title": "정본은 렌즈를 둘 이상 돌린 회차의 기록을 reviews 폴더에 남기라고 하는데 L2의 실행 국면 렌즈 회차는 브랜치에 커밋하지 않는 스크래치 리포트로만 남는다.",
+  "file": "agent-principles.md:50-51 (HEAD), skills/nested-orchestration/SKILL.md:19, skills/nested-orchestration/SKILL.md:28, skills/nested-orchestration/SKILL.md:30",
+  "evidence": "agent-principles.md:50-51 「렌즈를 둘 이상 돌렸으면 `meta-aggregate`의 세 걸음으로 결과를 모으고, 그 회차의 기록을 `docs/superpowers/reviews/`에 남긴다.」 / nested-orchestration:28 「필요하면 `lens-grounding`과 `lens-adversarial`을 더한다.」 / nested-orchestration:30 「리포트는 제품 트리 밖의 워크스트림별 고유 경로(예: `report-<workstream>.md`)에 쓰고 병합될 브랜치에는 커밋하지 않는다. … 리포트는 Bash로 스크래치에 기록한다.」",
+  "principle": "FAIL-LOUD · lens-consistency 커버리지 공백",
+  "consequence": "L2가 실행 국면에서 렌즈 둘을 돌려도 그 회차의 기록은 병합되는 브랜치에 남지 않는다. 병합 뒤에는 그 코드가 렌즈를 거쳤는지 0건이었는지 안 돌렸는지를 레포에서 구별할 수 없어, 정본이 기록 의무를 둔 이유 그대로의 실패가 생긴다. 스크래치 리포트는 L1이 취합한 뒤 지워져 근거가 사라진다.",
+  "detail": "nested-orchestration:19는 플랜 국면의 domain-spec-review는 기록을 남기는 절차를 그대로 쓰지만, 실행 국면의 `lens-*`는 결과를 리포트에만 담는다. 정본의 기록 의무는 '렌즈를 둘 이상 돌렸으면'이라는 조건뿐이라 실행 국면 회차도 걸린다. 그 회차를 기록에서 빼려면 정본에 예외가 있어야 하는데 없다.",
+  "fix": "nested-orchestration의 산출 계약에 '실행 국면 렌즈 회차의 기록은 워크트리의 `docs/superpowers/reviews/`에 쓰고 브랜치에 포함한다'를 적거나, 정본 50-51줄에 '3층 실행 국면은 리포트로 갈음한다'는 예외를 명시한다.",
+  "lens": "lens-consistency",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 셋이 파일에 그대로 있다 — HEAD 정본 49-51줄(발견은 50-51로 한 줄 어긋나나 내용 동일)의 무조건 기록 의무, nested-orchestration 28줄의 실행 국면 lens-grounding·lens-adversarial 추가, 30줄의 리포트 스크래치 기록·브랜치 미커밋. 산출 계약이 열거하는 리포트 내용(변경 파일·테스트 결과·스키마·스펙 이탈·브랜치명)에 렌즈 회차 기록은 들어 있지도 않고, 플랜 국면은 domain-spec-review가 자기 기록 절로 커버하지만 실행 국면 렌즈 기록을 docs/superpowers/reviews/에 남기라는 문장은 어느 스킬에도 없으며 정본에 3층 예외도 없다(domain-docs 125줄의 예외는 렌즈 중첩 금지에 대한 것이지 기록 의무가 아니다). '취합 뒤 지워진다'는 부분은 스킬에 적힌 사실이 아니라 추론이지만 핵심 판정에는 영향이 없다.",
+   "정본 47-49줄의 기록 의무는 「렌즈를 둘 이상 돌렸으면」이라는 조건뿐이고 예외가 없으며, nested-orchestration:28은 렌즈 선택을 바로 그 「검증」 절에 묶어 두고서(「정본의 「검증」 절」 인용) 30줄에서 리포트를 브랜치에 커밋하지 말라고 하므로 같은 절의 기록 의무와 정면으로 어긋난다. 제품 런타임(domain-llm-runtime)이 기록을 안 남기는 것은 SECRETS와 제품 코드라는 다른 근거가 있어 L2 세션에는 옮겨 오지 않고, 커밋 금지의 근거인 「고정 경로 병합 충돌」은 날짜·주제로 이름 붙는 reviews/ 파일에는 해당하지 않으며, doc_review_posttooluse.sh:21이 reviews/*.md를 넛지에서 빼 두어 워크트리에 쓰는 데 장애도 없다. 레포가 지금 reviews/를 봉인해 감사 흔적으로 쓰는 설계(2026-09-02 audit-record spec)를 진행 중이라 L2 실행 국면만 흔적 없이 병합되는 공백은 고칠 값어치가 있다."
+  ]
+ },
+ {
+  "title": "감사가 도는 동안 작업 트리가 HEAD와 25개 파일에서 갈라지고 있어 이 발견의 증거는 HEAD f301689에 고정했다.",
+  "file": "agent-principles.md, skills/lens-prior-art/SKILL.md:3,7,57 (작업 트리), skills/domain-spec-review/SKILL.md:70 (작업 트리)",
+  "evidence": "`git status --short` 결과 ` M agent-principles.md`, ` M README.md`, ` M skills/domain-docs/SKILL.md`, ` M skills/domain-spec-review/SKILL.md`, ` M skills/lens-prior-art/SKILL.md` 등 25개 파일이 HEAD와 다르고(`git diff HEAD --stat`: 35 insertions, 1220 deletions), agent-principles.md의 mtime이 22:52:17로 감사 중에 바뀌었다. 작업 트리의 agent-principles.md는 `EXPLAIN-STRUCTURE` 조항과 옛 `ASK-FORK` 문안으로 되돌아가 있고, 작업 트리의 lens-prior-art:7은 「**사용자가 선행연구를 직접 청하면 spec이 없어도 이 렌즈를 연다**」를 새로 넣었는데 같은 파일 :57의 「**이 렌즈는 spec 리뷰 전용이며**」는 그대로다.",
+  "principle": "MEASURE-FIRST · FAIL-LOUD · lens-consistency 드리프트",
+  "consequence": "메인 세션이 이 발견을 작업 트리와 대조하면 줄 번호와 인용이 맞지 않아 '틀린 지적'으로 걸러질 수 있다. 작업 트리의 변경이 그대로 커밋되면 lens-prior-art 안에서 'spec 없이도 연다'와 'spec 리뷰 전용이다'가 한 파일에 공존하는 새 모순이 생기고, 정본에는 이미 걷어낸 `EXPLAIN-STRUCTURE`가 되살아나 domain-docs:29가 가리키는 `CLEAR-COMM`이 정본에서 사라진다.",
+  "detail": "감사 시작 시점의 git status는 미추적 파일 넷뿐이었고 정본 첫 Read는 HEAD와 작업 트리가 섞인 중간 상태였다. 이후 확인에서 다른 프로세스가 파일을 차례로 바꾸고 있음을 봤다. 읽기 전용 렌즈는 개입하지 않으므로 증거를 HEAD 커밋에 고정하고 이 사실만 알린다.",
+  "fix": "메인 세션이 어느 프로세스가 작업 트리를 고치고 있는지 확인하고, 그 변경을 커밋하기 전에 lens-prior-art:57의 'spec 리뷰 전용'과 agent-principles의 `EXPLAIN-STRUCTURE` 복귀를 의도한 것인지 사용자에게 묻는다.",
+  "lens": "lens-consistency",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "핵심 증거가 모두 실측과 일치한다 — HEAD는 f301689, `git status`에 25개 파일이 HEAD와 다르고(지금은 41 insertions/1226 deletions로 감사 시점보다 더 벌어졌고 agent-principles.md mtime도 22:52→23:10로 다시 바뀌어 '계속 고쳐지는 중'이라는 서술이 맞다), 작업 트리 agent-principles.md에 `EXPLAIN-STRUCTURE`와 옛 `ASK-FORK` 문안이 있으며 HEAD에는 `CLEAR-COMM`이 있고, lens-prior-art:7에 「사용자가 선행연구를 직접 청하면 spec이 없어도 이 렌즈를 연다」가 새로 들어갔고 :57의 「이 렌즈는 spec 리뷰 전용이며」는 그대로이며, domain-spec-review:70 변경도 인용 그대로다. 다만 결과 문단의 한 대목은 부정확하다 — 작업 트리의 domain-docs:29도 함께 고쳐져 `CLEAR-COMM` 참조를 이미 뺐으므로, 그대로 커밋돼도 domain-docs가 정본에 없는 ID를 가리키는 문제는 생기지 않는다.",
+   "실측으로 반박에 실패했다. 작업 트리는 지금도 HEAD f301689와 25개 파일에서 갈라져 있고(agent-principles.md는 발견 뒤에도 23:10:24에 다시 바뀜), 작업 트리의 lens-prior-art는 :7의 「spec이 없어도 이 렌즈를 연다」와 :57의 「이 렌즈는 spec 리뷰 전용이며」가 한 파일에 공존하며, 작업 트리 정본은 `CLEAR-COMM`을 잃고 `EXPLAIN-STRUCTURE`를 되살려 `.claude/workflows/self-audit.js:26`의 `CLEAR-COMM` 인용이 정본에 없는 ID를 가리키고 `scripts/test_scaffold.sh:400-401`의 ASK-FORK 검사 둘이 실패한다. 발견 가운데 「domain-docs:29가 가리키는 CLEAR-COMM」 부분만 부정확하다(작업 트리의 domain-docs:29도 그 인용을 이미 걷어냈다). 그러나 이 변경이 의도된 설계 선택이더라도 그대로 커밋하면 모순과 테스트 실패가 남으므로 커밋 전에 사용자에게 묻는 고침은 실질 이득이 있고, 읽기 전용 렌즈가 증거를 HEAD에 고정하고 드리프트를 알린 것은 MEASURE-FIRST·FAIL-LOUD가 요구하는 처리다."
+  ]
+ },
+ {
+  "title": "자기감사 실행체는 감사 대상 리비전을 고정하지 않아, 감사 도중 작업 트리가 바뀌면 렌즈의 인용과 검증자의 읽기가 서로 다른 파일을 본다.",
+  "file": ".claude/workflows/self-audit.js:16",
+  "evidence": "const REPO = (typeof args === 'string' && args.length > 0) ? args : '.'  — 리비전 인자나 워크트리 생성이 없다. 실측: 이 세션에서 agent-principles.md 8행을 두 번 읽었는데 첫 번째는 CLEAR-COMM 항목이 있고 EXPLAIN-STRUCTURE가 없었으며, 두 번째는 EXPLAIN-STRUCTURE가 있고 CLEAR-COMM이 없었다. git status도 감사 시작 시점의 '?? 4건'에서 도중에 'M 18건 · D 7건'으로 바뀌었다.",
+  "principle": "MEASURE-FIRST · FAIL-LOUD · lens-adversarial 실패 모드(중간에 끊기거나 어긋나는 실행)",
+  "consequence": "렌즈가 인용한 줄이 검증자(verify-fact)가 읽을 때는 이미 없어져 '인용이 파일에 없다'로 기각되거나, 반대로 렌즈가 못 본 회귀를 검증자가 보고도 발견 목록에 없어 넘어간다. 감사 결과 파일에는 어느 리비전을 봤는지가 남지 않아 회차 사이 대조가 성립하지 않는다.",
+  "detail": "self-audit.js는 여덟 렌즈와 발견마다 두 검증자를 병렬로 띄우며 모두 같은 경로 '.'를 읽는다. 메인 세션이나 다른 창이 같은 트리를 고치는 동안 감사가 돌면 각 에이전트가 서로 다른 시점의 파일을 읽는다. 이것은 설계가 맞아도 실행이 어긋나 실패하는 길이고, 이번 회차에서 실제로 밟혔다.",
+  "fix": "감사를 시작할 때 `git rev-parse HEAD`로 SHA를 적고 그 커밋을 별도 워크트리에 체크아웃해 REPO로 넘기며, 결과 객체에 그 SHA를 남긴다. 작업 트리의 미커밋 변경을 감사하려면 감사 전에 커밋하라고 알린다.",
+  "lens": "lens-adversarial",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "self-audit.js:16의 인용문은 파일에 그대로 있고, 파일 전체에 rev-parse·워크트리·SHA 처리가 없으며 여덟 렌즈와 발견별 검증자 둘이 모두 같은 살아 있는 경로를 읽고 결과 객체에도 리비전이 남지 않는다. 실측 주장도 독립적으로 확인된다 — HEAD(f301689)의 agent-principles.md에는 CLEAR-COMM만 있고 작업 트리에는 EXPLAIN-STRUCTURE만 있으며, git status는 세션 시작의 ?? 4건과 달리 지금 M 18건·D 7건으로 발견의 숫자와 정확히 일치한다.",
+   "실측으로 발견의 현상이 재현된다 — `git diff HEAD -- agent-principles.md`가 미커밋 트리에서 CLEAR-COMM이 빠지고 EXPLAIN-STRUCTURE가 들어간 것을 보이고, `git status`가 M 18건·D 7건을 보이며, 세션 시작 때 주입된 관리 사본에는 아직 CLEAR-COMM이 있어 감사 도중 정본이 바뀐 것이 확인된다. self-audit.js는 REPO='.'만 넘기고 리비전을 적지도, 시작·종료 시점의 트리 변화를 감지해 알리지도 않으며 \"감사 중 편집 금지\" 전제를 어디에도 적지 않아, MEASURE-FIRST(휘발성 상태를 코드에서 도출)와 FAIL-LOUD(드리프트를 삼키지 않음)와 lens-adversarial의 \"설계가 맞는데도 실행이 어긋나 실패하는 길\"에 그대로 걸린다. 다만 제안된 워크트리 체크아웃은 미커밋 변경을 감사하는 현재 용례(커밋 전 회귀 감사)와 충돌하므로, 시작 시 HEAD SHA와 `git status --porcelain` 지문을 결과에 남기고 종료 시 다시 재서 달라졌으면 크게 알리는 작은 형태로도 실질 이득이 난다."
+  ]
+ },
+ {
+  "title": "_json_valid.sh의 json_hook_events는 같은 일을 하는 JSON 처리기를 셋 두고 그 사본이 이미 서로 갈라져 있어, domain-plugin이 '처리기 하나'로 막으려던 '한 번도 안 도는 사본' 결함을 자기 코드가 재현한다.",
+  "file": "scripts/_json_valid.sh:20-25 (규칙: skills/domain-plugin/SKILL.md:22, scripts/_ensure_autoupdate.sh:8-9; 소비자: scripts/test_hooks.sh:216)",
+  "evidence": "python3 갈래(21행): `json.load(open(sys.argv[1],encoding=\"utf-8\")).get(\"hooks\",{})` / python 갈래(23행): `json.load(open(sys.argv[1]))[\"hooks\"]` — encoding 인자가 없고 .get이 아니라 [\"hooks\"]다 / node 갈래(25행): `Object.keys(o.hooks||{})`. domain-plugin:22 '처리기 하나 — JSON을 다루는 처리기를 여러 개 두지 않는다. 폴백을 하나 더 두면 한 번도 안 도는 사본이 생기고, 안 돌아 본 코드에는 오류가 숨는다(`SIMPLE`).' / _ensure_autoupdate.sh:9 '노드 폴백을 두면 한 번도 안 도는 사본이 하나 더 생긴다(SIMPLE)'. test_hooks.sh:216은 폴백 사슬을 거치지 않고 `python -c`를 직접 부른다.",
+  "principle": "SIMPLE · SSOT · domain-plugin 「처리기 하나」 (자기모순: 처방 대 자기 코드)",
+  "consequence": "python3가 스토어 스텁이고 python만 있는 PC에서 hooks 키가 빠진 배선 파일을 넣으면 python3 갈래는 빈 출력을 내고 python 갈래는 KeyError 트레이스백을 내며, python 갈래는 encoding 지정도 빠져 있어 로케일이 다른 PC에서 한글이 든 배선 파일을 cp949로 읽어 또 다르게 실패한다 — 같은 검사가 PC마다 다른 결과를 낸다. python3만 있는 PC에서는 216행의 ESC_MIX 검사가 통째로 실패해 스위트가 환경 때문에 빨개진다.",
+  "detail": "세 갈래는 같은 일을 하는 사본이고 이미 두 갈래가 다르게 적혀 있다. 레포가 자기 처방에서 든 근거(안 돌아 본 사본에 오류가 숨는다)가 바로 이 파일에서 성립한다. 규칙의 적용 범위가 설정 파일 수정으로 한정되어 있어 문언상 위반은 아니나, 이 헬퍼가 hooks.json 유효성과 차단 응답 JSON을 판정하므로 여기가 틀리면 게이트 검사가 틀린다.",
+  "fix": "세 갈래를 한 파이썬 프로그램 문자열로 합치고 python3·python은 그 문자열을 실행하는 인터프리터 선택만 하게 하며(_ensure_autoupdate.sh가 이미 쓰는 방식), node 갈래는 이 PC에서 python이 실제로 부재한 적이 있는지 실측한 뒤 없앤다. test_hooks.sh:216도 그 헬퍼를 거치게 한다.",
+  "lens": "lens-adversarial, plugin-compliance",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용한 세 갈래(scripts/_json_valid.sh:21·23·25)와 규칙 문언(skills/domain-plugin/SKILL.md:22, scripts/_ensure_autoupdate.sh:9)과 소비자(scripts/test_hooks.sh:216의 직접 `python -c` 호출)가 파일에 그대로 있고, python 갈래만 encoding 인자가 없고 `[\"hooks\"]`로 갈라져 있음을 확인했다. 이 PC는 python3가 3.12.10으로 살아 있어 python 갈래가 실제로 한 번도 안 도는 사본이며, 기본 인코딩이 cp949(utf8_mode=0)라 로케일 실패 경로도 성립한다. 발견 스스로 규칙의 적용 범위가 설정 파일 수정에 한정됨을 밝혀 두어 과장도 없다.",
+   "실측으로 핵심이 확인된다 — 이 PC의 python3는 스토어 스텁(rc=49)이라 json_hook_events의 python3 갈래와 node 갈래는 한 번도 돌지 않는 사본이고, 살아 있는 python 갈래만 encoding 인자와 .get이 빠져 이미 갈라져 있으며, 같은 레포의 _ensure_autoupdate.sh는 프로그램 문자열 하나에 인터프리터 선택만 두는 방식으로 정확히 이 결함을 피하고 있어 SSOT·SIMPLE 위반과 자기모순이 성립한다. 또 test_hooks.sh:216이 헬퍼를 거치지 않고 `python -c`를 직접 불러 python3만 있는 PC에서는 스위트가 환경 때문에 빨개지는 것도 코드로 확인된다. 다만 domain-plugin 「처리기 하나」는 사용자 설정 파일 수정 절에 한정되어 문언상 위반은 아니고(발견도 인정), hooks 키가 빠진 경우의 결과 차이는 두 갈래 모두 FAIL 판정으로 같아 stderr 소음 차이뿐이며 hooks.json에 비ASCII 바이트가 없어 encoding 차이는 잠복 상태다 — 결과 문단은 그만큼 줄여 적어야 한다."
+  ]
+ },
+ {
+  "title": "문서 넛지 훅 둘은 프로젝트 밖의 .md에도 걸려, 메모리 파일과 계획 파일을 쓸 때마다 무시해야 할 넛지가 뜨고 훅 자신이 적어 둔 피로 기전이 실제 문서에서 발동한다.",
+  "file": "hooks/doc_review_posttooluse.sh:13-22; hooks/doc_format_pretooluse.sh:13-16",
+  "evidence": "doc_review_posttooluse.sh 13행 `case \"$FILE\" in *.md) ;; *) continue ;; esac`, 21행 `*docs/superpowers/reviews/*.md) continue ;;` — 제외는 이 하나뿐이다. 같은 파일 15-16행의 근거: '넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생기고, 그 순환을 매번 무시하다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.' doc_format_pretooluse.sh 15행 `[ -e \"$FILE\" ] && continue`는 새 파일이면 어디든 양식 제안을 낸다. 이 세션의 자동 메모리 디렉터리에는 .md가 다섯 있다.",
+  "principle": "FOCUSED · lens-adversarial 실패 모드(설계가 맞는데 실행이 어긋남)",
+  "consequence": "세션이 메모리(~/.claude/projects/…/memory/*.md), 플랜 모드 파일, 스크래치 노트를 쓸 때마다 '새 문서 작성 — 양식을 고르라'와 '비자가 검진을 거쳐라'가 뜬다. 그것을 매번 무시하는 것이 정상이 되면 README나 SKILL.md를 고쳤을 때의 같은 넛지도 같은 무게로 무시된다 — 훅 주석이 예견한 결과다.",
+  "detail": "제외 목록을 리뷰 기록 하나로 둔 것은 그때 관측된 순환만 막은 것이고, 같은 성질의 파일(사람이 처음부터 끝까지 읽지 않으며 형식이 도구에 의해 정해지는 파일)이 프로젝트 밖에 더 많다. 훅은 CLAUDE_PROJECT_DIR을 받을 수 있으므로 범위를 도출할 수 있다.",
+  "fix": "넛지 범위를 프로젝트 안(CLAUDE_PROJECT_DIR 아래)으로 좁힌다. 제외 목록을 늘리는 대신 포함 범위를 줄이는 것이라 기능 추가가 아니다.",
+  "lens": "lens-adversarial",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용된 줄(doc_review_posttooluse.sh 13·15-16·21행, doc_format_pretooluse.sh 15행)은 파일에 그대로 있고, 두 훅 모두 CLAUDE_PROJECT_DIR 같은 범위 제한이 없어 hooks.json의 Write|Edit 매처로 어느 경로에나 걸린다. 실제로 메모리 디렉터리의 기존 .md 편집 입력과 메모리·~/.claude/plans 아래 새 .md 쓰기 입력을 두 훅에 넣어 보니 모두 넛지 JSON을 출력했다(rc=0). 사소한 오차는 메모리 디렉터리의 .md가 MEMORY.md 포함 여섯이라는 점뿐이며 발견의 요지에는 영향이 없다.",
+   "반박에 실패했다. 이 세션 기록(1efdd644….jsonl 587·594·621행)에서 메모리 파일 pending-after-doc-round.md와 MEMORY.md를 쓸 때 검진 넛지와 양식 제안이 실제로 떴고, domain-docs는 메모리를 \"일회용 스크래치패드로 자유롭게\" 쓰는 타입으로 정해 검진 대상인 '일반 문서'에서 빼고 있으므로 훅의 실행이 자기 근거(15-16행의 피로 기전)와 문서 규정 양쪽과 어긋난다. 범위를 프로젝트 밖까지 넓히기로 한 결정은 어디에도 없고(spec 09-02의 \"경로 판별을 두지 않는다\"는 읽기 전용 잠금 훅에만 해당), 08-31에서 기각된 것은 쌍둥이 비대칭이지 범위가 아니다. 고치는 비용도 작다 — scaffold.sh:48의 `${CLAUDE_PROJECT_DIR:-$PWD}` 패턴을 그대로 쓰고 백슬래시·대소문자만 정규화하면 되며 미설정 시 지금 동작으로 떨어진다. 다만 인용 원칙 FOCUSED는 느슨한 근거이고 실질 근거는 훅 자신의 주석과 domain-docs의 메모리 조항이다."
+  ]
+ },
+ {
+  "title": "정본은 미룬 일을 메모리에 적으라고 하고 domain-docs는 백로그를 추적하지 말고 메모리는 머신로컬이라 하여, 지운 핸드오프가 메모리라는 이름으로 되살아난다.",
+  "file": "agent-principles.md:53-56; skills/domain-docs/SKILL.md:73-74",
+  "evidence": "정본 53행 '미해결은 사람이 손으로 갱신하는 목록으로 만들지 않는다.' 56행 '메모리 기록과 통보 — 미루지만 꼭 남겨야 하는 것은 메모리에 적고 사용자에게 알린다.' domain-docs 73행 '메모리는 머신로컬이다. … 공유되어야 하는 것은 git이 추적하는 문서에 둔다.' 74행 '이슈와 백로그 트래킹은 하지 않는다. 꼭 남겨야 하는 백로그는 프로젝트의 진짜 트래커로 위임한다.' 실측: 이 PC의 MEMORY.md에 '문서 회차 뒤 남은 일 — … 셋이 남았다'와 '감사 spec 리뷰 핸드오프 — … 합치기·기록·마커·🔴 보고가 남았다'가 있다.",
+  "principle": "SSOT · 자기모순(미해결의 처분 대 문서와 상태의 위생)",
+  "consequence": "미룬 일이 한 PC의 메모리에만 남아 다른 클론이나 동료에게는 없고, 그 목록은 사람이 손으로 지워야 낡지 않는다 — 정본이 첫 문장에서 금지한 손유지 목록이다. 핸드오프 문서를 지운 이유(경쟁하는 진실)가 메모리 항목으로 그대로 돌아온다.",
+  "detail": "두 문서가 같은 물음(미룬 일을 어디에 두는가)에 다른 답을 준다. 정본은 메모리, domain-docs는 진짜 트래커다. 실행하는 세션은 정본을 따르게 되고 그 결과가 지금 메모리에 보인다. 어느 쪽이 참인지 정하지 않으면 두 처방이 계속 갈린다.",
+  "fix": "둘 중 하나를 고른다 — 정본의 '메모리 기록과 통보'를 '트래커 기록과 통보'로 바꿔 domain-docs를 따르거나, domain-docs 74행이 메모리를 그 트래커로 명시하고 낡음을 막는 규칙(소비하면 지운다)을 같은 줄에 적는다.",
+  "lens": "lens-adversarial",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용한 정본 53·56행과 domain-docs 73·74행이 파일에 그대로 있고, 둘 다 '꼭 남겨야 하는' 것을 각각 메모리와 진짜 트래커로 보내 같은 물음에 다른 답을 준다. 이 PC의 MEMORY.md에는 감사 시점의 '핸드오프'·'남은 일' 항목이 있었고 지금도 손으로 갱신된 '남은 일' 항목이 남아 있어 실측 주장도 성립하며, 반증은 찾지 못했다.",
+   "두 문서가 같은 트리거 문구 \"꼭 남겨야 하는\"에 다른 집을 준다 — 정본 56행은 메모리, domain-docs 74행은 진짜 트래커다. 원래 설계(specs/2026-06-30-doc-management-control-design.md:112,133)는 \"작업 중 작업노트→메모리, must-keep 백로그→트래커, 메모리는 작업노트만\"으로 갈랐고 사용자 결정으로 확정됐는데, 정본을 다시 쓰면서 메모리 처분의 트리거가 트래커의 트리거(must-keep)로 바뀌어 그 구분이 사라졌다. 상시 로드되는 것은 정본이라 실행 세션은 must-keep을 메모리에 쌓게 되고 이는 기록된 사용자 결정과 어긋나므로 실질 위반이다. 다만 발견의 귀결 가운데 \"다른 PC·동료에 없다\"는 유실 위험은 그 결정에서 사용자가 감수한 것이고, 실측된 메모리 항목 둘은 domain-docs 73행이 허용하는 작업노트로 볼 수 있어 그 자체는 위반 증거가 못 된다. 고칠 방향은 메모리를 트래커로 명시하는 쪽이 아니라 정본 56행의 트리거를 작업노트(\"다음 세션이 이어 가려면 알아야 하는 것\")로 되돌려 원래 구분을 복원하는 쪽이다."
+  ]
+ },
+ {
+  "title": "Stop 훅이 spec/plan 디렉터리 목록을 `path_is_specplan` 술어와 별도로 git pathspec에 한 번 더 손으로 적고 있다.",
+  "file": "hooks/spec_review_stop.sh:39 (짝: hooks/_spec_marker.sh:20-25)",
+  "evidence": "hooks/spec_review_stop.sh:39 — `done < <(git status -z --porcelain --untracked-files=all --no-renames -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null)` / hooks/_spec_marker.sh:20-23 — `# spec/plan 경로 술어(SSOT): superpowers 기본 경로에 있는 .md인가.` … `*docs/superpowers/specs/*.md|*docs/superpowers/plans/*.md) return 0 ;;`",
+  "principle": "SSOT",
+  "consequence": "술어에 디렉터리를 하나 더하거나 이름을 바꾸면 PostToolUse 넛지는 새 경로를 잡는데 Stop 게이트의 `git status`는 옛 pathspec만 훑어 그 경로의 미리뷰 문서를 아무 메시지 없이 통과시킨다. 게이트가 좁아진 것을 알려 주는 검사가 없어 조용한 실패가 된다.",
+  "detail": "`_spec_marker.sh`는 자기 자신을 spec/plan 경로 술어의 SSOT라고 선언하고 두 훅이 그 함수를 source한다. 그런데 `spec_review_stop.sh`는 `git status`의 pathspec 인자에 같은 두 디렉터리를 문자열로 다시 적어, 어느 경로가 spec/plan인지를 코드 두 곳이 각자 안다. 술어는 걸러 내는 구실만 하고 후보를 만드는 것은 pathspec이라, 둘이 어긋나면 술어가 참이어도 후보에 들지 않는다. `scripts/test_hooks.sh`는 두 디렉터리 이름을 직접 만들어 넣어 시험하므로 이 이중 기술이 갈려도 잡지 못한다.",
+  "fix": "`_spec_marker.sh`에 디렉터리 목록 변수(예: `SPECPLAN_DIRS=\"docs/superpowers/specs docs/superpowers/plans\"`)를 두고 `path_is_specplan`과 Stop 훅의 pathspec이 모두 그 변수에서 도출하게 한다.",
+  "lens": "ssot-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용이 두 파일에 그대로 있다 — hooks/spec_review_stop.sh:39의 git status pathspec에 `docs/superpowers/specs docs/superpowers/plans`가 문자열로 박혀 있고, hooks/_spec_marker.sh:4·19-23은 자신을 \"마커·경로 규약의 코드 정본\"이자 경로 술어의 SSOT라고 선언한다. pathspec이 후보를 만들고 술어는 거르기만 하므로 술어에 디렉터리를 더해도 미추적·추가 파일 탐색은 옛 pathspec에 묶이며, scripts/test_hooks.sh도 두 디렉터리 이름을 직접 만들어 넣어 이 불일치를 잡지 못한다. 둘째 탐색(diff-tree HEAD)에는 pathspec이 없어 커밋된 파일만은 잡히지만 미추적·스테이지 파일의 조용한 통과라는 결과는 그대로다. 세부에서 \"두 훅이 source한다\"는 실제로는 넷이라 숫자만 어긋나나 발견의 본질을 뒤집지 않는다.",
+   "`_spec_marker.sh`가 스스로 경로 규약의 코드 정본이라 선언하는데, `spec_review_stop.sh:39`의 pathspec이 같은 디렉터리 목록을 문자열로 다시 적어 후보 생성을 좁히므로 SSOT 정의(한 사실은 한 곳에만, 필요하면 도출) 그대로의 위반이다. 술어는 접미 글로브(`*docs/superpowers/...`)라 하위 폴더의 레포도 잡지만 pathspec은 루트 상대 경로라 이미 둘이 어긋나 있고, 같은 파일의 둘째 탐색(diff-tree)은 pathspec 없이 술어만으로 걸러 설계가 자기 안에서도 일관되지 않으며, `test_hooks.sh`는 디렉터리 이름을 직접 박아 두 곳의 갈림을 못 잡는다. 고치는 비용은 변수 하나 또는 pathspec 제거로 작고, 이득은 게이트가 조용히 좁아지는 실패 경로를 없애는 것이라 실질적이다."
+  ]
+ },
+ {
+  "title": "`domain-docs`가 frontmatter 형식의 소유자로 `domain-plugin`을 가리키지만 `domain-plugin`에는 frontmatter 규칙이 한 줄도 없다.",
+  "file": "skills/domain-docs/SKILL.md:7 (짝: skills/domain-plugin/SKILL.md:9-13 · 전체)",
+  "evidence": "skills/domain-docs/SKILL.md:7 — `매니페스트와 frontmatter의 형식은 \\`domain-plugin\\`이 소유한다.` / `grep -n frontmatter skills/domain-plugin/SKILL.md` 결과가 비어 있다. skills/domain-plugin/SKILL.md의 절은 「플러그인을 만들 때 지킬 것」(version·marketplace.json·validate·컴포넌트 위치 네 항목)과 「사용자 설정 파일을 고칠 때 지킬 것」 둘뿐이다. 실측으로는 이 레포의 열네 스킬이 모두 name과 description 두 키만 쓰고 name이 디렉터리 이름과 일치한다.",
+  "principle": "SSOT (렌즈 규칙: 커버리지 공백)",
+  "consequence": "스킬 SKILL.md와 commands/*.md의 frontmatter에 어떤 키를 어떤 형식으로 두어야 하는지(name이 디렉터리 이름과 같아야 하는지, description 길이 상한, YAML 평문 스칼라에 ': '를 넣으면 깨진다는 것 등)를 두 문서 모두 적지 않아, 소유자가 있다고 믿고 찾아간 사람이 빈손으로 돌아온다. 새 스킬을 쓰는 세션은 형식을 짐작해서 쓰게 되고 그 짐작이 틀려도 어느 문서도 위반으로 판정해 주지 못하며, `.claude/workflows/self-audit.js`의 plugin-compliance 렌즈가 'frontmatter가 그 처방을 지키는지'를 감사하라는 지시를 받아도 대조할 처방이 없다. `test_docs_drift.sh`가 description에 '때|연다|쓴다|한다'를 요구하는 검사만 홀로 그 규칙 노릇을 한다.",
+  "detail": "소유자 포인터는 가리키는 곳에 내용이 있을 때만 참조이고, 없으면 그 사실의 소유자는 0곳이다. `domain-docs`는 자기 범위에서 frontmatter를 빼면서 `domain-plugin`에 넘겼는데 넘겨받은 쪽이 받지 않았다. 현재 열네 스킬의 형식 일치는 규칙으로 적힌 곳이 없어 우연히 지켜지고 있는 상태다.",
+  "fix": "`domain-plugin`의 「플러그인을 만들 때 지킬 것」에 frontmatter 항목을 넣는다 — 스킬은 name(디렉터리 이름과 같게)과 description 두 키를 쓰고, 커맨드는 description 하나를 쓰며, description은 '언제 여는지'를 담고 YAML 평문 스칼라라 ': '와 ' #'을 넣지 않는다. 또는 `domain-docs:7`의 위임 문장을 지우고 `domain-docs`가 소유한다고 적는다.",
+  "lens": "ssot-audit, plugin-compliance",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "domain-docs/SKILL.md:7의 위임 문장이 그대로 있고, domain-plugin/SKILL.md에는 'frontmatter' 문자열이 없으며 절도 둘뿐이라는 기술이 정확하다. 레포 전체에서 frontmatter 형식을 규정한 문서는 없고, 열네 스킬이 name·description 두 키만 쓰며 name이 디렉터리와 일치한다는 실측과 test_docs_drift.sh:420의 description 검사도 확인되어 반증을 찾지 못했다.",
+   "실측으로 확인했다 — skills/domain-docs/SKILL.md:7이 frontmatter 형식의 소유자를 `domain-plugin`으로 지정하는데 skills/domain-plugin/SKILL.md에는 frontmatter라는 낱말이 없고 외부 문서(plugins-reference)나 superpowers:writing-skills로 넘기는 링크도 없어 그 사실의 권위 있는 집이 0곳이다. 이는 정당한 참조가 아니라 빈 포인터이며, .claude/workflows/self-audit.js:92의 plugin-compliance 렌즈가 \"commands/·skills/ frontmatter가 그 처방을 지키는지\" 감사하라고 지시받지만 대조할 처방이 없고, scripts/test_scaffold.sh:329(name이 디렉터리 이름과 같아야 함)와 scripts/test_docs_drift.sh:420(description에 여는 때를 적어야 함)이 어느 문서에도 적히지 않은 규칙을 강제하고 있어 SSOT 커버리지 공백이 실재한다. 고치는 비용은 항목 하나 추가 또는 위임 문장 하나 삭제로 작고, 이득은 감사 렌즈에 대조 기준이 생기고 새 스킬 작성자가 형식을 짐작하지 않아도 되는 것이라 실질적이다."
+  ]
+ },
+ {
+  "title": "README와 CLAUDE.md가 게이트 경로·마커 리터럴·환경변수 이름을 코드에서 베껴 적고 있으며, 드리프트 검사는 그 가운데 `domain-spec-review` 한 파일만 코드와 대조한다.",
+  "file": "README.md:40 (짝: CLAUDE.md:6 · hooks/_spec_marker.sh:4-5 · scripts/test_docs_drift.sh:327-331)",
+  "evidence": "README.md:40 — `\\`docs/superpowers/specs/\\`나 \\`docs/superpowers/plans/\\`에 새 \\`.md\\`가 생긴 채 … \\`<!-- spec-review: passed -->\\` 마커(🔴가 있으면 \\`escalated\\`)가 남으면 풀린다. 끄려면 환경변수 \\`DISCIPLINED_CODER_REVIEW_GATE=off\\`를 준다. 상세는 \\`skills/domain-spec-review/SKILL.md\\`가 정본이다.` / CLAUDE.md:6 — `설계 문서는 \\`docs/superpowers/specs/\\`에, 계획 문서는 \\`docs/superpowers/plans/\\`에 쓴다.` / hooks/_spec_marker.sh:4-5 — `산문 기술은 domain-spec-review SKILL.md와 훅 안내문에도 있으니 규약 변경 시 함께 갱신한다(쌍 계약).` / scripts/test_docs_drift.sh:327 — `for D in \"$CALLER\"; do` (README·CLAUDE.md는 대조 대상이 아니다)",
+  "principle": "SSOT",
+  "consequence": "마커 문구나 환경변수 이름을 바꾸면 `test_docs_drift.sh`가 `domain-spec-review`의 낡음만 잡고 README와 CLAUDE.md는 옛 값을 그대로 사용자에게 안내한다. 환경변수 이름은 어느 검사도 문서와 코드를 맞대지 않아 훅 네 개에서 이름을 바꾸는 순간 README의 끄는 법이 조용히 거짓이 된다.",
+  "detail": "README는 같은 문단에서 `domain-spec-review`를 정본이라 선언하면서 그 정본이 가진 세 리터럴을 모두 다시 적는다. 코드 쪽 `_spec_marker.sh`는 여전히 사람에게 '함께 갱신하라'는 쌍 계약 지시를 남겨 두었는데, 이는 정본 SSOT 조항 `사람이 두 곳을 손으로 맞추게 만드는 순간 둘은 어긋난다`와 정면으로 부딪히고, `test_docs_drift.sh:316-317`이 '사람이 맞추는 대신 코드에서 뽑아 대조한다'고 적은 것과도 어긋난다 — 그 대조가 실제로는 한 파일에만 걸려 있기 때문이다.",
+  "fix": "README와 CLAUDE.md에서는 리터럴을 빼고 `domain-spec-review`와 훅 파일을 가리키게 하거나, `test_docs_drift.sh:327`의 대조 대상에 README와 CLAUDE.md를 넣고 환경변수 이름도 훅에서 뽑아 산문과 맞댄다. `_spec_marker.sh:4-5`의 쌍 계약 지시는 검사로 대체됐음을 적는 문장으로 바꾼다.",
+  "lens": "ssot-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "README.md:40, CLAUDE.md:6, hooks/_spec_marker.sh:4-5, scripts/test_docs_drift.sh:316-331의 인용이 파일에 그대로 있고, CALLER는 skills/domain-spec-review/SKILL.md 하나뿐이라 마커 대조가 README·CLAUDE.md에 걸리지 않는 것도 사실이다. 환경변수 이름은 훅 넷과 README·SKILL.md에 리터럴로 있으며 test_hooks.sh가 동작만 검사할 뿐 문서와 코드의 이름을 맞대는 검사는 어디에도 없어 반증을 찾지 못했다.",
+   "인용 증거가 모두 실재한다 — README.md:40이 마커 리터럴·환경변수 이름·경로를 다시 적으면서 domain-spec-review를 정본이라 선언하고, test_docs_drift.sh:327의 대조 루프는 `$CALLER`(domain-spec-review) 한 파일뿐이며, `DISCIPLINED_CODER_REVIEW_GATE`는 test_hooks.sh가 훅 동작만 재고 어느 검사도 산문과 맞대지 않는다(훅 넷에서 이름을 바꾸면 test_hooks는 실패하지만 README·SKILL.md는 옛 값으로 남는다). 이 레포가 SSOT를 운용하는 기준은 \"산문 복제는 코드에서 뽑아 대조할 때만 캐시로 허용\"(test_docs_drift.sh:6·316-317, 잠금 상수 검사 482-487)인데 README 사본은 그 대조 밖에 있고, `_spec_marker.sh:4-5`의 '함께 갱신한다(쌍 계약)' 지시는 검사가 대체했다고 적은 316-317과 정면으로 어긋나므로 정당한 설계 선택으로 볼 수 없다. 2026-09-01 회차가 README에 게이트 설명을 넣으라고 처방한 것은 사실이지만 대조 없이 넣으라는 뜻은 아니었고, 고침(루프에 README 추가·환경변수 이름을 훅에서 뽑아 대조·주석 정정)은 몇 줄로 끝나 비용 대비 이득이 분명하다. CLAUDE.md:6의 경로 사본은 superpowers 관례라 약한 부분이나 발견의 핵심(README 리터럴과 검사 범위)은 유지된다."
+  ]
+ },
+ {
+  "title": "자기감사 워크플로가 렌즈 산출물 계약을 `meta-aggregate`와 다른 두 번째 스키마로 다시 정의해, `read`·`principles_applied`·`notes`가 렌즈 리턴에서 사라진다.",
+  "file": ".claude/workflows/self-audit.js:18-40 (짝: skills/meta-aggregate/SKILL.md:20-31 · skills/domain-docs/SKILL.md:113)",
+  "evidence": ".claude/workflows/self-audit.js:26-32 — `title … file … evidence … principle … consequence … detail … fix` / .claude/workflows/self-audit.js:114 — `agent(r.prompt, { label: r.key, phase: '리뷰', schema: FINDINGS_SCHEMA })` / skills/meta-aggregate/SKILL.md:20 — `## 리뷰 산출물 계약 (렌즈 공통 — 여기가 SSOT)` 와 그 스키마 `\"read\": […], \"issues\": [ { \"where\", \"type\", \"claim\", \"consequence\", \"evidence\" } ], \"principles_applied\": […], \"notes\": \"\"` / skills/domain-docs/SKILL.md:113 — `**리턴 JSON에 \\`principles_applied\\`를 요구한다.**` (self-audit.js에 `principles_applied`·`\"read\"`·`notes`·`where`는 grep으로 한 건도 없다)",
+  "principle": "SSOT",
+  "consequence": "렌즈 프롬프트는 `lens-*/SKILL.md 를 읽고 그대로 적용하라`고 시켜 렌즈가 공통 계약대로 `read`와 `notes`를 채우려 하지만 구조화 리턴 스키마가 그 필드를 받지 않아 버려진다. 그래서 자기감사에서는 렌즈가 정본을 읽었는지(`principles_applied`)와 더 확인할 것(`notes`)을 알 길이 없고, 계약을 바꾸면 워크플로 스키마는 따라오지 않는다.",
+  "detail": "`meta-aggregate`는 렌즈 공통 산출물 계약의 SSOT라고 선언하고 여섯 렌즈 파일은 그 스키마를 가리키기만 한다. `self-audit.js`는 같은 렌즈를 띄우면서 필드 이름과 집합이 다른 스키마를 코드에 박아 두어 한 계약이 두 곳에서 권위를 갖는다. 워크플로가 결과를 집계할 때 `meta-aggregate` 방식을 쓰라고 지시하면서 정작 입력 형태는 그 계약이 아니라는 모순도 생긴다.",
+  "fix": "`FINDINGS_SCHEMA`를 `meta-aggregate`의 계약(`read`·`issues[where,type,claim,consequence,evidence]`·`principles_applied`·`notes`)으로 맞추고 자기감사 전용 필드(`principle`·`fix`)는 그 위에 더하는 확장으로 두어 공통 부분이 한 곳에서만 정의되게 한다.",
+  "lens": "ssot-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 셋이 모두 원본에 그대로 있고, self-audit.js에는 principles_applied·read·notes·where가 한 건도 없어 meta-aggregate가 SSOT라 선언한 계약과 다른 스키마로 lens-* 셋의 리턴을 받는 것이 사실이다. meta-aggregate의 확장 허용 조항과 워크플로 조항은 공통 필드를 빼는 예외가 아니므로 반증이 되지 않는다.",
+   "SSOT의 정의(\"하나의 사실은 한 곳에만 권위 있게 둔다\")에 그대로 걸린다 — meta-aggregate:19가 렌즈 산출물 계약의 SSOT를 자임하는데 self-audit.js:18-39는 같은 계약을 필드 집합이 다른 스키마로 다시 정의하고, 런타임에는 구조화 리턴 스키마가 이기므로 렌즈가 SKILL.md대로 채운 `read`·`principles_applied`·`notes`가 실제로 버려진다. 예외도 성립하지 않는다 — meta-aggregate:56의 \"자기 필드를 더할 수 있다\"는 추가 허용이지 대체 허용이 아니고, :45는 워크플로 호출자에게도 세 걸음(`where`·`source` 전제)을 따르라 하며, domain-docs:113·project-doc-audit:54는 Claude 서브에이전트 렌즈에 `principles_applied`를 요구한다고 못 박았고 2026-08-30 회차에서 사용자가 self-audit.js를 project-doc-audit 절차의 실행체로 정했다. 고치면 정본 도달 흔적(`principles_applied`·`read`)과 후속 확인 요청(`notes`)이 관측 가능해지고 집계 프롬프트가 요구하는 입력 형태와도 맞아 실질 이득이 있으며, 하위 단계가 쓰는 `principle`은 확장 필드로 남기면 되어 비용도 감당할 만하다."
+  ]
+ },
+ {
+  "title": "두 spec 훅이 같은 안내문을 각자 문자열로 갖고 있고, 드리프트 검사는 그 문구가 두 곳에 있기를 요구해 베끼기를 강제한다.",
+  "file": "hooks/spec_review_posttooluse.sh:22 (짝: hooks/spec_review_stop.sh:58 · scripts/test_docs_drift.sh:78-79)",
+  "evidence": "hooks/spec_review_posttooluse.sh:22 — `… 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영하라.` / hooks/spec_review_stop.sh:58 — `… 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영한 뒤 종료하라.` / scripts/test_docs_drift.sh:78-79 — `check \"PostToolUse 안내문이 마커 선기록을 지시한다\" \"grep -qF '마커를 먼저 남기고' …\"` `check \"Stop 안내문이 마커 선기록을 지시한다\" \"grep -qF '마커를 먼저 남기고' …\"`",
+  "principle": "SSOT",
+  "consequence": "절차 문안(예: 마커 값이 늘거나 PREP 지시가 바뀔 때)을 한 훅에서만 고치면 세션이 PostToolUse에서 받는 지시와 Stop에서 받는 지시가 달라지고, 검사는 고정 문구 하나만 찾으므로 그 밖의 문장이 갈린 것은 통과시킨다.",
+  "detail": "두 훅은 이미 `_spec_marker.sh`와 `_json_escape.sh`를 source하며 마커 판정을 한 곳에 모았는데, 세션에 보내는 지시문만은 각자 들고 있다. `project-doc-audit`의 「뿌리 찾기」는 '계약 테스트가 같은 문구가 두 곳에 있는가를 요구하면 그 검사는 베끼기를 강제한다'고 이 모양을 뿌리로 지목하는데, 이 레포의 자기 검사가 바로 그 모양이다.",
+  "fix": "안내문 본문을 `_spec_marker.sh`의 변수(예: `SPEC_REVIEW_INSTRUCTION`)로 올리고 두 훅이 앞뒤 문장만 붙이게 한 뒤, `test_docs_drift.sh:78-79`는 그 변수 하나를 검사하게 바꾼다.",
+  "lens": "ssot-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 셋(hooks/spec_review_posttooluse.sh:22, hooks/spec_review_stop.sh:58, scripts/test_docs_drift.sh:78-79)이 파일에 글자 그대로 있고, 두 훅이 _spec_marker.sh·_json_escape.sh를 source하는 것과 project-doc-audit/SKILL.md:89의 「같은 문구가 두 곳에 있는가」 문장도 확인됐다. 반증은 없고 오히려 보강 증거가 있다 — _spec_marker.sh 머리말이 훅 안내문을 손으로 함께 갱신하라는 「쌍 계약」이라 스스로 적고, plans/2026-08-16-review-layer-redesign.md:430·437에는 두 문자열이 이미 한 번 갈렸던 흔적(한쪽만 \"HTML 주석\")이 남아 있어 발견이 말한 드리프트가 실제로 일어났었다. 두 안내문이 앞뒤 문장은 다르지만 발견의 fix가 그 차이를 전제하므로 기술은 정확하다.",
+   "SSOT 정의의 마지막 문장(\"사람이 두 곳을 손으로 맞추게 만드는 순간 둘은 어긋난다\")에 정면으로 걸린다 — `_spec_marker.sh:4-5`가 훅 안내문을 \"규약 변경 시 함께 갱신한다(쌍 계약)\"라고 손 동기화를 지시하고, `test_docs_drift.sh:316`은 같은 '쌍 계약'을 없앨 대상으로 적어 놓고도 SKILL.md 쪽만 코드 리터럴과 대조하며 두 훅의 `passed 또는 escalated` 산문은 어느 검사도 붙들지 않는다. 또 78-79행이 각 훅 파일에서 고정 문구를 grep하므로 `_spec_marker.sh` 변수로 올리는 SSOT 수정 자체가 검사에 막히는 모양이고(project-doc-audit의 「검사의 모양」 뿌리 그대로), 두 훅이 이미 그 파일을 source하고 있어 고치는 비용은 작으며 fb896d7이 실제로 같은 문안을 두 훅에 따로 손댄 이력이 있어 이득도 실재한다."
+  ]
+ },
+ {
+  "title": "마켓플레이스 autoUpdate를 켤 때 지키는 규칙이 스크립트 머리말과 `domain-plugin`과 README 세 곳에 각각 적혀 있고 개수부터 서로 다르다.",
+  "file": "scripts/_ensure_autoupdate.sh:4-9 (짝: skills/domain-plugin/SKILL.md:15-24 · README.md:41)",
+  "evidence": "scripts/_ensure_autoupdate.sh:4 — `# 규칙 넷을 지킨다.` (1) 우리 항목만 2) 키가 없을 때만 3) 사본과 재파싱 4) 사유를 갈라 알림 + 파이썬만) / skills/domain-plugin/SKILL.md:15-22 — `## 사용자 설정 파일을 고칠 때 지킬 것` 아래 불릿 여섯(`대상 좁히기`·`사용자 결정 존중`·`사본과 재검증`·`사유를 가른 통지`·`처리기 하나`·`서식 변경 고지`) / README.md:41 — `키가 없을 때만 넣고, 사용자가 \\`false\\`로 둔 것은 그대로 두며, 사본(\\`.bak\\`)을 남기고 … 규칙은 \\`scripts/_ensure_autoupdate.sh\\`가 정본이다.`",
+  "principle": "SSOT",
+  "consequence": "규칙을 하나 더하거나 빼면(예: 서식 변경 고지를 없애거나 node 폴백을 허용하면) 세 곳 가운데 어느 하나만 바뀌어 스크립트가 하는 일과 `domain-plugin`이 다른 플러그인에 처방하는 일과 README가 사용자에게 약속하는 일이 갈라진다. 이 세 곳을 맞대는 검사는 `test_docs_drift.sh`에 없다.",
+  "detail": "README는 스크립트를 정본이라 선언하면서 규칙 셋을 다시 적고, `domain-plugin`은 같은 규칙을 일반 처방으로 여섯 불릿에 다시 적으며 스크립트를 사례로만 든다. 스크립트 머리말은 '넷'이라 세고 `domain-plugin`은 여섯이라 이미 세는 값이 다르다. 두 문서 모두 규칙의 전체 목록을 담아 어느 쪽을 읽어도 권위 있는 목록으로 보인다.",
+  "fix": "`domain-plugin`을 규칙의 소유자로 두고 스크립트 머리말은 '규칙은 domain-plugin의 「사용자 설정 파일을 고칠 때 지킬 것」이 정본이다'로 줄이거나, 반대로 스크립트를 소유자로 두고 `domain-plugin`은 절 이름으로 가리키기만 한다. README는 규칙을 다시 적지 말고 소유자를 가리킨다.",
+  "lens": "ssot-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용이 모두 실제 파일에 그대로 있다 — `scripts/_ensure_autoupdate.sh:4`는 \"규칙 넷\"을 세며 파이썬 단일 처리기는 4)에 묶고 서식 변경 고지는 번호 밖 10-11행에 두고, `skills/domain-plugin/SKILL.md:18-23`은 같은 내용을 여섯 불릿으로 다시 적으며, `README.md:41`은 스크립트를 정본이라 선언하면서 규칙 셋을 다시 적는다. `scripts/test_docs_drift.sh`에는 autoUpdate·domain-plugin 관련 검사가 없고 `test_scaffold.sh`는 동작만 검사하므로 세 문서를 맞대는 장치가 없다는 주장도 맞다.",
+   "스크립트 머리말(scripts/_ensure_autoupdate.sh:4-11)과 domain-plugin(SKILL.md:18-23)이 같은 여섯 규칙을 같은 근거 문구(\"한 번도 안 도는 사본\")까지 각각 전체로 적고 서로를 소유자로 가리키지 않으며, README만 스크립트를 정본이라 부르니 소유권 표시가 세 곳에서 갈린다 — SSOT 정의(\"복제하지 말고 참조하거나 도출한다\")에 예외 조항이 없고, 이 레포는 2026-08-25 회차에서 같은 꼴(회차 수 규칙 복제)을 소유자 하나로 정리한 선례가 있다. 다만 '개수가 다르다'는 대목은 과장이다: 스크립트 머리말은 번호를 넷만 붙였을 뿐 파이썬 단일 처리기와 서식 변경 고지까지 여섯을 다 담고 있어 내용 드리프트는 아직 없고 라벨('넷'·08-25 기록의 '다섯'·현재 '여섯')만 어긋난 상태라, 고치면 얻는 것은 앞으로의 드리프트 방지이지 지금의 모순 해소는 아니다."
+  ]
+ },
+ {
+  "title": "scaffold.sh는 프로젝트 CLAUDE.md와 전역 CLAUDE.md가 같은 파일인지 문자열로만 비교해서, 작업 폴더가 ~/.claude이면 매 세션 전역 관리블록을 걷어냈다가 다시 넣고 사본을 하나씩 쌓는다.",
+  "file": "scripts/scaffold.sh:480",
+  "evidence": "if [ -f \"$PCLAUDE\" ] && [ \"$PCLAUDE\" != \"$UC\" ]; then  (같은 파일 안 28행은 `[ \"$src\" -ef \"$dst\" ]`로 실제 동일 파일을 비교한다)",
+  "principle": "IDEMPOTENT · MEASURE-FIRST",
+  "consequence": "실측으로 재현했다 — CLAUDE_PROJECT_DIR을 Windows 형식 경로(C:\\...\\.claude)로 주고 세 번 돌리자 backups 폴더에 CLAUDE.md..claude.*.bak 이 세 개 쌓였고, 관리블록이 먼저 걷혀 had_import가 0이 되므로 매 세션 정본 전문이 stdout으로 다시 실렸으며, \"옛 관리블록을 걷어냈다\"는 알림이 매번 떴다. 같은 파일에 세 번 돌리면 같은 결과여야 하는데 세션 수만큼 사본과 알림이 는다.",
+  "detail": "훅이 받는 CLAUDE_PROJECT_DIR은 Windows 형식(백슬래시·드라이브 문자)이고 UC는 cygpath를 거친 POSIX 형식이라 같은 파일이어도 문자열은 다르다. 실제로 `[ \"$W/CLAUDE.md\" = \"$H/.claude/CLAUDE.md\" ]`는 거짓, `-ef`는 참으로 나왔다. 주석(44~45행)은 \"전역 CLAUDE.md와 같은 파일이면 건너뛴다\"고 약속하지만 코드는 그 약속을 이름 비교로만 지킨다. 사용자가 ~/.claude 에서 claude 를 열어 설정을 손보는 일은 드물지 않다.",
+  "fix": "28행과 같은 방식으로 `{ [ \"$PCLAUDE\" = \"$UC\" ] || [ \"$PCLAUDE\" -ef \"$UC\" ]; }`로 판정하고, test_scaffold.sh에 Windows 형식 프로젝트 경로로 전역 폴더를 가리키는 회귀 검사를 더한다.",
+  "lens": "shell-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "scripts/scaffold.sh 51행에 인용문 `if [ -f \"$PCLAUDE\" ] && [ \"$PCLAUDE\" != \"$UC\" ]; then`이 그대로 있고 28행은 `-ef`로 실제 파일을 비교하며, CLAUDE_HOME_DIR을 POSIX로·CLAUDE_PROJECT_DIR을 같은 폴더의 Windows 형식으로 주고 세 번 돌리자 문자열 비교는 거짓·-ef는 참으로 나왔고 backups에 .bak이 회차마다 쌓이며 매번 정본 전문(81줄)과 🔴 걷어냄 알림이 stdout에 다시 실렸다. 다만 발견의 위치 표기 \":480\"은 틀렸다 — 파일은 117줄이고 해당 줄은 51행이다.",
+   "직접 재현했다 — CLAUDE_PROJECT_DIR을 Windows 형식으로 주고 전역 .claude 폴더를 가리키게 하니 여섯 번 실행에 backups에 .bak 다섯 개가 쌓였고 매 회 정본 80줄이 stdout으로 다시 실렸으며 \"옛 관리블록을 걷어냈다\" 알림이 매번 떴다. 같은 폴더를 POSIX 형식으로 주면 두 번째부터 stdout 0줄·사본 0개로 멱등하므로 원인은 51행의 문자열 비교이고, 같은 파일 28행은 이미 `-ef`를 쓰며 44~45행 주석은 \"같은 파일이면 건너뛴다\"를 약속하고 있어 IDEMPOTENT의 예외 조항이나 설계 선택으로 볼 여지가 없다. 고치는 비용은 판정 한 줄과 회귀 검사 하나이며, 이득은 세션마다 정본 이중 적재·무한히 쌓이는 사본·거짓 알림이 사라지는 것이라 실질적이다."
+  ]
+ },
+ {
+  "title": "test_scaffold.sh에는 픽스처를 세우고 스캐폴드를 돌리지만 결과를 한 번도 단언하지 않는 블록이 넷 남아 있고, test_assertions.sh는 그것을 잡지 못한 채 초록이다.",
+  "file": "scripts/test_scaffold.sh:680",
+  "evidence": "680-681행 `NUDGE='형식 규칙 서술이 현행과 다르다'` `LOGTITLE='해결된 문제 로그 (solved_problems)'` / 683-685행 `HR1=...; OUTR1=\"$(run \"$HR1\" \"$PR1\")\"` / 698-709행 `(거) ... BEFORE14=\"$(cksum < \"$LOG14\")\"; OUTR14=\"$(run \"$HR14\" \"$PR14\")\"` / 719-727행 `# --- pairing: 색인 줄 수와 본문 파일 수를 맞댄다 --- ... OUTP1=\"$(run \"$HP1\" \"$PP1\")\"` — grep 결과 NUDGE·LOGTITLE·OUTR1·OUTR14·BEFORE14·OUTP1 참조 0건. `bash scripts/test_assertions.sh` → PASS=8 FAIL=0",
+  "principle": "TDD · SURGICAL",
+  "consequence": "solved_problems 오답노트 기능을 걷어낼 때 단언만 지우고 픽스처를 남긴 자리들이다. 읽는 사람은 '(거) 머리말 사유 구분'과 'pairing 색인 대조'가 검사되고 있다고 믿지만 코드는 아무것도 재지 않는다. test_assertions.sh 는 `echo \"[\"` 머리와 `# ---` 구획만 보는데, (가)·(거)는 `# (가)` 형태라 머리로 안 잡히고, `# --- pairing` 구획은 뒤에 붙은 무관한 `[stale-keep]`·`[count]` 머리가 h·n을 채워 고아로 안 잡힌다. 검사가 잡겠다고 선언한 결함이 검사 바로 옆에 살아 있다.",
+  "detail": "test_assertions.sh 머리말은 '삭제된 기능의 검사를 걷을 때 이 껍데기가 남았다'고 적고 그것을 막는 것이 목적이라고 밝힌다. 그런데 걷힌 기능(solved_problems)의 껍데기가 정확히 그 형태로 남아 있고, 검사의 두 휴리스틱 사이 틈에 놓여 초록이다. 죽은 코드를 지우지 않겠다면 SURGICAL 이 요구하는 대로 표시라도 있어야 하는데 표시도 없다.",
+  "fix": "네 블록과 두 상수를 지우거나 `# (제거됨)` 표시로 바꾸고, test_assertions.sh 에 '값을 받은 뒤 한 번도 읽히지 않는 OUT*/ERR* 변수' 를 잡는 검사를 더한다.",
+  "lens": "shell-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용된 상수와 변수(NUDGE·LOGTITLE·OUTR1·OUTR14·BEFORE14·OUTP1)는 파일에 그대로 있고 grep 결과 대입 외 참조가 0건이며, test_assertions.sh는 PASS=8 FAIL=0으로 초록이고 두 휴리스틱이 왜 못 잡는지의 설명도 코드와 일치한다. 앞 두 인용의 행 번호(680-685)는 실제 618-623으로 어긋나지만 내용은 정확하다.",
+   "실측으로 확인했다. scripts/test_scaffold.sh 에서 NUDGE·LOGTITLE(618-619행)은 정의만 되고 참조 0건, OUTR1(623행)·BEFORE14·OUTR14(708-709행)·OUTP1(727행)은 값을 받은 뒤 한 번도 읽히지 않으며, (거)와 `# --- pairing` 블록은 픽스처를 세우고 스캐폴드를 돌리지만 check 호출이 없다. 이 기능(solved_problems)은 _scaffold_common.sh 의 SCAFFOLD_STALE 에 올라 이미 걷힌 것이라 정당한 설계 선택으로 볼 여지가 없고, (거) 주석은 \"사유를 가려 알린다\"는 현행에 없는 계약을 서술해 읽는 사람을 잘못 이끈다. test_assertions.sh 는 `echo \"[\"` 머리와 `# ---` 구획 두 휴리스틱만 보므로 이 블록들이 뒤따르는 무관한 [stale]·[stale-keep] 머리에 가려 PASS=8 FAIL=0 으로 초록이며, 그 스크립트 머리말이 막겠다고 밝힌 결함이 그대로 살아 있다. TDD(실행 증거 없는 초록)와 SURGICAL(죽은 코드는 표시한다)의 실제 정의에 비추어 위반이 맞고, 지우거나 표시하면 오도하는 계약 서술과 불필요한 스캐폴드 실행 셋이 사라지므로 실질 이득이 있다."
+  ]
+ },
+ {
+  "title": "_scaffold_common.sh에는 호출자가 없는 함수와 사라진 상수를 설명하는 주석이 남아 있고, 테스트도 존재하지 않는 상수 이름을 근거로 삼는다.",
+  "file": "scripts/_scaffold_common.sh:81",
+  "evidence": "_scaffold_common.sh:81 `scaffold_names_only_in_first() {` — scripts·hooks·skills 전체에서 호출 0건 / 66행 `scaffold_count_matches()` — 호출은 test_scaffold.sh:715-717 뿐 / 16-22행 `# 쪼개진 로그(색인 + 본문 폴더)의 형식 규칙 블록. ... # 쪼개진 로그임을 알아보는 표. 규칙 블록의 마지막 줄에서 뽑아 온다` 아래에 코드 없음 / test_scaffold.sh:616 `# 픽스처는 상수(SCAFFOLD_SOLVED_RULES)에서 만들지 않고` — 그 상수는 어디에도 없음",
+  "principle": "SURGICAL · EXPLICIT",
+  "consequence": "scaffold_names_only_in_first 는 프로덕션 경로에서 절대 돌지 않는데 정본 정책 파일 안에 정의로만 살아 있고, scaffold_count_matches 는 테스트가 초록을 유지해 주기 때문에 '쓰이는 함수'처럼 보인다. 16-22행 주석은 SCAFFOLD_SOLVED_RULES 를 설명하지만 그 상수는 지워졌고 주석만 남아 읽는 사람에게 없는 규칙 블록을 찾게 만든다. SURGICAL 은 죽은 코드를 지우지 말고 표시하라고 하는데 표시가 없다.",
+  "detail": "solved_problems 로그를 STALE 로 옮기며 소비자는 걷어냈지만 헬퍼와 주석은 남았다. 정책 정본(SSOT)이라 선언한 파일에 쓰이지 않는 코드가 있으면 정책이 무엇인지 코드에서 도출할 수 없게 된다 — MEASURE-FIRST 로 코드를 읽는 사람이 '색인 대조가 아직 돈다'고 오판한다.",
+  "fix": "두 함수와 16-22행 주석에 `# (제거됨) — solved_problems 걷어냄과 함께 소비자가 사라졌다` 표시를 달거나 지우고, 715-717행의 검사도 함께 처분한다. test_scaffold.sh:616 의 상수 이름을 현재 코드에 있는 것으로 고친다.",
+  "lens": "shell-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용된 줄 번호와 문자열이 scripts/_scaffold_common.sh:16-22·66·81과 scripts/test_scaffold.sh:616·715-717에 그대로 있고, 레포 전체 grep에서 scaffold_names_only_in_first는 정의 말고 호출이 없으며 scaffold_count_matches는 테스트 세 줄만 부르고, SCAFFOLD_SOLVED_RULES 상수는 코드 어디에도 없으며 제거 표시도 없다. 2026-08-31·09-01 자가 감사 기록이 같은 항목을 이미 확정한 것도 확인했다.",
+   "grep 전수로 scaffold_names_only_in_first 호출 0건, scaffold_count_matches 호출은 test_scaffold.sh:715-717 뿐, SCAFFOLD_SOLVED_RULES 상수는 어떤 .sh에도 없고 16-22행 주석 아래 코드가 없음을 확인했다. 그 기능(쪼갠 solved_problems)은 SCAFFOLD_STALE에 이름이 올라 되돌려졌으므로 앞을 내다본 API라는 방어가 서지 않고, SURGICAL이 요구하는 죽은 코드 표시가 없으며 2026-09-01 감사가 확정한 뒤에도 f301689가 이 파일을 건드리지 않아 여전히 열려 있다."
+  ]
+ },
+ {
+  "title": "파이썬 인터프리터를 고르는 규칙이 _json_valid.sh 한 곳에 있는데도 테스트 셋이 각자 다른 방식으로 고르고, 한 곳은 폴백 없이 `python` 을 그대로 부른다.",
+  "file": "scripts/test_hooks.sh:216",
+  "evidence": "test_hooks.sh:150 `. \"$HERE/scripts/_json_valid.sh\"` 뒤 166행은 `json_valid_stdin` 을 쓰지만 216행은 `| python -c 'import json,sys; json.load(sys.stdin)'` / test_scaffold.sh:112 `MKTE=\"$(python -c 'import json,io,sys; print(...[\"name\"])' ...)\"` (같은 값을 47행은 `grep -o '\"name\"...' | head -1 | cut` 로 MKT 에 따로 뽑는다) / test_scaffold.sh:42-43 과 test_docs_drift.sh:463 은 각자 python3→python 을 고른다",
+  "principle": "SSOT · EXPLICIT",
+  "consequence": "_json_valid.sh 는 '이 PC의 python3는 Windows Store 스텁이라 python·node로 폴백한다'고 이유까지 적은 정본이다. 그런데 test_hooks.sh:216 은 그 헬퍼를 source 해 놓고도 옆에서 맨 `python` 을 부르고, test_scaffold.sh:112 는 `set -e` 아래에서 폴백 없이 `python` 을 불러 python3 만 있는 환경(CI ubuntu 등)이면 검사 전체가 그 줄에서 죽는다. 같은 마켓플레이스 이름을 MKT(grep)와 MKTE(python) 두 경로로 뽑아 하나가 틀려도 다른 하나는 초록이다.",
+  "detail": "인터프리터 선택이 네 가지 사본으로 흩어져 있어 한 곳을 고치면 나머지가 갈라진다. 47행의 grep 방식은 marketplace.json 에서 첫 번째 \"name\" 을 집는데, 그것이 마켓플레이스 이름인지 owner.name 인지는 키 순서에 달렸다.",
+  "fix": "_json_valid.sh 에 `json_field <파일> <키>` 같은 읽기 헬퍼를 하나 두고 MKT·MKTE·216행이 그것을 쓰게 한다. 맨 `python` 호출은 `json_valid_stdin` 으로 바꾼다.",
+  "lens": "shell-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용한 증거가 모두 실제 파일에 그대로 있다 — _json_valid.sh:3은 Windows Store 스텁 때문에 python·node로 폴백한다고 적었고, test_hooks.sh는 150행에서 그 헬퍼를 source하고 166·174행은 json_valid_stdin을 쓰면서 216행은 맨 `python -c`를 부르며, test_scaffold.sh는 3행 `set -euo pipefail` 아래 112행에서 폴백 없이 `python`을 불러 MKTE를 뽑고 47행은 같은 값을 grep으로 MKT에 따로 뽑는다(marketplace.json에서 \"name\"이 owner.name보다 먼저 와서 지금은 맞지만 키 순서에 의존한다). test_scaffold.sh:42-43과 test_docs_drift.sh:463은 각자 python3→python을 고르고, scripts/_ensure_autoupdate.sh:65-68에 같은 선택이 하나 더 있어 발견을 약화하기보다 보강한다. 반증은 찾지 못했다.",
+   "코드로 확인했다 — test_hooks.sh는 150행에서 _json_valid.sh를 source하고도 216행에서 맨 `python`을 부르고, test_scaffold.sh는 42-43행에 python3→python 폴백을 두고도 112행은 `set -e` 아래에서 폴백 없이 `python`을 불러 python3만 있는 환경(stock macOS·python-is-python3 없는 Debian)이면 그 줄에서 스크립트가 죽으며, 47행 grep 방식은 marketplace.json의 키 순서(지금은 최상위 \"name\"이 owner.name보다 앞이라 우연히 맞음)에 기대는 두 번째 추출 경로라 SSOT 정의(\"사람이 두 곳을 손으로 맞추게 만드는 순간 둘은 어긋난다\")에 그대로 걸리고, 실제로 _json_valid.sh만 node 폴백을 갖는 등 사본들이 이미 갈라져 있다. 다만 \"CI ubuntu에서 죽는다\"는 결과 부분은 확인되지 않았다 — 최근 CI 로그에서 test_hooks.sh·test_scaffold.sh는 test_docs_drift.sh 실패 뒤 아예 실행되지 않아(별개 결함) 러너에 `python`이 있는지 증거가 없으므로, 결과는 \"python이 없는 환경이면\"으로 좁혀 적어야 한다."
+  ]
+ },
+ {
+  "title": "spec_review_stop.sh 는 git 명령이 어떤 이유로 실패하든 아무 신호 없이 게이트를 연다 — 문서화된 FAIL-OPEN 범위(git 부재·디렉터리 부재)보다 넓다.",
+  "file": "hooks/spec_review_stop.sh:17",
+  "evidence": "5행 `# 순수 bash(jq 비의존). git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).` / 17행 `git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0` / 23-24행 `_root=\"$(git rev-parse --show-toplevel 2>/dev/null || true)\"; [ -n \"$_root\" ] || exit 0` / 39행 `done < <(git status -z ... 2>/dev/null)` / 52행 `git diff-tree ... 2>/dev/null || true` — 비-git cwd 로 실행하면 stdout·stderr 모두 0바이트, rc=0",
+  "principle": "FAIL-LOUD",
+  "consequence": "safe.directory 위반(dubious ownership — 네트워크 드라이브·다른 계정이 만든 워크트리에서 흔하다)·손상된 인덱스·권한 문제로 git 이 실패하면 미리뷰 spec 이 있어도 종료가 그대로 통과되고, 게이트가 열렸다는 사실을 알 길이 없다. 18-22행 주석이 '게이트가 꺼진 것을 알아챌 방법이 없는 조용한 실패' 를 고쳤다고 적었지만 같은 모양의 구멍이 그 바로 아래 남아 있다.",
+  "detail": "FAIL-OPEN 자체는 작업불능을 막으려는 결정이라 정당하다. 그러나 정본은 '절차에서는 사용자에게 알리고 계속 가는 것' 을 FAIL-LOUD 로 정한다. 지금은 알리지 않고 계속 간다. 2>/dev/null 로 git 의 오류 문구까지 버리므로 사후 진단도 안 된다.",
+  "fix": "git 실패 갈래에서 `{\"systemMessage\":\"disciplined-coder: git 을 읽지 못해 spec 리뷰 게이트를 검사하지 못했다 — <오류 첫 줄>\"}` 을 stdout 으로 내고 exit 0 한다. test_hooks.sh 의 non-git 검사를 '빈 출력' 이 아니라 '차단 없음 + 알림 있음' 으로 바꾼다.",
+  "lens": "shell-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용한 5·17·23-25·39·52행과 18-22행 주석이 파일에 그대로 있고, 미리뷰 spec이 있는 임시 레포에서 실제 git은 block을 내지만 exit 128로 실패하는 대체 git을 PATH에 두면 rc=0에 stdout·stderr 모두 0바이트로 통과되어 재현됐다. test_hooks.sh:86도 non-git 경우를 빈 출력으로 확인하고 있어 발견 기술과 일치한다.",
+   "재현했다 — git 이 있고 저장소 디렉터리도 있는 임시 레포에서 index 를 손상시키자 `git status` 가 fatal 로 실패했는데 훅은 미리뷰 spec 을 두고도 stdout 0바이트·rc=0 으로 통과했다. 이는 5행 주석과 spec(2026-06-14 §6 \"경계 밖=커스텀 경로·비-git, 침묵이 아니라 알려진 한계\")이 정한 FAIL-OPEN 범위 밖이므로 정당한 설계 선택으로 덮이지 않고, 정본 FAIL-LOUD 의 \"오류를 잡아 놓고 아무 일 없던 것처럼 넘기지 않는다\"에 그대로 걸린다. 다만 제안된 수정을 그대로 쓰면 비-git 프로젝트에서 매 턴 알림이 떠 전역 훅 소음이 되므로, \"not a git repository\" 갈래는 지금처럼 조용히 두고 그 밖의 git 실패(dubious ownership·index 손상·status/diff-tree 비정상 종료)에만 systemMessage 를 내도록 좁혀야 실질 이득이 난다."
+  ]
+ },
+ {
+  "title": "홈 리다이렉트 함정을 막는 USERPROFILE 갈래는 어떤 테스트도 밟지 않아, 우선순위를 바꿔도 검사가 초록이다.",
+  "file": "scripts/_resolve_home.sh:20",
+  "evidence": "_resolve_home.sh:20-25 `elif [ -n \"${USERPROFILE:-}\" ]; then val=\"$(cygpath -u \"$USERPROFILE\" ...)/$sub\" ...` / test_scaffold.sh:181-184 `# AD 리다이렉트 홈(예: $HOME=U:\\ ...)` 이라 적어 두고 실제로는 `HOME=\"$HJUNK\" CLAUDE_CONFIG_DIR=\"$H9\" ... bash \"$SCAFFOLD\"` 로 CLAUDE_CONFIG_DIR 갈래만 돈다 — scripts/test_*.sh 에서 USERPROFILE 을 설정하는 검사 0건",
+  "principle": "TDD · MEASURE-FIRST",
+  "consequence": "도메인 PC 의 실제 조건은 CLAUDE_CONFIG_DIR 이 비어 있고 HOME 과 USERPROFILE 이 다른 상태다. 그 조건을 재현하는 검사가 없어서, 누군가 `$HOME` 갈래를 USERPROFILE 앞으로 올리거나 cygpath 호출을 빼도 home-resolution 검사는 그대로 통과한다. 그러면 @import 가 조용히 빠지는 원래 버그가 되살아나는데, 이 파일 4-5행이 바로 그 결과('조용히 누락된다')를 경고한다.",
+  "detail": "검사 주석은 USERPROFILE 갈림을 회귀 방지 대상으로 부르지만 단언은 CLAUDE_CONFIG_DIR 의 우선을 잰다. 재려는 것과 재는 것이 다르면 항진에 가깝다 — test_assertions.sh 머리말이 '사람이 본다' 고 넘긴 바로 그 부류다.",
+  "fix": "`HOME=\"$HJUNK\" USERPROFILE=\"$(cygpath -w \"$H9b\")\" CLAUDE_CONFIG_DIR= CLAUDE_HOME_DIR= ... bash \"$SCAFFOLD\"` 로 한 회차를 더 돌려 `$H9b/.claude/CLAUDE.md` 가 생기고 `$HJUNK/.claude` 는 안 생기는지 단언한다. cygpath 가 없는 환경에서는 그 검사를 건너뛴다고 알린다.",
+  "lens": "shell-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 증거가 파일에 그대로 있다 — _resolve_home.sh:20-25의 USERPROFILE 갈래와 test_scaffold.sh:181-184의 주석·호출이 일치하고, scripts/test_*.sh 어디에도 USERPROFILE을 설정하거나 지우는 검사가 없으며 run() 헬퍼는 항상 CLAUDE_HOME_DIR을 넣어 그 갈래에 도달하지 못한다. test_docs_drift.sh:274는 변수 이름을 grep으로 대조할 뿐 동작을 재지 않으므로 반증이 되지 않는다.",
+   "변이 검증으로 확인했다 — _resolve_home.sh 에서 USERPROFILE 갈래를 통째로 지운 사본에서 scripts/test_scaffold.sh 가 PASS=222 FAIL=0 으로 초록이고(`run()` 헬퍼와 home-resolution 블록 모두 CLAUDE_HOME_DIR·CLAUDE_CONFIG_DIR 로만 들어가며 USERPROFILE 을 설정하는 검사는 0건), 반면 발견이 제안한 검사(`HOME=junk USERPROFILE=<cygpath -w> CLAUDE_CONFIG_DIR= CLAUDE_HOME_DIR=`)는 원본에서 USERPROFILE/.claude/CLAUDE.md 생성·junk 미생성·note 1회를, 변이체에서 그 반대를 정확히 가른다. TDD 의 \"실행 증거 없이 됐다고 하지 않는다\" 에 비추어 회귀 방지라 적힌 블록이 그 갈래를 한 번도 실행하지 않는 것은 진짜 공백이고, 이 갈래가 막는 결과가 파일 4-5행이 경고하는 @import 조용한 누락이라 고치면 실질 이득이 있다; 예외 조항이나 정당한 설계 선택으로 볼 근거는 없다."
+  ]
+ },
+ {
+  "title": "정본의 원칙 목록은 라벨 괄호 안 말끝이 문장·명사구·부사구로 갈려 한 목록 안 말끝 통일 규칙을 스스로 어긴다.",
+  "file": "agent-principles.md:8-25",
+  "evidence": "line 8: `ASK-FORK` (모호하면 묻는다) / line 9: `CLEAR-COMM` (명료한 소통) / line 15: `MEASURE-FIRST` (측정 먼저) / line 16: `NAME-ITEMS` (이름으로 부른다) / line 24: `SURGICAL` (꼭 필요한 곳만)",
+  "principle": "PROSE-FORM — 한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다; 이름을 붙이는 곳은 명사구로 쓴다",
+  "consequence": "매 세션 모든 프로젝트에 주입되는 정본이 자기 목록에서 말끝을 섞고 있어, 이 목록을 본보기로 삼는 세션은 라벨 말끝을 섞어도 된다고 배우고 lens-readability는 정본과 어긋난 판정을 내게 된다.",
+  "detail": "열여덟 원칙의 라벨은 모두 `ID (한국어 이름)` 한 형태로 나열된 한 목록인데, 괄호 안이 '모호하면 묻는다'·'이름으로 부른다'처럼 문장인 항목과 '명료한 소통'·'단일 출처'처럼 명사구인 항목과 '측정 먼저'·'꼭 필요한 곳만'처럼 부사구 조각인 항목이 섞여 있다. 같은 문서 line 18의 PROSE-FORM 조항이 '이름을 붙이는 곳은 명사구로 쓰고' '한 목록 안에서는 말끝을 하나로 맞춘다'고 못 박고 있어, 규칙을 담은 그 목록이 규칙의 반례가 되어 있다.",
+  "fix": "괄호 안을 모두 명사구로 맞춘다 — '모호하면 묻기'·'이름으로 부르기'·'측정 우선'·'최소 범위 수정'처럼 고치고, 문장으로 담던 주장은 각 항목 본문 첫 문장이 이미 말하고 있으므로 라벨에서 뺀다.",
+  "lens": "clear-comm-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "정본 목록의 라벨 괄호가 '모호하면 묻는다'·'이름으로 부른다'(문장), '명료한 소통'·'명시성'(명사구), '측정 먼저'·'꼭 필요한 곳만'(부사구)로 갈리는 것은 커밋된 HEAD와 관리 사본과 지금 작업 트리 세 판본 모두에서 확인되고, HEAD의 PROSE-FORM은 '불릿 라벨'을 명사구 자리로 못 박고 '한 목록 안 말끝 통일'을 굵게 적고 있으며 writing-korean SKILL.md 106행은 '라벨은 라벨끼리 맞춘다'고 더 좁혀 적어 반증이 없다. 다만 인용한 행 번호는 지금 작업 트리와 어긋난다 — 작업 트리는 이 세션 중 동시 편집되어 9행이 CLEAR-COMM이 아니라 EXPLAIN-STRUCTURE(구조로 설명한다)이고 18행 PROSE-FORM에는 말끝 통일 문장이 없으며(상세는 writing-korean 참조로 넘김), 인용문 자체는 HEAD의 10~27행에 그대로 존재한다. 판정의 실체는 판본과 무관하게 성립한다.",
+   "writing-korean SKILL.md 103-108행이 '불릿 라벨'을 이름 붙이는 곳으로 명시하고 '라벨은 라벨끼리' 말끝을 맞추라고 적으며 예외 조항이 없는데, 정본 원칙 목록의 괄호 이름은 '모호하면 묻는다'(문장)·'명료한 소통'(명사구)·'측정 먼저'(부사구 조각)로 실제 갈려 있어 규칙의 문면 그대로 위반이다(HEAD 판과 미커밋 작업본 모두 해당하며 작업본의 '구조로 설명한다'도 같은 문제다). 모든 프로젝트에 주입되는 본보기 문서이고 라벨만 명사구로 바꾸면 되는 가역적 수정이라 고칠 이득이 비용을 넘는다."
+  ]
+ },
+ {
+  "title": "정본의 「검증」 절 제목은 주장을 그대로 담아 제목은 명사구로 쓰라는 자기 규칙을 어긴다.",
+  "file": "agent-principles.md:29",
+  "evidence": "## 검증 — LLM 단독 출력을 그대로 마치지 않는다",
+  "principle": "PROSE-FORM — 이름을 붙이는 곳은 명사구로 쓰고 주장은 본문으로 내린다",
+  "consequence": "제목이 주장을 겸하면 훑어 내려가며 절을 찾는 사람이 이름과 주장을 한 번에 읽어야 하고, 정본이 스스로 이 배치를 쓰고 있어 lens-readability가 다른 문서에서 같은 모양을 지적할 때 정본을 근거로 반박당한다.",
+  "detail": "같은 문서 line 18은 제목과 소제목이 이름을 붙이는 곳이라 명사구로 쓰고 주장은 본문으로 내리라고 정한다. 그런데 line 29의 제목은 '검증'이라는 이름 뒤에 'LLM 단독 출력을 그대로 마치지 않는다'라는 완결된 주장을 붙였다. 바로 아래 line 31 첫 문장 '설계 문서든 제품 출력이든 리스크에 비례해 리뷰를 더한다'가 이미 그 절의 결론을 말하고 있어, 제목의 주장은 본문과 중복되며 자리만 어긋나 있다.",
+  "fix": "제목을 '## 검증'으로 줄이고, 필요하면 첫 문장을 'LLM 단독 출력은 그대로 마치지 않고 리스크에 비례해 리뷰를 더한다'로 합친다.",
+  "lens": "clear-comm-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "D:\\projects\\disciplined-coder\\agent-principles.md line 29는 \"## 검증 — LLM 단독 출력을 그대로 마치지 않는다\"로 인용 그대로이고, line 18은 \"제목과 표 머리처럼 이름을 붙이는 위치에만 명사구로 쓰고, 주장은 본문에서 문장으로 한다\"라 규칙 인용도 실질이 맞으며(발견의 '제목과 소제목'은 전역 사본 문구를 옮긴 것이라 낱말만 다르다), line 31 첫 문장도 그대로 있고 skills/writing-korean/SKILL.md line 119-121이 '주장을 담은 제목의 이득을 첫 문장으로 옮겨 받는 배치'라고 못 박아 반증이 없다. 정본의 다른 ## 제목은 모두 명사구라 이 절만 예외인 점도 확인했다.",
+   "정본 line 18과 writing-korean line 103·119-121, lens-readability line 51이 모두 제목은 명사구로 달고 주장은 그 아래 첫 문장으로 내리라고 못 박으며 예외 조항이 없고, writing-korean은 주장을 담은 제목의 회상 이득을 알면서도 첫 문장으로 옮기는 배치를 택했다고 근거까지 적었다. 같은 문서의 다른 `##` 제목 다섯은 모두 명사구인데 line 29만 완결된 서술문을 붙였고, line 31 첫 문장이 이미 그 절의 결론을 말하므로 제목을 '## 검증'으로 줄여도 잃는 내용이 없어 고치면 정본이 자기 규칙과 맞아 실질 이득이 있다."
+  ]
+ },
+ {
+  "title": "PROSE-FORM 상세의 정본인 writing-korean이 자기 소제목 셋에 주장을 담아 제목-명사구 규칙을 어긴다.",
+  "file": "skills/writing-korean/SKILL.md:60",
+  "evidence": "line 60: ## 금지 표현 — 문자열로 거른다 / line 76: ## KO-SYNTAX — 구조가 어려움을 정한다 / line 90: ## PROSE-FORM — 완결된 문장으로 쓴다",
+  "principle": "PROSE-FORM — 이름을 붙이는 곳은 명사구로 쓰고 주장은 본문으로 내린다",
+  "consequence": "lens-readability가 판정하기 전에 반드시 여는 기준 문서가 그 기준의 반례를 소제목에 두고 있어, 렌즈가 '제목은 명사구'를 판정 축으로 쓸 때 기준 문서와 대상 문서 중 어느 쪽을 따를지 흔들리고 지적이 일관되지 않게 나온다.",
+  "detail": "이 파일은 line 103에서 '제목·소제목·불릿 라벨·표 머리·차트의 축과 범례·다이어그램 노드가 이름을 붙이는 곳이다'라고 적고 주장은 본문으로 내리라고 정한다. 그런데 같은 파일의 소제목 '금지 표현 — 문자열로 거른다'·'KO-SYNTAX — 구조가 어려움을 정한다'·'PROSE-FORM — 완결된 문장으로 쓴다'는 이름 뒤에 '~한다' 문장을 붙여 주장을 제목에 올렸다. 반면 line 110 '## READ-FLOW — 읽는 흐름'은 규칙대로 명사구라 한 문서 안에서도 소제목 형태가 갈린다.",
+  "fix": "세 소제목의 대시 뒤를 명사구로 바꾸거나 떼고('금지 표현', 'KO-SYNTAX — 문장 구조', 'PROSE-FORM — 완결된 문장'), 각 절 첫 문장이 이미 그 주장을 하고 있는지 확인해 없으면 첫 문장으로 내린다.",
+  "lens": "clear-comm-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "D:\\projects\\disciplined-coder\\skills\\writing-korean\\SKILL.md 60·76·90행이 인용 그대로 존재하고 세 소제목 모두 대시 뒤가 '~한다' 문장이다. 같은 파일 103행이 소제목을 명사구로 쓰고 주장은 본문으로 내리라고 정하며 119~121행은 그 이득을 제목이 아니라 첫 문장에서 받는 배치라고 못박고 있어 자기모순이 성립하고, 12·39·110행의 소제목은 명사구라 한 문서 안에서 형태가 갈린다는 기술도 정확하다. 반증은 찾지 못했다.",
+   "writing-korean 103행은 소제목을 이름 붙이는 곳으로 명시하고 119~121행은 주장을 제목에서 첫 문장으로 옮기는 배치를 근거까지 들어 정하는데, 60·76·90행 소제목은 대시 뒤에 '~한다' 주장을 올렸고 같은 파일의 나머지 소제목(낱말을 고르는 법 여섯·읽는 흐름·고칠 순서)은 명사구라 예외 조항이나 의도된 관례로 볼 근거가 없다. lens-readability가 판정 전에 여는 기준 문서 자체의 반례이므로 실질 위반이며, KO-SYNTAX 절은 첫 문장('길이는 정하지 못한다')이 제목의 주장에 기대고 있어 제목을 명사구로 바꾸면서 첫 문장에 주장을 내리는 수정이 필요하고 그 비용은 작다."
+  ]
+ },
+ {
+  "title": "domain-docs의 문서 타입 표는 '담는 것' 열에서 명사구 여섯과 절 하나가 섞여 같은 열 말끝 통일 규칙을 어긴다.",
+  "file": "skills/domain-docs/SKILL.md:53",
+  "evidence": "line 50: | **상태** (roadmap) | 진행 상태와 다음 단계 | / line 53: | **기록** (reviews) | 렌즈 회차가 무엇을 보고 무엇을 지적했는지 | / line 54: | **핸드오프** (HANDOFF-*) | 1회성 인계 |",
+  "principle": "PROSE-FORM — 한 표 안에서는 말끝을 하나로 맞춘다; 표 셀은 같은 열끼리 맞춘다",
+  "consequence": "한 칸만 '~했는지' 절이고 나머지가 명사구라 읽는 사람이 그 차이에 뜻이 있는지 되짚게 되고, 이 표가 정본의 문서·상태 위생 절의 상세 정본이라 다른 레포가 베낄 때 섞인 형태까지 함께 퍼진다.",
+  "detail": "'담는 것' 열의 일곱 칸 가운데 여섯은 '진행 상태와 다음 단계'·'수행 방법과 스키마 계약'·'설계 근거'·'1회성 인계'·'세션 간 결정과 맥락'·'문서의 위치와 작업 방법'처럼 명사구로 끝나는데, 기록 행만 '렌즈 회차가 무엇을 보고 무엇을 지적했는지'라는 의문 절로 끝난다. writing-korean line 106-108은 표 셀은 같은 열끼리 말끝을 맞추라고 정하고 '한 칸만 문장이고 나머지가 명사구면 읽는 사람이 그 차이에 뜻이 있는지 되짚는다'고 근거까지 적어 두었다.",
+  "fix": "기록 행의 칸을 '렌즈 회차의 관찰과 지적'처럼 명사구로 바꾼다.",
+  "lens": "clear-comm-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "skills/domain-docs/SKILL.md 50·53·54행의 인용이 파일과 글자 그대로 일치하고, '담는 것' 열 일곱 칸 가운데 기록 행만 '~무엇을 지적했는지' 절이며 나머지 여섯은 명사구로 끝난다. writing-korean SKILL.md 106-107행이 '표 셀은 같은 열끼리 맞춘다'고 정하고 있어 발견의 근거도 실재하며 반증은 찾지 못했다.",
+   "writing-korean 106-108행은 표 셀을 같은 열끼리 말끝을 맞추라고 정하고 \"한 칸만 문장이고 나머지가 명사구면\" 되짚게 된다고 근거까지 적었는데, '담는 것' 열은 여섯 칸이 명사구이고 기록 행만 '-했는지' 절로 끝나 그 사례에 정확히 해당한다. 다른 열(수명·막는 방법·장치)은 각각 열 안에서 말끝이 맞아 있어 이 칸이 의도된 설계 선택이 아니라 단발 이탈이고, 기록 행의 특수성은 58행 산문이 따로 설명하므로 절 형태에 실린 뜻이 없으며, '회차가 본 것과 지적한 것' 같은 명사구로 바꾸면 정보 손실 없이 한 칸 수정으로 끝난다."
+  ]
+ },
+ {
+  "title": "domain-plugin의 첫 목록은 문장 라벨 하나와 명사 라벨 셋이 섞여 한 목록 안 말끝 통일 규칙을 어긴다.",
+  "file": "skills/domain-plugin/SKILL.md:10",
+  "evidence": "line 10: - **활성 개발 중이면 version을 비운다** — / line 11: - **marketplace.json** — / line 12: - **validate** — / line 13: - **컴포넌트 위치** —",
+  "principle": "PROSE-FORM — 이름을 붙이는 곳은 명사구로 쓴다; 한 목록 안에서는 말끝을 하나로 맞춘다",
+  "consequence": "같은 목록에서 첫 항목만 라벨이 문장이라 읽는 사람이 그 항목만 다른 종류의 지시인지 되짚고, 라벨이 주장을 겸하면 본문 첫 문장과 역할이 겹쳐 어느 쪽이 결론인지 흐려진다.",
+  "detail": "「플러그인을 만들 때 지킬 것」 아래 네 불릿은 모두 `**라벨** — 본문` 형태인데, 첫 항목 라벨은 '활성 개발 중이면 version을 비운다'라는 조건절이 딸린 완결 문장이고 나머지 셋은 'marketplace.json'·'validate'·'컴포넌트 위치'라는 명사다. 같은 파일 line 18-23의 둘째 목록은 '대상 좁히기'·'사용자 결정 존중'·'처리기 하나'처럼 명사구로 통일되어 있어, 규칙을 아는 채로 첫 목록만 어긋난 상태다.",
+  "fix": "첫 라벨을 'version 비우기' 또는 '버전 필드'로 바꾸고, 주장 '활성 개발 중이면 version을 비운다'는 그 항목 본문 첫 문장으로 내린다.",
+  "lens": "clear-comm-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "skills/domain-plugin/SKILL.md line 10의 라벨은 '활성 개발 중이면 version을 비운다'라는 완결 문장이고 line 11-13의 라벨은 'marketplace.json'·'validate'·'컴포넌트 위치'라는 명사라, 인용이 파일과 그대로 일치하고 기술도 정확하다. 같은 파일 line 18-23의 둘째 목록은 명사구로 통일되어 있어 첫 목록만 어긋난다는 서술도 맞으며, PROSE-FORM의 '불릿 라벨은 명사구로, 한 목록 안 말끝 통일' 조항이 정본에 그대로 있어 반증을 찾지 못했다.",
+   "writing-korean 103-107행이 불릿 라벨을 이름 붙이는 곳으로 명시하고 \"한 칸만 문장이고 나머지가 명사구면 읽는 사람이 그 차이에 뜻이 있는지 되짚는다\"고 바로 이 경우를 적시하는데, skills/domain-plugin/SKILL.md 10행 라벨만 조건절 딸린 완결 문장이고 11-13행은 명사이며 같은 파일 18-23행 둘째 목록은 명사구로 통일되어 있어 예외 조항이나 설계 의도로 볼 근거가 없다. 라벨을 'version 비우기'로 바꾸고 문장을 본문 첫 문장으로 내리면 원문 손실 없이 첫 목록이 둘째 목록과 같은 형태가 되므로 고치는 이득이 실질적이다."
+  ]
+ },
+ {
+  "title": "domain-docs의 문서 일반 규칙 목록과 README 목록은 문장 라벨과 명사 라벨을 한 목록에 섞어 말끝 통일 규칙을 어긴다.",
+  "file": "skills/domain-docs/SKILL.md:20",
+  "evidence": "line 20: - **ID로 참조하고 서수 번호를 쓰지 않는다** — / line 21: - **문서 SSOT** — / line 22: - **관리 블록 패턴** — / line 31: - **독자가 빨리 답해야 하는 네 가지** — / line 32: - **독자 분리** — / line 34: - **필요한 것만 넣는다**(`SIMPLE`) —",
+  "principle": "PROSE-FORM — 이름을 붙이는 곳은 명사구로 쓴다; 한 목록 안에서는 말끝을 하나로 맞춘다",
+  "consequence": "문서 저작 규칙의 소유자 문서가 자기 목록에서 라벨 형태를 섞고 있어, 이 스킬을 열고 문서를 쓰는 세션이 그 모양을 그대로 따라 쓰고 lens-readability의 '형태 섞임' 관찰에 걸린다.",
+  "detail": "「규칙 (문서 일반)」 목록 일곱 항목 가운데 첫 항목만 라벨이 '~쓰지 않는다' 문장이고 나머지 여섯은 '문서 SSOT'·'관리 블록 패턴'·'ID의 설명 의무' 같은 명사구다. 「README」 목록 네 항목도 '독자 분리'·'권장 동선' 명사구 사이에 '필요한 것만 넣는다' 문장 라벨이 하나 섞였다. 이 파일 line 24는 `PROSE-FORM`을 직접 인용하며 완결된 문장으로 설명하라고 적고 있고, writing-korean line 103은 불릿 라벨이 이름을 붙이는 곳이라고 정한다.",
+  "fix": "line 20 라벨을 'ID 참조'로, line 34 라벨을 '최소 구성'으로 바꾸고 문장이던 주장은 각 본문 첫 문장으로 내린다.",
+  "lens": "clear-comm-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용한 여섯 줄(20·21·22·31·32·34)이 skills/domain-docs/SKILL.md에 그대로 있고, 「규칙 (문서 일반)」 일곱 항목 가운데 line 20만 '~쓰지 않는다' 문장 라벨이며 나머지 여섯은 명사구, 「README」 네 항목 가운데 line 34만 '필요한 것만 넣는다' 문장 라벨인 것도 확인했다. writing-korean line 103이 불릿 라벨을 이름 붙이는 곳으로 정하고 line 106이 한 목록 안 말끝 통일을 요구하며 lens-readability line 36에 '형태 섞임' 관찰이 실재하므로 반증을 찾지 못했다.",
+   "writing-korean 103·106행은 불릿 라벨을 이름 붙이는 곳으로 정하고 \"한 칸만 문장이고 나머지가 명사구면 읽는 사람이 그 차이에 뜻이 있는지 되짚는다\"고 적는데, domain-docs 20행(일곱 항목 가운데 유일한 문장 라벨)과 34행(네 항목 가운데 유일한 문장 라벨)이 정확히 그 모양이며, 같은 파일의 다른 목록(84~87행·112~115행·122~123행)은 라벨 형태를 맞추고 있어 설계 선택이라 볼 근거도 없다. 예외 조항은 없고, 고침은 라벨 둘을 명사구로 바꾸고 주장을 본문 첫 문장으로 내리는 것이라 비용이 작으며 저작 규칙 소유자 문서가 자기 규칙을 지키게 되는 실질 이득이 있다."
+  ]
+ },
+ {
+  "title": "lens-prior-art와 lens-readability의 표 머리가 의문절로 되어 있어 표 머리는 명사구로 쓰라는 규칙을 어긴다.",
+  "file": "skills/lens-prior-art/SKILL.md:48",
+  "evidence": "lens-prior-art line 48: | 값 | 무슨 뜻인가 | 빈 `issues`를 어떻게 읽나 | / lens-readability line 19: | 못 적은 목적 | 왜 안 되나 | 고쳐 적은 것 |",
+  "principle": "PROSE-FORM — 이름을 붙이는 곳은 명사구로 쓴다 (제목·소제목·불릿 라벨·표 머리)",
+  "consequence": "한 표 안에서 머리 칸 하나는 명사구('값', '못 적은 목적')이고 다른 칸은 의문절이라 같은 구실을 하는 요소끼리 말끝이 갈리고, 렌즈 자신이 표 머리 규칙을 어기고 있어 그 렌즈가 대상 문서의 표 머리를 지적할 근거가 약해진다.",
+  "detail": "agent-principles line 18과 writing-korean line 103은 표 머리를 이름을 붙이는 곳으로 명시하고 명사구로 쓰라고 정한다. lens-prior-art의 `search_status` 표는 머리 셋 가운데 둘이 '무슨 뜻인가'·'빈 issues를 어떻게 읽나'라는 의문절이고, lens-readability의 목적 예시 표는 가운데 머리가 '왜 안 되나'다. 표 본문 셀의 '나쁜 예' 인용은 위반이 아니지만 머리는 렌즈 자신의 이름표라 예외에 들지 않는다.",
+  "fix": "머리를 '뜻'·'빈 issues의 해석'·'안 되는 이유'처럼 명사구로 바꾼다.",
+  "lens": "clear-comm-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "skills/lens-prior-art/SKILL.md:48의 `| 값 | 무슨 뜻인가 | 빈 issues를 어떻게 읽나 |`와 skills/lens-readability/SKILL.md:19의 `| 못 적은 목적 | 왜 안 되나 | 고쳐 적은 것 |`이 인용 그대로 있고, agent-principles.md:18과 writing-korean SKILL.md:103이 표 머리를 명사구로 쓰라고 명시하며 의문절 예외는 어디에도 없다.",
+   "writing-korean 103행은 표 머리를 이름 붙이는 곳으로 못 박고 명사구로 쓰라 하며 예외 조항이 없고, lens-readability 9행은 이를 목적을 따지지 않는 고정 규칙으로 선언한다. '무슨 뜻인가'·'빈 issues를 어떻게 읽나'·'왜 안 되나'는 의문절이라 위반이 맞고, 같은 머리 줄 안에서 명사구('값'·'못 적은 목적'·'고쳐 적은 것')와 섞여 106행의 '라벨은 라벨끼리 말끝을 맞춘다'도 어기며, 고치는 데 정보 손실이 없고 렌즈 자신의 규칙 준수를 회복하므로 실질 이득이 있다."
+  ]
+ },
+ {
+  "title": "nested-orchestration의 BLOCKED 목록은 라벨 없는 문장 불릿 둘과 라벨 있는 불릿 하나를 한 목록에 섞어 말끝 통일 규칙을 어긴다.",
+  "file": "skills/nested-orchestration/SKILL.md:33",
+  "evidence": "line 33: - L2가 사람 결정(🔴)에 부딪히면 그 지점에서 조기 종료하고 상태 `BLOCKED`와 질문을 리턴한다. / line 34: - L1이 그 질문을 사용자에게 알린다. / line 35: - **잔존 위험** — BLOCKED를 올려 보내라는 것은 프롬프트 넛지이지 하드 컨트롤이 아니다.",
+  "principle": "PROSE-FORM — 한 목록 안에서는 말끝을 하나로 맞춘다; 불릿은 같은 종류의 항목을 늘어놓을 때만 쓴다",
+  "consequence": "앞 두 항목은 절차 문장이고 셋째만 라벨이 달린 주의 항목이라 한 목록에 절차와 경고가 섞여 있고, 읽는 사람이 셋째 항목만 다른 층위인지 되짚으며 목록의 이득이 사라진다.",
+  "detail": "「사람 대화 불가 — BLOCKED와 재개」 절의 목록은 세 불릿인데 앞 둘은 라벨 없이 문장으로 시작하고 셋째만 `**잔존 위험** —` 라벨 형태다. 같은 파일 line 38-40의 「가드레일」 목록은 '구간 소유권 강제'·'크래시와 멈춤에서 되살리기'·'비용'으로 라벨을 통일했고, writing-korean line 123은 불릿은 같은 종류의 항목을 늘어놓을 때만 쓰고 논증은 산문으로 쓰라고 정한다. 앞 두 항목은 절차 서술이라 산문으로 두는 쪽이 규칙에 맞는다.",
+  "fix": "line 33-34를 산문 문단으로 풀고, '잔존 위험'은 그 뒤 별도 문단 첫 문장으로 내리거나 「가드레일」 목록으로 옮긴다.",
+  "lens": "clear-comm-audit",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "skills/nested-orchestration/SKILL.md 33-35행은 인용 그대로이며, 앞 두 불릿은 라벨 없는 문장이고 셋째만 `**잔존 위험** —` 라벨 형태라 한 목록 안 형식이 갈린다. 같은 파일 38-40행 「가드레일」 목록은 세 불릿 모두 라벨로 통일돼 있어 대비가 실재하고, writing-korean의 '불릿은 같은 종류의 항목만' 규칙(121-122행, 발견이 적은 123행과 한두 줄 어긋남)과 '한 목록 안 말끝 통일' 규칙(106-108행)도 존재한다. 다만 세 불릿의 문장 종결은 모두 '다'라 엄밀한 말끝 위반이 아니라 라벨 유무의 이질성 위반이며, 이 점은 발견의 상세가 이미 정확히 기술하고 있다.",
+   "발견의 제목이 든 \"말끝 통일\"은 틀린 근거다 — 세 불릿 모두 '-다'로 끝나 말끝은 이미 같다. 그러나 함께 인용한 writing-korean line 123의 \"불릿은 같은 종류의 항목을 늘어놓을 때만 쓴다\"에는 실제로 걸린다. 앞 둘은 순서가 있는 절차 서술(L2 종료 → L1 통보와 재디스패치)이고 셋째만 굵은 라벨을 단 경고라 항목의 종류와 라벨 구조가 한 목록 안에서 갈리며, 같은 파일의 「가드레일」·「흐름」 목록은 라벨과 번호를 일관되게 써서 예외로 볼 설계 선택도 아니다. 절차를 산문으로 풀고 잔존 위험을 별도 문단이나 「한계」 절로 내리는 고침은 비용이 작고 읽는 사람이 셋째 항목의 층위를 되짚는 부담을 없애므로 실질 이득이 있다. 다만 기록에는 근거 조항을 \"말끝 통일\"이 아니라 \"같은 종류의 항목만 불릿\"으로 바로잡아 적어야 한다."
+  ]
+ },
+ {
+  "title": "_json_valid.sh의 json_hook_events 주석은 '두 런타임의 배선을 대조'한다고 적지만, 배선 파일은 hooks.json 하나뿐이고 유일한 소비자는 대조가 아니라 비어 있지 않은지만 본다.",
+  "file": "scripts/_json_valid.sh:18 (소비자: scripts/test_hooks.sh:175)",
+  "evidence": "_json_valid.sh:18 \"# 훅 배선 파일에서 이벤트 이름을 정렬해 한 줄씩 출력한다($1=파일). 두 런타임의 배선을 대조할 때 쓴다.\" / test_hooks.sh:175 \"check \\\"$hn 이 이벤트를 하나 이상 배선한다\\\" \\\"[ -n \\\\\\\"\\\\$(json_hook_events '$hj')\\\\\\\" ]\\\"\" / `ls hooks/*.json` 결과는 hooks.json 한 파일이며 레포 안에서 'codex'·'Codex' 문자열은 docs/를 빼면 0건이다.",
+  "principle": "MEASURE-FIRST · 문서와 상태의 위생(안 적은 상태는 썩을 수 없다)",
+  "consequence": "이 헬퍼가 왜 남아 있는지를 설명하는 근거가 사라진 기능을 가리키므로, 읽는 사람은 존재하지 않는 둘째 배선 파일을 찾거나 이 함수를 지워도 되는지 판단할 수 없다. 함수의 실제 쓰임(배선 파일이 이벤트를 하나라도 가지는지 확인)은 어디에도 적혀 있지 않다.",
+  "detail": "주석은 두 런타임의 훅 배선을 비교하는 용도로 이 함수를 두었다고 적는다. 실측으로는 hooks/ 아래에 hooks.json 하나만 있고, 함수를 부르는 곳은 test_hooks.sh 한 줄이며 그 줄은 출력이 비어 있지 않은지만 확인한다. 두 런타임을 대조하는 코드는 레포 어디에도 없다. 코드 주석이 코드의 현재 상태를 캐시한 채 낡은 것이며, 정본이 말하는 '상태 문서는 진실의 캐시이지 진실이 아니다'가 코드 주석에서도 그대로 일어났다.",
+  "fix": "주석을 실제 소비자에 맞춰 '배선 파일이 이벤트를 하나 이상 가지는지 확인할 때 쓴다'로 고치거나, 그 확인을 json_valid_stdin 뒤 grep 한 줄로 대체하고 함수를 걷어낸다.",
+  "lens": "plugin-compliance",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "_json_valid.sh:18의 주석 문자열과 test_hooks.sh:175의 소비자 코드가 인용 그대로 존재하고, hooks/에는 hooks.json 하나뿐이며 docs/ 밖에 'codex' 문자열이 0건이다. git 이력(2f64d74)이 hooks-codex.json과 test_codex_scaffold.sh의 삭제를 보여 주므로 '두 런타임 대조'는 사라진 기능을 가리키는 낡은 주석이 맞다.",
+   "실측이 발견과 일치한다 — hooks/에는 hooks.json 하나뿐이고, json_hook_events의 유일한 호출처는 scripts/test_hooks.sh:175의 비어 있지 않은지 검사이며, docs/ 밖에 codex 문자열은 0건이고, git 이력(8a524ec)은 hooks-codex.json이 한때 있었다가 사라졌음을 보여 주므로 \"두 런타임의 배선을 대조할 때 쓴다\"는 주석은 사라진 기능을 가리키는 낡은 캐시다. 함수 자체는 살아 있어 삭제 대상은 아니지만, 쓰임을 적는 주석이 현재 코드와 어긋나면 읽는 사람이 없는 둘째 배선 파일을 찾게 되므로 '안 적은 상태는 썩을 수 없다'의 위반이 실재하고, 주석 한 줄을 실제 소비자에 맞추는 고침은 비용이 작고 이득이 분명하다."
+  ]
+ },
+ {
+  "title": "플러그인 소개 문안이 plugin.json과 marketplace.json에 글자 그대로 두 번 적혀 있고, 둘을 같게 유지하라는 규칙은 domain-plugin이 아니라 테스트 주석에만 산다.",
+  "file": ".claude-plugin/marketplace.json:9 (짝: .claude-plugin/plugin.json:5, scripts/test_docs_drift.sh:451-454)",
+  "evidence": "두 파일의 description이 같은 영문 문안이다: \"Team engineering discipline (SSOT principles) + per-domain design references + ...\". test_docs_drift.sh:452 \"플러그인 매니페스트를 정본으로 두고 마켓플레이스 항목이 그것과 글자 그대로 같은지 확인한다(`SSOT`).\" domain-plugin의 marketplace.json 항목은 \"최상위 `name`·`description`·`owner`·`plugins[]`를 둔다\"까지만 적고 plugins[].description을 어떻게 채우는지는 적지 않는다.",
+  "principle": "SSOT · lens-consistency 커버리지 공백",
+  "consequence": "이 레포에서는 드리프트 테스트가 갈라짐을 잡아 주지만, domain-plugin은 임의 프로젝트의 플러그인 제작자가 여는 참고서다. 그 참고서를 따라 만든 다른 플러그인은 같은 손 동기화 쌍을 갖고도 그것을 잡는 테스트가 없어, 마켓플레이스 카드가 오래된 문안을 계속 광고하는 일(테스트 주석이 이 레포에서 실제로 겪었다고 적은 그 일)을 되풀이한다.",
+  "detail": "같은 문안을 두 파일이 각자 갖는 구조는 정본이 말하는 '사람이 두 곳을 손으로 맞추게 만드는 순간 둘은 어긋난다'에 해당하고, 이 레포는 그 어긋남을 이미 한 번 겪은 뒤 테스트로 막았다. 그런데 그 교훈(어느 쪽이 정본이고 마켓플레이스 항목은 그것과 같아야 한다)은 테스트 파일 주석에만 있고, 플러그인 만드는 법의 정본인 domain-plugin에는 없다. 규칙이 사는 자리가 참고서가 아니라 검사 코드다.",
+  "fix": "domain-plugin의 marketplace.json 항목에 한 문장을 더한다 — plugins[].description은 plugin.json의 description과 같게 두고 plugin.json을 정본으로 삼으며, 같은지 확인하는 검사를 둔다.",
+  "lens": "plugin-compliance",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용이 모두 실제 파일과 일치한다 — plugin.json:5와 marketplace.json:10의 description이 글자 그대로 같고, test_docs_drift.sh:451-454 주석이 \"플러그인 매니페스트를 정본으로 두고 마켓플레이스 항목이 그것과 글자 그대로 같은지 확인한다(`SSOT`)\"와 과거 드리프트 경험을 그대로 적고 있으며, skills/domain-plugin/SKILL.md:11의 marketplace.json 항목은 최상위 키 넷과 source \"./\"만 말하고 plugins[].description과 plugin.json의 관계는 어디에도 적지 않는다. README·agent-principles·domain-docs에도 그 규칙이 없어 반증을 찾지 못했다.",
+   "실측으로 확인했다 — plugin.json:5와 marketplace.json:10의 description이 글자 그대로 같고, 어느 쪽이 정본이며 같아야 한다는 규칙은 test_docs_drift.sh:450-454 주석에만 있고 domain-plugin의 marketplace.json 항목은 plugins[] 내부 필드를 전혀 적지 않는다. 플러그인 제작 참고서인 domain-plugin이 이미 겪은 드리프트의 교훈을 담지 않은 것은 실재하는 공백이며 한 문장 추가로 고쳐진다. 다만 제안된 고침(같게 두고 검사한다)은 다시 볼 여지가 있다 — 공식 문서상 plugins[].description은 선택 필드이고 strict 기본에서 plugin.json이 권위이므로, 마켓플레이스 항목에서 description을 빼 버리는 것이 복제 자체를 없애는 더 나은 SSOT 처방일 수 있다(설치 전 카드에 실제로 plugin.json 문안이 뜨는지는 실측이 필요하다)."
+  ]
+ },
+ {
+  "title": "Codex 패리티 레이어의 spec과 plan이 superseded 표시 없이 작업 트리에서 삭제되어 있다.",
+  "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-06-25-codex-parity-layer-design.md (git status: D)",
+  "evidence": "git status --short: `D  docs/superpowers/plans/2026-06-25-codex-parity-layer.md` / `D  docs/superpowers/specs/2026-06-25-codex-parity-layer-design.md` — 대조: skills/domain-docs/SKILL.md:52 「**설계** (analysis-design / spec·plan) | 설계 근거 | 계속 살아 있다. spec과 plan은 배포된 뒤에도 지우지 않는다 | 상태를 적지 않고 대체된 문서에는 superseded를 표시한다」",
+  "principle": "domain-docs 「문서 타입과 수명」 설계 행 · SSOT · REVERSIBLE",
+  "consequence": "커밋되면 Codex 지원을 왜 설계했고 왜 걷어냈는지가 트리에서 사라져, 다음 사람은 '설계한 적이 없다'와 '설계했다가 뜯어냈다'를 구별하지 못한다. 같은 레포가 ultracode 토글과 issue-mode 토글은 superseded 머리말을 붙여 남겼으므로 처리 방식이 문서마다 갈린다. 게다가 test_docs_drift.sh는 superseded 요구를 SCAFFOLD_STALE 이름에서 도출하는데 거기에 codex가 없어, 삭제도 표시 누락도 어느 검사에도 걸리지 않는다.",
+  "detail": "domain-docs가 설계 타입에 내린 처방은 '지우지 않고 superseded를 표시한다'이며, 이 레포는 그 처방을 2026-06-30-issue-mode-toggle-design.md와 2026-07-03-ultracode-review-toggle-design.md에 이미 적용했다. Codex 삭제 회차만 spec과 plan을 통째로 지우는 쪽을 택해 자기 규칙과 자기 선례 둘 다에서 벗어났다.",
+  "fix": "두 파일을 되살리고 머리에 「제거된 기능의 설계다(superseded)」 문단을 붙인다. scripts/_scaffold_common.sh:14의 SCAFFOLD_STALE에 codex 계열 이름을 넣거나, test_docs_drift.sh:212의 도출이 codex 문서도 훑게 해 표시 누락이 검사에 걸리게 한다.",
+  "lens": "docs-compliance",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용 증거가 모두 실재한다 — `git status --short`에 두 codex spec·plan이 스테이지된 삭제(D)로 있고, skills/domain-docs/SKILL.md:52의 설계 행 문구가 그대로 일치하며, 2026-06-30-issue-mode-toggle과 2026-07-03-ultracode-review-toggle spec은 첫 12줄에 「제거된 기능의 설계다(superseded)」 머리말을 달고 있다. scripts/_scaffold_common.sh:14의 SCAFFOLD_STALE에 codex 계열 이름이 없고 test_docs_drift.sh(207~215줄)는 그 목록에서만 대상 문서를 도출하므로 삭제와 표시 누락이 어느 검사에도 걸리지 않는다는 기술도 정확하다. README·agent-principles·스크립트·훅 어디에도 Codex 지원을 걷어낸 이유나 대체 포인터가 남지 않아 반증을 찾지 못했다.",
+   "반박에 실패했다. skills/domain-docs/SKILL.md:52의 설계 행은 HEAD와 작업 트리 모두 \"spec과 plan은 배포된 뒤에도 지우지 않는다 / 대체된 문서에는 superseded를 표시한다\"이고 제거된 기능에 대한 예외 조항이 없으며, 같은 레포의 issue-mode(2026-06-30)와 ultracode(2026-07-03) spec은 \"제거된 기능의 설계다(superseded)\" 배너를 달고 남아 있어 선례도 그 규칙을 따른다. 두 codex 문서는 staged 삭제(D)로 확인되고 레포 역사에서 spec·plan이 삭제된 적은 한 번도 없으며(git log --diff-filter=D 0건), 메모리 기록은 이 삭제가 에이전트가 자체 판단으로 한 것이지 사용자가 규칙의 예외로 정한 결정이 아님을 보여준다. SCAFFOLD_STALE에 codex가 없어 test_docs_drift.sh:212의 도출 검사가 이 문서를 훑지 않는다는 서술도 실측과 일치한다. 다만 처방 가운데 SCAFFOLD_STALE에 codex를 넣는 쪽은 그 변수가 관리 디렉터리의 잔존 파일 목록이라 뜻이 어긋나므로, 도출 범위를 넓히는 둘째 처방을 택해야 한다."
+  ]
+ },
+ {
+  "title": "오답노트 기능의 spec 둘과 plan 하나가 기능이 제거된 뒤에도 superseded 표시 없이 남아 있고, 그 표시를 요구하는 검사는 파일 이름 대조라 이들을 놓친다.",
+  "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-08-26-solved-log-split.md:1-5",
+  "evidence": "plans/2026-08-26-solved-log-split.md:3 「**For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development ... to implement this plan task-by-task.」(머리 8줄에 superseded 없음) / specs/2026-08-25-solved-log-split-design.md:1 「# 오답노트 쪼개기 — ...」(표시 없음) / specs/2026-07-28-solved-header-refresh-design.md:1 「# 오답노트 형식 규칙이 낡았을 때 알리는 설계」(표시 없음) — 제거 근거: scripts/_scaffold_common.sh:14 `SCAFFOLD_STALE=\"... solved_problems.md solved_problems ...\"`, plans/2026-08-31-make-checks-real.md:10 「오답노트 기능을 지울 때 남긴 껍데기다.」 — 검사: scripts/test_docs_drift.sh:212 `for D in \"$HERE\"/docs/superpowers/specs/*\"$n\"*.md ...` (n=solved_problems 이므로 solved-log-split·solved-header-refresh 와 안 맞는다)",
+  "principle": "domain-docs 「문서 타입과 수명」 설계 행 「대체된 문서의 superseded 표시 검사」 · MEASURE-FIRST · FAIL-LOUD",
+  "consequence": "plan은 첫머리에서 스스로 태스크 단위 실행을 지시하므로, 이 파일을 연 에이전트는 이미 뜯어낸 오답노트 쪼개기를 지금 구현할 계획으로 읽고 실행에 들어간다. test_docs_drift.sh의 superseded 검사는 초록이라 이 누락은 사람이 우연히 보기 전까지 드러나지 않는다.",
+  "detail": "domain-docs는 대체된 설계 문서에 superseded를 표시하고 그것을 검사로 강제하라고 정했고, test_docs_drift.sh 주석도 '기능을 하나 더 걷어내면 그 설계 문서에 표시가 없다는 것이 여기서 실패한다'고 약속한다. 그런데 도출이 SCAFFOLD_STALE의 파일 이름을 spec·plan 파일 이름에 글자 그대로 맞대는 방식이라, 기능 이름(solved_problems)과 문서 이름(solved-log-split)이 다르면 검사가 아무것도 훑지 않는다. 검사가 있다는 사실이 오히려 표시 누락을 가린다.",
+  "fix": "세 문서 머리에 「제거된 기능의 설계다(superseded)」를 붙인다. 검사의 도출은 파일 이름 대조 대신 SCAFFOLD_STALE 항목에서 핵심어(solved·issue-mode·ultracode)를 뽑아 spec·plan 본문 첫 줄 제목까지 대조하게 넓힌다.",
+  "lens": "docs-compliance",
+  "status": "confirmed",
+  "confirmed": true,
+  "missingVotes": 0,
+  "verdicts": [
+   "인용한 줄이 모두 실제 파일에 그대로 있고, 세 문서에는 superseded가 한 번도 나오지 않으며, test_docs_drift.sh를 돌리면 superseded 절이 issue-mode·ultracode-review 문서만 훑고 초록으로 끝나 solved-* 문서를 놓치는 것을 실측으로 확인했다. 반증은 찾지 못했고, 오히려 project-solved-pointer spec·plan 한 쌍이 더 같은 상태다.",
+   "domain-docs 「문서 타입과 수명」 설계 행이 대체된 spec·plan에 superseded 표시와 그 검사를 요구하는데, 오답노트 기능은 795357c에서 제거됐고(살아 있는 코드에는 SCAFFOLD_STALE 정리 항목으로만 남음) 세 문서(plans/2026-08-26-solved-log-split.md, specs/2026-08-25-solved-log-split-design.md, specs/2026-07-28-solved-header-refresh-design.md)에는 본문 어디에도 superseded가 없다. test_docs_drift.sh를 실제로 돌려 보니 superseded 절이 훑는 문서는 issue-mode·ultracode 셋뿐이라 파일 이름 글롭(*solved_problems*)이 이 셋을 아예 못 잡는 것이 확인됐고, 같은 처지의 issue-mode·ultracode·project-solved-pointer 문서에는 이미 표시가 붙어 있어 예외 조항이나 의도된 설계로 볼 근거가 없다. 표시를 붙이면 plan 머리의 태스크 실행 지시가 오독되는 것을 막고, 2026-09-02 감사 스펙이 머리 12줄의 superseded로 감사 대상을 도출하려는 계획과도 맞물리므로 실질 이득이 있다."
+  ]
+ }
+]

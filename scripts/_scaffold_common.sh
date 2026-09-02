@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# 공유: scaffold.sh(Claude)와 codex-scaffold.sh(Codex)의 공통 로직(SSOT).
-# 두 스크립트는 홈 위치·주입 방식만 다르고 관리 디렉터리 정책은 동일해야 한다 — 여기가 정본.
+# scaffold.sh에서 분리한 관리 디렉터리 정책(SSOT) — 여기가 정본.
 
 # 관리 디렉터리에 두는 정본 파일. 두 스캐폴드가 복사하고 주입하는 것이 이 목록이다.
 SCAFFOLD_FILES="agent-principles.md"

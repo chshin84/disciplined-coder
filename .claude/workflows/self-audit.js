@@ -23,7 +23,7 @@ const FINDINGS_SCHEMA = {
       items: {
         type: 'object',
         properties: {
-          title: { type: 'string', description: '발견 제목 — 완결된 문장으로 (CLEAR-COMM)' },
+          title: { type: 'string', description: '발견 제목 — 완결된 문장으로 (PROSE-FORM)' },
           file: { type: 'string', description: '증거 파일 경로 (file:line 형식 권장)' },
           evidence: { type: 'string', description: '실제 파일에서 인용한 증거 텍스트' },
           principle: { type: 'string', description: '위반/관련 원칙 ID 또는 렌즈 규칙' },
@@ -85,11 +85,11 @@ const REVIEWERS = [
   { key: 'ssot-audit', prompt: `${COMMON}
 차원: SSOT 전수 조사 — agent-principles.md ↔ skills ↔ scripts ↔ hooks ↔ README ↔ CLAUDE.md ↔ commands 사이의 권위 있는 이중 기술(손 동기화 쌍)을 찾아라. 정당한 참조/도출은 위반이 아니다.` },
   { key: 'shell-audit', prompt: `${COMMON}
-차원: 셸 코드 품질 — scripts/*.sh 전부, hooks/*.sh, hooks/*.json, hooks/session-start-codex. FAIL-LOUD(오류 삼킴), IDEMPOTENT(재실행 안전 — 코드로 추적), EXPLICIT, 테스트 매직 넘버, Git Bash 홈 리다이렉트 함정. 실제 코드 라인을 인용하라.` },
+차원: 셸 코드 품질 — scripts/*.sh 전부, hooks/*.sh, hooks/*.json. FAIL-LOUD(오류 삼킴), IDEMPOTENT(재실행 안전 — 코드로 추적), EXPLICIT, 테스트 매직 넘버, Git Bash 홈 리다이렉트 함정. 실제 코드 라인을 인용하라.` },
   { key: 'clear-comm-audit', prompt: `${COMMON}
 차원: PROSE-FORM 자기준수 — agent-principles.md, skills/ 아래 모든 SKILL.md, commands/ 아래 모든 .md, README.md — 목록은 그 디렉터리들을 훑어 도출하라. 산문과 표에서 명사 조각 종결, 기호 문장(X = Y, 원인 → 해결)을 찾아라. 원칙 정의 안의 '나쁜 예' 인용문과 코드 블록·필드 스키마 표기는 위반이 아니다.` },
   { key: 'plugin-compliance', prompt: `${COMMON}
-차원: domain-plugin 자기준수 — ${REPO}/skills/domain-plugin/SKILL.md 를 읽고, .claude-plugin/*, .codex-plugin/*, hooks/hooks*.json, commands/·skills/ frontmatter가 그 처방을 지키는지 감사하라. 스킬의 주장 자체가 실측과 다르면 그것도 발견이다(MEASURE-FIRST).` },
+차원: domain-plugin 자기준수 — ${REPO}/skills/domain-plugin/SKILL.md 를 읽고, .claude-plugin/*, hooks/hooks.json, commands/·skills/ frontmatter가 그 처방을 지키는지 감사하라. 스킬의 주장 자체가 실측과 다르면 그것도 발견이다(MEASURE-FIRST).` },
   { key: 'docs-compliance', prompt: `${COMMON}
 차원: domain-docs 자기준수 — ${REPO}/skills/domain-docs/SKILL.md 를 읽고, docs/ 전체·README·CLAUDE.md가 타입별 처방(상태 금지·도출 우선·수명 규칙)을 지키는지 감사하라. spec/plan은 superpowers 소유라 현행 문서와의 드리프트만 본다.` },
 ]

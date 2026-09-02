@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# PostToolUse(Write|Edit | Codex apply_patch): 문서(.md, spec/plan 제외) 작성/수정 감지 → 비자가 검진 넛지(비블로킹, 게이트 아님).
-# 경로는 _extract_path.sh가 양 런타임 입력에서 추출(다중 순회). 순수 bash.
+# PostToolUse(Write|Edit): 문서(.md, spec/plan 제외) 작성/수정 감지 → 비자가 검진 넛지(비블로킹, 게이트 아님).
+# 경로는 _extract_path.sh가 추출(다중 순회). 순수 bash.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 DIR="$(cd "$(dirname "$0")" && pwd)"

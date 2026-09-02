@@ -101,7 +101,7 @@ check "상세가 이름 자리를 명사구로 정한다"   "grep -qF '이름을
 check "상세가 말끝 통일을 정한다"            "grep -qF '한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다' \"$WK\""
 check "상세가 넓은 말 대신 좁은 말을 시킨다" "grep -qF '넓은 말보다 좁은 말을 쓴다' \"$WK\""
 check "정본이 그 상세를 가리킨다"            "grep -qF 'writing-korean' \"$CANON\""
-check "정본이 결과를 구체로 적게 한다"       "grep -qF '결과는 무엇이 어떻게 되는지까지 적는다' \"\$CANON\""
+check "정본이 대상을 정확히 가리키게 한다"   "grep -qF '대상의 이름을 그대로 쓴다' \"\$CANON\""
 check "가독성 렌즈가 이름 형태를 본다"       "grep -qF '이름 형태' \"\$READ2\""
 check "가독성 렌즈가 형태 섞임을 본다"       "grep -qF '형태 섞임' \"\$READ2\""
 check "가독성 렌즈 프롬프트가 고쳐 주게 한다" "grep -qF '명사구로 고쳐 주고' \"\$READ2\""
@@ -146,7 +146,7 @@ echo "[합치기와 다시 리뷰]"
 check "합칠 때 세 기준으로 거른다"           "grep -qF '근거가 서 있는지만 묻는다' \"\$CALLER\""
 check "기능적 변화면 다시 리뷰한다고 적는다"  "grep -qF '기능적 변화' \"\$CALLER\""
 check "다시 리뷰는 매번 사용자에게 묻는다"    "grep -qF '다시 리뷰는 매번 사용자에게 묻는다' \"\$CALLER\""
-check "물을 때 질문 도구로 띄운다"           "grep -qF '질문 도구로 선택지를 띄운다' \"\$CALLER\""
+check "물을 때 선택지 질문으로 묻는다"        "grep -qF '선택지가 있는 질문으로 묻는다' \"\$CALLER\""
 check "🔴 반영도 다시 리뷰 대상이다"          "grep -qF '를 반영한 것도 대상이다' \"\$CALLER\""
 check "무엇이 남았는지 문서에 안 적는다"      "grep -qF '문서에 적지 않는다' \"\$CALLER\""
 check "문서 검진에 재검진 반복이 없다"        "grep -qF '다시 검진하지는 않는다' \"\$DOCS\""
@@ -178,7 +178,7 @@ echo "[렌즈에게 정본을 알리는 법 — domain-docs 한 곳만 규율을
 OWNER_DOC="$HERE/skills/domain-docs/SKILL.md"
 OWNER_ANCHOR='## 렌즈에게 정본을 알리는 법 (여기가 소유자)'
 # 규율 넷을 알아보는 문구. 소유자에만 있어야 한다.
-RULE_MARKS=('읽기 전용 에이전트도 Read는 갖는다' '비어 있지 않은 배열' '홈 해석이 어긋나는 환경과')
+RULE_MARKS=('읽기 전용 에이전트도 Read는 갖는다' '비어 있지 않은 배열' '홈 해석이 어긋나는 환경에서')
 check "소유자 절이 있다" "grep -qF -- \"\$OWNER_ANCHOR\" \"\$OWNER_DOC\""
 for m in "${RULE_MARKS[@]}"; do
   check "소유자가 규율을 적는다: $m" "grep -qF -- '$m' \"\$OWNER_DOC\""
@@ -237,10 +237,10 @@ echo "[프로젝트 파일 예외 — README 한 곳만 조건을 적는다]"
 # 문서를 한 줄로 펴서 본다 — 전에는 정본에서 줄이 바뀌자 같은 문장인데도 검사가 실패했다.
 flat() { tr '
 ' ' ' < "$1" | tr -s ' '; }
-OWN_MARKS=('없앤 기능이 남긴 관리블록이')
-COPY_MARKS=('없앤 기능이 남긴 관리블록이')
-check "README가 예외를 열거한다"        "grep -qF -- '자동 계층이 프로젝트 파일을 고치는 예외' \"\$README\""
-check "README가 정본임을 선언한다"      "grep -qF -- '여기가 그 정본이다' \"\$README\""
+OWN_MARKS=('그 블록을 만든 기능이 없어졌으면')
+COPY_MARKS=('그 블록을 만든 기능이 없어졌으면')
+check "README가 예외를 열거한다"        "grep -qF -- '이 플러그인이 프로젝트 파일을 고치는 예외' \"\$README\""
+check "README가 예외 조건을 소유한다"    "grep -qF -- '그 조건은 여기가 정한다' \"\$README\""
 for m in "${OWN_MARKS[@]}"; do
   check "README가 조건을 적는다: $m"    "flat \"\$README\" | grep -qF -- '$m'"
 done
@@ -251,9 +251,9 @@ EXC_SEC="$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$HERE/scripts/scaffold.sh" |
 check "스캐폴드가 README 절을 가리킨다" "[ -n \"\$EXC_SEC\" ]"
 check "그 절이 README에 실재한다"            "[ -n \"\$EXC_SEC\" ] && grep -qF \"## \$EXC_SEC\" \"\$README\""
 # 정본은 이제 조건을 되풀이하지 않고 README를 가리키기만 한다. 가리키는 문장이 살아 있는지 본다.
-check "정본이 README를 가리킨다"        "grep -qF -- 'README가 정본이다' \"$CANON\""
+check "정본이 README를 가리킨다"        "grep -qF -- 'README를 참고한다' \"$CANON\""
 
-for D in "$HERE/scripts/scaffold.sh" "$HERE/scripts/codex-scaffold.sh"; do
+for D in "$HERE/scripts/scaffold.sh"; do
   dn="$(basename "$D")"
   check "$dn 이 README 절을 가리킨다"   "grep -qF -- '프로젝트 폴더에 생기는 파일' '$D'"
   for m in "${COPY_MARKS[@]}"; do
@@ -426,8 +426,7 @@ done
 # 검사가 새 자리를 따라가 버려 끊긴 것을 못 잡았다. 그래서 셋을 한 줄로 함께 붙든다.
 echo "[규칙 출처] 정본 → writing-korean → lens-readability 가 이어져 있다"
 RDB_L="$HERE/skills/lens-readability/SKILL.md"
-check "정본에 이름 자리 조항이 있다"     "grep -qF '이름을 붙이는 곳은 명사구로 쓰고 주장은 본문으로 내린다' \"$CANON\""
-check "정본에 말끝 통일 조항이 있다"     "grep -qF '한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다' \"$CANON\""
+check "정본에 이름 자리 조항이 있다"     "grep -qF '이름을 붙이는 위치에만 명사구로 쓰고' \"$CANON\""
 check "정본이 상세 소유자를 가리킨다"    "grep -qF 'writing-korean' \"$CANON\""
 check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'writing-korean' \"$RDB_L\""
 check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'writing-korean'"
@@ -441,11 +440,10 @@ SC_FILES="$(grep -oE '^SCAFFOLD_FILES="[^"]*"' "$HERE/scripts/_scaffold_common.s
 check "SCAFFOLD_FILES 를 뽑아냈다" "[ -n \"\$SC_FILES\" ]"
 for scf in $SC_FILES; do
   check "스캐폴드가 '$scf' 를 하드코딩하지 않는다" \
-    "! grep -qE 'for f in .*$scf' '$HERE/scripts/scaffold.sh' '$HERE/scripts/codex-scaffold.sh'"
+    "! grep -qE 'for f in .*$scf' '$HERE/scripts/scaffold.sh'"
 done
-# 부정 단언의 짝이다 — 부정만 두면 두 스캐폴드에서 루프가 통째로 사라져도 통과한다.
+# 부정 단언의 짝이다 — 부정만 두면 스캐폴드에서 루프가 통째로 사라져도 통과한다.
 check "scaffold.sh 가 SCAFFOLD_FILES 를 쓴다"       "grep -qF 'for f in \$SCAFFOLD_FILES' '$HERE/scripts/scaffold.sh'"
-check "codex-scaffold.sh 가 SCAFFOLD_FILES 를 쓴다" "grep -qF 'for f in \$SCAFFOLD_FILES' '$HERE/scripts/codex-scaffold.sh'"
 check "화이트리스트가 그 목록에서 도출된다"          "grep -qF 'SCAFFOLD_WHITELIST=\"\$SCAFFOLD_FILES' '$HERE/scripts/_scaffold_common.sh'"
 
 # --- 마켓플레이스 문안이 매니페스트에서 갈라지지 않는다 ---
@@ -486,6 +484,16 @@ check "정본 절 이름을 파일에서 읽게 한다" "grep -qF '절 제목을
 echo "[README] 잠금 시간을 값으로 적지 않고 상수 자리를 가리킨다"
 check "README가 잠금 시간을 베끼지 않는다" "! grep -qE '잠금(은|이)? *[0-9]+초' '$HERE/README.md'"
 check "README가 상수 자리를 가리킨다"      "grep -qF '_managed_block.sh' '$HERE/README.md'"
+
+# --- 렌즈에게 정본을 알리는 법: domain-docs 한 곳만 내용을 갖는다 ---
+# 다른 스킬은 그 절을 가리키기만 한다. 첫 항목 문장이 다른 스킬에 나타나면 베낀 것이다.
+echo "[렌즈에게 정본을 알리는 법] 다른 스킬이 내용을 베끼지 않는다"
+TELL_SENT='정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다'
+check "domain-docs 가 그 문장을 갖는다" "grep -qF -- '$TELL_SENT' \"$HERE/skills/domain-docs/SKILL.md\""
+for f in "$HERE"/skills/*/SKILL.md; do
+  case "$f" in */domain-docs/*) continue ;; esac
+  check "$(basename "$(dirname "$f")") 이 베끼지 않는다" "! grep -qF -- '$TELL_SENT' '$f'"
+done
 
 # --- 금지 표현: 살아 있는 문서에 남지 않는다 ---
 # 목록을 검사에 손으로 적지 않고 writing-korean 의 「금지 표현」 표에서 도출한다. 그 표가 정본이라

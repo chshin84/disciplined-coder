@@ -231,7 +231,7 @@ check "잔존 파일에 경고를 남기지 않는다"     "! printf '%s' \"\$ER
 # --- readme-commands-drift: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (SSOT — 열거는 사용 절 한 곳) ---
 # 파일 전체가 아니라 '### 커맨드' 절만 검사한다 — 커맨드명이 다른 문단에 등장해
 # 목록 누락이 vacuous 통과하는 것을 막는다.
-CMD_SECTION="$(awk '/^### 커맨드/{f=1} f&&/^## /{exit} f' "$HERE/README.md")"
+CMD_SECTION="$(awk '/^## 커맨드/{f=1} f&&/^## /&&!/^## 커맨드/{exit} f' "$HERE/README.md")"
 echo "[readme-commands-drift] README commands section covers commands/ dir"
 for c in "$HERE"/commands/*.md; do
   n="/$(basename "$c" .md)"
@@ -245,7 +245,7 @@ WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agen
 echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
 check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
 check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'lens-*'"
-check "검증 기록을 요구한다"       "printf '%s' \"\$WF_BLOCK\" | grep -qF 'docs/superpowers/reviews/'"
+check "검증 기록은 호출자 스킬이 요구한다" "grep -qF 'docs/superpowers/reviews' \"$HERE/skills/domain-spec-review/SKILL.md\""
 check "사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_BLOCK\" | grep -qF 'ultracode 검증 모드'"
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
@@ -319,7 +319,7 @@ PO_BLOCK="$(awk '/^## 병렬 오케스트레이션/{f=1} f&&/^## /&&!/^## 병렬
 echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
 check "병렬 오케스트레이션 heading exists"      "printf '%s' \"\$PO_BLOCK\" | grep -qF '## 병렬 오케스트레이션'"
 check "병렬 오케스트레이션 points to skill (SSOT)" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
-check "단일 태스크는 3층이 아니라고 적는다"    "printf '%s' \"\$PO_BLOCK\" | grep -qF '단일 태스크'"
+check "일이 하나뿐이면 낭비라고 적는다"       "printf '%s' \"\$PO_BLOCK\" | grep -qF '일이 하나뿐이면'"
 
 # --- nested-orchestration-skill: nested-orchestration 스킬 존재 + 핵심 절(정본 계약 가드) ---
 # 단일 목적 파일이라 파일 전역 존재 검사로 충분하다(섹션 경합 없음 — Global Constraint 참조).
@@ -363,23 +363,19 @@ check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가
 
 # --- standing-consent: 렌즈 호출에 대한 상시 허가가 정본에 있다 ---
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
-# 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 정본은 @import(Claude)와 인라인
-# (Codex) 양쪽으로 실리므로, 이 한 문장이 있으면 두 런타임 모두에서 검진이 돈다.
+# 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 정본은 @import로 실리므로 이 한
+# 문장이 있으면 검진이 돈다.
 # 파일 전역 grep이 아니라 '검증 레이어' 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
 # 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
 SC_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$CANON")"
 # 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
 # 명령 치환으로 실행되어, 검사가 엉뚱한 문자열을 찾으면서도 초록으로 남는다.
-CONSENT='렌즈(`lens-*`) 호출은 사용자가 상시 허용한 것으로 간주한다'
+CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 본다'
 SC_SCOPE='허가는 `lens-*` 호출에만 미친다'
 echo "[standing-consent] lens calls carry the user's standing consent"
 check "검증 절이 잡힌다"                   "[ -n \"\$SC_BLOCK\" ]"
 check "canon: 상시 허가 문장"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '$CONSENT'"
 check "canon: 허가 범위 한정"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- \"\$SC_SCOPE\""
-check "canon: 다른 팬아웃은 제외"          "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '그 밖의 서브에이전트와 워크플로는 열어 주지 않는다'"
-# 한 번에 여럿 띄우기는 레포 문서 감사에서만 열어 두었다. 그 예외가 어느 절차의 것인지 함께 붙들어,
-# 예외만 남고 어느 절차인지가 지워지는 것을 막는다.
-check "canon: 여럿 띄우기는 감사에서만"    "printf '%s' \"\$SC_BLOCK\" | grep -qF -- 'project-doc-audit'"
 # 선행연구 렌즈는 이름을 대서 예외로 못 박아야 한다. 이름이 lens-*라 허가에 들면서 동시에 웹에
 # 나가는 유일한 렌즈라, 뭉뚱그린 말로 제외하면 같은 렌즈를 열고 닫는 문장이 된다. 그 상태에서는
 # 렌즈를 범위 밖으로 판단해 조용히 건너뛰게 되고, '막히면 알린다'는 안전장치도 발동하지 않는다.
@@ -397,8 +393,8 @@ SR="$HERE/skills/domain-spec-review/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
 check "ASK-FORK 항목이 잡힌다"              "[ -n \"\$CC_LINE\" ]"
-check "ASK-FORK: 질문 도구 규칙"            "printf '%s' \"\$CC_LINE\" | grep -qF -- '질문 도구로 선택지를 띄운다'"
-check "ASK-FORK: 평문이 안 되는 이유"       "printf '%s' \"\$CC_LINE\" | grep -qF -- '답해야 할 물음인지'"
+check "ASK-FORK: 선택지 질문지 규칙"        "printf '%s' \"\$CC_LINE\" | grep -qF -- '선택지가 있는 질문으로 묻는다'"
+check "ASK-FORK: 평문 금지"                 "printf '%s' \"\$CC_LINE\" | grep -qF -- '평문으로 묻지 않는다'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
 check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'ASK-FORK'"
 
@@ -447,19 +443,19 @@ for d in "${REACH_DOCS[@]}"; do
 done
 
 check "canon: 옛 도달 전제 제거"            "! grep -qF '서브에이전트도 이 글을 읽으므로' '$CANON'"
-check "canon: 도달을 전제하지 않는다"       "grep -qF '도달을 전제하지 않는다' '$CANON'"
+check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 실린다고 가정하지 않는다' '$CANON'"
 
 # --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
 # 전에는 셋이 규율 넷을 각자 적고 이 검사가 그 사본들을 맞춰 세웠다. 사본이라 갈라졌다 — 한 곳에서
 # 재시도 금지 항목만 빠져 그 경로가 금지된 재시도를 허용한 채 오래 남았고, DESIGN-NOTES 쪽은 넷 중
 # 둘만 갖고 있었다. 지금은 `domain-docs`가 규율을 소유하고 나머지는 가리키기만 한다(`SSOT`).
 # 소유자가 규율을 갖는지와 다른 문서가 베끼지 않는지는 `test_docs_drift.sh`가 본다. 여기서는 호출자
-# 셋이 그 소유자에 닿는지와 Codex 패리티만 본다.
+# 셋이 그 소유자에 닿는지와 런타임 중립만 본다.
 echo "[lens-contract] callers reach the canon-path rules and stay runtime-neutral"
 for s in domain-spec-review domain-docs nested-orchestration; do
   F="$HERE/skills/$s/SKILL.md"
   check "$s: 정본 알리는 법에 닿는다"       "grep -qF '렌즈에게 정본을 알리는 법' '$F'"
-  # Codex 패리티: Claude 전용 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
+  # 런타임 중립: 특정 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
 done
@@ -598,7 +594,7 @@ check "스캐폴드가 4를 알린다"                 "grep -qF 'prc\" -eq 4' '
 # 커맨드는 그 보고를 근거로 새로 생긴 파일과 이미 있던 파일을 알리라고 지시했다. 스크립트가 그
 # 사실을 안 내므로 지시를 따르려면 지어내야 했다. 죽은 변수가 되살아나면 여기서 실패한다.
 echo "[setup-report] the command may only ask for facts the script actually emits"
-for S in scaffold.sh codex-scaffold.sh; do
+for S in scaffold.sh; do
   check "$S: 값을 안 받는 created 가 없다" "! grep -qE '(^|[^_a-zA-Z])created' '$HERE/scripts/$S'"
 done
 SDC="$HERE/commands/setup-discipline.md"
@@ -609,9 +605,8 @@ check "커맨드가 새 파일 목록을 안 시킨다"    "! grep -qF '새로 �
 # --- 매니페스트 version 계약 ---
 # Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin).
 # 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다
-# 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다. Codex 매니페스트는 반대로 version을 갖는다.
+# 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다.
 check "Claude 매니페스트에 version 없음"  "! grep -qE '\"version\"[[:space:]]*:' '$HERE/.claude-plugin/plugin.json'"
-check "Codex 매니페스트에 version 있음"   "grep -qE '\"version\"[[:space:]]*:' '$HERE/.codex-plugin/plugin.json'"
 
 # --- solved-rules: 형식 규칙이 낡았으면 알리기만 한다 (읽기 전용 넛지) ---
 # 픽스처는 상수(SCAFFOLD_SOLVED_RULES)에서 만들지 않고 리터럴로 적는다 — 상수에서 만들면 상수에 오타가

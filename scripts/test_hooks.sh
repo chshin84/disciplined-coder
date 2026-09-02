@@ -15,10 +15,6 @@ drev() { printf '%s' "$1" | bash "$DREV"; }
 J() { printf '{"tool_input":{"file_path":"%s"}}' "$1"; }
 EXTRACT="$HERE/hooks/_extract_path.sh"
 extract() { printf '%s' "$1" | bash "$EXTRACT"; }
-# Codex apply_patch 입력 픽스처(패치는 JSON 문자열이라 개행이 \n 이스케이프됨)
-AP1() { printf '{"tool_input":{"input":"*** Begin Patch\\n*** Update File: %s\\n@@\\n+x\\n*** End Patch\\n"}}' "$1"; }
-AP2() { printf '{"tool_input":{"input":"*** Begin Patch\\n*** Update File: %s\\n@@\\n+x\\n*** Add File: %s\\n+y\\n*** End Patch\\n"}}' "$1" "$2"; }
-APDEL() { printf '{"tool_input":{"input":"*** Begin Patch\\n*** Delete File: %s\\n*** End Patch\\n"}}' "$1"; }
 
 T="$(mktemp -d)"; SP="$T/docs/superpowers/specs"; PL="$T/docs/superpowers/plans"; mkdir -p "$SP" "$PL" "$T/src"
 printf 'draft body\n' > "$SP/nomark.md"
@@ -38,9 +34,6 @@ printf 'body\n<!-- spec-review: passed 라고 적으면 안 된다\n' > "$SP/unc
 
 echo "[extract]"
 check "Claude file_path → 경로 1개"        "[ \"\$(extract '$(J "$T/src/a.md")')\" = '$T/src/a.md' ]"
-check "Codex apply_patch update → 경로 1개" "[ \"\$(extract '$(AP1 "$T/src/b.md")')\" = '$T/src/b.md' ]"
-check "Codex apply_patch delete → 경로 1개" "[ \"\$(extract '$(APDEL "$T/src/c.md")')\" = '$T/src/c.md' ]"
-check "Codex 다중 파일 → 두 경로 모두"      "[ \"\$(extract '$(AP2 "$T/src/d.py" "$T/src/e.md")' | tr '\n' ',')\" = '$T/src/d.py,$T/src/e.md,' ]"
 check "빈 입력 → 무출력"                    "[ -z \"\$(extract '{}')\" ]"
 check "Claude backslash path → normalized" "[ \"\$(extract '$(J 'C:\\\\dir\\\\f.md')')\" = 'C:/dir/f.md' ]"
 
@@ -136,14 +129,6 @@ check "plan 경로 → 무출력"               "[ -z \"\$(drev '$(J "$PL/nomark
 check "비문서(.py) → 무출력"             "[ -z \"\$(drev '$(J "$T/src/main.py")')\" ]"
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off drev '$(J "$T/existing.md")')\" ]"
 
-echo "[codex apply_patch input]"
-check "ptu: apply_patch spec 미마커 → 리뷰 지시"      "ptu '$(AP1 "$SP/nomark.md")' | grep -q additionalContext"
-check "ptu: apply_patch 다중(2번째가 spec) → 지시"    "ptu '$(AP2 "$T/src/x.py" "$SP/nomark.md")' | grep -q additionalContext"
-check "ptu: apply_patch terminal passed → 무출력"     "[ -z \"\$(ptu '$(AP1 "$SP/passed.md")')\" ]"
-check "fpre: apply_patch 새 .md → 양식 제안"          "fpre '$(AP1 "$T/codexnew.md")' | grep -q additionalContext"
-check "drev: apply_patch 기존 .md → 검진 넛지"        "drev '$(AP1 "$T/existing.md")' | grep -q additionalContext"
-check "drev: apply_patch 비문서(.py) → 무출력"        "[ -z \"\$(drev '$(AP1 "$T/src/main.py")')\" ]"
-
 echo "[리뷰 기록은 검진 대상이 아니다]"
 # 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
 J2() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s"}}' "$1"; }
@@ -182,8 +167,7 @@ check "차단 응답이 유효한 JSON"              "printf '%s' \"\$WSOUT\" | 
 
 echo "[hooks 배선 — 이 파일이 깨지면 게이트가 통째로 죽는다]"
 # 배선 파일 자체를 아무 테스트도 안 보던 구멍을 막는다. 이름을 손으로 적지 않고 디렉터리와 파일에서 도출한다.
-# 전에는 hooks.json 하나만 유효성을 재다가, hooks-codex.json에 쉼표 하나가 어긋나도 초록인 상태였다 —
-# 파일 이름은 다 들어 있으니 아래 배선 검사는 통과하고, Codex만 훅을 통째로 못 읽는다.
+# 배선 파일에 쉼표 하나가 어긋나도 파일 이름만 보는 검사는 초록이라 유효성부터 잰다.
 HJ="$HERE/hooks/hooks.json"
 for hj in "$HERE"/hooks/hooks*.json; do
   hn="$(basename "$hj")"
@@ -192,8 +176,7 @@ for hj in "$HERE"/hooks/hooks*.json; do
 done
 
 # 배선이 가리키는 경로가 실제로 존재하는가. ${CLAUDE_PLUGIN_ROOT}는 레포 루트로 치환해 확인한다.
-# 배선 파일을 하나만 훑으면 나머지 런타임의 게이트가 조용히 죽는다 — 훅 파일 이름을 바꿔도
-# 그쪽 JSON은 아무도 안 보기 때문이다. 그래서 hooks*.json 전부를 디렉터리에서 도출해 훑는다.
+# 배선 파일은 디렉터리에서 도출해 훑는다 — 이름을 손으로 적으면 새 배선 파일이 검사 밖에 남는다.
 missing=""
 for hj in "$HERE"/hooks/hooks*.json; do
   for rel in $(sed -n 's|.*\${CLAUDE_PLUGIN_ROOT}/\([^"]*\)\\".*|\1|p' "$hj"); do
@@ -204,15 +187,7 @@ check "배선이 가리키는 스크립트가 모두 존재" "[ -z \"\$missing\"
 [ -n "$missing" ] && echo "    없는 파일:$missing"
 
 # 훅 스크립트를 만들어 놓고 배선을 잊는 것을 막는다. 밑줄로 시작하는 것은 공유 헬퍼라 제외한다.
-#
-# **어느 배선 파일에도 안 실린 것만 잡는다.** 전에는 hooks.json 하나만 읽어 Codex 배선을 빠뜨려도
-# 초록이었다. 그렇다고 모든 훅이 모든 배선 파일에 있어야 한다고 요구하면 반대로 어긋난다 — 이
-# 레포는 런타임마다 진입점이 다르고(SessionStart는 Claude가 scripts/scaffold.sh, Codex가
-# hooks/session-start-codex), 한 런타임 전용 훅을 옳게 배선해도 실패해 안 쓰는 런타임에 억지로
-# 끼워 넣게 만든다. 그래서 "어디에도 없는 것"만 실패로 본다.
-#
-# 확장자로 훑지 않는 이유도 같다. hooks/session-start-codex 는 .sh 가 없어 *.sh 글롭에서 빠지는데,
-# 그 파일이야말로 배선에서 빠지면 Codex 게이트가 통째로 죽는 진입점이다.
+# 확장자로 훑지 않는다 — 확장자 없는 훅 파일이 글롭에서 빠지면 배선 누락을 못 잡는다.
 unwired=""
 for f in "$HERE"/hooks/*; do
   [ -f "$f" ] || continue

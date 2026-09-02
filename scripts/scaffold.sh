@@ -8,7 +8,7 @@ PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 
 # Claude 설정 홈 해석 — 공유 헬퍼(SSOT). 도메인 PC의 네트워크 홈 리다이렉트로 bash $HOME이
 # os.homedir(USERPROFILE)과 어긋나면 @import 가 조용히 빠지므로 우선순위 해석을
-# _resolve_home.sh 한 곳에 두고 codex-scaffold.sh와 공유한다.
+# _resolve_home.sh 한 곳에 둔다.
 . "$(dirname "$0")/_resolve_home.sh"
 . "$(dirname "$0")/_scaffold_common.sh"
 . "$(dirname "$0")/_ensure_autoupdate.sh"
