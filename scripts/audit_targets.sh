@@ -19,7 +19,10 @@ while [ "$#" -gt 0 ]; do
 done
 cd "$ROOT"
 LIST="$(mktemp)"
-git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -vE '(^|/)HANDOFF-' | while IFS= read -r f; do
+trap 'rm -f "$LIST"' EXIT
+# grep 단계마다 || true 를 붙인다 — pipefail 아래에서 걸리는 문서가 하나도 없으면 grep 이 1로 끝나
+# 파이프 전체가 실패로 이어지고 set -e 가 json_run 도 trap 도 돌기 전에 스크립트를 끊는다.
+git ls-files '*.md' | { grep -v '^docs/superpowers/' || true; } | { grep -vE '(^|/)HANDOFF-[^/]*$' || true; } | while IFS= read -r f; do
   head -12 "$f" | grep -qi superseded && continue
   printf '%s\n' "$f"
 done > "$LIST"
@@ -76,4 +79,3 @@ for path in io.open(listfile, encoding="utf-8").read().split("\n"):
     for (a, b) in fragments(lines, 1, len(lines)):
         sys.stdout.write(f"{path}\t{a}\t{b}\n")
 ' "$LIMIT" "$LIST"
-rm -f "$LIST"

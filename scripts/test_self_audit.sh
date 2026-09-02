@@ -40,7 +40,7 @@ while IFS= read -r f; do
   head -12 "$HERE/$f" | grep -qi superseded && continue
   printf '%s\n' "$AT_OUT" | cut -f1 | grep -qxF "$f" || AT_MISS="$AT_MISS $f"
 done <<EOF
-$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -vE '(^|/)HANDOFF-')
+$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -vE '(^|/)HANDOFF-[^/]*$')
 EOF
 [ -n "$AT_MISS" ] && echo "    빠진 문서:$AT_MISS"
 check "살아 있는 .md 가 모두 있다"                   "[ -z \"\$AT_MISS\" ]"
@@ -60,13 +60,20 @@ print(" ".join(over))
 [ -n "$AT_OVER" ] && echo "    문턱을 넘는 조각: $AT_OVER"
 check "조각마다 문자 수가 --limit 이하다"            "[ -z \"\$AT_OVER\" ]"
 # 성질로 빼는지는 픽스처 저장소에서 본다 — 레포 자신에 파일을 만들거나 색인을 건드리지 않는다.
-AT_G="$(mktemp -d)"; mkdir -p "$AT_G/docs/superpowers/specs" "$AT_G/sub"
+AT_G="$(mktemp -d)"; mkdir -p "$AT_G/docs/superpowers/specs" "$AT_G/sub" "$AT_G/HANDOFF-dir"
 ( cd "$AT_G" && git init -q && git config user.email t@t && git config user.name t \
   && printf '# live\n\nbody\n' > live.md && printf '# spec\n' > docs/superpowers/specs/s.md \
   && printf '# old\n> superseded 2026-09-03\n' > old.md && printf '# h\n' > HANDOFF-x.md && printf '# h2\n' > sub/HANDOFF-y.md \
+  && printf '# keep\n' > HANDOFF-dir/keep.md \
   && git add -A && git commit -qm seed )
 AT_FIX="$(bash "$AT" --root "$AT_G" 2>/dev/null || true)"
-check "픽스처에서 살아 있는 문서만 남는다"           "[ \"\$(printf '%s\n' \"\$AT_FIX\" | cut -f1 | sort | tr '\n' ' ' | sed 's/ *$//')\" = 'live.md' ]"
+check "픽스처에서 살아 있는 문서만 남는다"           "[ \"\$(printf '%s\n' \"\$AT_FIX\" | cut -f1 | sort | tr '\n' ' ' | sed 's/ *$//')\" = 'HANDOFF-dir/keep.md live.md' ]"
 check "문턱 값이 audit_targets.sh 한 곳에만 있다"     "[ \"\$(grep -rlE \"(^|[^0-9])\$AT_LIMIT([^0-9]|$)\" '$HERE'/scripts '$HERE'/skills '$HERE'/README.md '$HERE'/CLAUDE.md '$HERE'/.claude/workflows 2>/dev/null | grep -vE 'audit_targets.sh|test_self_audit.sh' | wc -l)\" = 0 ]"
+# 대상이 하나도 안 남는 저장소에서도 pipefail 아래 grep 단계가 조용히 죽지 않는지 본다.
+AT_E="$(mktemp -d)"; mkdir -p "$AT_E/docs/superpowers/specs"
+( cd "$AT_E" && git init -q && git config user.email t@t && git config user.name t \
+  && printf '# spec\n' > docs/superpowers/specs/s.md \
+  && git add -A && git commit -qm seed )
+check "대상이 하나도 없어도 조용히 죽지 않는다"      "bash '$AT' --root '$AT_E' >/dev/null 2>&1 && [ -z \"\$(bash '$AT' --root '$AT_E')\" ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
