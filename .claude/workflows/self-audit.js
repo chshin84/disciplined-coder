@@ -15,6 +15,13 @@ export const meta = {
 // 기본값 '.'은 "레포 루트에서 실행"을 전제하고, 다른 위치면 args로 절대 경로를 넘긴다.
 const REPO = (typeof args === 'string' && args.length > 0) ? args : '.'
 
+// 발견 id 는 회차 이름과 일련번호다(2026-09-02-self-audit#017). 기록자는 이 값을 그대로 옮겨 적는다.
+// ROUND 는 대상 도출 걸음이 정한다(덩어리 3). 그 전까지는 실행체 이름만 쓴다.
+let ROUND = 'self-audit'
+function findingId(round, n) { return `${round}#${String(n).padStart(3, '0')}` }
+// 판정 상태의 닫힌 집합 — 'derived'는 반박검증 없이 도출된 발견(회차 대조가 만든다)이다.
+const STATUS = ['confirmed', 'rejected', 'undetermined', 'derived']
+
 const FINDINGS_SCHEMA = {
   type: 'object',
   properties: {
@@ -155,12 +162,12 @@ const judged = await parallel(
     ]).then(vs => {
       // 검증자가 죽어 null이 온 것과 실제로 반박한 것은 다르다. 둘을 뭉치면 죽은 표가 '기각'으로 오염된다.
       // 그래서 상태를 셋으로 가른다 — 두 표가 모두 살아 있고 둘 다 진짜라면 confirmed, 둘 다 살아 있는데
-      // 하나라도 반박하면 rejected, 표가 모자라면 undetermined다.
+      // 하나라도 반박하면 rejected, 표가 모자라면 undetermined다. 판정(isReal)과 사유를 둘 다 남긴다.
       const alive = vs.filter(Boolean)
       const status = alive.length < 2
-        ? 'undetermined'
-        : (alive.filter(v => v.isReal).length === 2 ? 'confirmed' : 'rejected')
-      return { ...f, status, confirmed: status === 'confirmed', missingVotes: 2 - alive.length, verdicts: alive.map(v => v.reason) }
+        ? STATUS[2]
+        : (alive.filter(v => v.isReal).length === 2 ? STATUS[0] : STATUS[1])
+      return { id: findingId(ROUND, i + 1), ...f, status, missingVotes: 2 - alive.length, verdicts: alive.map(v => ({ isReal: v.isReal, reason: v.reason })) }
     })
   )
 )
@@ -178,7 +185,7 @@ const aggregate = await agent(
 먼저 ${REPO} 에서 git rev-parse HEAD 와 git status --porcelain | wc -l 을 다시 실행해 아래 결정론 테스트 결과의 '리비전 지문' 항목과 견주고, 다르면 「감사 도중 작업 트리가 바뀌었다 — 이 회차의 판정은 움직인 작업 트리에 대한 것이다」를 전체 판정 첫 문장으로 적어라.
 결정론 테스트 결과: ${JSON.stringify(test)}
 확정 발견 (${confirmed.length}건): ${JSON.stringify(confirmed)}
-기각 발견 제목들 (${rejected.length}건): ${JSON.stringify(rejected.map(r => ({ title: r.title, why: r.verdicts })))}
+기각 발견 제목들 (${rejected.length}건): ${JSON.stringify(rejected.map(r => ({ title: r.title, why: r.verdicts.map(v => v.reason) })))}
 미판정 (${undetermined.length}건 — 검증자가 응답하지 않아 판정에 이르지 못했다. 반박당한 것이 아니므로 커버리지 공백으로 다뤄라): ${JSON.stringify(undetermined.map(r => ({ title: r.title, file: r.file })))}
 응답하지 않은 렌즈 (${deadLenses.length}개): ${JSON.stringify(deadLenses)}`,
   { label: 'meta-aggregate', phase: '집계' }
@@ -189,7 +196,7 @@ return {
   confirmedCount: confirmed.length, rejectedCount: rejected.length, undeterminedCount: undetermined.length,
   deadLenses,
   confirmed,
-  rejectedTitles: rejected.map(r => r.title),
+  rejected: rejected.map(r => ({ id: r.id, title: r.title, reasons: r.verdicts.map(v => v.reason) })),
   undetermined: undetermined.map(r => ({ title: r.title, file: r.file, missingVotes: r.missingVotes })),
   aggregate,
 }
