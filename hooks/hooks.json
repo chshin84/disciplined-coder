@@ -17,6 +17,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/readonly_pretooluse.sh\""
+          },
+          {
+            "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/doc_format_pretooluse.sh\""
           }
         ]

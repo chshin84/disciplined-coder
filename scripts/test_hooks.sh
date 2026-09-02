@@ -15,6 +15,7 @@ drev() { printf '%s' "$1" | bash "$DREV"; }
 J() { printf '{"tool_input":{"file_path":"%s"}}' "$1"; }
 EXTRACT="$HERE/hooks/_extract_path.sh"
 extract() { printf '%s' "$1" | bash "$EXTRACT"; }
+. "$HERE/scripts/_json_valid.sh"   # JSON 유효성 검사기(공유)
 
 T="$(mktemp -d)"; SP="$T/docs/superpowers/specs"; PL="$T/docs/superpowers/plans"; mkdir -p "$SP" "$PL" "$T/src"
 export CLAUDE_PROJECT_DIR="$T"   # 문서 넛지는 프로젝트 안에서만 뜬다 — 픽스처 폴더를 프로젝트로 삼는다
@@ -118,6 +119,20 @@ check "HEAD spec에 마커 추가 후 → 통과(Fix C)"    "[ -z \"\$(stop '{\"
 ( cd "$G3" && git add -A && git commit -qm 'mark reviewed' )
 check "마커 커밋 후(HEAD=수정 커밋) → 통과(Fix C)" "[ -z \"\$(stop '{\"cwd\":\"$G3\"}')\" ]"
 
+echo "[readonly-pre — 읽기 전용 파일은 고치지 않는다]"
+RPRE="$HERE/hooks/readonly_pretooluse.sh"
+rpre() { printf '%s' "$1" | bash "$RPRE"; }
+RO="$(mktemp -d)"; printf 'sealed\n' > "$RO/sealed.md"; printf 'open\n' > "$RO/open.md"; chmod a-w "$RO/sealed.md"
+check "훅 파일이 있다"                         "[ -f '$RPRE' ]"
+check "읽기 전용 파일(절대경로) → deny"        "rpre '$(J "$RO/sealed.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+check "거부 사유가 들어 있다"                  "rpre '$(J "$RO/sealed.md")' | grep -qF '읽기 전용 파일은 고치지 않는다'"
+check "거부 응답이 유효한 JSON"                "rpre '$(J "$RO/sealed.md")' | json_valid_stdin"
+check "쓸 수 있는 파일 → 무출력"               "[ -f '$RPRE' ] && [ -z \"\$(rpre '$(J "$RO/open.md")')\" ]"
+check "없는 파일 → 무출력"                     "[ -f '$RPRE' ] && [ -z \"\$(rpre '$(J "$RO/nope.md")')\" ]"
+check "상대경로(현재 폴더 기준) 읽기 전용 → deny" "( cd '$RO' && printf '%s' '$(J "sealed.md")' | bash '$RPRE' ) | grep -qF '\"permissionDecision\":\"deny\"'"
+check "게이트 OFF 여도 거부한다"               "DISCIPLINED_CODER_REVIEW_GATE=off rpre '$(J "$RO/sealed.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+check "README 가 이 훅을 적는다"               "grep -qF '읽기 전용 차단' '$HERE/README.md'"
+
 echo "[doc-format-pre]"
 printf 'x\n' > "$T/existing.md"
 check "새 문서(.md) → 양식 제안"         "fpre '$(J "$T/newdoc.md")' | grep -q additionalContext"
@@ -160,8 +175,6 @@ check "no add-pointer nudge anymore"  "! printf '%s' \"\$OUT_GONE\" | grep -qF '
 check "generic nudge fires instead"   "printf '%s' \"\$OUT_GONE\" | grep -qF 'domain-docs'"
 check "nudge names no lens directly"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'lens-'"
 check "hook writes no project file"   "[ ! -f '$PN/docs/solved_problems.md' ]"
-
-. "$HERE/scripts/_json_valid.sh"   # JSON 유효성 검사기(공유)
 
 echo "[차단 사유의 셸·JSON 안전]"
 # 공백 든 경로가 사유에 정확히 한 번 온전하게 들어가야 한다. 공백으로 이어 붙이던 판본은 중복 제거가
