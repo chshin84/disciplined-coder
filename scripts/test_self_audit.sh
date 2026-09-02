@@ -23,4 +23,50 @@ check "발견에 type 선택 칸이 있다"                "grep -qF \"type: { t
 check "렌즈 이름을 쉼표로 나눠 센다"              "grep -qF 'function lensesOf' '$WF'"
 check "run 객체가 spec 의 칸을 갖는다"            "( for k in schema executor commit tree_clean tree_changed completed steps_done targets topic_groups counts_by_lens verdict_counts narrowed unlabeled dead_agents machine_checks stale_rounds; do grep -qE \"[{, ]\$k[:,]\" '$WF' || exit 1; done )"
 
+echo "[audit_targets.sh — 대상 조각과 문턱]"
+AT="$HERE/scripts/audit_targets.sh"
+check "스크립트가 있다"                              "[ -f '$AT' ]"
+AT_LIMIT="$(bash "$AT" --limit 2>/dev/null || true)"
+check "--limit 이 양의 정수를 낸다"                  "printf '%s' \"\$AT_LIMIT\" | grep -qE '^[1-9][0-9]*$'"
+AT_OUT="$(bash "$AT" 2>/dev/null || true)"
+check "출력이 비어 있지 않다"                        "[ -n \"\$AT_OUT\" ]"
+check "줄마다 경로·시작·끝 세 칸이다"                "printf '%s\n' \"\$AT_OUT\" | awk -F'\t' 'NF!=3{exit 1}'"
+check "docs/superpowers/ 아래는 없다"                "! printf '%s\n' \"\$AT_OUT\" | grep -q '^docs/superpowers/'"
+check "HANDOFF- 로 시작하는 파일은 없다"             "! printf '%s\n' \"\$AT_OUT\" | grep -qE '(^|/)HANDOFF-'"
+# 그 밖의 살아 있는 .md 전부가 있다 — 기대 목록은 스크립트와 같은 규칙으로 git 에서 도출한다.
+AT_MISS=""
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  head -12 "$HERE/$f" | grep -qi superseded && continue
+  printf '%s\n' "$AT_OUT" | cut -f1 | grep -qxF "$f" || AT_MISS="$AT_MISS $f"
+done <<EOF
+$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -vE '(^|/)HANDOFF-')
+EOF
+[ -n "$AT_MISS" ] && echo "    빠진 문서:$AT_MISS"
+check "살아 있는 .md 가 모두 있다"                   "[ -z \"\$AT_MISS\" ]"
+# 조각마다 문자 수가 --limit 을 넘지 않는다 — 자르기가 실제로 문턱을 지키는지 본다.
+AT_OVER="$(cd "$HERE" && printf '%s\n' "$AT_OUT" | json_run '
+import sys, io
+limit = int(sys.argv[1]); over = []
+for line in sys.stdin:
+    line = line.rstrip("\n")
+    if not line: continue
+    path, s, e = line.split("\t"); s, e = int(s), int(e)
+    lines = io.open(path, encoding="utf-8").read().split("\n")
+    n = len("\n".join(lines[s-1:e]))
+    if n > limit: over.append(f"{path}:{s}-{e}={n}")
+print(" ".join(over))
+' "$AT_LIMIT")"
+[ -n "$AT_OVER" ] && echo "    문턱을 넘는 조각: $AT_OVER"
+check "조각마다 문자 수가 --limit 이하다"            "[ -z \"\$AT_OVER\" ]"
+# 성질로 빼는지는 픽스처 저장소에서 본다 — 레포 자신에 파일을 만들거나 색인을 건드리지 않는다.
+AT_G="$(mktemp -d)"; mkdir -p "$AT_G/docs/superpowers/specs" "$AT_G/sub"
+( cd "$AT_G" && git init -q && git config user.email t@t && git config user.name t \
+  && printf '# live\n\nbody\n' > live.md && printf '# spec\n' > docs/superpowers/specs/s.md \
+  && printf '# old\n> superseded 2026-09-03\n' > old.md && printf '# h\n' > HANDOFF-x.md && printf '# h2\n' > sub/HANDOFF-y.md \
+  && git add -A && git commit -qm seed )
+AT_FIX="$(bash "$AT" --root "$AT_G" 2>/dev/null || true)"
+check "픽스처에서 살아 있는 문서만 남는다"           "[ \"\$(printf '%s\n' \"\$AT_FIX\" | cut -f1 | sort | tr '\n' ' ' | sed 's/ *$//')\" = 'live.md' ]"
+check "문턱 값이 audit_targets.sh 한 곳에만 있다"     "[ \"\$(grep -rlE \"(^|[^0-9])\$AT_LIMIT([^0-9]|$)\" '$HERE'/scripts '$HERE'/skills '$HERE'/README.md '$HERE'/CLAUDE.md '$HERE'/.claude/workflows 2>/dev/null | grep -vE 'audit_targets.sh|test_self_audit.sh' | wc -l)\" = 0 ]"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
