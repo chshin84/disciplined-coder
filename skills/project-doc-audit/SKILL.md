@@ -64,7 +64,7 @@ description: 한 레포의 살아 있는 문서 전부를 문서 종류에 따�
 돌아온 `notes`에서 렌즈가 더 확인해야 한다고 적은 것을 읽는다. 렌즈는 서브에이전트를 새로 열지 않고 거기에 적어 두므로, 호출자가 그 줄을 읽고 필요하면 같은 렌즈에게 이어 묻는다.
 
 ## 통합 기록
-결과는 `docs/superpowers/reviews/YYYY-MM-DD-project-doc-audit-check.md` 한 파일에 모은다. 같은 날 두 번째 회차를 돌면 `-check` 앞에 `-2`처럼 회차를 붙여 앞 회차를 덮지 않는다.
+결과는 `docs/superpowers/reviews/YYYY-MM-DD-project-doc-audit-check.md` 한 파일에 모은다. 같은 날 두 번째 회차는 `-check-2.md`처럼 종류 뒤에 회차를 붙인다. 이름 규칙은 `domain-docs`의 문서 타입 표 기록 행을 따른다.
 
 파일에 담는 것은 여섯이다.
 

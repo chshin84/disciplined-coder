@@ -15,7 +15,11 @@
 
 새 세션을 한 번 열면 셋업이 끝난다. `/show-principles`로 원칙 목록이 나오면 정상이다.
 
-목록이 안 나오면 셋업이 쓴 설정 홈과 지금 세션이 읽는 설정 홈이 다르다. 회사 PC는 홈 리다이렉트로 bash의 `$HOME`과 Windows의 `USERPROFILE`이 다르다. 실제 홈을 아래로 확인하고 `/setup-discipline`으로 다시 실행한다.
+목록이 안 나오면 원인은 셋 가운데 하나다.
+
+- **스코프** — 플러그인 스코프가 user가 아니어서 hook이 안 돌았다. 설치 때 스코프를 따로 준 적이 없으면 이 원인이 아니다(기본값이 user다). 터미널에서 `claude plugin install disciplined-coder@chshin-tools --scope user`로 다시 설치한다.
+- **셋업 오류** — 세션 시작 알림에 `ERROR`가 찍혔다. 정본 복사 실패나 `@import` 배선 실패이고, 뒤의 것은 그 세션에 원칙이 실리지 않는다. `/setup-discipline`으로 다시 실행하고, 다시 `ERROR`가 찍히면 그 메시지를 이슈로 올린다.
+- **설정 홈 불일치** — 셋업이 쓴 설정 홈과 지금 세션이 읽는 설정 홈이 다르다. 회사 PC의 홈 리다이렉트로 bash의 `$HOME`과 Windows의 `USERPROFILE`이 다를 때 생긴다. 실제 홈을 아래로 확인하고 `/setup-discipline`으로 다시 실행한다.
 
 ```bash
 for d in "${CLAUDE_CONFIG_DIR:-}" "${USERPROFILE:+$USERPROFILE/.claude}" "$HOME/.claude"; do
@@ -37,12 +41,13 @@ done
 
 이 플러그인이 프로젝트 파일을 고치는 예외는 하나이고 그 조건은 여기가 정한다. 그 레포 `CLAUDE.md`에 관리블록이 남아 있고 그 블록을 만든 기능이 없어졌으면, 사본을 전역 백업에 복사한 뒤 제거한다. 그때의 잠금 대기 시간은 `scripts/_managed_block.sh`의 상수가 정한다.
 
-## 하드 게이트와 전역 설정 수정
+## 하드 게이트와 넛지와 전역 설정 수정
 
-세션에 걸리는 것은 턴 종료를 막는 하드 게이트 하나와 전역 설정 수정 하나다. 둘 다 끄거나 되돌릴 수 있다.
+세션에는 턴 종료를 막는 하드 게이트 하나와 넛지 셋과 전역 설정 수정 하나가 걸린다. 게이트와 넛지는 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 넷 다 꺼지고, 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
 
-- **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고 `domain-spec-review` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `escalated`)가 남으면 종료 차단이 해제된다. 끄려면 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off`를 설정한다. 상세는 `skills/domain-spec-review/SKILL.md`를 참고한다.
-- **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다. 이 마켓플레이스 항목에만 `autoUpdate: true`를 넣어 깃허브의 갱신이 자동으로 적용되게 한다. 키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며, 사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다. 규칙은 `scripts/_ensure_autoupdate.sh`가 정한다.
+- **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고 `domain-spec-review` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 종료 차단이 해제된다. 차단은 턴에 한 번이다. 두 번째 종료 시도는 통과하므로 리뷰를 하지 않고도 턴을 끝낼 수 있다. 상세는 `skills/domain-spec-review/SKILL.md`를 참고한다.
+- **넛지 셋** — 차단하지 않고 안내만 한다. spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 `domain-docs`의 양식을 제안하며, `.md`를 고치면 문서 검진을 권한다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
+- **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다. 이 마켓플레이스 항목에만 `autoUpdate: true`를 넣어 깃허브의 갱신이 자동으로 적용되게 한다. 키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며, 사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다. 지키는 규칙은 `skills/domain-plugin/SKILL.md`의 「사용자 설정 파일을 고칠 때 지킬 것」을 참고한다.
 
 ## 주의
 

@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
 # 공유 헬퍼: 이 플러그인의 마켓플레이스 항목에 autoUpdate를 채워 넣는다(멱등).
 # 사용자가 손으로 켜지 않아도 깃허브의 갱신이 자동으로 따라오게 하려는 것이다.
-# 규칙 넷을 지킨다.
-#   1) 우리 마켓플레이스 이름의 항목만 만진다. 남의 마켓플레이스는 건드리지 않는다.
-#   2) autoUpdate 키가 아예 없을 때만 채운다. 사용자가 false로 둔 것은 사용자의 결정이라 그대로 둔다.
-#   3) 사본을 남기고, 새로 쓴 파일을 다시 파싱해 유효할 때만 제자리에 놓는다(FAIL-LOUD).
-#   4) 못 고친 회차는 그 까닭을 갈라 알린다. 설정을 못 읽은 것과 파이썬이 없는 것은 다른 일이다.
-#      JSON을 다루는 데 파이썬만 쓴다 — 노드 폴백을 두면 한 번도 안 도는 사본이 하나 더 생긴다(`SIMPLE`).
+# 지킬 규칙은 skills/domain-plugin/SKILL.md 「사용자 설정 파일을 고칠 때 지킬 것」이 소유한다(대상 좁히기·
+# 사용자 결정 존중·사본과 재검증·사유를 가른 통지·처리기 하나·서식 변경 고지). 여기 다시 적지 않는다.
 # 값을 채우면 파일 전체가 두 칸 들여쓰기로 다시 찍힌다 — 내용은 그대로이나 서식은 바뀔 수 있어
 # 사본(.bak)을 남기고 바뀐 경로를 호출자가 사용자에게 알린다.
 # 소비자는 scaffold.sh다.
+. "$(dirname "${BASH_SOURCE[0]}")/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
 #
 # 종료코드를 나눠 쓰는 까닭: 파이썬은 파싱에 실패해도 1로 끝난다. '고칠 것이 없다'를 1로 두면
 # 깨진 설정이 정상 회차와 같은 값으로 들어와 경고가 죽는다. 그래서 '고칠 것이 없다'를 10으로 옮겼다.
@@ -62,13 +59,9 @@ except Exception:
     sys.exit(5)
 sys.exit(0)
 '
-  if python3 -c 'import sys' >/dev/null 2>&1; then
-    rc=0; python3 -c "$prog" "$f" "$mkt" >/dev/null 2>&1 || rc=$?
-  elif python -c 'import sys' >/dev/null 2>&1; then
-    rc=0; python -c "$prog" "$f" "$mkt" >/dev/null 2>&1 || rc=$?
-  else
-    return 4
-  fi
+  # 인터프리터 고르기는 _json_valid.sh 한 곳이 한다. 파이썬이 없으면 4 — 호출자가 사유를 갈라 알린다.
+  local py; py="$(_json_python)" || return 4
+  rc=0; "$py" -c "$prog" "$f" "$mkt" >/dev/null 2>&1 || rc=$?
   # 치우기를 rm -rf 로 하는 까닭: 임시 자리에 폴더가 놓여 있으면 rm -f 로는 안 지워져 다음
   # 세션마다 같은 실패가 되풀이된다. 이 이름은 우리가 정한 것이라 지워도 안전하다.
   if [ "$rc" -ne 0 ]; then rm -rf "$tmp"; return "$rc"; fi

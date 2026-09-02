@@ -74,9 +74,12 @@ check "type 기반 처분 표를 적는다"          "grep -qF '값으로 행동
 
 PTU="$HERE/hooks/spec_review_posttooluse.sh"
 STOPH="$HERE/hooks/spec_review_stop.sh"
-echo "[훅 안내문 — 마커를 개선보다 먼저]"
-check "PostToolUse 안내문이 마커 선기록을 지시한다" "grep -qF '마커를 먼저 남기고' \"\$PTU\""
-check "Stop 안내문이 마커 선기록을 지시한다"        "grep -qF '마커를 먼저 남기고' \"\$STOPH\""
+SPECM="$HERE/hooks/_spec_marker.sh"
+echo "[훅 안내문 — 마커를 개선보다 먼저, 문안은 한 곳에]"
+check "공유 안내문이 마커 선기록을 지시한다"     "grep -qF '마커를 먼저 남기고' \"\$SPECM\""
+check "PostToolUse 훅이 공유 안내문을 쓴다"       "grep -qF 'SPEC_REVIEW_INSTRUCTION' \"\$PTU\""
+check "Stop 훅이 공유 안내문을 쓴다"              "grep -qF 'SPEC_REVIEW_INSTRUCTION' \"\$STOPH\""
+check "훅이 안내문을 따로 베끼지 않는다"          "! grep -qF '마커를 먼저 남기고' \"\$PTU\" \"\$STOPH\""
 
 echo "[리뷰 절차 — 렌즈를 한 번씩 띄우고 결과를 한데 모은다]"
 DOCS="$HERE/skills/domain-docs/SKILL.md"
@@ -115,7 +118,7 @@ check "표현만 다듬었으면 건너뛴다"            "grep -qF '골랐을 �
 check "건너뛰면 알린다"                       "grep -qF '건너뛰었다고 한 줄 알린다' \"\$DOCS\""
 
 echo "[한 번만 띄우므로 지킬 것 — 소유자와 여섯 렌즈 프롬프트]"
-check "domain-docs가 그 규칙의 소유자다"      "grep -qF '한 번만 띄우는 렌즈의 규율 (여기가 소유자)' \"\$DOCS\""
+check "domain-docs가 그 규칙의 소유자다"      "grep -A1 -F '## 한 번만 띄우는 렌즈의 규율' \"\$DOCS\" | grep -qF '여기가 소유자다'"
 check "중첩 금지를 적는다"                    "grep -qF '렌즈는 서브에이전트를 새로 열지 않는다' \"\$DOCS\""
 check "이어 묻기를 적는다"                    "grep -qF '대화 턴을' \"\$DOCS\""
 check "3층 오케스트레이션 예외를 적는다"      "grep -qF '3층 오케스트레이션은 이 금지의 예외다' \"\$DOCS\""
@@ -134,7 +137,7 @@ echo "[기록 — 자리와 담을 것]"
 check "spec 리뷰 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$CALLER\""
 check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$DOCS\""
 check "문서 검진 기록의 이름을 적는다"       "grep -qF '-check.md' \"\$DOCS\""
-check "문서 검진은 처리 결과를 함께 적는다"   "grep -qF '무엇을 고쳤고 무엇을 넘겼는지' \"\$DOCS\""
+check "문서 검진 기록은 처리 결과를 뺀다"    "grep -qF '무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다' \"\$DOCS\""
 check "spec 리뷰 기록은 처리 결과를 뺀다"    "grep -qF '어떻게 처리했는지는 담지 않는다' \"\$CALLER\""
 check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거를 검토 대상 문서 본문에 적는다' \"\$CALLER\""
 check "기록 파일 이름에 회차가 들어간다"      "grep -qF '-review-2.md' \"\$CALLER\""
@@ -176,7 +179,7 @@ echo "[렌즈에게 정본을 알리는 법 — domain-docs 한 곳만 규율을
 # 전에 여러 문서가 각자 적었다가 하나에서 둘이 빠져 갈라졌다. 소유자를 하나로 두고
 # 나머지는 가리키기만 하게 묶는다. 앵커는 소유자의 절 제목이라 제목을 고치면 실패한다(FAIL-LOUD).
 OWNER_DOC="$HERE/skills/domain-docs/SKILL.md"
-OWNER_ANCHOR='## 렌즈에게 정본을 알리는 법 (여기가 소유자)'
+OWNER_ANCHOR='## 렌즈에게 정본을 알리는 법'
 # 규율 넷을 알아보는 문구. 소유자에만 있어야 한다.
 RULE_MARKS=('읽기 전용 에이전트도 Read는 갖는다' '비어 있지 않은 배열' '홈 해석이 어긋나는 환경에서')
 check "소유자 절이 있다" "grep -qF -- \"\$OWNER_ANCHOR\" \"\$OWNER_DOC\""
@@ -208,7 +211,8 @@ STALE_NAMES="$(sed -n 's/^SCAFFOLD_STALE="\(.*\)"$/\1/p' "$HERE/scripts/_scaffol
 check "제거된 기능 목록을 도출했다" "[ -n \"\$STALE_NAMES\" ]"
 SN=0
 for n in $STALE_NAMES; do
-  case "$n" in *.md) continue ;; esac   # 파일 이름은 기능 이름이 아니다
+  # 파일 이름은 그대로 기능 이름이 아니다 — 첫 구분자 앞의 어간(solved_problems.md → solved)으로 훑는다.
+  case "$n" in *.md) n="${n%%[_.-]*}" ;; esac
   for D in "$HERE"/docs/superpowers/specs/*"$n"*.md "$HERE"/docs/superpowers/plans/*"$n"*.md; do
     [ -f "$D" ] || continue
     SN=$((SN+1))
@@ -324,10 +328,17 @@ check "코드에서 에스컬레이트 마커를 뽑아냈다" "[ -n \"\$MARK_ES
 # 둘 다 뽑은 값으로 대조한다. 전에는 에스컬레이트만 손으로 적은 'escalated' 리터럴로 재다가,
 # 마커 형태가 바뀌어도 낱말만 남아 있으면 통과하는 반쪽 대조가 됐다 — 절반만 기계화한 것이
 # 원래의 손 유지보다 오히려 조용했다.
-for D in "$CALLER"; do
+# README도 같은 리터럴을 적으므로 함께 대조한다 — 한 파일만 대조하면 나머지는 조용히 낡는다.
+for D in "$CALLER" "$README"; do
   dn="$(basename "$D")"
   check "$dn 이 통과 마커를 코드와 같이 적는다"       "grep -qF -- '$MARK_OK' '$D'"
   check "$dn 이 에스컬레이트 마커를 코드와 같이 적는다" "grep -qF -- '$MARK_ESC' '$D'"
+done
+# 끄기 변수 이름도 코드에서 뽑아 산문과 맞댄다.
+GATE_VAR="$(grep -oE 'DISCIPLINED_CODER_[A-Z_]+' "$STOPH" | head -1 || true)"
+check "코드에서 끄기 변수 이름을 뽑아냈다" "[ -n \"\$GATE_VAR\" ]"
+for D in "$CALLER" "$README"; do
+  check "$(basename "$D") 이 끄기 변수 이름을 코드와 같이 적는다" "grep -qF -- '$GATE_VAR' '$D'"
 done
 
 # --- 렌즈 전체 개수를 산문에 박지 않는다 ---
@@ -420,6 +431,18 @@ for d in "$HERE"/skills/*/; do
   check "$sk 이 언제 여는지 자기 설명에 적는다" "grep -m1 '^description:' '$d/SKILL.md' | grep -qE '때|연다|쓴다|한다'"
 done
 
+# description 값은 YAML 평문 스칼라다. ': ' 나 ' #' 이 들어가면 frontmatter 파싱이 깨져 그 스킬이 목록에서
+# 조용히 사라진다. 규칙은 domain-plugin 「frontmatter」가 소유하고 여기서 기계로 붙든다.
+echo "[frontmatter 안전 — description 값에 ': ' 와 ' #' 이 없다]"
+FMN=0
+for f in "$HERE"/skills/*/SKILL.md "$HERE"/commands/*.md; do
+  [ -f "$f" ] || continue
+  FMN=$((FMN+1))
+  DESC="$(grep -m1 '^description:' "$f" | sed 's/^description:[[:space:]]*//')"
+  check "$(basename "$(dirname "$f")")/$(basename "$f") 의 description 이 YAML 평문으로 안전하다" "! printf '%s' \"\$DESC\" | grep -qE ': | #'"
+done
+check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
+
 # --- 이독성 규칙의 출처가 세 문서에 걸쳐 이어져 있다 ---
 # 정본은 조항만 담고, writing-korean 이 상세를 담으며, lens-readability 가 그것을 열어 대조한다.
 # 전에 정본을 줄이면서 조항을 스킬로 통째로 내렸더니 렌즈가 가리키는 근거가 정본에서 사라졌는데,
@@ -459,8 +482,8 @@ pl=json.load(io.open(sys.argv[2],encoding="utf-8"))
 ent=[p for p in mk["plugins"] if p.get("name")==pl["name"]]
 print("MISSING" if not ent else ("SAME" if ent[0].get("description")==pl.get("description") else "DIFF"))
 '
-if python3 -c 'import sys' >/dev/null 2>&1; then PYBIN=python3; else PYBIN=python; fi
-MKCMP="$("$PYBIN" -c "$JSONPROG" "$HERE/.claude-plugin/marketplace.json" "$HERE/.claude-plugin/plugin.json" 2>&1)" || MKCMP="PARSE-ERROR"
+. "$HERE/scripts/_json_valid.sh"   # 인터프리터 고르기는 한 곳(json_run)이 한다
+MKCMP="$(json_run "$JSONPROG" "$HERE/.claude-plugin/marketplace.json" "$HERE/.claude-plugin/plugin.json" 2>&1)" || MKCMP="PARSE-ERROR"
 check "두 매니페스트가 JSON으로 파싱된다"     "[ '$MKCMP' != 'PARSE-ERROR' ]"
 check "마켓플레이스에 이 플러그인 항목이 있다" "[ '$MKCMP' != 'MISSING' ]"
 check "두 문안이 같다"                         "[ '$MKCMP' = 'SAME' ]"

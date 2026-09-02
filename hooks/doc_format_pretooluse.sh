@@ -4,7 +4,7 @@
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 DIR="$(cd "$(dirname "$0")" && pwd)"
-. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan) 공유(SSOT)
+. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_in_project) 공유(SSOT)
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 INPUT="$(cat)"
 match=""
@@ -12,7 +12,9 @@ while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
   case "$FILE" in *.md) ;; *) continue ;; esac          # 문서(.md)만
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
+  case "$FILE" in *docs/superpowers/reviews/*.md) continue ;; esac   # 리뷰 기록은 양식이 검진 절이 정한다
   [ -e "$FILE" ] && continue                             # 생성 때만 제안(편집은 양식 이미 정해짐)
+  path_in_project "$FILE" || continue                    # 프로젝트 밖 문서(메모리·계획 파일)에는 걸지 않는다
   match="$FILE"; break
 done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")

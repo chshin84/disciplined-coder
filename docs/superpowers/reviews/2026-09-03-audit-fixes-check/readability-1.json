@@ -1,0 +1,16 @@
+{
+ "lens": "readability",
+ "purpose": "설치해 본 적 없는 사람이 README만 보고 설치해 동작 확인까지 마치고, 세션에 무엇이 강제되는지와 그것을 어떻게 끄는지 알게 한다",
+ "read": ["skills/writing-korean/SKILL.md", "agent-principles.md", "docs/superpowers/reviews/2026-09-03-canon-rewrite-check.md", "git diff HEAD -- README.md"],
+ "issues": [
+  {"where": "「동작 확인과 복구」 원인 셋 문장 (README.md:18)", "type": "structure", "claim": "원인 셋이 한 문장(309바이트, 중앙값의 3.7배)에 겹치고 항목마다 관형절이 '것'을 꾸미며 괄호 부연이 또 들어 있어 자기 증상이 어느 원인인지 고르지 못한다.", "consequence": "스코프나 셋업 오류가 원인인 사람은 복구에 실패한 채 README를 떠난다.", "evidence": "README.md:18 / KO-SYNTAX 관형절·명사구 겹침", "rewrite": "원인 셋을 라벨 붙은 목록으로 나눈다."},
+  {"where": "「동작 확인과 복구」 마지막 문장 (README.md:18)", "type": "wrong-job", "claim": "원인을 셋으로 늘려 놓고 대책은 셋째 원인의 것 하나만 적었다.", "consequence": "첫째·둘째 원인에 해당하는 사람은 무엇을 해야 하는지 못 읽는다.", "evidence": "대책 문장은 「실제 홈을 아래로 확인하고 `/setup-discipline`으로 다시 실행한다」 하나뿐", "rewrite": "항목마다 대책 한 줄을 붙인다. 스코프 지정 절차는 문서에 없어 확인이 필요하다."},
+  {"where": "「세션에 걸리는 것」 제목과 첫 문장 (README.md:40, 42)", "type": "language", "claim": "이름이 있는 세 대상을 '것'으로 뭉뚱그려 목차에서 이 절을 지나친다.", "consequence": "무엇이 강제되는지 찾는 사람이 절을 못 찾는다.", "evidence": "writing-korean 「'것'의 대체」", "rewrite": "## 하드 게이트와 넛지와 전역 설정 수정 / 세션에는 …가 걸린다."},
+  {"where": "README.md:42 「게이트와 넛지 넷」", "type": "friction", "claim": "'합쳐 넷'으로도 '넛지 네 개'로도 읽혀 앞 문장의 '넛지 셋'과 어긋나 보인다.", "consequence": "개수를 되돌아가 다시 센다.", "evidence": "같은 문단에 '넛지 셋'과 '넛지 넷'", "rewrite": "게이트와 넛지는 환경변수 … 하나로 넷 다 꺼지고"},
+  {"where": "README.md:42 「되돌릴 수 있다」", "type": "friction", "claim": "무엇으로 되돌리는지 안 적었다.", "consequence": "결론만 읽은 사람은 방법을 못 찾는다.", "evidence": "사본(`.bak`)은 셋째 불릿 안쪽에만 나온다", "rewrite": "남겨 둔 사본(`.bak`)으로 되돌릴 수 있다."},
+  {"where": "README.md:42 환경변수 문장", "type": "friction", "claim": "변수 이름만 적고 어디에 두는지 없다.", "consequence": "초보 독자가 게이트를 끄지 못한다.", "evidence": "문서 어디에도 변수를 두는 곳이 없다", "rewrite": "변수를 두는 곳 한 줄을 덧붙인다(훅 코드로 확인)."},
+  {"where": "README.md:44 「강한 환기에 가깝다」", "type": "language", "claim": "게이트를 지나친 뒤 무엇이 되는지 안 적었다.", "consequence": "리뷰를 강제하는지 아닌지가 남는다.", "evidence": "writing-korean 「결과 서술」", "rewrite": "두 번째 종료 시도는 통과하므로 리뷰를 하지 않고도 턴을 끝낼 수 있다."}
+ ],
+ "principles_applied": ["PLAIN-KO", "PROSE-FORM", "READ-FLOW", "KO-SYNTAX", "MEASURE-FIRST", "NAME-ITEMS"],
+ "notes": "금지 표현 0건. 문장 41개, 바이트 중앙값 83, 최대 309(18행). 관찰 축 열을 축마다 셌다 — 강조 6(라벨), 끊김 6, 이음 3, 목록 2, 끼움 3, 이름 형태 위반 0(다만 '것' 제목), 형태 섞임 0, 두루뭉술한 결과 2, 수식 5. 앞 회차 반영분은 살아 있고 제목의 '것'만 되돌아왔다. 더 확인할 것 — 환경변수를 읽는 곳, 스코프를 user로 고르는 절차."
+}

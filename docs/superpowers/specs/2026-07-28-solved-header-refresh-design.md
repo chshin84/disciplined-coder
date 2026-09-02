@@ -1,5 +1,7 @@
 # 오답노트 형식 규칙이 낡았을 때 알리는 설계
 
+> **제거된 기능의 설계다(superseded).** 오답노트(solved_problems)는 걷어냈고, 남은 파일은 스캐폴드가 백업으로 옮긴다(`scripts/_scaffold_common.sh`의 `SCAFFOLD_STALE`). 왜 그렇게 설계했는지의 판단만 남겨 두는 것이니 지금 동작의 근거로 읽지 마라.
+
 ## 배경 — 무엇이 문제였나
 
 `scaffold_ensure_solved`는 오답노트 파일이 없을 때만 템플릿으로 만들고, 있으면 그 자리에서 반환한다

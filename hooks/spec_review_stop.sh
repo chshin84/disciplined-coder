@@ -14,7 +14,14 @@ command -v git >/dev/null 2>&1 || exit 0
 cwd="$(printf '%s' "$INPUT" | sed -n 's/.*"cwd"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1)"
 cwd="$(printf '%s' "$cwd" | tr -s '\\' '/')"
 if [ -n "$cwd" ]; then cd "$cwd" 2>/dev/null || exit 0; fi
-git rev-parse --is-inside-work-tree >/dev/null 2>&1 || exit 0
+# git이 "저장소가 아니다"라고 답하면 잠글 대상이 없으니 조용히 통과한다(FAIL-OPEN, 문서화된 한계).
+# 그 밖의 실패(소유권 의심·인덱스 손상 등)는 게이트를 검사하지 못한 것이므로 알리고 통과한다 —
+# 아무 신호 없이 열리면 게이트가 꺼진 것을 알아챌 방법이 없다(FAIL-LOUD).
+_gitout="$(git rev-parse --is-inside-work-tree 2>&1)" || {
+  case "$_gitout" in *'not a git repository'*) exit 0 ;; esac
+  printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: git을 읽지 못해 spec 리뷰 게이트를 검사하지 못했다 — $(printf '%s' "$_gitout" | head -n1)")"
+  exit 0
+}
 # 레포 루트로 옮긴 뒤에 찾는다. 아래 두 탐색이 모두 레포 루트 기준 경로를 쓰기 때문이다 —
 # git status 의 pathspec(`docs/superpowers/...`)은 현재 폴더 기준이고, diff-tree 가 돌려주는
 # 경로와 `[ -f "$f" ]` 도 루트 기준이다. 그래서 세션의 작업 폴더가 하위 폴더이면(예: myrepo/backend)
@@ -36,7 +43,7 @@ while IFS= read -r -d '' entry; do
   path_is_specplan "$f" || continue
   [ -f "$f" ] || continue
   marker_is_terminal "$f" || unreviewed+=("$f")
-done < <(git status -z --porcelain --untracked-files=all --no-renames -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null)
+done < <(git status -z --porcelain --untracked-files=all --no-renames -- $SPECPLAN_DIRS 2>/dev/null)
 
 # Fix C: 같은 턴 커밋 우회 차단 — HEAD 커밋이 추가(A)한 spec/plan도 검사한다.
 # 경계는 직전 커밋 하나: 과거 이력을 소급 차단하지 않는다(훅 도입 전 무마커 레거시가 있는
@@ -55,7 +62,7 @@ if [ "${#unreviewed[@]}" -gt 0 ]; then
   list=""; for u in "${unreviewed[@]}"; do list="$list
   - $u"; done
   reason="미리뷰 spec/plan:$list
-disciplined-coder domain-spec-review(PREP+독립 렌즈, 렌즈 구성은 그 스킬이 정한다)를 수행하고, 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영한 뒤 종료하라."
+${SPEC_REVIEW_INSTRUCTION} 반영을 마친 뒤 종료하라."
   printf '{"decision":"block","reason":"%s"}\n' "$(escape_for_json "$reason")"
 fi
 exit 0

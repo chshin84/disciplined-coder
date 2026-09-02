@@ -4,7 +4,7 @@
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 DIR="$(cd "$(dirname "$0")" && pwd)"
-. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan) 공유(SSOT)
+. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_in_project) 공유(SSOT)
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 INPUT="$(cat)"
 match=""
@@ -20,6 +20,9 @@ while IFS= read -r FILE; do
   case "$FILE" in
     *docs/superpowers/reviews/*.md) continue ;;
   esac
+  # 프로젝트 밖 문서에는 걸지 않는다. 메모리 파일과 계획 파일을 쓸 때마다 무시해야 할 넛지가 뜨면
+  # 진짜 문서에서도 이 넛지를 흘려보내게 된다 — 위 문단이 적은 피로 기전 그대로다.
+  path_in_project "$FILE" || continue
   match="$FILE"; break
 done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")

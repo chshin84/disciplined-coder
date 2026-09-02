@@ -101,6 +101,7 @@ const testPromise = agent(
 - scripts/test_*.sh 를 전부. 목록도 실행 명령도 여기 적지 않는다 — ${REPO}/CLAUDE.md 가 그 명령의 정본이니 그 파일을 읽고 거기 적힌 형태 그대로 돌려라. 앞 스크립트의 실패가 마지막 스크립트의 종료 코드에 묻히는 형태로 바꿔 쓰지 마라.
 - claude plugin validate ./ (non-strict)
 어떤 스크립트를 실제로 돌렸는지 이름을 모두 보고에 적어라. 하나도 못 찾았으면 그 사실 자체가 FAIL이다.
+- 감사 대상 리비전 지문: git rev-parse HEAD 와 git status --porcelain | wc -l 을 실행해, results 에 name 이 '리비전 지문'인 항목을 하나 더하고 summary 에 그 SHA와 미커밋 파일 수를 적어라(passed 는 미커밋 파일이 0이면 true). 감사가 도는 동안 작업 트리가 바뀌면 렌즈의 인용과 검증자의 읽기가 서로 다른 파일을 보므로, 미커밋이 있으면 먼저 커밋하라고 summary 에 적어라.
 각각 PASS/FAIL 카운트와, FAIL이 있으면 어떤 체크가 왜 실패했는지 출력에서 인용하라. 계약은 FAIL=0이다.
 환경 원인(도구 부재 등)으로 보이는 실패는 그 사실 자체를 보고하라(수정 시도 금지).`,
   { label: 'run-tests', phase: '테스트', schema: TEST_SCHEMA }
@@ -174,6 +175,7 @@ const test = await testPromise
 phase('집계')
 const aggregate = await agent(
   `너는 집계자다. ${REPO}/skills/meta-aggregate/SKILL.md 를 읽고 그 방식대로, 아래 자기감사 결과의 구조적 건강성을 점검하라 — 확정 발견 간 상충, 커버리지 공백, 전체 판정. 발견 내용 재판단은 금지(검증 단계가 끝냈다). 출력은 완결된 문어체 한국어로: (1) 전체 판정 한 단락, (2) 확정 발견 정리 — 등급을 매기지 말고, 사용자 결정이 필요한 것을 따로 가려 앞에 둔다, (3) 상충 명시, (4) 커버리지 공백.
+먼저 ${REPO} 에서 git rev-parse HEAD 와 git status --porcelain | wc -l 을 다시 실행해 아래 결정론 테스트 결과의 '리비전 지문' 항목과 견주고, 다르면 「감사 도중 작업 트리가 바뀌었다 — 이 회차의 판정은 움직인 작업 트리에 대한 것이다」를 전체 판정 첫 문장으로 적어라.
 결정론 테스트 결과: ${JSON.stringify(test)}
 확정 발견 (${confirmed.length}건): ${JSON.stringify(confirmed)}
 기각 발견 제목들 (${rejected.length}건): ${JSON.stringify(rejected.map(r => ({ title: r.title, why: r.verdicts })))}

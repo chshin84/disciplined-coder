@@ -39,9 +39,9 @@ if t is None: t=d.get(sys.argv[2])
 if not isinstance(t,dict) or "autoUpdate" not in t: print("none")
 else: print("true" if t["autoUpdate"] is True else "false")
 '
-  if python3 -c 'import sys' >/dev/null 2>&1; then python3 -c "$prog" "$1" "$2"
-  else python -c "$prog" "$1" "$2"; fi
+  json_run "$prog" "$1" "$2"
 }
+. "$HERE/scripts/_json_valid.sh"   # 인터프리터 고르기는 한 곳(json_run)이 한다
 
 # --- marketplace-autoupdate: 우리 마켓플레이스만, 키가 없을 때만 켠다 ---
 MKT="$(grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' "$HERE/.claude-plugin/marketplace.json" | head -1 | cut -d'"' -f4)"
@@ -109,7 +109,7 @@ check "읽기 실패는 읽기 실패라고 말한다"    "printf '%s' \"\$ERR_D
 # 읽기는 되는데 쓰기가 안 되는 회차. 임시 자리에 폴더를 두어 새 내용을 쓰지 못하게 만든다.
 # 전에는 이 갈래가 읽기 실패와 같은 문구로 나와, 사람이 멀쩡한 설정 파일을 뜯어보게 만들었다.
 HE="$(mktemp -d)"; PE="$(mktemp -d)"; mkdir -p "$HE/.claude"
-MKTE="$(python -c 'import json,io,sys; print(json.load(io.open(sys.argv[1],encoding="utf-8"))["name"])' "$HERE/.claude-plugin/marketplace.json")"
+MKTE="$(json_run 'import json,io,sys; print(json.load(io.open(sys.argv[1],encoding="utf-8"))["name"])' "$HERE/.claude-plugin/marketplace.json")"
 printf '{ "extraKnownMarketplaces": { "%s": { "source": { "source": "github", "repo": "chshin84/disciplined-coder" } } } }\n' "$MKTE" > "$HE/.claude/settings.json"
 mkdir -p "$HE/.claude/settings.json.dc-tmp/막는다"
 set +e; ERR_E="$(run "$HE" "$PE" 2>&1 >/dev/null)"; set -e
@@ -186,6 +186,31 @@ echo "[home-resolution] home resolution honors CLAUDE_CONFIG_DIR, not bash \$HOM
 check "CLAUDE_CONFIG_DIR honored (KDIR)"     "[ -f '$H9/disciplined-coder/agent-principles.md' ]"
 check "CLAUDE_CONFIG_DIR honored (CLAUDE.md)" "[ -f '$H9/CLAUDE.md' ]"
 check "did not fall back to bash \$HOME"      "[ ! -d '$HJUNK/.claude' ]"
+
+# USERPROFILE 갈래: CLAUDE_CONFIG_DIR도 CLAUDE_HOME_DIR도 없을 때 bash $HOME이 아니라 USERPROFILE을 따른다.
+# 우선순위를 바꿔도 초록이던 구멍이라 이 갈래만 따로 밟는다. Windows 형식 경로는 cygpath가 있어야 만든다.
+if command -v cygpath >/dev/null 2>&1; then
+  H9B="$(mktemp -d)"; P9B="$(mktemp -d)"; HJUNK2="$(mktemp -d)"
+  ( HOME="$HJUNK2" USERPROFILE="$(cygpath -w "$H9B")" CLAUDE_CONFIG_DIR= CLAUDE_HOME_DIR= CLAUDE_PROJECT_DIR="$P9B" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" >/dev/null 2>&1 ) || true
+  echo "[home-resolution] USERPROFILE beats bash \$HOME when no override is set"
+  check "USERPROFILE honored (KDIR)"            "[ -f '$H9B/.claude/disciplined-coder/agent-principles.md' ]"
+  check "USERPROFILE: did not touch bash \$HOME" "[ ! -d '$HJUNK2/.claude' ]"
+else
+  echo "  (skip) cygpath 없음 — USERPROFILE 갈래 검사를 건너뛴다"
+fi
+
+# 프로젝트 폴더가 전역 설정 폴더 자신이면(작업 폴더가 ~/.claude) 프로젝트 CLAUDE.md와 전역 CLAUDE.md가
+# 같은 파일이다. 문자열로만 견주던 판본은 Windows 형식과 POSIX 형식을 다른 파일로 보아 매 세션 전역
+# 관리블록을 걷어냈다가 다시 넣고 사본을 하나씩 쌓았다.
+if command -v cygpath >/dev/null 2>&1; then
+  H24="$(mktemp -d)"; mkdir -p "$H24/.claude"; P24="$(cygpath -w "$H24/.claude")"
+  CLAUDE_HOME_DIR="$H24/.claude" CLAUDE_PROJECT_DIR="$P24" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" >/dev/null 2>&1 || true
+  OUT24="$(CLAUDE_HOME_DIR="$H24/.claude" CLAUDE_PROJECT_DIR="$P24" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>/dev/null)"
+  echo "[same-file] a project CLAUDE.md that is the global CLAUDE.md is left alone"
+  check "같은 파일: 걷어냈다는 알림이 없다"  "! printf '%s' \"\$OUT24\" | grep -qF '옛 관리블록'"
+  check "같은 파일: 사본을 쌓지 않는다"      "! ls '$H24/.claude/disciplined-coder/backups' 2>/dev/null | grep -q '^CLAUDE.md'"
+  check "같은 파일: 관리블록이 하나다"       "[ \$(grep -cF '# BEGIN disciplined-coder' '$H24/.claude/CLAUDE.md') -eq 1 ]"
+fi
 
 # --- managed-dir-hygiene: 관리 디렉터리 위생 — 구 관리파일 제거·정본/사용자데이터 보존·빈 고아 제거 ---
 H10="$(mktemp -d)"; P10="$(mktemp -d)"
@@ -608,15 +633,6 @@ check "커맨드가 새 파일 목록을 안 시킨다"    "! grep -qF '새로 �
 # 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다.
 check "Claude 매니페스트에 version 없음"  "! grep -qE '\"version\"[[:space:]]*:' '$HERE/.claude-plugin/plugin.json'"
 
-# --- solved-rules: 형식 규칙이 낡았으면 알리기만 한다 (읽기 전용 넛지) ---
-# 픽스처는 상수(SCAFFOLD_SOLVED_RULES)에서 만들지 않고 리터럴로 적는다 — 상수에서 만들면 상수에 오타가
-# 나도 검사가 초록으로 남는 항진 검사가 된다. 옛 로그 픽스처는 실측된 PC 전역 로그의 머리말 모양이다.
-NUDGE='형식 규칙 서술이 현행과 다르다'
-LOGTITLE='해결된 문제 로그 (solved_problems)'
-
-# (가) 갓 만든 로그는 신호를 내지 않는다 — 생성 템플릿이 곧 현행 규칙이어야 한다.
-HR1="$(mktemp -d)"; PR1="$(mktemp -d)"
-OUTR1="$(run "$HR1" "$PR1")"
 HRS="$(mktemp -d)"; PRS="$(mktemp -d)"; mkdir -p "$HRS/.claude/disciplined-coder"
 KS="$HRS/.claude/disciplined-coder"
 printf 'old index
@@ -691,36 +707,8 @@ check "사본 실패: 블록을 안 걷어낸다"     "grep -qF 'BEGIN disciplin
 check "사본 실패: 사유를 알린다"          "printf '%s' \"\$OUTR13\" | grep -qF '사본을 뜨지 못해'"
 check "사본 실패: 나머지 셋업은 돈다"     "[ -f '$HR13/.claude/disciplined-coder/agent-principles.md' ]"
 
-# (거) 머리말을 못 고친 사유를 가려 알린다. 경계를 못 찾은 것과 사본을 못 뜬 것은 사람이 할 일이
-# 다르다 — 앞엣것은 로그를 손봐야 하고 뒤엣것은 쓰기 권한을 풀어야 한다. 한 문구로 뭉개면
-# 쓰기가 막힌 PC에서 멀쩡한 머리말을 고치려 들게 되고, 그 신호는 끄는 수단이 없다.
-HR14="$(mktemp -d)"; PR14="$(mktemp -d)"; mkdir -p "$HR14/.claude/disciplined-coder"
-printf 'backups 자리를 파일이 막고 있다\n' > "$HR14/.claude/disciplined-coder/backups"
-LOG14="$HR14/.claude/disciplined-coder/solved_problems.md"
-{ printf '# 해결된 문제 로그 (solved_problems)\n\n'
-  printf '옛 머리말이다.\n\n'
-  printf -- '- **옛 항목** → 원인 → 해결\n'
-} > "$LOG14"
-BEFORE14="$(cksum < "$LOG14")"
-OUTR14="$(run "$HR14" "$PR14")"
 COMMON="$HERE/scripts/_scaffold_common.sh"
-HC1="$(mktemp -d)"; printf 'a
-b
-' > "$HC1/f.md"
-echo "[count] the zero-match trap is contained in one helper"
-check "count: 있는 것을 센다"  "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^a\$')\" = 1 ]"
-check "count: 0건도 한 줄이다" "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/f.md' '^zzz\$')\" = 0 ]"
-check "count: 없는 파일도 0"   "[ \"\$(. '$COMMON'; scaffold_count_matches '$HC1/none.md' '^a\$')\" = 0 ]"
 
-# --- pairing: 색인 줄 수와 본문 파일 수를 맞댄다 ---
-HP1="$(mktemp -d)"; PP1="$(mktemp -d)"; mkdir -p "$HP1/.claude/disciplined-coder/solved_problems"
-LOGP1="$HP1/.claude/disciplined-coder/solved_problems.md"
-printf '# 가 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/solved_problems/a.md"
-printf '# 나 할 때는 이렇게 한다\n' > "$HP1/.claude/disciplined-coder/solved_problems/b.md"
-{ printf '# 해결된 문제 로그 (solved_problems) — PC 전역\n\n'
-  printf -- '- 가 할 때는 이렇게 한다.\n  → solved_problems/a.md\n'
-} > "$LOGP1"
-OUTP1="$(run "$HP1" "$PP1")"
 HK1="$(mktemp -d)"; KK1="$HK1/.claude/disciplined-coder"; mkdir -p "$KK1"
 printf '사용자가 적어 둔 줄
 ' > "$KK1/coding-principles.md"

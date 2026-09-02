@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "disciplined-coder",
   "displayName": "Disciplined Coder",
-  "description": "Team engineering discipline (SSOT principles) + per-domain design references + runtime LLM verification lenses + spec/plan & doc review gates, auto-injected into your global ~/.claude/CLAUDE.md (applies to all projects) via a SessionStart hook.",
+  "description": "Team engineering discipline (SSOT principles) + per-domain design references + runtime LLM verification lenses + spec/plan review gate + doc review nudges, auto-injected into your global ~/.claude/CLAUDE.md (applies to all projects) via a SessionStart hook.",
   "author": { "name": "chshin84", "email": "chshin84@gmail.com" },
   "license": "UNLICENSED",
   "keywords": ["principles", "discipline", "doc-review", "scaffold", "hooks"]

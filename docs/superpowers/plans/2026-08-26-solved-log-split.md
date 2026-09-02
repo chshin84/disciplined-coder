@@ -1,5 +1,7 @@
 # 오답노트 쪼개기 구현 계획
 
+> **제거된 기능의 계획이다(superseded).** 오답노트(solved_problems)는 걷어냈다. 아래 태스크를 실행하지 마라. 어떻게 쪼갰었는지의 기록으로만 남긴다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 오답노트를 지시사항 한 줄짜리 색인과 항목별 본문 파일로 갈라, 문제를 겪은 뒤가 아니라 그 일을 시작할 때 걸리게 만든다.

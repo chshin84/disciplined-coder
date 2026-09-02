@@ -17,6 +17,8 @@ EXTRACT="$HERE/hooks/_extract_path.sh"
 extract() { printf '%s' "$1" | bash "$EXTRACT"; }
 
 T="$(mktemp -d)"; SP="$T/docs/superpowers/specs"; PL="$T/docs/superpowers/plans"; mkdir -p "$SP" "$PL" "$T/src"
+export CLAUDE_PROJECT_DIR="$T"   # 문서 넛지는 프로젝트 안에서만 뜬다 — 픽스처 폴더를 프로젝트로 삼는다
+OUTSIDE="$(mktemp -d)"          # 프로젝트 밖(메모리·계획 파일이 놓이는 곳)
 printf 'draft body\n' > "$SP/nomark.md"
 printf 'draft body\n' > "$PL/nomark.md"
 printf 'body\n<!-- spec-review: passed lenses=3 date=2026-06-14 -->\n' > "$SP/passed.md"
@@ -42,6 +44,7 @@ check "spec 미마커 → 리뷰 지시"          "ptu '$(J "$SP/nomark.md")' | 
 check "plan 미마커 → 리뷰 지시"          "ptu '$(J "$PL/nomark.md")' | grep -q additionalContext"
 check "무관 경로 → 무출력"               "[ -z \"\$(ptu '$(J "$T/src/main.py")')\" ]"
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off ptu '$(J "$SP/nomark.md")')\" ]"
+check "프로젝트 밖 spec → 무출력"        "[ -z \"\$(ptu '$(J "$OUTSIDE/docs/superpowers/specs/x.md")')\" ]"
 check "terminal passed → 무출력"         "[ -z \"\$(ptu '$(J "$SP/passed.md")')\" ]"
 check "terminal escalated → 무출력"      "[ -z \"\$(ptu '$(J "$SP/esc.md")')\" ]"
 check "CRLF terminal → 무출력"           "[ -z \"\$(ptu '$(J "$SP/crlf.md")')\" ]"
@@ -84,6 +87,12 @@ check "리네임된 미리뷰 spec → block"     "stop '{\"cwd\":\"$G\"}' | gre
 # FAIL-OPEN(문서화된 한계): git/디렉터리 부재 시 차단하지 말고 통과해야 한다(작업불능 방지).
 NG="$(mktemp -d)"   # git 저장소 아님
 check "non-git cwd → FAIL-OPEN(통과)"    "[ -z \"\$(stop '{\"cwd\":\"$NG\"}')\" ]"
+# git 자체가 실패하면(소유권 의심·인덱스 손상) 조용히 열지 않고 알린다. 저장소가 아닌 것과 가르므로
+# 가짜 git으로 그 실패를 흉내 낸다.
+FG="$(mktemp -d)"; printf '#!/usr/bin/env bash\necho "fatal: detected dubious ownership in repository" >&2; exit 128\n' > "$FG/git"; chmod +x "$FG/git"
+FGOUT="$( PATH="$FG:$PATH"; export PATH; stop "{\"cwd\":\"$G\"}" )"
+check "git 실패 → 차단하지 않는다"       "! printf '%s' \"\$FGOUT\" | grep -q '\"block\"'"
+check "git 실패 → 알림을 낸다"           "printf '%s' \"\$FGOUT\" | grep -q systemMessage"
 check "존재하지 않는 cwd → FAIL-OPEN(통과)" "[ -z \"\$(stop '{\"cwd\":\"$NG/nope/x\"}')\" ]"
 # Fix A: 신규 작성만 하드게이트 — 기존(추적된) spec 수정(상태 strip 등)은 막지 않는다. Fix B: dateless 마커 인식.
 G2="$(mktemp -d)"; ( cd "$G2" && git init -q && git config user.email t@t && git config user.name t )
@@ -116,6 +125,8 @@ check "기존 문서(.md) → 무출력"          "[ -z \"\$(fpre '$(J "$T/exist
 check "spec 경로 새 .md → 무출력"        "[ -z \"\$(fpre '$(J "$SP/brandnew.md")')\" ]"
 check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/new.py")')\" ]"
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off fpre '$(J "$T/newdoc.md")')\" ]"
+check "프로젝트 밖 새 문서 → 무출력"     "[ -z \"\$(fpre '$(J "$OUTSIDE/new.md")')\" ]"
+check "새 리뷰 기록 → 무출력"            "[ -z \"\$(fpre '$(J "$T/docs/superpowers/reviews/new-check.md")')\" ]"
 # 넛지가 인용한 domain-docs 절이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로
 # 그 절 이름이 바뀌자 넛지가 없는 절을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD).
 NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*domain-docs의 '\([^']*\)' 절.*/\1/p")"
@@ -128,6 +139,9 @@ check "spec 경로 → 무출력"               "[ -z \"\$(drev '$(J "$SP/nomark
 check "plan 경로 → 무출력"               "[ -z \"\$(drev '$(J "$PL/nomark.md")')\" ]"
 check "비문서(.py) → 무출력"             "[ -z \"\$(drev '$(J "$T/src/main.py")')\" ]"
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off drev '$(J "$T/existing.md")')\" ]"
+check "프로젝트 밖 문서 → 무출력"        "[ -z \"\$(drev '$(J "$OUTSIDE/notes.md")')\" ]"
+check "상대경로 문서 → 검진 넛지"        "drev '$(J "notes/rel.md")' | grep -q additionalContext"
+check "Windows 형식 경로도 프로젝트 안"  "drev '$(J "$(cygpath -w "$T" 2>/dev/null || printf '%s' "$T")\\\\win.md")' | grep -q additionalContext"
 
 echo "[리뷰 기록은 검진 대상이 아니다]"
 # 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
@@ -213,7 +227,7 @@ ESC_MIX="$(escape_for_json "$(printf 'a"b\\c\nd\te\001f\033g')")"
 check "0x01을 유니코드 이스케이프로 바꾼다" "[ \"\$ESC_SOH\" = 'a\\u0001b' ]"
 check "0x0B을 유니코드 이스케이프로 바꾼다" "[ \"\$ESC_VT\" = 'a\\u000bb' ]"
 check "섞인 입력의 결과가 JSON으로 파싱된다" \
-  "printf '{\"r\":\"%s\"}' \"\$ESC_MIX\" | python -c 'import json,sys; json.load(sys.stdin)'"
+  "printf '{\"r\":\"%s\"}' \"\$ESC_MIX\" | json_valid_stdin"
 check "제어 문자가 결과에 안 남는다" \
   "! printf '%s' \"\$ESC_MIX\" | LC_ALL=C grep -q '[[:cntrl:]]'"
 

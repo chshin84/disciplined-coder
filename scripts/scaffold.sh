@@ -43,12 +43,15 @@ scaffold_hygiene "$KDIR"
 # 3a) 없앤 기능(/add-pointer)이 프로젝트 CLAUDE.md에 심어 두던 옛 관리블록을 걷어낸다. 지금은
 #     아무것도 그 블록을 다시 만들지 않으므로 남아 있으면 갱신되지 않는 고아다. 마커가 같으니
 #     전역 CLAUDE.md와 같은 파일이면 건너뛴다 — 그건 이 훅이 매 세션 다시 만드는 정상 블록이다.
+#     같은 파일인지는 문자열이 아니라 -ef 로 본다. 작업 폴더가 ~/.claude 이면 Windows 형식 경로와
+#     POSIX 형식 경로가 같은 파일을 가리키는데, 문자열로 견주면 다른 파일로 보아 매 세션 전역
+#     블록을 걷어냈다가 다시 넣고 사본을 하나씩 쌓았다.
 #     걷어내기 전에 사본을 뜬다 — 블록 안에 사람이 끼워 넣은 줄이 있으면 그것이 유일한 복구
 #     수단이고, 이 파일은 git 밖일 수 있다. 사본은 프로젝트가 아니라 전역 백업에 쌓는다.
 PROJ="${CLAUDE_PROJECT_DIR:-$PWD}"
 pointer_note=""
 PCLAUDE="$PROJ/CLAUDE.md"
-if [ -f "$PCLAUDE" ] && [ "$PCLAUDE" != "$UC" ]; then
+if [ -f "$PCLAUDE" ] && ! { [ "$PCLAUDE" = "$UC" ] || [ "$PCLAUDE" -ef "$UC" ]; }; then
   pblabel="$(printf '%s' "$(basename "$PROJ")" | tr -c 'A-Za-z0-9._-' '_')"
   pbstamp="$(date +%Y%m%d-%H%M%S 2>/dev/null || echo unknown)"
   prc=0
