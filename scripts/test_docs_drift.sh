@@ -567,4 +567,26 @@ RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=MD --name-only
 ' "$RV_HIST" | sed 's/^/      /'
 check "규칙이 들어온 뒤 이력에 고치거나 지운 기록이 없다" "[ -z \"\$RV_HIST\" ]"
 
+# --- 봉인: 기록은 만든 직후에 읽기 전용이 된다 ---
+# 읽기 전용 속성은 git이 옮기지 않아 새 클론에서는 풀려 있다. 그래서 SessionStart 훅이 세션마다 다시
+# 봉인한다. 인자 없는 갈래는 픽스처 저장소에서 검사한다 — 레포 자신에서 돌리면 스크립트가 아무것도
+# 처리하지 않아도 작업 트리 상태만으로 초록이 되고, 검사가 레포의 파일 속성을 바꾼다.
+echo "[봉인 — 기록은 읽기 전용이 된다]"
+SEAL="$HERE/scripts/seal_reviews.sh"
+check "봉인 스크립트가 있다"                 "[ -f '$SEAL' ]"
+SEAL_T="$(mktemp -d)"; printf 'a\n' > "$SEAL_T/one.md"; printf 'b\n' > "$SEAL_T/two.json"
+bash "$SEAL" "$SEAL_T/one.md" "$SEAL_T/two.json" >/dev/null 2>&1 || true
+check "인자로 준 파일이 읽기 전용이 된다"     "[ ! -w '$SEAL_T/one.md' ] && [ ! -w '$SEAL_T/two.json' ]"
+bash "$SEAL" "$SEAL_T/one.md" "$SEAL_T/two.json" >/dev/null 2>&1 || true
+check "인자 있는 봉인을 두 번 돌려도 같다"     "[ ! -w '$SEAL_T/one.md' ] && [ ! -w '$SEAL_T/two.json' ]"
+SEAL_G="$(mktemp -d)"; mkdir -p "$SEAL_G/docs/superpowers/reviews/r1"
+( cd "$SEAL_G" && git init -q && git config user.email t@t && git config user.name t \
+  && printf 'x\n' > docs/superpowers/reviews/r1.md && printf '{}\n' > docs/superpowers/reviews/r1/run.json \
+  && printf 'later\n' > docs/superpowers/reviews/untracked.md && git add docs/superpowers/reviews/r1.md docs/superpowers/reviews/r1/run.json && git commit -qm seed )
+bash "$SEAL" --root "$SEAL_G" >/dev/null 2>&1 || true
+bash "$SEAL" --root "$SEAL_G" >/dev/null 2>&1 || true
+check "인자 없는 봉인이 HEAD 의 기록을 전부 읽기 전용으로 만든다" "[ ! -w '$SEAL_G/docs/superpowers/reviews/r1.md' ] && [ ! -w '$SEAL_G/docs/superpowers/reviews/r1/run.json' ]"
+check "HEAD 에 없는 파일은 건드리지 않는다"     "[ -w '$SEAL_G/docs/superpowers/reviews/untracked.md' ]"
+check "이 레포의 SessionStart 가 봉인을 건다"  "grep -qF 'seal_reviews.sh' '$HERE/.claude/settings.json'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
