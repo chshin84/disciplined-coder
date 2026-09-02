@@ -81,7 +81,7 @@ const REVIEWERS = [
   { key: 'lens-consistency', prompt: `${COMMON}
 렌즈: ${REPO}/skills/lens-consistency/SKILL.md 를 읽고 그대로 적용하라. 검토 대상: agent-principles.md, README.md, CLAUDE.md, 그리고 skills/ 아래 모든 SKILL.md 상호간 — 스킬 목록은 그 디렉터리를 훑어 도출하라. 내부 모순, 커버리지 공백, 이름/참조 드리프트를 찾아라.` },
   { key: 'lens-adversarial', prompt: `${COMMON}
-렌즈: ${REPO}/skills/lens-adversarial/SKILL.md 를 읽고 그대로 적용하라(가드 포함: 기능 추가 제안 금지·근거 필수). 검토 대상: 정본의 절 전부와 hooks/·scripts/·skills/ 설계 전체 — 절 제목을 파일에서 읽어 목록을 만들고(`grep '^## ' agent-principles.md`) 그 전부를 훑어라. 실패 모드, 과설계·YAGNI, 비가역, 자기모순을 공격적으로 찾아라.` },
+렌즈: ${REPO}/skills/lens-adversarial/SKILL.md 를 읽고 그대로 적용하라(가드 포함: 기능 추가 제안 금지·근거 필수). 검토 대상: 정본의 절 전부와 hooks/·scripts/·skills/ 설계 전체 — 절 제목을 파일에서 읽어 목록을 만들고(\`grep '^## ' agent-principles.md\`) 그 전부를 훑어라. 실패 모드, 과설계·YAGNI, 비가역, 자기모순을 공격적으로 찾아라.` },
   { key: 'ssot-audit', prompt: `${COMMON}
 차원: SSOT 전수 조사 — agent-principles.md ↔ skills ↔ scripts ↔ hooks ↔ README ↔ CLAUDE.md ↔ commands 사이의 권위 있는 이중 기술(손 동기화 쌍)을 찾아라. 정당한 참조/도출은 위반이 아니다.` },
   { key: 'shell-audit', prompt: `${COMMON}

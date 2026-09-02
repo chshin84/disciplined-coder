@@ -104,11 +104,13 @@ done
 # 4b) 마켓플레이스 자동 갱신(멱등): 사용자가 손으로 켜지 않아도 깃허브의 갱신이 따라오게 한다.
 #     규칙과 안전장치는 _ensure_autoupdate.sh가 소유한다 — 우리 항목만, 키가 없을 때만, 사본을 남기고.
 autoupdated="$(ensure_marketplace_autoupdate "$CLAUDE_HOME" "$PLUGIN_ROOT" || true)"
+#     켰다는 사실은 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않는다. 옛 관리블록을
+#     걷어낸 알림과 같은 통로다. 사용자 설정 파일을 고쳐 놓고 아무도 모르게 두지 않는다(FAIL-LOUD).
 if [ -n "$autoupdated" ]; then
-  echo "[disciplined-coder] 플러그인 자동 갱신을 켰습니다. 고친 파일과 그 사본(.bak):" >&2
+  echo "🔵 disciplined-coder: 이 플러그인의 자동 갱신을 켰다(마켓플레이스 항목에 autoUpdate 만 넣었고 다른 설정은 그대로다). 고친 파일과 그 사본(.bak):"
   printf '%s
 ' "$autoupdated" | while IFS= read -r changed; do
-    [ -n "$changed" ] && echo "  $changed (사본: $changed.bak)" >&2
+    [ -n "$changed" ] && echo "  $changed (사본: $changed.bak)"
   done
 fi
 

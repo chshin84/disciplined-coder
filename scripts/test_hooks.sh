@@ -31,6 +31,10 @@ printf 'see <!-- spec-review: passed --> example\nmore body text here\n' > "$SP/
 printf 'body\nspec-review: { status: pending }\n' > "$SP/pending.md"
 # CRLF terminal 마커
 printf 'body\r\n<!-- spec-review: passed lenses=3 date=2026-06-14 -->\r\n' > "$SP/crlf.md"
+# 마지막 줄이 마커를 산문으로 언급만 한다 — 마커를 남긴 것이 아니므로 게이트가 열리면 안 된다.
+printf 'body\n마지막 줄에 <!-- spec-review: passed -->를 적어야 게이트가 풀린다.\n' > "$SP/prose.md"
+# 마지막 줄이 마커로 시작하지만 닫히지 않았다 — 마커가 아니다.
+printf 'body\n<!-- spec-review: passed 라고 적으면 안 된다\n' > "$SP/unclosed.md"
 
 echo "[extract]"
 check "Claude file_path → 경로 1개"        "[ \"\$(extract '$(J "$T/src/a.md")')\" = '$T/src/a.md' ]"
@@ -50,6 +54,8 @@ check "terminal escalated → 무출력"      "[ -z \"\$(ptu '$(J "$SP/esc.md")'
 check "CRLF terminal → 무출력"           "[ -z \"\$(ptu '$(J "$SP/crlf.md")')\" ]"
 check "본문 예시만(마지막 일반) → 지시"  "ptu '$(J "$SP/example.md")' | grep -q additionalContext"
 check "pending(마커 아님) → 지시"        "ptu '$(J "$SP/pending.md")' | grep -q additionalContext"
+check "산문 안 마커(마지막 줄) → 지시"   "ptu '$(J "$SP/prose.md")' | grep -q additionalContext"
+check "안 닫힌 마커 → 지시"              "ptu '$(J "$SP/unclosed.md")' | grep -q additionalContext"
 
 echo "[stop]"
 # $G = git 저장소 + 미리뷰 spec. 게이트 ON이면 block 이므로, loop guard/OFF가 깨지면
@@ -220,5 +226,20 @@ for f in "$HERE"/hooks/*; do
 done
 check "모든 훅 스크립트가 어딘가에 배선되어 있다" "[ -z \"\$unwired\" ]"
 [ -n "$unwired" ] && echo "    어느 배선 파일에도 없는 훅:$unwired"
+
+# --- JSON 이스케이프: 제어 문자가 날것으로 안 나간다 ---
+# 개행·복귀·탭만 다루면 그 밖의 0x20 미만 문자가 문자열 값에 날것으로 들어가고, 응답이 파싱되지
+# 않아 차단 결정이 통째로 무시된다. 소비자는 이 헬퍼를 source하는 훅 전부다.
+echo "[JSON 이스케이프 — 제어 문자]"
+. "$HERE/hooks/_json_escape.sh"
+ESC_SOH="$(escape_for_json "$(printf 'a\001b')")"
+ESC_VT="$(escape_for_json "$(printf 'a\013b')")"
+ESC_MIX="$(escape_for_json "$(printf 'a"b\\c\nd\te\001f\033g')")"
+check "0x01을 유니코드 이스케이프로 바꾼다" "[ \"\$ESC_SOH\" = 'a\\u0001b' ]"
+check "0x0B을 유니코드 이스케이프로 바꾼다" "[ \"\$ESC_VT\" = 'a\\u000bb' ]"
+check "섞인 입력의 결과가 JSON으로 파싱된다" \
+  "printf '{\"r\":\"%s\"}' \"\$ESC_MIX\" | python -c 'import json,sys; json.load(sys.stdin)'"
+check "제어 문자가 결과에 안 남는다" \
+  "! printf '%s' \"\$ESC_MIX\" | LC_ALL=C grep -q '[[:cntrl:]]'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

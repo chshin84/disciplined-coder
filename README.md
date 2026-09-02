@@ -35,6 +35,11 @@ done
 
 새로 생기는 파일은 없다. 자동 계층이 프로젝트 파일을 고치는 예외는 하나다(여기가 그 정본이다) — 없앤 기능이 남긴 관리블록이 그 레포 `CLAUDE.md`에 있으면 사본을 전역 백업에 쌓은 뒤 걷어낸다. 잠금 대기 시간은 `scripts/_managed_block.sh`의 상수가 정한다.
 
+## 세션에 강제하거나 고치는 것
+
+- **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고 `domain-spec-review` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `escalated`)가 남으면 풀린다. 끄려면 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off`를 준다. 상세는 `skills/domain-spec-review/SKILL.md`가 정본이다.
+- **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json`의 이 마켓플레이스 항목에만 `autoUpdate: true`를 넣어 깃허브의 갱신이 자동으로 따라오게 한다. 키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며, 사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다. 규칙은 `scripts/_ensure_autoupdate.sh`가 정본이다.
+
 ## 주의
 
 - **CLAUDE.md는 가이드이지 강제가 아니다** — 막으려면 `PreToolUse` hook을 건다.

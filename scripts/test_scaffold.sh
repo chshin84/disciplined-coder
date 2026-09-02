@@ -59,9 +59,14 @@ EOF
 cat > "$HA/.claude/plugins/known_marketplaces.json" <<EOF
 { "$MKT": { "source": { "source": "github", "repo": "chshin84/disciplined-coder" } } }
 EOF
-run "$HA" "$PA" >/dev/null 2>&1
+OUT_A="$(run "$HA" "$PA" 2>/dev/null)"
 SET_A="$HA/.claude/settings.json"; KNOWN_A="$HA/.claude/plugins/known_marketplaces.json"
 echo "[marketplace-autoupdate] 자동 갱신을 켠다"
+# 켰다는 사실은 stderr 가 아니라 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않고,
+# 옛 관리블록을 걷어낸 알림(pointer_note)이 이미 쓰는 통로가 stdout 이다. 사용자 설정 파일을 고쳐
+# 놓고 아무도 모르게 두면 안 된다(FAIL-LOUD).
+check "켰다는 알림이 stdout 으로 나간다"  "printf '%s' \"\$OUT_A\" | grep -qF '자동 갱신을 켰'"
+check "알림에 고친 파일 경로가 있다"       "printf '%s' \"\$OUT_A\" | grep -qF 'settings.json'"
 check "우리 항목에 autoUpdate가 켜졌다"   "[ \"\$(json_autoupdate '$SET_A' \"\$MKT\")\" = 'true' ]"
 check "알려진 마켓플레이스에도 켜졌다"     "[ \"\$(json_autoupdate '$KNOWN_A' \"\$MKT\")\" = 'true' ]"
 check "남의 마켓플레이스는 그대로다"       "[ \"\$(json_autoupdate '$SET_A' 'somebody-else')\" = 'none' ]"

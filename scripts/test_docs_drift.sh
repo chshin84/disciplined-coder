@@ -307,14 +307,10 @@ EOF
 done
 check "「」 참조를 하나 이상 찾았다" "[ '$BN' -gt 0 ]"
 
-# --- 도메인 참고서 열거 == 실제 디렉터리 ---
-# 렌즈 열거는 지키면서 바로 이웃 줄의 도메인 열거는 아무도 안 봤다. 참고서를 하나 더하면
-# domains-index에는 행이 늘지만 트리 주석은 옛 집합으로 남는다.
-# 제외 목록을 검사 대상 문장에서 뽑지 않는다. 전에는 트리 줄에 적힌 '호출자 domain-spec-review'를
-# 그대로 제외 목록으로 썼는데, 그러면 그 꼬리를 지우는 순간 기대 집합이 늘어 실패하고 실패 메시지가
-# 호출자 스킬을 사용자용 목차에 넣으라고 사람을 떠민다. 대신 트리 줄에서 참고서와 호출자를 각각
-# 뽑아 두 집합으로 다루고, 합집합이 디렉터리 전체와 같은지를 확인한다 — 새 호출자를 만들면 트리 줄에
-# 적어야 하고 안 적으면 합집합이 어긋나 실패한다.
+# (제거됨) 도메인 참고서 열거 == 실제 디렉터리 — 이 검사는 `docs/DESIGN-NOTES.md`의 트리 줄이
+# 참고서를 열거하던 것을 붙들었고, 커밋 2f64d74가 그 문서를 지우면서 함께 걷혔다. 지금은 어느 문서도
+# 도메인 참고서를 열거하지 않고 README가 `skills/` 디렉터리를 가리키기만 하므로 붙들 열거가 없다.
+# 다시 열거하는 문서가 생기면 그때 이 가드를 되살린다.
 
 # --- spec 리뷰 마커: 코드의 리터럴이 산문 둘에 그대로 있다 ---
 # 코드가 스스로 "쌍 계약"이라 부르며 사람에게 손으로 맞추라고 지시하던 자리다. 사람이 맞추는
@@ -373,6 +369,13 @@ check "CLAUDE.md가 실행 명령을 적는다"       "grep -qF -- 'for t in scr
 check "실패를 모으는 형태다"                 "grep -qF -- 'bad=\"\$bad \$t\"' \"\$CMD\""
 check "모은 결과를 마지막에 알린다"           "grep -qF -- 'FAILED:' \"\$CMD\""
 check "워크플로가 그 정본을 가리킨다"         "grep -qF -- 'CLAUDE.md 가 그 명령의 정본' '$HERE/.claude/workflows/self-audit.js'"
+# CI도 같은 명령을 돈다. 워크플로와 달리 CI는 정본을 읽을 수 없어 형태를 다시 적을 수밖에 없으니,
+# 적어도 그 형태가 정본과 같은 실패 처리를 하는지 붙든다. `set -e`에 맨 `bash "$t"`면 첫 실패에서
+# 멈춰 뒤 스크립트가 아예 안 돌고, 무엇이 더 깨졌는지 한 회차로는 알 수 없다.
+CI="$HERE/.github/workflows/ci.yml"
+check "CI가 계약 테스트를 돈다"               "grep -qF -- 'for t in scripts/test_*.sh' \"\$CI\""
+check "CI도 실패를 모으는 형태다"             "grep -qF -- 'bad=\"\$bad \$t\"' \"\$CI\""
+check "CI도 모은 결과를 마지막에 알린다"       "grep -qF -- 'FAILED:' \"\$CI\""
 
 
 # --- 렌즈: 본문 체크리스트의 축이 복사용 프롬프트에도 다 실린다 ---
@@ -514,5 +517,23 @@ $BANLIST
 EOF
 [ -n "$BANHIT" ] && printf '    남은 금지 표현:%s
 ' "$BANHIT"
+
+# --- 리뷰·감사 기록은 찍은 뒤 고치지 않는다 ---
+# 기록은 그 회차에 무엇을 보았는지의 증거라, 뒤에 고치면 회차 사이 대조가 무너진다. 그래서 새 기록을
+# 더하는 것만 허용하고 있는 기록의 수정과 삭제는 거부한다. 경계 날짜는 이 규칙이 들어온 날이다 —
+# 그 전의 수정 하나(0ce107c)는 규칙이 없던 때의 일이라 소급하지 않는다.
+echo "[리뷰 기록은 찍은 뒤 고치지 않는다]"
+RVDIR="docs/superpowers/reviews"
+check "기록 폴더에 기록이 하나 이상 있다" "ls \"\$HERE/\$RVDIR\"/*.md >/dev/null 2>&1"
+RV_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$RVDIR" 2>/dev/null | grep -vE '^(\?\?|A ) ' || true)"
+[ -n "$RV_TREE" ] && printf '    작업 트리에서 고치거나 지운 기록:
+%s
+' "$RV_TREE" | sed 's/^/      /'
+check "작업 트리에 고치거나 지운 기록이 없다" "[ -z \"\$RV_TREE\" ]"
+RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=MD --name-only --format= -- "$RVDIR" 2>/dev/null | grep -v '^$' || true)"
+[ -n "$RV_HIST" ] && printf '    규칙 뒤 이력에서 고치거나 지운 기록:
+%s
+' "$RV_HIST" | sed 's/^/      /'
+check "규칙이 들어온 뒤 이력에 고치거나 지운 기록이 없다" "[ -z \"\$RV_HIST\" ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
