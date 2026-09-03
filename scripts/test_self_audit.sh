@@ -90,4 +90,11 @@ check "옛 차원 렌즈가 없다"                            "! grep -qE 'ssot
 check "매니페스트가 실행체를 workflows 에 선언한다"     "grep -qF '\"./.claude/workflows/self-audit.js\"' '$HERE/.claude-plugin/plugin.json'"
 check "Date.now 와 Math.random 을 쓰지 않는다"          "! grep -qE 'Date\\.now|Math\\.random|new Date' '$WF'"
 
+check "걸음마다 서브에이전트 상한이 상수로 박혀 있다"  "grep -qE 'const CAPS = \{ review: [0-9]+, verify: [0-9]+ \}' '$WF'"
+check "상한을 넘겨 자른 것을 기록에 남긴다"            "grep -qF '리뷰 상한' '$WF' && grep -qF '검증 상한' '$WF' && grep -qF 'over_cap' '$WF'"
+check "검증자는 파일 하나에 하나다"                    "grep -qF 'verify:\${g.file}' '$WF' && grep -qF 'VERDICTS_SCHEMA' '$WF' && ! grep -qF 'verify-fact' '$WF'"
+check "렌즈 배정은 판단이 아니라 고정표에서 온다"      "grep -qF '「렌즈 배정 기준」 표' '$WF' && grep -qF '표에 없는 렌즈를 더하지 마라' '$WF'"
+check "중복제거는 본문이 아니라 번호를 돌려준다"        "grep -qF 'merged_from' '$WF' && grep -qF '번호만 돌려준다' '$WF'"
+check "배정 기준이 고정표다"                          "grep -qF '문서 종류로 정한다' '$HERE/skills/project-doc-audit/SKILL.md' && grep -qF '회차마다 다시 판단하지 않는다' '$HERE/skills/project-doc-audit/SKILL.md'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

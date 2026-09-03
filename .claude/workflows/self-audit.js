@@ -22,6 +22,10 @@ let ROUND = 'self-audit'
 const EXECUTOR = 'self-audit'
 const SCHEMA_VERSION = 1
 // 걸음 이름의 닫힌 목록. 기록자는 끝난 걸음 이름을 run.json 의 steps_done 에 쌓는다.
+// 한 걸음이 띄우는 서브에이전트의 상한이다. 배분 규칙은 하나씩 보면 타당해도 곱하면 세 자리가
+// 된다 — 리뷰는 문서×렌즈, 검증은 발견마다다. 상한을 넘으면 잘라 내고 무엇을 잘랐는지 기록에
+// 남긴다. 조용히 자르면 '아무도 반박하지 않았다'와 '아무도 보지 않았다'가 구별되지 않는다.
+const CAPS = { review: 40, verify: 40 }
 const STEPS = ['repo-check', 'targets', 'machine-checks', 'review', 'dedup', 'verify', 'aggregate', 'record']
 function findingId(round, n) { return `${round}#${String(n).padStart(3, '0')}` }
 // 판정 상태의 닫힌 집합 — 'derived'는 반박검증 없이 도출된 발견(회차 대조가 만든다)이다.
@@ -51,26 +55,27 @@ const FINDINGS_SCHEMA = {
   required: ['findings'],
 }
 
-// 중복제거는 병합 항목마다 그것이 덮는 원시 발견의 번호(merged_from)를 돌려준다. 개수만 견주면 발견을
-// 버려도 통과하므로, 모든 원시 발견이 정확히 한 항목에 들어갔는지를 워크플로가 확인한다.
+// 중복제거는 묶음마다 그것이 덮는 원시 발견의 번호(merged_from)를 돌려준다. 개수만 견주면 발견을
+// 버려도 통과하므로, 모든 원시 발견이 정확히 한 묶음에 들어갔는지를 워크플로가 확인한다.
+// 병합된 본문을 다시 쓰게 하지 않는 이유는 출력 상한이다 — 발견 수백 건의 본문을 한 응답에 담으면
+// 상한을 넘어 회차가 끊긴다. 어느 것이 같은 실체인지는 판단이고 본문을 잇는 것은 계산이라, 판단만
+// 에이전트에 맡기고 계산은 워크플로가 한다.
 const DEDUP_SCHEMA = {
   type: 'object',
   properties: {
-    findings: {
+    groups: {
       type: 'array',
       items: {
         type: 'object',
         properties: {
-          ...FINDINGS_SCHEMA.properties.findings.items.properties,
-          lens: { type: 'string', description: '병합된 렌즈 이름들 — 쉼표로 잇는다' },
-          target: { type: 'string', description: '발견이 나온 검토 대상 — 병합하면 쉼표로 잇는다' },
-          merged_from: { type: 'array', items: { type: 'integer' }, description: '이 항목이 덮는 원시 발견의 번호(0부터)' },
+          merged_from: { type: 'array', items: { type: 'integer' }, description: '한 실체를 가리키는 원시 발견의 번호(0부터) 전부' },
+          keep: { type: 'integer', description: '이 묶음에서 증거와 설명을 남길 대표 원시 발견의 번호' },
         },
-        required: [...FINDINGS_SCHEMA.properties.findings.items.required, 'lens', 'merged_from'],
+        required: ['merged_from', 'keep'],
       },
     },
   },
-  required: ['findings'],
+  required: ['groups'],
 }
 // 중복제거가 lens 를 쉼표로 잇는다. 세는 쪽은 그 문자열을 목록으로 다룬다.
 function lensesOf(f) { return String(f.lens || '').split(',').map(s => s.trim()).filter(Boolean) }
@@ -136,13 +141,26 @@ const AGGREGATE_SCHEMA = {
 const RECORD_SCHEMA = { type: 'object', properties: { path: { type: 'string' }, count: { type: 'integer' } }, required: ['path', 'count'] }
 const CHECK_SCHEMA = { type: 'object', properties: { path: { type: 'string' }, count: { type: 'integer' }, ids: { type: 'array', items: { type: 'string' } } }, required: ['path', 'count', 'ids'] }
 
-const VERDICT_SCHEMA = {
+
+// 검증자는 파일 하나를 읽고 그 파일의 발견 전부를 한 번에 판정한다. 발견마다 띄우면 같은 파일을
+// 발견 수만큼 다시 읽어 값만 늘고 판정은 나아지지 않는다.
+const VERDICTS_SCHEMA = {
   type: 'object',
   properties: {
-    isReal: { type: 'boolean', description: '반박에 실패했으면(=발견이 실재하면) true. 불확실하면 false.' },
-    reason: { type: 'string', description: '판정 근거 한두 문장' },
+    verdicts: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          n: { type: 'integer', description: '받은 목록에서 이 판정이 가리키는 발견의 번호' },
+          isReal: { type: 'boolean', description: '반박에 실패했으면(=발견이 실재하면) true. 불확실하면 false.' },
+          reason: { type: 'string', description: '판정 근거 한두 문장' },
+        },
+        required: ['n', 'isReal', 'reason'],
+      },
+    },
   },
-  required: ['isReal', 'reason'],
+  required: ['verdicts'],
 }
 
 const CANON = `${REPO}/agent-principles.md`
@@ -150,7 +168,7 @@ const COMMON = `너는 disciplined-coder 플러그인 저장소(${REPO})를 감�
 이 저장소는 그 플러그인 자체의 소스다 — 플러그인이 남에게 강제하는 원칙을 자기 자신이 지키는지 검증한다.
 먼저 ${CANON} (원칙 정본)을 읽고, 읽고 적용한 원칙 ID를 principles_applied 에 적어라. 문서 밖에서 연 파일은 read 에 적어라.
 규칙: (1) 파일을 직접 읽고 실제 인용을 증거로 제시하라 — 추측 금지. (2) 어떤 파일도 수정하지 마라.
-(3) 저장소의 어떤 파일에도 쓰지 마라 — 발견은 구조화 리턴으로만 보고한다. (4) 발견은 최대 10건 — 확신 높은 순으로. 없으면 빈 배열이 정직한 답이다.
+(3) 저장소의 어떤 파일에도 쓰지 마라 — 발견은 구조화 리턴으로만 보고한다. (4) 발견은 최대 3건 — 확신이 가장 높은 것만 낸다. 없으면 빈 배열이 정직한 답이다. 몫을 채우려고 약한 것을 올리지 마라, 약한 발견은 검증에서 기각되고 그 값은 아무것도 낳지 않는다. (4-1) evidence 에는 파일에 있는 그대로의 원문을 인용하고 몇 번째 줄인지 함께 적어라 — 인용이 파일과 한 글자라도 다르면 그 발견은 검증에서 무너진다.
 (5) 각 발견의 title과 detail은 완결된 문장으로 쓴다. (6) 서브에이전트를 새로 열지 마라.`
 // 문서별 렌즈 프롬프트 — 렌즈 SKILL.md 의 레퍼런스 프롬프트를 그대로 적용하게 하고 정본 경로와 principles_applied 만 더한다.
 function lensPrompt(lens, target) {
@@ -181,7 +199,7 @@ const tg = await agent(
 - \`date +%F\` 로 오늘 날짜를 얻는다.
 - \`bash scripts/audit_targets.sh --limit\` 로 문턱 값을, \`bash scripts/audit_targets.sh\` 로 조각 목록(경로<TAB>시작 줄<TAB>끝 줄)을 얻어 fragments 에 그대로 옮긴다. 경로는 스크립트가 낸 레포 상대경로 그대로 적는다.
 - 회차 이름은 <날짜>-${EXECUTOR} 이고, docs/superpowers/reviews/ 아래에 같은 이름의 폴더나 .md 가 이미 있으면 -2, -3 처럼 회차를 붙여 앞 회차를 덮지 않는다.
-- 조각의 경로를 문서 단위로 모아, 문서마다 ${REPO}/skills/project-doc-audit/SKILL.md 의 「렌즈 배정 기준」 물음 넷에 답해 lenses 를 정하고 그 답을 reason 에 적는다. 이 절차에서 lens-consistency 는 문서별로 걸지 않는다. lens-readability 를 걸 문서에는 purpose(읽는 사람과 그 사람이 무엇을 할 수 있어야 하는지)를 한 줄로 적고, 못 적겠으면 purpose 를 비우고 lens-readability 를 넣지 않고 reason 에 그 이유를 적는다.
+- 조각의 경로를 문서 단위로 모아, 문서마다 ${REPO}/skills/project-doc-audit/SKILL.md 의 「렌즈 배정 기준」 표에서 그 문서가 걸리는 종류의 행 하나를 골라 lenses 를 그 행에 적힌 대로 그대로 옮기고, 어느 행을 골랐는지와 왜 그 행인지를 reason 에 적는다. 행을 고르는 것이 판단이고 렌즈를 정하는 것은 판단이 아니다 — 표에 없는 렌즈를 더하지 마라. 이 절차에서 lens-consistency 는 문서별로 걸지 않는다. lens-readability 를 걸 문서에는 purpose(읽는 사람과 그 사람이 무엇을 할 수 있어야 하는지)를 한 줄로 적고, 못 적겠으면 purpose 를 비우고 lens-readability 를 넣지 않고 reason 에 그 이유를 적는다.
 - 배정은 무엇으로 만들어졌는지나 어느 폴더에 있는지로 정하지 않는다.`,
   { label: 'targets', phase: '준비', schema: TARGETS_SCHEMA }
 )
@@ -211,11 +229,14 @@ const run = {
   narrowed: 0, unlabeled: 0, dead_agents: {}, machine_checks: null, stale_rounds: [],
 }
 const COUNT_RULE = 'count 는 이렇게 센다 — JSON 에 findings 배열이 있으면 그 길이, items 배열이 있으면 그 길이, steps_done 배열이 있으면 그 길이, 마크다운은 파일이 있으면 1, 파일이 없으면 -1. ids 는 count 를 센 그 배열의 항목 id 만 순서대로 적고, 그 배열의 항목에 id 가 없으면 빈 배열이다.'
-async function writeFile(step, f) {  // f: { name, path(선택 — 없으면 DIR 아래), content(object|string), count, ids|null, seal }
+// 긴 파일은 한 응답에 다 못 쓴다 — 출력 상한을 넘으면 회차가 끊기므로 나눠 쓰라고 일러 준다.
+const CHUNK_RULE = `
+내용이 길다. 한 응답에 다 쓰려 하지 말고 여러 번에 나눠 이어붙여 써라 — 한 번에 다 쓰면 출력 상한에 걸려 회차가 끊긴다. 다 쓴 뒤 파일을 다시 열어 끝까지 온전한지 확인한다.`
+async function writeFile(step, f) {  // f: { name, chunked(선택), path(선택 — 없으면 DIR 아래), content(object|string), count, ids|null, seal }
   const path = f.path || `${DIR}/${f.name}`
   const body = typeof f.content === 'string' ? { text: f.content } : { json: f.content }
   const wrote = await agent(
-    `너는 기록자다. 파일 ${path} 를 만들어 내용을 한 글자도 바꾸지 말고 써라(폴더 ${DIR} 가 없으면 만든다). json 이 있으면 들여쓰기 1의 JSON 으로, text 가 있으면 그 문자열을 그대로 쓴다. 파일은 파이썬으로 쓴다.${f.seal ? `\n쓴 뒤 \`bash ${REPO}/scripts/seal_reviews.sh "${path}"\` 로 봉인한다.` : ''}
+    `너는 기록자다. 파일 ${path} 를 만들어 내용을 한 글자도 바꾸지 말고 써라(폴더 ${DIR} 가 없으면 만든다). json 이 있으면 들여쓰기 1의 JSON 으로, text 가 있으면 그 문자열을 그대로 쓴다. 파일은 파이썬으로 쓴다.${f.seal ? `\n쓴 뒤 \`bash ${REPO}/scripts/seal_reviews.sh "${path}"\` 로 봉인한다.` : ''}${f.chunked ? CHUNK_RULE : ''}
 ${COUNT_RULE} path 와 count 를 돌려줘라.
 ${JSON.stringify(body)}`,
     { label: `record:${step}:${f.name}`, phase: '기록', schema: RECORD_SCHEMA, effort: 'low' }
@@ -246,7 +267,7 @@ async function record(step, files) {
 async function writeSummary(text) {
   // 요약문은 봉인하지 않는다 — 호출자가 뿌리와 물음을 붙인 뒤 seal_reviews.sh 로 봉인한다.
   // 봉인만 빼고 기록 경로는 같다 — 기록자의 자기 보고를 믿지 않고 검수자가 파일을 다시 연다.
-  await writeFile('record', { name: `${ROUND}.md`, path: `${REVIEWS}/${ROUND}.md`, content: text, count: 1, ids: null, seal: false })
+  await writeFile('record', { name: `${ROUND}.md`, path: `${REVIEWS}/${ROUND}.md`, content: text, count: 1, ids: null, seal: false, chunked: true })
 }
 await record('targets', [])
 
@@ -266,7 +287,9 @@ const reviewJobs = perDoc.map(j => () => {
     .then(res => ({ key: w.key, file: `${w.key}-1.json`, target: '(전체)', res }))
     .catch(() => ({ key: w.key, file: `${w.key}-1.json`, target: '(전체)', res: null }))
 ))
-const reviews = (await parallel(reviewJobs)).filter(Boolean)
+const reviewCut = reviewJobs.length - CAPS.review
+if (reviewCut > 0) log(`⚠️ 리뷰 상한 ${CAPS.review}건을 넘어 렌즈 호출 ${reviewCut}건을 돌리지 않았다 — 이 감사의 커버리지가 그만큼 좁다`)
+const reviews = (await parallel(reviewJobs.slice(0, CAPS.review))).filter(Boolean)
 for (const r of reviews) if (!r.res) deadLenses.push(`${r.key}:${r.target}`)
 const all = reviews.filter(r => r.res).flatMap(r => r.res.findings.map(f => ({ ...f, lens: r.key, target: r.target })))
 run.dead_agents.review = deadLenses
@@ -278,65 +301,92 @@ phase('중복제거')
 const raw = all.map((f, i) => ({ raw_index: i, ...f }))
 let deduped = raw.map(f => ({ ...f, merged_from: [f.raw_index] }))
 if (raw.length > 1) {
+  // 넘기는 것은 요약만이다 — 같은 실체인지 가르는 데 필요한 칸만 보내고 본문은 워크플로가 들고 있는다.
+  const brief = raw.map(f => ({ raw_index: f.raw_index, lens: f.lens, target: f.target, file: f.file, title: f.title, evidence: String(f.evidence || '').slice(0, 200) }))
   const dd = await agent(
-    `다음은 disciplined-coder 저장소 감사에서 여러 렌즈가 낸 원시 발견 목록(JSON)이다. 항목마다 raw_index 가 있다.
-같은 실체(같은 파일의 같은 문제)를 가리키는 발견들을 하나로 병합하라 — evidence는 가장 구체적인 것을 남기고, lens와 target 은 같은 방식으로 쉼표로 합치고, consequence는 피해를 가장 구체적으로 적은 것을 남기고, type 이 있으면 그대로 옮긴다.
-병합 항목마다 그것이 덮는 원시 발견의 raw_index 전부를 merged_from 에 적어라. 모든 원시 발견은 정확히 한 항목에 들어가야 한다.
-서로 다른 문제는 절대 합치지 마라. 재판단·신규 발견 추가 금지 — 순수 병합만 한다.
-${JSON.stringify(raw)}`,
+    `다음은 disciplined-coder 저장소 감사에서 여러 렌즈가 낸 원시 발견의 요약 목록(JSON)이다. 항목마다 raw_index 가 있다.
+같은 실체(같은 파일의 같은 문제)를 가리키는 발견들을 한 묶음으로 모아라.
+묶음마다 그것이 덮는 raw_index 전부를 merged_from 에 적고, 증거와 설명을 남길 대표 하나를 keep 에 적어라 — 증거를 가장 구체적으로 적은 항목을 고른다.
+모든 원시 발견은 정확히 한 묶음에 들어가야 한다. 혼자인 발견도 묶음 하나로 낸다.
+서로 다른 문제는 절대 합치지 마라. 재판단·신규 발견 추가 금지 — 묶기만 한다. 발견의 본문을 다시 쓰지 마라, 번호만 돌려준다.
+${JSON.stringify(brief)}`,
     { label: 'dedup', phase: '중복제거', schema: DEDUP_SCHEMA, effort: 'low' }
   )
   if (!dd) throw new Error('중복제거 에이전트가 응답하지 않았다 — 회차를 실패로 끝낸다')
-  const covered = dd.findings.flatMap(f => f.merged_from).sort((a, b) => a - b)
+  const covered = dd.groups.flatMap(g => g.merged_from).sort((a, b) => a - b)
   const expected = raw.map(f => f.raw_index)
   if (JSON.stringify(covered) !== JSON.stringify(expected)) {
     throw new Error(`중복제거가 원시 발견을 잃었다 — 기대 ${JSON.stringify(expected)}, 실제 ${JSON.stringify(covered)}`)
   }
-  deduped = dd.findings
+  // 병합은 여기서 한다 — 대표의 본문을 남기고 렌즈와 대상만 쉼표로 잇는다.
+  deduped = dd.groups.map(g => {
+    const members = g.merged_from.map(i => raw[i])
+    const head = g.merged_from.includes(g.keep) ? raw[g.keep] : members[0]
+    const join = (k) => [...new Set(members.map(m => m[k]).filter(Boolean))].join(', ')
+    return { ...head, lens: join('lens'), target: join('target'), merged_from: g.merged_from }
+  })
 }
 log(`중복 제거 후 ${deduped.length}건 — 반박 검증 시작`)
 for (const k of [...new Set(all.map(f => f.lens))]) run.counts_by_lens[k] = { raw: all.filter(f => f.lens === k).length, unique: deduped.filter(f => lensesOf(f).length === 1 && lensesOf(f)[0] === k).length }
 await record('dedup', [])
 
 phase('반박검증')
-const judged = (await parallel(
-  deduped.map((f, i) => () =>
-    parallel([
-      () => agent(
-        `너는 회의적 검증자다. 저장소 ${REPO} 를 직접 읽고 다음 감사 발견을 사실성 관점에서 반박하라 — 인용 증거가 실제 파일에 그대로 존재하는가, 발견이 내용을 정확히 기술하는가, 못 본 반증이 있는가.
-불확실하면 isReal=false. 발견: ${JSON.stringify(f)}`,
-        { label: `verify-fact:${i}`, phase: '반박검증', schema: VERDICT_SCHEMA }
-      ),
-      () => agent(
-        `너는 회의적 검증자다. 먼저 ${REPO}/agent-principles.md 를 읽어라. 다음 감사 발견을 실질성 관점에서 반박하라 — 인용 원칙(${f.principle})의 실제 정의에 비추어 진짜 위반인가, 예외 조항·정당한 설계 선택에 해당하지 않는가, 고치면 실질 이득이 있는가.
-불확실하면 isReal=false. 발견: ${JSON.stringify(f)}`,
-        { label: `verify-merit:${i}`, phase: '반박검증', schema: VERDICT_SCHEMA }
-      ),
-    ]).then(vs => {
+// 검증은 파일 단위로 묶는다. 한 검증자가 그 파일을 한 번 읽고 거기서 나온 발견을 모두 판정한다.
+// 상한을 넘는 묶음은 아예 띄우지 않고 미검증으로 남긴다 — 잘랐다는 사실 자체가 기록에 있어야 한다.
+const byFile = new Map()
+for (const f of deduped) {
+  const k = f.file || '(파일 없음)'
+  if (!byFile.has(k)) byFile.set(k, [])
+  byFile.get(k).push(f)
+}
+const groups = [...byFile.entries()].map(([file, items]) => ({ file, items }))
+const toVerify = groups.slice(0, CAPS.verify)
+const overCap = groups.slice(CAPS.verify)
+log(`반박검증: 발견 ${deduped.length}건을 파일 ${groups.length}개로 묶어 검증자 ${toVerify.length}명을 띄운다`)
+if (overCap.length) log(`⚠️ 검증 상한 ${CAPS.verify}묶음을 넘어 ${overCap.length}묶음을 검증하지 않았다 — 미검증으로 기록한다`)
+let seq = 0
+const numbered = toVerify.map(g => ({ ...g, items: g.items.map(f => ({ ...f, seq: ++seq })) }))
+const verified = (await parallel(
+  numbered.map((g, gi) => () =>
+    agent(
+      `너는 회의적 검증자다. 저장소 ${REPO} 의 파일 ${g.file} 를 직접 열어 읽고, 그 파일을 두고 나온 아래 감사 발견을 하나씩 반박하라. 두 가지를 함께 본다.
+사실성 — 인용 증거가 실제 파일에 그대로 존재하는가, 발견이 내용을 정확히 기술하는가, 못 본 반증이 있는가.
+실질성 — ${REPO}/agent-principles.md 를 읽고, 발견이 인용한 원칙의 실제 정의에 비추어 진짜 위반인가, 예외 조항이나 정당한 설계 선택에 해당하지 않는가, 고치면 실질 이득이 있는가.
+둘 중 하나라도 무너지면 isReal=false 이고, 불확실해도 isReal=false 다. 발견마다 n(받은 번호)과 판정과 근거를 적어라. 받은 발견 전부에 판정을 내라 — 빠뜨리면 그 발견은 미판정으로 남는다.
+발견 목록: ${JSON.stringify(g.items.map(f => ({ n: f.seq, title: f.title, principle: f.principle, evidence: f.evidence, detail: f.detail, consequence: f.consequence })))}`,
+      { label: `verify:${g.file}`, phase: '반박검증', schema: VERDICTS_SCHEMA }
+    ).then(res => {
       // 검증자가 죽어 null이 온 것과 실제로 반박한 것은 다르다. 둘을 뭉치면 죽은 표가 '기각'으로 오염된다.
-      // 그래서 상태를 셋으로 가른다 — 두 표가 모두 살아 있고 둘 다 진짜라면 confirmed, 둘 다 살아 있는데
-      // 하나라도 반박하면 rejected, 표가 모자라면 undetermined다. 판정(isReal)과 사유를 둘 다 남긴다.
-      const alive = vs.filter(Boolean)
-      const status = alive.length < 2
-        ? STATUS[2]
-        : (alive.filter(v => v.isReal).length === 2 ? STATUS[0] : STATUS[1])
-      const { raw_index, ...rest } = f
-      return { id: findingId(ROUND, i + 1), ...rest, status, missingVotes: 2 - alive.length, verdicts: alive.map(v => ({ isReal: v.isReal, reason: v.reason })) }
+      // 그래서 상태를 셋으로 가른다 — 표가 있고 진짜라면 confirmed, 표가 있는데 반박했으면 rejected,
+      // 표가 없으면 undetermined다. 판정(isReal)과 사유를 둘 다 남긴다.
+      const byN = new Map((res ? res.verdicts : []).map(v => [v.n, v]))
+      return g.items.map(f => {
+        const v = byN.get(f.seq)
+        const { raw_index, seq, ...rest } = f
+        const status = !v ? STATUS[2] : (v.isReal ? STATUS[0] : STATUS[1])
+        return { id: findingId(ROUND, seq), ...rest, status, missingVotes: v ? 0 : 1, verdicts: v ? [{ isReal: v.isReal, reason: v.reason }] : [] }
+      })
     })
   )
-)).filter(Boolean)
+)).filter(Boolean).flat()
+const unverified = overCap.flatMap(g => g.items).map(f => {
+  const { raw_index, ...rest } = f
+  return { id: findingId(ROUND, ++seq), ...rest, status: STATUS[2], missingVotes: 0, over_cap: true, verdicts: [] }
+})
+const judged = verified.concat(unverified)
+run.unverified_over_cap = unverified.length
 const confirmed = judged.filter(j => j.status === 'confirmed')
 const rejected = judged.filter(j => j.status === 'rejected')
 const undetermined = judged.filter(j => j.status === 'undetermined')
 log(`반박 검증 완료: 확정 ${confirmed.length}건 · 기각 ${rejected.length}건 · 미판정 ${undetermined.length}건`)
-if (undetermined.length > 0) log(`⚠️ 미판정 ${undetermined.length}건은 검증자가 응답하지 않은 것이지 반박당한 것이 아니다`)
+if (undetermined.length > 0) log(`⚠️ 미판정 ${undetermined.length}건 — 이 가운데 ${unverified.length}건은 검증 상한 밖이라 안 띄운 것이고 나머지는 검증자가 응답하지 않은 것이다. 어느 쪽도 반박당한 것이 아니다`)
 run.verdict_counts = { confirmed: confirmed.length, rejected: rejected.length, undetermined: undetermined.length, derived: 0 }
 run.dead_agents.verify = judged.filter(j => j.missingVotes > 0).map(j => j.id)
 const findingsFile = { schema: SCHEMA_VERSION, findings: judged.filter(j => j.status !== STATUS[1]), rejected: rejected.map(r => ({ id: r.id, title: r.title, reasons: r.verdicts.map(v => v.reason) })) }
 // 첫 회차에는 대조할 지난 회차가 없다. 덩어리 4가 여기를 실제 대조로 바꾼다.
 const diffFile = { schema: SCHEMA_VERSION, no_prior_round: true, items: [] }
 await record('verify', [
-  { name: 'findings.json', content: findingsFile, count: findingsFile.findings.length, ids: findingsFile.findings.map(f => f.id) },
+  { name: 'findings.json', content: findingsFile, count: findingsFile.findings.length, ids: findingsFile.findings.map(f => f.id) , chunked: true },
   { name: 'diff.json', content: diffFile, count: diffFile.items.length, ids: null },
 ])
 
@@ -354,7 +404,7 @@ const aggregate = await agent(
 기계 검사: ${JSON.stringify(run.machine_checks)} (commit ${run.commit}, tree_clean ${run.tree_clean})
 확정 발견 (${confirmed.length}건): ${JSON.stringify(confirmed)}
 기각 (${rejected.length}건): ${JSON.stringify(findingsFile.rejected)}
-미판정 (${undetermined.length}건 — 검증자가 응답하지 않은 것이지 반박당한 것이 아니다. 커버리지 공백으로 다뤄라): ${JSON.stringify(undetermined.map(r => ({ id: r.id, title: r.title })))}
+미판정 (${undetermined.length}건 — 이 가운데 ${unverified.length}건은 검증 상한 ${CAPS.verify}묶음 밖이라 검증자를 띄우지 않은 것이고 나머지는 검증자가 응답하지 않은 것이다. 반박당한 것이 아니니 커버리지 공백으로 다뤄라): ${JSON.stringify(undetermined.map(r => ({ id: r.id, title: r.title })))}
 응답하지 않은 렌즈 호출: ${JSON.stringify(deadLenses)}`,
   { label: 'meta-aggregate', phase: '집계', schema: AGGREGATE_SCHEMA }
 )
@@ -369,7 +419,7 @@ const derivedFindings = findingsFile.findings.filter(f => f.status === STATUS[3]
 const summary = [
   `# 자기감사 회차 ${ROUND}`,
   '',
-  `실행체 ${EXECUTOR}(스키마 ${SCHEMA_VERSION})가 커밋 ${run.commit || '(측정 실패)'}${run.tree_clean === false ? '(작업 트리에 미커밋 변경 있음)' : ''} 위에서 돌았다. 확정 ${confirmed.length}건, 기각 ${rejected.length}건, 미판정 ${undetermined.length}건, 도출 ${derivedFindings.length}건이다.${run.tree_changed ? ' 감사 도중 작업 트리가 바뀌었다.' : ''} 구조화된 기록은 같은 이름의 폴더에 있다.`,
+  `실행체 ${EXECUTOR}(스키마 ${SCHEMA_VERSION})가 커밋 ${run.commit || '(측정 실패)'}${run.tree_clean === false ? '(작업 트리에 미커밋 변경 있음)' : ''} 위에서 돌았다. 확정 ${confirmed.length}건, 기각 ${rejected.length}건, 미판정 ${undetermined.length}건, 도출 ${derivedFindings.length}건이다.${unverified.length ? ` 미판정 가운데 ${unverified.length}건은 검증 상한 ${CAPS.verify}묶음을 넘어 검증자를 띄우지 않은 것이다.` : ''}${run.tree_changed ? ' 감사 도중 작업 트리가 바뀌었다.' : ''} 구조화된 기록은 같은 이름의 폴더에 있다.`,
   '',
   '## 범위와 배정',
   '',
