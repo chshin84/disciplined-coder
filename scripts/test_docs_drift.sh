@@ -140,7 +140,9 @@ check "문서 검진 기록의 이름을 적는다"       "grep -qF '-check.md' 
 check "문서 검진 기록은 처리 결과를 뺀다"    "grep -qF '무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다' \"\$DOCS\""
 check "spec 리뷰 기록은 처리 결과를 뺀다"    "grep -qF '어떻게 처리했는지는 담지 않는다' \"\$CALLER\""
 check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거를 검토 대상 문서 본문에 적는다' \"\$CALLER\""
-check "기록 파일 이름에 회차가 들어간다"      "grep -qF '-review-2.md' \"\$CALLER\""
+# 이름 규칙은 domain-docs 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
+check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$DOCS\""
+check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'domain-docs' \"\$CALLER\""
 check "원본을 받는 즉시 저장한다"            "grep -qF '받는 즉시' \"\$CALLER\""
 check "원본을 같은 이름 폴더에 둔다"          "grep -qF '같은 이름의 폴더' \"\$CALLER\""
 check "런타임이 기록 제외 이유를 적는다"      "grep -qF '사용자 입력이 로그로' \"\$RUNTIME2\""

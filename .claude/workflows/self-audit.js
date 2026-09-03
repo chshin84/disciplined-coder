@@ -25,7 +25,7 @@ const SCHEMA_VERSION = 1
 // 한 걸음이 띄우는 서브에이전트의 상한이다. 배분 규칙은 하나씩 보면 타당해도 곱하면 세 자리가
 // 된다 — 리뷰는 문서×렌즈, 검증은 발견마다다. 상한을 넘으면 잘라 내고 무엇을 잘랐는지 기록에
 // 남긴다. 조용히 자르면 '아무도 반박하지 않았다'와 '아무도 보지 않았다'가 구별되지 않는다.
-const CAPS = { review: 30, verify: 30 }
+const CAPS = { review: 30, verify: 50 }
 const STEPS = ['repo-check', 'targets', 'machine-checks', 'review', 'dedup', 'verify', 'aggregate', 'record']
 function findingId(round, n) { return `${round}#${String(n).padStart(3, '0')}` }
 // 판정 상태의 닫힌 집합 — 'derived'는 반박검증 없이 도출된 발견(회차 대조가 만든다)이다.
