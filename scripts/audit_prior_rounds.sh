@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 대조할 지난 회차를 고른다 — run.json 의 executor 가 같고 completed 가 참인 폴더를 경로 정렬해 최근 둘을
+# 대조할 앞선 회차 둘(직전 회차와 전전 회차)을 고른다 — run.json 의 executor 가 같고 completed 가 참인 폴더를 경로 정렬해 최근 둘을
 # 최신부터 낸다. --stale 이면 run.json 은 있으나 completed 가 참이 아닌 폴더(끊긴 회차)를 낸다.
 # 고르기를 LLM 에 두지 않는다 — 후보를 고르는 일은 LLM 밖에 둔다. run.json 이 없는 옛 기록은 회차로 세지 않는다.
 # 사용: audit_prior_rounds.sh [실행체 이름] [--root 레포 경로] [--stale]

@@ -134,7 +134,7 @@ check "걸음 표의 행 수와 '걸음은 N' 문장이 맞는다"     "[ \"\$PD
 check "걸음 표에 중복 제거와 반박검증이 있다"          "grep -qF '| 중복을 제거한다 |' '$PDA' && grep -qF '| 반박검증한다 |' '$PDA'"
 check "통합 기록이 파일 셋을 적는다"                  "grep -qF 'run.json' '$PDA' && grep -qF 'findings.json' '$PDA' && grep -qF 'diff.json' '$PDA'"
 
-echo "[audit_prior_rounds.sh — 지난 회차 고르기]"
+echo "[audit_prior_rounds.sh — 앞선 회차 고르기]"
 APR="$HERE/scripts/audit_prior_rounds.sh"
 check "스크립트가 있다"                                "[ -f '$APR' ]"
 APR_T="$(mktemp -d)"; mkdir -p "$APR_T/docs/superpowers/reviews"

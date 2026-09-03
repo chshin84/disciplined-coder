@@ -7,7 +7,7 @@ export const meta = {
     { title: '리뷰', detail: '문서별 렌즈(grounding·readability·fit)와 전체 렌즈(adversarial·plugin-compliance)를 병렬로 띄운다' },
     { title: '중복제거', detail: '묶음마다 merged_from 을 받아 원시 발견이 하나도 안 빠졌는지 확인한다' },
     { title: '반박검증', detail: '파일마다 검증자 하나가 사실성과 실질성을 함께 보고 판정과 사유를 둘 다 남긴다' },
-    { title: '대조', detail: '지난 회차 발견을 파일마다 에이전트 하나가 잔존·해소로 판정하고 재발을 도출한다' },
+    { title: '대조', detail: '직전 회차와 전전 회차에서 온 발견을 파일마다 에이전트 하나가 잔존·해소로 판정하고 재발을 도출한다' },
     { title: '집계', detail: '상충·커버리지 공백 표시와 지문 재확인' },
     { title: '기록', detail: '기록자가 파일 여럿을 맡아 쓰고 검수자가 폴더를 열어 센다 — run.json 은 검수를 지난 뒤 completed 로 닫힌다' },
   ],
@@ -515,8 +515,8 @@ const findingsFile = { schema: SCHEMA_VERSION, findings: judged.filter(j => j.st
 await record('verify', [])
 
 // ---------- 회차 대조 ----------
-// 대조 대상은 셋을 합친 것이다 — 직전 회차 findings.json 의 confirmed·undetermined·derived, 직전 diff.json 의
-// 잔존·미판정 전부, 직전 diff.json 의 해소 가운데 그 전 회차 diff.json 에서는 해소가 아니었던 것.
+// 대조 대상은 셋을 합친 것이다 — 직전 회차 findings.json 의 confirmed·undetermined·derived, 직전 회차 diff.json 의
+// 잔존·미판정 전부, 직전 회차 diff.json 의 해소 가운데 전전 회차 diff.json 에서는 해소가 아니었던 것.
 phase('대조')
 const DIFF_VERDICTS = ['잔존', '해소', '미판정']
 let diffFile = { schema: SCHEMA_VERSION, no_prior_round: true, items: [] }
@@ -524,13 +524,13 @@ const derivedFindings = []
 if (tg.prior_rounds.length > 0) {
   const [prev, prevprev] = tg.prior_rounds
   const pr = await agent(
-    `너는 읽기 전용 에이전트다. ${REVIEWS}/${prev}/findings.json 을 열어 status 가 confirmed·undetermined·derived 인 발견의 id·title·file·evidence·consequence·status 를 findings 에 옮겨라(rejected 는 빼라).
+    `너는 읽기 전용 에이전트다. 직전 회차는 ${prev} 이고 전전 회차는 ${prevprev || '(없음)'} 이다. ${REVIEWS}/${prev}/findings.json 을 열어 status 가 confirmed·undetermined·derived 인 발견의 id·title·file·evidence·consequence·status 를 findings 에 옮겨라(rejected 는 빼라).
 ${REVIEWS}/${prev}/diff.json 의 items 전부를 diff_items 에 옮겨라(비어 있으면 빈 배열).
 ${prevprev ? `${REVIEWS}/${prevprev}/diff.json 의 items 의 prior_id 와 verdict 만 prior_diff_items 에 옮겨라.` : 'prior_diff_items 는 빈 배열이다.'}
 아무 파일도 쓰지 마라.`,
     { label: 'prior-rounds', phase: '대조', schema: PRIOR_SCHEMA, effort: 'low' }
   )
-  if (!pr) throw new Error('지난 회차 읽기 에이전트가 응답하지 않았다 — 회차를 실패로 끝낸다')
+  if (!pr) throw new Error('직전 회차 읽기 에이전트가 응답하지 않았다 — 회차를 실패로 끝낸다')
   const prevResolved = new Set(pr.prior_diff_items.filter(i => i.verdict === '해소').map(i => i.prior_id))
   const subjects = []
   for (const f of pr.findings) subjects.push({ prior_id: f.id, prior_round: prev, title: f.title, file: f.file, evidence: f.evidence, consequence: f.consequence, was_resolved: false })
@@ -553,8 +553,8 @@ ${prevprev ? `${REVIEWS}/${prevprev}/diff.json 의 items 의 prior_id 와 verdic
     const sameFile = judged.filter(j => j.status !== STATUS[1] && String(j.file || '').split(':')[0] === g.file).map(j => ({ id: j.id, title: j.title, evidence: j.evidence }))
     const numbered = g.list.map((s, n) => ({ ...s, n: n + 1 }))
     return agent(
-      `너는 회차 대조 에이전트다. 지난 회차 발견이 지금 파일에 남아 있는지 판정하라. ${REPO} 의 파일 ${g.file} 을 직접 열어 본다. 아무 파일도 쓰지 마라.
-[지난 발견 ${numbered.length}건] ${JSON.stringify(numbered.map(s => ({ n: s.n, id: s.prior_id, round: s.prior_round, title: s.title, file: s.file, evidence: s.evidence, consequence: s.consequence })))}
+      `너는 회차 대조 에이전트다. 앞선 회차에서 나온 발견이 지금 파일에 남아 있는지 판정하라. 항목마다 round 가 어느 회차에서 온 것인지 알려 준다. ${REPO} 의 파일 ${g.file} 을 직접 열어 본다. 아무 파일도 쓰지 마라.
+[앞선 회차의 발견 ${numbered.length}건] ${JSON.stringify(numbered.map(s => ({ n: s.n, id: s.prior_id, round: s.prior_round, title: s.title, file: s.file, evidence: s.evidence, consequence: s.consequence })))}
 [이번 회차에서 같은 파일에 난 발견] ${JSON.stringify(sameFile)}
 판정은 둘이다 — 잔존(문제가 지금 파일에 있다. 어디에 있는지 인용한다. 이번 발견과 같은 실체이면 그 id 를 matched_id 에 적는다), 해소(없다. 무엇이 바뀌었는지 적는다).
 받은 발견 전부에 판정을 내고 n 을 그대로 옮겨 적어라 — 빠뜨리면 그 발견은 미판정으로 남는다.`,
@@ -567,7 +567,7 @@ ${prevprev ? `${REVIEWS}/${prevprev}/diff.json 의 items 의 prior_id 와 verdic
       })
     })
   }))).filter(Boolean).flat()
-  // 재발은 도출이다 — 직전 diff.json 이 해소로 적었던 발견이 이번에 잔존이면 가드 결함 발견을 새로 만든다.
+  // 재발은 도출이다 — 직전 회차 diff.json 이 해소로 적었던 발견이 이번에 잔존이면 가드 결함 발견을 새로 만든다.
   // id 번호는 반박검증이 쓴 번호 뒤를 잇는다.
   let n = deduped.length
   for (const it of items) {
@@ -579,7 +579,7 @@ ${prevprev ? `${REVIEWS}/${prevprev}/diff.json 의 items 의 prior_id 와 verdic
   diffFile = { schema: SCHEMA_VERSION, no_prior_round: false, items: items.map(({ was_resolved, n: _n, ...rest }) => rest) }
   run.dead_agents.diff = items.filter(i => i.verdict === DIFF_VERDICTS[2]).map(i => i.prior_id)
 } else {
-  log('대조할 지난 회차 없음')
+  log('대조할 직전 회차 없음')
 }
 run.verdict_counts.derived = derivedFindings.length
 findingsFile.findings.push(...derivedFindings)
@@ -642,7 +642,7 @@ const summary = [
   '',
   '## 회차 대조',
   '',
-  ...(diffFile.no_prior_round ? [line('대조할 지난 회차 없음')] : [line(`잔존 ${diffFile.items.filter(i => i.verdict === '잔존').length}건, 해소 ${diffFile.items.filter(i => i.verdict === '해소').length}건, 미판정 ${diffFile.items.filter(i => i.verdict === '미판정').length}건`)]),
+  ...(diffFile.no_prior_round ? [line('대조할 직전 회차 없음')] : [line(`잔존 ${diffFile.items.filter(i => i.verdict === '잔존').length}건, 해소 ${diffFile.items.filter(i => i.verdict === '해소').length}건, 미판정 ${diffFile.items.filter(i => i.verdict === '미판정').length}건`)]),
   ...(run.stale_rounds.length ? [line(`끊긴 회차 — ${run.stale_rounds.join(', ')}`)] : []),
   '',
   '## 도출된 발견',
