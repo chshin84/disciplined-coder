@@ -63,6 +63,7 @@ const DEDUP_SCHEMA = {
         properties: {
           ...FINDINGS_SCHEMA.properties.findings.items.properties,
           lens: { type: 'string', description: '병합된 렌즈 이름들 — 쉼표로 잇는다' },
+          target: { type: 'string', description: '발견이 나온 검토 대상 — 병합하면 쉼표로 잇는다' },
           merged_from: { type: 'array', items: { type: 'integer' }, description: '이 항목이 덮는 원시 발견의 번호(0부터)' },
         },
         required: [...FINDINGS_SCHEMA.properties.findings.items.required, 'lens', 'merged_from'],
@@ -209,9 +210,9 @@ const run = {
   verdict_counts: { confirmed: 0, rejected: 0, undetermined: 0, derived: 0 },
   narrowed: 0, unlabeled: 0, dead_agents: {}, machine_checks: null, stale_rounds: [],
 }
-const COUNT_RULE = 'count 는 이렇게 센다 — JSON 에 findings 배열이 있으면 그 길이, items 배열이 있으면 그 길이, steps_done 배열이 있으면 그 길이, 마크다운은 파일이 있으면 1, 파일이 없으면 -1.'
-async function writeFile(step, f) {  // f: { name, content(object|string), count, ids|null, seal }
-  const path = `${DIR}/${f.name}`
+const COUNT_RULE = 'count 는 이렇게 센다 — JSON 에 findings 배열이 있으면 그 길이, items 배열이 있으면 그 길이, steps_done 배열이 있으면 그 길이, 마크다운은 파일이 있으면 1, 파일이 없으면 -1. ids 는 count 를 센 그 배열의 항목 id 만 순서대로 적고, 그 배열의 항목에 id 가 없으면 빈 배열이다.'
+async function writeFile(step, f) {  // f: { name, path(선택 — 없으면 DIR 아래), content(object|string), count, ids|null, seal }
+  const path = f.path || `${DIR}/${f.name}`
   const body = typeof f.content === 'string' ? { text: f.content } : { json: f.content }
   const wrote = await agent(
     `너는 기록자다. 파일 ${path} 를 만들어 내용을 한 글자도 바꾸지 말고 써라(폴더 ${DIR} 가 없으면 만든다). json 이 있으면 들여쓰기 1의 JSON 으로, text 가 있으면 그 문자열을 그대로 쓴다. 파일은 파이썬으로 쓴다.${f.seal ? `\n쓴 뒤 \`bash ${REPO}/scripts/seal_reviews.sh "${path}"\` 로 봉인한다.` : ''}
@@ -221,7 +222,7 @@ ${JSON.stringify(body)}`,
   )
   if (!wrote) throw new Error(`기록자가 ${step} 걸음의 ${f.name} 에서 응답하지 않았다 — 회차를 실패로 끝낸다`)
   const chk = await agent(
-    `너는 검수자다. 파일 ${path} 를 열어 count 와 ids(항목의 id 값을 순서대로, 없으면 빈 배열)를 세어 돌려줘라. path 는 받은 문자열 그대로 돌려준다. 파일을 고치지 마라. ${COUNT_RULE}`,
+    `너는 검수자다. 파일 ${path} 를 열어 count 와 ids 를 세어 돌려줘라. path 는 받은 문자열 그대로 돌려준다. 파일을 고치지 마라. ${COUNT_RULE}`,
     { label: `check:${step}:${f.name}`, phase: '기록', schema: CHECK_SCHEMA, effort: 'low' }
   )
   if (!chk) throw new Error(`검수자가 ${step} 걸음의 ${f.name} 에서 응답하지 않았다 — 회차를 실패로 끝낸다`)
@@ -244,13 +245,8 @@ async function record(step, files) {
 }
 async function writeSummary(text) {
   // 요약문은 봉인하지 않는다 — 호출자가 뿌리와 물음을 붙인 뒤 seal_reviews.sh 로 봉인한다.
-  const path = `${REVIEWS}/${ROUND}.md`
-  const wrote = await agent(
-    `너는 기록자다. 파일 ${path} 를 만들어 아래 text 를 한 글자도 바꾸지 말고 써라. 봉인하지 않는다. ${COUNT_RULE} path 와 count 를 돌려줘라.
-${JSON.stringify({ text })}`,
-    { label: 'record:summary', phase: '기록', schema: RECORD_SCHEMA, effort: 'low' }
-  )
-  if (!wrote || wrote.count !== 1) throw new Error('기록자가 요약문을 쓰지 못했다 — 회차를 실패로 끝낸다')
+  // 봉인만 빼고 기록 경로는 같다 — 기록자의 자기 보고를 믿지 않고 검수자가 파일을 다시 연다.
+  await writeFile('record', { name: `${ROUND}.md`, path: `${REVIEWS}/${ROUND}.md`, content: text, count: 1, ids: null, seal: false })
 }
 await record('targets', [])
 
@@ -284,7 +280,7 @@ let deduped = raw.map(f => ({ ...f, merged_from: [f.raw_index] }))
 if (raw.length > 1) {
   const dd = await agent(
     `다음은 disciplined-coder 저장소 감사에서 여러 렌즈가 낸 원시 발견 목록(JSON)이다. 항목마다 raw_index 가 있다.
-같은 실체(같은 파일의 같은 문제)를 가리키는 발견들을 하나로 병합하라 — evidence는 가장 구체적인 것을 남기고, lens는 쉼표로 합치고, consequence는 피해를 가장 구체적으로 적은 것을 남기고, type 이 있으면 그대로 옮긴다.
+같은 실체(같은 파일의 같은 문제)를 가리키는 발견들을 하나로 병합하라 — evidence는 가장 구체적인 것을 남기고, lens와 target 은 같은 방식으로 쉼표로 합치고, consequence는 피해를 가장 구체적으로 적은 것을 남기고, type 이 있으면 그대로 옮긴다.
 병합 항목마다 그것이 덮는 원시 발견의 raw_index 전부를 merged_from 에 적어라. 모든 원시 발견은 정확히 한 항목에 들어가야 한다.
 서로 다른 문제는 절대 합치지 마라. 재판단·신규 발견 추가 금지 — 순수 병합만 한다.
 ${JSON.stringify(raw)}`,
@@ -337,7 +333,7 @@ if (undetermined.length > 0) log(`⚠️ 미판정 ${undetermined.length}건은 
 run.verdict_counts = { confirmed: confirmed.length, rejected: rejected.length, undetermined: undetermined.length, derived: 0 }
 run.dead_agents.verify = judged.filter(j => j.missingVotes > 0).map(j => j.id)
 const findingsFile = { schema: SCHEMA_VERSION, findings: judged.filter(j => j.status !== STATUS[1]), rejected: rejected.map(r => ({ id: r.id, title: r.title, reasons: r.verdicts.map(v => v.reason) })) }
-// 첫 회차에는 대조할 지난 회차가 없다. 덩어리 4가 이 자리를 실제 대조로 바꾼다.
+// 첫 회차에는 대조할 지난 회차가 없다. 덩어리 4가 여기를 실제 대조로 바꾼다.
 const diffFile = { schema: SCHEMA_VERSION, no_prior_round: true, items: [] }
 await record('verify', [
   { name: 'findings.json', content: findingsFile, count: findingsFile.findings.length, ids: findingsFile.findings.map(f => f.id) },
