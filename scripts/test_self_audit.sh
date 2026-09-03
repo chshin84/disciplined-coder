@@ -151,4 +151,12 @@ APR_STALE="$(bash "$APR" self-audit --root "$APR_T" --stale 2>/dev/null || true)
 check "--stale 이 끊긴 회차만 낸다"                     "[ \"\$APR_STALE\" = '2026-09-02-self-audit-2' ]"
 check "기본 실행체 이름은 self-audit 이다"              "grep -qF 'EXEC=\"self-audit\"' '$APR'"
 
+echo "[실행체 — 회차 대조]"
+check "실행체가 audit_prior_rounds.sh 를 부른다"        "grep -qF 'audit_prior_rounds.sh' '$WF'"
+check "대조 판정이 닫힌 집합이다"                       "grep -qF \"'잔존'\" '$WF' && grep -qF \"'해소'\" '$WF' && grep -qF \"'미판정'\" '$WF'"
+check "재발을 round-diff 의 derived 발견으로 만든다"    "grep -qF \"lens: 'round-diff'\" '$WF' && grep -qF '이것을 막는 검사가 없다' '$WF'"
+check "대조 걸음이 자기 phase 를 갖는다"                "grep -qF \"phase('대조')\" '$WF' && grep -qF \"title: '대조'\" '$WF'"
+check "최신 회차의 diff.json 에 대조 항목이 있다"       "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if d.get(\"no_prior_round\") is False and len(d[\"items\"])>0 else 1)' diff.json"
+check "걸음 표에 회차 대조가 있다"                      "grep -qF '| 회차를 대조한다 |' '$PDA' && grep -qF '## 회차 대조' '$PDA'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
