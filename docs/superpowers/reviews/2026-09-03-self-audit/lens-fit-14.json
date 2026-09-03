@@ -1,0 +1,42 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/project-doc-audit/SKILL.md",
+ "findings": [
+  {
+   "title": "「띄울 때 지킬 것」이 렌즈를 한 번씩만 띄운다는 계약을 선언하고 같은 절에서 문서마다 띄우라고 요구한다.",
+   "file": "skills/project-doc-audit/SKILL.md:55",
+   "evidence": "skills/project-doc-audit/SKILL.md:55 — \"렌즈는 한 번씩만 띄우며, 띄우는 횟수는 같은 스킬의 「한 번만 띄우는 렌즈의 규율」이 정한다.\" / skills/project-doc-audit/SKILL.md:63 — \"문서마다 따로 판정하는 렌즈에는 문서를 몰아주지 않는다. 짧은 문서 둘까지는 한 렌즈에게 줄 수 있고, 그때도 목적은 문서마다 따로 준다.\" / skills/project-doc-audit/SKILL.md:38 — \"문서마다 렌즈가 셋씩 붙어 호출이 문서 수의 세 배로 불어난다.\" / skills/domain-docs/SKILL.md:122 — \"이 규율은 여기가 소유자다. 렌즈는 어느 호출자에서나 한 번씩만 띄운다.\"",
+   "principle": "EXPLICIT",
+   "consequence": "55행을 읽은 호출자는 `lens-grounding`을 회차마다 한 번만 띄워 레포의 모든 문서를 한 호출에 몰아주고, 63행이 막으려던 얕은 판정을 그대로 낳는다. 반대로 63행을 따른 호출자는 자기가 정본의 규율을 어겼다고 보고 「통합 기록」의 렌즈 배정에 적을 호출 수를 어느 기준에 맞춰야 할지 정하지 못한다.",
+   "detail": "55행은 `domain-docs`의 「한 번만 띄우는 렌즈의 규율」을 그대로 따른다고 선언하는데, 그 규율은 렌즈를 어느 호출자에서나 한 번씩만 띄우라고 정한다. 그런데 같은 절 63행은 한 렌즈에 문서를 셋 이상 몰아주지 말라고 요구하고, 38행은 호출이 문서 수의 세 배로 불어나는 것을 전제로 배정 표를 고정했다. 한 문서 안에서 호출 횟수의 계약이 두 값으로 읽히므로, 이 문서를 소비하는 호출자가 어느 쪽에 맞춰야 하는지 문서만으로는 정할 수 없다.",
+   "fix": "55행에서 \"한 번씩만 띄우며\"를 이 절차의 단위(문서 또는 문서 묶음마다 한 번)로 다시 적고, 그 단위가 `domain-docs`의 규율과 어떻게 이어지는지 한 문장으로 밝힌다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_self_audit.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/docs/superpowers/reviews/"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "MEASURE-FIRST",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "NAME-ITEMS"
+ ]
+}

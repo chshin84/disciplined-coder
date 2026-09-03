@@ -1,0 +1,41 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/meta-aggregate/SKILL.md",
+ "findings": [
+  {
+   "title": "기록 파일 이름 규칙을 domain-docs가 소유하는데 이 문서가 그 경로 형식을 다시 적는다",
+   "file": "skills/meta-aggregate/SKILL.md:45",
+   "evidence": "skills/meta-aggregate/SKILL.md:45 — \"- **멀티에이전트 워크플로** — 호출자 스킬이 없으므로 워크플로를 짜는 세션이 직접 위 세 걸음을 따르고, 그 결과를 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-check.md`에 적는다.\" 소유자 문서인 skills/domain-docs/SKILL.md 는 \"기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md`이고 종류는 spec 리뷰가 `review`, 문서 검진과 레포 감사가 `check`, 선행연구 대조가 `prior-art`다. 실행체가 자동으로 쓰는 감사 요약문은 주제와 종류 대신 실행체 이름을 쓴다(`YYYY-MM-DD-<실행체 이름>.md`).\" 라고 적는다.",
+   "principle": "SSOT (domain-docs의 「규칙 (문서 일반)」 문서 SSOT 항목 — \"같은 사실은 한 문서에만 둔다. 다른 문서는 참조한다.\")",
+   "consequence": "소유자 문서의 종류 폐쇄 집합에는 워크플로 검증이 없는데 이 문서만 `-check`를 지정하므로, 워크플로를 짜는 세션은 소유자가 정의하지 않은 종류로 파일을 찍는다. 게다가 이름 규칙은 소유자 쪽에서 2026-09-03부터 바뀌었고 이 사본에는 그 갱신이 반영될 장치가 없어, 소유자가 다음에 규칙을 고치면 두 문서가 조용히 갈라진다.",
+   "detail": "이 레포는 사본 드리프트를 실제로 겪어 scripts/test_docs_drift.sh에 렌즈 스키마 사본과 「렌즈에게 정본을 알리는 법」의 사본 금지 검사를 두었으나, 기록 경로 사본에는 같은 가드가 없다. 이 문서는 자기 소유(리뷰 산출물 계약)에 대해서는 \"이 계약은 여기가 SSOT다\"라고 선언해 두고, 남이 소유한 사실은 참조 대신 값을 베껴 적었다.",
+   "fix": "경로 문자열을 지우고 \"기록 이름은 `domain-docs`의 문서 타입 표 기록 행을 따른다\"로 바꾼다. 워크플로 검증이 어느 종류에 해당하는지는 소유자 쪽 폐쇄 집합에 더한다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-consistency/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-adversarial/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-prior-art/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_scaffold.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "PROSE-FORM",
+  "NAME-ITEMS"
+ ]
+}

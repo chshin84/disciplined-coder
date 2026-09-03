@@ -1,0 +1,53 @@
+{
+ "lens": "lens-grounding",
+ "target": "commands/show-principles.md",
+ "findings": [
+  {
+   "title": "파일이 없을 때 안내하라는 한 문장이 원인을 \"scaffold가 아직 실행되지 않았다\" 하나로 단정하는데, 이 레포의 scaffold.sh와 README는 실행되고도 실패해 파일이 없는 길을 따로 적어 두었다.",
+   "file": "commands/show-principles.md:10-11",
+   "evidence": "파일이 없으면 \"scaffold가 아직 실행되지 않았다 — 새 세션을 열거나 `/setup-discipline`을 실행하라\"고\n한 줄로 안내하라.",
+   "principle": "MEASURE-FIRST · FAIL-LOUD (lens-grounding 체크리스트의 환각·불일치)",
+   "consequence": "정본 복사가 실패한 PC에서는 scaffold가 돌았는데도 파일이 없다. 그 사용자에게 이 커맨드는 \"아직 실행되지 않았다\"고 확인하지 않은 원인을 단정해 알리고, 시키는 대로 새 세션을 열거나 `/setup-discipline`을 다시 실행하면 같은 ERROR가 다시 나며 사용자는 같은 실패를 되풀이한다. README가 그 상황에 지시하는 \"그 메시지를 이슈로 올린다\"에는 끝내 이르지 못한다.",
+   "detail": "scripts/scaffold.sh 28행은 `cp \"$src\" \"$dst\" || { echo \"[disciplined-coder] ERROR: 정본 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)\" >&2; exit 1; }` 로, 첫 설치 PC에서 복사가 실패하면 파일이 없는 채 scaffold는 이미 실행된 상태가 된다. README.md 20행도 같은 증상의 원인으로 \"셋업 오류 — 세션 시작 알림에 `ERROR`가 찍혔다\"를 따로 적고 처방을 다르게 준다. 커맨드 문서는 원인을 확인하는 절차 없이 셋 가운데 하나를 사실로 적으라고 지시하므로, 출처에 없는 원인을 단정하는 안내가 된다.",
+   "fix": "안내 문장을 원인 단정에서 관측 서술로 바꾼다. 예를 들어 \"그 경로에 파일이 없다 — 세션 시작 알림에 `ERROR`가 있었으면 그 메시지를 그대로 전하고, 없었으면 새 세션을 열거나 `/setup-discipline`을 실행하라\"로 적으면 확인한 것만 말하게 된다.",
+   "lens": "lens-grounding",
+   "type": "unsupported"
+  },
+  {
+   "title": "도출한 값을 그대로 쓰라고만 적어 두었으나, `resolve_home`은 홈이 어긋난 PC에서 stderr로 note 한 줄을 함께 내보내므로 받은 출력에 경로가 아닌 줄이 섞인다.",
+   "file": "commands/show-principles.md:5-7",
+   "evidence": "먼저 관리 디렉터리를 도출하라 — 경로를 짐작하지 말고 아래를 실행해 받은 값을 쓴다.\n\n`bash -c '. \"${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh\" && resolve_home claude'`",
+   "principle": "EXPLICIT (lens-grounding 체크리스트의 누락)",
+   "consequence": "Bash 도구는 stdout과 stderr를 함께 돌려주므로, 홈이 어긋난 PC에서 세션이 받는 출력은 두 줄이 된다. 문서가 어느 줄이 경로인지 말해 주지 않아 세션이 note 줄을 경로의 일부로 삼아 존재하지 않는 파일을 Read하면, 원칙이 멀쩡히 깔려 있는데도 \"scaffold가 아직 실행되지 않았다\"가 뜬다. 이 문서가 13~15행에서 막으려던 오진이 그대로 되살아난다.",
+   "detail": "scripts/_resolve_home.sh 22~25행은 `if [ \"$val\" != \"${HOME:-}/$sub\" ]; then echo \"[disciplined-coder] note: 설정 홈을 USERPROFILE 기준 $val 로 잡음 (bash \\$HOME=${HOME:-} 와 다름)\" >&2` 로, USERPROFILE 기준 홈이 bash `$HOME`과 다를 때 note를 낸다. 그 조건은 이 문서가 13~15행에서 이 절차의 존재 이유로 든 도메인 PC의 상황과 정확히 같다. 즉 이 커맨드가 가장 필요한 PC에서만 출력이 두 줄이 되는데, 문서는 stdout 한 줄만 경로라는 사실을 적지 않았다.",
+   "fix": "실행 줄을 `bash -c '. \"${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh\" && resolve_home claude' 2>/dev/null` 로 바꾸거나, 그 아래에 \"`[disciplined-coder] note:` 로 시작하는 줄은 경로가 아니므로 버리고 나머지 한 줄을 경로로 쓴다\"를 한 문장 더한다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/show-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/setup-discipline.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_resolve_home.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/README.md"
+ ],
+ "principles_applied": [
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "EXPLICIT",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "KO-SYNTAX",
+  "SSOT"
+ ]
+}

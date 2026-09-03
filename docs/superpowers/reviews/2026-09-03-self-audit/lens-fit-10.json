@@ -1,0 +1,33 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-prior-art/SKILL.md",
+ "findings": [
+  {
+   "title": "레퍼런스 프롬프트가 이 렌즈만 갖는 필드 가운데 `search_status`와 `disclosures`를 채우라고 지시하지 않아, 조용한 통과를 막으려고 둔 필드가 실제 호출에서는 비어 돌아온다.",
+   "file": "skills/lens-prior-art/SKILL.md:39",
+   "evidence": "39번 줄 system 프롬프트: \"참신함을 채점하지 마라. 못 찾은 것은 `not_found`에 적고 독창성의 근거로 삼지 마라. 선행 사례는 목적·메커니즘·평가·적용 대상 네 축으로 대조하라. 모든 주장에 출처 URL과 그 성격을 달고 실제로 열어 확인하라.\" — 여기에 `search_status`도 `disclosures`도 나오지 않는다. 반면 44번 줄 스키마는 \"{ \\\"lens\\\": \\\"prior-art\\\", \\\"search_status\\\": \\\"ok|no-results|failed|not-attempted\\\", ...\"로 그 필드를 요구하고, 48번 줄은 \"`search_status`는 조용한 통과를 막는다. 빈 `issues`는 네 가지 다른 사정에서 나오는데 집계 단계는 넷을 구별하지 못하고 모두 발견 없음으로 읽는다.\"라고 적는다. 35번 줄 가드도 \"열지 못했으면 `opened`를 거짓으로 두고 `disclosures`에 적는다\"고 하지만 그 문장은 프롬프트에 옮겨져 있지 않다.",
+   "principle": "EXPLICIT",
+   "consequence": "렌즈를 띄운 서브에이전트는 프롬프트에 없는 필드를 빠뜨리거나 아무 값이나 채우고, 그러면 `search_status`가 없거나 근거 없이 `ok`인 결과가 돌아온다. domain-spec-review는 \"`search_status`가 `ok`가 아니면 이 렌즈의 결과를 판정으로 쓰지 않는다\"(skills/domain-spec-review/SKILL.md:139)로 그 값 하나에 기대어 판정 여부를 가르므로, 검색이 실패했거나 아예 안 돌아간 회차가 \"선행 사례를 봤으나 문제될 것이 없었다\"로 읽힌다. 48번 줄이 막겠다고 선언한 조용한 통과가 그대로 일어난다. `disclosures`가 비면 열지 못한 인용의 불확실성도 호출자에게 전달되지 않는다.",
+   "detail": "이 문서에서 프롬프트는 렌즈에게 실제로 전달되는 계약이고 스키마 절은 그 산출물의 형식이다. 공통 필드(`read`·`principles_applied`)는 meta-aggregate와 domain-docs가 호출자 쪽 규칙으로 소유하지만, `search_status`·`citations`·`not_found`·`disclosures` 넷은 이 렌즈만 갖는 필드라 이 파일이 지시할 자리다. 넷 가운데 `not_found`와 `citations`는 39번 줄 프롬프트에 문장으로 들어가 있는데 `search_status`와 `disclosures`만 빠져 있어, 형식은 요구하면서 그것을 채우게 하는 지시가 없는 상태다. lens-adversarial이 자기 가드 문장(\"기능 추가는 제안하지 마라\")을 프롬프트에 그대로 옮겨 둔 것과 대비된다.",
+   "fix": "39번 줄 system 프롬프트에 두 문장을 더한다. 검색을 돌렸는지와 결과가 있었는지를 `search_status`에 `ok`·`no-results`·`failed`·`not-attempted` 가운데 하나로 적고 시도하지 않았으면 `not-attempted`를 그대로 두라는 것과, 인용을 열지 못했으면 `opened`를 거짓으로 두고 그 사정을 `disclosures`에 적으라는 것이다.",
+   "lens": "lens-fit",
+   "type": "schema"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-prior-art/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-adversarial/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "SSOT",
+  "FAIL-LOUD",
+  "FOCUSED"
+ ]
+}

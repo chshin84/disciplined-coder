@@ -1,0 +1,30 @@
+{
+ "lens": "lens-readability",
+ "target": "commands/show-principles.md",
+ "findings": [],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/show-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/setup-discipline.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_resolve_home.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/README.md"
+ ],
+ "principles_applied": [
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "EXPLICIT",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "KO-SYNTAX",
+  "SSOT"
+ ]
+}

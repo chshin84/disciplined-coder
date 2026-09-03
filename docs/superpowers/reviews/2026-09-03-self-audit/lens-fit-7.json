@@ -1,0 +1,43 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-consistency/SKILL.md",
+ "findings": [
+  {
+   "title": "레퍼런스 프롬프트가 커버리지 공백을 spec↔plan으로 못 박아, 레포 문서 감사가 그 프롬프트를 그대로 쓰면 이 렌즈의 계약과 어긋난다",
+   "file": "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-consistency\\SKILL.md:22",
+   "evidence": "line 22: \"너는 정합성·커버리지 검수자다. 문서 내부의 모순, spec↔plan 커버리지 공백, 산출물 공백(무엇을 내놓는지와 그 형태와 놓일 곳이 안 적힌 것), 이름과 타입의 드리프트, 스코프 문제를 찾아라.\" / line 7: \"짝 문서가 무엇인지는 호출자가 정한다. 설계 문서 리뷰에서는 spec과 plan이 짝이고, 레포 문서 감사에서는 한 규칙이나 절차를 나눠 가진 문서 묶음 전체가 짝이다.\"",
+   "principle": "lens-fit 체크리스트의 「스타일」과 「호환」 / EXPLICIT / SSOT",
+   "consequence": "project-doc-audit이 도는 회차에서 이 렌즈는 spec도 plan도 없는 문서 묶음을 받는데, 프롬프트가 찾으라고 지시한 것은 spec↔plan 커버리지 공백이다. 서브에이전트는 자기가 받은 프롬프트만 계약으로 읽으므로 소유자 문서의 규칙이 그것을 따르는 문서로 이어지는지를 안 보고 지나가고, 그 회차는 빈 issues 배열을 정상 판정으로 돌려준다. 검증을 안 돌린 것과 지적이 0건인 것이 산출물상 구별되지 않는다.",
+   "detail": "이 문서의 본문(line 7, line 11)은 짝의 정의를 호출자가 정하는 것으로 열어 두고 레포 문서 감사에서는 문서 묶음 전체가 짝이라고 명시한다. 그런데 실제로 서브에이전트에 실리는 레퍼런스 프롬프트는 그 두 맥락 가운데 하나인 spec↔plan만 이름으로 부른다. project-doc-audit의 SKILL.md line 57은 \"렌즈 프롬프트는 그 렌즈 SKILL.md의 레퍼런스 프롬프트를 그대로 쓴다\"고 정하므로, 이 어긋남은 예외 상황이 아니라 그 절차의 기본 경로에서 매번 발생한다. 같은 자리에서 lens-fit의 레퍼런스 프롬프트(lens-fit/SKILL.md line 22)는 맥락 이름을 박지 않고 \"명시된 출력 계약\"이라고만 적어 두 맥락 모두에 걸린다.",
+   "fix": "레퍼런스 프롬프트에서 \"spec↔plan 커버리지 공백\"을 \"호출자가 준 짝 사이의 커버리지 공백\"처럼 맥락 중립으로 바꾸고, 무엇이 짝인지는 user 템플릿의 {background}로 호출자가 넣게 한다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  },
+  {
+   "title": "gap의 두 갈래를 claim에 적으라는 규칙이 레퍼런스 프롬프트 밖에 있어, 프롬프트를 그대로 쓰는 호출에는 그 요구가 전달되지 않는다",
+   "file": "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-consistency\\SKILL.md:29",
+   "evidence": "line 29: \"`gap`은 커버리지 공백과 산출물 공백 둘을 담는다. 집계본은 `type`만 싣고 그 둘을 가르지 않으므로 어느 쪽인지를 `claim`에 적는다.\" / line 23: \"user: \\\"[원문]\\\\n{document}\\\\n\\\\n[관련 배경]\\\\n{background}\\\\n\\\\n위 체크리스트로 이슈를 아래 JSON 스키마로 출력하라.\\\"\"",
+   "principle": "lens-fit 체크리스트의 「형식」 / EXPLICIT",
+   "consequence": "프롬프트에는 체크리스트도 스키마도 본문이 실리지 않고 \"위 체크리스트\"와 \"아래 JSON 스키마\"라는 가리킴만 남는다. 그대로 띄운 서브에이전트는 가리킬 위가 없어 type 값을 임의로 고르고 claim에 어느 갈래인지를 안 적는다. meta-aggregate의 집계본은 type만 싣고 둘을 안 가르므로(meta-aggregate/SKILL.md line 51의 aggregated 필드 목록), 산출물 공백 지적이 커버리지 공백과 섞여 어느 쪽인지 되찾을 수 없다.",
+   "detail": "이 렌즈가 자기 폐쇄 집합에 얹은 추가 요구는 line 29 한 줄이고, 그 요구를 실제로 지킬 주체는 프롬프트를 받는 서브에이전트다. 그런데 line 22와 line 23의 프롬프트 템플릿에는 체크리스트 본문도, 스키마 본문도, line 29의 claim 기재 규칙도 들어 있지 않다. project-doc-audit의 SKILL.md line 57은 프롬프트가 부담스러우면 \"렌즈에게 그 파일을 열어 읽으라고 시킨다\"는 대안을 두지만 그것은 선택지이고 기본은 그대로 쓰기다. 계약의 일부가 전달 경로 밖에 남아 있으므로 형식 적합성을 프롬프트만으로는 보장할 수 없다.",
+   "fix": "레퍼런스 프롬프트의 system 문장에 type 폐쇄 집합과 gap 두 갈래를 claim에 적으라는 요구를 넣거나, user 템플릿에 {checklist}와 {schema} 자리를 두어 호출자가 채우게 한다.",
+   "lens": "lens-fit",
+   "type": "format"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-consistency\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-spec-review\\SKILL.md"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "SSOT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "PROSE-FORM"
+ ]
+}

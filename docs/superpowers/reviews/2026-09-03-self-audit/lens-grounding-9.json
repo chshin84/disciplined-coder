@@ -1,0 +1,52 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-spec-review/SKILL.md",
+ "findings": [
+  {
+   "title": "선행연구 렌즈의 spec·plan 판정이 PostToolUse 훅이 넘기지 않는 경로에 기대고 있다",
+   "file": "skills/domain-spec-review/SKILL.md:66",
+   "evidence": "skills/domain-spec-review/SKILL.md 66행: \"spec인지 plan인지부터 가른다. 훅이 넘긴 경로가 `docs/superpowers/specs`면 spec이고 `plans`면 plan이다. 훅 밖에서 호출됐다면 경로로 도출되지 않으므로 무엇으로 판정했는지 보고에 적는다. plan에는 제안하지 않는다.\" / 반면 hooks/spec_review_posttooluse.sh 22~23행: \"base=\\\"$(basename \\\"$match\\\")\\\"\" 와 \"msg=\\\"📋 spec/plan(${base}) 작성됨 — 진행 전 반드시 ${SPEC_REVIEW_INSTRUCTION}\\\"\"",
+   "principle": "MEASURE-FIRST",
+   "consequence": "이 스킬을 실제로 발동시키는 것은 12행이 적은 대로 PostToolUse인데, 그 훅이 additionalContext에 실어 보내는 것은 경로가 아니라 basename 하나다. 그래서 메인 세션은 `docs/superpowers/specs`인지 `plans`인지를 훅 출력만으로 도출할 수 없고, 파일 이름만 보고 spec으로 짐작하거나 plan으로 짐작하게 된다. 66행 스스로가 plan에는 선행연구 렌즈를 제안하지 않는다고 정했으므로, 짐작이 어긋나면 제안해야 할 회차에 제안이 빠지거나 제안하지 말아야 할 회차에 웹에 나가는 렌즈가 붙는다. 게다가 \"훅 밖에서 호출됐다\"는 갈래에 걸리지 않으므로 무엇으로 판정했는지 보고에 적을 의무도 발동하지 않아, 판정 근거가 남지 않은 채 조용히 지나간다.",
+   "detail": "66행은 훅이 경로를 넘겨준다고 단정하지만, 훅 코드를 열어 보면 그 단정을 뒷받침하는 것이 없다. PostToolUse 훅은 22행에서 basename을 뽑아 23행 메시지에 그 값만 넣는다. 전체 경로를 문장에 실어 보내는 것은 Stop 훅(spec_review_stop.sh 62~63행의 목록)뿐인데, Stop은 턴 종료를 막는 하드 게이트라 리뷰를 시작하는 통상 경로가 아니다. 즉 문서가 절차의 분기 조건으로 삼은 사실이 실제 코드에 근거가 없다.",
+   "fix": "훅이 basename만 준다는 것을 문서에 그대로 적고, 판정 근거를 훅 출력이 아니라 메인 세션이 방금 쓴 파일의 경로에서 도출하라고 고치거나, PostToolUse 훅이 basename 대신 상대경로를 싣도록 코드를 고친다. 어느 쪽이든 판정 근거를 보고에 적는 의무는 훅 안팎을 가리지 말고 걸어 두는 편이 낫다.",
+   "lens": "lens-grounding",
+   "type": "unsupported"
+  },
+  {
+   "title": "리뷰 기록 파일 이름 규칙을 domain-docs가 소유하는데 이 문서가 조건을 뺀 채 다시 선언한다",
+   "file": "skills/domain-spec-review/SKILL.md:91",
+   "evidence": "skills/domain-spec-review/SKILL.md 91행: \"합치기가 끝나면 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-review.md`에 쓴다.\" 93행: \"회차마다 별개 파일을 만든다. 다시 리뷰를 돌면 `-review-2.md`로 새로 쓰고 앞 회차를 덮거나 이어 붙이지 않는다.\" / 반면 skills/domain-docs/SKILL.md 58행: \"기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md`이고 종류는 spec 리뷰가 `review`, 문서 검진과 레포 감사가 `check`, 선행연구 대조가 `prior-art`다. ... 같은 날 같은 주제의 두 번째 회차는 종류 뒤에 회차를 붙인다(`-review-2.md`·`-check-2.md`).\"",
+   "principle": "SSOT",
+   "consequence": "두 문서가 다음 회차 기록의 이름을 서로 다르게 지시한다. 둘째 회차가 다른 날에 돌면 domain-docs를 따를 때는 새 날짜를 붙인 `-review.md`가 되고, domain-spec-review를 따를 때는 `-review-2.md`가 된다. 이 저장소에는 이미 그 갈림이 파일로 남아 있다 — `docs/superpowers/reviews/2026-09-02-audit-record-and-diff-review.md` 다음 회차가 `2026-09-03-audit-record-and-diff-review-2.md`로 찍혀, 날짜는 바뀌었는데 회차 번호도 함께 붙었다. 이름 규칙이 두 곳에 있으니 한쪽을 고칠 때 다른 쪽이 조용히 낡고, 회차를 대조해 처분을 도출하는 절차(domain-docs 58행의 기록 행)가 어느 파일이 같은 계열인지 가리기 어려워진다.",
+   "detail": "기록 파일 이름과 회차 표기의 소유자는 domain-docs의 「문서 타입과 수명」 표이며, 같은 계열의 다른 호출자는 그 사실을 참조만 한다 — domain-docs 105행이 자기 검진 기록을 두고 \"이름과 회차 표기는 문서 타입 표의 기록 행을 따른다\"고 적은 것이 그 예다. domain-spec-review는 32행에서 \"이 문서 밖에서 가져올 것이 셋이다\"라며 외부 의존을 명시하는데 그 셋에 기록 이름 규칙이 없고, 대신 91행과 93행에서 규칙을 통째로 다시 적는다. 그러면서 소유자에 있는 \"같은 날 같은 주제\"라는 조건이 사본에서 빠져, 사본이 소유자보다 넓은 범위를 지시하게 되었다.",
+   "fix": "91행과 93행에서 이름과 회차 표기를 직접 적지 말고 domain-docs의 「문서 타입과 수명」 기록 행을 가리키게 바꾼다. 이 문서가 남길 것은 기록을 검토 대상 문서 옆이 아니라 별도 디렉터리에 두는 이유(95행)처럼 이 절차 고유의 근거뿐이다. 다만 scripts/test_docs_drift.sh가 `grep -qF '-review-2.md' \"$CALLER\"`로 이 사본을 붙들고 있으므로 그 검사도 함께 손봐야 한다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-spec-review\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-prior-art\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-plugin\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\_spec_marker.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_posttooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_stop.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\readonly_pretooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\seal_reviews.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\docs\\superpowers\\reviews\\"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "PROSE-FORM"
+ ]
+}

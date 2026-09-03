@@ -1,0 +1,40 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-docs/SKILL.md",
+ "findings": [
+  {
+   "title": "핸드오프 타입의 「강제하는 장치」로 적힌 잔존 패턴 린트가 이 저장소에 없고, 오히려 감사 대상 도출이 HANDOFF- 파일을 걸러 낸다",
+   "file": "skills/domain-docs/SKILL.md:54",
+   "evidence": "domain-docs/SKILL.md:54 — `| **핸드오프** (HANDOFF-*) | 1회성 인계 | 소비되면 곧바로 지운다 | 즉시 삭제한다 | 핸드오프 잔존 패턴 린트 |` / 같은 문서 70줄 — `| ephemeral | 한 번 쓰고 지운다 | 지울 의무가 있다 | 잔존하면 거짓 경쟁이 된다 | 잔존 패턴을 린트로 잡는다 |` / 실제 코드 scripts/audit_targets.sh:25 — `git ls-files '*.md' | { grep -v '^docs/superpowers/' || true; } | { grep -vE '(^|/)HANDOFF-[^/]*$' || true; } | while IFS= read -r f; do`",
+   "principle": "FAIL-LOUD",
+   "type": "unsupported",
+   "consequence": "이 저장소에 `HANDOFF-*.md`가 남으면 그것을 잡는 장치가 하나도 없다. 표가 약속한 린트는 `scripts/`·`hooks/`·`.claude/workflows/` 어디에도 없고, 유일하게 그 이름을 아는 `audit_targets.sh`는 잡는 것이 아니라 감사 대상에서 빼기 때문에 잔존 핸드오프는 계약 테스트에서도 자기감사에서도 보이지 않는다. 표를 읽는 사람은 장치가 도는 줄 알고 삭제를 확인하지 않으므로, 소비된 인계 문서가 살아 있는 지시로 계속 읽힌다.",
+   "detail": "「문서 타입과 수명」 표의 「강제하는 장치」 열은 다른 행에서 실재하는 장치를 가리킨다 — 설계 행의 superseded 표시 검사는 `scripts/test_docs_drift.sh:200-234`에, 기록 행의 수정·삭제 거부 검사는 같은 파일 552-568줄과 `hooks/readonly_pretooluse.sh`에 실재한다. 핸드오프 행만 실재하지 않는 장치를 적고 있어, 이 열의 다른 값과 같은 무게로 읽히지만 근거가 없다. 저장소 전체에서 `HANDOFF`를 부르는 코드는 `scripts/audit_targets.sh`와 그 테스트 `scripts/test_self_audit.sh` 둘뿐이고 둘 다 잔존을 잡지 않는다.",
+   "fix": "핸드오프 행의 장치 칸을 실재하는 것으로 바꾸거나(예: 계약 테스트에 `git ls-files 'HANDOFF-*'`가 비었는지 보는 검사를 더한다), 지금 장치가 없다는 사실을 그 칸에 그대로 적어 사람이 삭제를 손으로 확인하게 한다.",
+   "lens": "lens-grounding"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/audit_targets.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_scaffold_common.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_review_posttooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_format_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/readonly_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/docs/superpowers/reviews/ (디렉터리 목록)"
+ ],
+ "principles_applied": [
+  "FAIL-LOUD",
+  "EXPLICIT",
+  "SSOT",
+  "MEASURE-FIRST",
+  "NAME-ITEMS"
+ ]
+}

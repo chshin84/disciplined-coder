@@ -1,0 +1,50 @@
+{
+ "lens": "lens-readability",
+ "target": "CLAUDE.md",
+ "findings": [
+  {
+   "title": "변경 뒤 실행 절의 마지막 문장은 관형절 셋을 명사 앞에 쌓아, 실행 형태를 왜 그렇게 잡았는지가 문장 끝에 가서야 드러난다.",
+   "file": "CLAUDE.md:13",
+   "evidence": "CLAUDE.md 13행: \"실패한 이름을 모아 마지막에 알리는 형태인 이유는, 그냥 이어 돌리면 마지막 하나의 결과만 남아 앞의 실패가 묻히기 때문이다.\"",
+   "principle": "KO-SYNTAX · READ-FLOW",
+   "consequence": "읽는 사람이 \"실패한\"과 \"실패한 이름을 모아 마지막에 알리는\"과 \"…형태인\"을 차례로 붙들고 있어야 주어 '이유'에 닿고, 그 뒤에도 '때문이다'까지 가야 근거를 받는다. 명령을 그대로 복사해 쓰려는 사람이 이 문장에서 한 번 멈추고 되짚게 되어, 절의 결론인 실행 형태 자체가 근거 문장에 묻힌다.",
+   "detail": "writing-korean 의 KO-SYNTAX 는 관형절을 문장 가운데 끼우지 않고 명사 앞에 수식을 쌓지 않는다고 못 박는다. 이 문장은 '이유'라는 한 명사 앞에 관형 층을 셋 쌓았고, 그 층 전체가 주어 자리에 끼어 있다. 결론을 먼저 놓고 근거를 뒤에 두는 READ-FLOW 배치로 두 문장으로 끊으면 원문의 낱말을 하나도 버리지 않고 층이 풀린다.",
+   "fix": "\"실패한 이름을 모아 마지막에 알린다. 그냥 이어 돌리면 마지막 하나의 결과만 남아 앞의 실패가 묻히기 때문이다.\" — 문서 안 문장을 나눈 것이라 새로 지어낸 말이 없다.",
+   "lens": "lens-readability",
+   "type": "language"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\CLAUDE.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\hooks.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\_spec_marker.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_posttooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_stop.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\doc_review_posttooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\doc_format_pretooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\readonly_pretooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude\\settings.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude-plugin\\plugin.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude\\workflows\\self-audit.js",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_hooks.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_assertions.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_scaffold.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_self_audit.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.github\\workflows\\ci.yml"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "KO-SYNTAX",
+  "READ-FLOW",
+  "SSOT",
+  "MEASURE-FIRST",
+  "PROSE-FORM",
+  "PLAIN-KO"
+ ]
+}

@@ -102,4 +102,35 @@ check "리뷰 기록은 대상마다 묶어 쓰고 검수는 한 번 돈다" "gr
 check "리뷰는 문서 하나에 에이전트 하나다"            "grep -qF 'function docPrompt(' '$WF' && grep -qF '한 렌즈씩 차례로 적용하라' '$WF' && ! grep -qF 'function lensPrompt(' '$WF'"
 check "run.json 을 걸음마다 다시 쓰지 않는다"          "grep -qF \"if (step === 'review') await writeRun(false)\" '$WF'"
 
+echo "[회차 기록 — completed 인 최신 폴더의 파일 형태]"
+RV="$HERE/docs/superpowers/reviews"
+# 앵커: completed 가 참인 run.json 을 가진 폴더가 하나 이상 있어야 한다. 비면 아래 단언이 모두 근거 없이 통과한다.
+LATEST="$(for d in "$RV"/*/; do [ -f "$d/run.json" ] || continue; json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); sys.exit(0 if d.get("completed") is True else 1)' "$d/run.json" 2>/dev/null && printf '%s\n' "${d%/}"; done | sort | tail -1)"
+check "completed 인 회차 폴더가 하나 이상 있다"      "[ -n \"\$LATEST\" ]"
+rj() { json_run "$1" "$LATEST/$2"; }
+check "run.json 이 파싱된다"                          "[ -n \"\$LATEST\" ] && rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' run.json"
+check "findings.json 이 파싱된다"                     "[ -n \"\$LATEST\" ] && rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' findings.json"
+check "diff.json 이 파싱되고 no_prior_round 를 갖는다" "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if \"no_prior_round\" in d and isinstance(d.get(\"items\"),list) else 1)' diff.json"
+check "run.json 이 정한 칸을 갖는다"                  "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); need=[\"schema\",\"executor\",\"commit\",\"tree_clean\",\"tree_changed\",\"completed\",\"steps_done\",\"targets\",\"topic_groups\",\"counts_by_lens\",\"verdict_counts\",\"narrowed\",\"unlabeled\",\"dead_agents\",\"machine_checks\",\"stale_rounds\"]; sys.exit(0 if all(k in d for k in need) else 1)' run.json"
+check "findings.json 의 status 가 닫힌 집합 안이다"   "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(f.get(\"status\") in (\"confirmed\",\"rejected\",\"undetermined\",\"derived\") for f in d[\"findings\"]) else 1)' findings.json"
+check "findings.json 의 id 가 유일하다"               "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); ids=[f[\"id\"] for f in d[\"findings\"]]; sys.exit(0 if len(ids)==len(set(ids)) else 1)' findings.json"
+check "확정 발견은 검증자 판정을 갖는다"              "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(f.get(\"verdicts\") and all(\"isReal\" in v and \"reason\" in v for v in f[\"verdicts\"]) for f in d[\"findings\"] if f.get(\"status\")==\"confirmed\") else 1)' findings.json"
+check "미판정은 표가 없거나 상한 밖임을 밝힌다"        "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(f.get(\"missingVotes\",0)>0 or f.get(\"over_cap\") is True for f in d[\"findings\"] if f.get(\"status\")==\"undetermined\") else 1)' findings.json"
+check "diff.json 의 판정이 닫힌 집합 안이다"           "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(i.get(\"verdict\") in (\"잔존\",\"해소\",\"미판정\") for i in d[\"items\"]) else 1)' diff.json"
+check "요약문이 폴더와 같은 이름으로 있다"            "[ -n \"\$LATEST\" ] && [ -f \"\$LATEST.md\" ]"
+check "요약문에 고침·넘김 처분을 적지 않았다"          "[ -n \"\$LATEST\" ] && ! grep -qE '^- .*(고쳤다|넘겼다)' \"\$LATEST.md\""
+# 마지막 [ -w ] 가 거짓이면 while 의 종료 코드가 1이 되어 set -e 가 스크립트를 끝낸다. if 로 감싸 막는다.
+LATEST_RW="$(find "$LATEST" -type f 2>/dev/null | while IFS= read -r f; do if [ -w "$f" ]; then printf '%s
+' "$f"; fi; done)"
+check "폴더 안 파일이 전부 읽기 전용이다"              "[ -n \"\$LATEST\" ] && [ -z \"\$LATEST_RW\" ]"
+
+echo "[절차 문서 — 걸음 표와 개수 문장이 맞는다]"
+PDA="$HERE/skills/project-doc-audit/SKILL.md"
+PDA_ROWS="$(awk '/^## 걸음/{f=1;next} f&&/^## /{exit} f&&/^\| [^|-]/{n++} END{print n-1}' "$PDA")"
+PDA_SAID="$(LC_ALL=C.UTF-8 grep -oE '걸음은 [^ ]+이고' "$PDA" | head -1 | sed 's/걸음은 //; s/이고//')"
+KO_NUM() { case "$1" in 하나) echo 1;; 둘) echo 2;; 셋) echo 3;; 넷) echo 4;; 다섯) echo 5;; 여섯) echo 6;; 일곱) echo 7;; 여덟) echo 8;; 아홉) echo 9;; 열) echo 10;; 열하나) echo 11;; 열둘) echo 12;; *) echo 0;; esac; }
+check "걸음 표의 행 수와 '걸음은 N' 문장이 맞는다"     "[ \"\$PDA_ROWS\" = \"\$(KO_NUM \"\$PDA_SAID\")\" ]"
+check "걸음 표에 중복 제거와 반박검증이 있다"          "grep -qF '| 중복을 제거한다 |' '$PDA' && grep -qF '| 반박검증한다 |' '$PDA'"
+check "통합 기록이 파일 셋을 적는다"                  "grep -qF 'run.json' '$PDA' && grep -qF 'findings.json' '$PDA' && grep -qF 'diff.json' '$PDA'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

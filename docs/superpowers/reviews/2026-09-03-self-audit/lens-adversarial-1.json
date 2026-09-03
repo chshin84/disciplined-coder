@@ -1,0 +1,62 @@
+{
+ "lens": "lens-adversarial",
+ "target": "(전체)",
+ "findings": [
+  {
+   "title": "리뷰 상한이 잘라 낸 렌즈 호출은 로그에만 남고 봉인되는 기록에는 한 줄도 남지 않는다.",
+   "file": ".claude/workflows/self-audit.js:359-360",
+   "evidence": "const reviewCut = reviewJobs.length - CAPS.review\nif (reviewCut > 0) log(`⚠️ 리뷰 상한 ${CAPS.review}건을 넘어 렌즈 호출 ${reviewCut}건을 돌리지 않았다 — 이 감사의 커버리지가 그만큼 좁다`)",
+   "principle": "FAIL-LOUD",
+   "consequence": "문서가 늘어 리뷰 호출이 서른을 넘으면 잘린 호출은 run.json 에도 findings.json 에도 요약문에도 나타나지 않고, 요약문의 「범위와 배정」은 잘린 대상까지 배정된 것처럼 그대로 적는다. 기록은 봉인되어 고칠 수 없으므로, 다음 회차가 이 회차를 대조할 때 「봐서 아무것도 없던 대상」과 「아예 안 본 대상」이 영구히 구별되지 않는다. 잘리는 순서도 나쁘다 — 문서 대상이 앞에 오고 전체 렌즈 둘(lens-adversarial·plugin-compliance)이 목록 끝에 붙으므로, 상한을 넘는 순간 저장소를 통째로 보는 유일한 두 렌즈가 정확히 먼저 잘린다.",
+   "detail": "같은 파일 26~27행이 이 상황의 규칙을 스스로 적어 두었다. \"상한을 넘으면 잘라 내고 무엇을 잘랐는지 기록에 / 남긴다. 조용히 자르면 '아무도 반박하지 않았다'와 '아무도 보지 않았다'가 구별되지 않는다.\" 반박검증 걸음은 이 규칙을 지킨다 — 471행에서 run.unverified_over_cap 에 개수를 적고, 466~469행이 상한 밖 발견을 status='undetermined', over_cap=true 로 findings.json 에 실제로 싣는다. 리뷰 걸음만 log() 한 줄로 끝난다. log 는 회차가 끝나면 사라지는 실행 출력이고 기록 파일이 아니다. 그래서 이 워크플로는 자기가 명시한 규칙을 두 걸음 가운데 한 걸음에서만 지킨다.",
+   "fix": "reviewCut 을 run 객체의 칸(예: run.review_over_cap 과 잘린 대상 경로 목록)에 담아 run.json 에 함께 봉인하고, 요약문 「범위와 배정」에서 잘린 대상을 배정 목록과 나누어 적는다. 잘리는 순서는 reviewJobs 를 만들 때 WHOLE_LENSES 를 앞에 두면 뒤집힌다.",
+   "lens": "lens-adversarial",
+   "type": "failure-mode"
+  },
+  {
+   "title": "조각내기 기계는 문턱을 계산해 놓고 어느 렌즈 호출에도 걸리지 않아, 요약문에 숫자만 남기고 아무것도 제한하지 않는다.",
+   "file": "scripts/audit_targets.sh:3",
+   "evidence": "# --limit 이면 문턱 값(UTF-8 문자 수)만 낸다. 이 값은 렌즈 호출 하나의 입력 상한이며 여기 한 곳에만 둔다.",
+   "principle": "SIMPLE",
+   "consequence": "문턱을 넘는 긴 문서도 렌즈에 통째로 들어가므로 입력 상한이라는 보호가 실제로는 없다. 그런데도 요약문은 「조각 N개, 문턱 5000자」를 사실처럼 적어 봉인하므로, 기록을 읽는 사람은 감사가 조각 단위로 돌았다고 읽는다. 실제 감사 단위는 문서 하나다. 나중에 긴 문서에서 렌즈가 끊기면 문턱을 이미 걸어 두었다고 믿고 원인을 딴 데서 찾게 된다.",
+   "detail": "self-audit.js 212행의 문서별 렌즈 프롬프트는 \"검토 대상: ${REPO}/${target.path} 전체. 문서를 먼저 한 번 통독하라.\" 라고 쓴다. 조각의 시작 줄과 끝 줄은 프롬프트 어디에도 들어가지 않는다. 워크플로에서 fragments 가 쓰이는 곳은 스키마 정의(116·131행), 대상 도출 프롬프트(239행), 로그(249행), 요약문 한 줄(522행)뿐이고 호출을 나누는 데는 한 번도 쓰이지 않는다. audit_targets.sh 의 34~72행에 있는 ## 절 자르기와 ### 절 자르기와 문단 자르기 세 단계는 그 출력이 개수로만 소비되므로 지금 필요하지 않은 기계다.",
+   "fix": "둘 중 하나를 고른다. 조각을 실제로 쓰려면 docPrompt 가 대상의 조각 범위를 받아 「이 파일의 a~b행」으로 검토 범위를 좁히게 하고, 쓰지 않으려면 audit_targets.sh 는 대상 목록만 내게 줄이고 요약문에서 조각 수를 뺀다.",
+   "lens": "lens-adversarial",
+   "type": "over-engineering"
+  },
+  {
+   "title": "세션이 시작될 때마다 도는 봉인 스크립트가 인자 없이 돌아, 일부러 봉인하지 않고 남긴 요약문까지 잠근다.",
+   "file": ".claude/settings.json:9",
+   "evidence": "\"command\": \"bash \\\"$CLAUDE_PROJECT_DIR/scripts/seal_reviews.sh\\\"\"",
+   "principle": "REVERSIBLE",
+   "consequence": "요약문을 회차 폴더와 함께 커밋한 뒤 호출자가 뿌리와 물음을 붙이기 전에 세션이 새로 시작되거나 대화를 지우거나 재개하면, 그 요약문이 읽기 전용이 된다. 그다음 Edit 은 hooks/readonly_pretooluse.sh 가 \"읽기 전용 파일은 고치지 않는다\"는 사유로 거부하므로, 판단을 못 붙인 반쪽 요약문이 그대로 굳는다. 푸는 길은 셸에서 속성을 직접 되돌리는 것뿐이고 그 길은 이 훅의 설계상 안내되지 않는다.",
+   "detail": "self-audit.js 341행은 \"// 요약문은 봉인하지 않는다 — 호출자가 뿌리와 물음을 붙인 뒤 seal_reviews.sh 로 봉인한다.\" 라고 적어, 요약문에는 봉인 뒤에 할 일이 남아 있다고 못박는다. 그런데 scripts/seal_reviews.sh 는 16행에서 파일 인자가 없으면 `git ls-tree -r --name-only HEAD -- docs/superpowers/reviews` 로 HEAD 의 기록 파일 전부를 골라 chmod a-w 한다. SessionStart 훅은 인자를 하나도 넘기지 않고 matcher 가 startup|resume|clear 셋이라, 커밋된 요약문은 다음 세션 시작에 예외 없이 걸린다. 봉인의 범위를 정하는 곳이 둘로 갈려 있고(워크플로는 파일마다, 훅은 폴더 통째로) 둘이 같은 파일을 두고 반대로 판단한다.",
+   "fix": "봉인 대상에서 회차 요약문(docs/superpowers/reviews/*.md)을 빼거나, 판단을 붙이기 전 요약문임을 파일 자체에서 알 수 있게 표시하고 seal_reviews.sh 의 인자 없는 경로가 그 표시를 건너뛰게 한다.",
+   "lens": "lens-adversarial",
+   "type": "irreversible"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-adversarial/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/settings.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/audit_targets.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/seal_reviews.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/readonly_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/_spec_marker.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/spec_review_stop.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/spec_review_posttooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.superpowers/sdd/2026-09-03-audit-record-and-diff/progress.md"
+ ],
+ "principles_applied": [
+  "FAIL-LOUD",
+  "SIMPLE",
+  "REVERSIBLE",
+  "SSOT",
+  "MEASURE-FIRST",
+  "EXPLICIT",
+  "IDEMPOTENT"
+ ]
+}

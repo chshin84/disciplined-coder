@@ -1,0 +1,53 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/project-doc-audit/SKILL.md",
+ "findings": [
+  {
+   "title": "통합 기록 절이 정한 기록 파일 이름이 실제 실행체가 쓰는 이름과 어긋난다.",
+   "file": "skills/project-doc-audit/SKILL.md:70",
+   "evidence": "skills/project-doc-audit/SKILL.md:70 — \"결과는 `docs/superpowers/reviews/YYYY-MM-DD-project-doc-audit-check.md` 한 파일에 모은다. 같은 날 두 번째 회차는 `-check-2.md`처럼 종류 뒤에 회차를 붙인다. 이름 규칙은 `domain-docs`의 문서 타입 표 기록 행을 따른다.\" / skills/domain-docs/SKILL.md:58 — \"실행체가 자동으로 쓰는 감사 요약문은 주제와 종류 대신 실행체 이름을 쓴다(`YYYY-MM-DD-<실행체 이름>.md`).\" / .claude/workflows/self-audit.js:22 — \"const EXECUTOR = 'self-audit'\" / .claude/workflows/self-audit.js:240 — \"- 회차 이름은 <날짜>-${EXECUTOR} 이고, docs/superpowers/reviews/ 아래에 같은 이름의 폴더나 .md 가 이미 있으면 -2, -3 처럼 회차를 붙여 앞 회차를 덮지 않는다.\"",
+   "principle": "SSOT",
+   "consequence": "이 절차를 손으로 도는 사람은 `2026-09-03-project-doc-audit-check.md`를 만들고 실행체는 `2026-09-03-self-audit.md`를 만들어, 같은 감사 회차의 기록이 두 이름으로 갈라진다. 회차 대조가 지난 회차를 이름으로 찾는데 이름이 갈리면 앞 회차를 못 찾아 「대조할 지난 회차 없음」으로 지나가고, 잔존한 지적이 해소된 것처럼 사라진다.",
+   "detail": "project-doc-audit은 기록 이름의 SSOT가 `domain-docs`의 문서 타입 표 기록 행이라고 선언하면서도, 그 행이 실행체 자동 요약문에 두는 예외(`YYYY-MM-DD-<실행체 이름>.md`)를 따르지 않고 자기 이름을 종류 앞에 박은 값을 본문에 다시 적었다. 실제로 이 레포의 감사를 도는 `.claude/workflows/self-audit.js`는 예외 쪽을 구현해 회차 이름을 `<날짜>-self-audit`으로 만든다. 이름이라는 하나의 사실이 세 곳에 적혀 두 값으로 갈린 상태다.",
+   "fix": "70행에서 구체적인 파일 이름을 빼고 `domain-docs`의 기록 행을 가리키기만 하거나, 실행체가 도는 회차의 이름이 `YYYY-MM-DD-<실행체 이름>.md`임을 명시한다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  },
+  {
+   "title": "걸음 표가 일곱 걸음만 적어 실행체가 실제로 도는 반박검증과 회차 대조를 빠뜨린다.",
+   "file": "skills/project-doc-audit/SKILL.md:10",
+   "evidence": "skills/project-doc-audit/SKILL.md:10 — \"걸음은 일곱이고 순서가 있다. 뿌리 찾기까지 가지 않고 멈추면 렌즈별 지적만 쌓이고, 같은 것을 문서 수만큼 고치게 된다.\" / .claude/workflows/self-audit.js:427 — \"phase('반박검증')\" / .claude/workflows/self-audit.js:540 — \"'## 회차 대조',\" / .claude/workflows/self-audit.js:4 — \"결과는 docs/superpowers/reviews/<회차>/ 의 run.json·findings.json·diff.json·렌즈 원본과 봉인하지 않은 요약문이다.\"",
+   "principle": "MEASURE-FIRST",
+   "consequence": "이 문서를 절차의 정본으로 삼아 손으로 감사를 도는 사람은 렌즈가 낸 지적을 반박검증 없이 그대로 「통합 기록」에 옮기고 사용자에게 넘긴다. 실행체를 돌린 회차와 손으로 돈 회차가 같은 이름의 기록을 남기는데 한쪽에만 확정·기각·미판정 판정이 있어, 두 회차를 대조할 때 기각된 지적과 애초에 검증하지 않은 지적이 구별되지 않는다.",
+   "detail": "걸음 표는 대상 헤아리기부터 처분까지 일곱 행을 닫힌 목록으로 못박고 「통합 기록」에 담을 것도 여섯으로 못박았다. 그러나 이 레포에서 그 감사를 실제로 도는 `.claude/workflows/self-audit.js`는 렌즈 결과를 받은 뒤 반박검증 단계를 따로 돌려 발견마다 확정·기각·미판정을 매기고, 요약문에 「회차 대조」 절과 `diff.json`을 더한다. 절차 문서가 실행체의 두 걸음을 담지 않으므로, 문서만 읽는 사람과 실행체가 서로 다른 절차를 돈다.",
+   "fix": "걸음 표에 반박검증과 회차 대조 두 행을 더하고 각 행이 적힌 절을 만들거나, 그 두 걸음이 실행체 전용임을 본문에 밝힌다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_self_audit.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/docs/superpowers/reviews/"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "MEASURE-FIRST",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "NAME-ITEMS"
+ ]
+}

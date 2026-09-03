@@ -1,0 +1,33 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-llm-runtime/SKILL.md",
+ "findings": [
+  {
+   "title": "`meta-aggregate`를 LLM 콜로 두지 않는다고 단정한 문장이 그 사실의 소유자인 `meta-aggregate`가 허용한 예외와 어긋난다.",
+   "file": "skills/domain-llm-runtime/SKILL.md:20",
+   "evidence": "domain-llm-runtime/SKILL.md:20 — \"- `meta-aggregate`는 여기서 결정론적 파이썬 함수로 구현하며 LLM 콜로 두지 않는다.\" / meta-aggregate/SKILL.md:59 — \"- **제품 런타임**(`domain-llm-runtime`) — 결정론적 파이썬 함수로 구현한다. 모호한 상충 판정만 선택적으로 LLM을 쓴다.\"",
+   "principle": "SSOT",
+   "consequence": "구현자가 이 문서만 읽으면 모호한 상충 판정까지 결정론 코드로 짜려다 막히고, `meta-aggregate`를 읽은 사람과 서로 다른 설계를 내놓는다. 두 문서를 손으로 맞춰야 하므로 한쪽이 바뀔 때마다 다시 어긋난다.",
+   "detail": "구현 형태의 SSOT는 `meta-aggregate`의 「구현 형태」 절이고 거기서는 결정론 함수를 기본으로 하되 모호한 상충 판정에 한해 LLM을 선택적으로 허용한다. domain-llm-runtime은 그 사실을 참조하지 않고 복제하면서 예외를 떨어뜨렸고, 그 결과 '두지 않는다'는 더 강한 금지로 바뀌었다.",
+   "fix": "이 줄을 금지 단정 대신 \"구현 형태는 `meta-aggregate`의 「구현 형태」 절이 정한다\"는 참조로 바꾼다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-llm-runtime\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-spec-review\\SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "PROSE-FORM",
+  "SIMPLE"
+ ]
+}

@@ -1,0 +1,46 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/writing-korean/SKILL.md",
+ "findings": [
+  {
+   "title": "「고칠 순서」 절이 writing-korean과 lens-readability 두 곳에 거의 같은 문장으로 복제되어 있어 SSOT 선언과 어긋난다.",
+   "file": "skills/writing-korean/SKILL.md:80-84",
+   "evidence": "skills/writing-korean/SKILL.md:80 \"## 고칠 순서\" / :82 \"같은 글에서 여럿이 걸리면 분량을 줄이는 것을 먼저 한다. 낱말을 쉬운 말로 바꾸는 것은 마지막이다.\" / :84 \"설명이 모자라 보인다고 덧붙이지 않는다. ... 모자라 보이면 같은 글을 한 번 더 고치는 쪽이 낫다.\"  //  skills/lens-readability/SKILL.md:55 \"## 고칠 순서\" / :56 \"같은 문서에서 여럿이 걸리면 분량을 줄이는 것을 먼저 올린다. 낱말을 쉬운 말로 바꾸는 것은 마지막이다. 설명이 모자라 보인다고 덧붙이라고 하지 마라. 모자라 보이면 더하는 것이 아니라 같은 글을 한 번 더 고치는 쪽이 낫다.\"",
+   "principle": "SSOT",
+   "type": "duplication",
+   "consequence": "두 파일이 같은 규칙을 각자 적고 있어 한쪽만 고치면 렌즈가 대조하는 기준과 기준 문서가 조용히 어긋난다. 예를 들어 writing-korean에서 우선순위를 바꾸면 lens-readability는 옛 순서를 그대로 적용하고, 어느 쪽이 권위 있는지 판정할 근거가 문서 안에 없다.",
+   "detail": "writing-korean은 자신을 상세의 SSOT로 선언하고(:3 \"정본은 조항만 담고 여기가 상세의 SSOT다\"), lens-readability도 writing-korean을 기준 문서로 열어 읽는다고 적는다(:76 \"받은 문서와 목적, 그리고 기준 문서인 `writing-korean` 하나만 본다\"). 그런데도 「고칠 순서」의 두 문장은 참조가 아니라 복제로 두 파일에 들어 있고, 둘째 문장 \"낱말을 쉬운 말로 바꾸는 것은 마지막이다.\"는 한 글자도 다르지 않다. 이 레포는 같은 종류의 복제를 이미 기계로 막고 있다 — scripts/test_docs_drift.sh:511-519가 \"정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다\" 한 문장을 domain-docs 밖의 어느 스킬도 베끼지 못하게 검사한다. 같은 잣대를 자기 기준 문서에는 대지 않은 상태다.",
+   "fix": "lens-readability의 「고칠 순서」 절 본문을 지우고 `writing-korean`의 「고칠 순서」를 가리키는 한 문장만 남긴다. 그리고 test_docs_drift.sh의 복제 검사에 이 절의 첫 문장을 앵커로 추가해 다시 베끼면 검사가 실패하게 한다.",
+   "lens": "lens-grounding"
+  },
+  {
+   "title": "description은 규칙이 어느 측정에서 나왔는지 담는다고 약속하는데 본문의 수치는 출처를 하나도 밝히지 않는다.",
+   "file": "skills/writing-korean/SKILL.md:3",
+   "evidence": "skills/writing-korean/SKILL.md:3 \"정본의 PLAIN-KO·PROSE-FORM·READ-FLOW·KO-SYNTAX 네 조항이 무엇을 요구하는지와 어느 측정에서 나왔는지를 담는다.\"  //  :47 \"관형절이 가운데 끼고 어순이 흐트러지면 정답률이 청년 .92에서 .79로, 노년 .80에서 .63으로 떨어졌다.\"  //  :72 \"(직접 선행어가 있으면 835밀리초, 없으면 1,016밀리초)\"  //  :84 \"국세청 현장실험에서 안내지를 한 장 더 넣자 응답률이 4퍼센트포인트 떨어졌다.\"",
+   "principle": "MEASURE-FIRST",
+   "type": "unsupported",
+   "consequence": "수치를 의심하거나 규칙을 고치려는 사람이 어느 연구를 다시 열어야 하는지 알 수 없어 규칙의 근거를 검증하지도 갱신하지도 못한다. 이 파일은 상세의 SSOT라 여기서 근거가 끊기면 레포 전체에서 그 수치의 출처가 사라진다.",
+   "detail": "본문은 안구운동 추적, 배심 지시문 개정, 국세청 현장실험, 사람 글 스물넷 대 AI 글 스물넷 같은 실측을 열 건 넘게 인용하면서 저자·연도·제목·링크를 한 건도 붙이지 않는다. 같은 레포의 형제 문서는 그렇게 하지 않는다 — skills/lens-readability/SKILL.md:82는 \"긴 입력에서 앞쪽 지시로 쏠리는 편향과 가운데 정보가 묻히는 현상이 둘 다 보고되어 있다([IFScale](https://arxiv.org/abs/2507.11538), [Lost in the Middle](https://arxiv.org/abs/2307.03172))\"처럼 근거에 링크를 단다. 정본 agent-principles.md:3도 \"쉽게 말하되 근거와 과정은 감추지 않는다\"고 적는다. 따라서 이 파일의 출처 없는 수치는 레포 안의 기존 관례와 어긋난 상태이며, description이 약속한 \"어느 측정에서 나왔는지\"를 실제로는 이행하지 못한다.",
+   "fix": "각 수치 뒤에 lens-readability와 같은 형식으로 출처 링크나 저자·연도를 단다. 출처를 되찾지 못하는 항목은 수치를 지우고 방향만 남기거나 \"출처 미확인\"으로 표시해, 검증할 수 있는 근거와 그렇지 않은 것을 읽는 사람이 가를 수 있게 한다.",
+   "lens": "lens-grounding"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "MEASURE-FIRST",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "READ-FLOW",
+  "EXPLICIT",
+  "FOCUSED"
+ ]
+}

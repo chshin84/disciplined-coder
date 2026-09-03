@@ -1,0 +1,52 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/meta-aggregate/SKILL.md",
+ "findings": [
+  {
+   "title": "집계 단계를 메인 세션이 직접 밟는다고 적었으나 자기감사 워크플로는 별도 서브에이전트에 판정까지 시킨다",
+   "file": "skills/meta-aggregate/SKILL.md:60",
+   "evidence": "skills/meta-aggregate/SKILL.md:60 — \"- **spec/plan 리뷰와 문서 검진과 레포 문서 감사와 워크플로 검증** — 제품 코드가 없으므로 메인 세션이 위 「하는 일」의 세 걸음을 직접 따라 집계한다.\" 그러나 .claude/workflows/self-audit.js:495-503 은 \"const aggregate = await agent(\\n  `너는 집계자다. ${REPO}/skills/meta-aggregate/SKILL.md 를 읽고 그 방식대로 ... 전체 판정. 발견 내용 재판단은 금지(검증 단계가 끝냈다).\" 로 서브에이전트를 띄우고, self-audit.js:146 의 스키마는 \"verdict: { type: 'string', description: '전체 판정 한 단락 — 완결된 문어체 한국어' },\" 를 필수로 요구한다.",
+   "principle": "SSOT / MEASURE-FIRST / FAIL-LOUD",
+   "consequence": "이 문서를 계약으로 읽는 사람은 워크플로 검증에서도 메인 세션이 세 걸음만 밟고 판정은 없다고 이해하지만, 실제로 도는 자기감사 실행체는 서브에이전트를 하나 더 띄우고 `verdict`라는 전체 판정을 필수로 받는다. 그래서 문서만 보고 워크플로를 고치는 사람은 없는 배선을 전제로 고치고, 문서가 금지한 판정이 실행체 출력에는 남아 회차 기록에 들어간다.",
+   "detail": "「하는 일」 절은 집계가 \"상충과 커버리지 공백을 표시하는 데서 멈춘다\"고 못박고, 「출력 스키마」 절은 `decision`과 `retry_count`를 런타임 전용으로 한정한다. 실행체는 이름표를 `meta-aggregate`로 달고 이 문서를 읽으라고 시키면서도, 그 문서가 런타임 밖에서 금지한 전체 판정을 스키마의 필수 항목으로 요구한다. 문서가 실제 배선(서브에이전트 호출)과 실제 출력(판정)을 둘 다 반영하지 않은 상태다.",
+   "fix": "「구현 형태」 절에 자기감사 실행체를 다섯째 맥락으로 따로 적고, 그 맥락에서 집계자를 서브에이전트로 띄운다는 것과 `verdict`가 무엇을 담고 무엇을 담지 않는지(내용 재판단 금지)를 명시한다. 아니면 실행체에서 `verdict`를 빼 문서의 계약에 맞춘다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  },
+  {
+   "title": "커버리지 공백의 기준을 리스크로 적었으나 레포 문서 감사는 그 기준을 문서 종류 고정표로 이미 대체했다",
+   "file": "skills/meta-aggregate/SKILL.md:17",
+   "evidence": "skills/meta-aggregate/SKILL.md:17 — \"- **커버리지 공백** — 리스크에 비추어 봤어야 할 렌즈를 아무도 안 봤으면 그 렌즈를 더 부르라고 권한다.\" 그러나 호출자인 skills/project-doc-audit/SKILL.md 의 「렌즈 배정 기준」은 \"문서 종류로 정한다. 종류마다 걸 렌즈가 아래 표에 고정돼 있고, 회차마다 다시 판단하지 않는다. 판단에 맡기면 배정이 회차마다 달라져 회차끼리 대조할 수 없고\" 라고 적는다.",
+   "principle": "SSOT / EXPLICIT",
+   "consequence": "레포 문서 감사에서 집계자가 리스크를 새로 판단해 표에 없는 렌즈를 더 부르라고 권하면, 그 회차의 배정이 고정표를 벗어나 다음 회차와 대조할 수 없게 된다. 반대로 집계자가 고정표를 기준으로 삼으면 이 문서가 적은 리스크 기준을 어기는 것이 되어, 두 문서 가운데 어느 쪽이 참인지 사람이 매번 정해야 한다.",
+   "detail": "커버리지 공백의 판정 기준은 호출자마다 다르다. 제품 런타임은 `domain-llm-runtime`의 리스크 등급표를 쓰고, 레포 문서 감사는 문서 종류 고정표를 쓰며, 자기감사 실행체는 \"봤어야 하는데 아무도 안 본 대상이나 렌즈\"라고만 준다. 이 문서는 그 가운데 런타임의 기준 하나만 모든 맥락의 기준인 것처럼 적어 두었다.",
+   "fix": "「하는 일」의 커버리지 공백 줄에서 기준을 단정하지 말고 \"봤어야 할 렌즈의 기준은 호출자가 준다\"로 바꾸고, 호출자별 기준(런타임=리스크 등급표, 레포 문서 감사=문서 종류표)은 각 호출자 문서를 가리킨다.",
+   "lens": "lens-grounding",
+   "type": "mismatch"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-consistency/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-adversarial/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-prior-art/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_scaffold.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "PROSE-FORM",
+  "NAME-ITEMS"
+ ]
+}

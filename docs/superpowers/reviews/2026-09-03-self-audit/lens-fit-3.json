@@ -1,0 +1,44 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-llm-runtime/SKILL.md",
+ "findings": [
+  {
+   "title": "조립 절이 정한 행동 집합에 `meta-aggregate`가 요구하는 사람에게 올리는 경로가 없다.",
+   "file": "skills/domain-llm-runtime/SKILL.md:23",
+   "evidence": "domain-llm-runtime/SKILL.md:23 — \"그다음 제품 코드가 `type` 값으로 행동을 정하는 표를 따라 재생성·폴백·통과를 결정한다.\" / meta-aggregate/SKILL.md:43 — \"- **제품 런타임**(`domain-llm-runtime`) — 제품 코드가 `type` 값으로 행동을 정하는 표를 갖는다. 상충이나 커버리지 공백이 있으면 사람에게 올린다.\" / meta-aggregate/SKILL.md:51 — \"{ \"decision\": \"accept|regenerate|escalate\", \"reason\": \"...\",\"",
+   "principle": "FAIL-LOUD",
+   "consequence": "이 문서대로 짠 제품 코드는 집계본이 `escalate`를 돌려줘도 받을 자리가 없어 상충과 커버리지 공백을 재생성이나 통과로 삼켜 버린다. 사람이 봐야 할 사례가 조용히 지나간다.",
+   "detail": "다운스트림 계약인 `meta-aggregate`의 출력 스키마는 `decision`을 accept·regenerate·escalate 셋의 폐쇄 집합으로 정하고, 상충이나 커버리지 공백이면 사람에게 올리라고 못박는다. 그런데 이 문서의 조립 절이 제품 코드에 지시하는 행동은 재생성·폴백·통과 셋이라 escalate에 대응하는 항이 빠져 있고, 대신 스키마에 없는 폴백이 들어와 있다.",
+   "fix": "행동 집합을 집계 스키마의 `decision` 값과 맞추고, 상충과 커버리지 공백을 사람에게 올리는 항을 조립 절에 적는다.",
+   "lens": "lens-fit",
+   "type": "compat"
+  },
+  {
+   "title": "체크리스트의 등급이 모두 미리 정한 고정값이라는 선언이 등급 없는 항목과 조건부 항목 때문에 성립하지 않는다.",
+   "file": "skills/domain-llm-runtime/SKILL.md:34",
+   "evidence": "domain-llm-runtime/SKILL.md:34 — \"각 항목의 등급은 이 문서가 미리 정한 고정값이지 렌즈가 매기는 값이 아니다.\" / :42 — \"- 비가역이거나 위험이 큰 액션에는 사람 승인을 건다. 컴플라이언스 접점이면 critical이고, 아니면 정책에 따른다.\" / :43 — \"- 프롬프트와 로그에 비밀과 개인정보를 남기지 않는다(`SECRETS`).\" / :45 — \"누락 항목은 그 항목에 붙은 등급대로 처리하며, critical은 머지와 배포를 차단한다.\"",
+   "principle": "EXPLICIT",
+   "consequence": "비밀·개인정보 항목이 빠졌을 때 머지를 막아야 하는지 아닌지를 이 문서만으로 정할 수 없어, 검토자마다 다르게 처리하고 가장 무거운 항목이 등급 없이 통과할 수 있다.",
+   "detail": "한 목록 안에서 항목마다 등급 표기를 하나로 맞춰야 하는데 여섯 항목은 (critical)·(major)를 달고 있고, 사람 승인 항목은 조건에 따라 갈리는 값이며, 비밀과 개인정보 항목은 등급 자리에 원칙 ID만 있다. 그런데도 절 머리는 모든 항목의 등급이 고정값이라고 선언하고, 뒤의 처리 규칙은 '그 항목에 붙은 등급'이 있다는 전제 위에 서 있다.",
+   "fix": "비밀과 개인정보 항목에 등급을 붙이고, 사람 승인 항목은 조건별 등급이라는 예외를 절 머리에 명시하거나 등급을 하나로 확정한다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-llm-runtime\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-spec-review\\SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "PROSE-FORM",
+  "SIMPLE"
+ ]
+}

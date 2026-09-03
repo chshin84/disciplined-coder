@@ -1,0 +1,48 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-fit/SKILL.md",
+ "findings": [
+  {
+   "title": "읽기 범위가 문서 밖을 막아 두어, 호출자가 반드시 요구하는 정본 읽기와 부딪힌다.",
+   "file": "skills/lens-fit/SKILL.md:19",
+   "evidence": "skills/lens-fit/SKILL.md:18-19 — \"## 읽기 범위\\n출력 계약과 후보만 본다. 문서 밖으로 나가지 않으므로 `read`는 대개 빈 배열이다.\" 이에 맞서는 호출자 규칙은 skills/domain-docs/SKILL.md:114 — \"정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다. 읽기 전용 에이전트도 Read는 갖는다.\" 이고, skills/project-doc-audit/SKILL.md:55 — \"정본 경로를 프롬프트에 넣고 `principles_applied`를 요구한다.\" 이다. `read`의 뜻은 skills/meta-aggregate/SKILL.md:24 — \"\\\"read\\\": [\\\"문서 밖에서 실제로 열어본 것 — 파일 경로나 URL\\\"],\" 이다.",
+   "principle": "EXPLICIT",
+   "consequence": "정본을 읽으라는 지시와 문서 밖으로 나가지 말라는 지시를 함께 받은 렌즈는 둘 중 하나를 어긴다. 정본을 읽으면 `read`가 비지 않아 이 절의 \"대개 빈 배열\"과 어긋나고, 문서 밖으로 안 나가면 `principles_applied`가 읽지 않고 채운 값이 되어 흔적을 남기려던 장치가 무력해진다. 어느 쪽이든 skills/domain-docs/SKILL.md:117의 \"그 값이 비어 있으면 보고에 적는다\"에 따라 호출자 보고에 결함으로 오르므로, 회차마다 같은 잡음이 되풀이된다.",
+   "detail": "lens-fit은 자기 읽기 범위를 \"출력 계약과 후보\"로 닫아 두었으나, 이 렌즈를 부르는 두 호출자는 정본 파일을 열어 읽고 그 흔적을 `principles_applied`에 남기라고 요구한다. 정본은 검토 대상 문서 밖의 파일이므로 두 지시는 같은 행동을 두고 반대를 말한다. 같은 자리에서 lens-grounding은 skills/lens-grounding/SKILL.md:16에서 \"문서 밖을 반드시 읽는다\"고 적어 충돌이 없고, lens-adversarial은 skills/lens-adversarial/SKILL.md:22에서 \"문서가 가리키는 파일은 확인하되 스스로 탐색하지 않고, 확인한 것은 `read`에 적는다\"로 길을 열어 둔다. lens-fit만 문서 밖을 닫아 두었다.",
+   "fix": "읽기 범위에 정본 읽기를 예외로 명시하고, \"`read`는 대개 빈 배열이다\"를 빼거나 \"호출자가 준 정본 경로는 열어 `read`에 적는다\"로 바꾼다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  },
+  {
+   "title": "레퍼런스 프롬프트의 `{contract}`를 문서 감사에서 누가 무엇으로 채우는지 어느 문서도 정하지 않는다.",
+   "file": "skills/lens-fit/SKILL.md:23",
+   "evidence": "skills/lens-fit/SKILL.md:23 — \"- user: \\\"[출력 계약]\\\\n{contract}\\\\n\\\\n[후보]\\\\n{candidate}\\\\n\\\\n위반을 아래 JSON 스키마로 출력하라.\\\"\" 이고, 같은 파일 7행은 \"계약은 호출자가 준다.\"라고만 적는다. 호출자 쪽 skills/project-doc-audit/SKILL.md:57은 \"렌즈 프롬프트는 그 렌즈 `SKILL.md`의 레퍼런스 프롬프트를 그대로 쓴다.\"라고 하고, 같은 파일 59행은 lens-readability에 대해서만 \"표가 `lens-readability`를 건 문서에는 목적 한 줄을 함께 준다.\"라고 적는다.",
+   "principle": "EXPLICIT",
+   "consequence": "레포 문서 감사에서 `lens-fit`은 skills/project-doc-audit/SKILL.md:45의 \"| 렌즈 정의 | 렌즈 자신의 `SKILL.md` | `lens-fit` |\"에 따라 렌즈 정의 문서에 걸리는 유일한 렌즈인데, 계약이 안 들어오면 렌즈가 스스로 기준을 지어 판정한다. 그러면 같은 문서를 두 회차에 걸어도 기준이 달라 회차끼리 대조할 수 없고, 짐작한 계약으로 낸 지적인지 호출자가 관측할 방법도 없다.",
+   "detail": "lens-fit은 계약을 호출자에게서 받아야 성립하는 렌즈인데, 계약이 없을 때 어떻게 하라는 규정이 없다. lens-readability는 같은 문제를 fail-closed로 막아 두었다 — skills/lens-readability/SKILL.md의 「목적 주입」 절이 \"목적을 못 받으면 판정하지 않는다\"고 못 박고, 호출자인 project-doc-audit이 59행에서 그 한 줄을 주는 책임을 받는다. lens-fit에는 그 짝이 되는 절도, 호출자 쪽 주입 규정도 없다.",
+   "fix": "lens-fit에 계약 주입 절을 두어 계약을 못 받으면 판정하지 않고 `notes`에 적게 하고, project-doc-audit의 「띄울 때 지킬 것」에 문서 종류별로 무엇을 계약으로 줄지 한 줄을 더한다.",
+   "lens": "lens-fit",
+   "type": "format"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-consistency\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-adversarial\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-llm-runtime\\SKILL.md"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "SSOT",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "MEASURE-FIRST",
+  "PROSE-FORM"
+ ]
+}

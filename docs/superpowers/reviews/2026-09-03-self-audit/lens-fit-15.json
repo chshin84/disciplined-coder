@@ -1,0 +1,23 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/writing-korean/SKILL.md",
+ "findings": [],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "MEASURE-FIRST",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "READ-FLOW",
+  "EXPLICIT",
+  "FOCUSED"
+ ]
+}

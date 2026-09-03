@@ -1,0 +1,31 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-plugin/SKILL.md",
+ "findings": [],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-plugin/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/marketplace.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_ensure_autoupdate.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/setup-discipline.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/show-principles.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "KO-SYNTAX",
+  "FAIL-LOUD",
+  "SIMPLE"
+ ]
+}

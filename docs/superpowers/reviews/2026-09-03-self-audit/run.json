@@ -1,0 +1,264 @@
+{
+ "schema": 1,
+ "executor": "self-audit",
+ "commit": "04c8ef05c2c1ccb0f4454b2ee3792d76a95a3736",
+ "tree_clean": true,
+ "tree_changed": true,
+ "completed": true,
+ "steps_done": [
+  "repo-check",
+  "targets",
+  "review",
+  "dedup",
+  "verify",
+  "machine-checks",
+  "aggregate",
+  "record"
+ ],
+ "targets": [
+  {
+   "path": "CLAUDE.md",
+   "lenses": [
+    "lens-readability",
+    "lens-grounding"
+   ],
+   "reason": "「사람이 읽는 안내」 행을 골랐다. 판별 열이 프로젝트 CLAUDE.md를 그 행으로 명시한다.",
+   "purpose": "이 레포에서 작업하는 Claude와 기여자가 읽고, 정본과 상세가 어디 있는지 찾아 변경 뒤 무엇을 돌릴지 스스로 정할 수 있어야 한다."
+  },
+  {
+   "path": "README.md",
+   "lenses": [
+    "lens-readability",
+    "lens-grounding"
+   ],
+   "reason": "「사람이 읽는 안내」 행을 골랐다. 판별 열의 사용자용 README에 그대로 걸린다.",
+   "purpose": "플러그인을 처음 설치하는 사용자가 읽고, 무엇이 깔리고 프로젝트 폴더에 무엇이 생기는지 알고 설치를 끝낼 수 있어야 한다."
+  },
+  {
+   "path": "agent-principles.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit",
+    "lens-readability"
+   ],
+   "reason": "「원칙 정본」 행을 골랐다. CLAUDE.md와 여러 스킬이 이 파일을 정본이라 부른다.",
+   "purpose": "이 레포와 모든 프로젝트의 Claude가 읽고, 상황에 걸리는 원칙을 찾아 그대로 적용할 수 있어야 한다."
+  },
+  {
+   "path": "commands/setup-discipline.md",
+   "lenses": [
+    "lens-readability",
+    "lens-grounding"
+   ],
+   "reason": "「사람이 읽는 안내」 행을 골랐다. 판별 열이 명령 문서를 그 행으로 명시한다.",
+   "purpose": "플러그인을 깐 사용자가 읽고, 이 명령이 PC 전역에 무엇을 만들고 고치는지 알고 실행 여부를 정할 수 있어야 한다."
+  },
+  {
+   "path": "commands/show-principles.md",
+   "lenses": [
+    "lens-readability",
+    "lens-grounding"
+   ],
+   "reason": "「사람이 읽는 안내」 행을 골랐다. 판별 열이 명령 문서를 그 행으로 명시한다.",
+   "purpose": "사용자가 읽고, 지금 이 PC에 적용된 원칙 전문을 어떻게 확인하는지 알고 실행할 수 있어야 한다."
+  },
+  {
+   "path": "skills/domain-docs/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행을 골랐다. 문서 저작 규칙과 타입별 처방을 소유한다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/domain-llm-runtime/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행을 골랐다. 런타임 LLM 호출의 검증 절차를 소유한다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/domain-plugin/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행을 골랐다. 플러그인 제작의 처방을 소유하며 렌즈 정의는 아니다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/domain-spec-review/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행을 골랐다. spec·plan 리뷰 절차를 소유한 호출자다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-adversarial/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행을 골랐다. 렌즈 자신의 SKILL.md다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-consistency/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행을 골랐다. 렌즈 자신의 SKILL.md다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-fit/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행을 골랐다. 렌즈 자신의 SKILL.md다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-grounding/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행을 골랐다. 렌즈 자신의 SKILL.md다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-prior-art/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행을 골랐다. 렌즈 자신의 SKILL.md다. 이 문서를 감사 대상으로 읽는 것이지 lens-prior-art를 띄우는 것이 아니므로 웹 렌즈 제외 규칙에 걸리지 않는다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-readability/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행을 골랐다. 렌즈 자신의 SKILL.md다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/meta-aggregate/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행을 골랐다. 문서가 스스로 렌즈가 아니라고 밝히며 집계 절차를 소유한다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/nested-orchestration/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행을 골랐다. 3층 병렬 실행 절차를 소유한다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/project-doc-audit/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행을 골랐다. 레포 문서 감사 절차를 소유한 호출자다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/writing-korean/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit",
+    "lens-readability"
+   ],
+   "reason": "「원칙 정본」 행을 골랐다. 판별 열이 다른 문서가 정본이라 부르는 파일을 말하고, agent-principles의 네 조항과 lens-readability가 이 파일을 문체 상세의 정본으로 부른다.",
+   "purpose": "문서와 답을 쓰는 Claude가 읽고, 금지 표현과 문장 구조 규칙을 찾아 자기 문장을 고칠 수 있어야 한다."
+  }
+ ],
+ "topic_groups": 0,
+ "counts_by_lens": {
+  "lens-grounding": {
+   "raw": 21,
+   "unique": 20
+  },
+  "lens-readability": {
+   "raw": 6,
+   "unique": 6
+  },
+  "lens-fit": {
+   "raw": 19,
+   "unique": 19
+  },
+  "lens-adversarial": {
+   "raw": 3,
+   "unique": 3
+  },
+  "plugin-compliance": {
+   "raw": 1,
+   "unique": 0
+  }
+ },
+ "verdict_counts": {
+  "confirmed": 10,
+  "rejected": 20,
+  "undetermined": 19,
+  "derived": 0
+ },
+ "narrowed": 0,
+ "unlabeled": 0,
+ "dead_agents": {
+  "review": [],
+  "verify": []
+ },
+ "machine_checks": {
+  "allPassed": true,
+  "results": [
+   {
+    "name": "scripts/test_assertions.sh",
+    "passed": true,
+    "summary": "PASS=10 FAIL=0. 검사 블록마다 단언이 있고 구획 주석에 검사가 딸려 있음을 확인했다."
+   },
+   {
+    "name": "scripts/test_docs_drift.sh",
+    "passed": true,
+    "summary": "PASS=350 FAIL=0. 렌즈 계약, SSOT 드리프트, 금지 표현, 봉인 스크립트까지 전부 통과했다."
+   },
+   {
+    "name": "scripts/test_hooks.sh",
+    "passed": true,
+    "summary": "PASS=78 FAIL=0. Stop 게이트, 읽기 전용 차단, 넛지 셋, hooks.json 배선이 모두 통과했다."
+   },
+   {
+    "name": "scripts/test_scaffold.sh",
+    "passed": true,
+    "summary": "PASS=220 FAIL=0. 멱등 셋업, 관리블록 치유, 락 처리, 정본 조항 검사가 모두 통과했다."
+   },
+   {
+    "name": "scripts/test_self_audit.sh",
+    "passed": true,
+    "summary": "PASS=42 FAIL=0. 실행체 문법과 발견 칸, audit_targets.sh 문턱, 재배선 단언이 모두 통과했다."
+   },
+   {
+    "name": "claude plugin validate ./ (non-strict)",
+    "passed": true,
+    "summary": "Validation passed with warnings, 종료 코드 0. 경고는 plugins[0] plugin.json 의 version 미지정 하나뿐이며 CLAUDE.md 가 정상이라 적은 그 경고다."
+   },
+   {
+    "name": "실행 형태 — CLAUDE.md 정본 루프의 환경 제약",
+    "passed": true,
+    "summary": "CLAUDE.md:11 의 루프 형태를 그대로 돌리려 했으나 이 세션의 워크트리 격리가 거부했다(runs bash inside a construct too complex to verify). 환경 원인이므로 수정하지 않았고, 대신 scripts/test_*.sh 다섯을 각각 별도 명령으로 돌려 종료 코드를 하나씩 관측했다 — 앞 스크립트의 실패가 뒤에 묻히는 형태로 바꾸지 않았다."
+   }
+  ]
+ },
+ "stale_rounds": [],
+ "unverified_over_cap": 19
+}

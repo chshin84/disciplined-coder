@@ -1,0 +1,48 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-grounding/SKILL.md",
+ "findings": [
+  {
+   "title": "레퍼런스 프롬프트가 `notes`에 적으라고 두 번 지시하지만 이 회차를 실제로 돌리는 self-audit 워크플로의 리턴 스키마에는 `notes` 자리가 없어 그 지시가 조용히 버려진다.",
+   "file": "skills/lens-grounding/SKILL.md:19",
+   "evidence": "체크리스트를 항목마다 따로 훑고 그 결과를 한 번에 돌려주며, 훑은 각도를 `notes`에 적어라. 서브에이전트를 새로 열지 마라. 더 확인해야 할 것이 남으면 무엇을 왜 확인해야 하는지 `notes`에 적어라.",
+   "principle": "lens-fit 체크리스트의 「호환 — 기존 출력 계약과 하위 호환되는가」, FAIL-LOUD",
+   "consequence": "이 렌즈를 띄우는 실행체(.claude/workflows/self-audit.js)의 LENS_SCHEMA 는 properties 가 findings·read·principles_applied 셋뿐이고 required 도 그 셋이라, 렌즈가 훑은 각도와 '더 확인해야 할 것'을 적을 필드가 없다. 구조화 리턴만 읽는 호출자는 무엇을 안 봤는지와 무엇을 이어 물어야 하는지를 영영 받지 못하므로, project-doc-audit 의 「돌아온 `notes`에서 렌즈가 더 확인해야 한다고 적은 것을 읽는다」 걸음이 이 실행체에서는 빈 걸음이 되고, 커버리지 공백이 드러나지 않은 채 회차가 통과한다.",
+   "detail": "lens-fit 은 후보가 소비자 계약을 지키는지를 본다. 이 문서가 선언한 출력 스키마(22~26줄)는 `notes` 를 필수 필드로 두지만, 이 문서를 렌즈로 띄우는 실제 소비자인 .claude/workflows/self-audit.js 의 LENS_SCHEMA(85~104줄)에는 `notes` 키가 없고 파일 전체를 grep 해도 `notes` 문자열이 한 번도 나오지 않는다. 계약이 둘로 갈려 있고 실행되는 쪽이 문서 쪽을 잘라낸다.",
+   "fix": "self-audit.js 의 LENS_SCHEMA 에 `notes` 를 더해 렌즈 선언과 맞추거나, 이 실행체에서는 `notes` 를 받지 않는다는 사실과 그 대체 경로를 렌즈 계약의 SSOT 인 meta-aggregate 에 적고 이 문서는 그것을 가리킨다.",
+   "lens": "lens-fit",
+   "type": "compat"
+  },
+  {
+   "title": "frontmatter 의 description 이 등호와 빗금과 더하기로 문장을 대신해, 이 레포가 남에게 강제하는 PROSE-FORM 금지 규칙을 렌즈 정의 자신이 어긴다.",
+   "file": "skills/lens-grounding/SKILL.md:3",
+   "evidence": "description: LLM 출력·주장이 그 출처(런타임=요청+맥락 / spec리뷰=검토 문서+주입된 사실)에 근거하는지 보는 렌즈다.",
+   "principle": "PROSE-FORM (writing-korean 「금지 표현」의 \"'X = Y'·'원인 → 해결'처럼 기호로 문장을 대신하지 않는다\")",
+   "consequence": "description 은 스킬 목록에 그대로 실려 이 렌즈를 언제 여는지 판단하는 근거가 되는데, '런타임=요청+맥락 / spec리뷰=검토 문서+주입된 사실'은 읽는 쪽이 등호와 빗금의 뜻을 스스로 풀어야 하는 문자열이라 본문 7줄의 산문 설명과 달리 오독 여지가 남는다. 더 크게는 이 규칙을 다른 문서에 강제하는 렌즈 자신이 그 규칙을 어기고 있어, 같은 문장 형태를 다른 문서에서 지적할 때 근거가 약해진다.",
+   "detail": "writing-korean/SKILL.md 58줄이 기호로 문장을 대신하는 것을 금지하며 '문장 안 보조로 쓰는 것은 괜찮다'는 예외만 둔다. 여기서는 괄호 안 전체가 두 맥락의 출처가 무엇인지를 설명하는 독립된 진술이고 그것을 '='와 '+'와 '/'만으로 세워 두었으므로 보조가 아니라 문장 대체다. 같은 내용을 본문 7줄은 '런타임에서는 원래 요청과 함께 준 맥락이고, spec/plan 리뷰에서는 ...'처럼 완결된 문장으로 이미 적고 있어, 산문으로 적을 수 있는 내용임이 같은 파일 안에서 증명된다.",
+   "fix": "description 을 본문 7줄과 같은 산문으로 고친다. 예를 들어 '출처는 호출자가 준다. 런타임에서는 요청과 맥락이고, spec 리뷰에서는 검토 문서에 주입된 사실을 더한 것이다.'로 적는다.",
+   "lens": "lens-fit",
+   "type": "style"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-consistency\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-adversarial\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-plugin\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude\\workflows\\self-audit.js"
+ ],
+ "principles_applied": [
+  "PROSE-FORM",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "SSOT",
+  "MEASURE-FIRST",
+  "PLAIN-KO"
+ ]
+}

@@ -1,0 +1,43 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-plugin/SKILL.md",
+ "findings": [
+  {
+   "title": "컴포넌트 위치 목록이 이 레포가 실제로 쓰는 workflows 컴포넌트를 빠뜨렸다.",
+   "file": "skills/domain-plugin/SKILL.md:14",
+   "evidence": "SKILL.md:14 — \"- **컴포넌트 위치** — `agents/`·`skills/`·`commands/`·`hooks/hooks.json`에 둔다. 플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다.\" / 대조 출처 `.claude-plugin/plugin.json:8` — \"  \\\"workflows\\\": [\\\"./.claude/workflows/self-audit.js\\\"],\" / `.claude/workflows/self-audit.js` 파일이 실제로 존재한다(`ls .claude/workflows/` → `self-audit.js`).",
+   "principle": "SSOT · EXPLICIT · MEASURE-FIRST",
+   "consequence": "이 문서를 보고 플러그인을 만드는 사람은 컴포넌트를 넷(agents·skills·commands·hooks)으로 알고 `workflows`와 `.claude/workflows/`를 배선하지 않는다. 이 레포 자신이 self-audit 실행체를 그 키로 싣고 있으므로, 문서만 따라 만든 플러그인은 워크플로가 등록되지 않은 채 조용히 빠지고, 반대로 이 레포를 고치는 사람은 자기 매니페스트의 다섯째 키가 어느 문서의 계약인지 찾지 못한다. domain-docs가 \"매니페스트와 frontmatter의 형식은 `domain-plugin`이 소유한다\"고 선언했으므로 이 키는 다른 어디에도 정본이 없다(`docs/`와 `.superpowers/`의 1회성 브리프 밖에서는 문자열 `workflows`가 `plugin.json` 한 곳에만 나온다).",
+   "detail": "이 문서는 플러그인 컴포넌트를 어디에 두는지 열거하면서 `agents/`·`skills/`·`commands/`·`hooks/hooks.json` 넷만 적었다. 그러나 이 레포의 매니페스트는 다섯째 컴포넌트인 `workflows`를 선언하고 `.claude/workflows/self-audit.js`를 가리키며 그 파일은 실제로 있다. 문서가 주장하는 대상(자기 레포의 매니페스트)과 문서의 열거가 어긋나므로 누락이다. domain-docs가 매니페스트 형식의 소유권을 이 문서에 준 이상, 여기 없는 키는 저장소 어디에서도 계약으로 적혀 있지 않다.",
+   "fix": "「컴포넌트 위치」 항목에 `.claude/workflows/`와 매니페스트의 `workflows` 배열을 더하고, 그 키가 파일 경로 배열이라는 것과 이 레포의 self-audit 실행체가 그 자리에 있다는 것을 한 문장으로 적는다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-plugin/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/marketplace.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_ensure_autoupdate.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/setup-discipline.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/show-principles.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "KO-SYNTAX",
+  "FAIL-LOUD",
+  "SIMPLE"
+ ]
+}

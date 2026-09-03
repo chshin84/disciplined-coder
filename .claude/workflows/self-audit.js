@@ -494,7 +494,7 @@ await record('machine-checks', [])
 phase('집계')
 const aggregate = await agent(
   `너는 집계자다. ${REPO}/skills/meta-aggregate/SKILL.md 를 읽고 그 방식대로, 아래 자기감사 결과의 구조적 건강성을 점검하라 — 확정 발견 간 상충(같은 곳을 두고 반대로 판정한 짝)과 커버리지 공백(봤어야 하는데 아무도 안 본 대상이나 렌즈)과 전체 판정. 발견 내용 재판단은 금지(검증 단계가 끝냈다).
-먼저 ${REPO} 에서 git rev-parse HEAD 와 git status --porcelain 을 다시 실행해 commit 과 tree_clean 에 적어라. 아래 기계 검사의 지문과 다르면 「감사 도중 작업 트리가 바뀌었다 — 이 회차의 판정은 움직인 작업 트리에 대한 것이다」를 verdict 첫 문장으로 적어라.
+먼저 ${REPO} 에서 git rev-parse HEAD 와 git status --porcelain 을 다시 실행해 commit 과 tree_clean 에 적어라. 다만 이번 회차가 쓴 경로로 시작하는 줄은 세지 않는다 — docs/superpowers/reviews/${ROUND} 와 docs/superpowers/reviews/${ROUND}.md 가 그것이고, 회차 자신의 출력이라 감사 도중의 변경이 아니다. 그 줄을 뺀 뒤 남는 줄이 없으면 tree_clean 은 참이다. 아래 기계 검사의 지문과 다르면 「감사 도중 작업 트리가 바뀌었다 — 이 회차의 판정은 움직인 작업 트리에 대한 것이다」를 verdict 첫 문장으로 적어라.
 기계 검사: ${JSON.stringify(run.machine_checks)} (commit ${run.commit}, tree_clean ${run.tree_clean})
 확정 발견 (${confirmed.length}건): ${JSON.stringify(confirmed)}
 기각 (${rejected.length}건): ${JSON.stringify(findingsFile.rejected)}

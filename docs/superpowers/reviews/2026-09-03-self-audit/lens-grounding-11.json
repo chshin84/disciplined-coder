@@ -1,0 +1,51 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/nested-orchestration/SKILL.md",
+ "findings": [
+  {
+   "title": "L2가 자율로 domain-spec-review를 돌린다고 적었으나 그 스킬은 반영 뒤 재리뷰 여부를 매번 사용자에게 묻도록 요구하므로, 사람과 대화할 수 없는 L2에는 밟을 수 없는 걸음이 있다.",
+   "file": "skills/nested-orchestration/SKILL.md:19",
+   "evidence": "skills/nested-orchestration/SKILL.md:19 — \"플랜 국면은 L2가 자율로 `domain-spec-review`를 돌려 발견을 🔴와 고칠 것으로 가르고 고칠 것까지 반영하며\" / 같은 파일 23행 — \"L2는 자기 부모인 L1 외 누구와도 대화할 수 없으므로 프롬프트는 자기완결이어야 한다.\" / skills/domain-spec-review/SKILL.md:129 — \"다시 리뷰는 매번 사용자에게 묻는다. 자동으로 돌지 않는다. 물을 때는 `ASK-FORK`대로 선택지가 있는 질문으로 묻는다.\" (같은 파일 125행 — \"반영할 것 하나하나에 대해 그 수정이 **기능적 변화**를 일으키는지 본다.\")",
+   "principle": "FAIL-LOUD, EXPLICIT, SSOT",
+   "consequence": "L2가 플랜 리뷰 발견을 반영하다 동작이나 계약을 바꾸면 domain-spec-review는 재리뷰를 물으라고 요구하는데 L2에는 물을 상대가 없다. 이 문서가 그 경우를 적지 않았으므로 L2는 재리뷰 걸음을 조용히 건너뛰거나(아무 신호 없이 검증 한 겹이 사라진다) 물을 수 없다는 이유로 BLOCKED를 올려 멈춘다. 어느 쪽이 되는지가 프롬프트를 쓰는 사람마다 갈리고, 앞쪽이면 계약이 바뀐 플랜이 검증 없이 구현으로 넘어간다.",
+   "detail": "이 문서는 플랜 국면 검증을 L2에게 통째로 맡기면서 domain-spec-review를 그대로 돌리라고 적는다. 그런데 그 스킬의 절차는 아홉 걸음이고 마지막 걸음 뒤에 붙는 재리뷰 판정이 사용자 질문을 필수로 요구한다. 이 문서는 사람 결정이 필요한 경우로 🔴 하나만 BLOCKED 경로에 실어 두었고, 재리뷰 질문은 🔴가 아니라 절차 자체가 요구하는 질문이라 그 경로에 실리지 않는다. L2가 밟을 수 없는 걸음을 밟으라고 지시하는 상태이며, 못 밟을 때 무엇을 하는지가 명시되어 있지 않다.",
+   "fix": "L2가 domain-spec-review를 돌릴 때 재리뷰 질문을 어떻게 처리하는지 한 문장으로 명시한다. 물을 수 없으므로 기능적 변화가 생긴 반영은 리포트에 적어 L1이 사용자에게 물어 판단하게 하거나, 그 자리에서 BLOCKED로 올리거나 가운데 하나를 이 문서가 정한다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  },
+  {
+   "title": "플랜 국면 리뷰를 강제하는 훅이 L2에는 걸리지 않는데도 잔존 위험 절은 위험이 하나뿐이라고 적는다.",
+   "file": "skills/nested-orchestration/SKILL.md:37",
+   "evidence": "skills/nested-orchestration/SKILL.md:37 — \"잔존 위험이 하나 남는다. BLOCKED를 올려 보내라는 것은 프롬프트 넛지이지 하드 컨트롤이 아니다.\" / hooks/hooks.json — 등록된 이벤트는 \"SessionStart\", \"PreToolUse\", \"PostToolUse\", \"Stop\" 넷이고 `SubagentStop`은 없다(레포 전체 grep에서 `SubagentStop`은 한 곳도 나오지 않는다). / skills/domain-spec-review/SKILL.md:13 — \"**Stop**이 미리뷰 문서가 남은 채 턴이 끝나는 것을 차단한다(하드 게이트).\"",
+   "principle": "MEASURE-FIRST, FAIL-LOUD",
+   "consequence": "L2는 자기 워크트리에서 writing-plans로 `docs/superpowers/plans/*.md`를 쓰지만, Stop 훅은 메인 세션의 종료에만 걸리고 서브에이전트 종료에는 대응 훅이 없어 미리뷰 플랜이 남은 채 L2가 끝나도 아무것도 차단하지 않는다. 즉 플랜 국면 검증은 이 문서가 하드 게이트라고 믿는 장치 없이 L2 프롬프트에만 의존하며, L2가 그 걸음을 빼먹으면 L1의 최종 브랜치 리뷰는 코드를 볼 뿐이라 빠진 플랜 리뷰를 되찾지 못한다.",
+   "detail": "이 문서는 검증을 세 국면으로 나누고 플랜 국면을 L2의 자율 실행에 맡긴다. 그 실행을 뒷받침하는 강제 장치가 무엇인지는 domain-spec-review가 훅으로 적고 있으나, 실제 훅 등록은 Stop 하나뿐이고 서브에이전트 종료를 잡는 등록이 없다. 따라서 3층에서는 플랜 리뷰 강제가 사실상 프롬프트 넛지 하나로 내려앉는다. 그런데 잔존 위험 절은 넛지에 그치는 것이 BLOCKED 하나라고 단정한다. 실측한 훅 등록과 문서의 단정이 어긋난다.",
+   "fix": "잔존 위험 절에 플랜 국면 리뷰도 하드 게이트가 아니라 프롬프트 의존이라는 사실을 한 줄 더 적거나, L1 통합 걸음에서 각 브랜치의 플랜 마커를 확인하는 검사를 가드레일 절에 추가한다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/nested-orchestration/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/spec_review_stop.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/docs/superpowers/plans/2026-07-05-nested-orchestration.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md"
+ ],
+ "principles_applied": [
+  "FAIL-LOUD",
+  "EXPLICIT",
+  "SSOT",
+  "MEASURE-FIRST",
+  "READ-FLOW",
+  "NAME-ITEMS",
+  "PROSE-FORM",
+  "SIMPLE"
+ ]
+}

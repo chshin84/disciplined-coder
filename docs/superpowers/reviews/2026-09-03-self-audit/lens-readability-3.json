@@ -1,0 +1,41 @@
+{
+ "lens": "lens-readability",
+ "target": "agent-principles.md",
+ "findings": [
+  {
+   "title": "ASK-FORK 항목은 라벨과 본문이 서로 다른 발동 조건을 말해, 읽는 쪽이 언제 질문지를 띄워야 하는지 가릴 수 없다",
+   "file": "agent-principles.md:7",
+   "evidence": "정본 7행: `- **\\`ASK-FORK\\` (모호하면 질문)** — 판단이 필요하면 반드시 선택지가 있는 질문으로 묻는다. 평문으로 묻지 않는다.`",
+   "principle": "READ-FLOW",
+   "consequence": "라벨은 '모호할 때'로, 본문은 '판단이 필요할 때'로 발동 조건을 서로 다르게 말한다. 본문을 글자대로 적용하면 판단은 거의 모든 걸음에 있으므로 매 걸음 선택지 질문을 띄워야 하고, 그것이 불가능하다는 것을 읽는 쪽이 곧 알아채면 이 항목 전체를 자기 재량으로 넘기게 된다. 그러면 정작 대답이 있어야 다음 걸음이 정해지는 갈림길에서도 평문에 한 문장으로 섞여 나가고, 정본 항목을 재량으로 넘겨도 된다는 선례가 함께 남는다.",
+   "detail": "이 문서의 목적은 Claude가 읽고 상황에 걸리는 원칙을 찾아 그대로 적용하는 것이라, 각 항목은 언제 걸리는지를 하나로 말해야 한다. 그런데 이 항목은 이름 자리와 본문이 다른 조건을 댄다. 무엇이 '모호함'이고 무엇이 '판단이 필요함'인지도 적혀 있지 않아, 적용 여부가 매번 읽는 쪽의 짐작으로 갈린다. 다른 스킬은 이 항목을 발동 조건이 아니라 묻는 방식으로만 인용한다 — `skills/domain-spec-review/SKILL.md` 91행의 `물을 때는 \\`ASK-FORK\\`대로 선택지가 있는 질문으로 묻고` 가 그것이라, 언제 묻는지를 정하는 곳은 정본의 이 한 줄뿐이다.",
+   "fix": "발동 조건을 하나로 좁혀 본문 첫 문장에 적는다. 고쳐 적은 것은 다음과 같고, 이것은 문서 안 내용에서 추론해 새로 쓴 문장이라 사실 확인이 필요하다 — `- **\\`ASK-FORK\\` (갈림길의 질문)** — 대답이 있어야 다음 걸음이 정해지는 갈림길에서는 추측하지 말고 선택지가 있는 질문으로 묻는다. 평문에 섞어 묻지 않는다.`",
+   "lens": "lens-readability",
+   "type": "wrong-job"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\README.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\hooks.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_scaffold.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude\\workflows\\self-audit.js"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "FAIL-LOUD",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "ASK-FORK",
+  "NAME-ITEMS"
+ ]
+}

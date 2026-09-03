@@ -1,0 +1,35 @@
+{
+ "lens": "lens-readability",
+ "target": "commands/setup-discipline.md",
+ "findings": [
+  {
+   "title": "본문이 Claude에게 주는 지시문뿐이라 실행 여부를 정하려는 사용자가 무엇이 만들어지고 고쳐지는지 읽을 곳이 없다.",
+   "file": "commands/setup-discipline.md:5-14",
+   "evidence": "다음 스크립트를 실행해 PC 전역 디시플린 환경(~/.claude/disciplined-coder/)을 셋업하라 — 디시플린\n정본을 최신으로 갈아 두고 @import 배선을 다시 만드는 일이다:",
+   "principle": "lens-readability 「반드시 읽히는 곳의 필수 내용」의 wrong-job · READ-FLOW",
+   "consequence": "사용자가 이 문서를 열어도 만들어지는 폴더와 고쳐지는 파일의 목록을 얻지 못하므로, 실행 여부를 정하지 못하거나 정본 복사와 @import 재배선 둘뿐이라고 잘못 짐작한 채 실행한다. 실제 변경 목록은 실행이 끝난 뒤 출력에서야 드러나 되돌릴 판단이 사후로 밀린다.",
+   "detail": "본문 네 문단이 모두 '실행하라·알려라·보고하라'로 끝나는 Claude 대상 명령이고, 사용자가 읽을 대상은 첫 문장에 붙은 '정본을 최신으로 갈아 두고 @import 배선을 다시 만드는 일이다' 한 구절뿐이다. 그 구절은 scaffold.sh가 실제로 손대는 넷(관리 디렉터리 위생 정리, 전역 CLAUDE.md 관리블록, 프로젝트 CLAUDE.md의 옛 관리블록, 마켓플레이스 설정) 가운데 하나만 담는다. 이 문서가 전달하려는 것은 실행 여부의 판단인데 그 판단에 필요한 목록을 말하지 않으므로 문체가 아니라 말해야 할 것을 안 말하는 문제다.",
+   "fix": "'이 명령이 손대는 것' 소제목을 달고 그 아래 첫 문장에 결론을 적은 뒤, 만들어지는 ~/.claude/disciplined-coder/ 와 고쳐지는 ~/.claude/CLAUDE.md·프로젝트 CLAUDE.md·~/.claude/settings.json·~/.claude/plugins/known_marketplaces.json 을 사본이 남는 자리와 함께 목록으로 적는다. 다만 이 rewrite는 문서 밖 scaffold.sh에서 추론해 새로 쓴 것이라 반영 전에 사실 확인이 필요하다.",
+   "lens": "lens-readability",
+   "type": "wrong-job"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\scaffold.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\_scaffold_common.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\_ensure_autoupdate.sh"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "READ-FLOW",
+  "REVERSIBLE",
+  "PROSE-FORM",
+  "PLAIN-KO"
+ ]
+}

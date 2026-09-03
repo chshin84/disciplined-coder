@@ -1,0 +1,45 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-readability/SKILL.md",
+ "findings": [
+  {
+   "title": "출력 스키마가 선언한 `type` 폐쇄 집합 여섯 가운데 다섯은 뜻이 어디에도 적혀 있지 않다.",
+   "file": "skills/lens-readability/SKILL.md:86,89",
+   "evidence": "86행: \"type\": \"friction|narrative|language|scope|structure|wrong-job\" / 89행: \"관찰 축과 위 `type` 여섯은 서로 대응하지 않는다. 이 가운데 문서가 뜻을 적어 둔 것은 `wrong-job` 하나이며 「반드시 읽히는 곳의 필수 내용」이 그것을 정의한다.\" / skills/meta-aggregate/SKILL.md:20 \"이 계약은 여기가 SSOT다. 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.\"",
+   "principle": "lens-fit 체크리스트 「형식」 — 요구된 형식과 스키마를 지키는가(필수 키, 타입). EXPLICIT, SSOT",
+   "consequence": "friction·narrative·language·scope·structure 다섯은 어느 지적이 어느 값에 드는지 가르는 문장이 없어 같은 지적이 회차마다 다른 값으로 실린다. 그러면 project-doc-audit의 「뿌리 찾기」가 \"같은 모양이 문서 둘 이상에서 나오면\"으로 묶으려 할 때 같은 모양이 서로 다른 type으로 흩어져 한 뿌리로 안 묶이고, meta-aggregate가 같은 `where`를 짝지어 상충을 표시할 때도 대조할 축이 없어진다.",
+   "detail": "meta-aggregate가 리뷰 산출물 계약의 SSOT이면서 `type`의 폐쇄 집합만은 각 렌즈 파일에 정의를 맡겼는데, 이 파일은 값 여섯을 나열해 놓고 그중 `wrong-job` 하나만 정의했다고 89행에서 스스로 밝힌다. 정의를 다른 곳으로 넘기지도 않았으므로 나머지 다섯의 뜻은 이 레포 어디에도 없고, 판정하는 렌즈가 그때그때 짐작해 고르게 된다.",
+   "fix": "관찰 목록의 열이 type과 대응하지 않는다는 것을 89행이 이미 밝혔으므로, 값을 다섯으로 늘리는 대신 실제로 가르는 데 쓰는 값만 남기고 각 값이 무엇을 담는지 한 줄씩 정의하거나, 정의를 소유할 절을 지정한다.",
+   "lens": "lens-fit",
+   "type": "schema"
+  },
+  {
+   "title": "문서가 조용한 통과를 막는 값이라고 선언한 `purpose`와 `notes`가 이 레포의 실제 렌즈 리턴 스키마에는 없다.",
+   "file": "skills/lens-readability/SKILL.md:14,91 · .claude/workflows/self-audit.js:86-104",
+   "evidence": "SKILL.md 14행: \"그때는 짐작해 채우지 말고 `purpose`를 `null`로 두고, 받은 문장과 둘 중 무엇이 빠졌는지를 `notes`에 적는다.\" / 91행: \"`purpose`는 조용한 통과를 막는다. `purpose`가 채워져 있으면 그 목적에 비추어 판정했고 걸릴 것이 없었다는 뜻이라 판정으로 쓸 수 있다. `null`이면 판정 자체를 하지 않은 것이므로 이 렌즈를 돌린 것으로 치지 않는다.\" / self-audit.js 99-103행: \"read: { type: 'array', items: { type: 'string' }, description: '문서 밖에서 실제로 연 파일' },\" \"principles_applied: { type: 'array', items: { type: 'string' }, description: '읽고 적용한 원칙 ID' },\" \"required: ['findings', 'read', 'principles_applied'],\"",
+   "principle": "lens-fit 체크리스트 「호환」 — 기존 출력 계약과 하위 호환되는가. FAIL-LOUD, MEASURE-FIRST",
+   "consequence": "이 레포가 자기 문서를 감사할 때 쓰는 LENS_SCHEMA에는 `purpose`도 `notes`도 `rewrite`도 없다. 그래서 주입된 목적에 읽는 사람이나 할 수 있어야 하는 것 중 하나가 빠져 렌즈가 판정을 접어도 그 사실을 담아 돌려보낼 칸이 없고, 빈 findings 하나만 돌아온다. 호출자는 그것을 \"판정했고 걸릴 것이 없었다\"로 읽어 이 문서가 91행에서 막겠다고 한 조용한 통과가 그대로 일어난다. 고쳐 준 문장(`rewrite`)도 함께 버려져 59행이 없애려던 재작성 비용이 호출자에게 되돌아온다.",
+   "detail": "self-audit.js의 LENS_SCHEMA는 FINDINGS_SCHEMA의 항목에 `lens` 하나만 더하고 최상위는 findings·read·principles_applied 셋으로 닫혀 있다. 이 렌즈만 갖는 `purpose`와 `rewrite`, 그리고 meta-aggregate 계약의 공통 필드인 `notes`까지 실릴 자리가 없으므로, 문서가 선언한 안전장치가 실제 실행 경로에서 작동하지 않는다. self-audit.js 241행이 목적을 못 적으면 lens-readability를 아예 배정하지 않게 해 두어 목적이 빈 경우는 막았으나, 목적을 받았는데 그 한 줄에 둘 중 하나가 빠진 경우는 렌즈만 알 수 있고 알릴 통로가 없다.",
+   "fix": "LENS_SCHEMA에 `notes`를 공통 필드로 더하고, lens-readability가 배정된 문서에 한해 `purpose`와 발견별 `rewrite`를 받는 칸을 두거나, 반대로 이 문서가 그 두 필드를 어느 호출자에서 어떻게 받는지를 명시해 배선되지 않은 호출자에서는 이 렌즈를 돌린 것으로 치지 않는다고 적는다.",
+   "lens": "lens-fit",
+   "type": "compat"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  ".claude/workflows/self-audit.js"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "SSOT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "PROSE-FORM"
+ ]
+}

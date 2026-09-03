@@ -1,0 +1,50 @@
+{
+ "lens": "lens-grounding",
+ "target": "CLAUDE.md",
+ "findings": [
+  {
+   "title": "CLAUDE.md는 이 레포에 걸린 네 훅 가운데 spec/plan Stop 게이트 하나만 적어, 리뷰 기록이 읽기 전용으로 봉인된다는 사실과 그 밖의 문서를 고칠 때 검진 넛지가 뜬다는 사실을 알려 주지 않는다.",
+   "file": "CLAUDE.md:5",
+   "evidence": "CLAUDE.md 5행: \"설계 문서는 `docs/superpowers/specs/`에, 계획 문서는 `docs/superpowers/plans/`에 쓴다. 그 두 폴더에 `.md`를 새로 쓰면 Stop 리뷰 게이트가 발동한다.\" — 그러나 hooks/hooks.json 은 PreToolUse(Write|Edit)에 readonly_pretooluse.sh 와 doc_format_pretooluse.sh 를, PostToolUse(Write|Edit)에 spec_review_posttooluse.sh 와 doc_review_posttooluse.sh 를 함께 건다. .claude/settings.json 은 SessionStart(startup|resume|clear)에 \"bash \\\"$CLAUDE_PROJECT_DIR/scripts/seal_reviews.sh\\\"\" 를 걸고, scripts/test_docs_drift.sh 는 \"이 레포의 SessionStart 가 봉인을 건다\" 로 그것을 계약으로 붙든다. hooks/readonly_pretooluse.sh 의 거부 사유는 \"읽기 전용 파일은 고치지 않는다. 속성을 세운 쪽에 뜻이 있다 — 감사 기록이면 고치지 말고 새 기록을 더한다.\" 다.",
+   "principle": "EXPLICIT · FAIL-LOUD",
+   "consequence": "이 레포에서 일하는 Claude와 기여자가 docs/superpowers/reviews/ 의 기록을 고치려다 PreToolUse 거부를 받는데, CLAUDE.md 에는 그 폴더도 봉인 규칙도 없어 훅 고장으로 오인하고 속성을 풀거나 우회를 시도하게 된다. 반대로 README·SKILL.md 같은 다른 .md 를 고치면 매번 비자가 검진을 요구하는 넛지가 뜨는데 그것도 예고되어 있지 않아, 예상 못 한 요구로 읽히고 흘려보내는 습관이 생긴다.",
+   "detail": "이 문서의 목적은 이 레포에서 일하는 사람이 정본과 상세의 위치를 찾고 변경 뒤 무엇을 돌릴지 스스로 정하게 하는 것이다. 그런데 문서가 적은 훅은 넷 가운데 하나뿐이라, 실제로 쓰기 동작을 막거나 요구를 붙이는 나머지 셋이 문서에 근거가 없다. 특히 봉인은 이 레포에만 걸린 SessionStart 훅이고 계약 테스트가 지키고 있으므로 레포 고유의 사실이며, 스킬 위임으로 덮인다고 보기 어렵다.",
+   "fix": "5행 다음에 한 문장을 더한다 — \"docs/superpowers/reviews/ 의 감사 기록은 세션 시작 때 scripts/seal_reviews.sh 가 읽기 전용으로 만든다. 고치지 말고 새 기록을 더한다. 그 밖의 .md 를 쓰거나 고치면 문서 검진 넛지가 뜬다.\"",
+   "lens": "lens-grounding",
+   "type": "omission"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\CLAUDE.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\hooks.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\_spec_marker.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_posttooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_stop.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\doc_review_posttooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\doc_format_pretooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\readonly_pretooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude\\settings.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude-plugin\\plugin.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude\\workflows\\self-audit.js",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_hooks.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_assertions.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_scaffold.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_self_audit.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.github\\workflows\\ci.yml"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "KO-SYNTAX",
+  "READ-FLOW",
+  "SSOT",
+  "MEASURE-FIRST",
+  "PROSE-FORM",
+  "PLAIN-KO"
+ ]
+}

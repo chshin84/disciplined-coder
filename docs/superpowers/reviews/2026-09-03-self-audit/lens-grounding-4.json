@@ -1,0 +1,46 @@
+{
+ "lens": "lens-grounding",
+ "target": "commands/setup-discipline.md",
+ "findings": [
+  {
+   "title": "이 커맨드가 홈 디렉터리에만 쓴다고 적었으나 스크립트는 지금 열려 있는 프로젝트의 CLAUDE.md도 고친다.",
+   "file": "commands/setup-discipline.md:10-11",
+   "evidence": "인자는 없다. 인자가 붙어 오면 무시하고 그 사실을 한 줄로 알려라 — 이 커맨드는 홈 디렉터리에 쓰므로\n짐작해서 다르게 동작하지 않는다.",
+   "principle": "lens-grounding 체크리스트의 모순 · MEASURE-FIRST · FAIL-LOUD",
+   "consequence": "프로젝트 CLAUDE.md에 옛 관리블록이 남아 있는 사용자는 홈 디렉터리만 바뀔 것으로 알고 실행하는데, 실제로는 git으로 관리되는 프로젝트 파일이 그 자리에서 편집되어 커밋하지 않은 작업 트리에 자기가 내지 않은 변경이 섞인다. 사본이 프로젝트가 아니라 $KDIR/backups 에 쌓이므로 사용자는 무엇이 지워졌는지 그 폴더를 따로 열어 봐야 알 수 있다.",
+   "detail": "scaffold.sh 51-69줄은 PROJ=\"${CLAUDE_PROJECT_DIR:-$PWD}\" 로 프로젝트 폴더를 잡고 \"$PROJ/CLAUDE.md\" 가 전역 CLAUDE.md와 같은 파일이 아닐 때 managed_block_remove 를 불러 그 파일에서 관리블록을 걷어낸 뒤 \"🔵 disciplined-coder: $PCLAUDE 에 남아 있던 옛 관리블록을 걷어냈다\" 를 출력한다. 문서는 쓰기 대상을 홈 디렉터리로 한정해 적었으므로 실제 동작과 모순이다.",
+   "fix": "홈 디렉터리 한정이라는 서술을 걷어내고, 프로젝트 CLAUDE.md의 옛 관리블록을 걷어내는 동작과 사본이 남는 경로를 실행 전에 읽을 수 있게 본문에 적는다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  },
+  {
+   "title": "스크립트가 ~/.claude/settings.json 과 known_marketplaces.json 을 고쳐 이 플러그인의 자동 갱신을 켜는데 문서에 그 동작이 없다.",
+   "file": "commands/setup-discipline.md:2",
+   "evidence": "description: PC 전역(~/.claude/disciplined-coder/)을 셋업한다. 디시플린 정본(agent-principles.md)을 복사해 최신으로 갱신하고, ~/.claude/CLAUDE.md의 @import 블록을 다시 만든다. 여러 번 실행해도 결과가 같다(멱등).",
+   "principle": "lens-grounding 체크리스트의 누락 · EXPLICIT · REVERSIBLE",
+   "consequence": "사용자는 정본 복사와 @import 재배선 둘만 일어난다고 알고 실행하는데, 실제로는 깃허브 저장소의 갱신이 이후 자동으로 따라오도록 설정 파일이 바뀐다. 자기 PC의 플러그인이 언제 바뀌는지를 스스로 정하려던 사용자는 그 결정을 내릴 기회를 못 받고, 바뀐 사실은 실행 뒤 출력에서만 알게 된다.",
+   "detail": "scaffold.sh 109줄이 ensure_marketplace_autoupdate \"$CLAUDE_HOME\" \"$PLUGIN_ROOT\" 를 부르고, _ensure_autoupdate.sh 25줄이 \"$home/settings.json\" 과 \"$home/plugins/known_marketplaces.json\" 을 훑어 이 플러그인 항목에 t[\"autoUpdate\"]=True 를 채워 넣은 뒤 cp \"$f\" \"$f.bak\" 로 사본을 남기고 덮어쓴다. 두 파일은 ~/.claude/disciplined-coder/ 밖이며 문서의 description과 본문 어디에도 이 동작이 없다.",
+   "fix": "자동 갱신을 켜는 동작과 대상 파일 둘, 그리고 .bak 사본이 남는다는 것을 description과 본문에 적는다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\scaffold.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\_scaffold_common.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\_ensure_autoupdate.sh"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "READ-FLOW",
+  "REVERSIBLE",
+  "PROSE-FORM",
+  "PLAIN-KO"
+ ]
+}

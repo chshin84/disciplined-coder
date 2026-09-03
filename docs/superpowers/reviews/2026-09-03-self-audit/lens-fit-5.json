@@ -1,0 +1,41 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-spec-review/SKILL.md",
+ "findings": [
+  {
+   "title": "리뷰 기록에 담을 것을 다섯으로 닫아 놓고 다른 절들이 같은 파일에 더 적으라고 요구한다",
+   "file": "skills/domain-spec-review/SKILL.md:101",
+   "evidence": "skills/domain-spec-review/SKILL.md 101행: \"기록에 담는 것은 다섯이다. 렌즈별 지적을 합친 목록, 같은 지적을 둘 이상의 렌즈가 함께 잡았는지 여부, `meta-aggregate`가 표시한 상충과 커버리지 공백, \\\"렌즈를 한 번씩만 돌렸다\\\" 한 줄, 그리고 선행연구 렌즈를 붙였는지와 그 판정 이유다.\" / 99행: \"이 문서에서 \\\"리뷰 보고\\\"와 \\\"리뷰 기록\\\"은 같은 이 파일을 가리킨다.\" / 141행: \"**보고에 적을 것** — 이 렌즈를 붙였는지와 그 판정 이유, spec과 plan을 무엇으로 갈랐는지, `ok`가 아닌 `search_status`, 검증하지 못한 인용, 그리고 렌즈가 `disclosures`와 `not_found`에 적은 것 가운데 결론에 영향을 주는 것이다.\"",
+   "principle": "EXPLICIT",
+   "consequence": "기록 파일의 내용 계약이 한 문서 안에서 두 벌로 갈린다. 101행의 닫힌 열거를 따르면 141행이 요구하는 `ok`가 아닌 `search_status`와 검증하지 못한 인용이 기록에서 빠지고, 66행이 요구하는 spec·plan 판정 근거도 빠진다. 하필 그 셋은 검증이 온전히 돌지 못했다는 것을 드러내려고 둔 항목이라, 빠지면 기록만 보고는 선행연구 대조가 제대로 돈 회차와 검색이 실패한 회차를 구별할 수 없다. 105행이 \"이 파일은 그때의 결과를 그대로 남긴 기록이다\"라며 사후 수정을 막아 두었으므로 나중에 채워 넣을 수도 없다.",
+   "detail": "99행이 \"리뷰 보고\"와 \"리뷰 기록\"을 같은 한 파일로 못박았으므로 101행의 「기록에 담는 것」과 141행의 「보고에 적을 것」은 같은 파일의 내용 계약이다. 그런데 101행은 개수를 \"다섯이다\"로 닫아 선언하고, 141행은 그 다섯에 없는 항목 셋을 더 요구하며, 66행과 139행도 각각 판정 근거와 `search_status` 값을 보고에 적으라고 지시한다. 101행의 다섯째 항목이 \"선행연구 렌즈를 붙였는지와 그 판정 이유\"까지만 담아 141행의 첫 항목과 겹치는 것을 보면 101행이 선행연구 몫을 이미 흡수하려 한 것인데, 흡수가 중간에서 끊긴 채 개수만 닫혀 있다.",
+   "fix": "101행의 \"다섯이다\"를 닫힌 개수로 두지 말고, 선행연구 렌즈를 붙인 회차에는 141행의 「보고에 적을 것」이 그대로 더 붙는다는 문장을 101행 뒤에 둔다. 개수를 굳이 남기려면 기본 묶음의 넷과 선행연구 회차에 붙는 몫을 갈라 적는다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-spec-review\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-prior-art\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-plugin\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\_spec_marker.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_posttooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_stop.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\readonly_pretooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\seal_reviews.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\docs\\superpowers\\reviews\\"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "PROSE-FORM"
+ ]
+}

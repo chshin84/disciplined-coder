@@ -1,0 +1,44 @@
+{
+ "lens": "lens-grounding",
+ "target": "README.md",
+ "findings": [
+  {
+   "title": "README가 전역 설정 파일 두 개를 모두 고친다고 적었으나, 코드는 이 마켓플레이스 항목이 들어 있는 파일만 고치므로 보통은 known_marketplaces.json 하나만 바뀐다.",
+   "file": "README.md:51",
+   "evidence": "README.md 51행: \"- **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다.\"  /  scripts/_ensure_autoupdate.sh 26행: \"    [ -f \"$f\" ] || continue\", 47-48행: \"def pick(o):\" / \"    e=o.get(\\\"extraKnownMarketplaces\\\")\", 53행: \"if t is None or \\\"autoUpdate\\\" in t: sys.exit(10)\"",
+   "principle": "MEASURE-FIRST",
+   "type": "mismatch",
+   "consequence": "설치를 마친 사용자가 `~/.claude/settings.json`이 고쳐졌고 그 옆에 `settings.json.bak`이 생겼을 것으로 알고 확인하러 가지만 두 가지 다 없다. 그러면 셋업이 실패했다고 오판해 `/setup-discipline`을 되풀이하거나, 반대로 자기 settings.json이 플러그인에게 고쳐진 것으로 잘못 알고 되돌리기를 시도한다. 원상복구 절차를 안내할 때도 있지도 않은 사본을 가리키게 된다.",
+   "detail": "`ensure_marketplace_autoupdate`는 두 경로를 돌지만 각 파일마다 `[ -f \"$f\" ] || continue`로 없는 파일을 건너뛰고, 파이썬 `pick()`이 그 파일 안에서 이 마켓플레이스 이름의 항목(`extraKnownMarketplaces` 아래이거나 `source`를 가진 최상위 키)을 찾지 못하면 `sys.exit(10)`으로 아무것도 고치지 않는다. `/plugin marketplace add`로 설치한 표준 경로에서는 그 항목이 `~/.claude/plugins/known_marketplaces.json`에만 생기므로 `~/.claude/settings.json`은 손대지 않고 `.bak`도 남기지 않는다. 즉 README가 단정한 \"두 파일을 고친다\"는 코드가 보장하는 사실이 아니다. 같은 항목의 뒷문장 \"사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다\"는 코드와 맞으므로, 어긋난 것은 대상 파일 개수를 단정한 첫 문장이다.",
+   "fix": "\"첫 세션에 이 마켓플레이스 항목이 들어 있는 전역 설정 파일 하나를 고친다. 항목은 보통 `~/.claude/plugins/known_marketplaces.json`에 있고, `~/.claude/settings.json`의 `extraKnownMarketplaces`에 둔 경우에는 그 파일을 고친다. 항목이 없는 파일은 건드리지 않는다.\"로 바꾼다.",
+   "lens": "lens-grounding"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\README.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\hooks.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_stop.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\_spec_marker.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\doc_format_pretooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\doc_review_posttooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\scaffold.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\_ensure_autoupdate.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\seal_reviews.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\_managed_block.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude-plugin\\plugin.json"
+ ],
+ "principles_applied": [
+  "MEASURE-FIRST",
+  "EXPLICIT",
+  "KO-SYNTAX",
+  "PLAIN-KO",
+  "PROSE-FORM",
+  "READ-FLOW",
+  "NAME-ITEMS",
+  "SSOT"
+ ]
+}
