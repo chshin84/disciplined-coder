@@ -99,4 +99,7 @@ check "배정 기준이 고정표다"                          "grep -qF '문서
 
 check "리뷰 기록은 대상마다 묶어 쓰고 검수는 한 번 돈다" "grep -qF 'async function recordGrouped(' '$WF' && grep -qF 'FOLDER_CHECK_SCHEMA' '$WF' && grep -qF \"recordGrouped('review'\" '$WF'"
 
+check "리뷰는 문서 하나에 에이전트 하나다"            "grep -qF 'function docPrompt(' '$WF' && grep -qF '한 렌즈씩 차례로 적용하라' '$WF' && ! grep -qF 'function lensPrompt(' '$WF'"
+check "run.json 을 걸음마다 다시 쓰지 않는다"          "grep -qF \"if (step === 'review') await writeRun(false)\" '$WF'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

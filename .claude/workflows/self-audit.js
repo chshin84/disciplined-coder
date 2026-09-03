@@ -25,7 +25,7 @@ const SCHEMA_VERSION = 1
 // 한 걸음이 띄우는 서브에이전트의 상한이다. 배분 규칙은 하나씩 보면 타당해도 곱하면 세 자리가
 // 된다 — 리뷰는 문서×렌즈, 검증은 발견마다다. 상한을 넘으면 잘라 내고 무엇을 잘랐는지 기록에
 // 남긴다. 조용히 자르면 '아무도 반박하지 않았다'와 '아무도 보지 않았다'가 구별되지 않는다.
-const CAPS = { review: 40, verify: 40 }
+const CAPS = { review: 30, verify: 30 }
 const STEPS = ['repo-check', 'targets', 'machine-checks', 'review', 'dedup', 'verify', 'aggregate', 'record']
 function findingId(round, n) { return `${round}#${String(n).padStart(3, '0')}` }
 // 판정 상태의 닫힌 집합 — 'derived'는 반박검증 없이 도출된 발견(회차 대조가 만든다)이다.
@@ -80,10 +80,23 @@ const DEDUP_SCHEMA = {
 // 중복제거가 lens 를 쉼표로 잇는다. 세는 쪽은 그 문자열을 목록으로 다룬다.
 function lensesOf(f) { return String(f.lens || '').split(',').map(s => s.trim()).filter(Boolean) }
 
+// 한 문서에 배정된 렌즈가 둘셋이면 에이전트도 둘셋 띄우던 것을, 문서 하나에 하나로 묶었다.
+// 그 에이전트가 문서를 한 번 읽고 배정된 렌즈를 차례로 적용하므로, 발견마다 어느 렌즈가 낸 것인지
+// 스스로 적어야 한다. 기록은 예전대로 렌즈마다 파일 하나로 갈라 쓴다.
 const LENS_SCHEMA = {
   type: 'object',
   properties: {
-    findings: FINDINGS_SCHEMA.properties.findings,
+    findings: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          ...FINDINGS_SCHEMA.properties.findings.items.properties,
+          lens: { type: 'string', description: '이 발견을 낸 렌즈 이름 — 받은 렌즈 목록에 있는 것만 쓴다' },
+        },
+        required: [...FINDINGS_SCHEMA.properties.findings.items.required, 'lens'],
+      },
+    },
     read: { type: 'array', items: { type: 'string' }, description: '문서 밖에서 실제로 연 파일' },
     principles_applied: { type: 'array', items: { type: 'string' }, description: '읽고 적용한 원칙 ID' },
   },
@@ -151,8 +164,9 @@ const FOLDER_CHECK_SCHEMA = {
         properties: {
           name: { type: 'string', description: '파일 이름' },
           count: { type: 'integer', description: '그 파일에서 센 개수. 파일이 없으면 -1' },
+          ids: { type: 'array', items: { type: 'string' }, description: 'count 를 센 그 배열의 항목 id. id 가 없으면 빈 배열' },
         },
-        required: ['name', 'count'],
+        required: ['name', 'count', 'ids'],
       },
     },
   },
@@ -189,12 +203,19 @@ const COMMON = `너는 disciplined-coder 플러그인 저장소(${REPO})를 감�
 (3) 저장소의 어떤 파일에도 쓰지 마라 — 발견은 구조화 리턴으로만 보고한다. (4) 발견은 최대 3건 — 확신이 가장 높은 것만 낸다. 없으면 빈 배열이 정직한 답이다. 몫을 채우려고 약한 것을 올리지 마라, 약한 발견은 검증에서 기각되고 그 값은 아무것도 낳지 않는다. (4-1) evidence 에는 파일에 있는 그대로의 원문을 인용하고 몇 번째 줄인지 함께 적어라 — 인용이 파일과 한 글자라도 다르면 그 발견은 검증에서 무너진다.
 (5) 각 발견의 title과 detail은 완결된 문장으로 쓴다. (6) 서브에이전트를 새로 열지 마라.`
 // 문서별 렌즈 프롬프트 — 렌즈 SKILL.md 의 레퍼런스 프롬프트를 그대로 적용하게 하고 정본 경로와 principles_applied 만 더한다.
-function lensPrompt(lens, target) {
-  const purpose = lens === 'lens-readability' ? `\n[이 문서가 전달하려는 것]\n${target.purpose}\n` : ''
+function docPrompt(target) {
+  const purpose = target.lenses.includes('lens-readability') ? `
+[이 문서가 전달하려는 것]
+${target.purpose}
+` : ''
   return `${COMMON}
-렌즈: ${REPO}/skills/${lens}/SKILL.md 를 읽고 그 레퍼런스 프롬프트와 체크리스트를 그대로 적용하라. 검토 대상: ${REPO}/${target.path} 전체.${purpose}
+검토 대상: ${REPO}/${target.path} 전체. 문서를 먼저 한 번 통독하라.${purpose}
+이 문서에 배정된 렌즈는 ${target.lenses.length}개다. 렌즈마다 ${REPO}/skills/<렌즈이름>/SKILL.md 를 열어 그 레퍼런스 프롬프트와 체크리스트를 읽고, 한 렌즈씩 차례로 적용하라. 배정된 렌즈: ${target.lenses.join(', ')}.
+발견마다 어느 렌즈가 낸 것인지 lens 에 적어라 — 배정된 렌즈 이름만 쓴다. 렌즈 하나가 아무것도 못 찾았으면 그 렌즈의 발견을 억지로 만들지 마라.
+(4)의 상한 3건은 이 문서 전체에 대한 상한이지 렌즈마다의 몫이 아니다.
 source(진실): ${REPO} 의 scripts/*.sh, hooks/*, skills/*/SKILL.md, .claude-plugin/*, .claude/workflows/*. 문서가 주장하는 것이 실제와 어긋나면 발견이다.`
 }
+
 const WHOLE_LENSES = [
   { key: 'lens-adversarial', prompt: `${COMMON}
 렌즈: ${REPO}/skills/lens-adversarial/SKILL.md 를 읽고 그대로 적용하라(가드 포함: 기능 추가 제안 금지·근거 필수). 검토 대상: 정본의 절 전부와 hooks/·scripts/·skills/·.claude/workflows/ 설계 전체 — 절 제목을 파일에서 읽어 목록을 만들고(\`grep '^## ' agent-principles.md\`) 그 전부를 훑어라. 실패 모드, 과설계, 비가역, 자기모순을 공격적으로 찾아라.` },
@@ -283,18 +304,22 @@ ${JSON.stringify(payload)}`,
     )
     if (!wrote) throw new Error(`기록자가 ${step} 걸음의 ${g.key} 에서 응답하지 않았다 — 회차를 실패로 끝낸다`)
   }
-  const expected = groups.flatMap(g => g.files.map(f => ({ name: f.name, count: f.count })))
+  const expected = groups.flatMap(g => g.files.map(f => ({ name: f.name, count: f.count, ids: f.ids || null })))
   const chk = await agent(
     `너는 검수자다. 폴더 ${DIR} 에서 아래 이름의 파일을 하나씩 열어 개수를 세어 돌려줘라. 파일을 고치지 마라. 없는 파일은 count 를 -1 로 적는다. ${COUNT_RULE}
 ${JSON.stringify(expected.map(e => e.name))}`,
     { label: `check:${step}`, phase: '기록', schema: FOLDER_CHECK_SCHEMA, effort: 'low' }
   )
   if (!chk) throw new Error(`검수자가 ${step} 걸음에서 응답하지 않았다 — 회차를 실패로 끝낸다`)
-  const got = new Map(chk.files.map(f => [f.name, f.count]))
-  const bad = expected.filter(e => got.get(e.name) !== e.count)
-  if (bad.length) throw new Error(`기록 검수 불일치: ${bad.map(e => `${e.name} — 넘긴 ${e.count}건, 읽은 ${got.has(e.name) ? got.get(e.name) : '없음'}`).join(' / ')}`)
+  const got = new Map(chk.files.map(f => [f.name, f]))
+  const bad = expected.filter(e => {
+    const g = got.get(e.name)
+    if (!g || g.count !== e.count) return true
+    return !!e.ids && JSON.stringify(g.ids) !== JSON.stringify(e.ids)
+  })
+  if (bad.length) throw new Error(`기록 검수 불일치: ${bad.map(e => `${e.name} — 넘긴 ${e.count}건/${e.ids ? e.ids.length : '-'}id, 읽은 ${got.has(e.name) ? `${got.get(e.name).count}건/${got.get(e.name).ids.length}id` : '없음'}`).join(' / ')}`)
   if (!run.steps_done.includes(step)) run.steps_done.push(step)
-  await writeRun(false)
+  if (step === 'review') await writeRun(false)
 }
 async function writeRun(final) {
   if (final) {
@@ -308,7 +333,9 @@ async function record(step, files) {
   if (!STEPS.includes(step)) throw new Error(`알 수 없는 걸음 ${step}`)
   for (const f of files) await writeFile(step, { seal: true, ...f })
   if (!run.steps_done.includes(step)) run.steps_done.push(step)
-  await writeRun(false)
+  // 걸음마다 run.json 을 다시 쓰면 걸음 수의 두 배가 기록 배관으로 든다. 중간 상태는 리뷰가 끝난
+  // 한 번만 남기고, 나머지는 끝에 한 번 쓴다. 리뷰가 회차에서 가장 긴 걸음이라 여기가 갈림길이다.
+  if (step === 'review') await writeRun(false)
 }
 async function writeSummary(text) {
   // 요약문은 봉인하지 않는다 — 호출자가 뿌리와 물음을 붙인 뒤 seal_reviews.sh 로 봉인한다.
@@ -320,32 +347,47 @@ await record('targets', [])
 // ---------- 리뷰 ----------
 phase('리뷰')
 const deadLenses = []
-const perDoc = tg.targets.flatMap(t => t.lenses.map(lens => ({ lens, target: t })))
-const lensCounter = {}
-const reviewJobs = perDoc.map(j => () => {
-  lensCounter[j.lens] = (lensCounter[j.lens] || 0) + 1
-  const n = lensCounter[j.lens]
-  return agent(lensPrompt(j.lens, j.target), { label: `${j.lens}:${j.target.path}`, phase: '리뷰', schema: LENS_SCHEMA })
-    .then(res => ({ key: j.lens, file: `${j.lens}-${n}.json`, target: j.target.path, res }))
-    .catch(() => ({ key: j.lens, file: `${j.lens}-${n}.json`, target: j.target.path, res: null }))
-}).concat(WHOLE_LENSES.map(w => () =>
+const reviewJobs = tg.targets.map(t => () =>
+  agent(docPrompt(t), { label: `문서:${t.path}`, phase: '리뷰', schema: LENS_SCHEMA })
+    .then(res => ({ kind: 'doc', target: t, res }))
+    .catch(() => ({ kind: 'doc', target: t, res: null }))
+).concat(WHOLE_LENSES.map(w => () =>
   agent(w.prompt, { label: w.key, phase: '리뷰', schema: LENS_SCHEMA })
-    .then(res => ({ key: w.key, file: `${w.key}-1.json`, target: '(전체)', res }))
-    .catch(() => ({ key: w.key, file: `${w.key}-1.json`, target: '(전체)', res: null }))
+    .then(res => ({ kind: 'whole', key: w.key, target: { path: '(전체)', lenses: [w.key] }, res }))
+    .catch(() => ({ kind: 'whole', key: w.key, target: { path: '(전체)', lenses: [w.key] }, res: null }))
 ))
 const reviewCut = reviewJobs.length - CAPS.review
 if (reviewCut > 0) log(`⚠️ 리뷰 상한 ${CAPS.review}건을 넘어 렌즈 호출 ${reviewCut}건을 돌리지 않았다 — 이 감사의 커버리지가 그만큼 좁다`)
 const reviews = (await parallel(reviewJobs.slice(0, CAPS.review))).filter(Boolean)
-for (const r of reviews) if (!r.res) deadLenses.push(`${r.key}:${r.target}`)
-const all = reviews.filter(r => r.res).flatMap(r => r.res.findings.map(f => ({ ...f, lens: r.key, target: r.target })))
+for (const r of reviews) if (!r.res) deadLenses.push(r.target.path)
+// 발견에 붙은 lens 가 그 문서에 배정된 것이 아니면 배정 밖의 판정이라 버리지 않고 표시만 한다.
+const all = reviews.filter(r => r.res).flatMap(r => r.res.findings.map(f => ({
+  ...f,
+  lens: r.kind === 'whole' ? r.key : (r.target.lenses.includes(f.lens) ? f.lens : `${f.lens}(배정 밖)`),
+  target: r.target.path,
+})))
 run.dead_agents.review = deadLenses
 log(`리뷰 완료: 호출 ${reviews.length}건에서 원시 발견 ${all.length}건`)
-if (deadLenses.length > 0) log(`⚠️ 응답하지 않은 렌즈 ${deadLenses.length}건: ${deadLenses.join(', ')} — 이 감사의 커버리지가 그만큼 좁다`)
-const reviewGroups = []
+if (deadLenses.length > 0) log(`⚠️ 응답하지 않은 대상 ${deadLenses.length}건: ${deadLenses.join(', ')} — 이 감사의 커버리지가 그만큼 좁다`)
+
+// 기록은 렌즈마다 파일 하나로 갈라 쓰고, 기록자 하나가 여러 대상을 함께 맡는다.
+const lensCounter = {}
+const reviewFiles = []
 for (const r of reviews.filter(x => x.res)) {
-  let g = reviewGroups.find(x => x.key === r.target)
-  if (!g) { g = { key: r.target, files: [] }; reviewGroups.push(g) }
-  g.files.push({ name: r.file, content: { lens: r.key, target: r.target, ...r.res }, count: r.res.findings.length })
+  for (const lens of r.target.lenses) {
+    lensCounter[lens] = (lensCounter[lens] || 0) + 1
+    const mine = r.res.findings.filter(f => (r.kind === 'whole' ? true : f.lens === lens))
+    reviewFiles.push({
+      name: `${lens}-${lensCounter[lens]}.json`,
+      content: { lens, target: r.target.path, ...r.res, findings: mine },
+      count: mine.length,
+    })
+  }
+}
+const RECORDERS_PER_GROUP = 4
+const reviewGroups = []
+for (let i = 0; i < reviewFiles.length; i += RECORDERS_PER_GROUP) {
+  reviewGroups.push({ key: `묶음${reviewGroups.length + 1}`, files: reviewFiles.slice(i, i + RECORDERS_PER_GROUP) })
 }
 await recordGrouped('review', reviewGroups)
 
@@ -437,10 +479,10 @@ run.dead_agents.verify = judged.filter(j => j.missingVotes > 0).map(j => j.id)
 const findingsFile = { schema: SCHEMA_VERSION, findings: judged.filter(j => j.status !== STATUS[1]), rejected: rejected.map(r => ({ id: r.id, title: r.title, reasons: r.verdicts.map(v => v.reason) })) }
 // 첫 회차에는 대조할 지난 회차가 없다. 덩어리 4가 여기를 실제 대조로 바꾼다.
 const diffFile = { schema: SCHEMA_VERSION, no_prior_round: true, items: [] }
-await record('verify', [
-  { name: 'findings.json', content: findingsFile, count: findingsFile.findings.length, ids: findingsFile.findings.map(f => f.id) , chunked: true },
-  { name: 'diff.json', content: diffFile, count: diffFile.items.length, ids: null },
-])
+await recordGrouped('verify', [{ key: '판정', files: [
+  { name: 'findings.json', content: findingsFile, count: findingsFile.findings.length, ids: findingsFile.findings.map(f => f.id), chunked: true },
+  { name: 'diff.json', content: diffFile, count: diffFile.items.length },
+] }])
 
 const machine = await machinePromise
 run.machine_checks = machine ? { allPassed: machine.allPassed, results: machine.results } : null
