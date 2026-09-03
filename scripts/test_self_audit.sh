@@ -105,7 +105,8 @@ check "run.json 을 걸음마다 다시 쓰지 않는다"          "grep -qF \"i
 echo "[회차 기록 — completed 인 최신 폴더의 파일 형태]"
 RV="$HERE/docs/superpowers/reviews"
 # 앵커: completed 가 참인 run.json 을 가진 폴더가 하나 이상 있어야 한다. 비면 아래 단언이 모두 근거 없이 통과한다.
-LATEST="$(for d in "$RV"/*/; do [ -f "$d/run.json" ] || continue; json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); sys.exit(0 if d.get("completed") is True else 1)' "$d/run.json" 2>/dev/null && printf '%s\n' "${d%/}"; done | sort | tail -1)"
+# 마지막 폴더가 미완료면 for 의 종료 코드가 1이 되어 pipefail 과 set -e 가 스크립트를 끝낸다.
+LATEST="$({ for d in "$RV"/*/; do [ -f "$d/run.json" ] || continue; json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8")); sys.exit(0 if d.get("completed") is True else 1)' "$d/run.json" 2>/dev/null && printf '%s\n' "${d%/}"; done || true; } | sort | tail -1)"
 check "completed 인 회차 폴더가 하나 이상 있다"      "[ -n \"\$LATEST\" ]"
 rj() { json_run "$1" "$LATEST/$2"; }
 check "run.json 이 파싱된다"                          "[ -n \"\$LATEST\" ] && rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' run.json"
@@ -158,5 +159,7 @@ check "재발을 round-diff 의 derived 발견으로 만든다"    "grep -qF \"l
 check "대조 걸음이 자기 phase 를 갖는다"                "grep -qF \"phase('대조')\" '$WF' && grep -qF \"title: '대조'\" '$WF'"
 check "최신 회차의 diff.json 에 대조 항목이 있다"       "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if d.get(\"no_prior_round\") is False and len(d[\"items\"])>0 else 1)' diff.json"
 check "걸음 표에 회차 대조가 있다"                      "grep -qF '| 회차를 대조한다 |' '$PDA' && grep -qF '## 회차 대조' '$PDA'"
+
+check "검증 묶음의 열쇠에서 줄 번호를 뗀다"           "grep -qF \"const k = String(f.file || '(파일 없음)').split(':')[0]\" '$WF'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

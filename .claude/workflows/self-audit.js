@@ -462,7 +462,9 @@ phase('반박검증')
 // 상한을 넘는 묶음은 아예 띄우지 않고 미검증으로 남긴다 — 잘랐다는 사실 자체가 기록에 있어야 한다.
 const byFile = new Map()
 for (const f of deduped) {
-  const k = f.file || '(파일 없음)'
+  // file 칸은 CLAUDE.md:5 처럼 줄 번호를 달고 온다. 줄 번호까지 열쇠로 쓰면 같은 파일이 줄마다
+  // 다른 묶음이 되어 검증자가 파일 수가 아니라 발견 수만큼 뜬다. 경로만 열쇠로 쓴다.
+  const k = String(f.file || '(파일 없음)').split(':')[0]
   if (!byFile.has(k)) byFile.set(k, [])
   byFile.get(k).push(f)
 }
