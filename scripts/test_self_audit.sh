@@ -133,4 +133,22 @@ check "걸음 표의 행 수와 '걸음은 N' 문장이 맞는다"     "[ \"\$PD
 check "걸음 표에 중복 제거와 반박검증이 있다"          "grep -qF '| 중복을 제거한다 |' '$PDA' && grep -qF '| 반박검증한다 |' '$PDA'"
 check "통합 기록이 파일 셋을 적는다"                  "grep -qF 'run.json' '$PDA' && grep -qF 'findings.json' '$PDA' && grep -qF 'diff.json' '$PDA'"
 
+echo "[audit_prior_rounds.sh — 지난 회차 고르기]"
+APR="$HERE/scripts/audit_prior_rounds.sh"
+check "스크립트가 있다"                                "[ -f '$APR' ]"
+APR_T="$(mktemp -d)"; mkdir -p "$APR_T/docs/superpowers/reviews"
+mk_round() { mkdir -p "$APR_T/docs/superpowers/reviews/$1"; printf '{"executor":"%s","completed":%s}\n' "$2" "$3" > "$APR_T/docs/superpowers/reviews/$1/run.json"; }
+mk_round 2026-09-01-self-audit self-audit true
+mk_round 2026-09-02-self-audit self-audit true
+mk_round 2026-09-02-self-audit-2 self-audit false
+mk_round 2026-09-03-self-audit self-audit true
+mk_round 2026-09-03-other other true
+mkdir -p "$APR_T/docs/superpowers/reviews/2026-08-30-legacy"
+APR_OUT="$(bash "$APR" self-audit --root "$APR_T" 2>/dev/null || true)"
+check "completed 인 같은 실행체의 최근 둘을 최신부터 낸다" "[ \"\$(printf '%s' \"\$APR_OUT\" | tr '\n' ' ' | sed 's/ *$//')\" = '2026-09-03-self-audit 2026-09-02-self-audit' ]"
+check "다른 실행체와 끊긴 회차와 옛 기록은 빠진다"      "! printf '%s' \"\$APR_OUT\" | grep -qE 'other|self-audit-2|legacy'"
+APR_STALE="$(bash "$APR" self-audit --root "$APR_T" --stale 2>/dev/null || true)"
+check "--stale 이 끊긴 회차만 낸다"                     "[ \"\$APR_STALE\" = '2026-09-02-self-audit-2' ]"
+check "기본 실행체 이름은 self-audit 이다"              "grep -qF 'EXEC=\"self-audit\"' '$APR'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
