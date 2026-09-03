@@ -140,6 +140,24 @@ const AGGREGATE_SCHEMA = {
 }
 const RECORD_SCHEMA = { type: 'object', properties: { path: { type: 'string' }, count: { type: 'integer' } }, required: ['path', 'count'] }
 const CHECK_SCHEMA = { type: 'object', properties: { path: { type: 'string' }, count: { type: 'integer' }, ids: { type: 'array', items: { type: 'string' } } }, required: ['path', 'count', 'ids'] }
+const GROUP_RECORD_SCHEMA = { type: 'object', properties: { written: { type: 'array', items: { type: 'string' }, description: '실제로 쓴 파일 이름 전부' } }, required: ['written'] }
+const FOLDER_CHECK_SCHEMA = {
+  type: 'object',
+  properties: {
+    files: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: '파일 이름' },
+          count: { type: 'integer', description: '그 파일에서 센 개수. 파일이 없으면 -1' },
+        },
+        required: ['name', 'count'],
+      },
+    },
+  },
+  required: ['files'],
+}
 
 
 // 검증자는 파일 하나를 읽고 그 파일의 발견 전부를 한 번에 판정한다. 발견마다 띄우면 같은 파일을
@@ -250,6 +268,34 @@ ${JSON.stringify(body)}`,
   const idsOk = !f.ids || JSON.stringify(chk.ids) === JSON.stringify(f.ids)
   if (chk.count !== f.count || !idsOk) throw new Error(`기록 검수 불일치: ${f.name} — 넘긴 ${f.count}건/${f.ids ? f.ids.length : '-'}id, 읽은 ${chk.count}건/${chk.ids.length}id`)
 }
+// 파일마다 기록자와 검수자를 한 쌍씩 띄우면 파일 수의 두 배가 든다. 리뷰 걸음은 파일이 수십 개라
+// 한 대상이 낸 파일들을 기록자 하나가 함께 쓰고, 검수자는 걸음 끝에 하나만 띄워 폴더를 통째로 센다.
+// 검수의 보장은 그대로다 — 쓴 쪽이 아닌 다른 에이전트가 파일을 다시 열어 센다. 실패 단위만 대상 하나로 넓어진다.
+async function recordGrouped(step, groups) {  // groups: [{ key, files: [{ name, content, count }] }]
+  for (const g of groups) {
+    const payload = g.files.map(f => ({ path: `${DIR}/${f.name}`, json: f.content }))
+    const wrote = await agent(
+      `너는 기록자다. 아래 목록의 파일을 하나씩 만들어 내용을 한 글자도 바꾸지 말고 써라(폴더 ${DIR} 가 없으면 만든다). 각 항목의 json 을 들여쓰기 1의 JSON 으로 그 path 에 쓴다. 파일은 파이썬으로 쓴다.
+파일을 다 쓴 뒤 \`bash ${REPO}/scripts/seal_reviews.sh\` 뒤에 쓴 경로를 전부 인자로 이어 붙여 한 번에 봉인한다.${CHUNK_RULE}
+실제로 쓴 파일 이름을 written 에 적어라.
+${JSON.stringify(payload)}`,
+      { label: `record:${step}:${g.key}`, phase: '기록', schema: GROUP_RECORD_SCHEMA, effort: 'low' }
+    )
+    if (!wrote) throw new Error(`기록자가 ${step} 걸음의 ${g.key} 에서 응답하지 않았다 — 회차를 실패로 끝낸다`)
+  }
+  const expected = groups.flatMap(g => g.files.map(f => ({ name: f.name, count: f.count })))
+  const chk = await agent(
+    `너는 검수자다. 폴더 ${DIR} 에서 아래 이름의 파일을 하나씩 열어 개수를 세어 돌려줘라. 파일을 고치지 마라. 없는 파일은 count 를 -1 로 적는다. ${COUNT_RULE}
+${JSON.stringify(expected.map(e => e.name))}`,
+    { label: `check:${step}`, phase: '기록', schema: FOLDER_CHECK_SCHEMA, effort: 'low' }
+  )
+  if (!chk) throw new Error(`검수자가 ${step} 걸음에서 응답하지 않았다 — 회차를 실패로 끝낸다`)
+  const got = new Map(chk.files.map(f => [f.name, f.count]))
+  const bad = expected.filter(e => got.get(e.name) !== e.count)
+  if (bad.length) throw new Error(`기록 검수 불일치: ${bad.map(e => `${e.name} — 넘긴 ${e.count}건, 읽은 ${got.has(e.name) ? got.get(e.name) : '없음'}`).join(' / ')}`)
+  if (!run.steps_done.includes(step)) run.steps_done.push(step)
+  await writeRun(false)
+}
 async function writeRun(final) {
   if (final) {
     // 검수를 먼저 — 지금까지의 run.json 을 검수자가 읽어 끝난 걸음 수가 맞아야 completed 를 참으로 놓는다.
@@ -295,7 +341,13 @@ const all = reviews.filter(r => r.res).flatMap(r => r.res.findings.map(f => ({ .
 run.dead_agents.review = deadLenses
 log(`리뷰 완료: 호출 ${reviews.length}건에서 원시 발견 ${all.length}건`)
 if (deadLenses.length > 0) log(`⚠️ 응답하지 않은 렌즈 ${deadLenses.length}건: ${deadLenses.join(', ')} — 이 감사의 커버리지가 그만큼 좁다`)
-await record('review', reviews.filter(r => r.res).map(r => ({ name: r.file, content: { lens: r.key, target: r.target, ...r.res }, count: r.res.findings.length, ids: null })))
+const reviewGroups = []
+for (const r of reviews.filter(x => x.res)) {
+  let g = reviewGroups.find(x => x.key === r.target)
+  if (!g) { g = { key: r.target, files: [] }; reviewGroups.push(g) }
+  g.files.push({ name: r.file, content: { lens: r.key, target: r.target, ...r.res }, count: r.res.findings.length })
+}
+await recordGrouped('review', reviewGroups)
 
 phase('중복제거')
 const raw = all.map((f, i) => ({ raw_index: i, ...f }))

@@ -97,4 +97,6 @@ check "렌즈 배정은 판단이 아니라 고정표에서 온다"      "grep -
 check "중복제거는 본문이 아니라 번호를 돌려준다"        "grep -qF 'merged_from' '$WF' && grep -qF '번호만 돌려준다' '$WF'"
 check "배정 기준이 고정표다"                          "grep -qF '문서 종류로 정한다' '$HERE/skills/project-doc-audit/SKILL.md' && grep -qF '회차마다 다시 판단하지 않는다' '$HERE/skills/project-doc-audit/SKILL.md'"
 
+check "리뷰 기록은 대상마다 묶어 쓰고 검수는 한 번 돈다" "grep -qF 'async function recordGrouped(' '$WF' && grep -qF 'FOLDER_CHECK_SCHEMA' '$WF' && grep -qF \"recordGrouped('review'\" '$WF'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
