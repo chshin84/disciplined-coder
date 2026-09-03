@@ -76,4 +76,18 @@ AT_E="$(mktemp -d)"; mkdir -p "$AT_E/docs/superpowers/specs"
   && git add -A && git commit -qm seed )
 check "대상이 하나도 없어도 조용히 죽지 않는다"      "bash '$AT' --root '$AT_E' >/dev/null 2>&1 && [ -z \"\$(bash '$AT' --root '$AT_E')\" ]"
 
+echo "[실행체 — 재배선]"
+check "실행체가 audit_targets.sh 를 부른다"           "grep -qF 'audit_targets.sh' '$WF'"
+check "실행체가 검토 대상 문서를 손으로 적지 않는다"  "! grep -qE \"['\\\"](README|CLAUDE)\\\\.md['\\\"]\" '$WF' && ! grep -qF '검토 대상: README' '$WF'"
+check "레포 확인 걸음이 있다"                          "grep -qF \"'repo-check'\" '$WF' && grep -qF \"name !== 'disciplined-coder'\" '$WF'"
+check "기록은 파일 하나마다 기록자와 검수자를 띄운다"  "grep -qF 'async function writeFile(' '$WF' && grep -qF \"label: \\\`record:\" '$WF' && grep -qF \"label: \\\`check:\" '$WF' && grep -qF '기록 검수 불일치' '$WF'"
+check "completed 는 검수를 지난 뒤에만 참이 된다"     "grep -qF 'run.completed = true' '$WF' && grep -qF 'async function writeRun(' '$WF'"
+check "요약문은 봉인하지 않는다"                       "grep -qF 'async function writeSummary(' '$WF' && grep -qF '요약문은 봉인하지 않는다' '$WF'"
+check "기록자가 봉인 스크립트를 돈다"                  "grep -qF 'seal_reviews.sh' '$WF'"
+check "렌즈에 정본 경로와 principles_applied 를 요구한다" "grep -qF 'agent-principles.md' '$WF' && grep -qF 'principles_applied' '$WF'"
+check "기계 검사가 실패를 묻는 형태를 금지한다"        "grep -qF '종료 코드에 묻히는 형태로 바꿔 쓰지 마라' '$WF'"
+check "옛 차원 렌즈가 없다"                            "! grep -qE 'ssot-audit|shell-audit|clear-comm-audit|docs-compliance' '$WF'"
+check "매니페스트가 실행체를 workflows 에 선언한다"     "grep -qF '\"./.claude/workflows/self-audit.js\"' '$HERE/.claude-plugin/plugin.json'"
+check "Date.now 와 Math.random 을 쓰지 않는다"          "! grep -qE 'Date\\.now|Math\\.random|new Date' '$WF'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
