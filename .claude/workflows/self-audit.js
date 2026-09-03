@@ -272,7 +272,7 @@ const tg = await agent(
 - 회차 이름은 <날짜>-${EXECUTOR} 이고, docs/superpowers/reviews/ 아래에 같은 이름의 폴더나 .md 가 이미 있으면 -2, -3 처럼 회차를 붙여 앞 회차를 덮지 않는다.
 - 조각의 경로를 문서 단위로 모아, 문서마다 ${REPO}/skills/project-doc-audit/SKILL.md 의 「렌즈 배정 기준」 표에서 그 문서가 걸리는 종류의 행 하나를 골라 lenses 를 그 행에 적힌 대로 그대로 옮기고, 어느 행을 골랐는지와 왜 그 행인지를 reason 에 적는다. 행을 고르는 것이 판단이고 렌즈를 정하는 것은 판단이 아니다 — 표에 없는 렌즈를 더하지 마라. 이 절차에서 lens-consistency 는 문서별로 걸지 않는다. lens-readability 를 걸 문서에는 purpose(읽는 사람과 그 사람이 무엇을 할 수 있어야 하는지)를 한 줄로 적고, 못 적겠으면 purpose 를 비우고 lens-readability 를 넣지 않고 reason 에 그 이유를 적는다.
 - 배정은 무엇으로 만들어졌는지나 어느 폴더에 있는지로 정하지 않는다.
-- 'bash scripts/audit_prior_rounds.sh ${EXECUTOR}' 의 출력을 prior_rounds 에, 'bash scripts/audit_prior_rounds.sh ${EXECUTOR} --stale' 의 출력을 stale_rounds 에 한 줄에 하나씩 옮긴다.
+- 'bash scripts/audit_prior_rounds.sh ${EXECUTOR}' 의 출력을 prior_rounds 에, 'bash scripts/audit_prior_rounds.sh ${EXECUTOR} --stale' 의 출력을 stale_rounds 에 한 줄에 하나씩 옮긴다.`,
   { label: 'targets', phase: '준비', schema: TARGETS_SCHEMA }
 )
 if (!tg) throw new Error('대상 도출 에이전트가 응답하지 않았다 — 회차를 시작하지 않는다')
