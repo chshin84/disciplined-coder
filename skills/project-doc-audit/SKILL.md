@@ -43,10 +43,12 @@ description: 한 레포의 살아 있는 문서 전부를 문서 종류에 따�
 | 문서 종류 | 무엇으로 가리나 | 걸 렌즈 |
 |---|---|---|
 | 원칙 정본 | 다른 문서가 정본이라 부르는 그 파일 | `lens-grounding`, `lens-fit`, `lens-readability` |
-| 사람이 읽는 안내 | 사용자용 `README`, 프로젝트 `CLAUDE.md`, 명령 문서 | `lens-readability`, `lens-grounding` |
+| 사람이 읽는 안내 | 사용자용 `README`, 프로젝트 `CLAUDE.md`, 명령 문서 | `lens-grounding`, `lens-readability` |
 | 처방 스킬 | 절차나 처방을 소유한 `SKILL.md` | `lens-grounding`, `lens-fit` |
 | 렌즈 정의 | 렌즈 자신의 `SKILL.md` | `lens-fit` |
 | 위 어디에도 안 걸리는 문서 | 그 밖 | `lens-grounding` |
+
+표에 적은 차례가 적용하는 차례다. 한 호출이 렌즈를 이어서 적용하므로 뒤쪽이 얕아지는데, 행마다 차례가 다르면 어느 문서에서 무엇이 얕아지는지가 우연으로 정해진다. `lens-grounding`을 앞에 두는 것은 그것만 문서 밖 코드까지 뒤지기 때문이고, `lens-readability`를 뒤에 두는 것은 목적 한 줄과 `writing-korean`만 있으면 되는 가장 자족적인 렌즈이기 때문이다.
 
 `lens-consistency`는 이 표 밖이다. 어긋남은 문서 사이에서 드러나므로 문서마다 걸지 않고, 규칙을 소유한 문서와 그것을 따르는 문서 전부를 한 렌즈에게 묶음으로 한 번 준다.
 
