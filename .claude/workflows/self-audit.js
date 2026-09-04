@@ -611,10 +611,10 @@ for (const f of deduped) {
   if (!byFile.has(k)) byFile.set(k, [])
   byFile.get(k).push(f)
 }
-const groups = [...byFile.entries()].map(([file, items]) => ({ file, items }))
-const toVerify = groups.slice(0, CAPS.verify)
-const overCap = groups.slice(CAPS.verify)
-log(`반박검증: 발견 ${deduped.length}건을 파일 ${groups.length}개로 묶어 검증자 ${toVerify.length}명을 띄운다`)
+const verifyGroups = [...byFile.entries()].map(([file, items]) => ({ file, items }))
+const toVerify = verifyGroups.slice(0, CAPS.verify)
+const overCap = verifyGroups.slice(CAPS.verify)
+log(`반박검증: 발견 ${deduped.length}건을 파일 ${verifyGroups.length}개로 묶어 검증자 ${toVerify.length}명을 띄운다`)
 if (overCap.length) log(`⚠️ 검증 상한 ${CAPS.verify}묶음을 넘어 ${overCap.length}묶음을 검증하지 않았다 — 미검증으로 기록한다`)
 let seq = 0
 const numbered = toVerify.map(g => ({ ...g, items: g.items.map(f => ({ ...f, seq: ++seq })) }))
