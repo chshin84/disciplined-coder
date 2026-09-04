@@ -162,4 +162,51 @@ check "걸음 표에 회차 대조가 있다"                      "grep -qF '| 
 
 check "검증 묶음의 열쇠에서 줄 번호를 뗀다"           "grep -qF \"const k = String(f.file || '(파일 없음)').split(':')[0]\" '$WF'"
 
+echo "[audit_topics.sh — 이름표 목록]"
+ATP="$HERE/scripts/audit_topics.sh"
+check "스크립트가 있다"                          "[ -f '$ATP' ]"
+ATP_OUT="$(bash "$ATP" 2>/dev/null || true)"
+ATP_MISS=""
+while IFS= read -r want; do
+  [ -n "$want" ] || continue
+  printf '%s\n' "$ATP_OUT" | grep -qxF "$want" || ATP_MISS="$ATP_MISS [$want]"
+done <<TOPICEOF
+$(grep -oE '^- \*\*`[A-Z-]+`' "$HERE/agent-principles.md" | sed 's/^- \*\*`//; s/`$//')
+$(grep '^## ' "$HERE/agent-principles.md" | sed 's/^## //')
+$(ls "$HERE/skills")
+$(ls "$HERE/commands" | sed 's/\.md$//')
+TOPICEOF
+[ -n "$ATP_MISS" ] && echo "    빠진 이름표:$ATP_MISS"
+check "정본 원칙 ID·절 제목·스킬·명령 이름이 모두 있다" "[ -z \"\$ATP_MISS\" ]"
+check "중복이 없다"                                "[ \"\$(printf '%s\n' \"\$ATP_OUT\" | sort | uniq -d | wc -l)\" = 0 ]"
+
+echo "[실행체 — 일관성 방법]"
+check "실행체가 audit_topics.sh 를 부른다"                "grep -qF 'audit_topics.sh' '$WF'"
+check "뽑기 진술이 role 과 follows 와 context 를 갖는다"    "grep -qF \"enum: ['canon', 'follows', 'none']\" '$WF' && grep -qF 'context: { type' '$WF'"
+check "진술의 file 은 조각의 경로로 덮어쓴다"              "grep -qF 'file: e.fragment.path' '$WF'"
+check "모으기는 스크립트 안의 JS 가 한다"                  "grep -qF 'function groupByTopic' '$WF'"
+check "정본 관계를 조각 목록에서 도출한다"                 "grep -qF 'function canonOf' '$WF' && ! grep -qF \"'meta-aggregate', 'nested-orchestration'\" '$WF'"
+check "묶음마다 lens-consistency 를 띄운다"                "grep -qF 'label: \`lens-consistency:' '$WF'"
+check "판정 셋이 닫힌 집합이다"                            "grep -qF \"'어긋남'\" '$WF' && grep -qF \"'좁혀 적음'\" '$WF' && grep -qF \"'같음'\" '$WF'"
+check "렌즈가 narrowed 를 돌려준다"                        "grep -qF \"narrowed: { type: 'integer'\" '$WF'"
+check "복제는 판정에서 도출한다"                           "grep -qF \"type: 'duplication'\" '$WF' && grep -qF \"role === 'none'\" '$WF'"
+check "묶음 입력 크기를 JSON 길이로 세어 tg.limit 에 맞춘다" "grep -qF 'function groupSize' '$WF' && grep -qF 'tg.limit' '$WF'"
+check "좁혀 적음과 빈 이름표 개수를 run 에 담는다"         "grep -qF 'run.narrowed' '$WF' && grep -qF 'run.unlabeled' '$WF'"
+check "뽑기 걸음이 자기 phase 를 갖는다"                   "grep -qF \"phase('뽑기')\" '$WF' && grep -qF \"title: '뽑기'\" '$WF'"
+
+echo "[문서 — 일관성 방법이 절차와 렌즈에 적혔다]"
+LC="$HERE/skills/lens-consistency/SKILL.md"
+check "렌즈가 이름표 묶음 짝을 적는다"                  "grep -qF '## 레포 문서 감사에서의 짝' '$LC'"
+check "렌즈 type 에 duplication 이 있다"                "grep -qF 'duplication' '$LC'"
+check "렌즈가 판정 셋과 narrowed 를 적는다"             "grep -qF '좁혀 적음' '$LC' && grep -qF 'narrowed' '$LC'"
+check "렌즈가 산출물 공백·스코프를 감사에서 뺀다"        "grep -qF '레포 문서 감사에서는 걸지 않는다' '$LC'"
+check "집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다"  "grep -qF 'narrowed' '$HERE/skills/meta-aggregate/SKILL.md'"
+check "한 번만 규율에 '대상이 다르면 별개 호출' 이 있다" "grep -qF '대상이 다르면 별개 호출이다' '$HERE/skills/domain-docs/SKILL.md'"
+check "절차의 대체된 문장 셋이 사라졌다"                 "! grep -qF '만은 묶음에 한 번 건다' '$PDA' && ! grep -qF '묶음을 통째로 받는다' '$PDA' && ! grep -qF '묶음 전부를 서로 대조한다' '$LC'"
+check "절차의 '짧은 문서 둘까지' 가 사라졌다"            "! grep -qF '짧은 문서 둘까지' '$PDA'"
+check "절차에 「일관성 대조」 절과 걸음 행이 있다"         "grep -qF '## 일관성 대조' '$PDA' && grep -qF '| 진술을 뽑아 이름표로 모은다 |' '$PDA'"
+check "절차가 문턱 값을 audit_targets.sh 로 가리킨다"    "grep -qF 'audit_targets.sh' '$PDA'"
+check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '$HERE/docs/superpowers/specs/2026-08-30-audit-unification-design.md' | grep -qF '2026-09-02-audit-record-and-diff-design.md'"
+check "최신 회차 run.json 의 topic_groups 가 양수다"     "[ -n \"\$LATEST\" ] && rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if d.get(\"topic_groups\",0)>0 else 1)' run.json"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

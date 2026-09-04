@@ -4,6 +4,7 @@ export const meta = {
   whenToUse: '큰 변경(정본·훅·스캐폴드 수정) 후 회귀 감사가 필요할 때 레포 루트에서 실행한다(다른 위치면 args로 레포 경로를 넘긴다). 결과는 docs/superpowers/reviews/<회차>/ 의 run.json·findings.json·diff.json·렌즈 원본과 봉인하지 않은 요약문이다. 이 레포가 아니면 아무것도 쓰지 않고 멈춘다.',
   phases: [
     { title: '준비', detail: '레포 확인 → 대상·조각·문턱 도출과 렌즈 배정 → 기계 검사와 지문' },
+    { title: '뽑기', detail: '조각마다 진술을 뽑고 이름표별로 모아 둘 이상의 문서에서 온 묶음만 남긴다' },
     { title: '리뷰', detail: '문서별 렌즈(grounding·readability·fit)와 전체 렌즈(adversarial·plugin-compliance)를 병렬로 띄운다' },
     { title: '중복제거', detail: '묶음마다 merged_from 을 받아 원시 발견이 하나도 안 빠졌는지 확인한다' },
     { title: '반박검증', detail: '파일마다 검증자 하나가 사실성과 실질성을 함께 보고 판정과 사유를 둘 다 남긴다' },
@@ -27,7 +28,7 @@ const SCHEMA_VERSION = 1
 // 된다 — 리뷰는 문서×렌즈, 검증은 발견마다다. 상한을 넘으면 잘라 내고 무엇을 잘랐는지 기록에
 // 남긴다. 조용히 자르면 '아무도 반박하지 않았다'와 '아무도 보지 않았다'가 구별되지 않는다.
 const CAPS = { review: 30, verify: 50 }
-const STEPS = ['repo-check', 'targets', 'machine-checks', 'review', 'dedup', 'verify', 'diff', 'aggregate', 'record']
+const STEPS = ['repo-check', 'targets', 'machine-checks', 'extract', 'group', 'review', 'dedup', 'verify', 'diff', 'aggregate', 'record']
 function findingId(round, n) { return `${round}#${String(n).padStart(3, '0')}` }
 // 판정 상태의 닫힌 집합 — 'derived'는 반박검증 없이 도출된 발견(회차 대조가 만든다)이다.
 const STATUS = ['confirmed', 'rejected', 'undetermined', 'derived']
@@ -132,6 +133,50 @@ const DIFF_VERDICTS_SCHEMA = {
   },
   required: ['verdicts'],
 }
+const EXTRACT_SCHEMA = {
+  type: 'object',
+  properties: {
+    statements: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          topics: { type: 'array', items: { type: 'string' }, description: '이름표 목록에서 고른 것만. 어느 것에도 안 걸리면 빈 배열' },
+          statement: { type: 'string', description: '이 문서가 정한 것 한 줄(규칙·값·절차·이름)' },
+          line: { type: 'integer', description: '그 진술이 있는 줄(1부터)' },
+          context: { type: 'string', description: '그 줄 앞뒤 다섯 줄의 원문' },
+          role: { type: 'string', enum: ['canon', 'follows', 'none'], description: 'canon: 이 문서가 그 주제의 정본이라고 말한다. follows: 그 진술이나 그 진술이 든 절이 다른 문서를 정본으로 이름 부른다. none: 둘 다 아니다' },
+          follows: { type: 'string', description: 'role 이 follows 이면 그 문서의 레포 상대경로(스킬이면 skills/<이름>/SKILL.md), 아니면 빈 문자열' },
+          condition: { type: 'string', description: '조건이 붙은 문장이면 그 조건, 아니면 빈 문자열' },
+        },
+        required: ['topics', 'statement', 'line', 'context', 'role', 'follows', 'condition'],
+      },
+    },
+  },
+  required: ['statements'],
+}
+const CONSISTENCY_SCHEMA = {
+  type: 'object',
+  properties: {
+    pairs: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          canon_line: { type: 'integer' }, other_file: { type: 'string' }, other_line: { type: 'integer' },
+          verdict: { type: 'string', enum: ['어긋남', '좁혀 적음', '같음'] },
+          reason: { type: 'string' },
+        },
+        required: ['canon_line', 'other_file', 'other_line', 'verdict', 'reason'],
+      },
+    },
+    narrowed: { type: 'integer', description: '좁혀 적음 판정의 수' },
+    findings: FINDINGS_SCHEMA.properties.findings,
+    read: { type: 'array', items: { type: 'string' } },
+    principles_applied: { type: 'array', items: { type: 'string' } },
+  },
+  required: ['pairs', 'narrowed', 'findings', 'read', 'principles_applied'],
+}
 const REPO_CHECK_SCHEMA = {
   type: 'object',
   properties: { name: { type: 'string', description: '.claude-plugin/plugin.json 의 name. 파일이 없으면 빈 문자열' } },
@@ -157,10 +202,11 @@ const TARGETS_SCHEMA = {
         required: ['path', 'lenses', 'reason', 'purpose'],
       },
     },
+    topics: { type: 'array', items: { type: 'string' }, description: 'audit_topics.sh 의 출력' },
     prior_rounds: { type: 'array', items: { type: 'string' }, description: 'audit_prior_rounds.sh 의 출력 — 최신부터 최대 둘' },
     stale_rounds: { type: 'array', items: { type: 'string' }, description: 'audit_prior_rounds.sh --stale 의 출력' },
   },
-  required: ['date', 'round', 'limit', 'fragments', 'targets', 'prior_rounds', 'stale_rounds'],
+  required: ['date', 'round', 'limit', 'fragments', 'targets', 'topics', 'prior_rounds', 'stale_rounds'],
 }
 const MACHINE_SCHEMA = {
   type: 'object',
@@ -272,6 +318,7 @@ const tg = await agent(
 - 회차 이름은 <날짜>-${EXECUTOR} 이고, docs/superpowers/reviews/ 아래에 같은 이름의 폴더나 .md 가 이미 있으면 -2, -3 처럼 회차를 붙여 앞 회차를 덮지 않는다.
 - 조각의 경로를 문서 단위로 모아, 문서마다 ${REPO}/skills/project-doc-audit/SKILL.md 의 「렌즈 배정 기준」 표에서 그 문서가 걸리는 종류의 행 하나를 골라 lenses 를 그 행에 적힌 대로 그대로 옮기고, 어느 행을 골랐는지와 왜 그 행인지를 reason 에 적는다. 행을 고르는 것이 판단이고 렌즈를 정하는 것은 판단이 아니다 — 표에 없는 렌즈를 더하지 마라. 이 절차에서 lens-consistency 는 문서별로 걸지 않는다. lens-readability 를 걸 문서에는 purpose(읽는 사람과 그 사람이 무엇을 할 수 있어야 하는지)를 한 줄로 적고, 못 적겠으면 purpose 를 비우고 lens-readability 를 넣지 않고 reason 에 그 이유를 적는다.
 - 배정은 무엇으로 만들어졌는지나 어느 폴더에 있는지로 정하지 않는다.
+- 'bash scripts/audit_topics.sh' 의 출력을 topics 에 한 줄에 하나씩 옮긴다.
 - 'bash scripts/audit_prior_rounds.sh ${EXECUTOR}' 의 출력을 prior_rounds 에, 'bash scripts/audit_prior_rounds.sh ${EXECUTOR} --stale' 의 출력을 stale_rounds 에 한 줄에 하나씩 옮긴다.`,
   { label: 'targets', phase: '준비', schema: TARGETS_SCHEMA }
 )
@@ -377,6 +424,80 @@ async function writeSummary(text) {
 }
 await record('targets', [])
 
+// ---------- 뽑기 ----------
+// 조각마다 에이전트 하나가 그 문서가 정한 것을 한 줄씩 뽑는다. 이름표는 닫힌 목록에서만 고르고,
+// 진술의 file 은 에이전트가 적은 것을 쓰지 않고 조각의 경로로 덮어쓴다 — 경로 꼴이 어긋나면 모으기가 통째로 빈다.
+phase('뽑기')
+const topicSet = new Set(tg.topics)
+const extracted = (await parallel(tg.fragments.map(fr => () =>
+  agent(
+    `너는 진술 뽑기 에이전트다. ${REPO}/${fr.path} 의 ${fr.start}~${fr.end}행(1부터, 양끝 포함)만 읽고, 그 조각이 정한 것(규칙·값·절차·이름)을 한 줄씩 뽑아라. 아무 파일도 쓰지 마라.
+진술마다 이름표를 아래 목록에서만 고른다(여럿 가능). 목록에 없는 이름표를 지어 붙이지 마라. 어느 것에도 안 걸리면 빈 배열로 둔다. 진술마다 그 줄 앞뒤 다섯 줄의 원문을 context 에 그대로 담는다.
+역할은 셋이다 — canon(이 문서가 그 주제의 정본이라고 말한다), follows(그 진술이나 그 진술이 든 절이 다른 문서를 정본으로 이름 부른다 — "상세는 X를 참고한다"·"X가 정한다"·"X가 소유한다"가 그 꼴이다. follows 에 그 문서의 레포 상대경로를 적는다), none(둘 다 아니다). 절 머리에 참조가 있고 아래 문장들이 그것을 따르면 그 문장들도 follows 다.
+조건이 붙은 문장은 조건을 condition 에 담는다.
+[이름표 목록] ${JSON.stringify(tg.topics)}`,
+    { label: `extract:${fr.path}:${fr.start}`, phase: '뽑기', schema: EXTRACT_SCHEMA, effort: 'low' }
+  ).then(r => ({ fragment: fr, statements: r ? r.statements : null }))
+))).filter(Boolean)
+run.dead_agents.extract = extracted.filter(e => !e.statements).map(e => `${e.fragment.path}:${e.fragment.start}`)
+const statements = extracted.filter(e => e.statements).flatMap(e => e.statements.map(s => ({ ...s, file: e.fragment.path, topics: s.topics.filter(t => topicSet.has(t)) })))
+run.unlabeled = statements.filter(s => s.topics.length === 0).length
+log(`뽑기 완료: 진술 ${statements.length}건, 빈 이름표 ${run.unlabeled}건`)
+await record('extract', [])
+
+// ---------- 모으기 ----------
+// 스크립트 안의 JS 가 이름표별로 묶고 둘 이상의 문서에서 온 묶음만 남긴다. 에이전트가 아니다.
+// 정본 관계 세 규칙 — 원칙 ID 와 정본 절 제목의 정본은 agent-principles.md, 스킬·명령 이름의 정본은 그 스킬·명령,
+// 정본 문서의 진술이 follows 로 다른 문서를 이름 부르면 그 이름표의 정본은 그 문서다.
+// 스킬과 명령 이름은 조각 목록(audit_targets.sh 의 출력)에서 도출한다. 손으로 적은 목록은 두지 않는다.
+const fragPaths = [...new Set(tg.fragments.map(f => f.path))]
+const PRINCIPLES_PATH = fragPaths.find(p => p.endsWith('agent-principles.md'))
+const skillPathOf = {}, commandPathOf = {}
+for (const p of fragPaths) {
+  const sk = p.match(/^skills\/([^/]+)\/SKILL\.md$/); if (sk) skillPathOf[sk[1]] = p
+  const cm = p.match(/^commands\/([^/]+)\.md$/); if (cm) commandPathOf[cm[1]] = p
+}
+function canonOf(topic, group) {
+  let canon = skillPathOf[topic] || commandPathOf[topic] || PRINCIPLES_PATH
+  const delegated = group.find(s => s.file === canon && s.role === 'follows' && s.follows)
+  if (delegated) canon = delegated.follows
+  return canon
+}
+// 묶음 입력의 크기는 렌즈 프롬프트에 실제로 넣는 JSON 문자열 길이다(진술·앞뒤 원문·범위 문장 표시 전부).
+function groupSize(g) { return JSON.stringify({ canon: g.canon_statements, others: g.other_statements }).length }
+function groupByTopic(stmts, limit) {
+  const byTopic = {}
+  for (const s of stmts) for (const t of s.topics) (byTopic[t] = byTopic[t] || []).push(s)
+  const groups = []
+  for (const [topic, arr] of Object.entries(byTopic)) {
+    if (new Set(arr.map(s => s.file)).size < 2) continue
+    const canon = canonOf(topic, arr)
+    const canonStmts = arr.filter(s => s.file === canon)
+    const others = arr.filter(s => s.file !== canon)
+    if (canonStmts.length === 0 || others.length === 0) continue
+    const whole = { topic, canon, canon_statements: canonStmts, other_statements: others }
+    if (groupSize(whole) <= limit) { groups.push(whole); continue }
+    // 문턱을 넘으면 정본의 진술 대 따르는 문서 하나의 진술로 짝을 나누고, 그래도 넘으면 따르는 진술을 잘라 나눈다.
+    const byFile = {}
+    for (const s of others) (byFile[s.file] = byFile[s.file] || []).push(s)
+    for (const [file, os] of Object.entries(byFile)) {
+      let chunk = []
+      for (const s of os) {
+        const trial = { topic, canon, canon_statements: canonStmts, other_statements: chunk.concat([s]), split_for: file }
+        if (chunk.length > 0 && groupSize(trial) > limit) { groups.push({ topic, canon, canon_statements: canonStmts, other_statements: chunk, split_for: file }); chunk = [] }
+        chunk.push(s)
+      }
+      if (chunk.length) groups.push({ topic, canon, canon_statements: canonStmts, other_statements: chunk, split_for: file })
+    }
+  }
+  return groups
+}
+const groups = groupByTopic(statements, tg.limit)
+const oversize = groups.filter(g => groupSize(g) > tg.limit)
+run.topic_groups = groups.length
+log(`모으기 완료: 이름표 묶음 ${groups.length}개${oversize.length ? `, 문턱을 넘는 묶음 ${oversize.length}개(정본 진술만으로 이미 넘는다)` : ''}`)
+await record('group', [])
+
 // ---------- 리뷰 ----------
 phase('리뷰')
 const deadLenses = []
@@ -388,17 +509,39 @@ const reviewJobs = tg.targets.map(t => () =>
   agent(w.prompt, { label: w.key, phase: '리뷰', schema: LENS_SCHEMA })
     .then(res => ({ kind: 'whole', key: w.key, target: { path: '(전체)', lenses: [w.key] }, res }))
     .catch(() => ({ kind: 'whole', key: w.key, target: { path: '(전체)', lenses: [w.key] }, res: null }))
+)).concat(groups.map((g, gi) => () =>
+  agent(
+    `${COMMON}
+렌즈: ${REPO}/skills/lens-consistency/SKILL.md 를 읽고 그 「레포 문서 감사에서의 짝」 절대로 적용하라. 산출물 공백과 스코프는 이 감사에서 보지 않는다.
+[이름표] ${g.topic}
+[정본] ${g.canon}
+[정본의 진술] ${JSON.stringify(g.canon_statements.map(s => ({ line: s.line, statement: s.statement, context: s.context, condition: s.condition })))}
+[따르는 문서의 진술] ${JSON.stringify(g.other_statements.map(s => ({ file: s.file, line: s.line, statement: s.statement, context: s.context, role: s.role, follows: s.follows, condition: s.condition })))}
+범위 문장은 문서마다 하나다 — SKILL.md 이면 frontmatter 의 description, 그 밖이면 첫 문단이다. 정본과 따르는 문서의 범위 문장을 열어 읽어라.
+짝(정본 진술 × 따르는 진술)마다 판정은 셋이다 — 어긋남(같은 것을 다르게 정한다. findings 에 발견 하나를 만든다), 좁혀 적음(따르는 쪽이 정본의 규칙을 자기 범위에 적용해 더 좁게 또는 더 자세히 정한다. 정당한 도출이라 발견이 아니다), 같음(정본의 문장을 다른 말로 되풀이할 뿐 더한 것이 없다). 좁혀 적음의 수를 narrowed 에 적어라. 조건이 다른 짝은 어긋남으로 올리지 말고 reason 에 조건을 적어라.`,
+    { label: `lens-consistency:${g.topic}${g.split_for ? ':' + g.split_for : ''}`, phase: '리뷰', schema: CONSISTENCY_SCHEMA }
+  ).then(res => ({ kind: 'topic', key: 'lens-consistency', target: { path: g.topic, lenses: ['lens-consistency'] }, group: g, res }))
+    .catch(() => ({ kind: 'topic', key: 'lens-consistency', target: { path: g.topic, lenses: ['lens-consistency'] }, group: g, res: null }))
 ))
 const reviewCut = reviewJobs.length - CAPS.review
 if (reviewCut > 0) log(`⚠️ 리뷰 상한 ${CAPS.review}건을 넘어 렌즈 호출 ${reviewCut}건을 돌리지 않았다 — 이 감사의 커버리지가 그만큼 좁다`)
 const reviews = (await parallel(reviewJobs.slice(0, CAPS.review))).filter(Boolean)
 for (const r of reviews) if (!r.res) deadLenses.push(r.target.path)
 // 발견에 붙은 lens 가 그 문서에 배정된 것이 아니면 배정 밖의 판정이라 버리지 않고 표시만 한다.
+// 복제는 판정에서 도출한다 — 같음이면서 정본이 아닌 쪽의 역할이 none 이면 정본을 가리키지 않고 베낀 것이다(SSOT).
+const CONSISTENCY_VERDICTS = ['어긋남', '좁혀 적음', '같음']
+const consistencyRuns = reviews.filter(r => r.kind === 'topic' && r.res)
+run.narrowed = consistencyRuns.reduce((n, r) => n + r.res.narrowed, 0)
+const duplication = consistencyRuns.flatMap(r => r.res.pairs
+  .filter(p => p.verdict === CONSISTENCY_VERDICTS[2])
+  .map(p => ({ p, src: r.group.other_statements.find(s => s.file === p.other_file && s.line === p.other_line) }))
+  .filter(x => x.src && x.src.role === 'none')
+  .map(x => ({ title: `${x.p.other_file}이(가) 정본 ${r.group.canon}의 문장을 가리키지 않고 베낀다.`, file: `${x.p.other_file}:${x.p.other_line}`, evidence: x.src.statement, principle: 'SSOT', consequence: `정본의 ${r.group.topic} 규칙이 바뀌면 이 문장은 그대로 남아 두 판이 된다.`, detail: x.p.reason, fix: '정본을 가리키는 참조로 바꾼다.', type: 'duplication' })))
 const all = reviews.filter(r => r.res).flatMap(r => r.res.findings.map(f => ({
   ...f,
-  lens: r.kind === 'whole' ? r.key : (r.target.lenses.includes(f.lens) ? f.lens : `${f.lens}(배정 밖)`),
+  lens: r.kind === 'doc' ? (r.target.lenses.includes(f.lens) ? f.lens : `${f.lens}(배정 밖)`) : r.key,
   target: r.target.path,
-})))
+}))).concat(duplication.map(d => ({ ...d, lens: 'lens-consistency', target: '(이름표 묶음)' })))
 run.dead_agents.review = deadLenses
 log(`리뷰 완료: 호출 ${reviews.length}건에서 원시 발견 ${all.length}건`)
 if (deadLenses.length > 0) log(`⚠️ 응답하지 않은 대상 ${deadLenses.length}건: ${deadLenses.join(', ')} — 이 감사의 커버리지가 그만큼 좁다`)
@@ -409,7 +552,7 @@ const reviewFiles = []
 for (const r of reviews.filter(x => x.res)) {
   for (const lens of r.target.lenses) {
     lensCounter[lens] = (lensCounter[lens] || 0) + 1
-    const mine = r.res.findings.filter(f => (r.kind === 'whole' ? true : f.lens === lens))
+    const mine = r.res.findings.filter(f => (r.kind === 'doc' ? f.lens === lens : true))
     reviewFiles.push({
       name: `${lens}-${lensCounter[lens]}.json`,
       content: { lens, target: r.target.path, ...r.res, findings: mine },
@@ -623,6 +766,7 @@ const summary = [
   ...tg.targets.map(t => line(`\`${t.path}\` — ${t.lenses.join(', ') || '(문서별 렌즈 없음)'}. ${t.reason}`)),
   line(`전체 렌즈 — ${WHOLE_LENSES.map(w => w.key).join(', ')}`),
   line(`조각 ${tg.fragments.length}개, 문턱 ${tg.limit}자`),
+  line(`이름표 묶음 ${run.topic_groups}개, 좁혀 적음 ${run.narrowed}건, 빈 이름표 진술 ${run.unlabeled}건${oversize.length ? `, 문턱을 넘는 묶음 ${oversize.length}개` : ''}`),
   '',
   '## 기계 검사',
   '',

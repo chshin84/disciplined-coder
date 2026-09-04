@@ -53,7 +53,7 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 
 렌즈 리턴의 `principles_applied`는 집계 대상이 아니다. 비어 있으면 호출자가 자기 보고에 적는다.
 
-렌즈가 자기 필드를 더할 수 있고 그것도 집계 대상이 아니다. 집계 항목은 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 렌즈가 돌려준 원본을 본다. `lens-prior-art`의 `search_status`·`citations`·`not_found`·`disclosures`와 `lens-readability`의 `purpose`·`rewrite`가 그렇다. 그 가운데 `search_status`와 `purpose`는 빈 `issues`를 판정으로 써도 되는지를 가르는 값이므로, 집계본만 보고 넘어가면 조용한 통과가 생긴다.
+렌즈가 자기 필드를 더할 수 있고 그것도 집계 대상이 아니다. 집계 항목은 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 렌즈가 돌려준 원본을 본다. `lens-prior-art`의 `search_status`·`citations`·`not_found`·`disclosures`와 `lens-readability`의 `purpose`·`rewrite`와 `lens-consistency`의 `narrowed`·`pairs`가 그렇다. 그 가운데 `search_status`와 `purpose`는 빈 `issues`를 판정으로 써도 되는지를 가르는 값이므로, 집계본만 보고 넘어가면 조용한 통과가 생긴다.
 
 ## 구현 형태 (맥락 의존)
 - **제품 런타임**(`domain-llm-runtime`) — 결정론적 파이썬 함수로 구현한다. 모호한 상충 판정만 선택적으로 LLM을 쓴다.
