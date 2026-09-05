@@ -13,11 +13,11 @@
 2026-09-05에 사용자가 정했다.
 
 - 정본에 남는 기준은 "파일을 하나도 건드리지 않은 답 한 번으로도 어길 수 있으면 남는다"이다. 산출물이 있어야만 어길 수 있으면 스킬로 간다.
-- `domain-coding`은 코드 파일에 세션의 첫 `Write`나 `Edit`이 들어올 때 훅이 열라고 알린다. 스킬 설명문에만 맡기지 않는다.
+- `domain-coding`은 문서가 아닌 프로젝트 안 파일에 세션의 첫 `Write`나 `Edit`이 들어올 때, 편집 전에 훅이 열라고 알린다. 스킬 설명문에만 맡기지 않는다.
 - 정본에서 나가는 다섯 조항 `EXPLAIN-STRUCTURE`·`EXPLICIT`·`FOCUSED`·`IDEMPOTENT`·`SSOT`는 모두 `domain-coding`이 갖는다.
 - `domain-coding` 본문은 전부 영어다. 옮기는 다섯 조항은 한국어를 번역하지 않고, 같은 원칙을 말하는 널리 쓰이는 영어 정식 표현을 찾아 출처와 함께 쓴다.
 - 스킬마다 자기 문장을 갖는다. 카파시 원문 파일 하나를 여러 스킬이 공유하지 않는다.
-- 카파시의 문서용 문장 세 절은 `domain-docs`에 넣지 않고 새 스킬 `domain-writing`에 둔다. `domain-docs`는 지금 크기를 유지한다.
+- 카파시의 문서용 문장 세 절은 `domain-docs`에 넣지 않고 새 스킬 `domain-writing`에 둔다. `domain-docs`는 지금 크기를 유지한다. 새 문서 넛지와 수정 넛지의 알림 문장에 `domain-writing`을 함께 적는다.
 - 카파시 플러그인 설치 권유는 그대로 둔다.
 
 ## 기준을 적용한 배치
@@ -34,10 +34,11 @@
 | `EXPLAIN-STRUCTURE`·`EXPLICIT`·`FOCUSED`·`IDEMPOTENT`·`SSOT` | `domain-coding` | 코드가 있어야 어긴다 |
 | LOCAL-FIRST 관례 문단 | `domain-coding` | 코드 실행 환경의 관례다 |
 | 「문서와 상태의 위생」 첫 문단 | 삭제 | 상세가 이미 `domain-docs`의 「문서 타입과 수명」과 「시작점」에 있다 |
+| 「Karpathy 지침」의 Tradeoff 문장 | 삭제 | `domain-coding`의 Karpathy guidelines 절이 같은 문장을 갖는다 |
 
 ## 정본의 이후 모습
 
-절은 「원칙」·「Think Before Acting」·「검증」·「미해결의 처분」·「병렬 오케스트레이션」·「이 파일의 취급」 여섯이다. 「원칙」에는 조항 여덟이 남는다. 「Karpathy 지침」 겉 제목은 없애고 Think Before Acting이 바로 `##` 절이 된다. 그 절의 본문은 지금과 같고 넷째 불릿에 한 문장이 붙는다.
+절은 「원칙」·「Think Before Acting」·「검증」·「미해결의 처분」·「병렬 오케스트레이션」·「이 파일의 취급」 여섯이다. 「원칙」에는 조항 여덟이 남는다. 「Karpathy 지침」 겉 제목과 그 아래 Tradeoff 문장은 없애고 Think Before Acting이 바로 `##` 절이 된다. 그 절의 본문은 지금과 같고 넷째 불릿에 한 문장이 붙는다.
 
 ```
 - If a simpler approach exists, say so. Push back when warranted. Don't launch a fleet of subagents for what one call can do.
@@ -51,12 +52,12 @@
 
 ## domain-coding
 
-새 디렉터리 `skills/domain-coding/SKILL.md`이다. 설명문(frontmatter)은 다른 스킬처럼 한국어로 열리는 조건을 적고, 본문은 영어다. 아래가 본문 전문이다. 카파시 세 절은 플러그인 1.0.0의 원문 그대로이며 제목 번호만 뺀다. Goal-Driven Execution 끝의 "Never claim done" 문장은 정본의 `TDD`에서 온 것이다.
+새 디렉터리 `skills/domain-coding/SKILL.md`이다. 설명문(frontmatter)은 다른 스킬처럼 한국어로 열리는 조건을 적고, 본문은 영어다. 아래가 본문 전문이다. 카파시 세 절은 플러그인 1.0.0의 원문에서 제목 번호를 빼고 Goal-Driven Execution 끝에 한 문장을 더한 것이다. 그 문장 "Never claim done"은 지금 정본의 같은 절 끝에 있는 것으로, 앞서 뺀 `TDD` 조항에서 녹인 것이다. Simplicity First와 Surgical Changes는 원문과 글자까지 같다.
 
 ~~~markdown
 ---
 name: domain-coding
-description: 코드를 쓰거나 고칠 때의 규칙이다. 카파시(Andrej Karpathy) 코딩 지침의 코드용 세 절과, 정본에서 옮겨 온 다섯 원칙(한 가지 일·단일 출처·멱등성·명시성·변경 설명)과 로컬 우선 관례를 담는다. 코드 파일에 세션의 첫 Write나 Edit이 들어오면 훅이 이 스킬을 열라고 알린다. 코드를 구현하는 서브에이전트에도 이 파일 경로를 넘긴다.
+description: 코드를 쓰거나 고칠 때의 규칙이다. 카파시(Andrej Karpathy) 코딩 지침의 코드용 세 절과, 정본에서 옮겨 온 다섯 원칙(한 가지 일·단일 출처·멱등성·명시성·변경 설명)과 로컬 우선 관례를 담는다. 문서가 아닌 프로젝트 안 파일에 세션의 첫 Write나 Edit이 들어오면 편집 전에 훅이 이 스킬을 열라고 알린다. 코드를 구현하는 서브에이전트에도 이 파일 경로를 넘긴다.
 ---
 # domain-coding — rules for writing and changing code
 
@@ -173,7 +174,7 @@ Subagents do not receive this file automatically. When a subagent implements cod
 ~~~markdown
 ---
 name: domain-writing
-description: 문서를 새로 쓰거나 고칠 때 분량과 수정 범위와 완료 판정의 규칙이다. 카파시(Andrej Karpathy) 코딩 지침 세 절을 문서용으로 고친 것이다. 새 .md를 만들거나 고치면 훅이 이 스킬을 열라고 알린다. 문서의 타입과 수명과 검진은 domain-docs가, 한국어 문장 규칙은 writing-korean이 소유한다.
+description: 문서를 새로 쓰거나 고칠 때 분량과 수정 범위와 완료 판정의 규칙이다. 카파시(Andrej Karpathy) 코딩 지침 세 절을 문서용으로 고친 것이다. 프로젝트 안의 .md를 만들거나 고치면 훅이 이 스킬을 열라고 알린다. 훅이 건너뛰는 spec·plan과 리뷰 기록과 프로젝트 밖 문서에서는 이 설명문으로 연다. 문서의 타입과 수명과 검진은 domain-docs가, 한국어 문장 규칙은 writing-korean이 소유한다.
 ---
 # domain-writing — how much to write, how much to touch, when it is done
 
@@ -198,57 +199,64 @@ Touch only what the request needs. Clean up only your own mess.
 ## Goal-Driven Execution
 
 Define what the reader must be able to do after reading. Check the draft against that before calling the document done.
+
+## Reach
+
+Subagents do not receive this file automatically. When a subagent writes or edits a document, put this file's path in its prompt the way `domain-docs`'s 「렌즈에게 정본을 알리는 법」 prescribes for the canon.
 ~~~
 
 ## 훅
 
 ### 코드 넛지
 
-새 파일 `hooks/code_nudge_posttooluse.sh`를 `hooks/hooks.json`의 PostToolUse `Write|Edit` 목록 끝에 붙인다. 기존 넛지와 같은 헬퍼를 쓴다.
+새 파일 `hooks/code_nudge_pretooluse.sh`를 `hooks/hooks.json`의 PreToolUse `Write|Edit` 목록 끝에 붙인다. 편집 뒤가 아니라 편집 전에 알려야 규칙을 읽고 고칠 수 있다. 새 문서 넛지가 PreToolUse인 것과 같은 이유다. 기존 넛지와 같은 헬퍼 셋(`_extract_path.sh`·`_spec_marker.sh`·`_json_escape.sh`)을 쓰고, 세션 키 추출과 표시 파일 관리는 이 파일이 새로 갖는다.
 
 - `DISCIPLINED_CODER_REVIEW_GATE=off`이면 조용히 끝난다.
-- 경로는 `_extract_path.sh`로 뽑는다. `.md`는 건너뛰고, `path_in_project`가 아니면 건너뛴다. 남는 첫 경로가 대상이다.
-- 세션 키는 stdin JSON의 `session_id`다. 표시 파일은 `${TMPDIR:-/tmp}/disciplined-coder/code-nudge-<session_id>`이고, 있으면 조용히 끝나고 없으면 만든 뒤 알린다. `session_id`가 없으면 표시 파일 없이 매번 알린다. 조용히 빠지지 않는다.
-- 알림 문장은 하나다. `🧑‍💻 코드 파일(<basename>) 편집 시작 — disciplined-coder domain-coding을 열어 코드 규칙을 읽어라. 이 세션에 한 번만 알린다. 넛지일 뿐 차단은 아니다.`
-- 출력 형식은 `doc_review_posttooluse.sh`와 같은 `additionalContext`다.
+- 대상은 문서가 아닌 프로젝트 안 파일이다. 경로는 `_extract_path.sh`로 뽑고, `.md`와 `docs/superpowers/reviews/` 아래 파일(렌즈 원본 JSON이 놓인다)과 `path_in_project` 밖은 건너뛴다. 남는 첫 경로가 대상이다. `hooks.json` 같은 설정 파일도 대상이다. 그것을 고치는 것도 코딩이기 때문이다.
+- 세션 키는 stdin JSON의 `session_id`이고, `agent_id`가 있으면 둘을 잇는다. 둘 다 Claude Code 훅 문서(https://code.claude.com/docs/en/hooks)가 정한 공통 필드다. `session_id`는 모든 훅에 오고, `agent_id`는 서브에이전트 안의 훅 호출에만 온다. 그래서 서브에이전트는 부모의 표시 파일과 무관하게 자기 넛지를 한 번 받는다.
+- 표시 파일은 `${TMPDIR:-/tmp}/disciplined-coder/code-nudge-<키>`이고, 있으면 조용히 끝나고 없으면 만든 뒤 알린다. `session_id`가 없으면 계약이 깨진 것이므로 표시 파일 없이 알린다. 조용히 빠지지 않는다.
+- 알림 문장은 하나다. `🧑‍💻 문서가 아닌 파일(<basename>)을 고치려 한다 — 고치기 전에 disciplined-coder domain-coding을 열어 코드 규칙을 읽어라. 넛지일 뿐 차단은 아니다.` 한 번만 알린다는 말은 문장에 넣지 않는다. 계약이 깨진 갈래에서는 그 말이 거짓이 되기 때문이다.
+- 출력 형식은 `doc_format_pretooluse.sh`와 같은 `additionalContext`다.
 
-표시 파일은 임시 폴더에 쌓이고 지우지 않는다. 운영체제가 임시 폴더를 비운다.
+표시 파일은 임시 폴더에 쌓이고 지우지 않는다. 운영체제가 임시 폴더를 비운다. 테스트는 `TMPDIR`을 픽스처 폴더로 돌려 표시 파일을 격리한다. 그러지 않으면 스위트를 두 번째 돌릴 때 첫 편집 검사가 앞 실행의 표시 파일에 막힌다.
 
 ### 문서 넛지에 domain-writing을 덧붙인다
 
-새 훅은 두지 않는다. `doc_format_pretooluse.sh`의 새 문서 알림 문장 끝에 "분량은 domain-writing을 따른다"를 덧붙인다. `doc_review_posttooluse.sh`의 수정 알림 문장에도 "고칠 때는 domain-writing의 Surgical Changes대로 지적된 곳만 손댄다"를 덧붙인다. 둘째 덧붙임은 사용자 결정에 없던 것이다. Surgical Changes는 수정 때 걸리는 규칙이라 새 문서 알림만으로는 닿지 않아 더했다. 리뷰에서 빼라고 하면 뺀다.
+새 훅은 두지 않는다. `doc_format_pretooluse.sh`의 새 문서 알림 문장 끝에 "분량은 domain-writing을 따른다"를, `doc_review_posttooluse.sh`의 수정 알림 문장 끝에 "고칠 범위는 domain-writing을 따른다"를 덧붙인다. 스킬의 절 이름은 훅 문장에 적지 않는다. 그 훅이 주석으로 정한 대로 훅은 스킬을 가리키기만 하고 내용을 베끼지 않는다.
 
 ## 참조 고치기
 
 측정한 목록이다. `docs/superpowers/` 아래 기록은 그때의 사실이라 손대지 않는다.
 
-- `skills/domain-docs/SKILL.md` 29행의 "보편 원칙(Simplicity First·`SSOT`·`FOCUSED`·`READ-FLOW`)"에서 Simplicity First는 `domain-writing`의 절로, `SSOT`·`FOCUSED`는 `domain-coding`의 "Single source of truth"와 "Do one thing well"로 바꾼다. 63행의 `EXPLICIT`은 "Explicit is better than implicit"으로 바꾼다. 34행과 79행의 "(Simplicity First)"는 `domain-writing`의 절을 가리키므로 앞에 `domain-writing`을 붙인다.
+- `skills/domain-docs/SKILL.md` 29행의 "보편 원칙(Simplicity First·`SSOT`·`FOCUSED`·`READ-FLOW`)"에서 Simplicity First는 `domain-writing`의 절로, `SSOT`·`FOCUSED`는 `domain-coding`의 "Single source of truth"와 "Do one thing well"로 바꾼다. 63행의 `EXPLICIT`은 "Explicit is better than implicit"으로 바꾼다. 34행과 79행의 "(Simplicity First)"는 `domain-writing`의 절을 가리키므로 앞에 `domain-writing`을 붙인다. 21행 문서 SSOT 항목 끝의 "(`SSOT`)"는 "(`domain-coding`의 Single source of truth)"로 바꾼다. 45행 「문서 타입과 수명」의 첫 문장 "`agent-principles.md`의 「문서와 상태의 위생」 절의 상세는 여기가 소유한다"는 "문서의 상태 위생은 여기가 소유한다"로 바꾼다. 정본에 그 절이 더 없기 때문이다.
 - `skills/domain-plugin/SKILL.md` 23행의 "(Simplicity First)"는 `domain-coding`의 절을 가리키므로 앞에 `domain-coding`을 붙인다.
 - `skills/domain-spec-review/SKILL.md` 116행의 "(Surgical Changes)"는 spec을 고치는 자리라 앞에 `domain-writing`을 붙인다.
 - `skills/lens-adversarial/SKILL.md` 11행의 "(Simplicity First·YAGNI 위반)"은 그대로 둔다. 과설계 판정은 코드와 문서 둘 다에 걸린다.
-- `skills/nested-orchestration/SKILL.md` 28행의 방식 항목에 "구현자 프롬프트에는 `domain-coding`의 경로도 넣는다" 한 문장을 더한다.
+- `skills/nested-orchestration/SKILL.md` 28행의 방식 항목에 "구현자 프롬프트에는 `domain-coding`의 경로를, 문서를 쓰는 서브에이전트에는 `domain-writing`의 경로를 넣는다" 한 문장을 더한다.
 - `CLAUDE.md` 11행의 "(`SSOT`)"는 "(Single source of truth)"로 바꾼다.
-- `README.md`의 「하드 게이트와 넛지와 전역 설정 수정」에서 "넛지 셋"을 "넛지 넷"으로 바꾸고 코드 넛지 항목을 더하며, 새 문서 넛지 항목에 `domain-writing`을 함께 적는다. 「프로젝트 폴더에 생기는 파일」에 정본은 대화 규칙만 갖고 코딩 규칙은 `domain-coding`에, 문서 분량 규칙은 `domain-writing`에 있다는 한 문장을 더한다. 카파시 설치 권유 항목의 마지막 문장은 "정본의 「Think Before Acting」 절과 `domain-coding`·`domain-writing`의 카파시 절은 그 플러그인의 네 절을 옮긴 것이고, 겹치던 조항은 정본에서 뺐다"로 바꾼다.
+- `README.md`의 「하드 게이트와 넛지와 전역 설정 수정」에서 "넛지 셋"을 "넛지 넷"으로, 같은 문단의 "넷 다 꺼지고"를 "다섯 다 꺼지고"로 바꾸고 코드 넛지 항목을 더하며, 새 문서 넛지 항목에 `domain-writing`을 함께 적는다. 「프로젝트 폴더에 생기는 파일」에 정본은 대화 규칙만 갖고 코딩 규칙은 `domain-coding`에, 문서 분량 규칙은 `domain-writing`에 있다는 한 문장을 더한다. 카파시 설치 권유 항목의 마지막 문장은 "정본의 「Think Before Acting」 절과 `domain-coding`·`domain-writing`의 카파시 절은 그 플러그인의 네 절을 옮긴 것이고, 겹치던 조항은 정본에서 뺐다"로 바꾼다.
 - `scripts/scaffold.sh`의 카파시 넛지 주석 한 줄도 README와 같은 뜻으로 맞춘다.
 
 `SSOT`라는 낱말을 개념 이름으로 쓰는 스크립트 주석과 스킬 제목은 조항 참조가 아니므로 그대로 둔다. 검사는 백틱으로 감싼 조항 ID 형태만 본다.
 
 ## 테스트
 
-`scripts/test_hooks.sh`에 코드 넛지 여섯 경우를 더한다. 프로젝트 안 코드 파일 첫 편집에 `domain-coding`을 담은 알림이 나온다. 같은 `session_id`의 둘째 편집은 빈 출력이다. `.md`는 빈 출력이다. 프로젝트 밖 경로는 빈 출력이다. `DISCIPLINED_CODER_REVIEW_GATE=off`는 빈 출력이다. `session_id`가 없으면 매번 알린다. 문서 넛지 둘의 기존 검사에는 알림 문장이 `domain-writing`을 담는지를 하나씩 더한다.
+`scripts/test_hooks.sh`에 코드 넛지 여덟 경우를 더한다. `TMPDIR`을 픽스처 폴더로 둔 채 본다. 프로젝트 안 비문서 파일의 첫 편집에 `domain-coding`을 담은 알림이 나온다. 같은 키의 둘째 편집은 빈 출력이다. 같은 `session_id`에 다른 `agent_id`는 다시 알린다. `.md`는 빈 출력이다. `docs/superpowers/reviews/` 아래 `.json`은 빈 출력이다. 프로젝트 밖 경로는 빈 출력이다. `DISCIPLINED_CODER_REVIEW_GATE=off`는 빈 출력이다. `session_id`가 없으면 매번 알린다. 문서 넛지 둘의 기존 검사에는 알림 문장이 `domain-writing`을 담는지를 하나씩 더한다.
 
-`scripts/test_scaffold.sh`의 canon-sections 목록을 여섯 절로 맞춘다. karpathy-in-canon 검사는 karpathy-split으로 바꾼다. 정본에는 `## Think Before Acting`이 있고 `### Simplicity First`·`### Surgical Changes`·`### Goal-Driven Execution`은 없다. `domain-coding`에는 그 셋과 원칙 제목 다섯이 있다. `domain-writing`에는 `## ` 절 셋이 있다. 옛 조항 ID 열(먼저 뺀 다섯과 이번 다섯)이 정본에 `**`ID`` 형태로 없고, `skills`·`README.md`·`CLAUDE.md`·`scripts/scaffold.sh`에 백틱 형태로 없다. 정본의 넷째 불릿에 서브에이전트 문장이 있다. 「검증」 절에 "사실과 판단은 다르다"가 있다.
+`scripts/test_scaffold.sh`의 canon-sections 목록을 여섯 절로 맞춘다. karpathy-in-canon 검사는 karpathy-split으로 바꾼다. 정본에는 `## Think Before Acting`이 있고 `### Simplicity First`·`### Surgical Changes`·`### Goal-Driven Execution`은 없다. `domain-coding`에는 그 셋과 원칙 제목 다섯이 있다. `domain-writing`에는 카파시 절 셋과 「Reach」가 있다. 옛 조항 ID 열(먼저 뺀 다섯과 이번 다섯)이 정본에 `**`ID`` 형태로 없고, `skills`·`README.md`·`CLAUDE.md`·`scripts/scaffold.sh`에 백틱 형태로 없다. 정본의 넷째 불릿에 서브에이전트 문장이 있다. 「검증」 절에 "사실과 판단은 다르다"가 있다.
 
-`scripts/test_docs_drift.sh`는 `domain-coding`의 「Reach」 절이 「렌즈에게 정본을 알리는 법」의 첫 항목 문장을 베끼지 않았는지 기존 검사로 잡는다. 새 검사는 두지 않는다.
+`scripts/test_docs_drift.sh`의 베끼기 검사는 한국어 문장 하나를 앵커로 쓰므로 영어 「Reach」 절에는 발화하지 않는다. 대신 두 스킬의 「Reach」 절이 「렌즈에게 정본을 알리는 법」을 이름으로 가리키는지를 보는 검사를 하나 더한다.
 
 ## 하지 않는 것
 
 - 카파시 플러그인 설치 권유를 빼지 않는다.
 - 정본의 한국어 조항 여덟을 영어로 옮기지 않는다.
-- `domain-docs`의 기존 절을 다시 쓰지 않는다. 참조 네 곳만 고친다.
+- `domain-docs`의 기존 절을 다시 쓰지 않는다. 참조 여섯 곳만 고친다.
 - 코드 넛지를 차단으로 만들지 않는다.
 - `docs/superpowers/` 아래 옛 spec과 리뷰 기록의 조항 이름을 고치지 않는다.
 
 ## 되돌리기
 
-커밋 단위로 되돌린다. 정본 변경과 두 스킬 생성과 참조 수정을 한 커밋에, 훅과 그 테스트를 다른 커밋에 둔다. 앞 커밋만 되돌리면 정본은 `b24fdfa` 상태로 돌아가고, 뒤 커밋만 되돌리면 넛지 없이 스킬 설명문으로만 열리는 상태가 된다.
+커밋 단위로 되돌린다. 정본 변경과 두 스킬 생성과 참조 수정을 한 커밋에, 훅과 그 테스트를 다른 커밋에 둔다. 되돌리는 순서는 뒤 커밋이 먼저다. 뒤 커밋만 되돌리면 넛지 없이 스킬 설명문으로만 열리는 상태가 되고, 둘 다 되돌리면 `b24fdfa`로 돌아간다. 앞 커밋만 되돌리면 훅이 없는 스킬을 가리키므로 그렇게 하지 않는다.
+
+<!-- spec-review: passed -->
