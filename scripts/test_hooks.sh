@@ -133,6 +133,37 @@ check "상대경로(현재 폴더 기준) 읽기 전용 → deny" "( cd '$RO' &&
 check "게이트 OFF 여도 거부한다"               "DISCIPLINED_CODER_REVIEW_GATE=off rpre '$(J "$RO/sealed.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
 check "README 가 이 훅을 적는다"               "grep -qF '읽기 전용 차단' '$HERE/README.md'"
 
+echo "[code-nudge-pre — 문서가 아닌 파일의 세션 첫 편집 전에 domain-coding을 열라고 한 번 알린다]"
+# 표시 파일은 TMPDIR 아래에 남으므로 픽스처 폴더로 돌린다 — 안 그러면 스위트를 두 번째 돌릴 때 앞 실행의
+# 표시 파일이 남아 "첫 편집" 검사가 조용히 깨진다(IDEMPOTENT).
+CNUD="$HERE/hooks/code_nudge_pretooluse.sh"
+mkdir -p "$T/tmp"
+cnud() { printf '%s' "$1" | TMPDIR="$T/tmp" bash "$CNUD"; }
+JS() { printf '{"session_id":"%s"%s,"tool_input":{"file_path":"%s"}}' "$1" "$2" "$3"; }
+check "훅 파일이 있다"                              "[ -f '$CNUD' ]"
+check "첫 코드 편집 → domain-coding 안내"           "cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'domain-coding'"
+check "안내가 유효한 JSON"                          "cnud '$(JS s1b "" "$T/src/main.py")' | json_valid_stdin"
+check "안내는 PreToolUse 이벤트를 말한다"            "cnud '$(JS s1c "" "$T/src/main.py")' | grep -qF '\"hookEventName\":\"PreToolUse\"'"
+check "같은 키 둘째 편집 → 무출력"                  "[ -z \"\$(cnud '$(JS s1 "" "$T/src/other.py")')\" ]"
+check "같은 세션 다른 agent_id → 다시 안내"         "cnud '$(JS s1 ',"agent_id":"a1"' "$T/src/main.py")' | grep -qF 'domain-coding'"
+check "문서(.md) → 무출력"                          "[ -z \"\$(cnud '$(JS s2 "" "$T/existing.md")')\" ]"
+check "리뷰 기록 JSON → 무출력"                     "[ -z \"\$(cnud '$(JS s3 "" "$T/docs/superpowers/reviews/x-review/lens-grounding-1.json")')\" ]"
+check "프로젝트 밖 → 무출력"                        "[ -z \"\$(cnud '$(JS s4 "" "$OUTSIDE/tool.py")')\" ]"
+check "OFF → 무출력"                                "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off cnud '$(JS s5 "" "$T/src/main.py")')\" ]"
+check "session_id 없음 → 매번 안내"                 "cnud '$(J "$T/src/main.py")' | grep -qF 'domain-coding' && cnud '$(J "$T/src/main.py")' | grep -qF 'domain-coding'"
+check "설정 파일(.json)도 대상"                     "cnud '$(JS s6 "" "$T/hooks.json")' | grep -qF 'domain-coding'"
+
+echo "[code-nudge-sessionstart — 세션이 시작·재개·비워지면 그 세션의 표시를 지운다]"
+# 표시 파일은 "이 맥락에서 이미 알렸다"를 뜻한다. 재개한 세션이 같은 session_id 를 다시 받는지는 훅 문서가
+# 정하지 않는데, 이 훅이 있으면 어느 쪽이든 맞는다 — 아이디가 새로 나면 없는 파일을 지우는 무해한 동작이고,
+# 재사용되면 넛지가 제대로 다시 걸린다. 쌓인 표시 파일을 치우는 유일한 걸음이기도 하다.
+CSTA="$HERE/hooks/code_nudge_sessionstart.sh"
+csta() { printf '%s' "$1" | TMPDIR="$T/tmp" bash "$CSTA"; }
+JSS() { printf '{"session_id":"%s","hook_event_name":"SessionStart","source":"resume"}' "$1"; }
+check "세션 시작 훅 파일이 있다"                    "[ -f '$CSTA' ]"
+check "세션 시작은 아무것도 안 낸다"                "[ -z \"\$(csta '$(JSS s9)')\" ]"
+check "세션 시작이 표시를 지워 다시 알린다"         "csta '$(JSS s1)' && cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'domain-coding'"
+
 echo "[doc-format-pre]"
 printf 'x\n' > "$T/existing.md"
 check "새 문서(.md) → 양식 제안"         "fpre '$(J "$T/newdoc.md")' | grep -q additionalContext"
