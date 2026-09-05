@@ -12,8 +12,14 @@ while [ "$#" -gt 0 ]; do
     *) files+=("$1"); shift ;;
   esac
 done
+# mapfile 은 bash 4 부터라 mac 의 기본 bash 3.2 에서 조용히 빈 배열을 만든다. 봉인이 안 걸린 채
+# 통과하면 기록이 열려 있는데 아무도 모른다. while read 로 바꿔 어느 bash 에서나 같게 돈다.
+# 반복문 본문의 마지막 명령이 조건 결합이면 값이 빌 때 상태 1 로 끝나 set -e 아래에서 죽으므로
+# if 로 감싼다.
 if [ "${#files[@]}" -eq 0 ]; then
-  mapfile -t files < <(cd "$ROOT" && git ls-tree -r --name-only HEAD -- docs/superpowers/reviews 2>/dev/null | sed "s|^|$ROOT/|")
+  while IFS= read -r rel; do
+    if [ -n "$rel" ]; then files+=("$ROOT/$rel"); fi
+  done < <(cd "$ROOT" && git ls-tree -r --name-only HEAD -- docs/superpowers/reviews 2>/dev/null)
 fi
 n=0
 for f in "${files[@]}"; do

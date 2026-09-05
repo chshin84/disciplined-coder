@@ -13,7 +13,7 @@
 
 ## 동작 확인과 복구
 
-새 세션을 한 번 열면 셋업이 끝난다. `/show-principles`로 원칙 목록이 나오면 정상이다.
+새 세션을 한 번 열면 셋업이 끝난다. 세션 시작 알림에 `ERROR` 나 `WARNING` 줄이 없으면 정상이다. 정상 회차에도 정본 전문과 자동 갱신 알림과 설치 권유가 stdout 으로 나가므로, '출력이 없으면 정상'이 아니라 '오류 줄이 없으면 정상'이다. 확인은 `/show-principles` 로 하고 원칙 목록이 나오면 된다.
 
 목록이 안 나오면 원인은 셋 가운데 하나다.
 
@@ -39,11 +39,25 @@ done
 
 새로 생기는 파일은 없다. 원칙은 `agent-principles.md` 한 곳에 둔다. SessionStart hook이 원칙을 `~/.claude/disciplined-coder/`에 셋업하고, `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다.
 
-이 플러그인이 프로젝트 파일을 고치는 예외는 하나이고 그 조건은 여기가 정한다. 그 레포 `CLAUDE.md`에 관리블록이 남아 있고 그 블록을 만든 기능이 없어졌으면, 사본을 전역 백업에 복사한 뒤 제거한다. 그때의 잠금 대기 시간은 `scripts/_managed_block.sh`의 상수가 정한다.
+이 플러그인이 프로젝트 파일을 고치는 예외는 하나이고 그 조건은 여기가 정한다. 그 레포 `CLAUDE.md`에 관리블록이 남아 있고 그 블록을 만든 기능이 없어졌으면, 사본을 전역 백업에 복사한 뒤 제거한다. 조건이 하나 더 붙는다. 그 파일이 전역 `~/.claude/CLAUDE.md`와 같은 파일이면 건드리지 않는다 — 그것은 이 훅이 매 세션 다시 만드는 정상 블록이다. 같은 파일인지는 경로 문자열이 아니라 `-ef`로 본다. 작업 폴더가 `~/.claude`이면 윈도우 형식 경로와 POSIX 형식 경로가 같은 파일을 가리키는데 문자열로 견주면 다른 파일로 보인다. 그때의 잠금 대기 시간은 `scripts/_managed_block.sh`의 상수가 정한다.
 
 ## 하드 게이트와 넛지와 전역 설정 수정
 
 세션에는 턴 종료를 막는 하드 게이트 하나와 읽기 전용 파일 수정을 막는 차단 하나와 넛지 셋과 전역 설정 수정 하나가 걸리고, 세션 시작에 설치 권유 하나가 뜬다. 게이트와 넛지는 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 넷 다 꺼지고, 읽기 전용 차단과 설치 권유는 그 변수와 무관하며, 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
+
+배선은 둘이다. `hooks/hooks.json`은 이 플러그인이 어디서나 거는 훅이고, `.claude/settings.json`은 이 저장소에서만 도는 프로젝트 훅이다. 걸린 것은 아래가 전부다.
+
+| 이벤트 | 스크립트 | 하는 일 |
+|---|---|---|
+| SessionStart | `scripts/scaffold.sh` | 정본 사본과 `@import` 배선을 만들고 알린다 |
+| SessionStart | `scripts/seal_reviews.sh` | 커밋된 감사 기록을 읽기 전용으로 봉인한다(이 저장소의 프로젝트 훅) |
+| PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 걸린 Write 와 Edit 을 사유와 함께 거부한다 |
+| PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md` 에 문서 양식 넛지를 띄운다 |
+| PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan 을 감지해 리뷰를 지시한다 |
+| PostToolUse | `hooks/doc_review_posttooluse.sh` | 고친 문서에 검진 넛지를 띄운다 |
+| Stop | `hooks/spec_review_stop.sh` | 미리뷰 spec·plan 이 남은 채 턴이 끝나는 것을 막는다 |
+
+봉인 시점은 둘이다. 커밋된 기록은 세션 시작에 `seal_reviews.sh` 가 봉인하고, 회차 기록은 회차 끝에 호출자가 같은 스크립트를 파일 인자와 함께 불러 봉인한다.
 
 - **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고 `domain-spec-review` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 종료 차단이 해제된다. 차단은 턴에 한 번이다. 두 번째 종료 시도는 통과하므로 리뷰를 하지 않고도 턴을 끝낼 수 있다. 상세는 `skills/domain-spec-review/SKILL.md`를 참고한다.
 - **읽기 전용 차단** — 읽기 전용 속성이 선 파일에 `Write`나 `Edit`을 하려 하면 거부하고 사유를 보인다. 어느 프로젝트의 어느 파일이든 속성만 보며, 이 레포의 감사 기록은 만든 직후 `scripts/seal_reviews.sh`가 그 속성을 세운다. 풀려면 속성을 풀면 된다.
@@ -54,7 +68,7 @@ done
 ## 주의
 
 - **CLAUDE.md의 한계** — CLAUDE.md는 가이드이지 강제가 아니다. 파일 수정을 실제로 막으려면 `PreToolUse` hook을 설정한다.
-- **서브에이전트와 원칙** — 서브에이전트에 원칙이 실린다고 믿지 않는다. 렌즈에는 원칙 파일의 경로를 넣는다. 어느 경로인지는 `skills/domain-docs/SKILL.md`가 정한다.
+- **서브에이전트와 원칙** — 서브에이전트에 원칙이 실린다고 믿지 않는다. 렌즈에는 원칙 파일의 경로를 넣는다. 어느 경로인지는 `skills/dispatching-lenses/SKILL.md`가 정한다.
 - **병렬 오케스트레이션의 전제** — superpowers 플러그인이 함께 필요하다.
 
 ## 더 읽기

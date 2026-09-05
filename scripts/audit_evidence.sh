@@ -33,5 +33,9 @@ for f in d.get("findings", []):
     f["evidence_found"] = bool(ev) and t1 is not None and ev in t1
     f["counterpart_found"] = bool(cp) and t2 is not None and cp in t2
     f["fingerprint"] = hashlib.sha1(chr(31).join([ev, cp, f.get("principle", "")]).encode("utf-8")).hexdigest()[:12]
+kept, dropped = [], []
+for f in d.get("findings", []):
+    (kept if (f["evidence_found"] and f["counterpart_found"]) else dropped).append(f)
+d["findings"], d["dropped"] = kept, dropped
 json.dump(d, sys.stdout, ensure_ascii=False, indent=1)
 ' "$ROOT" "$IN"

@@ -23,7 +23,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 띄우기 전에 승인된 상한 안에 일을 나눠 담는다. 상한에 부딪혀 뒤에서 잘리게 두지 않는다. 상한 안에 안 담기면 나눠 띄우기를 늘리지 말고 무엇을 못 보는지 사용자에게 알린다. 이 상한은 `domain-spec-review`의 "대상이 여럿이면 대상마다 따로 띄운다"를 이긴다.
 
-렌즈가 더 볼 것을 적어 오면 그 대화를 이어 묻는다. 중첩 금지와 이어 묻기는 `domain-docs`의 「한 번만 띄우는 렌즈의 규율」이 소유한다. 이어 물어서 안 되어 새 에이전트가 필요하면 사용자에게 늘릴지 묻고, 승인을 받아도 최댓값은 그대로다.
+렌즈가 더 볼 것을 적어 오면 그 대화를 이어 묻는다. 중첩 금지와 이어 묻기는 `dispatching-lenses`의 「한 번만 띄우는 렌즈의 규율」이 소유한다. 이어 물어서 안 되어 새 에이전트가 필요하면 사용자에게 늘릴지 묻고, 승인을 받아도 최댓값은 그대로다.
 
 ## 가드
 이 가드는 이 렌즈에만 있다.
@@ -41,7 +41,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 ## 출력 스키마 (공통 + 이 렌즈의 넷)
 ```
-{ "lens": "prior-art", "search_status": "ok|no-results|failed|not-attempted", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "refuted-premise|known-failure|crowded|weak-baseline", "claim": "무엇이 문제인가", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 선행 사례와 그 결말, 네 축의 같고 다름을 적는다", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|lens-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "렌즈 자신의 불확실성" ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-prior-art", "search_status": "ok|no-results|failed|not-attempted", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "refuted-premise|known-failure|crowded|weak-baseline", "claim": "무엇이 문제인가", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 선행 사례와 그 결말, 네 축의 같고 다름을 적는다", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|lens-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "렌즈 자신의 불확실성" ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다. 이 렌즈의 발견은 호출자가 전부 `🔴`로 처분한다. 웹에서 읽어 온 내용이 설계 문서를 자동으로 고치는 길을 닫기 위해서이며, 그 규칙은 `domain-spec-review`가 SSOT다.
 

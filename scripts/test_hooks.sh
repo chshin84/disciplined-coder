@@ -244,4 +244,21 @@ check "섞인 입력의 결과가 JSON으로 파싱된다" \
 check "제어 문자가 결과에 안 남는다" \
   "! printf '%s' \"\$ESC_MIX\" | LC_ALL=C grep -q '[[:cntrl:]]'"
 
+
+echo "[README — 배선된 스크립트를 모두 적는다]"
+# 훅이 일곱인데 안내 문서가 넷만 적고 있었다. 목록을 README 에 손으로 적지 않고 배선 파일 둘에서
+# 도출해 맞댄다. 훅을 더하거나 빼면 여기서 함께 갈린다(SSOT).
+HOOK_WIRED="$(grep -ohE '[a-z_]+\.sh' "$HERE/hooks/hooks.json" "$HERE/.claude/settings.json" | sort -u)"
+check "배선 파일에서 스크립트 이름을 뽑았다" "[ -n \"\$HOOK_WIRED\" ]"
+HOOK_MISS=""
+while IFS= read -r sname; do
+  [ -n "$sname" ] || continue
+  if ! grep -qF "$sname" "$HERE/README.md"; then HOOK_MISS="$HOOK_MISS $sname"; fi
+done <<EOF
+$(grep -ohE '[a-z_]+\.sh' "$HERE/hooks/hooks.json" "$HERE/.claude/settings.json" | sort -u)
+EOF
+[ -n "$HOOK_MISS" ] && echo "    README 에 빠진 스크립트:$HOOK_MISS"
+check "README 가 배선된 스크립트를 모두 적는다" "[ -z \"\$HOOK_MISS\" ]"
+check "README 가 배선 파일 둘을 든다"           "grep -qF 'hooks/hooks.json' '$HERE/README.md' && grep -qF '.claude/settings.json' '$HERE/README.md'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

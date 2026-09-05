@@ -1,0 +1,116 @@
+{
+ "lens": "lens-consistency",
+ "target": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+ "read": [
+  "agent-principles.md",
+  "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/project-doc-audit/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_audit.sh",
+  "scripts/test_scaffold.sh",
+  "scripts/test_hooks.sh"
+ ],
+ "issues": [
+  {
+   "where": "3. 스크립트와 기록 계약 — audit_evidence.sh 대 1. 소유자 셋 — meta-aggregate 예외 둘",
+   "type": "contradiction",
+   "claim": "1절은 lens-prior-art 발견에 `principle` 칸이 없다고 정하고 3절은 그 칸으로 지문을 만들라고 한다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "예외 렌즈(lens-prior-art)의 발견은 `counterpart`가 없으므로 `evidence`만 확인하고 지문도 `evidence`와 `principle`로만 만든다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "lens-prior-art는 `file`·`counterpart_file`·`counterpart`·`principle`이 없고 `evidence`는 인용·경로·URL이다.",
+   "principle": "EXPLICIT",
+   "consequence": "audit_evidence.sh가 lens-prior-art 발견의 지문을 `evidence` 하나로 만드는지 없는 `principle` 칸을 빈 문자열로 이어 만드는지가 spec 안에서 두 가지로 읽히고, 4절의 test_audit.sh 픽스처는 어느 쪽을 단언할지 정할 수 없다."
+  },
+  {
+   "where": "성공 기준 둘째 대 1. 소유자 셋 — domain-docs",
+   "type": "contradiction",
+   "claim": "성공 기준은 렌즈·검진 낱말이 「문서 검진 방법」의 언제 여는지 문단에만 남는다고 하는데, 1절은 「글 유형별 적용」의 외부 공개 문서 행에 렌즈 셋을 적으라 하고 기록 문단과 「시작점」도 domain-docs에 남긴다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "렌즈·검진 낱말은 「문서 검진 방법」의 언제 여는지 문단에만 남는다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "외부 공개 문서의 렌즈를 「문서 검진 방법」과 같게 셋으로 맞춘다.",
+   "principle": "EXPLICIT",
+   "consequence": "1절대로 고친 domain-docs는 「글 유형별 적용」(lens-grounding·lens-fit·lens-readability), 「시작점」 6번(검진), 문서 타입 표 기록 행(렌즈 회차·렌즈별 원본), 기록 문단(렌즈별 원본 이름)에 렌즈·검진 낱말을 담으므로 이 성공 기준은 1절을 다 이행해도 거짓이다."
+  },
+  {
+   "where": "성공 기준 둘째 대 1. 소유자 셋 — dispatching-lenses 스킬",
+   "type": "contradiction",
+   "claim": "70줄 아래라는 수치는 1절이 옮긴다고 적은 것만으로는 닿지 않는다. 옮기는 줄이 24이고 남는 줄이 74이며 1절은 문장을 더하기도 한다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "domain-docs의 비어 있지 않은 줄이 98에서 70 아래로 줄고",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "언제 여는지를 적은 문단은 domain-docs에 남는다.",
+   "principle": "MEASURE-FIRST",
+   "consequence": "옮기는 것은 절 셋(빈 줄 제외 19줄)과 「문서 검진 방법」 17줄 가운데 띄우는 방법을 적은 다섯 줄이라 98에서 74가 남고, 1절이 더하는 검진 조건 문장·설계 행 문장·빈 셀 채움·기록 문단 재작성은 줄을 줄이지 않으므로 성공 기준의 70은 1절의 변경 목록에서 도출되지 않는 수치다."
+  },
+  {
+   "where": "3. 스크립트와 기록 계약 — 기록 계약 findings.json 대 2. 따르는 문서 — project-doc-audit",
+   "type": "gap",
+   "claim": "산출물 공백이 아니라 커버리지 공백이다. '검수에서 실패한다'의 검수를 실제 기록에 돌리는 걸음과 주체가 없고, 유일하게 이름 붙은 검사는 픽스처만 본다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "기각과 미판정은 사유가 없으면 검수에서 실패한다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "「판정」 절 마지막 문장은 검사 범위를 \"픽스처로 형태를 검사한다\"로 줄인다.",
+   "principle": "FAIL-LOUD",
+   "consequence": "3절의 검수와 4절의 형태 검사와 2절의 픽스처 검사가 같은 test_audit.sh를 가리키는데 그 검사는 자기 픽스처만 열고, 실제 회차의 findings.json에 사유 누락 검사를 돌리는 걸음은 1~5절 어디에도 없어 기각·미판정의 사유 필수는 실제 기록에서는 아무 검사에도 걸리지 않는다."
+  },
+  {
+   "where": "4. 검사 — 여섯째 단언 대 5. 훅 목록",
+   "type": "gap",
+   "claim": "4절 단언은 README에 배선된 스크립트 파일 이름 전부를 요구하는데 5절은 README에 배선 파일 이름과 이벤트 이름만 적으라 한다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "README 「하드 게이트와 넛지와 전역 설정 수정」이 `hooks/hooks.json`과 `.claude/settings.json`에 배선된 스크립트 파일 이름 전부를 담는다. 목록은 두 파일에서 도출한다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "README의 훅 절은 배선 파일 둘을 모두 적고 훅마다 이벤트 이름(SessionStart·PreToolUse·PostToolUse·Stop)을 붙인다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 README 그 절에 나오는 스크립트 이름은 seal_reviews.sh 하나이고 배선된 이름은 일곱(scaffold.sh·readonly_pretooluse.sh·doc_format_pretooluse.sh·spec_review_posttooluse.sh·doc_review_posttooluse.sh·spec_review_stop.sh·seal_reviews.sh)인데, 5절의 변경으로는 그 일곱이 README에 들어가지 않아 4절 단언이 초록이 될 길이 spec에 없다."
+  },
+  {
+   "where": "순서와 되돌리기 대 4. 검사",
+   "type": "contradiction",
+   "claim": "단계마다 FAIL=0을 요구하고 단계 사이에 파일을 섞지 말라 하는데, 1단계의 domain-docs 변경이 4단계에서만 고치는 검사 파일의 앵커를 깬다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "각 단계 끝에 계약 테스트 다섯과 `claude plugin validate ./`를 돌린다. 단계 커밋은 그 단계만 되돌릴 수 있게 다른 단계의 파일을 섞지 않는다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "`scripts/test_docs_drift.sh`에 단언 일곱을 더한다.",
+   "principle": "REVERSIBLE",
+   "consequence": "1단계에서 domain-docs의 절 넷을 옮기면 test_docs_drift.sh·test_audit.sh·test_hooks.sh·test_scaffold.sh의 domain-docs 앵커 단언이 빨간 불이 되는데 검사 파일은 4단계 파일이라, 1~3단계 커밋은 FAIL=0을 채우지 못하거나 검사 파일을 섞어야 하며 두 요구를 동시에 지킬 순서가 spec에 없다."
+  },
+  {
+   "where": "3. 스크립트와 기록 계약 — audit_statements.sh",
+   "type": "gap",
+   "claim": "산출물 공백이다. 새 스크립트의 출력 형태(JSON인지 표인지, 칸 이름)가 정해져 있지 않다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "입력은 렌즈 원본 JSON 여럿이고 출력은 이름표마다 진술한 문서와 진술 목록이다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "`audit_statements.sh`가 같은 이름표의 다른 문서 진술을 나열한다.",
+   "principle": "EXPLICIT",
+   "consequence": "같은 절의 diff.json은 칸 여섯과 최상위 셋을 이름으로 정하는데 audit_statements.sh는 형태와 칸 이름이 없어, 4절 픽스처가 무엇을 단언할지와 세션이 어느 칸을 읽어 갈리는 짝을 고를지가 plan 단계로 미뤄진다."
+  },
+  {
+   "where": "순서와 되돌리기 — 단계 넷",
+   "type": "scope",
+   "claim": "5절의 일 셋(세션 시작 알림 통로, 훅 목록, writing-korean)은 1~4절과 파일을 공유하지 않는 독립된 일인데 한 spec·한 plan·한 커밋열에 묶여 있다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "단계는 넷이고 단계마다 커밋 하나다. 소유자 셋(1절), 따르는 문서(2절), 스크립트와 기록 계약(3절), 검사와 통로(4·5절)다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "서로 독립된 일이 둘 이상이고 각 일이 계획과 구현과 리뷰를 한 바퀴씩 가질 만큼 크면, 한 세션에서 차례로 하지 말고 일마다 서브오케스트레이터를 두어 동시에 돌린다.",
+   "principle": "FOCUSED",
+   "consequence": "scaffold.sh·_ensure_autoupdate.sh·commands 둘·README 「동작 확인과 복구」·writing-korean은 렌즈 규율 이동(1·2절)과 감사 스크립트(3절)와 고치는 파일이 하나도 겹치지 않는데 4단계 커밋 하나에 검사와 함께 들어가, 5절만 되돌리려면 4절의 검사 변경까지 함께 되돌려야 한다."
+  }
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "REVERSIBLE",
+  "FOCUSED",
+  "SSOT",
+  "PLAIN-KO",
+  "PROSE-FORM"
+ ],
+ "notes": "훑은 각도는 모순·커버리지 공백·산출물 공백·드리프트·스코프 다섯이다. 드리프트로 올릴 것은 없었다. '검수'·'형태 검사'·'픽스처 검사'가 같은 test_audit.sh를 가리키는 것은 위 gap 발견에 담았다. 결정 일곱 가운데 spec 본문에 반영되지 않은 것은 없다. (1)은 domain-docs 설계 행과 project-doc-audit 제외 사유에, (2)는 domain-docs 검진 조건과 CLAUDE.md '새로 쓰면'에, (3)은 「메모리의 범위」 문장 삭제에, (4)는 dispatching-lenses 이름 표준과 meta-aggregate 열거에, (5)는 audit_rounds.sh diff의 auto_rejected에, (6)은 3절 스크립트 넷과 대조 대상 재정의에, (7)은 1절 dispatching-lenses에 있다. 산출물은 새 스킬 파일 경로, 스크립트 이름과 인자, 기록 파일 넷의 칸까지 대체로 정해져 있고 audit_statements.sh 출력만 비어 있다. 줄 수는 grep -c -v '^[[:space:]]*$' 로 셌고 절 경계는 '## ' 제목으로 갈랐다."
+}

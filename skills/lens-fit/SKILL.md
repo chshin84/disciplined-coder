@@ -23,17 +23,13 @@ description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일
 - user: "[출력 계약]\n{contract}\n\n[후보]\n{candidate}\n\n위반을 아래 JSON 스키마로 출력하라."
 
 ## 발견의 문턱
-발견 하나는 넷을 진다. 짚은 곳(파일과 그 파일의 문장), 상대편(어긋나는 실제 코드나 파일이나 다른 문서의 문장), 원칙(어느 규칙에 걸리는지), 결과다. **상대편을 못 대면 발견이 아니다.** 짚기만 하고 맞댈 것이 없으면 올리지 않는다.
-
-결과 칸에는 **지금 무엇이 그렇게 되어 있는지**를 적는다. 앞으로 벌어질 일을 적지 않는다. 벌어질 법한 일을 적는 칸이 있으면 그 칸이 추정을 부른다.
-
-출력에 `counterpart_file`과 `counterpart`를 담는다. 앞은 상대편이 있는 파일의 레포 상대경로이고 뒤는 그 파일에 있는 그대로의 문장이다. 줄 번호는 담지 않는다 — 줄이 밀리면 회차 사이의 지문이 깨진다.
+필드의 뜻과 문턱과 예외는 `meta-aggregate`의 리뷰 산출물 계약이 정한다.
 
 ## 기계에 넘기는 것
 스키마의 필수 키와 폐쇄 집합의 값과 금지 낱말은 결정론 검사가 먼저 답한다. 이 저장소에서는 `scripts/test_docs_drift.sh`가 그 몫을 진다. 이 렌즈는 그 검사가 답하지 못한 것, 곧 계약이 두 가지로 읽히는지를 본다.
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "fit", "read": [ "..." ], "issues": [ { "where": "...", "type": "schema|format|style|constraint|compat", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-fit", "read": [ "..." ], "issues": [ { "where": "...", "type": "schema|format|style|constraint|compat", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다. `principles_applied`를 언제 요구하는지는 `meta-aggregate`의 리뷰 산출물 계약이 정한다. 여기서 다시 정하지 않는다.

@@ -1,0 +1,138 @@
+{
+ "lens": "lens-consistency",
+ "target": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+ "read": [
+  "docs/superpowers/plans/2026-09-05-audit-roots.md",
+  "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+  "docs/superpowers/reviews/2026-09-05-audit-roots-review.md",
+  "docs/superpowers/reviews/2026-09-05-audit-roots-review-2.md",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/findings.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/run.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/diff.json",
+  "agent-principles.md",
+  "CLAUDE.md",
+  "README.md",
+  "skills/project-doc-audit/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-spec-review/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "scripts/audit_rounds.sh",
+  "scripts/audit_evidence.sh",
+  "scripts/test_audit.sh",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_scaffold.sh",
+  "scripts/seal_reviews.sh"
+ ],
+ "issues": [
+  {
+   "where": "각 과제의 검사 걸음(Task 1 Step 1~3·13, Task 2 Step 1~3·11, Task 3 Step 1~2, Task 4 Step 1~2, Task 5 Step 2~3)",
+   "type": "gap",
+   "claim": "spec 4절이 요구한 \"실패 형태 셋을 각 단계에 검사 항목으로 적는다\"가 계획의 어느 걸음에도 없다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "단언마다 고치기 전에 빨간 불을 먼저 확인하고, 이 회차가 보여 준 실패 형태 셋(이미 통과하는 단언, 자기 픽스처 되읽기, 리터럴 하나만 겨눔)을 plan의 각 단계에 검사 항목으로 적는다.",
+   "counterpart_file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "counterpart": "**빠진 것 하나를 적는다.** spec 4절은 단계별 단언 목록을 `grep`으로 도출하라고 정했고 이 계획의 Step 1 들이 그 검색 명령을 담는다.",
+   "principle": "TDD",
+   "consequence": "계획은 그 절의 앞 절반(grep 도출)만 걸음으로 옮기고 뒤 절반(실패 형태 셋)은 어느 과제에도 적지 않았다. Task 5 Step 2 가 더하는 \"실패 사유가 켰다는 머리말 아래 안 섞인다\"는 깨진 설정 픽스처라 켠 것이 없어 고치기 전에도 통과한다."
+  },
+  {
+   "where": "Task 3 Interfaces / Task 2 Step 8",
+   "type": "drift",
+   "claim": "metrics 의 마지막 인자 뜻이 스크립트 쪽과 절차 문서 쪽에서 갈린 채 남는다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "  - `audit_rounds.sh metrics [--root DIR] --tokens N --seconds N <이번 findings.json> [이번 diff.json]` → `{\"by_lens\",\"confirmed\",\"tokens\",\"seconds\",\"tokens_per_confirmed\",\"resolved_rate\",\"verdict_counts\"}`",
+   "counterpart_file": "skills/project-doc-audit/SKILL.md",
+   "counterpart": "- **측정** — `bash scripts/audit_rounds.sh metrics --tokens N --seconds N <이번 findings.json> [앞선 diff.json]`이 렌즈별 성적과 확정 하나당 값과 앞선 회차의 해소율을 낸다.",
+   "principle": "SSOT",
+   "consequence": "Task 2 Step 8 은 「기계가 하는 것」의 `diff` 인자 한 줄만 고치라고 적었고, 같은 절의 `metrics` 줄에 있는 `[앞선 diff.json]` 을 고치라고 적은 걸음이 없다. Task 3 Step 8 은 audit_rounds.sh 머리말 주석만 `[이번 diff.json]` 으로 고친다."
+  },
+  {
+   "where": "Task 2 Step 8 — 「통합 기록」",
+   "type": "gap",
+   "claim": "metrics 출력에 `verdict_counts` 를 더하면서 그 출력을 열거한 절차 문서 문장을 고치는 걸음이 없다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "회차 끝에 `bash scripts/audit_verify.sh <회차 폴더>`를 돌려 통과한 뒤에만 `run.json`의 `completed`를 참으로 놓는다.",
+   "counterpart_file": "skills/project-doc-audit/SKILL.md",
+   "counterpart": "`metrics`는 `audit_rounds.sh metrics`의 출력(`by_lens`·`confirmed`·`tokens`·`seconds`·`tokens_per_confirmed`·`resolved_rate`)을 그대로 담아",
+   "principle": "SSOT",
+   "consequence": "Task 2 Step 8 의 「통합 기록」 항목은 검수 주체 한 문장만 더한다. spec 3절은 `verdict_counts` 의 자리가 metrics 출력 안 하나이고 run.json 의 `metrics` 칸이 그 출력을 그대로 담는다고 정했다."
+  },
+  {
+   "where": "Task 3 Interfaces / Task 2 Step 8 — 「일관성 대조」와 「진술 받기」",
+   "type": "gap",
+   "claim": "새로 만드는 `audit_statements.sh` 를 부르는 자리가 절차 문서 어디에도 적히지 않는다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "  - `audit_statements.sh <렌즈 원본 JSON…>` → `{\"topics\": {\"<이름표>\": [{\"file\",\"statement\",\"evidence\"}]}}`",
+   "counterpart_file": "skills/project-doc-audit/SKILL.md",
+   "counterpart": "- **표 대조** — 호출자가 이름표별 표를 세운다. 이름표 목록은 `scripts/audit_topics.sh`가 낸다.",
+   "principle": "SSOT",
+   "consequence": "Task 2 Step 8 의 「진술 받기」 추가 문장은 `scripts/audit_topics.sh` 만 부르고, 「일관성 대조」에 더하는 걸음 둘은 정본 표시·앞뒤 다섯 줄과 `duplication` 도출이다. 계획 어디에도 「표 대조」가 `audit_statements.sh` 를 부른다고 적은 곳이 없고, test_audit.sh 가 `audit_topics.sh` 에 대해 갖고 있는 \"절차의 표 대조가 이 스크립트를 부른다\"에 대응하는 단언도 더하지 않는다."
+  },
+  {
+   "where": "Task 1 Step 4 — 절 다섯 / Step 8 — domain-docs 에서 옮긴 것을 덜어낸다",
+   "type": "gap",
+   "claim": "「문서 검진 방법」 첫 문단의 source 주입·JSON 리턴 문장이 옮길 목록에도 남길 꼴에도 없다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "이 방법은 여기가 소유자다. 일반 문서를 쓰거나 고친 뒤에는 `lens-grounding`(사실 정확)과 `lens-fit`(양식과 계약)을 건다. 사람이 처음부터 끝까지 읽는 문서에는 `lens-readability`를 셋째 렌즈로 더한다. 띄우는 방법은 `dispatching-lenses`가 정한다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "- domain-docs에 띄우는 방법 문장(한 호출에 렌즈 여럿, source 주입, JSON 리턴, 집계)과 렌즈 운용 절 넷의 제목이 없고, 그 문장과 제목은 dispatching-lenses에 있다.",
+   "principle": "SSOT",
+   "consequence": "domain-docs 의 첫 문단에는 \"호출자가 렌즈에 source를 주입하고, 렌즈는 JSON으로 지적을 리턴하며, 그 결과를 `meta-aggregate`로 한 목록에 모은 뒤 반영은 메인 세션이 한다.\" 가 있다. Step 4 의 옮길 문장 다섯에도 그 문장이 없고, Step 8 이 적은 남는 꼴에도 없다."
+  },
+  {
+   "where": "Task 3 Step 5 — 회차 대조 단언을 다시 쓴다",
+   "type": "gap",
+   "claim": "구획을 통째로 바꾸면서 Task 3 이 산출로 적은 `by_lens` 와 `tokens_per_confirmed` 를 재는 단언을 다시 넣지 않는다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "`scripts/test_audit.sh`의 `[audit_rounds.sh — 회차 대조와 측정]` 구획을 통째로 바꾼다. 픽스처에 앞선 기각 하나와 앞선 diff 하나를 넣는다.",
+   "counterpart_file": "scripts/test_audit.sh",
+   "counterpart": "sys.exit(0 if d[\\\"tokens_per_confirmed\\\"]==500 else 1)",
+   "principle": "TDD",
+   "consequence": "지금 그 구획은 `by_lens` 와 `tokens_per_confirmed` 를 각각 실측으로 재는 단언을 갖고 있다. 계획이 새로 적은 구획에는 그 둘이 없고, 같은 과제의 Interfaces 는 그 둘을 metrics 의 산출로 열거한다."
+  },
+  {
+   "where": "Task 2 Step 11 — 걸음 표 행 수 단언",
+   "type": "duplication",
+   "claim": "이미 있는 걸음 표 행 수 단언과 같은 것을 같은 파일에 하나 더 만들고 변수 이름도 겹쳐 쓴다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "check \"걸음 표 행 수와 문장이 맞는다\" \"[ \\\"\\$PDA_ROWS\\\" = \\\"\\$(KO_NUM \\\"\\$PDA_WORD\\\")\\\" ]\"",
+   "counterpart_file": "scripts/test_audit.sh",
+   "counterpart": "check \"걸음 표의 행 수와 '걸음은 N' 문장이 맞는다\" \"[ \\\"\\$PDA_ROWS\\\" = \\\"\\$(KO_NUM \\\"\\$PDA_SAID\\\")\\\" ]\"",
+   "principle": "SSOT",
+   "consequence": "test_audit.sh 는 이미 `PDA_ROWS` 와 `PDA_SAID` 로 같은 것을 재고 있다. 계획의 새 줄은 같은 이름 `PDA_ROWS` 를 다시 매기고, 걸음 절 안이 아니라 파일 전체의 표 행을 센다."
+  },
+  {
+   "where": "Task 3 Step 13 — audit_verify.sh 를 만든다",
+   "type": "drift",
+   "claim": "같은 스크립트가 판정 상태는 절차 문서에서 뽑고 렌즈 원본 이름 규칙은 리터럴로 박는다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "pat = re.compile(r\"^lens-[a-z-]+-[0-9]+\\.json$\")",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "렌즈별 원본은 요약문과 같은 이름의 폴더에 `<렌즈 스킬 이름>-<띄운 횟수>.json`으로 둔다",
+   "principle": "SSOT",
+   "consequence": "그 스크립트의 머리말은 \"판정 상태의 닫힌 집합은 여기서 리터럴로 박지 않고 절차 문서에서 뽑는다(SSOT)\"라고 적는다. 이름 규칙의 소유자는 domain-docs 의 문서 타입 표 기록 행이고, 계획은 Task 1 Step 10 에서 그 문단을 다시 쓴다."
+  },
+  {
+   "where": "Task 2 Step 8 — 「회차 대조」",
+   "type": "gap",
+   "claim": "자동 기각 사유가 성립하지 않을 때의 처분이 어느 문서에도 적히지 않는다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "성립하지 않으면 `status: undetermined`와 `verdict_reason: 앞선 기각 사유 소멸 — <사유>`를 붙이고 다시 판정하지 않는다.",
+   "counterpart_file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "counterpart": "- 「회차 대조」 둘째 문단(재발마다 `derived` 발견을 새로 만든다)을 바꾼다.",
+   "principle": "EXPLICIT",
+   "consequence": "Task 2 Step 8 의 「회차 대조」 편집은 대조 대상과 재발 처리 둘만 적는다. `auto_rejected` 를 받은 세션이 사유 성립을 확인한 뒤 무엇을 붙이는지는 Task 3 Step 5 의 픽스처 값 \"앞선 회차 기각 유지 — 정당한 좁혀 적기다\" 하나로만 나타나고, 사유가 소멸했을 때의 값은 계획 어디에도 없다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "TDD",
+  "EXPLICIT",
+  "NAME-ITEMS",
+  "FOCUSED"
+ ],
+ "notes": "네 각도를 따로 훑었다. (1) spec 절→과제 대응 — spec 의 전제·1~5절·「순서와 되돌리기」·성공 기준 다섯을 하나씩 계획의 Task/Step 에 짚어 봤다. 대체로 이어졌고 끊긴 곳이 셋이다. 4절의 '실패 형태 셋', 3절의 자동 기각 확인 실패 처분, 4절의 source 줄 검사 전환(이 셋째는 grounding 쪽에 올렸다)이다. 성공 기준 넷째의 118·9 는 봉인 기록을 실제로 세어 맞는 것을 확인했다. (2) 과제 사이 인터페이스 — Task 1 이 정한 절 이름 일곱을 Task 2 Step 5~10 이 같은 글자로 부르는지 대조했고 어긋난 것이 없었다. Task 3 이 정한 --prior·--prior-diff 를 Task 2 Step 8 이 같은 글자로 적는 것도 맞았다. 다만 metrics 의 마지막 인자 뜻이 갈린 채 남는다. (3) 같은 파일을 만지는 과제 — README(Task 1·4·5), lens-readability(Task 2·4), test_docs_drift.sh(Task 1·2·4), test_audit.sh(Task 1·2·3)를 덩이별로 맞대 보았다. 서로 덮어쓰는 곳은 없었고 걸리는 것은 test_audit.sh 의 걸음 표 단언 중복 하나다. (4) 산출물 — 새 스크립트 둘의 입력·출력·놓일 곳은 Interfaces 와 머리말 주석에 다 적혀 있으나 audit_statements.sh 를 부르는 절차 걸음이 없다. 새 단언이 놓일 테스트 파일은 Task 1(test_docs_drift.sh)·Task 2(test_docs_drift.sh·test_audit.sh)·Task 3(test_audit.sh)·Task 4(test_hooks.sh·test_docs_drift.sh)·Task 5(test_scaffold.sh) 모두 적혔다."
+}

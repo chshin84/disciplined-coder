@@ -12,6 +12,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 README="$HERE/README.md"
 CALLER="$HERE/skills/domain-spec-review/SKILL.md"
 AGG="$HERE/skills/meta-aggregate/SKILL.md"
+DISP="$HERE/skills/dispatching-lenses/SKILL.md"
 pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
 
@@ -23,9 +24,10 @@ DISPATCH="$(grep -oE '^- `lens-[a-z-]+`' "$CALLER" | sed 's/^- `lens-//; s/`$//'
 
 
 
-# 캐시 3 — meta-aggregate가 집계 항목의 출처를 태깅하는 렌즈 이름 열거.
-AGG_LINE="$(grep -F '"source"' "$AGG" || true)"
-AGGSET="$(printf '%s' "$AGG_LINE" | sed -n 's/.*"source"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | tr '|' '\n' | sed 's/^ *//; s/ *$//' | grep -v '^$' | sort || true)"
+# 캐시 3 — meta-aggregate 리뷰 산출물 계약의 렌즈 이름 열거. 출력 스키마의 `source`는 이 값을
+# 그대로 옮기는 자리라 열거를 두지 않는다. 이름 열거가 한 문서에 하나만 남게 여기서 뽑는다.
+AGG_LINE="$(grep -F '"lens": "lens-' "$AGG" | head -1 || true)"
+AGGSET="$(printf '%s' "$AGG_LINE" | sed 's/.*"lens"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | tr '|' '\n' | sed 's/^ *//; s/ *$//; s/^lens-//' | grep -v '^$' | sort || true)"
 
 # 캐시 4 — meta-aggregate가 「공통 계약의 예외」로 적은 렌즈 이름 열거. 손으로 목록을 베끼지
 # 않고 정본 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
@@ -40,7 +42,8 @@ check "호출자 디스패치 목록을 읽어냈다"          "[ -n \"\$DISPATC
 
 echo "[집계 태깅 == 실제 디렉터리]"
 # meta-aggregate의 출력 스키마가 이슈의 출처를 렌즈 이름으로 태깅한다. 그 열거도 렌즈가 늘면 낡는다.
-check "meta-aggregate source 줄을 찾았다"        "[ -n \"\$AGG_LINE\" ]"
+check "meta-aggregate lens 줄을 찾았다"          "[ -n \"\$AGG_LINE\" ]"
+check "meta-aggregate 에 source 열거가 없다"     "! grep -qE '\"source\"[[:space:]]*:[[:space:]]*\"[a-z-]+\\|' \"\$AGG\""
 check "meta-aggregate가 렌즈 전부를 태깅한다"    "[ \"\$AGGSET\" = \"\$ALL\" ]"
 if [ "$AGGSET" != "$ALL" ]; then
   echo "    디렉터리      : $(printf '%s' "$ALL" | tr '\n' ' ')"
@@ -63,7 +66,20 @@ for d in "$HERE"/skills/lens-*/; do
   n="$(basename "$d")"; f="$d/SKILL.md"
   check "$n 에 등급 라벨이 없다"          "! grep -qF 'severity' \"$f\""
   if is_exc "$n"; then
-    check "$n 은 공통 계약 예외라 consequence 를 요구하지 않는다" "! grep -qF 'consequence' \"$f\""
+    # 예외 렌즈가 계약에서 빼는 칸은 정본 예외 항목이 "빠지는 칸: `x`·`y`" 로 적는다. 목록을 여기
+    # 손으로 베끼지 않고 거기서 뽑아 그 렌즈의 출력 스키마 줄에 없는지 본다. 예외마다 빠지는 칸이
+    # 다르므로 "consequence 가 없다" 하나로 뭉뚱그리면 그 칸을 담는 예외에서 거짓이 된다.
+    EXC_BULLET="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -F "\`$n\`" | grep -oE '빠지는 칸: .*$' || true)"
+    check "$n 예외가 빠지는 칸을 적는다" "[ -n \"\$EXC_BULLET\" ]"
+    SCHEMA_LINE="$(grep -F '"lens": "' "$f" | head -1 || true)"
+    EXC_BAD=""
+    while IFS= read -r k; do
+      [ -n "$k" ] || continue
+      if printf '%s' "$SCHEMA_LINE" | grep -qF "\"$k\""; then EXC_BAD="$EXC_BAD $k"; fi
+    done <<EOF
+$(printf '%s' "$EXC_BULLET" | grep -oE '`[a-z_]+`' | tr -d '`')
+EOF
+    check "$n 스키마에 빠지는 칸이 없다" "[ -z \"\$EXC_BAD\" ]"
   else
     check "$n 이 consequence 를 요구한다"   "grep -qF 'consequence' \"$f\""
   fi
@@ -101,10 +117,9 @@ check "spec 리뷰가 회차 규칙을 다시 선언하지 않는다" "! grep -q
 check "spec 리뷰가 회차 규칙 소유자를 가리킨다" "grep -qF '한 번만 띄우는 렌즈의 규율' \"\$CALLER\""
 check "옛 2회 표집 규정이 남아 있지 않다"     "! grep -qF '2회씩' \"\$CALLER\""
 check "렌즈별 결과를 한데 모으는 것은 남는다" "grep -qF '한데 모아 관리하는 것은 그대로다' \"\$CALLER\""
-check "문서 검진은 한 번씩만 띄운다"          "grep -qF '렌즈는 한 번씩만 띄운다' \"\$DOCS\""
-check "런타임은 한 번씩만 부른다"             "grep -qF '렌즈는 한 번씩만 부른다' \"\$RUNTIME2\""
-check "런타임이 회차 수를 다시 정하지 않는다" "grep -qF '여기서 다시 정하지 않는다' \"$RUNTIME2\""
-check "문서 검진도 다시 정하지 않는다"        "grep -qF '여기서 다시 정하지 않는다' \"$DOCS\""
+check "소유자가 한 번씩만 띄운다고 적는다"    "grep -qF '렌즈는 한 번씩만 띄운다' \"\$DISP\""
+check "런타임은 서브에이전트 규율 밖이라고 적는다" "grep -qF '리뷰 콜은 제품 코드의 호출이라' \"\$RUNTIME2\""
+check "소유자 안에서 다시 정하지 않는다"      "grep -qF '여기서 다시 정하지 않는다' \"$DISP\""
 
 echo "[이름은 명사구, 주장은 첫 문장 — 정본과 가독성 렌즈]"
 CANON="$HERE/agent-principles.md"
@@ -130,10 +145,10 @@ check "표현만 다듬었으면 건너뛴다"            "grep -qF '골랐을 �
 check "건너뛰면 알린다"                       "grep -qF '건너뛰었다고 한 줄 알린다' \"\$DOCS\""
 
 echo "[한 번만 띄우므로 지킬 것 — 소유자와 여섯 렌즈 프롬프트]"
-check "domain-docs가 그 규칙의 소유자다"      "grep -A1 -F '## 한 번만 띄우는 렌즈의 규율' \"\$DOCS\" | grep -qF '여기가 소유자다'"
-check "중첩 금지를 적는다"                    "grep -qF '렌즈는 서브에이전트를 새로 열지 않는다' \"\$DOCS\""
-check "이어 묻기를 적는다"                    "grep -qF '대화 턴을' \"\$DOCS\""
-check "3층 오케스트레이션 예외를 적는다"      "grep -qF '3층 오케스트레이션은 이 금지의 예외다' \"\$DOCS\""
+check "dispatching-lenses가 그 규칙의 소유자다" "grep -A1 -F '## 한 번만 띄우는 렌즈의 규율' \"\$DISP\" | grep -qF '여기가 소유자다'"
+check "중첩 금지를 적는다"                    "grep -qF '렌즈는 서브에이전트를 새로 열지 않는다' \"\$DISP\""
+check "이어 묻기를 적는다"                    "grep -qF '대화 턴을' \"\$DISP\""
+check "3층 오케스트레이션 예외를 적는다"      "grep -qF '3층 오케스트레이션은 이 금지의 예외다' \"\$DISP\""
 for L in "$HERE"/skills/lens-*/SKILL.md; do
   NAME="$(basename "$(dirname "$L")")"
   check "$NAME 프롬프트가 중첩을 금지한다"    "grep -F -- '- system:' \"$L\" | grep -qF '서브에이전트를 새로 열지 마라'"
@@ -142,11 +157,41 @@ done
 
 echo "[렌즈끼리 볼 것을 나눠 주지 않는다 — 세 호출자 모두]"
 check "spec 리뷰가 나눠 주지 않는다"          "grep -qF '렌즈끼리 볼 것을 나눠 주지 않는다' \"\$CALLER\""
-check "문서 검진이 나눠 주지 않는다"          "grep -qF '렌즈끼리 볼 것을 나눠 주지 않는다' \"\$DOCS\""
+check "소유자가 나눠 주지 않는다"             "grep -qF '렌즈끼리 볼 것을 나눠 주지 않는다' \"\$DISP\""
 check "런타임이 나눠 주지 않는다"             "grep -qF '렌즈끼리 볼 것을 나눠 주지 않는다' \"\$RUNTIME2\""
 
+echo "[dispatching-lenses — 소유자가 하나다]"
+# 렌즈 운용 규율이 domain-docs 와 나뉘어 있던 동안 소유자가 둘이었다. 규율은 이 스킬이 지고
+# domain-docs 는 문서 저작만 진다. 절 제목과 띄우는 방법 문장이 양쪽에 함께 있으면 다시 갈린다.
+DISP_PTR='띄우는 방법은 `dispatching-lenses`가 정한다'
+check "domain-docs 에 렌즈 운용 절 제목이 없다"   "! grep -qE '^## (렌즈에게 정본을 알리는 법|판단 앞에 기계를 세운다|한 번만 띄우는 렌즈의 규율)$' \"\$DOCS\""
+check "domain-docs 가 띄우는 방법을 소유자로 넘긴다" "! grep -qF '렌즈 결과는' \"\$DOCS\" && grep -qF -- \"\$DISP_PTR\" \"\$DOCS\""
+check "소유자가 띄우는 방법을 적는다"             "grep -qF 'source를 주입' \"\$DISP\" && grep -qF '렌즈 결과는' \"\$DISP\""
+DISP_MISS=""
+while IFS= read -r n; do
+  [ -n "$n" ] || continue
+  if [ ! -d "$HERE/skills/$n" ]; then DISP_MISS="$DISP_MISS $n"; fi
+done <<EOF
+$(awk '/^## 예외 목록/{f=1;next} /^## /{f=0} f' "$DISP" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u)
+EOF
+check "예외 목록의 렌즈가 모두 실재한다"          "[ -z \"\$DISP_MISS\" ]"
+
+echo "[따르는 문서 — 이름과 문턱 사본]"
+# 렌즈 스키마의 lens 값은 디렉터리 이름과 같은 한 문자열이다. 짧은 이름이 남으면 기록 파일 이름과
+# findings 의 lens 칸이 갈린다.
+LENS_BAD=""
+while IFS= read -r d; do
+  [ -n "$d" ] || continue
+  ln="$(basename "$d")"
+  if ! grep -qF "\"lens\": \"$ln\"" "$d/SKILL.md"; then LENS_BAD="$LENS_BAD $ln"; fi
+done <<EOF
+$(ls -d "$HERE"/skills/lens-*)
+EOF
+check "렌즈 스키마의 lens 값이 디렉터리 이름과 같다" "[ -z \"\$LENS_BAD\" ]"
+check "렌즈 파일에 문턱 첫 문장이 안 남았다"          "! grep -qF '발견 하나는 넷을 진다' \"\$HERE\"/skills/lens-*/SKILL.md"
+
 echo "[기록 — 자리와 담을 것]"
-check "spec 리뷰 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$CALLER\""
+check "spec 리뷰가 기록 이름 소유자를 가리킨다" "grep -qF '문서 타입 표 기록 행이 소유하므로' \"\$CALLER\""
 check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$DOCS\""
 check "문서 검진 기록의 이름을 적는다"       "grep -qF '-check.md' \"\$DOCS\""
 check "문서 검진 기록은 처리 결과를 뺀다"    "grep -qF '무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다' \"\$DOCS\""
@@ -205,7 +250,7 @@ check "정본이 principle 칸을 필수로 적는다" "grep -qF -- '\"principle
 echo "[렌즈에게 정본을 알리는 법 — domain-docs 한 곳만 규율을 적는다]"
 # 전에 여러 문서가 각자 적었다가 하나에서 둘이 빠져 갈라졌다. 소유자를 하나로 두고
 # 나머지는 가리키기만 하게 묶는다. 앵커는 소유자의 절 제목이라 제목을 고치면 실패한다(FAIL-LOUD).
-OWNER_DOC="$HERE/skills/domain-docs/SKILL.md"
+OWNER_DOC="$HERE/skills/dispatching-lenses/SKILL.md"
 OWNER_ANCHOR='## 렌즈에게 정본을 알리는 법'
 # 규율 넷을 알아보는 문구. 소유자에만 있어야 한다.
 RULE_MARKS=('읽기 전용 에이전트도 Read는 갖는다' '비어 있지 않은 배열' '홈 해석이 어긋나는 환경에서')
@@ -388,7 +433,7 @@ NUM='(두|세|네|다섯|여섯|일곱|여덟|아홉|열)'
 NUMB='(둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)'
 # 렌즈 이름은 디렉터리에서 도출한다 — 여기 손으로 적으면 그 목록이 먼저 낡는다.
 LENS_RE="$(printf '%s' "$ALL" | tr '\n' '|' | sed 's/|$//')"
-COUNT_SCAN="$AGG $HERE/skills/lens-*/SKILL.md $HERE/skills/domain-docs/SKILL.md $CALLER $CANON $HERE/README.md"
+COUNT_SCAN="$AGG $HERE/skills/lens-*/SKILL.md $HERE/skills/domain-docs/SKILL.md $DISP $CALLER $CANON $HERE/README.md"
 # shellcheck disable=SC2086
 NUMHIT="$(LC_ALL=C.UTF-8 grep -nE "$NUM[ ]?렌즈|렌즈[ ]?$NUMB|다른 $NUMB[ ]?(렌즈|은|는)|$NUMB[ ]?곳에" $COUNT_SCAN 2>/dev/null \
   | grep -v '개수를 산문에\|이름을 같은 줄에' \
@@ -401,6 +446,9 @@ check "개수를 적은 자리마다 이름이 함께 있다" "[ -z \"\$NUMHIT\"
 # 되돌아가면 마지막 하나의 종료 코드만 남아 앞선 FAIL이 묻히고, 감사는 잘못된 FAIL=0을 보고한다.
 echo "[테스트 실행 명령 — 앞 스크립트의 실패가 안 묻힌다]"
 CMD="$HERE/CLAUDE.md"
+# 게이트는 새로 쓸 때만 걸린다. 조건을 빼고 적으면 이미 커밋된 spec 을 고칠 때도 막히는 것처럼
+# 읽힌다. '새로' 없이 그 문장이 나오면 실패한다.
+check "CLAUDE.md 가 새로 쓸 때만 게이트라고 적는다" "! grep -qE '(^|[^로 ])쓰면 Stop 게이트가' \"\$CMD\""
 check "CLAUDE.md가 실행 명령을 적는다"       "grep -qF -- 'for t in scripts/test_*.sh' \"\$CMD\""
 check "실패를 모으는 형태다"                 "grep -qF -- 'bad=\"\$bad \$t\"' \"\$CMD\""
 check "모은 결과를 마지막에 알린다"           "grep -qF -- 'FAILED:' \"\$CMD\""
@@ -523,9 +571,9 @@ check "README가 상수 자리를 가리킨다"      "grep -qF '_managed_block.s
 # 다른 스킬은 그 절을 가리키기만 한다. 첫 항목 문장이 다른 스킬에 나타나면 베낀 것이다.
 echo "[렌즈에게 정본을 알리는 법] 다른 스킬이 내용을 베끼지 않는다"
 TELL_SENT='정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다'
-check "domain-docs 가 그 문장을 갖는다" "grep -qF -- '$TELL_SENT' \"$HERE/skills/domain-docs/SKILL.md\""
+check "dispatching-lenses 가 그 문장을 갖는다" "grep -qF -- '$TELL_SENT' \"$DISP\""
 for f in "$HERE"/skills/*/SKILL.md; do
-  case "$f" in */domain-docs/*) continue ;; esac
+  case "$f" in */dispatching-lenses/*) continue ;; esac
   check "$(basename "$(dirname "$f")") 이 베끼지 않는다" "! grep -qF -- '$TELL_SENT' '$f'"
 done
 

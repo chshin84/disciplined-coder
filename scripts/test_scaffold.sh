@@ -13,6 +13,12 @@ blank_follows() {  # $1=file $2=exact-line-pattern
   awk -v pat="$2" 'matched && !verified { verified=1; if ($0=="") ok=1 } $0==pat { matched=1 } END { exit (ok==1 ? 0 : 1) }' "$1"
 }
 
+# PYTHONUTF8 안내는 OS 와 레지스트리를 읽어 판정하므로 픽스처마다 상태를 주입해 고정한다. run() 을
+# 거치지 않고 $SCAFFOLD 를 직접 부르는 픽스처가 여럿이라 헬퍼가 아니라 파일 머리에서 내보낸다.
+# 이것이 없으면 CI(ubuntu)와 변수를 넣은 윈도우 PC 와 안 넣은 PC 에서 결과가 갈린다.
+: "${UTF8_STATE:=set}"
+export DISCIPLINED_CODER_UTF8_STATE="$UTF8_STATE"
+
 run() {  # $1=HOME dir, $2=project dir  → echoes scaffold stdout
   CLAUDE_HOME_DIR="$1/.claude" CLAUDE_PROJECT_DIR="$2" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"
 }
@@ -102,7 +108,7 @@ set +e; run "$HD" "$PD" >/dev/null 2>&1; rc_d=$?; set -e
 check "깨진 설정에도 스캐폴드가 산다"      "[ $rc_d -eq 0 ]"
 check "깨진 설정을 고치지 않는다"          "grep -qF 'this is not json' '$HD/.claude/settings.json'"
 check "깨진 설정에도 정본은 깔린다"        "[ -f '$HD/.claude/disciplined-coder/agent-principles.md' ]"
-set +e; ERR_D="$(run "$HD" "$PD" 2>&1 >/dev/null)"; set -e
+set +e; ERR_D="$(run "$HD" "$PD" 2>/dev/null)"; set -e
 check "깨진 설정을 조용히 넘기지 않는다"    "printf '%s' \"\$ERR_D\" | grep -qF 'autoUpdate 설정을 건너뛴다'"
 check "읽기 실패는 읽기 실패라고 말한다"    "printf '%s' \"\$ERR_D\" | grep -qF '읽지 못했거나 내용이 JSON이 아니다'"
 
@@ -112,10 +118,13 @@ HE="$(mktemp -d)"; PE="$(mktemp -d)"; mkdir -p "$HE/.claude"
 MKTE="$(json_run 'import json,io,sys; print(json.load(io.open(sys.argv[1],encoding="utf-8"))["name"])' "$HERE/.claude-plugin/marketplace.json")"
 printf '{ "extraKnownMarketplaces": { "%s": { "source": { "source": "github", "repo": "chshin84/disciplined-coder" } } } }\n' "$MKTE" > "$HE/.claude/settings.json"
 mkdir -p "$HE/.claude/settings.json.dc-tmp/막는다"
-set +e; ERR_E="$(run "$HE" "$PE" 2>&1 >/dev/null)"; set -e
+set +e; ERR_E="$(run "$HE" "$PE" 2>/dev/null)"; set -e
 echo "[marketplace-autoupdate] a write failure is reported as a write failure"
 check "쓰기 실패에 자리가 따로 있다"        "printf '%s' \"\$ERR_E\" | grep -qF '고쳐 쓰지 못했다'"
 check "쓰기 실패를 읽기 실패로 안 부른다"   "! printf '%s' \"\$ERR_E\" | grep -qF '읽지 못했거나 내용이 JSON이 아니다'"
+# 사유는 stdout 으로 나오되 "켰다" 머리말 아래 섞이지 않는다. 이 픽스처는 켠 것이 없는 갈래라
+# 머리말이 아예 없어야 한다. 같은 블록에 섞어 찍으면 고친 파일 목록으로 읽힌다.
+check "실패 사유가 켰다는 머리말 아래 안 섞인다" "printf '%s' \"\$ERR_E\" | grep -qF '고쳐 쓰지 못했다' && ! printf '%s' \"\$ERR_E\" | grep -qF '자동 갱신을 켰다'"
 check "쓰기 실패에도 설정은 그대로다"       "grep -qF '\"source\": \"github\"' '$HE/.claude/settings.json'"
 check "쓰기 실패에도 임시 파일이 안 남는다" "[ ! -e '$HE/.claude/settings.json.dc-tmp' ]"
 
@@ -171,10 +180,10 @@ check "2nd run: single managed region"     "[ \$(grep -cF '# BEGIN disciplined-c
 # --- missing-canon: 정본 소스 부재 → FAIL-LOUD 경고(stderr) + 계속 진행(exit 0) ---
 H8="$(mktemp -d)"; P8="$(mktemp -d)"; ED="$(mktemp -d)"   # ED = 정본 없는 빈 plugin root
 set +e
-ERR8="$(CLAUDE_HOME_DIR="$H8/.claude" CLAUDE_PROJECT_DIR="$P8" CLAUDE_PLUGIN_ROOT="$ED" bash "$SCAFFOLD" 2>&1 >/dev/null)"; rc8=$?
+ERR8="$(CLAUDE_HOME_DIR="$H8/.claude" CLAUDE_PROJECT_DIR="$P8" CLAUDE_PLUGIN_ROOT="$ED" bash "$SCAFFOLD" 2>/dev/null)"; rc8=$?
 set -e
 echo "[missing-canon] missing source → FAIL-LOUD warning, exit 0"
-check "missing source warns to stderr"      "printf '%s' \"\$ERR8\" | grep -qF 'WARNING: source not found'"
+check "missing source warns to stdout"      "printf '%s' \"\$ERR8\" | grep -qF 'WARNING: source not found'"
 check "missing source still exit 0"         "[ $rc8 -eq 0 ]"
 
 # --- home-resolution: 홈 해석이 bash $HOME에 의존하지 않음 (CLAUDE_CONFIG_DIR 우선) ---
@@ -270,7 +279,7 @@ WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agen
 echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
 check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
 check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'lens-*'"
-check "검증 기록은 호출자 스킬이 요구한다" "grep -qF 'docs/superpowers/reviews' \"$HERE/skills/domain-spec-review/SKILL.md\""
+check "검증 기록은 호출자 스킬이 요구한다" "grep -qF '합치기가 끝나면 기록 파일에 쓴다' \"$HERE/skills/domain-spec-review/SKILL.md\" && grep -qF 'docs/superpowers/reviews/' \"$HERE/skills/domain-docs/SKILL.md\""
 check "사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_BLOCK\" | grep -qF 'ultracode 검증 모드'"
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
@@ -494,7 +503,7 @@ check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 
 echo "[lens-contract] callers reach the canon-path rules and stay runtime-neutral"
 for s in domain-spec-review domain-docs nested-orchestration; do
   F="$HERE/skills/$s/SKILL.md"
-  check "$s: 정본 알리는 법에 닿는다"       "grep -qF '렌즈에게 정본을 알리는 법' '$F'"
+  check "$s: 규율 소유자에 닿는다"          "grep -qF 'dispatching-lenses' '$F'"
   # 런타임 중립: 특정 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
@@ -755,5 +764,17 @@ check "already installed: still scaffolds"      "[ -f '$H31/.claude/disciplined-
 
 echo "[notice-encoding] user-facing notices are not double-encoded"
 check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COMMON\""
+
+# --- utf8-nudge: 사용자 환경 변수가 비었을 때만, 정본이 갱신된 첫 세션에만 ---
+# 매 세션 뜨면 세션 시작 알림 전체를 흘려보게 된다. 카파시 넛지와 같은 조건에 묶는다.
+H22="$(mktemp -d)"; P22="$(mktemp -d)"
+OUT22a="$(DISCIPLINED_CODER_UTF8_STATE=unset run "$H22" "$P22")"
+OUT22b="$(DISCIPLINED_CODER_UTF8_STATE=unset run "$H22" "$P22")"
+H23="$(mktemp -d)"; P23="$(mktemp -d)"
+OUT23="$(DISCIPLINED_CODER_UTF8_STATE=set run "$H23" "$P23")"
+echo "[utf8-nudge] PYTHONUTF8 안내는 변수가 비었을 때 첫 세션에만"
+check "변수가 비면 첫 세션에 안내한다"   "printf '%s' \"\$OUT22a\" | grep -qF 'PYTHONUTF8'"
+check "둘째 세션에는 안내하지 않는다"    "! printf '%s' \"\$OUT22b\" | grep -qF 'PYTHONUTF8'"
+check "변수가 있으면 안내하지 않는다"    "! printf '%s' \"\$OUT23\" | grep -qF 'PYTHONUTF8'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
