@@ -173,6 +173,7 @@ check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/ne
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off fpre '$(J "$T/newdoc.md")')\" ]"
 check "프로젝트 밖 새 문서 → 무출력"     "[ -z \"\$(fpre '$(J "$OUTSIDE/new.md")')\" ]"
 check "새 리뷰 기록 → 무출력"            "[ -z \"\$(fpre '$(J "$T/docs/superpowers/reviews/new-check.md")')\" ]"
+check "새 문서 넛지가 domain-writing 을 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'domain-writing'"
 # 넛지가 인용한 domain-docs 절이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로
 # 그 절 이름이 바뀌자 넛지가 없는 절을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD).
 NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*domain-docs의 '\([^']*\)' 절.*/\1/p")"
@@ -188,6 +189,9 @@ check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIE
 check "프로젝트 밖 문서 → 무출력"        "[ -z \"\$(drev '$(J "$OUTSIDE/notes.md")')\" ]"
 check "상대경로 문서 → 검진 넛지"        "drev '$(J "notes/rel.md")' | grep -q additionalContext"
 check "Windows 형식 경로도 프로젝트 안"  "drev '$(J "$(cygpath -w "$T" 2>/dev/null || printf '%s' "$T")\\\\win.md")' | grep -q additionalContext"
+check "수정 넛지가 domain-writing 을 가리킨다"   "drev '$(J "$T/existing.md")' | grep -qF 'domain-writing'"
+check "수정 넛지에 스킬 절 이름을 박지 않는다"   "! drev '$(J "$T/existing.md")' | grep -qF 'Surgical Changes'"
+check "README 가 코드 넛지를 적는다"             "grep -qF '코드 넛지' '$HERE/README.md'"
 
 echo "[리뷰 기록은 검진 대상이 아니다]"
 # 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
