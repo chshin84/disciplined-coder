@@ -1,0 +1,181 @@
+{
+ "lens": "lens-adversarial",
+ "target": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+ "read": [
+  "docs/superpowers/plans/2026-09-05-audit-roots.md",
+  "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+  "docs/superpowers/reviews/2026-09-05-audit-roots-review-2.md",
+  "scripts/audit_evidence.sh",
+  "scripts/audit_rounds.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/_json_valid.sh",
+  "scripts/test_audit.sh",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_scaffold.sh",
+  "scripts/test_hooks.sh",
+  "scripts/test_assertions.sh",
+  "scripts/scaffold.sh",
+  "skills/project-doc-audit/SKILL.md",
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/doc_format_pretooluse.sh",
+  "agent-principles.md",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/findings.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/run.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/diff.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/suggestions.json"
+ ],
+ "issues": [
+  {
+   "where": "Task 1 Step 11(meta-aggregate 계약을 고친다)과 Step 13(새 단언 넷을 더한다)",
+   "type": "failure-mode",
+   "claim": "Task 1 커밋이 FAIL=0 을 못 채운다. `source` 열거를 지우면 `test_docs_drift.sh` 가 그 줄에서 렌즈 집합을 뽑아 디렉터리 집합과 맞대는 단언이 깨지는데, 계획의 어느 걸음도 그 단언을 손대지 않는다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "「출력 스키마」의 `source` 열거를 지운다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "# 캐시 3 — meta-aggregate가 집계 항목의 출처를 태깅하는 렌즈 이름 열거.",
+   "principle": "SSOT",
+   "consequence": "`test_docs_drift.sh` 는 `grep -F '\"source\"'` 로 뽑은 값을 `|` 로 갈라 `skills/lens-*` 디렉터리 집합과 맞대고 있고, 계획이 그 자리에 넣는 값은 `<렌즈 리턴의 lens 값>` 한 덩이다. Task 1 Step 13 이 더하는 단언 넷에는 이 자리를 옮기는 것이 없다. spec 4절은 \"지금 `source` 줄을 읽는 검사를 `lens` 줄로 돌린다\"를 요구하고 있다."
+  },
+  {
+   "where": "Task 1 Step 13(새 단언 넷을 더한다)의 둘째 `check` 줄",
+   "type": "failure-mode",
+   "claim": "계획이 든 그 셸 줄은 그대로는 안 돈다. `check` 의 둘째 인자가 큰따옴표 문자열인데 그 안의 백틱이 명령 치환으로 먹혀 `dispatching-lenses` 를 실행하려 든다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "grep -qF '띄우는 방법은 `dispatching-lenses`가 정한다' \\\"\\$DOCS\\\"",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "check() { if eval \"$2\"; then echo \"  PASS: $1\"; pass=$((pass+1)); else echo \"  FAIL: $1\"; fail=$((fail+1)); fi; }",
+   "principle": "EXPLICIT",
+   "consequence": "큰따옴표 안에서는 안쪽 홑따옴표가 백틱을 막지 못한다. 치환 결과가 비어 검색 문자열이 '띄우는 방법은 가 정한다' 가 되고, domain-docs 를 옳게 고쳐도 이 단언은 초록이 되지 않는다."
+  },
+  {
+   "where": "Task 3 Step 1(인용 탈락 단언을 먼저 쓴다)과 Step 3(audit_evidence.sh 에 탈락을 넣는다)",
+   "type": "failure-mode",
+   "claim": "Task 3 이 초록이 되지 못한다. `audit_evidence.sh` 가 인용 없는 발견을 `findings` 에서 빼면 `test_audit.sh` 에 이미 있는 픽스처 단언 둘이 IndexError·ValueError 로 깨지는데, 계획은 그 구획에 단언을 '더한다'고만 적고 기존 것을 고치지 않는다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "`scripts/test_audit.sh`의 `audit_evidence.sh` 구획에 픽스처와 단언을 더한다.",
+   "counterpart_file": "scripts/test_audit.sh",
+   "counterpart": "sys.exit(0 if d[\\\"findings\\\"][1][\\\"evidence_found\\\"] is False else 1)",
+   "principle": "TDD",
+   "consequence": "기존 구획의 픽스처는 발견 둘 가운데 하나가 인용이 없는 것이고, 단언 둘이 `d[\"findings\"][1]` 을 첨자로 읽고 `a,b=d[\"findings\"]` 로 둘을 벗긴다. 탈락 뒤 `findings` 는 하나만 남는다."
+  },
+  {
+   "where": "Task 2 Step 11(새 단언 넷을 더한다)의 `절차에 derived 가 안 남았다` 줄",
+   "type": "failure-mode",
+   "claim": "그 단언을 `test_docs_drift.sh` 에 넣으면 그 파일이 중간에 죽는다. `$PDA` 는 `test_audit.sh` 에만 있는 변수이고 `test_docs_drift.sh` 는 `set -u` 아래 돈다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "! grep -qF 'derived' \\\"\\$PDA\\\"",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "set -euo pipefail",
+   "principle": "FAIL-LOUD",
+   "consequence": "`test_docs_drift.sh` 에는 `PDA` 라는 변수가 한 번도 나오지 않는다. `PDA` 를 정의하는 곳은 `test_audit.sh` 155행이다. `set -u` 아래 미정의 변수 전개는 `if` 조건 안이어도 셸을 끝내므로 FAIL 집계 줄까지 못 간다."
+  },
+  {
+   "where": "Task 2 Step 11(새 단언 넷을 더한다)의 걸음 표 행 수 단언",
+   "type": "failure-mode",
+   "claim": "계획이 든 행 수 단언은 그대로는 초록이 안 된다. 낱말 뽑기가 조사까지 물고 행 세기가 다른 표까지 센다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "PDA_WORD=\"$(grep -oE '걸음은 [가-힣]+' \"$PDA\" | head -1 | awk '{print $2}')\"",
+   "counterpart_file": "scripts/test_audit.sh",
+   "counterpart": "PDA_SAID=\"$(LC_ALL=C.UTF-8 grep -oE '걸음은 [^ ]+이고' \"$PDA\" | head -1 | sed 's/걸음은 //; s/이고//')\"",
+   "principle": "TDD",
+   "consequence": "`skills/project-doc-audit/SKILL.md` 의 문장은 \"걸음은 여덟이고 순서가 있다.\" 이고, `[가-힣]+` 는 '여덟이고'(고친 뒤에는 '열하나이고')를 통째로 문다. `KO_NUM` 은 그 값을 0 으로 돌린다. 그리고 그 파일에는 표가 둘 있어 `grep -cE '^\\| .* \\| .* \\|$'` 가 지금 15 를 낸다."
+  },
+  {
+   "where": "Task 2 Step 11(새 단언 넷을 더한다)의 걸음 표 행 수 단언",
+   "type": "over-engineering",
+   "claim": "같은 것을 재는 단언이 `test_audit.sh` 에 이미 있다. 계획은 그것을 고치지 않고 옆에 둘째 사본을 세운다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "걸음 표 행 수 단언은 `scripts/test_audit.sh`에 둔다.",
+   "counterpart_file": "scripts/test_audit.sh",
+   "counterpart": "check \"걸음 표의 행 수와 '걸음은 N' 문장이 맞는다\"",
+   "principle": "SSOT",
+   "consequence": "`test_audit.sh` 155~159행이 `PDA_ROWS`·`PDA_SAID`·`KO_NUM` 으로 같은 대조를 이미 하고 있고, 그 `PDA_ROWS` 는 awk 로 「걸음」 절 안으로 범위를 좁혀 머리 행을 뺀다. Task 2 가 손댈 곳은 `KO_NUM` 의 낱말 범위 하나다."
+  },
+  {
+   "where": "Task 1 Step 2(단언을 새 소유자로 돌린다)의 예외 렌즈 `consequence` 부재 단언 교체",
+   "type": "failure-mode",
+   "claim": "바꿔 놓은 단언은 어떤 경우에도 빨간 불이 안 된다. 이름을 뽑아 온 파일에서 그 이름을 다시 찾는 자기 되읽기다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "check \"$n 은 공통 계약 예외라 계약 절이 그 예외를 적는다\" \"grep -qF \\\"\\$n\\\" \\\"\\$AGG\\\"\"",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "예외 렌즈의 `consequence` 부재 단언은 \"예외 항목이 없다고 적은 칸이 그 렌즈 스키마에 없다\"로 바꾼다.",
+   "principle": "TDD",
+   "consequence": "`$n` 이 그 갈래에 드는 조건은 `is_exc \"$n\"` 이고, `EXC_LENSES` 는 `$AGG` 의 「공통 계약의 예외」 절에서 awk 로 뽑은 목록이다. 그 갈래 안에서 `$n` 은 이미 `$AGG` 안에 있는 문자열이다."
+  },
+  {
+   "where": "Task 3 Step 12~13(audit_verify.sh 단언과 빨간 불 확인)",
+   "type": "failure-mode",
+   "claim": "빨간 불 개수가 틀리고, 셋 가운데 하나는 스크립트가 없는 동안 이미 초록이다. 그 단언은 검수가 잘못 통과해도 안 잡는다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "Expected: FAIL 이 3(파일이 없다)",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "단언마다 고치기 전에 빨간 불을 먼저 확인하고, 이 회차가 보여 준 실패 형태 셋(이미 통과하는 단언, 자기 픽스처 되읽기, 리터럴 하나만 겨눔)을 plan의 각 단계에 검사 항목으로 적는다.",
+   "principle": "TDD",
+   "consequence": "셋째 단언은 `! bash '$AV' '$VR' >/dev/null 2>&1` 이다. `audit_verify.sh` 가 아직 없으면 `bash` 가 0 아닌 값으로 끝나고 `!` 가 그것을 PASS 로 뒤집는다. 그 걸음의 실제 FAIL 은 둘이다."
+  },
+  {
+   "where": "Task 3 Step 1~2(인용 탈락 단언과 빨간 불 확인)",
+   "type": "failure-mode",
+   "claim": "빨간 불 개수가 틀리고 셋 가운데 하나는 고치기 전부터 초록이다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "Expected: FAIL 이 3. `dropped` 키가 없어 KeyError 로 실패한다.",
+   "counterpart_file": "scripts/audit_evidence.sh",
+   "counterpart": "# 인용이 없는 발견을 LLM 이 아니라 여기서 떨어뜨리는 것이 이 스크립트를 둔 이유다.",
+   "principle": "TDD",
+   "consequence": "지금 `audit_evidence.sh` 는 입력의 `findings` 를 그대로 내보낸다. 첫 단언 \"인용이 실재하면 남는다\" 는 `d[\"findings\"]` 에서 `e#001` 을 찾는 것이라 고치기 전에도 PASS 다. `dropped` 를 읽는 둘만 KeyError 로 떨어진다."
+  },
+  {
+   "where": "Task 3 Step 15(회차 대조를 실제 기록으로 돌린다)",
+   "type": "failure-mode",
+   "claim": "그 걸음의 확인 명령이 이 계획 자신의 Global Constraints 와 어긋나 이 워크트리에서 실행되지 못한다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "python -X utf8 -c \"import json;d=json.load(open('/tmp/roundtrip.json',encoding='utf-8'));print(len(d['items']), sum(1 for i in d['items'] if i['prior_status']=='rejected'))\"",
+   "counterpart_file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "counterpart": "테스트는 하나씩 따로 호출하고, 파이썬은 파일로 써서 `python -X utf8 <파일>`로 돌린다.",
+   "principle": "EXPLICIT",
+   "consequence": "그 명령은 `-c` 로 프로그램을 문자열로 넘기고 그 문자열 안에 `for i in d['items']` 가 둘 들어 있다. Global Constraints 는 `for` 반복문이 거부된다고 적고 파이썬은 파일로 쓰라고 적는다. 앞선 걸음의 출력도 저장소 밖 `/tmp/roundtrip.json` 에 남고 지우는 걸음이 없다."
+  },
+  {
+   "where": "Task 5 Step 12(봉인 스크립트를 실제로 돌려 본다)",
+   "type": "irreversible",
+   "claim": "확인만 하려는 걸음이 이 워크트리의 기록 파일 전부를 되돌리는 걸음 없이 읽기 전용으로 바꾼다. 그 뒤로 Task 0 의 rebase 를 다시 해야 하면 git 이 그 파일들을 못 쓴다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "Run: `bash scripts/seal_reviews.sh`",
+   "counterpart_file": "scripts/seal_reviews.sh",
+   "counterpart": "chmod a-w \"$f\"",
+   "principle": "REVERSIBLE",
+   "consequence": "인자 없이 부르면 HEAD 의 `docs/superpowers/reviews/` 아래 파일 전부에 `chmod a-w` 가 걸린다. 지금 이 워크트리의 그 파일들은 `-rw-r--r--` 이고, Task 0 Step 2 는 `git rebase main` 이다. 계획에는 봉인을 푸는 걸음이 없다."
+  },
+  {
+   "where": "Task 0 Step 3(충돌을 푼다)의 Expected",
+   "type": "failure-mode",
+   "claim": "Task 0 이 성사됐는지를 그 확인으로는 못 가린다. rebase 를 아예 안 돌렸거나 중간에 abort 했어도 같은 결과가 나온다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "Expected: 충돌 표시(`UU`)가 없다.",
+   "counterpart_file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "counterpart": "Expected: main 의 최근 커밋에 정본과 스킬 넷을 함께 만진 커밋이 있고, 두 번째 명령이 1 이상을 낸다.",
+   "principle": "FAIL-LOUD",
+   "consequence": "Step 1 은 내용으로 확인하지만 Step 3 은 `git status --short` 에 `UU` 가 없는 것만 본다. Task 0 은 커밋을 만들지 않으므로 뒤 과제들이 옛 바탕 위에서 시작해도 남는 흔적이 없다. 같은 걸음이 \"충돌이 나면 main 쪽을 그대로 받는다\" 고만 적고 abort 갈래를 적지 않는다."
+  },
+  {
+   "where": "Task 1 Step 4(새 스킬 파일을 만든다)의 옮길 문장 목록",
+   "type": "risk",
+   "claim": "옮기는 문장 대부분에는 글자 그대로 옮겼는지를 붙드는 단언이 없다. 단순화로 없앨 수 없고 옮길 때의 규율로만 완화된다.",
+   "file": "docs/superpowers/plans/2026-09-05-audit-roots.md",
+   "evidence": "문서를 옮길 때는 문장을 다시 쓰지 않고 글자 그대로 옮긴다(`SURGICAL`). 계약 테스트가 그 문장을 글자로 찾는다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "domain-docs에 띄우는 방법 문장(한 호출에 렌즈 여럿, source 주입, JSON 리턴, 집계)과 렌즈 운용 절 넷의 제목이 없고, 그 문장과 제목은 dispatching-lenses에 있다. 줄 수는 기준으로 쓰지 않는다.",
+   "principle": "SURGICAL",
+   "consequence": "Task 1 Step 1 의 `grep` 이 겨누는 앵커는 열넷이고, Step 4 는 절 셋을 통째로 옮기라고 적는다. 절 안쪽 문장 가운데 앵커가 걸린 것 말고는 옮기다 흘려도 계약 테스트 다섯이 FAIL=0 을 그대로 낸다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "TDD",
+  "FAIL-LOUD",
+  "EXPLICIT",
+  "REVERSIBLE",
+  "SURGICAL"
+ ],
+ "notes": "훑은 각도는 다섯이다. (1) 과제별 커밋이 FAIL=0 을 채우는가 — 계약 테스트 다섯을 열어 계획이 옮긴다고 적은 앵커와 실제 줄을 대조했다. Task 1 은 test_docs_drift.sh 의 AGG_LINE/AGGSET 자리, Task 2 는 test_docs_drift.sh 의 $PDA 와 test_audit.sh 의 기존 걸음 표 단언, Task 3 은 test_audit.sh 첫 구획의 픽스처 단언 둘에서 빨간 불이 남는다. Task 1 Step 1 의 grep 이 테스트 셋만 겨누는 것은 확인 결과 문제가 아니었다 — test_assertions.sh 와 test_hooks.sh 에는 옮기는 문장의 앵커가 없다. test_hooks.sh 149행의 domain-docs 절 실재 단언도 넛지가 무는 절이 '글 유형별 적용' 이라 옮기는 절 셋에 안 걸린다. (2) 계획이 든 코드가 그대로 도는가 — 셸 인용, set -euo pipefail 아래의 조기 종료, 파이썬 예외, 픽스처 자기 되읽기를 따로 봤다. Task 1 Step 13 의 백틱과 Task 2 Step 11 의 $PDA·[가-힣]+ 가 걸렸다. Task 3 Step 5·7·8 의 회차 대조·측정 코드는 손으로 따라가 봤고 해소율 0.333, verdict_counts, new_ids, 재발 승계까지 픽스처와 맞았다. counts 를 out 에 담은 뒤 auto_rejected 를 넣는 것도 같은 딕셔너리라 반영된다. (3) Task 0 이 멈추면 — 커밋을 안 만드는 과제라 남는 것은 없지만 성사 확인이 약하고, 되돌리기가 안 되는 걸음은 Task 5 Step 12 의 봉인 하나다. (4) 과설계 — 걸음 표 행 수 단언 중복이 유일하게 확실했다. audit_verify.sh 가 test_audit.sh 246~249행의 status 집합 뽑기를 복제하는 것은 봤으나, Task 2 Step 8 이 '픽스처 형태는 test_audit.sh 가, 실제 기록은 audit_verify.sh 가' 로 역할을 갈라 두어 발견으로 올리지 않았다. audit_statements.sh 도 spec 이 근거를 대고 있어 올리지 않았다. (5) 완화만 가능한 위험 — 산문 앵커에 기댄 계약 테스트가 옮긴 문장 대부분을 안 붙드는 것 하나를 올렸다. 확인해 두고 발견이 아닌 것: 봉인된 docs/superpowers/reviews/2026-09-05-self-audit-2/ 를 계획이 든 audit_verify.sh 규칙으로 직접 돌려 봤고 findings 118건·기각 9건·verdict_reason 빠짐 없음·evidence_found/counterpart_found 전부 참·지문 열두 자·lens 접두사·run.json 필수 칸 여섯·diff.json 필수 칸 넷·no_prior_round 참·렌즈 원본 35개 이름 규칙과 target 칸이 모두 맞았다. Task 3 Step 14~15 의 기댓값 118 9 도 실측과 같다. 그리고 scripts/scaffold.sh 에 canon_changed 가 실재해 Task 5 Step 7 의 조건은 성립한다."
+}
