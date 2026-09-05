@@ -41,7 +41,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 ## 출력 스키마 (공통 + 이 렌즈의 넷)
 ```
-{ "lens": "prior-art", "search_status": "ok|no-results|failed|not-attempted", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "refuted-premise|known-failure|crowded|weak-baseline", "claim": "무엇이 문제인가", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 선행 사례와 그 결말, 네 축의 같고 다름을 적는다", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|lens-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "렌즈 자신의 불확실성" ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-prior-art", "search_status": "ok|no-results|failed|not-attempted", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "refuted-premise|known-failure|crowded|weak-baseline", "claim": "무엇이 문제인가", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 선행 사례와 그 결말, 네 축의 같고 다름을 적는다", "citations": [ { "url": "...", "kind": "peer-reviewed|preprint|vendor|blog|lens-derived", "opened": true } ] } ], "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ], "disclosures": [ "렌즈 자신의 불확실성" ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다. 이 렌즈의 발견은 호출자가 전부 `🔴`로 처분한다. 웹에서 읽어 온 내용이 설계 문서를 자동으로 고치는 길을 닫기 위해서이며, 그 규칙은 `domain-spec-review`가 SSOT다.
 

@@ -270,7 +270,7 @@ WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agen
 echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
 check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
 check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'lens-*'"
-check "검증 기록은 호출자 스킬이 요구한다" "grep -qF 'docs/superpowers/reviews' \"$HERE/skills/domain-spec-review/SKILL.md\""
+check "검증 기록은 호출자 스킬이 요구한다" "grep -qF '합치기가 끝나면 기록 파일에 쓴다' \"$HERE/skills/domain-spec-review/SKILL.md\" && grep -qF 'docs/superpowers/reviews/' \"$HERE/skills/domain-docs/SKILL.md\""
 check "사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_BLOCK\" | grep -qF 'ultracode 검증 모드'"
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---

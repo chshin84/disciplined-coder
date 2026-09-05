@@ -118,8 +118,7 @@ check "spec 리뷰가 회차 규칙 소유자를 가리킨다" "grep -qF '한 �
 check "옛 2회 표집 규정이 남아 있지 않다"     "! grep -qF '2회씩' \"\$CALLER\""
 check "렌즈별 결과를 한데 모으는 것은 남는다" "grep -qF '한데 모아 관리하는 것은 그대로다' \"\$CALLER\""
 check "소유자가 한 번씩만 띄운다고 적는다"    "grep -qF '렌즈는 한 번씩만 띄운다' \"\$DISP\""
-check "런타임은 한 번씩만 부른다"             "grep -qF '렌즈는 한 번씩만 부른다' \"\$RUNTIME2\""
-check "런타임이 회차 수를 다시 정하지 않는다" "grep -qF '여기서 다시 정하지 않는다' \"$RUNTIME2\""
+check "런타임은 서브에이전트 규율 밖이라고 적는다" "grep -qF '리뷰 콜은 제품 코드의 호출이라' \"\$RUNTIME2\""
 check "소유자 안에서 다시 정하지 않는다"      "grep -qF '여기서 다시 정하지 않는다' \"$DISP\""
 
 echo "[이름은 명사구, 주장은 첫 문장 — 정본과 가독성 렌즈]"
@@ -177,8 +176,22 @@ $(awk '/^## 예외 목록/{f=1;next} /^## /{f=0} f' "$DISP" | grep -oE '`lens-[a
 EOF
 check "예외 목록의 렌즈가 모두 실재한다"          "[ -z \"\$DISP_MISS\" ]"
 
+echo "[따르는 문서 — 이름과 문턱 사본]"
+# 렌즈 스키마의 lens 값은 디렉터리 이름과 같은 한 문자열이다. 짧은 이름이 남으면 기록 파일 이름과
+# findings 의 lens 칸이 갈린다.
+LENS_BAD=""
+while IFS= read -r d; do
+  [ -n "$d" ] || continue
+  ln="$(basename "$d")"
+  if ! grep -qF "\"lens\": \"$ln\"" "$d/SKILL.md"; then LENS_BAD="$LENS_BAD $ln"; fi
+done <<EOF
+$(ls -d "$HERE"/skills/lens-*)
+EOF
+check "렌즈 스키마의 lens 값이 디렉터리 이름과 같다" "[ -z \"\$LENS_BAD\" ]"
+check "렌즈 파일에 문턱 첫 문장이 안 남았다"          "! grep -qF '발견 하나는 넷을 진다' \"\$HERE\"/skills/lens-*/SKILL.md"
+
 echo "[기록 — 자리와 담을 것]"
-check "spec 리뷰 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$CALLER\""
+check "spec 리뷰가 기록 이름 소유자를 가리킨다" "grep -qF '문서 타입 표 기록 행이 소유하므로' \"\$CALLER\""
 check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$DOCS\""
 check "문서 검진 기록의 이름을 적는다"       "grep -qF '-check.md' \"\$DOCS\""
 check "문서 검진 기록은 처리 결과를 뺀다"    "grep -qF '무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다' \"\$DOCS\""

@@ -102,10 +102,15 @@ check "앞선 회차의 해소율을 낸다"          "amq 'import json,sys; d=j
 rm -rf "$ART"
 
 echo "[렌즈 — 발견의 문턱과 기계에 넘기는 것]"
+# 문턱은 meta-aggregate 「리뷰 산출물 계약」이 소유한다. 전에는 같은 세 문단이 렌즈 파일 넷에 같은
+# 글자로 있었고 이 검사가 그 사본들을 맞춰 세웠다. 지금은 소유자에서 한 번 보고, 렌즈 파일에는
+# 사본이 안 남았는지만 본다(SSOT).
+check "meta-aggregate 가 상대편을 필수로 적는다" "grep -qF 'counterpart' '$MA' && grep -qF '상대편을 못 대면 발견이 아니다' '$MA'"
+check "meta-aggregate 가 결과 기준을 적는다"     "grep -qF '지금 무엇이 그렇게 되어 있는지' '$MA' && grep -qF '앞으로 벌어질 일을 적지 않는다' '$MA'"
 for L in lens-grounding lens-fit lens-consistency lens-adversarial; do
   F="$HERE/skills/$L/SKILL.md"
-  check "$L 이 상대편을 필수로 적는다"   "grep -qF 'counterpart' '$F' && grep -qF '상대편을 못 대면 발견이 아니다' '$F'"
-  check "$L 이 결과 기준을 적는다"       "grep -qF '지금 무엇이 그렇게 되어 있는지' '$F' && grep -qF '앞으로 벌어질 일을 적지 않는다' '$F'"
+  check "$L 에 문턱 사본이 안 남았다"    "! grep -qF '상대편을 못 대면 발견이 아니다' '$F'"
+  check "$L 이 계약을 가리킨다"          "grep -qF '리뷰 산출물 계약이 정한다' '$F'"
   check "$L 에 기계에 넘기는 것 절이 있다" "grep -qF '## 기계에 넘기는 것' '$F'"
   check "$L 에 결과 칸의 옛 기준이 안 남았다" "! grep -qF '이대로 두면 무엇이 어떻게 잘못되는' '$F'"
   # F16 — 「발견의 문턱」이 상대편을 필수로 요구해도 system 프롬프트가 그 요구를 안 실으면 실제로
@@ -142,7 +147,8 @@ check "spec 리뷰가 대상 하나에 호출 하나를 띄우는 새 문장을 
 check "spec 리뷰가 규율 소유자를 가리킨다"   "grep -qF '한 번만 띄우는 렌즈의 규율' '$SR'"
 check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
 check "집계 계약이 제안 채널을 가른다"       "grep -qF 'suggestions' '$MA' && grep -qF '집계 대상이 아니다' '$MA'"
-check "묶는 규칙의 예외가 lens-adversarial 이름과 한 문장에 묶여 있다" "grep -qF '한 대상의 렌즈를 한 호출로 묶는 이 규칙의 예외로, 자세가 반대인 \`lens-adversarial\`만 따로 띄운다' '$SR'"
+check "묶는 규칙의 예외를 소유자가 적는다" "grep -qF 'lens-adversarial' '$DISP' && grep -qF '문서별 호출과 묶지 않고 따로 띄운다' '$DISP'"
+check "spec 리뷰가 그 예외를 베끼지 않는다" "! grep -qF '자세가 반대인 \`lens-adversarial\`만 따로 띄운다' '$SR'"
 check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "grep -qF '대상마다 따로 띄우는 이 절차에서 예외는 \`lens-prior-art\` 하나이며' '$SR'"
 
 echo "[domain-llm-runtime — 고정표 배정]"
@@ -156,9 +162,11 @@ echo "[project-doc-audit — 걸음 여덟과 기록 넷]"
 PDA="$HERE/skills/project-doc-audit/SKILL.md"
 PDA_ROWS="$(awk '/^## 걸음/{f=1;next} f&&/^## /{exit} f&&/^\| [^|-]/{n++} END{print n-1}' "$PDA")"
 PDA_SAID="$(LC_ALL=C.UTF-8 grep -oE '걸음은 [^ ]+이고' "$PDA" | head -1 | sed 's/걸음은 //; s/이고//')"
-KO_NUM() { case "$1" in 하나) echo 1;; 둘) echo 2;; 셋) echo 3;; 넷) echo 4;; 다섯) echo 5;; 여섯) echo 6;; 일곱) echo 7;; 여덟) echo 8;; 아홉) echo 9;; 열) echo 10;; *) echo 0;; esac; }
+KO_NUM() { case "$1" in 하나) echo 1;; 둘) echo 2;; 셋) echo 3;; 넷) echo 4;; 다섯) echo 5;; 여섯) echo 6;; 일곱) echo 7;; 여덟) echo 8;; 아홉) echo 9;; 열) echo 10;; 열하나) echo 11;; 열둘) echo 12;; *) echo 0;; esac; }
 check "걸음 표의 행 수와 '걸음은 N' 문장이 맞는다" "[ \"\$PDA_ROWS\" = \"\$(KO_NUM \"\$PDA_SAID\")\" ]"
 check "인용 확인 스크립트를 부른다"       "grep -qF 'audit_evidence.sh' '$PDA'"
+check "절차에 derived 가 안 남았다"            "! grep -qF 'derived' '$PDA'"
+check "절차의 표 대조가 진술 스크립트를 부른다" "grep -qF 'audit_statements.sh' '$PDA'"
 check "회차 대조 스크립트를 부른다"       "grep -qF 'audit_rounds.sh' '$PDA'"
 check "세션이 판정한다고 적는다"          "grep -qF '세션이 판정한다' '$PDA'"
 check "기록 파일 넷을 적는다"             "grep -qF 'run.json' '$PDA' && grep -qF 'findings.json' '$PDA' && grep -qF 'diff.json' '$PDA' && grep -qF 'suggestions.json' '$PDA'"
@@ -270,7 +278,10 @@ check "한 번만 규율에 '대상이 다르면 별개 호출' 이 있다" "gre
 check "절차의 대체된 문장 셋이 사라졌다"                 "! grep -qF '만은 묶음에 한 번 건다' '$PDA' && ! grep -qF '묶음을 통째로 받는다' '$PDA' && ! grep -qF '묶음 전부를 서로 대조한다' '$LC'"
 check "절차의 '짧은 문서 둘까지' 가 사라졌다"            "! grep -qF '짧은 문서 둘까지' '$PDA'"
 check "절차에 「일관성 대조」 절과 걸음 행이 있다"         "grep -qF '## 일관성 대조' '$PDA' && grep -qF '| 진술을 대조한다 |' '$PDA'"
-check "대상 목록을 손으로 적지 않고 도출한다고 적는다"    "grep -qF '목록은 손으로 적지 말고 파일에서 도출한다' '$PDA'"
+# 검색 문자열에 백틱이 있으면 변수에 담아 홑따옴표로 가둔다. check 의 둘째 인자는 큰따옴표라
+# 백틱을 그대로 넣으면 명령 치환으로 먹혀 검색어가 빈다.
+AT_DERIVE='목록은 손으로 적지 말고 `bash scripts/audit_targets.sh`가 내게 한다'
+check "대상 목록을 손으로 적지 않고 스크립트가 낸다"      "grep -qF -- \"\$AT_DERIVE\" '$PDA'"
 check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '$HERE/docs/superpowers/specs/2026-08-30-audit-unification-design.md' | grep -qF '2026-09-02-audit-record-and-diff-design.md'"
 # run.json 이 담을 것의 정본은 「통합 기록」 절의 run.json 서술 한 줄이다. 그 줄이 대상별
 # 렌즈 배정과 판정 개수를 여전히 담는다고 적는지, 그리고 픽스처가 그 두 사실을 실제로
