@@ -1,0 +1,73 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-fit/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/project-doc-audit/SKILL.md",
+  "skills/domain-llm-runtime/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "「기계에 넘기는 것」 절 마지막 문장과 「가드」 절",
+   "type": "constraint",
+   "claim": "기계 검사 뒤에 렌즈가 보는 범위를 「가드」는 '결정론으로 못 잡는 스타일과 모호한 제약'으로 적고 「기계에 넘기는 것」은 '곧 계약이 두 가지로 읽히는지'로 좁혀 적어, 체크리스트 스타일 축의 길이·언어·톤이 이 렌즈의 범위인지가 두 가지로 읽힌다.",
+   "file": "skills/lens-fit/SKILL.md",
+   "evidence": "이 렌즈는 그 검사가 답하지 못한 것, 곧 계약이 두 가지로 읽히는지를 본다.",
+   "counterpart_file": "skills/lens-fit/SKILL.md",
+   "counterpart": "LLM 리뷰는 결정론으로 못 잡는 스타일과 모호한 제약에만 쓴다.",
+   "principle": "EXPLICIT",
+   "consequence": "스타일 축 가운데 금지어는 scripts/test_docs_drift.sh가 맡지만 길이·언어·톤은 그 스크립트가 보지 않고, 「기계에 넘기는 것」을 따르는 호출은 렌즈에 계약이 두 가지로 읽히는 곳만 보라고 지시하므로 길이·언어·톤은 지금 기계도 렌즈도 보지 않는 축으로 남아 있다."
+  },
+  {
+   "where": "「가드」 절 첫 문장",
+   "type": "constraint",
+   "claim": "결정론적 검증을 누가 돌리는지 주어가 없다. 다른 렌즈 파일의 「가드」 절은 렌즈 자신에게 거는 제약이라 같은 자리의 이 문장은 렌즈가 validator를 돌리는 지시로 읽히고, 이 규칙의 소유자인 domain-docs는 렌즈는 판단만 한다고 정한다.",
+   "file": "skills/lens-fit/SKILL.md",
+   "evidence": "결정론적 검증(JSON 스키마 validator, 정규식)을 먼저 돌린다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "렌즈는 판단만 한다.",
+   "principle": "FOCUSED",
+   "consequence": "lens-adversarial의 「가드」 절은 '이 렌즈는 기능을 추가하자고 제안하지 않는다'처럼 렌즈 자신을 주어로 적혀 있고, domain-llm-runtime은 코드 validator를 리뷰 콜 앞에서 호출자 코드가 돌린다고 적어 놓아, 결정론 검증의 주체가 lens-fit 문서에서는 비어 있고 소유자 문서와 호출자 문서에서는 호출자로 적혀 있다."
+  },
+  {
+   "where": "「출력 스키마 (공통)」의 type 폐쇄 집합",
+   "type": "schema",
+   "claim": "체크리스트 축은 형식·스타일·오염·호환 넷인데 type 집합은 schema·format·style·constraint·compat 다섯이라, 오염 축의 발견이 어느 값을 받고 constraint 값이 어느 축에서 나오는지가 정해져 있지 않다.",
+   "file": "skills/lens-fit/SKILL.md",
+   "evidence": "\"type\": \"schema|format|style|constraint|compat\"",
+   "counterpart_file": "skills/lens-fit/SKILL.md",
+   "counterpart": "- **오염** — 다운스트림이 바로 파싱·사용할 수 있는가(여분 텍스트나 마크다운 펜스가 섞이지 않았는가).",
+   "principle": "EXPLICIT",
+   "consequence": "lens-consistency는 '`gap`은 커버리지 공백과 산출물 공백 둘을 담는다'로 축과 값의 대응을 적어 두었으나 이 문서에는 그 대응 문장이 없고, meta-aggregate는 제품 런타임이 type 값으로 행동을 정하는 표를 갖는다고 정하므로, 오염 발견에 적용될 그 표의 행이 이 문서로는 정해지지 않는다."
+  },
+  {
+   "where": "「발견의 문턱」 절",
+   "type": "constraint",
+   "claim": "meta-aggregate의 리뷰 산출물 계약은 렌즈 파일이 자기 type 폐쇄 집합만 정의하고 나머지는 참조하라고 정하는데, 이 절은 counterpart_file·counterpart·consequence의 뜻과 줄 번호 금지 규칙을 이 파일에서 다시 정한다.",
+   "file": "skills/lens-fit/SKILL.md",
+   "evidence": "출력에 `counterpart_file`과 `counterpart`를 담는다. 앞은 상대편이 있는 파일의 레포 상대경로이고 뒤는 그 파일에 있는 그대로의 문장이다. 줄 번호는 담지 않는다 — 줄이 밀리면 회차 사이의 지문이 깨진다.",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.",
+   "principle": "SSOT",
+   "consequence": "「발견의 문턱」 세 문단이 lens-grounding·lens-consistency·lens-adversarial·lens-fit 네 파일에 같은 글자로 들어 있고, 그 가운데 '줄 번호는 담지 않는다'와 '상대편을 못 대면 발견이 아니다' 규칙은 meta-aggregate의 리뷰 산출물 계약에 적혀 있지 않아 공통 필드의 규칙이 계약 밖 네 곳에 산다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FOCUSED",
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "SIMPLE"
+ ],
+ "notes": "훑은 각도는 체크리스트의 넷이다. 형식: 출력 스키마의 필드 이름과 뜻풀이를 meta-aggregate 계약과 하나씩 맞댔고 lens·read·issues의 아홉 칸·principles_applied·notes가 같다. principles_applied 뜻풀이만 계약을 가리키는 문장으로 바꿔 적었는데 이는 test_docs_drift.sh가 '제품 런타임 구현에는 요구하지 않는다'의 복제를 금지하므로 정당한 참조다. type 집합과 체크리스트 축의 대응이 안 적힌 것을 발견으로 올렸다. 스타일: frontmatter는 name이 디렉터리 이름과 같고 description에 ': '와 ' #'이 없으며 '호출한다'로 끝나 domain-plugin 규칙과 test_docs_drift.sh의 등재 검사에 맞는다. 금지 낱말은 다시 세지 않았다. 오염: 문서 자체는 마크다운이라 해당 없다. 호환: 「발견의 문턱」과 스키마 뒤 문단이 lens-grounding·lens-consistency·lens-adversarial과 글자 그대로 같아 렌즈 사이 호환은 유지되나, 그 공통 문단이 계약 밖에서 규칙을 더 정하는 것을 SSOT 발견으로 올렸다. 확인한 것: 「기계에 넘기는 것」이 가리키는 scripts/test_docs_drift.sh는 금지 낱말(writing-korean 표에서 도출)과 렌즈 스키마 문서의 필수 키(consequence·read·file·principle·evidence 문구)와 meta-aggregate의 source 열거를 검사한다. 각 렌즈의 type 폐쇄 집합 값 자체는 어느 검사도 대조하지 않으며, findings.json의 status 집합은 scripts/test_audit.sh가 맡는다. 「읽기 범위」의 'read는 대개 빈 배열이다'는 문서 검진과 레포 감사에서 계약이 다른 파일(meta-aggregate·domain-docs·writing-korean·domain-plugin)에 있어 실제로는 비지 않는데, '대개'로 완화되어 있어 발견으로 올리지 않았다. 발견 넷 가운데 첫째와 셋째는 상대편이 같은 파일 안에 있어 호출자가 lens-consistency의 몫으로 볼 수도 있다. 더 확인할 것: 「가드」의 주어를 호출자로 못 박을지는 domain-llm-runtime과 domain-docs 두 소유자 가운데 어느 문장을 정본으로 삼을지 사용자 결정이 필요하다."
+}

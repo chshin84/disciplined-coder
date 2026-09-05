@@ -1,0 +1,63 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-llm-runtime/SKILL.md",
+ "read": [
+  "skills/domain-docs/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "렌즈 선택 절 마지막 문장과 조립 절 첫 문장",
+   "type": "constraint",
+   "claim": "렌즈 선택 절은 렌즈가 하나면 집계 단계를 두지 않는다고 정하는데 조립 절은 집계를 무조건 걸음으로 적어, 렌즈가 하나인 호출의 조립 순서가 두 가지로 읽힌다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "1차 콜을 받은 뒤 「렌즈 선택」 표가 호출 종류로 고정한 렌즈 리뷰 콜을 병렬로 돌리고, `meta-aggregate`가 집계한다.",
+   "counterpart_file": "skills/domain-llm-runtime/SKILL.md",
+   "counterpart": "렌즈가 둘이면 `meta-aggregate`로 집계하고 하나면 집계 단계를 두지 않는다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 렌즈가 하나인 호출 종류(사용자에게 그대로 보이는 출력, 다운스트림이 파싱하는 출력)에 집계를 거는지가 이 문서 안에서 두 가지로 적혀 있다."
+  },
+  {
+   "where": "비기능 체크리스트, 사람 승인 항목",
+   "type": "constraint",
+   "claim": "이 절은 각 항목의 등급을 이 문서가 미리 정한 고정값이라고 선언하는데, 사람 승인 항목은 컴플라이언스 접점이 아닐 때의 등급을 '정책'에 맡기고 그 정책이 무엇인지 적지 않는다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "비가역이거나 위험이 큰 액션에는 사람 승인을 건다. 컴플라이언스 접점이면 critical이고, 아니면 정책에 따른다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "모호한 표현은 무엇이·언제·얼마나·어떤 결과인지로 바꾼다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 컴플라이언스 접점이 아닌 액션의 등급은 이 문서 어디에도 값이 없고 '정책'이 어느 문서를 가리키는지도 없다."
+  },
+  {
+   "where": "비기능 체크리스트, SECRETS 항목과 누락 처리 문장",
+   "type": "constraint",
+   "claim": "누락 항목은 그 항목에 붙은 등급대로 처리한다고 정하는데, SECRETS 항목에는 등급이 붙어 있지 않아 누락 시 처리가 정해지지 않는다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "프롬프트와 로그에 비밀과 개인정보를 남기지 않는다(`SECRETS`).",
+   "counterpart_file": "skills/domain-llm-runtime/SKILL.md",
+   "counterpart": "누락 항목은 그 항목에 붙은 등급대로 처리하며, critical은 머지와 배포를 차단한다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 SECRETS 항목은 등급이 없어 이 항목이 빠졌을 때 머지와 배포를 차단하는지가 이 문서로는 정해지지 않는다."
+  },
+  {
+   "where": "조립 절, 렌즈는 한 번씩만 부른다 문장과 재생성 문장",
+   "type": "constraint",
+   "claim": "렌즈를 한 번씩만 부른다고 정하면서 재생성이 돈다고 적어, 재생성한 출력을 렌즈가 다시 보는지가 두 가지로 읽힌다. 한 번이 요청당인지 후보당인지 적혀 있지 않다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "렌즈는 한 번씩만 부른다.",
+   "counterpart_file": "skills/domain-llm-runtime/SKILL.md",
+   "counterpart": "여기서 도는 것은 1차 출력을 다시 만드는 재생성이다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 재생성으로 만든 둘째 출력에 렌즈 리뷰 콜을 다시 거는지가 이 문서에 정해져 있지 않다."
+  }
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "PLAIN-KO",
+  "PROSE-FORM",
+  "NAME-ITEMS",
+  "SSOT"
+ ],
+ "notes": "형식·스타일·오염·호환 네 각도를 따로 훑었다. frontmatter는 name이 디렉터리 이름과 같고 description에 ': '와 ' #'이 없어 domain-plugin의 규칙을 지킨다. 문서 타입은 절차·계약이며 상태를 적지 않는다. 순서 없는 항목에 번호를 매기지 않았다. 금지 낱말과 폐쇄 집합은 지시대로 다시 세지 않았다. 계약이 두 가지로 읽히는 곳만 올렸다. writing-korean의 대구 제한('A가 아니라 B'는 한 답에 한 번)에 비추면 이 문서에 '에이전트가 아니라 제품 코드', '단계가 아니라 호출 코드 전체' 등 대구가 둘 이상 있는데, 그 규칙이 답변에 거는 것인지 참조 스킬 문서에도 거는 것인지 writing-korean이 갈라 적지 않아 발견으로 올리지 않았다. 호출자가 그 적용 범위를 정하면 다시 볼 수 있다. 재생성·폴백·통과 셋 가운데 재생성을 강제하는 type만 제품이 정한다고 적고 폴백과 통과의 조건은 적지 않은 것도 두 가지로 읽히지만, 맞댈 문장을 하나로 좁히지 못해 올리지 않았다."
+}

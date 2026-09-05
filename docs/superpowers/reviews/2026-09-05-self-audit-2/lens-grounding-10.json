@@ -1,0 +1,41 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/writing-korean/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "scripts/test_docs_drift.sh",
+  "skills/lens-readability/SKILL.md",
+  "skills/domain-docs/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "frontmatter description와 첫 문단 / 정본 「원칙」의 READ-FLOW 조항",
+   "type": "omission",
+   "claim": "이 문서는 정본 네 조항의 상세를 소유한다고 적지만, 정본은 PLAIN-KO·PROSE-FORM·KO-SYNTAX 세 조항에서만 writing-korean을 가리키고 READ-FLOW 조항에는 그 참조가 없다.",
+   "file": "skills/writing-korean/SKILL.md",
+   "evidence": "정본의 PLAIN-KO·PROSE-FORM·READ-FLOW·KO-SYNTAX 네 조항이 무엇을 요구하는지와 어느 측정에서 나왔는지를 담는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "두괄식으로 작성한다. 전문 용어는 처음 나올 때 한 줄로 풀어 준다. 짧은 답보다 사용자가 읽기에 편안한 글을 쓴다.",
+   "principle": "SSOT",
+   "consequence": "정본만 실리는 세션은 READ-FLOW의 상세와 근거가 이 문서에 있다는 것을 정본에서 알 수 없고, 다른 세 조항과 달리 이 문서의 READ-FLOW 절에는 정본에서 닿는 참조가 없다."
+  },
+  {
+   "where": "「금지 표현」 절 첫 문단 / scripts/test_docs_drift.sh의 금지 표현 검사",
+   "type": "unsupported",
+   "claim": "표를 문자열 검색으로 거른 뒤 내보낸다고 적으면서 무엇이 거르는지 이름을 적지 않았다. 저장소에서 그 표를 읽어 거르는 것은 scripts/test_docs_drift.sh 하나이고 그 대상은 git이 추적하는 .md 문서뿐이라, 이 문서가 함께 다루는 '답'을 내보내기 전에 거르는 장치는 저장소에 없다.",
+   "file": "skills/writing-korean/SKILL.md",
+   "evidence": "아래 표가 그 목록을 소유하며, 사람의 판단이 아니라 문자열 검색으로 거른 뒤 내보낸다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "BAN_DOCS=\"$(cd \"$HERE\" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^skills/writing-korean/SKILL.md')\"",
+   "principle": "EXPLICIT",
+   "consequence": "저장소 문서는 scripts/test_docs_drift.sh가 이 표에서 목록을 도출해 거르지만, 대화 답변에 문자열 검색을 거는 장치는 저장소 어디에도 없고 이 문서는 거르는 주체의 이름을 적지 않아 읽는 사람이 무엇이 언제 거르는지 알 수 없다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD"
+ ],
+ "notes": "훑은 각도는 누락·모순·환각·불일치 넷이다. 누락: 정본 네 조항을 대조해 READ-FLOW만 상세 소유자를 가리키지 않는 것을 찾았다. 모순: 정본 PLAIN-KO·PROSE-FORM·KO-SYNTAX의 문구와 이 문서의 절을 맞대어 어긋남을 찾지 못했다. lens-readability는 「읽기 범위」와 「기계에 넘기는 것」에서 이 파일을 기준 문서로 읽는다고 적어 이 문서의 주장과 맞는다. 환각: scripts/test_docs_drift.sh는 awk로 「## 금지 표현」 절의 표에서 목록을 도출하므로 표가 목록을 소유한다는 주장은 실제와 맞고, 거르는 주체와 범위를 안 적은 것만 올렸다. 불일치: 본문의 수치(.92→.79, 835밀리초, 8.12개, 4.1퍼센트/19.8퍼센트, 58퍼센트/47퍼센트, 4퍼센트포인트, 51→66→80)를 저장소 전체에서 검색했는데 이 파일과 과거 리뷰 기록 밖에는 없어 저장소 안에서 맞거나 틀리다고 판정할 출처가 없다. 그 출처 미표기는 계약 위반이라 lens-fit에 올렸다. 스크립트는 지시대로 실행하지 않았다. 더 확인할 것: 정본 READ-FLOW 조항이 writing-korean을 가리키지 않는 것이 의도된 것인지는 이 저장소 문서로는 알 수 없어 사용자에게 물어야 한다."
+}

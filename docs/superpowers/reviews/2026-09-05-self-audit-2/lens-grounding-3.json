@@ -1,0 +1,66 @@
+{
+ "lens": "lens-grounding",
+ "target": "CLAUDE.md",
+ "read": [
+  "agent-principles.md",
+  "README.md (「하드 게이트와 넛지와 전역 설정 수정」 절과 seal_reviews·settings.json·SessionStart 언급 검색)",
+  "hooks/hooks.json",
+  "hooks/_spec_marker.sh",
+  "hooks/spec_review_stop.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/doc_format_pretooluse.sh (머리 주석)",
+  "hooks/readonly_pretooluse.sh",
+  ".claude/settings.json",
+  ".claude/settings.local.json",
+  ".claude-plugin/plugin.json",
+  "scripts/seal_reviews.sh",
+  "scripts/ 목록 (test_assertions.sh·test_audit.sh·test_docs_drift.sh·test_hooks.sh·test_scaffold.sh)",
+  "scripts/test_*.sh 의 PASS/FAIL 집계와 종료 판정 줄",
+  "scripts/test_docs_drift.sh 의 「테스트 실행 명령」 블록",
+  "docs/superpowers/ 폴더 구조 (specs·plans·reviews)",
+  "skills/project-doc-audit/SKILL.md (seal_reviews 언급 검색)"
+ ],
+ "issues": [
+  {
+   "where": "CLAUDE.md 세 번째 문단 첫 문장 앞 절",
+   "type": "contradiction",
+   "claim": "기존 spec이나 plan을 고치는 것은 Stop 게이트가 아니라 PostToolUse 넛지가 맡는데, 문장은 spec과 plan을 쓰기만 하면 Stop 게이트가 리뷰를 요구한다고 적는다. Stop 훅은 git 상태가 미추적(??)이거나 추가(A)인 새 파일과 HEAD 커밋이 추가한 파일만 본다.",
+   "file": "CLAUDE.md",
+   "evidence": "spec과 plan을 쓰면 Stop 게이트가 리뷰를 요구하고",
+   "counterpart_file": "hooks/spec_review_stop.sh",
+   "counterpart": "Fix A: 신규(미추적 ??·추가 A)만 하드게이트 — 기존 spec 수정(상태 strip 등)엔 안 건다(넛지는 PostToolUse가).",
+   "principle": "SSOT",
+   "consequence": "같은 게이트의 발동 조건이 CLAUDE.md 안에 두 번 적혀 있고 둘이 다르다. 두 번째 문단은 '새로 쓰면'이라 하고 세 번째 문단은 '쓰면'이라 하며, 실제 코드는 두 번째 문단과 같다."
+  },
+  {
+   "where": "CLAUDE.md 세 번째 문단 첫 문장 뒤 절",
+   "type": "mismatch",
+   "claim": "검진 넛지는 spec/plan 밖의 모든 문서에 뜨는 것이 아니다. 훅은 docs/superpowers/reviews/ 아래 .md와 프로젝트 폴더 밖 .md를 건너뛰며, README도 그렇게 적는다.",
+   "file": "CLAUDE.md",
+   "evidence": "그 밖의 문서를 고치면 검진 넛지가 뜬다",
+   "counterpart_file": "README.md",
+   "counterpart": "프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.",
+   "principle": "SSOT",
+   "consequence": "이 레포에서 감사 기록(docs/superpowers/reviews/ 아래 .md)을 고치면 CLAUDE.md는 넛지가 뜬다고 하지만 hooks/doc_review_posttooluse.sh는 그 경로를 continue로 건너뛰어 아무것도 뜨지 않는다."
+  },
+  {
+   "where": "CLAUDE.md 세 번째 문단 마지막 문장",
+   "type": "unsupported",
+   "claim": "CLAUDE.md는 README의 그 절을 걸린 훅 전체 목록의 정본으로 가리키지만, 그 절은 플러그인 hooks.json의 여섯 훅(하드 게이트 하나·읽기 전용 차단 하나·넛지 셋·전역 설정 수정 하나)만 세고, CLAUDE.md 자신이 바로 앞 문장에서 적은 세션 시작 봉인(.claude/settings.json 의 SessionStart → scripts/seal_reviews.sh)은 그 절에 없다.",
+   "file": "CLAUDE.md",
+   "evidence": "걸린 훅의 전체 목록과 배선은 `README.md`의 「하드 게이트와 넛지와 전역 설정 수정」 절이 정본이다.",
+   "counterpart_file": "README.md",
+   "counterpart": "세션에는 턴 종료를 막는 하드 게이트 하나와 읽기 전용 파일 수정을 막는 차단 하나와 넛지 셋과 전역 설정 수정 하나가 걸린다.",
+   "principle": "SSOT",
+   "consequence": "세션 시작 봉인 훅의 배선은 .claude/settings.json 에만 있고 README 그 절에는 없어, 정본이라고 가리킨 곳을 열어도 CLAUDE.md가 말한 봉인 훅을 찾을 수 없다. README 그 절은 봉인 시점을 '만든 직후 scripts/seal_reviews.sh'로만 적는다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "EXPLICIT"
+ ],
+ "notes": "훑은 각도는 넷이다. 누락은 없다. 설계·계획 문서 경로는 hooks/_spec_marker.sh 의 SPECPLAN_DIRS와 같고 두 폴더가 실제로 있으며, 테스트 실행 명령은 scripts/test_docs_drift.sh 가 CLAUDE.md 를 정본으로 놓고 세 조각(for t in scripts/test_*.sh · bad=\"$bad $t\" · FAILED:)을 대조한다. 모순은 첫 발견 하나다. 환각은 없다. 'claude plugin validate ./ 는 version 경고 하나만 내면 정상'은 실행하지 않아 확인하지 못했으나 .claude-plugin/plugin.json 에 version 필드가 없어 경고가 날 개연성은 있다. 불일치는 둘째와 셋째 발견이다. 테스트 스크립트 다섯은 모두 pass/fail 을 세어 마지막에 [ \"$fail\" -eq 0 ] 으로 판정하므로 'FAIL=0이며 기대 개수를 숫자로 박지 않는다'는 코드와 맞는다. 읽기 전용 거부는 hooks/readonly_pretooluse.sh 가 Write|Edit 매처로 permissionDecision deny 와 사유를 내므로 맞는다. 세션 시작 봉인은 .claude/settings.json 의 SessionStart 에 scripts/seal_reviews.sh 가 걸려 있어 맞으며, 다만 HEAD 에 있는 파일만 봉인하므로 커밋 전 기록은 봉인되지 않는다. 더 확인할 것은 하나다. 'version 경고 하나만'이 지금도 참인지는 명령을 돌려야 안다."
+}

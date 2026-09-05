@@ -1,0 +1,32 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-plugin/SKILL.md",
+ "read": [
+  "skills/domain-docs/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "commands/setup-discipline.md",
+  "commands/show-principles.md"
+ ],
+ "issues": [
+  {
+   "where": "후보 「플러그인을 만들 때 지킬 것」의 frontmatter 항목 / 계약은 이 문서 자신이 정한 frontmatter 규칙과 그것을 기계로 붙드는 scripts/test_docs_drift.sh",
+   "type": "constraint",
+   "claim": "frontmatter 항목은 스킬 SKILL.md와 커맨드 .md를 한 문장에서 함께 다룬 뒤 `description`이 언제 여는지를 담는다고 적어, 그 요구가 커맨드에도 걸리는지 스킬에만 걸리는지 두 가지로 읽힌다. 기계 검사는 스킬만 훑고, 커맨드 둘의 description은 무엇을 하는지만 적는다.",
+   "file": "skills/domain-plugin/SKILL.md",
+   "evidence": "`description`은 언제 여는지를 담는다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "check \"$sk 이 언제 여는지 자기 설명에 적는다\" \"grep -m1 '^description:' '$d/SKILL.md' | grep -qE '때|연다|쓴다|한다'\"",
+   "principle": "EXPLICIT",
+   "consequence": "지금 그 검사는 `skills/*/SKILL.md` 반복문 안에서만 돌고 `commands/*.md`는 YAML 안전 검사만 받는다. commands/setup-discipline.md와 commands/show-principles.md의 description은 셋업한다·보여준다처럼 하는 일만 적고 언제 여는지는 적지 않으므로, 문서를 커맨드까지 걸리는 규칙으로 읽으면 두 커맨드가 위반이고 스킬에만 걸리는 규칙으로 읽으면 검사와 맞는다. 어느 쪽인지 문서가 정하지 않았다."
+  }
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "SSOT",
+  "PROSE-FORM",
+  "NAME-ITEMS",
+  "SIMPLE"
+ ],
+ "notes": "훑은 각도: 형식(frontmatter가 이 문서가 정한 두 키·한 키 규칙과 YAML 평문 조건을 지키는가), 스타일(domain-docs 「규칙 (문서 일반)」의 ID 참조·문서 SSOT·ID의 설명 의무·팩트와 근거, writing-korean의 PROSE-FORM 라벨 규칙과 대구 제한), 오염(참고서 본문에 여분 텍스트나 펜스가 섞였는가), 호환(domain-docs가 이 문서에 맡긴 \"매니페스트와 frontmatter의 형식\" 소유를 이 문서가 실제로 다루는가). 이 문서의 frontmatter는 name이 디렉터리 이름과 같고 description에 ': '와 ' #'이 없으며 \"설계와 개발 단계에서 연다\"로 언제 여는지를 담아 자기 규칙을 지킨다. 불릿 라벨은 모두 명사구이고 주장은 본문 문장에 있어 PROSE-FORM에 맞고, 번호 없이 이름을 부르며, `A가 아니라 B` 대구는 없다. 올리지 않은 두 가지 읽힘: \"`name`과 `description` 두 키를 쓴다\"가 정확히 둘인지 최소 둘인지는 갈리지만 다른 읽음을 보이는 상대편 문장이 레포에 없어 발견으로 세지 않았다. plugin.json과 marketplace.json이 같은 description을 두 곳에 두는 것은 domain-docs의 문서 SSOT와 겉으로 부딪히지만, 문서가 plugin.json을 정본으로 지정하고 test_docs_drift.sh가 동일성을 검사하므로 도출로 대체한 것으로 보아 올리지 않았다. 금지 낱말과 폐쇄 집합은 지시대로 다시 세지 않았다."
+}

@@ -1,0 +1,82 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-prior-art/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/domain-spec-review/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/audit_evidence.sh"
+ ],
+ "issues": [
+  {
+   "where": "「출력 스키마 (공통 + 이 렌즈의 넷)」 코드 블록의 evidence 칸",
+   "type": "schema",
+   "claim": "이 문서는 evidence 칸의 뜻을 '문서 인용, 파일 경로와 줄, URL'로 다시 정하는데, 바로 아래 문장에서 필드의 뜻은 meta-aggregate가 SSOT라고 적는다. meta-aggregate는 evidence를 '짚은 곳 파일에 있는 그대로의 문장'으로 정하고 렌즈 파일은 type 폐쇄 집합만 정의하라고 한다. 같은 칸의 뜻이 두 문서에서 다르게 읽힌다.",
+   "file": "skills/lens-prior-art/SKILL.md",
+   "evidence": "\"evidence\": \"그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 선행 사례와 그 결말, 네 축의 같고 다름을 적는다\"",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "\"evidence\": \"짚은 곳 파일에 있는 그대로의 문장\"",
+   "principle": "SSOT",
+   "consequence": "지금 evidence 칸의 정의가 두 곳에 있다. scripts/test_docs_drift.sh는 주석으로 '그 렌즈의 SKILL.md가 정본'이라 적어 이 렌즈를 대조에서 빼는데, meta-aggregate 본문은 그 예외를 적지 않아 정본이 어느 쪽인지 문서만 읽으면 갈린다."
+  },
+  {
+   "where": "「출력 스키마 (공통 + 이 렌즈의 넷)」 코드 블록의 issues 항목",
+   "type": "schema",
+   "claim": "이 렌즈의 issues 항목에는 공통 계약의 file·counterpart_file·counterpart·principle 네 칸이 없다. meta-aggregate의 「공통 계약의 예외」는 lens-readability 하나만 예외로 적으므로, 이 렌즈가 그 네 칸을 빼는 것이 허용된 예외인지 누락인지 계약 문서에서 읽을 수 없다.",
+   "file": "skills/lens-prior-art/SKILL.md",
+   "evidence": "\"issues\": [ { \"where\": \"문서 내 위치\", \"type\": \"refuted-premise|known-failure|crowded|weak-baseline\", \"claim\": \"무엇이 문제인가\", \"consequence\": \"이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지\"",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "`lens-readability` — 맞댈 상대편이 없어 위 공통 계약을 따르지 않는다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 scripts/audit_evidence.sh는 evidence·counterpart·principle을 이어 fingerprint를 만드는데, 이 렌즈의 발견에는 counterpart와 principle이 없어 지문이 evidence 하나로만 만들어진다. 그 사정을 계약 문서(meta-aggregate)가 예외로 적지 않고 scripts/test_docs_drift.sh의 주석만 알고 있다."
+  },
+  {
+   "where": "첫 문단의 직접 요청 경로",
+   "type": "constraint",
+   "claim": "사용자가 spec 없이 직접 청한 회차는 상한과 인용 검증만 spec 리뷰와 같다고 적고 기록 파일은 정하지 않는다. domain-spec-review는 기록을 -review.md에 쓰고, domain-docs는 선행연구 대조에 -prior-art.md 종류를 따로 둔다. spec이 없는 회차의 기록 이름이 두 가지로 읽힌다.",
+   "file": "skills/lens-prior-art/SKILL.md",
+   "evidence": "상한과 인용 검증은 spec 리뷰 때와 같다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "종류는 spec 리뷰가 `review`, 문서 검진과 레포 감사가 `check`, 선행연구 대조가 `prior-art`다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 spec 없이 직접 청한 회차의 기록을 어느 이름으로 남기는지 정한 문서가 없다. domain-spec-review는 spec 리뷰 안의 절차만 적고, 이 문서는 기록을 언급하지 않으며, domain-docs의 prior-art 종류는 어느 회차에 쓰는지 적지 않는다."
+  },
+  {
+   "where": "「띄울 때 지킬 상한」 둘째 문단",
+   "type": "constraint",
+   "claim": "'일을 나눠 담는다'의 '일'이 검토 대상(spec) 단위인지 한 대상 안의 각도 단위인지 정해져 있지 않다. domain-docs의 규율은 렌즈를 한 번씩만 띄우고 각도는 한 에이전트 안에서 나누라고 하는데, 이 문서는 통상 둘까지 서브에이전트를 허용한다. spec 하나에 에이전트 둘을 쓸 수 있는지가 두 문서에서 다르게 읽힌다.",
+   "file": "skills/lens-prior-art/SKILL.md",
+   "evidence": "띄우기 전에 승인된 상한 안에 일을 나눠 담는다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "렌즈는 어느 호출자에서나 한 번씩만 띄운다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 domain-docs는 예외로 3층 오케스트레이션과 이름표 묶음별 lens-consistency만 적고 이 렌즈를 적지 않는다. 이 문서는 상한을 '이 렌즈에만 있다'고 하면서 상한이 대상 수를 세는지 에이전트 수를 세는지 한 문장으로 못 박지 않았다."
+  },
+  {
+   "where": "「가드」의 인용 URL 항목",
+   "type": "format",
+   "claim": "domain-docs는 렌즈마다 기계에 넘기는 것을 그 렌즈 SKILL.md의 「기계에 넘기는 것」 절에 적으라 하고 절이 비어 있으면 넘길 것이 없다는 뜻이라 한다. 이 문서에는 그 절이 없는데 domain-spec-review는 citations URL이 응답하는지를 호출자가 먼저 결정론으로 확인한다. URL 확인이 렌즈 몫인지 기계 몫인지 이 문서의 형식만으로는 갈린다.",
+   "file": "skills/lens-prior-art/SKILL.md",
+   "evidence": "인용한 URL은 실제로 열어 확인하고 출처의 성격을 구분해 적는다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "렌즈마다 무엇을 기계에 넘기는지는 그 렌즈 `SKILL.md`의 「기계에 넘기는 것」 절이 적는다.",
+   "principle": "SSOT",
+   "consequence": "지금 lens-fit에는 그 절이 있고 이 문서에는 없다. URL 응답 확인은 domain-spec-review 「웹에 나가는 렌즈의 인용 검증」에 호출자 몫으로 적혀 있어, 기계에 넘기는 것의 목록이 이 렌즈 문서가 아니라 호출자 문서에만 있다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "SECRETS",
+  "SIMPLE",
+  "ASK-FORK"
+ ],
+ "notes": "훑은 각도는 lens-fit 체크리스트 넷이다. 형식에서는 출력 스키마를 meta-aggregate 공통 계약과 칸마다 맞댔고 lens 값 prior-art와 search_status·citations·not_found·disclosures 네 추가 칸은 meta-aggregate의 추가 필드 문단과 일치했다. 스타일에서는 frontmatter의 name이 디렉터리 이름과 같고 description에 ': '와 ' #'이 없음을 확인했으며 금지 낱말은 test_docs_drift.sh 몫이라 다시 세지 않았다. 오염에서는 레퍼런스 프롬프트가 JSON만 돌려주게 하는지 봤고 문제가 없었다. 호환에서는 호출자 domain-spec-review가 적은 조건(spec에 한해 조건부, 직접 요청은 승인, 통상 둘과 최대한 여섯, 대상마다 띄우기의 예외, 발견 전부 🔴)과 이 문서의 조건을 맞댔고 상한 숫자와 🔴 처분과 승인 규칙은 같았다. 더 확인할 것은 하나다. scripts/test_docs_drift.sh 주석이 이 렌즈의 evidence 정본을 이 SKILL.md로 두는데 그 결정이 meta-aggregate 「공통 계약의 예외」에 올라가야 하는지는 사용자 판단이다."
+}

@@ -1,0 +1,77 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-docs/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "skills/project-doc-audit/SKILL.md",
+  "scripts/test_audit.sh"
+ ],
+ "issues": [
+  {
+   "where": "「문서 검진 방법」 절, 기록 위치 문단",
+   "type": "format",
+   "claim": "같은 파일 안에서 기록 이름의 같은 칸을 한 곳은 `<문서이름>`으로, 소유 문단은 `<주제>`로 적어 그 칸이 검진 대상 문서의 이름인지 회차 주제인지 두 가지로 읽힌다. 실제 기록(2026-08-17-canon-readme-check.md·2026-08-24-readability-check.md)은 주제를 쓴다.",
+   "file": "skills/domain-docs/SKILL.md",
+   "evidence": "결과는 `docs/superpowers/reviews/YYYY-MM-DD-<문서이름>-check.md`에 남긴다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md`이고 종류는 spec 리뷰가 `review`, 문서 검진과 레포 감사가 `check`, 선행연구 대조가 `prior-art`다.",
+   "principle": "SSOT",
+   "consequence": "이름 규칙의 소유자라고 선언한 문서가 같은 칸을 두 이름으로 적고 있어, 문서 검진 기록을 쓰는 세션이 어느 자리표시자를 따를지 문서만으로는 하나로 정해지지 않는다."
+  },
+  {
+   "where": "「문서 타입과 수명」 절, 기록 파일 이름 규칙 문단",
+   "type": "constraint",
+   "claim": "레포 감사 요약문의 종류를 `check`로 정한 문장과, 감사 요약문은 종류 대신 실행체 이름을 쓴다는 문장이 한 문단에 함께 있어 레포 감사 기록의 이름이 `-check.md`와 `-<실행체 이름>.md` 두 가지로 읽힌다.",
+   "file": "skills/domain-docs/SKILL.md",
+   "evidence": "종류는 spec 리뷰가 `review`, 문서 검진과 레포 감사가 `check`, 선행연구 대조가 `prior-art`다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "실행체가 자동으로 쓰는 감사 요약문은 주제와 종류 대신 실행체 이름을 쓴다(`YYYY-MM-DD-<실행체 이름>.md`).",
+   "principle": "EXPLICIT",
+   "consequence": "기록 폴더에 레포 감사 요약문이 두 꼴(2026-08-30-project-doc-audit-check.md와 2026-09-05-self-audit.md)로 함께 있고, 어느 쪽이 규칙에 맞는지 이 문단만으로는 갈리지 않는다."
+  },
+  {
+   "where": "「문서 타입과 수명」 절, 기록 파일 이름 규칙 문단의 회차 표기 문장",
+   "type": "constraint",
+   "claim": "두 번째 회차의 표기를 '종류 뒤에' 붙인다고만 정했는데, 실행체 이름을 쓰는 요약문에는 종류가 없어 회차 숫자를 어디에 붙이는지 정해지지 않았다. 저장소의 검사와 폴더는 `-self-audit-2`를 쓴다.",
+   "file": "skills/domain-docs/SKILL.md",
+   "evidence": "같은 날 같은 주제의 두 번째 회차는 종류 뒤에 회차를 붙인다(`-review-2.md`·`-check-2.md`).",
+   "counterpart_file": "scripts/test_audit.sh",
+   "counterpart": "mk_round 2026-09-02-self-audit-2 self-audit false",
+   "principle": "EXPLICIT",
+   "consequence": "scripts/test_audit.sh와 docs/superpowers/reviews/2026-09-05-self-audit-2 폴더가 `-self-audit-2` 꼴을 쓰고 있는데, 이름 규칙의 소유 문단에는 실행체 이름 요약문의 회차 표기가 적혀 있지 않다."
+  },
+  {
+   "where": "「글 유형별 적용」 절, 외부 공개 문서 항목",
+   "type": "constraint",
+   "claim": "외부 공개 문서에 거는 렌즈를 `lens-grounding`과 `lens-fit` 둘로 적었는데, 같은 문서의 「문서 검진 방법」은 사람이 처음부터 끝까지 읽는 문서(설명 글·제안서 등)에 `lens-readability`를 셋째로 더한다고 정한다. 외부 공개 문서는 그 부류에 들어 렌즈가 둘인지 셋인지 두 가지로 읽힌다.",
+   "file": "skills/domain-docs/SKILL.md",
+   "evidence": "게시 전에 「문서 검진 방법」대로 `lens-grounding`과 `lens-fit` 검수를 거친다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "사람이 처음부터 끝까지 읽는 문서에는 `lens-readability`를 셋째 렌즈로 더한다. README, 인수인계, 작업 보고, 제안서, 설명 글, 발표자료 문안이 여기 든다.",
+   "principle": "SSOT",
+   "consequence": "외부 공개 문서에 걸 렌즈 구성이 같은 문서의 두 절에 다르게 적혀 있어, 「문서 검진 방법」을 따르라는 문장과 그 절이 정하는 셋째 렌즈가 서로 다른 개수를 낸다."
+  },
+  {
+   "where": "「문서 타입과 수명」 표, 규범·인덱스 행의 '강제하는 장치' 칸",
+   "type": "style",
+   "claim": "표 셀을 기호 '—' 하나로 채워 강제 장치가 없다는 뜻인지 아직 정하지 않았다는 뜻인지 갈린다. writing-korean은 표 셀을 알아볼 수 있는 문장이나 구로 채우라고 정한다.",
+   "file": "skills/domain-docs/SKILL.md",
+   "evidence": "| **규범·인덱스** (CLAUDE.md / 문서 맵) | 문서의 위치와 작업 방법 | 계속 살아 있다 | 포인터와 규칙만 적고 상태는 적지 않는다 | — |",
+   "counterpart_file": "skills/writing-korean/SKILL.md",
+   "counterpart": "표를 쓰더라도 셀은 알아볼 수 있는 문장이나 구로 채운다.",
+   "principle": "PROSE-FORM",
+   "consequence": "규범·인덕스 타입의 낡음을 막는 장치가 없는 것인지 미정인 것인지 표만 보고는 정해지지 않고, 「시작점」 5번 걸음(드리프트 가드가 있는지 본다)을 이 타입에 적용할 때 표가 답을 주지 않는다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "PROSE-FORM",
+  "NAME-ITEMS",
+  "FAIL-LOUD"
+ ],
+ "notes": "훑은 각도는 형식·스타일·오염·호환 넷이다. 형식: frontmatter는 domain-plugin 규칙(name이 디렉터리 이름과 같고 description에 ': '와 ' #'이 없다)을 지킨다. 「」로 가리킨 절(문서 타입과 수명·문서 검진 방법·렌즈에게 정본을 알리는 법·한 번만 띄우는 렌즈의 규율·하는 일·미해결의 처분·문서와 상태의 위생)은 모두 실재한다. 스타일: 금지 낱말과 폐쇄 집합은 scripts/test_docs_drift.sh가 검사했으므로 다시 세지 않았고, 계약이 두 가지로 읽히는 곳만 올렸다. 「시작점」의 번호 목록은 순서가 있는 걸음이라 「ID 참조」 규칙에 걸리지 않는다고 보았다. 오염: 문서 자체가 소비되는 형식이 아니라 해당 없다. 호환: 기록 이름 규칙이 2026-09-03 이전 기록을 소급하지 않는다고 적어 하위 호환을 스스로 정했으나, 그 경계일의 어긋남은 lens-grounding에 올렸다. 더 확인할 것: 「기계에 넘기는 것」 절이 lens-prior-art에 없는 점은 상대편 문장이 없어 여기서도 올리지 않았다."
+}

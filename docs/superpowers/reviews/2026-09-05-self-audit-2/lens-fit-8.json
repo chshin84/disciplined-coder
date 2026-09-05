@@ -1,0 +1,41 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/nested-orchestration/SKILL.md",
+ "read": [
+  "skills/domain-docs/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "agent-principles.md"
+ ],
+ "issues": [
+  {
+   "where": "「한계」 절",
+   "type": "constraint",
+   "claim": "절차·계약 타입 문서는 상태를 적지 않고 방법만 적는다는 계약인데, 이 절은 무엇이 검증됐고 무엇이 아직 미검증인지라는 진행 상태를 적는다. 그 상태의 정본은 spec의 「검증 상태」 절이다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "BLOCKED 정직성과 소유권 강제는 스파이크에서 검증됐으나 크래시 복구와 대형 워크스트림은 아직 미검증이다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "상태를 적지 않고 방법만 적는다",
+   "principle": "SSOT",
+   "consequence": "검증 진행 상태가 spec의 「검증 상태」와 이 스킬의 「한계」 두 곳에 적혀 있고, 스킬 쪽은 '아직 미검증'이라는 시점 의존 서술을 갱신 장치 없이 들고 있다."
+  },
+  {
+   "where": "「L2 디스패치 템플릿 — 여섯 블록」",
+   "type": "style",
+   "claim": "여섯 블록에 1부터 6까지 번호가 붙어 있는데 본문은 블록을 이름과 개수('여섯 블록')로만 부르고 번호로는 부르지 않아, 번호가 프롬프트 안의 순서를 뜻하는지 단순 열거인지 두 가지로 읽힌다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "재디스패치 프롬프트에는 여섯 블록에 더해 이어받을 브랜치명과 앞선 L2의 리포트 경로를 넣는다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "순서가 없는 항목에 번호(A/B/C, 1·2·3)를 매기지 않는다.",
+   "principle": "NAME-ITEMS",
+   "consequence": "블록마다 번호가 있으나 문서 어디에도 그 번호를 쓰는 문장이 없고 순서가 있다는 말도 없어, 읽는 쪽이 번호를 순서로 볼지 이름표로 볼지 정할 근거가 문서 안에 없다."
+  }
+ ],
+ "principles_applied": [
+  "NAME-ITEMS",
+  "SSOT",
+  "PROSE-FORM",
+  "EXPLICIT"
+ ],
+ "notes": "형식·스타일·오염·호환 네 각도를 각각 훑었다. 형식: frontmatter는 name이 디렉터리 이름과 같고 description 한 키를 더 쓰며 ': '와 ' #'이 없어 domain-plugin 규칙에 맞는다. 스타일: 금지 낱말과 폐쇄 집합은 scripts/test_docs_drift.sh가 검사하므로 다시 세지 않았다. description 안의 '→'는 괄호 안 보조 표기라 writing-korean이 허용하는 '문장 안 보조'로 보았다. 오염: 문서는 마크다운 스킬 문서로 소비되며 여분 텍스트나 펜스 오염이 없다. 호환: 「흐름」의 1~3 번호는 파이프라인 단계라 순서가 있어 문제로 보지 않았다. 「재구현 금지」 절이 superpowers 스킬 이름을 나열하는 것은 SSOT 포인터라 문서 SSOT 규칙에 맞는다. 더 확인할 것: 「관측성」 절의 '집계 대시보드와 메트릭은 볼 수 없고'는 도구 상태에 대한 서술이라 절차·계약 타입의 '상태를 적지 않는다'에 걸릴 수 있으나, 도구 동작은 이 저장소에서 대조할 수 없어 발견으로 올리지 않았다."
+}

@@ -1,0 +1,79 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-docs/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/domain-docs/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/audit_evidence.sh",
+  "scripts/test_audit.sh",
+  "hooks/hooks.json",
+  "hooks/doc_format_pretooluse.sh",
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/readonly_pretooluse.sh",
+  ".claude/settings.json",
+  "skills/project-doc-audit/SKILL.md",
+  "skills/domain-spec-review/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "README.md",
+  "CLAUDE.md",
+  "docs/superpowers/reviews/ (파일 이름 목록)",
+  "docs/superpowers/reviews/2026-09-05-self-audit/run.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit.md",
+  "docs/superpowers/reviews/2026-09-03-audit-record-and-diff-review-2.md",
+  "docs/superpowers/reviews/2026-09-03-self-audit.md"
+ ],
+ "issues": [
+  {
+   "where": "「문서 타입과 수명」 절, 기록 파일 이름 규칙 문단",
+   "type": "contradiction",
+   "claim": "감사 요약문의 이름 규칙이 '실행체가 자동으로 쓰는' 요약문에만 실행체 이름을 쓰라고 조건을 걸었는데, 이 저장소에서 감사 요약문을 쓰는 것은 세션이고 자동으로 쓰는 실행체(워크플로 스크립트)는 없다. project-doc-audit은 세션이 파일을 직접 쓴다고 정하고, scripts/test_audit.sh는 워크플로 파일이 없음을 단언한다.",
+   "file": "skills/domain-docs/SKILL.md",
+   "evidence": "실행체가 자동으로 쓰는 감사 요약문은 주제와 종류 대신 실행체 이름을 쓴다(`YYYY-MM-DD-<실행체 이름>.md`).",
+   "counterpart_file": "skills/project-doc-audit/SKILL.md",
+   "counterpart": "세션이 파일 넷을 직접 쓰고, 회차가 끝나면 `scripts/seal_reviews.sh`로 봉인한다.",
+   "principle": "EXPLICIT",
+   "consequence": "이름 규칙의 조건('실행체가 자동으로 쓰는')이 이 저장소에 없는 주체를 가리키고 있어, 세션이 쓴 2026-09-05-self-audit.md가 이 조건에 드는지 규칙 문장만으로는 정해지지 않는다."
+  },
+  {
+   "where": "「문서 타입과 수명」 절, 기록 파일 이름 규칙 문단의 마지막 문장",
+   "type": "mismatch",
+   "claim": "렌즈 원본 이름 규칙(접두사 `lens-`를 떼지 않는다)의 시작일을 2026-09-03으로 적었는데, 2026-09-03에 찍힌 기록이 접두사를 뗀 이름(`grounding-1.json`·`consistency-1.json`·`adversarial-1.json`)을 쓰고 있고 그 폴더 실물도 같다. 2026-09-03-canon-rewrite-check 폴더도 `consistency-1.md`·`readability-1.md`다.",
+   "file": "skills/domain-docs/SKILL.md",
+   "evidence": "이 규칙은 2026-09-03부터 찍는 기록에 걸리고, 그 전의 기록은 이름이 달라도 고치지 않는다.",
+   "counterpart_file": "docs/superpowers/reviews/2026-09-03-audit-record-and-diff-review-2.md",
+   "counterpart": "렌즈 원본은 같은 이름 폴더의 `grounding-1.json`(13건)·`consistency-1.json`(12건)·`adversarial-1.json`",
+   "principle": "MEASURE-FIRST",
+   "consequence": "규칙이 걸린다고 적은 날짜에 찍힌 기록 둘이 규칙과 다른 이름을 갖고 있고, 기록은 봉인되어 고칠 수 없으므로 이 문장은 지금 실제 기록과 어긋난 채로 남아 있다."
+  },
+  {
+   "where": "「한 번만 띄우는 렌즈의 규율」 절, 파일을 쓰는 에이전트 문단",
+   "type": "contradiction",
+   "claim": "기록을 에이전트가 쓰는 경우의 기록자·검수자 배치를 정하는데, 이 저장소의 레포 감사 절차는 서브에이전트를 렌즈에만 붙이고 기록은 호출자가 직접 쓴다고 정한다. project-doc-audit은 `completed`를 검수 뒤에만 참으로 놓으라 하면서 검수 주체는 적지 않는다.",
+   "file": "skills/domain-docs/SKILL.md",
+   "evidence": "기록자 하나가 파일 여럿을 맡고 검수자는 걸음 끝에 하나만 띄워 폴더를 통째로 센다.",
+   "counterpart_file": "skills/project-doc-audit/SKILL.md",
+   "counterpart": "걸음은 여덟이고 순서가 있다. 서브에이전트는 렌즈에만 붙고 나머지는 호출자가 직접 한다.",
+   "principle": "SSOT",
+   "consequence": "도메인 문서는 검수자를 에이전트 하나로 정하고 감사 절차는 렌즈 외 에이전트를 두지 않는다고 정해, run.json의 `completed`를 참으로 놓기 전의 검수를 누가 하는지가 두 문서 어디에도 하나로 정해져 있지 않다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "PROSE-FORM"
+ ],
+ "notes": "훑은 각도는 누락·모순·환각·불일치 넷이다. 누락: 「기계에 넘기는 것」 절이 모든 렌즈 SKILL.md에 있다고 전제하는 문장(\"그 절이 비어 있으면 넘길 것이 없다는 뜻\")이 있는데 skills/lens-prior-art/SKILL.md에는 그 절 자체가 없다. 절이 없음은 문장으로 인용할 수 없어 상대편을 대지 못해 발견으로 올리지 않았다. 모순: 위 셋. 환각: 문서가 이름을 부르는 scripts/test_docs_drift.sh의 검사(첫 항목 문장 '정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다'를 다른 스킬에서 금지), seal_reviews.sh와 .claude/settings.json의 SessionStart 배선, hooks/doc_review_posttooluse.sh가 넛지만 내고 마커 게이트가 없는 점, meta-aggregate의 principles_applied 요구 시점과 빈 값 처리, 「하는 일」 세 걸음은 모두 실제 파일과 일치했다. 불일치: 2026-09-05-self-audit 폴더에 `plugin-compliance-1.json`이 있는데 이는 렌즈 스킬 이름이 아니라 이 문서의 '<렌즈 스킬 이름>-<띄운 횟수>.json' 규칙 밖의 파일이다. 상대편으로 댈 문장이 2026-09-03-self-audit.md의 회고 문장뿐이어서 올리지 않았다. 더 확인할 것: 2026-09-05-self-audit-2 폴더에 추적되지 않는 .start_epoch·.targets.txt가 있는데 어느 문서도 이 파일을 정하지 않는다 — project-doc-audit 검토 회차에서 볼 일이다."
+}

@@ -1,0 +1,71 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-spec-review/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/domain-spec-review/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/project-doc-audit/SKILL.md",
+  "hooks/hooks.json",
+  "hooks/spec_review_stop.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "hooks/_spec_marker.sh",
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/doc_format_pretooluse.sh",
+  "hooks/readonly_pretooluse.sh",
+  ".claude/settings.json",
+  "docs/superpowers/reviews/ (파일·폴더 이름 목록, 2026-08-16-review-procedure-review·2026-08-30-audit-unification-review·2026-09-02-audit-record-and-diff-review·2026-09-03-audit-record-and-diff-review-2·2026-09-03-self-audit·2026-09-05-self-audit 폴더 내용)",
+  "docs/superpowers/reviews/2026-08-16-review-procedure-review-3.md (21%·55% 수치 확인)",
+  "docs/superpowers/specs/2026-08-13-prior-art-reviewer-design.md (94%·39~77% 수치 출처 확인, grep만)",
+  "README.md",
+  "CLAUDE.md",
+  "scripts/test_docs_drift.sh (CALLER 단언 부분)"
+ ],
+ "issues": [
+  {
+   "where": "「선행연구 렌즈의 제안과 승인」 절, spec·plan 가르기 문장",
+   "type": "mismatch",
+   "claim": "이 문서는 훅이 넘긴 경로로 spec과 plan을 가른다고 하지만, 이 스킬을 즉시 지시하는 PostToolUse 훅은 파일 이름(basename)만 넘기고 경로를 넘기지 않는다. 전체 경로를 담는 것은 Stop 훅의 차단 사유뿐이다.",
+   "file": "skills/domain-spec-review/SKILL.md",
+   "evidence": "훅이 넘긴 경로가 `docs/superpowers/specs`면 spec이고 `plans`면 plan이다.",
+   "counterpart_file": "hooks/spec_review_posttooluse.sh",
+   "counterpart": "msg=\"📋 spec/plan(${base}) 작성됨 — 진행 전 반드시 ${SPEC_REVIEW_INSTRUCTION}\"",
+   "principle": "EXPLICIT",
+   "consequence": "PostToolUse 넛지로 이 스킬이 열리는 시점에는 훅이 넘긴 것 안에 specs와 plans를 가를 경로가 없어, 세션은 훅 메시지가 아니라 자기가 방금 쓴 파일의 경로를 따로 떠올려야 spec인지 plan인지 정할 수 있다."
+  },
+  {
+   "where": "「3) 메타 집계」 절 첫 문장",
+   "type": "omission",
+   "claim": "이 문서는 메타 집계를 출처 태깅과 상충 감지 두 걸음에서 멈춘다고 적지만, 소유자 meta-aggregate의 「하는 일」은 집계·상충 감지·커버리지 공백 세 걸음이고, 이 문서의 「리뷰 기록」 절도 셋째 걸음의 산출인 커버리지 공백을 기록에 담으라고 한다.",
+   "file": "skills/domain-spec-review/SKILL.md",
+   "evidence": "출처 태깅과 상충 감지까지만 한다.",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "렌즈들의 이슈를 한 목록으로 모으고 상충과 커버리지 공백을 표시하는 데서 멈춘다.",
+   "principle": "SSOT",
+   "consequence": "집계 범위가 이 문서에서는 두 걸음, 소유자 문서에서는 세 걸음으로 적혀 있고, 이 문서 안에서도 「3) 메타 집계」는 커버리지 공백을 빼고 「리뷰 기록」은 그것을 담으라고 하여 같은 걸음의 범위가 두 곳에서 다르게 읽힌다."
+  },
+  {
+   "where": "「2) 디스패치」 절 첫 문단, lens-adversarial 예외 문장",
+   "type": "contradiction",
+   "claim": "이 문서는 한 대상의 렌즈를 한 호출로 묶는 규칙의 소유자를 domain-docs 「한 번만 띄우는 렌즈의 규율」이라 부르면서 lens-adversarial 예외를 덧붙이지만, 그 소유자 절에는 예외가 없다. 같은 예외는 project-doc-audit에도 따로 적혀 있다.",
+   "file": "skills/domain-spec-review/SKILL.md",
+   "evidence": "한 대상의 렌즈를 한 호출로 묶는 이 규칙의 예외로, 자세가 반대인 `lens-adversarial`만 따로 띄운다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "한 대상에 렌즈가 둘 이상 걸리면 에이전트도 둘 이상이 되지는 않는다.",
+   "principle": "SSOT",
+   "consequence": "소유자로 지목된 domain-docs의 규율에는 lens-adversarial을 따로 띄우는 예외가 없고, 그 예외는 이 문서와 project-doc-audit 두 호출자에 각각 적혀 있어 규칙의 정본과 호출자 사이에 예외의 유무가 갈린다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST"
+ ],
+ "notes": "훑은 각도는 누락·모순·환각·불일치 넷이다. 확인해서 어긋남이 없던 것: Stop 훅의 stop_hook_active 루프가드와 턴당 한 번 차단, 마커 prefix 매칭(_spec_marker.sh의 '<!-- spec-review: passed'*'-->'), DISCIPLINED_CODER_REVIEW_GATE=off, 신규 spec만 하드 게이트이고 기존 수정은 넛지, PostToolUse 비블로킹 additionalContext, 기본 렌즈 셋(디스패치 목록과 test_docs_drift.sh의 DISPATCH 추출이 일치), 기록 이름 규칙과 렌즈 원본 이름 lens-grounding-1.json이 domain-docs 기록 행과 일치, lens-prior-art 발견 전부 🔴가 lens-prior-art SKILL.md와 일치, 21%~55% 수치가 docs/superpowers/reviews/2026-08-16-review-procedure-review-3.md 표에 있음. 발견으로 올리지 않은 것: (1) 94%·39~77% 수치는 이 레포 안에서 docs/superpowers/specs/2026-08-13-prior-art-reviewer-design.md에만 있고 이 문서는 그 출처를 가리키지 않는다 — 상대편이 어긋나는 문장이 아니라 같은 주장이어서 발견 문턱에 못 미친다. (2) 2026-09-03-audit-record-and-diff-review-2 폴더의 렌즈 원본은 grounding-1.json처럼 접두사 없이 되어 있어 domain-docs가 2026-09-03부터 걸린다고 한 lens- 접두사 규칙과 어긋나지만, 상대편이 파일 이름이라 문장 인용을 댈 수 없다. (3) 「리뷰 기록」 절의 '사용자에게 따로 드리는 것은 🔴뿐이며'는 같은 문서의 '선행연구 대조를 돌릴지 함께 묻는다'·'다시 리뷰는 매번 사용자에게 묻는다'와 부딪치는데 문서 내부 모순이라 lens-consistency 몫이다. (4) lens-adversarial의 축은 넷(위험 포함)인데 이 문서의 디스패치 목록은 셋만 적는다 — 소유자 문서가 축을 정하므로 결과를 구체적으로 적을 만한 어긋남이 아니다."
+}

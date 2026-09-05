@@ -1,0 +1,130 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/project-doc-audit/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/project-doc-audit/SKILL.md",
+  "scripts/audit_targets.sh",
+  "scripts/audit_topics.sh",
+  "scripts/audit_evidence.sh",
+  "scripts/audit_rounds.sh",
+  "scripts/audit_prior_rounds.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_audit.sh",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/domain-spec-review/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "docs/superpowers/reviews/2026-09-05-self-audit/run.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit/findings.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit/diff.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit.md",
+  "docs/superpowers/reviews/2026-09-05-self-audit/ (폴더 목록)",
+  "commands/ (폴더 목록)"
+ ],
+ "issues": [
+  {
+   "where": "「회차 대조」 절 둘째 문단",
+   "type": "unsupported",
+   "claim": "문서는 `audit_rounds.sh diff`의 결과 항목마다 `prior_round`가 함께 온다고 적지만, 스크립트가 내는 항목 칸은 prior_id·fingerprint·title·file·verdict·matched_id 여섯이고 `prior_round`는 없다.",
+   "file": "skills/project-doc-audit/SKILL.md",
+   "evidence": "항목마다 어느 회차에서 온 발견인지 `prior_round`로 함께 온다.",
+   "counterpart_file": "scripts/audit_rounds.sh",
+   "counterpart": "\"file\": f.get(\"file\"), \"verdict\": \"잔존\" if alive else \"해소\",",
+   "principle": "EXPLICIT",
+   "consequence": "「통합 기록」이 `diff.json` 항목마다 `prior_round`를 요구하는데 그 값을 채우는 코드가 없어, 스크립트 출력을 그대로 저장하면 `diff.json`에 그 칸이 비고 채우려면 세션이 손으로 덧쓴다."
+  },
+  {
+   "where": "「회차 대조」 절 첫째·둘째 문단",
+   "type": "contradiction",
+   "claim": "문서는 대조 대상을 직전 회차 findings.json의 발견과 직전 diff.json의 잔존 항목과 전전 diff.json과 맞댄 해소 항목 셋의 합이라 정하고 그 계산을 `audit_rounds.sh diff`에 맡기지만, 스크립트는 앞선 findings.json 하나와 이번 findings.json 하나만 받고 diff.json은 입력으로 받지 않는다.",
+   "file": "skills/project-doc-audit/SKILL.md",
+   "evidence": "대조는 「기계가 하는 것」이 적은 `audit_rounds.sh diff`가 계산하며, 세션은 그 결과를 읽는다.",
+   "counterpart_file": "scripts/audit_rounds.sh",
+   "counterpart": "사용: audit_rounds.sh diff [--root DIR] <앞선 findings.json> <이번 findings.json>",
+   "principle": "MEASURE-FIRST",
+   "consequence": "셋 가운데 첫째 집합만 기계가 계산하고, 직전 diff.json의 잔존 항목과 전전 회차와 맞댄 해소 항목은 어느 스크립트도 다루지 않아 재발 판정이 세션의 손 계산에 남아 있다."
+  },
+  {
+   "where": "「기계가 하는 것」 절 인용 확인과 지문 항목",
+   "type": "contradiction",
+   "claim": "문서는 인용이 없는 발견이 `audit_evidence.sh`에서 떨어진다고 적지만, 스크립트는 발견을 지우지 않고 `evidence_found`·`counterpart_found` 참거짓만 붙여 전부 그대로 돌려준다.",
+   "file": "skills/project-doc-audit/SKILL.md",
+   "evidence": "인용이 없는 발견은 여기서 떨어지며 판단이 개입하지 않는다.",
+   "counterpart_file": "scripts/audit_evidence.sh",
+   "counterpart": "f[\"evidence_found\"] = bool(ev) and t1 is not None and ev in t1",
+   "principle": "EXPLICIT",
+   "consequence": "인용이 없는 발견을 걸러 내는 일이 스크립트가 아니라 그 참거짓을 읽는 세션에 남아 있고, 세션이 그 칸을 읽지 않으면 인용 없는 발견이 판정 걸음까지 그대로 올라간다."
+  },
+  {
+   "where": "「통합 기록」 절 run.json 항목",
+   "type": "mismatch",
+   "claim": "문서는 `audit_rounds.sh metrics`의 출력이 판정 개수를 낸다고 적지만, 스크립트 출력에 판정 개수 칸은 `confirmed` 하나뿐이고 기각·미판정·도출의 개수는 내지 않는다.",
+   "file": "skills/project-doc-audit/SKILL.md",
+   "evidence": "`metrics`는 `audit_rounds.sh metrics`의 출력(`by_lens`·`confirmed`·`tokens`·`seconds`·`tokens_per_confirmed`·`resolved_rate`)을 그대로 담아 렌즈별 발견 수와 확정 수, 판정 개수, 회차의 토큰과 시간, 확정 하나당 값, 앞선 회차의 해소율을 낸다.",
+   "counterpart_file": "scripts/audit_rounds.sh",
+   "counterpart": "out = {\"by_lens\": by, \"confirmed\": confirmed, \"tokens\": tokens, \"seconds\": secs,",
+   "principle": "EXPLICIT",
+   "consequence": "run.json의 `metrics`에는 확정 수만 실리고, 요약문이 적어야 하는 판정 개수 가운데 기각·미판정·도출은 run.json 어느 칸에도 없어 findings.json을 다시 세어야 나온다."
+  },
+  {
+   "where": "「판정」 절 마지막 문장",
+   "type": "mismatch",
+   "claim": "문서는 `scripts/test_audit.sh`가 이 절의 닫힌 집합으로 기록을 검사한다고 적지만, 그 테스트는 자기가 방금 쓴 픽스처 findings.json만 검사하고 `docs/superpowers/reviews/` 아래 실제 기록은 열지 않는다.",
+   "file": "skills/project-doc-audit/SKILL.md",
+   "evidence": "이 문장이 닫힌 집합의 정본이며 `scripts/test_audit.sh`가 여기서 뽑아 기록을 검사한다.",
+   "counterpart_file": "scripts/test_audit.sh",
+   "counterpart": "echo \"[회차 기록의 형태 — 픽스처로 검사한다]\"",
+   "principle": "FAIL-LOUD",
+   "consequence": "실제 기록의 `status`에 집합 밖 값이 들어가도 어느 테스트도 실패하지 않고, 검사되는 것은 문서 문장에서 집합을 뽑을 수 있는지와 픽스처가 그 집합 안인지 둘뿐이다."
+  },
+  {
+   "where": "「감사 대상 고르기」 절 셋째 문단",
+   "type": "omission",
+   "claim": "문서는 대상 목록을 파일에서 도출하라고 하면서 그 도출을 이미 구현한 `scripts/audit_targets.sh`를 부르지 않아, 이 문서에 그 스크립트 이름이 한 번도 나오지 않는다.",
+   "file": "skills/project-doc-audit/SKILL.md",
+   "evidence": "목록은 손으로 적지 말고 파일에서 도출한다.",
+   "counterpart_file": "scripts/audit_targets.sh",
+   "counterpart": "# 감사 대상 문서를 낸다 — 앞으로도 읽히고 고쳐질 문서만이다.",
+   "principle": "SSOT",
+   "consequence": "대상 도출 규칙이 이 절의 산문과 스크립트 두 곳에 있고, 절차를 따르는 세션은 스크립트를 모른 채 같은 배제 규칙을 손으로 다시 적용한다."
+  },
+  {
+   "where": "「렌즈 배정 기준」 절 첫째 문단",
+   "type": "contradiction",
+   "claim": "배정을 고정하는 근거로 문서마다 렌즈가 셋씩 붙으면 호출이 문서 수의 세 배가 된다고 적지만, 같은 문서의 「띄울 때 지킬 것」과 그 소유자 domain-docs는 한 문서에 렌즈가 여럿 걸려도 호출은 하나라고 정한다.",
+   "file": "skills/project-doc-audit/SKILL.md",
+   "evidence": "판단에 맡기면 배정이 회차마다 달라져 회차끼리 대조할 수 없고, 문서마다 렌즈가 셋씩 붙어 호출이 문서 수의 세 배로 불어난다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "한 대상에 렌즈가 둘 이상 걸리면 에이전트도 둘 이상이 되지는 않는다.",
+   "principle": "MEASURE-FIRST",
+   "consequence": "배정을 고정하는 두 근거 가운데 하나가 이 레포의 호출 규칙에서는 성립하지 않는 값 계산이라, 고정의 근거는 회차 대조 가능성 하나만 남아 있다."
+  },
+  {
+   "where": "「회차 대조」 절과 「기계가 하는 것」 절 회차 대조 항목",
+   "type": "mismatch",
+   "claim": "문서는 앞선 발견의 인용이 파일에 남았는지로 잔존·해소를 가르는데, `audit_prior_rounds.sh`가 고를 유일한 completed 회차인 2026-09-05-self-audit의 findings.json은 `evidence`가 파일 문장이 아니라 경로·줄 번호·여러 인용을 이어 붙인 합성 문자열이고 `fingerprint` 칸도 없다.",
+   "file": "skills/project-doc-audit/SKILL.md",
+   "evidence": "앞선 발견의 인용이 지금도 있으면 잔존이고 없으면 해소다.",
+   "counterpart_file": "docs/superpowers/reviews/2026-09-05-self-audit/findings.json",
+   "counterpart": "\"evidence\": \"README.md:49 — \\\"어느 프로젝트의 어느 파일이든 속성만 보며,",
+   "principle": "MEASURE-FIRST",
+   "consequence": "다음 회차가 이 기록을 앞선 회차로 잡으면 스크립트의 부분 문자열 검사가 확정 21건 전부에서 거짓이 되어 모두 해소로 찍히고 `matched_id`는 전부 null이 되며, 문제가 남았는지와 무관하게 해소율이 1.0으로 나온다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST"
+ ],
+ "notes": "훑은 각도는 누락·모순·환각·불일치 넷이다. 누락에서는 이 문서가 부르는 스크립트 여덟 가운데 audit_targets.sh가 빠진 것을 잡았고, 그 밖의 스크립트 이름·인자 형태(audit_evidence.sh, audit_rounds.sh diff/metrics, audit_prior_rounds.sh, seal_reviews.sh, audit_topics.sh, test_docs_drift.sh, test_audit.sh)는 실제 사용법과 맞았다. 모순에서는 스크립트 동작과 어긋난 서술 넷(prior_round 칸, 셋 합친 대조 대상, 인용 없는 발견의 탈락, 판정 개수)과 호출 수 계산 하나를 잡았다. 환각은 렌즈 배정표·렌즈 스킬 description의 호출자 명시·meta-aggregate 「하는 일」 세 걸음·domain-docs 절 이름(「렌즈에게 정본을 알리는 법」·「한 번만 띄우는 렌즈의 규율」·「판단 앞에 기계를 세운다」)·writing-korean 「금지 표현」 표·정본 「미해결의 처분」 절을 모두 열어 대조했고 없는 것을 지어낸 곳은 못 찾았다. 불일치에서는 걸음 표 행 수 여덟과 '걸음은 여덟' 문장이 맞고 표가 가리키는 절 이름 여덟이 모두 실재했다. 더 확인할 것은 셋이다. 첫째, `audit_rounds.sh diff`는 `new_ids`를 내는데 이 문서의 diff.json 서술에는 그 칸이 없다 — 기록 계약에 넣을지는 호출자가 정할 일이라 발견으로 올리지 않았다. 둘째, 앞선 회차 폴더에는 문서가 정한 파일 넷 가운데 suggestions.json이 없고 `plugin-compliance-1.json`처럼 렌즈가 아닌 원본이 있으며 run.json에는 `metrics` 대신 `counts_by_lens`·`verdict_counts`가 있다 — 옛 실행체가 남긴 기록이라 문서 결함으로 세지 않았으나, 스키마 값이 그 기록과 이 문서 양쪽에서 1로 같아 형태가 다른 두 기록이 같은 스키마 번호를 쓰는 상태다. 셋째, '검수를 지난 뒤에만 `completed`를 참으로 놓고'의 '검수'가 이 문서 어디에도 정의되어 있지 않아 누가 무엇을 하는 걸음인지 맞댈 문장을 못 찾았다. 실제 스크립트는 지시대로 돌리지 않았다."
+}
