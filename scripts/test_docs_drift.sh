@@ -388,17 +388,14 @@ check "개수를 적은 자리마다 이름이 함께 있다" "[ -z \"\$NUMHIT\"
 [ -n "$NUMHIT" ] && printf '    이름 없이 개수만 박힌 자리:\n%s\n' "$NUMHIT"
 
 # --- 테스트 실행 명령: 앞 스크립트의 실패를 삼키지 않는다 ---
-# 자기감사 워크플로가 실행 명령을 인라인에 적는 대신 CLAUDE.md를 정본으로 가리키게 바꿨는데,
-# 그 정본이 실제로 실패를 모으는 형태인지 확인하는 것이 없었다. CLAUDE.md의 그 줄이 지워지거나
-# `for t in ...; do bash "$t"; done` 으로 되돌아가면 마지막 하나의 종료 코드만 남아 앞선 FAIL이
-# 묻히고, 감사는 잘못된 FAIL=0을 보고한다.
+# CLAUDE.md가 실행 명령의 정본이다. 그 줄이 지워지거나 `for t in ...; do bash "$t"; done` 으로
+# 되돌아가면 마지막 하나의 종료 코드만 남아 앞선 FAIL이 묻히고, 감사는 잘못된 FAIL=0을 보고한다.
 echo "[테스트 실행 명령 — 앞 스크립트의 실패가 안 묻힌다]"
 CMD="$HERE/CLAUDE.md"
 check "CLAUDE.md가 실행 명령을 적는다"       "grep -qF -- 'for t in scripts/test_*.sh' \"\$CMD\""
 check "실패를 모으는 형태다"                 "grep -qF -- 'bad=\"\$bad \$t\"' \"\$CMD\""
 check "모은 결과를 마지막에 알린다"           "grep -qF -- 'FAILED:' \"\$CMD\""
-check "워크플로가 그 정본을 가리킨다"         "grep -qF -- 'CLAUDE.md 가 그 명령의 정본' '$HERE/.claude/workflows/self-audit.js'"
-# CI도 같은 명령을 돈다. 워크플로와 달리 CI는 정본을 읽을 수 없어 형태를 다시 적을 수밖에 없으니,
+# CI도 같은 명령을 돈다. CLAUDE.md와 달리 CI는 정본을 읽을 수 없어 형태를 다시 적을 수밖에 없으니,
 # 적어도 그 형태가 정본과 같은 실패 처리를 하는지 붙든다. `set -e`에 맨 `bash "$t"`면 첫 실패에서
 # 멈춰 뒤 스크립트가 아예 안 돌고, 무엇이 더 깨졌는지 한 회차로는 알 수 없다.
 CI="$HERE/.github/workflows/ci.yml"
@@ -505,19 +502,6 @@ MKCMP="$(json_run "$JSONPROG" "$HERE/.claude-plugin/marketplace.json" "$HERE/.cl
 check "두 매니페스트가 JSON으로 파싱된다"     "[ '$MKCMP' != 'PARSE-ERROR' ]"
 check "마켓플레이스에 이 플러그인 항목이 있다" "[ '$MKCMP' != 'MISSING' ]"
 check "두 문안이 같다"                         "[ '$MKCMP' = 'SAME' ]"
-
-# --- 자기감사 실행체가 죽은 이름을 렌즈에 넘기지 않는다 ---
-# 검토 대상을 프롬프트에 손으로 열거하면 그 목록만 조용히 낡는다. 실제로 없앤 기능 이름과 이미
-# 옮겨진 파일 이름이 남아 렌즈 시간이 거기에 쓰였고, 감사 자신은 그 사실을 구조상 알아낼 수 없었다.
-# 걷어낸 기능 목록(SCAFFOLD_STALE)에서 이름을 도출해 실행체가 그것을 부르지 않는지 확인한다.
-SA="$HERE/.claude/workflows/self-audit.js"
-echo "[자기감사] 실행체가 걷어낸 이름을 부르지 않는다"
-check "실행체 파일이 있다" "[ -f '$SA' ]"
-for n in $STALE_NAMES; do
-  check "self-audit.js 가 '$n' 을 안 부른다" "! grep -qF -- '$n' '$SA'"
-done
-# 부정 단언의 짝이다 — 절 이름을 파일에서 읽으라는 지시가 사라지면 열거로 되돌아간 것이다.
-check "정본 절 이름을 파일에서 읽게 한다" "grep -qF '절 제목을 파일에서 읽어' '$SA'"
 
 # --- README가 잠금 상수를 베껴 적지 않는다 ---
 # 전에는 대기 시간 두 값을 README가 숫자로 적어, 상수가 바뀌면 알려 주는 것 없이 틀린 값이 됐다.

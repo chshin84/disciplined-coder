@@ -149,4 +149,58 @@ fi || true
 check "적대적 렌즈를 저장소 전체에 따로 띄운다고 적는다" "grep -qF 'lens-adversarial' '$PDA' && grep -qF '저장소 전체를 입력으로 따로 한 번 띄운다' '$PDA'"
 check "따로 도는 이유가 자세 차이라고 적는다"           "grep -qF '자세가 반대' '$PDA' || grep -qF '설계를 공격하는 자세' '$PDA'"
 
+echo "[audit_prior_rounds.sh — 앞선 회차 고르기]"
+APR="$HERE/scripts/audit_prior_rounds.sh"
+check "스크립트가 있다"                                "[ -f '$APR' ]"
+APR_T="$(mktemp -d)"; mkdir -p "$APR_T/docs/superpowers/reviews"
+mk_round() { mkdir -p "$APR_T/docs/superpowers/reviews/$1"; printf '{"executor":"%s","completed":%s}\n' "$2" "$3" > "$APR_T/docs/superpowers/reviews/$1/run.json"; }
+mk_round 2026-09-01-self-audit self-audit true
+mk_round 2026-09-02-self-audit self-audit true
+mk_round 2026-09-02-self-audit-2 self-audit false
+mk_round 2026-09-03-self-audit self-audit true
+mk_round 2026-09-03-other other true
+mkdir -p "$APR_T/docs/superpowers/reviews/2026-08-30-legacy"
+APR_OUT="$(bash "$APR" self-audit --root "$APR_T" 2>/dev/null || true)"
+check "completed 인 같은 실행체의 최근 둘을 최신부터 낸다" "[ \"\$(printf '%s' \"\$APR_OUT\" | tr '\n' ' ' | sed 's/ *$//')\" = '2026-09-03-self-audit 2026-09-02-self-audit' ]"
+check "다른 실행체와 끊긴 회차와 옛 기록은 빠진다"      "! printf '%s' \"\$APR_OUT\" | grep -qE 'other|self-audit-2|legacy'"
+APR_STALE="$(bash "$APR" self-audit --root "$APR_T" --stale 2>/dev/null || true)"
+check "--stale 이 끊긴 회차만 낸다"                     "[ \"\$APR_STALE\" = '2026-09-02-self-audit-2' ]"
+check "기본 실행체 이름은 self-audit 이다"              "grep -qF 'EXEC=\"self-audit\"' '$APR'"
+rm -rf "$APR_T"
+
+echo "[실행체가 사라졌다]"
+check "워크플로 파일이 없다"           "[ ! -f '$HERE/.claude/workflows/self-audit.js' ]"
+check "매니페스트가 workflows 를 선언하지 않는다" "! grep -qF 'workflows' '$HERE/.claude-plugin/plugin.json'"
+check "옛 계약 테스트가 없다"          "[ ! -f '$HERE/scripts/test_self_audit.sh' ]"
+
+echo "[audit_targets.sh — 대상 목록만 낸다]"
+AT="$HERE/scripts/audit_targets.sh"
+check "문턱 인자가 사라졌다"           "! grep -qF -- '--limit' '$AT'"
+AT_OUT="$(bash "$AT" 2>/dev/null || true)"
+check "한 줄에 경로 하나만 낸다"       "! printf '%s' \"\$AT_OUT\" | grep -q \$'\t'"
+check "대상이 하나 이상이다"           "[ -n \"\$AT_OUT\" ]"
+check "지난 기록은 대상이 아니다"      "! printf '%s' \"\$AT_OUT\" | grep -q '^docs/superpowers/'"
+
+echo "[회차 기록의 형태 — 픽스처로 검사한다]"
+RT="$(mktemp -d)"; mkdir -p "$RT/round"
+cat > "$RT/round/run.json" <<'FIXTURE'
+{ "schema": 1, "executor": "session", "commit": "abc", "tree_clean": true, "completed": true,
+  "steps_done": ["targets"], "targets": [], "metrics": { "by_lens": {}, "confirmed": 0 } }
+FIXTURE
+cat > "$RT/round/findings.json" <<'FIXTURE'
+{ "schema": 1, "findings": [
+  { "id": "r#001", "fingerprint": "aaaaaaaaaaaa", "status": "confirmed", "title": "t",
+    "file": "a.md", "evidence": "e", "counterpart_file": "b.md", "counterpart": "c",
+    "principle": "SSOT", "consequence": "지금 이렇게 되어 있다", "lens": "lens-fit" } ] }
+FIXTURE
+printf '{ "schema": 1, "no_prior_round": true, "items": [], "new_ids": [] }\n' > "$RT/round/diff.json"
+printf '{ "schema": 1, "suggestions": [] }\n' > "$RT/round/suggestions.json"
+rj() { json_run "$1" "$RT/round/$2"; }
+check "run.json 이 파싱된다"           "rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' run.json"
+check "findings.json 의 status 가 닫힌 집합이다" "rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(f[\"status\"] in (\"confirmed\",\"rejected\",\"undetermined\",\"derived\") for f in d[\"findings\"]) else 1)' findings.json"
+check "발견마다 상대편과 지문이 있다"   "rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(f.get(\"counterpart\") and f.get(\"fingerprint\") for f in d[\"findings\"]) else 1)' findings.json"
+check "diff.json 이 파싱된다"          "rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' diff.json"
+check "suggestions.json 이 파싱된다"   "rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' suggestions.json"
+rm -rf "$RT"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
