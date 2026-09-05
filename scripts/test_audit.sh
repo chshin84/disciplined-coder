@@ -118,4 +118,10 @@ check "집계 계약이 제안 채널을 가른다"       "grep -qF 'suggestions
 check "묶는 규칙의 예외가 lens-adversarial 이름과 한 문장에 묶여 있다" "grep -qF '한 대상의 렌즈를 한 호출로 묶는 이 규칙의 예외로, 자세가 반대인 \`lens-adversarial\`만 따로 띄운다' '$SR'"
 check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "grep -qF '대상마다 따로 띄우는 이 절차에서 예외는 \`lens-prior-art\` 하나이며' '$SR'"
 
+echo "[domain-llm-runtime — 고정표 배정]"
+LR2="$HERE/skills/domain-llm-runtime/SKILL.md"
+check "리스크 점수 절이 사라졌다"        "! grep -qF '리스크 점수는 다음 조건마다 1점' '$LR2'"
+check "호출 종류별 고정표가 있다"        "grep -qF '| 호출 종류 |' '$LR2'"
+check "회차마다 다시 판단하지 않는다고 적는다" "grep -qF '회차마다 다시 판단하지 않는다' '$LR2'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
