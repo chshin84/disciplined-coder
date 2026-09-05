@@ -1,0 +1,53 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-docs/SKILL.md",
+ "findings": [
+  {
+   "title": "문서 검진 절이 렌즈를 \"각각 호출\"하라고 적어 같은 문서 뒷절의 한 에이전트 규율과 실제 워크플로 구현을 둘 다 어긴다.",
+   "file": "skills/domain-docs/SKILL.md:82",
+   "evidence": "82번째 줄: \"일반 문서를 쓰거나 고친 뒤에는 `lens-grounding`(사실 정확)과 `lens-fit`(양식과 계약) 두 렌즈를 읽기 전용 서브에이전트로 각각 호출해 검진을 받는다.\" — 그러나 같은 파일 127번째 줄은 \"한 대상에 렌즈가 둘 이상 걸리면 에이전트도 둘 이상이 되지는 않는다. 에이전트 하나가 그 대상을 한 번 읽고 렌즈를 차례로 적용하며, 발견마다 어느 렌즈가 낸 것인지 적어 돌려준다.\"라고 적고, .claude/workflows/self-audit.js 291번째 줄은 \"이 문서에 배정된 렌즈는 ${target.lenses.length}개다. 렌즈마다 ${REPO}/skills/<렌즈이름>/SKILL.md 를 열어 그 레퍼런스 프롬프트와 체크리스트를 읽고, 한 렌즈씩 차례로 적용하라.\"로 한 호출에 렌즈를 몰아 준다. skills/project-doc-audit/SKILL.md 도 \"한 문서에 렌즈가 둘 이상 걸리면 렌즈마다 따로 띄우지 말고 한 번에 띄운다.\"로 같은 편이다.",
+   "principle": "SSOT",
+   "consequence": "문서 검진 절만 읽고 절차를 따르는 세션은 문서 하나에 서브에이전트를 둘(가독성 렌즈까지 걸리면 셋) 띄우게 되어, 같은 문서를 렌즈 수만큼 다시 읽는 값을 그대로 치르고 「한 번만 띄우는 렌즈의 규율」이 막으려던 에이전트 수 팽창이 문서 검진 경로에서만 되살아난다. 회차마다 호출 수가 달라져 회차 대조의 기준선도 흔들린다.",
+   "detail": "띄우는 방식은 「한 번만 띄우는 렌즈의 규율」 절이 소유한다고 99번째 줄이 스스로 선언하는데도 82번째 줄이 호출 방식을 다시 적었고, 그 사본이 소유자 절과 반대로 적혀 있다. 소유자 절과 실제 구현(self-audit.js)과 자매 스킬(project-doc-audit)이 모두 \"한 에이전트가 렌즈를 차례로\"인 쪽이므로 어긋난 것은 82번째 줄이다.",
+   "fix": "82번째 줄에서 \"각각 호출해\"를 빼고 \"두 렌즈를 읽기 전용 서브에이전트 한 번에 걸어 검진을 받는다\"로 고치거나, 호출 방식은 적지 말고 「한 번만 띄우는 렌즈의 규율」을 가리키기만 한다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  },
+  {
+   "title": "기록 행이 강제 장치로 적은 \"수정·삭제를 거부하는 검사\"에서 삭제를 거부하는 장치는 이 레포에 없다.",
+   "file": "skills/domain-docs/SKILL.md:53",
+   "evidence": "53번째 줄: \"| **기록** (reviews) | 렌즈 회차의 관찰과 지적 | 계속 남는다. 찍은 뒤 고치지도 지우지도 않는다 | 처분과 상태를 안 적으니 낡을 것이 없다. 처분은 회차 사이 대조로 그때그때 도출한다 | 있는 기록의 수정·삭제를 거부하는 검사 |\" — 실제 장치는 hooks/readonly_pretooluse.sh 뿐이고 그 2번째 줄은 \"# PreToolUse(Write|Edit): 대상 파일이 있고 쓰기 불가이면 거부하고 사유를 낸다.\"이며, hooks/hooks.json 의 PreToolUse 항목은 \"matcher\": \"Write|Edit\" 하나뿐이다. scripts/seal_reviews.sh 는 \"chmod a-w\" 로 쓰기 속성만 내린다.",
+   "principle": "FAIL-LOUD",
+   "consequence": "감사 기록을 Bash 의 rm 으로 지우면 훅이 매칭되지 않아 아무 경고 없이 지워지고, POSIX 에서는 쓰기 속성을 내려도 상위 폴더가 쓰기 가능하면 삭제가 막히지 않는다. 회차 대조는 앞 회차 기록이 진실의 근거인데 그 근거가 조용히 사라지고, 지적이 0건이었던 회차와 기록이 지워진 회차가 구별되지 않는다.",
+   "detail": "표의 강제 장치 칸은 이 레포가 스스로 구현한다고 주장하는 계약인데, 구현된 것은 수정 거부(Write·Edit 도구 차단)뿐이고 삭제를 거부하거나 삭제를 사후에 잡아내는 검사는 hooks/ 와 scripts/ 어디에도 없다. 기록의 존재를 세는 검사도 test_hooks.sh 에는 없고 거기서 확인하는 것은 훅의 출력뿐이다.",
+   "fix": "칸을 \"있는 기록의 수정을 거부하는 훅\"으로 좁혀 실제와 맞추거나, 지워진 기록을 잡는 검사(회차 폴더와 git 이력 대조)를 더해 문장을 참으로 만든다.",
+   "lens": "lens-grounding",
+   "type": "mismatch"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/readonly_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_review_posttooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_format_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/seal_reviews.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_hooks.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_self_audit.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/audit_targets.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "EXPLICIT",
+  "SIMPLE",
+  "PROSE-FORM"
+ ]
+}

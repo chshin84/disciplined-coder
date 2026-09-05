@@ -1,0 +1,35 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/writing-korean/SKILL.md",
+ "findings": [
+  {
+   "title": "「금지 표현」 표는 test_docs_drift.sh가 정규식으로 파싱하는 계약인데 그 형식 요구를 문서가 어디에도 적지 않는다",
+   "file": "skills/writing-korean/SKILL.md:31",
+   "evidence": "writing-korean/SKILL.md:29 \"아래 표가 그 목록을 소유하며, 사람의 판단이 아니라 문자열 검색으로 거른 뒤 내보낸다.\" / writing-korean/SKILL.md:33 \"| `잰다` | 확인한다 · 측정한다 · 센다 |\" / scripts/test_docs_drift.sh:530 \"BANLIST=\\\"$(awk '/^## 금지 표현/{f=1; next} f && /^## /{exit} f' \\\"$WK\\\" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')\\\"\" / scripts/test_docs_drift.sh:533 \"check \\\"금지 목록을 정본에서 도출했다\\\" \\\"[ -n \\\\\\\"\\\\$BANLIST\\\\\\\" ]\\\"\"",
+   "principle": "EXPLICIT",
+   "consequence": "표에 새 낱말을 `|`헛돈다`|`처럼 파이프 뒤 공백 없이 적거나 왼쪽 칸의 역따옴표를 빼면 그 행은 BANLIST에서 조용히 빠진다. 검사는 BANLIST가 비었는지만 보므로 아홉 줄 가운데 한 줄이 사라져도 초록으로 통과하고, 그 낱말은 살아 있는 문서에서 걸러지지 않은 채 남는다.",
+   "detail": "이 표는 사람이 읽는 예시 목록이 아니라 스크립트가 읽는 입력이다. test_docs_drift.sh는 `## 금지 표현` 제목과 다음 `## ` 사이를 잘라 낸 뒤 `^[|] `로 시작하고 역따옴표로 감싼 첫 칸만 낱말로 인정한다. 그러므로 절 제목의 글자, 행 첫머리의 파이프와 그 뒤 공백 하나, 왼쪽 칸의 역따옴표가 모두 기계가 요구하는 형식이다. writing-korean은 이 가운데 무엇도 적지 않아, 표를 손보는 사람이 형식을 깨뜨렸는지 알 방법이 없다.",
+   "fix": "표 바로 위에 이 표가 test_docs_drift.sh의 입력이며 각 행의 왼쪽 칸을 역따옴표로 감싼 낱말로 적어야 한다고 한 문장으로 밝힌다. 아울러 검사 쪽에서 BANLIST의 개수를 표의 데이터 행 수와 대조해, 행이 파싱에서 빠지면 실패하게 한다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_format_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "PROSE-FORM",
+  "PLAIN-KO"
+ ]
+}

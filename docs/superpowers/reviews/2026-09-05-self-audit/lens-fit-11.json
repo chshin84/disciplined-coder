@@ -1,0 +1,52 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-consistency/SKILL.md",
+ "findings": [
+  {
+   "title": "레퍼런스 프롬프트를 그대로 쓰면 이 렌즈는 `narrowed`와 `pairs`를 돌려주지 않는다",
+   "file": "skills/lens-consistency/SKILL.md:22-23, 36, 40",
+   "evidence": "40행: \"`narrowed`(좁혀 적음 개수)와 `pairs`(짝마다의 판정)는 레포 문서 감사에서 이 렌즈가 더 돌려주는 칸이며 집계 대상이 아니다.\" / 36행 스키마: \"{ \"lens\": \"consistency\", \"read\": [ \"...\" ], \"issues\": [ ... ], \"principles_applied\": [ ... ], \"notes\": \"\" }\" — `narrowed`도 `pairs`도 없다. / 23행 user: \"[원문]\\n{document}\\n\\n[관련 배경]\\n{background}\\n\\n위 체크리스트로 이슈를 아래 JSON 스키마로 출력하라.\"",
+   "principle": "EXPLICIT",
+   "consequence": "호출자인 project-doc-audit이 63행에서 \"렌즈 프롬프트는 그 렌즈 `SKILL.md`의 레퍼런스 프롬프트를 그대로 쓴다\"고 정했으므로, 레포 문서 감사에서 띄운 서브에이전트는 22~23행 프롬프트와 36행 스키마만 보고 `narrowed`와 `pairs`가 없는 JSON을 돌려준다. 그러면 좁혀 적음으로 판정한 짝이 개수로도 남지 않아, 짝을 안 본 것과 정당한 도출이라 발견을 안 낸 것이 구별되지 않는다.",
+   "detail": "이 렌즈의 출력 계약은 세 곳에 나뉘어 있는데 서로 맞지 않는다. 40행 본문은 레포 문서 감사에서 `narrowed`와 `pairs`를 더 돌려준다고 정하지만, 실제로 서브에이전트에 전달되는 22~23행 레퍼런스 프롬프트에는 좁혀 적음도 짝별 판정도 나오지 않고, 36행 출력 스키마에도 두 칸이 없다. 게다가 23행 user 템플릿의 자리는 `{document}`와 `{background}` 둘뿐이라, 26행이 요구하는 레포 문서 감사의 입력(정본의 진술과 따르는 문서의 진술, 진술마다 원문 앞뒤 다섯 줄, 어느 문서가 정본인지)을 담을 자리도 없다. 계약을 읽는 쪽은 프롬프트와 스키마이지 본문 설명이 아니므로, 본문에만 적힌 칸은 실제로 산출되지 않는다.",
+   "fix": "레퍼런스 프롬프트를 레포 문서 감사용 지시와 함께 갖추고, 36행 스키마에 `narrowed`와 `pairs`를 그 조건과 함께 적어 프롬프트·스키마·본문이 한 계약을 가리키게 한다.",
+   "lens": "lens-fit",
+   "type": "schema"
+  },
+  {
+   "title": "레퍼런스 프롬프트가 레포 문서 감사에서 걸지 않기로 한 항목을 그대로 지시한다",
+   "file": "skills/lens-consistency/SKILL.md:12, 14, 22",
+   "evidence": "12행: \"**산출물 공백** — 이 일이 무엇을 내놓는지 적혀 있는가. 내놓는 것의 형태와 놓일 곳까지 정해져 있는가. spec·plan을 보는 항목이라 레포 문서 감사에서는 걸지 않는다.\" / 14행: \"**스코프** — 한 구현 계획에 맞는 크기인가, 아니면 쪼개야 하는가. spec·plan을 보는 항목이라 레포 문서 감사에서는 걸지 않는다.\" / 22행 system: \"문서 내부의 모순, spec↔plan 커버리지 공백, 산출물 공백(무엇을 내놓는지와 그 형태와 놓일 곳이 안 적힌 것), 이름과 타입의 드리프트, 스코프 문제를 찾아라.\"",
+   "principle": "EXPLICIT",
+   "consequence": "호출자가 이 프롬프트를 그대로 써서 레포 문서 감사의 이름표 묶음을 대조시키면, 서브에이전트는 걸지 않기로 한 산출물 공백과 스코프를 찾으라는 지시를 받고 `gap`과 `scope` 발견을 낸다. 그 발견은 반박검증과 중복 제거를 거치며 값을 쓰지만 애초에 이 맥락에서 볼 항목이 아니어서 버려지고, spec 리뷰에서 온 발견과 섞여 집계본을 오염시킨다.",
+   "detail": "체크리스트는 산출물 공백과 스코프를 맥락으로 나누어 레포 문서 감사에서는 걸지 않는다고 정했으나, 실제로 서브에이전트에 실리는 22행 레퍼런스 프롬프트는 맥락 구분 없이 다섯 항목을 모두 찾으라고 지시하고 \"spec↔plan 커버리지 공백\"이라 못박아 짝이 spec과 plan인 경우만 가정한다. project-doc-audit 63행이 이 프롬프트를 그대로 쓰라고 정했으므로, 문서에 적힌 제외 규칙은 호출 시점에 전달되지 않는다.",
+   "fix": "레퍼런스 프롬프트를 맥락에 따라 갈라 적거나, 프롬프트 안에 어느 항목을 거는지 호출자가 채우는 자리를 두어 제외 규칙이 실제 지시에 실리게 한다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  },
+  {
+   "title": "출력 스키마 블록이 meta-aggregate가 SSOT로 소유한 공통 필드를 통째로 다시 적는다",
+   "file": "skills/lens-consistency/SKILL.md:36",
+   "evidence": "36행: \"{ \"lens\": \"consistency\", \"read\": [ \"...\" ], \"issues\": [ { \"where\": \"문서 내 위치\", \"type\": \"contradiction|gap|drift|scope|duplication\", \"claim\": \"무엇이 문제인가\", \"consequence\": \"이대로 두면 무엇이 어떻게 잘못되는가\", \"evidence\": \"그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL\" } ], \"principles_applied\": [ ... ], \"notes\": \"\" }\" / skills/meta-aggregate/SKILL.md:20: \"이 계약은 여기가 SSOT다. 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.\"",
+   "principle": "SSOT",
+   "consequence": "공통 계약이 두 곳에 적혀 있어 meta-aggregate의 필드가 바뀌면 사람이 렌즈 파일마다 손으로 맞춰야 하고, 맞추지 못한 렌즈는 옛 필드 이름으로 돌려주어 집계 코드가 그 값을 못 읽는다.",
+   "detail": "meta-aggregate는 리뷰 산출물 계약의 SSOT를 자기라고 선언하고 렌즈 파일에는 자기 `type` 폐쇄 집합만 두라고 정했다. lens-consistency는 42행에서 \"필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다\"라고 가리키면서도, 36행에서 `where`·`claim`·`consequence`·`evidence`·`principles_applied`·`notes`의 설명 문구까지 그대로 복제해 두었다. 가리키는 문장과 복제한 블록이 한 파일에 같이 있어 어느 쪽이 계약인지 읽는 쪽이 정할 수 없다.",
+   "fix": "36행 블록을 자기 `type` 폐쇄 집합(`contradiction|gap|drift|scope|duplication`)과 이 렌즈만의 추가 칸만 남기고, 나머지 필드는 meta-aggregate의 계약을 가리키는 문장으로 대신한다.",
+   "lens": "lens-fit",
+   "type": "compat"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-consistency\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "SSOT",
+  "FOCUSED",
+  "FAIL-LOUD"
+ ]
+}

@@ -1,0 +1,52 @@
+{
+ "lens": "lens-grounding",
+ "target": "CLAUDE.md",
+ "findings": [
+  {
+   "title": "CLAUDE.md는 Stop 리뷰 게이트가 발동한다고만 적고 그 게이트를 푸는 유일한 조건인 spec-review 마커를 적지 않아, 기여자가 차단을 만난 뒤 무엇을 해야 풀리는지 이 문서만으로는 알 수 없다.",
+   "file": "CLAUDE.md:5",
+   "evidence": "설계 문서는 `docs/superpowers/specs/`에, 계획 문서는 `docs/superpowers/plans/`에 쓴다. 그 두 폴더에 `.md`를 새로 쓰면 Stop 리뷰 게이트가 발동한다.",
+   "principle": "lens-grounding 체크리스트의 「누락」 — 요청한 항목·제약을 빠짐없이 충족했는가. 원칙으로는 EXPLICIT·FAIL-LOUD.",
+   "consequence": "hooks/spec_review_stop.sh 는 마지막 비공백 줄이 terminal 마커가 아닌 신규 spec/plan 이 있으면 `{\"decision\":\"block\"}` 을 내어 세션 종료를 막는다. 이 문서를 근거로 spec 을 쓴 기여자는 종료가 막힌 뒤 무엇을 해야 풀리는지 이 문서에서 찾지 못하고, 차단 사유문에 적힌 안내에만 의존하거나 `DISCIPLINED_CODER_REVIEW_GATE=off` 로 게이트 자체를 끄는 쪽으로 간다. 게이트를 끄면 이후 어떤 spec 도 리뷰 없이 통과하고, 아무 신호도 남지 않는다.",
+   "detail": "hooks/_spec_marker.sh 의 `marker_is_terminal()` 은 파일의 마지막 비공백 줄이 `<!-- spec-review: passed ... -->` 또는 `<!-- spec-review: escalated ... -->` 일 때만 통과시킨다. hooks/spec_review_stop.sh 는 git status 의 신규(`??`·`A`) 항목과 HEAD 커밋이 추가한 항목 가운데 이 마커가 없는 것을 모아 종료를 차단한다. 즉 게이트를 여는 조건은 마커 한 줄인데, 문서가 알려 주는 것은 게이트가 발동한다는 사실뿐이다. 이 문서가 전달하려는 것이 '설계·계획 문서를 어디에 쓰는지와 그대로 실행할 수 있게 하는 것'이므로, 푸는 조건의 누락은 목적을 직접 막는다.",
+   "fix": "5번 줄 뒤에 게이트를 푸는 조건을 한 문장으로 더한다. 예를 들어 \"게이트는 그 문서의 마지막 비공백 줄에 `<!-- spec-review: passed -->` 나 `<!-- spec-review: escalated -->` 마커가 있을 때 열린다(마커 계약의 정본은 `hooks/_spec_marker.sh`다).\" 로 적고, 개수나 문구를 손으로 옮겨 적는 대신 정본 파일을 가리킨다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/CLAUDE.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/_spec_marker.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/spec_review_stop.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/spec_review_posttooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_review_posttooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_format_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/readonly_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_hooks.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_assertions.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_self_audit.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/seal_reviews.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/settings.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.github/workflows/ci.yml",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/README.md"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "READ-FLOW",
+  "PLAIN-KO",
+  "KO-SYNTAX",
+  "PROSE-FORM",
+  "SSOT",
+  "MEASURE-FIRST"
+ ]
+}

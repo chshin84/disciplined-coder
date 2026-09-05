@@ -1,0 +1,43 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-fit/SKILL.md",
+ "findings": [
+  {
+   "title": "「읽기 범위」가 `read`를 대개 빈 배열이라고 선언해, 정본을 읽으라는 호출자 계약과 어긋난다.",
+   "file": "skills/lens-fit/SKILL.md:18-19",
+   "evidence": "skills/lens-fit/SKILL.md 18-19행: \"## 읽기 범위\\n출력 계약과 후보만 본다. 문서 밖으로 나가지 않으므로 `read`는 대개 빈 배열이다.\" 반면 skills/domain-docs/SKILL.md 114행은 \"정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다. 읽기 전용 에이전트도 Read는 갖는다.\"이고, skills/project-doc-audit/SKILL.md 61행은 \"정본 경로를 프롬프트에 넣고 `principles_applied`를 요구한다.\"이다. 짝 렌즈인 skills/lens-consistency/SKILL.md 17행은 반대로 \"그 밖으로 탐색하지 않고, 연 것은 `read`에 적는다.\"라고 적는다.",
+   "principle": "EXPLICIT",
+   "type": "constraint",
+   "consequence": "호출자는 정본(agent-principles.md)을 열어 읽으라고 시키는데 렌즈 자신의 문서는 문서 밖으로 나가지 않는 것이 정상이라고 적혀 있어, 렌즈가 정본을 열고도 `read`를 비워 돌려주는 회차가 생긴다. 그러면 skills/meta-aggregate/SKILL.md 37행의 \"`read`가 비어 있으면 호출자가 자기 보고에 적는다\"가 매 회차 발동해, 정본을 정말 안 읽은 회차와 읽을 것이 없던 회차가 기록에서 구별되지 않는다.",
+   "detail": "이 렌즈에 걸리는 계약은 둘이다. 하나는 자기 문서가 정한 읽기 범위이고, 다른 하나는 호출자 둘이 공통으로 요구하는 정본 직접 읽기다. 뒤쪽은 렌즈에 정본이 안 실릴 수 있다는 전제에서 나온 요구라 `read`가 반드시 비지 않는다. 앞쪽 문장은 그 요구를 모르는 채로 빈 배열을 기본값으로 못 박는다. 같은 자리에서 lens-consistency는 \"연 것은 `read`에 적는다\"로 적어 두 계약이 부딪히지 않는데, lens-fit만 반대 방향의 기본값을 선언한다.",
+   "fix": "\"문서 밖으로 나가지 않으므로 `read`는 대개 빈 배열이다\"를 lens-consistency와 같은 형태로 바꿔, 계약과 후보 밖으로 탐색하지 않되 호출자가 준 정본 경로처럼 실제로 연 것은 `read`에 적는다고 쓴다.",
+   "lens": "lens-fit"
+  },
+  {
+   "title": "레퍼런스 프롬프트의 `{contract}` 슬롯에 레포 문서 감사가 무엇을 넣는지 이 문서가 정하지 않는다.",
+   "file": "skills/lens-fit/SKILL.md:7,23",
+   "evidence": "skills/lens-fit/SKILL.md 7행: \"계약은 호출자가 준다. 런타임에서는 다운스트림 코드가 파싱할 형식과 스키마이고, 문서 검진에서는 그 문서에 정해진 형식·길이·스타일·금지사항이다.\" 23행: \"- user: \\\"[출력 계약]\\\\n{contract}\\\\n\\\\n[후보]\\\\n{candidate}\\\\n\\\\n위반을 아래 JSON 스키마로 출력하라.\\\"\" 그런데 3행 description은 \"domain-llm-runtime의 런타임 리뷰와 domain-docs의 문서 검진과 project-doc-audit의 레포 문서 감사가 호출한다.\"로 호출자를 셋 적는다. 호출자 쪽 skills/project-doc-audit/SKILL.md 63행은 \"렌즈 프롬프트는 그 렌즈 `SKILL.md`의 레퍼런스 프롬프트를 그대로 쓴다.\"이고 69행은 \"문서마다 따로 판정하는 렌즈에는 문서 하나를 통째로 준다.\"이다.",
+   "principle": "EXPLICIT",
+   "type": "constraint",
+   "consequence": "레포 문서 감사는 `{candidate}`에 문서를 통째로 넣지만 `{contract}`에 넣을 것은 어디에도 안 적혀 있어, 호출자가 회차마다 계약을 스스로 지어 넣게 된다. 그러면 skills/project-doc-audit/SKILL.md 42행이 렌즈 배정을 고정한 이유인 \"회차마다 다시 판단하지 않는다\"가 계약 자리에서 무너져 회차끼리 대조할 수 없고, 계약을 비워 넣으면 렌즈가 형식 위반을 하나도 못 세면서 빈 목록이 정상이라는 정상 판정을 돌려준다.",
+   "detail": "이 렌즈의 판정은 호출자가 준 계약에 전적으로 달려 있으므로, 호출자마다 그 계약이 무엇인지 이 문서가 적어야 계약이 성립한다. 7행은 런타임과 문서 검진 둘만 적고 레포 문서 감사를 빠뜨렸는데, 정작 skills/project-doc-audit/SKILL.md 49행의 렌즈 배정 표는 \"렌즈 정의\" 종류에 lens-fit 하나만 걸어 이 렌즈가 그 회차의 유일한 판정자다. 같은 자리에서 lens-consistency는 「레포 문서 감사에서의 짝」이라는 절을 따로 두어 호출자가 무엇을 주는지와 판정을 어떻게 가르는지를 명시했다.",
+   "fix": "7행의 열거에 레포 문서 감사를 더해 그 맥락의 계약이 무엇인지(예: 그 문서 종류의 frontmatter 형식과 writing-korean의 금지 표현과 출력 스키마 준수) 한 문장으로 적거나, lens-consistency처럼 「레포 문서 감사에서의 계약」 절을 둔다.",
+   "lens": "lens-fit"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-consistency\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "SSOT",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "PROSE-FORM"
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/nested-orchestration/SKILL.md",
+ "findings": [],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/nested-orchestration/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-plugin/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_review_posttooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/docs/superpowers/plans/2026-07-05-nested-orchestration.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json"
+ ],
+ "principles_applied": [
+  "FAIL-LOUD",
+  "SSOT",
+  "ASK-FORK",
+  "EXPLICIT",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "NAME-ITEMS",
+  "MEASURE-FIRST"
+ ]
+}

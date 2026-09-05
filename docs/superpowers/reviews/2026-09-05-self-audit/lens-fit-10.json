@@ -1,0 +1,58 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-adversarial/SKILL.md",
+ "findings": [
+  {
+   "title": "이 문서가 선언한 출력 스키마와 실제 호출자가 강제하는 스키마가 서로 달라 `notes`에 적으라고 시킨 것이 갈 자리가 없다.",
+   "file": "skills/lens-adversarial/SKILL.md:16,30",
+   "evidence": "SKILL.md:16 — \"발견마다 `where`에 문서의 어느 줄이나 어느 절이 달라져야 하는지를 짚는다. \"설계 전반\" 같은 말은 쓰지 않는다. 원인은 보이는데 고칠 줄을 못 짚겠으면 그 사정을 `notes`에 적는다. 올리지 않고 삼키지 않는다.\" / SKILL.md:30 — `{ \"lens\": \"adversarial\", \"read\": [ \"...\" ], \"issues\": [ { \"where\": \"문서 내 위치\", ... } ], \"principles_applied\": [ ... ], \"notes\": \"\" }` / .claude/workflows/self-audit.js — `grep -n \"notes\" .claude/workflows/self-audit.js` 는 0건이고, 이 렌즈를 띄우는 LENS_SCHEMA 는 `required: ['findings', 'read', 'principles_applied']` 이며 findings 항목은 `title/file/evidence/principle/consequence/detail/fix/type/lens` 로 `where`·`claim`·`notes` 가 없다(self-audit.js:44-53, 97-105).",
+   "principle": "SSOT",
+   "consequence": "고칠 줄을 못 짚은 사정과 더 확인해야 할 것을 렌즈가 `notes`에 적어도 호출자의 스키마에 그 칸이 없어 응답에서 잘려 나간다. project-doc-audit/SKILL.md:73 이 \"돌아온 `notes`에서 렌즈가 더 확인해야 한다고 적은 것을 읽는다\"고 정한 걸음이 이 워크플로에서는 영영 빈 걸음이 되고, 렌즈가 삼키지 말라고 명시한 것이 조용히 사라진다.",
+   "detail": "이 파일은 자기 산출물 계약을 `lens`·`issues[where,claim]`·`notes` 로 선언하는데, 실제로 이 렌즈를 띄우는 유일한 코드인 .claude/workflows/self-audit.js 는 그와 다른 필드 집합을 구조화 출력 스키마로 강제한다. 두 곳이 같은 사실(렌즈 산출물의 모양)을 서로 다르게 적고 있어 하나가 반드시 틀리며, 지금은 문서 쪽이 실측과 어긋난 쪽이다. 특히 `notes`는 이 파일이 세 번(16줄 본문, 25줄 프롬프트의 \"훑은 각도\"와 \"더 확인해야 할 것\") 쓰라고 시키는 칸인데 소비자 스키마에 존재하지 않는다.",
+   "fix": "출력 스키마 절이 self-audit.js 가 강제하는 필드 집합을 가리키게 하거나, 반대로 self-audit.js 의 LENS_SCHEMA 에 `notes` 를 더해 둘을 한 계약으로 맞춘다. 어느 쪽을 참으로 삼을지는 사용자 결정이 필요한 갈림길이다.",
+   "lens": "lens-fit",
+   "type": "schema"
+  },
+  {
+   "title": "호출자가 다섯째 축인 자기모순을 찾으라고 시키지만 이 문서의 `type` 폐쇄 집합에는 그것을 담을 값이 없다.",
+   "file": "skills/lens-adversarial/SKILL.md:7,30",
+   "evidence": "SKILL.md:7 — \"축은 넷이다. 실패 모드, 과설계, 비가역성, 그리고 단순화로는 없앨 수 없어 완화해야 할 위험이다.\" / SKILL.md:30 — `\"type\": \"failure-mode|over-engineering|irreversible|risk\"` / .claude/workflows/self-audit.js:299 — \"렌즈: ${REPO}/skills/lens-adversarial/SKILL.md 를 읽고 그대로 적용하라(가드 포함: 기능 추가 제안 금지·근거 필수). ... 실패 모드, 과설계, 비가역, 자기모순을 공격적으로 찾아라.\"",
+   "principle": "EXPLICIT",
+   "consequence": "호출자가 시킨 자기모순 발견은 폐쇄 집합에 맞는 `type` 이 없어 렌즈가 아무 값이나 골라 넣거나 그 발견을 아예 올리지 않는다. 앞은 집계에서 `type` 으로 행동을 정하는 표를 어긋나게 하고, 뒤는 시켰는데 아무도 안 본 축을 만든다. 자기모순은 lens-consistency 가 소유하는 축이라 이 렌즈가 그것을 내면 중복 제거 단계에서 소유자가 갈린다.",
+   "detail": "이 파일은 축을 넷으로 닫고 `type` 도 그 넷으로 닫는다. 그런데 이 렌즈를 실제로 띄우는 self-audit.js 는 프롬프트에서 \"그대로 적용하라\"고 해 놓고 같은 문장에서 넷 대신 다섯을 열거하며, 그 다섯째가 이 렌즈의 축에 없는 자기모순이고, 반대로 이 렌즈가 가진 넷째 축인 위험은 열거에서 빠져 있다. 렌즈 파일과 그 소비자가 같은 렌즈의 적용 범위를 다르게 약속하고 있어, 산출물이 어느 계약을 지켜야 하는지가 문서만으로는 정해지지 않는다.",
+   "fix": "self-audit.js:299 의 축 열거를 지우고 \"이 SKILL.md 의 체크리스트 넷을 그대로 쓴다\"로 바꿔 축 목록의 소유자를 렌즈 파일 하나로 둔다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  },
+  {
+   "title": "체크리스트 네 항목의 말끝이 서술문과 의문문으로 갈려 있어 한 목록 안에서 형태가 섞인다.",
+   "file": "skills/lens-adversarial/SKILL.md:10-13",
+   "evidence": "SKILL.md:10 — \"**실패 모드** — 이 설계대로 해서 완전히 실패했다고 놓고 그 원인을 적는다. \"무엇이 잘못될 수 있는가\"로 묻지 않는다. ... 다른 렌즈는 문서가 틀렸는지만 보므로 이것은 이 렌즈가 아니면 아무도 안 본다.\" / :11 \"**과설계** — 지금 필요 없는 일반화·추상화·유연성이 들어갔는가(`SIMPLE`·YAGNI 위반).\" / :12 \"**비가역** — 되돌리기 어려운 결정이 근거 없이 들어갔는가(`REVERSIBLE`).\" / :13 \"**위험** — 단순화로는 없앨 수 없고 완화해야 할 위험이 남았는가. 그 제안에는 반드시 근거를 단다.\" / 대조: skills/lens-fit/SKILL.md:10-13 은 네 항목이 모두 \"~는가\"로 끝난다.",
+   "principle": "PROSE-FORM",
+   "consequence": "같은 구실을 하는 네 항목의 말끝이 갈려 있어 읽는 렌즈가 그 차이에 뜻이 있는지 되짚는다. 실패 모드 항목만 지시문이라 나머지 셋과 다른 무게로 읽히고, 이 파일은 체크리스트를 항목마다 따로 훑으라고 시키므로 항목 사이의 무게 차이가 곧 훑는 깊이의 차이로 옮는다.",
+   "detail": "writing-korean/SKILL.md:66 은 \"한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다. 맞추는 단위는 같은 구실을 하는 요소끼리다\"라고 정하고, 이어 \"한 칸만 문장이고 나머지가 명사구면 읽는 사람이 그 차이에 뜻이 있는지 되짚는다\"고 그 이유를 적는다. 이 파일의 체크리스트는 첫 항목만 \"적는다·묻지 않는다·든다·안 본다\"의 서술문이고 나머지 셋은 \"~는가\"의 의문문이다. 같은 자리에 같은 꼴로 놓인 lens-fit 의 체크리스트는 넷 모두 의문문이라 이 레포의 관례가 무엇인지도 분명하다.",
+   "fix": "실패 모드 항목을 \"이 설계대로 해서 완전히 실패했다면 그 원인이 무엇인가\"처럼 의문문으로 맞추고, 그 뒤에 붙은 묻는 방법의 지시는 문장을 나눠 뒤에 둔다.",
+   "lens": "lens-fit",
+   "type": "style"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-adversarial/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "PROSE-FORM",
+  "MEASURE-FIRST",
+  "SIMPLE"
+ ]
+}

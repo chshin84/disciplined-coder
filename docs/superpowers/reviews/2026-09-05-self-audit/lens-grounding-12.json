@@ -1,0 +1,55 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/nested-orchestration/SKILL.md",
+ "findings": [
+  {
+   "title": "L2가 자율로 domain-spec-review를 돌린다고 적었으나, 그 스킬은 반영 뒤 다시 리뷰할지를 매번 사용자에게 묻게 하므로 사람과 대화할 수 없는 L2가 그 걸음을 조용히 건너뛴다.",
+   "file": "skills/nested-orchestration/SKILL.md:19",
+   "evidence": "nested-orchestration/SKILL.md:19 「플랜 국면은 L2가 자율로 `domain-spec-review`를 돌려 발견을 🔴와 고칠 것으로 가르고 고칠 것까지 반영하며」 / :23 「L2는 자기 부모인 L1 외 누구와도 대화할 수 없으므로」 / domain-spec-review/SKILL.md:125 「반영할 것 하나하나에 대해 그 수정이 **기능적 변화**를 일으키는지 본다. 문장을 다듬는 정도면 그대로 두고, 동작이나 계약이 달라지면 다시 리뷰할 거리가 된다.」 / domain-spec-review/SKILL.md:129 「다시 리뷰는 매번 사용자에게 묻는다. 자동으로 돌지 않는다. 물을 때는 `ASK-FORK`대로 선택지가 있는 질문으로 묻는다.」",
+   "principle": "ASK-FORK / FAIL-LOUD",
+   "consequence": "플랜 리뷰에서 나온 지적을 반영해 계약이나 동작이 달라져도 L2는 다시 리뷰할지 물을 상대가 없어 그 걸음을 건너뛴다. nested-orchestration이 정한 BLOCKED 발동 조건은 🔴와 렌즈 간 상충과 커버리지 공백 셋뿐이라(:19) 이 상황은 어디에도 걸리지 않고, L1은 반영으로 달라진 계약이 재검증 없이 지나갔다는 사실조차 통지받지 못한 채 그 브랜치를 병합한다.",
+   "detail": "nested-orchestration은 플랜 국면 검증을 통째로 domain-spec-review에 위임하면서 그 스킬이 아홉 걸음 가운데 마지막 걸음에서 사용자 질문을 요구한다는 것을 옮겨 적지 않았다. domain-spec-review는 spec·plan 리뷰의 유일한 반복 장치로 「작업 순서와 다시 리뷰」를 두고 그 발동을 사용자 질문에 묶어 두었는데, 그 절차를 사람과 대화할 수 없는 층에 그대로 얹으면 장치가 발동할 수 없다. nested-orchestration은 사람 결정을 만나는 경우로 🔴 하나만 상정하고(:33 「L2가 사람 결정(🔴)에 부딪히면」) BLOCKED 발동 조건 셋을 :19에 닫아 두었으므로, 반영 뒤 재리뷰 질문은 그 셋 어디에도 대응하지 않는다.",
+   "fix": "L2가 반영한 수정 가운데 기능적 변화를 일으킨 것이 있으면 그 사실을 산출 계약의 리턴 항목에 더해 L1이 재리뷰 여부를 사용자에게 묻게 하거나, 3층에서는 재리뷰 질문을 L1이 대신 진다고 :19에 명시한다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  },
+  {
+   "title": "산출 계약이 L2가 남길 산출물을 리포트 하나로 닫아 놓아, domain-spec-review가 필수로 요구하는 플랜 리뷰 기록과 렌즈 원본 JSON이 어디에 남는지 정해지지 않는다.",
+   "file": "skills/nested-orchestration/SKILL.md:30",
+   "evidence": "nested-orchestration/SKILL.md:30 「상세는 리포트 파일에 쓰고(변경 파일과 테스트 최종 결과와 발행 스키마 실제 모양과 스펙 이탈과 브랜치명을 담는다), L1으로 리턴하는 것은 상태와 블로커와 한 줄 요약과 리포트 경로뿐이다. 리포트는 제품 트리 밖의 워크스트림별 고유 경로(예: `report-<workstream>.md`)에 쓰고 병합될 브랜치에는 커밋하지 않는다.」 / domain-spec-review/SKILL.md:91 「합치기가 끝나면 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-review.md`에 쓴다.」 / domain-spec-review/SKILL.md:97 「렌즈가 돌려준 원본은 받는 즉시 저장한다. 기록 파일과 **같은 이름의 폴더**를 만들어 그 안에 `lens-grounding-1.json`처럼 렌즈 스킬 이름과 띄운 횟수로 이름 붙여 넣는다. 서브에이전트 산출은 임시 저장소에 있어 나중에 몰아서 옮기려 하면 잃는다.」 / domain-spec-review/SKILL.md:107 「이 기록이 있어야 발견이 기록 없이 사라지지 않는다. 기록이 없으면 발견이 0건이었던 리뷰와 발견을 전량 넘긴 리뷰가 산출물상 구별되지 않는다(`FAIL-LOUD`).」",
+   "principle": "FAIL-LOUD / SSOT",
+   "consequence": "L2는 자기가 남길 것을 「상태와 블로커와 한 줄 요약과 리포트 경로뿐」으로 읽으므로 플랜 리뷰 기록과 렌즈 원본을 만들지 않거나, 만들더라도 병합되지 않는 스크래치에 두어 통합 뒤 사라진다. 그러면 워크스트림마다 돌린 플랜 리뷰가 지적 0건이었는지 아예 안 돌았는지를 L1도 사용자도 뒤에 구별할 수 없고, domain-spec-review가 기록을 필수로 둔 까닭이 3층에서만 무력해진다.",
+   "detail": "nested-orchestration은 :19에서 플랜 국면 검증을 domain-spec-review에 넘기면서 그 스킬이 산출물로 요구하는 두 가지, 곧 `docs/superpowers/reviews/` 아래의 리뷰 기록과 같은 이름 폴더의 렌즈 원본 JSON을 산출 계약에서 다루지 않는다. 산출 계약은 제품 트리 밖 스크래치에 두는 리포트 하나만 규정하고 그 근거로 병합 충돌과 문서 넛지 둘을 든다. 리뷰 기록은 그 두 근거 어느 쪽에도 걸리지 않는다 — 이름에 주제와 날짜가 들어가 워크스트림끼리 겹치지 않고, `hooks/doc_review_posttooluse.sh`가 `*docs/superpowers/reviews/*.md`를 넛지 대상에서 제외한다. 그런데도 계약이 리포트만 열거하고 리턴 항목을 「뿐」으로 닫아 두어, 남겨야 할 기록이 계약 밖으로 밀려난다.",
+   "fix": "산출 계약에 플랜 리뷰 기록과 렌즈 원본 JSON을 워크트리 안 `docs/superpowers/reviews/` 아래에 쓰고 브랜치에 커밋한다는 항목을 더하고, 리포트를 스크래치에 두는 규칙이 그 기록에는 걸리지 않는 까닭을 한 줄 적는다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/nested-orchestration/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-plugin/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_review_posttooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/docs/superpowers/plans/2026-07-05-nested-orchestration.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json"
+ ],
+ "principles_applied": [
+  "FAIL-LOUD",
+  "SSOT",
+  "ASK-FORK",
+  "EXPLICIT",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "NAME-ITEMS",
+  "MEASURE-FIRST"
+ ]
+}

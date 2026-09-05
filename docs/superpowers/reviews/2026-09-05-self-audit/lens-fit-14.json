@@ -1,0 +1,60 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-prior-art/SKILL.md",
+ "findings": [
+  {
+   "title": "가드가 이슈로 올릴 순간을 둘로 닫아 놓아, 같은 문서가 정의한 네 개짜리 `type` 폐쇄 집합 가운데 `crowded`와 `weak-baseline`이 올라올 길이 막힌다.",
+   "file": "skills/lens-prior-art/SKILL.md:31",
+   "evidence": "31행: \"- 참신함을 채점하지 않는다. 이슈가 되는 순간은 선행 결과가 이 설계의 전제를 반박하거나, 알려진 실패 원인이 이 설계에도 남아 있을 때뿐이다.\" / 44행: \"\\\"type\\\": \\\"refuted-premise|known-failure|crowded|weak-baseline\\\"\" / 34행: \"- `weak-baseline`은 비교를 요구하되 구현을 요구하지 않는다. 그 유형의 `claim`은 \\\"이 기준선과 비교되지 않았다\\\"까지만 적고 무엇을 만들라고 적지 않는다.\"",
+   "principle": "EXPLICIT",
+   "consequence": "가드를 문자 그대로 지키는 렌즈는 붐빔과 기준선 미비교를 찾아도 \"이슈가 되는 순간\"에 해당하지 않는다고 보고 `issues`에서 뺀다. 그러면 `search_status`가 `ok`이고 `issues`가 빈 회차가 나오는데, 48~52행 표에 따라 호출자는 그것을 \"선행 사례를 봤으나 문제될 것이 없었다\"는 판정으로 읽는다. 체크리스트의 두 항목이 조용히 사라지고 집계 단계는 그 공백을 알아채지 못한다.",
+   "detail": "이 문서는 한 산출물에 두 개의 서로 다른 계약을 건다. 체크리스트(10~14행)는 다섯 각도를 훑으라 하고 스키마(44행)는 이슈 유형을 넷으로 닫는데, 가드(31행)는 그 가운데 둘만 이슈가 된다고 한정한다. 34행은 `weak-baseline`을 실제로 쓰이는 유형으로 전제하고 그 `claim`의 문안까지 정하므로, 31행과 34행은 같은 문서 안에서 서로를 부정한다. 렌즈가 어느 쪽을 따르느냐로 산출물의 유형 분포가 갈리며 어느 쪽을 따랐는지는 산출물에 드러나지 않는다.",
+   "fix": "31행을 \"참신함 자체는 이슈가 아니다\"까지로 줄이고, 이슈가 되는 조건은 44행의 네 유형이 정한다고 가리킨다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  },
+  {
+   "title": "frontmatter의 호출자 열거가 `project-doc-audit`을 빠뜨려, 형제 렌즈들이 지키는 \"호출자를 빠짐없이 적는다\"는 계약을 이 파일만 어긴다.",
+   "file": "skills/lens-prior-art/SKILL.md:3",
+   "evidence": "3행 끝: \"domain-spec-review가 spec에 한해 조건부로 호출하고, 사용자가 선행연구를 직접 청하면 spec이 없어도 연다.\" / skills/project-doc-audit/SKILL.md:57: \"- **웹 렌즈 제외** — 웹에 나가는 렌즈는 이 절차에서 쓰지 않는다. `lens-prior-art`는 설계가 선행 사례와 어긋나는지 보는 렌즈다. 쓰려면 사용자에게 따로 승인을 받는다.\" / skills/lens-fit/SKILL.md:3: \"domain-llm-runtime의 런타임 리뷰와 domain-docs의 문서 검진과 project-doc-audit의 레포 문서 감사가 호출한다.\"",
+   "principle": "EXPLICIT",
+   "consequence": "레포 문서 감사에서 승인을 받아 이 렌즈를 돌리는 세션은, 렌즈 파일이 그 경로를 모른다고 적혀 있으므로 그 회차에 어떤 처분 규칙과 기록 규칙이 걸리는지 알 수 없다. 46행이 정한 \"발견을 전부 🔴로 처분한다\"는 규칙의 집행 주체가 그 경로에 없어, 웹에서 읽어 온 발견이 일반 지적에 섞여 검토 없이 문서를 고치게 된다.",
+   "detail": "lens-fit·lens-consistency·lens-adversarial·lens-readability의 description은 자기를 부르는 호출자를 모두 열거한다. lens-prior-art만 둘(domain-spec-review와 사용자 직접 요청)까지 적고, project-doc-audit이 승인을 조건으로 열어 둔 셋째 경로를 적지 않는다. 7행 본문도 같은 둘까지만 적어 frontmatter와 본문이 함께 빠뜨린다.",
+   "fix": "셋째 경로를 열어 둘 것이면 3행과 7행에 project-doc-audit을 승인 조건과 함께 더하고, 열지 않을 것이면 project-doc-audit:57에서 그 문장을 뺀다.",
+   "lens": "lens-fit",
+   "type": "compat"
+  },
+  {
+   "title": "집계 항목이 닫힌 필드 목록이라 인용이 실리지 않는다는 사실을 이 파일이 다시 서술해, 같은 문장 안에서 SSOT라고 가리킨 `meta-aggregate`와 사본이 둘로 갈린다.",
+   "file": "skills/lens-prior-art/SKILL.md:57",
+   "evidence": "57행: \"`citations`는 이슈 안에 두고 호출자가 원본 JSON에서 읽는다. 집계 항목은 닫힌 필드 목록이라 인용이 실리지 않으므로, 인용 검증은 집계본이 아니라 렌즈가 돌려준 원본을 본다. `not_found`와 `disclosures`도 집계 대상이 아니다.\" / 46행: \"필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다.\" / skills/meta-aggregate/SKILL.md:19: \"이 계약은 여기가 SSOT다. 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.\" / skills/meta-aggregate/SKILL.md:56: \"집계 항목은 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 렌즈가 돌려준 원본을 본다. `lens-prior-art`의 `search_status`·`citations`·`not_found`·`disclosures`와 …\"",
+   "principle": "SSOT",
+   "consequence": "집계 대상 필드가 바뀔 때 meta-aggregate만 고쳐지고 이 사본은 남는다. 그러면 이 파일을 읽고 온 세션은 이미 실리게 된 필드를 원본에서만 읽으려 하거나, 반대로 실리지 않는 필드를 집계본에서 찾아 인용 검증을 건너뛴다. scripts/test_docs_drift.sh는 `principles_applied` 규칙의 되풀이만 막으므로 이 사본은 검사에 걸리지 않는다.",
+   "detail": "meta-aggregate:19는 렌즈 파일이 자기 `type` 폐쇄 집합만 정의하고 나머지는 참조하라고 못 박고, 이 파일 46행도 그 계약이 SSOT라고 스스로 선언한다. 그런데 바로 다음 문단인 57행이 그 계약의 귀결 — 어느 필드가 집계 대상이 아닌가 — 을 다시 적어 같은 사실을 두 곳에 둔다.",
+   "fix": "57행에는 이 렌즈 고유의 요구인 \"인용 검증은 렌즈가 돌려준 원본 JSON을 본다\"만 남기고, 그 이유와 집계 제외 필드 목록은 meta-aggregate를 가리키는 한 줄로 줄인다.",
+   "lens": "lens-fit",
+   "type": "duplication"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-prior-art/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-consistency/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-adversarial/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_scaffold.sh"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "SSOT",
+  "FAIL-LOUD",
+  "PROSE-FORM",
+  "MEASURE-FIRST"
+ ]
+}

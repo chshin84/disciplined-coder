@@ -1,0 +1,63 @@
+{
+ "lens": "lens-readability",
+ "target": "CLAUDE.md",
+ "findings": [
+  {
+   "title": "「Stop 리뷰 게이트가 발동한다」는 무엇이 어떻게 되는지를 적지 않은 서술어이자 부연 없는 용어라, 읽는 사람이 넛지와 차단을 구별하지 못한다.",
+   "file": "CLAUDE.md:5",
+   "evidence": "그 두 폴더에 `.md`를 새로 쓰면 Stop 리뷰 게이트가 발동한다.",
+   "principle": "PLAIN-KO(결과는 무엇이 어떻게 되는지까지 적는다)·READ-FLOW(전문 용어는 처음 나올 때 한 줄 부연한다)",
+   "consequence": "이 레포에는 차단하는 훅과 차단하지 않는 넛지가 함께 있다. hooks/spec_review_stop.sh 만 `\"decision\":\"block\"` 으로 종료를 막고, hooks/doc_review_posttooluse.sh 는 자기 주석에 \"넛지일 뿐 차단은 아니다\" 라고 적은 안내만 낸다. '발동한다'로는 이 둘이 갈리지 않아, 읽는 사람은 차단을 넛지로 알고 무시하다가 종료가 막히거나 반대로 넛지를 차단으로 알고 불필요한 리뷰를 돈다. 'Stop'이 대화 종료 시점에 도는 훅 자리라는 것도 이 문서에서 처음 나오는데 부연이 없다.",
+   "detail": "lens-readability 의 관찰 축 「두루뭉술한 결과」는 무엇이 어떻게 되는지를 안 적은 서술어를 센다. '발동한다'가 그 서술어이며, 실제 결과는 '그 문서에 마커가 없으면 세션을 끝내려 할 때 종료가 막힌다'이다. 'Stop 리뷰 게이트'는 훅 이벤트 이름을 그대로 쓴 용어라 그대로 두되 한 줄 부연이 필요하다. 고친 문장은 문서 안 내용과 hooks/spec_review_stop.sh 에서 추론해 새로 쓴 것이므로 사실 확인이 필요하다.",
+   "fix": "다음으로 바꾼다 — \"그 두 폴더에 `.md`를 새로 쓰면 대화를 끝낼 때 도는 Stop 훅이 종료를 막는다. 그 문서의 마지막 비공백 줄에 spec-review 마커가 있을 때에만 종료가 통과한다.\"",
+   "lens": "lens-readability",
+   "type": "language"
+  },
+  {
+   "title": "「실패한 이름을 모아 마지막에 알리는 형태인 이유는」은 명사 앞에 수식을 세 겹 쌓은 문장이라, 왜 그 형태인지를 확인하러 온 사람이 문장을 두 번 읽게 된다.",
+   "file": "CLAUDE.md:13",
+   "evidence": "실패한 이름을 모아 마지막에 알리는 형태인 이유는, 그냥 이어 돌리면 마지막 하나의 결과만 남아 앞의 실패가 묻히기 때문이다.",
+   "principle": "KO-SYNTAX(명사 앞에 수식을 쌓지 않는다·관형절을 문장 가운데 끼우지 않는다)",
+   "consequence": "'이유'라는 명사에 닿기 전에 '실패한'·'모아 마지막에 알리는'·'형태인' 세 겹의 수식을 먼저 통과해야 하고, 주어가 무엇인지는 문장 끝의 '때문이다'에 가서야 정해진다. 이 문장은 11번 줄의 명령을 그대로 따라 칠지 아니면 자기 방식으로 바꿔 돌릴지를 정하는 근거인데, 근거가 한 번에 안 읽히면 기여자가 `for t in ...; do bash \"$t\"; done` 같은 더 짧은 형태로 바꿔 돌리고 앞선 스크립트의 실패가 마지막 종료 코드에 묻힌다. scripts/test_docs_drift.sh 가 이 형태를 검사로 붙들고 있는 이유가 바로 그것이다.",
+   "detail": "lens-readability 의 고정 규칙 가운데 `writing-korean` 의 KO-SYNTAX 절이 '명사 앞에 수식을 쌓지 않는다'를 못 박는다. 이 문장은 결론('앞의 실패가 묻힌다')을 맨 뒤에 두고 그 앞을 수식으로 채워 READ-FLOW 의 두괄식과도 어긋난다. 고친 것은 문서 안 문장을 두 문장으로 나누고 순서를 뒤집은 것이라 새로 지어낸 사실이 없다.",
+   "fix": "다음으로 바꾼다 — \"그냥 이어 돌리면 마지막 하나의 결과만 남아 앞의 실패가 묻힌다. 그래서 실패한 이름을 모아 마지막에 알린다.\"",
+   "lens": "lens-readability",
+   "type": "friction"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/CLAUDE.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/_spec_marker.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/spec_review_stop.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/spec_review_posttooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_review_posttooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/doc_format_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/readonly_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_hooks.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_assertions.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_self_audit.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/seal_reviews.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/settings.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.github/workflows/ci.yml",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/README.md"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "READ-FLOW",
+  "PLAIN-KO",
+  "KO-SYNTAX",
+  "PROSE-FORM",
+  "SSOT",
+  "MEASURE-FIRST"
+ ]
+}

@@ -1,0 +1,26 @@
+{
+ "lens": "lens-readability",
+ "target": "commands/setup-discipline.md",
+ "findings": [],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/setup-discipline.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/show-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_scaffold_common.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_ensure_autoupdate.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_resolve_home.sh"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "SSOT",
+  "IDEMPOTENT",
+  "PROSE-FORM",
+  "PLAIN-KO"
+ ]
+}

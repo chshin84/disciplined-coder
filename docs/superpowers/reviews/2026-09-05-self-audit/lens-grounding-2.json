@@ -1,0 +1,57 @@
+{
+ "lens": "lens-grounding",
+ "target": "README.md",
+ "findings": [
+  {
+   "title": "README는 감사 기록이 만든 직후 읽기 전용이 된다고 적지만, 봉인은 세션 시작 때 HEAD에 커밋된 파일에만 걸리고 실측한 기록 33개 가운데 32개가 쓰기 가능하다.",
+   "file": "README.md:49",
+   "evidence": "README.md:49 — \"어느 프로젝트의 어느 파일이든 속성만 보며, 이 레포의 감사 기록은 만든 직후 `scripts/seal_reviews.sh`가 그 속성을 세운다.\" / scripts/seal_reviews.sh:16 — \"  mapfile -t files < <(cd \\\"$ROOT\\\" && git ls-tree -r --name-only HEAD -- docs/superpowers/reviews 2>/dev/null | sed \\\"s|^|$ROOT/|\\\")\" / .claude/settings.json:9 — \"            \\\"command\\\": \\\"bash \\\\\\\"$CLAUDE_PROJECT_DIR/scripts/seal_reviews.sh\\\\\\\"\\\"\" (SessionStart) / 실측: docs/superpowers/reviews/ 의 .md 33개 가운데 2026-09-03-self-audit.md 하나만 읽기 전용이고 나머지 32개는 `[ -w ]` 가 참이다.",
+   "principle": "MEASURE-FIRST",
+   "consequence": "README를 읽은 사람은 감사 기록이 이미 잠겨 있다고 믿고 그 파일을 고치지 않을 것이라 여기지만, 실제로는 32개가 쓰기 가능해 Write·Edit이 그대로 통과한다. 읽기 전용 차단 훅은 속성만 보므로 잠기지 않은 기록에는 아무 경고도 내지 않고, 기록이 조용히 덧쓰여도 아무도 알아채지 못한다.",
+   "detail": "봉인을 부르는 곳은 둘뿐이다. 하나는 이 레포의 .claude/settings.json 이 SessionStart 에 거는 인자 없는 호출인데, 그 갈래는 seal_reviews.sh:16 이 보여 주듯 HEAD 에 추적된 파일만 훑으므로 방금 만든 미커밋 기록에는 닿지 않는다. 다른 하나는 .claude/workflows/self-audit.js 의 기록자가 JSON 산출에 한해 부르는 것이다. domain-spec-review 의 「리뷰 기록」 절(90-107행)에는 봉인 걸음이 없다. 그래서 사람이 절차대로 쓴 리뷰 .md 는 만든 직후에도 세션 시작에도 잠기지 않으며, 실측이 그것을 확인해 준다.",
+   "fix": "49행을 실제 배선에 맞춰 적는다 — 자기감사 워크플로가 만든 JSON 기록은 쓴 직후 봉인하고, 커밋된 리뷰 기록은 다음 세션 시작 때 `.claude/settings.json` 의 훅이 잠근다고 나누어 쓴다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  },
+  {
+   "title": "README는 셋업 오류를 세션 시작 알림의 ERROR로 알아보라고 안내하지만, 그 ERROR 두 줄은 stderr로 나가고 이 레포 자신의 주석이 SessionStart의 stderr는 사용자에게 닿지 않는다고 적는다.",
+   "file": "README.md:21",
+   "evidence": "README.md:21 — \"- **셋업 오류** — 세션 시작 알림에 `ERROR`가 찍혔다. 정본 복사 실패나 `@import` 배선 실패이고, 뒤의 것은 그 세션에 원칙이 실리지 않는다.\" / scripts/scaffold.sh:110 — \"#     켰다는 사실은 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않는다. 옛 관리블록을\" / scripts/scaffold.sh:29 — \"cp \\\"$src\\\" \\\"$dst\\\" || { echo \\\"[disciplined-coder] ERROR: 정본 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)\\\" >&2; exit 1; }\" / scripts/scaffold.sh:85 — \"  echo \\\"[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라.\\\" >&2\"",
+   "principle": "FAIL-LOUD",
+   "consequence": "원칙 목록이 안 나와 README의 복구 절차를 따라가는 사용자는 알림에서 ERROR를 찾지만 그 줄은 화면에 오지 않는다. 그러면 셋업 오류라는 원인을 후보에서 지우고 스코프나 설정 홈 불일치만 뒤지게 되어, 실제로는 정본 복사나 @import 배선이 실패한 상태를 그대로 두고 원칙 없이 세션을 계속 돌린다.",
+   "detail": "scaffold.sh 가 사용자에게 보이려고 stdout 으로 내보내는 것은 옛 관리블록 제거 알림과 자동 갱신 알림 둘뿐이고, 두 갈래의 ERROR 는 모두 `>&2` 로 나간다. 같은 파일 110행이 SessionStart 의 stderr 가 사용자에게 닿지 않는다고 못 박고 있으므로, README 의 안내는 이 레포가 스스로 측정해 적어 둔 사실과 어긋난다.",
+   "fix": "ERROR 두 갈래를 stdout 으로도 내보내도록 고치거나, 그것이 어려우면 README 21행을 「원칙 목록이 안 나오면 `/setup-discipline` 을 다시 실행하고 그 출력의 ERROR 를 본다」로 바꾼다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/README.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-plugin/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/spec_review_stop.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/readonly_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/seal_reviews.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_ensure_autoupdate.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_managed_block.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/settings.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/marketplace.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json"
+ ],
+ "principles_applied": [
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "KO-SYNTAX",
+  "SSOT",
+  "PROSE-FORM",
+  "READ-FLOW",
+  "EXPLICIT"
+ ]
+}

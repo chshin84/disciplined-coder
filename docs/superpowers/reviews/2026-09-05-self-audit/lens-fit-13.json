@@ -1,0 +1,47 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-grounding/SKILL.md",
+ "findings": [
+  {
+   "title": "lens-grounding만 `where`의 뜻을 \"출처/후보 내 위치\"로 적어 다른 다섯 렌즈와 집계 계약에서 어긋난다.",
+   "file": "skills/lens-grounding/SKILL.md:24",
+   "evidence": "{ \"lens\": \"grounding\", \"read\": [ \"...\" ], \"issues\": [ { \"where\": \"출처/후보 내 위치\", \"type\": \"omission|contradiction|unsupported|mismatch\", ... (skills/lens-grounding/SKILL.md:24)\n\n대조: \"where\": \"문서 내 위치\" (skills/meta-aggregate/SKILL.md:25, skills/lens-adversarial/SKILL.md:30, skills/lens-consistency/SKILL.md:36, skills/lens-prior-art/SKILL.md:44, skills/lens-readability/SKILL.md:86)",
+   "principle": "SSOT",
+   "consequence": "meta-aggregate의 상충 감지는 \"서로 다른 렌즈의 이슈가 같은 `where`를 가리키면서\"(skills/meta-aggregate/SKILL.md:16)를 짝짓기 기준으로 쓴다. grounding만 `where`에 출처 쪽 위치를 적을 수 있으므로, 다른 렌즈가 검토 문서의 같은 줄을 짚어도 문자열이 달라 짝이 잡히지 않는다. 그러면 escalate 후보로 올라가야 할 상충이 조용히 통과하고, 집계 목록에는 같은 곳을 가리키는 두 발견이 무관한 항목으로 남는다.",
+   "detail": "meta-aggregate의 리뷰 산출물 계약은 `where`를 \"문서 내 위치\"로 정하고, 렌즈 파일은 자기 `type` 폐쇄 집합만 정의하고 나머지는 그곳을 참조하라고 못박는다 — \"렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다\"(skills/meta-aggregate/SKILL.md:20). 그런데 여섯 렌즈 파일이 모두 필드 설명을 복제해 두었고, 그 복제 가운데 lens-grounding의 `where` 한 곳만 값이 달라졌다. 복제가 SSOT와 갈라진 실제 사례이며, 계약을 참조가 아니라 사본으로 들고 있는 한 다음 변경에서도 같은 드리프트가 난다.",
+   "fix": "lens-grounding의 `where`를 다른 렌즈와 같은 \"문서 내 위치\"로 되돌리고, 출처 쪽 위치는 `evidence`에 적게 한다. 더 근본적으로는 여섯 렌즈의 스키마 블록에서 필드 설명 문자열을 지우고 meta-aggregate의 계약을 가리키게 한다.",
+   "lens": "lens-fit",
+   "type": "compat"
+  },
+  {
+   "title": "description이 대응 관계를 `=`와 `/` 기호로 압축하고 \"spec리뷰\"를 붙여 써서, 문장 규칙과 다른 파일의 표기 둘 다에서 벗어난다.",
+   "file": "skills/lens-grounding/SKILL.md:3",
+   "evidence": "description: LLM 출력·주장이 그 출처(런타임=요청+맥락 / spec리뷰=검토 문서+주입된 사실)에 근거하는지 보는 렌즈다. (skills/lens-grounding/SKILL.md:3)\n\n같은 파일 본문은 띄어 쓴다: \"spec/plan 리뷰에서는 검토 대상 문서에 PREP 단계가 주입한 선행 결정과 검증할 사실을 더한 것이다\" (skills/lens-grounding/SKILL.md:7)",
+   "principle": "PROSE-FORM",
+   "consequence": "description은 Claude가 이 렌즈를 열지 말지 정할 때 읽는 문자열이다. `런타임=요청+맥락 / spec리뷰=...`은 문장이 아니라 등식 나열이라 두 맥락의 출처가 무엇인지 한 번에 읽히지 않고, 붙여 쓴 \"spec리뷰\"는 저장소의 다른 모든 자리에서 쓰는 \"spec 리뷰\"와 문자열이 달라 표기를 문자열 검색으로 맞출 때 이 한 줄만 빠진다.",
+   "detail": "정본의 PROSE-FORM은 \"기호로 문장을 대신하거나\" 쓰지 않는다고 정하는데(agent-principles.md:17), 이 description은 `=`로 정의를, `/`로 두 맥락의 분리를, `+`로 합집합을 대신한다. 형제 렌즈들의 description은 같은 자리에서 완결된 문장을 쓴다 — lens-adversarial은 \"가드가 둘이다. 기능 추가는 제안하지 않으며, 제안에는 근거를 단다\"(skills/lens-adversarial/SKILL.md:3)로 적는다. 표기 드리프트도 이 한 줄에만 있다. grep 결과 저장소의 다른 자리는 모두 \"spec 리뷰\" 또는 \"spec/plan 리뷰\"로 띄어 쓴다.",
+   "fix": "description의 괄호를 문장으로 푼다. 예를 들어 \"출처는 호출자가 준다. 런타임에서는 요청과 맥락이고, spec 리뷰에서는 검토 문서에 주입된 사실을 더한 것이다.\"로 적고, 본문 7행과 같은 표기를 쓴다.",
+   "lens": "lens-fit",
+   "type": "style"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/meta-aggregate/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-adversarial/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-consistency/SKILL.md (grep)",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-prior-art/SKILL.md (grep)",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md (grep)",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md (grep)",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md (grep)"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "PROSE-FORM",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "PLAIN-KO"
+ ]
+}

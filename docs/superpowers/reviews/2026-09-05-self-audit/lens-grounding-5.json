@@ -1,0 +1,47 @@
+{
+ "lens": "lens-grounding",
+ "target": "commands/show-principles.md",
+ "findings": [
+  {
+   "title": "커맨드는 명령이 돌려주는 값을 「관리 디렉터리」라고 부르지만, 소스에서 그 값은 설정 홈이고 관리 디렉터리는 그 아래 disciplined-coder다.",
+   "file": "commands/show-principles.md:5",
+   "evidence": "commands/show-principles.md:5 「먼저 관리 디렉터리를 도출하라 — 경로를 짐작하지 말고 아래를 실행해 받은 값을 쓴다.」 / commands/show-principles.md:9 「그 값 아래의 `disciplined-coder/agent-principles.md`를 Read해서 내용을 그대로 보여줘라.」 / scripts/_resolve_home.sh:2 「# 공유: 런타임 설정 홈을 우선순위대로 해석해 stdout으로 반환(SSOT).」, :6 「# Usage: HOME_DIR=\"$(resolve_home claude)\"   # ~/.claude」 / scripts/scaffold.sh:15-16 「CLAUDE_HOME=\"$(resolve_home claude)\"」 「KDIR=\"$CLAUDE_HOME/disciplined-coder\"」 / README.md:22 「**설정 홈 불일치** — 셋업이 쓴 설정 홈과 지금 세션이 읽는 설정 홈이 다르다.」",
+   "principle": "SSOT / EXPLICIT / PLAIN-KO",
+   "consequence": "같은 낱말 「관리 디렉터리」가 이 커맨드에서는 `~/.claude`를 가리키고 scaffold.sh와 README에서는 `~/.claude/disciplined-coder`를 가리킨다. 5행을 그대로 따르는 실행자는 받은 값 바로 아래에서 `agent-principles.md`를 찾아 없다고 판정하고, 설치가 멀쩡한 PC에서 「scaffold가 아직 실행되지 않았다」 안내를 내보낼 수 있다. 커맨드가 전달하려는 것(지금 PC에 적용된 원칙 전문 확인)이 그 지점에서 막힌다.",
+   "detail": "소스 정본인 `_resolve_home.sh`는 자기 반환값을 「설정 홈」이라 이름 붙이고 `~/.claude`를 돌려준다. `scaffold.sh`는 그 값을 `CLAUDE_HOME`에 받은 뒤 `KDIR=\"$CLAUDE_HOME/disciplined-coder\"`를 따로 잡고 그것을 관리 디렉터리라 부르며, README:22도 같은 값을 「설정 홈」이라 부른다. 커맨드 5행만 그 반환값에 「관리 디렉터리」라는 이름을 붙였으므로, 이름과 실제 값이 어긋나고 9행에서 다시 하위 경로를 붙이는 문장과도 서로 다른 것을 가리킨다.",
+   "fix": "5행을 「먼저 설정 홈을 도출하라 — 경로를 짐작하지 말고 아래를 실행해 받은 값을 쓴다.」로 고친다. 9행은 그대로 두면 그 아래 `disciplined-coder`가 관리 디렉터리를 가리켜 소스와 맞아떨어진다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  },
+  {
+   "title": "홈이 갈리는 PC에서 이 명령은 경로 한 줄만 돌려주지 않고 stderr 안내 한 줄을 함께 내는데, 커맨드는 「받은 값을 쓴다」고만 적어 두 줄을 가르는 규칙이 없다.",
+   "file": "commands/show-principles.md:7",
+   "evidence": "commands/show-principles.md:5-7 「경로를 짐작하지 말고 아래를 실행해 받은 값을 쓴다.」 / 「`bash -c '. \"${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh\" && resolve_home claude'`」 / scripts/_resolve_home.sh:9 「# USERPROFILE 기준 홈이 bash $HOME과 다르면 stderr로 note 1회(홈 드리프트 가시화).」, :22-25 「if [ \"$val\" != \"${HOME:-}/$sub\" ]; then」 「echo \"[disciplined-coder] note: 설정 홈을 USERPROFILE 기준 $val 로 잡음 (bash \\$HOME=${HOME:-} 와 다름)\" >&2」 「fi」 「printf '%s\\n' \"$val\"」",
+   "principle": "EXPLICIT / MEASURE-FIRST",
+   "consequence": "note가 뜨는 조건은 이 커맨드가 13-15행에서 존재 이유로 든 바로 그 조건(도메인 PC의 홈 리다이렉트)이다. Bash 도구는 stdout과 stderr를 함께 돌려주므로 그 PC에서는 출력이 두 줄이 되고, 「받은 값」이 어느 줄인지 정해 두지 않아 실행자가 안내 문장을 경로로 삼아 Read에 실패하거나 경로를 스스로 짐작해 고칠 수 있다. 정작 이 커맨드가 막으려던 환경에서 먼저 어긋난다.",
+   "detail": "`scaffold.sh:15`는 같은 함수를 `$( )` 명령 치환으로 받아 stderr를 값에서 자연히 걸러 내지만, 커맨드는 셸 변수에 담지 않고 실행 결과를 사람이 눈으로 읽어 쓰는 형태라 그 방어가 없다. 소스가 stderr 한 줄을 낸다는 사실이 커맨드 본문 어디에도 적혀 있지 않아, 문서가 소스보다 좁게 말하고 있다.",
+   "fix": "명령을 `bash -c '. \"${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh\" && resolve_home claude' 2>/dev/null`로 바꾸거나, 5행에 「출력이 두 줄이면 `[disciplined-coder] note:`로 시작하는 줄은 안내이므로 버리고 경로 줄만 쓴다」를 더한다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/show-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/commands/setup-discipline.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_resolve_home.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_scaffold_common.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/README.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "PLAIN-KO",
+  "READ-FLOW",
+  "MEASURE-FIRST",
+  "PROSE-FORM"
+ ]
+}

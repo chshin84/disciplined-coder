@@ -1,0 +1,60 @@
+{
+ "lens": "lens-adversarial",
+ "target": "(전체)",
+ "findings": [
+  {
+   "title": "회차 대조가 만든 도출 발견은 증거 자리에 파일 인용 대신 id 두 개를 넣으므로, 다음 회차의 대조 에이전트가 그 발견을 판정할 근거를 갖지 못한다.",
+   "file": ".claude/workflows/self-audit.js:719",
+   "evidence": "derivedFindings.push({ id: findingId(ROUND, n), lens: 'round-diff', title: '이것을 막는 검사가 없다', file: it.file, evidence: `${it.prior_id} → ${it.matched_id || '(이번 회차 짝 없음)'}`, principle: 'FAIL-LOUD', ... status: STATUS[3], missingVotes: 0, verdicts: [] })",
+   "principle": "EXPLICIT",
+   "consequence": "도출 발견은 status 가 derived 라 다음 회차의 대조 대상에 그대로 실린다(대조 절 머리 주석: \"직전 회차 findings.json 의 confirmed·undetermined·derived\"). 그런데 대조 에이전트는 \"${REPO} 의 파일 ${g.file} 을 직접 열어 본다\"는 지시와 함께 evidence 로 `2026-09-03-self-audit#017 → (이번 회차 짝 없음)` 같은 id 쌍을 받는다. 그 문자열은 파일 어디에도 없으므로 에이전트가 잔존 근거를 찾을 길이 없고, 판정은 거의 확정적으로 '해소'로 떨어진다. 그러면 재발을 잡으려고 만든 도출 발견이 한 회차 만에 스스로 해소로 지워지고, 가드가 없다는 사실은 다시 아무 데도 남지 않는다. 게다가 title 이 모든 도출 발견에서 '이것을 막는 검사가 없다'로 똑같아, 요약문의 「도출된 발견」 절과 findings.json 에서 어느 것이 무엇인지 구별되지 않는다.",
+   "detail": "같은 파일 46번 줄이 evidence 의 계약을 '실제 파일에서 인용한 증거 텍스트'로 정해 두었고, 회차 대조 에이전트에게도 잔존 판정에는 \"어디에 있는지 인용한다\"를 요구한다. 그런데 워크플로 자신이 만드는 도출 발견만 그 계약을 지키지 않고 id 쌍을 채워 넣는다. 계약을 어긴 값이 다음 회차의 입력이 되므로, 어긋남은 이번 회차가 아니라 다음 회차에서 조용한 오판으로 나타난다.",
+   "fix": "도출 발견의 evidence 에 재발한 원래 발견의 evidence(it.evidence)를 그대로 옮겨 담고, title 에 그 발견의 title 이나 file 을 넣어 항목마다 다르게 만든다. 새 기능이 아니라 이미 items 안에 있는 값을 옮겨 적는 것이다.",
+   "lens": "lens-adversarial",
+   "type": "failure-mode"
+  },
+  {
+   "title": "리뷰 기록을 쓰다 끊긴 회차는 run.json 이 없어 앞선 회차로도 끊긴 회차로도 잡히지 않고 조용히 사라진다.",
+   "file": "scripts/audit_prior_rounds.sh:27",
+   "evidence": "    if not os.path.isfile(p): continue",
+   "principle": "FAIL-LOUD",
+   "consequence": "회차가 파일을 처음 쓰는 곳은 self-audit.js:568 의 recordGrouped('review', reviewGroups) 이고, run.json 은 그 걸음이 끝난 뒤에야 writeRun(false) 로 쓰인다(402·418번 줄의 if (step === 'review') await writeRun(false)). 리뷰 기록 도중에 회차가 끊기면 docs/superpowers/reviews/<회차>/ 에 봉인된 렌즈 원본만 남고 run.json 은 없다. audit_prior_rounds.sh 는 그런 폴더를 앞선 회차 후보에서도 빼고 --stale 목록에서도 빼므로, 요약문의 「끊긴 회차」 줄에도 뜨지 않는다. 회차가 절반만 돌다 죽은 사실이 어디에도 기록되지 않은 채 봉인된 파일만 쌓이고, 사람이 폴더 목록을 손으로 훑기 전에는 알 수 없다.",
+   "detail": "리뷰 걸음은 이 회차에서 가장 길고 서브에이전트를 가장 많이 띄우는 걸음이라(CAPS.review = 30) 끊길 확률이 가장 높은 지점이다. 스크립트 머리의 \"run.json 이 없는 옛 기록은 회차로 세지 않는다\"는 옛 기록을 걸러 내려는 규칙인데, 같은 조건이 갓 끊긴 회차까지 함께 삼킨다. 이는 self-audit.js:29 가 상한을 자를 때 세운 원칙 — \"조용히 자르면 '아무도 반박하지 않았다'와 '아무도 보지 않았다'가 구별되지 않는다\" — 과 같은 자리에서 정반대로 동작한다.",
+   "fix": "run.json 을 targets 걸음 끝(self-audit.js:425)에서 completed:false 로 한 번 먼저 쓴다. 이미 있는 writeRun(false) 호출을 앞으로 옮기는 것이라 새 장치가 늘지 않으며, 그 뒤로는 어느 지점에서 끊겨도 폴더에 run.json 이 있어 --stale 이 잡는다.",
+   "lens": "lens-adversarial",
+   "type": "failure-mode"
+  },
+  {
+   "title": "읽기 전용 봉인을 푸는 유일한 길이라고 문서가 약속한 셸 조작은 다음 세션 시작에서 말없이 되감긴다.",
+   "file": "hooks/readonly_pretooluse.sh:4",
+   "evidence": "# 같은 뜻이다. 끄는 스위치를 두지 않는다(DISCIPLINED_CODER_REVIEW_GATE 도 미치지 않는다). 풀려면 속성을",
+   "principle": "REVERSIBLE",
+   "consequence": ".claude/settings.json 9번 줄의 SessionStart 훅이 matcher \"startup|resume|clear\" 로 인자 없이 seal_reviews.sh 를 돌리고, 그 갈래는 git ls-tree -r --name-only HEAD -- docs/superpowers/reviews 가 내는 파일 전부에 chmod a-w 를 다시 건다. 사용자가 잘못 적힌 기록을 고치려고 속성을 풀어도, 세션을 새로 열거나 /clear 를 하거나 세션을 재개하는 순간 다시 잠긴다. 봉인 스크립트는 \"sealed: $n\" 만 찍고 어느 파일을 잠갔는지 말하지 않으므로 사용자는 되감긴 사실조차 통보받지 못하고, 다음 Edit 이 거부될 때에야 알게 된다.",
+   "detail": "훅 머리 주석은 \"풀려면 속성을 풀면 되고 그 길은 셸이다\"라고 적고 README 49번 줄도 \"풀려면 속성을 풀면 된다\"로 같은 약속을 되풀이한다. 그런데 그 약속이 성립하려면 푼 상태가 유지되어야 하는데, 인자 없는 봉인이 HEAD 에 있는 기록 전부를 매 세션 무조건 다시 잠근다. 커밋된 요약문도 같은 목록에 들어가므로, self-audit.js:421 이 \"요약문은 봉인하지 않는다 — 호출자가 뿌리와 물음을 붙인 뒤\"라고 남겨 둔 여백도 커밋 이후에는 사라진다.",
+   "fix": "인자 없는 갈래를 아직 읽기 전용이 아닌 파일에만 걸고, 실제로 잠근 경로를 세션 시작 알림에 이름으로 내보낸다. 잠근 것이 하나도 없으면 아무 말도 하지 않는다 — 그러면 사람이 일부러 푼 파일을 되감았다는 사실이 눈에 띈다.",
+   "lens": "lens-adversarial",
+   "type": "irreversible"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-adversarial\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude\\workflows\\self-audit.js",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude\\settings.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\hooks.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\readonly_pretooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\seal_reviews.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\audit_prior_rounds.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\audit_targets.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\audit_topics.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\README.md"
+ ],
+ "principles_applied": [
+  "FAIL-LOUD",
+  "REVERSIBLE",
+  "EXPLICIT",
+  "SIMPLE",
+  "SSOT",
+  "IDEMPOTENT"
+ ]
+}

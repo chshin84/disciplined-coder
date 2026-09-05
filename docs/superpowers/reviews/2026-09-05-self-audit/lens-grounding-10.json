@@ -1,0 +1,50 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/project-doc-audit/SKILL.md",
+ "findings": [
+  {
+   "title": "문서가 검증자 상한만 적고 렌즈 호출 상한을 빠뜨려, 실행체가 렌즈 호출 서른 건을 넘겨 잘라 내는 것이 절차에 없는 동작이 된다.",
+   "file": "skills/project-doc-audit/SKILL.md:80",
+   "evidence": "SKILL.md:80 — \"한 회차가 띄우는 검증자에는 상한이 있다. 상한을 넘는 묶음은 검증자를 띄우지 않고 미판정으로 남기며 `over_cap`으로 표시한다. 조용히 자르면 아무도 반박하지 않은 것과 아무도 보지 않은 것이 구별되지 않는다.\" / .claude/workflows/self-audit.js:30 — \"const CAPS = { review: 30, verify: 50 }\" / 같은 파일 526-528 — \"const reviewCut = reviewJobs.length - CAPS.review\", \"if (reviewCut > 0) log(`⚠️ 리뷰 상한 ${CAPS.review}건을 넘어 렌즈 호출 ${reviewCut}건을 돌리지 않았다 — 이 감사의 커버리지가 그만큼 좁다`)\", \"const reviews = (await parallel(reviewJobs.slice(0, CAPS.review))).filter(Boolean)\"",
+   "principle": "FAIL-LOUD",
+   "consequence": "문서 수와 렌즈 수의 곱이 서른을 넘는 레포에서는 배정표대로 렌즈를 걸어 놓고도 초과분이 실행되지 않는다. 문서에 그 상한이 없으니 「띄울 때 지킬 것」만 읽은 호출자는 배정된 렌즈가 모두 돌았다고 믿고, run.json의 칸 목록에도 잘린 렌즈 호출 수를 담을 자리가 없어 다음 회차의 대조가 커버리지가 좁아진 회차와 지적이 없던 회차를 구별하지 못한다.",
+   "detail": "SKILL.md는 상한을 반박검증 걸음 하나에만 두고, 그 상한을 기록에 남기는 이유까지 적는다. 그런데 이 절차를 실제로 도는 실행체에는 상한이 둘이고, 리뷰 상한은 렌즈 호출 자체를 잘라 커버리지를 좁히는 쪽이라 검증 상한보다 영향이 크다. SKILL.md:90의 run.json 칸 목록은 \"상한을 넘겨 검증하지 않은 수\"만 적어 검증 상한만 기록으로 남기고, 실행체의 run 객체(self-audit.js:344-348)에도 리뷰 상한으로 자른 수를 담는 칸이 없어 경고 로그로만 흐르고 회차 기록에 남지 않는다.",
+   "fix": "「띄울 때 지킬 것」 절에 렌즈 호출 상한을 적고, 초과분을 자를 때 무엇을 안 돌렸는지 run.json에 남기도록 「통합 기록」의 칸 목록에 그 수를 더한다.",
+   "lens": "lens-grounding",
+   "type": "omission"
+  },
+  {
+   "title": "걸음 표가 기록을 집계보다 앞에 두어, 같은 문서의 「통합 기록」 절과 실행체의 걸음 순서 둘 다와 어긋난다.",
+   "file": "skills/project-doc-audit/SKILL.md:21",
+   "evidence": "SKILL.md:21-22 — \"| 결과를 기록에 남긴다 | 「통합 기록」 절 |\", \"| 상충과 커버리지 공백을 표시한다 | 「집계」 절 |\" / SKILL.md:94 — \"요약문은 세 파일에서 도출되는 사실만 적는다. 범위와 배정, 기계 검사, 판정 개수, 집계가 표시한 상충과 커버리지 공백, 확정 발견 목록, 회차 대조 개수, 도출된 발견 목록이다.\" / .claude/workflows/self-audit.js:28 — \"const STEPS = ['repo-check', 'targets', 'machine-checks', 'extract', 'group', 'review', 'dedup', 'verify', 'diff', 'aggregate', 'record']\"",
+   "principle": "SSOT",
+   "consequence": "표의 차례를 그대로 따르는 호출자는 집계를 돌리기 전에 요약문을 쓰게 되고, 요약문에 반드시 들어가야 하는 상충과 커버리지 공백을 적을 수 없어 그 절이 빈 채로 봉인된다. 실행체가 도는 회차와 사람이 표를 보고 도는 회차의 걸음 순서가 달라져 두 회차의 기록을 나란히 대조할 수 없다.",
+   "detail": "SKILL.md:10은 \"걸음은 열하나이고 순서가 있다\"고 못 박아 표의 차례를 계약으로 삼는다. 그런데 표는 기록을 여덟째, 집계를 아홉째에 두는 반면, 같은 문서 「통합 기록」 절은 요약문의 내용으로 \"집계가 표시한 상충과 커버리지 공백\"을 요구해 집계가 먼저 끝나 있어야 성립한다. 이 절차를 실제로 도는 실행체의 닫힌 걸음 목록도 aggregate 다음에 record를 둔다. 표만 순서가 뒤집혀 있다.",
+   "fix": "표에서 「집계」 행을 「통합 기록」 행 위로 올려 문서 본문과 실행체의 STEPS 순서에 맞춘다.",
+   "lens": "lens-grounding",
+   "type": "contradiction"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/project-doc-audit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-fit/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/workflows/self-audit.js",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/audit_targets.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/audit_topics.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/audit_prior_rounds.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/seal_reviews.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_self_audit.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "FAIL-LOUD",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "PROSE-FORM",
+  "NAME-ITEMS"
+ ]
+}

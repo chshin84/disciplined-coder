@@ -1,0 +1,46 @@
+{
+ "lens": "lens-readability",
+ "target": "README.md",
+ "findings": [
+  {
+   "title": "「하드 게이트와 넛지와 전역 설정 수정」 절의 첫 문장이 네 가지 장치를 관형절로 수식해 한 문장에 늘어놓아, 처음 설치한 사람이 무엇이 자기 세션에 걸리는지 한 번에 세지 못한다.",
+   "file": "README.md:46",
+   "evidence": "README.md:46 — \"세션에는 턴 종료를 막는 하드 게이트 하나와 읽기 전용 파일 수정을 막는 차단 하나와 넛지 셋과 전역 설정 수정 하나가 걸린다. 게이트와 넛지는 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 넷 다 꺼지고, 읽기 전용 차단은 그 변수와 무관하며, 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다.\"",
+   "principle": "KO-SYNTAX",
+   "consequence": "설치를 막 마친 사람은 이 절에서 자기 세션에 무엇이 걸리는지와 그것을 어떻게 끄는지를 얻어야 하는데, 첫 문장은 '~를 막는 X 하나' 꼴 명사구가 넷 겹쳐 있어 무엇이 몇 개인지 세려면 되짚어 읽어야 한다. 둘째 문장에서 '넷 다'가 가리키는 것이 앞 문장의 네 항목 전부가 아니라 게이트 하나와 넛지 셋이라는 것도 한 번에 갈리지 않아, 읽는 사람은 읽기 전용 차단도 환경변수로 꺼진다고 잘못 읽는다.",
+   "detail": "writing-korean 의 KO-SYNTAX 는 명사 앞에 수식을 쌓지 않고 비슷한 명사구를 한 문장에 겹치지 않을 것을 요구한다. 이 문장은 '턴 종료를 막는 하드 게이트'와 '읽기 전용 파일 수정을 막는 차단'이라는 같은 꼴의 관형절 수식 명사구를 나란히 두고 그 뒤에 다른 두 항목을 더 이어 붙였다. 바로 아래 불릿 넷이 같은 항목을 이름과 설명으로 다시 풀고 있으므로, 첫 문장이 개수와 끄는 방법만 맡고 나머지는 불릿에 넘기면 겹침이 사라진다.",
+   "fix": "rewrite(문서 안 문장을 나눈 것) — \"세션에는 네 가지가 걸린다. 턴 종료를 막는 하드 게이트 하나, 읽기 전용 파일 수정을 막는 차단 하나, 넛지 셋, 전역 설정 수정 하나다. 이 가운데 하드 게이트와 넛지 셋은 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 함께 꺼진다. 읽기 전용 차단은 그 변수와 무관하고, 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌린다.\"",
+   "lens": "lens-readability",
+   "type": "friction"
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/README.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-grounding/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-readability/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/writing-korean/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-spec-review/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-plugin/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-docs/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/hooks.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/spec_review_stop.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/hooks/readonly_pretooluse.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/scaffold.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/seal_reviews.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_ensure_autoupdate.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_managed_block.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude/settings.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/marketplace.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json"
+ ],
+ "principles_applied": [
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "KO-SYNTAX",
+  "SSOT",
+  "PROSE-FORM",
+  "READ-FLOW",
+  "EXPLICIT"
+ ]
+}

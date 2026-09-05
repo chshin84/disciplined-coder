@@ -1,0 +1,64 @@
+{
+ "lens": "lens-consistency",
+ "target": "domain-plugin",
+ "findings": [
+  {
+   "title": "domain-plugin이 적은 컴포넌트 자리 목록에 workflows가 빠져 있어, 이 레포 자신의 plugin.json이 선언한 실행체가 그 목록 밖에 있다.",
+   "file": "skills/domain-plugin/SKILL.md:14",
+   "evidence": "- **컴포넌트 위치** — `agents/`·`skills/`·`commands/`·`hooks/hooks.json`에 둔다. 플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다.",
+   "principle": "MEASURE-FIRST / lens-consistency 커버리지 공백",
+   "consequence": "이 참고서를 읽고 컴포넌트를 배치하는 사람은 workflows를 어디에 두어야 하는지 알 수 없고, 목록이 전부라고 읽으면 `.claude/workflows/self-audit.js`가 잘못 놓였다고 보아 옮기게 된다. 그 순간 `.claude-plugin/plugin.json`의 `\"workflows\": [\"./.claude/workflows/self-audit.js\"]` 선언이 끊기고, 그 선언을 단언하는 `scripts/test_self_audit.sh`(90행)가 실패한다.",
+   "detail": "이 참고서는 플러그인 컴포넌트를 어디에 두는지의 도메인 참고서이며, 그 목록에 `agents/`·`skills/`·`commands/`·`hooks/hooks.json` 넷만 적혀 있다. 그런데 이 레포의 매니페스트 `.claude-plugin/plugin.json` 8행은 `\"workflows\": [\"./.claude/workflows/self-audit.js\"]`를 선언하고 실제로 그 자리에 파일이 있으며(`scripts/test_self_audit.sh` 10행이 같은 경로를 잡는다), 목록에 적힌 `agents/`는 이 레포에 아예 없다. 플러그인이 남에게 알려 주는 배치 규칙이 자기 자신의 배치와 어긋나 있다.",
+   "fix": "컴포넌트 자리 항목에 workflows 한 줄을 더해 `plugin.json`의 `workflows` 키가 가리키는 경로에 실행체를 둔다고 적고, 이 레포의 실제 경로(`.claude/workflows/`)를 예로 붙인다."
+  }
+ ],
+ "narrowed": 2,
+ "pairs": [
+  {
+   "canon_line": 13,
+   "other_file": "CLAUDE.md",
+   "other_line": 9,
+   "verdict": "좁혀 적음",
+   "reason": "정본은 `claude plugin validate ./`로 검증한다고만 정하고, CLAUDE.md는 그 규칙을 이 레포의 작업 흐름에 적용해 '고친 것이 있을 때 테스트 스크립트를 먼저 돌리고 그다음 validate'라는 순서까지 좁혀 적는다. 더한 것은 조건과 순서뿐이라 정당한 도출이다."
+  },
+  {
+   "canon_line": 10,
+   "other_file": "CLAUDE.md",
+   "other_line": 13,
+   "verdict": "좁혀 적음",
+   "reason": "정본은 'claude plugin validate가 내는 version 경고는 수용한다'고 정하고, CLAUDE.md는 같은 규칙을 이 레포에 적용해 '`version` 경고 하나만 내면 정상이다'라고 통과 판정 기준까지 좁혀 적는다."
+  },
+  {
+   "canon_line": 13,
+   "other_file": "CLAUDE.md",
+   "other_line": 9,
+   "verdict": "같음",
+   "reason": "정본의 '--strict는 경고까지 실패로 취급하므로 non-strict로 통과를 확인한다'에 대해 CLAUDE.md는 non-strict 호출을 그대로 쓸 뿐 더한 것이 없다."
+  },
+  {
+   "canon_line": 14,
+   "other_file": "CLAUDE.md",
+   "other_line": 3,
+   "verdict": "같음",
+   "reason": "정본의 '플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다'와 이 레포 루트에 CLAUDE.md가 있는 것은 조건이 다르다 — 정본은 플러그인으로 설치되어 쓰일 때를 말하고, 이 파일은 이 레포에서 작업할 때 프로젝트 지침으로 실린다. 어긋남으로 올리지 않는다."
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-consistency/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-plugin/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/CLAUDE.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/marketplace.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_self_audit.sh"
+ ],
+ "principles_applied": [
+  "MEASURE-FIRST",
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "PROSE-FORM",
+  "NAME-ITEMS"
+ ]
+}

@@ -1,0 +1,50 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-readability/SKILL.md",
+ "findings": [
+  {
+   "title": "체크리스트 절이 없어 관찰 축 열이 기계 검사를 통과하지 않고 조용히 건너뛰어진다.",
+   "file": "skills/lens-readability/SKILL.md:27",
+   "evidence": "lens-readability/SKILL.md:27-28 은 `## 관찰 목록` 아래 \"판정 목록이 아니라 관찰 목록이다.\"라고 적었고, 여섯 렌즈 가운데 이 파일만 `## 체크리스트` 절이 없다(나머지 다섯은 모두 9행에 `## 체크리스트`). 그런데 같은 파일 79행의 레퍼런스 프롬프트는 \"체크리스트를 항목마다 따로 훑고 그 결과를 한 번에 돌려주며, 훑은 각도를 `notes`에 적어라.\"라고 시킨다. 이 절 이름을 앵커로 삼는 검사는 scripts/test_docs_drift.sh:402 의 `AXES=\"$(awk '/^## 체크리스트/{f=1;next} f&&/^## /{exit} f&&/^- \\*\\*/{print}' \"$L\" \\`이며, 404행이 `  [ -z \"$AXES\" ] && continue` 로 빠져나간다. 실제로 테스트를 돌리면 \"프롬프트가 축을 부른다\" 검사 22건이 다른 다섯 렌즈에만 붙고 lens-readability 는 한 건도 없으며, 전체는 `PASS=351 FAIL=0` 으로 통과한다.",
+   "principle": "형식 (lens-fit 체크리스트) · FAIL-LOUD · EXPLICIT",
+   "consequence": "관찰 축 열(강조·끊김·이음·목록·끼움·이름 형태·형태 섞임·두루뭉술한 결과·길이·수식) 가운데 하나가 본문에서 바뀌거나 늘어도 프롬프트와 대조되지 않으므로, 프롬프트를 그대로 복사해 띄운 세션에 그 축이 실리지 않은 채로 검사는 초록으로 통과한다. 검사가 붙들려던 실패(\"본문에만 적힌 축은 그대로 복사한 세션에 닿지 않아 그 축이 통째로 안 돈다\")가 이 렌즈에서만 무방비다. 또한 프롬프트를 받은 서브에이전트는 존재하지 않는 \"체크리스트\"를 훑으라는 지시를 받아 관찰 목록을 판정 목록으로 다루게 되는데, 28행이 금지한 \"관찰 단계에서 '많다'거나 '과하다'를 말하지 않는다\"가 바로 그 혼동이다.",
+   "detail": "여섯 렌즈 파일은 `## 체크리스트` 아래에 `- **축이름**` 꼴로 축을 적는다는 형식 계약을 공유하고, scripts/test_docs_drift.sh 가 그 절 이름을 앵커로 본문 축과 레퍼런스 프롬프트를 대조한다. lens-readability 는 같은 구실을 하는 절을 `## 관찰 목록`으로 달아 그 앵커에서 벗어나 있는데, 검사가 빈 축 목록을 오류가 아니라 건너뛸 사유로 처리하므로 어긋남이 드러나지 않는다. 자기 프롬프트가 \"체크리스트\"라는 이름을 그대로 부르고 있어, 이름이 갈린 것이 의도된 구분이 아니라 한쪽만 고친 흔적임을 이 파일 스스로 보여 준다.",
+   "fix": "절 이름을 `## 체크리스트`로 되돌리고 그 아래 첫 문장에 \"판정 목록이 아니라 관찰 목록이다\"를 남기거나, 프롬프트의 \"체크리스트\"를 \"관찰 목록\"으로 맞추고 검사의 awk 앵커를 두 이름 모두 받게 넓힌 뒤 빈 축 목록을 `continue` 가 아니라 FAIL 로 바꾼다.",
+   "lens": "lens-fit",
+   "type": "format"
+  },
+  {
+   "title": "목적 한 줄에 두 요소를 요구하는 이 렌즈의 입력 계약이 호출자 domain-docs 가 적은 계약보다 좁아 조용한 미판정을 만든다.",
+   "file": "skills/lens-readability/SKILL.md:14",
+   "evidence": "lens-readability/SKILL.md:14 는 \"목적에는 **읽는 사람**과 **그 사람이 무엇을 할 수 있어야 하는지**가 둘 다 있어야 하고, 하나라도 빠지면 판정하지 않는다.\"라고 적고, 91행은 \"`null`이면 판정 자체를 하지 않은 것이므로 이 렌즈를 돌린 것으로 치지 않는다.\"라고 적는다. 호출자 둘 가운데 project-doc-audit/SKILL.md:65 만 \"그 한 줄에 읽는 사람과 그 사람이 무엇을 할 수 있어야 하는지가 둘 다 있어야 한다.\"를 적고, 다른 호출자 domain-docs/SKILL.md:95 는 \"이 렌즈는 그 문서가 전달하려는 것 한 줄을 호출자에게서 받아야 성립하므로, 그 한 줄을 못 적겠으면 부르지 않는다.\"라고만 적어 두 요소 요구가 없다.",
+   "principle": "호환 (lens-fit 체크리스트) · SSOT · EXPLICIT",
+   "consequence": "domain-docs 의 문서 검진 절차를 그대로 따른 세션은 \"플러그인 사용법을 알린다\" 같은 한 줄만 주고도 계약을 지켰다고 여기는데, 렌즈는 그 입력을 받으면 purpose 를 null 로 두고 아무것도 판정하지 않는다. 검진 기록에는 lens-readability 를 걸었다고 남지만 실제로는 그 문서가 한 번도 판정되지 않은 회차가 되고, 호출자가 집계본만 보면 빈 issues 를 \"걸릴 것이 없었다\"로 읽어 조용한 통과가 생긴다. 이는 이 파일 12행이 막으려던 것과 같은 실패다.",
+   "detail": "이 렌즈는 입력 계약을 두 요소로 못 박아 두었으므로, 그 계약을 아는 호출자에게만 성립한다. 선언한 호출자 둘 가운데 project-doc-audit 은 두 요소를 그대로 옮겨 적었지만 domain-docs 는 한 줄만 요구하는 옛 계약에 머물러 있어, 같은 렌즈가 호출자에 따라 판정하기도 하고 안 하기도 한다. 목적 계약의 SSOT 가 렌즈 자신인지 호출자인지가 정해져 있지 않아 두 곳을 손으로 맞추는 모양이 되었고 이미 한쪽이 어긋났다.",
+   "fix": "목적 계약의 SSOT 를 lens-readability 로 못 박고 domain-docs:95 가 그 절(「목적 주입」)을 이름으로 가리키게 바꾼다. 그리고 두 요소가 갖춰졌는지를 호출자 문서에서 문자열로 붙드는 계약 검사를 test_docs_drift.sh 에 더해 다음에 갈라지면 FAIL 로 드러나게 한다.",
+   "lens": "lens-fit",
+   "type": "compat"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-adversarial\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-consistency\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-prior-art\\SKILL.md"
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "SSOT",
+  "MEASURE-FIRST",
+  "TDD",
+  "FOCUSED"
+ ]
+}

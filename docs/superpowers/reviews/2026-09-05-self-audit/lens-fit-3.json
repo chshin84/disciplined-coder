@@ -1,0 +1,39 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-llm-runtime/SKILL.md",
+ "findings": [
+  {
+   "title": "비기능 체크리스트의 마지막 항목에 등급이 없어 누락 처분 규칙이 그 항목에는 적용되지 않는다.",
+   "file": "skills/domain-llm-runtime/SKILL.md:43",
+   "evidence": "34행: \"각 항목의 등급은 이 문서가 미리 정한 고정값이지 렌즈가 매기는 값이 아니다.\" / 43행: \"- 프롬프트와 로그에 비밀과 개인정보를 남기지 않는다(`SECRETS`).\" / 45행: \"누락 항목은 그 항목에 붙은 등급대로 처리하며, critical은 머지와 배포를 차단한다.\"",
+   "principle": "EXPLICIT",
+   "consequence": "비밀과 개인정보 가드가 빠진 채 코드가 올라와도 등급이 없어 머지 차단 규칙이 걸리지 않는다. 검토자마다 이 항목을 critical로 볼지 무등급으로 볼지 갈리므로 가장 되돌리기 어려운 누락이 조용히 통과한다.",
+   "detail": "이 문서는 체크리스트의 각 항목이 고정 등급을 가진다고 선언하고, 누락 처분을 그 등급에 묶는다. 그런데 여덟 항목 가운데 마지막 SECRETS 항목만 등급 표기가 없고, 사람 승인 항목도 컴플라이언스 접점이 아닐 때는 \"정책에 따른다\"로 남겨 등급이 정해지지 않는다. 선언한 계약에 필수 값이 빠진 것이라 45행의 처분 규칙이 그 항목에 적용될 수 없다.",
+   "fix": "SECRETS 항목에 등급을 붙이고, 사람 승인 항목의 비컴플라이언스 갈래도 기본 등급을 정해 무등급 항목이 남지 않게 한다.",
+   "lens": "lens-fit",
+   "type": "constraint"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-llm-runtime\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-spec-review\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-plugin\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "NAME-ITEMS",
+  "SECRETS",
+  "MEASURE-FIRST"
+ ]
+}

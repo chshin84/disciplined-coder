@@ -1,0 +1,49 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-spec-review/SKILL.md",
+ "findings": [
+  {
+   "title": "디스패치 절은 렌즈마다 서브에이전트를 하나씩 띄우라고 적어, 한 대상에 렌즈가 여럿이면 에이전트 하나가 렌즈를 차례로 적용하라는 소유 규칙과 정면으로 어긋난다.",
+   "file": "skills/domain-spec-review/SKILL.md:45",
+   "evidence": "skills/domain-spec-review/SKILL.md 45번째 줄 — \"렌즈당 읽기 전용 서브에이전트를 한 번씩 띄운다. Edit와 Write가 없는 에이전트를 써서 구조적 거짓을 막고, 한 에이전트가 모든 렌즈를 몰아 보는 것을 막아 독립성을 강제한다.\" / 같은 파일 34번째 줄 — \"띄우는 개수도 여기서 정해진다. 기본은 렌즈 셋을 각각 한 번씩이라 셋이다.\" / 소유 규칙인 skills/domain-docs/SKILL.md 「한 번만 띄우는 렌즈의 규율」(127번째 줄) — \"한 대상에 렌즈가 둘 이상 걸리면 에이전트도 둘 이상이 되지는 않는다. 에이전트 하나가 그 대상을 한 번 읽고 렌즈를 차례로 적용하며, 발견마다 어느 렌즈가 낸 것인지 적어 돌려준다.\" / 같은 파일 61번째 줄도 소유 규칙 쪽을 되풀이한다 — \"한 대상에 렌즈가 둘 이상 걸리면 렌즈마다 따로 띄우지 않는다 — 그 호출 하나가 대상을 한 번 읽고 렌즈를 차례로 적용한다.\"",
+   "principle": "SSOT",
+   "type": "contradiction",
+   "consequence": "한 spec에 기본 렌즈 셋이 걸리는 것이 이 스킬의 표준 경로인데, 45번째 줄대로 하면 서브에이전트 셋이 뜨고 61번째 줄과 domain-docs의 소유 규칙대로 하면 하나가 뜬다. 이 문서를 읽고 도는 메인 세션은 같은 회차에서 어느 쪽을 따를지 문서만으로 정할 수 없고, 셋을 띄우면 소유 규칙이 금지한 중복 표집이 되어 같은 문서를 세 번 읽는 값을 그대로 치른다. 34번째 줄의 \"셋\"이라는 개수도 소유 규칙 아래에서는 틀린 수라, 서브에이전트 상한을 셈하는 자리에서 실제보다 크게 잡힌다.",
+   "detail": "45번째 줄은 렌즈당 에이전트 하나라는 배분을 적고 그 근거로 \"한 에이전트가 모든 렌즈를 몰아 보는 것을 막아 독립성을 강제한다\"를 든다. 그런데 같은 문서 61번째 줄과 그 규칙의 소유자인 domain-docs는 정확히 그 \"몰아 보기\"를 시킨다 — 한 대상에 렌즈가 둘 이상이면 에이전트 하나가 대상을 한 번 읽고 렌즈를 차례로 적용하라고 정한다. 두 문장은 같은 상황에 서로 반대되는 행동을 지시하므로 함께 성립하지 못한다. 61번째 줄이 소유자를 명시적으로 가리키므로 낡은 쪽은 45번째 줄과 34번째 줄의 개수 서술이다.",
+   "fix": "45번째 줄을 \"읽기 전용 서브에이전트로 띄운다(Edit·Write 없음). 한 대상에 렌즈가 둘 이상이면 에이전트 하나가 렌즈를 차례로 적용하며, 그 배분은 domain-docs의 「한 번만 띄우는 렌즈의 규율」이 정한다\"로 고치고, 독립성의 근거는 에이전트 분리가 아니라 렌즈별 체크리스트를 통째로 적용하고 발견에 렌즈 이름을 붙이는 것으로 다시 적는다. 34번째 줄의 \"셋이다\"도 렌즈 개수와 에이전트 개수를 갈라 적는다.",
+   "lens": "lens-grounding"
+  },
+  {
+   "title": "PostToolUse 훅이 넘기는 것은 파일 이름뿐이므로, spec인지 plan인지를 훅이 넘긴 경로로 가른다는 서술은 코드와 어긋난다.",
+   "file": "skills/domain-spec-review/SKILL.md:66",
+   "evidence": "skills/domain-spec-review/SKILL.md 66번째 줄 — \"훅이 넘긴 경로가 `docs/superpowers/specs`면 spec이고 `plans`면 plan이다.\" / hooks/spec_review_posttooluse.sh 22~23번째 줄 — \"base=\\\"$(basename \\\"$match\\\")\\\"\" 와 \"msg=\\\"📋 spec/plan(${base}) 작성됨 — 진행 전 반드시 ${SPEC_REVIEW_INSTRUCTION}\\\"\"",
+   "principle": "MEASURE-FIRST",
+   "type": "mismatch",
+   "consequence": "PostToolUse 넛지가 세션에 실어 주는 문자열에는 `basename` 결과인 파일 이름만 들어 있어 `specs`와 `plans` 가운데 어느 폴더에서 왔는지가 남아 있지 않다. 그 안내를 받고 이 스킬을 여는 세션이 66번째 줄대로 \"훅이 넘긴 경로\"를 찾으면 찾을 것이 없고, 그 자리에서 판정을 멈추거나 파일 이름만 보고 잘못 갈라 plan에 선행연구 렌즈를 제안하거나 spec에서 제안 걸음을 빠뜨린다. 66번째 줄은 그 경우에 대비한 \"훅 밖에서 호출됐다면\" 조항도 두었으므로, 훅을 통해 들어온 회차는 그 대비에도 걸리지 않고 조용히 어긋난다.",
+   "detail": "두 spec 훅 가운데 경로를 온전히 넘기는 것은 Stop 훅뿐이다. hooks/spec_review_stop.sh는 차단 사유에 레포 루트 기준 경로를 그대로 넣지만(62~65번째 줄의 `- $u`), PostToolUse는 22번째 줄에서 `basename`으로 디렉터리를 떼어 낸 값만 안내문에 넣는다. 그런데 이 스킬의 12번째 줄은 PostToolUse를 \"즉시 감지해 이 스킬 수행을 지시한다\"고 적어 두었으므로, 이 스킬로 들어오는 통상 경로가 바로 경로를 잃는 그 훅이다. 따라서 66번째 줄의 전제는 실제 훅 입력에서 도출되지 않는다.",
+   "fix": "66번째 줄을 \"기록된 파일 경로가 `docs/superpowers/specs` 아래면 spec, `plans` 아래면 plan이다. PostToolUse 안내문에는 파일 이름만 실리므로 경로는 그 회차에 문서를 쓴 도구 호출에서 확인한다\"로 고치거나, PostToolUse 훅이 파일 이름 대신 경로를 싣도록 바꾸고 문서는 그대로 둔다.",
+   "lens": "lens-grounding"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-spec-review\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-prior-art\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\_spec_marker.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_stop.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\spec_review_posttooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "MEASURE-FIRST",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "SIMPLE"
+ ]
+}

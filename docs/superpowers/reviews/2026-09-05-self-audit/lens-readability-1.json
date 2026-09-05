@@ -1,0 +1,47 @@
+{
+ "lens": "lens-readability",
+ "target": "agent-principles.md",
+ "findings": [
+  {
+   "title": "LOCAL-FIRST 문단이 도커를 쓰는 조건 넷을 '~할 때' 명사구로 한 문장에 겹쳐, 지금 어느 조건이 걸리는지 훑어서 대조할 수 없다.",
+   "file": "agent-principles.md:26",
+   "evidence": "agent-principles.md:26 — \"도커는 운영 환경과 같은 조건이 필요할 때, 데이터베이스처럼 따로 띄워야 하는 서비스가 있을 때, 이 PC에 깔기 어려운 것이 필요할 때, 사용자가 지시했을 때에만 쓴다.\"  /  skills/writing-korean/SKILL.md:49 — \"- **명사구 겹침** — 비슷한 명사구를 한 문장에 겹치지 않는다. 주절과 종속절에 같은 종류의 명사가 오면 서로 간섭한다.\"",
+   "principle": "KO-SYNTAX",
+   "consequence": "도커를 쓸지 정하는 순간에 읽는 사람은 조건 넷을 문장 끝의 '쓴다'까지 붙들고 가야 하고, 목록이 아니라 산문이라 자기 상황을 조건마다 대조하지 못한다. 넷 가운데 하나를 빠뜨린 채 도커를 띄우거나 반대로 띄우지 않는 결정이 나오며, 이 문서의 목적인 '지금 작업에 어느 조항이 걸리는지 스스로 판단'이 이 문단에서 막힌다.",
+   "detail": "'~할 때'라는 같은 종류의 명사구가 한 문장에 넷 겹치고, 그 넷 앞에 각각 관형절이 붙어 있다. 이는 기준 문서인 writing-korean이 목적을 따지지 않고 고정 규칙으로 못 박은 '명사구 겹침'과 '관형절'에 그대로 걸린다. 내용이 조건 목록인데 형태가 한 문장이라 형태와 내용이 어긋난 것이며, 같은 문서의 「미해결의 처분」이 처분 셋을 목록으로 편 것과도 형태가 갈린다.",
+   "fix": "한 문장을 목록으로 편다. 앞 두 문장은 그대로 두고 셋째 문장을 이렇게 바꾼다 — \"도커는 아래 넷 가운데 하나일 때만 쓴다.\" 뒤에 \"- 운영 환경과 같은 조건이 필요하다.\", \"- 데이터베이스처럼 따로 띄워야 하는 서비스가 있다.\", \"- 이 PC에 깔기 어려운 것이 필요하다.\", \"- 사용자가 지시했다.\" 넷을 말끝을 맞춰 단다. 원문의 낱말을 버리지 않고 자리만 옮긴 것이다.",
+   "lens": "lens-readability",
+   "type": "language"
+  }
+ ],
+ "read": [
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\agent-principles.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-grounding\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-fit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\lens-readability\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\domain-docs\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\writing-korean\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\meta-aggregate\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\project-doc-audit\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\skills\\nested-orchestration\\SKILL.md",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\hooks.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\hooks\\readonly_pretooluse.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude-plugin\\plugin.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\.claude\\settings.json",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_docs_drift.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\test_scaffold.sh",
+  "D:\\projects\\disciplined-coder\\.claude\\worktrees\\audit-record-and-diff\\scripts\\audit_topics.sh"
+ ],
+ "principles_applied": [
+  "ASK-FORK",
+  "KO-SYNTAX",
+  "PROSE-FORM",
+  "READ-FLOW",
+  "PLAIN-KO",
+  "SSOT",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD",
+  "NAME-ITEMS"
+ ]
+}

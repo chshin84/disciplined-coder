@@ -1,0 +1,97 @@
+{
+ "lens": "lens-consistency",
+ "target": "domain-plugin",
+ "findings": [
+  {
+   "title": "domain-plugin은 이 레포가 ~/.claude/settings.json 하나만 고친다고 적지만 README와 실제 스크립트는 두 파일을 고친다고 적는다.",
+   "file": "skills/domain-plugin/SKILL.md:17",
+   "evidence": "플러그인이 `~/.claude/settings.json`처럼 사용자가 손으로 관리하는 파일을 고쳐야 할 때가 있다. 이 레포는 마켓플레이스 자동 갱신을 켜느라 그 파일을 만진다(`scripts/_ensure_autoupdate.sh`). 아래를 지킨다. — 이에 대해 README.md:51은 \"- **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다.\"라 적고, scripts/_ensure_autoupdate.sh:25는 \"  for f in \\\"$home/settings.json\\\" \\\"$home/plugins/known_marketplaces.json\\\"; do\"로 두 파일을 돈다.",
+   "principle": "SSOT",
+   "consequence": "이 절을 정본으로 삼아 사용자 설정 수정의 범위를 확인하는 사람은 known_marketplaces.json이 고쳐진다는 사실을 놓친다. 사고가 났을 때 되돌릴 대상을 settings.json 하나로 잡아 plugins/known_marketplaces.json.bak을 그대로 남기고, 회사 PC처럼 홈이 갈리는 환경에서 어느 경로가 손대어졌는지 추적하지 못한다.",
+   "detail": "정본과 따르는 문서가 같은 것(이 레포가 어느 사용자 파일을 고치는가)을 다르게 정하므로 어긋남이다. 실측으로 갈랐다 — scripts/_ensure_autoupdate.sh가 두 경로를 순회하므로 README가 맞고 정본이 좁게 적혀 있다. 조건 차이가 아니다. 두 문서 모두 첫 세션의 같은 동작을 말한다.",
+   "fix": "skills/domain-plugin/SKILL.md의 「사용자 설정 파일을 고칠 때 지킬 것」 첫 문단에서 대상을 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 둘로 적거나, 경로 열거를 README 한 곳에만 두고 정본은 스크립트 이름만 가리키게 고친다.",
+   "type": "contradiction"
+  },
+  {
+   "title": "domain-plugin의 컴포넌트 위치 목록에 workflows가 빠져 있는데 이 레포의 plugin.json은 workflows 컴포넌트를 선언한다.",
+   "file": "skills/domain-plugin/SKILL.md:14",
+   "evidence": "- **컴포넌트 위치** — `agents/`·`skills/`·`commands/`·`hooks/hooks.json`에 둔다. 플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다. — 이에 대해 .claude-plugin/plugin.json은 \"  \\\"workflows\\\": [\\\"./.claude/workflows/self-audit.js\\\"],\"를 담고 그 파일이 실제로 있다.",
+   "principle": "MEASURE-FIRST",
+   "consequence": "플러그인을 만들며 이 참고서를 여는 사람은 워크플로를 어디에 두고 어떻게 선언하는지 알 수 없어, 목록에 있는 네 자리 가운데 하나에 밀어 넣거나 워크플로 자체를 포기한다. 자기 레포가 이미 쓰는 다섯째 위치가 참고서에 없으므로 참고서가 도메인을 다 덮지 못한다는 사실도 드러나지 않는다.",
+   "detail": "정본이 컴포넌트가 놓이는 자리를 열거하는데 그 열거가 이 레포의 실제 구성을 덮지 못하므로 커버리지 공백이다. 인용한 plugin.json의 workflows 항목과 .claude/workflows/self-audit.js의 존재로 실측했다.",
+   "fix": "skills/domain-plugin/SKILL.md의 컴포넌트 위치 항목에 워크플로가 plugin.json의 `workflows` 배열로 선언되고 파일이 `.claude/workflows/`에 놓인다는 것을 한 문장 더한다.",
+   "type": "gap"
+  }
+ ],
+ "narrowed": 1,
+ "pairs": [
+  {
+   "canon_line": 11,
+   "other_file": "README.md",
+   "other_line": 10,
+   "verdict": "좁혀 적음",
+   "reason": "정본은 `.claude-plugin/marketplace.json`에 최상위 name과 plugins[]를 두고 레포 루트가 곧 플러그인이면 source를 \"./\"로 가리키라고 정한다. README는 그 규칙이 적용된 이 레포의 결과를 사용자가 칠 두 줄(`/plugin marketplace add chshin84/disciplined-coder`와 `/plugin install disciplined-coder@chshin-tools`)로 좁혀 적는다. 실제 marketplace.json의 name이 chshin-tools이고 source가 \"./\"이므로 정당한 도출이다."
+  },
+  {
+   "canon_line": 10,
+   "other_file": "README.md",
+   "other_line": 10,
+   "verdict": "같음",
+   "reason": "정본의 version 비우기는 배포가 커밋 SHA로 굴러간다는 것을 정하고, README의 설치 두 줄은 그 배포 방식을 전제로만 쓰인다. README가 버전 정책에 더한 진술이 없어 어긋남도 좁힘도 아니다."
+  },
+  {
+   "canon_line": 17,
+   "other_file": "README.md",
+   "other_line": 51,
+   "verdict": "어긋남",
+   "reason": "정본은 이 레포가 만지는 사용자 파일을 `~/.claude/settings.json` 하나로 적고, README는 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 둘로 적는다. 조건이 같은 첫 세션의 같은 동작이며 scripts/_ensure_autoupdate.sh:25가 두 경로를 돌아 README 쪽이 맞다."
+  },
+  {
+   "canon_line": 20,
+   "other_file": "README.md",
+   "other_line": 51,
+   "verdict": "좁혀 적음",
+   "reason": "정본은 사용자가 값을 넣어 둔 키를 덮지 않고 키가 없을 때만 채우라고 정하고, README는 그것을 autoUpdate 한 키에 적용해 \"키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며\"로 좁혀 적는다."
+  },
+  {
+   "canon_line": 21,
+   "other_file": "README.md",
+   "other_line": 51,
+   "verdict": "같음",
+   "reason": "정본의 `.bak` 남기기를 README가 \"사본(`.bak`)을 남기고\"로 되풀이할 뿐 더한 것이 없다. 다만 README가 같은 줄에서 정본 절을 가리키고 있어 베낀 것으로 볼 소지는 호출자가 판정할 몫이다."
+  },
+  {
+   "canon_line": 22,
+   "other_file": "README.md",
+   "other_line": 51,
+   "verdict": "같음",
+   "reason": "정본의 사유를 가른 통지를 README가 \"세션 시작 알림으로 고친 경로를 알린다\"로 요약할 뿐 사유 구분을 더 정하지 않는다."
+  },
+  {
+   "canon_line": 14,
+   "other_file": "README.md",
+   "other_line": 40,
+   "verdict": "좁혀 적음",
+   "reason": "정본은 컴포넌트를 `agents/`·`skills/`·`commands/`·`hooks/hooks.json`에 두라고 정하고, README는 이 레포의 SessionStart hook이 무엇을 하는지로 좁혀 적는다. 위치 자체를 다르게 정하지 않는다."
+  }
+ ],
+ "read": [
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/agent-principles.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/lens-consistency/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/skills/domain-plugin/SKILL.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/README.md",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/plugin.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/.claude-plugin/marketplace.json",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/_ensure_autoupdate.sh",
+  "D:/projects/disciplined-coder/.claude/worktrees/audit-record-and-diff/scripts/test_docs_drift.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "MEASURE-FIRST",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "PROSE-FORM",
+  "KO-SYNTAX",
+  "NAME-ITEMS"
+ ]
+}
