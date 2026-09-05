@@ -18,6 +18,20 @@ UC="$CLAUDE_HOME/CLAUDE.md"
 
 mkdir -p "$KDIR"
 
+# 윈도우 사용자 환경 변수 PYTHONUTF8 을 읽는다. 프로세스 환경이 아니라 레지스트리를 보는 이유는,
+# SetEnvironmentVariable('User') 이 레지스트리만 바꿔 이미 뜬 Claude Code 의 환경에는 안 실리기
+# 때문이다. 프로세스 환경을 보면 넣은 뒤에도 계속 "비어 있다"가 참이라 안내가 되풀이된다.
+# 테스트는 DISCIPLINED_CODER_UTF8_STATE 로 결과를 주입해 OS 와 레지스트리를 안 본다.
+utf8_user_var_state() {
+  if [ -n "${DISCIPLINED_CODER_UTF8_STATE:-}" ]; then printf '%s' "$DISCIPLINED_CODER_UTF8_STATE"; return 0; fi
+  case "$(uname -s 2>/dev/null || echo unknown)" in
+    MINGW*|MSYS*|CYGWIN*) ;;
+    *) printf 'not-windows'; return 0 ;;
+  esac
+  # //v 는 Git Bash 가 /v 로 되돌린다. /v 로 쓰면 경로로 바꿔 버려 reg 가 못 알아듣는다.
+  if reg query "HKCU\\Environment" //v PYTHONUTF8 >/dev/null 2>&1; then printf 'set'; else printf 'unset'; fi
+}
+
 # 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
 #    사본이 없거나 내용이 다르면 canon_changed=1 — 플러그인을 처음 깔았거나 갱신한 첫 세션이라는 뜻이다.
 #    4c)의 넛지가 이 값으로 "그 세션에만" 뜬다.
@@ -30,10 +44,10 @@ for f in $SCAFFOLD_FILES; do
     # 아무도 모르게 된다(FAIL-LOUD).
     if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else
       if [ ! -f "$dst" ] || ! cmp -s "$src" "$dst"; then canon_changed=1; fi
-      cp "$src" "$dst" || { echo "[disciplined-coder] ERROR: 정본 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)" >&2; exit 1; }
+      cp "$src" "$dst" || { echo "[disciplined-coder] ERROR: 정본 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)"; exit 1; }
     fi
   else
-    echo "[disciplined-coder] WARNING: source not found at $src" >&2
+    echo "[disciplined-coder] WARNING: source not found at $src"
   fi
 done
 
@@ -86,7 +100,7 @@ managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" <<'EOF' || inject_rc=
 @disciplined-coder/agent-principles.md
 EOF
 if [ "$inject_rc" -ne 0 ]; then
-  echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라." >&2
+  echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라."
 fi
 
 # 4) 첫 세션 도달 보강: CLAUDE.md는 이 훅보다 먼저 로드되므로, 블록을 방금 만든 세션은
@@ -98,7 +112,7 @@ if [ "$had_import" -eq 0 ]; then
     # 읽기가 거부돼도 훅 전체를 죽이지 않는다. set -e 아래에서 cat 실패는 스캐폴드를 그 자리에서
     # 끝내 @import 배선까지 못 하게 만든다. 대신 못 읽었다는 사실을 stderr로 드러낸다(FAIL-LOUD).
     if ! cat "$KDIR/$f" 2>/dev/null; then
-      echo "[disciplined-coder] WARNING: cannot read $KDIR/$f — 이 세션의 stdout 보강에서 빠진다" >&2
+      echo "[disciplined-coder] WARNING: cannot read $KDIR/$f — 이 세션의 stdout 보강에서 빠진다"
     fi
   done
 fi
@@ -110,7 +124,11 @@ done
 
 # 4b) 마켓플레이스 자동 갱신(멱등): 사용자가 손으로 켜지 않아도 깃허브의 갱신이 따라오게 한다.
 #     규칙과 안전장치는 _ensure_autoupdate.sh가 소유한다 — 우리 항목만, 키가 없을 때만, 사본을 남기고.
-autoupdated="$(ensure_marketplace_autoupdate "$CLAUDE_HOME" "$PLUGIN_ROOT" || true)"
+#     그 함수는 실패마다 사유를 stderr 로 찍고 모든 갈래에서 0 으로 끝난다. 종료 코드는 통로가 못
+#     되므로 stderr 를 받아 stdout 으로 옮긴다. 함수의 stdout 은 바뀐 파일 목록을 돌려주는 반환
+#     통로라 거기 섞으면 "켰다" 머리말 아래 거짓 통지가 된다.
+au_err="$(mktemp)"
+autoupdated="$(ensure_marketplace_autoupdate "$CLAUDE_HOME" "$PLUGIN_ROOT" 2>"$au_err" || true)"
 #     켰다는 사실은 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않는다. 옛 관리블록을
 #     걷어낸 알림과 같은 통로다. 사용자 설정 파일을 고쳐 놓고 아무도 모르게 두지 않는다(FAIL-LOUD).
 if [ -n "$autoupdated" ]; then
@@ -120,6 +138,13 @@ if [ -n "$autoupdated" ]; then
     [ -n "$changed" ] && echo "  $changed (사본: $changed.bak)"
   done
 fi
+#     실패 사유는 켰다는 블록 뒤에 따로 찍는다. 켠 것이 없으면 머리말 자체가 안 나오고 사유만 나온다.
+if [ -s "$au_err" ]; then
+  while IFS= read -r au_line; do
+    if [ -n "$au_line" ]; then printf '%s\n' "$au_line"; fi
+  done < "$au_err"
+fi
+rm -f "$au_err"
 
 # 4c) 카파시 플러그인 설치 넛지(안내만, 설치는 하지 않는다): 정본이 새로 깔리거나 갱신된 세션에만,
 #     그 플러그인이 아직 없을 때만 stdout 으로 알린다. 무시하면 다음 갱신까지 조용하다. 다른 플러그인을
@@ -131,6 +156,14 @@ if [ "$canon_changed" -eq 1 ] && ! grep -qF "\"$KARPATHY_PLUGIN\"" "$CLAUDE_HOME
   echo "🔵 disciplined-coder: 카파시(Andrej Karpathy)의 코딩 지침 플러그인이 이 PC에 없다. 디시플린은 이 플러그인과 함께 쓰도록 맞춰져 있어 설치를 권한다(설치하지는 않았다). 두 줄을 차례로 실행하면 된다:"
   echo "  claude plugin marketplace add $KARPATHY_REPO"
   echo "  claude plugin install $KARPATHY_PLUGIN"
+fi
+
+# 4d) PYTHONUTF8 넛지(안내만): 정본이 새로 깔리거나 갱신된 세션에만, 사용자 환경 변수가 비었을 때만.
+#     매 세션 뜨면 세션 시작 알림 전체를 흘려보게 되므로 카파시 넛지와 같은 조건에 묶는다.
+#     이 PC 의 파이썬은 기본 인코딩이 cp949 라 한국어 리터럴이 깨진다. 저장소 자신의 파이썬 호출은
+#     json_run 이 프로세스마다 세워 두지만 클로드 코드 밖에서는 그 보호가 없다.
+if [ "$canon_changed" -eq 1 ] && [ "$(utf8_user_var_state)" = "unset" ]; then
+  echo "🔵 disciplined-coder: 파이썬 한국어 깨짐을 막으려면 /setup-discipline 을 실행하라(윈도우 사용자 환경 변수 PYTHONUTF8=1 을 넣는다)."
 fi
 
 exit 0
