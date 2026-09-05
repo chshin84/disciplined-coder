@@ -612,6 +612,10 @@ EOF
 # 기록은 그 회차에 무엇을 보았는지의 증거라, 뒤에 고치면 회차 사이 대조가 무너진다. 그래서 새 기록을
 # 더하는 것만 허용하고 있는 기록의 수정과 삭제는 거부한다. 경계 날짜는 이 규칙이 들어온 날이다 —
 # 그 전의 수정 하나(0ce107c)는 규칙이 없던 때의 일이라 소급하지 않는다.
+# 이력 검사는 줄이 하나도 오가지 않은 변경을 빼고 센다. 내용이 없는 파일은 그 회차에 무엇을 보았는지를
+# 담고 있지 않아 지워도 회차 사이 대조가 무너지지 않는다. 실제로 기록 폴더에 새어 든 빈 파일 하나를
+# 지운 커밋(c87c8e8)이 이 가드에 걸렸다. 진짜 기록의 수정은 반드시 줄을 옮기므로 그대로 걸린다.
+# 작업 트리 검사는 이 예외를 두지 않는다. 커밋 전에는 되돌릴 수 있어 지금 알리는 값이 더 크다.
 echo "[리뷰 기록은 찍은 뒤 고치지 않는다]"
 RVDIR="docs/superpowers/reviews"
 check "기록 폴더에 기록이 하나 이상 있다" "ls \"\$HERE/\$RVDIR\"/*.md >/dev/null 2>&1"
@@ -620,7 +624,8 @@ RV_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$RVDIR
 %s
 ' "$RV_TREE" | sed 's/^/      /'
 check "작업 트리에 고치거나 지운 기록이 없다" "[ -z \"\$RV_TREE\" ]"
-RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=MD --name-only --format= -- "$RVDIR" 2>/dev/null | grep -v '^$' || true)"
+RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=MD --numstat --format= -- "$RVDIR" 2>/dev/null \
+  | awk -F'\t' 'NF==3 && !($1=="0" && $2=="0") { print $3 }' || true)"
 [ -n "$RV_HIST" ] && printf '    규칙 뒤 이력에서 고치거나 지운 기록:
 %s
 ' "$RV_HIST" | sed 's/^/      /'
