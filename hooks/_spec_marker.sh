@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 공유: spec/plan 문서의 마지막 비공백 줄이 terminal 마커(passed|escalated)인지 판정(SSOT).
 # spec_review_posttooluse.sh·spec_review_stop.sh가 같은 마커 계약을 한 곳에서 쓰도록 단일화한다.
-# 마커·경로 규약의 코드 정본은 이 파일이다(바꾸려면 여기를 고친다). 산문(domain-spec-review·README)이
+# 마커·경로 규약의 코드 정본은 이 파일이다(바꾸려면 여기를 고친다). 산문(review-specs·README)이
 # 여기와 같은 마커를 적는지는 scripts/test_docs_drift.sh가 코드에서 뽑아 대조한다.
 # 마커는 줄 전체여야 한다. 문자열 일부로 찾으면 마커를 산문으로 언급하기만 한 문서도 통과해
 # 하드 게이트가 조용히 열린다 — 마커를 남기라고 안내하는 문장이 마지막 줄이면 그렇게 된다.
@@ -49,5 +49,5 @@ path_in_project() {  # $1=경로 → 프로젝트 안이면 0
 }
 
 # spec/plan 리뷰 안내문(SSOT). PostToolUse 넛지와 Stop 차단 사유가 같은 문장을 쓴다. 렌즈 구성은
-# domain-spec-review가 정하므로 여기 개수를 박지 않는다.
-SPEC_REVIEW_INSTRUCTION="disciplined-coder domain-spec-review 스킬로 PREP+독립 렌즈 리뷰를 수행하라(어느 렌즈를 돌릴지는 그 스킬이 정한다). 리뷰와 처분 분류가 끝나면 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영하라."
+# review-specs가 정하므로 여기 개수를 박지 않는다.
+SPEC_REVIEW_INSTRUCTION="disciplined-coder review-specs 스킬로 PREP+독립 렌즈 리뷰를 수행하라(어느 렌즈를 돌릴지는 그 스킬이 정한다). 리뷰와 처분 분류가 끝나면 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영하라."

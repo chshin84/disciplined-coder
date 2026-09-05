@@ -39,10 +39,10 @@ rm -rf "$EVT"
 
 echo "[F1 — audit_evidence.sh 가 읽는 칸이 렌즈 스키마에 다 있다]"
 # 픽스처가 필수 칸을 손으로 적으면, 렌즈 문서에서 칸이 빠져도 이 테스트는 못 잡는다(실제로 그랬다).
-# 그래서 스크립트가 실제로 읽는 칸(정규식으로 뽑는다)과 meta-aggregate 공통 스키마의 issues 필드
+# 그래서 스크립트가 실제로 읽는 칸(정규식으로 뽑는다)과 aggregating-lenses 공통 스키마의 issues 필드
 # 집합(같은 방식으로 뽑는다)을 맞대어, 스크립트가 읽는 칸 가운데 스키마에 없는 것이 있으면 실패한다.
 # 렌즈 넷의 출력 스키마가 다시 file 이나 principle 을 빼면 여기서 걸린다.
-MA="$HERE/skills/meta-aggregate/SKILL.md"
+MA="$HERE/skills/aggregating-lenses/SKILL.md"
 EVK_PROG='
 import re, sys, json
 ev = open(sys.argv[1], encoding="utf-8").read()
@@ -170,15 +170,15 @@ cat > "$VR/findings.json" <<'FIXTURE'
 FIXTURE
 check "사유 없는 기각을 잡는다" "[ -f '$AV' ] && ! bash '$AV' '$VR' >/dev/null 2>&1"
 rm -rf "$VT"
-check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' '$HERE/skills/domain-docs/SKILL.md'"
+check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' '$HERE/skills/domain-doc-upkeep/SKILL.md'"
 
 
 echo "[렌즈 — 발견의 문턱과 기계에 넘기는 것]"
-# 문턱은 meta-aggregate 「리뷰 산출물 계약」이 소유한다. 전에는 같은 세 문단이 렌즈 파일 넷에 같은
+# 문턱은 aggregating-lenses 「리뷰 산출물 계약」이 소유한다. 전에는 같은 세 문단이 렌즈 파일 넷에 같은
 # 글자로 있었고 이 검사가 그 사본들을 맞춰 세웠다. 지금은 소유자에서 한 번 보고, 렌즈 파일에는
 # 사본이 안 남았는지만 본다(SSOT).
-check "meta-aggregate 가 상대편을 필수로 적는다" "grep -qF 'counterpart' '$MA' && grep -qF '상대편을 못 대면 발견이 아니다' '$MA'"
-check "meta-aggregate 가 결과 기준을 적는다"     "grep -qF '지금 무엇이 그렇게 되어 있는지' '$MA' && grep -qF '앞으로 벌어질 일을 적지 않는다' '$MA'"
+check "aggregating-lenses 가 상대편을 필수로 적는다" "grep -qF 'counterpart' '$MA' && grep -qF '상대편을 못 대면 발견이 아니다' '$MA'"
+check "aggregating-lenses 가 결과 기준을 적는다"     "grep -qF '지금 무엇이 그렇게 되어 있는지' '$MA' && grep -qF '앞으로 벌어질 일을 적지 않는다' '$MA'"
 for L in lens-grounding lens-fit lens-consistency lens-adversarial; do
   F="$HERE/skills/$L/SKILL.md"
   check "$L 에 문턱 사본이 안 남았다"    "! grep -qF '상대편을 못 대면 발견이 아니다' '$F'"
@@ -202,7 +202,7 @@ check "기계에 넘기는 것 절이 있다"             "grep -qF '## 기계�
 check "출력 스키마에 issues 배열이 안 남았다"   "! grep -qF '\"issues\": [' '$LR'"
 
 echo "[dispatching-lenses — 결정론 우선]"
-DD="$HERE/skills/domain-docs/SKILL.md"
+DD="$HERE/skills/domain-doc-upkeep/SKILL.md"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
 check "결정론 우선 절이 있다"            "grep -qF '## 판단 앞에 기계를 세운다' '$DISP'"
 check "렌즈는 판단만 한다고 적는다"       "grep -qF '렌즈는 판단만 한다' '$DISP'"
@@ -211,8 +211,8 @@ check "판단임을 산출물에 적게 한다"       "grep -qF '판단이라는
 check "문서 검진이 렌즈를 각각 부르지 않는다" "! grep -qF '각각 호출' '$DD'"
 
 echo "[호출자 — 디스패치와 집계 계약]"
-SR="$HERE/skills/domain-spec-review/SKILL.md"
-MA="$HERE/skills/meta-aggregate/SKILL.md"
+SR="$HERE/skills/review-specs/SKILL.md"
+MA="$HERE/skills/aggregating-lenses/SKILL.md"
 check "spec 리뷰 본문에서 렌즈당 개별 디스패치 문구가 지워졌다" "! grep -qF '렌즈당 읽기 전용 서브에이전트를 한 번씩 띄운다' '$SR'"
 check "spec 리뷰 frontmatter에서 렌즈마다 개별 디스패치 문구가 지워졌다" "! grep -qF '렌즈마다 한 번씩 띄우고' '$SR'"
 check "spec 리뷰가 대상 하나에 호출 하나를 띄우는 새 문장을 담는다" "grep -qF '검토 대상 하나에 호출 하나를 띄우고 그 호출이 대상을 한 번 읽고 배정된 렌즈를 차례로 적용한다' '$SR'"
@@ -223,15 +223,15 @@ check "묶는 규칙의 예외를 소유자가 적는다" "grep -qF 'lens-advers
 check "spec 리뷰가 그 예외를 베끼지 않는다" "! grep -qF '자세가 반대인 \`lens-adversarial\`만 따로 띄운다' '$SR'"
 check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "grep -qF '대상마다 따로 띄우는 이 절차에서 예외는 \`lens-prior-art\` 하나이며' '$SR'"
 
-echo "[domain-llm-runtime — 고정표 배정]"
-LR2="$HERE/skills/domain-llm-runtime/SKILL.md"
+echo "[review-llm-calls — 고정표 배정]"
+LR2="$HERE/skills/review-llm-calls/SKILL.md"
 check "리스크 점수 절이 사라졌다"        "! grep -qF '리스크 점수는 다음 조건마다 1점' '$LR2'"
 check "호출 종류별 고정표가 있다"        "grep -qF '| 호출 종류 |' '$LR2'"
 check "회차마다 다시 판단하지 않는다고 적는다" "grep -qF '회차마다 다시 판단하지 않는다' '$LR2'"
 check "문서 전체에 리스크로 렌즈를 고른다는 서술이 안 남아 있다" "! grep -qF '리스크' '$LR2'"
 
-echo "[project-doc-audit — 걸음 여덟과 기록 넷]"
-PDA="$HERE/skills/project-doc-audit/SKILL.md"
+echo "[audit-repo-docs — 걸음 여덟과 기록 넷]"
+PDA="$HERE/skills/audit-repo-docs/SKILL.md"
 PDA_ROWS="$(awk '/^## 걸음/{f=1;next} f&&/^## /{exit} f&&/^\| [^|-]/{n++} END{print n-1}' "$PDA")"
 PDA_SAID="$(LC_ALL=C.UTF-8 grep -oE '걸음은 [^ ]+이고' "$PDA" | head -1 | sed 's/걸음은 //; s/이고//')"
 KO_NUM() { case "$1" in 하나) echo 1;; 둘) echo 2;; 셋) echo 3;; 넷) echo 4;; 다섯) echo 5;; 여섯) echo 6;; 일곱) echo 7;; 여덟) echo 8;; 아홉) echo 9;; 열) echo 10;; 열하나) echo 11;; 열둘) echo 12;; *) echo 0;; esac; }
@@ -321,7 +321,7 @@ rj() { json_run "$1" "$RT/round/$2"; }
 # (지운 단언) 발견마다 상대편과 지문이 있다 — 이 픽스처가 counterpart·fingerprint 를 손으로 채워
 # 넣고 그 값이 있는지를 같은 픽스처에서 되읽는 것이라 자기 자신을 증언하는 것과 같다. audit_evidence.sh
 # 가 그 칸을 실제로 읽는지는 위 [F1] 구획이 스키마와 대조해 이미 본다.
-# status 의 닫힌 집합은 이 파일이 손으로 든 리터럴이 아니라 절차 문서(project-doc-audit SKILL.md)
+# status 의 닫힌 집합은 이 파일이 손으로 든 리터럴이 아니라 절차 문서(audit-repo-docs SKILL.md)
 # 「판정」 절의 한 문장에서 뽑는다 — 계획 문서는 소비하고 지우는 문서라 정본이 못 된다. 문서가 상태
 # 이름을 더하거나 빼면 여기서 같이 갈린다(절차 문서나 이 픽스처 어느 한쪽만 바뀌어도 실패).
 STATUS_SRC="$PDA"
@@ -345,7 +345,7 @@ check "렌즈가 이름표 묶음 짝을 적는다"                  "grep -qF '
 check "렌즈 type 에 duplication 이 있다"                "grep -qF 'duplication' '$LC'"
 check "렌즈가 판정 셋과 narrowed 를 적는다"             "grep -qF '좁혀 적음' '$LC' && grep -qF 'narrowed' '$LC'"
 check "렌즈가 산출물 공백·스코프를 감사에서 뺀다"        "grep -qF '레포 문서 감사에서는 걸지 않는다' '$LC'"
-check "집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다"  "grep -qF 'narrowed' '$HERE/skills/meta-aggregate/SKILL.md'"
+check "집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다"  "grep -qF 'narrowed' '$HERE/skills/aggregating-lenses/SKILL.md'"
 check "한 번만 규율에 '대상이 다르면 별개 호출' 이 있다" "grep -qF '대상이 다르면 별개 호출이다' '$HERE/skills/dispatching-lenses/SKILL.md'"
 check "절차의 대체된 문장 셋이 사라졌다"                 "! grep -qF '만은 묶음에 한 번 건다' '$PDA' && ! grep -qF '묶음을 통째로 받는다' '$PDA' && ! grep -qF '묶음 전부를 서로 대조한다' '$LC'"
 check "절차의 '짧은 문서 둘까지' 가 사라졌다"            "! grep -qF '짧은 문서 둘까지' '$PDA'"

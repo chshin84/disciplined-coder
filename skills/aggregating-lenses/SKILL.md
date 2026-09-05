@@ -1,8 +1,8 @@
 ---
-name: meta-aggregate
+name: aggregating-lenses
 description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판정이 서로 어긋난 곳과 아무도 안 본 렌즈를 짚는 집계 단계. accept/regenerate/escalate 결정은 제품 런타임에서만 내고, spec·plan 리뷰와 문서 검진에서는 결정 없이 병합한 목록만 호출자에게 넘긴다. 렌즈가 아니다. 코드 설계도이며 내용 재판단은 하지 않는다.
 ---
-# meta-aggregate — 집계와 런타임 전용 결정 (코드 설계도)
+# aggregating-lenses — 집계와 런타임 전용 결정 (코드 설계도)
 
 렌즈들이 끝난 뒤 그 결과를 모아 다음 행동을 정하는 단계이며, 렌즈가 아니다. 프롬프트가 아니라 결정론적 코드로 구현한다.
 
@@ -48,22 +48,22 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 
 `where`의 뜻은 "검토 문서 안의 위치" 하나다. 레포 상대경로는 `file`이 진다.
 
-렌즈가 더하는 칸 가운데 `statements`는 레포 문서 감사에서 문서별 호출이 돌려주는 `{topic, statement, evidence}` 목록이다. 집계 대상이 아니다. 이 칸을 요구하는 주체는 `project-doc-audit`의 「진술 받기」 걸음이다. 어느 문서의 진술인지는 항목이 아니라 그 호출의 원본 파일이 지는 `target` 칸이 안다.
+렌즈가 더하는 칸 가운데 `statements`는 레포 문서 감사에서 문서별 호출이 돌려주는 `{topic, statement, evidence}` 목록이다. 집계 대상이 아니다. 이 칸을 요구하는 주체는 `audit-repo-docs`의 「진술 받기」 걸음이다. 어느 문서의 진술인지는 항목이 아니라 그 호출의 원본 파일이 지는 `target` 칸이 안다.
 
 ## 공통 계약의 예외
 - `lens-readability` — 맞댈 상대편이 없어 위 공통 계약을 따르지 않는다. 산출물이 `issues`가 아니라 `suggestions`이고, 항목의 칸이 `where`·`why`·`rewrite` 셋이며 `type`·`claim`·`consequence`·`evidence`가 없다. 발견이 아니라 제안이라 「집계」·「상충 감지」·「커버리지 공백」 어디에도 들어가지 않는다. 스키마의 상세는 `skills/lens-readability/SKILL.md`가 정본이다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`·`consequence`.
-- `lens-prior-art` — 맞댈 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다. `evidence`는 인용이나 경로나 URL 이고, 인용 검증은 호출자(`domain-spec-review`)가 자기 도구로 한다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`.
+- `lens-prior-art` — 맞댈 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다. `evidence`는 인용이나 경로나 URL 이고, 인용 검증은 호출자(`review-specs`)가 자기 도구로 한다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`.
 
 ## 처분 — 호출자의 몫
 렌즈는 처분을 고르지 않는다. 처분 축이 맥락마다 다르고, 사용자를 멈춰 세울지는 호출자의 책임이다.
 
-- **spec 리뷰**(`domain-spec-review`) — 사람이 근거를 읽고 `🔴`와 "고칠 것"으로 가른다. spec 리뷰에서는 결정 단계가 없다. 병합과 상충 감지까지만 한다.
-- **제품 런타임**(`domain-llm-runtime`) — 제품 코드가 `type` 값으로 행동을 정하는 표를 갖는다. 상충이나 커버리지 공백이 있으면 사람에게 올린다.
-- **문서 검진**(`domain-docs`)**과 레포 문서 감사**(`project-doc-audit`) — 결정 없이 병합과 상충 감지와 커버리지 공백 표시까지만 하고, 그 목록을 각자의 기록에 적어 사용자에게 넘긴다.
+- **spec 리뷰**(`review-specs`) — 사람이 근거를 읽고 `🔴`와 "고칠 것"으로 가른다. spec 리뷰에서는 결정 단계가 없다. 병합과 상충 감지까지만 한다.
+- **제품 런타임**(`review-llm-calls`) — 제품 코드가 `type` 값으로 행동을 정하는 표를 갖는다. 상충이나 커버리지 공백이 있으면 사람에게 올린다.
+- **문서 검진**(`domain-doc-upkeep`)**과 레포 문서 감사**(`audit-repo-docs`) — 결정 없이 병합과 상충 감지와 커버리지 공백 표시까지만 하고, 그 목록을 각자의 기록에 적어 사용자에게 넘긴다.
 - **멀티에이전트 워크플로** — 호출자 스킬이 없으므로 워크플로를 짜는 세션이 직접 위 세 걸음을 따르고, 그 결과를 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-check.md`에 적는다.
 
 ## 출력 스키마
-`decision`과 `retry_count`는 런타임 전용이다. spec 리뷰에서는 결정 단계가 없으므로 이 둘을 내지 않고, 병합한 목록을 `domain-spec-review`의 처분 절로 넘긴다.
+`decision`과 `retry_count`는 런타임 전용이다. spec 리뷰에서는 결정 단계가 없으므로 이 둘을 내지 않고, 병합한 목록을 `review-specs`의 처분 절로 넘긴다.
 
 ```
 { "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "type": "...", "source": "<렌즈 리턴의 lens 값>", "where": "...", "claim": "...", "consequence": "...", "evidence": "..." } ], "retry_count": 0 }
@@ -76,6 +76,6 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 렌즈가 자기 필드를 더할 수 있고 그것도 집계 대상이 아니다. 집계 항목은 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 렌즈가 돌려준 원본을 본다. `lens-prior-art`의 `search_status`·`citations`·`not_found`·`disclosures`와 `lens-readability`의 `purpose`·`rewrite`와 `lens-consistency`의 `narrowed`·`pairs`가 그렇다. 그 가운데 `search_status`는 빈 `issues`를 판정으로 써도 되는지를 가르고, `purpose`는 빈 `suggestions`를 판정으로 써도 되는지를 가른다. 집계본만 보고 넘어가면 조용한 통과가 생긴다.
 
 ## 구현 형태 (맥락 의존)
-- **제품 런타임**(`domain-llm-runtime`) — 결정론적 파이썬 함수로 구현한다. 모호한 상충 판정만 선택적으로 LLM을 쓴다.
+- **제품 런타임**(`review-llm-calls`) — 결정론적 파이썬 함수로 구현한다. 모호한 상충 판정만 선택적으로 LLM을 쓴다.
 - **spec/plan 리뷰와 문서 검진과 레포 문서 감사와 워크플로 검증** — 제품 코드가 없으므로 메인 세션이 위 「하는 일」의 세 걸음을 직접 따라 집계한다.
 - **런타임 재시도 상한** — 재시도에 상한(예: 1~2회)을 둬 무한 루프와 비용 폭주를 막는다.

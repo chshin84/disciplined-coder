@@ -1,8 +1,8 @@
 ---
-name: writing-korean
+name: domain-korean
 description: 한국어로 답과 문서를 쓸 때의 상세 규칙과 그 근거이며, lens-readability 가 대조하는 기준 문서다. 정본의 PLAIN-KO·PROSE-FORM·READ-FLOW·KO-SYNTAX 네 조항이 무엇을 요구하는지와 어느 측정에서 나왔는지를 담는다. 문서를 쓰거나 문체를 고치거나 규칙의 근거를 되짚어야 할 때 연다. 정본은 조항만 담고 여기가 상세의 SSOT다.
 ---
-# writing-korean — 한국어 작성 규칙의 상세와 근거
+# domain-korean — 한국어 작성 규칙의 상세와 근거
 
 정본(`agent-principles.md`)은 조항만 담는다. 무엇을 어떻게 하라는 상세와 그 조항이 어느 측정에서 나왔는지는 여기가 소유한다. `lens-readability`가 고정 규칙을 대조할 때 여는 기준 문서도 여기다. 그 렌즈는 이 파일을 읽고 나서 판정한다. 정본에 다시 적지 않는다. 매 세션 실리는 것은 정본뿐이라 거기 한 줄이 늘 때마다 다른 줄이 걸릴 확률이 함께 떨어진다.
 

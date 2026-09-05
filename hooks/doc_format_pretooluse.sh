@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse(Write|Edit): 새 문서(.md, spec/plan 제외) 생성 감지 → domain-docs 양식 제안(비블로킹).
+# PreToolUse(Write|Edit): 새 문서(.md, spec/plan 제외) 생성 감지 → domain-doc-upkeep 양식 제안(비블로킹).
 # 경로는 _extract_path.sh가 추출(다중 경로 순회). 순수 bash.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
@@ -20,7 +20,7 @@ done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")
 EOF
 [ -n "$match" ] || exit 0
-msg="📝 새 문서 작성 — 쓰기 전에 domain-docs의 '글 유형별 적용' 절에서 목적에 맞는 양식을 고르고(README·버그리포트·작업보고·기술블로그), 결론/요약을 앞에 두고 내용을 양식대로 배치하라. 분량은 domain-writing을 따른다."
+msg="📝 새 문서 작성 — 쓰기 전에 domain-writing의 '글 유형별 적용' 절에서 목적에 맞는 양식을 고르고(README·버그리포트·작업보고·기술블로그), 결론/요약을 앞에 두고 내용을 양식대로 배치하라. 둘 곳과 수명은 domain-doc-upkeep을 따른다."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

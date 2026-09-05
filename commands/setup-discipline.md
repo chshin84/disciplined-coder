@@ -21,8 +21,7 @@ CLAUDE.md에 옛 관리블록이 남아 있으면 그것도 걷어낸다(사본�
 
 `reg query "HKCU\Environment" //v PYTHONUTF8`
 
-이 명령이 실패하면 비어 있는 것이다. 그때만 선택지가 있는 질문으로 묻는다(정본 「Karpathy 지침」의
-Think Before Acting). 넣는 쪽을 고르면 다음을 실행하고 결과를 한 줄로 알린다.
+이 명령이 실패하면 비어 있는 것이다. 그때만 선택지가 있는 질문으로 묻는다(정본 「Think Before Acting」). 넣는 쪽을 고르면 다음을 실행하고 결과를 한 줄로 알린다.
 
 `powershell -NoProfile -Command "[Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User')"`
 

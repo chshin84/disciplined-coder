@@ -1,6 +1,6 @@
 ---
 name: lens-consistency
-description: 설계 문서(spec/plan)의 내부 모순·커버리지 공백·산출물 공백·이름/타입 드리프트·스코프를 보는 렌즈. domain-spec-review의 설계 문서 리뷰와 project-doc-audit의 레포 문서 감사가 읽기 전용 서브에이전트로 호출한다.
+description: 설계 문서(spec/plan)의 내부 모순·커버리지 공백·산출물 공백·이름/타입 드리프트·스코프를 보는 렌즈. review-specs의 설계 문서 리뷰와 audit-repo-docs의 레포 문서 감사가 읽기 전용 서브에이전트로 호출한다.
 ---
 # lens-consistency — 내부 정합성·커버리지 렌즈 (프롬프트 설계도)
 
@@ -32,17 +32,17 @@ description: 설계 문서(spec/plan)의 내부 모순·커버리지 공백·산
 복제는 이 렌즈가 판정하지 않고 호출자가 도출한다. 같음이면서 정본이 아닌 쪽의 역할이 정본을 가리키지 않는 것이면 그 진술은 베낀 것이고, 호출자가 `duplication` 발견으로 올린다. 조건이 다른 짝은 어긋남으로 올리지 않고 사유에 조건을 적는다.
 
 ## 발견의 문턱
-필드의 뜻과 문턱과 예외는 `meta-aggregate`의 리뷰 산출물 계약이 정한다.
+필드의 뜻과 문턱과 예외는 `aggregating-lenses`의 리뷰 산출물 계약이 정한다.
 
 ## 기계에 넘기는 것
 같은 이름표에 서로 다른 값이 적혔는지는 호출자가 표로 대조한다. 이 렌즈는 값이 다른 짝 가운데 정당한 좁혀 적기인지 갈리는 것만 받는다.
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "lens-consistency", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "contradiction|gap|drift|scope|duplication", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-consistency", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "contradiction|gap|drift|scope|duplication", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 `gap`은 커버리지 공백과 산출물 공백 둘을 담는다. 집계본은 `type`만 싣고 그 둘을 가르지 않으므로 어느 쪽인지를 `claim`에 적는다.
 
 `duplication`은 레포 문서 감사에서 호출자가 도출해 붙이는 값이다. `narrowed`(좁혀 적음 개수)와 `pairs`(짝마다의 판정)는 레포 문서 감사에서 이 렌즈가 더 돌려주는 칸이며 집계 대상이 아니다.
 
-필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다. `principles_applied`를 언제 요구하는지는 `meta-aggregate`의 리뷰 산출물 계약이 정한다. 여기서 다시 정하지 않는다.
+필드의 뜻과 공통 규칙은 `aggregating-lenses`의 리뷰 산출물 계약이 SSOT다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다. `principles_applied`를 언제 요구하는지는 `aggregating-lenses`의 리뷰 산출물 계약이 정한다. 여기서 다시 정하지 않는다.

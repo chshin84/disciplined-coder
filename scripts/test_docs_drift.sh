@@ -2,7 +2,7 @@
 # 문서의 렌즈 열거가 진실과 어긋나지 않는지 검증. 계약: FAIL=0 (매직넘버 금지 — 개수는 테스트가 센다).
 #
 # 두 불변식을 단언한다. 어느 쪽도 개수를 박지 않고 두 집합의 일치를 본다.
-#   집계 태깅   — meta-aggregate가 source 값으로 적은 렌즈 == 같은 디렉터리 집합
+#   집계 태깅   — aggregating-lenses가 source 값으로 적은 렌즈 == 같은 디렉터리 집합
 # 두 번째의 권위 있는 출처는 호출자 스킬이고 산문의 열거는 그 캐시다(SSOT).
 #
 # 인지한 대가: 앵커가 산문 문구라 표현을 고치면 내용이 멀쩡해도 실패한다. 조용히 통과하는 것보다
@@ -10,8 +10,8 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 README="$HERE/README.md"
-CALLER="$HERE/skills/domain-spec-review/SKILL.md"
-AGG="$HERE/skills/meta-aggregate/SKILL.md"
+CALLER="$HERE/skills/review-specs/SKILL.md"
+AGG="$HERE/skills/aggregating-lenses/SKILL.md"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
 pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
@@ -24,12 +24,12 @@ DISPATCH="$(grep -oE '^- `lens-[a-z-]+`' "$CALLER" | sed 's/^- `lens-//; s/`$//'
 
 
 
-# 캐시 3 — meta-aggregate 리뷰 산출물 계약의 렌즈 이름 열거. 출력 스키마의 `source`는 이 값을
+# 캐시 3 — aggregating-lenses 리뷰 산출물 계약의 렌즈 이름 열거. 출력 스키마의 `source`는 이 값을
 # 그대로 옮기는 자리라 열거를 두지 않는다. 이름 열거가 한 문서에 하나만 남게 여기서 뽑는다.
 AGG_LINE="$(grep -F '"lens": "lens-' "$AGG" | head -1 || true)"
 AGGSET="$(printf '%s' "$AGG_LINE" | sed 's/.*"lens"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | tr '|' '\n' | sed 's/^ *//; s/ *$//; s/^lens-//' | grep -v '^$' | sort || true)"
 
-# 캐시 4 — meta-aggregate가 「공통 계약의 예외」로 적은 렌즈 이름 열거. 손으로 목록을 베끼지
+# 캐시 4 — aggregating-lenses가 「공통 계약의 예외」로 적은 렌즈 이름 열거. 손으로 목록을 베끼지
 # 않고 정본 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
 # 예외 없이 다섯 렌즈 전부에게 강도 그대로의 대조를 요구한다.
 EXC_LENSES="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u || true)"
@@ -41,17 +41,17 @@ check "호출자 디스패치 목록을 읽어냈다"          "[ -n \"\$DISPATC
 
 
 echo "[집계 태깅 == 실제 디렉터리]"
-# meta-aggregate의 출력 스키마가 이슈의 출처를 렌즈 이름으로 태깅한다. 그 열거도 렌즈가 늘면 낡는다.
-check "meta-aggregate lens 줄을 찾았다"          "[ -n \"\$AGG_LINE\" ]"
-check "meta-aggregate 에 source 열거가 없다"     "! grep -qE '\"source\"[[:space:]]*:[[:space:]]*\"[a-z-]+\\|' \"\$AGG\""
-check "meta-aggregate가 렌즈 전부를 태깅한다"    "[ \"\$AGGSET\" = \"\$ALL\" ]"
+# aggregating-lenses의 출력 스키마가 이슈의 출처를 렌즈 이름으로 태깅한다. 그 열거도 렌즈가 늘면 낡는다.
+check "aggregating-lenses lens 줄을 찾았다"          "[ -n \"\$AGG_LINE\" ]"
+check "aggregating-lenses 에 source 열거가 없다"     "! grep -qE '\"source\"[[:space:]]*:[[:space:]]*\"[a-z-]+\\|' \"\$AGG\""
+check "aggregating-lenses가 렌즈 전부를 태깅한다"    "[ \"\$AGGSET\" = \"\$ALL\" ]"
 if [ "$AGGSET" != "$ALL" ]; then
   echo "    디렉터리      : $(printf '%s' "$ALL" | tr '\n' ' ')"
-  echo "    meta-aggregate: $(printf '%s' "$AGGSET" | tr '\n' ' ')"
+  echo "    aggregating-lenses: $(printf '%s' "$AGGSET" | tr '\n' ' ')"
 fi
 
 
-echo "[산출물 계약 — meta-aggregate가 소유한다]"
+echo "[산출물 계약 — aggregating-lenses가 소유한다]"
 check "계약이 consequence 를 필수로 적는다"     "grep -qF 'consequence' \"\$AGG\""
 check "계약이 evidence 를 필수로 적는다"        "grep -qF 'evidence' \"\$AGG\""
 check "계약이 read 필드를 정의한다"             "grep -qF '\"read\"' \"\$AGG\""
@@ -94,7 +94,7 @@ check "🔴 진입 기준을 적는다"                 "grep -qF '되돌리기 
 check "기본값이 고치기임을 적는다"            "grep -qF '기본값이 고치기' \"\$CALLER\""
 check "마커를 개선보다 먼저 남기라고 적는다"  "grep -qF '마커를 먼저 남긴다' \"\$CALLER\""
 
-RUNTIME="$HERE/skills/domain-llm-runtime/SKILL.md"
+RUNTIME="$HERE/skills/review-llm-calls/SKILL.md"
 echo "[런타임 — 등급이 아니라 type 으로 행동을 정한다]"
 check "런타임 파일을 찾았다"                "[ -f \"\$RUNTIME\" ]"
 check "등급 기반 재생성이 남아 있지 않다"    "! grep -qF 'critical만 regenerate' \"\$RUNTIME\""
@@ -110,8 +110,8 @@ check "Stop 훅이 공유 안내문을 쓴다"              "grep -qF 'SPEC_REVI
 check "훅이 안내문을 따로 베끼지 않는다"          "! grep -qF '마커를 먼저 남기고' \"\$PTU\" \"\$STOPH\""
 
 echo "[리뷰 절차 — 렌즈를 한 번씩 띄우고 결과를 한데 모은다]"
-DOCS="$HERE/skills/domain-docs/SKILL.md"
-RUNTIME2="$HERE/skills/domain-llm-runtime/SKILL.md"
+DOCS="$HERE/skills/domain-doc-upkeep/SKILL.md"
+RUNTIME2="$HERE/skills/review-llm-calls/SKILL.md"
 READMEF="$HERE/README.md"
 check "spec 리뷰가 회차 규칙을 다시 선언하지 않는다" "! grep -qF '렌즈마다 한 번씩만 띄운다' \"\$CALLER\""
 check "spec 리뷰가 회차 규칙 소유자를 가리킨다" "grep -qF '한 번만 띄우는 렌즈의 규율' \"\$CALLER\""
@@ -124,13 +124,13 @@ check "소유자 안에서 다시 정하지 않는다"      "grep -qF '여기서
 echo "[이름은 명사구, 주장은 첫 문장 — 정본과 가독성 렌즈]"
 CANON="$HERE/agent-principles.md"
 READ2="$HERE/skills/lens-readability/SKILL.md"
-# 상세는 writing-korean 이 소유하고 정본은 조항만 담는다. 양쪽을 함께 붙든다.
-WK="$HERE/skills/writing-korean/SKILL.md"
+# 상세는 domain-korean 이 소유하고 정본은 조항만 담는다. 양쪽을 함께 붙든다.
+WK="$HERE/skills/domain-korean/SKILL.md"
 check "상세 스킬이 있다"                     "[ -f \"$WK\" ]"
 check "상세가 이름 자리를 명사구로 정한다"   "grep -qF '이름을 붙이는 곳은 명사구로 쓰고 주장은 본문으로 내린다' \"$WK\""
 check "상세가 말끝 통일을 정한다"            "grep -qF '한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다' \"$WK\""
 check "상세가 넓은 말 대신 좁은 말을 시킨다" "grep -qF '넓은 말보다 좁은 말을 쓴다' \"$WK\""
-check "정본이 그 상세를 가리킨다"            "grep -qF 'writing-korean' \"$CANON\""
+check "정본이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
 check "정본이 대상을 정확히 가리키게 한다"   "grep -qF '대상의 이름을 그대로 쓴다' \"\$CANON\""
 check "가독성 렌즈가 이름 형태를 본다"       "grep -qF '이름 형태' \"\$READ2\""
 check "가독성 렌즈가 형태 섞임을 본다"       "grep -qF '형태 섞임' \"\$READ2\""
@@ -161,11 +161,11 @@ check "소유자가 나눠 주지 않는다"             "grep -qF '렌즈끼리
 check "런타임이 나눠 주지 않는다"             "grep -qF '렌즈끼리 볼 것을 나눠 주지 않는다' \"\$RUNTIME2\""
 
 echo "[dispatching-lenses — 소유자가 하나다]"
-# 렌즈 운용 규율이 domain-docs 와 나뉘어 있던 동안 소유자가 둘이었다. 규율은 이 스킬이 지고
-# domain-docs 는 문서 저작만 진다. 절 제목과 띄우는 방법 문장이 양쪽에 함께 있으면 다시 갈린다.
+# 렌즈 운용 규율이 domain-doc-upkeep 와 나뉘어 있던 동안 소유자가 둘이었다. 규율은 이 스킬이 지고
+# domain-doc-upkeep 는 문서 저작만 진다. 절 제목과 띄우는 방법 문장이 양쪽에 함께 있으면 다시 갈린다.
 DISP_PTR='띄우는 방법은 `dispatching-lenses`가 정한다'
-check "domain-docs 에 렌즈 운용 절 제목이 없다"   "! grep -qE '^## (렌즈에게 정본을 알리는 법|판단 앞에 기계를 세운다|한 번만 띄우는 렌즈의 규율)$' \"\$DOCS\""
-check "domain-docs 가 띄우는 방법을 소유자로 넘긴다" "! grep -qF '렌즈 결과는' \"\$DOCS\" && grep -qF -- \"\$DISP_PTR\" \"\$DOCS\""
+check "domain-doc-upkeep 에 렌즈 운용 절 제목이 없다"   "! grep -qE '^## (렌즈에게 정본을 알리는 법|판단 앞에 기계를 세운다|한 번만 띄우는 렌즈의 규율)$' \"\$DOCS\""
+check "domain-doc-upkeep 가 띄우는 방법을 소유자로 넘긴다" "! grep -qF '렌즈 결과는' \"\$DOCS\" && grep -qF -- \"\$DISP_PTR\" \"\$DOCS\""
 check "소유자가 띄우는 방법을 적는다"             "grep -qF 'source를 주입' \"\$DISP\" && grep -qF '렌즈 결과는' \"\$DISP\""
 DISP_MISS=""
 while IFS= read -r n; do
@@ -197,9 +197,9 @@ check "문서 검진 기록의 이름을 적는다"       "grep -qF '-check.md' 
 check "문서 검진 기록은 처리 결과를 뺀다"    "grep -qF '무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다' \"\$DOCS\""
 check "spec 리뷰 기록은 처리 결과를 뺀다"    "grep -qF '어떻게 처리했는지는 담지 않는다' \"\$CALLER\""
 check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거를 검토 대상 문서 본문에 적는다' \"\$CALLER\""
-# 이름 규칙은 domain-docs 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
+# 이름 규칙은 domain-doc-upkeep 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
 check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$DOCS\""
-check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'domain-docs' \"\$CALLER\""
+check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'domain-doc-upkeep' \"\$CALLER\""
 check "원본을 받는 즉시 저장한다"            "grep -qF '받는 즉시' \"\$CALLER\""
 check "원본을 같은 이름 폴더에 둔다"          "grep -qF '같은 이름의 폴더' \"\$CALLER\""
 check "런타임이 기록 제외 이유를 적는다"      "grep -qF '사용자 입력이 로그로' \"\$RUNTIME2\""
@@ -218,7 +218,7 @@ check "런타임에 다시 리뷰 반복이 없다"        "grep -qF '다시 리
 # 여섯 렌즈의 「출력 스키마」 블록은 공통 계약을 그 렌즈의 값으로 채워 보인 사본이다. 사본이므로
 # 손으로 맞추면 갈라진다 — 실제로 `evidence`의 뜻풀이에서 근거 형태 둘이 사라진 채 오래 남았다.
 # 그래서 앵커를 테스트에 박지 않고 정본에서 뽑아 온다. 정본 문안이 바뀌면 이 검사가 함께 따라간다.
-MA="$HERE/skills/meta-aggregate/SKILL.md"
+MA="$HERE/skills/aggregating-lenses/SKILL.md"
 CONTRACT_EV="$(grep -o '"evidence": "[^"]*"' "$MA" | head -1 | sed 's/^"evidence": "//; s/"$//')"
 CONTRACT_CONSEQ="$(grep -o '"consequence": "[^"]*"' "$MA" | head -1 | sed 's/^"consequence": "//; s/"$//')"
 echo "[렌즈 스키마 사본]"
@@ -247,7 +247,7 @@ check "정본이 principles_applied 규칙을 소유한다" "grep -qF '제품 �
 check "정본이 file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' \"\$MA\""
 check "정본이 principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' \"\$MA\""
 
-echo "[렌즈에게 정본을 알리는 법 — domain-docs 한 곳만 규율을 적는다]"
+echo "[렌즈에게 정본을 알리는 법 — domain-doc-upkeep 한 곳만 규율을 적는다]"
 # 전에 여러 문서가 각자 적었다가 하나에서 둘이 빠져 갈라졌다. 소유자를 하나로 두고
 # 나머지는 가리키기만 하게 묶는다. 앵커는 소유자의 절 제목이라 제목을 고치면 실패한다(FAIL-LOUD).
 OWNER_DOC="$HERE/skills/dispatching-lenses/SKILL.md"
@@ -259,7 +259,7 @@ for m in "${RULE_MARKS[@]}"; do
   check "소유자가 규율을 적는다: $m" "grep -qF -- '$m' \"\$OWNER_DOC\""
 done
 # 가리키기만 해야 하는 문서들. 규율 문구를 다시 적으면 실패한다.
-for D in "$HERE"/skills/domain-spec-review/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$HERE"/skills/domain-coding/SKILL.md "$HERE"/skills/domain-writing/SKILL.md; do
+for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$HERE"/skills/domain-coding/SKILL.md "$HERE"/skills/domain-writing/SKILL.md; do
   # 스킬 문서는 파일 이름이 모두 SKILL.md라 부모 디렉터리로 부른다 — 안 그러면 어느 문서가 실패했는지
   # 알 수 없다(`NAME-ITEMS`).
   dn="$(basename "$D")"; [ "$dn" = "SKILL.md" ] && dn="$(basename "$(dirname "$D")")"
@@ -433,7 +433,7 @@ NUM='(두|세|네|다섯|여섯|일곱|여덟|아홉|열)'
 NUMB='(둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)'
 # 렌즈 이름은 디렉터리에서 도출한다 — 여기 손으로 적으면 그 목록이 먼저 낡는다.
 LENS_RE="$(printf '%s' "$ALL" | tr '\n' '|' | sed 's/|$//')"
-COUNT_SCAN="$AGG $HERE/skills/lens-*/SKILL.md $HERE/skills/domain-docs/SKILL.md $DISP $CALLER $CANON $HERE/README.md"
+COUNT_SCAN="$AGG $HERE/skills/lens-*/SKILL.md $HERE/skills/domain-doc-upkeep/SKILL.md $DISP $CALLER $CANON $HERE/README.md"
 # shellcheck disable=SC2086
 NUMHIT="$(LC_ALL=C.UTF-8 grep -nE "$NUM[ ]?렌즈|렌즈[ ]?$NUMB|다른 $NUMB[ ]?(렌즈|은|는)|$NUMB[ ]?곳에" $COUNT_SCAN 2>/dev/null \
   | grep -v '개수를 산문에\|이름을 같은 줄에' \
@@ -483,7 +483,7 @@ done
 
 # --- 새로 만든 스킬이 진입로에 등재된다 ---
 # 스킬을 만들면서 그것을 가리키는 자리를 함께 만들지 않으면, 상황에서 출발한 세션이 그 스킬에 닿지
-# 못한다(실제로 project-doc-audit 이 정본의 두 표 어디에도 없었다). 그래서 스킬 디렉터리에서 이름을
+# 못한다(실제로 audit-repo-docs 이 정본의 두 표 어디에도 없었다). 그래서 스킬 디렉터리에서 이름을
 # 도출해 정본이나 도메인 목차가 그 이름을 한 번은 부르는지 본다.
 echo "[스킬 등재 — 진입로에서 이름이 불린다]"
 for d in "$HERE"/skills/*/; do
@@ -516,15 +516,15 @@ done
 check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
 
 # --- 이독성 규칙의 출처가 세 문서에 걸쳐 이어져 있다 ---
-# 정본은 조항만 담고, writing-korean 이 상세를 담으며, lens-readability 가 그것을 열어 대조한다.
+# 정본은 조항만 담고, domain-korean 이 상세를 담으며, lens-readability 가 그것을 열어 대조한다.
 # 전에 정본을 줄이면서 조항을 스킬로 통째로 내렸더니 렌즈가 가리키는 근거가 정본에서 사라졌는데,
 # 검사가 새 자리를 따라가 버려 끊긴 것을 못 잡았다. 그래서 셋을 한 줄로 함께 붙든다.
-echo "[규칙 출처] 정본 → writing-korean → lens-readability 가 이어져 있다"
+echo "[규칙 출처] 정본 → domain-korean → lens-readability 가 이어져 있다"
 RDB_L="$HERE/skills/lens-readability/SKILL.md"
 check "정본에 이름 자리 조항이 있다"     "grep -qF '이름을 붙이는 위치에만 명사구로 쓰고' \"$CANON\""
-check "정본이 상세 소유자를 가리킨다"    "grep -qF 'writing-korean' \"$CANON\""
-check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'writing-korean' \"$RDB_L\""
-check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'writing-korean'"
+check "정본이 상세 소유자를 가리킨다"    "grep -qF 'domain-korean' \"$CANON\""
+check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'domain-korean' \"$RDB_L\""
+check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'domain-korean'"
 check "기준 문서가 자기 구실을 밝힌다"   "grep -qF 'lens-readability' \"$WK\""
 
 # --- 관리 디렉터리 파일 목록은 한 곳에서만 정한다 ---
@@ -567,7 +567,7 @@ echo "[README] 잠금 시간을 값으로 적지 않고 상수 자리를 가리�
 check "README가 잠금 시간을 베끼지 않는다" "! grep -qE '잠금(은|이)? *[0-9]+초' '$HERE/README.md'"
 check "README가 상수 자리를 가리킨다"      "grep -qF '_managed_block.sh' '$HERE/README.md'"
 
-# --- 렌즈에게 정본을 알리는 법: domain-docs 한 곳만 내용을 갖는다 ---
+# --- 렌즈에게 정본을 알리는 법: domain-doc-upkeep 한 곳만 내용을 갖는다 ---
 # 다른 스킬은 그 절을 가리키기만 한다. 첫 항목 문장이 다른 스킬에 나타나면 베낀 것이다.
 echo "[렌즈에게 정본을 알리는 법] 다른 스킬이 내용을 베끼지 않는다"
 TELL_SENT='정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다'
@@ -578,19 +578,19 @@ for f in "$HERE"/skills/*/SKILL.md; do
 done
 
 # --- 금지 표현: 살아 있는 문서에 남지 않는다 ---
-# 목록을 검사에 손으로 적지 않고 writing-korean 의 「금지 표현」 표에서 도출한다. 그 표가 정본이라
+# 목록을 검사에 손으로 적지 않고 domain-korean 의 「금지 표현」 표에서 도출한다. 그 표가 정본이라
 # 낱말을 더하면 이 검사가 함께 따라온다. 대상에서 빼는 것이 둘이고 이유가 서로 다르다 —
-# writing-korean 자신은 그 낱말을 정의하는 정본이라 빼고, docs/superpowers/ 아래는 소비하고 지우는
+# domain-korean 자신은 그 낱말을 정의하는 정본이라 빼고, docs/superpowers/ 아래는 소비하고 지우는
 # 문서(spec·plan·인수인계)와 그때 찍은 기록(리뷰·되돌린 대응표)이라 살아 있는 문서가 아니어서 뺀다.
-# 뒤의 제외는 project-doc-audit 의 「대상 아님」과 같은 규정이다.
-WK="$HERE/skills/writing-korean/SKILL.md"
+# 뒤의 제외는 audit-repo-docs 의 「대상 아님」과 같은 규정이다.
+WK="$HERE/skills/domain-korean/SKILL.md"
 BANLIST="$(awk '/^## 금지 표현/{f=1; next} f && /^## /{exit} f' "$WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
-BAN_DOCS="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^skills/writing-korean/SKILL.md')"
+BAN_DOCS="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^skills/domain-korean/SKILL.md')"
 echo "[금지 표현] 살아 있는 문서에 남지 않는다"
 check "금지 목록을 정본에서 도출했다" "[ -n \"\$BANLIST\" ]"
 check "검사 대상 문서를 모았다"       "[ -n \"\$BAN_DOCS\" ]"
 # 앵커가 실제로 잡히는지 먼저 본다 — 목록이나 대상이 비면 아래 단언이 모두 근거 없이 통과한다.
-BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '금지 표현' skills/writing-korean/SKILL.md || true)"
+BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '금지 표현' skills/domain-korean/SKILL.md || true)"
 check "정본에 금지 표현 절이 있다"     "[ -n \"\$BAN_SELFTEST\" ]"
 BANHIT=""
 while IFS= read -r w; do

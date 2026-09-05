@@ -1,10 +1,10 @@
 ---
 name: lens-grounding
-description: LLM 출력·주장이 그 출처(런타임=요청+맥락 / spec리뷰=검토 문서+주입된 사실)에 근거하는지 보는 렌즈다. 누락과 모순과 환각을 찾는다. 호출자(domain-llm-runtime의 런타임 리뷰, domain-spec-review, domain-docs의 문서 검진, project-doc-audit의 레포 문서 감사)가 source를 제공한다.
+description: LLM 출력·주장이 그 출처(런타임=요청+맥락 / spec리뷰=검토 문서+주입된 사실)에 근거하는지 보는 렌즈다. 누락과 모순과 환각을 찾는다. 호출자(review-llm-calls의 런타임 리뷰, review-specs, domain-doc-upkeep의 문서 검진, audit-repo-docs의 레포 문서 감사)가 source를 제공한다.
 ---
 # lens-grounding — 근거 충실성 렌즈 (프롬프트 설계도)
 
-출력이나 주장이 제공된 출처에 충실한지 본다. 출처는 호출자가 준다. 런타임에서는 원래 요청과 함께 준 맥락이고, spec/plan 리뷰에서는 검토 대상 문서에 PREP 단계가 주입한 선행 결정과 검증할 사실을 더한 것이다. PREP의 절차는 `domain-spec-review`가 정한다.
+출력이나 주장이 제공된 출처에 충실한지 본다. 출처는 호출자가 준다. 런타임에서는 원래 요청과 함께 준 맥락이고, spec/plan 리뷰에서는 검토 대상 문서에 PREP 단계가 주입한 선행 결정과 검증할 사실을 더한 것이다. PREP의 절차는 `review-specs`가 정한다.
 
 ## 체크리스트
 - **누락** — 요청한 항목·필드·제약을 빠짐없이 충족했는가.
@@ -20,13 +20,13 @@ description: LLM 출력·주장이 그 출처(런타임=요청+맥락 / spec리�
 - user: "[출처]\n{source}\n\n[후보]\n{candidate}\n\n위 체크리스트로 이슈를 아래 JSON 스키마로 출력하라."
 
 ## 발견의 문턱
-필드의 뜻과 문턱과 예외는 `meta-aggregate`의 리뷰 산출물 계약이 정한다.
+필드의 뜻과 문턱과 예외는 `aggregating-lenses`의 리뷰 산출물 계약이 정한다.
 
 ## 기계에 넘기는 것
 인용한 문장이 그 파일에 그 글자로 있는지는 `scripts/audit_evidence.sh`가 확인한다. 이 렌즈는 인용이 실재하는지를 스스로 판정하지 않고, 인용한 것이 그 주장을 실제로 받치는지만 본다.
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "lens-grounding", "read": [ "..." ], "issues": [ { "where": "출처/후보 내 위치", "type": "omission|contradiction|unsupported|mismatch", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-grounding", "read": [ "..." ], "issues": [ { "where": "출처/후보 내 위치", "type": "omission|contradiction|unsupported|mismatch", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
-필드의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다. `principles_applied`를 언제 요구하는지는 `meta-aggregate`의 리뷰 산출물 계약이 정한다. 여기서 다시 정하지 않는다.
+필드의 뜻과 공통 규칙은 `aggregating-lenses`의 리뷰 산출물 계약이 SSOT다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다. `principles_applied`를 언제 요구하는지는 `aggregating-lenses`의 리뷰 산출물 계약이 정한다. 여기서 다시 정하지 않는다.

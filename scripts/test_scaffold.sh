@@ -279,7 +279,7 @@ WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agen
 echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
 check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
 check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'lens-*'"
-check "검증 기록은 호출자 스킬이 요구한다" "grep -qF '합치기가 끝나면 기록 파일에 쓴다' \"$HERE/skills/domain-spec-review/SKILL.md\" && grep -qF 'docs/superpowers/reviews/' \"$HERE/skills/domain-docs/SKILL.md\""
+check "검증 기록은 호출자 스킬이 요구한다" "grep -qF '합치기가 끝나면 기록 파일에 쓴다' \"$HERE/skills/review-specs/SKILL.md\" && grep -qF 'docs/superpowers/reviews/' \"$HERE/skills/domain-doc-upkeep/SKILL.md\""
 check "사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_BLOCK\" | grep -qF 'ultracode 검증 모드'"
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
@@ -414,7 +414,10 @@ done
 check "canon: subagent fleet rule stays"             "grep -qF \"Don't launch a fleet of subagents for what one call can do\" '$CANON'"
 check "canon: fact-vs-judgment paragraph stays"      "grep -qF '사실과 판단은 다르다' '$CANON'"
 check "canon: hygiene section gone"                  "! grep -qF '## 문서와 상태의 위생' '$CANON'"
-check "canon: local-first convention gone"           "! grep -qF 'LOCAL-FIRST' '$CANON'"
+check "canon: local-first convention stays"          "grep -qF '`LOCAL-FIRST`는 원칙이 아니라' '$CANON'"
+# 파일을 안 건드려도 어길 수 있는 규칙은 정본에 남는다는 기준을 다시 댄 결과다(실행 증거·서브에이전트 맥락·로컬 우선).
+check "canon: execution evidence rule"               "grep -qF '실행 증거 없이' '$CANON'"
+check "canon: subagent prompt context rule"          "grep -qF 'Context handed to a subagent is written into its prompt' '$CANON'"
 for id in FAIL-LOUD KO-SYNTAX NAME-ITEMS PLAIN-KO PROSE-FORM READ-FLOW REVERSIBLE SECRETS; do
   check "canon: clause $id stays"                    "grep -qF '**\`$id\`' '$CANON'"
 done
@@ -427,14 +430,20 @@ done
 DC="$HERE/skills/domain-coding/SKILL.md"
 echo "[domain-coding] code rules live in one English skill"
 check "domain-coding exists"                          "[ -f '$DC' ]"
-for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution" "Do one thing well" "Single source of truth" "Idempotence" "Explicit is better than implicit" "Describe the change, not the diff"; do
+for h in "Do one thing well" "Single source of truth" "Idempotence" "Explicit is better than implicit" "Describe the change, not the diff"; do
   check "domain-coding: section '$h'"                 "grep -qE '^### $h\$' '$DC'"
 done
-for h in "Karpathy guidelines" "Principles" "Local first" "Reach"; do
+for h in "Karpathy guidelines" "Principles" "Reach"; do
   check "domain-coding: section '$h'"                 "grep -qE '^## $h\$' '$DC'"
 done
-check "domain-coding: Tradeoff line"                  "grep -qF '**Tradeoff:**' '$DC'"
-check "domain-coding: never claim done"               "grep -qF 'Never claim \"done\" without execution evidence' '$DC'"
+# 카파시 세 절은 플러그인이 정본이다. 베끼지 않고 가리키므로 본문이 되살아나면 잡는다(Single source of truth).
+for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
+  check "domain-coding: no copy of '$h'"              "! grep -qE '^#+ $h\$' '$DC'"
+done
+check "domain-coding: points at the plugin skill"     "grep -qF 'karpathy-guidelines' '$DC'"
+check "domain-coding: gives the install commands"     "grep -qF 'claude plugin install andrej-karpathy-skills@karpathy-skills' '$DC'"
+check "domain-coding: no Tradeoff copy"               "! grep -qF '**Tradeoff:**' '$DC'"
+check "domain-coding: local-first moved to canon"     "! grep -qE '^## Local first\$' '$DC'"
 check "domain-coding: frontmatter name"               "grep -qF 'name: domain-coding' '$DC'"
 
 DW="$HERE/skills/domain-writing/SKILL.md"
@@ -472,7 +481,7 @@ check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$
 # 이 규칙이 리뷰 스킬 한 곳에만 있으면 그 스킬을 열지 않은 세션에는 닿지 않는다. 실제로 문서 검진
 # 세션이 다시 돌릴지를 평문으로 물어 선택 대화창이 뜨지 않았다. 묻는 방식은 특정 절차의 성질이 아니라
 # 소통 규칙이므로 상시 로드되는 항목에 두고, 리뷰 스킬은 그것을 가리키기만 한다(SSOT).
-SR="$HERE/skills/domain-spec-review/SKILL.md"
+SR="$HERE/skills/review-specs/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
 check "canon: 선택지 질문 규칙"             "grep -qF -- 'ask - as a question with options, never in plain prose' '$CANON'"
@@ -529,11 +538,11 @@ check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 
 # --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
 # 전에는 셋이 규율 넷을 각자 적고 이 검사가 그 사본들을 맞춰 세웠다. 사본이라 갈라졌다 — 한 곳에서
 # 재시도 금지 항목만 빠져 그 경로가 금지된 재시도를 허용한 채 오래 남았고, DESIGN-NOTES 쪽은 넷 중
-# 둘만 갖고 있었다. 지금은 `domain-docs`가 규율을 소유하고 나머지는 가리키기만 한다(`SSOT`).
+# 둘만 갖고 있었다. 지금은 `domain-doc-upkeep`이 규율을 소유하고 나머지는 가리키기만 한다(`SSOT`).
 # 소유자가 규율을 갖는지와 다른 문서가 베끼지 않는지는 `test_docs_drift.sh`가 본다. 여기서는 호출자
 # 셋이 그 소유자에 닿는지와 런타임 중립만 본다.
 echo "[lens-contract] callers reach the canon-path rules and stay runtime-neutral"
-for s in domain-spec-review domain-docs nested-orchestration; do
+for s in review-specs domain-doc-upkeep nested-orchestration; do
   F="$HERE/skills/$s/SKILL.md"
   check "$s: 규율 소유자에 닿는다"          "grep -qF 'dispatching-lenses' '$F'"
   # 런타임 중립: 특정 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
@@ -549,10 +558,10 @@ for D in "$HERE"/skills/lens-*/; do
   # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 정본으로 넘긴다. 예전에는 일곱 파일이
   # 같은 문단을 복제해 지켰는데, 그 사이 정본의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
   # 필수 여부가 두 곳에서 갈렸다. 지금은 정본 한 곳만 규정하고 렌즈는 가리키기만 한다(`SSOT`).
-  PA_POINTER='`meta-aggregate`의 리뷰 산출물 계약이 정한다'
+  PA_POINTER='`aggregating-lenses`의 리뷰 산출물 계약이 정한다'
   check "lens-$l: 규칙을 정본으로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
 done
-check "meta-aggregate: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/meta-aggregate/SKILL.md'"
+check "aggregating-lenses: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/aggregating-lenses/SKILL.md'"
 
 # --- 동시 진입: 창을 여럿 열면 SessionStart가 같은 ~/.claude/CLAUDE.md를 동시에 고친다 ---
 # 락이 없던 판본은 사용자 본문을 통째로 잃고 관리블록을 여러 벌 남겼다(실측: 사용자 2줄 → 0줄, 블록 6~11개).
@@ -735,7 +744,7 @@ check "포인터: 재실행도 사용자 줄 보존"   "grep -qF '이 줄은 사
 
 # (파) 블록을 걷어내기 전에 사본을 뜬다. 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에
 # 끼워 넣은 줄도 함께 사라진다. 이 파일은 git 밖일 수 있어 사본이 유일한 복구 수단이다
-# (오답노트 머리말과 같은 규율 — domain-docs가 정본).
+# (오답노트 머리말과 같은 규율 — domain-doc-upkeep이 정본).
 HR12="$(mktemp -d)"; PR12="$(mktemp -d)"
 { printf '# 내 프로젝트 지침\n\n'
   printf '# BEGIN disciplined-coder (managed — do not edit)\n'
