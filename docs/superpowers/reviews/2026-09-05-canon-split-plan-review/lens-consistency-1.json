@@ -1,0 +1,68 @@
+{
+  "lens": "consistency",
+  "read": [
+    "docs/superpowers/plans/2026-09-05-canon-split.md",
+    "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+    "agent-principles.md",
+    "README.md",
+    "CLAUDE.md",
+    "scripts/test_scaffold.sh",
+    "scripts/test_hooks.sh",
+    "scripts/test_docs_drift.sh",
+    "hooks/hooks.json",
+    "hooks/doc_format_pretooluse.sh",
+    "hooks/doc_review_posttooluse.sh",
+    "hooks/_spec_marker.sh",
+    "skills/domain-docs/SKILL.md",
+    "skills/nested-orchestration/SKILL.md",
+    "scripts/scaffold.sh"
+  ],
+  "issues": [
+    {
+      "where": "Task 6 Step 3의 README 치환",
+      "type": "contradiction",
+      "claim": "「넛지 넷」이라는 이름을 단 항목이 넛지 셋만 열거하고 넷째는 그다음 항목에 따로 있다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "- **넛지 넷** — 차단하지 않고 안내만 한다. spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 `domain-docs`의 양식과 `domain-writing`의 분량 규칙을 권하며, `.md`를 고치면 문서 검진과 `domain-writing`의 수정 범위 규칙을 권한다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.",
+      "counterpart_file": "CLAUDE.md",
+      "counterpart": "걸린 훅의 전체 목록과 배선은 `README.md`의 「하드 게이트와 넛지와 전역 설정 수정」 절이 정본이다.",
+      "principle": "SSOT",
+      "consequence": "훅 목록의 정본으로 선언된 절에서, 「넛지 넷」 항목의 본문에 세는 넛지는 spec·plan 하나와 새 `.md` 하나와 `.md` 수정 하나로 셋이고, 넷째인 코드 넛지는 바로 다음의 「코드 넛지」 항목에 있다. 같은 항목 안에서 이름의 수와 열거의 수가 다르다."
+    },
+    {
+      "where": "Task 1 Step 1의 canon-sections 치환",
+      "type": "gap",
+      "claim": "spec이 여섯 절로 맞추라고 한 목록을 이름 다섯으로 적어 「이 파일의 취급」에 존재 검사가 없다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "'for s in \"원칙\" \"Think Before Acting\" \"검증\" \"미해결의 처분\" \"병렬 오케스트레이션\"; do')",
+      "counterpart_file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "counterpart": "`scripts/test_scaffold.sh`의 canon-sections 목록을 여섯 절로 맞춘다.",
+      "principle": "FAIL-LOUD",
+      "consequence": "plan 자신의 Task 1 Interfaces는 정본의 절 여섯을 열거하는데 검사 목록에는 다섯만 있다. 「이 파일의 취급」 절이 사라져도 canon-sections 블록은 초록이고, 그 절의 존재는 Step 3의 손으로 세는 `grep -n '^## '` 한 번으로만 확인된다."
+    },
+    {
+      "where": "Task 2 Interfaces의 Produces",
+      "type": "gap",
+      "claim": "Task 4가 참조 이름으로 부르는 절 하나가 Task 2의 Produces 목록에 없다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "Produces: 절 이름 `Do one thing well`·`Single source of truth`·`Idempotence`·`Explicit is better than implicit`·`Describe the change, not the diff`. Task 4의 참조가 이 이름을 부른다.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "counterpart": "(\"안 돌아 본 코드에는 오류가 숨는다(Simplicity First).\", \"안 돌아 본 코드에는 오류가 숨는다(`domain-coding`의 Simplicity First).\")",
+      "principle": "EXPLICIT",
+      "consequence": "Task 4가 domain-plugin에 넣는 참조는 `domain-coding`의 Simplicity First인데, Task 2의 Produces는 카파시 절 셋을 빼고 원칙 절 다섯만 열거한다. 앞 태스크가 뒤 태스크에 넘긴다고 선언한 이름 집합과 실제로 넘기는 이름 집합이 다르다."
+    },
+    {
+      "where": "Task 5 Interfaces의 Produces와 Task 6 Interfaces의 Consumes",
+      "type": "drift",
+      "claim": "Task 5가 더하는 검사가 요구하는 한국어 훅 이름이 Task 5의 산출물 목록에 없다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "Produces: stdout에 hookSpecificOutput 한 줄 또는 빈 출력. 표시 파일 `${TMPDIR:-/tmp}/disciplined-coder/code-nudge-<session_id>[-<agent_id>]`.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "counterpart": "Consumes: Task 3의 스킬 이름 `domain-writing`. Task 5의 훅 이름 \"코드 넛지\".",
+      "principle": "EXPLICIT",
+      "consequence": "Task 6은 「코드 넛지」를 Task 5가 정한 이름으로 소비한다고 적지만, Task 5의 Produces에는 그 이름이 없고 훅 스크립트 본문에도 그 문자열이 없다. 그 이름이 처음 나타나는 곳은 Task 5가 test_hooks.sh에 넣는 README 검사이고, 그 이름을 실제로 만드는 곳은 Task 6의 README 치환이다."
+    }
+  ],
+  "principles_applied": ["SSOT", "EXPLICIT", "FAIL-LOUD", "NAME-ITEMS", "FOCUSED", "REVERSIBLE"],
+  "notes": "체크리스트를 항목마다 따로 훑었다. (1) 커버리지 공백 — spec의 아홉 절을 태스크에 하나씩 맞대었다. 배치 표의 열두 줄은 Task 1의 편집으로 모두 이어지고, 「참조 고치기」의 여덟 항목 가운데 손대지 말라는 lens-adversarial을 뺀 일곱이 Task 4에 그대로 있으며 domain-docs는 spec이 정한 여섯 곳만 고친다. 훅 절의 조건 여섯(OFF·대상 경로·세션 키·표시 파일·알림 문장·출력 형식)과 문장 둘 덧붙이기도 Task 5·6에 있다. 되돌리기 순서도 spec과 같다. (2) 태스크 사이 이름 — Task 2가 만드는 절 이름을 Task 4가 부르고, Task 3의 스킬 이름을 Task 4·6이 부르며, Task 5의 훅 파일 이름을 Task 5 Step 4가 배선한다. 어긋난 두 곳만 위에 올렸다. (3) 산출물 공백 — 두 SKILL.md는 전문이 plan 안에 있고 놓일 경로가 적혀 있으며, 커밋 메시지 둘도 파일 이름과 내용이 있다. 스크래치패드 경로는 Global Constraints의 run_tests.sh 주석에 한 번 온전히 적혀 있다. (4) 스코프 — `docs/superpowers/` 아래 옛 문서와 리뷰 기록을 건드리지 않고, 파일 이름에 coding을 넣지 않으며, 메인 체크아웃을 건드리지 않는다는 제약이 모두 있다. 다만 spec 「테스트」는 test_hooks.sh에 「코드 넛지 여덟 경우」를 더한다고 적는데 Task 5는 검사 열셋을 더한다. 늘어난 다섯이 spec의 다른 문장에서 도출되므로 발견으로 올리지 않았지만, 개수 표현을 spec 쪽에서 맞출지는 사용자가 정할 몫이다. (5) 더 확인할 것 — 커밋 A 뒤 금지 표현 검사가 새 두 SKILL.md를 git 추적 대상으로 훑게 되는데, 지금 본문이 영어고 설명문에 금지 낱말이 없어 통과할 것으로 보았다."
+}

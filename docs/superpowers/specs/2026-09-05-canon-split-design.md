@@ -209,7 +209,7 @@ Subagents do not receive this file automatically. When a subagent writes or edit
 
 ### 코드 넛지
 
-새 파일 `hooks/code_nudge_pretooluse.sh`를 `hooks/hooks.json`의 PreToolUse `Write|Edit` 목록 끝에 붙인다. 편집 뒤가 아니라 편집 전에 알려야 규칙을 읽고 고칠 수 있다. 새 문서 넛지가 PreToolUse인 것과 같은 이유다. 기존 넛지와 같은 헬퍼 셋(`_extract_path.sh`·`_spec_marker.sh`·`_json_escape.sh`)을 쓰고, 세션 키 추출과 표시 파일 관리는 이 파일이 새로 갖는다.
+새 파일 둘을 만든다. `hooks/code_nudge_pretooluse.sh`는 `hooks/hooks.json`의 PreToolUse `Write|Edit` 목록 끝에, `hooks/code_nudge_sessionstart.sh`는 SessionStart 목록 끝에 붙인다. 편집 뒤가 아니라 편집 전에 알려야 규칙을 읽고 고칠 수 있다. 새 문서 넛지가 PreToolUse인 것과 같은 이유다. 기존 넛지와 같은 헬퍼 셋(`_extract_path.sh`·`_spec_marker.sh`·`_json_escape.sh`)을 쓰고, 세션 키 추출과 표시 파일 관리는 이 파일이 새로 갖는다.
 
 - `DISCIPLINED_CODER_REVIEW_GATE=off`이면 조용히 끝난다.
 - 대상은 문서가 아닌 프로젝트 안 파일이다. 경로는 `_extract_path.sh`로 뽑고, `.md`와 `docs/superpowers/reviews/` 아래 파일(렌즈 원본 JSON이 놓인다)과 `path_in_project` 밖은 건너뛴다. 남는 첫 경로가 대상이다. `hooks.json` 같은 설정 파일도 대상이다. 그것을 고치는 것도 코딩이기 때문이다.
@@ -218,7 +218,9 @@ Subagents do not receive this file automatically. When a subagent writes or edit
 - 알림 문장은 하나다. `🧑‍💻 문서가 아닌 파일(<basename>)을 고치려 한다 — 고치기 전에 disciplined-coder domain-coding을 열어 코드 규칙을 읽어라. 넛지일 뿐 차단은 아니다.` 한 번만 알린다는 말은 문장에 넣지 않는다. 계약이 깨진 갈래에서는 그 말이 거짓이 되기 때문이다.
 - 출력 형식은 `doc_format_pretooluse.sh`와 같은 `additionalContext`다.
 
-표시 파일은 임시 폴더에 쌓이고 지우지 않는다. 운영체제가 임시 폴더를 비운다. 테스트는 `TMPDIR`을 픽스처 폴더로 돌려 표시 파일을 격리한다. 그러지 않으면 스위트를 두 번째 돌릴 때 첫 편집 검사가 앞 실행의 표시 파일에 막힌다.
+표시 파일은 SessionStart 훅 `hooks/code_nudge_sessionstart.sh`가 지운다. 그 세션의 표시와 서브에이전트 몫을 함께 지우고, 게이트 환경변수와 무관하게 돈다. 지우는 것은 안내가 아니라 청소이기 때문이다. 이 훅을 두는 이유는 표시 파일의 수명을 맥락의 수명에 맞추기 위해서다. 재개한 세션이 같은 `session_id`를 다시 받는지는 훅 문서가 정하지 않고 이 PC의 전사 파일 34개 측정으로도 갈리지 않았는데, 이 훅이 있으면 두 갈래 어느 쪽이든 맞는다. 아이디가 새로 나면 없는 파일을 지우는 무해한 동작이고, 재사용되면 스킬이 안 실린 맥락에서 넛지가 제대로 다시 걸린다. 쌓인 표시 파일을 치우는 걸음이기도 하다.
+
+테스트는 `TMPDIR`을 픽스처 폴더로 돌려 표시 파일을 격리한다. 그러지 않으면 스위트를 두 번째 돌릴 때 첫 편집 검사가 앞 실행의 표시 파일에 막힌다.
 
 ### 문서 넛지에 domain-writing을 덧붙인다
 

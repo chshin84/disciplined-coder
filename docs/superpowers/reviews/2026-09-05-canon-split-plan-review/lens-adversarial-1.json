@@ -1,0 +1,101 @@
+{
+  "lens": "adversarial",
+  "read": [
+    "docs/superpowers/plans/2026-09-05-canon-split.md",
+    "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+    "agent-principles.md",
+    "CLAUDE.md",
+    "README.md",
+    "hooks/hooks.json",
+    "hooks/_spec_marker.sh",
+    "hooks/_extract_path.sh",
+    "hooks/doc_format_pretooluse.sh",
+    "hooks/doc_review_posttooluse.sh",
+    "scripts/test_hooks.sh",
+    "scripts/test_scaffold.sh",
+    "scripts/test_docs_drift.sh",
+    "scripts/scaffold.sh",
+    "skills/domain-docs/SKILL.md",
+    "skills/domain-plugin/SKILL.md",
+    "skills/domain-spec-review/SKILL.md",
+    "skills/nested-orchestration/SKILL.md",
+    "skills/writing-korean/SKILL.md"
+  ],
+  "issues": [
+    {
+      "where": "Task 1 Step 1 — `edit_t1_test.py`의 new_block에 든 `canon: Think Before Acting is a section` 줄과 같은 스크립트가 고치는 canon-sections 루프. 그리고 Task 1 Step 2의 Expected 목록.",
+      "type": "failure-mode",
+      "claim": "정본이 Think Before Acting을 `##` 절로 올렸는지 보는 검사 둘이 지금도 초록이라, 빨간지 확인하는 걸음이 성립하지 않고 절 승격을 빠뜨려도 아무도 잡지 않는다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "check \"canon: Think Before Acting is a section\"      \"grep -qF '## Think Before Acting' '$CANON'\" — 그리고 Step 2의 \"Expected: 0보다 큰 수. `canon: section 'Think Before Acting' present`, `canon: Think Before Acting is a section`, `canon: no Tradeoff line`, ... 이 FAIL이다.\"",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "### Think Before Acting",
+      "principle": "FAIL-LOUD (조용한 실패 금지)",
+      "consequence": "지금 워크트리에서 `grep -qF '## Think Before Acting' agent-principles.md`를 돌리면 이미 0을 낸다. `### Think Before Acting`이 `## Think Before Acting`을 부분문자열로 담기 때문이다. 그래서 Step 2에서 그 두 검사는 FAIL이 아니라 PASS로 나오고, 실행자가 보는 FAIL 목록이 Expected와 다르다. Step 3에서 `###`를 `##`로 내리지 않아도 두 검사는 그대로 초록이다. `! grep -qF '### Simplicity First'` 쪽은 `###`를 그대로 써서 이 함정을 피했는데, Think Before Acting 쪽만 `##`로 적혀 있다."
+    },
+    {
+      "where": "Task 5 Step 1 — `edit_t5_test.py` 블록의 마지막 줄 `check \"README 가 이 훅을 적는다\"`. 그리고 Task 5 Step 5의 Expected.",
+      "type": "failure-mode",
+      "claim": "Task 5는 끝난 시점에 테스트 스위트를 빨간 채로 남기도록 설계되어 있다. 태스크 하나만 받은 실행자에게는 그 태스크 안에서 초록으로 만들 길이 없다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "check \"README 가 이 훅을 적는다\"                    \"grep -qF '코드 넛지' '$HERE/README.md'\" — 그리고 Step 5의 \"Expected: `README 가 이 훅을 적는다` 하나만 FAIL이다. README는 Task 6에서 고친다.\"",
+      "counterpart_file": "CLAUDE.md",
+      "counterpart": "고친 것이 있으면 아래를 돌리고, 그다음 `claude plugin validate ./`를 실행한다. 각 스크립트의 계약은 **FAIL=0**이며 기대 개수를 숫자로 박지 않는다(`SSOT`).",
+      "principle": "Goal-Driven Execution (agent-principles.md 「Karpathy 지침」의 \"Never claim done without execution evidence\")",
+      "consequence": "`scripts/test_hooks.sh`는 마지막 줄이 `echo \"----\"; echo \"PASS=$pass FAIL=$fail\"; [ \"$fail\" -eq 0 ]`이라, Task 5를 마친 상태에서 이 스크립트는 종료 코드 1을 낸다. 이 검사가 가리키는 README 문장은 Task 6 Step 3에서야 생긴다. 실행자가 초록을 맞추려고 README를 Task 5에서 미리 고치면, Task 6 Step 3의 `rw(\"README.md\", ...)`가 대상으로 삼는 `- **넛지 셋** — 차단하지 않고 안내만 한다. ...` 줄이 이미 바뀌어 있어 `assert s.count(old) == 1`에서 멈춘다."
+    },
+    {
+      "where": "Task 5 Step 3 — 훅 스크립트의 `key=\"$sid${aid:+-$aid}\"`부터 `[ -e \"$marker\" ] && exit 0`까지의 분기.",
+      "type": "failure-mode",
+      "claim": "표시 파일의 수명이 맥락의 수명이 아니라 임시 폴더의 수명이라, 정본과 스킬이 다시 실려야 하는 재개 시점에 넛지가 조용히 사라진다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "세션 키는 훅 입력의 공통 필드 session_id 에 agent_id(서브에이전트 안의 훅 호출에만 온다)를 이은 것이다. — 그리고 `[ -e \"$marker\" ] && exit 0`",
+      "counterpart_file": "hooks/hooks.json",
+      "counterpart": "\"matcher\": \"startup|resume|clear\",",
+      "principle": "FAIL-LOUD (조용한 실패 금지)",
+      "consequence": "이 레포는 SessionStart를 `startup|resume|clear` 셋에 걸어 두어, 재개와 clear를 정본을 다시 실어야 하는 순간으로 이미 세고 있다. 코드 넛지의 표시 파일은 `session_id`(와 `agent_id`)만으로 갈리고 지우는 걸음이 없어서, 같은 `session_id`로 돌아온 맥락에서는 domain-coding이 실려 있지 않은데도 훅이 아무 출력 없이 exit 0 한다. 계획의 훅 주석은 `session_id`가 없는 갈래만 FAIL-LOUD로 다루고 이 갈래는 다루지 않는다."
+    },
+    {
+      "where": "Task 2 Step 3의 `## Reach` 절, Task 3 Step 3의 `## Reach` 절, Task 4 Step 3의 `rw(\"skills/nested-orchestration/SKILL.md\", ...)`.",
+      "type": "over-engineering",
+      "claim": "\"서브에이전트 프롬프트에 이 파일 경로를 넣어라\"는 같은 지시를 세 문서가 각자 적고, 이 레포가 그런 복제를 잡으려고 둔 드리프트 검사는 셋 중 하나도 못 잡는다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "Subagents do not receive this file automatically. When a subagent implements code, put this file's path in its prompt the way `domain-docs`'s 「렌즈에게 정본을 알리는 법」 prescribes for the canon. — 그리고 Task 4의 새 문장 \"구현자 프롬프트에는 `domain-coding`의 경로를, 문서를 쓰는 서브에이전트에는 `domain-writing`의 경로를 넣는다.\"",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "# 다른 스킬은 그 절을 가리키기만 한다. 첫 항목 문장이 다른 스킬에 나타나면 베낀 것이다.",
+      "principle": "SSOT (단일 출처)",
+      "consequence": "드리프트 검사의 앵커는 `TELL_SENT='정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다'` 한국어 한 문장이다. 새 두 스킬의 Reach 절은 영어라 이 앵커에 안 걸리고, nested-orchestration에 새로 붙는 한국어 문장도 앵커와 글자가 달라 안 걸린다. spec도 「테스트」 절에서 \"영어 「Reach」 절에는 발화하지 않는다\"고 적어 이 상태를 그대로 두기로 한다. 대신 더하는 검사는 「렌즈에게 정본을 알리는 법」이라는 낱말이 들어 있는지만 보므로, 세 문장이 서로 갈라져도 초록이다."
+    },
+    {
+      "where": "Task 4 Step 3의 `edit_t4_refs.py`의 `rw()` 함수, Task 6 Step 3의 `edit_t6_impl.py`의 같은 `rw()`.",
+      "type": "failure-mode",
+      "claim": "치환 스크립트가 파일마다 곧바로 쓰고 나가므로, 중간에서 멈추면 절반만 고쳐진 상태로 남고 다시 돌릴 수도 없다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "def rw(path, pairs):\\n    s = io.open(R+path, encoding=\"utf-8\", newline=\"\").read()\\n    for old, new in pairs:\\n        assert s.count(old) == 1, (path, old[:50])\\n        s = s.replace(old, new)\\n    io.open(R+path, \"w\", encoding=\"utf-8\", newline=\"\").write(s)",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "- **`IDEMPOTENT` (멱등성)** — 스크립트와 셋업은 여러 번 실행해도 같은 결과를 내도록 한다. 이미 완료된 것은 건너뛰어, 두 번 돌려도 중복이나 손상이 생기지 않는다.",
+      "principle": "IDEMPOTENT (멱등성)",
+      "consequence": "`edit_t4_refs.py`는 파일 일곱을 차례로 고치고 파일마다 그 자리에서 쓴다. 뒤쪽 파일의 `assert s.count(old) == 1`이 걸리면 앞서 처리한 파일들은 이미 새 문장으로 바뀐 채 남는다. 그 상태에서 같은 스크립트를 다시 돌리면 첫 파일의 같은 assert가 0을 세어 다시 멈춘다. 같은 Task 1 Step 3의 `edit_t1_canon.py`는 마지막에 한 번만 쓰도록 되어 있어 이 문제가 없는데, 파일 여럿을 만지는 쪽만 반대다."
+    },
+    {
+      "where": "Task 4 Step 4 — `run_tests.sh` 실행과 그 Expected(커밋 A 앞에서 전체 테스트를 돌리는 걸음).",
+      "type": "risk",
+      "claim": "새 스킬 둘은 커밋 전까지 미추적이라, 금지 표현 검사가 한 번도 훑지 않은 채 Task 4의 \"ALL PASS\"가 나온다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "Expected: 다섯 스크립트 모두 `FAIL=0`, `ALL PASS`, validate는 version 경고 하나.",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "BAN_DOCS=\"$(cd \"$HERE\" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^skills/writing-korean/SKILL.md')\"",
+      "principle": "FAIL-LOUD (조용한 실패 금지)",
+      "consequence": "`skills/domain-coding/SKILL.md`와 `skills/domain-writing/SKILL.md`는 Task 4 Step 5의 `git add` 전까지 미추적이라 `git ls-files '*.md'` 출력에 없다. 두 파일의 설명문(frontmatter)은 한국어인데, Task 4 Step 4에서 초록이 나와도 그 두 문서는 금지 표현 검사 대상에 들어간 적이 없다. 대상에 넣는 유일한 걸음은 그 뒤의 커밋이고, 계획에는 커밋 뒤 다시 돌리는 걸음이 없다. Task 6 Step 4에서야 처음 훑게 되는데 그때 걸리면 커밋 A를 고쳐야 한다."
+    }
+  ],
+  "principles_applied": [
+    "FAIL-LOUD (조용한 실패 금지)",
+    "IDEMPOTENT (멱등성)",
+    "SSOT (단일 출처)",
+    "Goal-Driven Execution (「Karpathy 지침」)",
+    "Simplicity First (「Karpathy 지침」)",
+    "REVERSIBLE (가역성)"
+  ],
+  "notes": "훑은 각도 넷을 따로 훑었다. (1) 실패 모드 — 계획대로 하고도 깨지는 길을 셋으로 나눠 봤다. 검사가 빨갛지 않은 길(발견 1), 태스크가 빨간 채 끝나는 길(발견 2), 실행 중에 반만 적용되는 길(발견 5). (2) 과설계 — 결정 밖에서 늘어난 것만 봤고, 세 문서가 같은 지시를 각자 적는 자리 하나를 올렸다(발견 4). agent_id 로 표시 파일을 가르는 것도 결정에는 없는 것이지만, 그것 없이 서브에이전트가 넛지를 못 받는 결과가 구체적이라 올리지 않았다. (3) 비가역 — 없다. 커밋 A와 B의 되돌리기 순서는 spec 「되돌리기」와 plan Global Constraints가 같은 방향으로 적혀 있고, 워크트리의 변경은 `~/.claude/plugins/cache/`의 실행 사본에 닿지 않아 병합 전까지 되돌릴 수 있다. (4) 위험 — 검사가 초록인데 근거가 없는 자리 하나를 올렸다(발견 6).\n\n돌려 본 것과 확인한 것. Task 1·4·5·6의 `assert s.count(old) == 1`과 `s.index` 앵커를 실제 파일과 바이트로 맞춰 봤고, 모두 정확히 한 곳에 걸린다. `scripts/test_scaffold.sh`의 `live docs: no reference to $id` 줄, `hooks/hooks.json`의 doc_format 배선 블록, `scripts/test_hooks.sh`의 `echo \"[doc-format-pre]\"`·`새 리뷰 기록 → 무출력`·`Windows 형식 경로도 프로젝트 안`(백슬래시 넷), `skills/domain-docs/SKILL.md` 여섯 문장, domain-plugin·domain-spec-review·nested-orchestration·CLAUDE.md·README.md·scripts/scaffold.sh의 각 한 문장까지 다 셌다. Task 4 Step 2의 \"EXPLICIT·FOCUSED·SSOT 셋만 FAIL\"도 맞다. 살아 있는 문서에 백틱으로 남은 옛 ID는 domain-docs 셋 줄과 CLAUDE.md 한 줄뿐이다. Task 6 Step 4가 걱정한 `개수를 적은 자리마다 이름이 함께 있다` 검사도 실제 정규식이 \"넛지 넷\"·\"다섯 다 꺼지고\"를 잡지 않는다. 정본에서 지우는 「문서와 상태의 위생」 첫 문단의 상세가 `domain-docs`에 실제로 있는지도 확인했다(「시작점」의 핸드오프 삭제 항목과 「문서 타입과 수명 (상태 위생 SSOT)」 표에 있다).\n\n더 확인해야 할 것. 발견 3은 Claude Code가 `--resume`이나 `/clear` 뒤에 같은 `session_id`를 다시 쓰는지에 달려 있다. 이 레포 안에는 그 사실을 정하는 파일이 없어 훅 문서(https://code.claude.com/docs/en/hooks)를 직접 봐야 판정이 닫힌다. 같은 `session_id`를 다시 쓴다면 발견 3의 결과가 그대로 나고, 매번 새 `session_id`라면 표시 파일이 세션마다 하나씩 쌓이기만 하고 넛지는 정상으로 돈다. 어느 쪽이든 `${TMPDIR:-/tmp}/disciplined-coder/` 아래 파일을 지우는 걸음이 계획에 없다는 사실은 같다."
+}

@@ -1,0 +1,75 @@
+{
+  "lens": "grounding",
+  "read": [
+    "docs/superpowers/plans/2026-09-05-canon-split.md",
+    "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+    "agent-principles.md",
+    "scripts/test_scaffold.sh",
+    "scripts/test_hooks.sh",
+    "scripts/test_docs_drift.sh",
+    "hooks/hooks.json",
+    "hooks/_spec_marker.sh",
+    "hooks/_extract_path.sh",
+    "hooks/doc_format_pretooluse.sh",
+    "hooks/doc_review_posttooluse.sh",
+    "skills/domain-docs/SKILL.md",
+    "skills/domain-plugin/SKILL.md",
+    "skills/domain-spec-review/SKILL.md",
+    "skills/nested-orchestration/SKILL.md",
+    "skills/writing-korean/SKILL.md",
+    "CLAUDE.md",
+    "README.md",
+    "scripts/scaffold.sh",
+    "grep: 백틱 조항 ID 열 전수(skills·README.md·CLAUDE.md·scripts/scaffold.sh)",
+    "grep: domain-coding·domain-writing 이름의 기존 등장 여부",
+    "cat -A: test_scaffold.sh·test_hooks.sh 앵커 줄의 공백·백슬래시 실측"
+  ],
+  "issues": [
+    {
+      "where": "Task 1 Step 3의 edit_t1_canon.py 마지막 rep()",
+      "type": "mismatch",
+      "claim": "「검증」 끝으로 옮기는 문단의 파이썬 이스케이프가 문자열을 조기에 닫아 스크립트가 파싱되지 않고, 통과하더라도 정본에 없는 백슬래시를 넣는다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "rep()의 둘째 인자에 든 \\\\\"완료\\\\\" 이스케이프",
+      "counterpart_file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "counterpart": "사실과 판단은 다르다. 훅은 계산으로 확인되는 사실만 기록한다. \"완료\"는 성공 기준에 비춰 내리는 판단이므로 근거와 함께 사용자에게 알린다.",
+      "principle": "EXPLICIT",
+      "consequence": "이 rep()의 둘째 인자는 파이썬 큰따옴표 문자열인데 백슬래시 둘과 따옴표가 백슬래시 하나와 문자열을 닫는 따옴표로 읽힌다. 그 뒤의 완료가 닫힌 문자열 바로 뒤에 오므로 edit_t1_canon.py는 문법 오류로 한 줄도 실행되지 않고, Task 1 Step 3이 지시하는 정본 편집(조항 다섯 삭제·LOCAL-FIRST 삭제·Think Before Acting 교체·위생 절 삭제)이 통째로 일어나지 않는다."
+    },
+    {
+      "where": "Task 1 Step 2의 Expected 목록",
+      "type": "mismatch",
+      "claim": "빨간색으로 예상한 검사 둘은 정본을 고치기 전에도 초록이다. 두 검사 모두 부분 문자열 일치라 `###`를 `##`로 오인한다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "Expected: 0보다 큰 수. `canon: section 'Think Before Acting' present`, `canon: Think Before Acting is a section`, `canon: no Tradeoff line`, `canon: no '...' section` 셋, `canon: hygiene section gone`, `canon: local-first convention gone`, `canon: old clause ...` 다섯이 FAIL이다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "### Think Before Acting",
+      "principle": "FAIL-LOUD",
+      "consequence": "canon-sections 검사는 `grep -qF '## $s'`, 새 karpathy-split 검사는 `grep -qF '## Think Before Acting'`이다. 지금 정본의 `### Think Before Acting` 줄이 두 패턴을 모두 부분 문자열로 담고 있어 Step 3 전에도 둘 다 PASS이고, Step 3 뒤에도 이 가드는 절이 `##`인지 `###`인지를 가리지 못한다."
+    },
+    {
+      "where": "Task 1 Step 2의 Expected 목록",
+      "type": "omission",
+      "claim": "Task 1이 새로 넣는 검사 하나가 Step 2에서 반드시 빨간데 예상 목록에 없다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "check \"canon: subagent fleet rule stays\"             \"grep -qF \\\"Don't launch a fleet of subagents for what one call can do\\\" '$CANON'\"",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "- If a simpler approach exists, say so. Push back when warranted.",
+      "principle": "FAIL-LOUD",
+      "consequence": "지금 정본에는 그 영어 문장이 없고 Simplicity First의 `- No fleet of subagents for what one call can do.`만 있다. Step 2 실행에는 `canon: subagent fleet rule stays` FAIL이 하나 더 나오는데 plan의 열거에는 그 이름이 없다."
+    },
+    {
+      "where": "Task 4 Step 2의 Expected",
+      "type": "mismatch",
+      "claim": "그 시점에 test_docs_drift.sh가 초록일 것이라 적었지만 기존 「스킬 등재」 가드가 domain-writing에서 빨갛다.",
+      "file": "docs/superpowers/plans/2026-09-05-canon-split.md",
+      "evidence": "`bash scripts/test_docs_drift.sh 2>&1 | grep 'FAIL:'`는 없어야 한다(두 스킬이 이미 「렌즈에게 정본을 알리는 법」을 담는다).",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "check \"$sk 을 정본이나 다른 스킬이 부른다\" \"[ '$named' = 1 ]\"",
+      "principle": "FAIL-LOUD",
+      "consequence": "이 가드는 스킬 이름이 agent-principles.md나 다른 스킬의 SKILL.md에 한 번은 나오는지를 본다. 레포에서 `domain-writing`이라는 글자는 `docs/superpowers/` 밖 어디에도 없고, Task 2가 쓰는 domain-coding 본문에도 그 이름이 없다. 그 이름을 넣는 편집은 Task 4 Step 3의 domain-docs·nested-orchestration 치환이므로, Step 2에서는 그 검사가 FAIL로 나온다."
+    }
+  ],
+  "principles_applied": ["SSOT", "FAIL-LOUD", "EXPLICIT", "NAME-ITEMS", "IDEMPOTENT", "검증", "Think Before Acting"],
+  "notes": "체크리스트를 항목마다 따로 훑었다. (1) 치환 문자열 대조 — Task 4·6이 old로 쓴 문자열 열넷을 대상 파일에서 전수 확인했고 모두 그 글자로 정확히 한 번 있다(domain-docs 여섯, domain-plugin·domain-spec-review·nested-orchestration·CLAUDE.md 각 하나, README 넷, scaffold.sh 하나, hooks.json 하나, 훅 문장 둘). (2) 이스케이프 실측 — Task 1의 old_block_end는 test_scaffold.sh 실제 줄과 공백 여섯 칸까지 같다. Task 6의 a2는 파일의 백슬래시 넷을 파이썬 삼중따옴표에서 여덟으로 적어 정확히 맞고, a1도 공백 열두 칸까지 같다. Task 2·3·4의 anchor 공백도 서로 일치한다. 파이썬 이스케이프 문제는 위 첫 발견 한 곳뿐이다. (3) 새 검사가 통과할 조건 — `grep -qF '### Do one thing well'`은 Task 2 Step 3 파일과 맞는다. `JS s1 ',\"agent_id\":\"a1\"'`는 큰따옴표 안 명령 치환이 새 인용 문맥이라 bash에서 성립하고, 만들어지는 JSON에 작은따옴표가 없어 바깥 작은따옴표도 안전하다. hookEventName 검사도 기존 readonly 훅 검사와 같은 모양이라 성립한다. (4) live docs 가드 — skills·README.md·CLAUDE.md·scripts/scaffold.sh를 백틱 조항 ID 열 개로 전수 grep한 결과 domain-docs 셋(SSOT 둘·EXPLICIT 하나)과 CLAUDE.md 하나뿐이고 plan의 수정 목록과 정확히 맞는다. Task 4 Step 2의 EXPLICIT·FOCUSED·SSOT 셋 예상도 맞다. (5) 기존 테스트 회귀 — canon-first-run·standing-consent·question-tool·parallel-orchestration-nudge·canon-refresh·workflow-verification·reach-claims는 모두 남는 절과 조항을 앵커로 쓰므로 Task 1 뒤에도 성립한다. test_docs_drift의 writing-korean·대상의 이름을 그대로 쓴다·README를 참고한다·이름을 붙이는 위치에만 명사구로 쓰고·RULE_MARKS도 남는 문장이다. 「개수를 적은 자리마다 이름이 함께 있다」 검사의 정규식은 README의 「넛지 넷」·「다섯 다 꺼지고」에 걸리지 않는다 — plan Step 4의 판단이 맞다. writing-korean의 금지 표현 아홉도 새로 쓰는 두 SKILL.md 설명문과 README 새 문장에 없다. 아직 확인하지 못한 것 둘 — 「Simplicity First와 Surgical Changes는 원문과 글자까지 같다」는 andrej-karpathy-skills 1.0.0 원문이 이 워크트리에 없어 대조하지 못했고, agent_id가 훅 공통 필드라는 것은 지시대로 웹 검증을 하지 않았다."
+}
