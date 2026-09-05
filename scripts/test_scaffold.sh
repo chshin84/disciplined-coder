@@ -494,7 +494,7 @@ check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 
 echo "[lens-contract] callers reach the canon-path rules and stay runtime-neutral"
 for s in domain-spec-review domain-docs nested-orchestration; do
   F="$HERE/skills/$s/SKILL.md"
-  check "$s: 정본 알리는 법에 닿는다"       "grep -qF '렌즈에게 정본을 알리는 법' '$F'"
+  check "$s: 규율 소유자에 닿는다"          "grep -qF 'dispatching-lenses' '$F'"
   # 런타임 중립: 특정 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"

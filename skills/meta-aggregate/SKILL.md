@@ -20,7 +20,7 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 이 계약은 여기가 SSOT다. 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.
 
 ```
-{ "lens": "grounding|fit|consistency|adversarial|prior-art|readability",
+{ "lens": "lens-grounding|lens-fit|lens-consistency|lens-adversarial|lens-prior-art|lens-readability",
   "read": ["문서 밖에서 실제로 열어본 것 — 파일 경로나 URL"],
   "issues": [ { "where": "문서 내 위치", "type": "<렌즈가 정의한 폐쇄 집합>",
                 "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로",
@@ -40,8 +40,19 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 - `read`가 비어 있으면 호출자가 자기 보고에 적는다. 자동 재시도는 걸지 않는다. 읽지 않고 채우는 것을 막을 수 없어 재시도는 "비어 있지 않은 배열"로만 수렴한다.
 - `fingerprint` — 짚은 곳의 문장과 상대편과 원칙을 이어 만든 지문이다. 호출자가 `scripts/audit_evidence.sh`로 붙이며 렌즈가 적지 않는다. 회차 사이의 대조가 이 값으로 짝을 맞춘다.
 
+발견 하나는 넷을 진다. 짚은 곳(파일과 그 파일의 문장), 상대편(어긋나는 실제 코드나 파일이나 다른 문서의 문장), 원칙(어느 규칙에 걸리는지), 결과다. **상대편을 못 대면 발견이 아니다.** 짚기만 하고 맞댈 것이 없으면 올리지 않는다.
+
+결과 칸에는 **지금 무엇이 그렇게 되어 있는지**를 적는다. 앞으로 벌어질 일을 적지 않는다. 벌어질 법한 일을 적는 칸이 있으면 그 칸이 추정을 부른다.
+
+출력에 `counterpart_file`과 `counterpart`를 담는다. 앞은 상대편이 있는 파일의 레포 상대경로이고 뒤는 그 파일에 있는 그대로의 문장이다. 줄 번호는 담지 않는다 — 줄이 밀리면 회차 사이의 지문이 깨진다.
+
+`where`의 뜻은 "검토 문서 안의 위치" 하나다. 레포 상대경로는 `file`이 진다.
+
+렌즈가 더하는 칸 가운데 `statements`는 레포 문서 감사에서 문서별 호출이 돌려주는 `{topic, statement, evidence}` 목록이다. 집계 대상이 아니다. 이 칸을 요구하는 주체는 `project-doc-audit`의 「진술 받기」 걸음이다. 어느 문서의 진술인지는 항목이 아니라 그 호출의 원본 파일이 지는 `target` 칸이 안다.
+
 ## 공통 계약의 예외
-- `lens-readability` — 맞댈 상대편이 없어 위 공통 계약을 따르지 않는다. 산출물이 `issues`가 아니라 `suggestions`이고, 항목의 칸이 `where`·`why`·`rewrite` 셋이며 `type`·`claim`·`consequence`·`evidence`가 없다. 발견이 아니라 제안이라 「집계」·「상충 감지」·「커버리지 공백」 어디에도 들어가지 않는다. 스키마의 상세는 `skills/lens-readability/SKILL.md`가 정본이다.
+- `lens-readability` — 맞댈 상대편이 없어 위 공통 계약을 따르지 않는다. 산출물이 `issues`가 아니라 `suggestions`이고, 항목의 칸이 `where`·`why`·`rewrite` 셋이며 `type`·`claim`·`consequence`·`evidence`가 없다. 발견이 아니라 제안이라 「집계」·「상충 감지」·「커버리지 공백」 어디에도 들어가지 않는다. 스키마의 상세는 `skills/lens-readability/SKILL.md`가 정본이다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`·`consequence`.
+- `lens-prior-art` — 맞댈 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다. `evidence`는 인용이나 경로나 URL 이고, 인용 검증은 호출자(`domain-spec-review`)가 자기 도구로 한다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`.
 
 ## 처분 — 호출자의 몫
 렌즈는 처분을 고르지 않는다. 처분 축이 맥락마다 다르고, 사용자를 멈춰 세울지는 호출자의 책임이다.
@@ -55,8 +66,10 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 `decision`과 `retry_count`는 런타임 전용이다. spec 리뷰에서는 결정 단계가 없으므로 이 둘을 내지 않고, 병합한 목록을 `domain-spec-review`의 처분 절로 넘긴다.
 
 ```
-{ "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "type": "...", "source": "grounding|fit|consistency|adversarial|prior-art|readability", "where": "...", "claim": "...", "consequence": "...", "evidence": "..." } ], "retry_count": 0 }
+{ "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "type": "...", "source": "<렌즈 리턴의 lens 값>", "where": "...", "claim": "...", "consequence": "...", "evidence": "..." } ], "retry_count": 0 }
 ```
+
+집계 항목의 `source`는 렌즈 리턴의 `lens` 값을 그대로 옮긴다. 렌즈 이름 열거는 위 「리뷰 산출물 계약」의 `lens` 하나뿐이다.
 
 렌즈 리턴의 `principles_applied`는 집계 대상이 아니다. 비어 있으면 호출자가 자기 보고에 적는다.
 
