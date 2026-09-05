@@ -704,39 +704,52 @@ exit 0
 
 `edit_t5_wire.py`:
 
+이 파일만 줄바꿈이 CRLF다. 다른 파일은 전부 LF다. 그래서 앵커를 줄 목록으로 두고 파일이 쓰는 줄바꿈으로 이어 붙인다. LF로 적은 앵커를 그대로 쓰면 한 곳도 못 맞히고, 파일 전체를 LF로 바꾸면 이 변경과 무관한 줄까지 diff에 들어온다.
+
 ```python
 import io
 p = "D:/projects/disciplined-coder/.claude/worktrees/canon-split/hooks/hooks.json"
 s = io.open(p, encoding="utf-8", newline="").read()
+nl = "\r\n" if "\r\n" in s else "\n"
+def J(lines):
+    return nl.join(lines)
 
-pre_old = '''          {
-            "type": "command",
-            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/doc_format_pretooluse.sh\\""
-          }
-        ]'''
-pre_new = '''          {
-            "type": "command",
-            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/doc_format_pretooluse.sh\\""
-          },
-          {
-            "type": "command",
-            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/code_nudge_pretooluse.sh\\""
-          }
-        ]'''
-assert s.count(pre_old) == 1
+pre_old = J([
+  '          {',
+  '            "type": "command",',
+  '            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/doc_format_pretooluse.sh\\""',
+  '          }',
+  '        ]',
+])
+pre_new = J([
+  '          {',
+  '            "type": "command",',
+  '            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/doc_format_pretooluse.sh\\""',
+  '          },',
+  '          {',
+  '            "type": "command",',
+  '            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/code_nudge_pretooluse.sh\\""',
+  '          }',
+  '        ]',
+])
+assert s.count(pre_old) == 1, "pre"
 s = s.replace(pre_old, pre_new)
 
-start_old = '''            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.sh\\""
-          }
-        ]'''
-start_new = '''            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.sh\\""
-          },
-          {
-            "type": "command",
-            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/code_nudge_sessionstart.sh\\""
-          }
-        ]'''
-assert s.count(start_old) == 1
+start_old = J([
+  '            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.sh\\""',
+  '          }',
+  '        ]',
+])
+start_new = J([
+  '            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.sh\\""',
+  '          },',
+  '          {',
+  '            "type": "command",',
+  '            "command": "bash \\"${CLAUDE_PLUGIN_ROOT}/hooks/code_nudge_sessionstart.sh\\""',
+  '          }',
+  '        ]',
+])
+assert s.count(start_old) == 1, "start"
 s = s.replace(start_old, start_new)
 
 io.open(p, "w", encoding="utf-8", newline="").write(s)
