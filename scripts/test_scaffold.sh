@@ -432,6 +432,14 @@ check "domain-coding: Tradeoff line"                  "grep -qF '**Tradeoff:**' 
 check "domain-coding: never claim done"               "grep -qF 'Never claim \"done\" without execution evidence' '$DC'"
 check "domain-coding: frontmatter name"               "grep -qF 'name: domain-coding' '$DC'"
 
+DW="$HERE/skills/domain-writing/SKILL.md"
+echo "[domain-writing] document-side karpathy rules live in one short English skill"
+check "domain-writing exists"                         "[ -f '$DW' ]"
+for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution" "Reach"; do
+  check "domain-writing: section '$h'"                "grep -qE '^## $h\$' '$DW'"
+done
+check "domain-writing: frontmatter name"              "grep -qF 'name: domain-writing' '$DW'"
+
 # --- standing-consent: 렌즈 호출에 대한 상시 허가가 정본에 있다 ---
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
 # 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 정본은 @import로 실리므로 이 한
