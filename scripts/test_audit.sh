@@ -123,5 +123,6 @@ LR2="$HERE/skills/domain-llm-runtime/SKILL.md"
 check "리스크 점수 절이 사라졌다"        "! grep -qF '리스크 점수는 다음 조건마다 1점' '$LR2'"
 check "호출 종류별 고정표가 있다"        "grep -qF '| 호출 종류 |' '$LR2'"
 check "회차마다 다시 판단하지 않는다고 적는다" "grep -qF '회차마다 다시 판단하지 않는다' '$LR2'"
+check "문서 전체에 리스크로 렌즈를 고른다는 서술이 안 남아 있다" "! grep -qF '리스크' '$LR2'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
