@@ -17,7 +17,7 @@
 - 각 테스트 스크립트의 계약은 **FAIL=0**이다. 기대 개수를 숫자로 박지 않는다(`SSOT`).
 - 단계 끝마다 `bash scripts/test_assertions.sh`, `bash scripts/test_audit.sh`, `bash scripts/test_docs_drift.sh`, `bash scripts/test_hooks.sh`, `bash scripts/test_scaffold.sh`를 각각 돌리고 그다음 `claude plugin validate ./`를 돌린다. `validate`는 `version` 경고 하나만 내면 정상이다.
 - 이 워크트리의 격리 검사는 **셸 도구에 직접 넣는 명령**에서 `for` 반복문, heredoc(특히 `git`이라는 낱말이 든 것), `$((...))`, `sed -n`을 거부한다. 테스트 스크립트 **파일 안**의 `for`와 heredoc은 상관없다. 계약 테스트는 하나씩 따로 호출하고, 확인용 파이썬은 `-c` 문자열이 아니라 스크래치 폴더에 파일로 써서 `python -X utf8 <파일>`로 돌린다. 커밋 메시지는 `git commit -q -F - <<'EOF' … EOF` 꼴이 통과한다.
-- 문서를 옮길 때는 문장을 다시 쓰지 않고 글자 그대로 옮긴다(`SURGICAL`). 계약 테스트가 그 문장을 글자로 찾는다. 앵커가 안 걸린 문장도 그대로 옮긴다. 리뷰가 "옮기다 흘려도 계약 테스트가 통과한다"를 위험으로 올렸으므로, 절을 옮길 때는 옮기기 전후로 그 절의 비어 있지 않은 줄 수를 세어 같은지 확인한다.
+- 문서를 옮길 때는 문장을 다시 쓰지 않고 글자 그대로 옮긴다(정본 「Karpathy 지침」의 Surgical Changes). 계약 테스트가 그 문장을 글자로 찾는다. 앵커가 안 걸린 문장도 그대로 옮긴다. 리뷰가 "옮기다 흘려도 계약 테스트가 통과한다"를 위험으로 올렸으므로, 절을 옮길 때는 옮기기 전후로 그 절의 비어 있지 않은 줄 수를 세어 같은지 확인한다.
 - `docs/superpowers/reviews/` 아래 기록은 읽기 전용으로 봉인돼 있다. 어떤 과제도 그 파일을 고치지 않는다. `scripts/seal_reviews.sh`를 인자 없이 부르지 않는다. 인자 없이 부르면 이 워크트리의 기록 전부가 읽기 전용이 되고 되돌리는 걸음이 계획에 없다.
 - 판정 상태의 닫힌 집합은 `skills/project-doc-audit/SKILL.md` 「판정」 절의 한 문장이 정본이다. 스크립트와 테스트는 그 문장에서 뽑아 쓰고 리터럴로 박지 않는다.
 - 빨간 불을 확인할 때마다 실패 형태 셋을 함께 본다. 고치기 전에 이미 통과하는 단언인가. 자기 픽스처를 되읽는 단언인가. 리터럴 하나만 겨누는 단언인가. 이 셋 가운데 하나에 걸리면 그 단언을 다시 쓴다. 각 단계의 빨간 불 걸음이 기대 FAIL 수를 적으므로, 그 수와 실제가 다르면 어느 단언이 셋 중 하나에 걸린 것이다.
@@ -35,38 +35,46 @@
 - Modify: 없음(브랜치 위치만 바꾼다)
 
 **Interfaces:**
-- Consumes: main 브랜치에 들어온 다른 세션의 커밋(정본 「Extra 지침」 절과 스킬 넷의 조항 낱말 교체)
+- Consumes: main 브랜치에 들어온 다른 세션의 커밋 `b24fdfa`(정본 「Karpathy 지침」 절과 스킬 여섯·README·scaffold.sh 의 조항 참조 교체)
 - Produces: 이후 모든 과제가 딛는 바탕 커밋
 
-- [ ] **Step 1: 다른 세션의 변경이 main 에 들어왔는지 확인한다**
+이 과제는 2026-09-05 에 끝났다. 아래에 실제로 한 것과 그 결과를 적는다. 다시 돌릴 일은 없다.
 
-Run: `git -C D:/projects/disciplined-coder log --oneline -5 main`
-Run: `grep -c 'Extra 지침' D:/projects/disciplined-coder/agent-principles.md`
+- [x] **Step 1: 다른 세션의 변경이 main 에 들어왔는지 확인한다**
 
-Expected: main 의 최근 커밋에 정본과 스킬 넷을 함께 만진 커밋이 있고, 두 번째 명령이 1 이상을 낸다.
+Run: `git log --oneline -3 main`
+Run: `grep -c 'Karpathy 지침' agent-principles.md`
 
-정본에 「Extra 지침」 절이 없으면 그 세션이 아직 커밋하지 않은 것이다. **여기서 멈추고 사용자에게 알린다.** 구현을 시작하지 않는다(spec 「위험」 첫째 항).
+Expected: main 의 최근 커밋에 정본과 스킬 여섯을 함께 만진 커밋이 있다.
 
-- [ ] **Step 2: 옮기기 전 위치를 적어 둔다**
+결과는 이렇다. `b24fdfa` "카파시 지침 넷을 정본에 영어로 옮기고 겹치던 조항 다섯을 뺀다"가 main 에 있었다. 그 커밋은 정본에 「Karpathy 지침」 절을 영어로 넣고 조항 다섯(ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD)을 이름까지 뺐으며, 그 이름을 부르던 스킬 여섯과 README 와 scaffold.sh 를 새 절 이름으로 고쳤다. 그 커밋이 없었으면 여기서 멈추고 사용자에게 알렸을 것이다(spec 「위험」 첫째 항).
+
+- [x] **Step 2: 옮기기 전 위치를 적어 둔다**
 
 Run: `git rev-parse HEAD`
 Run: `git rev-parse main`
 
-두 값을 적어 둔다. 앞은 되돌릴 자리이고 뒤는 도착해야 할 바탕이다.
+두 값을 적어 둔다. 앞은 되돌릴 자리이고 뒤는 도착해야 할 바탕이다. 옮기기 전 이 브랜치의 끝은 `54cd877` 이었다. 되돌릴 일이 생기면 그 자리다.
 
-- [ ] **Step 3: 이 브랜치를 그 커밋 위로 옮긴다**
+봉인된 기록 파일이 읽기 전용이라 rebase 가 덮어쓰지 못할 수 있다. 옮기기 전에 푼다.
+
+```bash
+chmod -R u+w docs/superpowers/reviews
+```
+
+- [x] **Step 3: 이 브랜치를 그 커밋 위로 옮긴다**
 
 ```bash
 git rebase main
 ```
 
-- [ ] **Step 4: 충돌을 푼다**
+- [x] **Step 4: 충돌을 푼다**
 
-충돌이 예상되는 파일은 다섯이다. `agent-principles.md`(다른 세션이 SIMPLE·SURGICAL·TDD 조항을 고쳤고 이 브랜치는 그 이웃을 건드리지 않았으므로 대개 자동 병합된다), `skills/domain-docs/SKILL.md`, `skills/project-doc-audit/SKILL.md`, `skills/domain-spec-review/SKILL.md`, `skills/lens-adversarial/SKILL.md`다. 이 브랜치가 그 파일들에 넣은 것은 아직 없고 spec 과 리뷰 기록뿐이므로, 충돌이 나면 main 쪽을 그대로 받는다.
+충돌은 없었다. 이 브랜치의 커밋 다섯은 `docs/superpowers/` 아래 spec 과 plan 과 리뷰 기록만 만지고, `b24fdfa` 는 그 폴더를 만지지 않는다. 옮기는 절 셋(「렌즈에게 정본을 알리는 법」·「판단 앞에 기계를 세운다」·「한 번만 띄우는 렌즈의 규율」) 안의 문장도 그 커밋이 건드리지 않아, 절을 옮기다 옛 문장을 조용히 실어 나르는 갈래도 생기지 않았다.
 
-풀 수 없는 충돌을 만나면 `git rebase --abort` 로 되돌리고 사용자에게 알린다. 그만두면 Step 5 의 확인이 실패하므로 조용히 지나가지 않는다.
+풀 수 없는 충돌을 만났으면 `git rebase --abort` 로 되돌리고 사용자에게 알렸을 것이다. 그만두면 Step 5 의 확인이 실패하므로 조용히 지나가지 않는다.
 
-- [ ] **Step 5: 옮겨졌는지를 내용으로 확인한다**
+- [x] **Step 5: 옮겨졌는지를 내용으로 확인한다**
 
 Run: `git status --short`
 Expected: 충돌 표시(`UU`)가 없고 rebase 진행 표시도 없다.
@@ -77,9 +85,9 @@ Expected: `0`
 Run: `git rev-parse HEAD`
 Expected: Step 2 에서 적어 둔 앞 값과 **다르다**
 
-세 확인이 함께 서야 옮겨진 것이다. 충돌 표시가 없는 것만으로는 아예 안 돌렸거나 중간에 그만둔 것과 구별되지 않는다. Task 0 은 커밋을 만들지 않으므로 이 확인이 유일한 흔적이다.
+세 확인이 함께 서야 옮겨진 것이다. 충돌 표시가 없는 것만으로는 아예 안 돌렸거나 중간에 그만둔 것과 구별되지 않는다. Task 0 은 커밋을 만들지 않으므로 이 확인이 유일한 흔적이다. 셋이 다 섰고 브랜치의 끝은 `40323d4` 가 됐다.
 
-- [ ] **Step 6: 계약 테스트 다섯이 초록인지 확인한다**
+- [x] **Step 6: 계약 테스트 다섯이 초록인지 확인한다**
 
 Run: `bash scripts/test_assertions.sh`
 Run: `bash scripts/test_audit.sh`
@@ -1457,7 +1465,7 @@ Expected: `FAIL=0`
 
 `reg query "HKCU\Environment" //v PYTHONUTF8`
 
-이 명령이 실패하면 비어 있는 것이다. 그때만 `ASK-FORK` 대로 선택지가 있는 질문으로 묻는다. 넣는 쪽을
+이 명령이 실패하면 비어 있는 것이다. 그때만 Think Before Acting 대로 선택지가 있는 질문으로 묻는다. 넣는 쪽을
 고르면 다음을 실행하고 결과를 한 줄로 알린다.
 
 `powershell -NoProfile -Command "[Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User')"`
