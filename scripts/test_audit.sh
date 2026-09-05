@@ -244,7 +244,10 @@ check "빠지지 않을 문서는 남는다"              "printf '%s' \"\$EXT_O
 rm -rf "$EXT"
 
 echo "[안내 문서 — 실행체가 사라진 것을 반영한다]"
-check "CLAUDE.md 가 감사 기록 봉인을 적는다"  "grep -qF 'seal_reviews.sh' '$HERE/CLAUDE.md'"
+check "CLAUDE.md 가 감사 기록 봉인을 적는다"  "grep -qF '봉인' '$HERE/CLAUDE.md'"
 check "CLAUDE.md 가 읽기 전용 거부를 적는다"  "grep -qF '읽기 전용' '$HERE/CLAUDE.md'"
+check "CLAUDE.md 가 훅 목록의 정본을 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -qF '정본' '$HERE/CLAUDE.md'"
+check "CLAUDE.md 가 훅 개수를 세지 않는다" \
+  "! grep -qE '훅 (한|하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)' '$HERE/CLAUDE.md' && ! grep -qE '(하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)(개|가지)?(의)? 훅' '$HERE/CLAUDE.md'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
