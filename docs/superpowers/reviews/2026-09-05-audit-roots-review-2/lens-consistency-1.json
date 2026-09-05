@@ -1,0 +1,95 @@
+{
+ "lens": "lens-consistency",
+ "target": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+ "read": [
+  "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+  "docs/superpowers/reviews/2026-09-05-audit-roots-review.md",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2.md",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/run.json",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/diff.json",
+  "skills/domain-docs/SKILL.md",
+  "skills/project-doc-audit/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "scripts/test_audit.sh",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_scaffold.sh",
+  "scripts/audit_rounds.sh"
+ ],
+ "issues": [
+  {
+   "where": "「순서와 되돌리기」",
+   "type": "contradiction",
+   "claim": "마지막 두 단계(4·5단계)가 앞 셋과 파일이 겹치지 않는다고 하지만, 1단계가 README 「주의」를 고치고 4단계가 README 훅 절을 고치며 5단계가 README 「동작 확인과 복구」를 고친다. 또 2단계가 lens-readability를 고치고 4단계(writing-korean)가 lens-readability의 「고칠 순서」 사본을 지운다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "마지막 둘은 앞 셋과 파일이 겹치지 않아 따로 되돌릴 수 있다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "README 「주의」(\"어느 경로인지는 `skills/domain-docs/SKILL.md`가 정한다\")",
+   "principle": "REVERSIBLE",
+   "consequence": "지금 spec 안에서 README는 1·4·5단계에, lens-readability는 2·4단계에 함께 놓여 있어 '겹치지 않아 따로 되돌릴 수 있다'는 문장이 같은 문서의 배치와 맞지 않는다."
+  },
+  {
+   "where": "1절 dispatching-lenses와 성공 기준 둘째",
+   "type": "contradiction",
+   "claim": "1절은 「문서 검진 방법」에서 어떻게 띄우는지를 적은 문단 하나만 옮긴다고 하는데, 옮기는 절 셋의 비어 있지 않은 줄은 19라 문단 하나를 더해도 20이고 98에서 78이 남아 '75 아래'가 안 된다. 성공 기준의 24가 되려면 「문서 검진 방법」에서 다섯 줄(첫 문단, '띄우기 전에 아래 …', '렌즈는 한 번씩만 띄운다 …', '렌즈끼리 볼 것을 나눠 주지 않는다 …', '렌즈 결과는 meta-aggregate …')이 함께 옮겨야 하고, 그러면 1절의 '문단 하나'와 test_docs_drift.sh의 domain-docs 앵커('렌즈는 한 번씩만 띄운다'·'여기서 다시 정하지 않는다'·'렌즈끼리 볼 것을 나눠 주지 않는다')에 걸린다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "「문서 검진 방법」 가운데 어떻게 띄우는지를 적은 문단(한 호출에 렌즈 여럿, source 주입, JSON 리턴, 결과는 meta-aggregate로)도 옮긴다. 언제 여는지를 적은 문단은 domain-docs에 남는다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "비어 있지 않은 줄이 98에서 75 아래로 준다. 옮기는 줄이 24다.",
+   "principle": "MEASURE-FIRST",
+   "consequence": "지금 1절이 옮긴다고 적은 범위(절 셋 19줄과 문단 하나)와 성공 기준이 세는 옮기는 줄 24가 다르고, 1절이 domain-docs에 더하는 문장들(검진 조건, suggestions.json 두 문장, dispatching-lenses 포인터)은 어느 수치에도 들어 있지 않다."
+  },
+  {
+   "where": "3절 audit_rounds.sh metrics와 기록 계약 run.json",
+   "type": "drift",
+   "claim": "metrics 절은 verdict_counts를 metrics 출력이 '함께 낸다'고 하고, 기록 계약은 run.json이 verdict_counts와 metrics를 각각 최상위 칸으로 갖는다고 한다. project-doc-audit은 metrics 출력을 run.json의 metrics 칸에 그대로 담는다고 하므로 verdict_counts가 metrics 안과 최상위 둘에 놓이거나 한쪽 서술이 틀리다. 또 verdict_counts의 auto_rejected는 status 닫힌 집합(셋)에 없는 값이라 무엇에서 세는지(diff.json의 auto_rejected 목록인지 verdict_reason 접두사인지) 어느 절에도 없다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "`verdict_counts`(confirmed·rejected·undetermined·auto_rejected)를 함께 낸다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "`run.json` — `verdict_counts`·`tokens_method`·`lens_calls`·`subagents`·`metrics`·`completed`를 갖는다.",
+   "principle": "SSOT",
+   "consequence": "지금 verdict_counts의 자리(metrics 출력 안인가 run.json 최상위인가)와 auto_rejected 개수의 출처가 spec 안에서 하나로 정해져 있지 않다."
+  },
+  {
+   "where": "「목표와 비목표」와 3절 audit_rounds.sh diff",
+   "type": "contradiction",
+   "claim": "목표 절은 회차 대조의 해소가 '앞선 발견의 인용 문장이 사라졌는지'를 재는 값이라 하고, 3절은 잔존을 '지문이 이번에도 있다', 해소를 '없다'로 정한다. 인용 문장의 파일 실재와 지문의 이번 회차 출현은 다른 계산이며 spec은 어느 쪽이 정본인지 적지 않는다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "`verdict`는 셋이다. 잔존(지문이 이번에도 있다), 해소(없다), 재발(앞선 diff가 해소라 한 지문이 이번에 다시 있다)이다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "회차 대조의 '해소'는 앞선 발견의 인용 문장이 사라졌는지만 재므로 이 설계의 성공을 재는 값으로 쓰지 않는다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 같은 문서 안에서 해소가 두 뜻(인용 문장의 소멸, 지문의 미출현)으로 적혀 있다."
+  },
+  {
+   "where": "4절 4단계",
+   "type": "gap",
+   "claim": "산출물 공백이다. 1·2·3·5단계는 단언이 놓일 테스트 파일을 이름으로 부르는데 4단계의 단언 둘(README 훅 목록 도출, CLAUDE.md '새로' 검사)은 어느 test_*.sh에 들어가는지 적지 않는다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "4단계(README·CLAUDE.md·writing-korean)에서 바꾸는 단언이다. README 「하드 게이트와 넛지와 전역 설정 수정」이 `hooks/hooks.json`과 `.claude/settings.json`에 배선된 스크립트 파일 이름 전부를 담는다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "1단계(소유자)에서 바꾸는 단언이다. `test_docs_drift.sh`의 domain-docs 앵커",
+   "principle": "EXPLICIT",
+   "consequence": "지금 4단계의 새 단언 둘은 놓일 파일이 없어 계약 테스트 다섯 가운데 어느 것이 그것을 세는지 정해지지 않았다."
+  },
+  {
+   "where": "1절 dispatching-lenses 예외 목록과 2절 lens-consistency",
+   "type": "drift",
+   "claim": "lens-consistency에 갈리는 짝 묶음을 한 호출에 준다는 규칙이 1절에서는 dispatching-lenses 예외 목록에 모이고, 2절에서는 lens-consistency 「레포 문서 감사에서의 짝」에 남으며 그 의무의 소유자는 project-doc-audit으로 적힌다. 한 규칙이 세 파일에 놓이고 소유자는 넷째 이름이다.",
+   "file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "evidence": "lens-consistency는 갈리는 짝 묶음을 한 호출에 준다.",
+   "counterpart_file": "docs/superpowers/specs/2026-09-05-audit-roots-design.md",
+   "counterpart": "lens-consistency 「레포 문서 감사에서의 짝」은 \"호출자가 갈리는 짝 묶음을 한 호출에 주고 짝마다 원문 앞뒤 다섯 줄과 정본 표시를 함께 준다\"로 남기고 그 의무의 소유자를 project-doc-audit으로 적는다.",
+   "principle": "SSOT",
+   "consequence": "지금 spec은 같은 규칙을 dispatching-lenses(예외 목록)와 lens-consistency와 project-doc-audit에 두고 소유자를 project-doc-audit이라 적어, 예외 목록을 '모은 것'으로 세운 1절과 소유자 지정이 맞지 않는다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "REVERSIBLE",
+  "MEASURE-FIRST",
+  "FAIL-LOUD"
+ ],
+ "notes": "훑은 각도는 다섯이다. 모순은 1~5절과 「순서와 되돌리기」와 「성공 기준」을 서로 맞댔고, 4절의 단계 배치는 1~5절의 변경과 맞았다(같은 변경이 두 단계에 놓인 곳은 없다). 커버리지 공백은 전제 여덟과 목표 셋이 어느 절로 이어지는지 봤고 빠진 것은 없다(PYTHONUTF8은 5절, 병합 순서는 전제와 위험, 검수는 audit_verify.sh). 산출물 공백은 새 스크립트 둘 가운데 audit_statements.sh는 입력·출력 꼴이 있고 audit_verify.sh는 검사 항목과 종료 방식이 있어 형태가 정해졌다고 봤으며, 4단계 단언의 놓일 곳만 비었다. 드리프트는 verdict_counts의 자리와 짝 묶음 규칙의 소유자를 짚었다. 판정 집합 셋은 3절·기록 계약·audit_verify.sh 서술·회차 기록(derived 0건)과 맞는다. auto_rejected의 흐름(스크립트가 후보를 내고 세션이 사유 성립을 확인해 status: rejected와 verdict_reason을 붙인다)은 3절 diff·위험 셋째에서 같은 말이나, metrics의 verdict_counts.auto_rejected가 무엇에서 세는지는 위 드리프트 발견에 적었다. 스코프는 단계 다섯·커밋 다섯으로 한 plan에 담을 크기라 봤고 쪼개라는 발견은 올리지 않았다. 더 확인할 것: 「순서와 되돌리기」의 단계 다섯에 전제 절이 요구하는 rebase 걸음이 들어 있지 않아 plan이 그것을 0단계로 둘지 1단계에 붙일지 정해야 한다."
+}
