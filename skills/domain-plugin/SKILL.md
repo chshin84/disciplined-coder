@@ -9,7 +9,7 @@ Claude Code 플러그인과 마켓플레이스를 만들고 배포하는 방법�
 ## 플러그인을 만들 때 지킬 것
 - **version 비우기** — 활성 개발 중이면 plugin.json의 `version`을 비워 커밋 SHA 기반 자동 업데이트를 유지한다. version을 설정하면 업데이트가 버전 문자열 비교로 바뀌어, 값을 올리지 않는 한 새 커밋이 사용자에게 배포되지 않는다([plugins-reference의 Version management](https://code.claude.com/docs/en/plugins-reference#version-management)). `claude plugin validate`가 내는 version 경고는 수용한다.
 - **marketplace.json** — `.claude-plugin/marketplace.json`에 최상위 `name`·`description`·`owner`·`plugins[]`를 둔다. 레포 루트가 곧 플러그인이면 `source: "./"`로 가리킨다. `plugins[].description`은 `plugin.json`의 `description`과 글자 그대로 같게 둔다. 문안을 바꿀 때는 `plugin.json`을 고치고 마켓플레이스 항목을 따라 맞추며, 같은지는 `scripts/test_docs_drift.sh`가 확인한다.
-- **frontmatter** — 스킬 `SKILL.md`는 `name`(디렉터리 이름과 같게)과 `description` 두 키를 쓰고, 커맨드 `.md`는 `description` 하나를 쓴다. `description`은 언제 여는지를 담는다. 값은 YAML 평문 스칼라라 `: `와 ` #`을 넣지 않는다.
+- **frontmatter** — 스킬 `SKILL.md`는 `name`(디렉터리 이름과 같게)과 `description` 두 키를 쓰고, 커맨드 `.md`는 `description` 하나를 쓴다. `description`은 언제 여는지를 담는다. 이 요구는 스킬과 커맨드 양쪽에 걸린다. 스킬은 Claude 가 언제 열지 고르는 근거가 그 값뿐이고, 커맨드는 사용자가 목록에서 고르는 근거가 그 값뿐이다. 값은 YAML 평문 스칼라라 `: `와 ` #`을 넣지 않는다.
 - **validate** — `claude plugin validate ./`로 검증한다. `--strict`는 경고까지 실패로 취급하므로, 위 버전 정책을 쓰는 레포에서는 `--strict`가 실패하는 것이 정상이며 non-strict로 통과를 확인한다.
 - **컴포넌트 위치** — `agents/`·`skills/`·`commands/`·`hooks/hooks.json`에 둔다. 플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다.
 
