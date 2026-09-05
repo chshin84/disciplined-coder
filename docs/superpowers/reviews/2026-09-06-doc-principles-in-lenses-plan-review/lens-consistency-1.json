@@ -1,0 +1,117 @@
+{
+  "lens": "lens-consistency",
+  "target": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+  "read": [
+    "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+    "skills/lens-fit/SKILL.md",
+    "skills/lens-grounding/SKILL.md",
+    "skills/aggregating-lenses/SKILL.md",
+    "CLAUDE.md",
+    "agent-principles.md",
+    "새 정본 사본 (canon-consolidation 브랜치의 agent-principles.md)",
+    "docs/superpowers/reviews/2026-09-06-doc-principles-in-lenses-review/ 목록"
+  ],
+  "issues": [
+    {
+      "where": "머리말",
+      "type": "contradiction",
+      "claim": "머리말이 걸음을 넷이라고 적는데 본문의 ## 걸음 제목은 다섯이다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "바꾸는 파일은 둘이고 걸음은 넷이다.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "counterpart": "## 걸음 5 — 커밋한다",
+      "principle": "SSOT",
+      "consequence": "걸음 개수가 머리말과 본문 제목 두 곳에 갈라 적혀 있고 두 값이 다르다."
+    },
+    {
+      "where": "성공 기준 마지막 줄과 걸음 4",
+      "type": "contradiction",
+      "claim": "성공 기준이 skills/lens-*/ 밖의 파일이 하나도 바뀌지 않는다고 정하는데 걸음 4 가 docs/superpowers/reviews/ 아래에 새 파일을 만든다. 걸음 3 은 예외를 열거하지만 성공 기준에는 그 예외가 없다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "`skills/lens-*/` 밖의 파일이 하나도 바뀌지 않는다.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "counterpart": "산출물은 `docs/superpowers/reviews/` 아래 이 회차 폴더에 `lens-fit-1.json`으로 둔다.",
+      "principle": "SSOT",
+      "consequence": "편집 범위 규칙이 두 곳에 갈라 적혀 있고 범위가 서로 다르다."
+    },
+    {
+      "where": "걸음 4 마지막 문단과 성공 기준",
+      "type": "contradiction",
+      "claim": "설계는 doc_type 이 채워진 산출물을 받는 것을 성공 기준으로 정하는데 계획은 null 을 실패가 아니라고 정하고 성공 기준을 칸이 실재한다로 낮췄다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "`doc_type`이 `null`로 오면 실패가 아니다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "counterpart": "새 프롬프트를 실제로 한 번 돌려 `doc_type`이 채워진 산출물을 받는다.",
+      "principle": "Goal-Driven Execution",
+      "consequence": "설계와 계획이 같은 항목에 다른 문턱을 정하고 있어 타입 가리기가 한 번도 안 돈 회차가 계획의 문턱으로는 통과한다."
+    },
+    {
+      "where": "걸음 1 의 새 절 배치",
+      "type": "contradiction",
+      "claim": "설계는 걸음 셋을 「규율」 축 안에 못 박으라고 정하는데 계획은 그것을 체크리스트 밖의 새 ## 절로 옮긴다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "「체크리스트」 뒤, 「가드」 앞에 넣는다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "counterpart": "「규율」 축에 걸음 셋을 못 박는다.",
+      "principle": "EXPLICIT",
+      "consequence": "걸음 셋이 놓일 자리가 설계와 계획에서 서로 다르게 정해져 있다."
+    },
+    {
+      "where": "걸음 1 의 머리말 편집",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 설계는 승격을 관측 가능하게 만들려고 read 와 notes 둘을 요구하는데 계획은 read 만 옮기고 알림에서 끌어 왔다는 사실을 notes 에 적으라는 요구를 어느 걸음으로도 잇지 않는다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "무엇을 계약으로 삼았는지 `read`에 남긴다는 것이다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "counterpart": "계약 칸이 아니라 알림에서 끌어 온 것이면 그 사실을 `notes`에 적는다.",
+      "principle": "EXPLICIT",
+      "consequence": "계약 칸으로 받은 회차와 알림에서 승격한 회차가 산출물에서 구별되지 않는다."
+    },
+    {
+      "where": "걸음 5 와 설계 「전제」",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 설계가 「금지 표현」 표의 소유자에 대해 두 진술이 갈려 있다고 적고 사용자에게 넘긴다고 정하는데 계획에는 알리는 걸음이 없다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "`lens-doc-principles` 브랜치에만 커밋한다. 병합도 푸시도 하지 않는다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "counterpart": "이 회차의 편집 범위 밖이라 사용자에게 넘긴다.",
+      "principle": "즉시 통보",
+      "consequence": "설계가 사용자 결정으로 넘긴 항목이 계획의 다섯 걸음 어디에도 없다."
+    },
+    {
+      "where": "걸음 1 의 「규율」 항목 편집",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 설계는 정본의 절 이름을 「」로 가리키지 말라는 제약을 정하는데 계획은 그 제약을 옮기지 않는다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "조항 ID가 있으면 ID로, 없으면 절 이름으로, 표 안의 규칙이면 표 이름과 행 이름으로 부른다는 갈래를 넣는다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "counterpart": "정본의 절 이름을 「」로 가리키지 않는다.",
+      "principle": "EXPLICIT",
+      "consequence": "계획만 읽고 고치면 lens-fit 본문에 정본의 절 이름을 「」로 박아도 걸음 안에서 걸릴 것이 없다."
+    },
+    {
+      "where": "「되돌리기」",
+      "type": "contradiction",
+      "claim": "되돌리기가 걸음마다 파일 하나씩이라고 전제하는데 걸음 3 은 파일을 만들지 않고 걸음 4 는 기록 폴더에 산출물을 만들며 걸음 5 는 커밋이다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "걸음마다 파일 하나씩이라 걸음 단위로 되돌릴 수 있다.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "counterpart": "산출물은 `docs/superpowers/reviews/` 아래 이 회차 폴더에 `lens-fit-1.json`으로 둔다.",
+      "principle": "REVERSIBLE",
+      "consequence": "되돌리기 절이 다섯 걸음 가운데 둘만 덮고 있다."
+    },
+    {
+      "where": "걸음 4 둘째 문단",
+      "type": "gap",
+      "claim": "산출물 공백이다. 걸음 4 의 산출물이 놓일 곳을 이 회차 폴더로만 적고 폴더 이름과 함께 놓일 요약문을 정하지 않는다. 같은 이름의 폴더가 이미 spec 리뷰의 렌즈 원본 셋을 담고 있어 두 종류가 섞인다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "산출물은 `docs/superpowers/reviews/` 아래 이 회차 폴더에 `lens-fit-1.json`으로 둔다.",
+      "counterpart_file": "skills/domain-doc-upkeep/SKILL.md",
+      "counterpart": "렌즈별 원본은 요약문과 같은 이름의 폴더에 `lens-<렌즈 이름>-<띄운 횟수>.json`으로 둔다",
+      "principle": "EXPLICIT",
+      "consequence": "폴더 이름을 요약문 이름에서 도출하라는 규칙이 있는데 계획에는 그 요약문도 폴더 이름도 없다."
+    }
+  ],
+  "principles_applied": ["SSOT", "EXPLICIT", "REVERSIBLE", "Goal-Driven Execution", "즉시 통보"],
+  "notes": "체크리스트를 항목마다 따로 훑었다. 모순 축에서 걸음 개수와 편집 범위와 doc_type 문턱과 되돌리기 전제 넷을 올렸다. 커버리지 공백 축에서 설계의 요구를 하나씩 계획의 걸음에 이어 보았고 notes 기록과 사용자 통보와 절 이름 제약 셋이 안 이어져 올렸다. 산출물 공백 축에서 걸음 4 하나를 올렸다. 드리프트는 올릴 것이 없었고 스코프는 한 계획에 맞는 크기다. 더 확인해야 할 것은 정본 사본이 아직 병합되지 않아 산출물 공백 발견의 상대편이 레포 안이 아니라 주입된 사본이라는 것이다."
+}

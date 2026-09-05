@@ -1,0 +1,70 @@
+{
+  "lens": "lens-grounding",
+  "target": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+  "read": [
+    "skills/lens-fit/SKILL.md",
+    "skills/lens-consistency/SKILL.md",
+    "skills/lens-grounding/SKILL.md",
+    "skills/lens-readability/SKILL.md",
+    "skills/lens-adversarial/SKILL.md",
+    "skills/lens-prior-art/SKILL.md",
+    "skills/dispatching-lenses/SKILL.md",
+    "skills/aggregating-lenses/SKILL.md",
+    "skills/domain-doc-upkeep/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "agent-principles.md",
+    "새 정본 사본 (canon-consolidation 브랜치의 agent-principles.md)",
+    "scripts/test_docs_drift.sh",
+    "scripts/test_audit.sh",
+    "실행: bash scripts/test_assertions.sh (PASS=10 FAIL=0), test_audit.sh (PASS=152 FAIL=0), test_docs_drift.sh (PASS=383 FAIL=0), test_hooks.sh (PASS=101 FAIL=0), test_scaffold.sh (PASS=291 FAIL=0)",
+    "실행: claude plugin validate ./ (version 경고 1건, 검증 통과)"
+  ],
+  "issues": [
+    {
+      "where": "「무엇을 하는가」 표의 lens-grounding 행 근거 칸",
+      "type": "contradiction",
+      "claim": "lens-grounding 을 '문서 밖을 읽는 유일한 렌즈'라고 적었으나 lens-fit 도 계약이 경로로 오면 그 파일을 열고, lens-readability 는 domain-korean 과 원칙 정본을 열며, lens-prior-art 는 웹으로 나간다. 문서 밖을 읽는 렌즈는 넷이다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "| `lens-grounding` | 문서 검진과 레포 감사에서의 출처를 명시하고 단정을 근거 없음으로 올리게 한다 | 문서 밖을 읽는 유일한 렌즈다 |",
+      "counterpart_file": "skills/lens-fit/SKILL.md",
+      "counterpart": "다만 계약이 파일 경로로 오면 그 파일을 읽고 `read`에 적는다.",
+      "principle": "EXPLICIT",
+      "consequence": "이 설계가 lens-grounding 에만 소유자 문서를 출처로 붙이는 근거로 '유일함'을 들고 있는데, 지금 lens-fit 은 규칙집 경로를 열어 읽고 lens-readability 는 기준 문서 둘을 열어 읽는다."
+    },
+    {
+      "where": "「lens-consistency — 선언한 수정 규율을 대조한다」 마지막 문단과 「무엇을 하지 않는가」의 type 폐쇄 집합 문단",
+      "type": "unsupported",
+      "claim": "type 폐쇄 집합을 늘리면 aggregating-lenses 의 계약과 scripts/test_audit.sh 의 픽스처가 함께 움직여야 한다고 적었으나, aggregating-lenses 는 폐쇄 집합을 렌즈 파일에 맡기고 자기 계약에는 <렌즈가 정의한 폐쇄 집합> 이라고만 적는다. scripts/ 아래 어느 스크립트에도 type 문자열이 없다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "`type` 폐쇄 집합을 늘리지 않는다. 늘리면 `aggregating-lenses`의 계약과 `scripts/test_audit.sh`의 픽스처가 함께 움직여야 한다.",
+      "counterpart_file": "skills/aggregating-lenses/SKILL.md",
+      "counterpart": "렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.",
+      "principle": "SSOT",
+      "consequence": "폐쇄 집합을 안 늘리는 결정의 근거로 든 값이 실제로는 존재하지 않고, 폐쇄 집합은 skills/lens-consistency/SKILL.md 한 곳에만 적혀 있다."
+    },
+    {
+      "where": "「무엇을 푸는가」 셋째 문단",
+      "type": "contradiction",
+      "claim": "선언한 수정 규율과 실제 취급의 어긋남에 걸릴 축이 lens-consistency 에 없다고 적었으나, 「모순」 축이 괄호로 '문서가 스스로 정한 원칙을 어기는 설계 포함'을 이미 담고 있다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "계약을 선언해 놓고 지키지 않는 것은 내부 모순인데 `lens-consistency`의 축 다섯 가운데 이것에 걸리는 축이 없다.",
+      "counterpart_file": "skills/lens-consistency/SKILL.md",
+      "counterpart": "- **모순** — 한 절이 다른 절과 부딪치는가(문서가 스스로 정한 원칙을 어기는 설계 포함).",
+      "principle": "EXPLICIT",
+      "consequence": "설계가 더하려는 「선언과 취급」 축의 산출물을 스스로 contradiction 에 담으라고 정하고 있어, 지금 「모순」 축이 받는 것과 같은 자리에 축 이름만 하나 더 생긴다."
+    },
+    {
+      "where": "「lens-fit — 규칙집 계약을 실제로 받게 한다」의 「정본 경로를 계약으로 삼는다」",
+      "type": "contradiction",
+      "claim": "정본이 알림으로만 와서 규율 축이 안 돈다고 적었으나, 문서 검진 경로에서는 domain-doc-upkeep 이 정본 agent-principles.md 경로를 세 계약 가운데 하나로 이미 lens-fit 에 넘긴다. 구멍은 정본을 계약으로 넘긴다는 문장이 없는 audit-repo-docs 쪽에만 있다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "지금 `lens-fit`은 \"호출자가 규칙집을 계약으로 넘겼으면\"이라는 조건을 달아 두어, 정본이 알림으로만 오면 규율을 안 보고 지나간다.",
+      "counterpart_file": "skills/domain-doc-upkeep/SKILL.md",
+      "counterpart": "`lens-fit`에 넘기는 계약은 셋의 경로다. 정본 `agent-principles.md`와 `skills/domain-writing/SKILL.md`와 `skills/domain-korean/SKILL.md`다.",
+      "principle": "SSOT",
+      "consequence": "문서 검진에서는 정본이 이미 계약으로 오고 있어, 설계가 닫으려는 구멍이 두 호출자 가운데 하나에만 있는데 문제 진술은 둘을 가르지 않는다."
+    }
+  ],
+  "principles_applied": ["SSOT", "EXPLICIT", "FAIL-LOUD", "NAME-ITEMS"],
+  "notes": "체크리스트를 항목마다 따로 훑었다. 누락 — 설계가 대상으로 든 렌즈 여섯과 호출자 넷을 전부 열어 각 주장의 대응 문장을 찾았고 빠뜨린 대상은 없었다. 불일치 — 인용한 수치를 전부 기계로 확인했고 다섯 스크립트의 값과 plugin validate 의 경고 하나가 설계와 같았다. 「」 절 이름 실재 검사가 lens-readability·review-specs·정본 셋에 걸린다는 것과 test_audit.sh 가 system 프롬프트 검사를 이미 건다는 것도 확인했다. 모순·환각 — 넷을 올렸다. 확인 못 한 것은 옆 브랜치 문서를 출처로 못 받아 대조하지 못한 두 문장이다."
+}

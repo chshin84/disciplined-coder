@@ -1,0 +1,135 @@
+{
+  "lens": "lens-adversarial",
+  "target": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+  "read": [
+    "skills/lens-adversarial/SKILL.md",
+    "skills/aggregating-lenses/SKILL.md",
+    "skills/lens-fit/SKILL.md",
+    "skills/lens-consistency/SKILL.md",
+    "skills/lens-grounding/SKILL.md",
+    "skills/lens-readability/SKILL.md",
+    "skills/dispatching-lenses/SKILL.md",
+    "skills/domain-doc-upkeep/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "skills/domain-coding/SKILL.md",
+    "agent-principles.md",
+    "CLAUDE.md",
+    "scripts/test_docs_drift.sh",
+    "scripts/test_audit.sh",
+    "새 정본 사본 (canon-consolidation 브랜치의 agent-principles.md)"
+  ],
+  "issues": [
+    {
+      "where": "「성공 기준」 절의 세 줄 — 프롬프트와 체크리스트와 본문에 문장이 실린다는 기준",
+      "type": "failure-mode",
+      "claim": "넷을 다 고치고 테스트도 초록인데 판정 범위는 하나도 안 늘어난 모습이 실패다. 원인은 성공 기준 셋이 전부 문자열 존재 검사이고, 걸음 1 이 '못 가리면 notes 에 적는다'라는 탈출구를 함께 갖기 때문이다. 타입을 못 가려 아무것도 안 올린 회차와 볼 것이 없어 안 올린 회차가 산출물에서 구별되지 않는데 성공 기준은 둘 다 통과로 읽는다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "`lens-fit`의 system 프롬프트에 문서 타입을 먼저 가리라는 문장이 실린다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "실행 증거 없이 \"됐다\"고 하지 않는다.",
+      "principle": "Goal-Driven Execution",
+      "consequence": "지금 이 절에 새 판정이 실제로 한 번이라도 걸리는지를 재는 줄이 없다."
+    },
+    {
+      "where": "「lens-consistency — 선언한 수정 규율을 대조한다」 절 첫 문단",
+      "type": "failure-mode",
+      "claim": "설계가 맞아도 실행이 어긋나 실패하는 길이다. 체크리스트에 축을 더하라고만 하고 레퍼런스 프롬프트에 축 이름을 실으라는 지시가 없다. test_docs_drift.sh 가 렌즈 본문 축 이름을 뽑아 system 줄에 있는지 검사하므로 지시대로만 하면 그 검사가 FAIL 이고 같은 문서의 성공 기준과 부딪힌다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "체크리스트에 축 하나를 더한다. 이름은 「선언과 취급」이다.",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "    check \"$LN: 프롬프트가 축을 부른다: $ax\" \"grep -m1 '^- system:' '$L' | grep -qF -- '$ax'\"",
+      "principle": "EXPLICIT",
+      "consequence": "지금 프롬프트에 요구를 함께 실으라는 문단은 lens-fit 절 안에 하나뿐이다."
+    },
+    {
+      "where": "「lens-readability — 경계를 적는다」 절 마지막 문단과 「전제」 절 첫 문단",
+      "type": "failure-mode",
+      "claim": "절 이름이 정본에 없는 채로 병합되어 실패하는 길에 가드가 없다. 드리프트 검사의 대상 파일은 lens-readability 와 호출자와 정본 셋뿐이라 lens-fit 은 목록 밖이다. 옆 브랜치가 병합되지 않거나 절 이름이 달라지면 lens-fit 이 가리키는 절 이름은 어느 검사에도 안 걸리고 렌즈가 없는 절을 찾다 조용히 규율 축을 건너뛴다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "새 정본의 절 이름은 아직 이 브랜치에 없으므로 이 렌즈에는 「」로 새 절 이름을 적지 않는다.",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "for SRC in \"$HERE/skills/lens-readability/SKILL.md\" \"$CALLER\" \"$CANON\"; do",
+      "principle": "FAIL-LOUD",
+      "consequence": "지금 이 브랜치의 agent-principles.md 에는 문서 타입 표가 없고 그 사실을 붙드는 검사는 lens-fit 을 훑지 않는다."
+    },
+    {
+      "where": "「정본 경로를 계약으로 삼는다」 절",
+      "type": "risk",
+      "claim": "계약 여부를 계약 칸이 아니라 프롬프트 안에 어떤 경로가 보이는지로 판정하게 만든다. 그 경로는 실행 시점에 도출하라고 정해져 있어 레포 정본을 가리키기도 하고 설치본 사본을 가리키기도 한다. 완화는 무엇을 계약으로 삼았는지 read 에 반드시 남기게 하는 표시다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "프롬프트에 원칙 정본 경로가 들어 있으면 그것을 규칙집 계약으로 삼는다.",
+      "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+      "counterpart": "레포 안에서 도는 워크플로는 레포 정본을, 설치본으로 도는 호출은 관리 디렉터리의 사본을 가리킨다.",
+      "principle": "EXPLICIT",
+      "consequence": "지금 lens-fit 이 계약을 받는 칸은 레퍼런스 프롬프트의 {contract} 하나이고 읽기 범위는 출력 계약과 후보만 본다로 닫혀 있다."
+    },
+    {
+      "where": "「무엇을 하지 않는가」 절 첫 문단",
+      "type": "risk",
+      "claim": "곧 없어질 파일이 계약 경로로 계속 넘어온다는 것을 알면서 경로가 없을 때 렌즈가 무엇을 하는지를 안 정한다. 완화는 계약 경로를 못 읽으면 판정하지 말고 notes 에 적게 하는 한 줄이다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "`domain-doc-upkeep`의 「문서 검진 방법」이 `lens-fit`에 넘기는 계약 셋 가운데 하나(`domain-writing`)는 곧 사라지는데, 그 줄을 고치는 것은 옆 브랜치의 몫이다.",
+      "counterpart_file": "skills/lens-fit/SKILL.md",
+      "counterpart": "다만 계약이 파일 경로로 오면 그 파일을 읽고 `read`에 적는다.",
+      "principle": "FAIL-LOUD",
+      "consequence": "지금 lens-fit 의 읽기 범위에는 계약 경로가 실재하지 않을 때의 처신이 없다."
+    },
+    {
+      "where": "「lens-readability — 경계를 적는다」 절 첫 문단",
+      "type": "over-engineering",
+      "claim": "겹칠 수 없는 판정을 막으려고 문장을 하나 더한다. lens-readability 의 산출물은 suggestions 이고 집계와 상충 감지와 커버리지 공백 어디에도 안 들어가므로 판정이 겹칠 자리가 구조상 없다. 빼면 만지는 파일이 넷에서 셋으로 준다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "그 셋은 `lens-fit`과 `lens-consistency`가 본다고 적어 판정이 겹치지 않게 한다.",
+      "counterpart_file": "skills/aggregating-lenses/SKILL.md",
+      "counterpart": "발견이 아니라 제안이라 「집계」·「상충 감지」·「커버리지 공백」 어디에도 들어가지 않는다.",
+      "principle": "Simplicity First",
+      "consequence": "지금 lens-readability 의 산출물은 where·why·rewrite 셋만 담는 제안이고 문서 타입이나 수정 규율을 올릴 칸 자체가 없다."
+    },
+    {
+      "where": "「lens-consistency — 선언한 수정 규율을 대조한다」 절 둘째 문단",
+      "type": "over-engineering",
+      "claim": "걸릴 입력이 없는 축이다. 이 레포의 .md 어디에도 자기 수정 규율을 넷 가운데 하나로 선언한 문장이 없다. 선언이 없으면 축이 안 걸린다고 설계가 스스로 적으므로 이 축은 한 번도 발화하지 않는 상태로 들어간다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "선언이 없으면 이 축은 걸리지 않으며, 선언이 없다는 것을 문제로 올리지 않는다.",
+      "counterpart_file": "skills/domain-doc-upkeep/SKILL.md",
+      "counterpart": "문서가 어떻게 바뀌어도 되는지로 한 번 더 가른다. 문서가 자기 수정 규율을 선언하면(`domain-coding`의 Explicit is better than implicit) 그 선언이 곧 기계 강제의 계약이 된다.",
+      "principle": "Simplicity First",
+      "consequence": "지금 레포의 문서는 수정 규율을 선언하지 않고 기록의 봉인은 문서의 선언이 아니라 scripts/seal_reviews.sh 가 진다."
+    },
+    {
+      "where": "「성공 기준」 절 첫 문단",
+      "type": "failure-mode",
+      "claim": "설계 문서에 테스트 통과 개수라는 상태를 박아 두어 이 설계를 실행하는 세션이 자기가 만든 정상적인 증가를 실패로 읽는다. 축 하나만 더해도 렌즈 축 검사가 늘어 PASS 는 383 이 아니게 된다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "지금 값은 `test_assertions.sh` PASS=10, `test_audit.sh` PASS=152, `test_docs_drift.sh` PASS=383, `test_hooks.sh` PASS=101, `test_scaffold.sh` PASS=291 이며 모두 FAIL=0 이다.",
+      "counterpart_file": "CLAUDE.md",
+      "counterpart": "각 스크립트의 계약은 **FAIL=0**이며 기대 개수를 숫자로 박지 않는다",
+      "principle": "SSOT",
+      "consequence": "지금 이 설계 문서가 다섯 스크립트의 PASS 개수를 본문에 적어 두어 검사 개수의 사본이 레포에 하나 더 있다."
+    },
+    {
+      "where": "「전제」 절의 domain-korean 줄",
+      "type": "risk",
+      "claim": "전제가 파일이 남는지만 다루고 그 파일이 무엇을 계속 소유하는지는 안 다룬다. 새 정본은 쓰지 않는 낱말 목록의 소유자를 scripts/forbidden_words.tsv 로 정하는데 그 파일은 이 브랜치에 없다. 파일이 남아도 표의 소유가 옮겨 가면 lens-readability 는 없는 표를 찾는다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "`skills/domain-korean/SKILL.md`는 남는다. 옆 브랜치의 설계가 그것을 명시한다.",
+      "counterpart_file": "skills/lens-readability/SKILL.md",
+      "counterpart": "너는 전달 방해 검수자다. 먼저 `domain-korean` 스킬 파일을 열어 고정 규칙과 「금지 표현」 표를 읽어라.",
+      "principle": "SSOT",
+      "consequence": "지금 lens-readability 는 본문 셋과 프롬프트 하나에서 domain-korean 을 기준 문서로 부르고 scripts/ 에는 forbidden_words.tsv 가 없다."
+    },
+    {
+      "where": "「문서 타입을 먼저 가리고 그 타입이 금지한 것을 본다」 절의 걸음 1",
+      "type": "risk",
+      "claim": "타입을 가릴 사람이 렌즈인데 호출자의 분류축이 다르고 이 회차는 호출자를 못 고친다. 두 축 사이의 대응이 어디에도 없어 SKILL.md 가 어느 행인지 정할 근거가 없고 걸음 1 의 탈출구가 기본값이 된다. 완화는 무엇을 근거로 타입을 골랐는지 산출물에 남기게 하는 것이다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "계약에 문서 타입 표가 있으면 검사 대상이 어느 타입인지 먼저 가린다. 못 가리면 짐작하지 말고 `notes`에 적는다.",
+      "counterpart_file": "skills/audit-repo-docs/SKILL.md",
+      "counterpart": "| 렌즈 정의 | 렌즈 자신의 `SKILL.md` | `lens-fit` |",
+      "principle": "EXPLICIT",
+      "consequence": "지금 레포 감사의 렌즈 배정 표는 문서를 네 종류로 가르고 그 종류를 정본의 문서 타입으로 옮기는 대응표는 어느 문서에도 없다."
+    }
+  ],
+  "principles_applied": ["FAIL-LOUD", "EXPLICIT", "SSOT", "FOCUSED", "REVERSIBLE", "Simplicity First", "Surgical Changes", "Goal-Driven Execution", "Think Before Acting"],
+  "notes": "훑은 각도는 넷이다. 실패 모드는 설계가 틀려 실패하는 길과 실행이 어긋나 실패하는 길과 밖의 사건으로 절반만 이뤄지는 길로 갈랐다. 과설계는 걸릴 입력이 없는 축과 겹칠 수 없는 경계 둘을 봤다. 비가역은 올릴 것이 없었다. 위험은 계약 인식 채널과 사라질 계약 경로와 기준 문서 소유권과 타입 분류축 넷을 올렸고 제안은 모두 표시나 판정 보류다. 더 확인할 것 둘이 남았다. 옆 브랜치의 실제 커밋을 못 봤고, 축을 더했을 때 test_audit.sh 픽스처가 함께 움직여야 하는지는 실행 전에 그 스크립트를 돌려 확인해야 한다."
+}

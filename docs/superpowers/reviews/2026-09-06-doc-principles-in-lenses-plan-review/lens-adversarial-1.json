@@ -1,0 +1,125 @@
+{
+  "lens": "lens-adversarial",
+  "target": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+  "read": [
+    "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+    "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+    "skills/lens-adversarial/SKILL.md",
+    "skills/aggregating-lenses/SKILL.md",
+    "skills/lens-fit/SKILL.md",
+    "skills/lens-grounding/SKILL.md",
+    "skills/dispatching-lenses/SKILL.md",
+    "skills/domain-doc-upkeep/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "scripts/test_docs_drift.sh",
+    "scripts/test_audit.sh",
+    "scripts/test_scaffold.sh",
+    "scripts/seal_reviews.sh",
+    "CLAUDE.md",
+    "docs/superpowers/reviews/2026-09-06-doc-principles-in-lenses-review/ 목록",
+    "새 정본 사본 (canon-consolidation 브랜치의 agent-principles.md)"
+  ],
+  "issues": [
+    {
+      "where": "걸음 4 의 합격 조건 두 문장",
+      "type": "failure-mode",
+      "claim": "이 계획대로 하고 완전히 실패했다면 원인은 걸음 4 다. 이 브랜치에서 정본을 계약으로 주면 doc_type 은 반드시 null 이고 계획은 그 null 을 정상으로 못 박았다. 그래서 걸음 4 는 스키마에 칸이 하나 늘었다만 확인하고 끝나며, 설계가 이 걸음을 둔 이유를 그대로 통과시킨다. 완화는 대상 바꾸기다. 이 브랜치에서 문서 타입 표를 실제로 소유하는 것은 skills/domain-doc-upkeep/SKILL.md 이므로 그 경로를 계약으로 주면 오늘도 null 아닌 doc_type 이 돌아온다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "이 브랜치의 정본에는 아직 문서 타입 표가 없으므로 `null`이 정상적인 결과다. 확인하는 것은 값이 아니라 표시가 나오는지다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "counterpart": "**새 프롬프트를 실제로 한 번 돌려 `doc_type`이 채워진 산출물을 받는다.** 대상은 이 레포의 문서 하나이고 계약은 정본 경로다.",
+      "principle": "Goal-Driven Execution",
+      "consequence": "지금 걸음 4 의 합격 조건이 두 문장으로 갈려 있고 뒤엣것이 이 브랜치의 확정된 결과라 실제 합격선은 doc_type 키의 존재 하나다."
+    },
+    {
+      "where": "걸음 1 「검증」 문단",
+      "type": "failure-mode",
+      "claim": "걸음 1 과 걸음 2 의 검증이 두 스크립트만 돌리게 되어 있는데 scripts/test_scaffold.sh 도 skills/lens-*/SKILL.md 를 디렉터리에서 도출해 파일마다 검사를 건다. 걸음 1 이 초록이어도 스캐폴드 검사는 깨져 있을 수 있고 걸음 3 에 가서야 드러나 어느 편집이 깼는지가 걸음 단위로 갈리지 않는다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "이 둘이 이 파일에 걸린 검사를 전부 갖는다.",
+      "counterpart_file": "scripts/test_scaffold.sh",
+      "counterpart": "check \"lens-$l: principles_applied\"   \"grep -qF 'principles_applied' '$F'\"",
+      "principle": "FAIL-LOUD",
+      "consequence": "지금 걸음 1 과 걸음 2 의 검증은 두 스크립트뿐이고 test_scaffold.sh 의 렌즈 루프는 걸음 3 에서 처음 돈다."
+    },
+    {
+      "where": "걸음 4 의 산출물을 두는 자리",
+      "type": "irreversible",
+      "claim": "스모크 테스트 산출물을 기록 폴더에 lens-fit-1.json 으로 두라고 한다. 렌즈별 원본은 요약문과 같은 이름의 폴더에만 놓이는데 이 산출물에는 요약문이 없고, 이 회차의 기록 폴더는 이미 spec 리뷰의 것으로 존재해 세 렌즈의 원본이 들어 있다. 거기 넣으면 돌지 않은 네 번째 렌즈가 그 리뷰 회차에 돈 것처럼 보이고 다음 세션의 봉인이 그 파일을 읽기 전용으로 만든다. 완화는 기록으로 남기지 않고 걸음 4 안에서 확인하거나 요약문을 함께 두는 것이다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "산출물은 `docs/superpowers/reviews/` 아래 이 회차 폴더에 `lens-fit-1.json`으로 둔다.",
+      "counterpart_file": "skills/domain-doc-upkeep/SKILL.md",
+      "counterpart": "렌즈별 원본은 요약문과 같은 이름의 폴더에 `lens-<렌즈 이름>-<띄운 횟수>.json`으로 둔다",
+      "principle": "REVERSIBLE",
+      "consequence": "지금 그 폴더에는 렌즈 원본 셋이 있고 계획은 이 회차 폴더가 어느 폴더인지 이름으로 적지 않는다."
+    },
+    {
+      "where": "「성공 기준」 마지막 줄과 걸음 4",
+      "type": "failure-mode",
+      "claim": "성공 기준이 skills/lens-*/ 밖의 파일이 하나도 안 바뀌는 것이라고 못 박는데 걸음 4 는 기록 폴더에 파일을 하나 만든다. 걸음 3 의 git status 확인은 걸음 4 앞에 있어 이 파일을 못 보고 걸음 4 뒤에는 확인이 없다. 마무리에서 성공 기준을 대조하는 세션은 산출물을 지워 초록을 만들거나 실패로 보고하고 멈춘다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "`skills/lens-*/` 밖의 파일이 하나도 바뀌지 않는다.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "counterpart": "`git status`로 `skills/lens-fit/SKILL.md`와 `skills/lens-grounding/SKILL.md`와 이 회차의 spec 과 plan 과 리뷰 기록 밖에 바뀐 파일이 없는지 확인한다.",
+      "principle": "EXPLICIT",
+      "consequence": "지금 성공 기준의 마지막 줄에는 예외가 없고 걸음 3 의 git status 문장에만 예외 넷이 적혀 있다."
+    },
+    {
+      "where": "머리말",
+      "type": "failure-mode",
+      "claim": "머리말이 걸음을 넷이라고 세는데 본문의 걸음은 다섯이다. 걸음 단위로 집행하는 세션은 머리말의 수를 완료 조건으로 쓰기 쉬워 걸음 4 를 마치고 다 했다고 보고하며 커밋 없이 끝난다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "바꾸는 파일은 둘이고 걸음은 넷이다.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "counterpart": "## 걸음 5 — 커밋한다",
+      "principle": "EXPLICIT",
+      "consequence": "지금 이 문서에는 걸음 절이 다섯이고 머리말은 넷이라고 적는다."
+    },
+    {
+      "where": "걸음 3 의 첫 문장과 「성공 기준」의 테스트 줄",
+      "type": "failure-mode",
+      "claim": "테스트 개수를 다섯으로 박았다. 레포의 계약은 FAIL=0 이고 기대 개수를 숫자로 박지 않는 것이며 설계도 통과 개수를 안 적는다고 명시했다. 검사 스크립트가 하나 늘거나 줄면 글로브는 맞고 성공 기준만 어긋난다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "`scripts/test_*.sh` 다섯을 실패한 이름을 모으는 형태로 돌리고 FAIL=0 을 확인한다.",
+      "counterpart_file": "CLAUDE.md",
+      "counterpart": "각 스크립트의 계약은 **FAIL=0**이며 기대 개수를 숫자로 박지 않는다",
+      "principle": "SSOT",
+      "consequence": "지금 계획은 두 곳에서 개수를 다섯으로 적고 설계는 통과 개수는 여기 적지 않는다고 적는다."
+    },
+    {
+      "where": "걸음 3 의 테스트를 돌리는 형태",
+      "type": "risk",
+      "claim": "테스트를 돌리는 명령을 적지 않고 그 형태만 산문으로 다시 설명한다. 명령의 소유자는 CLAUDE.md 이고 거기에 붙여 쓸 한 줄이 있다. 형태만 읽은 세션이 스크립트를 하나씩 따로 돌리면 앞의 실패가 묻히는 형태가 된다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "이어 돌리기만 하면 마지막 하나의 결과만 남아 앞의 실패가 묻힌다.",
+      "counterpart_file": "CLAUDE.md",
+      "counterpart": "`bad=\"\"; for t in scripts/test_*.sh; do bash \"$t\" || bad=\"$bad $t\"; done; [ -z \"$bad\" ] && echo \"ALL PASS\" || echo \"FAILED:$bad\"`",
+      "principle": "SSOT",
+      "consequence": "지금 계획의 걸음 3 에는 돌릴 명령이 없고 그 형태를 설명하는 문장만 있다."
+    },
+    {
+      "where": "걸음 1 의 레퍼런스 프롬프트와 출력 스키마 항목",
+      "type": "risk",
+      "claim": "doc_type 은 빈 issues 가 걸릴 것이 없었다인지 걸음 2 를 안 돌았다인지를 가르는 칸인데 그 사실을 아는 곳은 렌즈 파일뿐이다. 같은 구실을 하는 narrowed 는 집계 계약이 렌즈 추가 칸으로 이름을 부르고 test_audit.sh 가 그 등재를 검사한다. 이 회차는 그 등재도 검사도 못 붙이므로 그 사실을 사용자에게 넘겨야 한다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "스키마 아래 문단에 그 칸이 `null`이면 판정으로 쓰지 않는다는 규칙과 집계 대상이 아니라는 것을 적는다.",
+      "counterpart_file": "scripts/test_audit.sh",
+      "counterpart": "check \"집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다\"  \"grep -qF 'narrowed' '$HERE/skills/aggregating-lenses/SKILL.md'\"",
+      "principle": "FAIL-LOUD",
+      "consequence": "지금 aggregating-lenses 의 렌즈 추가 칸 열거는 여덟이고 doc_type 은 들어갈 자리가 없다."
+    },
+    {
+      "where": "걸음 1 의 머리말 항목",
+      "type": "irreversible",
+      "claim": "알림으로 온 정본 경로를 렌즈가 스스로 계약으로 승격하는 절을 넣는데 이것은 호출자를 못 고치는 이 회차의 사정 때문에 렌즈 안에 두는 임시 배선이다. 옆 브랜치가 호출자에 그 문장을 적고 나면 이 절은 발화하지 않는 채 남고 계약이 어디서 오는지를 둘이 정하게 된다. 완화는 그 절 본문에 발화 조건과 사라질 조건을 함께 적는 것이다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "프롬프트에 원칙 정본 경로가 들어 있으면 계약 칸에 없더라도 규칙집 계약으로 삼고, 무엇을 계약으로 삼았는지 `read`에 남긴다는 것이다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "counterpart": "호출자를 고치지 않는다.",
+      "principle": "REVERSIBLE",
+      "consequence": "지금 계획에는 이 승격 절을 언제 거두는지가 어느 걸음에도 없다."
+    }
+  ],
+  "principles_applied": ["FAIL-LOUD", "SSOT", "EXPLICIT", "REVERSIBLE", "Simplicity First", "Goal-Driven Execution", "Surgical Changes"],
+  "notes": "훑은 각도 넷을 따로 돌았다. 실패 모드에서 걸음 4 의 합격선과 머리말의 걸음 수와 걸음 3 의 명령 부재와 성공 기준 충돌 넷을 올렸다. 과설계는 올릴 것이 없었다. 비가역에서 봉인될 산출물과 걷어낼 조건 없이 남는 승격 절 둘을 올렸다. 위험에서 doc_type 의 가드가 편집 범위 밖이라는 것과 테스트 실행 형태를 올렸다. 확인하지 못한 것 둘이 남았다. 옆 브랜치의 실제 diff 를 열지 않아 그 브랜치가 lens-fit 의 - system: 한 줄을 함께 고치는지 모른다. 걸음 4 의 대상 문서가 이름으로 안 박혀 있어 결과가 재현되지 않는다."
+}

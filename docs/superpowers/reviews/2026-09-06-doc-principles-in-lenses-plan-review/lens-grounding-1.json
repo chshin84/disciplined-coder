@@ -1,0 +1,37 @@
+{
+  "lens": "lens-grounding",
+  "target": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+  "read": [
+    "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+    "skills/lens-fit/SKILL.md",
+    "skills/lens-grounding/SKILL.md",
+    "skills/aggregating-lenses/SKILL.md",
+    "skills/dispatching-lenses/SKILL.md",
+    "scripts/test_docs_drift.sh",
+    "scripts/test_audit.sh",
+    "scripts/test_scaffold.sh",
+    "scripts/test_hooks.sh",
+    "scripts/test_assertions.sh",
+    "scripts/seal_reviews.sh",
+    "agent-principles.md",
+    "CLAUDE.md",
+    "새 정본 사본 (canon-consolidation 브랜치의 agent-principles.md)",
+    "git branch --show-current, git status --short",
+    "docs/superpowers/reviews/2026-09-06-doc-principles-in-lenses-review/ 목록"
+  ],
+  "issues": [
+    {
+      "where": "걸음 1 「검증」과 걸음 2 「검증」",
+      "type": "contradiction",
+      "claim": "걸음 1 이 test_docs_drift.sh 와 test_audit.sh 둘이 lens-fit/SKILL.md 에 걸린 검사를 전부 갖는다고 단정하는데, scripts/test_scaffold.sh 가 skills/lens-*/ 디렉터리를 돌며 같은 파일에 세 검사를 더 건다. 걸음 2 가 이 문장을 그대로 이어받는다.",
+      "file": "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md",
+      "evidence": "이 둘이 이 파일에 걸린 검사를 전부 갖는다.",
+      "counterpart_file": "scripts/test_scaffold.sh",
+      "counterpart": "check \"lens-$l: principles_applied\"   \"grep -qF 'principles_applied' '$F'\"",
+      "principle": "팩트와 근거",
+      "consequence": "걸음 1 과 걸음 2 의 검증 칸에 test_scaffold.sh 가 빠져 있어 principles_applied 문자열이나 계약 포인터 문장이 밀려나도 걸음 안에서는 초록이 나오고 걸음 3 에 가서야 드러난다."
+    }
+  ],
+  "principles_applied": ["팩트와 근거", "Goal-Driven Execution", "FAIL-LOUD"],
+  "notes": "체크리스트를 축마다 따로 훑었다. 누락 축은 설계의 편집 대상 둘과 성공 기준을 계획의 걸음에 이어 보았고 빠진 것은 lens-consistency 쪽으로 올렸다. 환각 축에서 계획이 이름으로 부른 파일과 행을 모두 열어 확인했다. test_docs_drift.sh 472~478 행의 축 추출과 - system: 대조는 사실이고, 새 ## 절이 축 추출 범위 밖이라는 것도 사실이며, 브랜치 이름도 실재하고, 이 워크트리의 agent-principles.md 에 문서 타입 표가 없다는 것도 사실이다. CLAUDE.md 「변경 뒤 실행」과 걸음 3 도 어긋나지 않는다. 더 확인해야 할 것은 걸음 4 가 어느 정본 경로를 계약으로 넘기는지가 계획에 없다는 것이다."
+}

@@ -1,0 +1,89 @@
+{
+  "lens": "lens-consistency",
+  "target": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+  "read": [
+    "skills/lens-fit/SKILL.md",
+    "skills/lens-consistency/SKILL.md",
+    "skills/lens-grounding/SKILL.md",
+    "skills/lens-readability/SKILL.md",
+    "skills/lens-adversarial/SKILL.md",
+    "skills/lens-prior-art/SKILL.md",
+    "skills/dispatching-lenses/SKILL.md",
+    "skills/aggregating-lenses/SKILL.md",
+    "skills/domain-doc-upkeep/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "scripts/test_docs_drift.sh",
+    "scripts/test_audit.sh",
+    "새 정본 사본 (canon-consolidation 브랜치의 agent-principles.md)"
+  ],
+  "issues": [
+    {
+      "where": "「lens-consistency — 선언한 수정 규율을 대조한다」 첫 문단",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 체크리스트에 축 「선언과 취급」을 더하라고만 정하고 레퍼런스 프롬프트에 그 축을 싣는 걸음을 정하지 않았다. scripts/test_docs_drift.sh 는 렌즈 본문 「체크리스트」의 축 이름을 모두 뽑아 - system: 줄에 그 글자가 있는지 검사하므로 프롬프트를 안 고치면 그 검사가 떨어진다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "체크리스트에 축 하나를 더한다. 이름은 「선언과 취급」이다.",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "echo \"[렌즈 — 본문 축이 프롬프트에도 실린다]\"",
+      "principle": "EXPLICIT",
+      "consequence": "지금 skills/lens-consistency/SKILL.md 의 - system: 줄에는 「선언과 취급」이라는 글자가 없고, 설계의 성공 기준은 scripts/test_*.sh 다섯이 모두 FAIL=0 이라고 적는다."
+    },
+    {
+      "where": "「lens-grounding — 문서 검진에서의 출처를 적는다」",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 출처를 주는 쪽은 호출자인데 설계는 출처가 무엇인지를 렌즈 본문에만 적고 호출자 수정을 금지한다. domain-doc-upkeep 은 lens-fit 에 넘길 계약 셋만 열거하고 lens-grounding 에 무엇을 넘길지는 적지 않으며, audit-repo-docs 도 정본 경로와 목적 한 줄만 정한다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "문서 검진과 레포 문서 감사에서의 출처를 본문에 적는다. 그 문서가 주장하는 대상 코드와 인프라, 그리고 그 규칙의 소유자 문서 둘이다.",
+      "counterpart_file": "skills/lens-grounding/SKILL.md",
+      "counterpart": "출처는 호출자가 준다.",
+      "principle": "EXPLICIT",
+      "consequence": "지금 domain-doc-upkeep 과 audit-repo-docs 어느 쪽도 lens-grounding 에 소유자 문서 경로를 넘기라고 적지 않아, 렌즈 본문이 기대하는 출처가 프롬프트에 안 들어온 채로 돈다."
+    },
+    {
+      "where": "「문서 타입을 먼저 가리고 그 타입이 금지한 것을 본다」의 걸음 1과 그 아래 문단",
+      "type": "contradiction",
+      "claim": "걸음 1 은 타입을 못 가리면 notes 에 적고 걸음 3 으로 나머지 조항을 계속 훑으라고 정하는데, 바로 아래 문단은 그것을 '타입을 못 가리면 판정하지 않는 것'이라 부르며 lens-readability 가 목적을 못 받았을 때 판정 자체를 멈추는 규율과 같다고 적는다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "타입을 못 가리면 판정하지 않는 것은 `lens-readability`가 목적을 못 받았을 때 판정하지 않는 것과 같은 규율이다.",
+      "counterpart_file": "skills/lens-readability/SKILL.md",
+      "counterpart": "목적을 못 받으면 판정하지 않는다.",
+      "principle": "EXPLICIT",
+      "consequence": "지금 설계는 같은 걸음을 두 가지로 읽히게 적어 두었다."
+    },
+    {
+      "where": "「문서 타입을 먼저 가리고 그 타입이 금지한 것을 본다」와 「무엇을 하지 않는가」",
+      "type": "gap",
+      "claim": "산출물 공백이다. 타입을 못 가려 걸음 2 가 안 돈 회차와 걸음 2 를 돌아 걸릴 것이 없던 회차를 산출물에서 가를 칸이 없다. lens-readability 의 purpose 와 lens-prior-art 의 search_status 가 그 조용한 통과를 막는 칸인데 설계는 lens-fit 에 그런 칸을 두는 것도 두지 않는 것도 정하지 않는다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "1. 계약에 문서 타입 표가 있으면 검사 대상이 어느 타입인지 먼저 가린다. 못 가리면 짐작하지 말고 `notes`에 적는다.",
+      "counterpart_file": "skills/aggregating-lenses/SKILL.md",
+      "counterpart": "집계본만 보고 넘어가면 조용한 통과가 생긴다.",
+      "principle": "FAIL-LOUD",
+      "consequence": "지금 lens-fit 의 출력 스키마에는 purpose 나 search_status 에 해당하는 칸이 없고, 빈 issues 는 두 사정 모두에서 같은 모양으로 나온다."
+    },
+    {
+      "where": "「lens-readability — 경계를 적는다」 첫 문단",
+      "type": "contradiction",
+      "claim": "경계 문장이 타입·수명·수정 규율 셋을 lens-fit 과 lens-consistency 가 본다고 적지만, 같은 설계의 「무엇을 하는가」 표는 lens-fit 에 문서 타입을, lens-consistency 에 선언한 수정 규율을 배정할 뿐 수명을 보는 렌즈를 어디에도 두지 않는다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "그 셋은 `lens-fit`과 `lens-consistency`가 본다고 적어 판정이 겹치지 않게 한다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "counterpart": "| `lens-consistency` | 선언한 수정 규율과 실제 취급의 어긋남을 축에 더한다 | 선언이 상대편이 되므로 상대편 요구를 지킨다 |",
+      "principle": "EXPLICIT",
+      "consequence": "설계대로 적으면 lens-readability 는 수명을 다른 렌즈가 본다고 가리키는데, 그 다른 렌즈 어느 쪽에도 수명을 보는 축이 안 생긴다."
+    },
+    {
+      "where": "「문서 타입을 먼저 가리고 그 타입이 금지한 것을 본다」 걸음 1",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 정본의 문서 타입 표에는 SKILL.md 행이 없는데 audit-repo-docs 의 렌즈 배정 표는 lens-fit 을 처방 스킬과 렌즈 정의, 곧 SKILL.md 파일에 주로 건다. 레포 감사에서 걸음 1 이 대부분 '못 가림'으로 끝나는데 설계는 어느 행으로 읽을지를 정하지 않는다.",
+      "file": "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+      "evidence": "2. 그 타입 행이 담지 말라고 한 것을 담았는지 본다. 담았으면 그 표의 행을 상대편으로 삼아 올린다.",
+      "counterpart_file": "skills/audit-repo-docs/SKILL.md",
+      "counterpart": "| 렌즈 정의 | 렌즈 자신의 `SKILL.md` | `lens-fit` |",
+      "principle": "EXPLICIT",
+      "consequence": "지금 레포 감사에서 lens-fit 만 걸리는 문서는 렌즈 여섯의 SKILL.md 이고, 정본의 문서 타입 표에는 그 문서를 받는 행 이름이 없다."
+    }
+  ],
+  "principles_applied": ["SSOT", "EXPLICIT", "FAIL-LOUD", "NAME-ITEMS"],
+  "notes": "체크리스트를 항목마다 따로 훑었다. 모순 둘, 커버리지 공백 셋, 산출물 공백 하나를 올렸다. lens-adversarial 과 lens-prior-art 를 안 고친다는 판단은 두 렌즈의 축과 문서 규칙이 겹치지 않아 짝과 어긋나지 않는다. 드리프트는 올릴 것이 없었고 스코프도 한 구현 계획에 맞는 크기다. 더 확인해야 할 것은 옆 브랜치의 새 정본이 금지 낱말 목록의 소유자를 scripts/forbidden_words.tsv 로 옮기는데 lens-readability 는 domain-korean 의 「금지 표현」 표를 기준으로 적고 있어, 두 소유자 진술이 병합 뒤에도 갈리는지다."
+}
