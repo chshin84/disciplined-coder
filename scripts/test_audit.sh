@@ -140,5 +140,13 @@ check "뽑기 걸음이 사라졌다"              "! grep -qF '진술을 뽑아
 check "반박검증 개념이 안 남았다"          "! grep -qF '반박검증' '$PDA'"
 check "검증자 개념이 안 남았다"            "! grep -qF '검증자' '$PDA'"
 check "중복제거 에이전트 개념이 안 남았다" "! grep -qF '중복제거 에이전트' '$PDA'"
+PDA_STEP_TARGETS="$(awk '/^## 걸음/{f=1;next} f&&/^## /{exit} f&&/^\| [^|-]/{print}' "$PDA" | tail -n +2 | LC_ALL=C.UTF-8 grep -oE '「[^」]+」' | sed 's/「//; s/」//' | sort -u)"
+if [ -n "$PDA_STEP_TARGETS" ]; then
+  while IFS= read -r PDA_SEC; do
+    check "걸음 표가 가리키는 '$PDA_SEC' 절이 실제로 있다" "grep -qxF '## $PDA_SEC' '$PDA'"
+  done <<< "$PDA_STEP_TARGETS"
+fi || true
+check "적대적 렌즈를 저장소 전체에 따로 띄운다고 적는다" "grep -qF 'lens-adversarial' '$PDA' && grep -qF '저장소 전체를 입력으로 따로 한 번 띄운다' '$PDA'"
+check "따로 도는 이유가 자세 차이라고 적는다"           "grep -qF '자세가 반대' '$PDA' || grep -qF '설계를 공격하는 자세' '$PDA'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
