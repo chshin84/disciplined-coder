@@ -419,6 +419,19 @@ for id in EXPLAIN-STRUCTURE EXPLICIT FOCUSED IDEMPOTENT SSOT; do
   check "canon: old clause $id removed"              "! grep -qF '**\`$id\`' '$CANON'"
 done
 
+DC="$HERE/skills/domain-coding/SKILL.md"
+echo "[domain-coding] code rules live in one English skill"
+check "domain-coding exists"                          "[ -f '$DC' ]"
+for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution" "Do one thing well" "Single source of truth" "Idempotence" "Explicit is better than implicit" "Describe the change, not the diff"; do
+  check "domain-coding: section '$h'"                 "grep -qF '### $h' '$DC'"
+done
+for h in "Karpathy guidelines" "Principles" "Local first" "Reach"; do
+  check "domain-coding: section '$h'"                 "grep -qF '## $h' '$DC'"
+done
+check "domain-coding: Tradeoff line"                  "grep -qF '**Tradeoff:**' '$DC'"
+check "domain-coding: never claim done"               "grep -qF 'Never claim \"done\" without execution evidence' '$DC'"
+check "domain-coding: frontmatter name"               "grep -qF 'name: domain-coding' '$DC'"
+
 # --- standing-consent: 렌즈 호출에 대한 상시 허가가 정본에 있다 ---
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
 # 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 정본은 @import로 실리므로 이 한
