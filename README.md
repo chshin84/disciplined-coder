@@ -37,7 +37,7 @@ done
 
 ## 프로젝트 폴더에 생기는 파일
 
-새로 생기는 파일은 없다. 원칙은 `agent-principles.md` 한 곳에 둔다. SessionStart hook이 원칙을 `~/.claude/disciplined-coder/`에 셋업하고, `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다.
+새로 생기는 파일은 없다. 원칙은 `agent-principles.md` 한 곳에 둔다. 그 정본에는 파일 없는 답 한 번으로도 어길 수 있는 대화 규칙만 있고, 코딩 규칙은 `skills/domain-coding/SKILL.md`에, 문서의 분량과 수정 범위 규칙은 `skills/domain-writing/SKILL.md`에 있다. SessionStart hook이 원칙을 `~/.claude/disciplined-coder/`에 셋업하고, `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다.
 
 이 플러그인이 프로젝트 파일을 고치는 예외는 하나이고 그 조건은 여기가 정한다. 그 레포 `CLAUDE.md`에 관리블록이 남아 있고 그 블록을 만든 기능이 없어졌으면, 사본을 전역 백업에 복사한 뒤 제거한다. 그때의 잠금 대기 시간은 `scripts/_managed_block.sh`의 상수가 정한다.
 
@@ -48,7 +48,7 @@ done
 - **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고 `domain-spec-review` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 종료 차단이 해제된다. 차단은 턴에 한 번이다. 두 번째 종료 시도는 통과하므로 리뷰를 하지 않고도 턴을 끝낼 수 있다. 상세는 `skills/domain-spec-review/SKILL.md`를 참고한다.
 - **읽기 전용 차단** — 읽기 전용 속성이 선 파일에 `Write`나 `Edit`을 하려 하면 거부하고 사유를 보인다. 어느 프로젝트의 어느 파일이든 속성만 보며, 이 레포의 감사 기록은 만든 직후 `scripts/seal_reviews.sh`가 그 속성을 세운다. 풀려면 속성을 풀면 된다.
 - **넛지 셋** — 차단하지 않고 안내만 한다. spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 `domain-docs`의 양식을 제안하며, `.md`를 고치면 문서 검진을 권한다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
-- **카파시 플러그인 설치 권유** — 이 플러그인을 처음 깔았거나 갱신한 첫 세션에, 카파시(Andrej Karpathy)의 코딩 지침 플러그인 `andrej-karpathy-skills`가 이 PC에 없으면 설치 명령 두 줄을 세션 시작 알림으로 보인다. 설치하지는 않으며, 무시하면 다음 갱신까지 다시 뜨지 않는다. 정본의 「Karpathy 지침」 절은 그 플러그인의 네 절을 영어 그대로 옮기되 코드 밖의 문서와 절차에도 걸리게 낱말을 고친 것이고, 겹치던 조항은 정본에서 뺐다.
+- **카파시 플러그인 설치 권유** — 이 플러그인을 처음 깔았거나 갱신한 첫 세션에, 카파시(Andrej Karpathy)의 코딩 지침 플러그인 `andrej-karpathy-skills`가 이 PC에 없으면 설치 명령 두 줄을 세션 시작 알림으로 보인다. 설치하지는 않으며, 무시하면 다음 갱신까지 다시 뜨지 않는다. 정본의 「Think Before Acting」 절과 `domain-coding`·`domain-writing`의 카파시 절은 그 플러그인의 네 절을 옮긴 것이고, 겹치던 조항은 정본에서 뺐다.
 - **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다. 이 마켓플레이스 항목에만 `autoUpdate: true`를 넣어 깃허브의 갱신이 자동으로 적용되게 한다. 키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며, 사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다. 지키는 규칙은 `skills/domain-plugin/SKILL.md`의 「사용자 설정 파일을 고칠 때 지킬 것」을 참고한다.
 
 ## 주의

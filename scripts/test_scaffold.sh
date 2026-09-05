@@ -409,14 +409,10 @@ check "canon: local-first convention gone"           "! grep -qF 'LOCAL-FIRST' '
 for id in FAIL-LOUD KO-SYNTAX NAME-ITEMS PLAIN-KO PROSE-FORM READ-FLOW REVERSIBLE SECRETS; do
   check "canon: clause $id stays"                    "grep -qF '**\`$id\`' '$CANON'"
 done
-# 먼저 뺀 다섯은 살아 있는 문서 가드를 이미 통과한다 — Task 1 이 그 가드를 잠시라도 걷어내지 않도록 여기 둔다.
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD; do
+# 조항 이름은 정본에서도 살아 있는 문서에서도 되살아나면 안 된다. CLAUDE.md 도 함께 본다.
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD EXPLAIN-STRUCTURE EXPLICIT FOCUSED IDEMPOTENT SSOT; do
   check "canon: old clause $id removed"              "! grep -qF '**\`$id\`' '$CANON'"
-  check "live docs: no reference to $id"             "! grep -rqF '\`$id\`' '$HERE/skills' '$HERE/README.md' '$HERE/scripts/scaffold.sh'"
-done
-# 이번에 빼는 다섯은 살아 있는 문서에 아직 남아 있다. 그 가드는 Task 4 가 참조를 고친 뒤에 붙인다.
-for id in EXPLAIN-STRUCTURE EXPLICIT FOCUSED IDEMPOTENT SSOT; do
-  check "canon: old clause $id removed"              "! grep -qF '**\`$id\`' '$CANON'"
+  check "live docs: no reference to $id"             "! grep -rqF '\`$id\`' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/scripts/scaffold.sh'"
 done
 
 DC="$HERE/skills/domain-coding/SKILL.md"

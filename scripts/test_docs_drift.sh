@@ -214,7 +214,7 @@ for m in "${RULE_MARKS[@]}"; do
   check "소유자가 규율을 적는다: $m" "grep -qF -- '$m' \"\$OWNER_DOC\""
 done
 # 가리키기만 해야 하는 문서들. 규율 문구를 다시 적으면 실패한다.
-for D in "$HERE"/skills/domain-spec-review/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md; do
+for D in "$HERE"/skills/domain-spec-review/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$HERE"/skills/domain-coding/SKILL.md "$HERE"/skills/domain-writing/SKILL.md; do
   # 스킬 문서는 파일 이름이 모두 SKILL.md라 부모 디렉터리로 부른다 — 안 그러면 어느 문서가 실패했는지
   # 알 수 없다(`NAME-ITEMS`).
   dn="$(basename "$D")"; [ "$dn" = "SKILL.md" ] && dn="$(basename "$(dirname "$D")")"

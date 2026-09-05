@@ -124,7 +124,7 @@ fi
 # 4c) 카파시 플러그인 설치 넛지(안내만, 설치는 하지 않는다): 정본이 새로 깔리거나 갱신된 세션에만,
 #     그 플러그인이 아직 없을 때만 stdout 으로 알린다. 무시하면 다음 갱신까지 조용하다. 다른 플러그인을
 #     사용자 대신 까는 것은 지나치다는 결정이 있었다. 설치 여부는 Claude Code 의 설치 기록 파일의 키로 본다.
-#     정본의 Karpathy 지침 절은 이 플러그인의 네 절을 옮긴 것이다.
+#     정본의 Think Before Acting 절과 domain-coding·domain-writing 의 카파시 절은 이 플러그인의 네 절을 옮긴 것이다.
 KARPATHY_PLUGIN="andrej-karpathy-skills@karpathy-skills"
 KARPATHY_REPO="forrestchang/andrej-karpathy-skills"
 if [ "$canon_changed" -eq 1 ] && ! grep -qF "\"$KARPATHY_PLUGIN\"" "$CLAUDE_HOME/plugins/installed_plugins.json" 2>/dev/null; then
