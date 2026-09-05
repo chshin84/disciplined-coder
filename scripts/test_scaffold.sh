@@ -423,10 +423,10 @@ DC="$HERE/skills/domain-coding/SKILL.md"
 echo "[domain-coding] code rules live in one English skill"
 check "domain-coding exists"                          "[ -f '$DC' ]"
 for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution" "Do one thing well" "Single source of truth" "Idempotence" "Explicit is better than implicit" "Describe the change, not the diff"; do
-  check "domain-coding: section '$h'"                 "grep -qF '### $h' '$DC'"
+  check "domain-coding: section '$h'"                 "grep -qE '^### $h\$' '$DC'"
 done
 for h in "Karpathy guidelines" "Principles" "Local first" "Reach"; do
-  check "domain-coding: section '$h'"                 "grep -qF '## $h' '$DC'"
+  check "domain-coding: section '$h'"                 "grep -qE '^## $h\$' '$DC'"
 done
 check "domain-coding: Tradeoff line"                  "grep -qF '**Tradeoff:**' '$DC'"
 check "domain-coding: never claim done"               "grep -qF 'Never claim \"done\" without execution evidence' '$DC'"
