@@ -216,13 +216,20 @@ check "절차의 '짧은 문서 둘까지' 가 사라졌다"            "! grep 
 check "절차에 「일관성 대조」 절과 걸음 행이 있다"         "grep -qF '## 일관성 대조' '$PDA' && grep -qF '| 진술을 대조한다 |' '$PDA'"
 check "대상 목록을 손으로 적지 않고 도출한다고 적는다"    "grep -qF '목록은 손으로 적지 말고 파일에서 도출한다' '$PDA'"
 check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '$HERE/docs/superpowers/specs/2026-08-30-audit-unification-design.md' | grep -qF '2026-09-02-audit-record-and-diff-design.md'"
+# run.json 이 담을 것의 정본은 「통합 기록」 절의 run.json 서술 한 줄이다. 그 줄이 대상별
+# 렌즈 배정과 판정 개수를 여전히 담는다고 적는지, 그리고 픽스처가 그 두 사실을 실제로
+# 담는 필드를 갖는지 양쪽을 대조한다 — 정본 문장이나 픽스처 어느 한쪽만 바뀌어도 실패한다.
+PDA_RUNJSON_LINE="$(grep -F '**`run.json`**' "$PDA")"
+check "정본이 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '대상 문서마다 건 렌즈'"
+check "정본이 판정 개수를 담는다고 적는다"               "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '판정 개수'"
 RT2="$(mktemp -d)"; mkdir -p "$RT2/round"
 cat > "$RT2/round/run.json" <<'FIXTURE'
 { "schema": 1, "executor": "session", "commit": "abc", "tree_clean": true, "completed": true,
   "steps_done": ["targets"], "targets": [], "metrics": { "by_lens": {}, "confirmed": 0 } }
 FIXTURE
 rj2() { json_run "$1" "$RT2/round/$2"; }
-check "run.json 이 대상과 지표 필드를 담는다"           "rj2 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if \"targets\" in d and \"metrics\" in d and \"confirmed\" in d[\"metrics\"] else 1)' run.json"
+check "픽스처가 대상별 렌즈 배정 필드를 담는다"          "rj2 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if \"targets\" in d else 1)' run.json"
+check "픽스처가 판정 개수 필드를 담는다"                 "rj2 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if \"confirmed\" in d[\"metrics\"] else 1)' run.json"
 rm -rf "$RT2"
 
 echo "[audit_targets.sh — 배제 규칙이 실제로 걸린다]"
