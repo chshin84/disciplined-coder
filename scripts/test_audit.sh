@@ -243,4 +243,8 @@ check "머리에 superseded 가 있는 문서가 빠진다" "! printf '%s' \"\$E
 check "빠지지 않을 문서는 남는다"              "printf '%s' \"\$EXT_OUT\" | grep -q 'kept.md'"
 rm -rf "$EXT"
 
+echo "[안내 문서 — 실행체가 사라진 것을 반영한다]"
+check "CLAUDE.md 가 감사 기록 봉인을 적는다"  "grep -qF 'seal_reviews.sh' '$HERE/CLAUDE.md'"
+check "CLAUDE.md 가 읽기 전용 거부를 적는다"  "grep -qF '읽기 전용' '$HERE/CLAUDE.md'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

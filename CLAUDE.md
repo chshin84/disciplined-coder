@@ -4,6 +4,8 @@
 
 설계 문서는 `docs/superpowers/specs/`에, 계획 문서는 `docs/superpowers/plans/`에 쓴다. 그 두 폴더에 `.md`를 새로 쓰면 Stop 리뷰 게이트가 발동한다.
 
+이 레포에는 훅 넷이 걸린다. spec과 plan을 쓰면 Stop 게이트가 리뷰를 요구하고, 그 밖의 문서를 고치면 검진 넛지가 뜬다. 세션이 시작될 때 `scripts/seal_reviews.sh`가 `docs/superpowers/reviews/` 아래 기록을 읽기 전용으로 봉인하고, 읽기 전용 파일에 Write나 Edit을 걸면 훅이 사유와 함께 거부한다. 기록을 고치려다 거부당하면 훅 고장이 아니라 봉인이다.
+
 ## 변경 뒤 실행
 
 고친 것이 있으면 아래를 돌리고, 그다음 `claude plugin validate ./`를 실행한다. 각 스크립트의 계약은 **FAIL=0**이며 기대 개수를 숫자로 박지 않는다(`SSOT`).
