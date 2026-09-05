@@ -384,7 +384,7 @@ check "single managed region after run"         "[ \$(grep -cF '# BEGIN discipli
 CANON="$HERE/agent-principles.md"
 echo "[canon-sections] procedure sections are named, not numbered"
 for s in "원칙" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
-  check "canon: section '$s' present"      "grep -qF '## $s' '$CANON'"
+  check "canon: section '$s' present"      "grep -qE '^## $s\$' '$CANON'"
 done
 # 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
