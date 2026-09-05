@@ -175,23 +175,32 @@ check "런타임에 다시 리뷰 반복이 없다"        "grep -qF '다시 리
 # 그래서 앵커를 테스트에 박지 않고 정본에서 뽑아 온다. 정본 문안이 바뀌면 이 검사가 함께 따라간다.
 MA="$HERE/skills/meta-aggregate/SKILL.md"
 CONTRACT_EV="$(grep -o '"evidence": "[^"]*"' "$MA" | head -1 | sed 's/^"evidence": "//; s/"$//')"
-CONTRACT_EV_TAIL="${CONTRACT_EV#*— }"
 CONTRACT_CONSEQ="$(grep -o '"consequence": "[^"]*"' "$MA" | head -1 | sed 's/^"consequence": "//; s/"$//')"
 echo "[렌즈 스키마 사본]"
-check "정본에서 evidence 뜻풀이를 뽑았다"   "[ -n \"\$CONTRACT_EV_TAIL\" ] && [ \"\$CONTRACT_EV_TAIL\" != \"\$CONTRACT_EV\" ]"
+check "정본에서 evidence 뜻풀이를 뽑았다"   "[ -n \"\$CONTRACT_EV\" ]"
 check "정본에서 consequence 뜻풀이를 뽑았다" "[ -n \"\$CONTRACT_CONSEQ\" ]"
 for L in "$HERE"/skills/lens-*/SKILL.md; do
   n="$(basename "$(dirname "$L")")"
   if is_exc "$n"; then
     check "$n: 공통 계약 예외라 스키마 사본 대조에서 빠진다" "grep -qF '$n' \"\$AGG\""
   else
-    check "$n: evidence 가 정본의 근거 형태를 담는다"    "grep -qF -- \"\$CONTRACT_EV_TAIL\" '$L'"
     check "$n: consequence 뜻풀이가 정본과 같다"         "grep -qF -- \"\$CONTRACT_CONSEQ\" '$L'"
+    # counterpart_file 을 쓰는 렌즈만 evidence·file·principle 도 함께 정본과 대조한다 —
+    # audit_evidence.sh가 그 짝을 읽는 렌즈(grounding·fit·consistency·adversarial)에 한해서다.
+    # lens-prior-art 는 상대편이 저장소 안이 아니라 웹 인용이라 counterpart_file 자체를 안 쓰고
+    # evidence 뜻풀이도 웹 인용에 맞춰 따로 적는다(그 렌즈의 SKILL.md가 정본).
+    if grep -qF -- '"counterpart_file"' "$L"; then
+      check "$n: evidence 가 정본과 같은 문구를 담는다"  "grep -qF -- \"\$CONTRACT_EV\" '$L'"
+      check "$n: file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' '$L'"
+      check "$n: principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' '$L'"
+    fi
   fi
   # 조건부 필드를 렌즈가 다시 규정하면 필수 여부가 두 곳에서 갈린다 — 가리키기만 해야 한다.
   check "$n: principles_applied 규칙을 되풀이하지 않는다" "! grep -qF '제품 런타임 구현에는 요구하지 않는다' '$L'"
 done
 check "정본이 principles_applied 규칙을 소유한다" "grep -qF '제품 런타임 구현에는 요구하지 않는다' \"\$MA\""
+check "정본이 file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' \"\$MA\""
+check "정본이 principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' \"\$MA\""
 
 echo "[렌즈에게 정본을 알리는 법 — domain-docs 한 곳만 규율을 적는다]"
 # 전에 여러 문서가 각자 적었다가 하나에서 둘이 빠져 갈라졌다. 소유자를 하나로 두고

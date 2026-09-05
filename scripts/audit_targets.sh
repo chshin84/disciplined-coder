@@ -9,7 +9,7 @@ ROOT="$HERE"
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --root) ROOT="$2"; shift 2 ;;
-    *) shift ;;
+    *) echo "사용: audit_targets.sh [--root DIR]" >&2; exit 2 ;;
   esac
 done
 cd "$ROOT"

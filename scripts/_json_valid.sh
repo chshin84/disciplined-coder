@@ -10,10 +10,20 @@ _json_python() {  # stdout: 쓸 수 있는 인터프리터 이름. 없으면 1.
   else return 1
   fi
 }
+# PYTHONUTF8=1 을 여기서 한 번 세우는 이유. 이 PC 의 파이썬은 기본 인코딩이 cp949 다. 한국어를
+# 표준 출력에 내면 cp949 바이트가 나가고, 그 출력을 파일에 두었다가 encoding="utf-8" 로 다시 열면
+# UnicodeDecodeError 가 난다. 표준 입력으로 한국어를 파이프해도 같은 이유로 깨진다 — 2026-09-05 에
+# 같은 뿌리에서 세 번 깨졌다. 저장소의 모든 파이썬 호출이 json_run 하나를 지나므로 여기서 한 번
+# 세우면 호출자 전부가 물려받고, 스크립트마다 sys.stdout.reconfigure(encoding="utf-8") 를 기억할
+# 필요가 사라진다. 이미 넣어 둔 reconfigure 줄은 해가 없어 그대로 둔다.
+# 이 설정이 바꾸는 것은 파이썬 프로세스의 표준 입출력 기본 인코딩뿐이다. 파일 읽기는 이 저장소가
+# 전부 encoding= 을 명시하고 있어 바뀌지 않는다. 파이썬이 아닌 곳(셸의 printf·grep)은 이 설정과
+# 무관하다. 그리고 명령 치환으로 받은 출력을 같은 파이썬으로 되읽는 테스트는 쓰기와 읽기가 상쇄되어
+# 인코딩 결함을 못 잡으므로, 인코딩을 검사하는 단언은 출력을 파일에 저장한 뒤 다시 열어야 한다.
 json_run() {  # $1=파이썬 프로그램 문자열, 나머지=그 프로그램의 인자. stdin은 그대로 넘긴다.
   local py prog="$1"; shift
   py="$(_json_python)" || { echo "  (json_run: python3/python 모두 없음 — 검증 불능은 FAIL로 계상)" >&2; return 1; }
-  "$py" -c "$prog" "$@"
+  PYTHONUTF8=1 "$py" -c "$prog" "$@"
 }
 # stdin이 유효한 JSON인지 검사한다.
 json_valid_stdin() { json_run 'import json,sys; json.load(sys.stdin)'; }

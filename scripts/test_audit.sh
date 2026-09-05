@@ -35,6 +35,28 @@ check "파일로 저장한 출력을 UTF-8 로 다시 열어도 인용이 원문
   "json_run 'import json,sys; d=json.load(open(sys.argv[1], encoding=\"utf-8\")); sys.exit(0 if d[\"findings\"][0][\"evidence\"]==\"어긋난 문장이 여기 있다.\" else 1)' '$EVT/ev_out.json'"
 rm -rf "$EVT"
 
+echo "[F1 — audit_evidence.sh 가 읽는 칸이 렌즈 스키마에 다 있다]"
+# 픽스처가 필수 칸을 손으로 적으면, 렌즈 문서에서 칸이 빠져도 이 테스트는 못 잡는다(실제로 그랬다).
+# 그래서 스크립트가 실제로 읽는 칸(정규식으로 뽑는다)과 meta-aggregate 공통 스키마의 issues 필드
+# 집합(같은 방식으로 뽑는다)을 맞대어, 스크립트가 읽는 칸 가운데 스키마에 없는 것이 있으면 실패한다.
+# 렌즈 넷의 출력 스키마가 다시 file 이나 principle 을 빼면 여기서 걸린다.
+MA="$HERE/skills/meta-aggregate/SKILL.md"
+EVK_PROG='
+import re, sys, json
+ev = open(sys.argv[1], encoding="utf-8").read()
+evk = sorted(set(re.findall(r"f\.get\(\"([a-z_]+)\"", ev)))
+ma = open(sys.argv[2], encoding="utf-8").read()
+m = re.search(r"\"issues\": \[(.*?)\],\s*\"principles_applied\"", ma, re.S)
+sk = sorted(set(re.findall(r"\"([a-z_]+)\":", m.group(1)))) if m else []
+missing = sorted(set(evk) - set(sk))
+json.dump({"evk": evk, "sk": sk, "missing": missing}, sys.stdout)
+'
+EVK_JSON="$(json_run "$EVK_PROG" "$EV" "$MA")"
+evkq() { printf '%s' "$EVK_JSON" | json_run "$1"; }
+check "audit_evidence.sh 가 읽는 칸을 뽑아냈다"          "evkq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"evk\"] else 1)'"
+check "렌즈 공통 스키마의 issues 필드를 뽑아냈다"        "evkq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"sk\"] else 1)'"
+check "audit_evidence.sh 가 읽는 칸이 스키마 필드에 다 있다" "evkq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if not d[\"missing\"] else 1)'"
+
 echo "[audit_rounds.sh — 회차 대조와 측정]"
 AR="$HERE/scripts/audit_rounds.sh"
 check "스크립트가 있다" "[ -f '$AR' ]"
@@ -61,7 +83,7 @@ cat > "$ART/cur.json" <<'FIXTURE'
 ] }
 FIXTURE
 AR_DIFF="$(bash "$AR" diff --root "$ART" "$ART/prior.json" "$ART/cur.json" 2>/dev/null || true)"
-arq() { printf '%s' "$AR_DIFF" | PYTHONUTF8=1 json_run "$1"; }
+arq() { printf '%s' "$AR_DIFF" | json_run "$1"; }
 check "대조 출력이 JSON 이다"            "printf '%s' \"\$AR_DIFF\" | json_valid_stdin"
 check "인용이 남아 있으면 잔존이다"       "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"p#001\"][0]; sys.exit(0 if i[\"verdict\"]==\"잔존\" else 1)'"
 check "인용이 사라졌으면 해소다"          "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"p#002\"][0]; sys.exit(0 if i[\"verdict\"]==\"해소\" else 1)'"
@@ -72,7 +94,7 @@ AR_DIFF2="$(bash "$AR" diff --root "$ART" "$ART/prior.json" "$ART/cur.json" 2>/d
 check "두 번 계산해도 같은 결과다"        "[ \"\$AR_DIFF\" = \"\$AR_DIFF2\" ]"
 printf '%s' "$AR_DIFF" > "$ART/diff.json"
 AR_MET="$(bash "$AR" metrics --tokens 1000 --seconds 60 "$ART/prior.json" "$ART/diff.json" 2>/dev/null || true)"
-amq() { printf '%s' "$AR_MET" | PYTHONUTF8=1 json_run "$1"; }
+amq() { printf '%s' "$AR_MET" | json_run "$1"; }
 check "측정 출력이 JSON 이다"             "printf '%s' \"\$AR_MET\" | json_valid_stdin"
 check "렌즈별로 낸 수와 확정 수를 센다"    "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"by_lens\"][\"lens-fit\"]=={\"raised\":2,\"confirmed\":1} else 1)'"
 check "확정 하나당 값을 낸다"             "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"tokens_per_confirmed\"]==500 else 1)'"
@@ -86,6 +108,10 @@ for L in lens-grounding lens-fit lens-consistency lens-adversarial; do
   check "$L 이 결과 기준을 적는다"       "grep -qF '지금 무엇이 그렇게 되어 있는지' '$F' && grep -qF '앞으로 벌어질 일을 적지 않는다' '$F'"
   check "$L 에 기계에 넘기는 것 절이 있다" "grep -qF '## 기계에 넘기는 것' '$F'"
   check "$L 에 결과 칸의 옛 기준이 안 남았다" "! grep -qF '이대로 두면 무엇이 어떻게 잘못되는' '$F'"
+  # F16 — 「발견의 문턱」이 상대편을 필수로 요구해도 system 프롬프트가 그 요구를 안 실으면 실제로
+  # 도는 것(프롬프트)에는 안 걸린다. 프롬프트 줄 자체에 짚은 곳·상대편·원칙 요구가 있는지 본다.
+  check "$L 의 system 프롬프트가 상대편·원칙 요구를 싣는다" \
+    "grep -m1 '^- system:' '$F' | grep -qF 'counterpart_file' && grep -m1 '^- system:' '$F' | grep -qF '상대편을 못 대면 올리지 마라'"
 done
 check "lens-grounding 이 인용 확인을 스크립트에 넘긴다" "grep -qF 'audit_evidence.sh' '$HERE/skills/lens-grounding/SKILL.md'"
 check "lens-adversarial 은 넘길 것이 없다고 적는다"      "grep -qF '기계에 넘길 것이 없다' '$HERE/skills/lens-adversarial/SKILL.md'"
@@ -135,7 +161,6 @@ check "인용 확인 스크립트를 부른다"       "grep -qF 'audit_evidence.
 check "회차 대조 스크립트를 부른다"       "grep -qF 'audit_rounds.sh' '$PDA'"
 check "세션이 판정한다고 적는다"          "grep -qF '세션이 판정한다' '$PDA'"
 check "기록 파일 넷을 적는다"             "grep -qF 'run.json' '$PDA' && grep -qF 'findings.json' '$PDA' && grep -qF 'diff.json' '$PDA' && grep -qF 'suggestions.json' '$PDA'"
-check "실행체를 가리키지 않는다"          "! grep -qF 'self-audit.js' '$PDA'"
 check "뽑기 걸음이 사라졌다"              "! grep -qF '진술을 뽑아 이름표로 모은다' '$PDA'"
 check "반박검증 개념이 안 남았다"          "! grep -qF '반박검증' '$PDA'"
 check "검증자 개념이 안 남았다"            "! grep -qF '검증자' '$PDA'"
@@ -180,11 +205,24 @@ AT_OUT="$(bash "$AT" 2>/dev/null || true)"
 check "한 줄에 경로 하나만 낸다"       "! printf '%s' \"\$AT_OUT\" | grep -q \$'\t'"
 check "대상이 하나 이상이다"           "[ -n \"\$AT_OUT\" ]"
 check "지난 기록은 대상이 아니다"      "! printf '%s' \"\$AT_OUT\" | grep -q '^docs/superpowers/'"
+check "모르는 인자를 주면 실패 종료한다" "! bash '$AT' --limit >/dev/null 2>&1"
+# 그 밖의 살아 있는 .md 전부가 있다 — 기대 목록을 스크립트와 같은 규칙(대상 아님·HANDOFF-·
+# superseded)으로 git 에서 도출해 실제 출력과 견준다. 조각 출력이 사라졌으므로 경로만 견준다.
+AT_MISS=""
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  head -12 "$HERE/$f" | grep -qi superseded && continue
+  printf '%s\n' "$AT_OUT" | grep -qxF "$f" || AT_MISS="$AT_MISS $f"
+done <<EOF
+$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -vE '(^|/)HANDOFF-[^/]*$')
+EOF
+[ -n "$AT_MISS" ] && echo "    빠진 문서:$AT_MISS"
+check "살아 있는 .md 가 모두 있다"     "[ -z \"\$AT_MISS\" ]"
 
 echo "[회차 기록의 형태 — 픽스처로 검사한다]"
 RT="$(mktemp -d)"; mkdir -p "$RT/round"
 cat > "$RT/round/run.json" <<'FIXTURE'
-{ "schema": 1, "executor": "session", "commit": "abc", "tree_clean": true, "completed": true,
+{ "schema": 1, "executor": "self-audit", "commit": "abc", "tree_clean": true, "completed": true,
   "steps_done": ["targets"], "targets": [], "metrics": { "by_lens": {}, "confirmed": 0 } }
 FIXTURE
 cat > "$RT/round/findings.json" <<'FIXTURE'
@@ -196,11 +234,26 @@ FIXTURE
 printf '{ "schema": 1, "no_prior_round": true, "items": [], "new_ids": [] }\n' > "$RT/round/diff.json"
 printf '{ "schema": 1, "suggestions": [] }\n' > "$RT/round/suggestions.json"
 rj() { json_run "$1" "$RT/round/$2"; }
-check "run.json 이 파싱된다"           "rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' run.json"
-check "findings.json 의 status 가 닫힌 집합이다" "rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(f[\"status\"] in (\"confirmed\",\"rejected\",\"undetermined\",\"derived\") for f in d[\"findings\"]) else 1)' findings.json"
-check "발견마다 상대편과 지문이 있다"   "rj 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(f.get(\"counterpart\") and f.get(\"fingerprint\") for f in d[\"findings\"]) else 1)' findings.json"
-check "diff.json 이 파싱된다"          "rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' diff.json"
-check "suggestions.json 이 파싱된다"   "rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' suggestions.json"
+# (지운 단언) run.json·diff.json·suggestions.json 이 파싱된다 — 이 픽스처는 이 테스트 자신이 방금
+# 쓴 문자열이다. "유효한 JSON을 다시 읽으면 유효하다"는 파싱만 보는 것이라 이 스크립트나 문서 어느
+# 쪽이 어긋나도 못 잡는다. F8이 정한 "파싱만 보는 것은 지운다"에 해당해 걷어냈다.
+# (지운 단언) 발견마다 상대편과 지문이 있다 — 이 픽스처가 counterpart·fingerprint 를 손으로 채워
+# 넣고 그 값이 있는지를 같은 픽스처에서 되읽는 것이라 자기 자신을 증언하는 것과 같다. audit_evidence.sh
+# 가 그 칸을 실제로 읽는지는 위 [F1] 구획이 스키마와 대조해 이미 본다.
+# status 의 닫힌 집합은 이 파일이 손으로 든 리터럴이 아니라 계획 문서의 한 문장에서 뽑는다 —
+# 문서가 상태 이름을 더하거나 빼면 여기서 같이 갈린다(계획 문서나 이 픽스처 어느 한쪽만 바뀌어도 실패).
+STATUS_SRC="$HERE/docs/superpowers/plans/2026-09-05-findings-bar-and-deterministic-first.md"
+STATUS_LINE="$(grep -F '`status`가' "$STATUS_SRC" | head -1)"
+STATUS_SET="$(printf '%s' "$STATUS_LINE" | grep -oE '`[a-z]+`' | tr -d '`' | sort -u | tr '\n' ' ')"
+check "계획 문서에서 status 닫힌 집합을 뽑았다" "[ -n \"\$STATUS_SET\" ]"
+STATUS_PROG='
+import json, sys
+allowed = set(sys.argv[2].split())
+d = json.load(open(sys.argv[1], encoding="utf-8"))
+sys.exit(0 if all(f.get("status") in allowed for f in d["findings"]) else 1)
+'
+check "findings.json 의 status 가 계획 문서의 닫힌 집합 안이다" \
+  "json_run \"\$STATUS_PROG\" '$RT/round/findings.json' \"\$STATUS_SET\""
 rm -rf "$RT"
 
 echo "[문서 — 일관성 방법이 절차와 렌즈에 적혔다]"
@@ -222,15 +275,11 @@ check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '
 PDA_RUNJSON_LINE="$(grep -F '**`run.json`**' "$PDA")"
 check "정본이 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '대상 문서마다 건 렌즈'"
 check "정본이 판정 개수를 담는다고 적는다"               "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '판정 개수'"
-RT2="$(mktemp -d)"; mkdir -p "$RT2/round"
-cat > "$RT2/round/run.json" <<'FIXTURE'
-{ "schema": 1, "executor": "session", "commit": "abc", "tree_clean": true, "completed": true,
-  "steps_done": ["targets"], "targets": [], "metrics": { "by_lens": {}, "confirmed": 0 } }
-FIXTURE
-rj2() { json_run "$1" "$RT2/round/$2"; }
-check "픽스처가 대상별 렌즈 배정 필드를 담는다"          "rj2 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if \"targets\" in d else 1)' run.json"
-check "픽스처가 판정 개수 필드를 담는다"                 "rj2 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if \"confirmed\" in d[\"metrics\"] else 1)' run.json"
-rm -rf "$RT2"
+# (지운 단언 둘) 픽스처가 대상별 렌즈 배정·판정 개수 필드를 담는다 — 이 파일 바로 위에서 손으로 쓴
+# run.json 리터럴에 그 키가 있는지를 같은 파일에서 되읽는 것이라, 정본 문장이 그 필드를 빼도 이
+# 픽스처는 안 바뀌어 계속 통과한다(F8). 바로 위 두 check(정본이 대상별 렌즈 배정/판정 개수를
+# 담는다고 적는다)가 정본 산문 쪽은 이미 보므로, 나머지는 F4의 metrics 필드 실측(아래
+# [audit_rounds.sh — 회차 대조와 측정] 구획)이 실제 계산 결과로 대신한다.
 
 echo "[audit_targets.sh — 배제 규칙이 실제로 걸린다]"
 EXT="$(mktemp -d)"
@@ -243,11 +292,32 @@ check "머리에 superseded 가 있는 문서가 빠진다" "! printf '%s' \"\$E
 check "빠지지 않을 문서는 남는다"              "printf '%s' \"\$EXT_OUT\" | grep -q 'kept.md'"
 rm -rf "$EXT"
 
+echo "[audit_topics.sh — 이름표 목록]"
+# 「일관성 대조」의 표 대조 걸음이 이름표 목록을 이 스크립트에서 받는다. 아무도 안 부른다고 죽은
+# 코드로 오인해 검사까지 함께 지워졌었다. 909eb39 의 세 단언을 되살린다.
+ATP="$HERE/scripts/audit_topics.sh"
+check "스크립트가 있다" "[ -f '$ATP' ]"
+ATP_OUT="$(bash "$ATP" 2>/dev/null || true)"
+ATP_MISS=""
+while IFS= read -r want; do
+  [ -n "$want" ] || continue
+  printf '%s\n' "$ATP_OUT" | grep -qxF "$want" || ATP_MISS="$ATP_MISS [$want]"
+done <<TOPICEOF
+$(grep -oE '^- \*\*`[A-Z-]+`' "$HERE/agent-principles.md" | sed 's/^- \*\*`//; s/`$//')
+$(grep '^## ' "$HERE/agent-principles.md" | sed 's/^## //')
+$(ls "$HERE/skills")
+$(ls "$HERE/commands" | sed 's/\.md$//')
+TOPICEOF
+[ -n "$ATP_MISS" ] && echo "    빠진 이름표:$ATP_MISS"
+check "정본 원칙 ID·절 제목·스킬·명령 이름이 모두 있다" "[ -z \"\$ATP_MISS\" ]"
+check "중복이 없다" "[ \"\$(printf '%s\n' \"\$ATP_OUT\" | sort | uniq -d | wc -l)\" = 0 ]"
+check "절차의 표 대조가 이 스크립트를 부른다" "grep -qF 'audit_topics.sh' '$PDA'"
+
 echo "[안내 문서 — 실행체가 사라진 것을 반영한다]"
 check "CLAUDE.md 가 감사 기록 봉인을 적는다"  "grep -qF '봉인' '$HERE/CLAUDE.md'"
 check "CLAUDE.md 가 읽기 전용 거부를 적는다"  "grep -qF '읽기 전용' '$HERE/CLAUDE.md'"
-check "CLAUDE.md 가 훅 목록의 정본을 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -qF '정본' '$HERE/CLAUDE.md'"
+check "CLAUDE.md 가 훅 목록의 정본을 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -F 'README.md' '$HERE/CLAUDE.md' | grep -qF '정본'"
 check "CLAUDE.md 가 훅 개수를 세지 않는다" \
-  "! grep -qE '훅 (한|하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)' '$HERE/CLAUDE.md' && ! grep -qE '(하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)(개|가지)?(의)? 훅' '$HERE/CLAUDE.md'"
+  "! grep -qE '훅 (한|하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)' '$HERE/CLAUDE.md' && ! grep -qE '(하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)(개|가지)?(의)? 훅' '$HERE/CLAUDE.md' && ! grep -qE '훅 [0-9]+개' '$HERE/CLAUDE.md' && ! grep -qE '[0-9]+ ?개의 훅' '$HERE/CLAUDE.md'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
