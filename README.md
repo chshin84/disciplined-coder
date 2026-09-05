@@ -48,7 +48,7 @@ done
 - **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고 `domain-spec-review` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 종료 차단이 해제된다. 차단은 턴에 한 번이다. 두 번째 종료 시도는 통과하므로 리뷰를 하지 않고도 턴을 끝낼 수 있다. 상세는 `skills/domain-spec-review/SKILL.md`를 참고한다.
 - **읽기 전용 차단** — 읽기 전용 속성이 선 파일에 `Write`나 `Edit`을 하려 하면 거부하고 사유를 보인다. 어느 프로젝트의 어느 파일이든 속성만 보며, 이 레포의 감사 기록은 만든 직후 `scripts/seal_reviews.sh`가 그 속성을 세운다. 풀려면 속성을 풀면 된다.
 - **넛지 셋** — 차단하지 않고 안내만 한다. spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 `domain-docs`의 양식을 제안하며, `.md`를 고치면 문서 검진을 권한다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
-- **카파시 플러그인 설치 권유** — 이 플러그인을 처음 깔았거나 갱신한 첫 세션에, 카파시(Andrej Karpathy)의 코딩 지침 플러그인 `andrej-karpathy-skills`가 이 PC에 없으면 설치 명령 두 줄을 세션 시작 알림으로 보인다. 설치하지는 않으며, 무시하면 다음 갱신까지 다시 뜨지 않는다. 정본의 `SURGICAL` 조항은 그 플러그인의 Surgical Changes와 맞춰 두었다.
+- **카파시 플러그인 설치 권유** — 이 플러그인을 처음 깔았거나 갱신한 첫 세션에, 카파시(Andrej Karpathy)의 코딩 지침 플러그인 `andrej-karpathy-skills`가 이 PC에 없으면 설치 명령 두 줄을 세션 시작 알림으로 보인다. 설치하지는 않으며, 무시하면 다음 갱신까지 다시 뜨지 않는다. 정본의 「Karpathy 지침」 절은 그 플러그인의 네 절을 영어 그대로 옮기되 코드 밖의 문서와 절차에도 걸리게 낱말을 고친 것이고, 겹치던 조항은 정본에서 뺐다.
 - **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다. 이 마켓플레이스 항목에만 `autoUpdate: true`를 넣어 깃허브의 갱신이 자동으로 적용되게 한다. 키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며, 사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다. 지키는 규칙은 `skills/domain-plugin/SKILL.md`의 「사용자 설정 파일을 고칠 때 지킬 것」을 참고한다.
 
 ## 주의

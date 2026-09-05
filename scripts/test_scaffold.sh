@@ -383,12 +383,26 @@ check "single managed region after run"         "[ \$(grep -cF '# BEGIN discipli
 # 있으므로 그 이름으로 부르고, 옛 서수 제목이 되살아나지 않는지 함께 본다.
 CANON="$HERE/agent-principles.md"
 echo "[canon-sections] procedure sections are named, not numbered"
-for s in "원칙" "검증" "미해결의 처분" "병렬 오케스트레이션" "문서와 상태의 위생"; do
+for s in "원칙" "Karpathy 지침" "검증" "미해결의 처분" "병렬 오케스트레이션" "문서와 상태의 위생"; do
   check "canon: section '$s' present"      "grep -qF '## $s' '$CANON'"
 done
 # 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
 check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
+
+# --- karpathy-in-canon: 카파시 지침 넷은 정본의 Karpathy 지침 절에 영어로 실린다 ---
+# 그 플러그인은 스킬이라 연 세션에만 닿는다. 정본은 @import로 상시 실리므로 본문을 정본에 두되, 코드에
+# 국한된 낱말은 문서와 절차에도 걸리게 고쳤다. 겹치던 옛 조항 다섯은 이름까지 뺐고, 살아 있는 문서가
+# 그 옛 이름을 다시 부르면 여기서 잡는다.
+echo "[karpathy-in-canon] karpathy guidelines live in the canon, generalized beyond code"
+for h in "Think Before Acting" "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
+  check "canon: guideline '$h' present"      "grep -qF '### $h' '$CANON'"
+done
+check "canon: generalized beyond code"        "grep -qF 'Before implementing, writing, or deciding:' '$CANON'"
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD; do
+  check "canon: old clause $id removed"       "! grep -qF '**\`$id\`' '$CANON'"
+  check "live docs: no reference to $id"      "! grep -rqF '\`$id\`' '$HERE/skills' '$HERE/README.md' '$HERE/scripts/scaffold.sh'"
+done
 
 # --- standing-consent: 렌즈 호출에 대한 상시 허가가 정본에 있다 ---
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
@@ -417,15 +431,12 @@ check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$
 # 이 규칙이 리뷰 스킬 한 곳에만 있으면 그 스킬을 열지 않은 세션에는 닿지 않는다. 실제로 문서 검진
 # 세션이 다시 돌릴지를 평문으로 물어 선택 대화창이 뜨지 않았다. 묻는 방식은 특정 절차의 성질이 아니라
 # 소통 규칙이므로 상시 로드되는 항목에 두고, 리뷰 스킬은 그것을 가리키기만 한다(SSOT).
-CC_LINE="$(grep -F '**`ASK-FORK`' "$CANON" || true)"
 SR="$HERE/skills/domain-spec-review/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
-check "ASK-FORK 항목이 잡힌다"              "[ -n \"\$CC_LINE\" ]"
-check "ASK-FORK: 선택지 질문지 규칙"        "printf '%s' \"\$CC_LINE\" | grep -qF -- '선택지가 있는 질문으로 묻는다'"
-check "ASK-FORK: 평문 금지"                 "printf '%s' \"\$CC_LINE\" | grep -qF -- '평문으로 묻지 않는다'"
+check "canon: 선택지 질문 규칙"             "grep -qF -- 'ask - as a question with options, never in plain prose' '$CANON'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
-check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'ASK-FORK'"
+check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'Think Before Acting'"
 
 # --- canon-refresh: 이미 옛 정본을 갖고 있는 PC도 갱신을 받는다 ---
 # 갓 설치한 경로만 검사하면, 정본 복사를 '없을 때만'으로 바꿔도 초록이 유지된다. 바로 이웃한 두
