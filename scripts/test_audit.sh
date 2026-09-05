@@ -109,10 +109,13 @@ check "문서 검진이 렌즈를 각각 부르지 않는다" "! grep -qF '각�
 echo "[호출자 — 디스패치와 집계 계약]"
 SR="$HERE/skills/domain-spec-review/SKILL.md"
 MA="$HERE/skills/meta-aggregate/SKILL.md"
-check "spec 리뷰가 렌즈마다 띄우지 않는다"   "! grep -qF '렌즈마다 서브에이전트를' '$SR'"
+check "spec 리뷰 본문에서 렌즈당 개별 디스패치 문구가 지워졌다" "! grep -qF '렌즈당 읽기 전용 서브에이전트를 한 번씩 띄운다' '$SR'"
+check "spec 리뷰 frontmatter에서 렌즈마다 개별 디스패치 문구가 지워졌다" "! grep -qF '렌즈마다 한 번씩 띄우고' '$SR'"
+check "spec 리뷰가 대상 하나에 호출 하나를 띄우는 새 문장을 담는다" "grep -qF '검토 대상 하나에 호출 하나를 띄우고 그 호출이 대상을 한 번 읽고 배정된 렌즈를 차례로 적용한다' '$SR'"
 check "spec 리뷰가 규율 소유자를 가리킨다"   "grep -qF '한 번만 띄우는 렌즈의 규율' '$SR'"
 check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
 check "집계 계약이 제안 채널을 가른다"       "grep -qF 'suggestions' '$MA' && grep -qF '집계 대상이 아니다' '$MA'"
-check "두 예외 문장이 각자 다른 규칙을 밝힌다" "grep -qF '대상마다 따로 띄우는 이 절차에서 예외는' '$SR' && grep -qF '한 대상의 렌즈를 한 호출로 묶는 이 규칙의 예외로' '$SR'"
+check "묶는 규칙의 예외가 lens-adversarial 이름과 한 문장에 묶여 있다" "grep -qF '한 대상의 렌즈를 한 호출로 묶는 이 규칙의 예외로, 자세가 반대인 \`lens-adversarial\`만 따로 띄운다' '$SR'"
+check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "grep -qF '대상마다 따로 띄우는 이 절차에서 예외는 \`lens-prior-art\` 하나이며' '$SR'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
