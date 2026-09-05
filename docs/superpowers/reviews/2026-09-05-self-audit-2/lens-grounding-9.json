@@ -1,0 +1,66 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/nested-orchestration/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/domain-spec-review/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "hooks/hooks.json",
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "hooks/spec_review_stop.sh",
+  "hooks/_spec_marker.sh",
+  ".claude/settings.json",
+  "scripts/test_scaffold.sh",
+  "scripts/test_docs_drift.sh",
+  "docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+  "docs/superpowers/plans/2026-07-05-nested-orchestration.md",
+  "README.md"
+ ],
+ "issues": [
+  {
+   "where": "「L2 디스패치 템플릿」 블록 4 방식",
+   "type": "mismatch",
+   "claim": "이 문서는 L2가 코드 diff에 `lens-adversarial`을 붙이라고 지시하는데, `lens-adversarial`은 자기 대상을 설계 문서로, 자기 호출자를 domain-spec-review와 project-doc-audit 둘로 적고 있어 nested-orchestration도 코드 diff도 그 목록에 없다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "SDD 태스크 렌즈를 쓰고, 필요하면 `lens-grounding`과 `lens-adversarial`을 더한다.",
+   "counterpart_file": "skills/lens-adversarial/SKILL.md",
+   "counterpart": "domain-spec-review의 설계 문서 리뷰와 project-doc-audit의 레포 문서 감사가 읽기 전용 서브에이전트로 호출한다.",
+   "principle": "SSOT",
+   "consequence": "렌즈 문서는 호출자 둘과 대상(설계 문서)을 적고, 이 문서는 셋째 호출자(L2)와 다른 대상(diff)을 적어, 어느 문서도 상대편을 가리키지 않은 채 두 문서가 서로 다른 호출자 목록을 들고 있다."
+  },
+  {
+   "where": "「L2 디스패치 템플릿」 블록 4 방식",
+   "type": "mismatch",
+   "claim": "`lens-grounding`은 출처(source)를 호출자가 준다고 하며 호출자 넷을 이름으로 적는데, 이 문서는 L2가 diff에 `lens-grounding`을 띄우라고 하면서 그 호출자 목록에 들어 있지 않고 diff 리뷰의 출처가 무엇인지도 적지 않는다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "읽기 전용 렌즈 서브에이전트가 diff를 읽고 발견을 돌려주면 L2가 고친다.",
+   "counterpart_file": "skills/lens-grounding/SKILL.md",
+   "counterpart": "호출자(domain-llm-runtime의 런타임 리뷰, domain-spec-review, domain-docs의 문서 검진, project-doc-audit의 레포 문서 감사)가 source를 제공한다.",
+   "principle": "EXPLICIT",
+   "consequence": "lens-grounding 문서의 호출자 넷에 L2가 없고, 이 문서의 L2 템플릿에는 diff 리뷰에서 렌즈에 넘길 출처가 적혀 있지 않아, L2가 무엇을 source로 주는지 두 문서 어디에도 없다."
+  },
+  {
+   "where": "「L2 디스패치 템플릿」 블록 6 산출 계약",
+   "type": "mismatch",
+   "claim": "리포트 위치를 첫 문장은 '제품 트리 밖'으로, 마지막 문장은 '프로젝트 밖 스크래치'로 적는데, 문서 넛지 훅이 조용해지는 경계는 CLAUDE_PROJECT_DIR 바깥(프로젝트 밖)이지 제품 트리 밖이 아니다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "리포트는 제품 트리 밖의 워크스트림별 고유 경로(예: `report-<workstream>.md`)에 쓰고 병합될 브랜치에는 커밋하지 않는다.",
+   "counterpart_file": "hooks/doc_review_posttooluse.sh",
+   "counterpart": "프로젝트 밖 문서에는 걸지 않는다.",
+   "principle": "EXPLICIT",
+   "consequence": "같은 블록 안에 리포트 위치의 경계가 '제품 트리 밖'과 '프로젝트 밖'으로 두 번 다르게 적혀 있고, 훅은 그 가운데 뒤쪽 경계만 본다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "SIMPLE",
+  "MEASURE-FIRST"
+ ],
+ "notes": "누락·모순·환각·불일치 네 각도를 각각 훑었다. 확인해서 맞은 것: 「병렬 오케스트레이션」 절은 agent-principles.md에 있고 nested-orchestration을 가리킨다. 문서 넛지가 프로젝트 안 .md에만 뜬다는 주장은 hooks/doc_review_posttooluse.sh의 path_in_project 검사와 맞는다. '약 40k 토큰' 숫자는 docs/superpowers/plans/2026-07-05-nested-orchestration.md에 같은 값으로 있다. 'BLOCKED 정직성과 소유권 강제는 스파이크에서 검증'은 spec의 「검증 상태」 SC4·SC5·SC6과 맞는다. 'accept·regenerate 결정 값이 없다'는 meta-aggregate의 '`decision`과 `retry_count`는 런타임 전용' 규정과 맞는다. domain-docs 「한 번만 띄우는 렌즈의 규율」은 3층 오케스트레이션을 예외로 명시해 이 문서와 어긋나지 않는다. 이 문서는 자기 스크립트나 훅이 있다고 주장하지 않으며, 소유권 검사는 git diff 명령으로 L1이 직접 한다고 적어 존재하지 않는 파일을 가리키는 곳은 없다. scripts/test_scaffold.sh와 scripts/test_docs_drift.sh가 이 문서의 frontmatter name·'구간 소유권(엄수)'·'산출 계약'·'렌즈에게 정본을 알리는 법' 문구를 가드한다. 저장소 안에서 확인 못 한 것: '/workflows 집계 대시보드에 뜨지 않는다'와 'CLI가 더블클릭으로 L2 라이브 세션에 드릴인된다'는 Claude Code 도구 동작에 대한 주장이라 이 저장소에 대조할 파일이 없어 판정하지 않았다. 문서 밖 사실 하나: README.md에 nested-orchestration 언급이 없다(plan은 README 등재를 산출물로 적었다). 이 문서의 주장이 아니라 발견으로 올리지 않았다."
+}

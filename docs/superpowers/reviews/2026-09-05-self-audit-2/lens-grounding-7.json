@@ -1,0 +1,90 @@
+{
+ "lens": "lens-grounding",
+ "target": "README.md",
+ "read": [
+  "agent-principles.md",
+  "README.md",
+  "CLAUDE.md",
+  "hooks/hooks.json",
+  "hooks/spec_review_stop.sh",
+  "hooks/readonly_pretooluse.sh",
+  "hooks/doc_format_pretooluse.sh",
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "hooks/_spec_marker.sh",
+  "hooks/_extract_path.sh",
+  "scripts/scaffold.sh",
+  "scripts/_scaffold_common.sh",
+  "scripts/_managed_block.sh",
+  "scripts/_ensure_autoupdate.sh",
+  "scripts/_resolve_home.sh",
+  "scripts/_json_valid.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/test_docs_drift.sh",
+  ".claude/settings.json",
+  ".claude-plugin/plugin.json",
+  ".claude-plugin/marketplace.json",
+  "commands/setup-discipline.md",
+  "commands/show-principles.md",
+  "skills/domain-plugin/SKILL.md",
+  "skills/domain-spec-review/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/nested-orchestration/SKILL.md",
+  "skills/project-doc-audit/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "README 「동작 확인과 복구」의 셋업 오류 항목 / scripts/scaffold.sh 3)·4b) 주석",
+   "type": "contradiction",
+   "claim": "README는 셋업 오류를 세션 시작 알림의 ERROR로 알아채고 복구하라고 하는데, scaffold.sh에서 @import 배선 실패의 ERROR는 stderr(`>&2`)로만 나가고 스크립트는 `exit 0`으로 끝난다. 같은 스크립트의 주석은 SessionStart의 stderr가 사용자에게 닿지 않는다고 적는다.",
+   "file": "README.md",
+   "evidence": "세션 시작 알림에 `ERROR`가 찍혔다. 정본 복사 실패나 `@import` 배선 실패이고, 뒤의 것은 그 세션에 원칙이 실리지 않는다.",
+   "counterpart_file": "scripts/scaffold.sh",
+   "counterpart": "SessionStart 의 stderr 는 사용자에게 닿지 않는다",
+   "principle": "FAIL-LOUD",
+   "consequence": "지금 scaffold.sh는 @import 배선 실패 메시지를 `>&2`로 내고 마지막에 `exit 0`으로 끝난다. README가 보라고 한 세션 시작 알림은 stdout 통로라 그 ERROR 줄이 거기에 없고, 자동 갱신을 켰다는 알림만 stdout으로 나간다."
+  },
+  {
+   "where": "README 「프로젝트 폴더에 생기는 파일」 둘째 문단 / scripts/scaffold.sh 3a)",
+   "type": "omission",
+   "claim": "README는 프로젝트 파일을 고치는 예외의 조건을 자기가 정한다고 선언하지만, 코드에는 README에 없는 조건이 하나 더 있다. 프로젝트 `CLAUDE.md`가 전역 `~/.claude/CLAUDE.md`와 같은 파일이면 걷어내지 않는다. 또 README가 적은 '그 블록을 만든 기능이 없어졌으면'은 코드가 검사하지 않는 조건이다.",
+   "file": "README.md",
+   "evidence": "이 플러그인이 프로젝트 파일을 고치는 예외는 하나이고 그 조건은 여기가 정한다.",
+   "counterpart_file": "scripts/scaffold.sh",
+   "counterpart": "if [ -f \"$PCLAUDE\" ] && ! { [ \"$PCLAUDE\" = \"$UC\" ] || [ \"$PCLAUDE\" -ef \"$UC\" ]; }; then",
+   "principle": "SSOT",
+   "consequence": "작업 폴더가 `~/.claude`일 때 건너뛴다는 조건이 scripts/scaffold.sh에만 있고, 조건의 소유자라고 선언한 README에는 없다. README가 적은 '기능이 없어졌으면'은 코드에 대응하는 검사가 없어 코드는 마커가 있는 블록을 모두 걷어낸다."
+  },
+  {
+   "where": "README 「하드 게이트와 넛지와 전역 설정 수정」 첫 문단 / CLAUDE.md 셋째 문단 / hooks/hooks.json",
+   "type": "omission",
+   "claim": "CLAUDE.md는 이 README 절을 걸린 훅의 전체 목록과 배선의 정본이라 부르지만, 그 절은 원칙을 복사하는 SessionStart 훅(`scripts/scaffold.sh`)을 목록에 넣지 않고 각 훅이 어느 이벤트(SessionStart·PreToolUse·PostToolUse·Stop)에 걸리는지도 적지 않는다.",
+   "file": "README.md",
+   "evidence": "세션에는 턴 종료를 막는 하드 게이트 하나와 읽기 전용 파일 수정을 막는 차단 하나와 넛지 셋과 전역 설정 수정 하나가 걸린다.",
+   "counterpart_file": "CLAUDE.md",
+   "counterpart": "걸린 훅의 전체 목록과 배선은 `README.md`의 「하드 게이트와 넛지와 전역 설정 수정」 절이 정본이다.",
+   "principle": "SSOT",
+   "consequence": "hooks/hooks.json에는 SessionStart(scaffold.sh), PreToolUse(readonly·doc_format), PostToolUse(spec_review·doc_review), Stop(spec_review_stop) 여섯이 배선되어 있는데, 정본이라 불린 절은 원칙 복사 훅과 이벤트 이름을 적지 않고 원칙 복사는 「프로젝트 폴더에 생기는 파일」 절에 따로 있다."
+  },
+  {
+   "where": "README 「하드 게이트와 넛지와 전역 설정 수정」 읽기 전용 차단 항목 / CLAUDE.md 셋째 문단 / .claude/settings.json",
+   "type": "mismatch",
+   "claim": "봉인 시점을 README는 '만든 직후'로, CLAUDE.md는 '세션이 시작될 때'로 적는다. 이 레포의 `.claude/settings.json`은 seal_reviews.sh를 SessionStart에 배선하고, skills/project-doc-audit/SKILL.md는 회차가 끝나면 호출자가 돌린다고 적어 두 시점이 다 실재하지만 두 문서는 각각 하나만 적는다.",
+   "file": "README.md",
+   "evidence": "이 레포의 감사 기록은 만든 직후 `scripts/seal_reviews.sh`가 그 속성을 세운다.",
+   "counterpart_file": "CLAUDE.md",
+   "counterpart": "세션이 시작될 때 감사 기록이 읽기 전용으로 봉인되고",
+   "principle": "SSOT",
+   "consequence": "같은 봉인이 README에서는 만든 직후에, CLAUDE.md에서는 세션 시작에 일어나는 것으로 읽힌다. 실제 배선은 `.claude/settings.json`의 SessionStart와 project-doc-audit의 회차 끝 호출 둘인데 어느 문서도 둘을 함께 적지 않는다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "EXPLICIT",
+  "IDEMPOTENT",
+  "REVERSIBLE"
+ ],
+ "notes": "훑은 각도: 누락(README가 정본이라 불리는 절이 실제 배선을 다 담는지, 예외 조건이 코드와 같은지), 모순(복구 안내가 스크립트의 출력 통로와 맞는지), 환각(설치 명령·마켓플레이스 이름·커맨드 둘·스킬 경로·절 이름이 실재하는지 — 모두 실재함: marketplace.json name은 chshin-tools, commands/ 둘, skills/domain-spec-review·domain-plugin·domain-docs의 절 이름 일치), 불일치(훅 수: 게이트 1·차단 1·넛지 3·전역 설정 수정 1은 hooks.json 배선과 맞음. DISCIPLINED_CODER_REVIEW_GATE는 stop·spec_review_post·doc_format·doc_review 넷이 읽고 readonly는 읽지 않아 README와 맞음. 마커 문자열은 hooks/_spec_marker.sh와 일치. autoUpdate 패치 대상 두 파일과 키 없을 때만 넣는 조건은 _ensure_autoupdate.sh와 일치. 설정 홈 확인 명령의 후보 순서는 _resolve_home.sh의 우선순위와 일치). 확인하지 못한 것: '스코프는 user여야 모든 프로젝트에서 hook이 실행된다'와 '기본값이 user다'는 Claude Code 자체의 동작이라 이 저장소 안에 상대편이 없어 판정하지 않았다. '병렬 오케스트레이션의 전제 — superpowers 플러그인'은 nested-orchestration이 brainstorming·writing-plans·subagent-driven-development·using-git-worktrees를 조합한다고 적어 근거가 있다. 발견 1의 정본 복사 실패 갈래는 `exit 1`로 끝나 Claude Code가 stderr를 보일 수 있으므로 @import 배선 실패 갈래(`exit 0`)에만 국한해 적었다."
+}

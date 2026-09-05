@@ -1,0 +1,84 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/meta-aggregate/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "scripts/audit_evidence.sh",
+  "scripts/test_docs_drift.sh",
+  "skills/domain-spec-review/SKILL.md",
+  "skills/domain-llm-runtime/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/project-doc-audit/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "「처분 — 호출자의 몫」 spec 리뷰 항목",
+   "type": "contradiction",
+   "claim": "spec 리뷰의 가르기 주체를 meta-aggregate는 사람으로 적고, 그 절차의 소유자인 domain-spec-review는 메인 세션으로 적는다. 사용자에게 가는 것은 갈라진 뒤의 🔴뿐이다.",
+   "file": "skills/meta-aggregate/SKILL.md",
+   "evidence": "사람이 근거를 읽고 `🔴`와 \"고칠 것\"으로 가른다.",
+   "counterpart_file": "skills/domain-spec-review/SKILL.md",
+   "counterpart": "병합한 발견을 메인 세션이 둘로 가른다.",
+   "principle": "SSOT",
+   "consequence": "같은 걸음의 주체가 두 문서에 다르게 적혀 있어, 처분 절을 meta-aggregate에서 읽은 세션과 domain-spec-review에서 읽은 세션이 🔴 가르기를 누가 하는지에 대해 다른 지시를 받는다."
+  },
+  {
+   "where": "「출력 스키마」 첫 문단",
+   "type": "mismatch",
+   "claim": "spec 리뷰에서 병합 목록을 넘기는 다음 걸음이 meta-aggregate에는 처분 절, domain-spec-review에는 합치기 절로 적혀 있다. domain-spec-review의 걸음 표에서 합치기와 인용 검증과 기록이 처분보다 앞선다.",
+   "file": "skills/meta-aggregate/SKILL.md",
+   "evidence": "병합한 목록을 `domain-spec-review`의 처분 절로 넘긴다.",
+   "counterpart_file": "skills/domain-spec-review/SKILL.md",
+   "counterpart": "`decision`을 내지 않고 병합한 목록을 「합치기」 절로 넘긴다.",
+   "principle": "SSOT",
+   "consequence": "meta-aggregate를 따라 읽으면 틀린 지적 거르기와 리뷰 기록 걸음 셋이 넘김 경로에서 빠진 채로 적혀 있고, 절차의 소유자 문서와 목적지가 다르다."
+  },
+  {
+   "where": "「공통 계약의 예외」 lens-readability 항목과 「출력 스키마」의 `source` 열거",
+   "type": "contradiction",
+   "claim": "예외 절은 readability 산출물이 집계·상충 감지·커버리지 공백 어디에도 들어가지 않는다고 적는데, 집계 항목의 `source` 열거에는 `readability`가 들어 있고 드리프트 검사가 그 열거를 렌즈 디렉터리 전부와 같게 강제한다.",
+   "file": "skills/meta-aggregate/SKILL.md",
+   "evidence": "발견이 아니라 제안이라 「집계」·「상충 감지」·「커버리지 공백」 어디에도 들어가지 않는다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "check \"meta-aggregate가 렌즈 전부를 태깅한다\"",
+   "principle": "EXPLICIT",
+   "consequence": "집계에 들어가지 않는다고 적은 렌즈가 집계 항목의 출처 값으로 남아 있고, 검사가 그 값을 지우지 못하게 막고 있어 계약의 열거와 예외 절이 서로 어긋난 채 검사를 통과한다."
+  },
+  {
+   "where": "「공통 계약의 예외」",
+   "type": "omission",
+   "claim": "공통 계약의 예외로 lens-readability만 적는다. lens-prior-art의 issues 항목에는 `file`·`counterpart_file`·`counterpart`·`principle`이 없고 `evidence` 뜻풀이도 다른데, 그 사정은 드리프트 검사의 주석에만 적혀 있다.",
+   "file": "skills/meta-aggregate/SKILL.md",
+   "evidence": "`lens-readability` — 맞댈 상대편이 없어 위 공통 계약을 따르지 않는다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "lens-prior-art 는 상대편이 저장소 안이 아니라 웹 인용이라 counterpart_file 자체를 안 쓰고",
+   "principle": "SSOT",
+   "consequence": "계약 정본을 읽으면 prior-art 발견도 상대편과 원칙 칸을 갖는 것으로 읽히고, 실제로 그 칸이 없다는 사실은 계약 정본이 아니라 테스트 스크립트 주석이 들고 있다."
+  },
+  {
+   "where": "「처분 — 호출자의 몫」 멀티에이전트 워크플로 항목",
+   "type": "unsupported",
+   "claim": "워크플로 검증 결과를 `-check.md`에 적으라고 하는데, 기록 이름 규칙의 소유자인 domain-docs는 `check`를 문서 검진과 레포 감사에만 배정하고 워크플로 검증이라는 종류를 두지 않는다.",
+   "file": "skills/meta-aggregate/SKILL.md",
+   "evidence": "그 결과를 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-check.md`에 적는다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "종류는 spec 리뷰가 `review`, 문서 검진과 레포 감사가 `check`, 선행연구 대조가 `prior-art`다.",
+   "principle": "SSOT",
+   "consequence": "워크플로 검증 기록이 문서 검진 기록과 같은 종류 이름을 쓰는 것이 이름 규칙의 정본에 적혀 있지 않고, meta-aggregate 한 곳에서만 그 배정이 나온다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST"
+ ],
+ "notes": "훑은 각도는 누락·모순·환각·불일치 넷이다. 누락: 예외 절에서 prior-art가 빠진 것을 올렸다. 모순: 처분 주체와 readability 집계 여부를 올렸다. 환각(근거 없음): 워크플로 기록의 `-check` 배정을 올렸다. 불일치: 병합 목록의 넘김 목적지를 올렸다. `fingerprint`가 evidence·counterpart·principle 셋을 잇는다는 주장은 audit_evidence.sh의 sha1 입력과 같아 어긋남이 없다. `lens` 열거 여섯과 lens-prior-art의 `search_status`·`citations`·`not_found`·`disclosures`, lens-consistency의 `narrowed`·`pairs`는 각 렌즈 파일과 맞다. 올리지 않은 것 둘을 적는다. 첫째, 「리뷰 산출물 계약」이 빈 `read`를 보고에 적으라 하는데 lens-fit은 `read`가 대개 빈 배열이라 적고 lens-readability는 기준 문서 하나만 남는다고 적어, 그 규칙이 두 렌즈에서는 정상 상태를 보고에 올리게 된다. 상대편 문장이 모순이라기보다 범위 차이라 발견으로 올리지 않았다. 둘째, 「상충 감지」가 '한쪽은 고치라 하고 다른 쪽은 그대로 두라고 하면'을 조건으로 두는데 어느 렌즈의 `type` 폐쇄 집합에도 '그대로 두라'는 판정이 없어 그 조건이 스키마 위에서 성립하지 않는다. 맞댈 한 문장을 못 골라 올리지 않았고, 호출자가 확인할 만하다."
+}

@@ -1,0 +1,52 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/meta-aggregate/SKILL.md",
+ "read": [
+  "skills/domain-docs/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "scripts/test_docs_drift.sh"
+ ],
+ "issues": [
+  {
+   "where": "「리뷰 산출물 계약」 아래 `read` 항목",
+   "type": "constraint",
+   "claim": "domain-docs가 소유한 「렌즈에게 정본을 알리는 법」의 규율 문구가 필드만 `read`로 바꿔 거의 그대로 적혀 있다. 소유자는 다른 문서가 가리키기만 하라고 정한다.",
+   "file": "skills/meta-aggregate/SKILL.md",
+   "evidence": "`read`가 비어 있으면 호출자가 자기 보고에 적는다. 자동 재시도는 걸지 않는다. 읽지 않고 채우는 것을 막을 수 없어 재시도는 \"비어 있지 않은 배열\"로만 수렴한다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "다른 문서는 이 절을 가리키기만 하고 내용을 베끼지 않는다.",
+   "principle": "SSOT",
+   "consequence": "규율 문구 \"비어 있지 않은 배열\"이 소유자 밖인 이 파일에 적혀 있고, 그 문구의 복제를 막는 드리프트 검사는 domain-spec-review와 nested-orchestration만 대상으로 삼아 이 파일은 검사를 지나간다."
+  },
+  {
+   "where": "「출력 스키마」 아래 `principles_applied` 문단",
+   "type": "constraint",
+   "claim": "빈 `principles_applied`의 처리 규칙이 소유자인 domain-docs와 이 파일 두 곳에 적혀 있다. 이 파일이 소유하는 것은 언제 요구하는지이고, 비었을 때의 처리는 domain-docs가 소유한다.",
+   "file": "skills/meta-aggregate/SKILL.md",
+   "evidence": "렌즈 리턴의 `principles_applied`는 집계 대상이 아니다. 비어 있으면 호출자가 자기 보고에 적는다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "그 값이 비어 있으면 보고에 적는다. 자동 재시도는 걸지 않는다.",
+   "principle": "SSOT",
+   "consequence": "같은 처리 규칙이 두 문서에 있어 어느 쪽이 소유자인지 문서만으로는 갈리지 않고, 한쪽만 고치면 두 문장이 갈라진다."
+  },
+  {
+   "where": "첫 문단과 「구현 형태 (맥락 의존)」",
+   "type": "constraint",
+   "claim": "첫 문단은 구현 형태를 결정론적 코드 하나로 단정하고, 「구현 형태」 절은 제품 런타임 밖에서는 메인 세션이 직접 따른다고 적어 이 스킬이 코드인지 절차인지가 두 가지로 읽힌다.",
+   "file": "skills/meta-aggregate/SKILL.md",
+   "evidence": "프롬프트가 아니라 결정론적 코드로 구현한다.",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "제품 코드가 없으므로 메인 세션이 위 「하는 일」의 세 걸음을 직접 따라 집계한다.",
+   "principle": "EXPLICIT",
+   "consequence": "첫 문단만 읽은 호출자는 집계를 코드 없이 하면 안 되는 것으로 읽고, 「구현 형태」 절까지 읽은 호출자는 메인 세션이 직접 하는 것으로 읽어 같은 문서가 두 지시를 낸다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "PROSE-FORM",
+  "NAME-ITEMS"
+ ],
+ "notes": "훑은 각도는 형식·스타일·오염·호환 넷이다. 형식: frontmatter는 `name`이 디렉터리 이름과 같고 `description`에 `: `와 ` #`이 없으며 언제 여는지를 담아 domain-plugin 규칙에 맞다. 스타일: 순서 없는 항목에 번호를 매긴 곳이 없고, 절차·계약 타입인데 상태를 적은 곳이 없다. 금지 낱말과 폐쇄 집합은 지시대로 다시 세지 않았다. 오염: 문서 자체가 소비 대상이라 해당 없다. 호환: 「리뷰 산출물 계약」과 「출력 스키마」는 test_docs_drift.sh가 정본에서 뽑아 대조하는 앵커(evidence·consequence 뜻풀이, `source` 줄, 「공통 계약의 예외」 절 제목, 'spec 리뷰에서는 결정 단계가 없다', '빈 배열인 것은 정상')를 그대로 갖고 있다. 세지 않고 적어 두는 관찰 하나는 `A가 아니라 B` 대구가 이 파일에 세 번('프롬프트가 아니라', '`issues`가 아니라', '발견이 아니라') 있다는 것이며, writing-korean의 대구 제한이 답변 단위로 적혀 있어 문서에 거는지가 갈려 발견으로 올리지 않았다."
+}

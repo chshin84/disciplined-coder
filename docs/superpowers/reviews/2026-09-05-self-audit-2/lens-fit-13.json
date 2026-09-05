@@ -1,0 +1,100 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-readability/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/project-doc-audit/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "「출력 스키마」 절 마지막 문단",
+   "type": "schema",
+   "claim": "`purpose` 필드의 뜻을 `meta-aggregate`의 리뷰 산출물 계약이 SSOT라고 적었지만, 그 계약의 스키마에는 `purpose`가 없고 meta-aggregate는 오히려 이 렌즈 스키마의 상세를 `skills/lens-readability/SKILL.md`가 정본이라고 적는다. 같은 문서의 앞 문단도 `purpose`는 이 렌즈에만 있다고 적어, `purpose`의 정본이 두 문서 가운데 어디인지 두 가지로 읽힌다.",
+   "file": "skills/lens-readability/SKILL.md",
+   "evidence": "`lens`·`purpose`·`read`·`principles_applied`·`notes`의 뜻과 공통 규칙은 `meta-aggregate`의 리뷰 산출물 계약이 SSOT다.",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "스키마의 상세는 `skills/lens-readability/SKILL.md`가 정본이다.",
+   "principle": "SSOT",
+   "consequence": "`purpose`의 뜻은 lens-readability 문서의 「출력 스키마」 절이 정하고 있는데, 같은 절이 그 SSOT를 meta-aggregate로 가리키고 meta-aggregate는 다시 lens-readability를 정본으로 가리켜, 두 문서가 서로를 정본으로 지목하고 있다."
+  },
+  {
+   "where": "「레퍼런스 프롬프트」 system 문장",
+   "type": "constraint",
+   "claim": "프롬프트는 domain-docs가 요구하는 대로 \"체크리스트를 항목마다 따로 훑고\"라는 문장을 담고 있으나, 이 문서에는 「체크리스트」 절이 없고 「관찰 목록」만 있으며 그 절은 스스로를 판정 목록이 아니라고 적는다. 렌즈가 항목마다 훑어야 하는 목록이 관찰 축 열인지, 「손대지 않는 요소」인지, 「반드시 읽히는 곳의 필수 내용」인지 문서 안에서 가려지지 않는다.",
+   "file": "skills/lens-readability/SKILL.md",
+   "evidence": "체크리스트를 항목마다 따로 훑고 그 결과를 한 번에 돌려주며, 훑은 각도를 `notes`에 적어라.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "렌즈의 체크리스트 항목을 하나씩 따로 훑고 그 결과를 한 번에 돌려주게 한다.",
+   "principle": "EXPLICIT",
+   "consequence": "domain-docs의 규율은 렌즈마다 체크리스트가 있다고 전제하고 프롬프트도 그 낱말을 쓰는데, lens-readability 문서에는 그 이름의 절이 없어 `notes`에 적을 \"훑은 각도\"의 단위가 문서 안에 정해져 있지 않다."
+  },
+  {
+   "where": "「기계에 넘기는 것」 절 둘째 문단",
+   "type": "constraint",
+   "claim": "이 문서는 고정 규칙을 `writing-korean`에서 받는다고 적으면서 그 내용을 좁혀 되풀이한다. 고정 규칙의 말끝 맞춤 범위를 \"한 표와 한 목록\"으로 적었으나 기준 문서는 표·목록·다이어그램·차트 넷을 적고, 이 문서의 프롬프트와 「관찰 목록」의 형태 섞임 축도 넷을 적는다. 명사구 대상도 \"제목과 소제목\"으로 적었으나 기준 문서는 불릿 라벨·표 머리·차트 축과 범례·다이어그램 노드까지 든다.",
+   "file": "skills/lens-readability/SKILL.md",
+   "evidence": "제목과 소제목을 명사구로 달고 주장을 그 아래 첫 문장으로 내리는 것, 한 표와 한 목록 안에서 말끝을 맞추는 것, 그리고 그 파일의 「금지 표현」 표에 오른 말을 문자열로 걸러 내는 것이 그 고정 규칙이다.",
+   "counterpart_file": "skills/writing-korean/SKILL.md",
+   "counterpart": "한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다.",
+   "principle": "SSOT",
+   "consequence": "다이어그램과 차트 안의 말끝 섞임, 그리고 불릿 라벨과 표 머리가 명사구가 아닌 것이 목적을 따지지 않는 고정 규칙인지 목적에 비추어 판정하는 관찰인지가 이 문서의 「기계에 넘기는 것」과 프롬프트 사이에서 갈린다."
+  },
+  {
+   "where": "「이 렌즈의 산출물은 발견이 아니라 제안이다」 절 둘째 문단",
+   "type": "format",
+   "claim": "호출자가 제안 목록을 `suggestions.json`에 따로 적는다고 호출자 구분 없이 적었으나, 그 파일을 정의한 것은 project-doc-audit의 「통합 기록」뿐이다. 다른 호출자인 domain-docs의 문서 검진은 기록으로 요약문과 렌즈별 원본 `<렌즈 스킬 이름>-<띄운 횟수>.json`만 정하고 `suggestions.json`을 적지 않는다.",
+   "file": "skills/lens-readability/SKILL.md",
+   "evidence": "호출자는 이 목록을 `suggestions.json`에 따로 적는다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "렌즈별 원본은 요약문과 같은 이름의 폴더에 `<렌즈 스킬 이름>-<띄운 횟수>.json`으로 둔다",
+   "principle": "SSOT",
+   "consequence": "문서 검진(domain-docs)에서 이 렌즈를 돌리면 제안이 `lens-readability-1.json` 원본 하나에 남는지 `suggestions.json`에도 따로 남는지가 두 호출자 문서 사이에서 다르게 정해져 있다."
+  },
+  {
+   "where": "「읽기 범위」 절",
+   "type": "constraint",
+   "claim": "읽기 범위를 받은 문서와 목적과 `writing-korean` 하나로 한정하고 그 밖으로 나가지 않는다고 적었으나, 호출 규칙은 렌즈가 원칙 정본 경로를 받아 직접 읽고 `principles_applied`에 흔적을 남기게 하며, 이 문서의 출력 스키마도 `principles_applied`를 담는다. 정본을 여는 것이 읽기 범위 안인지 밖인지가 갈린다.",
+   "file": "skills/lens-readability/SKILL.md",
+   "evidence": "받은 문서와 목적, 그리고 기준 문서인 `writing-korean` 하나만 본다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다.",
+   "principle": "EXPLICIT",
+   "consequence": "렌즈가 `principles_applied`를 채우려면 원칙 정본을 열어야 하는데 「읽기 범위」는 `writing-korean` 하나만 연다고 적어, `read` 배열에 정본 경로가 들어가는 것이 규칙 준수인지 범위 이탈인지 문서 안에서 정해져 있지 않다."
+  },
+  {
+   "where": "「레퍼런스 프롬프트」 system 문장 첫 부분",
+   "type": "constraint",
+   "claim": "프롬프트는 렌즈에게 「금지 표현」 표의 말을 문자열로 찾아 하나도 빠뜨리지 말고 지적하라고 시킨다. 같은 문서의 「기계에 넘기는 것」 첫 문장은 그 목록을 `scripts/test_docs_drift.sh`가 먼저 훑고 렌즈는 그 목록에 없는 것만 본다고 적으며, 규칙 소유자인 domain-docs도 렌즈는 결정론 검사가 답하지 못한 것만 본다고 정한다. 금지 표현 검색이 기계의 몫인지 렌즈의 몫인지 두 가지로 읽힌다.",
+   "file": "skills/lens-readability/SKILL.md",
+   "evidence": "그 표에 오른 말은 문서에서 문자열로 찾아 하나도 빠뜨리지 말고 지적하고 고친 문장을 함께 줘라.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "같은 물음에 답하는 결정론 검사가 있거나 이 저장소 안에서 몇 줄로 쓸 수 있으면 그것을 먼저 돌리고, 렌즈는 그 결과가 답하지 못한 것만 본다.",
+   "principle": "FOCUSED",
+   "consequence": "같은 금지 표현 검색을 `scripts/test_docs_drift.sh`와 렌즈 프롬프트가 둘 다 하도록 적혀 있어, 렌즈가 그 말을 지적하면 기계 검사와 중복이고 지적하지 않으면 프롬프트 위반이 된다."
+  },
+  {
+   "where": "「목적 적는 법」 절 마지막 문단",
+   "type": "constraint",
+   "claim": "호출자에게 목적을 둘로 갈라 이 렌즈를 두 번 돌리는 것을 먼저 고려하라고 권하지만, 띄우는 횟수의 소유자인 domain-docs는 렌즈를 어느 호출자에서나 한 번씩만 띄우고 모자란다고 에이전트 수를 늘리는 길은 막아 둔다고 정한다. 같은 문서를 목적 둘로 두 번 띄우는 것이 규율의 예외인지 위반인지 정해져 있지 않다.",
+   "file": "skills/lens-readability/SKILL.md",
+   "evidence": "호출자가 목적을 둘로 갈라 두 번 돌리는 것을 관찰 축을 하나 늘리는 것보다 먼저 고려한다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "렌즈는 어느 호출자에서나 한 번씩만 띄운다.",
+   "principle": "SSOT",
+   "consequence": "domain-docs의 「한 번만 띄우는 렌즈의 규율」이 소유하는 띄우는 횟수를 lens-readability 문서가 다시 정하고 있고, 그 값이 한 번과 두 번으로 서로 다르다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FOCUSED",
+  "FAIL-LOUD",
+  "MEASURE-FIRST"
+ ],
+ "notes": "훑은 각도 넷. 형식: meta-aggregate 「공통 계약의 예외」가 적은 산출물 이름(suggestions)과 칸 셋(where·why·rewrite)과 없는 칸 넷(type·claim·consequence·evidence)을 이 문서 「출력 스키마」와 맞댔고 일치했다. lens 값 readability는 meta-aggregate의 폐쇄 집합에 있다. 어긋난 것은 purpose의 정본 지목 하나다. 스타일: domain-plugin frontmatter 규칙(name이 디렉터리 이름과 같음, description 하나, 값에 ': '와 ' #' 없음)을 확인했고 위반이 없다. writing-korean에 「금지 표현」 표와 명사구 라벨 규칙과 말끝 맞춤 규칙이 실제로 있음을 확인했다. 금지 낱말 계수는 지시대로 다시 하지 않았다. 오염: 이 문서는 프롬프트 설계도라 다운스트림 파싱 대상이 아니며 스키마 예시가 코드 펜스 안에 있어 문제가 없다. 호환: description의 호출자(domain-docs 문서 검진, project-doc-audit 레포 문서 감사)와 두 호출자 문서의 배정 표가 일치하고, spec·plan에 걸지 않는다는 진술이 domain-spec-review 미배정과 어긋나지 않는다. 확인 못 한 것: meta-aggregate 「출력 스키마」의 aggregated.source 폐쇄 집합에 readability가 들어 있는 것은 「공통 계약의 예외」가 집계에 안 들어간다고 적은 것과 어긋나 보이나 그 문서가 검토 대상이 아니라 발견으로 올리지 않았다. 호출자가 meta-aggregate 회차에서 볼 것."
+}

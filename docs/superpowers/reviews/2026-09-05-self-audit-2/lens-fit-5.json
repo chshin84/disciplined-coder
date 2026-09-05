@@ -1,0 +1,52 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-grounding/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-spec-review/SKILL.md",
+  "skills/project-doc-audit/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "scripts/audit_evidence.sh",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_audit.sh"
+ ],
+ "issues": [
+  {
+   "where": "「출력 스키마 (공통)」의 where 필드",
+   "type": "schema",
+   "claim": "공통 계약은 렌즈 파일이 자기 type 폐쇄 집합만 정의하고 나머지 필드는 계약을 참조하라고 하는데, 이 렌즈의 스키마 사본은 where의 뜻을 계약의 '문서 내 위치'와 다른 '출처/후보 내 위치'로 다시 정한다. 다른 세 렌즈(consistency·adversarial)는 계약과 같은 '문서 내 위치'를 쓴다. 그래서 grounding의 where가 검토 문서 안의 위치인지 출처 쪽 위치인지 두 가지로 읽히고, drift 테스트는 evidence·consequence·file·principle만 대조하므로 이 차이를 잡지 않는다.",
+   "file": "skills/lens-grounding/SKILL.md",
+   "evidence": "\"where\": \"출처/후보 내 위치\"",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "\"where\": \"문서 내 위치\"",
+   "principle": "SSOT",
+   "consequence": "지금 meta-aggregate의 상충 감지는 서로 다른 렌즈의 이슈가 같은 where를 가리키는지로 짝을 맞추는데, grounding만 where의 좌표계를 따로 정해 두어 같은 곳을 짚은 발견이 where 문자열로는 다른 곳으로 적히는 상태다."
+  },
+  {
+   "where": "첫 문단의 출처 정의와 frontmatter description의 호출자 목록",
+   "type": "constraint",
+   "claim": "레퍼런스 프롬프트의 user 템플릿은 {source}를 필수 입력으로 받는데, 본문은 출처가 무엇인지를 런타임과 spec/plan 리뷰 둘에 대해서만 정하고, description이 호출자로 적은 domain-docs의 문서 검진과 project-doc-audit의 레포 문서 감사에 대해서는 정하지 않는다. 그 두 호출자 문서(domain-docs의 「문서 검진 방법」, project-doc-audit의 「띄울 때 지킬 것」)도 '호출자가 source를 주입한다'고만 적고 무엇을 넣는지는 적지 않는다.",
+   "file": "skills/lens-grounding/SKILL.md",
+   "evidence": "런타임에서는 원래 요청과 함께 준 맥락이고, spec/plan 리뷰에서는 검토 대상 문서에 PREP 단계가 주입한 선행 결정과 검증할 사실을 더한 것이다.",
+   "counterpart_file": "skills/lens-grounding/SKILL.md",
+   "counterpart": "호출자(domain-llm-runtime의 런타임 리뷰, domain-spec-review, domain-docs의 문서 검진, project-doc-audit의 레포 문서 감사)가 source를 제공한다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 문서 검진과 레포 문서 감사에서 {source}에 무엇을 넣는지를 정한 문장이 이 파일에도 두 호출자 문서에도 없어, 검토 문서 자체를 출처로 삼는 읽기와 문서가 가리키는 코드와 다른 문서를 출처로 삼는 읽기가 함께 성립하는 상태다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST",
+  "SIMPLE"
+ ],
+ "notes": "훑은 각도는 넷이다. 형식: 출력 스키마 사본의 필드 집합(lens·read·issues 안의 where·type·claim·file·evidence·counterpart_file·counterpart·principle·consequence·principles_applied·notes)은 meta-aggregate 계약과 같고, lens 값 grounding은 계약의 폐쇄 집합에 있으며, type 폐쇄 집합 넷은 체크리스트 넷(누락·모순·환각·불일치)과 하나씩 대응한다. frontmatter는 name이 디렉터리 이름과 같고 description에 ': '와 ' #'이 없다. 스타일: 금지 낱말과 폐쇄 집합은 test_docs_drift.sh가 검사했으니 다시 세지 않았다. description의 '(런타임=요청+맥락 / spec리뷰=검토 문서+주입된 사실)'은 기호로 문장을 대신한 모양이지만 writing-korean의 PROSE-FORM이 '문장 안 보조로 쓰는 것은 괜찮다'고 예외를 두어 발견으로 올리지 않았다. 오염: 문서 자체가 후보라 해당 없음. 스키마 블록은 코드 펜스 안에 있다. 호환: 「발견의 문턱」 세 문단은 lens-fit·lens-consistency·lens-adversarial의 같은 절과 글자 그대로 같고, system 프롬프트의 공통 문장(체크리스트 항목별 훑기·notes·서브에이전트 금지·등급 금지·상대편 필수·consequence 규칙·빈 목록 정상)도 다른 렌즈와 같다. 「기계에 넘기는 것」이 가리키는 scripts/audit_evidence.sh는 evidence와 counterpart가 file·counterpart_file에 공백 정규화 뒤 부분 문자열로 있는지 확인해 evidence_found·counterpart_found와 fingerprint를 붙이므로 이 문서가 적은 '확인한다'는 몫을 실제로 진다. 다만 그 스크립트는 인용이 없는 발견을 떨어뜨리지 않고 플래그만 붙이는데, '여기서 떨어진다'고 적은 것은 이 문서가 아니라 project-doc-audit의 「기계가 하는 것」이라 이 대상의 발견으로 올리지 않았다. 호출자가 그 문서를 볼 때 확인할 것이다. 또 런타임 호출에서는 후보가 레포 파일이 아니라 file·counterpart_file을 '레포 상대경로'로 정한 계약이 그대로 맞지 않는데, 그 정의의 소유자는 meta-aggregate라 여기서 올리지 않았다."
+}

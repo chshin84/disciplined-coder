@@ -1,0 +1,346 @@
+{
+ "schema": 1,
+ "executor": "self-audit",
+ "commit": "5bbe53d450da9c662378a16ae9db4a11303115b6",
+ "tree_clean": true,
+ "completed": true,
+ "started_at": "2026-09-05T08:15:18Z",
+ "steps_done": [
+  "targets",
+  "machine-checks",
+  "review",
+  "adversarial",
+  "evidence",
+  "consistency",
+  "verdict",
+  "record"
+ ],
+ "targets": [
+  {
+   "path": "CLAUDE.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-readability"
+   ],
+   "reason": "「사람이 읽는 안내」 행. 표가 사용자용 README·프로젝트 CLAUDE.md·명령 문서를 이 행에 명시한다.",
+   "purpose": "이 레포에서 일하는 Claude와 기여자가 설계·계획 문서를 어디에 쓰는지와 고친 뒤 무엇을 돌리는지 알고 그대로 실행할 수 있어야 한다."
+  },
+  {
+   "path": "README.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-readability"
+   ],
+   "reason": "「사람이 읽는 안내」 행. 표가 사용자용 README·프로젝트 CLAUDE.md·명령 문서를 이 행에 명시한다.",
+   "purpose": "플러그인을 처음 설치하는 사용자가 무엇이 설치되고 프로젝트 폴더에 무엇이 생기는지 알고 설치를 끝까지 마칠 수 있어야 한다."
+  },
+  {
+   "path": "agent-principles.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit",
+    "lens-readability"
+   ],
+   "reason": "「원칙 정본」 행. 다른 문서들이 이 파일을 정본이라 부른다.",
+   "purpose": "Claude와 사용자가 원칙 조항을 읽고 지금 작업에 어느 조항이 걸리는지 스스로 판단해 적용할 수 있어야 한다."
+  },
+  {
+   "path": "commands/setup-discipline.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-readability"
+   ],
+   "reason": "「사람이 읽는 안내」 행. 표가 사용자용 README·프로젝트 CLAUDE.md·명령 문서를 이 행에 명시한다.",
+   "purpose": "이 명령을 부르는 사용자가 전역 셋업이 무엇을 갱신하는지 알고 실행 결과를 확인할 수 있어야 한다."
+  },
+  {
+   "path": "commands/show-principles.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-readability"
+   ],
+   "reason": "「사람이 읽는 안내」 행. 표가 사용자용 README·프로젝트 CLAUDE.md·명령 문서를 이 행에 명시한다.",
+   "purpose": "이 명령을 부르는 사용자가 지금 PC에 적용된 원칙 전문이 무엇인지 확인할 수 있어야 한다."
+  },
+  {
+   "path": "skills/domain-docs/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행. 절차나 처방을 소유한 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/domain-llm-runtime/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행. 절차나 처방을 소유한 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/domain-plugin/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행. 절차나 처방을 소유한 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/domain-spec-review/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행. 절차나 처방을 소유한 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-adversarial/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행. 렌즈 자신의 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-consistency/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행. 렌즈 자신의 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-fit/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행. 렌즈 자신의 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-grounding/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행. 렌즈 자신의 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-prior-art/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행. 렌즈 자신의 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/lens-readability/SKILL.md",
+   "lenses": [
+    "lens-fit"
+   ],
+   "reason": "「렌즈 정의」 행. 렌즈 자신의 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/meta-aggregate/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행. 절차나 처방을 소유한 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/nested-orchestration/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행. 절차나 처방을 소유한 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/project-doc-audit/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행. 절차나 처방을 소유한 SKILL.md 다.",
+   "purpose": ""
+  },
+  {
+   "path": "skills/writing-korean/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "「처방 스킬」 행. 절차나 처방을 소유한 SKILL.md 다.",
+   "purpose": ""
+  }
+ ],
+ "repo_wide": [
+  {
+   "lens": "lens-adversarial",
+   "reason": "문서별로 배정하지 않고 저장소 전체를 입력으로 따로 한 번 띄운다."
+  }
+ ],
+ "machine_checks": {
+  "allPassed": true,
+  "results": [
+   {
+    "name": "scripts/test_assertions.sh",
+    "passed": true,
+    "summary": "PASS=10 FAIL=0"
+   },
+   {
+    "name": "scripts/test_audit.sh",
+    "passed": true,
+    "summary": "PASS=128 FAIL=0 (판정 상태 집합의 출처를 절차 문서로 옮긴 뒤)"
+   },
+   {
+    "name": "scripts/test_docs_drift.sh",
+    "passed": true,
+    "summary": "PASS=349 FAIL=0"
+   },
+   {
+    "name": "scripts/test_hooks.sh",
+    "passed": true,
+    "summary": "PASS=78 FAIL=0"
+   },
+   {
+    "name": "scripts/test_scaffold.sh",
+    "passed": true,
+    "summary": "PASS=220 FAIL=0"
+   },
+   {
+    "name": "claude plugin validate ./",
+    "passed": true,
+    "summary": "Validation passed with warnings — version 경고 하나뿐이다."
+   }
+  ],
+  "style_metrics": {
+   "what": "writing-korean 「금지 표현」 표의 아홉 낱말(잰다·재는·재지·붉어진·헛돈다·자리·부분·영역·경우)이 대상 문서 열아홉에 부분 문자열로 나오는 횟수",
+   "method_a": "xargs grep -oh -e <낱말>... < 대상목록 | sort | uniq -c",
+   "method_b": "python -X utf8 에서 파일마다 str.count(낱말)",
+   "agree": true,
+   "counts": {
+    "잰다": 3,
+    "재는": 1,
+    "재지": 1,
+    "붉어진": 1,
+    "헛돈다": 1,
+    "자리": 4,
+    "부분": 2,
+    "영역": 2,
+    "경우": 2
+   },
+   "verdict": "17건 전부 skills/writing-korean/SKILL.md 의 「금지 표현」 표 자체(목록의 소유자)에 있고 다른 열여덟 문서에는 0건이다. 어느 세는 법으로도 이 결론이다."
+  }
+ },
+ "metrics": {
+  "by_lens": {
+   "lens-adversarial": {
+    "raised": 14,
+    "confirmed": 12
+   },
+   "lens-fit": {
+    "raised": 54,
+    "confirmed": 49
+   },
+   "lens-grounding": {
+    "raised": 49,
+    "confirmed": 45
+   },
+   "lens-consistency": {
+    "raised": 1,
+    "confirmed": 1
+   }
+  },
+  "confirmed": 107,
+  "tokens": 2885259,
+  "seconds": 2843,
+  "tokens_per_confirmed": 26965,
+  "resolved_rate": null
+ },
+ "verdict_counts": {
+  "confirmed": 107,
+  "rejected": 9,
+  "undetermined": 2,
+  "derived": 0
+ },
+ "suggestions": 22,
+ "subagents": 21,
+ "lens_calls": {
+  "lens-grounding": 13,
+  "lens-fit": 15,
+  "lens-readability": 5,
+  "lens-adversarial": 1,
+  "lens-consistency": 1
+ },
+ "tokens_method": "하네스가 서브에이전트 호출마다 돌려준 usage.subagent_tokens 스물하나를 더했다(문서 스무 호출 2,814,541 + 일관성 70,718 = 2,885,259). seconds 는 회차 폴더의 .start_epoch(08:15:18Z)과 metrics 실행 시각의 차다.",
+ "evidence_check": {
+  "raw": 118,
+  "dropped": 0,
+  "merged_by_fingerprint": 0,
+  "note": "렌즈 스물하나의 인용 118건이 모두 파일에 글자 그대로 있었다. 하네스가 중화한 HTML 엔티티(&gt; &amp;)는 ingest 에서 되돌린 뒤 확인했다."
+ },
+ "determinism_check": {
+  "legacy_prior_twice_md5": "1e4f77c631602506c758723e613cb875",
+  "self_prior_twice_md5": "5b9bf9fddfa4e4c763c7a9db8b770f63",
+  "note": "같은 입력 둘(옛 회차 findings 대 이번 findings, 이번 대 이번)을 각각 두 번 계산해 출력 해시가 같았다."
+ },
+ "legacy_diff_measurement": {
+  "items": 21,
+  "verdict": {
+   "해소": 21
+  },
+  "matched": 0,
+  "new_ids": 117,
+  "note": "2026-09-05-self-audit 의 findings.json 은 옛 형태(evidence 가 경로·줄·여러 인용의 합성, fingerprint 없음)라 확정 21건이 전부 해소로 찍힌다. 그래서 이번 대조는 no_prior_round 로 기록한다(#088 이 같은 것을 짚었다)."
+ },
+ "consistency": {
+  "pairs_sent": 2,
+  "misaligned": 1,
+  "narrowed": 1,
+  "statements": 204,
+  "topics": 40,
+  "topics_multi_file": 39
+ },
+ "aggregate": {
+  "conflicts": [
+   {
+    "ids": [
+     "2026-09-05-self-audit-2#003",
+     "2026-09-05-self-audit-2#002",
+     "2026-09-05-self-audit-2#051",
+     "2026-09-05-self-audit-2#052",
+     "2026-09-05-self-audit-2#053",
+     "2026-09-05-self-audit-2#054",
+     "2026-09-05-self-audit-2#055"
+    ],
+    "where": "skills/project-doc-audit/SKILL.md 「일관성 대조」 절과 skills/lens-consistency/SKILL.md 「레포 문서 감사에서의 짝」",
+    "note": "lens-adversarial(#003)은 이 걸음을 통째로 빼라 하고, lens-fit(#051~#055)과 lens-adversarial 자신(#002)은 이 걸음의 계약을 채우라 한다. 같은 절을 두고 방향이 반대다. 세션은 이 회차의 실측(짝 둘 가운데 어긋남 하나 확정)으로 #003을 기각했다."
+   },
+   {
+    "ids": [
+     "2026-09-05-self-audit-2#013",
+     "2026-09-05-self-audit-2#084"
+    ],
+    "where": "skills/project-doc-audit/SKILL.md 「통합 기록」 run.json 항목의 metrics 문장",
+    "note": "lens-adversarial(#013)은 tokens·seconds 를 metrics 에서 빼라 하고, lens-grounding(#084)은 metrics 가 판정 개수를 더 내야 한다고 한다. 같은 문장을 두고 줄이는 방향과 늘리는 방향이 맞선다. 세션은 #013을 기각했다(하네스 usage 로 측정된 값이다)."
+   }
+  ],
+  "coverage_gaps": [
+   "lens-prior-art 는 설계대로 돌지 않았다(웹 렌즈, 사용자 승인 필요). 선행 사례 대조 축은 이번 판정에 없다.",
+   "scripts/·hooks/·.claude/settings.json 은 lens-adversarial 한 번만 대상으로 삼았고 lens-grounding 은 상대편으로만 열었다. 코드 자체의 결함은 code-review 몫이라 절차 밖이다.",
+   "docs/superpowers/specs·plans 는 audit_targets.sh 가 통째로 뺀다. #006 이 그 제외의 전제가 domain-docs 표(spec·plan 은 계속 살아 있다)와 어긋난다고 확정했다.",
+   "이름표 39개 가운데 lens-consistency 에 넘긴 짝은 둘이다. 나머지 37개 이름표의 진술 차이는 세션이 눈으로 좁혀 적음으로 판단했고 기계가 검증하지 않았다.",
+   "HANDOFF-*.md 둘은 설계대로 대상에서 뺐다."
+  ]
+ }
+}

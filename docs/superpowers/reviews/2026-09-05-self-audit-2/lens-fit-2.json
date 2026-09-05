@@ -1,0 +1,57 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-adversarial/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "scripts/audit_evidence.sh"
+ ],
+ "issues": [
+  {
+   "where": "「출력 스키마 (공통)」의 evidence 칸",
+   "type": "schema",
+   "claim": "evidence 칸에 정본 계약에 없는 둘째 뜻(단순화 제안의 근거)을 덧붙여, 같은 칸이 '파일에 있는 그대로의 문장'과 '제안의 근거' 두 가지로 읽힌다.",
+   "file": "skills/lens-adversarial/SKILL.md",
+   "evidence": "\"evidence\": \"짚은 곳 파일에 있는 그대로의 문장. 단순화 제안이면 그 근거를 여기 적는다\"",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "\"evidence\": \"짚은 곳 파일에 있는 그대로의 문장\"",
+   "principle": "SSOT",
+   "consequence": "지금 lens-adversarial의 evidence 칸은 정본 계약이 정한 뜻 하나에 제안의 근거라는 뜻을 더 갖고 있고, scripts/audit_evidence.sh는 evidence를 짚은 파일의 부분 문자열로만 확인하므로 근거 산문을 적은 evidence는 evidence_found가 거짓으로 찍힌다."
+  },
+  {
+   "where": "「체크리스트」 실패 모드 항목과 「발견의 문턱」 첫 문단",
+   "type": "constraint",
+   "claim": "실행이 계획을 안 따라 실패하는 길은 이 렌즈만 보는 축으로 정해 두었는데, 그 길에는 어긋나는 문장이 어느 파일에도 없어 상대편을 댈 수 없고, 같은 문서가 상대편 없는 것은 올리지 말라고 정해 두 문장이 서로 다른 처분을 요구한다.",
+   "file": "skills/lens-adversarial/SKILL.md",
+   "evidence": "실행하는 세션이 계획을 안 따르거나, 중간에 끊기거나, 절반만 하고 끝나는 것이다. 다른 렌즈는 문서가 틀렸는지만 보므로 이것은 이 렌즈가 아니면 아무도 안 본다.",
+   "counterpart_file": "skills/lens-adversarial/SKILL.md",
+   "counterpart": "짚기만 하고 맞댈 것이 없으면 올리지 않는다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 이 문서는 실행이 어긋나 실패하는 길을 반드시 보라고 하면서 상대편 없는 지적은 올리지 말라고 함께 정하고 있어, 그 축의 발견을 issues에 올릴지 notes에만 적을지가 문서에서 정해지지 않은 채로 있다."
+  },
+  {
+   "where": "「발견의 문턱」 절 전체",
+   "type": "schema",
+   "claim": "정본 계약은 렌즈 파일이 type 폐쇄 집합만 정의하라고 하는데, 이 절은 상대편 필수와 줄 번호 금지 같은 공통 칸의 규칙을 다시 정하고, 그 규칙 가운데 일부는 정본 계약에 없다.",
+   "file": "skills/lens-adversarial/SKILL.md",
+   "evidence": "발견 하나는 넷을 진다. 짚은 곳(파일과 그 파일의 문장), 상대편(어긋나는 실제 코드나 파일이나 다른 문서의 문장), 원칙(어느 규칙에 걸리는지), 결과다.",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.",
+   "principle": "SSOT",
+   "consequence": "지금 「발견의 문턱」 세 문단이 lens-adversarial·lens-fit·lens-grounding·lens-consistency 네 파일에 같은 글자로 있고, 그 가운데 '상대편을 못 대면 발견이 아니다'와 '줄 번호는 담지 않는다'는 meta-aggregate의 리뷰 산출물 계약에 없어 네 사본이 그 규칙의 유일한 출처다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "MEASURE-FIRST"
+ ],
+ "notes": "훑은 각도는 넷이다. 형식: 출력 스키마의 필드 이름과 순서는 meta-aggregate의 리뷰 산출물 계약과 같고 lens 값 adversarial은 계약의 폐쇄 집합 안에 있으며, evidence 칸의 뜻만 정본과 달라 발견으로 올렸다. 스타일: frontmatter는 name이 디렉터리 이름과 같고 description에 ': '와 ' #'이 없어 domain-plugin 규칙을 지키며, 'A가 아니라 B' 대구는 description에 한 번 있다. 금지 낱말과 폐쇄 집합은 지시대로 다시 세지 않았다. 오염: user 프롬프트가 JSON 스키마로만 출력하라고 정해 여분 텍스트를 부르는 문장이 없다. 호환: 레퍼런스 프롬프트에 domain-docs 「한 번만 띄우는 렌즈의 규율」이 요구하는 세 문장(항목마다 훑기, 서브에이전트 금지, 더 확인할 것은 notes)이 그대로 있고, 「렌즈에게 정본을 알리는 법」의 첫 항목 문장은 베끼지 않았으며, principles_applied의 시기는 meta-aggregate를 가리킨다. 셋째 발견은 네 렌즈 파일에 공통이므로 한 곳에서 고치면 나머지도 같은 처방이다. 더 확인할 것은 남지 않았다."
+}

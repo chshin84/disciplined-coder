@@ -245,7 +245,8 @@ rj() { json_run "$1" "$RT/round/$2"; }
 # 이름을 더하거나 빼면 여기서 같이 갈린다(절차 문서나 이 픽스처 어느 한쪽만 바뀌어도 실패).
 STATUS_SRC="$PDA"
 STATUS_LINE="$(grep -F '`status`가' "$STATUS_SRC" | head -1)"
-STATUS_SET="$(printf '%s' "$STATUS_LINE" | grep -oE '`[a-z]+`' | tr -d '`' | sort -u | tr '\n' ' ')"
+# 그 문장에는 칸 이름 `status` 자체도 백틱으로 들어 있어 값 집합에서 뺀다. 안 빼면 status 가 "status" 인 발견이 통과한다.
+STATUS_SET="$(printf '%s' "$STATUS_LINE" | grep -oE '`[a-z]+`' | tr -d '`' | grep -vx status | sort -u | tr '\n' ' ')"
 check "절차 문서 「판정」 절에서 status 닫힌 집합을 뽑았다" "[ -n \"\$STATUS_SET\" ]"
 STATUS_PROG='
 import json, sys

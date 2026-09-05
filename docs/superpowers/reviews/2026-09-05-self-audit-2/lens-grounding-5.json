@@ -1,0 +1,68 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-plugin/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/domain-plugin/SKILL.md",
+  ".claude-plugin/plugin.json",
+  ".claude-plugin/marketplace.json",
+  "hooks/hooks.json",
+  "hooks/_extract_path.sh",
+  "hooks/_json_escape.sh",
+  "hooks/_spec_marker.sh",
+  "hooks/doc_format_pretooluse.sh",
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/readonly_pretooluse.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "hooks/spec_review_stop.sh",
+  ".claude/settings.json",
+  "scripts/scaffold.sh",
+  "scripts/_ensure_autoupdate.sh",
+  "scripts/_json_valid.sh",
+  "scripts/_managed_block.sh",
+  "scripts/_resolve_home.sh",
+  "scripts/_scaffold_common.sh",
+  "scripts/test_docs_drift.sh",
+  "commands/setup-discipline.md",
+  "commands/show-principles.md",
+  "README.md",
+  "CLAUDE.md",
+  "skills/domain-docs/SKILL.md",
+  ".github/workflows/ci.yml",
+  "skills/*/SKILL.md (frontmatter만)"
+ ],
+ "issues": [
+  {
+   "where": "후보 「사용자 설정 파일을 고칠 때 지킬 것」의 사유를 가른 통지 항목 / 출처 scripts/_ensure_autoupdate.sh와 scripts/scaffold.sh",
+   "type": "contradiction",
+   "claim": "문서는 못 고친 회차의 까닭을 사용자에게 갈라 알린다고 적는데, 그 통지를 구현한 `ensure_marketplace_autoupdate`의 WARNING 네 줄은 모두 stderr로 나가고, 같은 레포의 scaffold.sh는 SessionStart의 stderr가 사용자에게 닿지 않는다고 적어 놓았다.",
+   "file": "skills/domain-plugin/SKILL.md",
+   "evidence": "못 고친 회차는 까닭을 갈라 알린다.",
+   "counterpart_file": "scripts/scaffold.sh",
+   "counterpart": "켰다는 사실은 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않는다.",
+   "principle": "FAIL-LOUD",
+   "consequence": "지금 `scripts/_ensure_autoupdate.sh`의 종료코드 3·4·5·그 밖을 가른 네 안내문은 `>&2`로 나가고 스크립트는 exit 0으로 끝나므로, 레포 자신의 설명대로면 사용자는 그 회차에 자동 갱신이 켜지지 않았다는 사실과 까닭을 세션 시작 알림에서 받지 못한다. 문서가 지킨다고 적은 규칙과 그 규칙을 지킨다고 적은 스크립트의 통로가 어긋나 있다."
+  },
+  {
+   "where": "후보 「사용자 설정 파일을 고칠 때 지킬 것」의 사본과 재검증 항목 / 출처 scripts/_managed_block.sh의 managed_block_inject",
+   "type": "contradiction",
+   "claim": "문서는 사용자가 손으로 관리하는 파일을 고칠 때 고치기 전에 `.bak`을 남긴다고 적는데, 같은 플러그인이 매 SessionStart마다 `~/.claude/CLAUDE.md`를 다시 쓰는 `managed_block_inject`는 사본을 뜨지 않는다고 스스로 적어 놓았다.",
+   "file": "skills/domain-plugin/SKILL.md",
+   "evidence": "고치기 전에 `.bak`을 남기고, 새로 쓴 파일을 다시 파싱해 유효할 때만 원래 경로에 놓는다.",
+   "counterpart_file": "scripts/_managed_block.sh",
+   "counterpart": "이쪽은 사본을 뜨지 않으므로 원본을",
+   "principle": "REVERSIBLE",
+   "consequence": "지금 이 규칙은 `scripts/_ensure_autoupdate.sh`가 고치는 settings.json과 known_marketplaces.json에만 적용되고, 절의 첫 문장이 범위로 잡은 \"사용자가 손으로 관리하는 파일\"에 드는 `~/.claude/CLAUDE.md`는 `managed_block_inject`가 사본 없이 awk 변환 결과로 덮어쓴다. 문서는 그 예외를 적지 않아 플러그인이 만지는 사용자 파일 전부가 `.bak`으로 되돌려지는 것으로 읽힌다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "FAIL-LOUD",
+  "REVERSIBLE",
+  "SIMPLE",
+  "SURGICAL",
+  "EXPLICIT",
+  "MEASURE-FIRST"
+ ],
+ "notes": "훑은 각도: 누락(문서가 이름 부른 파일과 규칙이 실제로 있는가), 모순(플러그인 구조·훅 배선·처리기 하나·사본과 재검증 규칙이 레포 파일과 어긋나는가), 환각(레포에 없는 것을 있다고 하는가), 불일치(파일 이름·키 이름·명령이 실제와 같은가). 확인하고 올리지 않은 것: plugin.json에 version이 없고 CI(.github/workflows/ci.yml)와 CLAUDE.md가 non-strict로 validate를 돌려 version 정책과 validate 항목은 레포와 맞는다. marketplace.json은 최상위 name·description·owner·plugins[]를 갖고 source가 \"./\"이며 plugins[0].description이 plugin.json과 글자 그대로 같고, test_docs_drift.sh가 JSON 파싱으로 그 동일성을 검사한다. 스킬 SKILL.md 열넷의 frontmatter는 모두 name·description 두 키이고 name이 디렉터리 이름과 같으며 커맨드 둘은 description 하나다. `agents/` 디렉터리는 레포에 없지만 문서는 위치를 처방한 것이라 어긋남으로 세지 않았다. 처리기 하나 규칙은 scripts/_json_valid.sh가 파이썬 하나만 두고 인터프리터 이름만 python3·python 순으로 고르므로 맞는다. 대상 좁히기와 사용자 결정 존중은 _autoupdate_patch가 marketplace.json의 name으로 항목을 고르고 autoUpdate 키가 있으면 10으로 물러나므로 맞는다. 레포 밖 사실인 \"플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다\"와 \"--strict는 경고까지 실패로 취급\"은 이 저장소에서 대조할 상대편이 없어 근거 없음으로 표시만 하고 올리지 않았다."
+}

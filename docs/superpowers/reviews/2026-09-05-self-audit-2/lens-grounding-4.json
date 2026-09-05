@@ -1,0 +1,89 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-llm-runtime/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/domain-llm-runtime/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/domain-spec-review/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "조립 절 첫 문장",
+   "type": "contradiction",
+   "claim": "이 문서는 렌즈 리뷰 콜을 병렬로 돌린다고 적으면서 띄우는 횟수의 소유를 domain-docs의 「한 번만 띄우는 렌즈의 규율」에 넘긴다. 그 규율은 한 대상에 렌즈가 둘 이상 걸려도 하나가 대상을 한 번 읽고 렌즈를 차례로 적용한다고 정한다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "1차 콜을 받은 뒤 「렌즈 선택」 표가 호출 종류로 고정한 렌즈 리뷰 콜을 병렬로 돌리고, `meta-aggregate`가 집계한다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "에이전트 하나가 그 대상을 한 번 읽고 렌즈를 차례로 적용하며, 발견마다 어느 렌즈가 낸 것인지 적어 돌려준다.",
+   "principle": "SSOT",
+   "consequence": "지금 이 문서는 횟수 규칙의 소유자로 domain-docs를 가리키면서 같은 걸음을 그 소유자가 정한 차례 적용과 다른 병렬 콜로 적고 있다."
+  },
+  {
+   "where": "조립 절, type 값으로 행동을 정하는 표",
+   "type": "mismatch",
+   "claim": "이 문서는 런타임 결정을 재생성·폴백·통과 셋으로 부르는데 meta-aggregate의 출력 스키마와 description은 결정 집합을 accept/regenerate/escalate로 정한다. 폴백과 escalate가 서로 대응하지 않는다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "그다음 제품 코드가 `type` 값으로 행동을 정하는 표를 따라 재생성·폴백·통과를 결정한다.",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "accept/regenerate/escalate 결정은 제품 런타임에서만 내고, spec·plan 리뷰와 문서 검진에서는 결정 없이 병합한 목록만 호출자에게 넘긴다.",
+   "principle": "SSOT",
+   "consequence": "지금 런타임 결정의 폐쇄 집합이 두 문서에서 다른 이름과 다른 원소로 적혀 있다."
+  },
+  {
+   "where": "조립 절, 라우팅의 근거 문장",
+   "type": "omission",
+   "claim": "meta-aggregate는 제품 런타임에 상충이나 커버리지 공백이 있으면 사람에게 올리라고 정하는데, 이 문서의 조립 절은 라우팅 근거를 type 하나로만 적고 사람에게 올리는 갈래를 적지 않는다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "렌즈는 등급을 매기지 않으므로 라우팅의 근거는 폐쇄 집합인 `type`이다.",
+   "counterpart_file": "skills/meta-aggregate/SKILL.md",
+   "counterpart": "제품 코드가 `type` 값으로 행동을 정하는 표를 갖는다. 상충이나 커버리지 공백이 있으면 사람에게 올린다.",
+   "principle": "FAIL-LOUD",
+   "consequence": "지금 이 문서를 따라 짠 라우팅 표에는 상충과 커버리지 공백을 사람에게 올리는 입구가 없다."
+  },
+  {
+   "where": "렌즈 선택 절, lens-fit 항목",
+   "type": "contradiction",
+   "claim": "이 문서는 fit 리뷰 콜을 validator가 실패했을 때만 쓴다고 적는다. lens-fit의 가드는 결정론 검사를 먼저 돌리고 LLM 리뷰는 결정론으로 못 잡는 스타일과 모호한 제약에 쓴다고 정하므로, validator를 통과한 출력도 스타일 제약은 리뷰 대상이다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "스키마와 형식은 코드 validator를 먼저 돌리고 실패했을 때만 리뷰 콜을 쓴다.",
+   "counterpart_file": "skills/lens-fit/SKILL.md",
+   "counterpart": "LLM 리뷰는 결정론으로 못 잡는 스타일과 모호한 제약에만 쓴다.",
+   "principle": "SSOT",
+   "consequence": "지금 두 문서가 fit 리뷰 콜을 언제 쓰는지를 다르게 적고 있고, 이 문서대로면 validator를 통과한 출력은 스타일 제약을 리뷰 없이 지난다."
+  },
+  {
+   "where": "조립 절, 렌즈끼리 볼 것을 나눠 주지 않는다 문단",
+   "type": "mismatch",
+   "claim": "이 문서는 grounding이 외부 사실의 근거를 본다고 적는데, 같은 문서의 렌즈 선택 절과 lens-grounding 정본은 런타임의 출처를 원래 요청과 제공된 맥락으로 정한다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "`grounding`이 외부 사실의 근거를 보고 `fit`이 양식과 계약을 보므로 원래 보는 것이 갈려 있다.",
+   "counterpart_file": "skills/lens-grounding/SKILL.md",
+   "counterpart": "런타임에서는 원래 요청과 함께 준 맥락이고, spec/plan 리뷰에서는 검토 대상 문서에 PREP 단계가 주입한 선행 결정과 검증할 사실을 더한 것이다.",
+   "principle": "SSOT",
+   "consequence": "지금 이 문서는 한 절에서 grounding의 출처를 요청과 맥락이라 적고 다른 절에서 외부 사실이라 적고 있다."
+  },
+  {
+   "where": "머리말 둘째 문단",
+   "type": "mismatch",
+   "claim": "이 문서는 검증의 방법을 이 문서가 정한다고 적는데, 정본의 검증 절은 띄우는 방법을 domain-docs가 정한다고 적는다. 이 문서 자신도 조립 절에서 횟수를 domain-docs에 넘긴다.",
+   "file": "skills/domain-llm-runtime/SKILL.md",
+   "evidence": "검증을 더하라는 원칙은 `agent-principles.md`의 「검증」 절에 있고, 방법은 이 문서가 정한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "어느 렌즈를 언제 띄우는지는 그것을 부르는 스킬이 정하고, 띄우는 방법은 `domain-docs`가 정한다.",
+   "principle": "SSOT",
+   "consequence": "지금 방법의 소유자가 정본에서는 domain-docs로, 이 문서에서는 이 문서로 적혀 있다."
+  }
+ ],
+ "principles_applied": [
+  "SSOT",
+  "FAIL-LOUD",
+  "EXPLICIT",
+  "MEASURE-FIRST",
+  "SECRETS"
+ ],
+ "notes": "누락·모순·환각·불일치 네 각도를 따로 훑었다. 렌즈 선택 표의 다섯 행과 meta-aggregate의 집계 조건, lens-grounding의 source 정의, domain-spec-review의 「렌즈끼리 볼 것을 나눠 주지 않는다」 문단 소유 주장, domain-docs의 「판단 앞에 기계를 세운다」 절 존재는 대조해 어긋남이 없었다. 환각 각도에서는 이 문서가 부르는 절 이름이 모두 실재했다. 「렌즈끼리 볼 것을 나눠 주지 않는다」 세 문장은 domain-docs와 이 문서에 글자 그대로 같이 있는데, 소유자인 domain-spec-review가 '다른 호출자는 이 문단을 가리킨다'고 정한 것과 비교해 두 호출자가 요약을 복제한 상태다. 상대편이 셋으로 갈려 한 발견으로 올리지 않았다. 비기능 체크리스트의 critical·major 등급은 meta-aggregate의 등급 금지와 충돌하지 않는다. 이 문서가 렌즈가 아니라 코드 설계도의 고정값이라고 적어 두었기 때문이다."
+}

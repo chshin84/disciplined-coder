@@ -1,0 +1,77 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/lens-consistency/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/meta-aggregate/SKILL.md",
+  "skills/domain-docs/SKILL.md",
+  "skills/project-doc-audit/SKILL.md",
+  "skills/writing-korean/SKILL.md",
+  "skills/domain-plugin/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "레퍼런스 프롬프트 (언어 중립) — system 문장",
+   "type": "constraint",
+   "claim": "system 문장은 산출물 공백과 스코프를 항상 찾으라 하는데, 같은 파일의 체크리스트는 그 둘을 레포 문서 감사에서 걸지 않는다고 정한다. 호출자는 이 프롬프트를 그대로 쓰므로 레포 문서 감사에서 렌즈가 받는 지시가 두 가지로 읽힌다.",
+   "file": "skills/lens-consistency/SKILL.md",
+   "evidence": "문서 내부의 모순, spec↔plan 커버리지 공백, 산출물 공백(무엇을 내놓는지와 그 형태와 놓일 곳이 안 적힌 것), 이름과 타입의 드리프트, 스코프 문제를 찾아라.",
+   "counterpart_file": "skills/project-doc-audit/SKILL.md",
+   "counterpart": "렌즈 프롬프트는 그 렌즈 `SKILL.md`의 레퍼런스 프롬프트를 그대로 쓴다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 레포 문서 감사에서 렌즈에 들어가는 system 문장은 산출물 공백과 스코프를 찾으라 하고, 같은 파일의 체크리스트 항목 둘은 그 감사에서 걸지 않는다고 적혀 있어, 한 호출 안에 서로 반대인 지시가 함께 실린다."
+  },
+  {
+   "where": "읽기 범위",
+   "type": "compat",
+   "claim": "이 렌즈가 받는다고 적은 입력은 '짝 문서 하나이거나 문서 묶음 전체'인데, 띄우는 규율의 소유자는 레포 문서 감사에서 이름표 묶음 전부가 아니라 갈리는 짝만 준다고 정한다. 렌즈가 받는 것이 문서 전체인지 짝만인지가 두 가지로 읽힌다.",
+   "file": "skills/lens-consistency/SKILL.md",
+   "evidence": "호출자가 준 짝(짝 문서 하나이거나 문서 묶음 전체)과 그 문서들이 직접 이름을 부른 파일까지만 읽는다.",
+   "counterpart_file": "skills/domain-docs/SKILL.md",
+   "counterpart": "그때 호출자는 이름표 묶음 전부가 아니라 값이 다른 짝 가운데 정당한 좁혀 적기인지 갈리는 것만 준다.",
+   "principle": "SSOT",
+   "consequence": "지금 같은 파일 안에서 「읽기 범위」는 문서 묶음 전체를 입력으로 적고 「레포 문서 감사에서의 짝」은 갈리는 짝만을 입력으로 적으며, domain-docs는 뒤쪽만 정하고 있어 `{background}`에 무엇이 들어가는지가 두 곳에서 다르게 적혀 있다."
+  },
+  {
+   "where": "레포 문서 감사에서의 짝",
+   "type": "compat",
+   "claim": "이 렌즈는 짝마다 원문 앞뒤 다섯 줄과 정본 표시를 받는다고 적었는데, 호출자의 「일관성 대조」 절은 갈리는 짝만 준다고 적고 앞뒤 다섯 줄이나 정본 표시를 주는 걸음이 없다. 호출자가 준다고 적은 것과 렌즈가 받는다고 적은 것이 다르다.",
+   "file": "skills/lens-consistency/SKILL.md",
+   "evidence": "짝마다 원문 앞뒤 다섯 줄과 어느 문서가 정본인지를 함께 준다.",
+   "counterpart_file": "skills/project-doc-audit/SKILL.md",
+   "counterpart": "값이 다른데 정당한 좁혀 적기인지 갈리는 짝만 `lens-consistency`에 준다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 앞뒤 다섯 줄과 정본 표시를 주는 의무는 렌즈 파일에만 적혀 있고 호출자 파일에는 없어, 좁혀 적음 판정에 필요한 정본 표시가 호출자 절차에서는 도출되지 않는다."
+  },
+  {
+   "where": "출력 스키마 (공통) — narrowed·pairs 문단",
+   "type": "compat",
+   "claim": "이 렌즈는 한 호출이 짝 여럿을 받아 `pairs`에 짝마다의 판정과 `narrowed`에 개수를 돌려준다고 적었는데, 호출자는 갈리는 짝마다 따로 건다고 적었다. 한 호출에 짝을 몇 개 주는지가 두 가지로 읽힌다.",
+   "file": "skills/lens-consistency/SKILL.md",
+   "evidence": "`narrowed`(좁혀 적음 개수)와 `pairs`(짝마다의 판정)는 레포 문서 감사에서 이 렌즈가 더 돌려주는 칸이며 집계 대상이 아니다.",
+   "counterpart_file": "skills/project-doc-audit/SKILL.md",
+   "counterpart": "문서별로 걸지 않고 「일관성 대조」 절대로 갈리는 짝마다 건다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 호출 단위가 렌즈 파일에서는 짝 묶음 하나이고 호출자 파일에서는 짝 하나여서, `narrowed` 개수와 `pairs` 배열이 호출자 절차대로 띄우면 항목 하나짜리로만 나온다."
+  },
+  {
+   "where": "출력 스키마 (공통) — duplication 문단",
+   "type": "schema",
+   "claim": "`type` 폐쇄 집합에 든 `duplication`은 이 렌즈가 내지 않고 호출자가 도출해 붙인다고 적었는데, 호출자의 「일관성 대조」 절은 세 걸음만 적고 그 도출 걸음이 없다. 그 값을 누가 어느 걸음에서 만드는지가 어느 문서에도 없다.",
+   "file": "skills/lens-consistency/SKILL.md",
+   "evidence": "`duplication`은 레포 문서 감사에서 호출자가 도출해 붙이는 값이다.",
+   "counterpart_file": "skills/project-doc-audit/SKILL.md",
+   "counterpart": "세 걸음이다. 진술은 문서마다 도는 렌즈 호출이 이미 낸 것을 받아 쓰고, 묶기는 스크립트가 하며, 갈리는 짝만 새로 묻는다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 `duplication`은 렌즈의 `type` 집합에 있으나 렌즈는 내지 않고, 호출자 절차에는 `pairs`의 같음 판정을 읽어 그 값을 붙이는 걸음이 적혀 있지 않다."
+  }
+ ],
+ "principles_applied": [
+  "EXPLICIT",
+  "SSOT",
+  "MEASURE-FIRST",
+  "FAIL-LOUD"
+ ],
+ "notes": "훑은 각도는 넷이다. 형식: 출력 스키마의 필드(lens·read·issues[where·type·claim·file·evidence·counterpart_file·counterpart·principle·consequence]·principles_applied·notes)가 meta-aggregate의 리뷰 산출물 계약과 같고, type 폐쇄 집합만 자기 것으로 정의하며 나머지는 그 계약을 가리킨다. narrowed·pairs는 meta-aggregate의 '렌즈가 자기 필드를 더할 수 있고 집계 대상이 아니다' 문단에 이름이 올라 있어 예외 목록과 어긋나지 않는다. 다만 pairs 항목의 칸이 어디에도 정의되지 않아 호출자가 같음 판정을 읽을 스키마가 없고, 이것은 위 duplication 발견에 딸린다. 스타일: frontmatter는 name이 디렉터리 이름과 같고 description 두 키이며 ': '와 ' #'이 없어 domain-plugin 규칙에 맞다. 금지 낱말은 test_docs_drift.sh 몫이라 세지 않았다. 오염: 출력 스키마 블록은 JSON 하나이고 여분 텍스트가 없다. 호환: 렌즈에게 정본을 알리는 법·한 번만 띄우는 렌즈의 규율·일관성 대조와 맞댄 결과가 위 발견 넷(입력 범위·앞뒤 다섯 줄·호출 단위·duplication 도출)이다. 더 확인할 것: 「레포 문서 감사에서의 짝」의 '범위 문장은 렌즈가 문서마다 하나씩 연다'에서 '범위 문장'이 무엇을 가리키는지 어느 파일에도 정의가 없어 대조할 상대편을 대지 못했고, 그래서 발견으로 올리지 않았다. 호출자가 그 뜻을 정하면 다시 대조할 수 있다."
+}

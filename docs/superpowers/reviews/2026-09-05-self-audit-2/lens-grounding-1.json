@@ -1,0 +1,46 @@
+{
+ "lens": "lens-grounding",
+ "target": "commands/show-principles.md",
+ "read": [
+  "agent-principles.md",
+  "commands/show-principles.md",
+  "scripts/_resolve_home.sh",
+  "scripts/_scaffold_common.sh",
+  "scripts/scaffold.sh",
+  ".claude-plugin/plugin.json",
+  "README.md",
+  "commands/setup-discipline.md",
+  "skills/lens-grounding/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "후보 본문 셋째 문장 — 파일이 없을 때의 안내 문구",
+   "type": "unsupported",
+   "claim": "문서는 파일이 없다는 사실 하나로 원인을 \"scaffold가 아직 실행되지 않았다\"로 확정해 안내하게 한다. 그런데 scaffold.sh에는 스크립트가 실행됐는데도 파일이 생기지 않는 길이 있다. 원본이 없으면 stderr WARNING만 내고 계속 가며, 복사가 실패하면 ERROR로 끝난다. README도 목록이 안 나오는 원인을 셋(스코프·셋업 오류·설정 홈 불일치)으로 가른다. 따라서 '아직 실행되지 않았다'는 진단은 스크립트 동작이 뒷받침하지 않는다.",
+   "file": "commands/show-principles.md",
+   "evidence": "파일이 없으면 \"scaffold가 아직 실행되지 않았다 — 새 세션을 열거나 `/setup-discipline`을 실행하라\"고",
+   "counterpart_file": "scripts/scaffold.sh",
+   "counterpart": "echo \"[disciplined-coder] WARNING: source not found at $src\" >&2",
+   "principle": "MEASURE-FIRST",
+   "consequence": "지금 이 명령은 scaffold가 돌았으나 원본을 못 찾았거나 복사에 실패한 PC에서도 사용자에게 '아직 실행되지 않았다'고 안내하고, README가 가른 셋업 오류 원인은 이 안내에 나타나지 않는다."
+  },
+  {
+   "where": "후보 본문 첫 문장 — 경로 도출 명령의 출력을 쓰는 방법",
+   "type": "omission",
+   "claim": "문서는 '받은 값을 쓴다'고만 하는데, resolve_home은 도메인 PC에서 stdout의 경로 한 줄과 함께 stderr로 note 한 줄을 더 낸다. 문서는 출력 가운데 어느 줄이 값인지, note 줄이 함께 올 수 있다는 것을 적지 않는다. 이 스크립트를 부르는 다른 문서(setup-discipline.md)는 출력을 그대로 전하라고만 하므로 이 문제가 없지만, 이 문서는 출력을 경로로 이어 써야 한다.",
+   "file": "commands/show-principles.md",
+   "evidence": "먼저 관리 디렉터리를 도출하라 — 경로를 짐작하지 말고 아래를 실행해 받은 값을 쓴다.",
+   "counterpart_file": "scripts/_resolve_home.sh",
+   "counterpart": "echo \"[disciplined-coder] note: 설정 홈을 USERPROFILE 기준 $val 로 잡음 (bash \\$HOME=${HOME:-} 와 다름)\" >&2",
+   "principle": "EXPLICIT",
+   "consequence": "지금 홈이 갈린 PC에서 이 명령을 실행하면 출력이 두 줄(경로와 note)로 오고, 문서는 그중 어느 줄을 경로로 이어 쓸지 정하지 않는다."
+  }
+ ],
+ "principles_applied": [
+  "MEASURE-FIRST",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "SSOT"
+ ],
+ "notes": "누락: resolve_home의 stderr note가 함께 올 수 있다는 것이 빠져 있다(이슈로 올림). 그 밖에 요청한 항목은 다 있다 — 경로 도출, 읽을 파일, 없을 때 안내, 인자 없음. 모순: 파일 경로 `<홈>/disciplined-coder/agent-principles.md`는 scaffold.sh의 KDIR와 _scaffold_common.sh의 SCAFFOLD_FILES와 일치한다. description의 '디시플린 정본의 사본'은 agent-principles.md 「이 파일의 취급」의 '플러그인이 사본을 PC 전역 폴더에 두고'와 일치한다. '새 세션을 열거나 /setup-discipline'은 README 「동작 확인과 복구」와 setup-discipline.md의 scaffold.sh 호출과 일치한다. 홈 드리프트 설명은 _resolve_home.sh 머리 주석과 일치한다. 환각: 없다. 불일치: 식별자(`${CLAUDE_PLUGIN_ROOT}`, `resolve_home claude`, `/setup-discipline`)는 실제 스크립트와 setup-discipline.md의 표기와 같다. 발견으로 올리지 않은 것 — README는 '`/show-principles`로 원칙 목록이 나오면 정상이다'라 하고 이 문서는 '전문을 그대로'라 하는데, 정본 파일이 원칙 목록을 담고 있어 어긋남으로 보지 않았다. 문서가 홈 드리프트 원인으로 USERPROFILE만 들고 CLAUDE_CONFIG_DIR 우선순위는 적지 않는데, 이유 설명의 일부일 뿐이라 모순이 아니다. 더 확인할 것 — 커맨드 파일 안의 `${CLAUDE_PLUGIN_ROOT}`가 Claude Code에서 실행 전에 치환되는지는 이 레포 안에서 확인할 수 없고 setup-discipline.md와 같은 표기를 쓰고 있다는 것만 확인했다."
+}
