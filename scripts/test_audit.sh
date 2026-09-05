@@ -30,6 +30,9 @@ check "상대편 인용도 확인한다"            "evq 'import json,sys; d=jso
 check "지문이 열두 자 16진수다"           "evq 'import json,sys,re; d=json.load(sys.stdin); sys.exit(0 if all(re.fullmatch(r\"[0-9a-f]{12}\", f[\"fingerprint\"]) for f in d[\"findings\"]) else 1)'"
 check "인용이 다르면 지문이 다르다"       "evq 'import json,sys,hashlib; d=json.load(sys.stdin); a,b=d[\"findings\"]; sys.exit(0 if a[\"fingerprint\"]!=b[\"fingerprint\"] else 1)'"
 check "출력에 CR 이 없다"                 "! printf '%s' \"\$EV_OUT\" | grep -q \$'\\r'"
+bash "$EV" --root "$EVT" "$EVT/findings.json" > "$EVT/ev_out.json" 2>/dev/null || true
+check "파일로 저장한 출력을 UTF-8 로 다시 열어도 인용이 원문 그대로다" \
+  "json_run 'import json,sys; d=json.load(open(sys.argv[1], encoding=\"utf-8\")); sys.exit(0 if d[\"findings\"][0][\"evidence\"]==\"어긋난 문장이 여기 있다.\" else 1)' '$EVT/ev_out.json'"
 rm -rf "$EVT"
 
 echo "[audit_rounds.sh — 회차 대조와 측정]"

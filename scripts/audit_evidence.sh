@@ -15,7 +15,7 @@ done
 [ -n "$IN" ] || { echo "사용: audit_evidence.sh [--root DIR] <findings.json>" >&2; exit 2; }
 json_run '
 import json, os, re, sys, hashlib
-sys.stdout.reconfigure(newline=chr(10))
+sys.stdout.reconfigure(encoding="utf-8", newline=chr(10))
 root, path = sys.argv[1], sys.argv[2]
 def norm(s): return re.sub(r"\s+", " ", s or "").strip()
 cache = {}
