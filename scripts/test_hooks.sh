@@ -135,7 +135,7 @@ check "README 가 이 훅을 적는다"               "grep -qF '읽기 전용 �
 
 echo "[rules-nudge-pre — 세션의 첫 파일 편집 전에 규칙 스킬 둘을 한 번 알린다]"
 # 표시 파일은 TMPDIR 아래에 남으므로 픽스처 폴더로 돌린다 — 안 그러면 스위트를 두 번째 돌릴 때 앞 실행의
-# 표시 파일이 남아 "첫 편집" 검사가 조용히 깨진다(`domain-coding`의 Idempotence).
+# 표시 파일이 남아 "첫 편집" 검사가 조용히 깨진다(정본의 `IDEMPOTENT`).
 # 코드와 문서를 가르지 않는다. 셸 명령의 대상은 실행해 봐야 정해져 편집 전에 가를 방법이 없기 때문이다.
 CNUD="$HERE/hooks/rules_nudge_pretooluse.sh"
 mkdir -p "$T/tmp"
@@ -143,17 +143,17 @@ cnud() { printf '%s' "$1" | TMPDIR="$T/tmp" bash "$CNUD"; }
 JS() { printf '{"session_id":"%s"%s,"tool_input":{"file_path":"%s"}}' "$1" "$2" "$3"; }
 JB() { printf '{"session_id":"%s","tool_name":"Bash","tool_input":{"command":"%s"}}' "$1" "$2"; }
 check "훅 파일이 있다"                              "[ -f '$CNUD' ]"
-check "첫 편집 → domain-coding 안내"                "cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'domain-coding'"
-check "첫 편집 → domain-writing 도 함께 안내"       "cnud '$(JS s1z "" "$T/src/main.py")' | grep -qF 'domain-writing'"
+check "첫 편집 → 정본 경로 안내      "                "cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
+check "첫 편집 → domain-korean 도 함께 안내"       "cnud '$(JS s1z "" "$T/src/main.py")' | grep -qF 'domain-korean'"
 check "안내가 유효한 JSON"                          "cnud '$(JS s1b "" "$T/src/main.py")' | json_valid_stdin"
 check "안내는 PreToolUse 이벤트를 말한다"            "cnud '$(JS s1c "" "$T/src/main.py")' | grep -qF '\"hookEventName\":\"PreToolUse\"'"
 check "같은 키 둘째 편집 → 무출력"                  "[ -z \"\$(cnud '$(JS s1 "" "$T/src/other.py")')\" ]"
-check "같은 세션 다른 agent_id → 다시 안내"         "cnud '$(JS s1 ',"agent_id":"a1"' "$T/src/main.py")' | grep -qF 'domain-coding'"
-check "문서(.md)도 대상이다"                        "cnud '$(JS s2 "" "$T/existing.md")' | grep -qF 'domain-writing'"
-check "셸 편집(sed -i)도 대상이다"                  "cnud '$(JB s7 'sed -i s/a/b/ src/main.py')' | grep -qF 'domain-coding'"
+check "같은 세션 다른 agent_id → 다시 안내"         "cnud '$(JS s1 ',"agent_id":"a1"' "$T/src/main.py")' | grep -qF 'agent-principles.md'"
+check "문서(.md)도 대상이다"                        "cnud '$(JS s2 "" "$T/existing.md")' | grep -qF 'agent-principles.md'"
+check "셸 편집(sed -i)도 대상이다"                  "cnud '$(JB s7 'sed -i s/a/b/ src/main.py')' | grep -qF 'agent-principles.md'"
 check "셸 편집도 세션당 한 번이다"                  "[ -z \"\$(cnud '$(JB s7 'sed -i s/c/d/ src/other.py')')\" ]"
 check "OFF → 무출력"                                "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off cnud '$(JS s5 "" "$T/src/main.py")')\" ]"
-check "session_id 없음 → 매번 안내"                 "cnud '$(J "$T/src/main.py")' | grep -qF 'domain-coding' && cnud '$(J "$T/src/main.py")' | grep -qF 'domain-coding'"
+check "session_id 없음 → 매번 안내"                 "cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md' && cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 
 echo "[rules-nudge-sessionstart — 세션이 시작·재개·비워지면 그 세션의 표시를 지운다]"
 # 표시 파일은 "이 맥락에서 이미 알렸다"를 뜻한다. 재개한 세션이 같은 session_id 를 다시 받는지는 훅 문서가
@@ -165,8 +165,8 @@ csta() { printf '%s' "$1" | TMPDIR="$T/tmp" bash "$CSTA"; }
 JSS() { printf '{"session_id":"%s","hook_event_name":"SessionStart","source":"resume"}' "$1"; }
 check "세션 시작 훅 파일이 있다"                    "[ -f '$CSTA' ]"
 check "세션 시작은 아무것도 안 낸다"                "[ -z \"\$(csta '$(JSS s9)')\" ]"
-check "세션 시작이 표시를 지워 다시 알린다"         "csta '$(JSS s1)' && cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'domain-coding'"
-check "세션 시작이 서브에이전트 표시도 지워 다시 알린다" "cnud '$(JS s1 ',"agent_id":"a1"' "$T/src/main.py")' | grep -qF 'domain-coding'"
+check "세션 시작이 표시를 지워 다시 알린다"         "csta '$(JSS s1)' && cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
+check "세션 시작이 서브에이전트 표시도 지워 다시 알린다" "cnud '$(JS s1 ',"agent_id":"a1"' "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 
 echo "[doc-format-pre]"
 printf 'x\n' > "$T/existing.md"
@@ -177,12 +177,12 @@ check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/ne
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off fpre '$(J "$T/newdoc.md")')\" ]"
 check "프로젝트 밖 새 문서 → 무출력"     "[ -z \"\$(fpre '$(J "$OUTSIDE/new.md")')\" ]"
 check "새 리뷰 기록 → 무출력"            "[ -z \"\$(fpre '$(J "$T/docs/superpowers/reviews/new-check.md")')\" ]"
-check "새 문서 넛지가 domain-writing 을 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'domain-writing'"
-# 넛지가 인용한 domain-doc-upkeep 절이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로
+check "새 문서 넛지가 domain-readme 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'domain-readme'"
+# 넛지가 인용한 정본의 절이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로
 # 그 절 이름이 바뀌자 넛지가 없는 절을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD).
-NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*domain-writing의 '\([^']*\)' 절.*/\1/p")"
+NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*정본의 '\([^']*\)' 절.*/\1/p")"
 check "넛지가 인용한 절 이름 추출됨"       "[ -n \"\$NUDGE_SEC\" ]"
-check "그 절이 domain-writing에 실재"           "grep -qF \"## \$NUDGE_SEC\" '$HERE/skills/domain-writing/SKILL.md'"
+check "그 절이 정본에 실재         "           "grep -qF \"## \$NUDGE_SEC\" '$HERE/agent-principles.md'"
 
 echo "[doc-review-post]"
 check "문서(.md) → 검진 넛지"            "drev '$(J "$T/existing.md")' | grep -q additionalContext"
@@ -193,7 +193,7 @@ check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIE
 check "프로젝트 밖 문서 → 무출력"        "[ -z \"\$(drev '$(J "$OUTSIDE/notes.md")')\" ]"
 check "상대경로 문서 → 검진 넛지"        "drev '$(J "notes/rel.md")' | grep -q additionalContext"
 check "Windows 형식 경로도 프로젝트 안"  "drev '$(J "$(cygpath -w "$T" 2>/dev/null || printf '%s' "$T")\\\\win.md")' | grep -q additionalContext"
-check "수정 넛지가 domain-writing 을 가리킨다"   "drev '$(J "$T/existing.md")' | grep -qF 'domain-writing'"
+check "수정 넛지가 review-docs 를 가리킨다  "   "drev '$(J "$T/existing.md")' | grep -qF 'review-docs'"
 check "수정 넛지에 스킬 절 이름을 박지 않는다"   "! drev '$(J "$T/existing.md")' | grep -qF 'Surgical Changes'"
 check "README 가 규칙 넛지를 적는다"             "grep -qF '규칙 넛지' '$HERE/README.md'"
 
@@ -211,7 +211,7 @@ in_claudemd() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s/CLAUD
 OUT_GONE="$(in_claudemd "$PN" | CLAUDE_PROJECT_DIR="$PN" bash "$DREV" 2>&1)" || true
 check "no add-pointer nudge anymore"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'add-pointer'"
 # 렌즈 이름이 아니라 위임 대상을 단언한다 — 이름을 단언하면 이 테스트가 네 번째 사본이 된다(SSOT).
-check "generic nudge fires instead"   "printf '%s' \"\$OUT_GONE\" | grep -qF 'domain-doc-upkeep'"
+check "generic nudge fires instead"   "printf '%s' \"\$OUT_GONE\" | grep -qF 'review-docs'"
 check "nudge names no lens directly"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'lens-'"
 check "hook writes no project file"   "[ ! -f '$PN/docs/solved_problems.md' ]"
 
