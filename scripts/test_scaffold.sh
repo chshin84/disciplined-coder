@@ -436,13 +436,12 @@ done
 for h in "Karpathy guidelines" "Principles" "Reach"; do
   check "domain-coding: section '$h'"                 "grep -qE '^## $h\$' '$DC'"
 done
-# 카파시 세 절은 플러그인이 정본이다. 베끼지 않고 가리키므로 본문이 되살아나면 잡는다(Single source of truth).
+# 카파시 세 절은 이 파일이 복사본으로 갖는다. 규칙을 얻으려고 다른 파일을 열지 않기로 한 결정이다.
 for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
-  check "domain-coding: no copy of '$h'"              "! grep -qE '^#+ $h\$' '$DC'"
+  check "domain-coding: section '$h'"                 "grep -qE '^### $h\$' '$DC'"
 done
-check "domain-coding: points at the plugin skill"     "grep -qF 'karpathy-guidelines' '$DC'"
-check "domain-coding: gives the install commands"     "grep -qF 'claude plugin install andrej-karpathy-skills@karpathy-skills' '$DC'"
-check "domain-coding: no Tradeoff copy"               "! grep -qF '**Tradeoff:**' '$DC'"
+check "domain-coding: Tradeoff line"                  "grep -qF '**Tradeoff:**' '$DC'"
+check "domain-coding: does not send you elsewhere"    "! grep -qF 'karpathy-guidelines' '$DC'"
 check "domain-coding: local-first moved to canon"     "! grep -qE '^## Local first\$' '$DC'"
 check "domain-coding: frontmatter name"               "grep -qF 'name: domain-coding' '$DC'"
 

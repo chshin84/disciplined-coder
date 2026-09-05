@@ -1,6 +1,6 @@
 ---
 name: domain-coding
-description: 코드를 쓰거나 고칠 때의 규칙이다. 정본에서 옮겨 온 다섯 원칙(한 가지 일·단일 출처·멱등성·명시성·변경 설명)을 담고, 겹치는 카파시(Andrej Karpathy) 코딩 지침은 베끼지 않고 andrej-karpathy-skills 플러그인의 karpathy-guidelines 스킬을 열게 한다. 그 플러그인이 없으면 설치를 먼저 권한다. 문서가 아닌 프로젝트 안 파일에 세션의 첫 편집이 들어오면 편집 전에 훅이 이 스킬을 열라고 알린다. 코드를 구현하는 서브에이전트에도 이 파일 경로를 넘긴다.
+description: 코드를 쓰거나 고칠 때의 규칙이다. 카파시(Andrej Karpathy) 코딩 지침의 코드용 세 절과, 정본에서 옮겨 온 다섯 원칙(한 가지 일·단일 출처·멱등성·명시성·변경 설명)을 담는다. 규칙을 얻으려고 다른 파일을 열 필요가 없게 이 한 파일로 닫아 둔다. 세션에서 파일을 처음 건드리려 하면 훅이 이 스킬을 열라고 알린다. 코드를 구현하는 서브에이전트에도 이 파일 경로를 넘긴다.
 ---
 # domain-coding — rules for writing and changing code
 
@@ -8,16 +8,55 @@ These rules apply whenever code is written or changed. Rules that also hold in p
 
 ## Karpathy guidelines
 
-Do not read them here. They live in the `andrej-karpathy-skills` plugin's `karpathy-guidelines` skill, which is their single source of truth. **Open that skill before you write or change code.** Simplicity First, Surgical Changes, and Goal-Driven Execution are not repeated in this file.
+From `andrej-karpathy-skills` 1.0.0, copied here so this file stands alone. Think Before Coding is not repeated: it applies to plain answers too and lives in the canon as Think Before Acting.
 
-If that skill is not available on this machine, the plugin is not installed. Tell the user so and give them the two commands, then continue without it:
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
+### Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+### Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+### Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
 ```
-claude plugin marketplace add forrestchang/andrej-karpathy-skills
-claude plugin install andrej-karpathy-skills@karpathy-skills
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
 ```
 
-Think Before Coding is the one section that is not there for you to open here: it applies to plain answers too, so it lives in the always-loaded canon as Think Before Acting.
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
 ## Principles
 
