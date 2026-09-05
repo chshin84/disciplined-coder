@@ -35,6 +35,7 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 - `consequence`를 구체적으로 못 적는 발견은 올리지 않는다.
 - `issues`가 빈 배열인 것은 정상적인 결과다.
 - `read`가 비어 있으면 호출자가 자기 보고에 적는다. 자동 재시도는 걸지 않는다. 읽지 않고 채우는 것을 막을 수 없어 재시도는 "비어 있지 않은 배열"로만 수렴한다.
+- `fingerprint` — 짚은 곳의 문장과 상대편과 원칙을 이어 만든 지문이다. 호출자가 `scripts/audit_evidence.sh`로 붙이며 렌즈가 적지 않는다. 회차 사이의 대조가 이 값으로 짝을 맞춘다.
 
 ## 공통 계약의 예외
 - `lens-readability` — 맞댈 상대편이 없어 위 공통 계약을 따르지 않는다. 산출물이 `issues`가 아니라 `suggestions`이고, 항목의 칸이 `where`·`why`·`rewrite` 셋이며 `type`·`claim`·`consequence`·`evidence`가 없다. 발견이 아니라 제안이라 「집계」·「상충 감지」·「커버리지 공백」 어디에도 들어가지 않는다. 스키마의 상세는 `skills/lens-readability/SKILL.md`가 정본이다.

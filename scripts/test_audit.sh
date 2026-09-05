@@ -106,4 +106,12 @@ check "값의 경계를 적는다"               "grep -qF '새 프로젝트나 
 check "판단임을 산출물에 적게 한다"       "grep -qF '판단이라는 사실을 산출물에 적는다' '$DD'"
 check "문서 검진이 렌즈를 각각 부르지 않는다" "! grep -qF '각각 호출' '$DD'"
 
+echo "[호출자 — 디스패치와 집계 계약]"
+SR="$HERE/skills/domain-spec-review/SKILL.md"
+MA="$HERE/skills/meta-aggregate/SKILL.md"
+check "spec 리뷰가 렌즈마다 띄우지 않는다"   "! grep -qF '렌즈마다 서브에이전트를' '$SR'"
+check "spec 리뷰가 규율 소유자를 가리킨다"   "grep -qF '한 번만 띄우는 렌즈의 규율' '$SR'"
+check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
+check "집계 계약이 제안 채널을 가른다"       "grep -qF 'suggestions' '$MA' && grep -qF '집계 대상이 아니다' '$MA'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
