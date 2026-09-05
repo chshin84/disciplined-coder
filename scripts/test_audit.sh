@@ -240,19 +240,20 @@ rj() { json_run "$1" "$RT/round/$2"; }
 # (지운 단언) 발견마다 상대편과 지문이 있다 — 이 픽스처가 counterpart·fingerprint 를 손으로 채워
 # 넣고 그 값이 있는지를 같은 픽스처에서 되읽는 것이라 자기 자신을 증언하는 것과 같다. audit_evidence.sh
 # 가 그 칸을 실제로 읽는지는 위 [F1] 구획이 스키마와 대조해 이미 본다.
-# status 의 닫힌 집합은 이 파일이 손으로 든 리터럴이 아니라 계획 문서의 한 문장에서 뽑는다 —
-# 문서가 상태 이름을 더하거나 빼면 여기서 같이 갈린다(계획 문서나 이 픽스처 어느 한쪽만 바뀌어도 실패).
-STATUS_SRC="$HERE/docs/superpowers/plans/2026-09-05-findings-bar-and-deterministic-first.md"
+# status 의 닫힌 집합은 이 파일이 손으로 든 리터럴이 아니라 절차 문서(project-doc-audit SKILL.md)
+# 「판정」 절의 한 문장에서 뽑는다 — 계획 문서는 소비하고 지우는 문서라 정본이 못 된다. 문서가 상태
+# 이름을 더하거나 빼면 여기서 같이 갈린다(절차 문서나 이 픽스처 어느 한쪽만 바뀌어도 실패).
+STATUS_SRC="$PDA"
 STATUS_LINE="$(grep -F '`status`가' "$STATUS_SRC" | head -1)"
 STATUS_SET="$(printf '%s' "$STATUS_LINE" | grep -oE '`[a-z]+`' | tr -d '`' | sort -u | tr '\n' ' ')"
-check "계획 문서에서 status 닫힌 집합을 뽑았다" "[ -n \"\$STATUS_SET\" ]"
+check "절차 문서 「판정」 절에서 status 닫힌 집합을 뽑았다" "[ -n \"\$STATUS_SET\" ]"
 STATUS_PROG='
 import json, sys
 allowed = set(sys.argv[2].split())
 d = json.load(open(sys.argv[1], encoding="utf-8"))
 sys.exit(0 if all(f.get("status") in allowed for f in d["findings"]) else 1)
 '
-check "findings.json 의 status 가 계획 문서의 닫힌 집합 안이다" \
+check "findings.json 의 status 가 절차 문서의 닫힌 집합 안이다" \
   "json_run \"\$STATUS_PROG\" '$RT/round/findings.json' \"\$STATUS_SET\""
 rm -rf "$RT"
 
