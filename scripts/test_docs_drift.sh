@@ -27,6 +27,12 @@ DISPATCH="$(grep -oE '^- `lens-[a-z-]+`' "$CALLER" | sed 's/^- `lens-//; s/`$//'
 AGG_LINE="$(grep -F '"source"' "$AGG" || true)"
 AGGSET="$(printf '%s' "$AGG_LINE" | sed -n 's/.*"source"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | tr '|' '\n' | sed 's/^ *//; s/ *$//' | grep -v '^$' | sort || true)"
 
+# 캐시 4 — meta-aggregate가 「공통 계약의 예외」로 적은 렌즈 이름 열거. 손으로 목록을 베끼지
+# 않고 정본 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
+# 예외 없이 다섯 렌즈 전부에게 강도 그대로의 대조를 요구한다.
+EXC_LENSES="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u || true)"
+is_exc() { printf '%s\n' "$EXC_LENSES" | grep -qxF "$1"; }
+
 echo "[앵커가 실제로 잡히는가 — 못 잡으면 아래 단언이 무의미해진다]"
 check "렌즈 디렉터리가 하나 이상 있다"          "[ -n \"\$ALL\" ]"
 check "호출자 디스패치 목록을 읽어냈다"          "[ -n \"\$DISPATCH\" ]"
@@ -50,11 +56,17 @@ check "계약이 빈손을 정상으로 적는다"           "grep -qF '빈 배�
 check "계약에 등급 라벨이 없다"                 "! grep -qF 'severity' \"\$AGG\""
 check "spec 리뷰에 결정 단계가 없음을 적는다"   "grep -qF 'spec 리뷰에서는 결정 단계가 없다' \"\$AGG\""
 
+check "정본에서 공통 계약 예외 렌즈를 뽑았다" "[ -n \"\$EXC_LENSES\" ]"
+
 echo "[렌즈 계약 — 등급 없음, 근거 필수]"
 for d in "$HERE"/skills/lens-*/; do
   n="$(basename "$d")"; f="$d/SKILL.md"
   check "$n 에 등급 라벨이 없다"          "! grep -qF 'severity' \"$f\""
-  check "$n 이 consequence 를 요구한다"   "grep -qF 'consequence' \"$f\""
+  if is_exc "$n"; then
+    check "$n 은 공통 계약 예외라 consequence 를 요구하지 않는다" "! grep -qF 'consequence' \"$f\""
+  else
+    check "$n 이 consequence 를 요구한다"   "grep -qF 'consequence' \"$f\""
+  fi
   check "$n 이 read 를 요구한다"          "grep -qF '\"read\"' \"$f\""
   check "$n 이 빈손을 정상으로 적는다"    "grep -qF '빈 목록이 정상' \"$f\""
   check "$n 이 읽기 범위를 적는다"        "grep -qF '읽기 범위' \"$f\""
@@ -170,8 +182,12 @@ check "정본에서 evidence 뜻풀이를 뽑았다"   "[ -n \"\$CONTRACT_EV_TAI
 check "정본에서 consequence 뜻풀이를 뽑았다" "[ -n \"\$CONTRACT_CONSEQ\" ]"
 for L in "$HERE"/skills/lens-*/SKILL.md; do
   n="$(basename "$(dirname "$L")")"
-  check "$n: evidence 가 정본의 근거 형태를 담는다"    "grep -qF -- \"\$CONTRACT_EV_TAIL\" '$L'"
-  check "$n: consequence 뜻풀이가 정본과 같다"         "grep -qF -- \"\$CONTRACT_CONSEQ\" '$L'"
+  if is_exc "$n"; then
+    check "$n: 공통 계약 예외라 스키마 사본 대조에서 빠진다" "grep -qF '$n' \"\$AGG\""
+  else
+    check "$n: evidence 가 정본의 근거 형태를 담는다"    "grep -qF -- \"\$CONTRACT_EV_TAIL\" '$L'"
+    check "$n: consequence 뜻풀이가 정본과 같다"         "grep -qF -- \"\$CONTRACT_CONSEQ\" '$L'"
+  fi
   # 조건부 필드를 렌즈가 다시 규정하면 필수 여부가 두 곳에서 갈린다 — 가리키기만 해야 한다.
   check "$n: principles_applied 규칙을 되풀이하지 않는다" "! grep -qF '제품 런타임 구현에는 요구하지 않는다' '$L'"
 done
