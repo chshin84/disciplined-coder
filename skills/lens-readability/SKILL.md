@@ -83,7 +83,7 @@ description: 문서가 전달하려는 것을 무엇이 방해하는지 보는 �
 
 ## 출력 스키마 (공통 + 이 렌즈의 둘)
 ```
-{ "lens": "readability", "purpose": "판정에 쓴 목적 한 줄 — 못 받았거나 읽는 사람과 할 수 있어야 하는 것 중 하나라도 빠졌으면 null", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "friction|narrative|language|scope|structure|wrong-job", "claim": "무엇이 방해하는가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가 — 이 렌즈에서는 전달이 어떻게 막히는가", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 문제 문장을 그대로 인용한다", "rewrite": "고친 것 — 문장이든 옮긴 절이든 새로 쓴 문장이든. 손대지 않는 요소에 걸릴 때만 null" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "readability", "purpose": "판정에 쓴 목적 한 줄 — 못 받았거나 읽는 사람과 할 수 있어야 하는 것 중 하나라도 빠졌으면 null", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "friction|narrative|language|scope|structure|wrong-job", "claim": "무엇이 방해하는가", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지 — 이 렌즈에서는 전달이 지금 어떻게 막혀 있는지", "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL. 이 렌즈는 문제 문장을 그대로 인용한다", "rewrite": "고친 것 — 문장이든 옮긴 절이든 새로 쓴 문장이든. 손대지 않는 요소에 걸릴 때만 null" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 meta-aggregate의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 
 관찰 축과 위 `type` 여섯은 서로 대응하지 않는다. 이 가운데 문서가 뜻을 적어 둔 것은 `wrong-job` 하나이며 「반드시 읽히는 곳의 필수 내용」이 그것을 정의한다.

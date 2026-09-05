@@ -23,7 +23,7 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 { "lens": "grounding|fit|consistency|adversarial|prior-art|readability",
   "read": ["문서 밖에서 실제로 열어본 것 — 파일 경로나 URL"],
   "issues": [ { "where": "문서 내 위치", "type": "<렌즈가 정의한 폐쇄 집합>",
-                "claim": "무엇이 문제인가", "consequence": "이대로 두면 무엇이 어떻게 잘못되는가",
+                "claim": "무엇이 문제인가", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지",
                 "evidence": "그렇게 본 근거 — 문서 인용, 파일 경로와 줄, URL" } ],
   "principles_applied": ["읽고 적용한 원칙 ID — Claude 서브에이전트로 띄운 리뷰에서만 채운다"], "notes": "" }
 ```
