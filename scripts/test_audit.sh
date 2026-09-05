@@ -125,4 +125,20 @@ check "호출 종류별 고정표가 있다"        "grep -qF '| 호출 종류 |
 check "회차마다 다시 판단하지 않는다고 적는다" "grep -qF '회차마다 다시 판단하지 않는다' '$LR2'"
 check "문서 전체에 리스크로 렌즈를 고른다는 서술이 안 남아 있다" "! grep -qF '리스크' '$LR2'"
 
+echo "[project-doc-audit — 걸음 여덟과 기록 넷]"
+PDA="$HERE/skills/project-doc-audit/SKILL.md"
+PDA_ROWS="$(awk '/^## 걸음/{f=1;next} f&&/^## /{exit} f&&/^\| [^|-]/{n++} END{print n-1}' "$PDA")"
+PDA_SAID="$(LC_ALL=C.UTF-8 grep -oE '걸음은 [^ ]+이고' "$PDA" | head -1 | sed 's/걸음은 //; s/이고//')"
+KO_NUM() { case "$1" in 하나) echo 1;; 둘) echo 2;; 셋) echo 3;; 넷) echo 4;; 다섯) echo 5;; 여섯) echo 6;; 일곱) echo 7;; 여덟) echo 8;; 아홉) echo 9;; 열) echo 10;; *) echo 0;; esac; }
+check "걸음 표의 행 수와 '걸음은 N' 문장이 맞는다" "[ \"\$PDA_ROWS\" = \"\$(KO_NUM \"\$PDA_SAID\")\" ]"
+check "인용 확인 스크립트를 부른다"       "grep -qF 'audit_evidence.sh' '$PDA'"
+check "회차 대조 스크립트를 부른다"       "grep -qF 'audit_rounds.sh' '$PDA'"
+check "세션이 판정한다고 적는다"          "grep -qF '세션이 판정한다' '$PDA'"
+check "기록 파일 넷을 적는다"             "grep -qF 'run.json' '$PDA' && grep -qF 'findings.json' '$PDA' && grep -qF 'diff.json' '$PDA' && grep -qF 'suggestions.json' '$PDA'"
+check "실행체를 가리키지 않는다"          "! grep -qF 'self-audit.js' '$PDA'"
+check "뽑기 걸음이 사라졌다"              "! grep -qF '진술을 뽑아 이름표로 모은다' '$PDA'"
+check "반박검증 개념이 안 남았다"          "! grep -qF '반박검증' '$PDA'"
+check "검증자 개념이 안 남았다"            "! grep -qF '검증자' '$PDA'"
+check "중복제거 에이전트 개념이 안 남았다" "! grep -qF '중복제거 에이전트' '$PDA'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
