@@ -96,5 +96,6 @@ check "발견이 아니라 제안을 돌려준다고 적는다" "grep -qF '발�
 check "산출물 이름이 suggestions 다"          "grep -qF 'suggestions' '$LR'"
 check "판정 목록에 들어가지 않는다고 적는다"    "grep -qF '확정과 기각을 세는 목록에 들어가지 않는다' '$LR'"
 check "기계에 넘기는 것 절이 있다"             "grep -qF '## 기계에 넘기는 것' '$LR'"
+check "출력 스키마에 issues 배열이 안 남았다"   "! grep -qF '\"issues\": [' '$LR'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
