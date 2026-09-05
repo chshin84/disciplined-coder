@@ -98,4 +98,12 @@ check "판정 목록에 들어가지 않는다고 적는다"    "grep -qF '확�
 check "기계에 넘기는 것 절이 있다"             "grep -qF '## 기계에 넘기는 것' '$LR'"
 check "출력 스키마에 issues 배열이 안 남았다"   "! grep -qF '\"issues\": [' '$LR'"
 
+echo "[domain-docs — 결정론 우선]"
+DD="$HERE/skills/domain-docs/SKILL.md"
+check "결정론 우선 절이 있다"            "grep -qF '## 판단 앞에 기계를 세운다' '$DD'"
+check "렌즈는 판단만 한다고 적는다"       "grep -qF '렌즈는 판단만 한다' '$DD'"
+check "값의 경계를 적는다"               "grep -qF '새 프로젝트나 새 모델이나 새 의존이 필요하면 제안하지 않는다' '$DD'"
+check "판단임을 산출물에 적게 한다"       "grep -qF '판단이라는 사실을 산출물에 적는다' '$DD'"
+check "문서 검진이 렌즈를 각각 부르지 않는다" "! grep -qF '각각 호출' '$DD'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
