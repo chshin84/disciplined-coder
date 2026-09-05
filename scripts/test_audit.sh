@@ -113,5 +113,6 @@ check "spec 리뷰가 렌즈마다 띄우지 않는다"   "! grep -qF '렌즈마
 check "spec 리뷰가 규율 소유자를 가리킨다"   "grep -qF '한 번만 띄우는 렌즈의 규율' '$SR'"
 check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
 check "집계 계약이 제안 채널을 가른다"       "grep -qF 'suggestions' '$MA' && grep -qF '집계 대상이 아니다' '$MA'"
+check "두 예외 문장이 각자 다른 규칙을 밝힌다" "grep -qF '대상마다 따로 띄우는 이 절차에서 예외는' '$SR' && grep -qF '한 대상의 렌즈를 한 호출로 묶는 이 규칙의 예외로' '$SR'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
