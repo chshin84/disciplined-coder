@@ -1,6 +1,6 @@
 ---
 name: lens-fit
-description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일·금지사항)과, 호출자가 계약으로 넘긴 규칙집(정본·domain-writing·domain-coding 같은 것)을 지키는지 보는 렌즈. 다운스트림이 파싱·사용하기 전에 형식 적합성을 거른다. 가능하면 결정론 검증을 먼저 돌린다. review-llm-calls의 런타임 리뷰와 domain-doc-upkeep의 문서 검진과 audit-repo-docs의 레포 문서 감사가 호출한다.
+description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일·금지사항)과, 호출자가 계약으로 넘긴 규칙집(정본과 domain-korean 같은 것)을 지키는지 보는 렌즈. 다운스트림이 파싱·사용하기 전에 형식 적합성을 거른다. 가능하면 결정론 검증을 먼저 돌린다. review-llm-calls의 런타임 리뷰와 review-docs의 문서 검진과 audit-repo-docs의 레포 문서 감사가 호출한다.
 ---
 # lens-fit — 계약 적합성 렌즈 (프롬프트 설계도)
 

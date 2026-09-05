@@ -110,7 +110,7 @@ check "Stop 훅이 공유 안내문을 쓴다"              "grep -qF 'SPEC_REVI
 check "훅이 안내문을 따로 베끼지 않는다"          "! grep -qF '마커를 먼저 남기고' \"\$PTU\" \"\$STOPH\""
 
 echo "[리뷰 절차 — 렌즈를 한 번씩 띄우고 결과를 한데 모은다]"
-DOCS="$HERE/skills/domain-doc-upkeep/SKILL.md"
+DOCS="$HERE/skills/review-docs/SKILL.md"
 RUNTIME2="$HERE/skills/review-llm-calls/SKILL.md"
 READMEF="$HERE/README.md"
 check "spec 리뷰가 회차 규칙을 다시 선언하지 않는다" "! grep -qF '렌즈마다 한 번씩만 띄운다' \"\$CALLER\""
@@ -161,11 +161,11 @@ check "소유자가 나눠 주지 않는다"             "grep -qF '렌즈끼리
 check "런타임이 나눠 주지 않는다"             "grep -qF '렌즈끼리 볼 것을 나눠 주지 않는다' \"\$RUNTIME2\""
 
 echo "[dispatching-lenses — 소유자가 하나다]"
-# 렌즈 운용 규율이 domain-doc-upkeep 와 나뉘어 있던 동안 소유자가 둘이었다. 규율은 이 스킬이 지고
-# domain-doc-upkeep 는 문서 저작만 진다. 절 제목과 띄우는 방법 문장이 양쪽에 함께 있으면 다시 갈린다.
+# 렌즈 운용 규율이 문서 검진 절차와 나뉘어 있던 동안 소유자가 둘이었다. 규율은 이 스킬이 지고
+# review-docs 는 검진 절차만 진다. 절 제목과 띄우는 방법 문장이 양쪽에 함께 있으면 다시 갈린다.
 DISP_PTR='띄우는 방법은 `dispatching-lenses`가 정한다'
-check "domain-doc-upkeep 에 렌즈 운용 절 제목이 없다"   "! grep -qE '^## (렌즈에게 정본을 알리는 법|판단 앞에 기계를 세운다|한 번만 띄우는 렌즈의 규율)$' \"\$DOCS\""
-check "domain-doc-upkeep 가 띄우는 방법을 소유자로 넘긴다" "! grep -qF '렌즈 결과는' \"\$DOCS\" && grep -qF -- \"\$DISP_PTR\" \"\$DOCS\""
+check "review-docs 에 렌즈 운용 절 제목이 없다"        "! grep -qE '^## (렌즈에게 정본을 알리는 법|판단 앞에 기계를 세운다|한 번만 띄우는 렌즈의 규율)$' \"\$DOCS\""
+check "review-docs 가 띄우는 방법을 소유자로 넘긴다"    "! grep -qF '렌즈 결과는' \"\$DOCS\" && grep -qF -- \"\$DISP_PTR\" \"\$DOCS\""
 check "소유자가 띄우는 방법을 적는다"             "grep -qF 'source를 주입' \"\$DISP\" && grep -qF '렌즈 결과는' \"\$DISP\""
 DISP_MISS=""
 while IFS= read -r n; do
@@ -191,15 +191,15 @@ check "렌즈 스키마의 lens 값이 디렉터리 이름과 같다" "[ -z \"\$
 check "렌즈 파일에 문턱 첫 문장이 안 남았다"          "! grep -qF '발견 하나는 넷을 진다' \"\$HERE\"/skills/lens-*/SKILL.md"
 
 echo "[기록 — 자리와 담을 것]"
-check "spec 리뷰가 기록 이름 소유자를 가리킨다" "grep -qF '문서 타입 표 기록 행이 소유하므로' \"\$CALLER\""
+check "spec 리뷰가 기록 이름 소유자를 가리킨다" "grep -qF '정본의 기록 이름 규칙이 소유하므로' \"\$CALLER\""
 check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$DOCS\""
 check "문서 검진 기록의 이름을 적는다"       "grep -qF '-check.md' \"\$DOCS\""
 check "문서 검진 기록은 처리 결과를 뺀다"    "grep -qF '무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다' \"\$DOCS\""
 check "spec 리뷰 기록은 처리 결과를 뺀다"    "grep -qF '어떻게 처리했는지는 담지 않는다' \"\$CALLER\""
 check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거를 검토 대상 문서 본문에 적는다' \"\$CALLER\""
-# 이름 규칙은 domain-doc-upkeep 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
-check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$DOCS\""
-check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'domain-doc-upkeep' \"\$CALLER\""
+# 이름 규칙은 정본이 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
+check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$CANON\""
+check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF '정본의 기록 이름 규칙' \"\$CALLER\""
 check "원본을 받는 즉시 저장한다"            "grep -qF '받는 즉시' \"\$CALLER\""
 check "원본을 같은 이름 폴더에 둔다"          "grep -qF '같은 이름의 폴더' \"\$CALLER\""
 check "런타임이 기록 제외 이유를 적는다"      "grep -qF '사용자 입력이 로그로' \"\$RUNTIME2\""
@@ -247,7 +247,7 @@ check "정본이 principles_applied 규칙을 소유한다" "grep -qF '제품 �
 check "정본이 file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' \"\$MA\""
 check "정본이 principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' \"\$MA\""
 
-echo "[렌즈에게 정본을 알리는 법 — domain-doc-upkeep 한 곳만 규율을 적는다]"
+echo "[렌즈에게 정본을 알리는 법 — dispatching-lenses 한 곳만 규율을 적는다]"
 # 전에 여러 문서가 각자 적었다가 하나에서 둘이 빠져 갈라졌다. 소유자를 하나로 두고
 # 나머지는 가리키기만 하게 묶는다. 앵커는 소유자의 절 제목이라 제목을 고치면 실패한다(FAIL-LOUD).
 OWNER_DOC="$HERE/skills/dispatching-lenses/SKILL.md"
@@ -259,7 +259,7 @@ for m in "${RULE_MARKS[@]}"; do
   check "소유자가 규율을 적는다: $m" "grep -qF -- '$m' \"\$OWNER_DOC\""
 done
 # 가리키기만 해야 하는 문서들. 규율 문구를 다시 적으면 실패한다.
-for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$HERE"/skills/domain-coding/SKILL.md "$HERE"/skills/domain-writing/SKILL.md; do
+for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$HERE"/skills/review-docs/SKILL.md; do
   # 스킬 문서는 파일 이름이 모두 SKILL.md라 부모 디렉터리로 부른다 — 안 그러면 어느 문서가 실패했는지
   # 알 수 없다(`NAME-ITEMS`).
   dn="$(basename "$D")"; [ "$dn" = "SKILL.md" ] && dn="$(basename "$(dirname "$D")")"
@@ -433,7 +433,7 @@ NUM='(두|세|네|다섯|여섯|일곱|여덟|아홉|열)'
 NUMB='(둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)'
 # 렌즈 이름은 디렉터리에서 도출한다 — 여기 손으로 적으면 그 목록이 먼저 낡는다.
 LENS_RE="$(printf '%s' "$ALL" | tr '\n' '|' | sed 's/|$//')"
-COUNT_SCAN="$AGG $HERE/skills/lens-*/SKILL.md $HERE/skills/domain-doc-upkeep/SKILL.md $DISP $CALLER $CANON $HERE/README.md"
+COUNT_SCAN="$AGG $HERE/skills/lens-*/SKILL.md $HERE/skills/review-docs/SKILL.md $HERE/skills/domain-readme/SKILL.md $DISP $CALLER $CANON $HERE/README.md"
 # shellcheck disable=SC2086
 NUMHIT="$(LC_ALL=C.UTF-8 grep -nE "$NUM[ ]?렌즈|렌즈[ ]?$NUMB|다른 $NUMB[ ]?(렌즈|은|는)|$NUMB[ ]?곳에" $COUNT_SCAN 2>/dev/null \
   | grep -v '개수를 산문에\|이름을 같은 줄에' \
@@ -567,7 +567,7 @@ echo "[README] 잠금 시간을 값으로 적지 않고 상수 자리를 가리�
 check "README가 잠금 시간을 베끼지 않는다" "! grep -qE '잠금(은|이)? *[0-9]+초' '$HERE/README.md'"
 check "README가 상수 자리를 가리킨다"      "grep -qF '_managed_block.sh' '$HERE/README.md'"
 
-# --- 렌즈에게 정본을 알리는 법: domain-doc-upkeep 한 곳만 내용을 갖는다 ---
+# --- 렌즈에게 정본을 알리는 법: dispatching-lenses 한 곳만 내용을 갖는다 ---
 # 다른 스킬은 그 절을 가리키기만 한다. 첫 항목 문장이 다른 스킬에 나타나면 베낀 것이다.
 echo "[렌즈에게 정본을 알리는 법] 다른 스킬이 내용을 베끼지 않는다"
 TELL_SENT='정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다'

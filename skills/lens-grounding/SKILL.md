@@ -1,6 +1,6 @@
 ---
 name: lens-grounding
-description: LLM 출력·주장이 그 출처(런타임=요청+맥락 / spec리뷰=검토 문서+주입된 사실)에 근거하는지 보는 렌즈다. 누락과 모순과 환각을 찾는다. 호출자(review-llm-calls의 런타임 리뷰, review-specs, domain-doc-upkeep의 문서 검진, audit-repo-docs의 레포 문서 감사)가 source를 제공한다.
+description: LLM 출력·주장이 그 출처(런타임=요청+맥락 / spec리뷰=검토 문서+주입된 사실)에 근거하는지 보는 렌즈다. 누락과 모순과 환각을 찾는다. 호출자(review-llm-calls의 런타임 리뷰, review-specs, review-docs, audit-repo-docs의 레포 문서 감사)가 source를 제공한다.
 ---
 # lens-grounding — 근거 충실성 렌즈 (프롬프트 설계도)
 

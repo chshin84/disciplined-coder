@@ -170,7 +170,7 @@ cat > "$VR/findings.json" <<'FIXTURE'
 FIXTURE
 check "사유 없는 기각을 잡는다" "[ -f '$AV' ] && ! bash '$AV' '$VR' >/dev/null 2>&1"
 rm -rf "$VT"
-check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' '$HERE/skills/domain-doc-upkeep/SKILL.md'"
+check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' '$HERE/agent-principles.md'"
 
 
 echo "[렌즈 — 발견의 문턱과 기계에 넘기는 것]"
@@ -202,7 +202,7 @@ check "기계에 넘기는 것 절이 있다"             "grep -qF '## 기계�
 check "출력 스키마에 issues 배열이 안 남았다"   "! grep -qF '\"issues\": [' '$LR'"
 
 echo "[dispatching-lenses — 결정론 우선]"
-DD="$HERE/skills/domain-doc-upkeep/SKILL.md"
+DD="$HERE/skills/review-docs/SKILL.md"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
 check "결정론 우선 절이 있다"            "grep -qF '## 판단 앞에 기계를 세운다' '$DISP'"
 check "렌즈는 판단만 한다고 적는다"       "grep -qF '렌즈는 판단만 한다' '$DISP'"

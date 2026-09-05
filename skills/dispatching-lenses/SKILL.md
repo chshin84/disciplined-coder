@@ -62,6 +62,6 @@ description: 읽기 전용 서브에이전트를 렌즈로 띄울 때 지키는 
 렌즈 이름은 `lens-` 접두사가 붙은 한 문자열이고 스킬 디렉터리 이름과 같다. 스키마의 `lens` 값, 기록 파일 이름, `findings.json`의 `lens` 칸이 모두 그 한 문자열이다. 짧은 이름(`grounding`)은 쓰지 않는다.
 
 ## 호출자 목록
-이 규율을 여는 스킬은 넷이다. `review-specs`, `domain-doc-upkeep`의 문서 검진, `audit-repo-docs`, `nested-orchestration`의 L2 다.
+이 규율을 여는 스킬은 넷이다. `review-specs`, `review-docs`, `audit-repo-docs`, `nested-orchestration`의 L2 다.
 
 `review-llm-calls`는 목록에 들지 않는다. 제품 코드가 리뷰 콜을 부르는 청사진이라 서브에이전트 규율이 걸리지 않는다. 다만 그 문서가 「판단 앞에 기계를 세운다」를 이름으로 부를 때는 소유자를 이 스킬로 적는다.

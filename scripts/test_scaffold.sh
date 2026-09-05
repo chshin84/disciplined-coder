@@ -279,7 +279,7 @@ WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agen
 echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
 check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
 check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'lens-*'"
-check "검증 기록은 호출자 스킬이 요구한다" "grep -qF '합치기가 끝나면 기록 파일에 쓴다' \"$HERE/skills/review-specs/SKILL.md\" && grep -qF 'docs/superpowers/reviews/' \"$HERE/skills/domain-doc-upkeep/SKILL.md\""
+check "검증 기록은 호출자 스킬이 요구한다" "grep -qF '합치기가 끝나면 기록 파일에 쓴다' \"$HERE/skills/review-specs/SKILL.md\" && grep -qF 'docs/superpowers/reviews/' \"$HERE/skills/review-docs/SKILL.md\""
 check "사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_BLOCK\" | grep -qF 'ultracode 검증 모드'"
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
@@ -399,59 +399,49 @@ done
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
 check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
 
-# --- karpathy-split: 정본에는 대화 규칙만 남고, 코드 규칙은 domain-coding, 문서 규칙은 domain-writing에 있다 ---
-# 기준은 "파일을 하나도 건드리지 않은 답 한 번으로도 어길 수 있으면 정본에 남는다"이다. 산출물이 있어야만
-# 어기는 규칙은 스킬로 갔고, 스킬은 훅이 열게 한다(코드 넛지는 test_hooks.sh가 본다).
-echo "[karpathy-split] conversation rules stay in the canon; code and document rules live in skills"
+# --- canon-consolidation: 규칙집 스킬 셋을 접어 정본이 원칙 전부를 갖는다 ---
+# 어제 기준은 "파일을 하나도 건드리지 않은 답 한 번으로도 어길 수 있으면 정본에 남는다"였다. 그 기준이
+# 가르는 두 무리 가운데 하나가 비어 있다는 것을 실측으로 확인해 오늘 셋을 접었다. 정본은 원칙을 먼저
+# 정의하고 대화·문서·코드 세 갈래가 그 이름을 부른다. 절차와 산출물 한 종류에만 걸리는 것만 스킬로 남는다.
+echo "[canon-consolidation] the canon owns every principle; only procedures and per-artifact rules stay skills"
 # 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
 # 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
-check "canon: Think Before Acting is a top-level section" "grep -qE '^## Think Before Acting$' '$CANON'"
-check "canon: Think Before Acting is not a subsection"    "! grep -qE '^### Think Before Acting$' '$CANON'"
-check "canon: no Tradeoff line"                      "! grep -qF '**Tradeoff:**' '$CANON'"
-for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
-  check "canon: no '$h' section"                     "! grep -qF '### $h' '$CANON'"
+for sec in "원칙" "Karpathy guidelines" "대화할 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
+  check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
 done
+# 카파시 넷은 정본 안의 하위 절이다. Think Before Acting 이 최상위로 올라가면 갈래 셋과 나란히 서서
+# 어느 작업에 걸리는지가 흐려진다.
+for h in "Think Before Acting" "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
+  check "canon: karpathy '$h' is a subsection"       "grep -qE '^### $h\$' '$CANON'"
+  check "canon: karpathy '$h' is not top-level"      "! grep -qE '^## $h\$' '$CANON'"
+done
+check "canon: Tradeoff line stays"                   "grep -qF '**Tradeoff:**' '$CANON'"
+check "canon: karpathy object is generalized"        "grep -qF 'generalized from code to any artifact' '$CANON'"
 check "canon: subagent fleet rule stays"             "grep -qF \"Don't launch a fleet of subagents for what one call can do\" '$CANON'"
 check "canon: fact-vs-judgment paragraph stays"      "grep -qF '사실과 판단은 다르다' '$CANON'"
-check "canon: hygiene section gone"                  "! grep -qF '## 문서와 상태의 위생' '$CANON'"
 check "canon: local-first convention stays"          "grep -qF '`LOCAL-FIRST`는 원칙이 아니라' '$CANON'"
-# 파일을 안 건드려도 어길 수 있는 규칙은 정본에 남는다는 기준을 다시 댄 결과다(실행 증거·서브에이전트 맥락·로컬 우선).
 check "canon: execution evidence rule"               "grep -qF '실행 증거 없이' '$CANON'"
 check "canon: subagent prompt context rule"          "grep -qF 'Context handed to a subagent is written into its prompt' '$CANON'"
-for id in FAIL-LOUD KO-SYNTAX NAME-ITEMS PLAIN-KO PROSE-FORM READ-FLOW REVERSIBLE SECRETS; do
-  check "canon: clause $id stays"                    "grep -qF '**\`$id\`' '$CANON'"
+# 조항 열넷의 목록은 이 파일이 소유한다. 정본에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
+# 조항이 하나 떨어져도 그 결손을 정답으로 굳힌다. 계획 문서의 「정본이 갖는 조항 열넷」 절과 같은 목록이다.
+for id in FAIL-LOUD FOCUSED EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
+  check "canon: clause $id present"                  "grep -qF '**\`$id\`' '$CANON'"
 done
-# 조항 이름은 정본에서도 살아 있는 문서에서도 되살아나면 안 된다. CLAUDE.md 도 함께 본다.
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD EXPLAIN-STRUCTURE EXPLICIT FOCUSED IDEMPOTENT SSOT; do
-  check "canon: old clause $id removed"              "! grep -qF '**\`$id\`' '$CANON'"
+# 어제 카파시 절로 녹여 이름까지 뺀 다섯은 되살아나면 안 된다. 정본에서도 살아 있는 문서에서도 본다.
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD; do
+  check "canon: old clause $id stays removed"        "! grep -qF '**\`$id\`' '$CANON'"
   check "live docs: no reference to $id"             "! grep -rqF '\`$id\`' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/scripts/scaffold.sh'"
 done
-
-DC="$HERE/skills/domain-coding/SKILL.md"
-echo "[domain-coding] code rules live in one English skill"
-check "domain-coding exists"                          "[ -f '$DC' ]"
-for h in "Do one thing well" "Single source of truth" "Idempotence" "Explicit is better than implicit" "Describe the change, not the diff"; do
-  check "domain-coding: section '$h'"                 "grep -qE '^### $h\$' '$DC'"
+# 접은 스킬 셋은 디렉터리가 없어야 한다. 존재 검사를 부재 검사로 뒤집은 것이라 가드 수가 줄지 않는다.
+for sk in domain-coding domain-writing domain-doc-upkeep; do
+  check "skill $sk is gone"                          "[ ! -d '$HERE/skills/$sk' ]"
+  check "live code does not name $sk"                "! grep -rqF '$sk' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/agent-principles.md'"
 done
-for h in "Karpathy guidelines" "Principles" "Reach"; do
-  check "domain-coding: section '$h'"                 "grep -qE '^## $h\$' '$DC'"
+# 접으면서 새로 선 스킬 둘이 실재하고 이름이 디렉터리와 맞는다.
+for sk in review-docs domain-readme; do
+  check "skill $sk exists"                           "[ -f '$HERE/skills/$sk/SKILL.md' ]"
+  check "skill $sk frontmatter name"                 "grep -qF 'name: $sk' '$HERE/skills/$sk/SKILL.md'"
 done
-# 카파시 세 절은 이 파일이 복사본으로 갖는다. 규칙을 얻으려고 다른 파일을 열지 않기로 한 결정이다.
-for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
-  check "domain-coding: section '$h'"                 "grep -qE '^### $h\$' '$DC'"
-done
-check "domain-coding: Tradeoff line"                  "grep -qF '**Tradeoff:**' '$DC'"
-check "domain-coding: does not send you elsewhere"    "! grep -qF 'karpathy-guidelines' '$DC'"
-check "domain-coding: local-first moved to canon"     "! grep -qE '^## Local first\$' '$DC'"
-check "domain-coding: frontmatter name"               "grep -qF 'name: domain-coding' '$DC'"
-
-DW="$HERE/skills/domain-writing/SKILL.md"
-echo "[domain-writing] document-side karpathy rules live in one short English skill"
-check "domain-writing exists"                         "[ -f '$DW' ]"
-for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution" "Reach"; do
-  check "domain-writing: section '$h'"                "grep -qE '^## $h\$' '$DW'"
-done
-check "domain-writing: frontmatter name"              "grep -qF 'name: domain-writing' '$DW'"
 
 # --- standing-consent: 렌즈 호출에 대한 상시 허가가 정본에 있다 ---
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
@@ -537,11 +527,11 @@ check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 
 # --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
 # 전에는 셋이 규율 넷을 각자 적고 이 검사가 그 사본들을 맞춰 세웠다. 사본이라 갈라졌다 — 한 곳에서
 # 재시도 금지 항목만 빠져 그 경로가 금지된 재시도를 허용한 채 오래 남았고, DESIGN-NOTES 쪽은 넷 중
-# 둘만 갖고 있었다. 지금은 `domain-doc-upkeep`이 규율을 소유하고 나머지는 가리키기만 한다(`SSOT`).
+# 둘만 갖고 있었다. 지금은 `dispatching-lenses`가 규율을 소유하고 나머지는 가리키기만 한다.
 # 소유자가 규율을 갖는지와 다른 문서가 베끼지 않는지는 `test_docs_drift.sh`가 본다. 여기서는 호출자
 # 셋이 그 소유자에 닿는지와 런타임 중립만 본다.
 echo "[lens-contract] callers reach the canon-path rules and stay runtime-neutral"
-for s in review-specs domain-doc-upkeep nested-orchestration; do
+for s in review-specs review-docs nested-orchestration; do
   F="$HERE/skills/$s/SKILL.md"
   check "$s: 규율 소유자에 닿는다"          "grep -qF 'dispatching-lenses' '$F'"
   # 런타임 중립: 특정 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
@@ -743,7 +733,7 @@ check "포인터: 재실행도 사용자 줄 보존"   "grep -qF '이 줄은 사
 
 # (파) 블록을 걷어내기 전에 사본을 뜬다. 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에
 # 끼워 넣은 줄도 함께 사라진다. 이 파일은 git 밖일 수 있어 사본이 유일한 복구 수단이다
-# (오답노트 머리말과 같은 규율 — domain-doc-upkeep이 정본).
+# (오답노트 머리말과 같은 규율 — 정본이 소유한다).
 HR12="$(mktemp -d)"; PR12="$(mktemp -d)"
 { printf '# 내 프로젝트 지침\n\n'
   printf '# BEGIN disciplined-coder (managed — do not edit)\n'
@@ -797,9 +787,12 @@ OUT31="$(run "$H31" "$P31")"
 echo "[karpathy-nudge] karpathy plugin install nudge on install/update sessions only"
 check "fresh install: nudge names the plugin"   "printf '%s' \"\$OUT30a\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
 check "fresh install: nudge gives marketplace"  "printf '%s' \"\$OUT30a\" | grep -qF 'forrestchang/andrej-karpathy-skills'"
-check "unchanged session: no nudge"             "! printf '%s' \"\$OUT30b\" | grep -qF 'karpathy'"
+# 넛지의 부재는 낱말 'karpathy' 로 보지 않는다. 정본이 카파시 지침의 출처를 밝히면서 그 낱말이
+# scaffold 가 찍는 알림에 섞이게 됐고, 그때부터 이 단언은 넛지와 무관하게 붉어졌다. 넛지가 뜰 때만
+# 나오는 고유 문자열인 설치 명령 줄을 본다.
+check "unchanged session: no nudge"             "! printf '%s' \"\$OUT30b\" | grep -qF 'claude plugin marketplace add'"
 check "updated canon: nudge again"              "printf '%s' \"\$OUT30c\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
-check "already installed: no nudge"             "! printf '%s' \"\$OUT31\" | grep -qF 'karpathy'"
+check "already installed: no nudge"             "! printf '%s' \"\$OUT31\" | grep -qF 'claude plugin marketplace add'"
 check "already installed: still scaffolds"      "[ -f '$H31/.claude/disciplined-coder/agent-principles.md' ]"
 
 echo "[notice-encoding] user-facing notices are not double-encoded"

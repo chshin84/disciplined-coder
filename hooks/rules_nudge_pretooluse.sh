@@ -32,7 +32,7 @@ fi
 # session_id 가 없으면 계약이 깨진 것이다. 표시 파일 없이 매번 알린다 — 조용히 빠지지 않는다(FAIL-LOUD).
 
 # 스킬의 절 이름을 여기 박지 않는다 — 훅은 스킬을 가리키기만 하고 내용을 베끼지 않는다(문서 넛지와 같은 규칙).
-msg="🧑‍💻 이 세션에서 파일을 처음 건드린다 — 고치기 전에 disciplined-coder 의 규칙을 읽어라. 코드는 domain-coding, 문서는 domain-writing 이다. 넛지일 뿐 차단은 아니다."
+msg="🧑‍💻 이 세션에서 파일을 처음 건드린다 — 규칙은 정본 agent-principles.md 가 상시로 싣고, 한국어 문장 규칙의 상세는 disciplined-coder domain-korean 이 갖는다. 서브에이전트에는 정본이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 넛지일 뿐 차단은 아니다."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

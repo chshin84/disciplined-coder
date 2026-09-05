@@ -33,9 +33,9 @@ base="$(basename "$match")"
 # (제거됨) 오답노트 발견·복구 넛지 — /add-pointer 폐지와 함께 뺐다. 빈 템플릿을 미리 만들라는
 # 권유였는데, 빈 파일은 recall이 발화해도 얻는 교훈이 0이다. 이제 교훈이 생긴 시점에 만든다.
 
-# 렌즈 이름을 여기 박지 않는다 — 구성은 domain-doc-upkeep의 문서 검진 절이 SSOT이고, 여기 적으면 그 사본이
+# 렌즈 이름을 여기 박지 않는다 — 구성은 review-docs 가 SSOT이고, 여기 적으면 그 사본이
 # 먼저 낡아 훅이 안내하는 렌즈와 문서가 정하는 렌즈가 조용히 갈라진다(spec 훅도 같은 이유로 위임한다).
-msg="🔎 문서(${base}) 작성/수정됨 — done 하기 전에 disciplined-coder domain-doc-upkeep의 문서 검진 절이 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 domain-writing을 따른다. 넛지일 뿐 차단은 아니다."
+msg="🔎 문서(${base}) 작성/수정됨 — done 하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 정본을 따른다. 넛지일 뿐 차단은 아니다."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0
