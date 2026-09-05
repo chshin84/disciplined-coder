@@ -19,6 +19,9 @@ UC="$CLAUDE_HOME/CLAUDE.md"
 mkdir -p "$KDIR"
 
 # 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
+#    사본이 없거나 내용이 다르면 canon_changed=1 — 플러그인을 처음 깔았거나 갱신한 첫 세션이라는 뜻이다.
+#    4c)의 넛지가 이 값으로 "그 세션에만" 뜬다.
+canon_changed=0
 for f in $SCAFFOLD_FILES; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
   if [ -f "$src" ]; then
@@ -26,6 +29,7 @@ for f in $SCAFFOLD_FILES; do
     # @import 배선도 남아 있어 README가 알려 준 확인 셋을 그대로 통과하므로, 정본만 낡은 채
     # 아무도 모르게 된다(FAIL-LOUD).
     if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else
+      if [ ! -f "$dst" ] || ! cmp -s "$src" "$dst"; then canon_changed=1; fi
       cp "$src" "$dst" || { echo "[disciplined-coder] ERROR: 정본 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)" >&2; exit 1; }
     fi
   else
@@ -115,6 +119,18 @@ if [ -n "$autoupdated" ]; then
 ' "$autoupdated" | while IFS= read -r changed; do
     [ -n "$changed" ] && echo "  $changed (사본: $changed.bak)"
   done
+fi
+
+# 4c) 카파시 플러그인 설치 넛지(안내만, 설치는 하지 않는다): 정본이 새로 깔리거나 갱신된 세션에만,
+#     그 플러그인이 아직 없을 때만 stdout 으로 알린다. 무시하면 다음 갱신까지 조용하다. 다른 플러그인을
+#     사용자 대신 까는 것은 지나치다는 결정이 있었다. 설치 여부는 Claude Code 의 설치 기록 파일의 키로 본다.
+#     정본의 SURGICAL 조항은 이 플러그인의 Surgical Changes 와 맞춰 두었다.
+KARPATHY_PLUGIN="andrej-karpathy-skills@karpathy-skills"
+KARPATHY_REPO="forrestchang/andrej-karpathy-skills"
+if [ "$canon_changed" -eq 1 ] && ! grep -qF "\"$KARPATHY_PLUGIN\"" "$CLAUDE_HOME/plugins/installed_plugins.json" 2>/dev/null; then
+  echo "🔵 disciplined-coder: 카파시(Andrej Karpathy)의 코딩 지침 플러그인이 이 PC에 없다. 디시플린은 이 플러그인과 함께 쓰도록 맞춰져 있어 설치를 권한다(설치하지는 않았다). 두 줄을 차례로 실행하면 된다:"
+  echo "  claude plugin marketplace add $KARPATHY_REPO"
+  echo "  claude plugin install $KARPATHY_PLUGIN"
 fi
 
 exit 0

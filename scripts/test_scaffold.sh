@@ -330,7 +330,11 @@ check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# 
 check "2nd run sends nothing"         "[ -z \"\$OUT20b\" ]"
 
 # --- crlf-import-line: CRLF 관리영역에서도 재주입하지 않는다 (had_import의 CR 내성) ---
-H21="$(mktemp -d)"; P21="$(mktemp -d)"; mkdir -p "$H21/.claude"
+H21="$(mktemp -d)"; P21="$(mktemp -d)"; mkdir -p "$H21/.claude/plugins"
+# 이 홈은 정본 사본이 없어 "새로 깐 세션"으로 보이므로 카파시 넛지가 뜬다. 여기서 보려는 것은 CRLF 배선
+# 인식뿐이라 설치 기록을 넣어 넛지를 잠재우고, "아무것도 안 보낸다" 단언은 그대로 둔다.
+printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ] } }
+' > "$H21/.claude/plugins/installed_plugins.json"
 printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
 OUT21="$(run "$H21" "$P21")"
 echo "[crlf-import-line] CRLF import line still counts as present"
@@ -718,6 +722,26 @@ ERRK1="$( . "$COMMON"; scaffold_hygiene "$KK1" 2>&1 >/dev/null || true )"
 echo "[stale-keep] a stale file survives when its backup cannot be written"
 check "stale-keep: 내용이 든 파일이 남는다" "[ -f '$KK1/coding-principles.md' ]"
 check "stale-keep: 조용히 넘어가지 않는다" "printf '%s' \"$ERRK1\" | grep -qF -- '사본으로 못 옮겨 그대로 두었다'"
+# --- karpathy-nudge: 카파시 플러그인 설치 넛지 — 정본이 새로 깔리거나 갱신된 세션에, 그 플러그인이 없을 때만 ---
+H30="$(mktemp -d)"; P30="$(mktemp -d)"
+OUT30a="$(run "$H30" "$P30")"
+OUT30b="$(run "$H30" "$P30")"
+# 갱신 재현: 전역 사본을 낡게 만들면 다음 세션에 정본이 다시 복사되므로 갱신 뒤 첫 세션과 같다.
+printf 'stale
+' > "$H30/.claude/disciplined-coder/agent-principles.md"
+OUT30c="$(run "$H30" "$P30")"
+H31="$(mktemp -d)"; P31="$(mktemp -d)"; mkdir -p "$H31/.claude/plugins"
+printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ] } }
+' > "$H31/.claude/plugins/installed_plugins.json"
+OUT31="$(run "$H31" "$P31")"
+echo "[karpathy-nudge] karpathy plugin install nudge on install/update sessions only"
+check "fresh install: nudge names the plugin"   "printf '%s' \"\$OUT30a\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
+check "fresh install: nudge gives marketplace"  "printf '%s' \"\$OUT30a\" | grep -qF 'forrestchang/andrej-karpathy-skills'"
+check "unchanged session: no nudge"             "! printf '%s' \"\$OUT30b\" | grep -qF 'karpathy'"
+check "updated canon: nudge again"              "printf '%s' \"\$OUT30c\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
+check "already installed: no nudge"             "! printf '%s' \"\$OUT31\" | grep -qF 'karpathy'"
+check "already installed: still scaffolds"      "[ -f '$H31/.claude/disciplined-coder/agent-principles.md' ]"
+
 echo "[notice-encoding] user-facing notices are not double-encoded"
 check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COMMON\""
 
