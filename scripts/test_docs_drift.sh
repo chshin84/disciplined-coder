@@ -446,6 +446,9 @@ check "개수를 적은 자리마다 이름이 함께 있다" "[ -z \"\$NUMHIT\"
 # 되돌아가면 마지막 하나의 종료 코드만 남아 앞선 FAIL이 묻히고, 감사는 잘못된 FAIL=0을 보고한다.
 echo "[테스트 실행 명령 — 앞 스크립트의 실패가 안 묻힌다]"
 CMD="$HERE/CLAUDE.md"
+# 게이트는 새로 쓸 때만 걸린다. 조건을 빼고 적으면 이미 커밋된 spec 을 고칠 때도 막히는 것처럼
+# 읽힌다. '새로' 없이 그 문장이 나오면 실패한다.
+check "CLAUDE.md 가 새로 쓸 때만 게이트라고 적는다" "! grep -qE '(^|[^로 ])쓰면 Stop 게이트가' \"\$CMD\""
 check "CLAUDE.md가 실행 명령을 적는다"       "grep -qF -- 'for t in scripts/test_*.sh' \"\$CMD\""
 check "실패를 모으는 형태다"                 "grep -qF -- 'bad=\"\$bad \$t\"' \"\$CMD\""
 check "모은 결과를 마지막에 알린다"           "grep -qF -- 'FAILED:' \"\$CMD\""
