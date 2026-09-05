@@ -392,26 +392,58 @@ check "single managed region after run"         "[ \$(grep -cF '# BEGIN discipli
 # 있으므로 그 이름으로 부르고, 옛 서수 제목이 되살아나지 않는지 함께 본다.
 CANON="$HERE/agent-principles.md"
 echo "[canon-sections] procedure sections are named, not numbered"
-for s in "원칙" "Karpathy 지침" "검증" "미해결의 처분" "병렬 오케스트레이션" "문서와 상태의 위생"; do
-  check "canon: section '$s' present"      "grep -qF '## $s' '$CANON'"
+for s in "원칙" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
+  check "canon: section '$s' present"      "grep -qE '^## $s\$' '$CANON'"
 done
 # 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
 check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
 
-# --- karpathy-in-canon: 카파시 지침 넷은 정본의 Karpathy 지침 절에 영어로 실린다 ---
-# 그 플러그인은 스킬이라 연 세션에만 닿는다. 정본은 @import로 상시 실리므로 본문을 정본에 두되, 코드에
-# 국한된 낱말은 문서와 절차에도 걸리게 고쳤다. 겹치던 옛 조항 다섯은 이름까지 뺐고, 살아 있는 문서가
-# 그 옛 이름을 다시 부르면 여기서 잡는다.
-echo "[karpathy-in-canon] karpathy guidelines live in the canon, generalized beyond code"
-for h in "Think Before Acting" "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
-  check "canon: guideline '$h' present"      "grep -qF '### $h' '$CANON'"
+# --- karpathy-split: 정본에는 대화 규칙만 남고, 코드 규칙은 domain-coding, 문서 규칙은 domain-writing에 있다 ---
+# 기준은 "파일을 하나도 건드리지 않은 답 한 번으로도 어길 수 있으면 정본에 남는다"이다. 산출물이 있어야만
+# 어기는 규칙은 스킬로 갔고, 스킬은 훅이 열게 한다(코드 넛지는 test_hooks.sh가 본다).
+echo "[karpathy-split] conversation rules stay in the canon; code and document rules live in skills"
+# 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
+# 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
+check "canon: Think Before Acting is a top-level section" "grep -qE '^## Think Before Acting$' '$CANON'"
+check "canon: Think Before Acting is not a subsection"    "! grep -qE '^### Think Before Acting$' '$CANON'"
+check "canon: no Tradeoff line"                      "! grep -qF '**Tradeoff:**' '$CANON'"
+for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
+  check "canon: no '$h' section"                     "! grep -qF '### $h' '$CANON'"
 done
-check "canon: generalized beyond code"        "grep -qF 'Before implementing, writing, or deciding:' '$CANON'"
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD; do
-  check "canon: old clause $id removed"       "! grep -qF '**\`$id\`' '$CANON'"
-  check "live docs: no reference to $id"      "! grep -rqF '\`$id\`' '$HERE/skills' '$HERE/README.md' '$HERE/scripts/scaffold.sh'"
+check "canon: subagent fleet rule stays"             "grep -qF \"Don't launch a fleet of subagents for what one call can do\" '$CANON'"
+check "canon: fact-vs-judgment paragraph stays"      "grep -qF '사실과 판단은 다르다' '$CANON'"
+check "canon: hygiene section gone"                  "! grep -qF '## 문서와 상태의 위생' '$CANON'"
+check "canon: local-first convention gone"           "! grep -qF 'LOCAL-FIRST' '$CANON'"
+for id in FAIL-LOUD KO-SYNTAX NAME-ITEMS PLAIN-KO PROSE-FORM READ-FLOW REVERSIBLE SECRETS; do
+  check "canon: clause $id stays"                    "grep -qF '**\`$id\`' '$CANON'"
 done
+# 조항 이름은 정본에서도 살아 있는 문서에서도 되살아나면 안 된다. CLAUDE.md 도 함께 본다.
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD EXPLAIN-STRUCTURE EXPLICIT FOCUSED IDEMPOTENT SSOT; do
+  check "canon: old clause $id removed"              "! grep -qF '**\`$id\`' '$CANON'"
+  check "live docs: no reference to $id"             "! grep -rqF '\`$id\`' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/scripts/scaffold.sh'"
+done
+
+DC="$HERE/skills/domain-coding/SKILL.md"
+echo "[domain-coding] code rules live in one English skill"
+check "domain-coding exists"                          "[ -f '$DC' ]"
+for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution" "Do one thing well" "Single source of truth" "Idempotence" "Explicit is better than implicit" "Describe the change, not the diff"; do
+  check "domain-coding: section '$h'"                 "grep -qE '^### $h\$' '$DC'"
+done
+for h in "Karpathy guidelines" "Principles" "Local first" "Reach"; do
+  check "domain-coding: section '$h'"                 "grep -qE '^## $h\$' '$DC'"
+done
+check "domain-coding: Tradeoff line"                  "grep -qF '**Tradeoff:**' '$DC'"
+check "domain-coding: never claim done"               "grep -qF 'Never claim \"done\" without execution evidence' '$DC'"
+check "domain-coding: frontmatter name"               "grep -qF 'name: domain-coding' '$DC'"
+
+DW="$HERE/skills/domain-writing/SKILL.md"
+echo "[domain-writing] document-side karpathy rules live in one short English skill"
+check "domain-writing exists"                         "[ -f '$DW' ]"
+for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution" "Reach"; do
+  check "domain-writing: section '$h'"                "grep -qE '^## $h\$' '$DW'"
+done
+check "domain-writing: frontmatter name"              "grep -qF 'name: domain-writing' '$DW'"
 
 # --- standing-consent: 렌즈 호출에 대한 상시 허가가 정본에 있다 ---
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.

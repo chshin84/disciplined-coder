@@ -1,0 +1,97 @@
+{
+  "lens": "grounding",
+  "read": [
+    "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+    "agent-principles.md",
+    "C:/Users/ho381/.claude/plugins/cache/karpathy-skills/andrej-karpathy-skills/1.0.0/CLAUDE.md",
+    "hooks/hooks.json",
+    "hooks/doc_format_pretooluse.sh",
+    "hooks/doc_review_posttooluse.sh",
+    "hooks/_spec_marker.sh",
+    "hooks/_extract_path.sh",
+    "hooks/_json_escape.sh",
+    "scripts/test_scaffold.sh",
+    "scripts/test_hooks.sh",
+    "scripts/test_docs_drift.sh",
+    "scripts/scaffold.sh",
+    "scripts/_scaffold_common.sh",
+    "skills/domain-docs/SKILL.md",
+    "skills/domain-plugin/SKILL.md",
+    "skills/domain-spec-review/SKILL.md",
+    "skills/lens-adversarial/SKILL.md",
+    "skills/nested-orchestration/SKILL.md",
+    "CLAUDE.md",
+    "README.md",
+    ".claude-plugin/plugin.json"
+  ],
+  "issues": [
+    {
+      "where": "domain-coding 절의 머리말",
+      "type": "mismatch",
+      "claim": "Goal-Driven Execution 끝의 'Never claim done' 문장이 정본의 `TDD` 조항에서 왔다고 적는다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "Goal-Driven Execution 끝의 \"Never claim done\" 문장은 정본의 `TDD`에서 온 것이다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "Strong success criteria let you loop independently. Weak criteria (\"make it work\") require constant clarification. Never claim \"done\" without execution evidence.",
+      "principle": "SSOT",
+      "consequence": "지금 정본에는 `TDD` 조항이 없다. 「원칙」 절의 조항은 EXPLAIN-STRUCTURE·EXPLICIT·FAIL-LOUD·FOCUSED·IDEMPOTENT·KO-SYNTAX·NAME-ITEMS·PLAIN-KO·PROSE-FORM·READ-FLOW·REVERSIBLE·SECRETS·SSOT 열셋이고, 그 문장은 정본 「Goal-Driven Execution」 절의 마지막 문장으로 있다. scripts/test_scaffold.sh도 `check \"canon: old clause $id removed\"`로 TDD가 없음을 이미 단언한다."
+    },
+    {
+      "where": "domain-coding 절의 머리말",
+      "type": "contradiction",
+      "claim": "domain-coding에 옮기는 카파시 세 절이 플러그인 1.0.0 원문 그대로이고 제목 번호만 뺐다고 적는다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "카파시 세 절은 플러그인 1.0.0의 원문 그대로이며 제목 번호만 뺀다.",
+      "counterpart_file": "C:/Users/ho381/.claude/plugins/cache/karpathy-skills/andrej-karpathy-skills/1.0.0/CLAUDE.md",
+      "counterpart": "Strong success criteria let you loop independently. Weak criteria (\"make it work\") require constant clarification.",
+      "principle": "FAIL-LOUD",
+      "consequence": "플러그인 원문의 Goal-Driven Execution은 그 문장으로 끝난다. 문서가 싣는 domain-coding 본문의 같은 절은 뒤에 \"Never claim \\\"done\\\" without execution evidence.\"가 한 문장 더 붙어 있어 세 절 중 하나가 원문과 다르다. Simplicity First와 Surgical Changes 두 절은 원문과 글자까지 같다."
+    },
+    {
+      "where": "「참조 고치기」와 「테스트」",
+      "type": "omission",
+      "claim": "백틱으로 감싼 조항 ID를 고칠 자리를 다 측정했다고 적고, 새 검사가 `skills` 아래에 그 형태가 없음을 단언하게 한다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "옛 조항 ID 열(먼저 뺀 다섯과 이번 다섯)이 정본에 `**`ID`` 형태로 없고, `skills`·`README.md`·`CLAUDE.md`·`scripts/scaffold.sh`에 백틱 형태로 없다.",
+      "counterpart_file": "skills/domain-docs/SKILL.md",
+      "counterpart": "- **문서 SSOT** — 같은 사실은 한 문서에만 둔다. 다른 문서는 참조한다. 외부 관례와 표준을 인용할 때도 본문을 베끼지 말고 핵심만 요약한 뒤 출처를 링크한다(`SSOT`).",
+      "principle": "SSOT",
+      "consequence": "`skills` 아래에서 백틱으로 감싼 조항 ID가 남은 자리는 domain-docs의 29행·63행 말고 이 줄이 하나 더 있는데, 「참조 고치기」의 domain-docs 항목은 29·34·63·79행 넷만 든다. 문서가 요구한 새 검사를 그대로 짜면 이 줄에서 FAIL이 난다."
+    },
+    {
+      "where": "「기준을 적용한 배치」와 「하지 않는 것」",
+      "type": "omission",
+      "claim": "정본의 「문서와 상태의 위생」 첫 문단을 지우고 둘째 문단은 「검증」으로 옮기며, domain-docs는 참조 네 곳만 고친다고 적는다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "`domain-docs`의 기존 절을 다시 쓰지 않는다. 참조 네 곳만 고친다.",
+      "counterpart_file": "skills/domain-docs/SKILL.md",
+      "counterpart": "`agent-principles.md`의 「문서와 상태의 위생」 절의 상세는 여기가 소유한다. 낡는 것을 막는 길은 한 규칙이 아니라 타입별 전략이다.",
+      "principle": "SSOT",
+      "consequence": "정본에서 그 절이 통째로 사라지면 domain-docs 「문서 타입과 수명 (상태 위생 SSOT)」 절의 첫 문장이 없는 절을 가리킨다. 이 줄은 문서의 참조 고치기 목록(29·34·63·79행)에 없다. 살아 있는 파일에서 그 절 이름을 부르는 자리는 이 줄과 README.md 51행 둘뿐이고, README만 목록에 들어 있다."
+    },
+    {
+      "where": "「참조 고치기」의 README 항목",
+      "type": "mismatch",
+      "claim": "README에서 \"넛지 셋\"을 \"넛지 넷\"으로 바꾸고 코드 넛지 항목을 더하면 README가 맞는다고 적는다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "`README.md`의 「하드 게이트와 넛지와 전역 설정 수정」에서 \"넛지 셋\"을 \"넛지 넷\"으로 바꾸고 코드 넛지 항목을 더하며, 새 문서 넛지 항목에 `domain-writing`을 함께 적는다.",
+      "counterpart_file": "README.md",
+      "counterpart": "게이트와 넛지는 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 넷 다 꺼지고, 읽기 전용 차단과 설치 권유는 그 변수와 무관하며, 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다.",
+      "principle": "SSOT",
+      "consequence": "그 문장의 \"넷\"은 하드 게이트 하나와 넛지 셋을 합한 수다. 넛지가 넷이 되면 다섯이 되는데, 문서의 고칠 목록에는 \"넛지 셋\"만 있고 이 수는 없다. 코드 넛지도 `DISCIPLINED_CODER_REVIEW_GATE=off`로 꺼진다고 문서가 「훅」 절에서 적고 있다."
+    },
+    {
+      "where": "「훅」의 코드 넛지",
+      "type": "unsupported",
+      "claim": "훅 stdin JSON의 `session_id`를 세션 키로 쓰고, 기존 넛지와 같은 헬퍼로 만든다고 적는다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "세션 키는 stdin JSON의 `session_id`다. 표시 파일은 `${TMPDIR:-/tmp}/disciplined-coder/code-nudge-<session_id>`이고, 있으면 조용히 끝나고 없으면 만든 뒤 알린다.",
+      "counterpart_file": "hooks/_extract_path.sh",
+      "counterpart": "printf '%s' \"$INPUT\" | grep -o '\"file_path\"[[:space:]]*:[[:space:]]*\"[^\"]*\"'",
+      "principle": "EXPLICIT",
+      "consequence": "레포의 `hooks/`와 `scripts/` 어디에도 `session_id`나 `TMPDIR`를 읽는 코드가 없다. 공유 헬퍼는 `_extract_path.sh`(file_path만 뽑는다)·`_spec_marker.sh`(경로 술어와 마커)·`_json_escape.sh`(JSON 이스케이프) 셋뿐이라 \"기존 넛지와 같은 헬퍼를 쓴다\"로는 세션 키 추출과 표시 파일 관리가 덮이지 않고, 문서는 그 계약이 이 레포에서 확인되지 않는다는 것을 적지 않는다."
+    }
+  ],
+  "principles_applied": ["SSOT", "EXPLICIT", "FAIL-LOUD", "NAME-ITEMS", "Think Before Acting"],
+  "notes": "훑은 각도 넷. (1) 누락 — 「참조 고치기」가 든 아홉 자리를 파일에서 하나씩 열어 문장을 대조했고(domain-docs 29·34·63·79, domain-plugin 23, domain-spec-review 116, lens-adversarial 11, nested-orchestration 28, CLAUDE.md 11, README.md 51 모두 문서가 말하는 문장을 실제로 담았다), 그다음 `docs/superpowers/` 밖 살아 있는 파일 전체에 백틱 조항 ID를 grep해 목록 밖에 남은 것을 찾았다. (2) 모순 — 카파시 세 절을 플러그인 1.0.0 원문과 줄 단위로 견줬다. Simplicity First와 Surgical Changes는 완전히 같고 Goal-Driven Execution만 한 문장이 늘었다. 정본에 옛 조항 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD가 없음을 확인했다. (3) 환각 — 훅 stdin 계약(`session_id`), 표시 파일 경로 관례, 공유 헬퍼의 실제 계약을 `hooks/` 전부를 읽어 대조했다. (4) 불일치 — 테스트 세 파일의 실제 블록(canon-sections의 여섯 절 목록, karpathy-in-canon의 `### $h` 루프와 옛 조항 루프, test_hooks의 doc-format-pre·doc-review-post 검사와 배선 검사, test_docs_drift의 RULE_MARKS·TELL_SENT·superseded 도출)을 열어 문서의 「테스트」 절과 견줬다.\n\n확인 결과 문제 없던 것 셋을 적어 둔다. 첫째, test_docs_drift.sh의 `for f in \"$HERE\"/skills/*/SKILL.md` 루프는 새 스킬을 자동으로 훑으므로 domain-coding의 「Reach」 절 베끼기는 문서 말대로 기존 검사가 잡는다. 둘째, doc_format_pretooluse.sh 알림 문장 끝에 한 마디를 덧붙여도 test_hooks.sh의 `NUDGE_SEC` sed 추출은 여전히 '글 유형별 적용'을 뽑는다. 셋째, test_hooks.sh의 \"모든 훅 스크립트가 어딘가에 배선되어 있다\" 검사가 있어 새 훅을 hooks.json에 붙이라는 지시는 필요하고 충분하다.\n\n남은 확인거리 둘. 첫째, 훅 stdin JSON에 `session_id`가 실제로 오는지는 Claude Code 훅 입력 스키마 문서로만 정할 수 있다. 이 레포에는 근거가 없으므로 확인 전까지는 코드 넛지의 \"한 번만 알린다\"가 성립하는지 판정할 수 없다. 둘째, 인용 여덟의 원문 대조는 요구되지 않아 하지 않았다. 다만 문서 안에서 두 번 이상 나오는 표현(\"Single source of truth\"·\"Explicit is better than implicit\"·\"Do one thing well\")은 domain-coding 본문과 「참조 고치기」에서 글자가 같았다."
+}

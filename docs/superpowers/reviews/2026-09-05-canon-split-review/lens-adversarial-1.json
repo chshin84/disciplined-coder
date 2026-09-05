@@ -1,0 +1,167 @@
+{
+  "lens": "adversarial",
+  "read": [
+    "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+    "agent-principles.md",
+    "README.md",
+    "CLAUDE.md",
+    "hooks/hooks.json",
+    "hooks/doc_review_posttooluse.sh",
+    "hooks/doc_format_pretooluse.sh",
+    "hooks/_spec_marker.sh",
+    "hooks/_extract_path.sh",
+    "skills/domain-docs/SKILL.md",
+    "skills/domain-plugin/SKILL.md",
+    "skills/domain-spec-review/SKILL.md",
+    "skills/nested-orchestration/SKILL.md",
+    "scripts/scaffold.sh",
+    "scripts/test_scaffold.sh",
+    "scripts/test_hooks.sh",
+    "scripts/test_docs_drift.sh"
+  ],
+  "issues": [
+    {
+      "where": "「참조 고치기」 절의 `skills/domain-docs/SKILL.md` 항목",
+      "type": "failure-mode",
+      "claim": "참조 목록이 `domain-docs`의 백틱 `SSOT` 한 곳을 빠뜨려, 이 설계가 새로 요구하는 검사가 곧바로 FAIL 난다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "측정한 목록이다. / `skills/domain-docs/SKILL.md` 29행의 \"보편 원칙(Simplicity First·`SSOT`·`FOCUSED`·`READ-FLOW`)\"에서 Simplicity First는 `domain-writing`의 절로, `SSOT`·`FOCUSED`는 `domain-coding`의 \"Single source of truth\"와 \"Do one thing well\"로 바꾼다. 63행의 `EXPLICIT`은 \"Explicit is better than implicit\"으로 바꾼다. 34행과 79행의 \"(Simplicity First)\"는 `domain-writing`의 절을 가리키므로 앞에 `domain-writing`을 붙인다.",
+      "counterpart_file": "skills/domain-docs/SKILL.md",
+      "counterpart": "- **문서 SSOT** — 같은 사실은 한 문서에만 둔다. 다른 문서는 참조한다. 외부 관례와 표준을 인용할 때도 본문을 베끼지 말고 핵심만 요약한 뒤 출처를 링크한다(`SSOT`).",
+      "principle": "SSOT",
+      "consequence": "설계의 「테스트」 절은 \"옛 조항 ID 열(먼저 뺀 다섯과 이번 다섯)이 ... `skills`·`README.md`·`CLAUDE.md`·`scripts/scaffold.sh`에 백틱 형태로 없다\"를 요구하는데, 지금 `skills/domain-docs/SKILL.md`의 「규칙 (문서 일반)」 절 문서 SSOT 항목에 `SSOT`가 백틱으로 남아 있고 참조 목록에 그 자리가 없다. 「하지 않는 것」이 \"참조 네 곳만 고친다\"고 못 박아 두어 실행자가 그 줄을 손대지 않으면 검사는 FAIL로 끝난다."
+    },
+    {
+      "where": "「기준을 적용한 배치」 표의 「문서와 상태의 위생」 첫 문단 행과 「참조 고치기」 목록",
+      "type": "failure-mode",
+      "claim": "정본에서 「문서와 상태의 위생」 절 자체가 사라지는데, 그 절을 이름으로 가리키는 `domain-docs`의 문장이 고칠 목록에 없다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "| 「문서와 상태의 위생」 첫 문단 | 삭제 | 상세가 이미 `domain-docs`의 「문서 타입과 수명」과 「시작점」에 있다 |",
+      "counterpart_file": "skills/domain-docs/SKILL.md",
+      "counterpart": "`agent-principles.md`의 「문서와 상태의 위생」 절의 상세는 여기가 소유한다. 낡는 것을 막는 길은 한 규칙이 아니라 타입별 전략이다.",
+      "principle": "SSOT",
+      "consequence": "「정본의 이후 모습」이 남는 절을 \"「원칙」·「Think Before Acting」·「검증」·「미해결의 처분」·「병렬 오케스트레이션」·「이 파일의 취급」 여섯\"으로 못 박아 「문서와 상태의 위생」이 사라지는데, 지금 `skills/domain-docs/SKILL.md`의 「문서 타입과 수명 (상태 위생 SSOT)」 절 첫 문장이 그 절 이름을 소유 관계로 가리키고 있고, 「참조 고치기」의 일곱 항목 어디에도 그 문장이 없다."
+    },
+    {
+      "where": "「정본의 이후 모습」 절",
+      "type": "failure-mode",
+      "claim": "정본의 Tradeoff 문장이 어디로 가는지 어느 절에도 적혀 있지 않다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "「Karpathy 지침」 겉 제목은 없애고 Think Before Acting이 바로 `##` 절이 된다. 그 절의 본문은 지금과 같고 넷째 불릿에 한 문장이 붙는다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.",
+      "principle": "FOCUSED",
+      "consequence": "지금 정본에서 그 문장은 `## Karpathy 지침` 제목 바로 아래, `### Think Before Acting` 위에 있다. 겉 제목만 없애라는 지시로는 그 문장이 「원칙」 절 뒤에 부모 없이 남고, 「기준을 적용한 배치」 표에도 「정본의 이후 모습」에도 그 문장의 행이 없다. `domain-coding` 본문에는 같은 문장이 다시 실리므로, 실행자가 판단으로 지우면 삭제 근거가 문서에 없고 남기면 정본에 고아 문장이 생긴다."
+    },
+    {
+      "where": "「훅 > 코드 넛지」의 \"표시 파일은 임시 폴더에 쌓이고 지우지 않는다\" 문장과 「테스트」 절의 코드 넛지 여섯 경우",
+      "type": "failure-mode",
+      "claim": "표시 파일이 테스트의 임시 픽스처 밖에 살아남아, 테스트 스위트를 두 번째로 돌리면 첫 편집 검사가 깨진다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "표시 파일은 `${TMPDIR:-/tmp}/disciplined-coder/code-nudge-<session_id>`이고, 있으면 조용히 끝나고 없으면 만든 뒤 알린다. ... 표시 파일은 임시 폴더에 쌓이고 지우지 않는다. 운영체제가 임시 폴더를 비운다.",
+      "counterpart_file": "scripts/test_hooks.sh",
+      "counterpart": "T=\"$(mktemp -d)\"; SP=\"$T/docs/superpowers/specs\"; PL=\"$T/docs/superpowers/plans\"; mkdir -p \"$SP\" \"$PL\" \"$T/src\"",
+      "principle": "IDEMPOTENT",
+      "consequence": "지금 `scripts/test_hooks.sh`는 모든 상태를 `mktemp -d`로 만든 폴더에 가두고 `CLAUDE_PROJECT_DIR`를 거기로 돌려 매 실행이 깨끗한 상태에서 시작한다. 새 표시 파일만 그 격리 밖의 `${TMPDIR:-/tmp}/disciplined-coder/`에 남고, 설계는 테스트가 `TMPDIR`를 픽스처로 바꾼다는 말을 어디에도 적지 않았다. 「테스트」 절 첫 경우 \"프로젝트 안 코드 파일 첫 편집에 `domain-coding`을 담은 알림이 나온다\"는 같은 `session_id` 픽스처를 쓰는 둘째 실행부터 빈 출력을 받는다. CLAUDE.md는 고칠 때마다 `for t in scripts/test_*.sh` 전량 실행을 계약으로 적고 있다."
+    },
+    {
+      "where": "「훅 > 코드 넛지」의 세션 키 불릿",
+      "type": "risk",
+      "claim": "`session_id`가 훅 stdin에 오는지를 재지도 묻지도 않고 설계를 확정했고, 안 오는 쪽 갈래는 편집마다 알림을 내는 상태로 남는다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "`session_id`가 없으면 표시 파일 없이 매번 알린다. 조용히 빠지지 않는다.",
+      "counterpart_file": "hooks/doc_review_posttooluse.sh",
+      "counterpart": "# 프로젝트 밖 문서에는 걸지 않는다. 메모리 파일과 계획 파일을 쓸 때마다 무시해야 할 넛지가 뜨면 / # 진짜 문서에서도 이 넛지를 흘려보내게 된다 — 위 문단이 적은 피로 기전 그대로다.",
+      "principle": "Think Before Acting",
+      "consequence": "지금 이 레포의 훅 넷(`spec_review_posttooluse.sh`·`spec_review_stop.sh`·`doc_format_pretooluse.sh`·`doc_review_posttooluse.sh`) 가운데 stdin JSON의 `session_id`를 읽는 것은 하나도 없어서, 그 필드의 존재는 이 설계가 처음으로 의존하는 미측정 전제다. 필드가 없으면 코드 파일을 고치는 모든 Write/Edit마다 같은 알림이 뜨고, 이는 기존 훅 주석이 이름 붙여 피해 놓은 피로 기전 그대로다. 정본의 Think Before Acting은 \"Don't assume the current state. Measure it in the actual code, data, and environment. If measuring doesn't settle it, ask whether to proceed.\"를 요구하는데 설계는 잰 결과도 물어본 흔적도 남기지 않았다."
+    },
+    {
+      "where": "「훅 > 코드 넛지」의 경로 불릿",
+      "type": "failure-mode",
+      "claim": "건너뛰기 조건이 `.md`와 `path_in_project` 둘뿐이라, 코드를 한 줄도 안 쓰는 문서 검진 세션이 렌즈 결과 JSON을 저장하는 순간 코드 넛지를 맞는다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "경로는 `_extract_path.sh`로 뽑는다. `.md`는 건너뛰고, `path_in_project`가 아니면 건너뛴다. 남는 첫 경로가 대상이다.",
+      "counterpart_file": "skills/domain-docs/SKILL.md",
+      "counterpart": "렌즈별 원본은 요약문과 같은 이름의 폴더에 `<렌즈 스킬 이름>-<띄운 횟수>.json`으로 둔다 — 스킬 디렉터리 이름을 그대로 쓰므로 `lens-grounding-1.json`이고, 접두사를 떼지 않는다 — 렌즈는 JSON을 돌려주므로 그대로 저장한다.",
+      "principle": "FOCUSED",
+      "consequence": "지금 `docs/superpowers/reviews/` 아래의 렌즈 원본은 `.json`이고 프로젝트 안에 있으므로 설계의 두 조건을 모두 통과한다. 리뷰나 검진만 하는 세션이 그 파일을 쓰면 \"🧑‍💻 코드 파일(lens-grounding-1.json) 편집 시작 — disciplined-coder domain-coding을 열어 코드 규칙을 읽어라\"가 뜬다. 기존 `doc_review_posttooluse.sh`는 같은 경로를 `case \"$FILE\" in *docs/superpowers/reviews/*.md) continue ;; esac`로 명시적으로 뺐는데, 새 훅에는 그 예외가 설계에 없다."
+    },
+    {
+      "where": "「참조 고치기」의 `README.md` 항목",
+      "type": "failure-mode",
+      "claim": "README에서 고칠 것으로 \"넛지 셋\"만 짚었고 같은 문단의 꺼지는 훅 개수는 빠져 있다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "`README.md`의 「하드 게이트와 넛지와 전역 설정 수정」에서 \"넛지 셋\"을 \"넛지 넷\"으로 바꾸고 코드 넛지 항목을 더하며, 새 문서 넛지 항목에 `domain-writing`을 함께 적는다.",
+      "counterpart_file": "README.md",
+      "counterpart": "게이트와 넛지는 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 넷 다 꺼지고, 읽기 전용 차단과 설치 권유는 그 변수와 무관하며, 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다.",
+      "principle": "SSOT",
+      "consequence": "지금 README의 그 문단에는 개수가 두 번 적혀 있다. 하드 게이트 하나에 넛지 셋을 더한 \"넷 다 꺼지고\"와 목록 제목 \"넛지 셋\"이다. 설계는 뒤엣것만 고치라고 적어서, 코드 넛지를 더하면 앞엣것이 넷에 멈춘 채 다섯을 가리키게 된다. 이 문단은 CLAUDE.md가 \"걸린 훅의 전체 목록과 배선은 `README.md`의 「하드 게이트와 넛지와 전역 설정 수정」 절이 정본이다\"라고 지목한 정본이다."
+    },
+    {
+      "where": "「되돌리기」 절",
+      "type": "irreversible",
+      "claim": "설계가 허용한 부분 되돌리기 한쪽이 훅을 없는 스킬로 향하게 만든다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "앞 커밋만 되돌리면 정본은 `b24fdfa` 상태로 돌아가고, 뒤 커밋만 되돌리면 넛지 없이 스킬 설명문으로만 열리는 상태가 된다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "**`REVERSIBLE` (가역성)** — 되돌릴 수 있는 결정을 선호한다. 되돌리기 어려운 결정은 그 근거를 남긴다.",
+      "principle": "REVERSIBLE",
+      "consequence": "앞 커밋에 두 스킬 생성이 들어 있고 뒤 커밋에 훅과 `hooks.json` 배선이 들어 있다. 앞 커밋만 되돌리면 `skills/domain-coding/SKILL.md`가 사라진 채 `hooks/code_nudge_posttooluse.sh`가 살아남아, 코드 파일 첫 편집마다 존재하지 않는 스킬을 열라는 알림이 뜬다. 설계는 그 조합을 \"정본은 `b24fdfa` 상태로 돌아가고\"라고만 적고 훅 쪽 상태를 적지 않는다."
+    },
+    {
+      "where": "「테스트」 절의 `scripts/test_docs_drift.sh` 문장",
+      "type": "risk",
+      "claim": "베끼기 검사의 앵커가 한국어 문장 하나인데 `domain-coding` 본문은 전부 영어라, 그 검사는 새 스킬에 대해 발화하지 않는다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "`scripts/test_docs_drift.sh`는 `domain-coding`의 「Reach」 절이 「렌즈에게 정본을 알리는 법」의 첫 항목 문장을 베끼지 않았는지 기존 검사로 잡는다. 새 검사는 두지 않는다.",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "TELL_SENT='정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다'",
+      "principle": "FAIL-LOUD",
+      "consequence": "그 검사는 `grep -qF`로 한국어 문장 하나가 그대로 있는지만 본다. 설계가 정한 `domain-coding` 본문은 \"`domain-coding` 본문은 전부 영어다\"이고 「Reach」 절도 영어라, 그 절이 규율을 영어로 풀어 다시 적어도 검사는 통과한다. 설계는 이 검사를 새 스킬의 드리프트 가드로 세워 두고 \"새 검사는 두지 않는다\"로 닫았다."
+    },
+    {
+      "where": "「domain-writing」 절 안의 frontmatter `description` 줄",
+      "type": "failure-mode",
+      "claim": "설명문이 훅의 실제 발화 범위보다 넓게 약속한다. 특히 이 설계가 `domain-writing`을 붙이라고 지시한 spec 수정 자리에는 훅이 닿지 않는다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "새 .md를 만들거나 고치면 훅이 이 스킬을 열라고 알린다.",
+      "counterpart_file": "hooks/doc_review_posttooluse.sh",
+      "counterpart": "if path_is_specplan \"$FILE\"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)",
+      "principle": "EXPLICIT",
+      "consequence": "지금 두 문서 훅은 spec/plan 경로와 `docs/superpowers/reviews/*.md`와 프로젝트 밖 경로에서 조용히 빠진다. 그런데 같은 설계의 「참조 고치기」는 \"`skills/domain-spec-review/SKILL.md` 116행의 \\\"(Surgical Changes)\\\"는 spec을 고치는 자리라 앞에 `domain-writing`을 붙인다\"고 적어, 훅이 절대 발화하지 않는 자리를 이 스킬의 적용처로 지목한다. 설명문은 그 자리에도 훅이 알린다고 읽힌다."
+    },
+    {
+      "where": "「훅 > 문서 넛지에 domain-writing을 덧붙인다」 절",
+      "type": "failure-mode",
+      "claim": "훅 메시지에 스킬의 절 이름을 박는 것이, 바로 그 훅이 주석으로 금지해 둔 사본 만들기다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "`doc_review_posttooluse.sh`의 수정 알림 문장에도 \"고칠 때는 domain-writing의 Surgical Changes대로 지적된 곳만 손댄다\"를 덧붙인다.",
+      "counterpart_file": "hooks/doc_review_posttooluse.sh",
+      "counterpart": "# 렌즈 이름을 여기 박지 않는다 — 구성은 domain-docs의 문서 검진 절이 SSOT이고, 여기 적으면 그 사본이 / # 먼저 낡아 훅이 안내하는 렌즈와 문서가 정하는 렌즈가 조용히 갈라진다(spec 훅도 같은 이유로 위임한다).",
+      "principle": "SSOT",
+      "consequence": "그 훅은 지금 렌즈 구성을 이름으로 적지 않고 \"disciplined-coder domain-docs의 문서 검진 절이 정하는 렌즈로\"라고 위임만 한다. 덧붙이려는 문장은 `domain-writing`의 `## Surgical Changes` 절 제목을 훅 메시지에 복제하며, 그 제목이 바뀌면 훅만 옛 이름을 부르고 이를 잡는 검사는 설계의 「테스트」 절에 없다."
+    },
+    {
+      "where": "「domain-coding」 본문의 「Reach」 절",
+      "type": "risk",
+      "claim": "다섯 조항이 상시 로드에서 나가면서, 서브에이전트에 닿는 길이 사람이 매번 프롬프트에 적는 관례 하나로 줄어든다.",
+      "file": "docs/superpowers/specs/2026-09-05-canon-split-design.md",
+      "evidence": "Subagents do not receive this file automatically. When a subagent implements code, put this file's path in its prompt the way `domain-docs`'s 「렌즈에게 정본을 알리는 법」 prescribes for the canon.",
+      "counterpart_file": "README.md",
+      "counterpart": "- **서브에이전트와 원칙** — 서브에이전트에 원칙이 실린다고 믿지 않는다. 렌즈에는 원칙 파일의 경로를 넣는다. 어느 경로인지는 `skills/domain-docs/SKILL.md`가 정한다.",
+      "principle": "EXPLICIT",
+      "consequence": "설계가 이 관례를 기계로 거는 자리는 `skills/nested-orchestration/SKILL.md` 28행 한 곳뿐이다. 그 밖의 경로로 구현 서브에이전트를 띄우면 `domain-coding`이 프롬프트에 안 실릴 수 있고, 코드 넛지도 세션당 한 번이라 부모 세션이 이미 표시 파일을 만들었으면 조용하다. 「테스트」 절에도 프롬프트에 경로가 실렸는지를 보는 검사가 없다."
+    }
+  ],
+  "principles_applied": [
+    "SSOT",
+    "FAIL-LOUD",
+    "IDEMPOTENT",
+    "REVERSIBLE",
+    "EXPLICIT",
+    "FOCUSED",
+    "Think Before Acting",
+    "Simplicity First"
+  ],
+  "notes": "훑은 각도는 넷이다. 실패 모드는 두 갈래로 봤다. 설계가 그대로 실행됐을 때 깨지는 곳(참조 목록 누락으로 새 검사가 FAIL, 표시 파일이 테스트 격리 밖이라 둘째 실행부터 FAIL, 훅이 리뷰 기록 JSON에서 오발화, README 개수 반쪽 수정, 「문서와 상태의 위생」과 Tradeoff 문장의 매달린 참조)와, 설계가 맞아도 실행이 어긋나 실패하는 곳(서브에이전트에 경로를 손으로 넣는 관례가 한 곳에만 걸림, 영어 본문에 한국어 앵커 검사, 설명문이 약속하는 훅 범위와 실제 범위의 차이)이다. 과설계 각도로는 두 스킬 분리와 표시 파일 기전을 봤는데 둘 다 「결정」 절이 정한 것이라 뒤집자고 올리지 않았고, 새로 더한 일반화나 안 쓰이는 유연성은 못 찾아 이 유형으로 올린 것이 없다. 비가역 각도로는 「되돌리기」 절의 두 커밋 분할 하나만 걸렸다. 위험 각도로는 단순화로 못 없애는 것 셋(session_id 미측정, 영어 본문의 드리프트 가드, 서브에이전트 도달)을 올렸다.\n\n확인이 남은 것 셋이다. 첫째, 훅 stdin JSON에 `session_id`가 실제로 오는지다. 이 레포의 훅 넷 어디도 그 필드를 안 읽어 여기서는 못 재고, Claude Code 훅 입력 스키마 문서나 실제 훅 로그로만 가려진다. 그 답에 따라 표시 파일 기전 전체가 서거나 무너진다. 둘째, 서브에이전트가 부모와 같은 `session_id`를 받는지다. 같으면 부모가 만든 표시 파일 때문에 구현 서브에이전트는 코드 넛지를 영영 못 받는다. 셋째, PostToolUse 훅이 서브에이전트의 Write/Edit에도 도는지다. 셋 다 이 워크트리 안에서는 근거를 못 찾아 발견으로 올리지 않고 여기 남긴다.\n\n고칠 줄을 못 짚은 것이 하나 있다. 카파시 세 절이 `domain-coding`과 `domain-writing`에 서로 다른 말로 두 벌 실리는 것은 `SSOT`와 부딪히지만, 「결정」 절의 \"스킬마다 자기 문장을 갖는다\"가 그것을 정면으로 정했고 결정은 뒤집지 말라는 지시가 있어 발견으로 올리지 않았다. 대신 두 벌이 갈라지는 것을 잡는 검사가 「테스트」 절에 없다는 것만 적어 둔다."
+}

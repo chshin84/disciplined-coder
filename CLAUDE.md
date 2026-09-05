@@ -8,7 +8,7 @@ spec과 plan을 새로 쓰면 Stop 게이트가 리뷰를 요구하고, 그 밖�
 
 ## 변경 뒤 실행
 
-고친 것이 있으면 아래를 돌리고, 그다음 `claude plugin validate ./`를 실행한다. 각 스크립트의 계약은 **FAIL=0**이며 기대 개수를 숫자로 박지 않는다(`SSOT`).
+고친 것이 있으면 아래를 돌리고, 그다음 `claude plugin validate ./`를 실행한다. 각 스크립트의 계약은 **FAIL=0**이며 기대 개수를 숫자로 박지 않는다(`domain-coding`의 Single source of truth).
 
 `bad=""; for t in scripts/test_*.sh; do bash "$t" || bad="$bad $t"; done; [ -z "$bad" ] && echo "ALL PASS" || echo "FAILED:$bad"`
 

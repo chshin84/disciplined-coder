@@ -37,13 +37,13 @@ done
 
 ## 프로젝트 폴더에 생기는 파일
 
-새로 생기는 파일은 없다. 원칙은 `agent-principles.md` 한 곳에 둔다. SessionStart hook이 원칙을 `~/.claude/disciplined-coder/`에 셋업하고, `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다.
+새로 생기는 파일은 없다. 원칙은 `agent-principles.md` 한 곳에 둔다. 그 정본에는 파일 없는 답 한 번으로도 어길 수 있는 대화 규칙만 있고, 코딩 규칙은 `skills/domain-coding/SKILL.md`에, 문서의 분량과 수정 범위 규칙은 `skills/domain-writing/SKILL.md`에 있다. SessionStart hook이 원칙을 `~/.claude/disciplined-coder/`에 셋업하고, `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다.
 
 이 플러그인이 프로젝트 파일을 고치는 예외는 하나이고 그 조건은 여기가 정한다. 그 레포 `CLAUDE.md`에 관리블록이 남아 있고 그 블록을 만든 기능이 없어졌으면, 사본을 전역 백업에 복사한 뒤 제거한다. 조건이 하나 더 붙는다. 그 파일이 전역 `~/.claude/CLAUDE.md`와 같은 파일이면 건드리지 않는다 — 그것은 이 훅이 매 세션 다시 만드는 정상 블록이다. 같은 파일인지는 경로 문자열이 아니라 `-ef`로 본다. 작업 폴더가 `~/.claude`이면 윈도우 형식 경로와 POSIX 형식 경로가 같은 파일을 가리키는데 문자열로 견주면 다른 파일로 보인다. 그때의 잠금 대기 시간은 `scripts/_managed_block.sh`의 상수가 정한다.
 
 ## 하드 게이트와 넛지와 전역 설정 수정
 
-세션에는 턴 종료를 막는 하드 게이트 하나와 읽기 전용 파일 수정을 막는 차단 하나와 넛지 셋과 전역 설정 수정 하나가 걸리고, 세션 시작에 설치 권유 하나가 뜬다. 게이트와 넛지는 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 넷 다 꺼지고, 읽기 전용 차단과 설치 권유는 그 변수와 무관하며, 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
+세션에는 턴 종료를 막는 하드 게이트 하나와 읽기 전용 파일 수정을 막는 차단 하나와 넛지 넷과 전역 설정 수정 하나가 걸리고, 세션 시작에 설치 권유 하나가 뜬다. 게이트와 넛지는 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 다섯 다 꺼지고, 읽기 전용 차단과 설치 권유와 코드 넛지 표시를 지우는 세션 시작 훅은 그 변수와 무관하며, 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
 
 배선은 둘이다. `hooks/hooks.json`은 이 플러그인이 어디서나 거는 훅이고, `.claude/settings.json`은 이 저장소에서만 도는 프로젝트 훅이다. 걸린 것은 아래가 전부다.
 
@@ -51,8 +51,10 @@ done
 |---|---|---|
 | SessionStart | `scripts/scaffold.sh` | 정본 사본과 `@import` 배선을 만들고 알린다 |
 | SessionStart | `scripts/seal_reviews.sh` | 커밋된 감사 기록을 읽기 전용으로 봉인한다(이 저장소의 프로젝트 훅) |
+| SessionStart | `hooks/code_nudge_sessionstart.sh` | 이 세션의 코드 넛지 표시를 지워 다시 알리게 한다 |
 | PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 걸린 Write 와 Edit 을 사유와 함께 거부한다 |
 | PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md` 에 문서 양식 넛지를 띄운다 |
+| PreToolUse | `hooks/code_nudge_pretooluse.sh` | 문서가 아닌 파일의 세션 첫 편집 전에 `domain-coding` 을 열라고 알린다 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan 을 감지해 리뷰를 지시한다 |
 | PostToolUse | `hooks/doc_review_posttooluse.sh` | 고친 문서에 검진 넛지를 띄운다 |
 | Stop | `hooks/spec_review_stop.sh` | 미리뷰 spec·plan 이 남은 채 턴이 끝나는 것을 막는다 |
@@ -61,8 +63,9 @@ done
 
 - **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고 `domain-spec-review` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 종료 차단이 해제된다. 차단은 턴에 한 번이다. 두 번째 종료 시도는 통과하므로 리뷰를 하지 않고도 턴을 끝낼 수 있다. 상세는 `skills/domain-spec-review/SKILL.md`를 참고한다.
 - **읽기 전용 차단** — 읽기 전용 속성이 선 파일에 `Write`나 `Edit`을 하려 하면 거부하고 사유를 보인다. 어느 프로젝트의 어느 파일이든 속성만 보며, 이 레포의 감사 기록은 만든 직후 `scripts/seal_reviews.sh`가 그 속성을 세운다. 풀려면 속성을 풀면 된다.
-- **넛지 셋** — 차단하지 않고 안내만 한다. spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 `domain-docs`의 양식을 제안하며, `.md`를 고치면 문서 검진을 권한다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
-- **카파시 플러그인 설치 권유** — 이 플러그인을 처음 깔았거나 갱신한 첫 세션에, 카파시(Andrej Karpathy)의 코딩 지침 플러그인 `andrej-karpathy-skills`가 이 PC에 없으면 설치 명령 두 줄을 세션 시작 알림으로 보인다. 설치하지는 않으며, 무시하면 다음 갱신까지 다시 뜨지 않는다. 정본의 「Karpathy 지침」 절은 그 플러그인의 네 절을 영어 그대로 옮기되 코드 밖의 문서와 절차에도 걸리게 낱말을 고친 것이고, 겹치던 조항은 정본에서 뺐다.
+- **문서 넛지 셋** — 차단하지 않고 안내만 한다. spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 `domain-docs`의 양식과 `domain-writing`의 분량 규칙을 권하며, `.md`를 고치면 문서 검진과 `domain-writing`의 수정 범위 규칙을 권한다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
+- **코드 넛지 하나** — 문서가 아닌 프로젝트 안 파일에 세션의 첫 `Write`나 `Edit`이 들어오면 편집 전에 `domain-coding`을 열라고 한 번 알린다. 세션은 훅 입력의 `session_id`로 가르고 서브에이전트는 `agent_id`로 따로 세므로 각자 한 번씩 받는다. 그 표시는 임시 폴더에 두고 세션이 시작·재개·비워질 때 지운다. `.md`와 리뷰 기록 폴더와 프로젝트 밖 경로에는 뜨지 않는다.
+- **카파시 플러그인 설치 권유** — 이 플러그인을 처음 깔았거나 갱신한 첫 세션에, 카파시(Andrej Karpathy)의 코딩 지침 플러그인 `andrej-karpathy-skills`가 이 PC에 없으면 설치 명령 두 줄을 세션 시작 알림으로 보인다. 설치하지는 않으며, 무시하면 다음 갱신까지 다시 뜨지 않는다. 정본의 「Think Before Acting」 절과 `domain-coding`·`domain-writing`의 카파시 절은 그 플러그인의 네 절을 옮긴 것이고, 겹치던 조항은 정본에서 뺐다.
 - **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다. 이 마켓플레이스 항목에만 `autoUpdate: true`를 넣어 깃허브의 갱신이 자동으로 적용되게 한다. 키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며, 사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다. 지키는 규칙은 `skills/domain-plugin/SKILL.md`의 「사용자 설정 파일을 고칠 때 지킬 것」을 참고한다.
 
 ## 주의
