@@ -25,10 +25,12 @@ EV_OUT="$(bash "$EV" --root "$EVT" "$EVT/findings.json" 2>/dev/null || true)"
 evq() { printf '%s' "$EV_OUT" | json_run "$1"; }
 check "출력이 JSON 이다"                 "printf '%s' \"\$EV_OUT\" | json_valid_stdin"
 check "있는 인용을 찾았다고 적는다"       "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"findings\"][0][\"evidence_found\"] is True else 1)'"
-check "없는 인용을 못 찾았다고 적는다"     "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"findings\"][1][\"evidence_found\"] is False else 1)'"
-check "상대편 인용도 확인한다"            "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if all(f[\"counterpart_found\"] is True for f in d[\"findings\"]) else 1)'"
-check "지문이 열두 자 16진수다"           "evq 'import json,sys,re; d=json.load(sys.stdin); sys.exit(0 if all(re.fullmatch(r\"[0-9a-f]{12}\", f[\"fingerprint\"]) for f in d[\"findings\"]) else 1)'"
-check "인용이 다르면 지문이 다르다"       "evq 'import json,sys,hashlib; d=json.load(sys.stdin); a,b=d[\"findings\"]; sys.exit(0 if a[\"fingerprint\"]!=b[\"fingerprint\"] else 1)'"
+check "없는 인용을 못 찾았다고 적는다"     "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"dropped\"][0][\"evidence_found\"] is False else 1)'"
+check "상대편 인용도 확인한다"            "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if all(f[\"counterpart_found\"] is True for f in d[\"findings\"]+d[\"dropped\"]) else 1)'"
+check "지문이 열두 자 16진수다"           "evq 'import json,sys,re; d=json.load(sys.stdin); sys.exit(0 if all(re.fullmatch(r\"[0-9a-f]{12}\", f[\"fingerprint\"]) for f in d[\"findings\"]+d[\"dropped\"]) else 1)'"
+check "인용이 다르면 지문이 다르다"       "evq 'import json,sys; d=json.load(sys.stdin); a=d[\"findings\"][0]; b=d[\"dropped\"][0]; sys.exit(0 if a[\"fingerprint\"]!=b[\"fingerprint\"] else 1)'"
+check "인용이 없으면 탈락한다"            "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if len(d[\"dropped\"])==1 and d[\"dropped\"][0][\"id\"]==\"r#002\" else 1)'"
+check "탈락한 것은 findings 에 없다"      "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if len(d[\"findings\"])==1 and d[\"findings\"][0][\"id\"]==\"r#001\" else 1)'"
 check "출력에 CR 이 없다"                 "! printf '%s' \"\$EV_OUT\" | grep -q \$'\\r'"
 bash "$EV" --root "$EVT" "$EVT/findings.json" > "$EVT/ev_out.json" 2>/dev/null || true
 check "파일로 저장한 출력을 UTF-8 로 다시 열어도 인용이 원문 그대로다" \
@@ -60,10 +62,10 @@ check "audit_evidence.sh 가 읽는 칸이 스키마 필드에 다 있다" "evkq
 echo "[audit_rounds.sh — 회차 대조와 측정]"
 AR="$HERE/scripts/audit_rounds.sh"
 check "스크립트가 있다" "[ -f '$AR' ]"
-ART="$(mktemp -d)"
+ART="$(mktemp -d)"; mkdir -p "$ART/2026-01-01-self-audit"
 printf '남아 있는 어긋난 문장.\n' > "$ART/doc.md"
 printf '상대편 문장.\n' > "$ART/other.md"
-cat > "$ART/prior.json" <<'FIXTURE'
+cat > "$ART/2026-01-01-self-audit/findings.json" <<'FIXTURE'
 { "schema": 1, "findings": [
   { "id": "p#001", "fingerprint": "aaaaaaaaaaaa", "status": "confirmed", "title": "남은 것",
     "file": "doc.md", "evidence": "남아 있는 어긋난 문장.",
@@ -72,34 +74,104 @@ cat > "$ART/prior.json" <<'FIXTURE'
     "file": "doc.md", "evidence": "이제 없는 문장.",
     "counterpart_file": "other.md", "counterpart": "상대편 문장.", "principle": "SSOT", "lens": "lens-fit" },
   { "id": "p#003", "fingerprint": "cccccccccccc", "status": "rejected", "title": "기각된 것",
+    "verdict_reason": "정당한 좁혀 적기다",
     "file": "doc.md", "evidence": "남아 있는 어긋난 문장.",
     "counterpart_file": "other.md", "counterpart": "상대편 문장.", "principle": "SSOT", "lens": "lens-fit" }
 ] }
 FIXTURE
+cat > "$ART/prior-diff.json" <<'FIXTURE'
+{ "schema": 1, "no_prior_round": false, "items": [
+  { "prior_id": "o#009", "prior_round": "2025-12-01-self-audit", "prior_status": "confirmed",
+    "fingerprint": "eeeeeeeeeeee", "title": "옛 회차의 해소", "file": "doc.md",
+    "verdict": "해소", "matched_id": null }
+], "new_ids": [], "auto_rejected": [] }
+FIXTURE
 cat > "$ART/cur.json" <<'FIXTURE'
 { "schema": 1, "findings": [
   { "id": "c#001", "fingerprint": "aaaaaaaaaaaa", "status": "confirmed", "lens": "lens-grounding" },
-  { "id": "c#002", "fingerprint": "dddddddddddd", "status": "rejected", "lens": "lens-fit" }
+  { "id": "c#002", "fingerprint": "dddddddddddd", "status": "undetermined", "verdict_reason": "못 정했다", "lens": "lens-fit" },
+  { "id": "c#003", "fingerprint": "cccccccccccc", "status": "rejected", "verdict_reason": "앞선 회차 기각 유지 — 정당한 좁혀 적기다", "lens": "lens-fit" },
+  { "id": "c#004", "fingerprint": "eeeeeeeeeeee", "status": "confirmed", "lens": "lens-adversarial" }
 ] }
 FIXTURE
-AR_DIFF="$(bash "$AR" diff --root "$ART" "$ART/prior.json" "$ART/cur.json" 2>/dev/null || true)"
+AR_DIFF="$(bash "$AR" diff --root "$ART" --prior "$ART/2026-01-01-self-audit/findings.json" --prior-diff "$ART/prior-diff.json" "$ART/cur.json" 2>/dev/null || true)"
 arq() { printf '%s' "$AR_DIFF" | json_run "$1"; }
 check "대조 출력이 JSON 이다"            "printf '%s' \"\$AR_DIFF\" | json_valid_stdin"
 check "인용이 남아 있으면 잔존이다"       "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"p#001\"][0]; sys.exit(0 if i[\"verdict\"]==\"잔존\" else 1)'"
 check "인용이 사라졌으면 해소다"          "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"p#002\"][0]; sys.exit(0 if i[\"verdict\"]==\"해소\" else 1)'"
-check "기각된 앞선 발견은 대조하지 않는다" "arq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if not [x for x in d[\"items\"] if x[\"prior_id\"]==\"p#003\"] else 1)'"
+check "기각된 앞선 발견도 대조한다"       "arq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if [x for x in d[\"items\"] if x[\"prior_id\"]==\"p#003\"] else 1)'"
+check "회차 이름을 앞선 경로에서 뽑는다"   "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"p#001\"][0]; sys.exit(0 if i[\"prior_round\"]==\"2026-01-01-self-audit\" else 1)'"
+check "앞선 diff 의 해소가 다시 나오면 재발이다" "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"o#009\"][0]; sys.exit(0 if i[\"verdict\"]==\"재발\" else 1)'"
+check "재발은 앞선 회차 이름을 승계한다"   "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"o#009\"][0]; sys.exit(0 if i[\"prior_round\"]==\"2025-12-01-self-audit\" else 1)'"
+check "앞선 기각과 지문이 같으면 자동 기각 후보다" "arq 'import json,sys; d=json.load(sys.stdin); a=d[\"auto_rejected\"]; sys.exit(0 if len(a)==1 and a[0][\"id\"]==\"c#003\" and a[0][\"prior_reason\"]==\"정당한 좁혀 적기다\" else 1)'"
 check "같은 지문이면 이번 발견을 짝짓는다" "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"p#001\"][0]; sys.exit(0 if i[\"matched_id\"]==\"c#001\" else 1)'"
 check "앞선 회차에 없던 지문을 신규로 센다" "arq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"new_ids\"]==[\"c#002\"] else 1)'"
-AR_DIFF2="$(bash "$AR" diff --root "$ART" "$ART/prior.json" "$ART/cur.json" 2>/dev/null || true)"
+AR_DIFF2="$(bash "$AR" diff --root "$ART" --prior "$ART/2026-01-01-self-audit/findings.json" --prior-diff "$ART/prior-diff.json" "$ART/cur.json" 2>/dev/null || true)"
 check "두 번 계산해도 같은 결과다"        "[ \"\$AR_DIFF\" = \"\$AR_DIFF2\" ]"
+AR_NONE="$(bash "$AR" diff --root "$ART" "$ART/cur.json" 2>/dev/null || true)"
+anq() { printf '%s' "$AR_NONE" | json_run "$1"; }
+check "앞선 회차가 없으면 그렇게 적는다"   "anq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"no_prior_round\"] and d[\"items\"]==[] and len(d[\"new_ids\"])==4 else 1)'"
 printf '%s' "$AR_DIFF" > "$ART/diff.json"
-AR_MET="$(bash "$AR" metrics --tokens 1000 --seconds 60 "$ART/prior.json" "$ART/diff.json" 2>/dev/null || true)"
+AR_MET="$(bash "$AR" metrics --tokens 1000 --seconds 60 "$ART/cur.json" "$ART/diff.json" 2>/dev/null || true)"
 amq() { printf '%s' "$AR_MET" | json_run "$1"; }
 check "측정 출력이 JSON 이다"             "printf '%s' \"\$AR_MET\" | json_valid_stdin"
-check "렌즈별로 낸 수와 확정 수를 센다"    "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"by_lens\"][\"lens-fit\"]=={\"raised\":2,\"confirmed\":1} else 1)'"
+check "렌즈별로 낸 수와 확정 수를 센다"    "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"by_lens\"][\"lens-fit\"]=={\"raised\":2,\"confirmed\":0} else 1)'"
 check "확정 하나당 값을 낸다"             "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"tokens_per_confirmed\"]==500 else 1)'"
-check "앞선 회차의 해소율을 낸다"          "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"resolved_rate\"]==0.5 else 1)'"
+check "판정 개수를 낸다"                  "amq 'import json,sys; d=json.load(sys.stdin); v=d[\"verdict_counts\"]; sys.exit(0 if v[\"confirmed\"]==2 and v[\"rejected\"]==1 and v[\"undetermined\"]==1 and v[\"auto_rejected\"]==1 else 1)'"
+check "해소율 분모에 기각이 없다"          "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"resolved_rate\"]==0.333 else 1)'"
 rm -rf "$ART"
+
+echo "[audit_statements.sh — 이름표별 진술]"
+AS="$HERE/scripts/audit_statements.sh"
+check "스크립트가 있다" "[ -f '$AS' ]"
+AST="$(mktemp -d)"
+cat > "$AST/lens-fit-1.json" <<'FIXTURE'
+{ "lens": "lens-fit", "target": "skills/a/SKILL.md", "issues": [],
+  "statements": [ { "topic": "봉인 시점", "statement": "세션 시작에 봉인한다", "evidence": "봉인" } ] }
+FIXTURE
+cat > "$AST/lens-fit-2.json" <<'FIXTURE'
+{ "lens": "lens-fit", "target": "skills/b/SKILL.md", "issues": [],
+  "statements": [ { "topic": "봉인 시점", "statement": "회차 끝에 봉인한다", "evidence": "회차" } ] }
+FIXTURE
+AS_OUT="$(bash "$AS" "$AST/lens-fit-1.json" "$AST/lens-fit-2.json" 2>/dev/null || true)"
+asq() { printf '%s' "$AS_OUT" | json_run "$1"; }
+check "진술 출력이 JSON 이다"          "printf '%s' \"\$AS_OUT\" | json_valid_stdin"
+check "이름표로 모은다"                "asq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if len(d[\"topics\"][\"봉인 시점\"])==2 else 1)'"
+check "문서 경로는 원본의 target 이다"  "asq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"topics\"][\"봉인 시점\"][0][\"file\"]==\"skills/a/SKILL.md\" else 1)'"
+rm -rf "$AST"
+
+echo "[audit_verify.sh — 실제 기록 검수]"
+AV="$HERE/scripts/audit_verify.sh"
+check "스크립트가 있다" "[ -f '$AV' ]"
+VT="$(mktemp -d)"; mkdir -p "$VT/2026-01-02-self-audit"
+VR="$VT/2026-01-02-self-audit"
+cat > "$VR/findings.json" <<'FIXTURE'
+{ "schema": 1, "findings": [
+  { "id": "v#001", "fingerprint": "aaaaaaaaaaaa", "status": "confirmed", "title": "t",
+    "file": "a.md", "evidence": "e", "counterpart_file": "b.md", "counterpart": "c",
+    "principle": "SSOT", "consequence": "지금 이렇게 되어 있다", "lens": "lens-fit",
+    "evidence_found": true, "counterpart_found": true } ] }
+FIXTURE
+printf '{ "schema": 1, "no_prior_round": true, "items": [], "new_ids": ["v#001"] }\n' > "$VR/diff.json"
+printf '{ "schema": 1, "suggestions": [] }\n' > "$VR/suggestions.json"
+cat > "$VR/run.json" <<'FIXTURE'
+{ "schema": 1, "tokens_method": "합산", "lens_calls": {}, "subagents": 1, "targets": [],
+  "metrics": { "by_lens": {}, "confirmed": 1 }, "completed": true }
+FIXTURE
+cat > "$VR/lens-fit-1.json" <<'FIXTURE'
+{ "lens": "lens-fit", "target": "a.md", "issues": [] }
+FIXTURE
+check "제대로 된 회차는 통과한다" "bash '$AV' '$VR' >/dev/null 2>&1"
+cat > "$VR/findings.json" <<'FIXTURE'
+{ "schema": 1, "findings": [
+  { "id": "v#002", "fingerprint": "aaaaaaaaaaaa", "status": "rejected", "title": "t",
+    "file": "a.md", "evidence": "e", "counterpart_file": "b.md", "counterpart": "c",
+    "principle": "SSOT", "lens": "lens-fit", "evidence_found": true, "counterpart_found": true } ] }
+FIXTURE
+check "사유 없는 기각을 잡는다" "[ -f '$AV' ] && ! bash '$AV' '$VR' >/dev/null 2>&1"
+rm -rf "$VT"
+check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' '$HERE/skills/domain-docs/SKILL.md'"
+
 
 echo "[렌즈 — 발견의 문턱과 기계에 넘기는 것]"
 # 문턱은 meta-aggregate 「리뷰 산출물 계약」이 소유한다. 전에는 같은 세 문단이 렌즈 파일 넷에 같은
