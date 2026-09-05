@@ -79,4 +79,14 @@ check "확정 하나당 값을 낸다"             "amq 'import json,sys; d=json
 check "앞선 회차의 해소율을 낸다"          "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"resolved_rate\"]==0.5 else 1)'"
 rm -rf "$ART"
 
+echo "[렌즈 — 발견의 문턱과 기계에 넘기는 것]"
+for L in lens-grounding lens-fit lens-consistency lens-adversarial; do
+  F="$HERE/skills/$L/SKILL.md"
+  check "$L 이 상대편을 필수로 적는다"   "grep -qF 'counterpart' '$F' && grep -qF '상대편을 못 대면 발견이 아니다' '$F'"
+  check "$L 이 결과 기준을 적는다"       "grep -qF '지금 무엇이 그렇게 되어 있는지' '$F' && grep -qF '앞으로 벌어질 일을 적지 않는다' '$F'"
+  check "$L 에 기계에 넘기는 것 절이 있다" "grep -qF '## 기계에 넘기는 것' '$F'"
+done
+check "lens-grounding 이 인용 확인을 스크립트에 넘긴다" "grep -qF 'audit_evidence.sh' '$HERE/skills/lens-grounding/SKILL.md'"
+check "lens-adversarial 은 넘길 것이 없다고 적는다"      "grep -qF '기계에 넘길 것이 없다' '$HERE/skills/lens-adversarial/SKILL.md'"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
