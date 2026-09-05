@@ -441,7 +441,7 @@ for h in "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
   check "domain-coding: no copy of '$h'"              "! grep -qE '^#+ $h\$' '$DC'"
 done
 check "domain-coding: points at the plugin skill"     "grep -qF 'karpathy-guidelines' '$DC'"
-check "domain-coding: gives the install commands"     "grep -qF 'claude plugin install andrej-karpathy-skills@karpathy-skills' '$DC'"
+check "domain-coding: names the CLAUDE.md import"     "grep -qF 'karpathy-guidelines/SKILL.md' '$DC'"
 check "domain-coding: no Tradeoff copy"               "! grep -qF '**Tradeoff:**' '$DC'"
 check "domain-coding: local-first moved to canon"     "! grep -qE '^## Local first\$' '$DC'"
 check "domain-coding: frontmatter name"               "grep -qF 'name: domain-coding' '$DC'"

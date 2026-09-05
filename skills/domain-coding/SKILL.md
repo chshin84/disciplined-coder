@@ -8,16 +8,7 @@ These rules apply whenever code is written or changed. Rules that also hold in p
 
 ## Karpathy guidelines
 
-Do not read them here. They live in the `andrej-karpathy-skills` plugin's `karpathy-guidelines` skill, which is their single source of truth. **Open that skill before you write or change code.** Simplicity First, Surgical Changes, and Goal-Driven Execution are not repeated in this file.
-
-If that skill is not available on this machine, the plugin is not installed. Tell the user so and give them the two commands, then continue without it:
-
-```
-claude plugin marketplace add forrestchang/andrej-karpathy-skills
-claude plugin install andrej-karpathy-skills@karpathy-skills
-```
-
-Think Before Coding is the one section that is not there for you to open here: it applies to plain answers too, so it lives in the always-loaded canon as Think Before Acting.
+Not repeated here. `~/.claude/CLAUDE.md` imports `karpathy-guidelines/SKILL.md`, so Simplicity First, Surgical Changes and Goal-Driven Execution are already in context every session. Think Before Coding lives in the canon as Think Before Acting.
 
 ## Principles
 
