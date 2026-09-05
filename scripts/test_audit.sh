@@ -203,4 +203,37 @@ check "diff.json 이 파싱된다"          "rj 'import json,sys; json.load(open
 check "suggestions.json 이 파싱된다"   "rj 'import json,sys; json.load(open(sys.argv[1],encoding=\"utf-8\"))' suggestions.json"
 rm -rf "$RT"
 
+echo "[문서 — 일관성 방법이 절차와 렌즈에 적혔다]"
+LC="$HERE/skills/lens-consistency/SKILL.md"
+check "렌즈가 이름표 묶음 짝을 적는다"                  "grep -qF '## 레포 문서 감사에서의 짝' '$LC'"
+check "렌즈 type 에 duplication 이 있다"                "grep -qF 'duplication' '$LC'"
+check "렌즈가 판정 셋과 narrowed 를 적는다"             "grep -qF '좁혀 적음' '$LC' && grep -qF 'narrowed' '$LC'"
+check "렌즈가 산출물 공백·스코프를 감사에서 뺀다"        "grep -qF '레포 문서 감사에서는 걸지 않는다' '$LC'"
+check "집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다"  "grep -qF 'narrowed' '$HERE/skills/meta-aggregate/SKILL.md'"
+check "한 번만 규율에 '대상이 다르면 별개 호출' 이 있다" "grep -qF '대상이 다르면 별개 호출이다' '$HERE/skills/domain-docs/SKILL.md'"
+check "절차의 대체된 문장 셋이 사라졌다"                 "! grep -qF '만은 묶음에 한 번 건다' '$PDA' && ! grep -qF '묶음을 통째로 받는다' '$PDA' && ! grep -qF '묶음 전부를 서로 대조한다' '$LC'"
+check "절차의 '짧은 문서 둘까지' 가 사라졌다"            "! grep -qF '짧은 문서 둘까지' '$PDA'"
+check "절차에 「일관성 대조」 절과 걸음 행이 있다"         "grep -qF '## 일관성 대조' '$PDA' && grep -qF '| 진술을 대조한다 |' '$PDA'"
+check "대상 목록을 손으로 적지 않고 도출한다고 적는다"    "grep -qF '목록은 손으로 적지 말고 파일에서 도출한다' '$PDA'"
+check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '$HERE/docs/superpowers/specs/2026-08-30-audit-unification-design.md' | grep -qF '2026-09-02-audit-record-and-diff-design.md'"
+RT2="$(mktemp -d)"; mkdir -p "$RT2/round"
+cat > "$RT2/round/run.json" <<'FIXTURE'
+{ "schema": 1, "executor": "session", "commit": "abc", "tree_clean": true, "completed": true,
+  "steps_done": ["targets"], "targets": [], "metrics": { "by_lens": {}, "confirmed": 0 } }
+FIXTURE
+rj2() { json_run "$1" "$RT2/round/$2"; }
+check "run.json 이 대상과 지표 필드를 담는다"           "rj2 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if \"targets\" in d and \"metrics\" in d and \"confirmed\" in d[\"metrics\"] else 1)' run.json"
+rm -rf "$RT2"
+
+echo "[audit_targets.sh — 배제 규칙이 실제로 걸린다]"
+EXT="$(mktemp -d)"
+( cd "$EXT" && git init -q && printf 'a\n' > kept.md && printf 'b\n' > "HANDOFF-x.md" \
+  && printf 'superseded\n표시\n' > old.md \
+  && git add kept.md "HANDOFF-x.md" old.md && git -c user.email=t@t -c user.name=t commit -qm seed )
+EXT_OUT="$(bash "$AT" --root "$EXT" 2>/dev/null || true)"
+check "HANDOFF- 로 시작하는 파일이 빠진다"     "! printf '%s' \"\$EXT_OUT\" | grep -q 'HANDOFF-x.md'"
+check "머리에 superseded 가 있는 문서가 빠진다" "! printf '%s' \"\$EXT_OUT\" | grep -q 'old.md'"
+check "빠지지 않을 문서는 남는다"              "printf '%s' \"\$EXT_OUT\" | grep -q 'kept.md'"
+rm -rf "$EXT"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
