@@ -29,13 +29,21 @@ utf8_user_var_state() {
     *) printf 'not-windows'; return 0 ;;
   esac
   # //v 는 Git Bash 가 /v 로 되돌린다. /v 로 쓰면 경로로 바꿔 버려 reg 가 못 알아듣는다.
-  if reg query "HKCU\\Environment" //v PYTHONUTF8 >/dev/null 2>&1; then printf 'set'; else printf 'unset'; fi
+  # 상태를 넷으로 가른다. 'off' 는 사용자가 값을 0 으로 적어 일부러 끈 것이라 손대지 않는다.
+  utf8_q="$(reg query "HKCU\\Environment" //v PYTHONUTF8 2>/dev/null || true)"
+  if [ -z "$utf8_q" ]; then printf 'unset'; return 0; fi
+  utf8_v="$(printf '%s' "$utf8_q" | awk '/PYTHONUTF8/ { print $NF }' | tr -d '\r' | tail -1)"
+  if [ "$utf8_v" = "0" ]; then printf 'off'; else printf 'on'; fi
+}
+
+# 사용자 환경 변수를 넣는다. 레지스트리를 바꾸므로 상태 주입이 걸린 시험에서는 실제로 부르지 않는다.
+# 넣는 곳을 여기 하나로 둔다. 같은 일을 커맨드에서도 하면 어느 쪽이 진짜인지 흐려진다.
+utf8_set_user_var() {
+  if [ -n "${DISCIPLINED_CODER_UTF8_STATE:-}" ]; then return 0; fi
+  powershell -NoProfile -Command "[Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User')" >/dev/null 2>&1
 }
 
 # 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
-#    사본이 없거나 내용이 다르면 canon_changed=1 — 플러그인을 처음 깔았거나 갱신한 첫 세션이라는 뜻이다.
-#    4c)의 넛지가 이 값으로 "그 세션에만" 뜬다.
-canon_changed=0
 for f in $SCAFFOLD_FILES; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
   if [ -f "$src" ]; then
@@ -43,7 +51,6 @@ for f in $SCAFFOLD_FILES; do
     # @import 배선도 남아 있어 README가 알려 준 확인 셋을 그대로 통과하므로, 정본만 낡은 채
     # 아무도 모르게 된다(FAIL-LOUD).
     if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else
-      if [ ! -f "$dst" ] || ! cmp -s "$src" "$dst"; then canon_changed=1; fi
       cp "$src" "$dst" || { echo "[disciplined-coder] ERROR: 정본 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)"; exit 1; }
     fi
   else
@@ -146,25 +153,45 @@ if [ -s "$au_err" ]; then
 fi
 rm -f "$au_err"
 
-# 4c) 카파시 플러그인 설치 넛지(안내만, 설치는 하지 않는다): 정본이 새로 깔리거나 갱신된 세션에만,
-#     그 플러그인이 아직 없을 때만 stdout 으로 알린다. 무시하면 다음 갱신까지 조용하다. 다른 플러그인을
-#     사용자 대신 까는 것은 지나치다는 결정이 있었다. 설치 여부는 Claude Code 의 설치 기록 파일의 키로 본다.
-#     정본의 Karpathy guidelines 절 넷은 이 플러그인의 네 절을 산출물 기준으로 일반화해 옮긴 것이다.
-KARPATHY_PLUGIN="andrej-karpathy-skills@karpathy-skills"
-KARPATHY_REPO="forrestchang/andrej-karpathy-skills"
-if [ "$canon_changed" -eq 1 ] && ! grep -qF "\"$KARPATHY_PLUGIN\"" "$CLAUDE_HOME/plugins/installed_plugins.json" 2>/dev/null; then
-  echo "🔵 disciplined-coder: 카파시(Andrej Karpathy)의 코딩 지침 플러그인이 이 PC에 없다. 디시플린은 이 플러그인과 함께 쓰도록 맞춰져 있어 설치를 권한다(설치하지는 않았다). 두 줄을 차례로 실행하면 된다:"
-  echo "  claude plugin marketplace add $KARPATHY_REPO"
-  echo "  claude plugin install $KARPATHY_PLUGIN"
+# 4c) 함께 쓰는 플러그인 확인(매 세션): 없을 때만 설치 명령을 알리고 대신 깔지는 않는다. 다른
+#     플러그인을 사용자 대신 까는 것은 지나치다는 결정이 있었다. 깔려 있으면 아무것도 안 나오므로
+#     매 세션 돌아도 조용하다. 안 깔기로 정했으면 plugin-notice.skip 에 이름을 한 줄 적어 끈다 —
+#     건너뛸 목록을 이 스크립트에 안 적으므로 그 파일 하나로 정해지고 끈 근거도 거기 남는다.
+#     설치 여부는 Claude Code 의 설치 기록 파일의 키로 본다. 마켓플레이스 이름은 설치 방법에 따라
+#     갈리므로 '이름@' 앞부분만 맞대고, 마켓플레이스 인자가 '-' 면 추가 없이 바로 설치한다.
+#     정본의 Karpathy guidelines 절 넷은 카파시 플러그인의 네 절을 산출물 기준으로 일반화해 옮긴 것이다.
+DEP_SKIP="$KDIR/plugin-notice.skip"
+DEP_LIST="superpowers|-|superpowers@claude-plugins-official
+andrej-karpathy-skills|forrestchang/andrej-karpathy-skills|andrej-karpathy-skills@karpathy-skills"
+dep_missing=0
+while IFS='|' read -r dep_name dep_mkt dep_key; do
+  [ -n "$dep_name" ] || continue
+  if grep -qF "\"$dep_name@" "$CLAUDE_HOME/plugins/installed_plugins.json" 2>/dev/null; then continue; fi
+  if [ -f "$DEP_SKIP" ] && grep -qxF "$dep_name" "$DEP_SKIP" 2>/dev/null; then continue; fi
+  dep_missing=1
+  echo "🔵 disciplined-coder: 함께 쓰는 플러그인 $dep_name 이 이 PC에 없다. 디시플린은 이것과 함께 쓰도록 맞춰져 있어 설치를 권한다(설치하지는 않았다):"
+  [ "$dep_mkt" = "-" ] || echo "  claude plugin marketplace add $dep_mkt"
+  echo "  claude plugin install $dep_key"
+done <<DEPEOF
+$DEP_LIST
+DEPEOF
+if [ "$dep_missing" -eq 1 ]; then
+  echo "  안 깔기로 정했으면 그 이름을 $DEP_SKIP 에 한 줄씩 적으면 이 알림이 조용해진다."
 fi
 
-# 4d) PYTHONUTF8 넛지(안내만): 정본이 새로 깔리거나 갱신된 세션에만, 사용자 환경 변수가 비었을 때만.
-#     매 세션 뜨면 세션 시작 알림 전체를 흘려보게 되므로 카파시 넛지와 같은 조건에 묶는다.
+# 4d) PYTHONUTF8 을 넣는다(알리는 데서 그치지 않고 실제로 넣는다): 매 세션 확인하고 변수가 비었을
+#     때만 넣으므로 여러 번 돌아도 결과가 같다. 값이 0 이면 일부러 끈 것으로 보고 손대지 않는다.
+#     전역 설정의 autoUpdate 를 false 로 둔 것을 존중하는 규칙과 같은 방식이다.
 #     이 PC 의 파이썬은 기본 인코딩이 cp949 라 한국어 리터럴이 깨진다. 저장소 자신의 파이썬 호출은
 #     json_run 이 프로세스마다 세워 두지만 클로드 코드 밖에서는 그 보호가 없다.
-if [ "$canon_changed" -eq 1 ] && [ "$(utf8_user_var_state)" = "unset" ]; then
-  echo "🔵 disciplined-coder: 파이썬 한국어 깨짐을 막으려면 /setup-discipline 을 실행하라(윈도우 사용자 환경 변수 PYTHONUTF8=1 을 넣는다)."
+if [ "$(utf8_user_var_state)" = "unset" ]; then
+  if utf8_set_user_var; then
+    echo "🔵 disciplined-coder: 윈도우 사용자 환경 변수 PYTHONUTF8=1 을 넣었다(파이썬 한국어 깨짐 방지). 새로 여는 터미널부터 걸린다. 끄려면 그 변수를 0 으로 두면 다시 넣지 않는다."
+  else
+    echo "[disciplined-coder] WARNING: PYTHONUTF8 을 넣지 못했다. 직접 넣으려면 powershell 로 [Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User') 를 실행한다."
+  fi
 fi
+
 
 # 4e) 핸드오프 잔존 린트: 소비되면 곧바로 지우는 문서가 프로젝트에 남아 있으면 알린다.
 #     정본의 문서 타입 표가 이 타입의 강제 장치로 이 린트를 적는다. 세는 규칙은 audit_targets.sh 와

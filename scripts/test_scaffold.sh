@@ -16,7 +16,7 @@ blank_follows() {  # $1=file $2=exact-line-pattern
 # PYTHONUTF8 안내는 OS 와 레지스트리를 읽어 판정하므로 픽스처마다 상태를 주입해 고정한다. run() 을
 # 거치지 않고 $SCAFFOLD 를 직접 부르는 픽스처가 여럿이라 헬퍼가 아니라 파일 머리에서 내보낸다.
 # 이것이 없으면 CI(ubuntu)와 변수를 넣은 윈도우 PC 와 안 넣은 PC 에서 결과가 갈린다.
-: "${UTF8_STATE:=set}"
+: "${UTF8_STATE:=on}"
 export DISCIPLINED_CODER_UTF8_STATE="$UTF8_STATE"
 
 run() {  # $1=HOME dir, $2=project dir  → echoes scaffold stdout
@@ -328,7 +328,11 @@ check "orphan: warns BEGIN w/o END"   "printf '%s' \"\$ERR19\" | grep -qF 'BEGIN
 check "orphan: marker line gone"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC19') -eq 1 ]"
 
 # --- canon-first-run-only: 정본 stdout 덤프는 첫 설치 세션에만 (이중 주입 회귀 가드) ---
-H20="$(mktemp -d)"; P20="$(mktemp -d)"
+H20="$(mktemp -d)"; P20="$(mktemp -d)"; mkdir -p "$H20/.claude/plugins"
+# 여기서 보려는 것은 정본 덤프가 첫 회차에만 나오는지다. 함께 쓰는 플러그인 알림이 섞이면
+# "2회차에 아무것도 안 보낸다" 단언이 그 알림 때문에 실패하므로 설치 기록을 넣어 잠재운다.
+printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ], "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
+' > "$H20/.claude/plugins/installed_plugins.json"
 OUT20a="$(run "$H20" "$P20")"
 OUT20b="$(run "$H20" "$P20")"
 echo "[canon-first-run-only] canon dumped on first run only"
@@ -340,9 +344,9 @@ check "2nd run sends nothing"         "[ -z \"\$OUT20b\" ]"
 
 # --- crlf-import-line: CRLF 관리영역에서도 재주입하지 않는다 (had_import의 CR 내성) ---
 H21="$(mktemp -d)"; P21="$(mktemp -d)"; mkdir -p "$H21/.claude/plugins"
-# 이 홈은 정본 사본이 없어 "새로 깐 세션"으로 보이므로 카파시 넛지가 뜬다. 여기서 보려는 것은 CRLF 배선
-# 인식뿐이라 설치 기록을 넣어 넛지를 잠재우고, "아무것도 안 보낸다" 단언은 그대로 둔다.
-printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ] } }
+# 여기서 보려는 것은 CRLF 배선 인식뿐이라 함께 쓰는 플러그인 둘의 설치 기록을 넣어 그 알림을
+# 잠재우고, "아무것도 안 보낸다" 단언은 그대로 둔다.
+printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ], "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
 ' > "$H21/.claude/plugins/installed_plugins.json"
 printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
 OUT21="$(run "$H21" "$P21")"
@@ -784,42 +788,52 @@ ERRK1="$( . "$COMMON"; scaffold_hygiene "$KK1" 2>&1 >/dev/null || true )"
 echo "[stale-keep] a stale file survives when its backup cannot be written"
 check "stale-keep: 내용이 든 파일이 남는다" "[ -f '$KK1/coding-principles.md' ]"
 check "stale-keep: 조용히 넘어가지 않는다" "printf '%s' \"$ERRK1\" | grep -qF -- '사본으로 못 옮겨 그대로 두었다'"
-# --- karpathy-nudge: 카파시 플러그인 설치 넛지 — 정본이 새로 깔리거나 갱신된 세션에, 그 플러그인이 없을 때만 ---
+# --- deps-notice: 함께 쓰는 플러그인 확인 — 매 세션, 없을 때만, 건너뛸 이름은 skip 파일이 정한다 ---
 H30="$(mktemp -d)"; P30="$(mktemp -d)"
 OUT30a="$(run "$H30" "$P30")"
 OUT30b="$(run "$H30" "$P30")"
-# 갱신 재현: 전역 사본을 낡게 만들면 다음 세션에 정본이 다시 복사되므로 갱신 뒤 첫 세션과 같다.
-printf 'stale
-' > "$H30/.claude/disciplined-coder/agent-principles.md"
-OUT30c="$(run "$H30" "$P30")"
 H31="$(mktemp -d)"; P31="$(mktemp -d)"; mkdir -p "$H31/.claude/plugins"
-printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ] } }
+printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ], "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
 ' > "$H31/.claude/plugins/installed_plugins.json"
 OUT31="$(run "$H31" "$P31")"
-echo "[karpathy-nudge] karpathy plugin install nudge on install/update sessions only"
-check "fresh install: nudge names the plugin"   "printf '%s' \"\$OUT30a\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
-check "fresh install: nudge gives marketplace"  "printf '%s' \"\$OUT30a\" | grep -qF 'forrestchang/andrej-karpathy-skills'"
-# 넛지의 부재는 낱말 'karpathy' 로 보지 않는다. 정본이 카파시 지침의 출처를 밝히면서 그 낱말이
-# scaffold 가 찍는 알림에 섞이게 됐고, 그때부터 이 단언은 넛지와 무관하게 붉어졌다. 넛지가 뜰 때만
-# 나오는 고유 문자열인 설치 명령 줄을 본다.
-check "unchanged session: no nudge"             "! printf '%s' \"\$OUT30b\" | grep -qF 'claude plugin marketplace add'"
-check "updated canon: nudge again"              "printf '%s' \"\$OUT30c\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
-check "already installed: no nudge"             "! printf '%s' \"\$OUT31\" | grep -qF 'claude plugin marketplace add'"
-check "already installed: still scaffolds"      "[ -f '$H31/.claude/disciplined-coder/agent-principles.md' ]"
+# 건너뛰기: 첫 회차로 관리 디렉터리를 만든 뒤 이름 하나를 적고 다시 돌린다.
+H32="$(mktemp -d)"; P32="$(mktemp -d)"
+run "$H32" "$P32" >/dev/null
+printf 'superpowers
+' > "$H32/.claude/disciplined-coder/plugin-notice.skip"
+OUT32="$(run "$H32" "$P32")"
+echo "[deps-notice] 함께 쓰는 플러그인 알림"
+check "없으면 superpowers 를 알린다"       "printf '%s' \"\$OUT30a\" | grep -qF 'superpowers@claude-plugins-official'"
+check "없으면 카파시도 알린다"             "printf '%s' \"\$OUT30a\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
+check "카파시는 마켓플레이스를 함께 준다"  "printf '%s' \"\$OUT30a\" | grep -qF 'forrestchang/andrej-karpathy-skills'"
+# superpowers 는 공식 마켓플레이스라 추가 명령이 없다. 목록의 '-' 가 실제로 그 줄을 뺐는지 본다.
+check "superpowers 는 마켓플레이스 추가가 없다" "[ \$(printf '%s' \"\$OUT30a\" | grep -cF 'claude plugin marketplace add') -eq 1 ]"
+check "끄는 방법을 함께 알린다"            "printf '%s' \"\$OUT30a\" | grep -qF 'plugin-notice.skip'"
+check "둘째 세션에도 그대로 알린다"        "printf '%s' \"\$OUT30b\" | grep -qF 'superpowers@claude-plugins-official'"
+check "둘 다 깔렸으면 조용하다"            "! printf '%s' \"\$OUT31\" | grep -qF 'claude plugin install'"
+check "둘 다 깔렸어도 셋업은 돈다"         "[ -f '$H31/.claude/disciplined-coder/agent-principles.md' ]"
+check "skip 에 적힌 것은 안 알린다"        "! printf '%s' \"\$OUT32\" | grep -qF 'superpowers@claude-plugins-official'"
+check "skip 에 없는 것은 그대로 알린다"    "printf '%s' \"\$OUT32\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
 
 echo "[notice-encoding] user-facing notices are not double-encoded"
 check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COMMON\""
 
-# --- utf8-nudge: 사용자 환경 변수가 비었을 때만, 정본이 갱신된 첫 세션에만 ---
-# 매 세션 뜨면 세션 시작 알림 전체를 흘려보게 된다. 카파시 넛지와 같은 조건에 묶는다.
+# --- utf8-set: 변수가 비었을 때만 넣는다. 0 은 일부러 끈 것이라 손대지 않는다 ---
+# 레지스트리를 실제로 바꾸지 않도록 상태를 주입한다. 주입이 걸려 있으면 setter 가 실제 호출을
+# 건너뛰므로, 여기서 보는 것은 어느 상태에서 넣기로 판단하는가다.
 H22="$(mktemp -d)"; P22="$(mktemp -d)"
 OUT22a="$(DISCIPLINED_CODER_UTF8_STATE=unset run "$H22" "$P22")"
-OUT22b="$(DISCIPLINED_CODER_UTF8_STATE=unset run "$H22" "$P22")"
 H23="$(mktemp -d)"; P23="$(mktemp -d)"
-OUT23="$(DISCIPLINED_CODER_UTF8_STATE=set run "$H23" "$P23")"
-echo "[utf8-nudge] PYTHONUTF8 안내는 변수가 비었을 때 첫 세션에만"
-check "변수가 비면 첫 세션에 안내한다"   "printf '%s' \"\$OUT22a\" | grep -qF 'PYTHONUTF8'"
-check "둘째 세션에는 안내하지 않는다"    "! printf '%s' \"\$OUT22b\" | grep -qF 'PYTHONUTF8'"
-check "변수가 있으면 안내하지 않는다"    "! printf '%s' \"\$OUT23\" | grep -qF 'PYTHONUTF8'"
+OUT23="$(DISCIPLINED_CODER_UTF8_STATE=on run "$H23" "$P23")"
+H24="$(mktemp -d)"; P24="$(mktemp -d)"
+OUT24="$(DISCIPLINED_CODER_UTF8_STATE=off run "$H24" "$P24")"
+H25="$(mktemp -d)"; P25="$(mktemp -d)"
+OUT25="$(DISCIPLINED_CODER_UTF8_STATE=not-windows run "$H25" "$P25")"
+echo "[utf8-set] PYTHONUTF8 은 비었을 때만 넣는다"
+check "비면 넣고 넣었다고 알린다"     "printf '%s' \"\$OUT22a\" | grep -qF 'PYTHONUTF8=1 을 넣었다'"
+check "끄는 방법을 함께 알린다"       "printf '%s' \"\$OUT22a\" | grep -qF '0 으로 두면'"
+check "값이 있으면 조용하다"          "! printf '%s' \"\$OUT23\" | grep -qF 'PYTHONUTF8'"
+check "0 이면 손대지 않는다"          "! printf '%s' \"\$OUT24\" | grep -qF 'PYTHONUTF8'"
+check "윈도우가 아니면 조용하다"      "! printf '%s' \"\$OUT25\" | grep -qF 'PYTHONUTF8'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
