@@ -230,12 +230,21 @@ check "호출 종류별 고정표가 있다"        "grep -qF '| 호출 종류 |
 check "회차마다 다시 판단하지 않는다고 적는다" "grep -qF '회차마다 다시 판단하지 않는다' '$LR2'"
 check "문서 전체에 리스크로 렌즈를 고른다는 서술이 안 남아 있다" "! grep -qF '리스크' '$LR2'"
 
-echo "[audit-repo-docs — 걸음 여덟과 기록 넷]"
-PDA="$HERE/skills/audit-repo-docs/SKILL.md"
-PDA_ROWS="$(awk '/^## 걸음/{f=1;next} f&&/^## /{exit} f&&/^\| [^|-]/{n++} END{print n-1}' "$PDA")"
-PDA_SAID="$(LC_ALL=C.UTF-8 grep -oE '걸음은 [^ ]+이고' "$PDA" | head -1 | sed 's/걸음은 //; s/이고//')"
+echo "[걸음 개수] 표의 행 수와 '걸음은 N' 문장이 맞는다"
+# 대상을 손으로 적지 않고 문서에서 도출한다. '걸음은 N이고'를 담은 스킬을 모두 찾아 그 문장 뒤
+# 같은 절의 표 행 수와 맞댄다. 같은 꼴의 문서가 하나 늘면 이 검사가 저절로 그것을 본다(SSOT).
+# 전에는 audit-repo-docs 하나만 봤고, 같은 꼴인 review-specs 의 「절차」 표는 아무도 안 붙들어
+# 행을 더하면 조용히 낡았다.
 KO_NUM() { case "$1" in 하나) echo 1;; 둘) echo 2;; 셋) echo 3;; 넷) echo 4;; 다섯) echo 5;; 여섯) echo 6;; 일곱) echo 7;; 여덟) echo 8;; 아홉) echo 9;; 열) echo 10;; 열하나) echo 11;; 열둘) echo 12;; *) echo 0;; esac; }
-check "걸음 표의 행 수와 '걸음은 N' 문장이 맞는다" "[ \"\$PDA_ROWS\" = \"\$(KO_NUM \"\$PDA_SAID\")\" ]"
+STEP_DOCS="$(LC_ALL=C.UTF-8 grep -lE '걸음은 [^ ]+이고' "$HERE"/skills/*/SKILL.md || true)"
+check "걸음 문장을 담은 문서를 찾았다" "[ -n \"\$STEP_DOCS\" ]"
+for D in $STEP_DOCS; do
+  dn="$(basename "$(dirname "$D")")"
+  said="$(LC_ALL=C.UTF-8 grep -oE '걸음은 [^ ]+이고' "$D" | head -1 | sed 's/걸음은 //; s/이고//')"
+  rows="$(awk '!f && /걸음은 [^ ]+이고/ {f=1; next} f && /^## / {exit} f && /^\| [^|-]/ {n++} END{print (n>0 ? n-1 : 0)}' "$D")"
+  check "$dn 의 걸음 표 행 수와 '걸음은 $said' 가 맞는다" "[ \"$rows\" = \"\$(KO_NUM '$said')\" ]"
+done
+PDA="$HERE/skills/audit-repo-docs/SKILL.md"
 check "인용 확인 스크립트를 부른다"       "grep -qF 'audit_evidence.sh' '$PDA'"
 check "절차에 derived 가 안 남았다"            "! grep -qF 'derived' '$PDA'"
 check "절차의 표 대조가 진술 스크립트를 부른다" "grep -qF 'audit_statements.sh' '$PDA'"
