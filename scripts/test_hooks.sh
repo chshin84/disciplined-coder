@@ -297,7 +297,7 @@ echo "[python3-guard] 윈도우에서 안내판으로 풀리는 python3 만 막�
 # 상태를 주입해 OS 와 PATH 를 안 본다 — 그것이 없으면 CI(ubuntu)와 윈도우 PC 에서 결과가 갈린다.
 P3G="$HERE/hooks/python3_guard_pretooluse.sh"
 XCMD="$HERE/hooks/_extract_command.sh"
-REDIR="/c/Users/x/AppData/Local/Microsoft/WindowsApps/python3"
+REDIR="/c/Program Files/WindowsApps/Microsoft.DesktopAppInstaller_1.29.290.0_x64__8wekyb3d8bbwe/AppInstallerPythonRedirector.exe"
 JC() { printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$1"; }
 p3() { JC "$1" | DISCIPLINED_CODER_PYTHON3_STATE="${2:-$REDIR}" bash "$P3G"; }
 # 막아야 하는 것 — 명령어로 놓인 python3
@@ -318,6 +318,8 @@ N1="$(p3 'python3 --version' not-windows)"
 N2="$(p3 'python3 --version' none)"
 N3="$(p3 'python3 --version' /usr/bin/python3)"
 N4="$(p3 'python3 --version' /c/Users/x/AppData/Local/Programs/Python/Python312/python3)"
+# 스토어로 깐 진짜 파이썬도 WindowsApps 아래에 놓인다 — 경로가 아니라 링크가 가리키는 실물로 가른다.
+N5="$(p3 'python3 --version' '/c/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.12_x64/python3.exe')"
 deny() { printf '%s' "$1" | grep -q '"permissionDecision":"deny"'; }
 check "맨 앞의 python3 을 막는다"          "deny \"\$D1\""
 check "heredoc 을 여는 python3 을 막는다"  "deny \"\$D2\""
@@ -334,9 +336,10 @@ check "윈도우가 아니면 통과한다"           "[ -z \"\$N1\" ]"
 check "안 풀리면 통과한다"                 "[ -z \"\$N2\" ]"
 check "리눅스 경로면 통과한다"             "[ -z \"\$N3\" ]"
 check "실제 파이썬이면 통과한다"           "[ -z \"\$N4\" ]"
+check "스토어 파이썬이면 통과한다"         "[ -z \"\$N5\" ]"
 check "거부 응답이 JSON 으로 파싱된다"     "printf '%s' \"\$D1\" | json_valid_stdin"
 check "거부 사유가 부를 이름을 말한다"     "printf '%s' \"\$D1\" | grep -q 'py -3'"
-check "거부 사유가 풀리는 곳을 적는다"     "printf '%s' \"\$D1\" | grep -qF 'WindowsApps'"
+check "거부 사유가 가리키는 실물을 적는다" "printf '%s' \"\$D1\" | grep -qF 'AppInstallerPythonRedirector'"
 # 명령 뽑기 — 큰따옴표가 든 명령이 첫 \" 에서 잘리면 그 뒤의 명령어를 훅이 못 본다.
 EX1="$(printf '{"tool_input":{"command":"echo \\"a\\" && python3 x.py"}}' | bash "$XCMD")"
 check "따옴표가 든 명령을 끝까지 뽑는다"   "[ \"\$EX1\" = 'echo \"a\" && python3 x.py' ]"

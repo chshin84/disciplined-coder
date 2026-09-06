@@ -59,13 +59,13 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 ## 처분 — 호출자의 몫
 렌즈는 처분을 고르지 않는다. 처분 축이 맥락마다 다르고, 사용자를 멈춰 세울지는 호출자의 책임이다.
 
-- **spec 리뷰**(`review-specs`) — 메인 세션이 근거를 읽고 `🔴`와 "고칠 것"으로 가르며, `🔴`만 사용자에게 올린다. spec 리뷰에서는 결정 단계가 없다. 병합과 상충 감지까지만 한다.
+- **spec 리뷰**(`review-specs`) — 메인 세션이 근거를 읽고 `🔴`와 "고칠 것"으로 가르며, `🔴`만 사용자에게 올린다. spec 리뷰에서는 결정 단계가 없다. 「하는 일」의 세 걸음까지만 한다.
 - **제품 런타임**(`review-llm-calls`) — 제품 코드가 `type` 값으로 행동을 정하는 표를 갖는다. 상충이나 커버리지 공백이 있으면 사람에게 올린다.
 - **문서 검진**(`review-docs`)**과 레포 문서 감사**(`audit-repo-docs`) — 결정 없이 병합과 상충 감지와 커버리지 공백 표시까지만 하고, 그 목록을 각자의 기록에 적어 사용자에게 넘긴다.
 - **멀티에이전트 워크플로** — 호출자 스킬이 없으므로 워크플로를 짜는 세션이 직접 위 세 걸음을 따르고, 그 결과를 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-check.md`에 적는다.
 
 ## 출력 스키마
-`decision`과 `retry_count`는 런타임 전용이다. spec 리뷰에서는 결정 단계가 없으므로 이 둘을 내지 않고, 병합한 목록을 `review-specs`의 처분 절로 넘긴다.
+`decision`과 `retry_count`는 런타임 전용이다. spec 리뷰에서는 결정 단계가 없으므로 이 둘을 내지 않고, 병합한 목록을 `review-specs`의 「합치기」 절로 넘긴다.
 
 ```
 { "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "type": "...", "source": "<렌즈 리턴의 lens 값>", "where": "...", "claim": "...", "consequence": "...", "evidence": "..." } ], "retry_count": 0 }
@@ -79,18 +79,18 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 
 이 목록은 여기가 소유한다. 렌즈는 공통 계약의 칸 말고 자기 칸을 더할 수 있고, 더한 칸은 집계 대상이 아니다. 집계 항목이 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 렌즈가 돌려준 원본을 본다.
 
-| 칸 | 더하는 렌즈 | 무엇 |
+| 칸 | 더하는 쪽 | 담는 것 |
 |---|---|---|
 | `statements` | 문서별 호출 | 레포 문서 감사에서 그 문서가 정한 것의 목록이다. 항목은 `{topic, statement, evidence}` 셋이고, 요구하는 주체는 `audit-repo-docs`의 「진술 받기」 걸음이다 |
-| `target` | 문서별 호출 | 어느 문서의 진술인지를 아는 칸이다. 항목이 아니라 그 호출의 원본 파일이 진다 |
 | `search_status` | `lens-prior-art` | 검색이 제대로 돌았는지다. 빈 `issues`를 판정으로 써도 되는지를 이 값이 가른다 |
 | `citations` | `lens-prior-art` | 인용의 목록이다 |
 | `not_found` | `lens-prior-art` | 찾지 못한 것의 목록이다 |
 | `disclosures` | `lens-prior-art` | 렌즈가 스스로 밝히는 한계다 |
 | `purpose` | `lens-readability` | 그 문서의 목적 한 줄이다. 빈 `suggestions`를 판정으로 써도 되는지를 이 값이 가른다 |
-| `rewrite` | `lens-readability` | 고쳐 쓴 문장이다 |
-| `narrowed` | `lens-consistency` | 정당한 좁혀 적기로 판정한 짝이다 |
-| `pairs` | `lens-consistency` | 갈리는 짝의 목록이다 |
+| `rewrite` | `lens-readability` | 고친 것이다. 문장이든 옮긴 절이든 새로 쓴 문장이든 담고, 손대지 않는 요소에 걸리면 비운다 |
+| `doc_type` | `lens-fit` | 그 문서를 어느 타입으로 가렸는지다 |
+| `narrowed` | `lens-consistency` | 정당한 좁혀 적기로 판정한 짝의 개수다 |
+| `pairs` | `lens-consistency` | 짝마다의 판정이다 |
 
 `search_status`와 `purpose`는 집계본만 보고 넘어가면 조용한 통과가 생긴다. 그 둘은 호출자가 원본을 열어 확인한다.
 

@@ -5,8 +5,9 @@
 # 이것을 못 잡는다 — 환경이 갖춰졌는지가 아니라 부르는 순간의 문제라 그 명령을 세울 곳이 여기다.
 #
 # 세 곳에서 좁힌다. 윈도우가 아니면 python3 이 정상 이름이라 바로 통과시키고, 이름만 보고 막지 않고
-# 실제로 풀리는 실행 파일이 WindowsApps 아래인지 확인하며, 따옴표 안 문자열과 python312 같은 이름은
-# 안 잡는다. 그래서 끄는 스위치를 두지 않는다 — 정당한 python3 은 애초에 안 막힌다.
+# 링크를 따라간 실물이 안내판 자신인지 확인하며, 따옴표 안 문자열과 python312 같은 이름은 안 잡는다.
+# 경로에 WindowsApps 가 들었는지로 가르지 않는 것은 스토어로 깐 진짜 파이썬도 거기 놓이기 때문이다.
+# WindowsApps 의 python3.exe 는 실물을 가리키는 링크라 readlink 로 그 실물의 이름을 볼 수 있다.
 set -euo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
@@ -20,13 +21,16 @@ python3_target() {
     MINGW*|MSYS*|CYGWIN*) ;;
     *) printf 'not-windows'; return 0 ;;
   esac
-  command -v python3 2>/dev/null || printf 'none'
+  p="$(command -v python3 2>/dev/null || true)"
+  [ -n "$p" ] || { printf 'none'; return 0; }
+  # 링크를 끝까지 따라간다. 안내판은 링크이고 그 실물의 이름이 판정의 근거다.
+  readlink -f "$p" 2>/dev/null || printf '%s' "$p"
 }
 
 TARGET="$(python3_target)"
 case "$TARGET" in
-  *WindowsApps*) ;;
-  *) exit 0 ;;              # 맥·리눅스이거나, 안 풀리거나, 실제 파이썬으로 풀린다 — 훅의 일이 아니다
+  *AppInstallerPythonRedirector*) ;;
+  *) exit 0 ;;              # 맥·리눅스이거나, 안 풀리거나, 파이썬으로 풀린다 — 훅의 일이 아니다
 esac
 
 CMD="$(printf '%s' "$INPUT" | bash "$DIR/_extract_command.sh")"
@@ -64,7 +68,7 @@ END {
 ')"
 [ -n "$HIT" ] || exit 0
 
-reason="이 PC 에서 python3 은 파이썬이 아니다. 마이크로소프트 스토어로 보내는 안내판이라 'Python' 이라는 낱말만 찍고 종료 코드 49 로 끝나므로, 스크립트가 통째로 안 돌아도 성공처럼 보인다. python 이나 py -3 으로 부르라. python3 이 풀리는 곳: $TARGET"
+reason="이 PC 에서 python3 은 파이썬이 아니다. 마이크로소프트 스토어로 보내는 안내판이라 'Python' 이라는 낱말만 찍고 종료 코드 49 로 끝나므로, 스크립트가 통째로 안 돌아도 성공처럼 보인다. python 이나 py -3 으로 부르라. python3 이 가리키는 실물: $TARGET"
 esc="$(escape_for_json "$reason")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$esc"
 exit 0
