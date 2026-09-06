@@ -7,7 +7,7 @@ description: Claude Code 플러그인·마켓플레이스를 만들 때 참조�
 Claude Code 플러그인과 마켓플레이스를 만들고 배포하는 방법을 다룬다.
 
 ## 플러그인을 만들 때 지킬 것
-플러그인은 남의 PC 로 배포되는 것이라 값을 잘못 두면 그쪽에서 조용히 안 도는 일이 생긴다.
+플러그인은 남의 PC 로 배포되므로, 값을 잘못 두면 새 커밋이 그쪽에 안 실리거나 스킬이 안 열린다.
 
 - **version 비우기** — 활성 개발 중이면 plugin.json의 `version`을 비워 커밋 SHA 기반 자동 업데이트를 유지한다. version을 설정하면 업데이트가 버전 문자열 비교로 바뀌어, 값을 올리지 않는 한 새 커밋이 사용자에게 배포되지 않는다([plugins-reference의 Version management](https://code.claude.com/docs/en/plugins-reference#version-management)). `claude plugin validate`가 내는 version 경고는 수용한다.
 - **marketplace.json** — `.claude-plugin/marketplace.json`에 최상위 `name`·`description`·`owner`·`plugins[]`를 둔다. 레포 루트가 곧 플러그인이면 `source: "./"`로 가리킨다. `plugins[].description`은 `plugin.json`의 `description`과 글자 그대로 같게 둔다. 문안을 바꿀 때는 `plugin.json`을 고치고 마켓플레이스 항목을 따라 맞추며, 같은지는 `scripts/test_docs_drift.sh`가 확인한다.
@@ -20,7 +20,7 @@ Claude Code 플러그인과 마켓플레이스를 만들고 배포하는 방법�
 
 플러그인이 `~/.claude/settings.json`처럼 사용자가 손으로 관리하는 파일을 고쳐야 할 때가 있다. 이 레포는 마켓플레이스 자동 갱신을 켜느라 그 파일을 만진다(`scripts/_ensure_autoupdate.sh`). 아래를 지킨다.
 
-- OS 환경 변수는 물어서 넣는다. 이미 값이 있으면 건드리지 않는다. 넣은 값은 이미 열려 있는 창에 실리지 않고 다음에 여는 창부터 실린다는 것을 함께 알린다.
+- **환경 변수** — OS 환경 변수는 물어서 넣는다. 이미 값이 있으면 건드리지 않는다. 넣은 값은 이미 열려 있는 창에 실리지 않고 다음에 여는 창부터 실린다는 것을 함께 알린다.
 
 - **대상 좁히기** — 우리 것으로 식별되는 항목만 고친다. 남의 항목은 값이 같아도 손대지 않는다.
 - **사용자 결정 존중** — 사용자가 값을 넣어 둔 키는 덮지 않는다. 키가 아예 없을 때만 채운다.
