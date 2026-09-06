@@ -434,9 +434,9 @@ check "canon: no roll-call in the Korean section"    "! grep -qF '\`FAIL-LOUD\`�
 check "canon: no roll-call in the document section"  "! grep -qF '\`SSOT\`와 \`NAME-ITEMS\`와 \`EXPLICIT\`이 문서에도 그대로 걸리고' '$CANON'"
 check "canon: no roll-call in the code section"      "! grep -qF '\`FOCUSED\`와 \`SSOT\`와 \`EXPLICIT\`이 코드에 그대로 걸리고' '$CANON'"
 check "canon: old section name is gone everywhere"   "! grep -rqF '대화할 때' '$CANON' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/scripts/scaffold.sh'"
-# 조항 열넷의 목록은 이 파일이 소유한다. 정본에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
-# 조항이 하나 떨어져도 그 결손을 정답으로 굳힌다. 계획 문서의 「정본이 갖는 조항 열넷」 절과 같은 목록이다.
-for id in FAIL-LOUD FOCUSED EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
+# 조항 열다섯의 목록은 이 파일이 소유한다. 정본에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
+# 조항이 하나 떨어져도 그 결손을 정답으로 굳힌다.
+for id in FAIL-LOUD FOCUSED EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
   check "canon: clause $id present"                  "grep -qF '**\`$id\`' '$CANON'"
 done
 # 어제 카파시 절로 녹여 이름까지 뺀 다섯은 되살아나면 안 된다. 정본에서도 살아 있는 문서에서도 본다.

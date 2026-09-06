@@ -724,20 +724,35 @@ for f in "$HERE"/skills/*/SKILL.md; do
 done
 
 # --- 금지 표현: 살아 있는 문서에 남지 않는다 ---
-# 목록을 검사에 손으로 적지 않고 domain-korean 의 「금지 표현」 표에서 도출한다. 그 표가 정본이라
-# 낱말을 더하면 이 검사가 함께 따라온다. 대상에서 빼는 것이 둘이고 이유가 서로 다르다 —
-# domain-korean 자신은 그 낱말을 정의하는 정본이라 빼고, docs/superpowers/ 아래는 소비하고 지우는
-# 문서(spec·plan·인수인계)와 그때 찍은 기록(리뷰·되돌린 대응표)이라 살아 있는 문서가 아니어서 뺀다.
-# 뒤의 제외는 audit-repo-docs 의 「대상 아님」과 같은 규정이다.
-WK="$HERE/skills/domain-korean/SKILL.md"
-BANLIST="$(awk '/^## 금지 표현/{f=1; next} f && /^## /{exit} f' "$WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
-BAN_DOCS="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^skills/domain-korean/SKILL.md')"
+# 목록을 검사에 손으로 적지 않고 정본(agent-principles.md)의 「금지 표현」 표에서 도출한다. 그 표가
+# 목록의 소유자라 말을 더하면 이 검사가 함께 따라온다. 표를 스킬에서 정본으로 옮긴 이유는 스킬이
+# 열릴 때만 대화에 실려 답을 쓰는 동안 목록이 눈앞에 없었기 때문이다.
+#
+# 셋째 칸이 `문서와 답변` 인 행만 뽑는다. `답변` 인 행은 사용자에게 보내는 답에만 걸리고
+# hooks/reply_check_stop.sh 가 검사한다. 그 말들은 이 저장소의 문서에 아직 남아 있으므로 여기서
+# 걸면 돌아가는 문서 스물두 개를 한꺼번에 다시 써야 한다 — 그 결정은 사용자 몫으로 남겨 두었다.
+#
+# 대상에서 빼는 것이 셋이고 이유가 서로 다르다. 정본 자신은 그 말을 정의하는 표를 담아서 빼고,
+# domain-korean 은 각 항목이 어느 지적에서 나왔는지를 적으며 그 말을 이름으로 불러야 해서 빼며,
+# docs/superpowers/ 아래는 소비하고 지우는 문서(spec·plan·인수인계)와 그때 찍은 기록이라 살아 있는
+# 문서가 아니어서 뺀다. 마지막 제외는 audit-repo-docs 의 「대상 아님」과 같은 규정이다.
+WK="$HERE/agent-principles.md"
+# 표의 행만 본다. 절의 설명 문단에도 백틱이 들어 있어, 절 전체에서 뽑으면 그 문단의 경로와 칸 이름이
+# 금지어로 둔갑한다(2026-09-06 에 실제로 세 건이 그렇게 잡혔다). 그리고 첫 칸에서만 뽑는다 —
+# 대체어 칸에 백틱이 생겨도 금지어로 새지 않게 한다.
+BANROWS="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/ && /문서와 답변/' "$WK" || true)"
+BANLIST="$(printf '%s\n' "$BANROWS" | awk -F'|' '{print $2}' | grep -oE '`[^`]+`' | tr -d '`' || true)"
+BAN_DOCS="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^agent-principles.md$' | grep -v '^skills/domain-korean/SKILL.md$')"
 echo "[금지 표현] 살아 있는 문서에 남지 않는다"
 check "금지 목록을 정본에서 도출했다" "[ -n \"\$BANLIST\" ]"
 check "검사 대상 문서를 모았다"       "[ -n \"\$BAN_DOCS\" ]"
 # 앵커가 실제로 잡히는지 먼저 본다 — 목록이나 대상이 비면 아래 단언이 모두 근거 없이 통과한다.
-BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '금지 표현' skills/domain-korean/SKILL.md || true)"
+BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '### 금지 표현' agent-principles.md || true)"
 check "정본에 금지 표현 절이 있다"     "[ -n \"\$BAN_SELFTEST\" ]"
+# 답변에만 거는 행도 실제로 뽑히는지 본다. 이 행들이 사라지면 훅이 검사할 말이 없어지는데,
+# 훅은 조용히 통과하므로 그 소실을 알아챌 다른 신호가 없다.
+BANREPLY="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/' "$WK" | grep -E '\| *답변 *\|' || true)"
+check "답변에만 거는 행이 표에 있다"   "[ -n \"\$BANREPLY\" ]"
 BANHIT=""
 while IFS= read -r w; do
   [ -n "$w" ] || continue
