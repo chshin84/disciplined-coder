@@ -769,6 +769,61 @@ EOF
 [ -n "$BANHIT" ] && printf '    남은 금지 표현:%s
 ' "$BANHIT"
 
+# --- 대구 한도: `A가 아니라 B` 는 글 한 편에 한 번까지 ---
+# 규칙은 domain-korean 의 「대구 제한」이 소유한다. 사람 글 스물넷에서 0건인데 AI 글 스물넷에서
+# 스물일곱 건 나온 신호라 한도를 두었는데, 세는 곳이 없어 문서 여덟이 넘긴 채로 있었다.
+# 세는 대상에서 빼는 것이 넷이고 이유가 서로 다르다. frontmatter 의 description 은 본문이 아니고,
+# 「레퍼런스 프롬프트」 절은 서브에이전트로 실어 보내는 페이로드이며, 백틱 안은 규칙이 자기 형태를
+# 이름으로 부르는 곳이고, 양쪽이 따옴표로 묶인 짝은 다른 조항이 드는 예시다.
+# 문자 부류를 안 쓰고 (가|이) 로 가르는 것은, 로케일이 UTF-8 이 아니면 gawk 가 부류를 바이트로
+# 읽어 한글 한 자가 세 바이트로 흩어지기 때문이다. 갈라 적으면 로케일과 무관하게 맞는다.
+ANTI_SQ="'"
+anti_count() {  # $1=파일 경로 → 이 문서에 남은 대구의 개수
+  LC_ALL=C.UTF-8 awk -v sq="$ANTI_SQ" '
+    NR==1 && $0=="---" { fm=1; next }
+    fm==1 && $0=="---" { fm=2; next }
+    fm==1 { next }
+    /^## 레퍼런스 프롬프트/ { sk=1; next }
+    sk==1 && /^## / { sk=0 }
+    sk==1 { next }
+    {
+      line=$0
+      gsub(/`[^`]*`/, "", line)
+      gsub(sq "[^" sq "]*" sq "(가|이) 아니라 " sq "[^" sq "]*" sq, "", line)
+      c += gsub(/(가|이) 아니라/, "", line)
+    }
+    END { print c+0 }
+  ' "$1"
+}
+echo "[대구 한도] 글 한 편에 한 번까지"
+ANTI_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
+check "검사 대상 문서를 모았다" "[ -n \"\$ANTI_DOCS\" ]"
+# 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.
+ANTI_TMP="$(mktemp -d)"
+printf 'A가 아니라 B다.
+C이 아니라 D다.
+' > "$ANTI_TMP/two.md"
+check "둘이 든 문서를 둘로 센다" "[ \"\$(anti_count \"\$ANTI_TMP/two.md\")\" = 2 ]"
+# 제외 넷이 각각 빠지는지 본다. 하나라도 안 빠지면 정상인 문장이 계속 잡힌다.
+printf -- '---
+description: X가 아니라 Y
+---
+본문에 `A가 아니라 B` 리터럴.
+예시는 %s버릴 것%s이 아니라 %s버릴 연구%s다.
+## 레퍼런스 프롬프트
+- system: "P가 아니라 Q로 하라"
+' "$ANTI_SQ" "$ANTI_SQ" "$ANTI_SQ" "$ANTI_SQ" > "$ANTI_TMP/skip.md"
+check "제외 넷은 세지 않는다" "[ \"\$(anti_count \"\$ANTI_TMP/skip.md\")\" = 0 ]"
+ANTI_BAD=""
+for f in $ANTI_DOCS; do
+  anti_n="$(anti_count "$HERE/$f")"
+  [ "$anti_n" -gt 1 ] && ANTI_BAD="$ANTI_BAD [$f:$anti_n]"
+done
+[ -n "$ANTI_BAD" ] && printf '    한도를 넘긴 문서:%s
+' "$ANTI_BAD"
+check "한도를 넘긴 문서가 없다" "[ -z \"\$ANTI_BAD\" ]"
+rm -rf "$ANTI_TMP"
+
 # --- 리뷰·감사 기록은 찍은 뒤 고치지 않는다 ---
 # 기록은 그 회차에 무엇을 보았는지의 증거라, 뒤에 고치면 회차 사이 대조가 무너진다. 그래서 새 기록을
 # 더하는 것만 허용하고 있는 기록의 수정과 삭제는 거부한다. 경계 날짜는 이 규칙이 들어온 날이다 —
