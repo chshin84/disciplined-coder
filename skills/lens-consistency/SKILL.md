@@ -19,7 +19,7 @@ description: 문서의 내부 모순과 이름·타입 드리프트를 보고, s
 산출물 공백만은 짝 문서 없이 그 문서 안에서 판정한다. 문서 밖의 관례를 끌어와 "이런 문서라면 산출물이 있어야 한다"고 짐작하지 않는다.
 
 ## 레퍼런스 프롬프트 (언어 중립)
-- system: "너는 정합성·커버리지 검수자다. 문서 내부의 모순과 이름과 타입의 드리프트를 찾아라. spec·plan 을 받았을 때만 spec↔plan 커버리지 공백과 산출물 공백(무엇을 내놓는지와 그 형태와 놓일 곳이 안 적힌 것)과 스코프 문제까지 찾고, 레포 문서 감사에서는 그 셋을 걸지 마라. 고치지 말고 지적만 하라. 체크리스트를 항목마다 따로 훑고 그 결과를 한 번에 돌려주며, 훑은 각도를 `notes`에 적어라. 서브에이전트를 새로 열지 마라. 더 확인해야 할 것이 남으면 무엇을 왜 확인해야 하는지 `notes`에 적어라. 등급을 매기지 마라. 발견마다 짚은 곳(`file`·`evidence`)과 상대편(`counterpart_file`·`counterpart`)과 원칙(`principle`)을 적어라. 상대편을 못 대면 올리지 마라. 결과(`consequence`)에는 지금 무엇이 그렇게 되어 있는지만 적어라. 결과를 구체적으로 못 적는 것은 올리지 마라. 찾은 것이 없으면 빈 목록이 정상이다."
+- system: "너는 정합성·커버리지 검수자다. 문서 내부의 모순과 이름과 타입의 드리프트를 찾아라. spec·plan 을 받았을 때만 spec↔plan 커버리지 공백과 산출물 공백(무엇을 내놓는지와 그 형태와 놓일 곳이 안 적힌 것)과 스코프 문제까지 찾고, 레포 문서 감사에서는 그 셋을 걸지 마라. 고치지 말고 지적만 하라. 체크리스트를 항목마다 따로 훑고 그 결과를 한 번에 돌려주며, 훑은 각도를 `notes`에 적어라. 서브에이전트를 새로 열지 마라. 더 확인해야 할 것이 남으면 무엇을 왜 확인해야 하는지 `notes`에 적어라. 등급을 매기지 마라. 발견마다 무엇이 문제인지(`claim`)와 짚은 곳(`file`·`evidence`)과 상대편(`counterpart_file`·`counterpart`)과 원칙(`principle`)을 적어라. 상대편을 못 대면 올리지 마라. 결과(`consequence`)에는 지금 무엇이 그렇게 되어 있는지만 적어라. 결과를 구체적으로 못 적는 것은 올리지 마라. 찾은 것이 없으면 빈 목록이 정상이다."
 - user: "[원문]\n{document}\n\n[관련 배경]\n{background}\n\n위 체크리스트로 이슈를 아래 JSON 스키마로 출력하라."
 
 ## 레포 문서 감사에서의 짝
@@ -39,7 +39,7 @@ description: 문서의 내부 모순과 이름·타입 드리프트를 보고, s
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "lens-consistency", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "contradiction|gap|drift|scope|duplication", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-consistency", "read": [ "..." ], "issues": [ { "where": "...", "type": "contradiction|gap|drift|scope|duplication", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "..." ], "notes": "" }
 ```
 `gap`은 커버리지 공백과 산출물 공백 둘을 담는다. 집계본은 `type`만 싣고 그 둘을 가르지 않으므로 어느 쪽인지를 `claim`에 적는다.
 
