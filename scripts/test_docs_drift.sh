@@ -145,7 +145,9 @@ check "표현만 다듬었으면 건너뛴다"            "grep -qF '골랐을 �
 check "건너뛰면 알린다"                       "grep -qF '건너뛰었다고 한 줄 알린다' \"\$DOCS\""
 
 echo "[한 번만 띄우므로 지킬 것 — 소유자와 여섯 렌즈 프롬프트]"
-check "dispatching-lenses가 그 규칙의 소유자다" "grep -A1 -F '## 한 번만 띄우는 렌즈의 규율' \"\$DISP\" | grep -qF '여기가 소유자다'"
+# 선언 문구는 「소유 표」 블록이 정한 한 꼴을 쓴다. 옛 꼴('여기가 소유자다')로 되돌아가면 그 절이
+# 소유 표에서 빠지므로 여기서도 함께 빨개진다.
+check "dispatching-lenses가 그 규칙의 소유자다" "grep -A1 -F '## 한 번만 띄우는 렌즈의 규율' \"\$DISP\" | grep -qF '여기가 소유한다'"
 check "중첩 금지를 적는다"                    "grep -qF '렌즈는 서브에이전트를 새로 열지 않는다' \"\$DISP\""
 check "이어 묻기를 적는다"                    "grep -qF '대화 턴을' \"\$DISP\""
 check "3층 오케스트레이션 예외를 적는다"      "grep -qF '3층 오케스트레이션은 이 금지의 예외다' \"\$DISP\""
@@ -276,6 +278,53 @@ for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestratio
     check "$dn 이 규율을 베끼지 않는다: $m" "! grep -qF -- '$m' '$D'"
   done
 done
+
+echo "[소유 표] 소유는 하나뿐이고 나머지는 가리킨다"
+# 소유 선언을 데이터 파일에 적지 않고 문서에서 도출한다. 자기 소유를 밝히는 문장은
+# 「이 <무엇>은 여기가 소유한다」 한 꼴이고, 그 문장이 놓인 절 제목이 소유 표의 키다. 다른 절을
+# 가리키는 문장은 이 꼴을 쓰지 않으므로 포인터가 소유자로 잡히지 않는다.
+# 전에는 「렌즈에게 정본을 알리는 법」 하나에만 이 검사가 걸렸고 가리킬 문서 셋도 손으로 적혀
+# 있었다. 넷째 문서가 복제하면 검사가 지나쳤다. 이제 소유자도 대상도 도출한다(SSOT).
+OWN_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
+check "소유 검사 대상 문서를 모았다" "[ -n \"\$OWN_DOCS\" ]"
+OWN_TSV=""
+for od in $OWN_DOCS; do
+  OWN_TSV="$OWN_TSV$(awk -v file="$od" '
+    /^#{1,3} / { title=$0; sub(/^#+ /, "", title) }
+    /여기가 소유한다/ { if (title != "") print title "\t" file }' "$HERE/$od")
+"
+done
+OWN_TSV="$(printf '%s' "$OWN_TSV" | grep -v '^$' | sort || true)"
+check "소유 선언을 뽑았다" "[ -n \"\$OWN_TSV\" ]"
+# 앵커 자가시험 — 목록이 비면 아래 단언이 모두 근거 없이 통과한다.
+check "알려진 소유자가 표에 있다" "printf '%s' \"\$OWN_TSV\" | grep -qF '한 번만 띄우는 렌즈의 규율'"
+OWN_DUP="$(printf '%s' "$OWN_TSV" | cut -f1 | sort | uniq -d || true)"
+[ -n "$OWN_DUP" ] && printf '    둘 이상이 소유한 절:%s\n' "$(printf '%s' "$OWN_DUP" | tr '\n' ' ')"
+check "같은 절을 둘 이상이 소유하지 않는다" "[ -z \"\$OWN_DUP\" ]"
+OWN_BAD=""
+while IFS="$(printf '\t')" read -r otitle oowner; do
+  [ -n "$otitle" ] || continue
+  case "$oowner" in
+    skills/*/SKILL.md) oname="$(basename "$(dirname "$oowner")")" ;;
+    *) oname="$(basename "$oowner")" ;;
+  esac
+  for og in $OWN_DOCS; do
+    [ "$og" = "$oowner" ] && continue
+    # 파일이 아니라 그 줄을 본다. 파일 단위로 보면 소유자를 다른 데서 한 번 부른 문서가 이 줄에서
+    # 포인터를 빠뜨려도 통과한다.
+    while IFS= read -r oline; do
+      [ -n "$oline" ] || continue
+      printf '%s' "$oline" | grep -qF "$oname" && continue
+      OWN_BAD="$OWN_BAD [$og→「$otitle」]"; break
+    done <<INNER
+$(grep -F "「$otitle」" "$HERE/$og" || true)
+INNER
+  done
+done <<EOF
+$OWN_TSV
+EOF
+[ -n "$OWN_BAD" ] && printf '    소유자를 안 가리키고 절 이름만 담은 곳:%s\n' "$OWN_BAD"
+check "절 이름을 담은 문서가 소유자를 가리킨다" "[ -z \"\$OWN_BAD\" ]"
 
 echo "[첫 문장] 소제목 아래 첫 줄이 산문이다"
 # READ-FLOW 가 "소제목 바로 아래 첫 문장에 그 절의 결론을 적는다"고 정하는데 재는 곳이 없었다.

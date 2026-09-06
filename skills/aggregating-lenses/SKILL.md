@@ -17,7 +17,7 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 - **커버리지 공백** — 리스크에 비추어 봤어야 할 렌즈를 아무도 안 봤으면 그 렌즈를 더 부르라고 권한다.
 
 ## 리뷰 산출물 계약 (렌즈 공통)
-이 계약은 여기가 SSOT다. 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.
+이 계약은 여기가 소유한다. 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.
 
 ```
 { "lens": "lens-grounding|lens-fit|lens-consistency|lens-adversarial|lens-prior-art|lens-readability",
@@ -53,7 +53,7 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 ## 공통 계약의 예외
 `lens-readability`와 `lens-prior-art`는 빠지는 칸이 서로 달라 예외마다 따로 적는다.
 
-- `lens-readability` — 맞댈 상대편이 없어 위 공통 계약을 따르지 않는다. 산출물이 `issues`가 아니라 `suggestions`이고, 항목의 칸이 `where`·`why`·`rewrite` 셋이며 `type`·`claim`·`consequence`·`evidence`가 없다. 발견이 아니라 제안이라 「집계」·「상충 감지」·「커버리지 공백」 어디에도 들어가지 않는다. 스키마의 상세는 `skills/lens-readability/SKILL.md`가 정본이다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`·`consequence`.
+- `lens-readability` — 맞댈 상대편이 없어 위 공통 계약을 따르지 않는다. 산출물이 `issues`가 아니라 `suggestions`이고, 항목의 칸이 `where`·`why`·`rewrite` 셋이며 `type`·`claim`·`consequence`·`evidence`가 없다. 발견이 아니라 제안이라 「집계」·「상충 감지」·「커버리지 공백」 어디에도 들어가지 않는다. 스키마의 상세는 `skills/lens-readability/SKILL.md`가 소유한다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`·`consequence`.
 - `lens-prior-art` — 맞댈 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다. `evidence`는 인용이나 경로나 URL 이고, 인용 검증은 호출자(`review-specs`)가 자기 도구로 한다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`.
 
 ## 처분 — 호출자의 몫
@@ -77,7 +77,7 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 
 ## 렌즈가 더하는 칸
 
-이 절이 덧붙임 칸의 목록을 소유한다. 렌즈는 공통 계약의 칸 말고 자기 칸을 더할 수 있고, 더한 칸은 집계 대상이 아니다. 집계 항목이 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 렌즈가 돌려준 원본을 본다.
+이 목록은 여기가 소유한다. 렌즈는 공통 계약의 칸 말고 자기 칸을 더할 수 있고, 더한 칸은 집계 대상이 아니다. 집계 항목이 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 렌즈가 돌려준 원본을 본다.
 
 | 칸 | 더하는 렌즈 | 무엇 |
 |---|---|---|

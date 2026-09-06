@@ -411,7 +411,9 @@ check "절차의 표 대조가 이 스크립트를 부른다" "grep -qF 'audit_t
 echo "[안내 문서 — 실행체가 사라진 것을 반영한다]"
 check "CLAUDE.md 가 감사 기록 봉인을 적는다"  "grep -qF '봉인' '$HERE/CLAUDE.md'"
 check "CLAUDE.md 가 읽기 전용 거부를 적는다"  "grep -qF '읽기 전용' '$HERE/CLAUDE.md'"
-check "CLAUDE.md 가 훅 목록의 정본을 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -F 'README.md' '$HERE/CLAUDE.md' | grep -qF '정본'"
+# 「정본」은 agent-principles.md 그 파일 하나를 가리키는 말로 두고, 어떤 사실의 소유자를 가리킬
+# 때는 「소유한다」를 쓴다. 한 낱말에 뜻이 둘이면 소유 표 도출이 포인터를 소유자로 센다.
+check "CLAUDE.md 가 훅 목록의 소유자를 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -F 'README.md' '$HERE/CLAUDE.md' | grep -qF '소유한다'"
 check "CLAUDE.md 가 훅 개수를 세지 않는다" \
   "! grep -qE '훅 (한|하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)' '$HERE/CLAUDE.md' && ! grep -qE '(하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)(개|가지)?(의)? 훅' '$HERE/CLAUDE.md' && ! grep -qE '훅 [0-9]+개' '$HERE/CLAUDE.md' && ! grep -qE '[0-9]+ ?개의 훅' '$HERE/CLAUDE.md'"
 
