@@ -749,10 +749,10 @@ check "검사 대상 문서를 모았다"       "[ -n \"\$BAN_DOCS\" ]"
 # 앵커가 실제로 잡히는지 먼저 본다 — 목록이나 대상이 비면 아래 단언이 모두 근거 없이 통과한다.
 BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '### 금지 표현' agent-principles.md || true)"
 check "정본에 금지 표현 절이 있다"     "[ -n \"\$BAN_SELFTEST\" ]"
-# 답변에만 거는 행도 실제로 뽑히는지 본다. 이 행들이 사라지면 훅이 검사할 말이 없어지는데,
-# 훅은 조용히 통과하므로 그 소실을 알아챌 다른 신호가 없다.
-BANREPLY="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/' "$WK" | grep -E '\| *답변 *\|' || true)"
-check "답변에만 거는 행이 표에 있다"   "[ -n \"\$BANREPLY\" ]"
+# 답과 산출물에만 거는 행도 실제로 뽑히는지 본다. 이 행들이 사라지면 훅 둘이 검사할 말이
+# 없어지는데, 그 훅들은 조용히 통과하므로 소실을 알아챌 다른 신호가 없다.
+BANREPLY="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/' "$WK" | grep -F '| 답변과 산출물 |' || true)"
+check "답과 산출물에만 거는 행이 표에 있다" "[ -n \"\$BANREPLY\" ]"
 BANHIT=""
 while IFS= read -r w; do
   [ -n "$w" ] || continue

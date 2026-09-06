@@ -372,11 +372,39 @@ check "기록이 없으면 조용히 통과한다"       "[ -z \"\$(rc \"\$(rcj 
 check "스위치를 끄면 통과한다"              "[ -z \"\$(DISCIPLINED_CODER_REPLY_CHECK=off rc \"\$(rcj false '$RCT/rc_hit.jsonl')\")\" ]"
 # 정본이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.
 FAKE="$T/fake"; mkdir -p "$FAKE/hooks" "$FAKE/scripts"
-cp "$RC" "$HERE/hooks/_json_escape.sh" "$FAKE/hooks/"
+cp "$RC" "$HERE/hooks/_json_escape.sh" "$HERE/hooks/_banned_words.sh" "$FAKE/hooks/"
 cp "$HERE/scripts/_json_valid.sh" "$FAKE/scripts/"
 RC_NOCANON="$(printf '%s' "$(rcj false "$RCT/rc_hit.jsonl")" | bash "$FAKE/hooks/reply_check_stop.sh")"
 check "정본이 없으면 알린다"                "printf '%s' \"\$RC_NOCANON\" | grep -qF 'systemMessage'"
 check "정본이 없을 때 막지는 않는다"        "! printf '%s' \"\$RC_NOCANON\" | grep -qF '\"decision\"'"
+
+echo "[산출물 차단 — 산출물 문서의 금지 표현을 거부한다]"
+# 대상을 가리는 규칙이 넷이라(확장자·저장소 자신·메모리·설계 문서) 규칙마다 픽스처를 둔다.
+# 경로만 다르고 본문은 같은 것을 쓴다 — 갈리는 것이 경로 하나임을 검사가 보이게 한다.
+DW="$HERE/hooks/doc_word_pretooluse.sh"
+DWBODY='확인이 이루어지는 자리는 절차의 마지막이다. 다음 걸음을 정해 달라.'
+DWCLEAN='확인이 이루어지는 단계는 절차의 마지막이다. 다음 단계를 정해 달라.'
+DWQUOTE='표의 `자리` 행과 `걸음` 행을 그대로 두었다.'
+dwj() { printf '{"tool_input":{"file_path":"%s","content":"%s"}}' "$1" "$2"; }
+dwe() { printf '{"tool_input":{"file_path":"%s","old_string":"옛 문장","new_string":"%s"}}' "$1" "$2"; }
+dw() { printf '%s' "$1" | bash "$DW"; }
+DWDIR="$T/deliv"; mkdir -p "$DWDIR/docs/superpowers/specs" "$DWDIR/sub"
+# 저장소 자신으로 보이게 하는 픽스처 — 조상 폴더에 정본이 있으면 대상에서 빠진다.
+DWREPO="$T/fakerepo"; mkdir -p "$DWREPO/skills"; : > "$DWREPO/agent-principles.md"
+DW_HIT="$(dw "$(dwj "$DWDIR/report.md" "$DWBODY")")"
+check "산출물의 금지 표현을 거부한다"       "printf '%s' \"\$DW_HIT\" | grep -qF '\"permissionDecision\":\"deny\"'"
+check "거부 응답이 JSON 으로 파싱된다"       "printf '%s' \"\$DW_HIT\" | json_valid_stdin"
+check "거부 사유가 걸린 말을 적는다"         "printf '%s' \"\$DW_HIT\" | grep -qF '자리'"
+check "거부 사유가 대체어를 적는다"          "printf '%s' \"\$DW_HIT\" | grep -qF '단계'"
+check "Edit 의 새 본문도 본다"               "printf '%s' \"\$(dw \"\$(dwe '$DWDIR/report.md' '$DWBODY')\")\" | grep -qF 'deny'"
+check "금지 표현이 없으면 통과한다"          "[ -z \"\$(dw \"\$(dwj '$DWDIR/report.md' '$DWCLEAN')\")\" ]"
+check "백틱 안은 안 잡는다"                  "[ -z \"\$(dw \"\$(dwj '$DWDIR/report.md' '$DWQUOTE')\")\" ]"
+check "md 가 아니면 통과한다"                "[ -z \"\$(dw \"\$(dwj '$DWDIR/report.txt' '$DWBODY')\")\" ]"
+check "저장소 자신의 문서는 통과한다"        "[ -z \"\$(dw \"\$(dwj '$DWREPO/skills/x.md' '$DWBODY')\")\" ]"
+check "메모리는 통과한다"                    "[ -z \"\$(dw \"\$(dwj '$T/.claude/projects/p/memory/m.md' '$DWBODY')\")\" ]"
+check "설계 문서는 통과한다"                 "[ -z \"\$(dw \"\$(dwj '$DWDIR/docs/superpowers/specs/s.md' '$DWBODY')\")\" ]"
+check "스위치를 끄면 통과한다"               "[ -z \"\$(DISCIPLINED_CODER_REPLY_CHECK=off dw \"\$(dwj '$DWDIR/report.md' '$DWBODY')\")\" ]"
+check "경로가 없으면 통과한다"               "[ -z \"\$(dw '{}')\" ]"
 
 echo "[README — 배선된 스크립트를 모두 적는다]"
 # 훅이 일곱인데 안내 문서가 넷만 적고 있었다. 목록을 README 에 손으로 적지 않고 배선 파일 둘에서

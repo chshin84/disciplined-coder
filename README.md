@@ -45,7 +45,7 @@ done
 
 ## 하드 게이트와 넛지와 전역 설정 수정
 
-세션에는 턴 종료를 막는 하드 게이트 하나와 답변을 고쳐 다시 내보내게 하는 되돌림 하나와 차단 둘과 넛지 넷과 전역 설정 수정 하나가 걸리고, 세션 시작에 함께 쓰는 플러그인 설치 권유와 파이썬 인코딩 변수 설정 둘이 걸린다. 차단 둘은 읽기 전용 파일 수정과 스토어 안내판으로 풀리는 `python3` 호출이다. 게이트와 넛지 다섯은 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 다 꺼진다. 되돌림은 그 변수와 무관하고 `DISCIPLINED_CODER_REPLY_CHECK=off` 로 따로 끈다 — 정본의 금지 표현 표를 고치다가 그 표가 검사 대상에 걸리는 일을 피하려고 통로를 나눠 두었다. 차단 둘과 세션 시작의 그 둘도 그 변수와 무관하고, 규칙 넛지 표시를 지우는 세션 시작 훅도 그렇다. 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
+세션에는 턴 종료를 막는 하드 게이트 하나와 답변을 고쳐 다시 내보내게 하는 되돌림 하나와 차단 셋과 넛지 넷과 전역 설정 수정 하나가 걸리고, 세션 시작에 함께 쓰는 플러그인 설치 권유와 파이썬 인코딩 변수 설정 둘이 걸린다. 차단 셋은 읽기 전용 파일 수정과 스토어 안내판으로 풀리는 `python3` 호출과 금지 표현이 든 산출물 문서 쓰기다. 게이트와 넛지 다섯은 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 다 꺼진다. 되돌림과 산출물 차단은 그 변수와 무관하고 `DISCIPLINED_CODER_REPLY_CHECK=off` 로 함께 끈다 — 둘이 같은 표를 보는 같은 규칙이라 스위치를 하나로 두었고, 정본의 금지 표현 표를 고치다가 그 표가 검사 대상에 걸리는 일을 피하려고 리뷰 게이트와는 통로를 나눠 두었다. 나머지 차단 둘과 세션 시작의 그 둘도 그 변수와 무관하고, 규칙 넛지 표시를 지우는 세션 시작 훅도 그렇다. 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
 
 이 목록은 여기가 소유한다. 배선은 둘이다. `hooks/hooks.json`은 이 플러그인이 어디서나 거는 훅이고, `.claude/settings.json`은 이 저장소에서만 도는 프로젝트 훅이다. 걸린 것은 아래가 전부다.
 
@@ -56,6 +56,7 @@ done
 | SessionStart | `hooks/rules_nudge_sessionstart.sh` | 이 세션의 규칙 넛지 표시를 지워 다시 알리게 한다 |
 | PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 걸린 Write 와 Edit 을 사유와 함께 거부한다 |
 | PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md` 에 문서 양식 넛지를 띄운다 |
+| PreToolUse | `hooks/doc_word_pretooluse.sh` | 산출물 `.md` 에 금지 표현이 들어가면 거부한다 |
 | PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 세션의 첫 파일 편집 전에 정본 사본의 절대경로와 `domain-korean` 을 알린다 |
 | PreToolUse | `hooks/python3_guard_pretooluse.sh` | 윈도우에서 `python3` 이 스토어 안내판으로 풀릴 때 그 Bash 명령을 거부한다 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan 을 감지해 리뷰를 지시한다 |
@@ -67,6 +68,7 @@ done
 
 - **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고 `review-specs` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 종료 차단이 해제된다. 차단은 턴에 한 번이다. 두 번째 종료 시도는 통과하므로 리뷰를 하지 않고도 턴을 끝낼 수 있다. 상세는 `skills/review-specs/SKILL.md`를 참고한다.
 - **답변 되돌림** — 답을 마칠 때 그 답의 산문을 정본의 「금지 표현」 표와 맞춰 보고, 걸린 말이 있으면 무엇을 무엇으로 고칠지와 함께 그 답을 다시 쓰게 한다. 코드 블록과 백틱 안은 검사하지 않는다. 파일 내용과 식별자를 인용한 것까지 걸면 거짓 지적이 되기 때문이다. 되돌림은 한 답에 한 번이고 두 번째 종료 시도는 통과하므로 대화가 멈추지 않는다. 문서를 검사하는 `scripts/test_docs_drift.sh`가 저장소의 `.md` 파일만 보고 사용자가 읽는 답에는 안 걸려서 생긴 훅이다.
+- **산출물 차단** — 사용자가 요구한 산출물 문서를 쓰려 할 때 그 본문을 정본의 「금지 표현」 표와 대조하고, 걸린 말이 있으면 무엇을 무엇으로 고칠지와 함께 거부한다. 대상은 `.md` 이고 셋을 뺀다. 이 플러그인 저장소 자신의 문서(조상 폴더에 정본이 있는 파일)와 Claude 메모리(`/.claude/projects/` 아래)와 `docs/superpowers/` 아래다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 문서에 적어야 하면 백틱으로 감싼다. 발표자료와 워드 파일은 파이썬으로 만들어 이 훅에 안 걸리고 `lens-readability` 검진이 맡는다.
 - **읽기 전용 차단** — 읽기 전용 속성이 선 파일에 `Write`나 `Edit`을 하려 하면 거부하고 사유를 보인다. 어느 프로젝트의 어느 파일이든 속성만 보며, 이 레포의 감사 기록은 만든 직후 `scripts/seal_reviews.sh`가 그 속성을 세운다. 풀려면 속성을 풀면 된다.
 - **`python3` 차단** — 윈도우에서 `python3`이 스토어 안내판(`AppInstallerPythonRedirector.exe`)으로 풀릴 때만 그 Bash 명령을 거부하고 `python`이나 `py -3`을 쓰라고 알린다. 안내판은 `Python`이라는 낱말만 찍고 종료 코드 49로 끝나 성공처럼 보이므로, 스크립트가 통째로 안 돌아도 눈에 안 띈다. 이름을 보지 않고 링크를 따라간 실물의 이름을 본다. 경로에 `WindowsApps`가 들었는지로 가르지 않는 것은 스토어로 깐 진짜 파이썬도 거기 놓이기 때문이다. 맥과 리눅스에서는 걸리지 않는다. 환경 변수 `DISCIPLINED_CODER_PYTHON3_STATE`에 값을 넣으면 그 값이 판정을 대신한다. 시험이 상태를 주입하려고 둔 통로이고 `not-windows`를 넣으면 이 차단이 통째로 꺼진다.
 - **문서 넛지 셋** — 차단하지 않고 안내만 한다. spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 정본의 「문서를 쓰고 관리할 때」로 타입과 수명을 가리게 하며 README라면 `domain-readme`를 함께 가리키고, `.md`를 고치면 `review-docs`의 검진과 정본의 Surgical Changes를 권한다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
