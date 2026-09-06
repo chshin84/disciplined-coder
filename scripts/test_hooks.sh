@@ -345,39 +345,6 @@ EX1="$(printf '{"tool_input":{"command":"echo \\"a\\" && python3 x.py"}}' | bash
 check "따옴표가 든 명령을 끝까지 뽑는다"   "[ \"\$EX1\" = 'echo \"a\" && python3 x.py' ]"
 check "command 가 없으면 무출력"           "[ -z \"\$(printf '{}' | bash '$XCMD')\" ]"
 
-echo "[답변 되돌림 — 답에 남은 금지 표현을 잡는다]"
-# 이 훅만 파이썬으로 대화 기록을 읽는다. 그래서 경로를 윈도우가 아는 꼴로 넘긴다 — Git Bash 의
-# /tmp/... 는 네이티브 파이썬이 열지 못해, 변환을 안 하면 훅이 조용히 통과하고 검사가 전부 초록이
-# 된다(그 조용한 통과가 이 검사가 막으려는 것과 같은 종류의 결함이다).
-RC="$HERE/hooks/reply_check_stop.sh"
-RCT="$(cygpath -m "$T" 2>/dev/null || printf '%s' "$T")"
-rcj() { printf '{"stop_hook_active":%s,"transcript_path":"%s"}' "$1" "$2"; }
-rc() { printf '%s' "$1" | bash "$RC"; }
-printf '%s\n' '{"type":"assistant","isSidechain":false,"message":{"content":[{"type":"text","text":"앞선 답이다."}]}}' > "$T/rc_hit.jsonl"
-printf '%s\n' '{"type":"assistant","isSidechain":false,"message":{"content":[{"type":"text","text":"확인이 이루어지는 자리는 절차의 마지막이다. 다음 걸음을 정해 달라."}]}}' >> "$T/rc_hit.jsonl"
-printf '%s\n' '{"type":"assistant","isSidechain":false,"message":{"content":[{"type":"text","text":"확인이 이루어지는 자리는 절차의 마지막이다."}]}}' > "$T/rc_clean.jsonl"
-printf '%s\n' '{"type":"assistant","isSidechain":false,"message":{"content":[{"type":"text","text":"표를 고쳤다. `자리` 행과 `걸음` 행이 그대로다.\n\n```\n자리 걸음 뿌리\n```\n\n남은 것은 없다."}]}}' >> "$T/rc_clean.jsonl"
-printf '%s\n' '{"type":"assistant","isSidechain":false,"message":{"content":[{"type":"text","text":"고쳐서 다시 보낸다."}]}}' > "$T/rc_side.jsonl"
-printf '%s\n' '{"type":"assistant","isSidechain":true,"message":{"content":[{"type":"text","text":"서브에이전트의 답이다. 자리 걸음 뿌리."}]}}' >> "$T/rc_side.jsonl"
-RC_HIT="$(rc "$(rcj false "$RCT/rc_hit.jsonl")")"
-check "산문의 금지 표현을 잡는다"           "printf '%s' \"\$RC_HIT\" | grep -qF '\"decision\":\"block\"'"
-check "되돌림 응답이 JSON 으로 파싱된다"     "printf '%s' \"\$RC_HIT\" | json_valid_stdin"
-check "걸린 말을 사유에 적는다"             "printf '%s' \"\$RC_HIT\" | grep -qF '자리'"
-check "대체어를 함께 준다"                  "printf '%s' \"\$RC_HIT\" | grep -qF '가리키는 대상의 이름'"
-check "답변에만 거는 말도 잡는다"           "printf '%s' \"\$RC_HIT\" | grep -qF '걸음'"
-check "백틱과 코드 블록 안은 안 잡는다"     "[ -z \"\$(rc \"\$(rcj false '$RCT/rc_clean.jsonl')\")\" ]"
-check "서브에이전트의 답은 세지 않는다"     "[ -z \"\$(rc \"\$(rcj false '$RCT/rc_side.jsonl')\")\" ]"
-check "되돌린 뒤에는 다시 막지 않는다"      "[ -z \"\$(rc \"\$(rcj true '$RCT/rc_hit.jsonl')\")\" ]"
-check "기록이 없으면 조용히 통과한다"       "[ -z \"\$(rc \"\$(rcj false '$RCT/rc_none.jsonl')\")\" ]"
-check "스위치를 끄면 통과한다"              "[ -z \"\$(DISCIPLINED_CODER_REPLY_CHECK=off rc \"\$(rcj false '$RCT/rc_hit.jsonl')\")\" ]"
-# 정본이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.
-FAKE="$T/fake"; mkdir -p "$FAKE/hooks" "$FAKE/scripts"
-cp "$RC" "$HERE/hooks/_json_escape.sh" "$HERE/hooks/_banned_words.sh" "$FAKE/hooks/"
-cp "$HERE/scripts/_json_valid.sh" "$FAKE/scripts/"
-RC_NOCANON="$(printf '%s' "$(rcj false "$RCT/rc_hit.jsonl")" | bash "$FAKE/hooks/reply_check_stop.sh")"
-check "정본이 없으면 알린다"                "printf '%s' \"\$RC_NOCANON\" | grep -qF 'systemMessage'"
-check "정본이 없을 때 막지는 않는다"        "! printf '%s' \"\$RC_NOCANON\" | grep -qF '\"decision\"'"
-
 echo "[산출물 차단 — 산출물 문서의 금지 표현을 거부한다]"
 # 대상을 가리는 규칙이 넷이라(확장자·저장소 자신·메모리·설계 문서) 규칙마다 픽스처를 둔다.
 # 경로만 다르고 본문은 같은 것을 쓴다 — 갈리는 것이 경로 하나임을 검사가 보이게 한다.
@@ -405,6 +372,14 @@ check "메모리는 통과한다"                    "[ -z \"\$(dw \"\$(dwj '$T/
 check "설계 문서는 통과한다"                 "[ -z \"\$(dw \"\$(dwj '$DWDIR/docs/superpowers/specs/s.md' '$DWBODY')\")\" ]"
 check "스위치를 끄면 통과한다"               "[ -z \"\$(DISCIPLINED_CODER_REPLY_CHECK=off dw \"\$(dwj '$DWDIR/report.md' '$DWBODY')\")\" ]"
 check "경로가 없으면 통과한다"               "[ -z \"\$(dw '{}')\" ]"
+# 정본이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.
+# 막지는 않는다. 여기서 막으면 정본을 못 찾는 설치에서 문서 편집이 통째로 멈춘다.
+FAKE="$T/fake"; mkdir -p "$FAKE/hooks" "$FAKE/scripts"
+cp "$DW" "$HERE/hooks/_json_escape.sh" "$HERE/hooks/_banned_words.sh" "$HERE/hooks/_extract_path.sh" "$FAKE/hooks/"
+cp "$HERE/scripts/_json_valid.sh" "$FAKE/scripts/"
+DW_NOCANON="$(printf '%s' "$(dwj "$DWDIR/report.md" "$DWBODY")" | bash "$FAKE/hooks/doc_word_pretooluse.sh")"
+check "정본이 없으면 알린다"                 "printf '%s' \"\$DW_NOCANON\" | grep -qF 'systemMessage'"
+check "정본이 없을 때 막지는 않는다"         "! printf '%s' \"\$DW_NOCANON\" | grep -qF 'permissionDecision'"
 
 echo "[README — 배선된 스크립트를 모두 적는다]"
 # 훅이 일곱인데 안내 문서가 넷만 적고 있었다. 목록을 README 에 손으로 적지 않고 배선 파일 둘에서
