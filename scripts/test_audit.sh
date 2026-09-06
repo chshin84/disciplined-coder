@@ -170,7 +170,7 @@ cat > "$VR/findings.json" <<'FIXTURE'
 FIXTURE
 check "사유 없는 기각을 잡는다" "[ -f '$AV' ] && ! bash '$AV' '$VR' >/dev/null 2>&1"
 rm -rf "$VT"
-check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' '$HERE/agent-principles.md'"
+check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' '$HERE/skills/review-docs/SKILL.md'"
 
 
 echo "[렌즈 — 발견의 문턱과 기계에 넘기는 것]"

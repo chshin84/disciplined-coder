@@ -121,7 +121,7 @@ Strong criteria let you loop on your own. Weak criteria ("make it work") need co
 
 기록은 "지워라"의 예외다. 앞선 회차의 기록이 없으면 지적이 0건이었던 회차와 검증을 안 돌린 회차가 구별되지 않는다.
 
-기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md` 하나다. 종류는 넷이다. `review`는 spec·plan 리뷰이고, `check`는 문서 검진과 워크플로 검증이고, `prior-art`는 선행연구 대조이고, `audit`은 레포 감사다. 레포 감사는 주제가 `self`라 `2026-09-05-self-audit.md` 꼴이 된다. 같은 날 같은 주제의 두 번째 회차는 종류 뒤에 회차를 붙인다(`-review-2.md`·`-audit-2.md`). 앞 회차를 덮거나 이어 붙이지 않는다. 렌즈별 원본은 요약문과 같은 이름의 폴더에 `lens-<렌즈 이름>-<띄운 횟수>.json`으로 둔다. 스킬 디렉터리 이름을 그대로 쓰므로 접두사를 떼지 않으며, 그 이름은 `scripts/audit_verify.sh`가 검사한다. 이 규칙 전의 기록은 이름이 달라도 고치지 않는다.
+기록 파일의 이름과 회차 표기는 `review-docs`가 소유한다.
 
 ### 수정 규율
 

@@ -191,15 +191,17 @@ check "렌즈 스키마의 lens 값이 디렉터리 이름과 같다" "[ -z \"\$
 check "렌즈 파일에 문턱 첫 문장이 안 남았다"          "! grep -qF '발견 하나는 넷을 진다' \"\$HERE\"/skills/lens-*/SKILL.md"
 
 echo "[기록 — 자리와 담을 것]"
-check "spec 리뷰가 기록 이름 소유자를 가리킨다" "grep -qF '정본의 기록 이름 규칙이 소유하므로' \"\$CALLER\""
+check "spec 리뷰가 기록 이름 소유자를 가리킨다" "grep -qF 'review-docs 가 소유하므로' \"\$CALLER\""
 check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$DOCS\""
 check "문서 검진 기록의 이름을 적는다"       "grep -qF '-check.md' \"\$DOCS\""
 check "문서 검진 기록은 처리 결과를 뺀다"    "grep -qF '무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다' \"\$DOCS\""
 check "spec 리뷰 기록은 처리 결과를 뺀다"    "grep -qF '어떻게 처리했는지는 담지 않는다' \"\$CALLER\""
 check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거를 검토 대상 문서 본문에 적는다' \"\$CALLER\""
-# 이름 규칙은 정본이 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
-check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$CANON\""
-check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF '정본의 기록 이름 규칙' \"\$CALLER\""
+# 이름 규칙은 review-docs 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
+check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$DOCS\""
+check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'review-docs 가 소유' \"\$CALLER\""
+check "정본은 그 규칙을 더 안 적는다"        "! grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' \"\$CANON\""
+check "정본이 새 소유자를 가리킨다"          "grep -qF '기록 파일의 이름과 회차 표기는 \`review-docs\`가 소유한다' \"\$CANON\""
 check "원본을 받는 즉시 저장한다"            "grep -qF '받는 즉시' \"\$CALLER\""
 check "원본을 같은 이름 폴더에 둔다"          "grep -qF '같은 이름의 폴더' \"\$CALLER\""
 check "런타임이 기록 제외 이유를 적는다"      "grep -qF '사용자 입력이 로그로' \"\$RUNTIME2\""
