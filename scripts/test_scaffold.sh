@@ -418,6 +418,12 @@ done
 check "canon: Tradeoff line stays"                   "grep -qF '**Tradeoff:**' '$CANON'"
 check "canon: karpathy object is generalized"        "grep -qF 'generalized from code to any artifact' '$CANON'"
 check "canon: subagent fleet rule stays"             "grep -qF \"Don't launch a fleet of subagents for what one call can do\" '$CANON'"
+check "canon: measure-the-state rule stays"          "grep -qF \"Don't assume the current state\" '$CANON'"
+check "canon: impossible-case rule stays"            "grep -qF 'No handling for situations that cannot occur' '$CANON'"
+check "canon: pre-existing-dead-code rule stays"     "grep -qF \"Don't remove what was already unused\" '$CANON'"
+check "canon: weak-criteria rule stays"              "grep -qF 'Weak criteria' '$CANON'"
+# 카파시 절의 위 문턱. 제목 줄부터 다음 `## ` 줄 직전까지를 세고 45 를 넘으면 실패다.
+check "canon: karpathy section is 45 lines or fewer" "[ \"\$(awk 'index(\$0,\"## Karpathy guidelines\")==1{s=NR;next} s&&index(\$0,\"## \")==1{print NR-s;exit}' '$CANON')\" -le 45 ]"
 check "canon: fact-vs-judgment paragraph stays"      "grep -qF '사실과 판단은 다르다' '$CANON'"
 check "canon: local-first convention stays"          "grep -qF '`LOCAL-FIRST`는 원칙이 아니라' '$CANON'"
 check "canon: execution evidence rule"               "grep -qF '실행 증거 없이' '$CANON'"
@@ -477,7 +483,7 @@ check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$
 SR="$HERE/skills/review-specs/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
-check "canon: 선택지 질문 규칙"             "grep -qF -- 'ask - as a question with options, never in plain prose' '$CANON'"
+check "canon: 선택지 질문 규칙"             "grep -qF -- 'Ask as a question with options, never in plain prose' '$CANON'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
 check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'Think Before Acting'"
 

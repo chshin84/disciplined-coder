@@ -24,60 +24,41 @@ From `andrej-karpathy-skills` 1.0.0, generalized from code to any artifact you p
 
 ### Think Before Acting
 
-**Don't assume. Don't hide confusion. Surface tradeoffs.**
-
 Before implementing, writing, or deciding:
-- Don't assume the current state. Measure it in the actual code, data, and environment. If measuring doesn't settle it, ask whether to proceed.
-- State your assumptions explicitly. If uncertain, ask - as a question with options, never in plain prose.
-- If multiple interpretations exist, present them - don't pick silently.
+- Don't assume the current state. Measure it in the actual code, data, and environment.
+- State your assumptions explicitly, and surface the tradeoffs rather than hiding them.
+- When measuring doesn't settle it, when something is unclear, or when several interpretations fit — stop, name what is unresolved, and ask. Ask as a question with options, never in plain prose. Never pick silently.
 - If a simpler approach exists, say so. Push back when warranted. Don't launch a fleet of subagents for what one call can do.
-- If something is unclear, stop. Name what's confusing. Ask.
 
 ### Simplicity First
-
-**The minimum artifact that solves the problem. Nothing speculative.**
 
 - Nothing beyond what was asked.
 - No abstraction for a single use.
 - No flexibility or configurability that was not requested.
 - No handling for situations that cannot occur.
-- If you produced 200 lines and 50 would do, produce it again.
-
-Ask yourself: "Would an experienced colleague call this overbuilt?" If yes, simplify.
+- If you produced 200 lines and 50 would do, produce it again. Would an experienced colleague call this overbuilt? Then simplify.
 
 ### Surgical Changes
 
-**Touch only what you must. Clean up only your own mess.**
+Every changed line must trace directly to the request.
 
 When changing something that already works:
 - Don't improve adjacent material, wording, or formatting.
 - Don't rework what is not broken.
 - Match the existing style, even if you would do it differently.
-- If you notice unrelated dead material, say so - don't delete it.
+- If you notice unrelated dead material, say so — don't delete it.
 
 When your change leaves orphans:
 - Remove what your own change made unused.
 - Don't remove what was already unused.
 
-The test: every changed line traces directly to the request.
-
 ### Goal-Driven Execution
-
-**Define success criteria. Loop until verified.**
 
 Turn the task into something you can check:
 - "Add validation" → "Write the failing cases first, then make them pass"
 - "Fix the bug" → "Reproduce it, then make the reproduction pass"
-- "Rewrite X" → "Show the same checks pass before and after"
-
-For multi-step work, state the plan:
-
-```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
-```
-
-Strong criteria let you loop on your own. Weak criteria ("make it work") need constant clarification. Never say it is done without evidence that you ran the check.
+- For multi-step work, state the plan as numbered steps, each with the check that verifies it.
+- Strong criteria let you loop on your own. Weak criteria ("make it work") need constant clarification.
 
 ## 한국어로 쓸 때
 
