@@ -38,7 +38,7 @@ description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "lens-fit", "doc_type": "계약의 문서 타입 표에서 고른 행의 이름과 그렇게 고른 근거 — 계약에 타입 표가 없거나 타입을 못 가렸으면 null", "read": [ "..." ], "issues": [ { "where": "...", "type": "schema|format|style|constraint|compat", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-fit", "doc_type": "계약의 문서 타입 표에서 고른 행의 이름과 그렇게 고른 근거 — 계약에 타입 표가 없거나 타입을 못 가렸으면 null", "read": [ "..." ], "issues": [ { "where": "...", "type": "schema|format|style|constraint|compat", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 `doc_type`은 조용한 통과를 막는다. 이 칸이 채워져 있으면 그 타입 행에 비추어 보았고 걸릴 것이 없었다는 뜻이라 판정으로 쓸 수 있다. `null`이면 타입을 못 가려 그 걸음을 안 돈 것이므로 빈 `issues`를 판정으로 쓰지 않는다. `lens-readability`의 `purpose`와 `lens-prior-art`의 `search_status`가 같은 구실을 한다.
 

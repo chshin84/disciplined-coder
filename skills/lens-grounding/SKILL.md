@@ -29,6 +29,6 @@ spec 리뷰와 문서 검진과 레포 문서 감사에서는 문서 밖을 반�
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "lens-grounding", "read": [ "..." ], "issues": [ { "where": "출처/후보 내 위치", "type": "omission|contradiction|unsupported|mismatch", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-grounding", "read": [ "..." ], "issues": [ { "where": "출처/후보 내 위치", "type": "omission|contradiction|unsupported|mismatch", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 필드의 뜻과 공통 규칙은 `aggregating-lenses`의 리뷰 산출물 계약이 SSOT다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다. `principles_applied`를 언제 요구하는지는 `aggregating-lenses`의 리뷰 산출물 계약이 정한다. 여기서 다시 정하지 않는다.

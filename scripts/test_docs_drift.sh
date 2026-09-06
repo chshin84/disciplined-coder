@@ -231,20 +231,26 @@ for L in "$HERE"/skills/lens-*/SKILL.md; do
   if is_exc "$n"; then
     check "$n: 공통 계약 예외라 스키마 사본 대조에서 빠진다" "grep -qF '$n' \"\$AGG\""
   else
-    check "$n: consequence 뜻풀이가 정본과 같다"         "grep -qF -- \"\$CONTRACT_CONSEQ\" '$L'"
-    # counterpart_file 을 쓰는 렌즈만 evidence·file·principle 도 함께 정본과 대조한다 —
-    # audit_evidence.sh가 그 짝을 읽는 렌즈(grounding·fit·consistency·adversarial)에 한해서다.
-    # lens-prior-art 는 상대편이 저장소 안이 아니라 웹 인용이라 counterpart_file 자체를 안 쓰고
-    # evidence 뜻풀이도 웹 인용에 맞춰 따로 적는다(그 렌즈의 SKILL.md가 정본).
+    # 계약이 "렌즈 파일에는 자기 type 폐쇄 집합만 정의하고 나머지는 여기를 참조한다"고 정하므로
+    # 뜻풀이를 담고 있으면 실패한다. 전에는 반대로 담고 있어야 통과해서 검사가 베끼기를 강제했다.
+    # 「레퍼런스 프롬프트」 절은 예외다 — 그 문장은 정본이 안 실리는 서브에이전트에 그대로 실어
+    # 보내는 페이로드라 복제가 아니다. 그래서 그 절을 떼어 낸 나머지에서만 본다.
+    NOPROMPT="$(awk '/^## 레퍼런스 프롬프트/{f=1;next} f&&/^## /{f=0} !f' "$L")"
+    check "$n: consequence 뜻풀이를 베끼지 않는다" "! printf '%s' \"\$NOPROMPT\" | grep -qF -- \"\$CONTRACT_CONSEQ\""
+    check "$n: evidence 뜻풀이를 베끼지 않는다"    "! printf '%s' \"\$NOPROMPT\" | grep -qF -- \"\$CONTRACT_EV\""
+    check "$n: 출력 스키마가 계약 소유자를 가리킨다" "grep -qF '리뷰 산출물 계약' '$L'"
     if grep -qF -- '"counterpart_file"' "$L"; then
-      check "$n: evidence 가 정본과 같은 문구를 담는다"  "grep -qF -- \"\$CONTRACT_EV\" '$L'"
-      check "$n: file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' '$L'"
-      check "$n: principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' '$L'"
+      check "$n: file 칸을 이름으로 적는다"      "grep -qF -- '\"file\":' '$L'"
+      check "$n: principle 칸을 이름으로 적는다" "grep -qF -- '\"principle\":' '$L'"
     fi
   fi
   # 조건부 필드를 렌즈가 다시 규정하면 필수 여부가 두 곳에서 갈린다 — 가리키기만 해야 한다.
   check "$n: principles_applied 규칙을 되풀이하지 않는다" "! grep -qF '제품 런타임 구현에는 요구하지 않는다' '$L'"
 done
+# 렌즈가 계약에 없는 칸을 더할 수 있고, 그 목록은 SSOT 의 「렌즈가 더하는 칸」 절이 소유한다.
+# 목록을 여기 손으로 적지 않고 그 절에서 뽑아, 렌즈가 쓰는 덧붙임 칸이 다 올라 있는지 본다.
+EXTRA_LISTED="$(awk '/^## 렌즈가 더하는 칸/{f=1;next} f&&/^## /{exit} f' "$MA" | grep -oE '`[a-z_]+`' | tr -d '`' | sort -u)"
+check "SSOT 에서 덧붙이는 칸 목록을 뽑았다" "[ -n \"\$EXTRA_LISTED\" ]"
 check "정본이 principles_applied 규칙을 소유한다" "grep -qF '제품 런타임 구현에는 요구하지 않는다' \"\$MA\""
 check "정본이 file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' \"\$MA\""
 check "정본이 principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' \"\$MA\""

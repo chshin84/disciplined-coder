@@ -33,6 +33,8 @@ description: 설계 문서의 실패 모드·과설계·비가역·YAGNI 위반�
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "lens-adversarial", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "failure-mode|over-engineering|irreversible|risk", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장. 단순화 제안이면 그 근거를 여기 적는다", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-adversarial", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "failure-mode|over-engineering|irreversible|risk", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
+이 렌즈는 `evidence`에 하나를 더 요구한다. 단순화를 제안하는 발견이면 그 근거를 그 칸에 적는다.
+
 필드의 뜻과 공통 규칙은 `aggregating-lenses`의 리뷰 산출물 계약이 SSOT다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다. `principles_applied`를 언제 요구하는지는 `aggregating-lenses`의 리뷰 산출물 계약이 정한다. 여기서 다시 정하지 않는다.

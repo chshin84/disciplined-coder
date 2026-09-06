@@ -39,7 +39,7 @@ description: 문서의 내부 모순과 이름·타입 드리프트를 보고, s
 
 ## 출력 스키마 (공통)
 ```
-{ "lens": "lens-consistency", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "contradiction|gap|drift|scope|duplication", "claim": "무엇이 문제인가", "file": "짚은 곳의 레포 상대경로", "evidence": "짚은 곳 파일에 있는 그대로의 문장", "counterpart_file": "레포 상대경로", "counterpart": "그 파일에 있는 그대로의 문장", "principle": "걸린 원칙 ID", "consequence": "이 어긋남 때문에 지금 무엇이 그렇게 되어 있는지" } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
+{ "lens": "lens-consistency", "read": [ "..." ], "issues": [ { "where": "문서 내 위치", "type": "contradiction|gap|drift|scope|duplication", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "읽고 적용한 원칙 ID — 언제 요구하는지는 aggregating-lenses의 리뷰 산출물 계약이 정한다" ], "notes": "" }
 ```
 `gap`은 커버리지 공백과 산출물 공백 둘을 담는다. 집계본은 `type`만 싣고 그 둘을 가르지 않으므로 어느 쪽인지를 `claim`에 적는다.
 

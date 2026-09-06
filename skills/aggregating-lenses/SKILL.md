@@ -48,10 +48,10 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 
 `where`의 뜻은 "검토 문서 안의 위치" 하나다. 레포 상대경로는 `file`이 진다.
 
-렌즈가 더하는 칸 가운데 `statements`는 레포 문서 감사에서 문서별 호출이 돌려주는 `{topic, statement, evidence}` 목록이다. 집계 대상이 아니다. 이 칸을 요구하는 주체는 `audit-repo-docs`의 「진술 받기」 걸음이다. 어느 문서의 진술인지는 항목이 아니라 그 호출의 원본 파일이 지는 `target` 칸이 안다.
+렌즈는 위 칸 말고 자기 칸을 더할 수 있고, 무엇을 더해도 되는지는 아래 「렌즈가 더하는 칸」이 소유한다.
 
 ## 공통 계약의 예외
-`lens-readability`와 `lens-prior-art`는 맞댈 상대편이 없어 위 계약을 그대로 따르지 못한다.
+`lens-readability`와 `lens-prior-art`는 빠지는 칸이 서로 달라 예외마다 따로 적는다.
 
 - `lens-readability` — 맞댈 상대편이 없어 위 공통 계약을 따르지 않는다. 산출물이 `issues`가 아니라 `suggestions`이고, 항목의 칸이 `where`·`why`·`rewrite` 셋이며 `type`·`claim`·`consequence`·`evidence`가 없다. 발견이 아니라 제안이라 「집계」·「상충 감지」·「커버리지 공백」 어디에도 들어가지 않는다. 스키마의 상세는 `skills/lens-readability/SKILL.md`가 정본이다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`·`consequence`.
 - `lens-prior-art` — 맞댈 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다. `evidence`는 인용이나 경로나 URL 이고, 인용 검증은 호출자(`review-specs`)가 자기 도구로 한다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`.
@@ -75,7 +75,24 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 
 렌즈 리턴의 `principles_applied`는 집계 대상이 아니다. 비어 있으면 호출자가 자기 보고에 적는다.
 
-렌즈가 자기 필드를 더할 수 있고 그것도 집계 대상이 아니다. 집계 항목은 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 렌즈가 돌려준 원본을 본다. `lens-prior-art`의 `search_status`·`citations`·`not_found`·`disclosures`와 `lens-readability`의 `purpose`·`rewrite`와 `lens-consistency`의 `narrowed`·`pairs`가 그렇다. 그 가운데 `search_status`는 빈 `issues`를 판정으로 써도 되는지를 가르고, `purpose`는 빈 `suggestions`를 판정으로 써도 되는지를 가른다. 집계본만 보고 넘어가면 조용한 통과가 생긴다.
+## 렌즈가 더하는 칸
+
+이 절이 덧붙임 칸의 목록을 소유한다. 렌즈는 공통 계약의 칸 말고 자기 칸을 더할 수 있고, 더한 칸은 집계 대상이 아니다. 집계 항목이 닫힌 필드 목록이라 실리지 않으므로, 그 값이 필요한 호출자는 렌즈가 돌려준 원본을 본다.
+
+| 칸 | 더하는 렌즈 | 무엇 |
+|---|---|---|
+| `statements` | 문서별 호출 | 레포 문서 감사에서 그 문서가 정한 것의 목록이다. 항목은 `{topic, statement, evidence}` 셋이고, 요구하는 주체는 `audit-repo-docs`의 「진술 받기」 걸음이다 |
+| `target` | 문서별 호출 | 어느 문서의 진술인지를 아는 칸이다. 항목이 아니라 그 호출의 원본 파일이 진다 |
+| `search_status` | `lens-prior-art` | 검색이 제대로 돌았는지다. 빈 `issues`를 판정으로 써도 되는지를 이 값이 가른다 |
+| `citations` | `lens-prior-art` | 인용의 목록이다 |
+| `not_found` | `lens-prior-art` | 찾지 못한 것의 목록이다 |
+| `disclosures` | `lens-prior-art` | 렌즈가 스스로 밝히는 한계다 |
+| `purpose` | `lens-readability` | 그 문서의 목적 한 줄이다. 빈 `suggestions`를 판정으로 써도 되는지를 이 값이 가른다 |
+| `rewrite` | `lens-readability` | 고쳐 쓴 문장이다 |
+| `narrowed` | `lens-consistency` | 정당한 좁혀 적기로 판정한 짝이다 |
+| `pairs` | `lens-consistency` | 갈리는 짝의 목록이다 |
+
+`search_status`와 `purpose`는 집계본만 보고 넘어가면 조용한 통과가 생긴다. 그 둘은 호출자가 원본을 열어 확인한다.
 
 ## 구현 형태 (맥락 의존)
 같은 집계라도 제품 코드가 있느냐에 따라 구현하는 곳이 갈린다.
