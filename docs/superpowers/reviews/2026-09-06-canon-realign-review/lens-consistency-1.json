@@ -1,0 +1,127 @@
+{
+  "lens": "lens-consistency",
+  "read": [
+    "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+    "agent-principles.md",
+    "skills/lens-consistency/SKILL.md",
+    "skills/domain-korean/SKILL.md",
+    "skills/review-docs/SKILL.md",
+    "skills/review-specs/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "skills/domain-readme/SKILL.md",
+    "hooks/rules_nudge_pretooluse.sh",
+    "hooks/doc_format_pretooluse.sh",
+    "scripts/test_scaffold.sh",
+    "scripts/test_audit.sh",
+    "scripts/test_docs_drift.sh",
+    "scripts/test_hooks.sh",
+    "scripts/audit_verify.sh",
+    "scripts/audit_targets.sh",
+    "README.md"
+  ],
+  "issues": [
+    {
+      "where": "「성공 기준」 표 124행과 128행",
+      "type": "contradiction",
+      "claim": "성공 기준 두 줄이 동시에 참일 수 없다. '기록 이름 규칙의 소유자가 review-docs 다'를 만족하려면 정본에서 문단을 빼야 하는데, scripts/test_docs_drift.sh:201 이 정본 안에 `-review-2.md` 가 있어야 한다고 단언하므로 '시험 전부가 통과한다'가 깨진다. 그 파일이 「따라 바뀌는 것」 표에 없어 함께 고치라는 지시도 없다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "| 기록 이름 규칙의 소유자가 `review-docs`다 | `test_audit.sh:173`이 새 경로로 통과한다 |",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "check \"기록 이름 규칙을 소유자가 적는다\"     \"grep -qF '-review-2.md' \\\"$CANON\\\"\"",
+      "principle": "SSOT",
+      "consequence": "확인 방법으로 적힌 test_audit.sh:173 은 문자열 `lens-<렌즈 이름>-<띄운 횟수>.json` 만 보므로 이 어긋남을 잡지 못한다. 소유권 이동을 초록으로 확인해 놓고 다른 스크립트에서 붉게 뜨는 상태가 된다."
+    },
+    {
+      "where": "「기록 이름 규칙을 review-docs 로 옮긴다」 75행",
+      "type": "gap",
+      "claim": "산출물 공백이다. 정본에 남길 '소유자를 가리키는 한 줄'의 문구가 안 정해졌는데, scripts/test_docs_drift.sh:202 가 review-specs 쪽에서 '정본의 기록 이름 규칙'이라는 문자열을 그대로 요구한다. 남길 한 줄의 글자에 따라 그 검사와 194행이 통과하기도 실패하기도 한다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "정본 124행의 문단 전체를 `skills/review-docs/SKILL.md`로 옮기고, 정본에는 소유자를 가리키는 한 줄만 남긴다.",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "check \"spec 리뷰가 기록 이름 소유자를 가리킨다\" \"grep -qF '정본의 기록 이름 규칙이 소유하므로' \\\"$CALLER\\\"\"",
+      "principle": "EXPLICIT",
+      "consequence": "구현자가 남길 한 줄을 스스로 지어야 하고, 그 한 줄과 review-specs·audit-repo-docs 의 포인터 문구와 두 검사의 고정 문자열 넷이 서로 맞물리는 조합을 문서 없이 맞춰야 한다."
+    },
+    {
+      "where": "「성공 기준」 표 121행",
+      "type": "gap",
+      "claim": "커버리지 공백이다. '카파시 절이 서른 줄 안팎이다'의 확인 방법이 '절 줄 수를 센다'인데 '안팎'이 문턱을 정하지 않아 세고 나서도 통과와 실패가 갈리지 않는다. 정본이 스스로 금지한 모호한 표현이다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "| 카파시 절이 서른 줄 안팎이다 | 절 줄 수를 센다 |",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "- **모호한 표현의 구체화** — 모호한 표현은 무엇이·언제·얼마나·어떤 결과인지로 바꾼다. \"느리다\"가 아니라 \"로딩 12초\"다.",
+      "principle": "READ-FLOW",
+      "consequence": "재작성 뒤 40줄이 나와도 25줄이 나와도 이 기준으로는 판정이 안 된다. 문서를 줄이는 것이 이 설계의 근거 둘 가운데 하나인데 그 결과를 가릴 문턱이 없다."
+    },
+    {
+      "where": "「상시 적재에 다른 프로젝트가 안 쓰는 것이 실린다」 19행과 「카파시 절 재작성」 65행",
+      "type": "contradiction",
+      "claim": "19행은 Simplicity First 불릿 다섯 가운데 넷이 같은 말을 되풀이한다고 세고, 65행은 그 다섯 가운데 `No handling for situations that cannot occur` 는 다른 실패를 가리키므로 합치지 않는다고 정한다. 어느 넷인지 안 적어서 두 문장이 같은 불릿을 두고 서로를 부정할 수 있다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "`Simplicity First`는 불릿 다섯 가운데 넷이 \"안 시킨 것을 더하지 마라\"를 반복하고",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "counterpart": "`No handling for situations that cannot occur`는 방어적 오류 처리라는 구체적 행동을 잡으므로 `Nothing beyond what was asked`와 합치지 않는다.",
+      "principle": "NAME-ITEMS",
+      "consequence": "합칠 불릿을 이름으로 안 부르고 개수로만 세어, 구현자가 넷을 어떻게 고르든 설계의 한쪽 문장을 어기게 된다. 정본 40~44행의 다섯 가운데 넷째를 넣으면 65행에 걸리고, 빼면 19행의 '넷'이 안 채워진다."
+    },
+    {
+      "where": "「상시 적재에 다른 프로젝트가 안 쓰는 것이 실린다」 17행",
+      "type": "drift",
+      "claim": "한 문단 안에서 '자'가 두 뜻으로 쓰인다. 정본 크기의 '16,188자'는 바이트이고 문단 크기의 '494자'는 문자다. 같은 이름표에 다른 단위가 걸렸다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "정본은 16,188자이고 `@import`로 모든 프로젝트 모든 세션에 실린다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "counterpart": "하나는 기록 파일 이름 규칙 한 문단(124행, 494자)이고, 이것은 `docs/superpowers/reviews/` 경로와 `scripts/audit_verify.sh`를 이름으로 부른다.",
+      "principle": "EXPLICIT",
+      "consequence": "두 수를 나눠 문단 몫을 3.0%로 읽게 되지만 같은 단위로 세면 5.1%다. 이 절이 드는 두 덩이 가운데 하나의 크기가 잘못 견주어져 있다."
+    },
+    {
+      "where": "「따라 바뀌는 것」 표 94행",
+      "type": "gap",
+      "claim": "커버리지 공백이다. hooks/doc_format_pretooluse.sh:23 의 메시지를 고치라고만 적고, scripts/test_hooks.sh:184 가 그 메시지에서 `정본의 '<절 이름>' 절` 꼴로 절 이름을 뽑아낸다는 제약을 안 적는다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "| `hooks/doc_format_pretooluse.sh:23` | 메시지가 '문서를 쓰고 관리할 때'를 이름으로 부른다 |",
+      "counterpart_file": "scripts/test_hooks.sh",
+      "counterpart": "NUDGE_SEC=\"$(fpre \"$(J \"$T/newdoc.md\")\" | sed -n \"s/.*정본의 '\\([^']*\\)' 절.*/\\1/p\")\"",
+      "principle": "EXPLICIT",
+      "consequence": "메시지를 다른 꼴로 다시 쓰면 NUDGE_SEC 가 빈 문자열이 되어 test_hooks.sh:184 의 '넛지가 인용한 절 이름 추출됨'이 실패한다. 절 이름만 바꾸면 이 검사는 정본 제목에서 다시 도출하므로 통과하는데, 설계는 어느 쪽을 지켜야 하는지 말하지 않는다."
+    },
+    {
+      "where": "「성공 기준」 표 127행",
+      "type": "gap",
+      "claim": "커버리지 공백이다. '살아 있는 문서와 훅과 스크립트'에 정본 자신이 드는지 안 적었는데, 옛 이름 셋을 담은 여덟 곳 가운데 넷이 정본 안에 있다. 그 가운데 5행은 본문 57행이 고치라고 정한 곳이다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "| 옛 절 이름을 가리키는 곳이 없다 | 살아 있는 문서와 훅과 스크립트에서 옛 이름 셋이 안 잡힌다 |",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "이 문서는 원칙을 먼저 정의하고, 그다음 대화할 때와 문서를 쓰고 관리할 때와 코딩할 때로 나누어 그 작업에 걸리는 원칙을 이름으로 부른다. 한 원칙을 두 번 적지 않는다.",
+      "principle": "EXPLICIT",
+      "consequence": "확인 방법을 정본 밖으로 좁게 읽으면 5행의 옛 이름 셋이 남아도 이 기준이 초록으로 통과한다. 본문 57행이 고치라고 정한 것을 성공 기준이 다시 붙들지 못한다."
+    },
+    {
+      "where": "「바꾸는 것 넷」과 「따라 바뀌는 것」 표의 관계",
+      "type": "scope",
+      "claim": "독립된 변경 넷을 한 설계에 담으면서 표 아홉 줄이 어느 변경에 딸린 것인지 표시하지 않는다. 사용자가 넷을 함께 정했으므로 묶는 것 자체는 정당하나, 되돌릴 단위가 문서에 없다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "| 파일 | 무엇이 걸리는가 |",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "- **`REVERSIBLE` (Reversible decisions)** — 되돌릴 수 있는 결정을 선호한다. 되돌리기 어려운 결정은 그 근거를 남긴다.",
+      "principle": "REVERSIBLE",
+      "consequence": "시험이 깨졌을 때 넷 가운데 어느 변경을 되돌려야 하는지 표에서 고를 수 없다. 갈래 이름 교체는 test_scaffold.sh:409 만 건드리고 소유권 이동은 test_docs_drift.sh 와 test_audit.sh 를 건드리는데, 표는 둘을 한 목록으로 섞어 놓았다."
+    }
+  ],
+  "principles_applied": [
+    "SSOT",
+    "EXPLICIT",
+    "FAIL-LOUD",
+    "NAME-ITEMS",
+    "REVERSIBLE",
+    "READ-FLOW",
+    "PROSE-FORM",
+    "PLAIN-KO",
+    "KO-SYNTAX",
+    "Karpathy — Simplicity First",
+    "Karpathy — Surgical Changes",
+    "Karpathy — Goal-Driven Execution"
+  ],
+  "notes": "체크리스트 다섯을 따로 훑었다.\n\n모순은 「문제」와 「결정」과 「바꾸는 것 넷」과 「성공 기준」을 서로 맞대어 봤다. 잡힌 둘은 성공 기준 두 줄의 충돌과 Simplicity First 불릿 개수의 충돌이다. 설계가 스스로 정한 원칙과 부딪히는지도 봤다. 39행의 '판정할 수 없는 경계를 이름으로 다시 세우지 않는다'는 새 이름 셋(「한국어로 쓸 때」·「문서를 다룰 때」·「코드를 다룰 때」)과 부딪히지 않는다. 새 이름은 게이트가 아니라 규칙이 걸리는 대상을 말하고, 37행이 갈래가 게이트가 아닌 이유를 미리 밝히기 때문이다. 이 논증은 hooks/rules_nudge_pretooluse.sh:6~7 의 주석과 맞다.\n\n커버리지 공백은 「바꾸는 것 넷」의 각 걸음이 「따라 바뀌는 것」과 「성공 기준」으로 이어지는지 짚었다. 넷 가운데 셋은 이어진다. 갈래 이름 교체는 표 91·94·95·98·99행과 기준 118·127행으로, 카파시 재작성은 표 92행과 기준 119~123행으로, 낡은 것 넷은 기준 125·126행으로 이어진다. 이어지지 않는 것은 소유권 이동이다. 표가 96·97행 둘만 들고 test_docs_drift.sh 와 review-specs 와 audit-repo-docs 를 빠뜨린다. 훅 메시지 꼴 제약도 이쪽 공백이다.\n\n산출물 공백은 문서 안에서만 봤다. 「바꾸는 것 넷」이 넷 다 무엇을 어디에 내놓는지 적는다. 예외는 정본에 남길 한 줄의 문구 하나이고 위에 올렸다. 카파시 재작성은 기준(65행)만 주고 결과 문안은 안 주는데, 이는 설계 문서에 결과물을 통째로 담지 않는 정상 배치로 봤다. 다만 문턱이 '서른 줄 안팎'이라 결과를 가릴 수 없는 것은 따로 올렸다.\n\n드리프트는 같은 대상을 두 이름으로 부르는지 봤다. 옛 이름과 새 이름은 표로 짝지어져 있어 드리프트가 없다. 잡힌 것은 '자'라는 단위 하나다. '기록 이름 규칙'과 '기록 파일 이름 규칙'이 섞여 쓰이지만(17행 대 73행 제목) 레포 안의 다른 문서들도 두 꼴을 함께 쓰므로 새로 생기는 드리프트가 아니라고 봤다.\n\n스코프는 한 구현 계획에 맞는 크기인지 봤다. 파일 열넷 안팎을 건드리는 한 바퀴이고 사용자가 넷을 함께 정했으므로 쪼개라고 하지 않는다. 표에 변경 소속이 없는 것만 올렸다.\n\n「범위 밖」 넷은 이번 변경으로 깨지지 않는다. 핸드오프 강제 갈림은 정본 118행의 표를 안 건드리므로 그대로고, scripts/audit_targets.sh:18 이 HANDOFF-* 를 빼는 것도 그대로다. 건너뛴 회차 장부와 seal_reviews.sh 성능과 넛지 효과 측정은 이 변경과 닿는 코드가 없다. 다만 규칙 넛지 메시지를 두 갈래로 가르면 넷째의 측정 기준선이 메시지 세대 앞뒤로 갈리므로, 나중에 세려 할 때 그 시점을 표시해 두는 것이 낫다.\n\n한 가지 덧붙인다. 옮기고 나면 정본 145행 '문서를 쓰거나 고친 뒤의 검진 절차는 review-docs 가 소유한다. 어느 렌즈를 걸고 언제 묻고 기록을 어디에 남기는지가 거기 있다'가 비로소 참이 된다. 지금은 145행이 review-docs 를 소유자로 세우면서 124행이 이름 규칙을 쥐고 있어 정본 안에서 이미 갈려 있다. 설계가 이 근거를 안 들었는데, 「문제」 절에 넣으면 이동의 근거가 분량 하나에서 둘로 는다.\n\n더 확인할 것 하나다. review-docs 가 이름 규칙을 소유하면 review-specs 와 audit-repo-docs 가 자매 스킬을 가리키게 된다. 지금은 셋 다 정본이라는 한 곳을 가리켰다. 이 새 의존 방향이 dispatching-lenses 와 aggregating-lenses 가 세운 소유 구조와 맞는지는 그 둘의 소유 관계 서술을 더 열어 봐야 갈린다. 이번 회차에서는 두 파일의 기록 관련 문장만 봤고 소유 구조 전반은 안 봤다."
+}

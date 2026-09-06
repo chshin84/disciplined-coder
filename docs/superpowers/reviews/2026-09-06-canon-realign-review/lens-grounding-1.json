@@ -1,0 +1,131 @@
+{
+  "lens": "lens-grounding",
+  "read": [
+    "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+    "agent-principles.md",
+    "skills/domain-korean/SKILL.md",
+    "skills/lens-grounding/SKILL.md",
+    "skills/review-docs/SKILL.md",
+    "skills/review-specs/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "skills/domain-readme/SKILL.md",
+    "skills/dispatching-lenses/SKILL.md",
+    "skills/aggregating-lenses/SKILL.md",
+    "hooks/rules_nudge_pretooluse.sh",
+    "hooks/doc_format_pretooluse.sh",
+    "scripts/test_scaffold.sh",
+    "scripts/test_audit.sh",
+    "scripts/test_docs_drift.sh",
+    "scripts/test_hooks.sh",
+    "scripts/audit_verify.sh",
+    "scripts/audit_targets.sh",
+    "README.md",
+    "HANDOFF-self-improvement-loop.md",
+    "git show 3fced53 (커밋 메시지)",
+    "git show 3fced53^:hooks/rules_nudge_pretooluse.sh",
+    "git show c952361^:agent-principles.md"
+  ],
+  "issues": [
+    {
+      "where": "「상시 적재에 다른 프로젝트가 안 쓰는 것이 실린다」 17행",
+      "type": "mismatch",
+      "claim": "정본 크기를 '16,188자'로 단정했으나 16,188은 UTF-8 바이트 수다. 코드포인트로 센 문자 수는 9,201이다. 같은 문단이 옮길 문단은 '494자'로 문자 단위로 적어, 한 문단 안에서 '자'가 두 뜻으로 쓰였다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "정본은 16,188자이고 `@import`로 모든 프로젝트 모든 세션에 실린다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "(파일 전체 계측값이며 인용 문장이 아니다) 177줄 · 16,188바이트 · 9,201문자",
+      "principle": "EXPLICIT",
+      "consequence": "옮길 문단의 몫이 494/16,188 = 3.0%로 읽힌다. 같은 단위로 다시 세면 468/9,201 = 5.1%다. 상시 적재를 줄인다는 이 절의 근거가 실제의 절반 크기로 제시되어 있다."
+    },
+    {
+      "where": "「상시 적재에 다른 프로젝트가 안 쓰는 것이 실린다」 17행",
+      "type": "mismatch",
+      "claim": "옮길 문단을 '494자'로 적었으나 정본 124행의 실측 길이는 468자다(849바이트).",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "하나는 기록 파일 이름 규칙 한 문단(124행, 494자)이고, 이것은 `docs/superpowers/reviews/` 경로와 `scripts/audit_verify.sh`를 이름으로 부른다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md` 하나다. 종류는 넷이다.",
+      "principle": "EXPLICIT",
+      "consequence": "124행이라는 위치와 그 문단이 audit_verify.sh 를 이름으로 부른다는 서술은 맞으나 분량 숫자만 26자 크다. 이 수가 옮기는 근거의 크기를 재는 유일한 수치다."
+    },
+    {
+      "where": "「상시 적재에 다른 프로젝트가 안 쓰는 것이 실린다」 17행 끝",
+      "type": "contradiction",
+      "claim": "'이 규칙을 읽어야 하는 곳은 review-docs 와 audit-repo-docs 둘뿐이다'라고 단정하는데 셋이다. review-specs 도 그 규칙을 소유자로 가리키고, 그 포인터를 검사가 붙들고 있다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "이 규칙을 읽어야 하는 곳은 `review-docs`와 `audit-repo-docs` 둘뿐이다.",
+      "counterpart_file": "skills/review-specs/SKILL.md",
+      "counterpart": "이름 규칙은 정본의 기록 이름 규칙이 소유하므로 여기 베끼지 않는다 — 회차를 뒤에 붙이는 조건이 그 규칙에 있다.",
+      "principle": "SSOT",
+      "consequence": "소유권을 review-docs 로 옮기면 review-specs/SKILL.md:93 의 서술이 거짓이 되는데, 설계는 그 파일을 독자로도 「따라 바뀌는 것」의 대상으로도 세지 않았다."
+    },
+    {
+      "where": "「따라 바뀌는 것」 표 89~99행",
+      "type": "omission",
+      "claim": "표에 scripts/test_docs_drift.sh 가 없다. 그 파일 201행이 정본 안에 `-review-2.md` 라는 문자열이 있어야 한다고 단언하므로, 124행 문단을 정본 밖으로 옮기면 이 검사는 곧바로 실패한다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "정본 124행의 문단 전체를 `skills/review-docs/SKILL.md`로 옮기고, 정본에는 소유자를 가리키는 한 줄만 남긴다.",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "check \"기록 이름 규칙을 소유자가 적는다\"     \"grep -qF '-review-2.md' \\\"$CANON\\\"\"",
+      "principle": "FAIL-LOUD",
+      "consequence": "성공 기준 마지막 줄이 요구하는 'scripts/test_*.sh 가 FAIL=0'과 소유권 이동이 동시에 성립하지 않는다. 설계대로 다섯 스크립트를 돌리면 이 한 줄이 붉게 뜬다."
+    },
+    {
+      "where": "「따라 바뀌는 것」 표 89~99행",
+      "type": "omission",
+      "claim": "정본을 이름 규칙 소유자로 가리키는 곳 넷이 표에 없다. scripts/test_docs_drift.sh:194 와 202, skills/review-specs/SKILL.md:93, skills/audit-repo-docs/SKILL.md:98 이다. 표는 아홉 줄로 전부라고 말한다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "| `scripts/audit_verify.sh:7` | 주석이 이름 규칙의 소유자를 가리킨다 |",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "check \"호출자는 그 규칙의 소유자를 가리킨다\" \"grep -qF '정본의 기록 이름 규칙' \\\"$CALLER\\\"\"",
+      "principle": "SSOT",
+      "consequence": "표만 보고 고치면 review-specs/SKILL.md:93 과 audit-repo-docs/SKILL.md:98 이 없어진 소유자를 계속 가리키고, test_docs_drift.sh:194 와 202 는 옛 문구를 강제한 채 남는다. audit_verify.sh 하나만 표에 들어 있어 나머지 넷이 안 보인다."
+    },
+    {
+      "where": "「상시 적재에 다른 프로젝트가 안 쓰는 것이 실린다」 19행",
+      "type": "mismatch",
+      "claim": "'Think Before Acting 이 「모르겠으면 물어라」를 둘째와 다섯째 불릿에서 두 번 말한다'고 적었으나 첫째 불릿도 같은 지시로 끝난다. 세 번이다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "`Think Before Acting`은 \"모르겠으면 물어라\"를 둘째와 다섯째 불릿에서 두 번 말하며",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "- Don't assume the current state. Measure it in the actual code, data, and environment. If measuring doesn't settle it, ask whether to proceed.",
+      "principle": "EXPLICIT",
+      "consequence": "합칠 대상을 셋이 아니라 둘로 세면 62줄을 30줄로 줄이는 근거가 그만큼 얇아진다. 첫째 불릿의 물음은 측정이 안 갈린다는 조건이 붙어 있어 갈릴 소지가 있으므로, 남길지 합칠지를 설계가 정해야 한다."
+    },
+    {
+      "where": "「따라 바뀌는 것」 표 97행",
+      "type": "mismatch",
+      "claim": "`scripts/audit_verify.sh:7` 이 소유자를 가리킨다고 적었으나 소유자를 가리키는 문장은 6행이고, 7행은 그 규칙이 정한 꼴을 옮긴 줄이다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "| `scripts/audit_verify.sh:7` | 주석이 이름 규칙의 소유자를 가리킨다 |",
+      "counterpart_file": "scripts/audit_verify.sh",
+      "counterpart": "# 렌즈 원본 이름 규칙의 소유자는 정본의 기록 이름 규칙이다. 그 규칙이 정한 꼴이",
+      "principle": "EXPLICIT",
+      "consequence": "고칠 줄을 7행으로 잡으면 소유자를 가리키는 6행이 정본을 계속 가리킨 채 남는다. 두 줄이 이어진 한 주석이라 함께 고쳐야 한다."
+    },
+    {
+      "where": "「따라 바뀌는 것」 표와 「범위 밖」 전체",
+      "type": "omission",
+      "claim": "HANDOFF-self-improvement-loop.md:40 이 이름 규칙의 소유자를 `skills/domain-docs/SKILL.md` 로 적는데 그 스킬은 3fced53 이 지웠다. 표에도 범위 밖에도 없다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "아래 넷은 이번에 손대지 않는다. 확인은 했으므로 남겨 둔 이유를 적는다.",
+      "counterpart_file": "HANDOFF-self-improvement-loop.md",
+      "counterpart": "- 기록을 어디에 남기나. 기록 이름 규칙의 소유자는 `skills/domain-docs/SKILL.md`의 문서 타입 표다.",
+      "principle": "FAIL-LOUD",
+      "consequence": "이번 이동으로 소유자가 한 번 더 바뀌면 이 줄은 두 세대 낡은 포인터가 된다. scripts/audit_targets.sh:18 이 HANDOFF-* 를 감사 대상에서 빼므로 레포 감사도 이것을 잡지 않는다."
+    }
+  ],
+  "principles_applied": [
+    "SSOT",
+    "EXPLICIT",
+    "FAIL-LOUD",
+    "NAME-ITEMS",
+    "PLAIN-KO",
+    "PROSE-FORM",
+    "READ-FLOW",
+    "KO-SYNTAX",
+    "Karpathy — Think Before Acting",
+    "Karpathy — Goal-Driven Execution"
+  ],
+  "notes": "훑은 각도 넷이다. 첫째, 주입된 사실 열넷을 하나씩 파일에서 다시 계측했다. 맞은 것은 177줄, 「Karpathy guidelines」 19~80행 62줄과 정본 177줄의 35.0%, 절 제목 82·97·147행, 각 절 첫 문장의 호명 조각 셋(84·99·149행) 전문 일치, scripts/test_scaffold.sh:409 의 절 이름 아홉, 같은 파일 418·419·420 의 카파시 문자열 셋, scripts/test_audit.sh:173 의 소유자 단언, hooks/doc_format_pretooluse.sh:23, skills/domain-readme/SKILL.md:7, skills/review-docs/SKILL.md:44, README.md:40·66·67 이다. skills/review-docs/SKILL.md:11 이 정본과 domain-korean 을 lens-fit 계약으로 넘기는 것도 확인했다. 정본 80행의 영어 문장과 161행의 한국어 문장이 같은 규칙인 것도 확인했다. scripts/test_scaffold.sh:431 이 옛 조항 다섯의 부재를 단언하는 것도 확인했다. 어긋난 것은 위 발견의 숫자 둘과 audit_verify.sh 행 번호 하나다.\n\n둘째, 커밋 경위를 git 으로 확인했다. 3fced53 의 메시지가 domain-coding·domain-writing·domain-doc-upkeep 삭제와 '177줄이다'를 적고, 3fced53^ 의 hooks/rules_nudge_pretooluse.sh:35 는 스킬 이름 둘을 알렸다. c952361^ 의 정본은 `## Think Before Acting` 하나만 최상위 절로 가졌다. 설계가 든 경위 셋은 모두 받쳐진다.\n\n셋째, 옛 절 이름 셋을 docs/ 와 .git/ 을 뺀 레포 전량에서 검색했다. 잡힌 여덟 곳은 agent-principles.md 의 5·82·97·147행, hooks/doc_format_pretooluse.sh:23, README.md:40·66, scripts/test_scaffold.sh:409, skills/domain-readme/SKILL.md:7 이다. 설계의 표 밖에서 새로 나온 것은 정본 자신의 네 줄뿐이고 그 가운데 5행은 본문 57행이 따로 다룬다. 옛 절 이름을 가리키는 곳은 설계가 빠짐없이 셌다.\n\n넷째, 기록 이름 규칙을 가리키는 곳을 같은 범위로 검색했다. 이쪽에서 표 밖의 다섯이 나왔고 위에 올렸다. 옛 절 이름은 다 셌는데 이름 규칙은 못 셌다는 대조가 이 설계의 가장 큰 결손이다.\n\n남은 확인 둘이다. 첫째, 메모리 `karpathy-upstream-watch` 는 이 PC 의 Claude 메모리에 있어 레포에서 열 수 없었으므로 그 내용이 '정본은 Think Before Acting 하나만 갖는다'인지 확인하지 못했다. c952361^ 의 정본이 그렇다는 것만 확인했으므로 갱신이 필요하다는 결론 자체는 받쳐진다. 둘째, `claude plugin validate ./` 가 version 경고 하나만 내는지는 실행하지 않아 확인하지 못했다. 인용문이 그 파일에 그 글자로 있는지는 scripts/audit_evidence.sh 가 볼 몫이라 여기서 판정하지 않았다."
+}

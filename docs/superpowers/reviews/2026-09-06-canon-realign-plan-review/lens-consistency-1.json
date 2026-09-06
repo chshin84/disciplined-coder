@@ -1,0 +1,125 @@
+{
+  "lens": "lens-consistency",
+  "read": [
+    "docs/superpowers/plans/2026-09-06-canon-realign.md",
+    "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+    "agent-principles.md",
+    "scripts/test_scaffold.sh",
+    "scripts/test_hooks.sh",
+    "scripts/test_audit.sh",
+    "scripts/test_docs_drift.sh",
+    "scripts/test_assertions.sh",
+    "scripts/audit_verify.sh",
+    "scripts/audit_topics.sh",
+    "scripts/_resolve_home.sh",
+    "hooks/rules_nudge_pretooluse.sh",
+    "hooks/doc_format_pretooluse.sh",
+    "skills/review-docs/SKILL.md",
+    "skills/review-specs/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "skills/domain-readme/SKILL.md",
+    "README.md",
+    "CLAUDE.md"
+  ],
+  "issues": [
+    {
+      "where": "Task 1 전체 — 절 이름 교체의 커버리지",
+      "type": "gap",
+      "claim": "커버리지 공백. 설계의 성공 기준 '「대화할 때」를 가리키는 곳이 없다'를 확인하는 걸음도 가드도 계획에 없다. Task 2·Task 3 은 같은 종류의 확인을 grep 걸음으로 두는데 Task 1 만 없다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "Run: `grep -c \"lens-<렌즈 이름>\" agent-principles.md`",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "counterpart": "| 「대화할 때」를 가리키는 곳이 없다 | 위에서 정한 범위에서 그 이름이 안 잡힌다 |",
+      "principle": "Goal-Driven Execution",
+      "consequence": "그 이름을 부르는 살아 있는 파일은 지금 셋이다 — test_scaffold.sh:409, domain-readme/SKILL.md:7, README.md:40. Task 1 Step 7 이 뒤 둘을 손으로 고치라고만 적고, 셋 가운데 하나를 빠뜨려도 잡는 시험이 없다. test_docs_drift.sh:374 의 실재 대조는 SRC 가 셋뿐이라 domain-readme 와 README 를 안 훑는다."
+    },
+    {
+      "where": "Task 1 / Step 5 — 84행과 149행의 처리가 갈린다",
+      "type": "contradiction",
+      "claim": "'아래 넷은 한국어로 쓸 때만 걸린다'는 제목 되풀이라 지우고 '아래 셋은 코드에만 걸린다'는 정보를 더한다고 남기는데, 두 문장은 제목과의 관계가 같은 꼴이다.",
+      "file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "evidence": "84행에 남는 \"아래 넷은 한국어로 쓸 때만 걸린다\"는 새 제목과 같은 말이 되므로 함께 지운다.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "counterpart": "아래 셋은 코드에만 걸린다.",
+      "principle": "READ-FLOW",
+      "consequence": "Task 1 뒤 「한국어로 쓸 때」 절의 첫 문장은 domain-korean 소유 표시 하나뿐이고, 조항 넷이 한국어에만 걸린다는 한정이 사라진다. 같은 꼴의 문장을 가진 「코딩할 때」 절만 그 한정을 갖는다. 정본의 READ-FLOW 는 소제목 바로 아래 첫 문장에 그 절의 결론을 적으라고 하는데, 남는 첫 문장은 결론이 아니라 소유 표시다."
+    },
+    {
+      "where": "Task 3 / Step 7 — 스물넷 대조의 결과",
+      "type": "gap",
+      "claim": "산출물 공백. 기계로 못 하는 유일한 걸음의 결과를 어디에 어떤 형태로 남기는지가 안 적혀 있다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "설계 문서의 표에 적힌 스물넷을 새 본문과 맞대고 어느 줄이 담는지 적는다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "counterpart": "| 카파시 절에서 실패 유형 스물넷이 모두 확인된다 | 위 표의 스물넷을 하나씩 새 본문과 맞대어 읽고 어느 줄이 담는지 적는다 |",
+      "principle": "EXPLICIT",
+      "consequence": "적을 곳이 세션 출력인지 커밋 메시지인지 리뷰 기록인지 안 정해져 있다. Task 3 Step 10 의 git add 목록에 그 결과를 담을 파일이 없고, 다음 회차가 이 확인을 했는지 못 가린다."
+    },
+    {
+      "where": "Task 1 / Files 목록과 Step 3",
+      "type": "drift",
+      "claim": "같은 삽입을 Files 목록은 155행 뒤 둘로, Step 3 은 156행 뒤 셋으로 적는다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "Modify: `scripts/test_hooks.sh:136`, 같은 파일 155행 뒤에 단언 둘 추가",
+      "counterpart_file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "counterpart": "같은 파일 156행 바로 아래에 셋을 더한다.",
+      "principle": "SSOT",
+      "consequence": "실측으로 156행이 'session_id 없음 → 매번 안내' 줄이고 155행은 'OFF → 무출력' 줄이다. 더하는 단언은 셋이다. Files 목록 쪽이 자리와 개수를 둘 다 틀리게 적는다."
+    },
+    {
+      "where": "Task 2 / Step 1 — test_docs_drift.sh 201행 교체",
+      "type": "drift",
+      "claim": "그 스크립트가 이미 가진 변수 대신 같은 경로를 손으로 적는다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "grep -qF '-review-2.md' \\\"$HERE/skills/review-docs/SKILL.md\\\"",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "DOCS=\"$HERE/skills/review-docs/SKILL.md\"",
+      "principle": "SSOT",
+      "consequence": "같은 파일 113행이 그 경로를 DOCS 로 이미 갖고 195~197행이 \"$DOCS\" 로 부른다. 새 줄만 리터럴이라 한 스크립트에 같은 경로가 두 꼴로 남고, 확장 시점도 다른 줄들과 달라진다."
+    },
+    {
+      "where": "Task 1 / Step 3 — 새 단언 둘째 줄",
+      "type": "contradiction",
+      "claim": "무엇을 고쳐도 참인 단언을 더한다. 그 스크립트 묶음이 스스로 금지한 물건이다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "check \"그 경로에 파일이 실재한다\"                   \"[ -f '$NH/disciplined-coder/agent-principles.md' ]\"",
+      "counterpart_file": "scripts/test_assertions.sh",
+      "counterpart": "그러니 이 검사를 초록으로 만들려고 형식적인 단언을 붙이지 마라. 그것은 이 검사가 걷어내려는 것과 같은 물건이다.",
+      "principle": "FAIL-LOUD",
+      "consequence": "그 경로는 두 줄 위 픽스처가 방금 만든 파일이라, 훅이 무엇을 내든 이 단언은 참이다. 훅이 실제로 낸 경로를 뽑아 대조하는 방식은 같은 파일 183~185행에 이미 있다."
+    },
+    {
+      "where": "Task 2 / Step 4 — review-docs 에 새 절 추가",
+      "type": "drift",
+      "claim": "한 파일 안에 기록 파일 이름 꼴이 두 벌 남고, 절 이름이 「기록」과 「기록 파일의 이름」으로 나란히 선다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "이 절이 기록 파일 이름 규칙의 소유자다.",
+      "counterpart_file": "skills/review-docs/SKILL.md",
+      "counterpart": "결과는 `docs/superpowers/reviews/YYYY-MM-DD-<문서이름>-check.md`에 남긴다.",
+      "principle": "SSOT",
+      "consequence": "새 절은 YYYY-MM-DD-<주제>-<종류>.md 하나를 소유자로 선언하는데, 같은 파일 44행은 YYYY-MM-DD-<문서이름>-check.md 를 따로 적는다. 이름 꼴이 한 파일에 두 벌이고, 44행이 새 절에서 도출된다는 표시도 없다. 절 이름도 「기록」 바로 뒤에 「기록 파일의 이름」이 붙어 어느 절이 무엇을 소유하는지가 이름으로 안 갈린다."
+    },
+    {
+      "where": "Task 2 / Step 3 — 정본에 남기는 한 줄",
+      "type": "drift",
+      "claim": "정본이 같은 스킬을 소유자로 가리키는 문장을 두 곳에 갖게 되는데, 그 새 한 줄을 요구하는 시험이 없다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "기록 파일의 이름과 회차 표기는 `review-docs`가 소유한다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "문서를 쓰거나 고친 뒤의 검진 절차는 `review-docs`가 소유한다. 어느 렌즈를 걸고 언제 묻고 기록을 어디에 남기는지가 거기 있다.",
+      "principle": "SSOT",
+      "consequence": "Task 2 뒤 정본 124행과 145행이 스물한 줄 사이를 두고 같은 스킬을 소유자로 가리킨다. 145행은 이미 '기록을 어디에 남기는지가 거기 있다'고 적으므로 이동이 끝나면 참이 된다. 새 124행을 붙드는 단언은 없다."
+    }
+  ],
+  "principles_applied": [
+    "SSOT",
+    "NAME-ITEMS",
+    "EXPLICIT",
+    "FAIL-LOUD",
+    "READ-FLOW",
+    "Simplicity First",
+    "Surgical Changes",
+    "Goal-Driven Execution"
+  ],
+  "notes": "훑은 각도. (1) 모순 — 계획 안의 절끼리, 그리고 계획과 설계를 맞댔다. 발견 넷이 여기서 나왔다. (2) 커버리지 공백 — 설계 성공 기준 열넷을 계획의 걸음과 하나씩 이었다. 열셋은 이어진다. 못 이어진 하나가 '「대화할 때」를 가리키는 곳이 없다'이다. 설계 「따라 바뀌는 것」 표의 열셋도 이었고 열셋 전부가 담긴다. (3) 산출물 공백 — Task 3 Step 7 하나가 걸렸다. (4) 드리프트 — review-docs 안의 이름 꼴 두 벌과 test_docs_drift.sh 의 경로 두 꼴이 걸렸다. (5) 스코프 — 태스크 셋, 커밋 셋, 걸음 서른이다. 설계가 정한 커밋 셋과 정확히 맞고 쪼갤 이유를 못 찾았다. (6) 기계로 확인한 것. Task 2 의 줄 번호 가정은 맞다 — Task 1 이 바꾸는 5·82·84·99행이 모두 한 줄에서 한 줄로 가고 149행은 124행보다 뒤라 124행은 안 밀린다. Task 3 이 420행 뒤에 넣는 것도 Task 1 이 424행 뒤에 넣은 것에 안 밀린다. git add 목록 셋은 각 Task 가 고친다고 적은 파일을 빠짐없이 담는다. (7) 계획에 안 적힌 시험이 깨지는지 scripts/ 전량을 훑었다. 정본을 문자열로 grep 하는 단언 가운데 이 변경으로 움직이는 것은 계획이 이미 적은 넷뿐이다. 절 제목을 쓰는 audit_topics.sh 7~8행과 test_audit.sh 392~393행은 정본에서 도출하므로 이름이 바뀌어도 따라간다. 금지 표현 아홉은 계획이 새로 쓰는 한국어 문장 어디에도 안 들어간다. count_karpathy.py 를 새로 만드는 것을 막거나 등재를 요구하는 검사는 없다. (8) 못 본 것. 시험을 실제로 돌리지 않았다. 지금 스위트가 초록인지, Task 1 Step 4 가 기대하는 빨강이 정확히 그 단언들에서만 나는지는 문자열 대조로만 판정했다. claude plugin validate 도 안 돌렸다."
+}

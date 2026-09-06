@@ -1,0 +1,130 @@
+{
+  "lens": "lens-grounding",
+  "read": [
+    "docs/superpowers/plans/2026-09-06-canon-realign.md",
+    "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+    "agent-principles.md",
+    "skills/lens-grounding/SKILL.md",
+    "skills/lens-consistency/SKILL.md",
+    "skills/review-docs/SKILL.md",
+    "skills/review-specs/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "skills/domain-readme/SKILL.md",
+    "skills/domain-korean/SKILL.md (금지 표현 표만)",
+    "skills/lens-fit/SKILL.md",
+    "hooks/rules_nudge_pretooluse.sh",
+    "hooks/doc_format_pretooluse.sh",
+    "hooks/_json_escape.sh",
+    "hooks/hooks.json",
+    "scripts/_resolve_home.sh",
+    "scripts/test_scaffold.sh",
+    "scripts/test_hooks.sh",
+    "scripts/test_audit.sh",
+    "scripts/test_docs_drift.sh",
+    "scripts/test_assertions.sh",
+    "scripts/audit_verify.sh",
+    "scripts/audit_topics.sh",
+    "README.md",
+    "CLAUDE.md",
+    "memory/karpathy-upstream-watch.md"
+  ],
+  "issues": [
+    {
+      "where": "Task 1 / Step 6 — 넛지 훅의 머리주석 교체",
+      "type": "mismatch",
+      "claim": "그 훅의 1행은 셰뱅이고 머리주석은 2~12행이다. 계획이 적은 '1~9행'을 그대로 하면 셰뱅이 지워지고, 새 블록이 이미 담은 「세션 키」 문단이 파일에 두 벌 남는다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "`hooks/rules_nudge_pretooluse.sh`의 머리주석 1~9행을 아래로 바꾼다.",
+      "counterpart_file": "hooks/rules_nudge_pretooluse.sh",
+      "counterpart": "#!/usr/bin/env bash",
+      "principle": "Think Before Acting",
+      "consequence": "지금 그 파일 1행이 셰뱅, 2~12행이 머리주석, 13행이 set -euo pipefail 이다. 계획의 대체 블록은 지금 10~12행의 세션 키 문단을 글자 그대로 다시 담고 있어, 1~9행만 갈아치우면 셰뱅이 없어지고 세션 키 문단이 두 번 남는다."
+    },
+    {
+      "where": "Task 3 / Step 5·Step 6 — 카파시 대체 본문의 줄 수",
+      "type": "mismatch",
+      "claim": "계획이 '44줄이다'라고 적고 Step 6이 44를 기대하는데, 코드 울타리 안 본문은 43줄이다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "`## Karpathy guidelines` 줄부터 `## 한국어로 쓸 때` 줄 직전까지를 아래로 바꾼다. 44줄이다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "## 대화할 때",
+      "principle": "Goal-Driven Execution",
+      "consequence": "본문은 실측 43줄이며 뒤따르는 빈 줄이 없다. 지금 절은 정본 19~81행 63줄이고 81행이 빈 줄이다. 대체할 때 빈 줄을 안 남기면 count_karpathy.py 가 43을 찍어 기대값 44와 어긋난다. 시험 문자열 일곱은 새 본문에 모두 있다."
+    },
+    {
+      "where": "Task 3 / Step 5 — Surgical Changes 의 마무리 문장",
+      "type": "contradiction",
+      "claim": "지금 절 전체에 걸리는 마무리 문장을 '고아가 남을 때'의 셋째 불릿으로 넣어 적용 범위를 좁힌다. 설계는 이 절의 삭제 넷만 적었고 자리 옮김은 안 적었다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "- Every changed line must trace directly to the request.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "The test: every changed line traces directly to the request.",
+      "principle": "Surgical Changes",
+      "consequence": "지금 정본 62행은 빈 줄을 사이에 두고 Surgical Changes 절 전체의 판정 기준으로 서 있다. 새 본문에서는 'When your change leaves orphans:' 아래 불릿이 되어 고아를 지울 때만 걸리는 규칙으로 읽힌다."
+    },
+    {
+      "where": "Task 3 / Step 5 — Goal-Driven Execution 의 걸음 서식",
+      "type": "unsupported",
+      "claim": "설계가 열거하지 않은 다섯째 삭제를 한다. 걸음 서식 코드 울타리를 지우고 산문 한 줄로 바꾼다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "- For multi-step work, state the plan as numbered steps, each with the check that verifies it.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-06-canon-realign-design.md",
+      "counterpart": "지우는 것은 넷이다.",
+      "principle": "SSOT",
+      "consequence": "지금 정본 73~78행의 'For multi-step work, state the plan:'과 그 아래 코드 울타리가 새 본문에 없다. 설계의 삭제 목록 넷에 이 항목이 없어, 이 삭제는 설계가 안 정한 판단이다. 실패 유형 스물넷 자체는 새 본문이 모두 담는다."
+    },
+    {
+      "where": "Task 1 / Step 1 — test_scaffold.sh 409행 위 주석",
+      "type": "contradiction",
+      "claim": "409행 루프의 근거를 적은 402~405행 주석이 지워질 갈래 이름과 지워질 호명 방식을 둘 다 그대로 적는데, 계획의 Files 목록과 걸음은 409행만 적는다.",
+      "file": "scripts/test_scaffold.sh",
+      "evidence": "# 정의하고 대화·문서·코드 세 갈래가 그 이름을 부른다. 절차와 산출물 한 종류에만 걸리는 것만 스킬로 남는다.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "counterpart": "`scripts/test_scaffold.sh:409`에서 `\"대화할 때\"`를 `\"한국어로 쓸 때\"`로 바꾼다.",
+      "principle": "FAIL-LOUD",
+      "consequence": "Task 1 뒤 그 주석이 없어진 갈래 이름과 없어진 호명 방식을 가드 바로 위에서 계속 설명한다. 시험은 주석을 안 보므로 초록이다."
+    },
+    {
+      "where": "Task 2 / Step 1 — test_docs_drift.sh 201행 위 주석",
+      "type": "contradiction",
+      "claim": "계획이 바꾸는 201·202행 바로 위 200행 주석이 소유자를 정본이라 적는다. 계획은 이 주석을 안 적는다.",
+      "file": "scripts/test_docs_drift.sh",
+      "evidence": "# 이름 규칙은 정본이 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.",
+      "counterpart_file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "counterpart": "`scripts/test_docs_drift.sh:201`을 아래로 바꾼다.",
+      "principle": "FAIL-LOUD",
+      "consequence": "Task 2 뒤 200행 주석은 정본이 소유자라 적고 201·202행은 review-docs 를 본다. Task 2 Step 7 의 grep 확인 대상 넷에 test_docs_drift.sh 가 안 들어 있어 이 주석은 잡히지 않는다."
+    },
+    {
+      "where": "Task 1 / Step 9 — 메모리 갱신",
+      "type": "omission",
+      "claim": "그 메모리에 낡은 진술이 셋인데 계획은 한 문자열만 지목한다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "description 과 본문에서 \"정본은 Think Before Acting 하나만 갖고 나머지 셋은 플러그인을 가리킨다\"를 바꾼다.",
+      "counterpart_file": "memory/karpathy-upstream-watch.md",
+      "counterpart": "정본 `agent-principles.md`로 옮겼고 그 절은 지금 「Think Before Acting」이다.",
+      "principle": "SSOT",
+      "consequence": "그 파일 8행이 정본의 절 이름을 「Think Before Acting」이라 적는데 실제 절 이름은 「Karpathy guidelines」이고 하위 절이 넷이다. 계획이 지목한 문구는 3행과 10행에만 있어 8행은 그대로 낡은 채 남는다."
+    },
+    {
+      "where": "Global Constraints — 시험 전부를 돌리는 명령",
+      "type": "unsupported",
+      "claim": "실행 명령의 대안으로 이 저장소에 없는 파일 이름을 적고, 실행 명령의 소유자를 안 가리킨다.",
+      "file": "docs/superpowers/plans/2026-09-06-canon-realign.md",
+      "evidence": "시험 전부를 돌리는 명령은 `bash scripts/run_all_tests.sh`가 아니라 아래 러너다.",
+      "counterpart_file": "CLAUDE.md",
+      "counterpart": "bad=\"\"; for t in scripts/test_*.sh; do bash \"$t\" || bad=\"$bad $t\"; done; [ -z \"$bad\" ] && echo \"ALL PASS\" || echo \"FAILED:$bad\"",
+      "principle": "SSOT",
+      "consequence": "scripts/ 아래에 run_all_tests.sh 가 없다. 실행 명령의 소유자는 CLAUDE.md 13행이고 ALL PASS 문구의 출처도 거기이며, scripts/test_docs_drift.sh:452 가 그 줄의 실재를 검사한다."
+    }
+  ],
+  "principles_applied": [
+    "FAIL-LOUD",
+    "SSOT",
+    "EXPLICIT",
+    "Think Before Acting",
+    "Surgical Changes",
+    "Goal-Driven Execution"
+  ],
+  "notes": "훑은 각도. (1) 계획이 '이 문자열을 이 줄에서 바꾼다'고 적은 것 전부를 열어 대조했다. 맞은 것: agent-principles.md 5·82·84·99·124·149행, test_scaffold.sh 409·418·419·420·424행, test_hooks.sh 136·156행, test_audit.sh 173행, test_docs_drift.sh 194·201·202행, audit_verify.sh 6~8행, domain-readme 7행, review-docs 44행, audit-repo-docs 98행, review-specs 93행, README.md 40·67행. 인용한 문자열이 모두 그 줄에 그 글자로 있다. 어긋난 것은 rules_nudge_pretooluse.sh 의 '1~9행' 하나다. (2) 설계의 실측 숫자를 다시 쟀다. 정본 177줄·16,188바이트·9,201자, 124행 468자, 카파시 절 19~81행 63줄 — 넷 다 정확하다. (3) 실패 유형 스물넷을 새 본문과 하나씩 맞댔고 스물넷이 다 담긴다. 못 담는 것은 없다. 다만 '바뀐 줄이 요청으로 추적 안 된다'는 담기되 자리가 옮겨져 범위가 좁아진다. (4) 셸 이스케이프를 대조했다. 계획이 더하는 새 줄들은 기존 줄과 같은 방식이라 그대로 붙여도 문법 오류가 안 난다. (5) 다만 기존 422행의 LOCAL-FIRST 단언은 역따옴표가 안 이스케이프되어 있어 호출 시점에 LOCAL-FIRST 를 명령으로 실행하고 빈 문자열로 치환한다. 실제로 검사되는 것은 '는 원칙이 아니라' 뿐이다. 계획이 만든 것이 아닌 기존 결함이고 계획은 안 건드리지만, 그 줄을 본보기로 삼아 복사하면 새 단언이 같은 방식으로 헐거워진다. (6) 계획이 안 건드린다고 적은 것을 확인했다. doc_format_pretooluse.sh:23 이 부르는 절 이름은 안 바뀌므로 test_hooks.sh:183~185 도 안 움직인다. README.md:66 도 같다. (7) hooks/ 아래 어느 훅도 지금 _resolve_home.sh 를 안 부르는 것이 맞다. CLAUDE_HOME_DIR 를 주면 resolve_home 이 그 값을 그대로 돌려주므로 픽스처 경로와 훅이 만들 CANON_PATH 가 실제로 같다. (8) 못 본 것. 계획이 지시한 편집을 실제로 적용해 보지는 않았다. 시험 스위트를 돌려 보지 않았으므로 '지금 ALL PASS 인가'는 확인 못 했고, 빨강·초록 전이는 문자열 대조로만 판정했다."
+}
