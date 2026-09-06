@@ -427,7 +427,7 @@ check "canon: numbered-steps-plan rule stays"        "grep -qF 'For multi-step w
 # 카파시 절의 위 문턱. 제목 줄부터 다음 `## ` 줄 직전까지를 세고 45 를 넘으면 실패다.
 check "canon: karpathy section is 45 lines or fewer" "[ \"\$(awk 'index(\$0,\"## Karpathy guidelines\")==1{s=NR;next} s&&index(\$0,\"## \")==1{print NR-s;exit}' '$CANON')\" -le 45 ]"
 check "canon: fact-vs-judgment paragraph stays"      "grep -qF '사실과 판단은 다르다' '$CANON'"
-check "canon: local-first convention stays"          "grep -qF '`LOCAL-FIRST`는 원칙이 아니라' '$CANON'"
+check "canon: local-first convention stays"          "grep -qF '\`LOCAL-FIRST\`는 원칙이 아니라' '$CANON'"
 check "canon: execution evidence rule"               "grep -qF '실행 증거 없이' '$CANON'"
 check "canon: subagent prompt context rule"          "grep -qF 'Context handed to a subagent is written into its prompt' '$CANON'"
 check "canon: no roll-call in the Korean section"    "! grep -qF '\`FAIL-LOUD\`와 \`NAME-ITEMS\`와 \`SECRETS\`가 답 한 번에도 걸린다' '$CANON'"
