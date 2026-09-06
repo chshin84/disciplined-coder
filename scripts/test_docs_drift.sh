@@ -271,6 +271,37 @@ for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestratio
   done
 done
 
+echo "[첫 문장] 소제목 아래 첫 줄이 산문이다"
+# READ-FLOW 가 "소제목 바로 아래 첫 문장에 그 절의 결론을 적는다"고 정하는데 재는 곳이 없었다.
+# 빈 줄을 건너뛴 첫 줄이 불릿·표·코드블록·인용·번호목록이면 결론 문장이 아니다. 그 줄이 산문인데
+# 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
+# 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
+# 따라온다(SSOT). 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
+# 한글이 없는 제목은 건너뛴다. READ-FLOW 는 「한국어로 쓸 때」의 규칙이라 영어 절에는 안 걸린다.
+HF_WK="$HERE/skills/domain-korean/SKILL.md"
+HF_EXC="$(awk '/^### 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,3} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
+check "첫 문장 예외를 정본에서 뽑았다" "[ -n \"\$HF_EXC\" ]"
+HF_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
+check "검사 대상 문서를 모았다(첫 문장)" "[ -n \"\$HF_DOCS\" ]"
+HF_BAD=""
+for hf in $HF_DOCS; do
+  hf_lens=0; case "$hf" in skills/lens-*/SKILL.md) hf_lens=1 ;; esac
+  hit="$(awk -v isLens="$hf_lens" -v exc="$HF_EXC" '
+    BEGIN { n=split(exc, E, "\n") }
+    /^#{2,3} / {
+      title=$0; sub(/^#+ /, "", title)
+      if (title !~ /[가-힣]/) next
+      first=""
+      while ((getline line) > 0) { if (line ~ /^[ \t]*$/) continue; first=line; break }
+      if (first == "") next
+      if (isLens) { for (i=1;i<=n;i++) if (E[i] != "" && index(title, E[i]) == 1) next }
+      if (first ~ /^[-*+] / || first ~ /^\|/ || first ~ /^```/ || first ~ /^> / || first ~ /^[0-9]+\. /) print title
+    }' "$HERE/$hf")"
+  [ -n "$hit" ] && HF_BAD="$HF_BAD [$hf: $(printf '%s' "$hit" | tr '\n' ',')]"
+done
+[ -n "$HF_BAD" ] && printf '    첫 줄이 산문이 아닌 소제목:%s\n' "$HF_BAD"
+check "소제목 아래 첫 줄이 모두 산문이다" "[ -z \"\$HF_BAD\" ]"
+
 echo "[문서 타입 표] 강제하는 장치 칸이 실물을 가리킨다"
 # 표가 장치를 이름으로만 적으면 실물이 없어도 그 행은 갖춰진 것처럼 읽힌다. 칸을 정본에서 뽑아
 # 백틱 경로면 그 파일이 있는지 보고, 「없다」로 열리면 뒤에 이유가 붙었는지 본다. 둘 다 아니면

@@ -30,6 +30,8 @@ done
 
 ## 커맨드
 
+커맨드는 셸이 아니라 클로드 코드 안에서 슬래시로 부른다.
+
 ```text
 /show-principles     # 적용 중인 원칙 보기
 /setup-discipline    # 전역 셋업 재실행(멱등)
@@ -72,6 +74,8 @@ done
 - **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다. 이 마켓플레이스 항목에만 `autoUpdate: true`를 넣어 깃허브의 갱신이 자동으로 적용되게 한다. 키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며, 사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다. 지키는 규칙은 `skills/domain-plugin/SKILL.md`의 「사용자 설정 파일을 고칠 때 지킬 것」을 참고한다.
 
 ## 주의
+
+아래는 이 플러그인을 쓰다가 잘못 믿기 쉬운 것들이다.
 
 - **CLAUDE.md의 한계** — CLAUDE.md는 가이드이지 강제가 아니다. 파일 수정을 실제로 막으려면 `PreToolUse` hook을 설정한다.
 - **서브에이전트와 원칙** — 서브에이전트에 원칙이 실린다고 믿지 않는다. 렌즈에는 원칙 파일의 경로를 넣는다. 어느 경로인지는 `skills/dispatching-lenses/SKILL.md`가 정한다.
