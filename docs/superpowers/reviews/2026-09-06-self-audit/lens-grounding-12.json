@@ -1,0 +1,112 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/review-docs/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/review-docs/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "hooks/hooks.json",
+  "hooks/doc_review_posttooluse.sh",
+  "scripts/test_docs_drift.sh",
+  "skills/domain-korean/SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "팩트와 근거",
+  "문서 타입과 수명"
+ ],
+ "notes": "lens-fit 의 doc_type: 「절차·계약(operations·setup·contract)」 행이다. 이 문서는 검진을 어떤 순서로 어떤 렌즈로 수행하는지와 lens-fit 에 넘길 계약 경로만 담고, 어느 문서가 검진을 마쳤는지 같은 진행 상태를 담지 않는다. 그 행이 담지 말라고 한 상태는 이 문서에서 찾지 못했다. 훑은 각도. lens-grounding 은 넷을 따로 돌았다. (1) 누락 — 「언제 여는지」의 갈래와 훅 발동 조건을 맞대 새 일반 문서 작성이 갈래에 없는 것을 잡았다. (2) 모순 — '마커 게이트는 없다'를 hooks.json 의 Stop 배선과 doc_review_posttooluse.sh 의 비블로킹 출력으로 대조했고 어긋나지 않았다. (3) 환각 — 이름으로 부른 경로 넷이 모두 실재했고, 기계 선처리 주장만 근거가 없었다. (4) 불일치 — 기록 경로와 종류를 정본의 종류 넷과 맞대 종류 자체는 맞았고 슬롯 이름만 갈렸다. lens-fit 은 다섯을 따로 돌았다. 형식·스타일·오염·호환·규율이다. 금지 낱말은 review-docs 자신의 규칙대로 렌즈가 세지 않았다 — scripts/test_docs_drift.sh 가 domain-korean 의 표에서 목록을 도출해 이미 검사한다. 계약 범위. 호출자가 계약으로 준 것은 정본 경로 하나뿐이고 domain-korean 경로는 오지 않았다. 그래서 한국어 조항은 정본의 네 조항으로만 판정했고 domain-korean 의 상세 규칙으로는 판정하지 않았다. 이 문서 자신은 검진 때 그 경로를 계약으로 넘기라고 정하므로, 이 회차는 그 계약 하나가 빠진 채 돈 것이다(FAIL-LOUD). 더 확인할 것 셋. (1) 뿌리 후보 — 기록 이름 패턴 사본이 이 문서만이 아니라 skills/aggregating-lenses/SKILL.md 의 「처분」 절에도 있다. 문서 하나를 고쳐서는 사라지지 않는다. (2) 렌즈 배정이 audit-repo-docs 의 표와 갈리는 자리가 있다. 렌즈 자신의 SKILL.md 를 고쳤을 때 이 문서대로면 grounding 과 fit 둘이 걸리고, audit-repo-docs 의 표대로면 lens-fit 하나만 걸린다. audit 쪽이 호출 수를 줄이려는 이유를 자기 절에 적어 두어 정당한 좁혀 적기로 보고 발견으로 올리지 않았다. (3) 이 문서의 「기록」 절은 렌즈가 돌려준 원본 JSON 을 어디에 두는지 적지 않는다. review-specs 와 audit-repo-docs 는 각각 즉시 저장을 적는다. '받는 즉시 저장한다'는 의무 자체는 이 절차의 어느 문서에도 걸려 있지 않다.",
+ "issues": [
+  {
+   "lens": "lens-grounding",
+   "where": "「`lens-fit`에 넘기는 계약」 마지막 문단",
+   "type": "unsupported",
+   "claim": "금지 낱말과 개조식을 함께 묶어 먼저 기계로 걸러 렌즈에 안 넘긴다고 적었으나, 이 저장소에서 기계 몫을 지는 검사에 개조식을 잡는 규칙이 없다. 금지 낱말은 scripts/test_docs_drift.sh 가 domain-korean 의 「금지 표현」 표에서 목록을 도출해 검사하지만, 개조식이라는 낱말은 scripts/ 와 hooks/ 어디에도 나오지 않는다.",
+   "file": "skills/review-docs/SKILL.md",
+   "evidence": "문자열로 잡히는 것(금지 낱말·개조식)은 `dispatching-lenses`의 「판단 앞에 기계를 세운다」대로 먼저 기계로 걸러 렌즈에 안 넘긴다.",
+   "counterpart_file": "skills/lens-fit/SKILL.md",
+   "counterpart": "이 저장소에서는 `scripts/test_docs_drift.sh`가 그 몫을 진다.",
+   "principle": "팩트와 근거",
+   "consequence": "둘 가운데 금지 낱말만 기계가 거르고 개조식은 거르는 곳이 없어, 이 문서는 렌즈에 안 넘긴다고 적힌 것을 실제로는 렌즈가 그대로 받는다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「언제 여는지」 첫 문장과 갈래 셋",
+   "type": "omission",
+   "claim": "이 절이 가르는 경우는 기존 문서 수정과 새 spec·plan 작성 둘인데, 이 절차를 발동시키는 넛지 훅은 spec·plan이 아닌 문서를 처음 쓸 때에도 뜬다. 새로 쓴 일반 문서를 어느 갈래로 다룰지가 이 문서에 없다.",
+   "file": "skills/review-docs/SKILL.md",
+   "evidence": "기존 문서를 고칠 때는 묻고, 새 spec·plan을 처음 쓸 때는 Stop 게이트가 자동으로 강제한다.",
+   "counterpart_file": "hooks/doc_review_posttooluse.sh",
+   "counterpart": "PostToolUse(Write|Edit): 문서(.md, spec/plan 제외) 작성/수정 감지 → 비자가 검진 넛지(비블로킹, 게이트 아님).",
+   "principle": "EXPLICIT",
+   "consequence": "새 일반 문서를 처음 쓰면 훅은 이 절차를 가리키는 넛지를 띄우지만, 이 문서의 갈래 셋은 모두 이미 있는 문서를 고친 경우를 가르고 있어 그 회차에 물을지 건너뛸지가 이 문서에서 도출되지 않는다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "review-docs",
+   "statement": "문서 하나를 쓰거나 고친 뒤의 검진은 이 문서가 소유하고, 걸리는 렌즈는 lens-grounding 과 lens-fit 둘이다.",
+   "evidence": "일반 문서를 쓰거나 고친 뒤에 `lens-grounding`(사실 정확)과 `lens-fit`(양식과 계약과 규율)을 건다."
+  },
+  {
+   "topic": "lens-fit",
+   "statement": "lens-fit 에는 계약으로 경로 둘을 넘기고, README 를 검진할 때만 domain-readme 경로를 더한다.",
+   "evidence": "README를 검진할 때만 `skills/domain-readme/SKILL.md`를 더한다."
+  },
+  {
+   "topic": "domain-korean",
+   "statement": "한국어 조항 검사는 domain-korean 경로를 계약으로 넘겨 lens-fit 이 맡으며, 넘기지 않으면 그 렌즈는 형식만 본다.",
+   "evidence": "넘기지 않으면 그 렌즈는 계약을 모른 채 돌아 형식만 본다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "띄우는 방법과 정본을 알리는 법은 dispatching-lenses 가 소유하며 이 문서는 가리키기만 한다.",
+   "evidence": "띄우기 전에 `dispatching-lenses`의 「렌즈에게 정본을 알리는 법」을 본다."
+  },
+  {
+   "topic": "lens-readability",
+   "statement": "사람이 처음부터 끝까지 읽는 문서에만 lens-readability 를 셋째 렌즈로 더하고, 목적 한 줄을 못 적으면 부르지 않는다.",
+   "evidence": "사람이 처음부터 끝까지 읽는 문서에는 `lens-readability`를 셋째 렌즈로 더한다."
+  },
+  {
+   "topic": "검증",
+   "statement": "검진을 열지 말지는 매번 자동으로 정하지 않고 사용자에게 선택지가 있는 질문으로 제시하며, 건너뛴 회차는 한 줄 알린다.",
+   "evidence": "검진을 열기 전에 사용자에게 제시한다."
+  },
+  {
+   "topic": "FAIL-LOUD",
+   "statement": "기록을 남기는 이유는 지적이 0건이었던 회차와 지적을 전량 넘긴 회차를 구별하기 위해서다.",
+   "evidence": "기록이 없으면 지적이 0건이었던 검진과 지적을 전량 넘긴 검진이 구별되지 않는다(`FAIL-LOUD`)."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "그 회차 렌즈 전부의 지적을 한 목록으로 모으고 둘 이상이 함께 잡은 것과 상충과 커버리지 공백을 기록에 적는다.",
+   "evidence": "그 회차에 돌린 렌즈 전부의 지적을 한 목록으로 모으고, 둘 이상의 렌즈가 함께 잡은 것과 상충과 커버리지 공백을 적는다."
+  },
+  {
+   "topic": "문서를 쓰고 관리할 때",
+   "statement": "검진 기록은 docs/superpowers/reviews 아래 종류 check 로 남기고, 무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다.",
+   "evidence": "무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "spec·plan 리뷰는 review-specs 가 소유하고, 반영 뒤 다시 보는 되풀이도 그쪽에만 둔다.",
+   "evidence": "반영한 뒤 다시 검진하지는 않는다."
+  },
+  {
+   "topic": "audit-repo-docs",
+   "statement": "레포 전체를 한 회차로 훑는 감사는 audit-repo-docs 가 소유하므로 이 문서는 다루지 않는다.",
+   "evidence": "레포 전체를 한 회차로 훑는 감사는 audit-repo-docs가, spec·plan 리뷰는 review-specs가 소유한다."
+  }
+ ]
+}

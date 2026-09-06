@@ -1,0 +1,126 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/review-llm-calls/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/review-llm-calls/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_audit.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "SECRETS",
+  "PROSE-FORM",
+  "Think Before Acting"
+ ],
+ "notes": "doc_type — 절차·계약 (operations·setup·contract). 런타임 LLM 호출에 검증을 어떻게 붙이는지의 수행 방법과 렌즈 배정표와 체크리스트를 담고, 무엇이 어디까지 되었는지의 진행 상태는 담지 않는다. 훑은 각도. lens-grounding 은 넷을 따로 훑었다. 누락에서는 aggregating-lenses 「처분 — 호출자의 몫」의 제품 런타임 행과 「구현 형태」의 결정론적 파이썬 함수 요건과 런타임 재시도 상한을 이 문서와 맞댔다. 재시도 상한은 「비기능 체크리스트」의 재시도 횟수 상한 항목이 받고 있어 올리지 않았다. 사람에게 올리는 처분은 이 문서에 집계가 표시한다는 데까지만 적혀 있으나, 그 처분의 소유자가 aggregating-lenses 라 복제를 요구하는 꼴이 되어 올리지 않았다. 모순에서 집계 발동 조건 둘과 lens-fit 호출 시점 하나를 찾았다. 환각에서는 정본 「검증」 절의 실재와 dispatching-lenses 「호출자 목록」이 이 문서를 제외한다는 서술을 확인했고 어긋남이 없었다. 불일치에서는 「렌즈 선택」 표의 렌즈 이름 둘이 실제 디렉터리로 실재하는지 확인했고 둘 다 맞았다. 두 렌즈의 type 폐쇄 집합도 열어 확인했는데, 이 문서는 집합을 열거하지 않고 재생성을 강제하는 값을 제품이 정하라고만 적어 어긋날 곳이 없었다. lens-fit 은 다섯을 따로 훑었다. 형식과 오염과 호환은 이 문서가 JSON 산출물이 아니라 걸리는 것이 없었다. 규율은 세 걸음을 돌았다. 타입은 절차·계약 행으로 가렸고, 그 행이 담지 말라고 한 진행 상태는 이 문서에 없다. 나머지 조항에서 셋을 올렸다. 올리지 않은 것 둘. 「렌즈 선택」 표의 마지막 행은 「무엇으로 가리나」 칸이 다른 네 행의 문장과 말끝이 다르고, 이것은 정본 PROSE-FORM 의 한 표 안 말끝을 맞추라는 조항에 걸린다. 같은 자리에서 A가 아니라 B 대구도 넷 이상 쓰였다. 둘 다 정본에서 그 조항이 「대화할 때」 절 아래 있고 lens-readability 의 대상 목록에도 SKILL.md 가 없어, 이 타입 문서에 걸리는지가 갈린다고 보고 발견으로 올리지 않았다. 더 확인할 것 둘. 짧은 이름 문장은 skills/dispatching-lenses/SKILL.md 에도 같은 글자로 있어, 렌즈 이름 표준을 그 표준의 소유자 파일이 스스로 어기고 있다. 이 회차의 대상 밖이라 올리지 않았다. 그리고 scripts/test_docs_drift.sh 가 이 문서에 거는 계약 검사는 셋뿐이고 집계 발동 조건은 재지 않는다. 결정론으로 잡으려면 그 스크립트에 단언을 더해야 하는지 사용자 판단이 필요하다.",
+ "issues": [
+  {
+   "lens": "lens-grounding",
+   "where": "「조립」 — 렌즈 하나짜리 호출의 집계 단계",
+   "type": "contradiction",
+   "claim": "집계 단계를 언제 여는지가 소유자 문서와 어긋난다. 이 문서는 렌즈가 하나여도 집계를 거치라고 적는데, 집계의 소유자 문서는 렌즈를 둘 이상 돌린 뒤에 여는 단계라고 적는다.",
+   "file": "skills/review-llm-calls/SKILL.md",
+   "evidence": "렌즈 하나만 부른 호출도 집계 단계를 거친다.",
+   "counterpart_file": "skills/aggregating-lenses/SKILL.md",
+   "counterpart": "렌즈를 둘 이상 돌린 뒤에 연다.",
+   "principle": "SSOT",
+   "consequence": "집계 단계의 발동 조건이 두 값으로 적혀 있다. 이 문서는 렌즈 하나에도 거치라고 적고, 그 단계를 소유한 aggregating-lenses 는 둘 이상일 때 연다고 적는다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「렌즈 선택」 마지막 문단과 「조립」 둘째 문단",
+   "type": "contradiction",
+   "claim": "같은 문서 안에서 렌즈 하나짜리 호출의 처리가 서로 반대로 적혀 있다. 「렌즈 선택」은 하나면 집계 단계를 두지 않는다고 적고, 「조립」은 하나만 불러도 집계 단계를 거친다고 적는다.",
+   "file": "skills/review-llm-calls/SKILL.md",
+   "evidence": "렌즈가 둘이면 `aggregating-lenses`로 집계하고 하나면 집계 단계를 두지 않는다.",
+   "counterpart_file": "skills/review-llm-calls/SKILL.md",
+   "counterpart": "렌즈 하나만 부른 호출도 집계 단계를 거친다.",
+   "principle": "EXPLICIT",
+   "consequence": "이 문서를 청사진으로 삼아 제품 코드를 짜는 쪽이 렌즈 하나짜리 호출에 집계 함수를 붙일지 말지를 이 문서만으로 못 가린다. 두 문장이 반대로 적혀 있고 어느 쪽이 뒤라는 표시도 없다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「렌즈 선택」 — lens-fit 앞에 기계를 세우는 대목",
+   "type": "mismatch",
+   "claim": "lens-fit 리뷰 콜을 언제 쓰는지가 그 렌즈의 가드와 어긋난다. 이 문서는 validator 가 실패했을 때만 리뷰 콜을 쓴다고 적는데, lens-fit 의 가드는 결정론이 못 잡는 스타일과 모호한 제약에만 리뷰 콜을 쓴다고 적는다.",
+   "file": "skills/review-llm-calls/SKILL.md",
+   "evidence": "스키마와 형식은 코드 validator를 먼저 돌리고 실패했을 때만 리뷰 콜을 쓴다.",
+   "counterpart_file": "skills/lens-fit/SKILL.md",
+   "counterpart": "LLM 리뷰는 결정론으로 못 잡는 스타일과 모호한 제약에만 쓴다.",
+   "principle": "SSOT",
+   "consequence": "lens-fit 리뷰 콜의 발동 조건이 두 값으로 적혀 있다. 이 문서는 validator 실패를 조건으로 적고, 그 렌즈 파일은 결정론이 못 잡는 것을 조건으로 적는다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "review-llm-calls",
+   "statement": "제품 런타임의 LLM 호출은 단독 콜로 끝내지 않고 검증을 제품 코드에 구현한다.",
+   "evidence": "제품이 런타임에 LLM을 호출하는 기능은 단독 콜로 끝내지 말고 검증을 코드에 구현한다."
+  },
+  {
+   "topic": "검증",
+   "statement": "검증을 더하라는 원칙은 정본이 소유하고, 런타임에서의 검증 방법은 이 문서가 정한다.",
+   "evidence": "검증을 더하라는 원칙은 `agent-principles.md`의 「검증」 절에 있고, 방법은 이 문서가 정한다."
+  },
+  {
+   "topic": "review-llm-calls",
+   "statement": "렌즈는 호출 종류로 고정 배정하고 회차마다 다시 판단하지 않는다.",
+   "evidence": "종류마다 걸 렌즈가 아래 표에 고정돼 있고, 회차마다 다시 판단하지 않는다."
+  },
+  {
+   "topic": "lens-grounding",
+   "statement": "런타임에서 lens-grounding 의 출처는 원래 요청과 제공된 맥락 하나뿐이다.",
+   "evidence": "`lens-grounding`의 \"출처\"는 여기서 원래 요청과 제공된 맥락 하나다."
+  },
+  {
+   "topic": "lens-fit",
+   "statement": "스키마와 형식은 코드 validator 를 먼저 돌리고 그다음에 lens-fit 리뷰 콜을 쓴다.",
+   "evidence": "스키마와 형식은 코드 validator를 먼저 돌리고 실패했을 때만 리뷰 콜을 쓴다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "판단 앞에 기계를 세운다는 규칙의 소유자를 dispatching-lenses 로 적는다.",
+   "evidence": "이것이 `dispatching-lenses`의 「판단 앞에 기계를 세운다」가 이 절차에 걸린 꼴이다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "처분 이름은 aggregating-lenses 의 출력 스키마와 같은 셋을 쓰고, 라우팅의 근거는 폐쇄 집합인 type 이다.",
+   "evidence": "이름은 `aggregating-lenses`의 출력 스키마와 같은 셋을 쓴다."
+  },
+  {
+   "topic": "review-llm-calls",
+   "statement": "리뷰 콜은 제품 코드의 호출이라 서브에이전트 규율 밖이고 병렬로 돌린다.",
+   "evidence": "리뷰 콜은 제품 코드의 호출이라 서브에이전트 규율이 걸리지 않고 병렬로 돌릴 수 있다."
+  },
+  {
+   "topic": "SECRETS",
+   "statement": "렌즈의 지적을 로그로 남기지 않고 개인정보를 뺀 집계값만 남긴다.",
+   "evidence": "렌즈의 지적을 로그로 남기지 않는다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "렌즈끼리 볼 것을 나눠 주지 않으며 그 근거는 review-specs 가 소유한다.",
+   "evidence": "근거는 `review-specs`의 같은 이름 문단이 소유한다."
+  },
+  {
+   "topic": "FAIL-LOUD",
+   "statement": "체크리스트 누락은 그 항목의 등급대로 처리하고 critical 은 머지와 배포를 막는다.",
+   "evidence": "누락 항목은 그 항목에 붙은 등급대로 처리하며, critical은 머지와 배포를 차단한다."
+  },
+  {
+   "topic": "Karpathy guidelines",
+   "statement": "요청과 지연과 토큰과 실패율을 로깅하는 요건의 근거로 Think Before Acting 을 든다.",
+   "evidence": "측정하지 않으면 개선할 수 없다(Think Before Acting, major)."
+  }
+ ]
+}

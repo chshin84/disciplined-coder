@@ -1,0 +1,241 @@
+{
+ "lens": "lens-grounding",
+ "target": "agent-principles.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/domain-korean/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "scripts/audit_verify.sh",
+  "scripts/audit_targets.sh",
+  "scripts/audit_topics.sh",
+  "scripts/scaffold.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/test_audit.sh",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_scaffold.sh",
+  "hooks/hooks.json",
+  "hooks/rules_nudge_pretooluse.sh",
+  "README.md",
+  "HANDOFF-self-improvement-loop.md",
+  "docs/superpowers/reviews/2026-09-05-self-audit-2/",
+  "docs/superpowers/reviews/2026-09-06-doc-principles-in-lenses-review/"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "PLAIN-KO",
+  "PROSE-FORM",
+  "READ-FLOW",
+  "KO-SYNTAX"
+ ],
+ "notes": "doc_type — 규범·인덱스 (CLAUDE.md·문서 맵). 담는 것으로 가렸다. 이 문서는 조항과 소유자 포인터와 작업 방법만 담고 진행 상태나 다음 단계를 담지 않는다. 훑은 각도. lens-grounding 은 체크리스트 넷을 따로 돌았다. 누락에서는 정본이 이름으로 부른 소유자 문서 일곱(domain-korean·domain-plugin·domain-readme·review-docs·dispatching-lenses·nested-orchestration·audit_verify.sh)이 모두 실재하는지 열어 확인했고 다 있었다. 모순에서는 문서를 쓰고 관리할 때 절의 spec·plan 처리 하나가 걸렸다. 환각에서는 문서 타입 표의 강제 장치 일곱 칸을 하나씩 저장소와 맞댔다. 여섯은 실물이 있었다(superseded 표시는 scripts/test_docs_drift.sh, 기록 봉인은 scripts/seal_reviews.sh 와 hooks/readonly_pretooluse.sh, 문서와 코드를 맞대는 테스트는 scripts/test_docs_drift.sh). 핸드오프 잔존 린트 하나만 실물이 없어 올렸다. 불일치에서는 렌즈 원본 파일 이름 꼴과 문장 규칙 넷의 개수 둘이 걸렸다. 기록 이름 규칙은 docs/superpowers/reviews 의 실제 파일 이름과 맞았다. 매 세션 덮어쓴다는 주장은 hooks/hooks.json 의 SessionStart 가 scripts/scaffold.sh 를 부르는 것으로 확인했다. lens-fit 은 계약을 둘로 잡았다. 하나는 정본 자신이고 다른 하나는 aggregating-lenses 의 리뷰 산출물 계약이다. 정본 경로는 계약 칸이 아니라 검토 대상으로 들어왔고, lens-fit SKILL.md 의 승격 문단에 따라 규칙집 계약으로도 삼았다. 문서 타입은 담는 것으로 가려 규범·인덱스 행으로 정했고, 그 행이 담지 말라고 한 상태를 담았는지 본 결과 업스트림 버전 1.0.0 하나가 걸렸다. 형식과 오염과 호환 축은 마크다운 문서라 걸릴 것이 없었다. 규율 축에서 금지 표현 표 아홉 낱말을 문자열로 검색했고 0건이었다. 연결어미 뒤 쉼표는 네 곳이라 절제 범위 안으로 보았다. 제목 열일곱은 모두 명사구다. lens-readability 는 목적에 읽는 사람과 할 수 있어야 하는 것이 둘 다 있어 판정했다. 관찰 축 열의 값은 이렇다. 강조는 굵게 처리한 구간 서른셋이고 그중 문장을 통째로 굵힌 것이 넷인데 넷 다 카파시 소절의 요약 줄이다. 끊김은 산문과 표 사이 오감이 넷이고 코드 블록이 하나다. 이음은 절 첫 문단 열일곱 가운데 앞 절의 말을 그대로 받아 시작하는 것이 열둘이다. 목록은 불릿 마흔 가운데 문장이 둘 이상인 것이 열여섯이고 가장 긴 것은 PLAIN-KO 조항의 일곱 문장이다. 끼움은 괄호 부연 스물여섯이고 대부분 조항 이름의 영어 병기다. 이름 형태는 제목 열일곱이 모두 명사구이고, 그 아래 첫 문장이 그 절의 결론인 절이 열여섯, 아닌 절이 하나(Karpathy guidelines)다. 형태 섞임은 문서 타입 표의 강제하는 장치 열 한 곳이다. 수정 규율 표는 열마다 말끝이 맞는다. 두루뭉술한 결과는 금지 표현 0건이고 결과를 안 적은 서술어도 못 찾았다. 길이는 산문 문장 백쉰일곱의 중앙값 마흔두 자, 90퍼센타일 여든다섯 자, 최장 백예순세 자이며 최장 셋은 모두 카파시 절의 영어 불릿이다. 수식은 관형절이 문장 가운데 낀 곳을 못 찾았고 명사 앞 수식이 세 겹 이상 쌓인 곳도 없었다. 열에 안 걸리지만 전달을 막는 것 하나를 적는다. PLAIN-KO 조항 하나가 규칙 일곱을 한 불릿에 담아, 지금 답에 무엇이 걸리는지 고르려면 그 안에서 다시 세어야 한다. 정본이 분량을 일부러 눌렀고 상세를 domain-korean 이 갖고 있어 제안으로 올리지 않고 여기 적는다. 더 확인할 것 둘. 하나, 검증 절의 훅은 계산으로 확인되는 사실만 기록한다는 문장에 대응하는 기록 동작을 hooks 아래에서 못 찾았다. 지금 훅이 쓰는 파일은 hooks/rules_nudge_pretooluse.sh 의 넛지 중복 방지 표시 하나뿐이다. 맞댈 문장을 가진 상대편 파일을 못 찾아 발견으로 올리지 않았으니, 이 문장이 훅의 현재 동작을 말하는 것인지 훅을 만들 때의 규칙을 말하는 것인지 사용자가 갈라 주면 다음 회차에서 판정할 수 있다. 둘, 서브에이전트를 새로 열지 말라는 가드를 지켜 아무 렌즈도 추가로 띄우지 않았다.",
+ "issues": [
+  {
+   "lens": "lens-grounding",
+   "where": "「문서 타입과 수명」 절의 기록 이름 규칙 문단",
+   "type": "mismatch",
+   "claim": "정본이 정한 렌즈 원본 파일 이름 꼴을 그대로 펼치면 실제 회차 폴더에 있는 파일 이름과 다르고, 같은 규칙을 적은 소유자 문서의 꼴과도 다르다.",
+   "file": "agent-principles.md",
+   "evidence": "렌즈별 원본은 요약문과 같은 이름의 폴더에 `lens-<렌즈 이름>-<띄운 횟수>.json`으로 둔다.",
+   "counterpart_file": "skills/audit-repo-docs/SKILL.md",
+   "counterpart": "폴더 안에는 파일 넷과 렌즈별 원본(`<렌즈>-<띄운 횟수>.json`)을 둔다.",
+   "principle": "SSOT",
+   "consequence": "정본의 꼴에 스킬 디렉터리 이름을 접두사째 넣으면 lens-lens-fit-1.json 이 되는데, docs/superpowers/reviews/2026-09-05-self-audit-2 에 실제로 들어 있는 파일은 lens-fit-1.json 이고 audit-repo-docs 는 접두사 없는 꼴로 같은 규칙을 적고 있다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「문서 타입과 수명」 표의 핸드오프 행",
+   "type": "unsupported",
+   "claim": "핸드오프의 강제 장치로 적힌 잔존 패턴 린트가 저장소에 없고, 지워졌어야 할 핸드오프가 레포 루트에 남아 있다.",
+   "file": "agent-principles.md",
+   "evidence": "| **핸드오프** (HANDOFF-*) | 1회성 인계 | 소비되면 곧바로 지운다 | 즉시 삭제한다 | 핸드오프 잔존 패턴 린트 |",
+   "counterpart_file": "HANDOFF-self-improvement-loop.md",
+   "counterpart": "이 파일은 살아 있는 문서가 아니다.",
+   "principle": "FAIL-LOUD",
+   "consequence": "레포 루트에 HANDOFF-self-improvement-loop.md 가 남아 있고, HANDOFF- 를 다루는 코드는 scripts/audit_targets.sh 와 scripts/test_audit.sh 뿐인데 둘 다 그 파일을 감사 대상에서 빼기만 해 잔존이 아무 검사에도 걸리지 않는다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「대화할 때」 절의 문장 규칙 문단",
+   "type": "mismatch",
+   "claim": "넷이라고 세어 놓고 그 문단이 담은 규칙은 다섯이다.",
+   "file": "agent-principles.md",
+   "evidence": "문장을 쓸 때 지키는 것이 넷 더 있다.",
+   "counterpart_file": "skills/domain-korean/SKILL.md",
+   "counterpart": "`A가 아니라 B` 대구는 글 한 편에 한 번까지 쓴다.",
+   "principle": "SSOT",
+   "consequence": "그 문단의 마지막 문장 하나가 domain-korean 의 별개 항목 둘(대구 제한과 쉼표 절제)을 함께 담고 있어, 문단이 실제로 담은 규칙은 '것'의 대체와 좁은 말과 결과 서술과 대구 제한과 쉼표 절제 다섯이다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「문서를 쓰고 관리할 때」 절 첫 문단",
+   "type": "contradiction",
+   "claim": "spec 과 plan 을 여기서 다루지 않는다고 적어 놓고, 같은 절의 문서 타입 표가 spec·plan 의 수명과 표시 규칙과 검사를 정한다.",
+   "file": "agent-principles.md",
+   "evidence": "spec과 plan은 superpowers가 소유하므로 여기서 다루지 않는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "| **설계** (spec·plan) | 설계 근거 | 계속 살아 있다. 배포된 뒤에도 지우지 않는다. 과거 것은 보존 목적이며 활용하지 않는다 | 상태를 적지 않고 대체된 문서에는 superseded를 표시한다 | 대체된 문서의 superseded 표시 검사 |",
+   "principle": "SSOT",
+   "consequence": "같은 절 안에서 한 문장은 spec·plan 을 다루지 않는다고 말하고 표의 설계 행은 spec·plan 의 수명과 superseded 표시를 정하고 있으며, 그 표시를 scripts/test_docs_drift.sh 가 실제로 검사한다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "원칙",
+   "statement": "원칙 절의 일곱 조항은 작업의 종류를 가리지 않고 모두 걸린다.",
+   "evidence": "어느 작업에나 걸린다."
+  },
+  {
+   "topic": "FAIL-LOUD",
+   "statement": "어긋남은 감추지 않고 그 자리에서 드러낸다.",
+   "evidence": "어긋남을 발견하면 바로 드러낸다."
+  },
+  {
+   "topic": "FOCUSED",
+   "statement": "함수와 파일과 스킬과 서브에이전트 같은 하나의 업무 단위는 한 가지 일만 한다.",
+   "evidence": "다른 작업은 내부를 몰라도 입력과 출력만 알면 쓸 수 있게 만든다."
+  },
+  {
+   "topic": "EXPLICIT",
+   "statement": "서브에이전트에 넘기는 맥락은 그 프롬프트에 적어 넣는다.",
+   "evidence": "이름과 타입과 계약만으로 동작이 드러나게 한다."
+  },
+  {
+   "topic": "SSOT",
+   "statement": "하나의 사실은 한 곳에만 두고 다른 데서는 참조하거나 도출한다.",
+   "evidence": "다른 데서 필요하면 복제하지 말고 그곳을 참조하거나 거기서 도출한다."
+  },
+  {
+   "topic": "NAME-ITEMS",
+   "statement": "순서가 없는 항목은 번호가 아니라 이름으로 부른다.",
+   "evidence": "번호는 거짓 우선순위를 만든다."
+  },
+  {
+   "topic": "REVERSIBLE",
+   "statement": "되돌리기 어려운 결정에는 근거를 남긴다.",
+   "evidence": "되돌릴 수 있는 결정을 선호한다."
+  },
+  {
+   "topic": "SECRETS",
+   "statement": "키와 토큰과 비밀번호는 서버에만 두고 프롬프트와 로그에도 남기지 않는다.",
+   "evidence": "프롬프트와 로그에도 비밀과 개인정보를 남기지 않는다."
+  },
+  {
+   "topic": "Karpathy guidelines",
+   "statement": "이 지침 넷은 속도보다 조심을 택하며 사소한 작업에서는 판단으로 조절한다.",
+   "evidence": "For trivial tasks, use judgment."
+  },
+  {
+   "topic": "PLAIN-KO",
+   "statement": "낱말의 쉬움은 빈도가 정하고 어종은 정하지 못한다.",
+   "evidence": "쉬움을 정하는 것은 빈도이고 어종이 아니다."
+  },
+  {
+   "topic": "KO-SYNTAX",
+   "statement": "관형절을 문장 가운데 끼우지 않고 명사 앞에 수식을 쌓지 않으며 길이는 기준으로 삼지 않는다.",
+   "evidence": "비슷한 명사구를 한 문장에 겹치지 않는다."
+  },
+  {
+   "topic": "PROSE-FORM",
+   "statement": "이름을 붙이는 위치에만 명사구를 쓰고 주장은 본문 문장으로 내리며 한 표와 한 목록 안에서 말끝을 맞춘다.",
+   "evidence": "제목과 표 머리처럼 이름을 붙이는 위치에만 명사구로 쓰고, 주장은 본문 문장으로 내린다."
+  },
+  {
+   "topic": "READ-FLOW",
+   "statement": "결론을 먼저 말하고 소제목 아래 첫 문장에 그 절의 결론을 적는다.",
+   "evidence": "소제목 바로 아래 첫 문장에 그 절의 결론을 적는다."
+  },
+  {
+   "topic": "IDEMPOTENT",
+   "statement": "스크립트와 셋업은 현재 상태를 확인하고 차이만 고쳐 두 번 돌려도 결과가 같다.",
+   "evidence": "스크립트와 셋업은 현재 상태를 확인하고 차이만 고쳐, 두 번 돌려도 중복이나 손상이 생기지 않게 한다."
+  },
+  {
+   "topic": "EXPLAIN-STRUCTURE",
+   "statement": "코드를 바꾸면 바뀐 줄이 아니라 무엇이 무엇을 부르고 무엇에 의존하게 되었는지를 적는다.",
+   "evidence": "줄은 diff가 이미 보여 준다."
+  },
+  {
+   "topic": "LOCAL-FIRST",
+   "statement": "기본은 이 PC에서 바로 돌리는 것이고 도커는 정해진 네 조건에서만 쓴다.",
+   "evidence": "`LOCAL-FIRST`는 원칙이 아니라 이 환경의 관례다."
+  },
+  {
+   "topic": "대화할 때",
+   "statement": "답 한 번에 FAIL-LOUD 와 NAME-ITEMS 와 SECRETS 가 걸리고 한국어 조항 넷은 한국어로 쓸 때만 걸린다.",
+   "evidence": "`FAIL-LOUD`와 `NAME-ITEMS`와 `SECRETS`가 답 한 번에도 걸린다."
+  },
+  {
+   "topic": "문서를 쓰고 관리할 때",
+   "statement": "문서에도 SSOT 와 NAME-ITEMS 와 EXPLICIT 이 걸리고 카파시 지침 셋의 목적어를 문서로 읽는다.",
+   "evidence": "`SSOT`와 `NAME-ITEMS`와 `EXPLICIT`이 문서에도 그대로 걸리고, Simplicity First와 Surgical Changes와 Goal-Driven Execution의 목적어를 문서로 읽는다."
+  },
+  {
+   "topic": "코딩할 때",
+   "statement": "코드에는 FOCUSED 와 SSOT 와 EXPLICIT 과 카파시 지침 넷이 모두 걸리고 코드 전용 조항 셋이 더 걸린다.",
+   "evidence": "`FOCUSED`와 `SSOT`와 `EXPLICIT`이 코드에 그대로 걸리고, Karpathy guidelines 넷이 모두 걸린다."
+  },
+  {
+   "topic": "검증",
+   "statement": "한 번에 낸 출력을 검토 없이 결과로 삼지 않고 렌즈 호출은 상시 허용된 것으로 본다.",
+   "evidence": "렌즈 호출은 사용자가 상시 허용한 것으로 본다."
+  },
+  {
+   "topic": "lens-prior-art",
+   "statement": "웹에 나가는 선행연구 렌즈만 상시 허가에서 빠져 그때마다 승인을 받는다.",
+   "evidence": "웹에 나가는 `lens-prior-art`는 그때마다 승인을 받는다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈를 언제 띄우는지는 부르는 스킬이 정하고 띄우는 방법은 dispatching-lenses 가 정한다.",
+   "evidence": "어느 렌즈를 언제 띄우는지는 그것을 부르는 스킬이 정하고, 띄우는 방법은 `dispatching-lenses`가 정한다."
+  },
+  {
+   "topic": "domain-korean",
+   "statement": "쓰지 않는 낱말의 목록은 domain-korean 의 금지 표현 표가 소유하고 문자열 검색으로 거른다.",
+   "evidence": "쓰지 않는 낱말의 목록은 `domain-korean`의 「금지 표현」 표가 소유한다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "플러그인과 마켓플레이스를 만들 때의 규칙은 domain-plugin 이 소유한다.",
+   "evidence": "플러그인과 마켓플레이스를 만들 때의 규칙은 `domain-plugin`이 소유한다."
+  },
+  {
+   "topic": "review-docs",
+   "statement": "문서를 쓰거나 고친 뒤의 검진 절차는 review-docs 가 소유한다.",
+   "evidence": "문서를 쓰거나 고친 뒤의 검진 절차는 `review-docs`가 소유한다."
+  },
+  {
+   "topic": "domain-readme",
+   "statement": "README 고유의 동선과 배지 판단은 domain-readme 가 소유한다.",
+   "evidence": "README 고유의 동선과 배지 판단은 `domain-readme`가 소유한다."
+  },
+  {
+   "topic": "미해결의 처분",
+   "statement": "해결되지 않은 문제를 할 일 목록 문서에 모으지 않고 즉시 처리와 메모리 기록과 즉시 통보로 가른다.",
+   "evidence": "해결되지 않은 문제를 할 일 목록 문서에 모으지 않는다."
+  },
+  {
+   "topic": "병렬 오케스트레이션",
+   "statement": "독립된 일이 둘 이상이고 각 일이 계획과 구현과 리뷰를 한 바퀴 가질 만큼 크면 일마다 서브오케스트레이터를 두어 동시에 돌린다.",
+   "evidence": "일이 하나뿐이면 그 단계는 낭비다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "병렬 오케스트레이션의 상세는 nested-orchestration 이 소유한다.",
+   "evidence": "상세는 `nested-orchestration`을 참고한다."
+  },
+  {
+   "topic": "이 파일의 취급",
+   "statement": "이 파일이 정본이고 전역 폴더의 사본은 매 세션 덮어써지므로 직접 고치지 않는다.",
+   "evidence": "전역 폴더의 사본은 직접 고치지 않는다."
+  }
+ ]
+}

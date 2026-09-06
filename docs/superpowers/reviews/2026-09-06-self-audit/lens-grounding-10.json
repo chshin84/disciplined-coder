@@ -1,0 +1,173 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/audit-repo-docs/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "scripts/audit_targets.sh",
+  "scripts/audit_evidence.sh",
+  "scripts/audit_rounds.sh",
+  "scripts/audit_topics.sh",
+  "scripts/audit_statements.sh",
+  "scripts/audit_prior_rounds.sh",
+  "scripts/audit_verify.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/test_audit.sh",
+  "scripts/test_docs_drift.sh",
+  "docs/superpowers/rewrite-map/"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "PROSE-FORM",
+  "READ-FLOW",
+  "Karpathy guidelines"
+ ],
+ "notes": "doc_type — 절차·계약 (operations·setup·contract). 감사 한 회차를 어떻게 도는지의 수행 방법과 회차 기록 파일 넷의 스키마 계약을 담고, 진행 상태나 다음 단계는 담지 않아 상태 행이 아니다. 훑은 각도. lens-grounding 은 넷을 따로 훑었다. (1) 누락 — 문서가 이름으로 부른 스크립트 아홉을 모두 열어, 문서가 약속한 사용법 줄과 스크립트의 usage 문자열을 한 줄씩 맞댔다. 플래그는 모두 실재했고, metrics 는 문서가 --root DIR 를 뺐지만 스크립트의 오류 안내와 같아 어긋남으로 세지 않았다. run.json 이 담을 것의 열거만 검수 스크립트가 요구하는 칸과 어긋나 올렸다. (2) 모순 — 「회차 대조」 절 안의 두 서술을 맞댔다. (3) 환각 — 문서가 부른 스크립트와 절 이름이 모두 실재하는지 보았다. dispatching-lenses 의 네 절 제목이 모두 그 파일의 제목으로 있었고, test_docs_drift.sh 는 문서가 적은 대로 열거와 옛 이름을 검사하고 있었다. (4) 불일치 — metrics 출력 칸 일곱이 스크립트 출력과 글자까지 같았고, 「걸음」 표의 행 열하나가 문장의 수와 맞았으며, 표가 가리키는 절 열둘이 모두 실재했다. diff.json 의 값 집합만 어긋나 올렸다. lens-fit 은 다섯을 따로 훑었다. 형식은 frontmatter 의 name·description 과 제목 꼴을 보았고 어긋난 것이 없다. 스타일은 표와 목록 안의 말끝이 하나로 맞는지, 소제목 바로 아래 첫 문장이 그 절의 결론인지를 절 열둘에서 보았고 어긋난 것이 없다. 오염과 호환은 이 문서가 파싱 대상이 아니라 걸리는 것이 없었다. 규율은 정본을 계약으로 삼아, 먼저 문서 타입 표에서 절차·계약 행을 가린 뒤 그 행이 담지 말라는 상태가 있는지 보았고 없었다. 이어 나머지 조항을 훑어 SSOT 하나와 열거 수 하나를 올렸다. 올리지 않은 것 셋. 첫째, 「기계가 하는 것」의 '중복 제거' 항목은 어느 스크립트도 하지 않고 세션이 지문을 견주는 일인데, 없음을 인용으로 댈 수 없어 상대편을 못 세워 뺐다. 둘째, 「감사 대상 고르기」의 '레포에 든 .md 파일을 모두 세운 뒤'는 audit_targets.sh 가 git ls-files 로 추적 파일만 세는 것과 좁게 보면 다르지만, 지금 docs/superpowers/rewrite-map/ 아래 일곱은 모두 머리에 superseded 를 달아 「대상 아님」에 걸리므로 목록에서 빠진 살아 있는 문서가 없어 결과를 구체적으로 못 적어 뺐다. 셋째, 「통합 기록」의 findings.json 서술은 사유를 기각에만 요구하는데 audit_verify.sh 는 미판정에도 verdict_reason 을 요구한다. 다만 「판정」 절이 '판정마다 근거를 적고'라 적고 「회차 대조」 절이 미판정의 verdict_reason 을 글자로 보여 주므로 문서가 덮고 있다고 보아 뺐다. 더 확인할 것 둘. 「회차 대조」의 '확정·미판정·도출 발견'에서 '도출'이 「일관성 대조」의 복제 도출 발견을 가리키는지, 아니면 test_audit.sh 가 남지 말라고 검사하는 옛 derived 상태의 잔재인지가 이 문서만으로는 갈리지 않는다. 그리고 「통합 기록」의 '감사 범위'는 세 곳에서 그 이름으로 불리는데 정작 그 절은 '범위와 배정'이라 적어 이름이 반만 맞는다.",
+ "issues": [
+  {
+   "lens": "lens-grounding",
+   "where": "「통합 기록」 절의 run.json 항목",
+   "type": "omission",
+   "claim": "run.json 이 담을 것의 서술이 audit_verify.sh 가 있는지 확인하는 칸 가운데 셋을 안 적는다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "스키마 버전, 실행체 이름(`self-audit`으로 고정한다), 커밋 지문과 작업 트리 상태, 끝난 걸음 목록, 대상 문서마다 건 렌즈와 그 근거, 기계 검사 요약, 그리고 `metrics` 칸을 담는다.",
+   "counterpart_file": "scripts/audit_verify.sh",
+   "counterpart": "for k in [\"tokens_method\", \"lens_calls\", \"subagents\", \"metrics\", \"completed\", \"targets\"]:",
+   "principle": "EXPLICIT",
+   "consequence": "지금 run.json 이 담을 것의 서술에는 검수 스크립트가 있는지 보는 여섯 칸 가운데 tokens_method·lens_calls·subagents 셋이 빠져 있고, 그 셋의 이름은 이 절차 문서 어디에도 없다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「통합 기록」 절의 diff.json 항목",
+   "type": "mismatch",
+   "claim": "diff.json 항목의 값을 잔존·해소 둘로 적었으나 스크립트는 재발까지 셋을 쓴다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "**`diff.json`** — 앞선 회차에서 온 발견마다 잔존·해소 가운데 하나를 적은 대조 결과다.",
+   "counterpart_file": "scripts/audit_rounds.sh",
+   "counterpart": "\"verdict\": \"재발\", \"matched_id\": cur_fp[fp]})",
+   "principle": "SSOT",
+   "consequence": "지금 diff.json 의 verdict 값 집합이 「통합 기록」에는 둘로, 같은 문서의 「회차 대조」와 audit_rounds.sh 에는 재발을 더한 셋으로 적혀 있다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「회차 대조」 절의 대조 대상 열거",
+   "type": "contradiction",
+   "claim": "같은 절이 대조 대상을 한 번은 기각 포함 전부라 적고, 열거에서는 기각을 뺀다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "직전 회차 `findings.json`의 확정·미판정·도출 발견, 직전 회차 `diff.json`이 잔존으로 적은 항목, 그리고 직전 회차 `diff.json`이 해소로 적은 항목 가운데 전전 회차 `diff.json`에서는 해소가 아니었던 것이다.",
+   "counterpart_file": "scripts/test_audit.sh",
+   "counterpart": "check \"기각된 앞선 발견도 대조한다\"",
+   "principle": "SSOT",
+   "consequence": "지금 「회차 대조」 절의 첫 문장은 기각을 포함한 발견 전부를 대조 대상이라 적고, 같은 절의 열거는 확정·미판정·도출만 들며, 계약 테스트와 audit_rounds.sh 는 기각까지 대조한다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "audit-repo-docs",
+   "statement": "이 절차는 살아 있는 문서를 헤아리고 종류별로 렌즈를 배정해 병렬로 띄운 뒤, 한 파일에 모아 뿌리를 찾아 사용자에게 넘기는 데서 끝난다.",
+   "evidence": "사용자가 레포 전체 점검을 요청하면 살아 있는 문서를 모두 헤아리고, 문서 종류에 따라 렌즈를 배정해 병렬로 띄우고, 결과를 한 파일에 모아 되풀이되는 뿌리를 찾은 뒤 가른 목록을 사용자에게 넘긴다."
+  },
+  {
+   "topic": "audit-repo-docs",
+   "statement": "호출자는 처분을 정하지 않고 사용자가 정한다.",
+   "evidence": "호출자는 처분을 정하지 않는다."
+  },
+  {
+   "topic": "review-docs",
+   "statement": "문서 하나를 쓰거나 고친 뒤의 검진은 이 절차가 아니라 review-docs 가 소유한다.",
+   "evidence": "문서 하나를 쓰거나 고친 뒤의 검진은 `review-docs`가 소유한다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "정본을 렌즈에 알리는 방법은 dispatching-lenses 가 소유하므로 이 절차에 베끼지 않는다.",
+   "evidence": "방법은 `dispatching-lenses`의 「렌즈에게 정본을 알리는 법」이 소유하므로 여기 베끼지 않는다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "집계는 aggregating-lenses 의 세 걸음을 그대로 따르고 결정은 내지 않는다.",
+   "evidence": "렌즈 결과를 한 목록으로 병합한 뒤 `aggregating-lenses`의 「하는 일」 세 걸음으로 상충과 커버리지 공백을 표시한다."
+  },
+  {
+   "topic": "lens-grounding",
+   "statement": "한 호출 안에서 lens-grounding 을 앞에, lens-readability 를 뒤에 두는 차례가 고정돼 있다.",
+   "evidence": "`lens-grounding`을 앞에 두는 것은 그것만 문서 밖 코드까지 뒤지기 때문이고, `lens-readability`를 뒤에 두는 것은 목적 한 줄과 `domain-korean`만 있으면 되는 가장 자족적인 렌즈이기 때문이다."
+  },
+  {
+   "topic": "lens-fit",
+   "statement": "렌즈 자신의 SKILL.md 에는 lens-fit 하나만 건다.",
+   "evidence": "| 렌즈 정의 | 렌즈 자신의 `SKILL.md` | `lens-fit` |"
+  },
+  {
+   "topic": "lens-readability",
+   "statement": "lens-readability 를 건 문서에는 읽는 사람과 그 사람이 할 수 있어야 하는 것을 담은 목적 한 줄을 함께 준다.",
+   "evidence": "표가 `lens-readability`를 건 문서에는 목적 한 줄을 함께 준다."
+  },
+  {
+   "topic": "lens-adversarial",
+   "statement": "lens-adversarial 은 문서별 배정에서 빠지고 저장소 전체를 입력으로 한 번만 띄운다.",
+   "evidence": "`lens-adversarial`은 문서별로 배정하지 않고 저장소 전체를 입력으로 따로 한 번 띄운다."
+  },
+  {
+   "topic": "lens-consistency",
+   "statement": "lens-consistency 는 문서별 배정 표 밖이며 갈리는 짝마다 건다.",
+   "evidence": "`lens-consistency`는 이 표 밖이다."
+  },
+  {
+   "topic": "lens-prior-art",
+   "statement": "웹에 나가는 lens-prior-art 는 이 절차에서 쓰지 않고 쓰려면 따로 승인을 받는다.",
+   "evidence": "`lens-prior-art`는 설계가 선행 사례와 어긋나는지 보는 렌즈다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "이 절차에서는 렌즈 호출 하나가 문서 하나를 받는 규칙이 review-specs 의 대상별 분리 규칙을 대신한다.",
+   "evidence": "이 규칙은 이 절차에서 `review-specs`의 \"대상마다 따로 띄운다\"를 대신한다."
+  },
+  {
+   "topic": "검증",
+   "statement": "인용 확인을 지난 발견의 실질성은 서브에이전트가 아니라 세션이 판정한다.",
+   "evidence": "인용 확인을 지난 발견을 **세션이 판정한다**."
+  },
+  {
+   "topic": "검증",
+   "statement": "findings.json 의 status 닫힌 집합은 confirmed·rejected·undetermined 셋이고 이 문장이 그 정본이다.",
+   "evidence": "`findings.json`의 `status`가 `confirmed`·`rejected`·`undetermined` 가운데 하나다."
+  },
+  {
+   "topic": "문서를 쓰고 관리할 때",
+   "statement": "회차 기록의 이름 규칙은 정본이 소유하고 이 절차는 그것을 따른다.",
+   "evidence": "이름 규칙은 정본의 기록 이름 규칙을 따른다."
+  },
+  {
+   "topic": "미해결의 처분",
+   "statement": "이번에 안 고치기로 한 것은 정본의 미해결 처분대로 메모리에 적고 사용자에게 알린다.",
+   "evidence": "정본의 「미해결의 처분」대로 메모리에 적고 사용자에게 알린다."
+  },
+  {
+   "topic": "Karpathy guidelines",
+   "statement": "사용자 결정이 필요한 것은 선택지가 있는 질문으로 묻는다.",
+   "evidence": "선택지가 있는 질문으로 묻는다(Think Before Acting)."
+  },
+  {
+   "topic": "domain-korean",
+   "statement": "문체 지표로 세는 말은 domain-korean 의 금지 표현 표에 오른 것으로 한정한다.",
+   "evidence": "세는 지표는 `domain-korean`의 「금지 표현」 표에 오른 말로 한정한다."
+  },
+  {
+   "topic": "FAIL-LOUD",
+   "statement": "계약 테스트를 전부 돌리고 실패한 이름을 모아 마지막에 알린다.",
+   "evidence": "실패한 것이 있으면 그 이름을 모아 마지막에 알린다."
+  },
+  {
+   "topic": "NAME-ITEMS",
+   "statement": "처분 넷 사이에는 순서를 두지 않는다.",
+   "evidence": "처분은 넷이고 사이에 순서가 없다."
+  }
+ ]
+}

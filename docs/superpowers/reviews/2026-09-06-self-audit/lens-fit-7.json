@@ -1,0 +1,57 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/dispatching-lenses/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/nested-orchestration/SKILL.md",
+  "skills/review-llm-calls/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/audit_verify.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "FOCUSED",
+  "PROSE-FORM",
+  "READ-FLOW"
+ ],
+ "notes": "doc_type — 절차·계약. 정본 「문서 타입과 수명」 표에서 고른 행이다. 이 문서는 렌즈를 몇 번 어떻게 띄우고 무엇을 먼저 기계에 넘기는지의 수행 방법을 담고, 진행 상태나 설계 근거를 담지 않는다. lens-grounding 체크리스트를 항목마다 따로 훑었다. [누락] 호출자 목록이 든 넷을 하나씩 열어 이 규율을 여는 문장이 있는지 확인했다 — review-specs·review-docs·audit-repo-docs·nested-orchestration 디스패치 템플릿에 모두 있어 빠진 호출자는 없었다. [모순] 예외 넷을 각 렌즈 파일과 맞댔다 — lens-consistency와 lens-readability는 이 절을 가리키고 값도 같으며, lens-prior-art의 상한 값도 같고, lens-adversarial만 가리키는 문장이 없어 발견으로 올렸다. lens-readability가 옛 문장을 지금 적지 않는 것은 이 문서가 과거형으로 적고 있어 어긋남이 아니다. [환각] 이 문서가 test_docs_drift.sh에 대해 말한 것을 실제 검사와 대조했다 — TELL_SENT 검사가 「렌즈에게 정본을 알리는 법」 첫 항목 문장을 dispatching-lenses를 뺀 모든 스킬에서 찾아 실패시키므로 그 주장은 그대로 성립한다. [불일치] 렌즈 이름 표준이 든 세 자리를 확인했다 — aggregating-lenses의 lens 열거, review-specs의 렌즈 원본 파일 이름, audit_verify.sh 의 정규식과 findings.json lens 접두사 검사가 모두 그 한 문자열을 쓴다. lens-fit 체크리스트도 항목마다 따로 훑었다. [형식] 이 문서에는 파싱될 스키마가 없어 걸릴 것이 없었다. [오염] 마크다운 펜스나 여분 텍스트는 없었다. [호환] 예외 목록과 호출자 목록의 이름이 실제 스킬 디렉터리와 모두 맞았다. [규율] 정본을 계약으로 삼아 문서 타입을 절차·계약으로 가른 뒤, 그 행이 담지 말라고 한 진행 상태와 다음 단계가 있는지 먼저 보았고 없었다. 그다음 나머지 조항을 훑어 SSOT 하나와 PROSE-FORM 하나를 올렸다. 계약 칸에 정본만 왔고 domain-korean은 안 와서 금지 표현과 개조식은 판정하지 않았다 — 그 몫은 scripts/test_docs_drift.sh 의 금지 표현 검사가 이 파일을 포함해 이미 진다. 더 확인할 것 둘을 남긴다. 첫째, scripts/test_docs_drift.sh 의 RULE_MARKS 검사는 review-specs·nested-orchestration·review-docs 셋만 훑고 호출자인 audit-repo-docs를 대상에서 빼는데, 그것이 의도인지 빠뜨린 것인지는 이 문서만으로 갈리지 않는다. 둘째, 이 문서 「띄우는 방법」 절이 '렌즈는 한 번씩만 띄운다'를 적고 곧바로 아래 절이 소유한다고 말하는 자리는 같은 파일 안의 중복인데, 같은 문자열을 scripts/test_docs_drift.sh 가 앵커로 요구하고 있어 문서만 고치면 검사가 깨진다. 문서를 고칠지 검사의 앵커를 옮길지는 호출자가 정할 일이라 발견으로 올리지 않았다.",
+ "issues": [
+  {
+   "lens": "lens-fit",
+   "where": "「예외 목록」 절, lens-prior-art 항목",
+   "type": "constraint",
+   "claim": "베끼지 말라고 같은 절에서 정해 놓고 lens-prior-art가 소유한 상한 두 값을 숫자로 옮겨 적었다. 호출자인 review-specs는 같은 값을 숫자로 적지 않고 그 렌즈의 「띄울 때 지킬 상한」을 가리키기만 한다.",
+   "file": "skills/dispatching-lenses/SKILL.md",
+   "evidence": "사용자 승인 아래 통상 둘, 최대 여섯이다.",
+   "counterpart_file": "skills/lens-prior-art/SKILL.md",
+   "counterpart": "사용자가 최대한으로 돌리라고 하면 여섯까지이고 여섯이 최댓값이라 그 위는 없다.",
+   "principle": "SSOT",
+   "consequence": "지금 통상 둘과 최대 여섯이라는 두 값이 skills/dispatching-lenses/SKILL.md 의 예외 목록과 skills/lens-prior-art/SKILL.md 의 「띄울 때 지킬 상한」 두 곳에 각각 숫자로 적혀 있다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "「판단 앞에 기계를 세운다」 절 제목",
+   "type": "style",
+   "claim": "정본은 이름을 붙이는 자리를 명사구로 쓰고 주장은 본문 첫 문장으로 내리라고 정하는데, 이 소제목만 서술문이다. 같은 문서의 다른 소제목 여섯은 모두 명사구다.",
+   "file": "skills/dispatching-lenses/SKILL.md",
+   "evidence": "## 판단 앞에 기계를 세운다",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "제목과 표 머리처럼 이름을 붙이는 위치에만 명사구로 쓰고, 주장은 본문 문장으로 내린다.",
+   "principle": "PROSE-FORM",
+   "consequence": "지금 이 문서의 소제목 일곱 가운데 이 하나만 서술문이고 나머지 여섯은 명사구다. review-docs·review-llm-calls·audit-repo-docs 세 문서가 그 서술문을 절 이름으로 부른다."
+  }
+ ]
+}

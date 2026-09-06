@@ -1,0 +1,61 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-readme/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "README.md",
+  "skills/domain-readme/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FOCUSED",
+  "NAME-ITEMS",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "FAIL-LOUD"
+ ],
+ "notes": "문서 타입 판정(lens-fit 규율 걸음 1): 절차·계약 행으로 가렸다. 이 문서는 README 를 쓰는 수행 방법만 담고 진행 상태나 다음 단계를 담지 않아 상태 행이 아니고, 문서의 위치만 가리키는 규범·인덱스 행도 아니다. 걸음 2(그 행이 담지 말라고 한 것)에서는 걸린 것이 없다. 절차·계약 행의 '상태를 적지 않고 방법만 적는다'에 비추어 훑었고 진행 상태를 담은 문장은 없다. 호출자가 정한 최상위 칸에 doc_type 이 없어 여기에 적는다. lens-grounding 으로 훑은 각도는 넷이다. 누락에서는 정본의 소유 선언이 요구하는 두 가지를 이 문서가 「권장 동선」과 「필요한 것만」으로 모두 덮는지 보았고 덮고 있었다. 모순에서는 이 문서의 규칙과 이 레포 README.md 를 열어 맞댔고 「독자 분리」 하나가 걸렸다. 환각에서는 이 문서가 정본에 있다고 부른 세 자리를 정본에서 확인했고 모두 실재했다. 불일치에서는 인용한 절 이름과 조항 이름이 정본의 글자와 맞는지 보았고, 절 이름은 맞았으며 조항은 ID 대신 풀어 쓴 말로 불려 lens-fit 쪽 발견으로 올렸다. lens-fit 으로 훑은 각도는 다섯이다. 형식에서는 frontmatter 의 name·description 이 있고 name 이 디렉터리 이름과 같은지 보았고 맞았다. 스타일에서는 한 표와 한 목록 안의 말끝, 제목의 명사구 여부, 용어의 단일성을 보았고 용어 하나가 걸렸다. 오염에서는 본문에 남은 지시문이나 잘린 구간이 없는지 보았고 없었다. 호환에서는 정본이 이 문서에 준 소유 범위를 벗어난 규정이 있는지 보았고, 「독자가 빨리 답해야 하는 네 가지」와 「독자 분리」는 소유 범위보다 넓지만 정본의 다른 조항과 부딪히지 않아 올리지 않았다. 남은 확인거리가 둘이다. 첫째, README.md 의 훅 표를 개발자 내부 근거로 볼지는 프로젝트 CLAUDE.md 가 그 절을 훅 배선의 정본으로 선언한 것과 부딪힌다. 「독자 분리」와 그 선언 가운데 무엇이 이기는지는 사용자 결정이 필요하다. 둘째, 「출처」의 링크 다섯은 웹에 나가지 않아 확인하지 않았다.",
+ "issues": [
+  {
+   "lens": "lens-fit",
+   "where": "도입 문단",
+   "type": "constraint",
+   "claim": "정본을 이름으로 참조한다고 선언해 놓고 세 조항 가운데 둘을 조항 ID 가 아니라 조항 내용을 풀어 쓴 말로 가리킨다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "분량은 정본 「Karpathy guidelines」의 Simplicity First, 사실을 한 곳에만 두는 것과 한 파일이 한 일만 하는 것은 정본 「원칙」, 결론을 먼저 두는 것은 정본 「대화할 때」의 두괄식 조항이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "이 문서는 원칙을 먼저 정의하고, 그다음 대화할 때와 문서를 쓰고 관리할 때와 코딩할 때로 나누어 그 작업에 걸리는 원칙을 이름으로 부른다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 이 문장은 `SSOT`·`FOCUSED`·`READ-FLOW` 세 조항을 ID 없이 '사실을 한 곳에만 두는 것'·'한 파일이 한 일만 하는 것'·'두괄식 조항'으로만 부르고 있고, 같은 문장 안에서 이름으로 불린 것은 Simplicity First 하나다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "필요한 것만 (frontmatter description 과 대조)",
+   "type": "style",
+   "claim": "같은 개념을 frontmatter description 에서는 '배지'와 '목차'로, 본문에서는 'badge'와 'TOC'로 부른다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "badge·TOC·스크린샷·changelog는 프로젝트가 실제로 필요로 할 때만 넣는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "한 개념에는 한 용어만 쓰고 앞 문장의 말을 그대로 다시 쓴다.",
+   "principle": "READ-FLOW",
+   "consequence": "지금 한 파일 안에서 배지를 가리키는 말이 description 의 '배지'와 본문의 'badge' 둘이고, 목차를 가리키는 말도 '목차'와 'TOC' 둘이다. 정본이 이 문서의 소유 범위를 선언한 문장도 '배지 판단'이라 적어 본문 용어와 갈린다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "권장 동선",
+   "type": "style",
+   "claim": "소제목 바로 아래 첫 문장이 그 절의 결론이 아니라 오해를 막는 단서다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "순위가 아니다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "소제목 바로 아래 첫 문장에 그 절의 결론을 적는다.",
+   "principle": "READ-FLOW",
+   "consequence": "지금 「권장 동선」 절의 첫 문장은 순위 여부를 부정하는 단서이고, 그 절의 결론인 절 순서는 두 번째 문장에 있다."
+  }
+ ]
+}
