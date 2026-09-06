@@ -1,0 +1,166 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/dispatching-lenses/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/nested-orchestration/SKILL.md",
+  "skills/review-llm-calls/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/audit_verify.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "FOCUSED",
+  "PROSE-FORM",
+  "READ-FLOW"
+ ],
+ "notes": "doc_type — 절차·계약. 정본 「문서 타입과 수명」 표에서 고른 행이다. 이 문서는 렌즈를 몇 번 어떻게 띄우고 무엇을 먼저 기계에 넘기는지의 수행 방법을 담고, 진행 상태나 설계 근거를 담지 않는다. lens-grounding 체크리스트를 항목마다 따로 훑었다. [누락] 호출자 목록이 든 넷을 하나씩 열어 이 규율을 여는 문장이 있는지 확인했다 — review-specs·review-docs·audit-repo-docs·nested-orchestration 디스패치 템플릿에 모두 있어 빠진 호출자는 없었다. [모순] 예외 넷을 각 렌즈 파일과 맞댔다 — lens-consistency와 lens-readability는 이 절을 가리키고 값도 같으며, lens-prior-art의 상한 값도 같고, lens-adversarial만 가리키는 문장이 없어 발견으로 올렸다. lens-readability가 옛 문장을 지금 적지 않는 것은 이 문서가 과거형으로 적고 있어 어긋남이 아니다. [환각] 이 문서가 test_docs_drift.sh에 대해 말한 것을 실제 검사와 대조했다 — TELL_SENT 검사가 「렌즈에게 정본을 알리는 법」 첫 항목 문장을 dispatching-lenses를 뺀 모든 스킬에서 찾아 실패시키므로 그 주장은 그대로 성립한다. [불일치] 렌즈 이름 표준이 든 세 자리를 확인했다 — aggregating-lenses의 lens 열거, review-specs의 렌즈 원본 파일 이름, audit_verify.sh 의 정규식과 findings.json lens 접두사 검사가 모두 그 한 문자열을 쓴다. lens-fit 체크리스트도 항목마다 따로 훑었다. [형식] 이 문서에는 파싱될 스키마가 없어 걸릴 것이 없었다. [오염] 마크다운 펜스나 여분 텍스트는 없었다. [호환] 예외 목록과 호출자 목록의 이름이 실제 스킬 디렉터리와 모두 맞았다. [규율] 정본을 계약으로 삼아 문서 타입을 절차·계약으로 가른 뒤, 그 행이 담지 말라고 한 진행 상태와 다음 단계가 있는지 먼저 보았고 없었다. 그다음 나머지 조항을 훑어 SSOT 하나와 PROSE-FORM 하나를 올렸다. 계약 칸에 정본만 왔고 domain-korean은 안 와서 금지 표현과 개조식은 판정하지 않았다 — 그 몫은 scripts/test_docs_drift.sh 의 금지 표현 검사가 이 파일을 포함해 이미 진다. 더 확인할 것 둘을 남긴다. 첫째, scripts/test_docs_drift.sh 의 RULE_MARKS 검사는 review-specs·nested-orchestration·review-docs 셋만 훑고 호출자인 audit-repo-docs를 대상에서 빼는데, 그것이 의도인지 빠뜨린 것인지는 이 문서만으로 갈리지 않는다. 둘째, 이 문서 「띄우는 방법」 절이 '렌즈는 한 번씩만 띄운다'를 적고 곧바로 아래 절이 소유한다고 말하는 자리는 같은 파일 안의 중복인데, 같은 문자열을 scripts/test_docs_drift.sh 가 앵커로 요구하고 있어 문서만 고치면 검사가 깨진다. 문서를 고칠지 검사의 앵커를 옮길지는 호출자가 정할 일이라 발견으로 올리지 않았다.",
+ "issues": [
+  {
+   "lens": "lens-grounding",
+   "where": "「띄우는 방법」 절, 렌즈끼리 볼 것을 나눠 주지 않는다 문단",
+   "type": "unsupported",
+   "claim": "이 문단은 근거의 소유자를 review-specs로 지목하면서 자기가 근거 문장을 함께 적는다. 지목된 review-specs의 같은 이름 문단에는 이 근거 문장이 없고, 그 문단은 다른 근거를 적는다. 같은 글자의 이 문장은 review-llm-calls에도 그대로 있어 근거가 소유자 밖 두 곳에 산다.",
+   "file": "skills/dispatching-lenses/SKILL.md",
+   "evidence": "`grounding`이 외부 사실의 근거를 보고 `fit`이 양식과 계약을 보므로 원래 보는 것이 갈려 있다.",
+   "counterpart_file": "skills/review-specs/SKILL.md",
+   "counterpart": "이 규칙은 여기가 소유하고 다른 호출자는 이 문단을 가리킨다.",
+   "principle": "SSOT",
+   "consequence": "지금 그 근거 문장은 소유자로 지목된 skills/review-specs/SKILL.md 에 없고, skills/dispatching-lenses/SKILL.md 와 skills/review-llm-calls/SKILL.md 두 파일에만 같은 글자로 들어 있다. scripts/test_docs_drift.sh 는 앞 문장이 세 파일에 있는지만 보고 뒤의 근거 문장은 보지 않는다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「판단 앞에 기계를 세운다」 절 마지막 문단",
+   "type": "mismatch",
+   "claim": "렌즈마다 「기계에 넘기는 것」 절이 있고 그 절이 비어 있으면 넘길 것이 없다는 뜻이라고 적었으나, 렌즈 여섯 가운데 lens-prior-art에는 그 이름의 절 자체가 없다. 나머지 다섯은 그 절을 갖고 lens-adversarial은 넘길 것이 없다고 절 안에 적는다.",
+   "file": "skills/dispatching-lenses/SKILL.md",
+   "evidence": "렌즈마다 무엇을 기계에 넘기는지는 그 렌즈 `SKILL.md`의 「기계에 넘기는 것」 절이 적는다.",
+   "counterpart_file": "skills/lens-prior-art/SKILL.md",
+   "counterpart": "## 출력 스키마 (공통 + 이 렌즈의 넷)",
+   "principle": "EXPLICIT",
+   "consequence": "지금 skills/lens-prior-art/SKILL.md 는 「가드」 다음에 「레퍼런스 프롬프트」와 이 출력 스키마 절로 이어지고 「기계에 넘기는 것」 절이 없어서, 그 렌즈가 넘길 것이 없다고 정한 것인지 절을 안 적은 것인지가 이 문장의 규칙으로는 갈리지 않는다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "「예외 목록」 절 첫 문단",
+   "type": "mismatch",
+   "claim": "예외 목록의 소유자가 여기이고 각 렌즈 파일과 호출자는 이 절을 가리키기만 한다고 적었으나, 예외로 든 lens-adversarial의 파일에는 dispatching-lenses를 가리키는 문장이 하나도 없고, 호출자인 audit-repo-docs는 이 예외를 가리키는 대신 자기 사유를 붙여 다시 적는다.",
+   "file": "skills/dispatching-lenses/SKILL.md",
+   "evidence": "각 렌즈 파일과 호출자는 이 절을 가리키고 내용을 베끼지 않는다.",
+   "counterpart_file": "skills/audit-repo-docs/SKILL.md",
+   "counterpart": "`lens-adversarial`은 문서별로 배정하지 않고 저장소 전체를 입력으로 따로 한 번 띄운다.",
+   "principle": "SSOT",
+   "consequence": "지금 lens-adversarial을 따로 띄운다는 예외는 skills/dispatching-lenses/SKILL.md 의 「예외 목록」과 skills/audit-repo-docs/SKILL.md 의 「띄울 때 지킬 것」 두 곳에 각각 사유와 함께 적혀 있고, skills/lens-adversarial/SKILL.md 에는 그 예외도 소유자를 가리키는 문장도 없다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "dispatching-lenses",
+   "statement": "한 대상에 렌즈가 둘 이상 걸려도 호출은 하나이고, 그 호출이 대상을 한 번 읽고 렌즈를 차례로 적용한다.",
+   "evidence": "렌즈마다 따로 띄우지 않고 호출 하나가 그 문서를 한 번 읽고 렌즈를 차례로 적용한다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈는 어느 호출자에서나 한 번씩만 띄우고, 대상이 다르면 별개 호출로 센다.",
+   "evidence": "렌즈는 어느 호출자에서나 한 번씩만 띄운다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "정본 경로는 프롬프트에 넣어 렌즈가 직접 읽게 하고, 그 경로는 실행 시점에 도출한다.",
+   "evidence": "정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "같은 물음에 결정론 검사가 답할 수 있으면 그것을 먼저 돌리고 렌즈는 남은 것만 본다.",
+   "evidence": "같은 물음에 답하는 결정론 검사가 있거나 이 저장소 안에서 몇 줄로 쓸 수 있으면 그것을 먼저 돌리고, 렌즈는 그 결과가 답하지 못한 것만 본다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈를 싸게 만들려고 새 프로젝트나 새 모델이나 새 의존을 제안하지 않고, 그럴 때는 판단이라는 사실을 산출물에 적는다.",
+   "evidence": "**새 프로젝트나 새 모델이나 새 의존이 필요하면 제안하지 않는다.**"
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "한 걸음이 띄우는 에이전트 수에 상한을 두고, 넘으면 잘라 낸 것을 산출물에 남긴다.",
+   "evidence": "한 걸음이 띄우는 에이전트 수에는 상한을 둔다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈 이름은 lens- 접두사가 붙은 한 문자열이고 스킬 디렉터리 이름과 같으며 짧은 이름은 쓰지 않는다.",
+   "evidence": "렌즈 이름은 `lens-` 접두사가 붙은 한 문자열이고 스킬 디렉터리 이름과 같다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "이 규율을 여는 스킬은 넷이다.",
+   "evidence": "이 규율을 여는 스킬은 넷이다."
+  },
+  {
+   "topic": "lens-adversarial",
+   "statement": "자세가 반대라 문서별 호출에 묶지 않고 따로 띄운다.",
+   "evidence": "`lens-adversarial` — 자세가 반대라 문서별 호출과 묶지 않고 따로 띄운다."
+  },
+  {
+   "topic": "lens-prior-art",
+   "statement": "웹에 나가므로 렌즈 하나로 세지 않고 서브에이전트 수로 세며, 통상 둘과 최대 여섯이 그 상한이다.",
+   "evidence": "사용자 승인 아래 통상 둘, 최대 여섯이다."
+  },
+  {
+   "topic": "lens-consistency",
+   "statement": "레포 문서 감사에서 갈리는 짝 묶음을 한 호출에 주고 짝마다 원문 앞뒤 다섯 줄과 정본 표시를 함께 준다.",
+   "evidence": "`lens-consistency` — 레포 문서 감사에서 호출자가 갈리는 짝 묶음을 한 호출에 주고, 짝마다 원문 앞뒤 다섯 줄과 정본 표시를 함께 준다."
+  },
+  {
+   "topic": "lens-readability",
+   "statement": "목적이 둘이면 한 호출 안에서 둘을 차례로 보고 두 번 띄우지 않는다.",
+   "evidence": "`lens-readability` — 목적이 둘이면 한 호출 안에서 둘을 차례로 보고 두 번 띄우지 않는다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "렌즈 결과는 aggregating-lenses의 세 걸음으로 병합하고 결정은 내지 않는다.",
+   "evidence": "렌즈 결과는 `aggregating-lenses`의 「하는 일」 세 걸음으로 모은다."
+  },
+  {
+   "topic": "review-llm-calls",
+   "statement": "제품 코드가 리뷰 콜을 부르는 청사진이라 이 규율의 호출자 목록에 들지 않는다.",
+   "evidence": "`review-llm-calls`는 목록에 들지 않는다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "3층 오케스트레이션의 서브오케스트레이터는 중첩 금지의 예외다.",
+   "evidence": "3층 오케스트레이션은 이 금지의 예외다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "렌즈끼리 볼 것을 나눠 주지 않는다는 규칙의 근거는 review-specs가 소유한다.",
+   "evidence": "근거는 `review-specs`의 같은 이름 문단이 소유한다."
+  },
+  {
+   "topic": "SSOT",
+   "statement": "렌즈에게 정본을 알리는 법은 다른 문서가 가리키기만 하고 내용을 베끼지 않으며, 그 준수는 기계 검사가 붙든다.",
+   "evidence": "다른 문서는 이 절을 가리키기만 하고 내용을 베끼지 않는다."
+  },
+  {
+   "topic": "FAIL-LOUD",
+   "statement": "훑은 각도를 산출물에 적게 해 무엇을 안 봤는지 드러낸다.",
+   "evidence": "훑은 각도를 산출물에 적게 해 무엇을 안 봤는지 드러낸다(`FAIL-LOUD`)."
+  },
+  {
+   "topic": "EXPLICIT",
+   "statement": "리턴 JSON에 principles_applied를 요구하고 비어 있으면 보고에 적되 자동 재시도는 걸지 않는다.",
+   "evidence": "리턴 JSON에 `principles_applied`를 요구한다."
+  }
+ ]
+}

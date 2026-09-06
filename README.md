@@ -43,7 +43,7 @@ done
 
 ## 하드 게이트와 넛지와 전역 설정 수정
 
-세션에는 턴 종료를 막는 하드 게이트 하나와 읽기 전용 파일 수정을 막는 차단 하나와 넛지 넷과 전역 설정 수정 하나가 걸리고, 세션 시작에 설치 권유 하나가 뜬다. 게이트와 넛지는 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 다섯 다 꺼지고, 읽기 전용 차단과 설치 권유와 코드 넛지 표시를 지우는 세션 시작 훅은 그 변수와 무관하며, 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
+세션에는 턴 종료를 막는 하드 게이트 하나와 읽기 전용 파일 수정을 막는 차단 하나와 넛지 넷과 전역 설정 수정 하나가 걸리고, 세션 시작에 설치 권유와 파이썬 인코딩 넛지 둘이 뜬다. 게이트와 넛지 다섯은 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 다 꺼진다. 읽기 전용 차단과 세션 시작 알림 둘은 그 변수와 무관하고, 규칙 넛지 표시를 지우는 세션 시작 훅도 그렇다. 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
 
 배선은 둘이다. `hooks/hooks.json`은 이 플러그인이 어디서나 거는 훅이고, `.claude/settings.json`은 이 저장소에서만 도는 프로젝트 훅이다. 걸린 것은 아래가 전부다.
 
@@ -66,6 +66,7 @@ done
 - **문서 넛지 셋** — 차단하지 않고 안내만 한다. spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 정본의 「문서를 쓰고 관리할 때」로 타입과 수명을 가리게 하며 README라면 `domain-readme`를 함께 가리키고, `.md`를 고치면 `review-docs`의 검진과 정본의 Surgical Changes를 권한다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
 - **규칙 넛지 하나** — 세션에서 파일을 처음 건드리려 하면 편집 전에 정본 사본의 절대경로와 `domain-korean`을 한 번 알린다. `Write`와 `Edit`뿐 아니라 `Bash`도 잡는다. 정본은 `@import`로 상시 실리지만 서브에이전트에는 실리지 않으므로, 이 넛지가 그 경로를 프롬프트에 직접 넣으라고 알린다. 이 레포 안에서 도는 워크플로는 그 사본 대신 이 레포의 정본을 넣는다 — 상세는 `skills/dispatching-lenses/SKILL.md`를 참고한다. 세션은 훅 입력의 `session_id`로 가르고 서브에이전트는 `agent_id`로 따로 세므로 각자 한 번씩 받는다. 그 표시는 임시 폴더에 두고 세션이 시작·재개·비워질 때 지운다.
 - **카파시 플러그인 설치 권유** — 이 플러그인을 처음 깔았거나 갱신한 첫 세션에, 카파시(Andrej Karpathy)의 코딩 지침 플러그인 `andrej-karpathy-skills`가 이 PC에 없으면 설치 명령 두 줄을 세션 시작 알림으로 보인다. 설치하지는 않으며, 무시하면 다음 갱신까지 다시 뜨지 않는다. 정본의 「Karpathy guidelines」 절 넷이 그 플러그인에서 옮긴 것이고, 목적어를 코드에서 산출물로 일반화했다. 겹치던 옛 조항 다섯은 정본에서 뺐다.
+- **파이썬 인코딩 넛지** — 같은 첫 세션에, 이 PC가 윈도우이고 사용자 환경 변수 `PYTHONUTF8` 이 비어 있으면 `/setup-discipline` 을 실행하라고 세션 시작 알림으로 보인다. 넣지는 않으며 그 커맨드가 물어서 넣는다.
 - **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다. 이 마켓플레이스 항목에만 `autoUpdate: true`를 넣어 깃허브의 갱신이 자동으로 적용되게 한다. 키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며, 사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다. 지키는 규칙은 `skills/domain-plugin/SKILL.md`의 「사용자 설정 파일을 고칠 때 지킬 것」을 참고한다.
 
 ## 주의
@@ -76,4 +77,4 @@ done
 
 ## 더 읽기
 
-정본은 [`agent-principles.md`](agent-principles.md)이고 상세는 `skills/` 아래 각 스킬이 소유한다. 이슈는 [저장소](https://github.com/chshin84/disciplined-coder)에 올린다. 라이선스는 아직 정하지 않았다.
+정본은 [`agent-principles.md`](agent-principles.md)이고 상세는 `skills/` 아래 각 스킬이 소유한다. 이슈는 [저장소](https://github.com/chshin84/disciplined-coder)에 올린다. 라이선스는 플러그인 매니페스트가 `UNLICENSED` 로 선언한다.

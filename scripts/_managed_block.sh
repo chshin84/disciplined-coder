@@ -7,12 +7,17 @@
 #   (2) 닫는 마커가 없는 여는 마커는 '그 줄만' 제거하고 경고. 뒤 내용은 사용자 것일 수 있어 보존.
 #   (3) 영역 밖에 남은 짝 없는 닫는 마커도 제거.
 # 본문 줄을 지우지 않는 이유: 본문에 빈 줄이 포함될 수 있어 '본문과 같은 줄 제거'는 사용자 파일의 빈 줄을 전멸시킨다.
+# 이름표. 이 값은 사람이 읽는 메시지에만 쓰이고 동작에는 쓰이지 않는다 — 마커는 함수 인자로 들어오고
+# 락 경로는 대상 파일에서 나오므로, 이 값을 바꿔도 갈라지는 것은 stderr 문구와 고아 주석뿐이다.
+# 이 파일을 사본으로 가져가는 쪽은 source 앞뒤에 이 값만 세우면 되고 함수 시그니처는 그대로다.
+# 여기서 경로나 판정을 만들지 마라 — 그러면 사본 쪽에서 조용히 다른 동작이 된다.
+MANAGED_TAG="${MANAGED_TAG:-disciplined-coder}"
 # 표준 관리블록 마커(SSOT). 소비자(scaffold)는 begin/end를 인자로 넘긴다.
-MANAGED_BEGIN="# BEGIN disciplined-coder (managed — do not edit)"
-MANAGED_END="# END disciplined-coder (managed — do not edit)"
+MANAGED_BEGIN="# BEGIN $MANAGED_TAG (managed — do not edit)"
+MANAGED_END="# END $MANAGED_TAG (managed — do not edit)"
 # 고아 주석은 마커 집합의 파생값이라 인자를 늘리지 않고 함수가 모듈 상수를 직접 읽는다(비대칭 의도).
 # 새로 쓰지는 않는다 — (2)가 마커 줄을 지우므로 다음 실행에 고아가 남지 않는다. 읽기 전용 하위호환.
-MANAGED_ORPHAN="# (disciplined-coder: orphan BEGIN neutralized — END missing)"
+MANAGED_ORPHAN="# ($MANAGED_TAG: orphan BEGIN neutralized — END missing)"
 # 동시 진입 방지: 이 함수의 대상은 프로젝트마다 공유되는 하나의 ~/.claude/CLAUDE.md이고, SessionStart는
 # startup·resume·clear마다 돈다. 창을 둘 이상 동시에 열면 두 프로세스의 read-modify-write가 겹쳐
 # 사용자가 손으로 적은 지침이 조각날 수 있다. 그래서 대상 파일마다 락을 잡고 직렬화하며, 임시 파일도
@@ -41,7 +46,7 @@ MANAGED_STRIP_AWK='
         else { i++ }
       }
       for (i=1;i<=n;i++) if (!del[i]) print line[i]
-      if (orphan) print "[disciplined-coder] WARNING: " f " has BEGIN but no END — orphan marker line dropped (content preserved)" > "/dev/stderr"
+      if (orphan) print "[" tag "] WARNING: " f " has BEGIN but no END — orphan marker line dropped (content preserved)" > "/dev/stderr"
     }
 '
 # 끝의 빈 줄을 걷어낸다(블록을 뗀 자리에 빈 줄이 쌓이는 것을 막는다).
@@ -89,7 +94,7 @@ managed_block_lock() {  # $1=락 디렉터리 경로 → 성공하면 주인 토
   while :; do
     total=$((total+1))
     if [ "$total" -gt "$MANAGED_LOCK_TOTAL_TICKS" ]; then
-      echo "[disciplined-coder] ERROR: 락을 잡지 못했다 — $lock (부모 디렉터리에 쓸 수 있는지, 같은 이름의 파일이 있는지 보라). 이 파일은 고치지 않는다." >&2
+      echo "[$MANAGED_TAG] ERROR: 락을 잡지 못했다 — $lock (부모 디렉터리에 쓸 수 있는지, 같은 이름의 파일이 있는지 보라). 이 파일은 고치지 않는다." >&2
       return 1
     fi
     if mkdir "$gate" 2>/dev/null; then
@@ -104,7 +109,7 @@ managed_block_lock() {  # $1=락 디렉터리 경로 → 성공하면 주인 토
       born="$(cat "$lock/heldsince" 2>/dev/null || true)"
       now="$(date +%s 2>/dev/null || echo 0)"
       if [ -z "$born" ] || [ "$((now - born))" -ge "$MANAGED_LOCK_STALE_SECONDS" ]; then
-        echo "[disciplined-coder] WARNING: stale lock at $lock — 오래 잡혀 있어 빼앗는다" >&2
+        echo "[$MANAGED_TAG] WARNING: stale lock at $lock — 오래 잡혀 있어 빼앗는다" >&2
         rm -rf "$lock" 2>/dev/null || true
         rmdir "$gate" 2>/dev/null || true
         continue
@@ -113,7 +118,7 @@ managed_block_lock() {  # $1=락 디렉터리 경로 → 성공하면 주인 토
     else
       gwait=$((gwait+1))
       if [ "$gwait" -gt "$MANAGED_GATE_STALE_TICKS" ]; then
-        echo "[disciplined-coder] WARNING: stale gate at $gate — 30s 대기 후 치운다" >&2
+        echo "[$MANAGED_TAG] WARNING: stale gate at $gate — 30s 대기 후 치운다" >&2
         rm -rf "$gate" 2>/dev/null || true
         gwait=0
       fi
@@ -161,7 +166,7 @@ managed_block_remove() {
   trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock" "$tok"' RETURN
   # 두 변환의 종료 코드를 각각 본다. 앞이 실패한 채로 넘어가면 빈 임시 파일이 원본을 덮어,
   # 사람이 적은 줄이 사라진다(`FAIL-LOUD`).
-  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 4
+  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" -v tag="$MANAGED_TAG" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 4
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 4
   mv "$norm" "$uc" || return 4
   return 0
@@ -182,7 +187,7 @@ managed_block_inject() {
   trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock" "$tok"' RETURN
   # 걷어내기와 같은 이유로 두 변환의 종료 코드를 각각 본다. 이쪽은 사본을 뜨지 않으므로 원본을
   # 잘못 덮으면 되돌릴 수단이 아예 없다.
-  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 2
+  awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" -v tag="$MANAGED_TAG" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 2
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 2
   mv "$norm" "$uc" || return 2
   {

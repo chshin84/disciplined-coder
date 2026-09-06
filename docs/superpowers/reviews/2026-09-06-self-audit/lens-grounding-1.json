@@ -1,0 +1,74 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-readme/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "README.md",
+  "skills/domain-readme/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FOCUSED",
+  "NAME-ITEMS",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "FAIL-LOUD"
+ ],
+ "notes": "문서 타입 판정(lens-fit 규율 걸음 1): 절차·계약 행으로 가렸다. 이 문서는 README 를 쓰는 수행 방법만 담고 진행 상태나 다음 단계를 담지 않아 상태 행이 아니고, 문서의 위치만 가리키는 규범·인덱스 행도 아니다. 걸음 2(그 행이 담지 말라고 한 것)에서는 걸린 것이 없다. 절차·계약 행의 '상태를 적지 않고 방법만 적는다'에 비추어 훑었고 진행 상태를 담은 문장은 없다. 호출자가 정한 최상위 칸에 doc_type 이 없어 여기에 적는다. lens-grounding 으로 훑은 각도는 넷이다. 누락에서는 정본의 소유 선언이 요구하는 두 가지를 이 문서가 「권장 동선」과 「필요한 것만」으로 모두 덮는지 보았고 덮고 있었다. 모순에서는 이 문서의 규칙과 이 레포 README.md 를 열어 맞댔고 「독자 분리」 하나가 걸렸다. 환각에서는 이 문서가 정본에 있다고 부른 세 자리를 정본에서 확인했고 모두 실재했다. 불일치에서는 인용한 절 이름과 조항 이름이 정본의 글자와 맞는지 보았고, 절 이름은 맞았으며 조항은 ID 대신 풀어 쓴 말로 불려 lens-fit 쪽 발견으로 올렸다. lens-fit 으로 훑은 각도는 다섯이다. 형식에서는 frontmatter 의 name·description 이 있고 name 이 디렉터리 이름과 같은지 보았고 맞았다. 스타일에서는 한 표와 한 목록 안의 말끝, 제목의 명사구 여부, 용어의 단일성을 보았고 용어 하나가 걸렸다. 오염에서는 본문에 남은 지시문이나 잘린 구간이 없는지 보았고 없었다. 호환에서는 정본이 이 문서에 준 소유 범위를 벗어난 규정이 있는지 보았고, 「독자가 빨리 답해야 하는 네 가지」와 「독자 분리」는 소유 범위보다 넓지만 정본의 다른 조항과 부딪히지 않아 올리지 않았다. 남은 확인거리가 둘이다. 첫째, README.md 의 훅 표를 개발자 내부 근거로 볼지는 프로젝트 CLAUDE.md 가 그 절을 훅 배선의 정본으로 선언한 것과 부딪힌다. 「독자 분리」와 그 선언 가운데 무엇이 이기는지는 사용자 결정이 필요하다. 둘째, 「출처」의 링크 다섯은 웹에 나가지 않아 확인하지 않았다.",
+ "issues": [
+  {
+   "lens": "lens-grounding",
+   "where": "독자 분리",
+   "type": "contradiction",
+   "claim": "이 문서가 소유한 「독자 분리」 규칙을 이 레포의 README.md 가 지키지 않는다. README 는 설치·사용 경로와 함께 훅 스크립트 경로 표와 `-ef` 비교 같은 구현 근거를 같은 문서에 담고 있다.",
+   "file": "README.md",
+   "evidence": "같은 파일인지는 경로 문자열이 아니라 `-ef`로 본다.",
+   "counterpart_file": "skills/domain-readme/SKILL.md",
+   "counterpart": "사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않는다.",
+   "principle": "FOCUSED",
+   "consequence": "지금 README.md 의 「프로젝트 폴더에 생기는 파일」 절과 「하드 게이트와 넛지와 전역 설정 수정」 절이 사용자 설치·사용 경로와 같은 문서 안에서 훅 스크립트 경로와 파일 동일성 판정 방식 같은 개발자 내부 근거를 담고 있다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "domain-readme",
+   "statement": "보편 원칙은 정본이 소유하므로 이 문서에서 다시 적지 않고 이름으로만 참조한다.",
+   "evidence": "보편 원칙은 정본이 소유하므로 여기서 다시 적지 않고 이름으로 참조한다."
+  },
+  {
+   "topic": "domain-readme",
+   "statement": "README 독자가 빨리 답해야 하는 것을 넷으로 정하고, 그 동선을 막는 것을 군더더기로 본다.",
+   "evidence": "이 도구가 내 문제를 푸는가, 내가 쓸 수 있는가, 누가 만들었는가, 더 배우려면 어디로 가는가다."
+  },
+  {
+   "topic": "domain-readme",
+   "statement": "사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않고, 후자는 별도 문서나 스킬로 뺀다.",
+   "evidence": "사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않는다."
+  },
+  {
+   "topic": "domain-readme",
+   "statement": "README 절의 권장 순서를 정하고, 그 순서가 순위가 아님을 함께 밝힌다.",
+   "evidence": "제목과 한 줄 설명 다음 핵심 셀링포인트, 무엇을 왜 하는지, 설치, 사용 예시, 주의와 한계, 더 읽기와 기여 순이다."
+  },
+  {
+   "topic": "NAME-ITEMS",
+   "statement": "README 의 절에는 번호를 매기지 않는다.",
+   "evidence": "절에 번호를 매기지 않는다."
+  },
+  {
+   "topic": "domain-readme",
+   "statement": "배지와 목차와 스크린샷과 변경 이력은 프로젝트가 실제로 필요로 할 때만 넣는다.",
+   "evidence": "badge·TOC·스크린샷·changelog는 프로젝트가 실제로 필요로 할 때만 넣는다."
+  },
+  {
+   "topic": "Karpathy guidelines",
+   "statement": "배지와 목차와 스크린샷과 변경 이력을 넣을지는 정본의 Simplicity First 로 가른다.",
+   "evidence": "정본의 Simplicity First가 그 판단의 기준이다."
+  }
+ ]
+}

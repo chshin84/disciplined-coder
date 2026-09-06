@@ -1,0 +1,55 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/review-docs/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/review-docs/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "hooks/hooks.json",
+  "hooks/doc_review_posttooluse.sh",
+  "scripts/test_docs_drift.sh",
+  "skills/domain-korean/SKILL.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "팩트와 근거",
+  "문서 타입과 수명"
+ ],
+ "notes": "lens-fit 의 doc_type: 「절차·계약(operations·setup·contract)」 행이다. 이 문서는 검진을 어떤 순서로 어떤 렌즈로 수행하는지와 lens-fit 에 넘길 계약 경로만 담고, 어느 문서가 검진을 마쳤는지 같은 진행 상태를 담지 않는다. 그 행이 담지 말라고 한 상태는 이 문서에서 찾지 못했다. 훑은 각도. lens-grounding 은 넷을 따로 돌았다. (1) 누락 — 「언제 여는지」의 갈래와 훅 발동 조건을 맞대 새 일반 문서 작성이 갈래에 없는 것을 잡았다. (2) 모순 — '마커 게이트는 없다'를 hooks.json 의 Stop 배선과 doc_review_posttooluse.sh 의 비블로킹 출력으로 대조했고 어긋나지 않았다. (3) 환각 — 이름으로 부른 경로 넷이 모두 실재했고, 기계 선처리 주장만 근거가 없었다. (4) 불일치 — 기록 경로와 종류를 정본의 종류 넷과 맞대 종류 자체는 맞았고 슬롯 이름만 갈렸다. lens-fit 은 다섯을 따로 돌았다. 형식·스타일·오염·호환·규율이다. 금지 낱말은 review-docs 자신의 규칙대로 렌즈가 세지 않았다 — scripts/test_docs_drift.sh 가 domain-korean 의 표에서 목록을 도출해 이미 검사한다. 계약 범위. 호출자가 계약으로 준 것은 정본 경로 하나뿐이고 domain-korean 경로는 오지 않았다. 그래서 한국어 조항은 정본의 네 조항으로만 판정했고 domain-korean 의 상세 규칙으로는 판정하지 않았다. 이 문서 자신은 검진 때 그 경로를 계약으로 넘기라고 정하므로, 이 회차는 그 계약 하나가 빠진 채 돈 것이다(FAIL-LOUD). 더 확인할 것 셋. (1) 뿌리 후보 — 기록 이름 패턴 사본이 이 문서만이 아니라 skills/aggregating-lenses/SKILL.md 의 「처분」 절에도 있다. 문서 하나를 고쳐서는 사라지지 않는다. (2) 렌즈 배정이 audit-repo-docs 의 표와 갈리는 자리가 있다. 렌즈 자신의 SKILL.md 를 고쳤을 때 이 문서대로면 grounding 과 fit 둘이 걸리고, audit-repo-docs 의 표대로면 lens-fit 하나만 걸린다. audit 쪽이 호출 수를 줄이려는 이유를 자기 절에 적어 두어 정당한 좁혀 적기로 보고 발견으로 올리지 않았다. (3) 이 문서의 「기록」 절은 렌즈가 돌려준 원본 JSON 을 어디에 두는지 적지 않는다. review-specs 와 audit-repo-docs 는 각각 즉시 저장을 적는다. '받는 즉시 저장한다'는 의무 자체는 이 절차의 어느 문서에도 걸려 있지 않다.",
+ "issues": [
+  {
+   "lens": "lens-fit",
+   "where": "「기록」 절 첫 문장",
+   "type": "constraint",
+   "claim": "기록 파일 이름 규칙은 정본이 소유하는데, 이 문장이 디렉터리와 날짜 형식까지 포함한 이름 패턴을 그대로 다시 적는다. 슬롯 이름도 정본과 갈려 있다. 같은 규칙을 쓰는 review-specs 는 패턴을 적지 않고 소유자만 가리킨다.",
+   "file": "skills/review-docs/SKILL.md",
+   "evidence": "결과는 `docs/superpowers/reviews/YYYY-MM-DD-<문서이름>-check.md`에 남긴다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md` 하나다.",
+   "principle": "SSOT",
+   "consequence": "같은 이름 규칙이 정본과 이 문서 두 곳에 적혀 있고, 두 곳의 슬롯 이름이 서로 다르다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "「언제 여는지」의 불릿 목록 넷째 항목",
+   "type": "style",
+   "claim": "이 목록은 성격이 다른 항목을 한 층에 늘어놓는다. 앞의 셋은 어느 갈래인지를 가르는 항목이고 넷째는 갈래를 고른 뒤에 지킬 의무인데, 바로 위 문장이 그 차이를 스스로 적으면서도 같은 불릿에 넣었다.",
+   "file": "skills/review-docs/SKILL.md",
+   "evidence": "- **건너뛴 회차의 통지** — 건너뛰었다고 한 줄 알린다(`FAIL-LOUD`).",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "불릿은 같은 종류를 늘어놓을 때만 쓰고 논증과 인과는 산문으로 쓴다.",
+   "principle": "READ-FLOW",
+   "consequence": "갈래를 고르는 항목 셋과 갈래를 고른 뒤의 의무 하나가 같은 불릿 목록에 같은 층으로 놓여 있다."
+  }
+ ]
+}

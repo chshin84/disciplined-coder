@@ -1,0 +1,64 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/review-llm-calls/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/review-llm-calls/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/domain-plugin/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_audit.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "SECRETS",
+  "PROSE-FORM",
+  "Think Before Acting"
+ ],
+ "notes": "doc_type — 절차·계약 (operations·setup·contract). 런타임 LLM 호출에 검증을 어떻게 붙이는지의 수행 방법과 렌즈 배정표와 체크리스트를 담고, 무엇이 어디까지 되었는지의 진행 상태는 담지 않는다. 훑은 각도. lens-grounding 은 넷을 따로 훑었다. 누락에서는 aggregating-lenses 「처분 — 호출자의 몫」의 제품 런타임 행과 「구현 형태」의 결정론적 파이썬 함수 요건과 런타임 재시도 상한을 이 문서와 맞댔다. 재시도 상한은 「비기능 체크리스트」의 재시도 횟수 상한 항목이 받고 있어 올리지 않았다. 사람에게 올리는 처분은 이 문서에 집계가 표시한다는 데까지만 적혀 있으나, 그 처분의 소유자가 aggregating-lenses 라 복제를 요구하는 꼴이 되어 올리지 않았다. 모순에서 집계 발동 조건 둘과 lens-fit 호출 시점 하나를 찾았다. 환각에서는 정본 「검증」 절의 실재와 dispatching-lenses 「호출자 목록」이 이 문서를 제외한다는 서술을 확인했고 어긋남이 없었다. 불일치에서는 「렌즈 선택」 표의 렌즈 이름 둘이 실제 디렉터리로 실재하는지 확인했고 둘 다 맞았다. 두 렌즈의 type 폐쇄 집합도 열어 확인했는데, 이 문서는 집합을 열거하지 않고 재생성을 강제하는 값을 제품이 정하라고만 적어 어긋날 곳이 없었다. lens-fit 은 다섯을 따로 훑었다. 형식과 오염과 호환은 이 문서가 JSON 산출물이 아니라 걸리는 것이 없었다. 규율은 세 걸음을 돌았다. 타입은 절차·계약 행으로 가렸고, 그 행이 담지 말라고 한 진행 상태는 이 문서에 없다. 나머지 조항에서 셋을 올렸다. 올리지 않은 것 둘. 「렌즈 선택」 표의 마지막 행은 「무엇으로 가리나」 칸이 다른 네 행의 문장과 말끝이 다르고, 이것은 정본 PROSE-FORM 의 한 표 안 말끝을 맞추라는 조항에 걸린다. 같은 자리에서 A가 아니라 B 대구도 넷 이상 쓰였다. 둘 다 정본에서 그 조항이 「대화할 때」 절 아래 있고 lens-readability 의 대상 목록에도 SKILL.md 가 없어, 이 타입 문서에 걸리는지가 갈린다고 보고 발견으로 올리지 않았다. 더 확인할 것 둘. 짧은 이름 문장은 skills/dispatching-lenses/SKILL.md 에도 같은 글자로 있어, 렌즈 이름 표준을 그 표준의 소유자 파일이 스스로 어기고 있다. 이 회차의 대상 밖이라 올리지 않았다. 그리고 scripts/test_docs_drift.sh 가 이 문서에 거는 계약 검사는 셋뿐이고 집계 발동 조건은 재지 않는다. 결정론으로 잡으려면 그 스크립트에 단언을 더해야 하는지 사용자 판단이 필요하다.",
+ "issues": [
+  {
+   "lens": "lens-fit",
+   "where": "「조립」 — 렌즈끼리 볼 것을 나눠 주지 않는다는 문단",
+   "type": "constraint",
+   "claim": "렌즈를 접두사 없는 짧은 이름으로 부른다. 렌즈 이름 표준의 소유자는 짧은 이름을 쓰지 말라고 적는다.",
+   "file": "skills/review-llm-calls/SKILL.md",
+   "evidence": "`grounding`이 외부 사실의 근거를 보고 `fit`이 양식과 계약을 보므로 원래 보는 것이 갈려 있다.",
+   "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+   "counterpart": "짧은 이름(`grounding`)은 쓰지 않는다.",
+   "principle": "EXPLICIT",
+   "consequence": "이 문서 안에서 렌즈 이름이 두 형태로 갈려 있다. 「렌즈 선택」 표는 lens-grounding·lens-fit 으로 부르고 「조립」의 이 문장은 grounding·fit 으로 부른다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "「조립」 — 렌즈끼리 볼 것을 나눠 주지 않는다는 문단",
+   "type": "constraint",
+   "claim": "소유자를 이름으로 가리키면서 그 규칙의 근거 문장을 함께 복제해 두었다. 그런데 복제된 이 문장은 소유자로 지목된 review-specs 에는 없고, 같은 문장이 dispatching-lenses 에도 그대로 있다.",
+   "file": "skills/review-llm-calls/SKILL.md",
+   "evidence": "근거는 `review-specs`의 같은 이름 문단이 소유한다.",
+   "counterpart_file": "skills/review-specs/SKILL.md",
+   "counterpart": "이 규칙은 여기가 소유하고 다른 호출자는 이 문단을 가리킨다.",
+   "principle": "SSOT",
+   "consequence": "근거 문장이 소유자가 아닌 두 파일(skills/review-llm-calls/SKILL.md 와 skills/dispatching-lenses/SKILL.md)에만 같은 글자로 있고, 가리킨 소유자 문단에는 그 문장이 없다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "「비기능 체크리스트」 — 항목별 등급",
+   "type": "constraint",
+   "claim": "체크리스트의 모든 항목이 등급을 가진다고 선언해 놓고 두 항목에는 등급이 없다. 사람 승인 항목에는 괄호 등급이 없고, 비밀·개인정보 항목의 괄호에는 등급 대신 원칙 ID 가 들어 있다.",
+   "file": "skills/review-llm-calls/SKILL.md",
+   "evidence": "비가역이거나 위험이 큰 액션에는 사람 승인을 건다.",
+   "counterpart_file": "skills/review-llm-calls/SKILL.md",
+   "counterpart": "누락 항목은 그 항목에 붙은 등급대로 처리하며, critical은 머지와 배포를 차단한다.",
+   "principle": "EXPLICIT",
+   "consequence": "여덟 항목 가운데 둘에 등급이 없어, 그 둘이 빠졌을 때 머지와 배포를 막을지가 이 문서만으로 정해지지 않는다."
+  }
+ ]
+}

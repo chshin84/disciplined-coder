@@ -1,0 +1,77 @@
+{
+ "schema": 1,
+ "executor": "self-audit",
+ "commit": "1c909d0dfc9c26a8b673fc5b9153788f14400293",
+ "tree_clean": true,
+ "worktree": ".claude/worktrees/self-audit-2026-09-06",
+ "started_at": "2026-09-06T01:23:26Z",
+ "finished_at": "2026-09-06T02:07:26Z",
+ "completed": true,
+ "steps_done": [
+  "targets",
+  "machine-checks",
+  "review",
+  "adversarial",
+  "evidence",
+  "consistency",
+  "rounds-diff",
+  "verdict",
+  "record"
+ ],
+ "tokens_method": "서브에이전트가 보고한 subagent_tokens 스물셋을 그대로 더한 값이다. 메인 세션이 쓴 토큰은 세지 않았다. 두 번째로 세는 법은 회차 시작과 끝의 세션 잔여 토큰 차이인데 이 회차에서는 그 값을 남기지 못해 대조하지 못했다. 그래서 tokens 는 하한이다.",
+ "lens_calls": 23,
+ "subagents": 23,
+ "subagent_cap": "동시 실행 상한 스물에 걸려 두 호출(lens-readability 정의, 저장소 전체 lens-adversarial)이 뒤로 밀렸고, 앞 호출이 끝난 뒤 그대로 띄웠다. 잘라 낸 호출은 없다.",
+ "machine_checks": {
+  "contract_tests": "scripts/test_*.sh 다섯을 모두 돌려 FAIL=0 이다(test_assertions PASS=10, test_audit PASS=152, test_docs_drift PASS=377, test_hooks PASS=101, test_scaffold PASS=286).",
+  "targets_script": "bash scripts/audit_targets.sh 가 스물하나를 냈다.",
+  "topics_script": "bash scripts/audit_topics.sh 가 이름표 마흔하나를 냈다.",
+  "prior_rounds_script": "bash scripts/audit_prior_rounds.sh 가 2026-09-05-self-audit-2 와 2026-09-05-self-audit 를 냈다.",
+  "evidence_script": "bash scripts/audit_evidence.sh 가 아흔아홉 가운데 하나를 인용 미확인으로 떨어뜨렸다.",
+  "style_metrics": "문체 지표는 domain-korean 「금지 표현」 표의 아홉 낱말로 한정해 세었고, 세는 법은 scripts/test_docs_drift.sh 가 그 표에서 목록을 도출해 git 이 추적하는 .md 를 훑는 문자열 검색이다. 그 검사가 FAIL=0 이라 이 회차의 금지 낱말은 0건이다. 두 번째로 세는 법으로 lens-readability 를 건 문서 다섯에서 렌즈가 같은 아홉 낱말을 따로 훑었고 역시 0건이라 두 방법이 같았다."
+ },
+ "targets": [
+  {"path":"agent-principles.md","lenses":["lens-grounding","lens-fit","lens-readability"],"reason":"「원칙 정본」 행. 다른 문서들이 이 파일을 정본이라 부른다.","purpose":"Claude와 사용자가 원칙 조항을 읽고 지금 작업에 어느 조항이 걸리는지 스스로 판단해 적용할 수 있어야 한다."},
+  {"path":"README.md","lenses":["lens-grounding","lens-readability"],"reason":"「사람이 읽는 안내」 행. 표가 사용자용 README·프로젝트 CLAUDE.md·명령 문서를 이 행에 명시한다.","purpose":"플러그인을 처음 설치하는 사용자가 무엇이 설치되고 프로젝트 폴더에 무엇이 생기는지 알고 설치를 끝까지 마칠 수 있어야 한다."},
+  {"path":"CLAUDE.md","lenses":["lens-grounding","lens-readability"],"reason":"「사람이 읽는 안내」 행.","purpose":"이 레포에서 일하는 Claude와 기여자가 설계·계획 문서를 어디에 쓰는지와 고친 뒤 무엇을 돌리는지 알고 그대로 실행할 수 있어야 한다."},
+  {"path":"commands/setup-discipline.md","lenses":["lens-grounding","lens-readability"],"reason":"「사람이 읽는 안내」 행.","purpose":"이 명령을 부르는 사용자가 전역 셋업이 무엇을 갱신하는지 알고 실행 결과를 확인할 수 있어야 한다."},
+  {"path":"commands/show-principles.md","lenses":["lens-grounding","lens-readability"],"reason":"「사람이 읽는 안내」 행.","purpose":"이 명령을 부르는 사용자가 지금 PC에 적용된 원칙 전문이 무엇인지 확인할 수 있어야 한다."},
+  {"path":"skills/aggregating-lenses/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행. 집계 절차와 렌즈 공통 산출물 계약을 소유한다."},
+  {"path":"skills/audit-repo-docs/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행. 이 감사 절차 자신이다."},
+  {"path":"skills/dispatching-lenses/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행. 렌즈를 띄우는 규율을 소유한다."},
+  {"path":"skills/domain-korean/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행. 한국어 네 조항의 상세를 소유한다."},
+  {"path":"skills/domain-plugin/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행."},
+  {"path":"skills/domain-readme/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행."},
+  {"path":"skills/nested-orchestration/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행."},
+  {"path":"skills/review-docs/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행."},
+  {"path":"skills/review-llm-calls/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행."},
+  {"path":"skills/review-specs/SKILL.md","lenses":["lens-grounding","lens-fit"],"reason":"「처방 스킬」 행."},
+  {"path":"skills/lens-adversarial/SKILL.md","lenses":["lens-fit"],"reason":"「렌즈 정의」 행."},
+  {"path":"skills/lens-consistency/SKILL.md","lenses":["lens-fit"],"reason":"「렌즈 정의」 행."},
+  {"path":"skills/lens-fit/SKILL.md","lenses":["lens-fit"],"reason":"「렌즈 정의」 행. 이 렌즈가 자기 체크리스트를 자기에게 걸었다."},
+  {"path":"skills/lens-grounding/SKILL.md","lenses":["lens-fit"],"reason":"「렌즈 정의」 행."},
+  {"path":"skills/lens-prior-art/SKILL.md","lenses":["lens-fit"],"reason":"「렌즈 정의」 행. 웹에 나가지 않고 그 정의 문서만 검토했다."},
+  {"path":"skills/lens-readability/SKILL.md","lenses":["lens-fit"],"reason":"「렌즈 정의」 행."},
+  {"path":"repo","lenses":["lens-adversarial"],"reason":"「띄울 때 지킬 것」이 이 렌즈를 문서별 배정에서 빼고 저장소 전체를 입력으로 한 번 띄우라고 정한다."},
+  {"path":"pairs","lenses":["lens-consistency"],"reason":"「일관성 대조」의 갈리는 짝만 묻기 걸음. 값이 다른 짝 셋을 한 호출에 주었다."}
+ ],
+ "scope_notes": [
+  "종류를 못 정해 마지막 행으로 보낸 문서는 없다. 대상 스물하나가 모두 표의 앞 네 행에 걸렸다.",
+  "lens-readability 를 걸지 않은 문서는 처방 스킬 열과 렌즈 정의 여섯이다. 표가 그 렌즈를 그 두 행에 배정하지 않는다.",
+  "웹에 나가는 lens-prior-art 는 이 절차의 「웹 렌즈 제외」대로 쓰지 않았다."
+ ],
+ "metrics": {
+  "by_lens": {
+   "lens-adversarial": {"raised": 5, "confirmed": 4},
+   "lens-consistency": {"raised": 3, "confirmed": 3},
+   "lens-fit": {"raised": 50, "confirmed": 47},
+   "lens-grounding": {"raised": 39, "confirmed": 39}
+  },
+  "confirmed": 93,
+  "tokens": 2991736,
+  "seconds": 2640,
+  "tokens_per_confirmed": 32169,
+  "resolved_rate": 0.862,
+  "verdict_counts": {"confirmed": 93, "rejected": 1, "undetermined": 3, "auto_rejected": 0}
+ }
+}
