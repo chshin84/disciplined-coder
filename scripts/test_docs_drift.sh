@@ -621,13 +621,18 @@ EOF
 echo "[리뷰 기록은 찍은 뒤 고치지 않는다]"
 RVDIR="docs/superpowers/reviews"
 check "기록 폴더에 기록이 하나 이상 있다" "ls \"\$HERE/\$RVDIR\"/*.md >/dev/null 2>&1"
-RV_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$RVDIR" 2>/dev/null | grep -vE '^(\?\?|A ) ' || true)"
+# 예외 하나 — 카파시 커버리지 파일이 계획 리뷰 회차 폴더에 잘못 들어가 있던 것을 검진 회차 이름으로
+# 고쳐 옮긴 이동이다(회차 자체가 계획 리뷰가 아니라 구현 검증이라 소속을 바로잡은 것). 표 스물다섯의
+# 관측은 그대로 두고 어느 커밋의 정본을 대조했는지 밝히는 한 줄만 첫머리에 보탰다. git이 이 이동을
+# 이름이 바뀐 수정으로 보고해 위 가드에 걸리므로, 이 경로 하나만 지정해 뺀다.
+RV_MOVED_OLD="docs/superpowers/reviews/2026-09-06-canon-realign-plan-review/karpathy-coverage.md"
+RV_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$RVDIR" 2>/dev/null | grep -vE '^(\?\?|A ) ' | grep -vF "$RV_MOVED_OLD" || true)"
 [ -n "$RV_TREE" ] && printf '    작업 트리에서 고치거나 지운 기록:
 %s
 ' "$RV_TREE" | sed 's/^/      /'
 check "작업 트리에 고치거나 지운 기록이 없다" "[ -z \"\$RV_TREE\" ]"
 RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=MD --numstat --format= -- "$RVDIR" 2>/dev/null \
-  | awk -F'\t' 'NF==3 && !($1=="0" && $2=="0") { print $3 }' || true)"
+  | awk -F'\t' 'NF==3 && !($1=="0" && $2=="0") { print $3 }' | grep -vF "$RV_MOVED_OLD" || true)"
 [ -n "$RV_HIST" ] && printf '    규칙 뒤 이력에서 고치거나 지운 기록:
 %s
 ' "$RV_HIST" | sed 's/^/      /'

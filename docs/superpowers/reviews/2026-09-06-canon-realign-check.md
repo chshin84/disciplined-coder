@@ -1,5 +1,7 @@
 # 카파시 절 실패 유형 스물다섯 대조
 
+커밋 `55fc0f6`(카파시 절을 만든 `4e34c45`~`55fc0f6` 구간의 끝) 시점의 `agent-principles.md` 본문을 대조한 사진이다.
+
 설계 문서(`docs/superpowers/specs/2026-09-06-canon-realign-design.md`)의 「카파시 절 재작성」 표에 적힌 실패 유형 스물다섯을 재작성한 `agent-principles.md`의 「Karpathy guidelines」 절(19행~61행)과 맞댄 결과다. 오른쪽 칸은 그 유형이 읽히는 새 본문의 줄 번호다.
 
 | 실패 유형 | 담는 줄 |

@@ -107,7 +107,9 @@
 
 옛 조항 이름 `ASK-FORK`와 `MEASURE-FIRST`와 `SIMPLE`과 `SURGICAL`과 `TDD`는 되살리지 않는다. `scripts/test_scaffold.sh`가 그 부재를 단언한다.
 
-시험이 문자열로 고정한 문장 셋은 유지한다. `**Tradeoff:**`와 `generalized from code to any artifact`와 `Don't launch a fleet of subagents for what one call can do`이며, 각각 `test_scaffold.sh`의 418행과 419행과 420행이 검사한다. 여기에 고정 문자열을 더 건다. 지금은 이 절을 붙잡는 단언이 제목 넷과 문자열 셋뿐이라 나머지가 사라져도 시험이 안 잡는다. 위 표의 스물넷 가운데 다른 절과 헷갈리지 않는 문자열 넷을 골라 `test_scaffold.sh`에 단언을 더한다.
+시험이 문자열로 고정한 문장 셋은 유지한다. `**Tradeoff:**`와 `generalized from code to any artifact`와 `Don't launch a fleet of subagents for what one call can do`이며, 각각 `test_scaffold.sh`의 418행과 419행과 420행이 검사한다. 여기에 고정 문자열을 더 건다. 지금은 이 절을 붙잡는 단언이 제목 넷과 문자열 셋뿐이라 나머지가 사라져도 시험이 안 잡는다. 위 표의 스물넷 가운데 다른 절과 헷갈리지 않는 문자열 여섯을 골라 `test_scaffold.sh`에 단언을 더한다.
+
+처음 계획은 넷이었다. measure-the-state·impossible-case·pre-existing-dead-code·weak-criteria 네 문장에 단언을 걸 생각이었는데, 계획 리뷰가 「자리를 옮긴 문장 둘을 아무도 안 지킨다」고 짚었다. `Surgical Changes`의 trace-to-request 문장과 `Goal-Driven Execution`의 numbered-steps-plan 문장이 그 둘이라, 그 자리에도 단언을 걸어 여섯이 됐다.
 
 ### 기록 이름 규칙을 review-docs 로 옮긴다
 
@@ -177,7 +179,7 @@
 | 옛 조항 이름 다섯이 안 되살아났다 | `test_scaffold.sh`의 부재 단언이 통과한다 |
 | 카파시 절이 45줄 이하다 | `test_scaffold.sh`에 더한 단언이 절의 시작 줄과 다음 `## ` 줄 사이를 세어 통과한다 |
 | 카파시 절에서 실패 유형 스물다섯이 모두 확인된다 | 위 표의 스물다섯을 하나씩 새 본문과 맞대어 읽고 어느 줄이 담는지 리뷰 기록 폴더에 파일로 남긴다 |
-| 카파시 절의 고정 문자열이 셋에서 일곱으로 는다 | `test_scaffold.sh`에 더한 단언 넷이 통과한다 |
+| 카파시 절의 고정 문자열이 셋에서 아홉으로 는다 | `test_scaffold.sh`에 더한 단언 여섯이 통과한다 |
 | 실행 증거 규칙이 정본에 한 번만 있다 | 영어 문장이 없고 한국어 문장이 있다 |
 | 기록 이름 규칙의 소유자가 `review-docs`다 | `test_audit.sh:173`과 `test_docs_drift.sh`의 194·201·202행이 새 소유자로 통과한다 |
 | 정본을 소유자로 가리키던 넷이 새 소유자를 가리킨다 | 그 넷에서 "정본의 기록 이름 규칙"이 안 잡힌다 |

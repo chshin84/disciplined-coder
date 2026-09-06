@@ -26,7 +26,7 @@ if declare -f resolve_home >/dev/null 2>&1; then
   CANON_PATH="$(resolve_home claude 2>/dev/null)/disciplined-coder/agent-principles.md"
 fi
 if [ -n "$CANON_PATH" ] && [ -f "$CANON_PATH" ]; then
-  where="규칙 정본은 $CANON_PATH 에 있다."
+  where="규칙 정본의 사본은 $CANON_PATH 에 있다."
 else
   where="규칙 정본의 사본을 못 찾았다 — disciplined-coder setup-discipline 을 돌려라."
 fi
@@ -48,7 +48,7 @@ fi
 # session_id 가 없으면 계약이 깨진 것이다. 표시 파일 없이 매번 알린다 — 조용히 빠지지 않는다(FAIL-LOUD).
 
 # 스킬의 절 이름을 여기 박지 않는다 — 훅은 스킬을 가리키기만 하고 내용을 베끼지 않는다(문서 넛지와 같은 규칙).
-msg="🧑‍💻 이 세션에서 파일을 처음 건드린다 — $where 한국어 문장 규칙의 상세는 disciplined-coder domain-korean 이 갖는다. 서브에이전트에는 정본이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 넛지일 뿐 차단은 아니다."
+msg="🧑‍💻 이 세션에서 파일을 처음 건드린다 — $where 한국어 문장 규칙의 상세는 disciplined-coder domain-korean 이 갖는다. 서브에이전트에는 정본이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 레포 안에서 도는 워크플로는 이 사본 대신 그 레포의 정본을 넣는다 — 상세는 disciplined-coder dispatching-lenses 가 갖는다. 넛지일 뿐 차단은 아니다."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

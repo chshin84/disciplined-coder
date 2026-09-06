@@ -158,7 +158,7 @@ check "셸 편집도 세션당 한 번이다"                  "[ -z \"\$(cnud '
 check "OFF → 무출력"                                "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off cnud '$(JS s5 "" "$T/src/main.py")')\" ]"
 check "session_id 없음 → 매번 안내"                 "cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md' && cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 cnudh() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$2" bash "$CNUD"; }
-NUDGE_CANON="$(cnudh "$(JS s8 "" "$T/src/main.py")" "$NH" | sed -n 's/.*규칙 정본은 \(.*\) 에 있다\..*/\1/p')"
+NUDGE_CANON="$(cnudh "$(JS s8 "" "$T/src/main.py")" "$NH" | sed -n 's/.*규칙 정본의 사본은 \(.*\) 에 있다\..*/\1/p')"
 check "넛지에서 정본 경로가 뽑힌다"                 "[ -n \"\$NUDGE_CANON\" ]"
 check "뽑은 경로에 파일이 실재한다"                 "[ -f \"\$NUDGE_CANON\" ]"
 check "넛지에 상시 적재라는 거짓 문장이 없다"       "! cnudh '$(JS s8b "" "$T/src/main.py")' '$NH' | grep -qF '상시로 싣고'"
