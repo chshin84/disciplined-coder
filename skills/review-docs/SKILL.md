@@ -8,7 +8,7 @@ description: 문서 하나를 쓰거나 고친 뒤에 렌즈로 검진하는 절
 
 ## `lens-fit`에 넘기는 계약
 
-계약은 둘의 경로다. 정본 `agent-principles.md`와 `skills/domain-korean/SKILL.md`다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 더한다.
+이 계약은 여기가 소유한다. 계약은 둘의 경로다. 정본 `agent-principles.md`와 `skills/domain-korean/SKILL.md`다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 더한다. `review-specs`가 spec·plan 에 이 렌즈를 걸 때도 같은 둘을 넘긴다.
 
 넘기지 않으면 그 렌즈는 계약을 모른 채 돌아 형식만 본다. 참조물처럼 `lens-readability`가 안 걸리는 문서도 이 경로로 정본의 한국어 조항을 검사받는다.
 

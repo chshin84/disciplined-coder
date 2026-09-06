@@ -1,6 +1,6 @@
 ---
 name: review-specs
-description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 렌즈들(lens-grounding·lens-consistency·lens-adversarial, 그리고 spec에 한해 제안·승인 뒤 붙는 lens-prior-art)로 검증하고, 발견을 🔴와 고칠 것으로 가르는 호출자. 검토 대상 하나에 렌즈마다 호출 하나를 따로 띄우고, 그 결과를 한데 모아 리뷰 기록으로 남긴다. superpowers 경로에 spec이나 plan을 쓰면 훅이 강제한다. 제품 런타임 콜을 다루지 않고 Claude 자신의 설계 문서를 리뷰한다.
+description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 렌즈들(lens-grounding·lens-consistency·lens-adversarial·lens-fit, 그리고 spec에 한해 제안·승인 뒤 붙는 lens-prior-art)로 검증하고, 발견을 🔴와 고칠 것으로 가르는 호출자. 검토 대상 하나에 렌즈마다 호출 하나를 따로 띄우고, 그 결과를 한데 모아 리뷰 기록으로 남긴다. superpowers 경로에 spec이나 plan을 쓰면 훅이 강제한다. 제품 런타임 콜을 다루지 않고 Claude 자신의 설계 문서를 리뷰한다.
 ---
 # review-specs — spec/plan 독립 리뷰 호출자
 
@@ -31,7 +31,7 @@ Claude가 설계 문서를 만들 때 메인 세션이 직접 서브에이전트
 
 이 문서 밖에서 가져올 것이 셋이다. 선행연구 렌즈의 서브에이전트 상한은 `lens-prior-art`의 「띄울 때 지킬 상한」에, 렌즈에게 원칙 정본을 알리는 법과 회차 수는 `dispatching-lenses`에, 집계 절차는 `aggregating-lenses`에 있다.
 
-띄우는 개수도 여기서 정해진다. 대상 하나에 셋이다. 배정된 렌즈가 셋이고 렌즈마다 따로 띄우기 때문이며, spec 과 plan 을 함께 보는 회차는 여섯이 된다. `lens-prior-art`는 이 셋에 들지 않고, 붙이기로 하면 렌즈 개수 대신 서브에이전트 상한으로 센다. 그 상한은 `lens-prior-art`의 「띄울 때 지킬 상한」이 정하며 사용자가 정한 값이다.
+띄우는 개수도 여기서 정해진다. 대상 하나에 넷이다. 배정된 렌즈가 넷이고 렌즈마다 따로 띄우기 때문이며, spec 과 plan 을 함께 보는 회차는 여덟이 된다. `lens-prior-art`는 이 넷에 들지 않고, 붙이기로 하면 렌즈 개수 대신 서브에이전트 상한으로 센다. 그 상한은 `lens-prior-art`의 「띄울 때 지킬 상한」이 정하며 사용자가 정한 값이다.
 
 ### 1) PREP (기대를 먼저 적는 준비)
 디스패치 전에 메인이 렌즈별로 준비한다. 즉흥으로 띄우지 않는다.
@@ -55,6 +55,7 @@ Claude가 설계 문서를 만들 때 메인 세션이 직접 서브에이전트
 - `lens-grounding` — 외부 사실·비용·API·환경을 두고 한 주장에 근거가 있는지 보고, 근거 없는 단정과 환각을 찾는다.
 - `lens-consistency` — 내부 모순과 spec에서 plan으로 넘어가며 생긴 커버리지 공백을 찾고, 산출물 공백과 이름·타입 드리프트와 스코프를 본다.
 - `lens-adversarial` — 실패 모드와 과설계와 비가역과 완화만 가능한 위험 넷을 찾는다. 기능 추가는 제안하지 않는 가드가 걸려 있다.
+- `lens-fit` — 정본과 한국어 규율을 계약으로 받아 그것을 지키는지 본다. 넘길 계약의 경로는 `review-docs`의 「`lens-fit`에 넘기는 계약」이 소유한다.
 
 선행연구 대조는 위 목록에 들어 있지 않다. 기본 묶음에서 빠져 있으며 제안과 승인을 거쳐 따로 돈다.
 

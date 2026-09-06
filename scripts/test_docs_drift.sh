@@ -734,15 +734,35 @@ done
 #
 # 대상에서 빼는 것이 셋이고 이유가 서로 다르다. 정본 자신은 그 말을 정의하는 표를 담아서 빼고,
 # domain-korean 은 각 항목이 어느 지적에서 나왔는지를 적으며 그 말을 이름으로 불러야 해서 빼며,
-# docs/superpowers/ 아래는 소비하고 지우는 문서(spec·plan·인수인계)와 그때 찍은 기록이라 살아 있는
-# 문서가 아니어서 뺀다. 마지막 제외는 audit-repo-docs 의 「대상 아님」과 같은 규정이다.
+# docs/superpowers/ 아래의 기록(리뷰)과 인수인계는 찍은 뒤 고치지 않거나 소비하고 지우는 것이라 뺀다.
+# 마지막 제외는 audit-repo-docs 의 「대상 아님」과 같은 규정이다.
+#
+# spec·plan 은 그 제외에서 다시 꺼낸다. 전에는 docs/superpowers/ 를 통째로 빼서 이 둘도 함께 빠졌는데,
+# 정본의 문서 타입 표는 설계(spec·plan)를 "계속 살아 있다"고 적으므로 빼는 근거가 정본과 어긋났다.
+# 실제로 이 저장소의 spec·plan 에 금지 표현이 남아 있었고 그것을 보는 장치가 어디에도 없었다 — 레포
+# 감사는 spec·plan 을 대상에서 빼며 그 근거로 "쓰는 시점에 리뷰를 받는다"를 들고, 그 리뷰인
+# review-specs 는 lens-fit 을 부르지 않았다. 세 곳이 서로에게 미루어 아무도 안 보는 자리가 생겼다.
+#
+# 다만 이미 커밋된 spec·plan 은 대상에서 뺀다. 정본이 "과거 것은 보존 목적이며 활용하지 않는다"고
+# 적고 사용자가 새 spec·plan 만 자동 검증하기로 정했으므로, 지난 설계 문서를 소급해 고치지 않는다.
+# 새것을 가르는 방법은 봉인(seal_reviews.sh)이 HEAD 로 기록을 가르는 것을 뒤집은 것이다. 커밋 전이면
+# 검사에 걸리고 커밋되면 과거가 된다. 이 저장소는 고친 뒤 검사를 돌리는 규약이라 그때가 커밋 전이다.
 WK="$HERE/agent-principles.md"
 # 표의 행만 본다. 절의 설명 문단에도 백틱이 들어 있어, 절 전체에서 뽑으면 그 문단의 경로와 칸 이름이
 # 금지어로 둔갑한다(2026-09-06 에 실제로 세 건이 그렇게 잡혔다). 그리고 첫 칸에서만 뽑는다 —
 # 대체어 칸에 백틱이 생겨도 금지어로 새지 않게 한다.
 BANROWS="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/ && /문서와 답변/' "$WK" || true)"
 BANLIST="$(printf '%s\n' "$BANROWS" | awk -F'|' '{print $2}' | grep -oE '`[^`]+`' | tr -d '`' || true)"
-BAN_DOCS="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^agent-principles.md$' | grep -v '^skills/domain-korean/SKILL.md$')"
+BAN_LIVE="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^agent-principles.md$' | grep -v '^skills/domain-korean/SKILL.md$')"
+# 아직 HEAD 에 없는 spec·plan 만 고른다. HEAD 목록이 비면 grep -vxF 가 전부를 지우므로 나눠 다룬다.
+SP_ALL="$(cd "$HERE" && git ls-files 'docs/superpowers/specs/*.md' 'docs/superpowers/plans/*.md')"
+SP_OLD="$(cd "$HERE" && git ls-tree -r --name-only HEAD -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null | grep '\.md$' || true)"
+if [ -n "$SP_OLD" ]; then
+  SP_NEW="$(printf '%s\n' "$SP_ALL" | grep -vxF "$SP_OLD" || true)"
+else
+  SP_NEW="$SP_ALL"
+fi
+BAN_DOCS="$(printf '%s\n%s\n' "$BAN_LIVE" "$SP_NEW" | grep -v '^$' || true)"
 echo "[금지 표현] 살아 있는 문서에 남지 않는다"
 check "금지 목록을 정본에서 도출했다" "[ -n \"\$BANLIST\" ]"
 check "검사 대상 문서를 모았다"       "[ -n \"\$BAN_DOCS\" ]"
