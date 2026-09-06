@@ -1,0 +1,56 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-korean/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "skills/review-docs/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "docs/superpowers/specs/2026-09-06-canon-consolidation-design.md",
+  "docs/superpowers/specs/2026-09-06-doc-principles-in-lenses-design.md",
+  "docs/superpowers/specs/2026-06-16-writing-principles-from-wikidocs-design.md",
+  "README.md",
+  "hooks/rules_nudge_pretooluse.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "PLAIN-KO",
+  "KO-SYNTAX",
+  "PROSE-FORM",
+  "READ-FLOW"
+ ],
+ "notes": "doc_type — 절차·계약 (operations·setup·contract). 담는 것이 한국어로 답과 문서를 쓰는 수행 방법과 그 근거이고 진행 상태나 다음 단계를 적지 않는다. 강제하는 장치도 그 행이 말한 '문서와 코드를 맞대는 테스트'인 scripts/test_docs_drift.sh 로 이미 걸려 있다. lens-grounding 을 먼저 돌리고 lens-fit 을 뒤에 돌렸다. [누락] 정본의 PLAIN-KO·KO-SYNTAX·PROSE-FORM·READ-FLOW 네 조항의 문장을 하나씩 떼어 이 문서에서 대응 항목을 찾았고, 정본의 조항 문장은 모두 상세를 가졌다. 정본이 READ-FLOW에 적은 전문 용어 부연은 이 문서에서 「PLAIN-KO — 낱말을 고르는 법」의 좁은 뜻 항목이 받고 있어 조항과 절이 어긋나지만, 그 절을 이름으로 가리키는 문장이 READ-FLOW 절에 있어 누락으로 올리지 않았다. [모순] 네 조항의 상세와 정본 문장을 한 줄씩 맞댔고 뜻이 뒤집힌 곳은 없었다. 개수만 어긋나 issues 에 하나 올렸다. [환각] 이 문서가 든 측정을 레포 전체에서 찾았다. docs/superpowers/specs/ 스물여덟 편과 README와 스킬 전부를 훑었으나 안구운동 추적·835밀리초·1,016밀리초·회상 8.12개 대 5.71개·58퍼센트·47퍼센트·국세청 4퍼센트포인트·배심 지시문 51→66→80퍼센트를 받치는 자료가 이 파일과 리뷰 기록 밖에 없었다. 리뷰 기록은 이 문서를 인용한 것이라 출처가 되지 못한다. [불일치] 「금지 표현」 표의 아홉 낱말을 scripts/test_docs_drift.sh 의 도출식에 맞춰 대조했고 아홉이 모두 잡힌다. lens-readability 가 가리키는 것도 같은 표이며 이름과 자리가 일치한다. 검사가 skills/domain-korean/SKILL.md 자신과 docs/superpowers/ 아래를 대상에서 빼는 것은 스크립트 주석이 이유를 적어 두어 근거가 있다. [형식·스키마·오염·호환] 이 문서는 JSON 산출물이 아니라 스킬 문서이므로 frontmatter 유효성으로 대신 확인했다. description 값에 콜론과 우물정자 앞 빈칸이 없어 test_docs_drift.sh 의 frontmatter 안전 검사를 지난다. [규율] 정본을 규칙집 계약으로 삼았다. 프롬프트가 계약 칸이 아니라 '원칙 정본' 알림으로 그 경로를 줬으므로 lens-fit 의 승격 규정에 따라 계약으로 올려 판정했고, 읽은 경로를 read 에 남겼다. 문서 타입 표로 절차·계약 행을 골랐고 그 행이 금지한 상태 기재는 없었다. 이 문서가 한국어 문장 규칙의 소유자라 자기 문장에 자기 규칙을 걸었다. 금지 낱말 아홉을 문자열로 훑은 결과 잰다·자리·부분·영역·경우가 나오는 곳은 모두 규칙을 정의하며 인용부호로 감싼 것이거나 표의 왼쪽 열이라 위반이 아니다. 말끝 통일만 표 한 곳에서 어긋나 issues 에 올렸다. 더 확인할 것이 둘 남았다. 하나는 '매 세션 실리는 것은 정본뿐이라'인데, 정본이 CLAUDE.md 도 상시로 싣는다고 적어 문자 그대로는 어긋난다. 규칙집끼리 견주는 문맥이라 읽는 뜻은 맞을 수 있어 발견으로 올리지 않았고, 사용자가 문안을 좁힐지 정할 것을 권한다. 다른 하나는 이 문서의 측정에 출처를 붙일지인데, 붙일 자리가 이 파일인지 별도 근거 문서인지는 사용자 결정이 필요하다.",
+ "issues": [
+  {
+   "lens": "lens-fit",
+   "where": "「PLAIN-KO — 문장을 쓸 때 지키는 것」의 구조 먼저 항목과 「고칠 순서」 절",
+   "type": "constraint",
+   "claim": "낱말 바꾸기를 마지막에 한다는 같은 규칙과 그것을 받치는 같은 실측이 한 파일 안 두 절에 각각 적혀 있다. 이 문서는 상세의 SSOT를 자처하면서 그 안에서 사실 하나를 두 곳에 둔다.",
+   "file": "skills/domain-korean/SKILL.md",
+   "evidence": "실측에서 어려운 낱말을 쉬운 낱말로 바꾼 이득은 낱말 단위에 그쳤고 문장 이해도까지 오지 않았다.",
+   "counterpart_file": "skills/domain-korean/SKILL.md",
+   "counterpart": "화면 읽기 실험에서 단어 수를 절반으로 줄인 조건이 사용성을 58퍼센트 올렸고 훑기 쉽게 만든 조건이 47퍼센트 올렸는데, 어려운 낱말을 쉬운 낱말로 바꾼 한국어 실험에서는 낱말 읽는 시간만 줄고 문장 이해도는 그대로였다.",
+   "principle": "SSOT",
+   "consequence": "지금 어휘 교체를 뒤로 미루라는 규칙과 그 실측 근거가 「PLAIN-KO — 문장을 쓸 때 지키는 것」과 「고칠 순서」 두 절에 나뉘어 실려 있어, 한쪽을 고치면 다른 쪽이 옛 문안으로 남는다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "「금지 표현」 표의 '대신 쓰는 말' 열",
+   "type": "style",
+   "claim": "이 문서가 못 박은 말끝 통일 규칙을 자기 표가 어긴다. 같은 열 안에서 종결형과 관형형과 명사구가 섞여 있다.",
+   "file": "skills/domain-korean/SKILL.md",
+   "evidence": "| `자리` | 가리키는 대상의 이름 |",
+   "counterpart_file": "skills/domain-korean/SKILL.md",
+   "counterpart": "라벨은 라벨끼리, 표 셀은 같은 열끼리 맞춘다.",
+   "principle": "PROSE-FORM",
+   "consequence": "지금 '대신 쓰는 말' 열이 '확인한다 · 측정한다 · 센다' 같은 종결형과 '확인하는 · 측정하는' 같은 관형형과 '가리키는 대상의 이름' 같은 명사구로 갈려 있어, 이 표를 기준으로 삼는 lens-readability 와 세션이 그 차이에 뜻이 있는지 되짚어야 한다."
+  }
+ ]
+}

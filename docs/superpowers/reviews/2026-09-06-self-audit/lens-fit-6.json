@@ -1,0 +1,59 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/audit-repo-docs/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "scripts/audit_targets.sh",
+  "scripts/audit_evidence.sh",
+  "scripts/audit_rounds.sh",
+  "scripts/audit_topics.sh",
+  "scripts/audit_statements.sh",
+  "scripts/audit_prior_rounds.sh",
+  "scripts/audit_verify.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/test_audit.sh",
+  "scripts/test_docs_drift.sh",
+  "docs/superpowers/rewrite-map/"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "PROSE-FORM",
+  "READ-FLOW",
+  "Karpathy guidelines"
+ ],
+ "notes": "doc_type — 절차·계약 (operations·setup·contract). 감사 한 회차를 어떻게 도는지의 수행 방법과 회차 기록 파일 넷의 스키마 계약을 담고, 진행 상태나 다음 단계는 담지 않아 상태 행이 아니다. 훑은 각도. lens-grounding 은 넷을 따로 훑었다. (1) 누락 — 문서가 이름으로 부른 스크립트 아홉을 모두 열어, 문서가 약속한 사용법 줄과 스크립트의 usage 문자열을 한 줄씩 맞댔다. 플래그는 모두 실재했고, metrics 는 문서가 --root DIR 를 뺐지만 스크립트의 오류 안내와 같아 어긋남으로 세지 않았다. run.json 이 담을 것의 열거만 검수 스크립트가 요구하는 칸과 어긋나 올렸다. (2) 모순 — 「회차 대조」 절 안의 두 서술을 맞댔다. (3) 환각 — 문서가 부른 스크립트와 절 이름이 모두 실재하는지 보았다. dispatching-lenses 의 네 절 제목이 모두 그 파일의 제목으로 있었고, test_docs_drift.sh 는 문서가 적은 대로 열거와 옛 이름을 검사하고 있었다. (4) 불일치 — metrics 출력 칸 일곱이 스크립트 출력과 글자까지 같았고, 「걸음」 표의 행 열하나가 문장의 수와 맞았으며, 표가 가리키는 절 열둘이 모두 실재했다. diff.json 의 값 집합만 어긋나 올렸다. lens-fit 은 다섯을 따로 훑었다. 형식은 frontmatter 의 name·description 과 제목 꼴을 보았고 어긋난 것이 없다. 스타일은 표와 목록 안의 말끝이 하나로 맞는지, 소제목 바로 아래 첫 문장이 그 절의 결론인지를 절 열둘에서 보았고 어긋난 것이 없다. 오염과 호환은 이 문서가 파싱 대상이 아니라 걸리는 것이 없었다. 규율은 정본을 계약으로 삼아, 먼저 문서 타입 표에서 절차·계약 행을 가린 뒤 그 행이 담지 말라는 상태가 있는지 보았고 없었다. 이어 나머지 조항을 훑어 SSOT 하나와 열거 수 하나를 올렸다. 올리지 않은 것 셋. 첫째, 「기계가 하는 것」의 '중복 제거' 항목은 어느 스크립트도 하지 않고 세션이 지문을 견주는 일인데, 없음을 인용으로 댈 수 없어 상대편을 못 세워 뺐다. 둘째, 「감사 대상 고르기」의 '레포에 든 .md 파일을 모두 세운 뒤'는 audit_targets.sh 가 git ls-files 로 추적 파일만 세는 것과 좁게 보면 다르지만, 지금 docs/superpowers/rewrite-map/ 아래 일곱은 모두 머리에 superseded 를 달아 「대상 아님」에 걸리므로 목록에서 빠진 살아 있는 문서가 없어 결과를 구체적으로 못 적어 뺐다. 셋째, 「통합 기록」의 findings.json 서술은 사유를 기각에만 요구하는데 audit_verify.sh 는 미판정에도 verdict_reason 을 요구한다. 다만 「판정」 절이 '판정마다 근거를 적고'라 적고 「회차 대조」 절이 미판정의 verdict_reason 을 글자로 보여 주므로 문서가 덮고 있다고 보아 뺐다. 더 확인할 것 둘. 「회차 대조」의 '확정·미판정·도출 발견'에서 '도출'이 「일관성 대조」의 복제 도출 발견을 가리키는지, 아니면 test_audit.sh 가 남지 말라고 검사하는 옛 derived 상태의 잔재인지가 이 문서만으로는 갈리지 않는다. 그리고 「통합 기록」의 '감사 범위'는 세 곳에서 그 이름으로 불리는데 정작 그 절은 '범위와 배정'이라 적어 이름이 반만 맞는다.",
+ "issues": [
+  {
+   "lens": "lens-fit",
+   "where": "「통합 기록」 절 첫 문단의 렌즈 원본 이름 꼴",
+   "type": "constraint",
+   "claim": "이름 규칙을 정본에 맡긴다고 적고서 정본과 다른 꼴로 다시 적었다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "폴더 안에는 파일 넷과 렌즈별 원본(`<렌즈>-<띄운 횟수>.json`)을 둔다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "렌즈별 원본은 요약문과 같은 이름의 폴더에 `lens-<렌즈 이름>-<띄운 횟수>.json`으로 둔다.",
+   "principle": "SSOT",
+   "consequence": "지금 같은 이름 규칙이 두 곳에 다른 글자로 있고, 절차 문서 쪽 꼴에는 audit_verify.sh 의 정규식이 요구하는 lens- 접두사가 없다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "「일관성 대조」 절 첫 문장과 그 아래 항목 목록",
+   "type": "constraint",
+   "claim": "세 걸음이라 적고 이름 붙인 항목은 넷이다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "세 걸음이다.",
+   "counterpart_file": "skills/audit-repo-docs/SKILL.md",
+   "counterpart": "- **복제 도출** — 같음이면서 정본이 아닌 쪽의 역할이 정본을 가리키지 않으면 그 진술은 베낀 것이다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 「일관성 대조」 절은 걸음이 셋이라고 적고 진술 받기·표 대조·갈리는 짝만 묻기·복제 도출 넷을 이름 붙여 두고 있으며, 「걸음」 절의 수를 세는 test_audit.sh 의 검사는 이 절을 세지 않는다."
+  }
+ ]
+}

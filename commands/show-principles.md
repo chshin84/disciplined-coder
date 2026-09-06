@@ -2,7 +2,8 @@
 description: 지금 이 PC에 적용되어 있는 디시플린 원칙 전문을 그대로 보여준다(PC 전역 agent-principles.md — 디시플린 정본의 사본이다).
 ---
 
-먼저 관리 디렉터리를 도출하라 — 경로를 짐작하지 말고 아래를 실행해 받은 값을 쓴다.
+먼저 설정 홈을 도출하라 — 경로를 짐작하지 말고 아래를 실행해 받은 값을 쓴다. 홈이 갈리는 PC에서는
+이 명령이 stdout의 경로 한 줄과 함께 stderr로 안내 한 줄을 더 낸다. 쓸 값은 stdout의 경로다.
 
 `bash -c '. "${CLAUDE_PLUGIN_ROOT}/scripts/_resolve_home.sh" && resolve_home claude'`
 
@@ -12,4 +13,4 @@ description: 지금 이 PC에 적용되어 있는 디시플린 원칙 전문을 
 
 경로를 도출하는 이유는 홈이 갈리는 PC가 있기 때문이다. 도메인 PC는 네트워크 홈 리다이렉트로 bash의
 `$HOME`이 `USERPROFILE`과 어긋날 수 있고, 그때 `~/.claude`를 그대로 읽으면 scaffold가 쓴 곳과 다른
-곳을 보게 된다. 그러면 멀쩡히 설치된 상태에서 "아직 실행되지 않았다"가 뜬다.
+곳을 보게 된다. 그러면 멀쩡히 설치된 상태에서 "원칙 사본이 없다"가 뜬다.

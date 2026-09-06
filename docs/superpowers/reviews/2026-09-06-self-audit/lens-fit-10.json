@@ -1,0 +1,58 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/review-specs/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "CLAUDE.md",
+  "skills/review-specs/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "hooks/hooks.json",
+  "hooks/spec_review_stop.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "hooks/_spec_marker.sh",
+  ".claude/settings.json",
+  "scripts/test_docs_drift.sh"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "PLAIN-KO",
+  "PROSE-FORM",
+  "READ-FLOW",
+  "KO-SYNTAX",
+  "REVERSIBLE"
+ ],
+ "notes": "doc_type — 절차·계약 (operations·setup·contract). 이 문서는 spec·plan 리뷰의 수행 방법(걸음 아홉과 각 걸음의 절차)과 렌즈 산출물의 스키마 계약 참조를 담고, 진행 상태나 다음 단계는 담지 않는다. 「작업 순서와 다시 리뷰」 절이 무엇이 남았는지는 문서에 적지 않는다라고 스스로 상태를 배제한다. lens-grounding 을 체크리스트 항목마다 따로 훑었다. [누락] 「한계」 절이 적은 셋을 hooks/spec_review_stop.sh 와 맞댔다. 루프가드와 git 아님 시 FAIL-OPEN 과 기존 커밋 spec 수정 제외는 코드와 맞았다. 코드 주석이 선언한 한계 가운데 문서에 없는 것이 둘 있다 — 같은 턴 커밋 우회 차단의 경계가 HEAD 한 커밋뿐이라 두 커밋 앞의 spec 은 빠지는 것과, PostToolUse 가 프로젝트 밖 spec 에는 넛지를 안 거는 것이다. 둘 다 상대편으로 삼을 코드 주석이 여러 줄에 걸쳐 있어 한 문장 그대로 옮길 수 없어 올리지 않았다. 사람이 확인할 값어치는 있다. [모순] 「훅이 거는 강제」의 문장은 Stop 훅이 신규 파일에만 하드 게이트를 거는 것보다 넓게 읽히지만, 같은 문서 「한계」가 이미 좁혀 두었고 CLAUDE.md 와도 맞아 올리지 않았다. [환각] 마커 문자열·해제 조건·env 스위치·게이트 경로는 hooks/_spec_marker.sh 와 하나씩 맞았다. dispatching-lenses 의 예외 목록과 한 번만 띄우는 규율, lens-prior-art 의 조건부 호출과 상한은 이 문서가 숫자를 박지 않고 소유자를 가리키는 꼴이라 어긋남이 없었다. 기록 이름 규칙도 정본을 가리키기만 하고 베끼지 않았다. [불일치] 유일하게 어긋난 숫자가 「절차」 절의 디스패치 개수 셋이다. lens-fit 을 항목마다 따로 훑었다. 계약은 프롬프트가 알림으로 준 정본 경로를 승격해 삼았고 그 사실을 여기 적는다. [형식] 스킬 frontmatter 의 name·description 이 있고 name 이 디렉터리 이름과 같다. [오염] 없다. [호환] 산출물 스키마를 스스로 정의하지 않고 aggregating-lenses 를 가리켜 계약 갈래가 생기지 않았다. [규율] 문서 타입 표에서 절차·계약 행으로 가린 뒤 그 행이 금한 상태 기재를 훑었고 없었다. PROSE-FORM 의 말끝 통일을 걸음 표와 불릿 여섯 묶음에 걸었고 모두 맞았다. READ-FLOW 의 결론 선행도 절마다 확인해 걸릴 것이 없었다. 걸린 것은 PLAIN-KO 의 대구 상한 하나다. 문체 전반은 lens-readability 의 몫이라 이 회차에서 더 보지 않았다. 이 회차에 걸지 않은 렌즈가 둘이다 — lens-consistency 와 lens-adversarial 이다. 그래서 못 본 것이 남는다. 훑는 동안 lens-consistency 가 볼 만한 것이 하나 보였다. 「웹에 나가는 렌즈의 인용 검증」이 검증 범위를 처분에 기대어 정하는데, 걸음 표에서 인용 검증은 여섯째이고 처분은 여덟째라 범위를 정할 때 아직 처분이 안 나와 있다. 게다가 「처분」 절이 이 렌즈의 발견을 전부 🔴로 보내므로 앞 갈래는 이 렌즈에 발화하지 않는다.",
+ "issues": [
+  {
+   "lens": "lens-fit",
+   "where": "frontmatter 의 description",
+   "type": "constraint",
+   "claim": "frontmatter 의 렌즈 열거가 lens- 접두사를 뗀 짧은 이름 consistency·adversarial 을 쓴다. 렌즈 이름 표준이 짧은 이름을 금지한다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 렌즈들(lens-grounding·consistency·adversarial, 그리고 spec에 한해 제안·승인 뒤 붙는 lens-prior-art)로 검증하고, 발견을 🔴와 고칠 것으로 가르는 호출자.",
+   "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+   "counterpart": "짧은 이름(`grounding`)은 쓰지 않는다.",
+   "principle": "EXPLICIT",
+   "consequence": "이 문서에 렌즈 이름이 두 꼴로 있다. 본문 디스패치 목록은 lens-consistency·lens-adversarial 이고 frontmatter 는 consistency·adversarial 이다. scripts/test_docs_drift.sh 의 DISPATCH 추출은 본문의 목록 꼴만 읽어 frontmatter 는 검사 밖에 있다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "문서 전체 — 「개요」·「리뷰 기록」·「인용 검증」·「한계」 절",
+   "type": "style",
+   "claim": "`A가 아니라 B` 대구를 한 글에 다섯 번 썼다. 정본은 한 편에 한 번까지로 정한다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "이 게이트는 실질적으로 차단이 아니라 턴당 한 번의 강한 환기다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "`A가 아니라 B` 대구는 글 한 편에 한 번까지 쓰고, 연결어미 뒤 쉼표를 줄인다.",
+   "principle": "PLAIN-KO",
+   "consequence": "다섯 자리에 같은 대구가 있다. frontmatter 와 개요와 「리뷰 기록」과 「인용 검증」과 「한계」다."
+  }
+ ]
+}

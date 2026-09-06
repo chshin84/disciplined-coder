@@ -1,0 +1,107 @@
+{
+ "lens": "lens-grounding",
+ "target": "CLAUDE.md",
+ "read": [
+  "agent-principles.md",
+  "README.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/domain-korean/SKILL.md",
+  "hooks/hooks.json",
+  ".claude/settings.json",
+  "hooks/_spec_marker.sh",
+  "hooks/spec_review_stop.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/doc_format_pretooluse.sh",
+  "hooks/rules_nudge_pretooluse.sh",
+  "hooks/readonly_pretooluse.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/test_docs_drift.sh",
+  ".claude-plugin/plugin.json"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "READ-FLOW",
+  "PLAIN-KO",
+  "KO-SYNTAX",
+  "PROSE-FORM"
+ ],
+ "notes": "[lens-grounding — 훑은 각도] 체크리스트 넷을 따로 돌았다. (1) 누락: CLAUDE.md가 말하는 장치를 hooks/hooks.json·.claude/settings.json의 배선과 하나씩 맞댔다. hooks.json은 SessionStart 둘(scaffold.sh·rules_nudge_sessionstart.sh), PreToolUse 셋(readonly·doc_format·rules_nudge), PostToolUse 둘(spec_review·doc_review), Stop 하나(spec_review_stop.sh)를 걸고 .claude/settings.json은 seal_reviews.sh 하나를 건다. CLAUDE.md가 안 적은 것은 문서 양식 넛지와 규칙 넛지와 scaffold.sh인데, 전체 목록의 정본을 README로 넘긴다고 스스로 적었으므로 누락으로 올리지 않았다. 봉인의 '커밋된' 한정만 issues에 올렸다. (2) 모순: 넛지 예외 문장이 규칙 넛지에는 안 맞아 issues에 올렸다. (3) 환각: 나머지 주장은 근거를 찾았다 — specs/plans 경로는 hooks/_spec_marker.sh의 SPECPLAN_DIRS와 일치하고, Stop 게이트가 '새로 쓸 때만' 걸린다는 것은 같은 훅의 신규 파일 걸음이 받치며, 읽기 전용 거부 사유 출력은 hooks/readonly_pretooluse.sh가, README 절 제목은 README.md의 「하드 게이트와 넛지와 전역 설정 수정」이 실재한다. claude plugin validate ./가 version 경고 하나만 낸다는 것은 .claude-plugin/plugin.json에 version 키가 없는 것과 어긋나지 않지만, 명령을 돌려 확인하지는 않았다. (4) 불일치: 실행 명령 문자열을 scripts/test_docs_drift.sh가 CLAUDE.md에서 직접 grep으로 대조하고 있어 명령의 세 조각이 모두 일치한다. scripts/ 아래 test_*.sh 다섯이 모두 fail 0 검사로 끝나 FAIL=0 계약과 일치한다. [더 확인할 것] '기대 개수를 숫자로 박지 않는다'는 계약 문장은 scripts/test_scaffold.sh의 상태값 비교 숫자들에 걸릴 수 있다. 그 숫자들은 통과 개수가 아니라 검사 대상의 상태값이라 위반으로 보지 않았으나, '기대 개수'가 무엇을 가리키는지는 CLAUDE.md도 그 스크립트도 못 박지 않았다. 사용자가 뜻을 정해 주면 판정이 갈린다. [범위 밖 관찰] 레포 루트에 HANDOFF-self-improvement-loop.md가 남아 있다. 정본의 문서 타입 표는 핸드오프를 '소비되면 곧바로 지운다'로 정하지만 CLAUDE.md는 이 파일을 언급하지 않아 검토 대상 문서 안에 짚을 곳이 없으므로 issues로 올리지 않았다. [lens-readability — 훑은 각도와 관찰] 목적에 읽는 사람과 할 수 있어야 하는 것이 둘 다 있어 판정했다. 문서가 짧아 통째로 한 번 봤다. domain-korean의 「금지 표현」 표 아홉을 문자열로 훑어 걸린 것이 없었다. 관찰 열은 문서 전체(제목 둘과 문단 넷과 명령 한 줄, 문장 열넷)를 범위로 셌다. 강조는 굵은 구간 하나이고 문장을 통째로 굵힌 것은 없다. 끊김은 산문과 인라인 코드 줄 사이를 두 번 오간다. 이음은 문단 넷 가운데 둘이 앞 문단의 말을 받아 시작한다. 목록은 없다. 끼움은 괄호 부연 하나로 문장 열넷 대비 하나다. 이름 형태는 제목 둘이 모두 명사구이고 각 제목 아래 첫 문장이 그 절의 결론을 말한다. 형태 섞임은 표와 목록이 없어 세지 못했다. 두루뭉술한 결과는 '발동한다' 하나다. 길이는 중앙값이 약 45자이고 가장 긴 문장이 약 63자다. 수식은 관형절이 주어 앞에 통째로 끼어든 곳 하나이고 명사 앞 수식이 두 겹 쌓인 곳도 같은 자리다. 열에 안 걸리는 방해로 둘째 문단과 셋째 문단의 사실 중복과 이름 갈림을 찾아 첫 제안으로 올렸다. [제안을 반영할 때의 기계 제약] scripts/test_docs_drift.sh가 CLAUDE.md를 직접 검사한다. 첫 제안의 rewrite는 이름을 'Stop 리뷰 게이트'로 모으므로 그 검사를 통과하고, 넷째 제안의 코드 블록은 명령 문자열을 그대로 두므로 나머지 셋을 통과한다. 반영 뒤 bash scripts/test_docs_drift.sh를 돌려 확인하라.",
+ "issues": [
+  {
+   "lens": "lens-grounding",
+   "where": "본문 셋째 문단 — 넛지 예외를 적은 문장",
+   "type": "mismatch",
+   "claim": "넛지 예외가 넛지 전체에 걸리는 것처럼 적혀 있으나, 리뷰 기록과 프로젝트 밖 경로를 거르는 걸음은 문서 넛지 둘에만 있고 규칙 넛지에는 없다. 규칙 넛지는 세션의 첫 파일 접촉이면 대상 경로를 보지 않고 뜬다.",
+   "file": "CLAUDE.md",
+   "evidence": "리뷰 기록과 프로젝트 밖 문서에는 넛지가 뜨지 않는다.",
+   "counterpart_file": "hooks/rules_nudge_pretooluse.sh",
+   "counterpart": "PreToolUse(Write|Edit|Bash): 이 세션이 파일을 처음 건드리려 하면 규칙 스킬 둘을 열라고 한 번 알린다",
+   "principle": "SSOT",
+   "consequence": "지금 CLAUDE.md는 넛지 전체에 예외가 걸린다고 적고 있고, hooks/rules_nudge_pretooluse.sh에는 path_is_specplan·path_in_project 같은 경로 술어 호출이 한 줄도 없어 리뷰 기록을 쓸 때도 프로젝트 밖 파일을 고칠 때도 규칙 넛지가 뜬다. 같은 예외를 README는 「문서 넛지 셋」 항목에만 걸어 두 문서가 갈려 있다."
+  },
+  {
+   "lens": "lens-grounding",
+   "where": "본문 셋째 문단 — 봉인과 읽기 전용 거부를 적은 문장",
+   "type": "omission",
+   "claim": "봉인 범위를 좁히는 '커밋된'이 빠졌다. scripts/seal_reviews.sh는 파일 인자가 없으면 HEAD에 있는 docs/superpowers/reviews/ 아래 파일만 봉인하므로, 아직 커밋되지 않은 기록은 세션 시작에 봉인되지 않는다.",
+   "file": "CLAUDE.md",
+   "evidence": "세션이 시작될 때 감사 기록이 읽기 전용으로 봉인되고, 읽기 전용 파일에 Write나 Edit을 걸면 훅이 사유와 함께 거부한다.",
+   "counterpart_file": "README.md",
+   "counterpart": "| SessionStart | `scripts/seal_reviews.sh` | 커밋된 감사 기록을 읽기 전용으로 봉인한다(이 저장소의 프로젝트 훅) |",
+   "principle": "SSOT",
+   "consequence": "지금 CLAUDE.md에는 봉인 대상을 커밋된 기록으로 한정하는 말이 없어, 커밋 전 기록도 세션 시작에 봉인되는 것으로 읽힌다. README가 적은 두 번째 봉인 시점도 CLAUDE.md에 없다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "SSOT",
+   "statement": "원칙의 정본은 레포 루트의 agent-principles.md이고, 상세는 skills/ 아래 각 스킬이 소유한다.",
+   "evidence": "정본은 `agent-principles.md`이고, 상세는 `skills/` 아래 각 스킬이 소유한다."
+  },
+  {
+   "topic": "문서를 쓰고 관리할 때",
+   "statement": "설계 문서와 계획 문서를 두는 경로를 각각 docs/superpowers/specs/와 docs/superpowers/plans/로 못 박는다.",
+   "evidence": "설계 문서는 `docs/superpowers/specs/`에, 계획 문서는 `docs/superpowers/plans/`에 쓴다."
+  },
+  {
+   "topic": "검증",
+   "statement": "spec·plan을 새로 쓰면 Stop 게이트가 리뷰를 요구하고, 그 밖의 문서를 고치면 검진 넛지가 뜬다.",
+   "evidence": "spec과 plan을 새로 쓰면 Stop 게이트가 리뷰를 요구하고, 그 밖의 문서를 고치면 검진 넛지가 뜬다."
+  },
+  {
+   "topic": "검증",
+   "statement": "넛지 예외를 리뷰 기록과 프로젝트 밖 문서로 정한다.",
+   "evidence": "리뷰 기록과 프로젝트 밖 문서에는 넛지가 뜨지 않는다."
+  },
+  {
+   "topic": "FAIL-LOUD",
+   "statement": "읽기 전용 파일에 걸린 Write·Edit 거부를 훅 고장이 아니라 봉인으로 읽으라고 정한다.",
+   "evidence": "기록을 고치려다 거부당하면 훅 고장이 아니라 봉인이다."
+  },
+  {
+   "topic": "SSOT",
+   "statement": "걸린 훅의 전체 목록과 배선의 정본을 README.md의 「하드 게이트와 넛지와 전역 설정 수정」 절로 지정한다.",
+   "evidence": "걸린 훅의 전체 목록과 배선은 `README.md`의 「하드 게이트와 넛지와 전역 설정 수정」 절이 정본이다."
+  },
+  {
+   "topic": "코딩할 때",
+   "statement": "고친 것이 있으면 계약 테스트를 모두 돌리고 그다음 claude plugin validate ./를 실행한다.",
+   "evidence": "고친 것이 있으면 아래를 돌리고, 그다음 `claude plugin validate ./`를 실행한다."
+  },
+  {
+   "topic": "SSOT",
+   "statement": "각 테스트 스크립트의 계약을 FAIL=0으로 두고 기대 개수를 숫자로 박지 않는다.",
+   "evidence": "각 스크립트의 계약은 **FAIL=0**이며 기대 개수를 숫자로 박지 않는다(정본의 `SSOT`)."
+  },
+  {
+   "topic": "FAIL-LOUD",
+   "statement": "테스트를 이어 돌릴 때 앞 스크립트의 실패가 묻히지 않도록 실패한 이름을 모아 마지막에 알린다.",
+   "evidence": "실패한 이름을 모아 마지막에 알리는 형태인 이유는, 그냥 이어 돌리면 마지막 하나의 결과만 남아 앞의 실패가 묻히기 때문이다."
+  }
+ ]
+}

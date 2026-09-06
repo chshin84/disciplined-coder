@@ -1,0 +1,62 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/aggregating-lenses/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/review-llm-calls/SKILL.md",
+  "skills/nested-orchestration/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "scripts/audit_verify.sh",
+  "scripts/audit_statements.sh",
+  "scripts/test_audit.sh",
+  "scripts/test_docs_drift.sh",
+  "docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "NAME-ITEMS",
+  "FOCUSED",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "KO-SYNTAX"
+ ],
+ "notes": "doc_type — 「절차·계약」 행이다. 파일의 종류가 아니라 담는 것으로 갈랐다. 이 문서는 집계의 수행 방법(「하는 일」 세 걸음)과 스키마 계약(「리뷰 산출물 계약」)을 담고 진행 상태나 다음 단계를 담지 않는다. 그 행이 담지 말라고 한 상태는 이 문서에 없다. lens-grounding 훑은 각도 — 누락은 스키마 블록의 최상위 칸과 issues 필드를 렌즈 여섯의 출력 스키마 줄, scripts/audit_verify.sh, scripts/audit_statements.sh, scripts/test_audit.sh 블록과 하나씩 맞대어 봤고(target 누락과 doc_type 미등재를 찾았다), 모순은 호출자 다섯의 처분·집계 문단을 이 문서의 「처분」·「구현 형태」와 맞대어 봤으며(spec 리뷰의 가르는 주체가 갈렸다), 환각은 이 문서가 이름으로 부른 scripts/audit_evidence.sh 와 audit-repo-docs 의 「진술 받기」 걸음이 실재하는지 열어 확인했고(둘 다 실재한다), 불일치는 「공통 계약의 예외」가 적은 빠지는 칸 목록을 lens-readability 와 lens-prior-art 의 실제 스키마 줄과 대조해 어긋남이 없음을 확인했다. lens-fit 훑은 각도 — 형식은 스키마 블록의 JSON 꼴과 폐쇄 집합 값을, 스타일과 규율은 정본의 PLAIN-KO·KO-SYNTAX·PROSE-FORM·READ-FLOW 넷을, 오염과 호환은 집계 항목의 닫힌 필드 목록이 렌즈 원본의 필드를 잃는지를 봤다. 계약 칸이 아니라 알림에서 끌어 온 정본을 계약으로 삼았다. 호출자 계약 준수 대조 — 렌즈 여섯의 출력 스키마 줄이 공통 필드를 다 담는지 확인했고 예외 둘은 「공통 계약의 예외」가 적은 대로 빠져 있었다. 호출자 다섯 가운데 nested-orchestration 은 이 문서를 이름으로 부르지 않고 dispatching-lenses 만 가리킨다. 올리지 않은 것 셋 — (1) 「처분」의 멀티에이전트 워크플로 항목이 기록 경로 꼴을 적는데 정본의 기록 이름 규칙이 그 소유자이고 review-specs 는 베끼지 않겠다고 선언했다. 다만 review-docs 도 같은 꼴을 적고 있어 이 문서 하나의 문제가 아니라 레포 전체의 되풀이라 여기 올리지 않았다. (2) 「공통 계약의 예외」 두 불릿이 개조식으로 끝나 보이나, scripts/test_docs_drift.sh 가 그 문자열을 정규식으로 뽑아 렌즈 스키마와 대조하므로 그 꼴이 기계 계약이다. 고치면 검사가 깨진다. (3) 「출력 스키마」의 렌즈 이름 열거 문장이 이 문서 안으로 읽히는지 레포 전체로 읽히는지 갈린다. 앞뒤 문맥이 집계 스키마라 이 문서 안으로 읽는 쪽이 자연스러워 올리지 않았다. 더 확인할 것 — doc_type 미등재는 docs/superpowers/plans/2026-09-06-doc-principles-in-lenses.md 가 이미 남은 일로 적어 둔 것이라 이번 회차의 새 발견이 아니라 잔존이다. 호출자가 회차 대조에서 그렇게 다루는 것이 맞는지 확인이 필요하다.",
+ "issues": [
+  {
+   "lens": "lens-fit",
+   "where": "「리뷰 산출물 계약 (렌즈 공통)」의 read 항목과 「출력 스키마」 절의 principles_applied 문단",
+   "type": "constraint",
+   "claim": "빈 값을 보고에 적고 자동 재시도를 걸지 않는다는 규칙과 그 근거 문장이 dispatching-lenses 의 「렌즈에게 정본을 알리는 법」 넷째 항목과 거의 같은 말로 이 파일에 다시 적혀 있다. 그 절은 다른 문서가 가리키기만 하고 베끼지 않는다고 스스로 선언한다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "읽지 않고 채우는 것을 막을 수 없어 재시도는 \"비어 있지 않은 배열\"로만 수렴한다.",
+   "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+   "counterpart": "다른 문서는 이 절을 가리키기만 하고 내용을 베끼지 않는다.",
+   "principle": "SSOT",
+   "consequence": "지금 같은 재시도 근거가 두 파일에 적혀 있고, scripts/test_docs_drift.sh 가 베끼기를 검사하는 것은 그 절의 첫 항목 문장 하나뿐이다."
+  },
+  {
+   "lens": "lens-fit",
+   "where": "「공통 계약의 예외」와 「구현 형태 (맥락 의존)」의 소제목 바로 아래",
+   "type": "style",
+   "claim": "두 절이 소제목 다음에 결론 문장 없이 바로 불릿으로 시작한다. 계약으로 받은 정본의 READ-FLOW 조항은 소제목 바로 아래 첫 문장에 그 절의 결론을 적으라고 정한다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "## 공통 계약의 예외",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "소제목 바로 아래 첫 문장에 그 절의 결론을 적는다.",
+   "principle": "READ-FLOW",
+   "consequence": "지금 이 문서의 절 아홉 가운데 둘이 결론 문장 없이 불릿으로 시작하고, 나머지 일곱은 첫 문장에 결론을 적고 있다."
+  }
+ ]
+}

@@ -1,0 +1,112 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-plugin/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  ".claude-plugin/plugin.json",
+  ".claude-plugin/marketplace.json",
+  "hooks/hooks.json",
+  "scripts/test_docs_drift.sh",
+  "scripts/_ensure_autoupdate.sh",
+  "scripts/scaffold.sh",
+  "commands/setup-discipline.md",
+  "commands/show-principles.md",
+  "skills/nested-orchestration/SKILL.md",
+  "CLAUDE.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "KO-SYNTAX"
+ ],
+ "notes": "문서 타입 가르기(lens-fit 의 doc_type) — 호출자가 최상위 칸을 여섯으로 못 박아 별도 칸을 두지 않고 여기 적는다. 정본 「문서 타입과 수명」 표의 절차·계약(operations·setup·contract) 행으로 가렸다. 이 문서는 진행 상태나 다음 단계가 아니라 플러그인을 만들고 사용자 설정 파일을 고칠 때의 수행 방법만 담기 때문이다. 그 행이 담지 말라고 한 상태는 이 문서에 없다. lens-grounding 으로 훑은 각도 넷. 누락은 이 문서가 이름으로 부른 소유자·대상 파일을 다 열었는지로 봤고, scripts/test_docs_drift.sh 가 마켓플레이스 문안 동일성 검사를 실제로 갖고 있음을 확인했다. 모순은 배선 파일과 맞대 봤고 아래 대조가 다 맞았다. plugin.json 에 version 키가 없다. marketplace.json 이 최상위 name·description·owner·plugins[] 를 갖고 source 로 루트를 가리킨다. 두 파일의 description 이 글자 그대로 같다. 스킬 열여섯이 모두 name·description 둘만 쓰고, 커맨드 둘은 description 하나만 쓴다. hooks/hooks.json 이 실재하고 skills/ 와 commands/ 가 실재한다(agents/ 는 없으나 이 문서는 있어야 한다고 말하지 않는다). 「사용자 설정 파일을 고칠 때 지킬 것」 여섯 조항이 scripts/_ensure_autoupdate.sh 에 그대로 있다 — name 으로 고를 항목을 좁히고, autoUpdate 가 이미 있으면 종료코드 10 으로 물러나고, .bak 을 남긴 뒤 임시 파일을 다시 파싱해서 옮기고, 종료코드 3·4·5 로 사유를 갈라 알리고, 파이썬 인터프리터 고르기를 _json_valid.sh 한 곳에 두고, scripts/scaffold.sh 가 고친 파일과 사본 경로를 함께 찍는다. OS 환경 변수 불릿도 commands/setup-discipline.md 에서 레지스트리로 확인하고 물어서 넣으며 '다음에 여는 창부터 실린다'를 알리는 것까지 확인했다. 환각과 불일치 축에서는 인용한 파일 경로·키 이름·스크립트 이름이 모두 실재했다. 확인이 안 되어 발견으로 올리지 않은 것 셋. 첫째, version 을 설정하면 업데이트가 버전 문자열 비교로 바뀐다는 것과 --strict 가 경고를 실패로 취급한다는 것은 Claude Code 쪽 동작이라 이 레포 파일로는 확인되지 않는다. 둘째, '플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다'도 같은 이유로 확인되지 않는다. 셋째, claude plugin validate ./ 를 직접 돌리지 않았다. lens-fit 으로 훑은 각도 다섯. 형식은 frontmatter 두 키와 제목 구조로 봤고 어긋난 곳이 없었다. 스타일은 정본의 PLAIN-KO·PROSE-FORM·READ-FLOW·KO-SYNTAX 로 봤고, 불릿 여섯의 말끝이 '-다'로 하나로 맞아 있으며 제목 둘이 명사구다. 오염은 해당 없다. 호환은 scripts/test_docs_drift.sh 가 이 문서의 「frontmatter」 절을 소유자로 부르는 자리와 맞대 봤고 절 이름이 일치했다. 규율 축에서 걸린 것이 위 발견 하나다. 판정 유보 하나. 두 소제목이 '지킬 것'으로 끝나 정본의 대상을 가리키는 '것'은 실제 이름으로 바꾼다에 걸릴 여지가 있으나, 여기서 '것'은 대상이 아니라 규칙 묶음의 이름 자리라 올리지 않았다. 이 판정의 근거인 상세는 domain-korean 이 소유하는데 호출자가 그 경로를 계약으로 넘기지 않아 열지 않았다.",
+ "issues": [
+  {
+   "lens": "lens-grounding",
+   "where": "「플러그인을 만들 때 지킬 것」의 '스킬 이름의 부류' 항목",
+   "type": "mismatch",
+   "claim": "이름 부류를 셋으로 갈라 놓았으나 skills/ 아래 nested-orchestration 이 어느 부류에도 안 들고 열거에도 없다. 그 스킬은 규칙집이 아니라 방법을 담은 절차이고 L3 에서 렌즈를 띄우는데, 이름은 domain- 도 lens- 도 아니고 동사구도 아니다.",
+   "file": "skills/domain-plugin/SKILL.md",
+   "evidence": "열어서 읽는 규칙집에는 `domain-` 접두사를 붙이고(`domain-korean`·`domain-readme`·`domain-plugin`), 읽기 전용 서브에이전트로 띄우는 렌즈에는 `lens-` 접두사를 붙이며, 렌즈를 띄워 결과를 내는 절차에는 접두사 대신 동사구를 쓴다(`review-specs`·`review-docs`·`review-llm-calls`·`audit-repo-docs`·`dispatching-lenses`·`aggregating-lenses`).",
+   "counterpart_file": "skills/nested-orchestration/SKILL.md",
+   "counterpart": "`agent-principles.md`의 「병렬 오케스트레이션」 절이 트리거이고, 여기가 방법의 SSOT다.",
+   "principle": "EXPLICIT",
+   "consequence": "지금 skills/ 아래 열여섯 스킬 가운데 nested-orchestration 하나가 이 문서의 세 부류 어디에도 안 들어, 이름만 보고는 그것이 규칙집인지 절차인지 갈리지 않는다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "domain-plugin",
+   "statement": "활성 개발 중인 플러그인은 plugin.json 의 version 을 비워 커밋 SHA 기반 자동 업데이트를 유지한다.",
+   "evidence": "활성 개발 중이면 plugin.json의 `version`을 비워 커밋 SHA 기반 자동 업데이트를 유지한다."
+  },
+  {
+   "topic": "SSOT",
+   "statement": "마켓플레이스 항목의 description 은 plugin.json 의 description 과 글자 그대로 같게 둔다.",
+   "evidence": "`plugins[].description`은 `plugin.json`의 `description`과 글자 그대로 같게 둔다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "스킬 SKILL.md 는 name 과 description 두 키를 쓰고 커맨드 .md 는 description 하나를 쓴다.",
+   "evidence": "스킬 `SKILL.md`는 `name`(디렉터리 이름과 같게)과 `description` 두 키를 쓰고, 커맨드 `.md`는 `description` 하나를 쓴다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "frontmatter 의 description 값에는 콜론과 우물정자 앞 빈칸을 넣지 않는다.",
+   "evidence": "값은 YAML 평문 스칼라라 `: `와 ` #`을 넣지 않는다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "플러그인 검증은 non-strict 로 돌리고 version 경고는 수용한다.",
+   "evidence": "`claude plugin validate ./`로 검증한다."
+  },
+  {
+   "topic": "EXPLICIT",
+   "statement": "스킬 이름의 모양이 그 스킬을 어떻게 쓰는지 말하게 한다.",
+   "evidence": "이름의 모양이 그 스킬을 어떻게 쓰는지 말하게 한다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "플러그인 컴포넌트는 agents·skills·commands·hooks/hooks.json 에 둔다.",
+   "evidence": "`agents/`·`skills/`·`commands/`·`hooks/hooks.json`에 둔다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "사용자 설정 파일에서는 우리 것으로 식별되는 항목만 고친다.",
+   "evidence": "우리 것으로 식별되는 항목만 고친다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "사용자가 값을 넣어 둔 키는 덮지 않고 키가 없을 때만 채운다.",
+   "evidence": "사용자가 값을 넣어 둔 키는 덮지 않는다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "고치기 전에 사본을 남기고 새로 쓴 파일을 다시 파싱해 유효할 때만 원래 경로에 놓는다.",
+   "evidence": "고치기 전에 `.bak`을 남기고, 새로 쓴 파일을 다시 파싱해 유효할 때만 원래 경로에 놓는다."
+  },
+  {
+   "topic": "FAIL-LOUD",
+   "statement": "못 고친 회차는 까닭을 갈라 알린다.",
+   "evidence": "못 고친 회차는 까닭을 갈라 알린다."
+  },
+  {
+   "topic": "Karpathy guidelines",
+   "statement": "JSON 처리기를 여러 개 두지 않는다.",
+   "evidence": "JSON을 다루는 처리기를 여러 개 두지 않는다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "서식이 바뀌면 바뀐 경로와 사본 위치를 함께 알린다.",
+   "evidence": "바뀐 경로를 알리고 사본 위치를 함께 보인다."
+  }
+ ]
+}

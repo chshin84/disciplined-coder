@@ -1,0 +1,45 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-plugin/SKILL.md",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  ".claude-plugin/plugin.json",
+  ".claude-plugin/marketplace.json",
+  "hooks/hooks.json",
+  "scripts/test_docs_drift.sh",
+  "scripts/_ensure_autoupdate.sh",
+  "scripts/scaffold.sh",
+  "commands/setup-discipline.md",
+  "commands/show-principles.md",
+  "skills/nested-orchestration/SKILL.md",
+  "CLAUDE.md"
+ ],
+ "principles_applied": [
+  "SSOT",
+  "EXPLICIT",
+  "FAIL-LOUD",
+  "FOCUSED",
+  "READ-FLOW",
+  "PROSE-FORM",
+  "PLAIN-KO",
+  "KO-SYNTAX"
+ ],
+ "notes": "문서 타입 가르기(lens-fit 의 doc_type) — 호출자가 최상위 칸을 여섯으로 못 박아 별도 칸을 두지 않고 여기 적는다. 정본 「문서 타입과 수명」 표의 절차·계약(operations·setup·contract) 행으로 가렸다. 이 문서는 진행 상태나 다음 단계가 아니라 플러그인을 만들고 사용자 설정 파일을 고칠 때의 수행 방법만 담기 때문이다. 그 행이 담지 말라고 한 상태는 이 문서에 없다. lens-grounding 으로 훑은 각도 넷. 누락은 이 문서가 이름으로 부른 소유자·대상 파일을 다 열었는지로 봤고, scripts/test_docs_drift.sh 가 마켓플레이스 문안 동일성 검사를 실제로 갖고 있음을 확인했다. 모순은 배선 파일과 맞대 봤고 아래 대조가 다 맞았다. plugin.json 에 version 키가 없다. marketplace.json 이 최상위 name·description·owner·plugins[] 를 갖고 source 로 루트를 가리킨다. 두 파일의 description 이 글자 그대로 같다. 스킬 열여섯이 모두 name·description 둘만 쓰고, 커맨드 둘은 description 하나만 쓴다. hooks/hooks.json 이 실재하고 skills/ 와 commands/ 가 실재한다(agents/ 는 없으나 이 문서는 있어야 한다고 말하지 않는다). 「사용자 설정 파일을 고칠 때 지킬 것」 여섯 조항이 scripts/_ensure_autoupdate.sh 에 그대로 있다 — name 으로 고를 항목을 좁히고, autoUpdate 가 이미 있으면 종료코드 10 으로 물러나고, .bak 을 남긴 뒤 임시 파일을 다시 파싱해서 옮기고, 종료코드 3·4·5 로 사유를 갈라 알리고, 파이썬 인터프리터 고르기를 _json_valid.sh 한 곳에 두고, scripts/scaffold.sh 가 고친 파일과 사본 경로를 함께 찍는다. OS 환경 변수 불릿도 commands/setup-discipline.md 에서 레지스트리로 확인하고 물어서 넣으며 '다음에 여는 창부터 실린다'를 알리는 것까지 확인했다. 환각과 불일치 축에서는 인용한 파일 경로·키 이름·스크립트 이름이 모두 실재했다. 확인이 안 되어 발견으로 올리지 않은 것 셋. 첫째, version 을 설정하면 업데이트가 버전 문자열 비교로 바뀐다는 것과 --strict 가 경고를 실패로 취급한다는 것은 Claude Code 쪽 동작이라 이 레포 파일로는 확인되지 않는다. 둘째, '플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다'도 같은 이유로 확인되지 않는다. 셋째, claude plugin validate ./ 를 직접 돌리지 않았다. lens-fit 으로 훑은 각도 다섯. 형식은 frontmatter 두 키와 제목 구조로 봤고 어긋난 곳이 없었다. 스타일은 정본의 PLAIN-KO·PROSE-FORM·READ-FLOW·KO-SYNTAX 로 봤고, 불릿 여섯의 말끝이 '-다'로 하나로 맞아 있으며 제목 둘이 명사구다. 오염은 해당 없다. 호환은 scripts/test_docs_drift.sh 가 이 문서의 「frontmatter」 절을 소유자로 부르는 자리와 맞대 봤고 절 이름이 일치했다. 규율 축에서 걸린 것이 위 발견 하나다. 판정 유보 하나. 두 소제목이 '지킬 것'으로 끝나 정본의 대상을 가리키는 '것'은 실제 이름으로 바꾼다에 걸릴 여지가 있으나, 여기서 '것'은 대상이 아니라 규칙 묶음의 이름 자리라 올리지 않았다. 이 판정의 근거인 상세는 domain-korean 이 소유하는데 호출자가 그 경로를 계약으로 넘기지 않아 열지 않았다.",
+ "issues": [
+  {
+   "lens": "lens-fit",
+   "where": "「사용자 설정 파일을 고칠 때 지킬 것」 소제목 바로 아래",
+   "type": "style",
+   "claim": "소제목 바로 아래가 그 절의 결론 문장이 아니라 OS 환경 변수 불릿 하나이고, 그 절이 무엇을 다루는지 밝히는 산문이 그 불릿 뒤에 온다. 뒤따르는 산문은 '아래를 지킨다'로 그 아래 여섯 항목만 묶으므로, 위에 떨어져 있는 불릿은 어느 묶음에도 안 든다.",
+   "file": "skills/domain-plugin/SKILL.md",
+   "evidence": "OS 환경 변수는 물어서 넣는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "소제목 바로 아래 첫 문장에 그 절의 결론을 적는다.",
+   "principle": "READ-FLOW",
+   "consequence": "지금 그 절은 불릿 하나, 도입 산문, 불릿 여섯 순서로 놓여 있고, 첫 불릿만 '**이름** — 설명' 꼴을 안 쓴 채 나머지 여섯과 떨어져 있다."
+  }
+ ]
+}
