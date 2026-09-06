@@ -323,6 +323,19 @@ INNER
 done <<EOF
 $OWN_TSV
 EOF
+# 소유자로 불리는데 스스로 선언하지 않은 절을 잡는다. 그런 절은 소유 표에 안 올라 위 단언 둘이
+# 아예 안 본다 — 조용히 빠지는 것을 막는다(FAIL-LOUD). 제목이 괄호를 달고 갈리므로 참조가 제목의
+# 앞부분과 맞으면 같은 절로 본다.
+OWN_TITLES="$(printf '%s' "$OWN_TSV" | cut -f1)"
+OWN_UNDECL=""
+while IFS= read -r rtitle; do
+  [ -n "$rtitle" ] || continue
+  printf '%s\n' "$OWN_TITLES" | grep -qF -- "$rtitle" || OWN_UNDECL="$OWN_UNDECL [「$rtitle」]"
+done <<EOF
+$(for og in $OWN_DOCS; do LC_ALL=C.UTF-8 grep -oE '「[^」]+」[^「]{0,20}소유한다' "$HERE/$og" | sed 's/」.*//; s/^「//'; done | sort -u)
+EOF
+[ -n "$OWN_UNDECL" ] && printf '    소유자로 불리는데 선언이 없는 절:%s\n' "$OWN_UNDECL"
+check "소유자로 불리는 절이 스스로 선언한다" "[ -z \"\$OWN_UNDECL\" ]"
 [ -n "$OWN_BAD" ] && printf '    소유자를 안 가리키고 절 이름만 담은 곳:%s\n' "$OWN_BAD"
 check "절 이름을 담은 문서가 소유자를 가리킨다" "[ -z \"\$OWN_BAD\" ]"
 
