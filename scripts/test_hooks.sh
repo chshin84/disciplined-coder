@@ -139,7 +139,10 @@ echo "[rules-nudge-pre — 세션의 첫 파일 편집 전에 정본의 절대�
 # 코드와 문서를 가르지 않는다. 셸 명령의 대상은 실행해 봐야 정해져 편집 전에 가를 방법이 없기 때문이다.
 CNUD="$HERE/hooks/rules_nudge_pretooluse.sh"
 mkdir -p "$T/tmp"
-cnud() { printf '%s' "$1" | TMPDIR="$T/tmp" bash "$CNUD"; }
+# cnud() 를 이 PC 의 실제 ~/.claude 에 매지 않는다 — 사본 없는 머신(예: 새 클론·CI)에서
+# 훅이 "사본을 못 찾았다" 갈래로 빠져 아래 리터럴 단언들이 이 변경과 무관하게 빨개진다.
+NH="$T/nudgehome"; mkdir -p "$NH/disciplined-coder"; printf 'x\n' > "$NH/disciplined-coder/agent-principles.md"
+cnud() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$NH" bash "$CNUD"; }
 JS() { printf '{"session_id":"%s"%s,"tool_input":{"file_path":"%s"}}' "$1" "$2" "$3"; }
 JB() { printf '{"session_id":"%s","tool_name":"Bash","tool_input":{"command":"%s"}}' "$1" "$2"; }
 check "훅 파일이 있다"                              "[ -f '$CNUD' ]"
@@ -154,7 +157,6 @@ check "셸 편집(sed -i)도 대상이다"                  "cnud '$(JB s7 'sed 
 check "셸 편집도 세션당 한 번이다"                  "[ -z \"\$(cnud '$(JB s7 'sed -i s/c/d/ src/other.py')')\" ]"
 check "OFF → 무출력"                                "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off cnud '$(JS s5 "" "$T/src/main.py")')\" ]"
 check "session_id 없음 → 매번 안내"                 "cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md' && cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md'"
-NH="$T/nudgehome"; mkdir -p "$NH/disciplined-coder"; printf 'x\n' > "$NH/disciplined-coder/agent-principles.md"
 cnudh() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$2" bash "$CNUD"; }
 NUDGE_CANON="$(cnudh "$(JS s8 "" "$T/src/main.py")" "$NH" | sed -n 's/.*규칙 정본은 \(.*\) 에 있다\..*/\1/p')"
 check "넛지에서 정본 경로가 뽑힌다"                 "[ -n \"\$NUDGE_CANON\" ]"

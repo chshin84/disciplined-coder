@@ -54,7 +54,7 @@ done
 | SessionStart | `hooks/rules_nudge_sessionstart.sh` | 이 세션의 규칙 넛지 표시를 지워 다시 알리게 한다 |
 | PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 걸린 Write 와 Edit 을 사유와 함께 거부한다 |
 | PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md` 에 문서 양식 넛지를 띄운다 |
-| PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 세션의 첫 파일 편집 전에 정본과 `domain-korean` 의 경로를 알린다 |
+| PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 세션의 첫 파일 편집 전에 정본의 절대경로와 `domain-korean` 을 알린다 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan 을 감지해 리뷰를 지시한다 |
 | PostToolUse | `hooks/doc_review_posttooluse.sh` | 고친 문서에 검진 넛지를 띄운다 |
 | Stop | `hooks/spec_review_stop.sh` | 미리뷰 spec·plan 이 남은 채 턴이 끝나는 것을 막는다 |
