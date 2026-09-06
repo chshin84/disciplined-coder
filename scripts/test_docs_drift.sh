@@ -271,6 +271,34 @@ for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestratio
   done
 done
 
+echo "[문서 타입 표] 강제하는 장치 칸이 실물을 가리킨다"
+# 표가 장치를 이름으로만 적으면 실물이 없어도 그 행은 갖춰진 것처럼 읽힌다. 칸을 정본에서 뽑아
+# 백틱 경로면 그 파일이 있는지 보고, 「없다」로 열리면 뒤에 이유가 붙었는지 본다. 둘 다 아니면
+# 실패한다 — 이름만 적고 넘어가는 길을 막는다(FAIL-LOUD). 행을 하나 더해도 저절로 따라온다.
+TYPE_CELLS="$(awk '/^### 문서 타입과 수명/{f=1;next} f&&/^## /{exit} f&&/^\| \*\*/{n=split($0,a,"|"); print a[n-1]}' "$CANON")"
+check "문서 타입 표에서 장치 칸을 뽑았다" "[ -n \"\$TYPE_CELLS\" ]"
+TYPE_BAD=""
+while IFS= read -r cell; do
+  [ -n "$cell" ] || continue
+  # 백틱이 없는 칸이 정상이므로(사유 있는 「없다」) grep 실패를 오류로 삼지 않는다.
+  tpath="$(printf '%s' "$cell" | grep -oE '`[^`]+`' | tr -d '`' | head -1 || true)"
+  if [ -n "$tpath" ]; then
+    [ -e "$HERE/$tpath" ] || TYPE_BAD="$TYPE_BAD [실물없음:$tpath]"
+  elif printf '%s' "$cell" | LC_ALL=C.UTF-8 grep -qE '없다\. .+'; then
+    :
+  else
+    TYPE_BAD="$TYPE_BAD [경로도사유도없음]"
+  fi
+done <<EOF
+$TYPE_CELLS
+EOF
+[ -n "$TYPE_BAD" ] && printf '    어긋난 칸:%s
+' "$TYPE_BAD"
+check "장치 칸이 모두 실물 경로이거나 사유 있는 「없다」다" "[ -z \"\$TYPE_BAD\" ]"
+# 핸드오프 행이 가리키는 린트가 그 파일 안에 실제로 있는지 본다. 파일 존재만 보면 경로가 맞아도
+# 린트가 없을 수 있다.
+check "핸드오프 린트가 세션 시작 스크립트에 있다" "grep -qF 'handoff-keep-until' '$HERE/scripts/scaffold.sh'"
+
 echo "[대체된 설계 문서에 superseded 표시]"
 OLDSPEC="$HERE/docs/superpowers/specs/2026-08-16-review-layer-redesign-design.md"
 OLDPLAN="$HERE/docs/superpowers/plans/2026-08-16-review-layer-redesign.md"

@@ -166,4 +166,24 @@ if [ "$canon_changed" -eq 1 ] && [ "$(utf8_user_var_state)" = "unset" ]; then
   echo "🔵 disciplined-coder: 파이썬 한국어 깨짐을 막으려면 /setup-discipline 을 실행하라(윈도우 사용자 환경 변수 PYTHONUTF8=1 을 넣는다)."
 fi
 
+# 4e) 핸드오프 잔존 린트: 소비되면 곧바로 지우는 문서가 프로젝트에 남아 있으면 알린다.
+#     정본의 문서 타입 표가 이 타입의 강제 장치로 이 린트를 적는다. 세는 규칙은 audit_targets.sh 와
+#     같은 HANDOFF- 접두사다. 유예는 건너뛸 목록을 여기 적지 않고 파일 머리의
+#     `handoff-keep-until: YYYY-MM-DD` 를 읽어 정한다 — 목록을 손으로 안 적으므로 날짜가 지나면
+#     저절로 다시 걸리고, 유예의 근거가 그 파일 안에 남는다(SSOT). 값이 0 이면 아무것도 안 낸다.
+if [ -n "${CLAUDE_PROJECT_DIR:-}" ] && [ -d "${CLAUDE_PROJECT_DIR:-}" ]; then
+  ho_today="$(date +%Y-%m-%d)"
+  ho_left=""
+  for ho in "$CLAUDE_PROJECT_DIR"/HANDOFF-*.md; do
+    [ -f "$ho" ] || continue
+    ho_until="$(head -20 "$ho" | grep -oE 'handoff-keep-until:[[:space:]]*[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1 | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' || true)"
+    # 문자열 비교로 날짜를 견준다 — YYYY-MM-DD 는 사전순이 곧 시간순이다.
+    if [ -n "$ho_until" ] && [ "$ho_today" \< "$ho_until" ]; then continue; fi
+    ho_left="$ho_left $(basename "$ho")"
+  done
+  if [ -n "$ho_left" ]; then
+    echo "WARNING disciplined-coder: 핸드오프가 남아 있다 —$ho_left. 담긴 것을 영속처로 옮긴 뒤 지워라. 미루려면 그 파일 머리에 handoff-keep-until: YYYY-MM-DD 를 적어라."
+  fi
+fi
+
 exit 0
