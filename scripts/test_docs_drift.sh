@@ -253,6 +253,22 @@ done
 # 목록을 여기 손으로 적지 않고 그 절에서 뽑아, 렌즈가 쓰는 덧붙임 칸이 다 올라 있는지 본다.
 EXTRA_LISTED="$(awk '/^## 렌즈가 더하는 칸/{f=1;next} f&&/^## /{exit} f' "$MA" | grep -oE '`[a-z_]+`' | tr -d '`' | sort -u)"
 check "SSOT 에서 덧붙이는 칸 목록을 뽑았다" "[ -n \"\$EXTRA_LISTED\" ]"
+# 뽑아 놓고 대조를 안 하면 목록이 낡아도 초록이다. 실제로 그랬고 lens-fit 의 doc_type 이 빠져
+# 있었다. 렌즈 파일이 자기 덧붙임 칸이라 밝힌 이름을 뽑아 위 목록에 다 있는지 본다.
+EXTRA_BAD=""
+for xf in "$HERE"/skills/lens-*/SKILL.md; do
+  xn="$(basename "$(dirname "$xf")")"
+  while IFS= read -r xk; do
+    [ -n "$xk" ] || continue
+    printf '%s
+' "$EXTRA_LISTED" | grep -qx -- "$xk" || EXTRA_BAD="$EXTRA_BAD [$xn:$xk]"
+  done <<INNER
+$(LC_ALL=C.UTF-8 grep -oE '`[a-z_]+`[^`]{0,14}이 렌즈가 더하는 칸' "$xf" | grep -oE '^`[a-z_]+`' | tr -d '`' | sort -u)
+INNER
+done
+[ -n "$EXTRA_BAD" ] && printf '    SSOT 목록에 안 오른 덧붙임 칸:%s
+' "$EXTRA_BAD"
+check "렌즈가 더하는 칸이 모두 SSOT 목록에 있다" "[ -z \"\$EXTRA_BAD\" ]"
 check "정본이 principles_applied 규칙을 소유한다" "grep -qF '제품 런타임 구현에는 요구하지 않는다' \"\$MA\""
 check "정본이 file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' \"\$MA\""
 check "정본이 principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' \"\$MA\""
@@ -308,6 +324,7 @@ while IFS="$(printf '\t')" read -r otitle oowner; do
     skills/*/SKILL.md) oname="$(basename "$(dirname "$oowner")")" ;;
     *) oname="$(basename "$oowner")" ;;
   esac
+  oshort="${otitle%% (*}"   # 제목이 괄호를 달면 가리키는 쪽은 괄호 앞까지만 적는다
   for og in $OWN_DOCS; do
     [ "$og" = "$oowner" ] && continue
     # 파일이 아니라 그 줄을 본다. 파일 단위로 보면 소유자를 다른 데서 한 번 부른 문서가 이 줄에서
@@ -317,7 +334,7 @@ while IFS="$(printf '\t')" read -r otitle oowner; do
       printf '%s' "$oline" | grep -qF "$oname" && continue
       OWN_BAD="$OWN_BAD [$og→「$otitle」]"; break
     done <<INNER
-$(grep -F "「$otitle」" "$HERE/$og" || true)
+$(grep -F "「$otitle」" "$HERE/$og"; [ "$oshort" = "$otitle" ] || grep -F "「$oshort」" "$HERE/$og"; true)
 INNER
   done
 done <<EOF
