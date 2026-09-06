@@ -293,6 +293,55 @@ check "제어 문자가 결과에 안 남는다" \
   "! printf '%s' \"\$ESC_MIX\" | LC_ALL=C grep -q '[[:cntrl:]]'"
 
 
+echo "[python3-guard] 윈도우에서 안내판으로 풀리는 python3 만 막는다"
+# 상태를 주입해 OS 와 PATH 를 안 본다 — 그것이 없으면 CI(ubuntu)와 윈도우 PC 에서 결과가 갈린다.
+P3G="$HERE/hooks/python3_guard_pretooluse.sh"
+XCMD="$HERE/hooks/_extract_command.sh"
+REDIR="/c/Users/x/AppData/Local/Microsoft/WindowsApps/python3"
+JC() { printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$1"; }
+p3() { JC "$1" | DISCIPLINED_CODER_PYTHON3_STATE="${2:-$REDIR}" bash "$P3G"; }
+# 막아야 하는 것 — 명령어로 놓인 python3
+D1="$(p3 'python3 --version')"
+D2="$(p3 'python3 <<EOF')"
+D3="$(p3 'cd /tmp && python3 x.py')"
+D4="$(p3 'PYTHONUTF8=1 python3 x.py')"
+D5="$(p3 'echo hi | python3 -')"
+# 통과해야 하는 것 — 다른 이름이거나 명령어 자리가 아니다
+A1="$(p3 'python --version')"
+A2="$(p3 'py -3 x.py')"
+A3="$(p3 'python312 --version')"
+A4="$(p3 'python3.12 x.py')"
+A5="$(p3 'grep python3 README.md')"
+A6="$(p3 'echo \"use python3 here\"')"
+# 통과해야 하는 것 — 윈도우가 아니거나 실물이 안내판이 아니다
+N1="$(p3 'python3 --version' not-windows)"
+N2="$(p3 'python3 --version' none)"
+N3="$(p3 'python3 --version' /usr/bin/python3)"
+N4="$(p3 'python3 --version' /c/Users/x/AppData/Local/Programs/Python/Python312/python3)"
+deny() { printf '%s' "$1" | grep -q '"permissionDecision":"deny"'; }
+check "맨 앞의 python3 을 막는다"          "deny \"\$D1\""
+check "heredoc 을 여는 python3 을 막는다"  "deny \"\$D2\""
+check "&& 뒤의 python3 을 막는다"          "deny \"\$D3\""
+check "VAR= 뒤의 python3 을 막는다"        "deny \"\$D4\""
+check "파이프 뒤의 python3 을 막는다"      "deny \"\$D5\""
+check "python 은 통과한다"                 "[ -z \"\$A1\" ]"
+check "py -3 은 통과한다"                  "[ -z \"\$A2\" ]"
+check "python312 는 통과한다"              "[ -z \"\$A3\" ]"
+check "python3.12 는 통과한다"             "[ -z \"\$A4\" ]"
+check "명령어 자리가 아니면 통과한다"      "[ -z \"\$A5\" ]"
+check "따옴표 안 문자열은 통과한다"        "[ -z \"\$A6\" ]"
+check "윈도우가 아니면 통과한다"           "[ -z \"\$N1\" ]"
+check "안 풀리면 통과한다"                 "[ -z \"\$N2\" ]"
+check "리눅스 경로면 통과한다"             "[ -z \"\$N3\" ]"
+check "실제 파이썬이면 통과한다"           "[ -z \"\$N4\" ]"
+check "거부 응답이 JSON 으로 파싱된다"     "printf '%s' \"\$D1\" | json_valid_stdin"
+check "거부 사유가 부를 이름을 말한다"     "printf '%s' \"\$D1\" | grep -q 'py -3'"
+check "거부 사유가 풀리는 곳을 적는다"     "printf '%s' \"\$D1\" | grep -qF 'WindowsApps'"
+# 명령 뽑기 — 큰따옴표가 든 명령이 첫 \" 에서 잘리면 그 뒤의 명령어를 훅이 못 본다.
+EX1="$(printf '{"tool_input":{"command":"echo \\"a\\" && python3 x.py"}}' | bash "$XCMD")"
+check "따옴표가 든 명령을 끝까지 뽑는다"   "[ \"\$EX1\" = 'echo \"a\" && python3 x.py' ]"
+check "command 가 없으면 무출력"           "[ -z \"\$(printf '{}' | bash '$XCMD')\" ]"
+
 echo "[README — 배선된 스크립트를 모두 적는다]"
 # 훅이 일곱인데 안내 문서가 넷만 적고 있었다. 목록을 README 에 손으로 적지 않고 배선 파일 둘에서
 # 도출해 맞댄다. 훅을 더하거나 빼면 여기서 함께 갈린다(SSOT).
