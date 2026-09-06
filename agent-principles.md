@@ -2,7 +2,7 @@
 
 쉽게 말하되 근거와 과정은 감추지 않는다. 대화 스타일에서 전역 지침과 부딪히면 팀 원칙을 따른다. 원칙 사이에는 우열도 순서도 없다. 상황에 걸리는 것을 모두 적용한다.
 
-이 문서는 원칙을 먼저 정의하고, 그다음 대화할 때와 문서를 쓰고 관리할 때와 코딩할 때로 나누어 그 작업에 걸리는 원칙을 이름으로 부른다. 한 원칙을 두 번 적지 않는다.
+이 문서는 원칙을 먼저 정의하고, 그다음 한국어로 쓸 때와 문서를 쓰고 관리할 때와 코딩할 때로 나누어 그 갈래에만 걸리는 것을 적는다. 한 원칙을 두 번 적지 않는다.
 
 ## 원칙
 
@@ -79,9 +79,9 @@ For multi-step work, state the plan:
 
 Strong criteria let you loop on your own. Weak criteria ("make it work") need constant clarification. Never say it is done without evidence that you ran the check.
 
-## 대화할 때
+## 한국어로 쓸 때
 
-`FAIL-LOUD`와 `NAME-ITEMS`와 `SECRETS`가 답 한 번에도 걸린다. 아래 넷은 한국어로 쓸 때만 걸린다. 각 조항의 상세와 그것이 어느 측정에서 나왔는지는 `domain-korean`이 소유한다.
+아래 넷이 한국어 문장을 어떻게 쓰는지 정하고, 각 조항의 상세와 그것이 어느 측정에서 나왔는지는 `domain-korean`이 소유한다.
 
 - **`PLAIN-KO` (Plain language)** — 읽는 사람이 이미 그 뜻으로 아는 낱말을 고른다. 쉬움을 정하는 것은 빈도이고 어종이 아니다. 뜻이 좁은 말을 고르고, 한자어를 고유어로 바꾸지 않는다. 기본 사용역은 문어다. 영어 표현을 직역하지 않는다. 다의어로 바꾸지 않는다. 짧게 만드느라 이어주는 말을 지우지 않는다.
 - **`KO-SYNTAX` (Korean syntax)** — 관형절을 문장 가운데 끼우지 않는다. 명사 앞에 수식을 쌓지 않는다. 비슷한 명사구를 한 문장에 겹치지 않는다. 길이는 기준이 아니다.
@@ -96,7 +96,7 @@ Strong criteria let you loop on your own. Weak criteria ("make it work") need co
 
 ## 문서를 쓰고 관리할 때
 
-`SSOT`와 `NAME-ITEMS`와 `EXPLICIT`이 문서에도 그대로 걸리고, Simplicity First와 Surgical Changes와 Goal-Driven Execution의 목적어를 문서로 읽는다. spec과 plan은 superpowers가 소유하므로 여기서 다루지 않는다.
+문서는 타입에 따라 수명과 수정 규율이 다르므로 만지기 전에 타입부터 가른다. spec과 plan은 superpowers가 소유하므로 여기서 다루지 않는다.
 
 문서를 하나 만지려 할 때 다섯을 차례로 가른다. 무슨 타입인지 아래 표에서 가리고, 상태를 담는지 보고, 핸드오프면 담긴 것을 영속처에 옮긴 뒤 지우고, 도출로 대체할 수 있으면 진실인 코드와 인프라를 가리키고, 이 타입의 드리프트 가드가 없으면 추가하라고 권한다.
 
@@ -146,7 +146,7 @@ Strong criteria let you loop on your own. Weak criteria ("make it work") need co
 
 ## 코딩할 때
 
-`FOCUSED`와 `SSOT`와 `EXPLICIT`이 코드에 그대로 걸리고, Karpathy guidelines 넷이 모두 걸린다. 아래 셋은 코드에만 걸린다.
+아래 셋은 코드에만 걸린다.
 
 - **`IDEMPOTENT` (Idempotence)** — 스크립트와 셋업은 현재 상태를 확인하고 차이만 고쳐, 두 번 돌려도 중복이나 손상이 생기지 않게 한다.
 - **`EXPLAIN-STRUCTURE` (Describe the change, not the diff)** — 코드를 바꾸면 구조의 변화를 설명한다. 바뀐 줄이 아니라 무엇이 무엇을 부르게 되었고 무엇에 의존하게 되었는지를 적는다. 줄은 diff가 이미 보여 준다.

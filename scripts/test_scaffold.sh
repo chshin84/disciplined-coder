@@ -399,14 +399,14 @@ done
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
 check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
 
-# --- canon-consolidation: 규칙집 스킬 셋을 접어 정본이 원칙 전부를 갖는다 ---
-# 어제 기준은 "파일을 하나도 건드리지 않은 답 한 번으로도 어길 수 있으면 정본에 남는다"였다. 그 기준이
-# 가르는 두 무리 가운데 하나가 비어 있다는 것을 실측으로 확인해 오늘 셋을 접었다. 정본은 원칙을 먼저
-# 정의하고 대화·문서·코드 세 갈래가 그 이름을 부른다. 절차와 산출물 한 종류에만 걸리는 것만 스킬로 남는다.
+# --- canon-realign: 정본이 원칙을 호명하지 않고 갈래는 걸리는 대상으로 이름 붙는다 ---
+# 접기(3fced53) 뒤에 정본이 원칙 전부를 갖는다. 갈래마다 원칙을 이름으로 다시 부르던 문장 셋은
+# 「원칙」 절이 이미 선언한 것을 부분집합으로 되풀이해 빠진 것이 안 걸린다는 뜻으로 읽혔다.
+# 이름이 범위를 좁게 말하던 절 하나만 「한국어로 쓸 때」로 바꾸고 나머지 여덟은 그대로 둔다.
 echo "[canon-consolidation] the canon owns every principle; only procedures and per-artifact rules stay skills"
 # 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
 # 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
-for sec in "원칙" "Karpathy guidelines" "대화할 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
+for sec in "원칙" "Karpathy guidelines" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
   check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
 done
 # 카파시 넷은 정본 안의 하위 절이다. Think Before Acting 이 최상위로 올라가면 갈래 셋과 나란히 서서
@@ -422,6 +422,10 @@ check "canon: fact-vs-judgment paragraph stays"      "grep -qF '사실과 판단
 check "canon: local-first convention stays"          "grep -qF '`LOCAL-FIRST`는 원칙이 아니라' '$CANON'"
 check "canon: execution evidence rule"               "grep -qF '실행 증거 없이' '$CANON'"
 check "canon: subagent prompt context rule"          "grep -qF 'Context handed to a subagent is written into its prompt' '$CANON'"
+check "canon: no roll-call in the Korean section"    "! grep -qF '\`FAIL-LOUD\`와 \`NAME-ITEMS\`와 \`SECRETS\`가 답 한 번에도 걸린다' '$CANON'"
+check "canon: no roll-call in the document section"  "! grep -qF '\`SSOT\`와 \`NAME-ITEMS\`와 \`EXPLICIT\`이 문서에도 그대로 걸리고' '$CANON'"
+check "canon: no roll-call in the code section"      "! grep -qF '\`FOCUSED\`와 \`SSOT\`와 \`EXPLICIT\`이 코드에 그대로 걸리고' '$CANON'"
+check "canon: old section name is gone everywhere"   "! grep -rqF '대화할 때' '$CANON' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/scripts/scaffold.sh'"
 # 조항 열넷의 목록은 이 파일이 소유한다. 정본에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
 # 조항이 하나 떨어져도 그 결손을 정답으로 굳힌다. 계획 문서의 「정본이 갖는 조항 열넷」 절과 같은 목록이다.
 for id in FAIL-LOUD FOCUSED EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
