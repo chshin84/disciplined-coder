@@ -421,7 +421,9 @@ check "canon: subagent fleet rule stays"             "grep -qF \"Don't launch a 
 check "canon: measure-the-state rule stays"          "grep -qF \"Don't assume the current state\" '$CANON'"
 check "canon: impossible-case rule stays"            "grep -qF 'No handling for situations that cannot occur' '$CANON'"
 check "canon: pre-existing-dead-code rule stays"     "grep -qF \"Don't remove what was already unused\" '$CANON'"
-check "canon: weak-criteria rule stays"              "grep -qF 'Weak criteria' '$CANON'"
+check "canon: weak-criteria rule stays"              "grep -qF 'Weak criteria (\"make it work\") need constant clarification' '$CANON'"
+check "canon: trace-to-request rule stays"           "grep -qF 'Every changed line must trace directly to the request.' '$CANON'"
+check "canon: numbered-steps-plan rule stays"        "grep -qF 'For multi-step work, state the plan as numbered steps, each with the check that verifies it.' '$CANON'"
 # 카파시 절의 위 문턱. 제목 줄부터 다음 `## ` 줄 직전까지를 세고 45 를 넘으면 실패다.
 check "canon: karpathy section is 45 lines or fewer" "[ \"\$(awk 'index(\$0,\"## Karpathy guidelines\")==1{s=NR;next} s&&index(\$0,\"## \")==1{print NR-s;exit}' '$CANON')\" -le 45 ]"
 check "canon: fact-vs-judgment paragraph stays"      "grep -qF '사실과 판단은 다르다' '$CANON'"
