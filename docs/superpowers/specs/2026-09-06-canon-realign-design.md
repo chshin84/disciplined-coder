@@ -107,7 +107,7 @@
 
 옛 조항 이름 `ASK-FORK`와 `MEASURE-FIRST`와 `SIMPLE`과 `SURGICAL`과 `TDD`는 되살리지 않는다. `scripts/test_scaffold.sh`가 그 부재를 단언한다.
 
-시험이 문자열로 고정한 문장 셋은 유지한다. `**Tradeoff:**`와 `generalized from code to any artifact`와 `Don't launch a fleet of subagents for what one call can do`이며, 각각 `test_scaffold.sh`의 418행과 419행과 420행이 검사한다. 여기에 고정 문자열을 더 건다. 지금은 이 절을 붙잡는 단언이 제목 넷과 문자열 셋뿐이라 나머지가 사라져도 시험이 안 잡는다. 위 표의 스물넷 가운데 다른 절과 헷갈리지 않는 문자열 여섯을 골라 `test_scaffold.sh`에 단언을 더한다.
+시험이 문자열로 고정한 문장 셋은 유지한다. `**Tradeoff:**`와 `generalized from code to any artifact`와 `Don't launch a fleet of subagents for what one call can do`이며, 각각 `test_scaffold.sh`의 418행과 419행과 420행이 검사한다. 여기에 고정 문자열을 더 건다. 지금은 이 절을 붙잡는 단언이 제목 넷과 문자열 셋뿐이라 나머지가 사라져도 시험이 안 잡는다. 위 표의 스물다섯 가운데 다른 절과 헷갈리지 않는 문자열 여섯을 골라 `test_scaffold.sh`에 단언을 더한다.
 
 처음 계획은 넷이었다. measure-the-state·impossible-case·pre-existing-dead-code·weak-criteria 네 문장에 단언을 걸 생각이었는데, 계획 리뷰가 「자리를 옮긴 문장 둘을 아무도 안 지킨다」고 짚었다. `Surgical Changes`의 trace-to-request 문장과 `Goal-Driven Execution`의 numbered-steps-plan 문장이 그 둘이라, 그 자리에도 단언을 걸어 여섯이 됐다.
 
