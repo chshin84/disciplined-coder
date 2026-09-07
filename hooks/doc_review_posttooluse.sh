@@ -19,6 +19,7 @@ while IFS= read -r FILE; do
   # 문체 검진에서 얻을 것이 거의 없다. 색인과 본문 파일을 함께 뺀다.
   case "$FILE" in
     *docs/superpowers/reviews/*.md) continue ;;
+    *solved_problems.md|*solved_problems/*.md) continue ;;
   esac
   # 프로젝트 밖 문서에는 걸지 않는다. 메모리 파일과 계획 파일을 쓸 때마다 무시해야 할 넛지가 뜨면
   # 진짜 문서에서도 이 넛지를 흘려보내게 된다 — 위 문단이 적은 피로 기전 그대로다.

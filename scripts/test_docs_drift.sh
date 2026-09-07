@@ -596,7 +596,23 @@ CMD="$HERE/CLAUDE.md"
 # 읽힌다. '새로' 없이 그 문장이 나오면 실패한다.
 check "CLAUDE.md 가 새로 쓸 때만 게이트라고 적는다" "! grep -qE '(^|[^로 ])쓰면 Stop 게이트가' \"\$CMD\""
 check "CLAUDE.md가 실행 명령을 적는다"       "grep -qF -- 'for t in scripts/test_*.sh' \"\$CMD\""
-check "실패를 모으는 형태다"                 "grep -qF -- 'bad=\"\$bad \$t\"' \"\$CMD\""
+# 글자가 아니라 동작으로 잰다. 앞 판본은 `bad="$bad $t"` 라는 글자를 봤기 때문에, 같은 계약을
+# 지키는 다른 구현(동시 실행)으로 바꾸자 계약이 아니라 구현이 깨졌다고 알렸다. 여기서는 그 줄을
+# CLAUDE.md에서 뽑아 픽스처에 대고 실제로 돌린다 — 실패한 스크립트를 이름으로 지목하는지, 전부
+# 통과하면 통과라고 하는지 둘 다 본다.
+RUNCMD="$(grep -F -- 'for t in scripts/test_*.sh' "$CMD" | head -1 | sed 's/^[[:space:]]*`//; s/`[[:space:]]*$//')"
+check "실행 명령 한 줄을 뽑아냈다"           "[ -n \"\$RUNCMD\" ]"
+# 이름을 aaa로 두어 정렬상 맨 앞에 오게 한다 — 묻히는 것은 언제나 '앞' 스크립트의 실패다.
+FXB="$(mktemp -d)"; mkdir -p "$FXB/scripts"
+printf '#!/usr/bin/env bash\necho "  FAIL: 일부러 심은 회귀"\nexit 1\n' > "$FXB/scripts/test_aaa_bad.sh"
+printf '#!/usr/bin/env bash\necho "  PASS: ok"\n' > "$FXB/scripts/test_zzz_ok.sh"
+FXBOUT="$(cd "$FXB" && bash -c "$RUNCMD" 2>&1 || true)"
+check "앞 스크립트가 실패하면 이름을 지목한다" "printf '%s' \"\$FXBOUT\" | grep -qF 'test_aaa_bad.sh'"
+check "실패했는데 ALL PASS라고 하지 않는다"   "! printf '%s' \"\$FXBOUT\" | grep -qF 'ALL PASS'"
+FXG="$(mktemp -d)"; mkdir -p "$FXG/scripts"
+printf '#!/usr/bin/env bash\necho "  PASS: ok"\n' > "$FXG/scripts/test_zzz_ok.sh"
+FXGOUT="$(cd "$FXG" && bash -c "$RUNCMD" 2>&1 || true)"
+check "전부 통과하면 ALL PASS라고 한다"       "printf '%s' \"\$FXGOUT\" | grep -qF 'ALL PASS'"
 check "모은 결과를 마지막에 알린다"           "grep -qF -- 'FAILED:' \"\$CMD\""
 # CI도 같은 명령을 돈다. CLAUDE.md와 달리 CI는 정본을 읽을 수 없어 형태를 다시 적을 수밖에 없으니,
 # 적어도 그 형태가 정본과 같은 실패 처리를 하는지 붙든다. `set -e`에 맨 `bash "$t"`면 첫 실패에서

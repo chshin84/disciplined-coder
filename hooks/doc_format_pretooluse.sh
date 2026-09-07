@@ -12,7 +12,14 @@ while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
   case "$FILE" in *.md) ;; *) continue ;; esac          # 문서(.md)만
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
-  case "$FILE" in *docs/superpowers/reviews/*.md) continue ;; esac   # 리뷰 기록은 양식이 검진 절이 정한다
+  # 리뷰 기록은 양식이 검진 절이 정하고, 오답노트는 그 로그 자신의 머리말이 정한다. 둘 다 양식이
+  # 이미 따로 있어 domain-docs 양식을 고르라는 제안이 틀린 조언이 된다. 검진 넛지도 같은 이유로
+  # 같은 경로를 뺀다 — 한쪽만 빼면 같은 파일을 만들 때 한 훅은 조용하고 다른 훅은 떠들어 어느 쪽이
+  # 맞는지 알 수 없다.
+  case "$FILE" in
+    *docs/superpowers/reviews/*.md) continue ;;
+    *solved_problems.md|*solved_problems/*.md) continue ;;
+  esac
   [ -e "$FILE" ] && continue                             # 생성 때만 제안(편집은 양식 이미 정해짐)
   path_in_project "$FILE" || continue                    # 프로젝트 밖 문서(메모리·계획 파일)에는 걸지 않는다
   match="$FILE"; break

@@ -186,6 +186,11 @@ check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/ne
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off fpre '$(J "$T/newdoc.md")')\" ]"
 check "프로젝트 밖 새 문서 → 무출력"     "[ -z \"\$(fpre '$(J "$OUTSIDE/new.md")')\" ]"
 check "새 리뷰 기록 → 무출력"            "[ -z \"\$(fpre '$(J "$T/docs/superpowers/reviews/new-check.md")')\" ]"
+# 오답노트는 양식을 그 로그 자신의 머리말이 정해 두어 domain-docs 양식 제안이 틀린 조언이 된다.
+# 검진 넛지가 같은 이유로 같은 경로를 빼고 있으니 양식 제안도 함께 뺀다 — 한쪽만 빼면 같은 파일을
+# 만들 때 한 훅은 조용하고 다른 훅은 떠들어 어느 쪽이 맞는지 알 수 없다.
+check "새 오답노트 색인 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems.md")')\" ]"
+check "새 오답노트 본문 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems/new-lesson.md")')\" ]"
 check "새 문서 넛지가 domain-readme 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'domain-readme'"
 # 넛지가 인용한 정본의 절이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로
 # 그 절 이름이 바뀌자 넛지가 없는 절을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD).
@@ -212,6 +217,8 @@ J2() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s"}}' "$1"; }
 check "리뷰 기록에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/superpowers/reviews/x-review.md")')\" ]"
 # 오답노트도 기록에 대한 기록을 또 쓰게 만드는 부류다 — 교훈 한 줄을 적을 때마다 검진을 묻는
 # 순환이 생기고, 그것을 매번 건너뛰다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.
+check "오답노트 색인에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/solved_problems.md")')\" ]"
+check "오답노트 본문에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/solved_problems/lesson.md")')\" ]"
 check "다른 문서에는 넛지가 뜬다"  "drev '$(J2 "$T/docs/guide.md")' | grep -q additionalContext"
 
 echo "[project-solved nudge removed]"

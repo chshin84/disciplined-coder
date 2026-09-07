@@ -10,6 +10,6 @@ spec과 plan을 새로 쓰면 Stop 게이트가 리뷰를 요구하고, 그 밖�
 
 고친 것이 있으면 아래를 돌리고, 그다음 `claude plugin validate ./`를 실행한다. 각 스크립트의 계약은 **FAIL=0**이며 기대 개수를 숫자로 박지 않는다(정본의 `SSOT`).
 
-`bad=""; for t in scripts/test_*.sh; do bash "$t" || bad="$bad $t"; done; [ -z "$bad" ] && echo "ALL PASS" || echo "FAILED:$bad"`
+`d=$(mktemp -d); for t in scripts/test_*.sh; do ( bash "$t" > "$d/$(basename "$t").log" 2>&1 || echo "$t" >> "$d/bad" ) & done; wait; if [ -s "$d/bad" ]; then echo "FAILED:"; while read -r t; do echo "--- $t"; grep 'FAIL:' "$d/$(basename "$t").log"; done < "$d/bad"; else echo "ALL PASS"; fi`
 
-실패한 이름을 모아 마지막에 알리는 형태인 이유는, 그냥 이어 돌리면 마지막 하나의 결과만 남아 앞의 실패가 묻히기 때문이다. `claude plugin validate ./`는 `version` 경고 하나만 내면 정상이다.
+실패한 이름을 모아 마지막에 알리는 형태인 이유는, 그냥 이어 돌리면 마지막 하나의 결과만 남아 앞의 실패가 묻히기 때문이다. 다섯 벌을 동시에 띄우는 이유는 이 PC에서 차례로 돌리면 334초, 동시에 돌리면 219초이기 때문이다(정본의 `ASYNC-FIRST`). 시간을 쓰는 것은 계산이 아니고 프로그램 하나 띄우는 데 드는 64밀리초이며, 실시간 감시가 그 비용을 만든다. `claude plugin validate ./`는 `version` 경고 하나만 내면 정상이다.

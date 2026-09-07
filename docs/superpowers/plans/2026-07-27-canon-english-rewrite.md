@@ -31,6 +31,8 @@
 
 ### Task 1: 정본을 영문으로 다시 쓰고 그에 매달린 가드를 고친다
 
+> **되돌린 작업이다 — 이 태스크를 실행하지 마라.** 이 재작성은 되돌려졌고 정본은 지금도 한국어다. 절만 떼어 받았다면 이 계획서 맨 위의 표시를 읽어라.
+
 **Files:**
 - Modify: `agent-principles.md` (전면)
 - Create: `docs/superpowers/rewrite-map/agent-principles.md`
@@ -183,6 +185,8 @@ git commit -m "refactor(canon): 정본을 영문으로 다시 쓰고 절 이름�
 
 ### Task 2: `domains-index.md`를 다시 쓴다
 
+> **되돌린 작업이다 — 이 태스크를 실행하지 마라.** 이 재작성은 되돌려졌고 정본은 지금도 한국어다. 절만 떼어 받았다면 이 계획서 맨 위의 표시를 읽어라.
+
 **Files:**
 - Modify: `domains-index.md`
 - Create: `docs/superpowers/rewrite-map/domains-index.md`
@@ -218,6 +222,8 @@ git commit -m "refactor(domains-index): 도메인 목차를 영문으로 다시 
 ---
 
 ### Task 3: 리뷰어 렌즈 스킬 넷을 다시 쓴다
+
+> **되돌린 작업이다 — 이 태스크를 실행하지 마라.** 이 재작성은 되돌려졌고 정본은 지금도 한국어다. 절만 떼어 받았다면 이 계획서 맨 위의 표시를 읽어라.
 
 **Files:**
 - Modify: `skills/reviewer-grounding/SKILL.md`, `skills/reviewer-consistency/SKILL.md`, `skills/reviewer-adversarial/SKILL.md`, `skills/reviewer-fit/SKILL.md`
@@ -255,6 +261,8 @@ git commit -m "refactor(skills): 리뷰어 렌즈 넷을 영문으로 다시 쓴
 
 ### Task 4: `domain-plugin`·`meta-aggregate`·`domain-llm-runtime`을 다시 쓴다
 
+> **되돌린 작업이다 — 이 태스크를 실행하지 마라.** 이 재작성은 되돌려졌고 정본은 지금도 한국어다. 절만 떼어 받았다면 이 계획서 맨 위의 표시를 읽어라.
+
 **Files:**
 - Modify: `skills/domain-plugin/SKILL.md`, `skills/meta-aggregate/SKILL.md`, `skills/domain-llm-runtime/SKILL.md`
 - Create: `docs/superpowers/rewrite-map/domain-plugin-meta-llm.md`
@@ -279,6 +287,8 @@ git commit -m "refactor(skills): domain-plugin·meta-aggregate·domain-llm-runti
 ---
 
 ### Task 5: `domain-spec-review`와 `nested-orchestration`을 다시 쓴다
+
+> **되돌린 작업이다 — 이 태스크를 실행하지 마라.** 이 재작성은 되돌려졌고 정본은 지금도 한국어다. 절만 떼어 받았다면 이 계획서 맨 위의 표시를 읽어라.
 
 **Files:**
 - Modify: `skills/domain-spec-review/SKILL.md`, `skills/nested-orchestration/SKILL.md`
@@ -321,6 +331,8 @@ git commit -m "refactor(skills): domain-spec-review·nested-orchestration을 영
 
 ### Task 6: `domain-docs`를 다시 쓴다
 
+> **되돌린 작업이다 — 이 태스크를 실행하지 마라.** 이 재작성은 되돌려졌고 정본은 지금도 한국어다. 절만 떼어 받았다면 이 계획서 맨 위의 표시를 읽어라.
+
 **Files:**
 - Modify: `skills/domain-docs/SKILL.md`
 - Create: `docs/superpowers/rewrite-map/domain-docs.md`
@@ -345,6 +357,8 @@ git commit -m "refactor(skills): domain-docs를 영문으로 다시 쓴다"
 ---
 
 ### Task 7: 커맨드 다섯 개의 frontmatter를 다시 쓴다
+
+> **되돌린 작업이다 — 이 태스크를 실행하지 마라.** 이 재작성은 되돌려졌고 정본은 지금도 한국어다. 절만 떼어 받았다면 이 계획서 맨 위의 표시를 읽어라.
 
 **Files:**
 - Modify: `commands/setup-discipline.md`, `commands/show-principles.md`, `commands/show-solved.md`, `commands/issue-mode.md`, `commands/ultracode-review.md`
@@ -375,6 +389,8 @@ git commit -m "refactor(commands): 커맨드 frontmatter를 영문으로 다시 
 ---
 
 ### Task 8: 남은 참조를 고치고 오답노트 형식을 옮긴다
+
+> **되돌린 작업이다 — 이 태스크를 실행하지 마라.** 이 재작성은 되돌려졌고 정본은 지금도 한국어다. 절만 떼어 받았다면 이 계획서 맨 위의 표시를 읽어라.
 
 **Files:**
 - Modify: `README.md`, `docs/DESIGN-NOTES.md`, `docs/solved_problems.md`, `.claude/workflows/self-audit.js`, `CLAUDE.md`
