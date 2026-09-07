@@ -802,18 +802,27 @@ run "$H32" "$P32" >/dev/null
 printf 'superpowers
 ' > "$H32/.claude/disciplined-coder/plugin-notice.skip"
 OUT32="$(run "$H32" "$P32")"
+# skip 은 적힌 이름만 잠재운다. 다른 이름을 적어 두고도 알림이 그대로 나오는지 따로 본다 —
+# 이 단언이 없으면 skip 파일이 있기만 하면 통째로 조용해지는 구현도 초록으로 지나간다.
+H33="$(mktemp -d)"; P33="$(mktemp -d)"
+run "$H33" "$P33" >/dev/null
+printf 'not-a-dependency
+' > "$H33/.claude/disciplined-coder/plugin-notice.skip"
+OUT33="$(run "$H33" "$P33")"
 echo "[deps-notice] 함께 쓰는 플러그인 알림"
 check "없으면 superpowers 를 알린다"       "printf '%s' \"\$OUT30a\" | grep -qF 'superpowers@claude-plugins-official'"
-check "없으면 카파시도 알린다"             "printf '%s' \"\$OUT30a\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
-check "카파시는 마켓플레이스를 함께 준다"  "printf '%s' \"\$OUT30a\" | grep -qF 'forrestchang/andrej-karpathy-skills'"
+# 카파시는 목록에서 뺐다. 정본이 그 네 절을 이미 담고 있어 함께 깔면 지침이 두 벌이 된다.
+# 낱말 'andrej-karpathy-skills' 의 부재로 재면 안 된다 — 첫 회차 출력에 실리는 정본 덤프가 출처
+# 표기로 그 낱말을 갖고 있어 늘 실패한다. 알림에만 나오는 설치 키로 재야 알림의 부재가 잡힌다.
+check "카파시는 더 권하지 않는다"          "! printf '%s' \"\$OUT30a\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
 # superpowers 는 공식 마켓플레이스라 추가 명령이 없다. 목록의 '-' 가 실제로 그 줄을 뺐는지 본다.
-check "superpowers 는 마켓플레이스 추가가 없다" "[ \$(printf '%s' \"\$OUT30a\" | grep -cF 'claude plugin marketplace add') -eq 1 ]"
+check "superpowers 는 마켓플레이스 추가가 없다" "[ \$(printf '%s' \"\$OUT30a\" | grep -cF 'claude plugin marketplace add') -eq 0 ]"
 check "끄는 방법을 함께 알린다"            "printf '%s' \"\$OUT30a\" | grep -qF 'plugin-notice.skip'"
 check "둘째 세션에도 그대로 알린다"        "printf '%s' \"\$OUT30b\" | grep -qF 'superpowers@claude-plugins-official'"
-check "둘 다 깔렸으면 조용하다"            "! printf '%s' \"\$OUT31\" | grep -qF 'claude plugin install'"
-check "둘 다 깔렸어도 셋업은 돈다"         "[ -f '$H31/.claude/disciplined-coder/agent-principles.md' ]"
+check "깔렸으면 조용하다"                  "! printf '%s' \"\$OUT31\" | grep -qF 'claude plugin install'"
+check "깔렸어도 셋업은 돈다"               "[ -f '$H31/.claude/disciplined-coder/agent-principles.md' ]"
 check "skip 에 적힌 것은 안 알린다"        "! printf '%s' \"\$OUT32\" | grep -qF 'superpowers@claude-plugins-official'"
-check "skip 에 없는 것은 그대로 알린다"    "printf '%s' \"\$OUT32\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
+check "skip 에 없는 것은 그대로 알린다"    "printf '%s' \"\$OUT33\" | grep -qF 'superpowers@claude-plugins-official'"
 
 echo "[notice-encoding] user-facing notices are not double-encoded"
 check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COMMON\""

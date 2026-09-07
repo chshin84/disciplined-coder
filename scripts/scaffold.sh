@@ -159,10 +159,11 @@ rm -f "$au_err"
 #     건너뛸 목록을 이 스크립트에 안 적으므로 그 파일 하나로 정해지고 끈 근거도 거기 남는다.
 #     설치 여부는 Claude Code 의 설치 기록 파일의 키로 본다. 마켓플레이스 이름은 설치 방법에 따라
 #     갈리므로 '이름@' 앞부분만 맞대고, 마켓플레이스 인자가 '-' 면 추가 없이 바로 설치한다.
-#     정본의 Karpathy guidelines 절 넷은 카파시 플러그인의 네 절을 산출물 기준으로 일반화해 옮긴 것이다.
+#     카파시 플러그인은 이 목록에서 뺐다. 정본의 「Karpathy guidelines」 절이 그 네 절을 산출물
+#     기준으로 일반화해 이미 담고 있어, 함께 깔면 비슷하지만 어긋나는 지침이 매 세션 두 벌 실린다.
+#     정본이 출처를 적어 두므로 어디서 온 것인지는 거기서 확인한다.
 DEP_SKIP="$KDIR/plugin-notice.skip"
-DEP_LIST="superpowers|-|superpowers@claude-plugins-official
-andrej-karpathy-skills|forrestchang/andrej-karpathy-skills|andrej-karpathy-skills@karpathy-skills"
+DEP_LIST="superpowers|-|superpowers@claude-plugins-official"
 dep_missing=0
 while IFS='|' read -r dep_name dep_mkt dep_key; do
   [ -n "$dep_name" ] || continue
