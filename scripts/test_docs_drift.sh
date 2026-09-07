@@ -522,7 +522,11 @@ for SRC in "$HERE/skills/lens-readability/SKILL.md" "$CALLER" "$CANON"; do
   while IFS= read -r sec; do
     [ -n "$sec" ] || continue
     BN=$((BN+1))
-    check "$sn 이 가리킨 절이 있다: $sec" "printf '%s\n' \"\$HEADINGS\" | grep -qxF -- '$sec'"
+    # 파이프 대신 here-string 으로 넘긴다. `printf | grep -q` 는 이 스크립트의 pipefail 과 맞물려
+    # 뒤집힌 실패를 낸다 — grep -q 는 찾는 즉시 빠져나가고, 그러면 아직 쓰고 있던 printf 가 EPIPE 를
+    # 받아 파이프라인 전체가 실패로 계상된다. 제목이 있어서 실패하는 것이라 로컬에서는 통과하고
+    # CI 에서만 붉게 뜬다. 제목 집합이 32KB 를 넘긴 뒤로 grep 의 첫 읽기가 전부를 못 담아 갈렸다.
+    check "$sn 이 가리킨 절이 있다: $sec" "grep -qxF -- '$sec' <<<\"\$HEADINGS\""
   done <<EOF
 $(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$SRC" | sed 's/^「//; s/」$//; s/ *[—(].*$//; s/ *$//' | sort -u)
 EOF
