@@ -1,0 +1,123 @@
+{
+  "lens": "lens-grounding",
+  "read": [
+    "agent-principles.md",
+    "skills/lens-grounding/SKILL.md",
+    "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md",
+    "scripts/test_scaffold.sh",
+    "scripts/test_docs_drift.sh",
+    "scripts/scaffold.sh",
+    "skills/domain-korean/SKILL.md",
+    "skills/lens-readability/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "skills/lens-adversarial/SKILL.md",
+    "skills/review-specs/SKILL.md",
+    "skills/dispatching-lenses/SKILL.md",
+    "skills/lens-prior-art/SKILL.md",
+    "hooks/_banned_words.sh",
+    "hooks/doc_word_pretooluse.sh",
+    "CLAUDE.md (문자열 검색)",
+    "저장소 루트 목록 (.codex-plugin 존재 확인)"
+  ],
+  "issues": [
+    {
+      "where": "「안 바꾸는 것과 그 근거」 마지막 문단",
+      "type": "mismatch",
+      "claim": "A·B·C·E 의 삭제 합이 172자이고 D 의 추가가 약 180자여서 순증이 8자라는 산술",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:109",
+      "evidence": "분량은 172자 줄고 D 의 위임 상한이 약 180자 늘어 순증 8자다.",
+      "counterpart_file": "agent-principles.md:13,30,36,173",
+      "counterpart": "실측값은 A 37자(문장 36자 + 뒤 공백 1자, 173행), B 49자(113→64), C 39자(87행 문안 85→46), E 33자(36행 32자 + 줄바꿈 1자)로 합 158자다. D 는 32행이 125자에서 288자가 되어 163자 증가다.",
+      "principle": "팩트와 근거",
+      "consequence": "삭제 합이 158자이고 D 추가가 163자라서 A·B·C·D·E 만 놓은 실제 순증은 8자가 아니라 5자다."
+    },
+    {
+      "where": "「안 바꾸는 것과 그 근거」 마지막 문단",
+      "type": "omission",
+      "claim": "여섯 곳을 고친다고 해놓고 산술에 F 의 증가분이 빠졌다",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:109",
+      "evidence": "분량은 172자 줄고 D 의 위임 상한이 약 180자 늘어 순증 8자다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:85 / agent-principles.md:61",
+      "counterpart": "F 의 새 문안 For multi-step work, state the plan as steps and say up front what would show the whole task is done. 는 101자이고 원문은 92자여서 9자가 는다.",
+      "principle": "팩트와 근거",
+      "consequence": "A~F 여섯을 모두 반영한 실제 순증은 14자이고, 문서가 적은 8자는 여섯 중 다섯만 센 값이다."
+    },
+    {
+      "where": "「측정」 절 표 마지막 행",
+      "type": "mismatch",
+      "claim": "표에 적히지 않은 절이 여섯이라는 이름표",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:41",
+      "evidence": "| 나머지 여섯 절과 머리말 | 1,691자 | 15.9% |",
+      "counterpart_file": "agent-principles.md:7,20,64,111,163,171,179,187,191",
+      "counterpart": "정본의 ## 절은 아홉이고 표가 넷을 이미 적었으므로 남는 절은 다섯이다. 코딩할 때·검증·미해결의 처분·병렬 오케스트레이션·이 파일의 취급이다.",
+      "principle": "팩트와 근거",
+      "consequence": "숫자 1,691자와 15.9%는 다섯 절과 머리말의 합으로 정확한데 이름표만 하나 더 많아, 읽는 사람이 정본의 절 수를 열로 센다."
+    },
+    {
+      "where": "「과잉 검증을 부르는 조항이 둘이다」 둘째 문단",
+      "type": "mismatch",
+      "claim": "따옴표로 옮긴 정본 문장",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:15",
+      "evidence": "바로 다음 문장이 이미 \"어느 렌즈를 언제 띄우는지는 그것을 부르는 스킬이 정한다\"라고 적으므로",
+      "counterpart_file": "agent-principles.md:173",
+      "counterpart": "어느 렌즈를 언제 띄우는지는 그것을 부르는 스킬이 정하고, 띄우는 방법은 `dispatching-lenses`가 정한다.",
+      "principle": "팩트와 근거",
+      "consequence": "따옴표 안 문장이 정본에 그 글자로 없다. 정본은 정하고, 로 이어지며 dispatching-lenses 를 함께 가리킨다."
+    },
+    {
+      "where": "「바꿀 것」 D 항목의 근거 문단",
+      "type": "unsupported",
+      "claim": "test_scaffold.sh:424 가 새 불릿을 만들지 못하게 막는다는 근거",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:79",
+      "evidence": "새 항목을 만들지 않고 기존 항목에 이어 붙이는 이유는 둘이다. scripts/test_scaffold.sh:424 가 … 를 글자 그대로 붙들고 있고",
+      "counterpart_file": "scripts/test_scaffold.sh:424",
+      "counterpart": "check \"canon: subagent fleet rule stays\" 는 grep -qF 로 그 문자열이 정본 안 어디에 있기만 하면 통과한다.",
+      "principle": "팩트와 근거",
+      "consequence": "424행은 새 불릿을 따로 만들어도 깨지지 않는다. 이어 붙일 근거로 실제 성립하는 것은 432행의 45줄 상한 하나다."
+    },
+    {
+      "where": "「바꿀 것」 D 항목의 새 문안",
+      "type": "contradiction",
+      "claim": "렌즈를 「검증」 절이 소유한다는 서술",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:74",
+      "evidence": "Lenses are the exception; 「검증」 owns them.",
+      "counterpart_file": "agent-principles.md:173,175",
+      "counterpart": "어느 렌즈를 언제 띄우는지는 그것을 부르는 스킬이 정하고, 띄우는 방법은 dispatching-lenses가 정한다. / 렌즈 호출은 사용자가 상시 허용한 것으로 본다.",
+      "principle": "SSOT",
+      "consequence": "정본은 「검증」 절이 렌즈 배선을 소유하지 않고 부르는 스킬과 dispatching-lenses 로 넘긴다고 적는다. 「검증」이 갖는 것은 175행의 상시 허용 선언뿐이라, 새 문안대로면 소유 선언이 두 곳으로 갈린다."
+    },
+    {
+      "where": "「판정 규칙」 마지막 문단",
+      "type": "contradiction",
+      "claim": "다른 PC 의 전역 CLAUDE.md 에 설치 블록이 없다는 서술",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:53",
+      "evidence": "정본은 플러그인이 배포하는 것이라 다른 PC 에는 그 파일의 설치 블록이 없다.",
+      "counterpart_file": "scripts/scaffold.sh:102-107",
+      "counterpart": "if [ -f \"$UC\" ] && grep -qF '@disciplined-coder/agent-principles.md' \"$UC\"; then had_import=1; fi … $UC 는 $CLAUDE_HOME/CLAUDE.md 다",
+      "principle": "팩트와 근거",
+      "consequence": "플러그인이 깔린 PC 는 모두 전역 CLAUDE.md 에 그 관리 블록을 갖는다. 전역 CLAUDE.md 를 비교에서 빼는 근거로 성립하는 것은 사용자가 손으로 적은 줄이 다른 PC 에 없다는 것이지 설치 블록의 부재가 아니다."
+    },
+    {
+      "where": "「안 바꾸는 것과 그 근거」 표의 한국어 절 행",
+      "type": "omission",
+      "claim": "금지 표현 표를 읽는 곳이 스킬 둘이라는 목록",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:106",
+      "evidence": "금지 표현 표는 skills/lens-readability 와 skills/audit-repo-docs 가 직접 읽는다",
+      "counterpart_file": "hooks/_banned_words.sh:2,13 / hooks/doc_word_pretooluse.sh:2 / scripts/test_docs_drift.sh:774 / scripts/test_scaffold.sh:518",
+      "counterpart": "공유 헬퍼: 정본의 「금지 표현」 표를 한 번 읽어 두 파일로 낸다. / BANNED_TABLE_HEAD='### 금지 표현'",
+      "principle": "EXPLICIT",
+      "consequence": "표를 정본에 남길 근거로 스킬 둘만 적혀, 표의 제목과 표 형식에 직접 묶여 있는 훅 둘과 검사 스크립트 둘이 근거에서 안 보인다."
+    }
+  ],
+  "principles_applied": [
+    "FAIL-LOUD",
+    "SSOT",
+    "EXPLICIT",
+    "ASYNC-FIRST",
+    "NAME-ITEMS",
+    "Think Before Acting",
+    "팩트와 근거",
+    "모호한 표현의 구체화"
+  ],
+  "notes": "타깃 체크리스트를 항목마다 따로 확인했다.\n\n측정치 재계산 — 정본을 LF 로 정규화해 문자 수를 셌다. 전체 10,656자이고 한글 음절은 4,556개다. 둘 다 문서 값과 같다. 절별 크기는 원칙 1,134 / Karpathy 2,036 / 한국어 2,887 / 문서 2,908 이고 남은 다섯 절과 머리말이 1,691 이다. 합이 정확히 10,656 이고 비중도 100.0 으로 맞다. 숫자는 모두 맞고 이름표 하나만 틀렸다.\n\n감축 산술 — 실제 삭제는 158자이고 D 추가는 163자이며 F 가 9자를 더 늘린다.\n\n줄 수 — test_scaffold.sh:432 의 awk 와 같은 방식으로 세면 Karpathy 절은 지금 44줄이다. E 가 한 줄을 지우고 나머지 다섯은 줄 수를 바꾸지 않으므로 43줄이 맞다. 상한 45 도 맞다.\n\n행번호 넷 — 424 는 subagent fleet 문자열 검사, 430 은 numbered-steps 앵커, 432 는 45줄 상한, 443 은 조항 목록 for 문이다. 넷 다 문서가 말한 내용과 같다. 다만 문서가 그 파일이 이유를 적어 두었다고 가리킨 주석은 441-442 행이다.\n\n조항 목록 개수 — 443행 목록은 열다섯이고 정본에서 뽑으면 열여섯이며 빠진 것은 ASYNC-FIRST 하나다. 문서 주장이 맞다.\n\n직접 인용 대조 — 「검증」 첫 문장, ASYNC-FIRST 마지막 문장, Think Before Acting 둘째·넷째 항목, Simplicity First 첫 항목, Goal-Driven 셋째 항목, domain-korean/SKILL.md:7, test_scaffold.sh:441-442 주석은 모두 글자 그대로 있다. 어긋난 인용은 하나이고 발견 넷째에 적었다.\n\n참조 개수 주장 — SSOT 서른 곳은 방법을 밝히지 않았는데, 살아 있는 파일에서 문자열 SSOT 를 담은 파일을 세면 정확히 30개다(71줄). REVERSIBLE 은 skills/lens-adversarial/SKILL.md:12 와 skills/review-specs/SKILL.md:113 이 참조한다. 금지 표현 표는 skills/lens-readability/SKILL.md:92 와 skills/audit-repo-docs/SKILL.md:60 이 실제로 읽는다. 다만 읽는 곳이 이 둘만은 아니어서 발견 여덟째에 적었다.\n\nA 의 앵커 없음 — 검토 없이 결과로·한 번에 낸 출력·결과로 삼지 를 저장소 전체에서 검색했다. 나온 곳은 agent-principles.md:173 하나뿐이다. test_scaffold.sh 는 「검증」 절을 제목 존재로만 확인하고 본문 문장은 안 붙든다. 문서 주장이 참이다.\n\n.codex-plugin — 저장소 루트에 없다. 계획 문서는 docs/superpowers/plans/2026-06-25-codex-parity-layer.md 와 같은 이름의 spec 으로 실재한다. 문서 주장이 참이다.\n\n확인 불가 — 세션 기본 지침 인용 셋은 내가 열 수 있는 파일에 없는 외부 사실이라 판정하지 않았다. 이 셋이 C 와 E 삭제의 유일한 근거이므로 사용자가 그 지침 원문을 직접 대조해야 한다. 외부 웹 출처 둘도 웹에 나가지 말라는 지시를 지켜 열지 않았고 확인 불가로 둔다.\n\n확인 못 한 것 — 성공 기준 1 의 claude plugin validate ./ 가 version 경고 하나만 낸다는 것은 실행 결과라 정적 대조로 확인되지 않는다. scripts/test_*.sh 가 다섯 벌인 것은 확인했다. test_docs_drift.sh 의 「소유 표」 검사도 298행에 실재한다.\n\n덧붙임 — D 의 새 문안 중 one agent rather than several 는 skills/review-specs/SKILL.md:34 의 대상 하나에 넷과 skills/dispatching-lenses/SKILL.md:52 의 렌즈별 개별 호출과 겉으로 부딪히지만, 같은 문안이 렌즈를 예외로 두어 실질 충돌은 없다."
+}

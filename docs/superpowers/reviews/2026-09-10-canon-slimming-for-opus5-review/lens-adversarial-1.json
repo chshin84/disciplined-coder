@@ -1,0 +1,217 @@
+{
+  "lens": "lens-adversarial",
+  "read": [
+    "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md",
+    "agent-principles.md",
+    "scripts/test_scaffold.sh",
+    "scripts/test_docs_drift.sh (125-135, 196-206, 274-357, 690-691)",
+    "scripts/scaffold.sh (39-110)",
+    "skills/dispatching-lenses/SKILL.md",
+    "skills/review-specs/SKILL.md (grep)",
+    "hooks/ 디렉터리 목록과 hooks/_spec_marker.sh, hooks/doc_review_posttooluse.sh, hooks/spec_review_stop.sh (grep)"
+  ],
+  "issues": [
+    {
+      "where": "「바꿀 것」 A 항목 (spec 59행)",
+      "type": "failure-mode",
+      "claim": "A 를 적용하면 상시 실리는 정본 어디에도 검증을 하라는 의무 문장이 남지 않는다. 남는 「검증」 절은 포인터 한 문장과 허가 한 문단과 사실·판단 한 문단뿐이라, 렌즈를 부르는 스킬을 열어야 한다는 계기가 사라진다. 스킬은 열려야 실리므로, 열 이유를 주던 유일한 상시 문장을 지우면 스킬이 자기 자신을 부르지 못한다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:59",
+      "evidence": "A. 「검증」 첫 문장을 지운다. `Claude가 한 번에 낸 출력을 검토 없이 결과로 삼지 않는다.` 를 지우고 다음 문장부터 시작한다.",
+      "counterpart_file": "agent-principles.md:173",
+      "counterpart": "삭제 뒤 남는 첫 문장은 `어느 렌즈를 언제 띄우는지는 그것을 부르는 스킬이 정하고, 띄우는 방법은 dispatching-lenses가 정한다` 이며, 이것은 어느 스킬을 열라는 지시가 아니라 소유자 안내다.",
+      "principle": "FAIL-LOUD · SSOT",
+      "consequence": "훅이 강제하는 대상은 `docs/superpowers/` 아래 spec·plan(hooks/spec_review_stop.sh)과 `.md` 문서 넛지(hooks/doc_review_posttooluse.sh)뿐이다. 코드와 사용자에게 보내는 답과 파이썬으로 만드는 발표자료·워드 파일은 어느 훅에도 안 걸리므로, 그 종류에서는 검증을 부르는 상시 문장이 A 뒤에 하나도 남지 않는다."
+    },
+    {
+      "where": "「바꿀 것」 D 항목의 새 문장 (spec 74행) 가운데 `never to check your own work`",
+      "type": "failure-mode",
+      "claim": "D 는 자기 출력을 검사하는 위임을 절대 금지로 적고 예외를 `lens-*` 하나로만 열었다. 이 저장소가 실제로 쓰는 자기 검사 위임에는 렌즈가 아닌 것이 여럿이라, 그 경로들이 이름 없이 금지된다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:74",
+      "evidence": "delegate only for large, genuinely independent tracks, one agent rather than several, and never to check your own work. Lenses are the exception; 「검증」 owns them.",
+      "counterpart_file": "skills/dispatching-lenses/SKILL.md:45, 47",
+      "counterpart": "「한 번만 띄우는 렌즈의 규율」이 `파일을 쓰는 에이전트도 이 규율 안에 있다 ... 검수자는 걸음 끝에 하나만 띄워 폴더를 통째로 센다` 라고 적고, 그 검수자는 `lens-*` 이름이 아니다. 세션에 실리는 스킬 목록에도 `superpowers:requesting-code-review`, `superpowers:verification-before-completion`, `superpowers:subagent-driven-development` 가 있고 셋 다 자기 작업을 서브에이전트로 검사한다.",
+      "principle": "EXPLICIT · FAIL-LOUD",
+      "consequence": "정본은 상시 실리고 스킬은 열려야 실린다. 지금 상태에서 D 의 금지문은 상시로 읽히고 그 예외 목록은 `lens-*` 한 종류만 이름을 갖는다. 이름이 없는 나머지 자기 검사 위임은 금지 쪽으로 읽혀 조용히 안 돌고, 안 돌았다는 사실을 알리는 장치가 없다."
+    },
+    {
+      "where": "「바꿀 것」 D 항목 (spec 74행)과 「검증」 절을 함께 읽는 자리 — A 와 D 의 결합",
+      "type": "failure-mode",
+      "claim": "D 의 예외는 `「검증」 owns them` 으로 「검증」 절에 렌즈 운용을 넘긴다. 그런데 같은 spec 의 A 가 그 절에서 의무 문장을 빼 허가만 남긴 절로 만든다. 예외가 가리키는 곳이 권한만 있고 계기가 없는 절이 되어, 금지는 상시로 읽히고 예외는 비어 있는 상태가 된다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:59, 74",
+      "evidence": "A 와 D 가 같은 커밋에 들어가고, D 의 예외가 A 로 얇아진 절을 소유자로 지목한다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:15",
+      "counterpart": "spec 은 `첫 문장은 트리거가 아니라 태도 선언이고, 바로 다음 문장이 이미 어느 렌즈를 언제 띄우는지는 그것을 부르는 스킬이 정한다라고 적으므로 첫 문장을 지워도 렌즈 배선은 그대로다` 라고 적어 A 가 무해하다고 판정한다. 이 판정은 D 가 같은 커밋에 `never to check your own work` 를 새로 들여온다는 사실을 계산에 넣지 않았다.",
+      "principle": "SSOT · EXPLICIT",
+      "consequence": "spec 은 A 의 안전성을 D 가 없는 정본을 기준으로 논증하고, D 의 안전성을 A 가 없는 「검증」 절을 기준으로 논증한다. 두 논증이 각자 다른 정본을 가정하므로 둘을 함께 적용한 결과에는 어느 논증도 닿지 않는다."
+    },
+    {
+      "where": "「바꿀 것」 D 항목의 `one agent rather than several` (spec 74행)",
+      "type": "failure-mode",
+      "claim": "`한 번에 여럿이 아니라 하나` 라는 상한이 같은 정본의 다른 절과 정면으로 부딪힌다. 정본 안에서 서로 반대를 말하는 두 문장이 상시로 함께 실린다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:74",
+      "evidence": "delegate only for large, genuinely independent tracks, one agent rather than several",
+      "counterpart_file": "agent-principles.md:13, 189",
+      "counterpart": "`ASYNC-FIRST` 가 `서로 기다릴 이유가 없는 일이 둘 이상이면 차례로 돌리지 말고 한꺼번에 돌린다` 라고 적고, 「병렬 오케스트레이션」이 `일마다 서브오케스트레이터를 두어 동시에 돌린다` 라고 적는다. skills/dispatching-lenses/SKILL.md:52 는 `따로 띄우기(기본) — 렌즈 하나가 서브에이전트 하나다` 이고 skills/review-specs/SKILL.md:34 는 `대상 하나에 넷이다` 이다.",
+      "principle": "ASYNC-FIRST · SSOT",
+      "consequence": "spec 의 「안 바꾸는 것과 그 근거」 표에는 `ASYNC-FIRST` 도 「병렬 오케스트레이션」도 없다. 새 상한과 그 둘의 관계를 spec 이 한 줄도 다루지 않은 채, 두 진술이 같은 파일 안에 남는다."
+    },
+    {
+      "where": "「바꿀 것」 F 항목 (spec 83-85행)",
+      "type": "failure-mode",
+      "claim": "F 는 단계마다 붙던 검증을 없애고 전체 작업 하나의 완료 기준으로 바꾼다. 그러면 여러 단계짜리 계획에서 어느 단계가 끝났는지 판정할 기준이 사라지고, 마지막에 전체를 한 번 보는 형태로 수렴한다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:85",
+      "evidence": "`For multi-step work, state the plan as numbered steps, each with the check that verifies it.` 를 `For multi-step work, state the plan as steps and say up front what would show the whole task is done.` 로 바꾼다.",
+      "counterpart_file": "agent-principles.md:58, 62",
+      "counterpart": "같은 절이 `Turn the task into something you can check` 로 시작하고 `Strong criteria let you loop on your own` 로 끝난다. 스스로 도는 반복은 단계마다 판정이 있어야 성립하고, 전체 하나짜리 기준은 마지막에 한 번만 판정한다.",
+      "principle": "Goal-Driven Execution · FAIL-LOUD",
+      "consequence": "spec 은 이 변경의 근거를 `단계마다 검증을 붙이라는 지시라 같은 계열이다` 한 줄로 적고, 단계별 판정이 사라졌을 때 무엇이 대신 그 구실을 하는지는 적지 않는다. 대체물의 이름이 문서에 없다."
+    },
+    {
+      "where": "「바꿀 것」 F 항목 (spec 83-85행) 가운데 `numbered` 를 뺀 것",
+      "type": "failure-mode",
+      "claim": "F 는 `numbered steps` 에서 `numbered` 를 함께 뺀다. spec 은 19행에서 `NAME-ITEMS` 와 부딪히지 않는 이유로 `계획에는 순서가 있다` 를 들어 번호를 정당화해 놓고, 정작 바꿀 문안에서는 번호를 지운다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:19, 85",
+      "evidence": "19행 `NAME-ITEMS 는 이 항목과 부딪히지 않는다. 그 조항은 순서가 없으면 각 항목을 이름으로 부른다라는 조건부이고 계획에는 순서가 있다.` 와 85행의 새 문안 `state the plan as steps` 가 서로 반대다.",
+      "counterpart_file": "agent-principles.md:16",
+      "counterpart": "`NAME-ITEMS` 가 `순서가 없으면 각 항목을 이름으로 부른다. 번호는 거짓 우선순위를 만든다` 이다. 정본이 번호를 안 시키면 계획 단계는 `NAME-ITEMS` 쪽으로 읽혀 이름으로 불리게 된다.",
+      "principle": "NAME-ITEMS · EXPLICIT",
+      "consequence": "이 저장소의 계획과 리뷰 기록은 단계를 번호로 부른다. docs/superpowers/reviews/2026-09-05-canon-split-plan-review/lens-grounding-1.json:59 가 `Step 2 실행에는` 이라고 적는다. 번호로 부르는 관례를 만들던 정본 문장이 사라지는데, spec 은 그 관례를 다루지 않는다."
+    },
+    {
+      "where": "「테스트 두 줄」 절 (spec 87-93행)",
+      "type": "failure-mode",
+      "claim": "정본을 고치는 여섯 가운데 넷(A·B·C·E)에 테스트 앵커가 없다. 구현자가 그 넷을 빼먹거나 문안을 잘못 옮겨도 검사가 전부 초록이다. spec 이 테스트로 붙드는 것은 F 하나뿐이다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:87-91",
+      "evidence": "테스트 절이 다루는 것은 G(조항 목록에 ASYNC-FIRST 추가)와 H(F 의 앵커 갱신) 둘뿐이고, A 에 대해서는 59행이 `이 문장을 붙드는 테스트 앵커는 없다` 라고 스스로 적는다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:115",
+      "counterpart": "성공 기준 1 이 `scripts/test_*.sh 다섯 벌이 FAIL=0` 이다. 이 기준은 A·B·C·E 를 하나도 적용하지 않은 정본에서도 그대로 통과한다.",
+      "principle": "Goal-Driven Execution · FAIL-LOUD",
+      "consequence": "지금 test_scaffold.sh 는 Karpathy 절에서 문자열 여덟 줄(424-430행)과 45줄 상한(432행)만 붙든다. B 와 C 와 E 가 건드리는 문장은 그 여덟에 없다."
+    },
+    {
+      "where": "「검증」 절의 성공 기준 3 (spec 117행)",
+      "type": "failure-mode",
+      "claim": "성공 기준 3 을 기계가 판정한다고 적었는데 43줄을 확인하는 기계가 없다. 실제 검사는 45줄 이하만 본다. E 를 통째로 빼먹으면 44줄이 되어 그대로 통과한다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:113, 117",
+      "evidence": "113행 `성공 기준 넷이고 앞의 셋은 기계가 판정한다` 와 117행 `Karpathy 절이 43줄로 상한 45 아래에 남는다`.",
+      "counterpart_file": "scripts/test_scaffold.sh:432",
+      "counterpart": "check \"canon: karpathy section is 45 lines or fewer\" 가 `-le 45` 로만 판정한다. 43 을 요구하는 단언이 저장소에 없다.",
+      "principle": "Goal-Driven Execution · EXPLICIT",
+      "consequence": "D 는 기존 항목에 이어 붙이므로 줄 수를 안 늘린다. 그래서 E 만 빼먹으면 44줄이고, 45줄 상한 검사와 성공 기준 1 이 함께 초록이라 결손을 알리는 것이 하나도 없다."
+    },
+    {
+      "where": "「바꿀 것」 A 항목 (spec 59행) — 문장 하나를 지우는 방법",
+      "type": "failure-mode",
+      "claim": "지울 문장이 줄 하나를 혼자 쓰지 않고 살려 둘 문장과 같은 줄에 있다. 구현자가 줄 단위로 지우면 `dispatching-lenses` 포인터가 함께 사라지는데, 그 포인터를 붙드는 검사가 없다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:59",
+      "evidence": "spec 은 `지우고 다음 문장부터 시작한다` 라고만 적고, 그 줄에 무엇이 함께 있는지와 무엇을 반드시 남겨야 하는지를 적지 않는다.",
+      "counterpart_file": "agent-principles.md:173",
+      "counterpart": "그 한 줄이 `Claude가 한 번에 낸 출력을 검토 없이 결과로 삼지 않는다. 어느 렌즈를 언제 띄우는지는 그것을 부르는 스킬이 정하고, 띄우는 방법은 `dispatching-lenses`가 정한다.` 이다.",
+      "principle": "EXPLICIT · SSOT",
+      "consequence": "scripts/test_docs_drift.sh:288 의 반복문은 review-specs·nested-orchestration·review-docs 셋만 소유자를 가리키는지 확인하고 정본은 그 목록에 없다. scripts/test_scaffold.sh:281 이 「검증」 절에서 찾는 문자열은 `lens-*` 인데, 그 문자열은 175행에 있어 173행을 통째로 지워도 통과한다."
+    },
+    {
+      "where": "「테스트 두 줄」 H 항목 (spec 91행)",
+      "type": "failure-mode",
+      "claim": "H 는 앵커 문자열만 갱신하라고 적고 그 검사의 이름은 다루지 않는다. 이름이 `numbered-steps-plan rule stays` 인데 새 문안에는 번호가 없어, 검사 이름이 존재하지 않는 규칙을 가리키게 된다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:91",
+      "evidence": "H. `scripts/test_scaffold.sh:430` 의 앵커를 F 의 새 문안으로 갱신한다.",
+      "counterpart_file": "scripts/test_scaffold.sh:430",
+      "counterpart": "check \"canon: numbered-steps-plan rule stays\" 가 검사 이름이다. FAIL 이 났을 때 사람에게 보이는 것이 이 이름이다.",
+      "principle": "EXPLICIT · NAME-ITEMS",
+      "consequence": "다음에 이 검사가 실패하면 출력에 `numbered-steps-plan` 이 뜨는데 정본에는 번호가 없다. 무엇이 깨졌는지 찾는 사람이 없는 규칙을 찾게 된다."
+    },
+    {
+      "where": "「측정」 절의 절별 크기 표 (spec 33-41행)",
+      "type": "over-engineering",
+      "claim": "표 다섯 줄이 어느 결정에도 쓰이지 않는다. 같은 절이 세 줄 뒤에서 분량은 값이 없다고 스스로 적고, 「바꿀 것」의 여섯 항목 가운데 이 표를 근거로 고르는 것이 하나도 없다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:33-43",
+      "evidence": "43행 `토큰 절약은 이 설계의 목표가 아니다. 10,656자는 1M 맥락의 1% 미만이라 절약 자체로는 값이 없다. 값이 있는 것은 지시 희석이고, 그것은 분량이 아니라 어느 조항이 모델 행동과 겹치는지에 달렸다.` 단순화 근거는 이 문장 자체이며, 결정에 안 쓰이는 표는 읽는 사람이 절 크기를 판정 기준으로 오해하게 만든다.",
+      "counterpart_file": "agent-principles.md:36-40",
+      "counterpart": "`Simplicity First` 의 `Nothing beyond what was asked.` 와 `If you produced 200 lines and 50 would do, produce it again.`",
+      "principle": "Simplicity First",
+      "consequence": "「바꿀 것」의 여섯 항목은 전부 절별 크기가 아니라 세션 기본 지침과의 중복으로 골랐다. 표가 고른 항목은 없다."
+    },
+    {
+      "where": "「판정 규칙」 절 (spec 45-53행)",
+      "type": "over-engineering",
+      "claim": "세 조건 규칙이 실제로 지배하는 것은 A·C·E 셋뿐이다. D 는 추가이고 F 는 교체라 이 규칙이 안 걸리며, B 는 되풀이를 줄이는 것이라 걸리지 않는다. 규칙이 여섯 가운데 셋을 다루면서 문서 앞머리에 전체 판정 규칙으로 서 있다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:47",
+      "evidence": "`문장 하나를 빼려면 셋이 모두 참이어야 한다.` 규칙의 대상이 삭제로 한정되어 있다. 단순화 근거는 이 규칙이 다루지 않는 D 가 순증의 전부(약 180자)이고 이 설계에서 행동을 가장 크게 바꾸는 항목이라는 사실이다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:69-77",
+      "counterpart": "D 항목이 판정 규칙을 한 번도 인용하지 않고, 대신 `Opus 5 공식 가이드가 권한다` 와 테스트 줄 수 여유만 근거로 든다.",
+      "principle": "Simplicity First · EXPLICIT",
+      "consequence": "새 문장을 정본에 넣을 때 무엇이 참이어야 하는지를 정하는 규칙이 이 문서에 없다. D 를 넣을지 판정한 기준이 문서에 적혀 있지 않다."
+    },
+    {
+      "where": "「안 바꾸는 것과 그 근거」 표의 「문서를 쓰고 관리할 때」 행 (spec 107행)",
+      "type": "over-engineering",
+      "claim": "표 머리말이 판정 규칙을 돌린 결과라고 선언하는데 이 행은 규칙을 안 돌리고 범위 밖이라고만 적는다. 한 표 안에서 두 종류의 판정이 섞여 있다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:97, 107",
+      "evidence": "97행 `판정 규칙을 돌렸을 때 남기기로 한 것들이다.` 와 107행 `이 설계의 범위 밖이다. 분량을 목표에서 뺐으므로 표 둘을 스킬로 옮기지 않는다.` 단순화 근거는 범위 밖 선언이 「문제」 절에 이미 있으면 표에 행을 더할 이유가 없다는 것이다.",
+      "counterpart_file": "agent-principles.md:70",
+      "counterpart": "`PROSE-FORM` 이 `한 표와 한 목록 안에서는 말끝을 하나로 맞춘다` 라고 하고, 같은 이유로 한 표 안의 항목은 같은 종류여야 읽힌다.",
+      "principle": "PROSE-FORM · Simplicity First",
+      "consequence": "표의 일곱 행 가운데 여섯은 세션 기본 지침과의 대조 결과이고 이 한 행만 범위 선언이다. 표 머리말은 그 한 행에 대해 사실이 아니다."
+    },
+    {
+      "where": "「되돌리기」 절 (spec 122-126행)",
+      "type": "irreversible",
+      "claim": "파일을 되돌리는 것은 커밋 하나가 맞다. 되돌릴 때가 되었다는 것을 알려 줄 신호가 없는 것이 되돌리기를 막는다. 이 설계가 바꾸는 것은 행동이고, 행동이 나빠졌을 때 붉게 실패하는 검사가 하나도 없다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:124-126",
+      "evidence": "`커밋 하나를 되돌리면 끝난다` 와 `되돌릴 근거가 생길 만한 것은 하나다. Codex 병행 계층을 나중에 붙이면` 이다. 되돌릴 근거로 든 것이 이 설계가 노리는 효과와 무관한 미래 계획 하나뿐이다. 완화 근거는 이 저장소가 정본 문장의 효과를 실제로 표본으로 측정한 전례를 갖는다는 사실이다(agent-principles.md:86 의 `규칙에 이름이 적힌 단어는 스무 표본에서 0건이고 규칙이 없던 열다섯 표본에서 5건이었다`).",
+      "counterpart_file": "agent-principles.md:29",
+      "counterpart": "`Don't assume the current state. Measure it in the actual code, data, and environment.`",
+      "principle": "REVERSIBLE · Think Before Acting",
+      "consequence": "spec 은 렌즈가 덜 돌게 되었는지, 검증을 건너뛰게 되었는지를 확인하는 방법을 적지 않는다. 성공 기준 넷 가운데 셋은 테스트와 줄 수이고 넷째는 D 항목의 한국어 읽힘이다."
+    },
+    {
+      "where": "「되돌리기」 절 (spec 124행)의 `따로 복구할 것이 없다`",
+      "type": "risk",
+      "claim": "PC 전역 사본은 매 세션 덮어써지므로 옛 내용이 남는 길이 닫혀 있다. 남는 위험은 플러그인 루트 자체가 옛 커밋에 멈춘 PC 다. 그 PC 에서는 갱신 코드가 멈춘 커밋의 정본을 매 세션 충실히 다시 깔고, 뒤처졌다는 사실을 알리는 것이 없다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:124",
+      "evidence": "완화 근거는 갱신 실패만 알리고 뒤처짐은 안 알리는 코드가 이미 있다는 사실이다. scripts/scaffold.sh:54 는 `cp` 가 실패할 때만 ERROR 를 내고, 사본이 최신인지는 확인하지 않는다.",
+      "counterpart_file": "scripts/test_scaffold.sh:88, 91",
+      "counterpart": "autoUpdate 를 사용자가 꺼 두면 `check \"꺼 둔 값을 되돌리지 않는다\"` 가 그 결정을 존중한다. 그 PC 는 사람이 직접 갱신할 때까지 어느 커밋에든 멈춰 있을 수 있다.",
+      "principle": "REVERSIBLE · FAIL-LOUD",
+      "consequence": "scripts/scaffold.sh:47-59 의 복사는 조건 없이 매번 돈다. 그래서 `~/.claude/disciplined-coder/agent-principles.md` 는 항상 플러그인 루트와 같다. 최신인지는 플러그인 루트가 정하고, 그것이 뒤처졌는지를 판정하는 코드는 이 저장소에 없다."
+    },
+    {
+      "where": "「과잉 검증을 부르는 조항이 둘이다」 절 (spec 13행)",
+      "type": "risk",
+      "claim": "이 설계 전체가 딛고 선 전제(Opus 5 는 시키지 않아도 스스로 검증하므로 검증 지시가 과잉 검증을 만든다)를 이 저장소에서 확인한 흔적이 없다. 확인하는 방법은 저장소 안에 이미 있는데 쓰지 않았다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:13",
+      "evidence": "전제의 출처가 외부 가이드 인용 하나뿐이고, 이 정본을 실은 세션에서 과잉 검증이 실제로 일어난 사례를 spec 이 하나도 인용하지 않는다. 완화 근거는 같은 물음을 재는 방법이 정본 안에 적혀 있다는 사실이다 — agent-principles.md:86 이 규칙 있는 스무 표본과 규칙 없는 열다섯 표본을 대조한 측정을 기록한다.",
+      "counterpart_file": "agent-principles.md:29-31",
+      "counterpart": "`Think Before Acting` 이 `Don't assume the current state. Measure it in the actual code, data, and environment.` 와 `State your assumptions explicitly` 를 요구한다. 이 spec 은 C 항목에서 뒤 문장을 지우자고 제안하면서, 자기 자신은 앞 문장을 적용하지 않았다.",
+      "principle": "Think Before Acting · 팩트와 근거",
+      "consequence": "전제가 틀리면 A 와 F 가 함께 무너진다. 둘 다 검증 지시를 빼는 항목이고, 빼고 나면 그 자리를 대신하는 것이 모델 자신의 습관뿐이다. spec 은 그 습관을 이 환경에서 확인한 값을 적지 않는다."
+    },
+    {
+      "where": "「검증」 절의 성공 기준 넷 (spec 113-118행)",
+      "type": "failure-mode",
+      "claim": "넷이 다 통과해도 설계가 실패한 상태가 성립한다. 넷 가운데 셋은 테스트와 줄 수이고 넷째는 D 항목 한 줄의 한국어 읽힘이라, 이 설계가 노린 효과와 그 반대 효과를 하나도 구별하지 못한다.",
+      "file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:115-118",
+      "evidence": "성공 기준 1 은 테스트 FAIL=0, 2 는 조항 목록이 열여섯, 3 은 Karpathy 절 줄 수, 4 는 `D 항목이 UNPACK 에 걸리지 않는지` 다.",
+      "counterpart_file": "docs/superpowers/specs/2026-09-10-canon-slimming-for-opus5-design.md:5",
+      "counterpart": "「문제」 절이 목표를 `둘 다 Opus 5 에서 행동을 나쁘게 만든다` 로 적는다. 목표가 행동인데 기준 넷은 전부 문서 상태다.",
+      "principle": "Goal-Driven Execution",
+      "consequence": "A·B·C·E 를 하나도 안 고치고 G 와 H 만 해도 기준 1 과 2 는 통과한다. 반대로 여섯을 다 고쳐서 렌즈가 전혀 안 돌게 되어도 기준 넷은 전부 통과한다."
+    }
+  ],
+  "principles_applied": [
+    "FAIL-LOUD",
+    "EXPLICIT",
+    "SSOT",
+    "ASYNC-FIRST",
+    "NAME-ITEMS",
+    "REVERSIBLE",
+    "PROSE-FORM",
+    "Think Before Acting",
+    "Simplicity First",
+    "Surgical Changes",
+    "Goal-Driven Execution",
+    "문서를 쓰고 관리할 때 — 팩트와 근거"
+  ],
+  "notes": "타깃 체크리스트를 항목마다 따로 검토했고 각도는 다음과 같다. (1) 실패 모드 — 이 설계대로 해서 완전히 실패했다고 놓고 원인을 일곱 방향으로 되짚었다. A 가 상시 문장을 없애 렌즈 호출 계기를 없애는 길, D 의 `never to check your own work` 가 렌즈 아닌 자기 검사 위임을 이름 없이 막는 길, A 와 D 가 서로 상대가 없는 정본을 가정해 각각 안전을 논증한 길, D 의 `one agent rather than several` 이 ASYNC-FIRST 와 「병렬 오케스트레이션」과 부딪히는 길, F 가 단계별 판정을 없애는 길, F 가 번호를 없애 이 저장소의 단계 호명 관례를 끊는 길, 성공 기준 넷이 실패와 성공을 구별하지 못하는 길이다. (2) 실행이 어긋나 실패하는 길 — 여섯 변경 가운데 넷에 앵커가 없다는 것, A 가 줄 단위 삭제로 포인터를 잃는다는 것, 성공 기준 3 을 판정하는 기계가 없다는 것, H 가 검사 이름을 남겨 둔다는 것을 각각 확인했다. (3) 과설계 — 측정 표와 판정 규칙 세 조건과 안 바꾸는 것 표를 하나씩 검토했다. 순증 8자 대비 문서량 자체는 지적하지 않았다. 이 문서는 삭제 판정의 근거를 남기는 설계 문서라 분량 자체가 과한 것으로 보이지 않았고, 대신 결정에 안 쓰이는 표와 여섯 가운데 셋만 다루는 규칙을 각각 지적했다. (4) 비가역 — `~/.claude/disciplined-coder/` 사본이 언제 갱신되는지를 scripts/scaffold.sh:47-59 에서 직접 확인했다. 조건 없이 매 세션 `cp` 하고 scripts/test_scaffold.sh:496-506 이 옛 사본 갱신을 붙들고 있어, 되돌린 뒤 사본이 옛 내용으로 남는 길은 닫혀 있다. 그래서 그 길은 발견으로 올리지 않았다. 남은 것은 플러그인 루트가 뒤처진 PC 와 되돌릴 신호가 없다는 것 둘이다. (5) YAGNI — D 의 위임 상한이 사용자가 청한 것이 아니라 외부 가이드의 권고에서 나왔고 이 저장소에서 과잉 위임을 확인한 기록이 없다는 것을 근거의 취약성 항목과 판정 규칙 항목에 나누어 담았다. (6) 근거의 취약성 — 전제 확인 방법이 저장소 안에 있는지 확인했고 agent-principles.md:86 의 표본 대조가 그 방법이다. (7) 성공 기준의 허점 — 마지막 발견이 그 답이다. 더 확인해야 할 것이 하나 남았다. spec 이 인용한 세션 기본 지침의 문장 넷(`deliver the complete work under explicitly stated assumptions` 등)이 실제 이 환경의 기본 지침에 그대로 있는지는 이 저장소 안에서 확인할 수 없다. C 와 E 의 판정 규칙 첫 조건이 전부 그 인용에 걸려 있으므로, 사람이 실제 기본 지침과 직접 대조해야 한다."
+}
