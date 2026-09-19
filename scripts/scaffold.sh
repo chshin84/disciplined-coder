@@ -105,25 +105,24 @@ had_import=0
 if [ -f "$UC" ] && grep -qF '@disciplined-coder/agent-principles.md' "$UC"; then had_import=1; fi
 
 # 같은 금지 표현 목록이 두 번 실리지 않게 한다. 다른 배포처가 이미 목록을 @import 로 싣고 있으면
-# 우리 줄을 안 쓰고 안 썼다는 사실을 블록 안에 적는다. 그 줄은 매 세션 실리므로 사용자와 Claude
-# 둘 다 왜 없는지 보게 된다(FAIL-LOUD). 파일은 그대로 복사하므로 산출물 검사 훅은 영향이 없다.
+# 우리 줄을 건너뛴다. 어느 쪽 목록인지는 중요하지 않다 — 둘 다 같은 JSON 에서 나온다. 남의 줄이
+# 없어지면 다음 세션에 우리 줄이 저절로 돌아오므로 목록이 빠진 채로 남는 상태가 안 생긴다.
+# 파일은 그대로 복사하므로 산출물 검사 훅은 영향이 없다.
 # 가르는 기준을 배포처 이름이 아니라 파일 이름 관례로 둔다 — 이 플러그인이 남의 배포처 이름을
 # 알 이유가 없고, 사외 사용자 PC 에는 그런 줄이 아예 없어 이 갈래가 걸리지 않는다.
 BAN_IMPORT='@disciplined-coder/korean-banned-words-dc.md'
-ban_entry="$BAN_IMPORT"
 ban_skipped=0
 if [ -f "$UC" ] && grep -E '^@[^[:space:]]*korean-banned-words' "$UC" | grep -vqF "$BAN_IMPORT"; then
-  ban_entry='# 금지 표현 목록은 다른 곳이 이미 싣고 있어 여기서는 싣지 않는다.'
   ban_skipped=1
 fi
 # 잠금을 못 잡으면 배선을 안 쓰고 물러난다. 그 사실을 여기서 알린다 — 정본 파일은 깔렸는데
 # @import만 빠지면 세션은 원칙 없이 도는데 파일이 다 있어 아무도 눈치채지 못한다(`FAIL-LOUD`).
 inject_rc=0
-# 따옴표 없는 EOF 다. 금지 표현 줄이 조건에 따라 갈리므로 값을 넣어야 한다. 본문에 다른 `$` 는 없다.
-managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" <<EOF || inject_rc=$?
-@disciplined-coder/agent-principles.md
-$ban_entry
-EOF
+# 줄 수가 조건에 따라 갈리므로 heredoc 대신 만들어서 넘긴다. 건너뛸 때 빈 줄이 블록에 남지 않는다.
+{
+  printf '%s\n' '@disciplined-coder/agent-principles.md'
+  if [ "$ban_skipped" -eq 0 ]; then printf '%s\n' "$BAN_IMPORT"; fi
+} | managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" || inject_rc=$?
 if [ "$inject_rc" -ne 0 ]; then
   echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라."
 fi

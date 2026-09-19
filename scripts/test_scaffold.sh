@@ -163,10 +163,11 @@ run "$H22" "$P22" >/dev/null
 UC22="$H22/.claude/CLAUDE.md"
 echo "[banlist-yield] 다른 곳이 이미 싣고 있으면 비킨다"
 check "우리 줄을 안 쓴다"            "! grep -qxF '@disciplined-coder/korean-banned-words-dc.md' '$UC22'"
-check "왜 없는지 블록에 적는다"      "grep -qF '금지 표현 목록은 다른 곳이 이미 싣고 있어' '$UC22'"
 check "남의 줄은 그대로 둔다"        "grep -qxF '@somewhere/korean-banned-words.md' '$UC22'"
 check "정본 줄은 그대로 쓴다"        "grep -qxF '@disciplined-coder/agent-principles.md' '$UC22'"
 check "파일은 그래도 놓는다"          "[ -f '$H22/.claude/disciplined-coder/korean-banned-words-dc.md' ]"
+# 건너뛴 자리에 빈 줄이나 설명을 남기지 않는다. 블록은 정본 줄 하나뿐이어야 한다.
+check "블록에 군더더기가 안 남는다"  "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC22' | wc -l) -eq 3 ]"
 
 # --- crlf-region: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
