@@ -786,7 +786,7 @@ done
 # 새것을 가르는 방법은 봉인(seal_reviews.sh)이 HEAD 로 기록을 가르는 것을 뒤집은 것이다. 커밋 전이면
 # 검사에 걸리고 커밋되면 과거가 된다. 이 저장소는 고친 뒤 검사를 돌리는 규약이라 그때가 커밋 전이다.
 # 표는 정본이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 이고
-# scripts/gen_banned_words.py 가 그것을 이 파일로 낸다.
+# 그 저장소의 render.py 가 만들어 dist/ 에 올린 것을 워크플로가 받아 온다.
 BANSRC="$HERE/korean-banned-words-dc.md"
 # 표의 행만 본다. 절의 설명 문단에도 백틱이 들어 있어, 절 전체에서 뽑으면 그 문단의 경로와 칸 이름이
 # 금지어로 둔갑한다(2026-09-06 에 실제로 세 건이 그렇게 잡혔다). 그리고 첫 칸에서만 뽑는다 —
@@ -810,9 +810,9 @@ echo "[금지 표현] 목록은 생성물이다"
 check "목록 파일이 있다"               "[ -f \"\$BANSRC\" ]"
 check "목록이 생성물이라고 밝힌다"     "grep -qF '이 파일은 생성물이다' \"\$BANSRC\""
 check "목록이 원본 저장소를 가리킨다"  "grep -qF 'KiwoomAX/korean-banned-words' \"\$BANSRC\""
-check "생성기가 있다"                  "[ -f '$HERE/scripts/gen_banned_words.py' ]"
-check "생성기가 그 파일을 낸다"        "grep -qF 'korean-banned-words-dc.md' '$HERE/scripts/gen_banned_words.py'"
-check "다시 만드는 수단을 워크플로가 든다" "grep -qF 'gen_banned_words.py' '$HERE/.github/workflows/banned-words-sync.yml'"
+check "받아오는 워크플로가 있다"       "[ -f '$HERE/.github/workflows/banned-words-sync.yml' ]"
+check "워크플로가 원본 dist 를 받는다" "grep -qF 'korean-banned-words/main/dist/korean-banned-words-dc.md' '$HERE/.github/workflows/banned-words-sync.yml'"
+check "이 저장소는 목록을 만들지 않는다" "[ ! -f '$HERE/scripts/gen_banned_words.py' ]"
 
 echo "[금지 표현] 살아 있는 문서에 남지 않는다"
 check "금지 목록을 생성물에서 도출했다" "[ -n \"\$BANLIST\" ]"
