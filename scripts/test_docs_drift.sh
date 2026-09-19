@@ -124,12 +124,29 @@ check "소유자 안에서 다시 정하지 않는다"      "grep -qF '여기서
 echo "[이름은 명사구, 주장은 첫 문장 — 정본과 가독성 렌즈]"
 CANON="$HERE/agent-principles.md"
 READ2="$HERE/skills/lens-readability/SKILL.md"
+# 문서 타입과 수명과 수정 규율은 정본에서 이 스킬로 옮겼다. 정본에는 포인터만 남는다.
+DOCS_SK="$HERE/skills/domain-docs/SKILL.md"
 # 상세는 domain-korean 이 소유하고 정본은 조항만 담는다. 양쪽을 함께 붙든다.
 WK="$HERE/skills/domain-korean/SKILL.md"
 check "상세 스킬이 있다"                     "[ -f \"$WK\" ]"
-check "상세가 이름 자리를 명사구로 정한다"   "grep -qF '이름을 붙이는 곳은 명사구로 쓰고 주장은 본문으로 내린다' \"$WK\""
-check "상세가 말끝 통일을 정한다"            "grep -qF '한 표·한 목록·한 다이어그램·한 차트 안에서는 말끝을 하나로 맞춘다' \"$WK\""
-check "상세가 넓은 말 대신 좁은 말을 시킨다" "grep -qF '넓은 말보다 좁은 말을 쓴다' \"$WK\""
+# 정본이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
+# 그 검사가 우리가 없애려던 중복을 오히려 요구했다. 이제 ID 로 잇고, 지시 문장이 스킬에 그대로
+# 있으면 실패한다.
+KO_IDS="$(awk '/^### `PLAIN-KO`/{f=1} f&&/^## /{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
+check "정본에서 한국어 조항 ID 를 뽑았다"    "[ -n \"\$KO_IDS\" ]"
+KO_MISS=""
+KO_DUP=""
+for kid in $KO_IDS; do
+  grep -qF "\`$kid\`" "$WK" || KO_MISS="$KO_MISS $kid"
+  ko_sent="$(grep -F "**\`$kid\`**" "$CANON" | sed 's/^.*\*\* — //')"
+  if [ -n "$ko_sent" ]; then
+    if grep -qF "$ko_sent" "$WK"; then KO_DUP="$KO_DUP $kid"; fi
+  fi
+done
+[ -n "$KO_MISS" ] && printf '    스킬에 근거가 없는 조항:%s\n' "$KO_MISS"
+[ -n "$KO_DUP" ] && printf '    스킬이 지시를 그대로 옮겨 적은 조항:%s\n' "$KO_DUP"
+check "스킬이 모든 조항 ID 로 근거를 단다"   "[ -z \"\$KO_MISS\" ]"
+check "스킬이 지시 문장을 다시 적지 않는다"  "[ -z \"\$KO_DUP\" ]"
 check "정본이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
 check "정본이 대상을 정확히 가리키게 한다"   "grep -qF '대상의 이름을 그대로 쓴다' \"\$CANON\""
 check "가독성 렌즈가 이름 형태를 본다"       "grep -qF '이름 형태' \"\$READ2\""
@@ -203,7 +220,7 @@ check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거�
 check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$DOCS\""
 check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'review-docs 가 소유' \"\$CALLER\""
 check "정본은 그 규칙을 더 안 적는다"        "! grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' \"\$CANON\""
-check "정본이 새 소유자를 가리킨다"          "grep -qF '기록 파일의 이름과 회차 표기는 \`review-docs\`가 소유한다' \"\$CANON\""
+check "문서 스킬이 새 소유자를 가리킨다"     "grep -qF '기록 파일의 이름과 회차 표기는 \`review-docs\`가 소유한다' \"\$DOCS_SK\""
 check "원본을 받는 즉시 저장한다"            "grep -qF '받는 즉시' \"\$CALLER\""
 check "원본을 같은 이름 폴더에 둔다"          "grep -qF '같은 이름의 폴더' \"\$CALLER\""
 check "런타임이 기록 제외 이유를 적는다"      "grep -qF '사용자 입력이 로그로' \"\$RUNTIME2\""
@@ -364,7 +381,8 @@ echo "[첫 문장] 소제목 아래 첫 줄이 산문이다"
 # 따라온다(SSOT). 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
 # 한글이 없는 제목은 건너뛴다. READ-FLOW 는 「한국어로 쓸 때」의 규칙이라 영어 절에는 안 걸린다.
 HF_WK="$HERE/skills/domain-korean/SKILL.md"
-HF_EXC="$(awk '/^### 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,3} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
+# 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
+HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
 check "첫 문장 예외를 정본에서 뽑았다" "[ -n \"\$HF_EXC\" ]"
 HF_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
 check "검사 대상 문서를 모았다(첫 문장)" "[ -n \"\$HF_DOCS\" ]"
@@ -388,10 +406,10 @@ done
 check "소제목 아래 첫 줄이 모두 산문이다" "[ -z \"\$HF_BAD\" ]"
 
 echo "[문서 타입 표] 강제하는 장치 칸이 실물을 가리킨다"
-# 표가 장치를 이름으로만 적으면 실물이 없어도 그 행은 갖춰진 것처럼 읽힌다. 칸을 정본에서 뽑아
-# 백틱 경로면 그 파일이 있는지 보고, 「없다」로 열리면 뒤에 이유가 붙었는지 본다. 둘 다 아니면
+# 표가 장치를 이름으로만 적으면 실물이 없어도 그 행은 갖춰진 것처럼 읽힌다. 칸을 표가 사는 곳에서
+# 뽑아 백틱 경로면 그 파일이 있는지 보고, 「없다」로 열리면 뒤에 이유가 붙었는지 본다. 둘 다 아니면
 # 실패한다 — 이름만 적고 넘어가는 길을 막는다(FAIL-LOUD). 행을 하나 더해도 저절로 따라온다.
-TYPE_CELLS="$(awk '/^### 문서 타입과 수명/{f=1;next} f&&/^## /{exit} f&&/^\| \*\*/{n=split($0,a,"|"); print a[n-1]}' "$CANON")"
+TYPE_CELLS="$(awk '/^## 문서 타입과 수명/{f=1;next} f&&/^## /{exit} f&&/^\| \*\*/{n=split($0,a,"|"); print a[n-1]}' "$DOCS_SK")"
 check "문서 타입 표에서 장치 칸을 뽑았다" "[ -n \"\$TYPE_CELLS\" ]"
 TYPE_BAD=""
 while IFS= read -r cell; do
@@ -687,7 +705,7 @@ check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
 # 검사가 새 자리를 따라가 버려 끊긴 것을 못 잡았다. 그래서 셋을 한 줄로 함께 붙든다.
 echo "[규칙 출처] 정본 → domain-korean → lens-readability 가 이어져 있다"
 RDB_L="$HERE/skills/lens-readability/SKILL.md"
-check "정본에 이름 자리 조항이 있다"     "grep -qF '이름을 붙이는 위치에만 명사구로 쓰고' \"$CANON\""
+check "정본에 이름 자리 조항이 있다"     "grep -qF '명사구로 쓰고, 주장은 본문 문장으로 내린다' \"$CANON\""
 check "정본이 상세 소유자를 가리킨다"    "grep -qF 'domain-korean' \"$CANON\""
 check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'domain-korean' \"$RDB_L\""
 check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'domain-korean'"
@@ -744,9 +762,9 @@ for f in "$HERE"/skills/*/SKILL.md; do
 done
 
 # --- 금지 표현: 살아 있는 문서에 남지 않는다 ---
-# 목록을 검사에 손으로 적지 않고 정본(agent-principles.md)의 「금지 표현」 표에서 도출한다. 그 표가
-# 목록의 소유자라 말을 더하면 이 검사가 함께 따라온다. 표를 스킬에서 정본으로 옮긴 이유는 스킬이
-# 열릴 때만 대화에 실려 답을 쓰는 동안 목록이 눈앞에 없었기 때문이다.
+# 목록을 검사에 손으로 적지 않고 korean-banned-words-dc.md 의 「금지 표현」 표에서 도출한다. 말을
+# 더하면 이 검사가 함께 따라온다. 표를 스킬이 아니라 상시 실리는 파일에 두는 이유는 스킬이 열릴
+# 때만 대화에 실려 답을 쓰는 동안 목록이 눈앞에 없었기 때문이다.
 #
 # 셋째 칸이 `문서와 답변` 인 행만 뽑는다. `답변` 인 행은 사용자에게 보내는 답에만 걸리고
 # hooks/doc_word_pretooluse.sh 가 검사한다. 그 말들은 이 저장소의 문서에 아직 남아 있으므로 여기서
@@ -767,13 +785,15 @@ done
 # 적고 사용자가 새 spec·plan 만 자동 검증하기로 정했으므로, 지난 설계 문서를 소급해 고치지 않는다.
 # 새것을 가르는 방법은 봉인(seal_reviews.sh)이 HEAD 로 기록을 가르는 것을 뒤집은 것이다. 커밋 전이면
 # 검사에 걸리고 커밋되면 과거가 된다. 이 저장소는 고친 뒤 검사를 돌리는 규약이라 그때가 커밋 전이다.
-WK="$HERE/agent-principles.md"
+# 표는 정본이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 이고
+# scripts/gen_banned_words.py 가 그것을 이 파일로 낸다.
+BANSRC="$HERE/korean-banned-words-dc.md"
 # 표의 행만 본다. 절의 설명 문단에도 백틱이 들어 있어, 절 전체에서 뽑으면 그 문단의 경로와 칸 이름이
 # 금지어로 둔갑한다(2026-09-06 에 실제로 세 건이 그렇게 잡혔다). 그리고 첫 칸에서만 뽑는다 —
 # 대체어 칸에 백틱이 생겨도 금지어로 새지 않게 한다.
-BANROWS="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/ && /문서와 답변/' "$WK" || true)"
+BANROWS="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/ && /문서와 답변/' "$BANSRC" || true)"
 BANLIST="$(printf '%s\n' "$BANROWS" | awk -F'|' '{print $2}' | grep -oE '`[^`]+`' | tr -d '`' || true)"
-BAN_LIVE="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^agent-principles.md$' | grep -v '^skills/domain-korean/SKILL.md$')"
+BAN_LIVE="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^agent-principles.md$' | grep -v '^korean-banned-words-dc.md$' | grep -v '^skills/domain-korean/SKILL.md$')"
 # 아직 HEAD 에 없는 spec·plan 만 고른다. HEAD 목록이 비면 grep -vxF 가 전부를 지우므로 나눠 다룬다.
 SP_ALL="$(cd "$HERE" && git ls-files 'docs/superpowers/specs/*.md' 'docs/superpowers/plans/*.md')"
 SP_OLD="$(cd "$HERE" && git ls-tree -r --name-only HEAD -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null | grep '\.md$' || true)"
@@ -783,15 +803,26 @@ else
   SP_NEW="$SP_ALL"
 fi
 BAN_DOCS="$(printf '%s\n%s\n' "$BAN_LIVE" "$SP_NEW" | grep -v '^$' || true)"
+echo "[금지 표현] 목록은 생성물이다"
+# 내용이 원본과 같은지는 네트워크가 필요해 여기서 못 본다. .github/workflows/banned-words-sync.yml
+# 이 하루 한 번 다시 만들어 diff 로 대조한다. 여기서는 손으로 고쳐도 되는 파일처럼 보이지
+# 않게 하는 표시와 만드는 수단이 실재하는지만 본다.
+check "목록 파일이 있다"               "[ -f \"\$BANSRC\" ]"
+check "목록이 생성물이라고 밝힌다"     "grep -qF '이 파일은 생성물이다' \"\$BANSRC\""
+check "목록이 원본 저장소를 가리킨다"  "grep -qF 'KiwoomAX/korean-banned-words' \"\$BANSRC\""
+check "생성기가 있다"                  "[ -f '$HERE/scripts/gen_banned_words.py' ]"
+check "생성기가 그 파일을 낸다"        "grep -qF 'korean-banned-words-dc.md' '$HERE/scripts/gen_banned_words.py'"
+check "다시 만드는 수단을 워크플로가 든다" "grep -qF 'gen_banned_words.py' '$HERE/.github/workflows/banned-words-sync.yml'"
+
 echo "[금지 표현] 살아 있는 문서에 남지 않는다"
-check "금지 목록을 정본에서 도출했다" "[ -n \"\$BANLIST\" ]"
+check "금지 목록을 생성물에서 도출했다" "[ -n \"\$BANLIST\" ]"
 check "검사 대상 문서를 모았다"       "[ -n \"\$BAN_DOCS\" ]"
 # 앵커가 실제로 잡히는지 먼저 본다 — 목록이나 대상이 비면 아래 단언이 모두 근거 없이 통과한다.
-BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '### 금지 표현' agent-principles.md || true)"
-check "정본에 금지 표현 절이 있다"     "[ -n \"\$BAN_SELFTEST\" ]"
+BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '### 금지 표현' korean-banned-words-dc.md || true)"
+check "생성물에 금지 표현 절이 있다"   "[ -n \"\$BAN_SELFTEST\" ]"
 # 답과 산출물에만 거는 행도 실제로 뽑히는지 본다. 이 행들이 사라지면 훅 둘이 검사할 말이
 # 없어지는데, 그 훅들은 조용히 통과하므로 소실을 알아챌 다른 신호가 없다.
-BANREPLY="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/' "$WK" | grep -F '| 답변과 산출물 |' || true)"
+BANREPLY="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/' "$BANSRC" | grep -F '| 답변과 산출물 |' || true)"
 check "답과 산출물에만 거는 행이 표에 있다" "[ -n \"\$BANREPLY\" ]"
 BANHIT=""
 while IFS= read -r w; do

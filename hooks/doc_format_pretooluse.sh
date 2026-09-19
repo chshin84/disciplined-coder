@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse(Write|Edit): 새 문서(.md, spec/plan 제외) 생성 감지 → 정본의 문서 규칙 제안(비블로킹).
+# PreToolUse(Write|Edit): 새 문서(.md, spec/plan 제외) 생성 감지 → domain-docs 의 타입·수명 판단 제안(비블로킹).
 # 경로는 _extract_path.sh가 추출(다중 경로 순회). 순수 bash.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
@@ -27,7 +27,7 @@ done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")
 EOF
 [ -n "$match" ] || exit 0
-msg="📝 새 문서 작성 — 쓰기 전에 정본의 '문서를 쓰고 관리할 때' 절에서 이 문서의 타입과 수명을 가리고, 결론을 앞에 두고 내용을 배치하라. README 라면 disciplined-coder domain-readme 를 함께 열어라."
+msg="📝 새 문서 작성 — 쓰기 전에 disciplined-coder domain-docs 에서 이 문서의 타입과 수명을 가리고, 결론을 앞에 두고 내용을 배치하라. README 라면 disciplined-coder domain-readme 를 함께 열어라."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

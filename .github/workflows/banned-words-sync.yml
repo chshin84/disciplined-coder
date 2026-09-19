@@ -1,0 +1,69 @@
+name: banned-words-sync
+
+# 금지 표현 목록의 원본은 KiwoomAX/korean-banned-words 의 JSON 하나다. 이 저장소는 그 데이터를
+# 복제하지 않고 생성물(korean-banned-words-dc.md)만 커밋한다. 원본이 바뀌면 이 워크플로가
+# 다시 만들어 PR 을 연다.
+#
+# 미는 쪽이 아니라 당기는 쪽으로 짠다. 원본 저장소가 이 저장소에 쓰려면 개인 토큰을 시크릿에
+# 넣어야 하는데, 여기서 당기면 Actions 가 기본으로 주는 권한으로 끝난다.
+#
+# 목록이 몇 달에 한 번 바뀌므로 하루 한 번으로 충분하고, 급하면 workflow_dispatch 로 바로 돌린다.
+
+on:
+  schedule:
+    - cron: '17 20 * * *'   # 매일 UTC 20:17 (한국 시간 다음 날 05:17)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      # 받아오기와 만들기를 한 번에 한다. 생성기가 인자 없이 돌면 원본을 직접 받아온다.
+      - name: 원본에서 다시 만든다
+        run: python scripts/gen_banned_words.py
+
+      - name: 바뀐 것이 있는지 본다
+        id: diff
+        run: |
+          if git diff --quiet -- korean-banned-words-dc.md; then
+            echo "changed=no" >> "$GITHUB_OUTPUT"
+            echo "원본과 같다 — 열 PR 이 없다"
+          else
+            echo "changed=yes" >> "$GITHUB_OUTPUT"
+            git --no-pager diff --stat -- korean-banned-words-dc.md
+          fi
+
+      # 생성물만 바뀌므로 테스트를 함께 돌린다. 목록이 늘면 저장소 문서가 그 말을 품고 있어
+      # 검사가 실패할 수 있고, 그것은 사람이 판단할 일이라 PR 에 실패를 붙여 보낸다.
+      - name: 계약 테스트
+        if: steps.diff.outputs.changed == 'yes'
+        continue-on-error: true
+        run: |
+          bad=""
+          for t in scripts/test_*.sh; do bash "$t" || bad="$bad $t"; done
+          [ -z "$bad" ] || echo "FAILED:$bad"
+
+      - name: PR 을 연다
+        if: steps.diff.outputs.changed == 'yes'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: banned-words-sync
+          title: '금지 표현 목록을 원본에 맞춘다'
+          commit-message: '금지 표현 생성물을 원본에 맞춰 다시 만든다'
+          body: |
+            `KiwoomAX/korean-banned-words` 의 데이터가 바뀌어 `korean-banned-words-dc.md` 를 다시 만들었다.
+
+            손으로 고치지 말고 목록을 바꿀 일이 있으면 원본 저장소를 고쳐라. 여기서 고치면 다음 실행에서 사라진다.
+
+            계약 테스트 결과를 함께 보라. 목록에 항목이 늘면 이 저장소의 살아 있는 문서가 그 말을 품고 있어 검사가 실패할 수 있고, 그때는 문서를 고칠지 그 항목을 원본에서 끌지 사람이 정해야 한다.
+          delete-branch: true

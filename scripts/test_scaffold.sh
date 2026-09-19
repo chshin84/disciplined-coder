@@ -31,6 +31,9 @@ echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
 check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/agent-principles.md' '$UC'"
 check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
+# 금지 표현 목록은 아무도 안 싣고 있을 때만 우리가 싣는다. 여기는 아무것도 없는 PC 라 싣는다.
+check "banlist: 아무도 안 실으면 우리가 싣는다" "grep -qxF '@disciplined-coder/korean-banned-words-dc.md' '$UC'"
+check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words-dc.md' ]"
 check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
 
 # 마켓플레이스 항목의 autoUpdate 값을 읽어 출력한다($1=파일 $2=항목 이름). 없으면 none을 찍는다.
@@ -150,6 +153,21 @@ echo "[user-content-preserved] preserve user content + no blank accumulation"
 check "personal note preserved"      "grep -qxF 'my personal global note' '$UC5'"
 check "one region after 3 runs"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC5') -eq 1 ]"
 check "blank lines bounded (<=1)"    "[ \$(grep -c '^\$' '$UC5') -le 1 ]"
+
+# --- banlist-yield: 다른 곳이 금지 표현 목록을 이미 실으면 우리는 안 싣는다 ---
+# 이 PC 에만 둘이 다 있는 상황이 실재한다. 두 벌이 실리면 같은 목록에 값을 두 번 치른다.
+# 파일은 그대로 놓아야 한다 — 산출물 검사 훅이 그 파일을 읽으므로 안 놓으면 검사가 꺼진다.
+H22="$(mktemp -d)"; P22="$(mktemp -d)"; mkdir -p "$H22/.claude"
+printf '# 내 설정\n\n@somewhere/korean-banned-words.md\n' > "$H22/.claude/CLAUDE.md"
+run "$H22" "$P22" >/dev/null
+UC22="$H22/.claude/CLAUDE.md"
+echo "[banlist-yield] 다른 곳이 이미 싣고 있으면 비킨다"
+check "우리 줄을 안 쓴다"            "! grep -qxF '@disciplined-coder/korean-banned-words-dc.md' '$UC22'"
+check "남의 줄은 그대로 둔다"        "grep -qxF '@somewhere/korean-banned-words.md' '$UC22'"
+check "정본 줄은 그대로 쓴다"        "grep -qxF '@disciplined-coder/agent-principles.md' '$UC22'"
+check "파일은 그래도 놓는다"          "[ -f '$H22/.claude/disciplined-coder/korean-banned-words-dc.md' ]"
+# 건너뛴 자리에 빈 줄이나 설명을 남기지 않는다. 블록은 정본 줄 하나뿐이어야 한다.
+check "블록에 군더더기가 안 남는다"  "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC22' | wc -l) -eq 3 ]"
 
 # --- crlf-region: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
@@ -440,8 +458,21 @@ check "canon: no roll-call in the code section"      "! grep -qF '\`FOCUSED\`와
 check "canon: old section name is gone everywhere"   "! grep -rqF '대화할 때' '$CANON' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/scripts/scaffold.sh'"
 # 조항 열다섯의 목록은 이 파일이 소유한다. 정본에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
 # 조항이 하나 떨어져도 그 결손을 정답으로 굳힌다.
-for id in FAIL-LOUD FOCUSED EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
+for id in FAIL-LOUD FOCUSED EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
   check "canon: clause $id present"                  "grep -qF '**\`$id\`' '$CANON'"
+done
+# 한국어 절은 두 층이다. 묶는 이름은 `###` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
+# 검사해야 이름만 남고 지시가 빠지거나 그 반대인 상태를 잡는다.
+for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK REVISE-ORDER; do
+  check "canon: korean group $g present"             "grep -qE '^### \`$g\`' '$CANON'"
+done
+for id in VOCAB-FREQ SPECIFIC-NAME SINO-KEEP LOANWORD-KEEP \
+          NO-MID-MOD NO-STACK-MOD KEEP-CONNECT ANTI-LIMIT COMMA-CUT \
+          FULL-SENTENCE LABEL-NOUN ONE-ENDING \
+          BOTTOM-LINE SECTION-HEAD LEXICAL-CHAIN BULLET-SCOPE ONE-IDEA \
+          TERM-EXPLAIN TERM-ONE ASK-CONTEXT NO-ANALOGY \
+          EDIT-PRIORITY REWRITE-NOT-ADD; do
+  check "canon: korean clause $id present"           "grep -qF '**\`$id\`' '$CANON'"
 done
 # 어제 카파시 절로 녹여 이름까지 뺀 다섯은 되살아나면 안 된다. 정본에서도 살아 있는 문서에서도 본다.
 for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD; do
@@ -489,7 +520,12 @@ check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$
 SR="$HERE/skills/review-specs/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
-check "canon: 선택지 질문 규칙"             "grep -qF -- 'Ask as a question with options, never in plain prose' '$CANON'"
+# 묻는 방식은 두 곳이 나눠 갖는다. 선택지로 물으라는 것은 카파시 절이, 선택지 앞에 배경을
+# 산문으로 두라는 것은 한국어 절의 `ASK-CONTEXT` 가 정한다. 예전에는 카파시 절이
+# `never in plain prose` 까지 적어 `ASK-CONTEXT` 와 부딪혔고, 그 조각만 걷었다.
+check "canon: 선택지 질문 규칙"             "grep -qF -- 'Ask as a question with options' '$CANON'"
+check "canon: 묻는 방식은 한국어 절이 갖는다" "grep -qF '**\`ASK-CONTEXT\`' '$CANON'"
+check "canon: 산문 금지 조각은 없다"         "! grep -qF -- 'never in plain prose' '$CANON'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
 check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'Think Before Acting'"
 

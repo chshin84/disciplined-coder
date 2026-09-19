@@ -4,7 +4,7 @@
 
 ## 설치
 
-스코프는 user여야 모든 프로젝트에서 hook이 실행된다. Windows는 [Git Bash](https://git-scm.com/downloads)를 먼저 설치한다. hook이 `bash`로 스크립트를 실행하기 때문이다. 마켓플레이스 자동 갱신에는 파이썬이 필요하다.
+스코프는 user여야 모든 프로젝트에서 hook이 실행된다. Windows는 [Git Bash](https://git-scm.com/downloads)와 [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows)을 먼저 설치한다. hook이 `bash`로 스크립트를 실행하고, 환경 변수를 넣는 단계가 `pwsh`를 부르기 때문이다. 윈도우에 기본으로 있는 5.1(`powershell`)로 물러서지 않는다. 마켓플레이스 자동 갱신에는 파이썬이 필요하다.
 
 ```text
 /plugin marketplace add chshin84/disciplined-coder
@@ -39,15 +39,13 @@ done
 
 ## 프로젝트 폴더에 생기는 파일
 
-새로 생기는 파일은 없다. 원칙은 `agent-principles.md` 한 곳에 둔다. 그 정본이 원칙과 Karpathy guidelines(산출물이면 무엇에나 거는 지침)와 한국어로 쓸 때와 문서를 쓰고 관리할 때와 코딩할 때의 규칙을 모두 갖는다. 절차와 산출물 한 종류에만 걸리는 규칙만 `skills/` 아래 스킬로 남는다. SessionStart hook이 원칙을 `~/.claude/disciplined-coder/`에 셋업하고, `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다.
+새로 생기는 파일은 없다. 원칙은 `agent-principles.md` 한 곳에 둔다. 그 정본이 원칙과 Karpathy guidelines(산출물이면 무엇에나 거는 지침)와 한국어로 쓸 때와 코딩할 때의 규칙을 갖는다. 절차와 산출물 한 종류에만 걸리는 규칙, 그리고 문서를 만지기 전에만 필요한 타입과 수명 판단은 `skills/` 아래 스킬로 둔다. SessionStart hook이 원칙을 `~/.claude/disciplined-coder/`에 셋업하고, `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다.
 
 이 플러그인이 프로젝트 파일을 고치는 예외는 하나이고 그 조건은 여기가 정한다. 그 레포 `CLAUDE.md`에 관리블록이 남아 있고 그 블록을 만든 기능이 없어졌으면, 사본을 전역 백업에 복사한 뒤 제거한다. 조건이 하나 더 붙는다. 그 파일이 전역 `~/.claude/CLAUDE.md`와 같은 파일이면 건드리지 않는다 — 그것은 이 훅이 매 세션 다시 만드는 정상 블록이다. 같은 파일인지는 경로 문자열 대신 `-ef`로 본다. 작업 폴더가 `~/.claude`이면 윈도우 형식 경로와 POSIX 형식 경로가 같은 파일을 가리키는데 문자열로 견주면 다른 파일로 보인다. 그때의 잠금 대기 시간은 `scripts/_managed_block.sh`의 상수가 정한다.
 
 ## 하드 게이트와 넛지와 전역 설정 수정
 
-세션에는 턴 종료를 막는 하드 게이트 하나와 차단 셋과 넛지 넷과 전역 설정 수정 하나가 걸리고, 세션 시작에 함께 쓰는 플러그인 설치 권유와 파이썬 인코딩 변수 설정 둘이 걸린다. 차단 셋은 읽기 전용 파일 수정과 스토어 안내판으로 풀리는 `python3` 호출과 금지 표현이 든 산출물 문서 쓰기다. 매 대화마다 도는 것은 하나도 없다. 답에 남은 금지 표현을 잡는 Stop 훅을 만들었다가 걷어냈는데, 실제 대화 기록으로 측정하니 답 하나에 1,021밀리초가 들었기 때문이다. 답은 정본의 표가 지시로 맡는다. 게이트와 넛지 다섯은 환경변수 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 다 꺼진다. 산출물 차단은 그 변수와 무관하고 `DISCIPLINED_CODER_REPLY_CHECK=off` 로 끈다 — 정본의 금지 표현 표를 고치다가 그 표가 검사 대상에 걸리는 일을 피하려고 리뷰 게이트와는 통로를 나눠 두었다. 나머지 차단 둘과 세션 시작의 그 둘도 그 변수와 무관하고, 규칙 넛지 표시를 지우는 세션 시작 훅도 그렇다. 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
-
-이 목록은 여기가 소유한다. 배선은 둘이다. `hooks/hooks.json`은 이 플러그인이 어디서나 거는 훅이고, `.claude/settings.json`은 이 저장소에서만 도는 프로젝트 훅이다. 걸린 것은 아래가 전부다.
+이 플러그인이 세션에 무엇을 걸고 무엇을 막는지가 여기 있다. 이 목록은 여기가 소유한다. 배선은 둘이다. `hooks/hooks.json`은 이 플러그인이 어디서나 거는 훅이고, `.claude/settings.json`은 이 저장소에서만 도는 프로젝트 훅이다. 걸린 것은 아래가 전부이고 매 대화마다 도는 것은 하나도 없다. 답에 남은 금지 표현을 잡는 Stop 훅을 만들었다가 걷어냈는데, 실제 대화 기록으로 측정하니 답 하나에 1,021밀리초가 들었기 때문이다.
 
 | 이벤트 | 스크립트 | 하는 일 |
 |---|---|---|
@@ -65,15 +63,30 @@ done
 
 봉인 시점은 둘이다. 커밋된 기록은 세션 시작에 `seal_reviews.sh` 가 봉인하고, 회차 기록은 회차 끝에 호출자가 같은 스크립트를 파일 인자와 함께 불러 봉인한다.
 
-- **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 종료를 막고 `review-specs` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 종료 차단이 해제된다. 차단은 턴에 한 번이다. 두 번째 종료 시도는 통과하므로 리뷰를 하지 않고도 턴을 끝낼 수 있다. 상세는 `skills/review-specs/SKILL.md`를 참고한다.
-- **산출물 차단** — 사용자가 요구한 산출물 문서를 쓰려 할 때 그 본문을 정본의 「금지 표현」 표와 대조하고, 걸린 말이 있으면 무엇을 무엇으로 고칠지와 함께 거부한다. 대상은 `.md` 이고 셋을 뺀다. 이 플러그인 저장소 자신의 문서(조상 폴더에 정본이 있는 파일)와 Claude 메모리(`/.claude/projects/` 아래)와 `docs/superpowers/` 아래다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 문서에 적어야 하면 백틱으로 감싼다. 발표자료와 워드 파일은 파이썬으로 만들어 이 훅에 안 걸리고 `lens-readability` 검진이 맡는다.
-- **읽기 전용 차단** — 읽기 전용 속성이 선 파일에 `Write`나 `Edit`을 하려 하면 거부하고 사유를 보인다. 어느 프로젝트의 어느 파일이든 속성만 보며, 이 레포의 감사 기록은 만든 직후 `scripts/seal_reviews.sh`가 그 속성을 세운다. 풀려면 속성을 풀면 된다.
-- **`python3` 차단** — 윈도우에서 `python3`이 스토어 안내판(`AppInstallerPythonRedirector.exe`)으로 풀릴 때만 그 Bash 명령을 거부하고 `python`이나 `py -3`을 쓰라고 알린다. 안내판은 `Python`이라는 낱말만 찍고 종료 코드 49로 끝나 성공처럼 보이므로, 스크립트가 통째로 안 돌아도 눈에 안 띈다. 이름을 보지 않고 링크를 따라간 실물의 이름을 본다. 경로에 `WindowsApps`가 들었는지로 가르지 않는 것은 스토어로 깐 진짜 파이썬도 거기 놓이기 때문이다. 맥과 리눅스에서는 걸리지 않는다. 환경 변수 `DISCIPLINED_CODER_PYTHON3_STATE`에 값을 넣으면 그 값이 판정을 대신한다. 시험이 상태를 주입하려고 둔 통로이고 `not-windows`를 넣으면 이 차단이 통째로 꺼진다.
-- **문서 넛지 셋** — 차단하지 않고 안내만 한다. spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 정본의 「문서를 쓰고 관리할 때」로 타입과 수명을 가리게 하며 README라면 `domain-readme`를 함께 가리키고, `.md`를 고치면 `review-docs`의 검진과 정본의 Surgical Changes를 권한다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
-- **규칙 넛지 하나** — 세션에서 파일을 처음 건드리려 하면 편집 전에 정본 사본의 절대경로와 `domain-korean`을 한 번 알린다. `Write`와 `Edit`뿐 아니라 `Bash`도 잡는다. 정본은 `@import`로 상시 실리지만 서브에이전트에는 실리지 않으므로, 이 넛지가 그 경로를 프롬프트에 직접 넣으라고 알린다. 이 레포 안에서 도는 워크플로는 그 사본 대신 이 레포의 정본을 넣는다 — 상세는 `skills/dispatching-lenses/SKILL.md`를 참고한다. 세션은 훅 입력의 `session_id`로 가르고 서브에이전트는 `agent_id`로 따로 세므로 각자 한 번씩 받는다. 그 표시는 임시 폴더에 두고 세션이 시작·재개·비워질 때 지운다.
-- **함께 쓰는 플러그인 설치 권유** — 매 세션, superpowers 가 이 PC에 있는지 보고 없으면 설치 명령으로 알린다. 대신 깔지는 않는다. 깔려 있으면 아무것도 나오지 않고, 안 깔기로 정했으면 `~/.claude/disciplined-coder/plugin-notice.skip` 에 그 이름을 한 줄 적으면 조용해진다. 카파시(Andrej Karpathy)의 `andrej-karpathy-skills` 는 이 목록에 없다. 정본의 「Karpathy guidelines」 절이 그 네 절을 코드에서 산출물로 일반화해 이미 담고 있어, 함께 깔면 비슷하지만 어긋나는 지침이 두 벌 실린다.
-- **파이썬 인코딩 변수 설정** — 매 세션, 이 PC가 윈도우이고 사용자 환경 변수 `PYTHONUTF8` 이 비어 있으면 값 `1` 을 넣고 넣었다고 알린다. 값이 `0` 이면 일부러 끈 것으로 보고 손대지 않으므로, 끄려면 그 변수를 `0` 으로 두면 된다. 넣은 값은 새로 여는 창부터 실린다.
-- **전역 설정 수정** — 첫 세션에 `~/.claude/settings.json`과 `~/.claude/plugins/known_marketplaces.json` 두 파일을 고친다. 이 마켓플레이스 항목에만 `autoUpdate: true`를 넣어 깃허브의 갱신이 자동으로 적용되게 한다. 키가 없을 때만 넣고, 사용자가 `false`로 둔 것은 그대로 두며, 사본(`.bak`)을 남기고 세션 시작 알림으로 고친 경로를 알린다. 지키는 규칙은 `skills/domain-plugin/SKILL.md`의 「사용자 설정 파일을 고칠 때 지킬 것」을 참고한다.
+### 막는 것 넷
+
+여기 넷만 실제로 작업을 막는다. 나머지는 알리기만 한다.
+
+- **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 막고 `review-specs` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 풀린다. 차단은 턴에 한 번이라 두 번째 종료 시도는 통과한다.
+- **산출물 차단** — 사용자가 요구한 산출물 `.md`에 「금지 표현」 목록의 말이 있으면 거부하고 무엇을 무엇으로 고칠지 보인다. 목록은 `korean-banned-words-dc.md`에 있고 손으로 고치지 않는 생성물이다. 셋은 대상에서 뺀다. 이 플러그인 저장소 자신의 문서와 Claude 메모리(`/.claude/projects/` 아래)와 `docs/superpowers/` 아래다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 적어야 하면 백틱으로 감싼다.
+- **읽기 전용 차단** — 읽기 전용 속성이 선 파일에 `Write`나 `Edit`을 하려 하면 거부하고 사유를 보인다. 어느 프로젝트의 어느 파일이든 속성만 본다. 풀려면 속성을 풀면 된다.
+- **`python3` 차단** — 윈도우에서 `python3`이 스토어 안내판(`AppInstallerPythonRedirector.exe`)으로 풀릴 때만 그 Bash 명령을 거부하고 `python`이나 `py -3`을 쓰라고 알린다. 맥과 리눅스에서는 걸리지 않는다.
+
+### 알리기만 하는 것 넷
+
+spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 `domain-docs`로 타입과 수명을 가리게 하며 README라면 `domain-readme`를 함께 가리키고, `.md`를 고치면 `review-docs`의 검진을 권한다. 그리고 세션에서 파일을 처음 건드리기 전에 정본 사본의 절대경로와 `domain-korean`을 한 번 알린다. 정본은 `@import`로 상시 실리지만 서브에이전트에는 안 실리기 때문이다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
+
+### 세션 시작에 하는 것 셋
+
+새 세션을 열 때마다 이 셋이 돈다. 모두 알리고 지나가며 되돌릴 수 있다.
+
+- 정본 사본과 `@import` 배선을 만들고 알린다. 다른 곳이 금지 표현 목록을 이미 싣고 있으면 그 줄은 건너뛴다.
+- superpowers 가 이 PC에 없으면 설치 명령으로 알린다. 대신 깔지는 않는다. `~/.claude/disciplined-coder/plugin-notice.skip` 에 이름을 한 줄 적으면 조용해진다. 카파시(Andrej Karpathy)의 `andrej-karpathy-skills` 는 이 목록에 없다. 정본의 「Karpathy guidelines」 절이 그 네 절을 코드에서 산출물로 일반화해 줄여 담고 있어, 함께 깔면 비슷하지만 어긋나는 지침이 두 벌 실린다.
+- 윈도우이고 사용자 환경 변수 `PYTHONUTF8` 이 비어 있으면 값 `1` 을 넣고 넣었다고 알린다. 값이 `0` 이면 일부러 끈 것으로 보고 손대지 않는다.
+
+### 끄는 법
+
+게이트와 넛지 다섯은 `DISCIPLINED_CODER_REVIEW_GATE=off` 하나로 다 꺼진다. 산출물 차단은 그 변수와 무관하고 `DISCIPLINED_CODER_REPLY_CHECK=off` 로 끈다 — 금지 표현 목록을 고치다가 그 목록이 검사 대상에 걸리는 일을 피하려고 통로를 나눠 두었다. 읽기 전용 차단과 `python3` 차단과 세션 시작의 셋은 어느 변수에도 안 걸린다. 그 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다. 전역 설정 수정은 남겨 둔 사본(`.bak`)으로 되돌릴 수 있다.
 
 ## 주의
 

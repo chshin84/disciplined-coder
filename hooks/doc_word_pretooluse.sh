@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# PreToolUse(Write|Edit): 사용자가 요구한 산출물 문서에 정본의 금지 표현이 들어가면 거부한다.
-# 같은 규칙이 답에도 걸리지만 답 쪽에는 검사하는 기계가 없다. 정본의 표가 지시로 맡는다.
+# PreToolUse(Write|Edit): 사용자가 요구한 산출물 문서에 금지 표현이 들어가면 거부한다.
+# 목록은 korean-banned-words-dc.md 가 담고 정본에는 포인터만 있다. 같은 규칙이 답에도 걸리지만
+# 답 쪽에는 검사하는 기계가 없어, 그 목록이 정본과 함께 실려 지시로만 걸린다.
 #
 # 무엇을 산출물로 보는가. `.md` 가운데 아래 셋에 안 드는 것 전부다. 사람이 요구해서 만드는 보고서,
 # 제안서, 인수인계, 다른 프로젝트의 README 가 여기 든다.
@@ -19,7 +20,7 @@ set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
 HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
 . "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프(SSOT) 공유
-. "$HOOKDIR/_banned_words.sh"   # 정본 표 파싱(SSOT) 공유
+. "$HOOKDIR/_banned_words.sh"   # 금지 표현 표 파싱(SSOT) 공유
 INPUT="$(cat)"
 
 FILE="$(printf '%s' "$INPUT" | bash "$HOOKDIR/_extract_path.sh" | head -n1)"
@@ -35,19 +36,21 @@ while [ -n "$_d" ] && [ "$_d" != "$_prev" ]; do
   _prev="$_d"; _d="${_d%/*}"
 done
 
-CANON="$HOOKDIR/../agent-principles.md"
-if [ ! -f "$CANON" ]; then
+# 표는 정본이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 하나이고
+# scripts/gen_banned_words.py 가 그것을 이 파일로 낸다. 정본에는 포인터만 남는다.
+BANSRC="$HOOKDIR/../korean-banned-words-dc.md"
+if [ ! -f "$BANSRC" ]; then
   # 검사 불능은 통과가 아니다. 막지는 않고 알린다 — 여기서 막으면 편집이 통째로 멈춘다(FAIL-LOUD).
-  printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: 정본을 찾지 못해 산출물의 금지 표현을 검사하지 못했다 — $CANON")"
+  printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: 금지 표현 목록을 찾지 못해 산출물을 검사하지 못했다 — $BANSRC")"
   exit 0
 fi
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 PAIRS="$WORK/pairs"; TOKS="$WORK/toks"; RAW="$WORK/raw"
-banned_parse "$CANON" "$PAIRS" "$TOKS"
+banned_parse "$BANSRC" "$PAIRS" "$TOKS"
 if [ ! -s "$TOKS" ]; then
-  printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: 정본의 「금지 표현」 표에서 검색할 글자를 하나도 못 뽑아 산출물을 검사하지 못했다 — $CANON")"
+  printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: 「금지 표현」 표에서 검색할 글자를 하나도 못 뽑아 산출물을 검사하지 못했다 — $BANSRC")"
   exit 0
 fi
 printf '%s' "$INPUT" > "$RAW"
@@ -96,7 +99,7 @@ for words, repl in rows:
 
 [ -n "$REPORT" ] || exit 0
 
-REASON="이 문서에 정본 「금지 표현」 표의 말이 들어 있다. 아래를 대체어로 고쳐 다시 써라. 코드 블록과 백틱 안은 검사하지 않았으므로 걸린 것은 모두 산문에 있고, 그 말 자체를 문서에 적어야 하면 백틱으로 감싸라.
+REASON="이 문서에 「금지 표현」 목록의 말이 들어 있다. 아래를 대체어로 고쳐 다시 써라. 코드 블록과 백틱 안은 검사하지 않았으므로 걸린 것은 모두 산문에 있고, 그 말 자체를 문서에 적어야 하면 백틱으로 감싸라.
 
 $REPORT
 

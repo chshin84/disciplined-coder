@@ -192,11 +192,12 @@ check "새 리뷰 기록 → 무출력"            "[ -z \"\$(fpre '$(J "$T/docs
 check "새 오답노트 색인 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems.md")')\" ]"
 check "새 오답노트 본문 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems/new-lesson.md")')\" ]"
 check "새 문서 넛지가 domain-readme 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'domain-readme'"
-# 넛지가 인용한 정본의 절이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로
-# 그 절 이름이 바뀌자 넛지가 없는 절을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD).
-NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*정본의 '\([^']*\)' 절.*/\1/p")"
-check "넛지가 인용한 절 이름 추출됨"       "[ -n \"\$NUDGE_SEC\" ]"
-check "그 절이 정본에 실재         "           "grep -qF \"## \$NUDGE_SEC\" '$HERE/agent-principles.md'"
+# 넛지가 가리킨 스킬이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로 가리키던 절
+# 이름이 바뀌자 넛지가 없는 곳을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD). 타입과 수명이
+# 정본에서 domain-docs 로 옮겨 가 가리키는 대상이 절에서 스킬로 바뀌었고, 이 검사도 따라 바뀐다.
+NUDGE_SK="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*disciplined-coder \([a-z][a-z-]*\) 에서.*/\1/p")"
+check "넛지가 가리킨 스킬 이름 추출됨"     "[ -n \"\$NUDGE_SK\" ]"
+check "그 스킬이 실재"                    "[ -f \"$HERE/skills/\$NUDGE_SK/SKILL.md\" ]"
 
 echo "[doc-review-post]"
 check "문서(.md) → 검진 넛지"            "drev '$(J "$T/existing.md")' | grep -q additionalContext"

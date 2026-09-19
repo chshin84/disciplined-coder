@@ -40,7 +40,10 @@ utf8_user_var_state() {
 # 넣는 곳을 여기 하나로 둔다. 같은 일을 커맨드에서도 하면 어느 쪽이 진짜인지 흐려진다.
 utf8_set_user_var() {
   if [ -n "${DISCIPLINED_CODER_UTF8_STATE:-}" ]; then return 0; fi
-  powershell -NoProfile -Command "[Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User')" >/dev/null 2>&1
+  # PowerShell 7(`pwsh`)을 전제로 한다. 윈도우에 늘 있는 5.1(`powershell`)로 물러서지 않는다.
+  # 없으면 아래 WARNING 이 뜨고 사용자가 직접 넣는다 — 조용히 5.1 로 내려가면 이 플러그인이
+  # 무엇을 전제로 도는지가 PC 마다 갈린다(FAIL-LOUD).
+  pwsh -NoProfile -Command "[Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User')" >/dev/null 2>&1
 }
 
 # 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
@@ -100,12 +103,26 @@ fi
 # 이중 주입이 조용히 되살아난다(이 레포는 CRLF를 실재 문제로 이미 다룬다).
 had_import=0
 if [ -f "$UC" ] && grep -qF '@disciplined-coder/agent-principles.md' "$UC"; then had_import=1; fi
+
+# 같은 금지 표현 목록이 두 번 실리지 않게 한다. 다른 배포처가 이미 목록을 @import 로 싣고 있으면
+# 우리 줄을 건너뛴다. 어느 쪽 목록인지는 중요하지 않다 — 둘 다 같은 JSON 에서 나온다. 남의 줄이
+# 없어지면 다음 세션에 우리 줄이 저절로 돌아오므로 목록이 빠진 채로 남는 상태가 안 생긴다.
+# 파일은 그대로 복사하므로 산출물 검사 훅은 영향이 없다.
+# 가르는 기준을 배포처 이름이 아니라 파일 이름 관례로 둔다 — 이 플러그인이 남의 배포처 이름을
+# 알 이유가 없고, 사외 사용자 PC 에는 그런 줄이 아예 없어 이 갈래가 걸리지 않는다.
+BAN_IMPORT='@disciplined-coder/korean-banned-words-dc.md'
+ban_skipped=0
+if [ -f "$UC" ] && grep -E '^@[^[:space:]]*korean-banned-words' "$UC" | grep -vqF "$BAN_IMPORT"; then
+  ban_skipped=1
+fi
 # 잠금을 못 잡으면 배선을 안 쓰고 물러난다. 그 사실을 여기서 알린다 — 정본 파일은 깔렸는데
 # @import만 빠지면 세션은 원칙 없이 도는데 파일이 다 있어 아무도 눈치채지 못한다(`FAIL-LOUD`).
 inject_rc=0
-managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" <<'EOF' || inject_rc=$?
-@disciplined-coder/agent-principles.md
-EOF
+# 줄 수가 조건에 따라 갈리므로 heredoc 대신 만들어서 넘긴다. 건너뛸 때 빈 줄이 블록에 남지 않는다.
+{
+  printf '%s\n' '@disciplined-coder/agent-principles.md'
+  if [ "$ban_skipped" -eq 0 ]; then printf '%s\n' "$BAN_IMPORT"; fi
+} | managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" || inject_rc=$?
 if [ "$inject_rc" -ne 0 ]; then
   echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라."
 fi
@@ -116,6 +133,9 @@ fi
 if [ "$had_import" -eq 0 ]; then
   for f in $SCAFFOLD_FILES; do
     [ -f "$KDIR/$f" ] || continue
+    # 안 싣기로 한 목록은 이 보강에서도 뺀다. 여기서 흘리면 첫 세션에만 두 벌이 실린다.
+    # `&&` 로 이으면 앞 조건이 거짓일 때 반환값이 1 이라 set -e 가 스캐폴드를 죽인다.
+    if [ "$ban_skipped" -eq 1 ] && [ "$f" = "korean-banned-words-dc.md" ]; then continue; fi
     # 읽기가 거부돼도 훅 전체를 죽이지 않는다. set -e 아래에서 cat 실패는 스캐폴드를 그 자리에서
     # 끝내 @import 배선까지 못 하게 만든다. 대신 못 읽었다는 사실을 stderr로 드러낸다(FAIL-LOUD).
     if ! cat "$KDIR/$f" 2>/dev/null; then
@@ -189,7 +209,7 @@ if [ "$(utf8_user_var_state)" = "unset" ]; then
   if utf8_set_user_var; then
     echo "🔵 disciplined-coder: 윈도우 사용자 환경 변수 PYTHONUTF8=1 을 넣었다(파이썬 한국어 깨짐 방지). 새로 여는 터미널부터 걸린다. 끄려면 그 변수를 0 으로 두면 다시 넣지 않는다."
   else
-    echo "[disciplined-coder] WARNING: PYTHONUTF8 을 넣지 못했다. 직접 넣으려면 powershell 로 [Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User') 를 실행한다."
+    echo "[disciplined-coder] WARNING: PYTHONUTF8 을 넣지 못했다. PowerShell 7(pwsh)이 깔려 있는지 보고, 직접 넣으려면 pwsh 로 [Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User') 를 실행한다."
   fi
 fi
 
