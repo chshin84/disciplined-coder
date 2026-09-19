@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# 공유 헬퍼: 정본의 「금지 표현」 표를 한 번 읽어 두 파일로 낸다.
+# 공유 헬퍼: 「금지 표현」 표를 한 번 읽어 두 파일로 낸다. 그 표는 정본이 아니라
+# korean-banned-words-dc.md 에 있고, 그 파일은 외부 저장소의 JSON 에서 만들어 낸 생성물이다.
 # 소비자는 hooks/doc_word_pretooluse.sh 다. 답을 검사하던 훅이 값 때문에 걷혀 지금은 하나이고,
 # 표를 읽는 자리를 늘리지 않으려고 파싱은 계속 여기 한 벌만 둔다(SSOT).
 #
@@ -18,7 +19,7 @@ BANNED_TABLE_HEAD='### 금지 표현'
 # 로케일을 C 로 둔다. 가르는 글자가 세로줄과 백틱뿐인데 둘 다 아스키이고, UTF-8 이어보기 바이트는
 # 0x80 이상이라 한국어 안에 그 두 글자가 나타날 수 없다. 그래서 바이트로 갈라도 결과가 같다.
 # C.UTF-8 로 두었을 때 이 awk 한 번이 213밀리초였고 C 로 바꾸니 크게 줄었다.
-banned_parse() {  # $1=정본 경로, $2=pairs 낼 곳, $3=tokens 낼 곳
+banned_parse() {  # $1=표가 든 파일 경로, $2=pairs 낼 곳, $3=tokens 낼 곳
   LC_ALL=C awk -v h="$BANNED_TABLE_HEAD" -v pairs="$2" -v toks="$3" '
     index($0, h) == 1 { f = 1; next }
     f && /^#/ { exit }

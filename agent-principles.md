@@ -1,6 +1,6 @@
 # 디시플린 (팀 원칙)
 
-쉽게 말하되 근거와 과정은 감추지 않는다. 대화 스타일에서 전역 지침과 부딪히면 팀 원칙을 따른다. 원칙 사이에는 우열도 순서도 없다. 상황에 걸리는 것을 모두 적용한다.
+익숙한 말로 쓰되 근거와 과정은 감추지 않는다. 대화 스타일에서 전역 지침과 부딪히면 팀 원칙을 따른다. 원칙 사이에는 우열도 순서도 없다. 상황에 걸리는 것을 모두 적용한다.
 
 이 문서는 원칙과 Karpathy guidelines 를 먼저 정의한다. Karpathy guidelines 는 산출물이면 코드든 문서든 답이든 다 걸린다. 그다음 한국어로 쓸 때와 문서를 쓰고 관리할 때와 코딩할 때로 나누어 그 갈래에만 걸리는 것을 적는다. 한 원칙을 두 번 적지 않는다.
 
@@ -19,17 +19,19 @@
 
 ## Karpathy guidelines
 
-From `andrej-karpathy-skills` 1.0.0, generalized from code to any artifact you produce — an answer, a document, or code.
+Condensed from `andrej-karpathy-skills` 1.0.0 — the wording is not upstream's, and it is
+generalized from code to any artifact you produce: an answer, a document, or code.
 
 **Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
 ### Think Before Acting
 
-Before implementing, writing, or deciding:
 - Don't assume the current state. Measure it in the actual code, data, and environment.
-- State your assumptions explicitly, and surface the tradeoffs rather than hiding them.
-- When measuring doesn't settle it, when something is unclear, or when several interpretations fit — stop, name what is unresolved, and ask. Ask as a question with options, never in plain prose. Never pick silently.
-- If a simpler approach exists, say so. Push back when warranted. Don't launch a fleet of subagents for what one call can do.
+- State your assumptions explicitly rather than hiding them.
+- When measuring doesn't settle it, or several readings fit, stop and name what is
+  unresolved. Ask as a question with options; never pick silently. How to shape that
+  question — the background in prose before the options — is `UNPACK`'s to say.
+- Don't launch a fleet of subagents for what one call can do.
 
 ### Simplicity First
 
@@ -37,128 +39,97 @@ Before implementing, writing, or deciding:
 - No abstraction for a single use.
 - No flexibility or configurability that was not requested.
 - No handling for situations that cannot occur.
-- If you produced 200 lines and 50 would do, produce it again. Would an experienced colleague call this overbuilt? Then simplify.
+- If 50 lines would do, don't ship 200. Would an experienced colleague call this
+  overbuilt? Then simplify.
 
 ### Surgical Changes
 
 Every changed line must trace directly to the request.
 
-When changing something that already works:
-- Don't improve adjacent material, wording, or formatting.
-- Don't rework what is not broken.
-- Match the existing style, even if you would do it differently.
-- If you notice unrelated dead material, say so — don't delete it.
-
-When your change leaves orphans:
-- Remove what your own change made unused.
-- Don't remove what was already unused.
+- Don't improve adjacent material, wording, or formatting, and don't rework what is not
+  broken. Match the existing style, even if you would do it differently.
+- Notice unrelated dead material? Say so — don't delete it.
+- Remove what your own change made unused. Don't remove what was already unused.
 
 ### Goal-Driven Execution
 
-Turn the task into something you can check:
-- "Add validation" → "Write the failing cases first, then make them pass"
-- "Fix the bug" → "Reproduce it, then make the reproduction pass"
-- For multi-step work, state the plan as numbered steps, each with the check that verifies it.
-- Strong criteria let you loop on your own. Weak criteria ("make it work") need constant clarification.
+Turn the task into something you can check. "Fix the bug" becomes "reproduce it, then make
+the reproduction pass".
+For multi-step work, state the plan as numbered steps, each with the check that verifies it.
+Weak criteria ("make it work") need constant clarification;
+strong criteria let you loop on your own.
 
 ## 한국어로 쓸 때
 
-아래 다섯이 한국어 문장을 어떻게 쓰는지 정하고, 각 조항의 상세와 그것이 어느 측정에서 나왔는지는 `domain-korean`이 소유한다.
+한국어 지시는 여기가 소유한다. 각 항목이 어느 측정과 어느 지적에서 나왔는지는 `domain-korean`이
+소유하고, 그 스킬은 지시를 다시 적지 않고 아래 ID로 가리킨다. 같은 문장이 양쪽에 있으면
+검사가 막는다.
 
-- **`PLAIN-KO` (Plain language)** — 읽는 사람이 이미 그 뜻으로 아는 낱말을 고른다. 쉬움을 정하는 것은 빈도이고 어종이 아니다. 뜻이 좁은 말을 고르고, 한자어를 고유어로 바꾸지 않는다. 기본 사용역은 문어다. 영어 표현을 직역하지 않는다. 다의어로 바꾸지 않는다. 짧게 만드느라 이어주는 말을 지우지 않는다.
-- **`KO-SYNTAX` (Korean syntax)** — 관형절을 문장 가운데 끼우지 않는다. 명사 앞에 수식을 쌓지 않는다. 비슷한 명사구를 한 문장에 겹치지 않는다. 길이는 기준이 아니다.
-- **`PROSE-FORM` (Complete sentences)** — 완결된 문어체로 쓴다. 명사만 늘어놓거나, 기호로 문장을 대신하거나, 말끝을 흐리거나, 개조식으로 쓰지 않는다. 제목과 표 머리처럼 이름을 붙이는 위치에만 명사구로 쓰고, 주장은 본문 문장으로 내린다. 한 표와 한 목록 안에서는 말끝을 하나로 맞춘다.
-- **`READ-FLOW` (Bottom line up front)** — 결론을 먼저 말하고 근거는 뒤에 둔다. 소제목 바로 아래 첫 문장에 그 절의 결론을 적는다. 한 개념에는 한 용어만 쓰고 앞 문장의 말을 그대로 다시 쓴다. 전문 용어는 답마다 처음 나올 때 한 줄로 풀어 준다. 불릿은 같은 종류를 늘어놓을 때만 쓰고 논증과 인과는 산문으로 쓴다. 짧은 답보다 읽기에 편안한 답을 고른다.
-- **`UNPACK` (Unpack before handing over)** — 한글로 썼다고 한국어가 아니다. 내 작업 맥락에서만 통하는 압축을 사용자에게 그대로 넘기지 않는다. 저장소와 스킬 안에서만 통하는 이름은 그 답 안에서 처음 나올 때 한 줄로 풀고, 결정을 청할 때는 선택지 앞에 배경과 근거를 산문으로 먼저 적는다. 지어낸 비유로 정확한 이름을 대신하지 않는다. 같은 대상을 답마다 다른 말로 부르지 않는다. 압축한 채로 넘긴 것은 받는 사람이 다시 풀 수 없다.
+거는 곳은 글의 종류가 정한다. 남에게 남는 산출물에는 아래를 예외 없이 걸고, 대화 답에는
+문어체를 지키되 길이까지 맞추려 들지 않는다.
 
-문장을 쓸 때 지키는 것이 다섯 더 있다. '것'의 대체는 대상을 가리키는 '것'을 실제 이름으로 바꾸는 것이다. 좁은 말은 무엇이든 가리킬 수 있는 넓은 말 대신 대상의 이름을 그대로 쓴다. 결과 서술은 무엇이 어떻게 되는지까지 적는 것이다. 대구 제한은 `A가 아니라 B`를 글 한 편에 한 번까지 쓰는 것이다. 쉼표 절제는 연결어미 뒤 쉼표를 줄이는 것이다. 여섯째인 구조 먼저는 아래 문단이 담는다.
+### `PLAIN-KO` — 낱말을 고른다
 
-같은 글에서 여럿이 걸리면 분량을 줄이는 것을 먼저 하고 낱말을 바꾸는 것은 마지막에 한다. 설명이 모자라 보인다고 덧붙이지 말고 같은 글을 한 번 더 고친다.
+무슨 말을 쓸지 고를 때 걸린다.
+
+- **`VOCAB-FREQ`** — 읽는 사람이 이미 그 뜻으로 아는 낱말을 고른다. 익숙함을 정하는 것은 빈도이고 어종이 아니다.
+- **`SPECIFIC-NAME`** — 무엇이든 가리킬 수 있는 넓은 말 대신 가리키는 대상의 이름을 그대로 쓴다. 대상을 가리키는 '것'도 그 이름으로 바꾸고, 결과는 무엇이 어떻게 되는지까지 적는다.
+- **`SINO-KEEP`** — 한자어를 고유어로 바꾸지 않는다. 기본 사용역은 문어다.
+- **`LOANWORD-KEEP`** — 통용되는 외래어와 영어 용어를 억지로 우리말로 옮기지 않는다. 하네스·런타임·커밋처럼 그 분야에서 쓰는 말은 그대로 쓴다.
+
+### `KO-SYNTAX` — 문장을 짓는다
+
+한 문장을 어떻게 짜는지 정한다.
+
+- **`NO-MID-MOD`** — 관형절을 문장 가운데 끼우지 않는다.
+- **`NO-STACK-MOD`** — 명사 앞에 수식을 쌓지 않는다.
+- **`KEEP-CONNECT`** — 짧게 만드느라 이어주는 말을 지우지 않는다. 길이는 목표가 아니다.
+- **`ANTI-LIMIT`** — `A가 아니라 B` 대구는 글 한 편에 한 번까지 쓴다.
+- **`COMMA-CUT`** — 연결어미 뒤 쉼표를 줄인다.
+
+### `PROSE-FORM` — 문장으로 끝낸다
+
+문장을 어떻게 끝내고 무엇을 명사구로 둘지 정한다.
+
+- **`FULL-SENTENCE`** — 명사 조각이나 기호로 문장을 대신하지 않고 말끝을 흐리지 않는다. 표를 쓰더라도 셀은 알아볼 수 있는 문장이나 구로 채운다.
+- **`LABEL-NOUN`** — 제목과 소제목과 불릿 라벨과 표 머리와 차트의 축과 범례는 명사구로 쓰고, 주장은 본문 문장으로 내린다.
+- **`ONE-ENDING`** — 한 표와 한 목록과 한 다이어그램과 한 차트 안에서 같은 구실을 하는 요소끼리 말끝을 하나로 맞춘다.
+
+### `READ-FLOW` — 읽는 흐름
+
+글 전체에서 무엇을 어디에 놓을지 정한다.
+
+- **`BOTTOM-LINE`** — 결론을 먼저 말하고 근거는 뒤에 둔다.
+- **`SECTION-HEAD`** — 긴 답은 소제목으로 끊고 소제목 바로 아래 첫 문장에 그 절의 결론을 적는다.
+- **`LEXICAL-CHAIN`** — 앞 문장에 나온 말을 다음 문장에서 그대로 다시 쓴다.
+- **`BULLET-SCOPE`** — 불릿은 같은 종류를 늘어놓을 때만 쓰고, 한 항목이 여러 문장이 되면 산문으로 쓴다.
+- **`ONE-IDEA`** — 한 문장에 한 개념을 담고 단락은 짧게 끊는다.
+
+### `UNPACK` — 풀어서 건넨다
+
+내 맥락을 사용자에게 넘기기 전에 무엇을 풀지 정한다.
+
+- **`TERM-EXPLAIN`** — 저장소 안에서만 통하는 이름과 그 분야의 용어는 답마다 처음 나올 때 한 줄로 푼다.
+- **`TERM-ONE`** — 한 개념에는 한 용어만 쓰고, 답이 바뀌어도 같은 대상을 같은 이름으로 부른다.
+- **`ASK-CONTEXT`** — 결정을 청할 때 무엇을 왜 정해야 하는지를 산문으로 먼저 적고 그다음에 묻는다.
+- **`NO-ANALOGY`** — 지어낸 비유로 정확한 이름을 대신하지 않는다.
+
+### `REVISE-ORDER` — 고칠 순서
+
+여럿이 걸릴 때 무엇부터 손볼지 정한다.
+
+- **`EDIT-PRIORITY`** — 여럿이 걸리면 분량을 먼저 줄이고 문장 구조를 그다음에 손보며 낱말은 마지막에 바꾼다.
+- **`REWRITE-NOT-ADD`** — 설명이 모자라 보여도 덧붙이지 말고 같은 글을 한 번 더 고친다.
 
 ### 금지 표현
 
-쓰지 않는 말의 목록은 이 표가 소유한다. 사람의 판단에 맡기지 말고 문자열 검색으로 거른 뒤 내보낸다. 각 항목이 어느 지적에서 나왔는지는 `domain-korean`이 소유한다. 목록이 여기 있는 이유는 스킬이 열릴 때만 실리기 때문이다. 검색할 목록이 눈앞에 없으면 검색하라는 지시를 실행할 수 없다.
+쓰지 않는 말의 목록은 `korean-banned-words-dc.md`가 담고 이 문서와 함께 매 세션 실린다. 사람의 판단에 맡기지 말고 그 목록을 문자열로 검색해 거른 뒤 내보낸다. 그 파일은 생성물이라 손으로 고치지 않는다. 원본은 KiwoomAX/korean-banned-words 이고 항목마다의 근거도 거기가 소유한다.
 
-첫째 칸의 백틱 안이 검색할 글자 그대로다. 셋째 칸이 거는 곳을 정하고 값은 둘이다.
-
-`답변과 산출물`은 사용자에게 보내는 답과 사용자가 요구한 산출물 문서에 걸린다. 보고서·제안서·인수인계·다른 프로젝트의 README가 산출물이다. 산출물은 `hooks/doc_word_pretooluse.sh`가 검사한다. 이 플러그인 저장소 자신의 문서와 Claude 메모리와 `docs/superpowers/` 아래는 대상이 아니다. 저장소 자신의 문서를 다시 쓰지 않기로 사용자가 정했고, 나머지 둘은 사람이 요구한 산출물이 아니다.
-
-답에는 검사하는 기계가 없고 이 표가 지시로만 걸린다. 답을 마칠 때마다 도는 훅을 만들어 실제 대화 기록으로 측정했더니 한 번에 1,021밀리초였고, 사용자가 그 값을 치르지 않기로 정했다. 대신 이 표를 정본에 두어 답을 쓰는 동안 눈앞에 있게 했다. 지시만으로 듣는지는 측정했다. 규칙에 이름이 적힌 단어는 스무 표본에서 0건이고 규칙이 없던 열다섯 표본에서 5건이었다. 그 측정은 `domain-korean`이 담는다.
-
-`문서와 답변`은 거기에 이 저장소의 살아 있는 문서까지 더한 것이고 `scripts/test_docs_drift.sh`가 그 문서를 검사한다.
-
-발표자료와 워드 파일은 이 훅 둘에 안 걸린다. 파이썬으로 만들므로 훅에 들어오는 것이 파이썬 코드이고 슬라이드 문안은 거기 없다. 그 문안은 `lens-readability`가 검진할 때 걸린다.
-
-| 쓰지 않는 말 | 대신 쓰는 말 | 거는 곳 |
-|---|---|---|
-| `잰다` · `재는` · `재지` | 측정한다 · 확인한다 · 센다 | 문서와 답변 |
-| `자리` | 가리키는 대상의 이름 | 문서와 답변 |
-| `부분` · `영역` | 가리키는 대상의 이름 | 문서와 답변 |
-| `경우` | 가리키는 조건 | 문서와 답변 |
-| `붉어진` | 실패한 | 문서와 답변 |
-| `헛돈다` | 무의미해진다 | 문서와 답변 |
-| `걸음` | 단계 | 답변과 산출물 |
-| `뿌리` | 원인 · 근본 원인 | 답변과 산출물 |
-| `꼴` | 형태 · 형식 | 답변과 산출물 |
-| `갈래` | 종류 · 분기 | 답변과 산출물 |
-| `회차` · `째 판` · `이번 판` | 무엇의 몇 번째인지를 이름과 함께 | 답변과 산출물 |
-| `낱말` | 단어 | 답변과 산출물 |
-| `품이 든` | 수고가 든다 · 손이 더 간다 | 답변과 산출물 |
-| `짚` | 지적한다 · 가리킨다 | 답변과 산출물 |
-| `훑` | 살펴본다 · 검토한다 | 답변과 산출물 |
-| `맞대` · `맞댄` | 대조한다 | 답변과 산출물 |
+산출물 문서는 `hooks/doc_word_pretooluse.sh`가 검사해 거부하지만, 답에는 검사하는 기계가 없어 그 목록이 지시로만 걸린다. 어느 훅이 무엇을 검사하고 무엇이 대상에서 빠지는지는 README가 담는다.
 
 ## 문서를 쓰고 관리할 때
 
-문서는 타입에 따라 수명과 수정 규율이 다르므로 만지기 전에 타입부터 가른다. spec과 plan을 쓰는 방법은 superpowers가 소유하므로 여기서 다루지 않고, 아래 표에는 그 둘의 수명과 표시 규칙만 담는다.
-
-문서를 하나 만지려 할 때 다섯을 차례로 가른다. 무슨 타입인지 아래 표에서 가리고, 상태를 담는지 보고, 핸드오프면 담긴 것을 영속처에 옮긴 뒤 지우고, 도출로 대체할 수 있으면 진실인 코드와 인프라를 가리키고, 이 타입의 드리프트 가드가 없으면 추가하라고 권한다.
-
-- **관리 블록 패턴** — 자동 생성 구간은 BEGIN/END 마커로 감싸 멱등 재생성한다. 사용자 콘텐츠는 그 바깥에 둔다.
-- **문서를 두는 곳** — 항상 필요한 것은 `CLAUDE.md`에 두고 `@import`로 싣는다. 필요할 때만 여는 것은 스킬로 만들고, 특정 경로에서만 걸리는 것은 rules에 둔다.
-- **모호한 표현의 구체화** — 모호한 표현은 무엇이·언제·얼마나·어떤 결과인지로 바꾼다. "느리다"로 적지 말고 "로딩 12초"로 적는다.
-- **팩트와 근거** — 의견과 사실을 구분하고, 확인 안 된 것은 단정하지 말고 가능성으로 표시하며, 주장에는 확인 가능한 근거를 붙인다.
-
-### 문서 타입과 수명
-
-낡는 것을 막는 길은 한 규칙으로 정해지지 않고 타입마다 다르다. 세로로 읽으면 절반이 "상태를 담지 마라, 지워라, 도출하라"로 모인다.
-
-| 타입 | 담는 것 | 수명 | 낡는 것을 막는 방법 | 강제하는 장치 |
-|---|---|---|---|---|
-| **상태** (roadmap) | 진행 상태와 다음 단계 | 계속 살아 있고 집은 하나뿐이다 | 가능하면 도출하고, 못 하면 한 곳에만 적고 나머지는 링크한다 | 없다. 무엇과 맞댈지는 그 프로젝트의 코드와 인프라가 정하므로 여기서 못 정한다 |
-| **절차·계약** (operations·setup·contract) | 수행 방법과 스키마 계약 | 계속 살아 있다 | 상태를 적지 않고 방법만 적는다 | 문서와 코드를 맞대는 테스트가 있다 `scripts/test_docs_drift.sh` |
-| **설계** (spec·plan) | 설계 근거 | 계속 살아 있다. 배포된 뒤에도 지우지 않는다. 과거 것은 보존 목적이며 활용하지 않는다 | 상태를 적지 않고 대체된 문서에는 superseded를 표시한다 | 대체된 문서의 superseded 표시를 검사한다 `scripts/test_docs_drift.sh` |
-| **기록** (reviews) | 렌즈 회차의 관찰과 지적 | 계속 남는다. 찍은 뒤 고치지도 지우지도 않는다 | 처분과 상태를 안 적으니 낡을 것이 없다. 처분은 회차 사이 대조로 그때그때 도출한다 | 있는 기록의 수정을 거부하는 훅 `hooks/readonly_pretooluse.sh` 와 지운 기록을 잡는 검사 `scripts/test_docs_drift.sh` |
-| **핸드오프** (HANDOFF-*) | 1회성 인계 | 소비되면 곧바로 지운다 | 즉시 삭제한다 | 세션 시작에 잔존을 세어 알린다 `scripts/scaffold.sh` |
-| **맥락** (Claude 메모리) | 세션 간 결정과 맥락 | 계속 살아 있고 이 PC에만 있다 | 코드와 어긋나면 코드를 따른다 | 없다. 메모리가 git 밖이라 검사가 닿지 않는다 |
-| **규범·인덱스** (CLAUDE.md·문서 맵) | 문서의 위치와 작업 방법 | 계속 살아 있다 | 포인터와 규칙만 적고 상태는 적지 않는다 | 없다. 포인터만 두므로 낡을 상태가 없다 |
-
-강제하는 장치 칸의 경로는 이 저장소의 것이다. 사본이 실린 다른 프로젝트에서는 그 프로젝트가 같은 구실을 하는 장치를 갖는지 보고, 없으면 없다고 적는다.
-
-기록은 "지워라"의 예외다. 앞선 회차의 기록이 없으면 지적이 0건이었던 회차와 검증을 안 돌린 회차가 구별되지 않는다.
-
-기록 파일의 이름과 회차 표기는 `review-docs`가 소유한다.
-
-### 수정 규율
-
-문서가 어떻게 바뀌어도 되는지로 한 번 더 가른다. 문서가 자기 수정 규율을 선언하면 그 선언이 곧 기계 강제의 계약이 된다(`EXPLICIT`).
-
-| 수정 규율 | 방법 | 유지 의무 | 실패 모드 | 기계 강제 |
-|---|---|---|---|---|
-| append-only | 추가만 하고 과거는 고치지 않는다 | 없다 | 쌓여서 비대해진다 | 이전 줄을 고치거나 지우면 거부한다 |
-| generated | 진실에서 다시 만들고 손대지 않는다 | 없다 | 생성기에 버그가 있으면 통째로 틀어진다 | 다시 만들어 diff로 대조한다 |
-| living | 있는 파일을 손으로 고친다 | 있다 | 드리프트가 생기고 거짓양성이 난다 | 상태를 적지 말고 방법만 적게 하거나 문서와 코드를 맞대는 가드를 둔다 |
-| ephemeral | 한 번 쓰고 지운다 | 지울 의무가 있다 | 잔존하면 거짓 경쟁이 된다 | 잔존 패턴을 린트로 잡는다 |
-
-가능하면 문서를 append-only나 generated로 만든다. 상태를 적는 것은 그것이 바뀔 때마다 갱신할 의무를 지는 것이다.
-
-### 메모리와 백로그와 문서 맵
-
-메모리는 이 PC에만 있다. Claude 작업맥락의 일회용 스크래치패드로 자유롭게 쓴다. 이슈와 백로그 트래킹은 하지 않는다. 미해결 문제는 아래 「미해결의 처분」을 따른다.
-
-문서 맵은 포인터만 가볍게 두고 가능하면 도출로 대체한다. 새 문서를 만들기 전에 기존 SSOT에 귀속될 수 있는지 먼저 본다.
-
-플러그인과 마켓플레이스를 만들 때의 규칙은 `domain-plugin`이 소유한다. 문서를 쓰거나 고친 뒤의 검진 절차는 `review-docs`가 소유한다. 어느 렌즈를 걸고 언제 묻고 기록을 어디에 남기는지가 거기 있다. README 고유의 동선과 배지 판단은 `domain-readme`가 소유한다.
+문서를 만들거나 고치기 전에 그 문서의 타입과 수명과 수정 규율을 가린다. 타입 일곱과 규율 넷과 타입마다 강제하는 장치는 `domain-docs`가 소유한다. 그 스킬을 열어 가린 뒤에 쓴다.
 
 ## 코딩할 때
 
