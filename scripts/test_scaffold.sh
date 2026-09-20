@@ -31,8 +31,11 @@ echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
 check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/agent-principles.md' '$UC'"
 check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
-# 금지 표현 목록은 아무도 안 싣고 있을 때만 우리가 싣는다. 여기는 아무것도 없는 PC 라 싣는다.
-check "banlist: 아무도 안 실으면 우리가 싣는다" "grep -qxF '@disciplined-coder/korean-banned-words-dc.md' '$UC'"
+# 금지 표현 목록은 중립 이름의 공용 블록이 싣는다. 규약 정본은 KiwoomAX/korean-banned-words 의
+# import-protocol.md 다. 여기는 아무것도 없는 PC 라 우리가 블록을 만들고 우리 목록을 가리킨다.
+check "banlist: 공용 블록을 만든다"       "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC') -eq 1 ]"
+check "banlist: 블록이 우리를 가리킨다"   "sed -n '/BEGIN korean-banned-words/,/END korean-banned-words/p' '$UC' | grep -qxF '@disciplined-coder/korean-banned-words-dc.md'"
+check "banlist: 관리블록에는 목록이 없다" "! sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC' | grep -q 'korean-banned-words'"
 check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words-dc.md' ]"
 check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
 
@@ -152,22 +155,73 @@ UC5="$H5/.claude/CLAUDE.md"
 echo "[user-content-preserved] preserve user content + no blank accumulation"
 check "personal note preserved"      "grep -qxF 'my personal global note' '$UC5'"
 check "one region after 3 runs"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC5') -eq 1 ]"
-check "blank lines bounded (<=1)"    "[ \$(grep -c '^\$' '$UC5') -le 1 ]"
+# 블록이 둘(관리블록과 공용 블록)이라 각 블록 앞의 구분 빈 줄로 둘까지 나온다. 이 검사가
+# 막으려는 것은 실행을 거듭할 때 빈 줄이 쌓이는 것이므로 상한만 블록 수에 맞춘다.
+check "blank lines bounded (<=2)"    "[ \$(grep -c '^\$' '$UC5') -le 2 ]"
 
-# --- banlist-yield: 다른 곳이 금지 표현 목록을 이미 실으면 우리는 안 싣는다 ---
-# 이 PC 에만 둘이 다 있는 상황이 실재한다. 두 벌이 실리면 같은 목록에 값을 두 번 치른다.
-# 파일은 그대로 놓아야 한다 — 산출물 검사 훅이 그 파일을 읽으므로 안 놓으면 검사가 꺼진다.
+# --- banlist-shared: 공용 블록 규약의 판정 절차 ---
+# 규약 정본은 KiwoomAX/korean-banned-words 의 import-protocol.md 다. 목록을 싣는 플러그인이
+# 둘이라 각자 자기 마커 블록에 두면 두 벌이 실리고 결과가 도는 차례에 따라 갈린다. 아래가
+# 판정 절차의 줄기를 하나씩 확인한다. 우리 판은 생성물에서 읽어 쓴다 — 숫자를 박으면 목록이
+# 갱신될 때마다 이 검사가 거짓으로 통과한다.
+BANV="$(head -20 "$HERE/korean-banned-words-dc.md" | grep -o 'schema [0-9]*, [0-9][0-9-]*' | head -1)"
+ban_fixture() {  # $1=HOME $2=판 표시 줄 → 그 목록을 깔고 공용 블록이 그것을 가리키게 한다
+  mkdir -p "$1/.claude/other"
+  printf '# 목록\n\n생성물\n\n원본\n방법\n%s\n' "$2" > "$1/.claude/other/korean-banned-words.md"
+  printf '# BEGIN korean-banned-words (shared — do not edit)\n@other/korean-banned-words.md\n# END korean-banned-words (shared — do not edit)\n' > "$1/.claude/CLAUDE.md"
+}
+
 H22="$(mktemp -d)"; P22="$(mktemp -d)"; mkdir -p "$H22/.claude"
-printf '# 내 설정\n\n@somewhere/korean-banned-words.md\n' > "$H22/.claude/CLAUDE.md"
+ban_fixture "$H22" '<!-- 원본 판: schema 99, 2099-01-01, aaaaaaaaaaaa -->'
 run "$H22" "$P22" >/dev/null
 UC22="$H22/.claude/CLAUDE.md"
-echo "[banlist-yield] 다른 곳이 이미 싣고 있으면 비킨다"
-check "우리 줄을 안 쓴다"            "! grep -qxF '@disciplined-coder/korean-banned-words-dc.md' '$UC22'"
-check "남의 줄은 그대로 둔다"        "grep -qxF '@somewhere/korean-banned-words.md' '$UC22'"
-check "정본 줄은 그대로 쓴다"        "grep -qxF '@disciplined-coder/agent-principles.md' '$UC22'"
+echo "[banlist-shared] 상대가 더 최신이면 안 건드린다"
+check "남의 줄이 그대로다"            "grep -qxF '@other/korean-banned-words.md' '$UC22'"
+check "우리 줄을 안 넣는다"           "! grep -qF '@disciplined-coder/korean-banned-words-dc.md' '$UC22'"
 check "파일은 그래도 놓는다"          "[ -f '$H22/.claude/disciplined-coder/korean-banned-words-dc.md' ]"
-# 건너뛴 자리에 빈 줄이나 설명을 남기지 않는다. 블록은 정본 줄 하나뿐이어야 한다.
-check "블록에 군더더기가 안 남는다"  "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC22' | wc -l) -eq 3 ]"
+
+H23="$(mktemp -d)"; P23="$(mktemp -d)"; mkdir -p "$H23/.claude"
+ban_fixture "$H23" '<!-- 원본 판: schema 0, 2000-01-01, aaaaaaaaaaaa -->'
+OUT23="$(run "$H23" "$P23")"
+UC23="$H23/.claude/CLAUDE.md"
+echo "[banlist-shared] 상대가 낡으면 우리 것으로 바꾼다"
+check "우리 줄로 바뀐다"              "sed -n '/BEGIN korean-banned-words/,/END korean-banned-words/p' '$UC23' | grep -qxF '@disciplined-coder/korean-banned-words-dc.md'"
+check "남의 줄이 사라진다"            "! grep -qF '@other/korean-banned-words.md' '$UC23'"
+check "블록이 하나뿐이다"             "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC23') -eq 1 ]"
+check "바꿨다고 알린다"               "printf '%s' \"\$OUT23\" | grep -qF '공용 금지 표현 블록을 고쳤다'"
+
+H24="$(mktemp -d)"; P24="$(mktemp -d)"; mkdir -p "$H24/.claude"
+printf '# BEGIN korean-banned-words (shared — do not edit)\n@gone/korean-banned-words.md\n# END korean-banned-words (shared — do not edit)\n' > "$H24/.claude/CLAUDE.md"
+run "$H24" "$P24" >/dev/null
+UC24="$H24/.claude/CLAUDE.md"
+echo "[banlist-shared] 없는 파일을 가리키면 우리 것으로 바꾼다"
+check "우리 줄로 바뀐다"              "sed -n '/BEGIN korean-banned-words/,/END korean-banned-words/p' '$UC24' | grep -qxF '@disciplined-coder/korean-banned-words-dc.md'"
+
+H25="$(mktemp -d)"; P25="$(mktemp -d)"; mkdir -p "$H25/.claude"
+ban_fixture "$H25" "<!-- 원본 판: $BANV, ffffffffffff -->"
+OUT25="$(run "$H25" "$P25")"
+UC25="$H25/.claude/CLAUDE.md"
+echo "[banlist-shared] 판이 같고 내용이 다르면 그대로 두고 알린다"
+check "남의 줄이 그대로다"            "grep -qxF '@other/korean-banned-words.md' '$UC25'"
+check "판단 불가를 알린다"            "printf '%s' \"\$OUT25\" | grep -qF '판은 같은데 내용이 다르다'"
+
+H26="$(mktemp -d)"; P26="$(mktemp -d)"; mkdir -p "$H26/.claude"
+printf '# 내 설정\n\n@somewhere/korean-banned-words.md\n' > "$H26/.claude/CLAUDE.md"
+OUT26="$(run "$H26" "$P26")"
+UC26="$H26/.claude/CLAUDE.md"
+echo "[banlist-shared] 블록 바깥의 줄은 안 지우고 알린다"
+check "남의 줄을 안 지운다"           "grep -qxF '@somewhere/korean-banned-words.md' '$UC26'"
+check "공용 블록을 만든다"            "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC26') -eq 1 ]"
+check "바깥 줄을 알린다"              "printf '%s' \"\$OUT26\" | grep -qF '블록 바깥에 목록을 싣는 줄이 있다'"
+check "정본 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC26'"
+# 관리블록은 정본 줄 하나뿐이어야 한다. 목록이 거기 남으면 공용 블록과 합쳐 두 벌이 실린다.
+check "관리블록에 군더더기가 안 남는다" "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC26' | wc -l) -eq 3 ]"
+
+# 멱등. 바꾼 PC 를 두 번 더 돌려도 블록은 하나이고 가리키는 곳이 그대로다.
+run "$H23" "$P23" >/dev/null; run "$H23" "$P23" >/dev/null
+echo "[banlist-shared] 여러 번 돌려도 같다"
+check "블록이 여전히 하나다"          "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC23') -eq 1 ]"
+check "가리키는 곳이 그대로다"        "sed -n '/BEGIN korean-banned-words/,/END korean-banned-words/p' '$UC23' | grep -qxF '@disciplined-coder/korean-banned-words-dc.md'"
 
 # --- crlf-region: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
@@ -366,7 +420,7 @@ H21="$(mktemp -d)"; P21="$(mktemp -d)"; mkdir -p "$H21/.claude/plugins"
 # 잠재우고, "아무것도 안 보낸다" 단언은 그대로 둔다.
 printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ], "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
 ' > "$H21/.claude/plugins/installed_plugins.json"
-printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
+printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n# BEGIN korean-banned-words (shared — do not edit)\r\n@disciplined-coder/korean-banned-words-dc.md\r\n# END korean-banned-words (shared — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
 OUT21="$(run "$H21" "$P21")"
 echo "[crlf-import-line] CRLF import line still counts as present"
 check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린 (팀 원칙)'"

@@ -104,25 +104,103 @@ fi
 had_import=0
 if [ -f "$UC" ] && grep -qF '@disciplined-coder/agent-principles.md' "$UC"; then had_import=1; fi
 
-# 같은 금지 표현 목록이 두 번 실리지 않게 한다. 다른 배포처가 이미 목록을 @import 로 싣고 있으면
-# 우리 줄을 건너뛴다. 어느 쪽 목록인지는 중요하지 않다 — 둘 다 같은 JSON 에서 나온다. 남의 줄이
-# 없어지면 다음 세션에 우리 줄이 저절로 돌아오므로 목록이 빠진 채로 남는 상태가 안 생긴다.
-# 파일은 그대로 복사하므로 산출물 검사 훅은 영향이 없다.
-# 가르는 기준을 배포처 이름이 아니라 파일 이름 관례로 둔다 — 이 플러그인이 남의 배포처 이름을
-# 알 이유가 없고, 사외 사용자 PC 에는 그런 줄이 아예 없어 이 갈래가 걸리지 않는다.
+# 금지 표현 목록의 @import 는 공용 블록 하나에만 둔다. 규약은 KiwoomAX/korean-banned-words 의
+# import-protocol.md 가 소유하고 이 스크립트는 그 절차를 구현하기만 한다. 플러그인마다 자기
+# 마커 블록에 목록을 두면 목록이 두 벌 실리고 결과가 도는 차례에 따라 갈린다 — 각 설치
+# 스크립트가 자기 마커 안만 다시 쓰므로 남의 줄을 보고도 자기 줄을 뺄 수 없기 때문이다.
+# 마커는 어느 플러그인도 소유하지 않는 중립 이름이라 사내 kw-control-tower 도 같은 블록을 쓴다.
+BAN_BEGIN='# BEGIN korean-banned-words (shared — do not edit)'
+BAN_END='# END korean-banned-words (shared — do not edit)'
 BAN_IMPORT='@disciplined-coder/korean-banned-words-dc.md'
-ban_skipped=0
-if [ -f "$UC" ] && grep -E '^@[^[:space:]]*korean-banned-words' "$UC" | grep -vqF "$BAN_IMPORT"; then
-  ban_skipped=1
+BAN_FILE="$KDIR/korean-banned-words-dc.md"
+
+# 판 표시를 읽는다. 목록 파일 머리 20줄 안의 `<!-- 원본 판: schema N, 날짜, 지문 -->` 이고,
+# 그 줄이 머리 20줄 안에 남는 것은 원본 저장소의 render.py 가 만들 때마다 확인하는 계약이다.
+# 지문은 데이터의 sha256 앞 열두 글자다. 하루에 열두 판이 나온 날이 있어 날짜만으로는 두 사본이
+# 같은지 알 수 없다. 지문이 없는 옛 생성물도 읽히게 두 번 시도하고 셋째 값을 빈 값으로 낸다.
+# 판 표시를 못 읽으면 빈 값을 낸다 — 빈 값은 낡음으로 처리되므로 읽기 실패가 조용히 통과하지 않는다.
+# 한국어를 패턴에 넣지 않는다. 이 훅이 도는 PC 의 로캘이 갈려도 같게 읽혀야 한다.
+ban_stamp() {  # $1=파일 경로 → "schema|날짜|지문" 또는 빈 값
+  [ -f "$1" ] || return 0
+  ban_head="$(head -20 "$1")"
+  ban_v="$(printf '%s\n' "$ban_head" | sed -n 's/.*schema *\([0-9][0-9]*\), *\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\), *\([0-9a-f][0-9a-f]*\).*/\1|\2|\3/p' | head -1)"
+  if [ -z "$ban_v" ]; then
+    ban_v="$(printf '%s\n' "$ban_head" | sed -n 's/.*schema *\([0-9][0-9]*\), *\([0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\).*/\1|\2|/p' | head -1)"
+  fi
+  printf '%s' "$ban_v"
+}
+
+# 두 판을 견준다. 규약의 판정 순서를 그대로 쓴다 — schema 를 정수로 먼저 보고, 같으면 날짜를
+# 문자열로 보고(YYYY-MM-DD 는 사전순이 곧 시간순이다), 둘 다 같으면 지문을 본다.
+# 더 높은 schema 를 무조건 최신으로 보아도 되는 근거는, 생성물의 앞 두 칸을 옮기지 않고 칸은
+# 뒤에만 더한다는 원본 저장소의 약속이다. 그 약속이 있어 schema 가 올라가도 옛 소비자가 읽는다.
+# **지문은 순서를 정하지 못하고 다른지만 말한다.** 판이 같은데 지문이 다르면 덮어쓰지 않는다 —
+# 덮어쓰면 두 설치기가 세션마다 서로를 덮어 번갈아 바뀌고 끝나지 않는다.
+ban_compare() {  # $1=내 판, $2=상대 판 → 0 우리가 최신, 1 그대로 둔다, 2 판단 불가
+  [ -n "$2" ] || return 0
+  [ -n "$1" ] || return 1
+  ban_a="$1"; ban_b="$2"
+  ban_as="${ban_a%%|*}"; ban_ar="${ban_a#*|}"; ban_ad="${ban_ar%%|*}"; ban_af="${ban_ar#*|}"
+  ban_bs="${ban_b%%|*}"; ban_br="${ban_b#*|}"; ban_bd="${ban_br%%|*}"; ban_bf="${ban_br#*|}"
+  if [ "$ban_as" -gt "$ban_bs" ] 2>/dev/null; then return 0; fi
+  if [ "$ban_as" -lt "$ban_bs" ] 2>/dev/null; then return 1; fi
+  if [ "$ban_ad" \> "$ban_bd" ]; then return 0; fi
+  if [ "$ban_ad" \< "$ban_bd" ]; then return 1; fi
+  if [ "$ban_af" = "$ban_bf" ]; then return 1; fi
+  return 2
+}
+
+# 공용 블록 안의 @import 줄을 읽는다. 마커는 줄 처음에서만 찾고 뒤따르는 공백을 허용한다.
+ban_block_import() {
+  [ -f "$UC" ] || return 0
+  awk '
+    { l=$0; sub(/\r$/,"",l) }
+    l ~ /^#[ \t]*BEGIN korean-banned-words/ { inb=1; next }
+    l ~ /^#[ \t]*END korean-banned-words/   { inb=0; next }
+    inb && l ~ /^@/ { print l; exit }
+  ' "$UC"
+}
+
+# 무엇을 할지 정한다. ban_action 이 비면 블록을 건드리지 않는다 — 규약이 같거나 상대가 더
+# 최신이면 건드리지 말라고 하므로, 매 세션 블록을 다시 쓰면 두 플러그인이 서로의 판정을 지운다.
+ban_action=""; ban_conflict=""
+ban_cur="$(ban_block_import)"
+if [ -z "$ban_cur" ]; then
+  ban_action='없어서 만들었다'
+elif [ "$ban_cur" = "$BAN_IMPORT" ]; then
+  :
+else
+  ban_target="$CLAUDE_HOME/${ban_cur#@}"
+  if [ ! -f "$ban_target" ]; then
+    ban_action="없는 파일을 가리켜 우리 것으로 바꿨다 — $ban_cur"
+  else
+    ban_cmp=0
+    ban_compare "$(ban_stamp "$BAN_FILE")" "$(ban_stamp "$ban_target")" || ban_cmp=$?
+    case "$ban_cmp" in
+      0) ban_action="가리키던 목록이 낡아 우리 것으로 바꿨다 — $ban_cur" ;;
+      2) ban_conflict="🔵 disciplined-coder: 공용 금지 표현 블록이 가리키는 목록과 우리 목록이 판은 같은데 내용이 다르다 — $ban_cur. 어느 쪽이 새것인지 기계가 알 수 없어 그대로 두었다. 두 플러그인을 모두 갱신한 뒤 새 세션을 열어라." ;;
+    esac
+  fi
 fi
+# 3d) 공용 금지 표현 블록을 쓴다. 고칠 것이 있을 때만 쓴다(위에서 정했다). 관리블록 주입 뒤에
+#     두는 이유는 둘이 같은 파일의 같은 락을 차례로 잡아야 하기 때문이다.
+if [ -n "$ban_action" ]; then
+  ban_rc=0
+  printf '%s\n' "$BAN_IMPORT" | managed_block_inject "$UC" "$BAN_BEGIN" "$BAN_END" || ban_rc=$?
+  if [ "$ban_rc" -ne 0 ]; then
+    echo "[disciplined-coder] ERROR: $UC 의 공용 금지 표현 블록을 못 썼다 — 이 세션에 목록이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열어라."
+    ban_action=""
+  fi
+fi
+
 # 잠금을 못 잡으면 배선을 안 쓰고 물러난다. 그 사실을 여기서 알린다 — 정본 파일은 깔렸는데
 # @import만 빠지면 세션은 원칙 없이 도는데 파일이 다 있어 아무도 눈치채지 못한다(`FAIL-LOUD`).
 inject_rc=0
-# 줄 수가 조건에 따라 갈리므로 heredoc 대신 만들어서 넘긴다. 건너뛸 때 빈 줄이 블록에 남지 않는다.
-{
-  printf '%s\n' '@disciplined-coder/agent-principles.md'
-  if [ "$ban_skipped" -eq 0 ]; then printf '%s\n' "$BAN_IMPORT"; fi
-} | managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" || inject_rc=$?
+# 규약이 요구하는 것 — 자기 마커 블록에 목록 @import 를 두지 않는다. 두면 공용 블록에 한 줄,
+# 여기에 한 줄이 되어 중복이 늘어난다. 이 블록은 매 세션 통째로 다시 쓰이므로 자기 줄을 계속
+# 되살리기 때문이다.
+printf '%s\n' '@disciplined-coder/agent-principles.md' \
+  | managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" || inject_rc=$?
 if [ "$inject_rc" -ne 0 ]; then
   echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라."
 fi
@@ -133,9 +211,9 @@ fi
 if [ "$had_import" -eq 0 ]; then
   for f in $SCAFFOLD_FILES; do
     [ -f "$KDIR/$f" ] || continue
-    # 안 싣기로 한 목록은 이 보강에서도 뺀다. 여기서 흘리면 첫 세션에만 두 벌이 실린다.
-    # `&&` 로 이으면 앞 조건이 거짓일 때 반환값이 1 이라 set -e 가 스캐폴드를 죽인다.
-    if [ "$ban_skipped" -eq 1 ] && [ "$f" = "korean-banned-words-dc.md" ]; then continue; fi
+    # 목록은 이 보강에서 뺀다. 공용 블록이 정하므로 had_import 와 무관하고, 여기서 흘리면
+    # 블록을 안 고친 세션에도 목록이 한 벌 더 실린다.
+    if [ "$f" = "korean-banned-words-dc.md" ]; then continue; fi
     # 읽기가 거부돼도 훅 전체를 죽이지 않는다. set -e 아래에서 cat 실패는 스캐폴드를 그 자리에서
     # 끝내 @import 배선까지 못 하게 만든다. 대신 못 읽었다는 사실을 stderr로 드러낸다(FAIL-LOUD).
     if ! cat "$KDIR/$f" 2>/dev/null; then
@@ -145,7 +223,24 @@ if [ "$had_import" -eq 0 ]; then
 fi
 # 무엇을 했는지 알린다. 파일을 고쳤으면 조용히 넘기지 않는다 — 사용자가 열어 둔 레포가 바뀌었을 수
 # 있고, 그 사실은 사본 경로와 함께 눈에 보여야 한다(FAIL-LOUD).
-for note in "$pointer_note"; do
+# 규약 3번 조항. 공용 블록 바깥에 목록을 싣는 줄이 있으면 지우지 않고 알리기만 한다. 남의 마커
+# 안일 수 있고, 지워도 그쪽 설치 스크립트가 자기 블록을 다시 쓸 때 되살린다. 블록을 쓴 뒤에
+# 세는 이유는, 그 전에 세면 방금 우리가 걷어낸 옛 줄까지 세어 없는 중복을 알리기 때문이다.
+ban_outside="$( { [ -f "$UC" ] && awk '
+    { l=$0; sub(/\r$/,"",l) }
+    l ~ /^#[ \t]*BEGIN korean-banned-words/ { inb=1; next }
+    l ~ /^#[ \t]*END korean-banned-words/   { inb=0; next }
+    !inb && l ~ /^@/ && l ~ /korean-banned-words/ { print l }
+  ' "$UC"; } || true )"
+ban_note=""
+if [ -n "$ban_action" ]; then
+  ban_note="🔵 disciplined-coder: $UC 의 공용 금지 표현 블록을 고쳤다 — $ban_action."
+fi
+ban_out_note=""
+if [ -n "$ban_outside" ]; then
+  ban_out_note="🔵 disciplined-coder: 공용 금지 표현 블록 바깥에 목록을 싣는 줄이 있다 — $(printf '%s' "$ban_outside" | tr '\n' ' '). 규약대로 지우지 않았다. 그 줄을 넣는 플러그인이 규약을 채택하면 사라진다."
+fi
+for note in "$pointer_note" "$ban_note" "$ban_conflict" "$ban_out_note"; do
   if [ -n "$note" ]; then printf '%s\n' "$note"; fi
 done
 
