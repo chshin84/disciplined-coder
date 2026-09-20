@@ -209,13 +209,26 @@ H26="$(mktemp -d)"; P26="$(mktemp -d)"; mkdir -p "$H26/.claude"
 printf '# 내 설정\n\n@somewhere/korean-banned-words.md\n' > "$H26/.claude/CLAUDE.md"
 OUT26="$(run "$H26" "$P26")"
 UC26="$H26/.claude/CLAUDE.md"
-# 상대가 아직 자기 블록에서 목록을 싣는 전환 구간이다. 여기서 공용 블록을 만들면 목록이 두 벌
-# 실려, 이 규약이 없애려던 바로 그 상태가 계속된다. 그래서 만들지 않고 알리기만 한다.
-echo "[banlist-shared] 바깥에 줄이 있으면 블록을 만들지 않는다"
+# 사용자가 손으로 적은 줄이다. 마커 블록 안이 아니므로 지울 쪽도 고칠 쪽도 없다. 이것 때문에
+# 기다리면 공용 블록이 영영 안 생기므로, 블록은 만들고 그 줄은 지우지 않고 알리기만 한다.
+echo "[banlist-shared] 사용자가 적은 줄은 기다림의 근거가 아니다"
 check "남의 줄을 안 지운다"           "grep -qxF '@somewhere/korean-banned-words.md' '$UC26'"
-check "공용 블록을 안 만든다"         "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC26') -eq 0 ]"
-check "목록이 한 벌만 실린다"         "[ \$(grep -c '^@.*korean-banned-words' '$UC26') -eq 1 ]"
-check "기다린다고 알린다"             "printf '%s' \"\$OUT26\" | grep -qF '공용 블록을 만들지 않았다'"
+check "공용 블록을 만든다"            "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC26') -eq 1 ]"
+check "바깥 줄을 알린다"              "printf '%s' \"\$OUT26\" | grep -qF '블록 바깥에 목록을 싣는 줄이 있다'"
+
+# --- banlist-transition: 남의 마커 블록 안의 줄일 때만 비킨다 ---
+# 상대 플러그인이 아직 자기 블록에서 목록을 싣는 전환 구간이다. 여기서 공용 블록을 만들면 목록이
+# 두 벌 실려, 이 규약이 없애려던 상태가 채택이 끝날 때까지 계속된다.
+H27="$(mktemp -d)"; P27="$(mktemp -d)"; mkdir -p "$H27/.claude"
+printf '# BEGIN AX 설치 (자동 생성 영역)\n@kw-ax/korean-banned-words.md\n# END AX 설치\n' > "$H27/.claude/CLAUDE.md"
+OUT27="$(run "$H27" "$P27")"
+UC27="$H27/.claude/CLAUDE.md"
+echo "[banlist-transition] 남의 블록 안의 줄이면 비킨다"
+check "공용 블록을 안 만든다"         "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC27') -eq 0 ]"
+check "목록이 한 벌만 실린다"         "[ \$(grep -c '^@.*korean-banned-words' '$UC27') -eq 1 ]"
+check "남의 줄을 안 지운다"           "grep -qxF '@kw-ax/korean-banned-words.md' '$UC27'"
+check "기다린다고 알린다"             "printf '%s' \"\$OUT27\" | grep -qF '공용 블록을 만들지 않았다'"
+check "정본 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC27'"
 check "정본 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC26'"
 # 관리블록은 정본 줄 하나뿐이어야 한다. 목록이 거기 남으면 공용 블록과 합쳐 두 벌이 실린다.
 check "관리블록에 군더더기가 안 남는다" "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC26' | wc -l) -eq 3 ]"

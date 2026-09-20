@@ -173,12 +173,26 @@ ban_outside="$( { [ -f "$UC" ] && awk '
     l ~ /^#[ \t]*END disciplined-coder/     { inm=0; next }
     !inb && !inm && l ~ /^@/ && l ~ /korean-banned-words/ { print l }
   ' "$UC"; } || true )"
+# 그 가운데 남의 마커 블록 안에 있는 줄만 따로 센다. 기다릴지는 이것으로 정한다. 사용자가 손으로
+# 적은 줄까지 기다림의 근거로 쓰면, 플러그인이 하나뿐인 PC 에서 그 줄 하나 때문에 공용 블록이
+# 영영 안 생긴다 — 만들 쪽이 하나뿐이라 아무도 시작하지 못한다. 남의 블록 안의 줄은 그 플러그인이
+# 규약을 채택하면 사라지지만, 사용자 줄은 사용자가 지울 때까지 남는다.
+ban_managed_elsewhere="$( { [ -f "$UC" ] && awk '
+    { l=$0; sub(/\r$/,"",l) }
+    l ~ /^#[ \t]*BEGIN korean-banned-words/ { inb=1; next }
+    l ~ /^#[ \t]*END korean-banned-words/   { inb=0; next }
+    l ~ /^#[ \t]*BEGIN disciplined-coder/   { inm=1; next }
+    l ~ /^#[ \t]*END disciplined-coder/     { inm=0; next }
+    l ~ /^#[ \t]*BEGIN[ \t]/                { ino=1; next }
+    l ~ /^#[ \t]*END[ \t]/                  { ino=0; next }
+    ino && !inb && !inm && l ~ /^@/ && l ~ /korean-banned-words/ { print l }
+  ' "$UC"; } || true )"
 
 # 무엇을 할지 정한다. ban_action 이 비면 블록을 건드리지 않는다 — 규약이 같거나 상대가 더
 # 최신이면 건드리지 말라고 하므로, 매 세션 블록을 다시 쓰면 두 플러그인이 서로의 판정을 지운다.
 ban_action=""; ban_conflict=""; ban_wait=0
 ban_cur="$(ban_block_import)"
-if [ -z "$ban_cur" ] && [ -n "$ban_outside" ]; then
+if [ -z "$ban_cur" ] && [ -n "$ban_managed_elsewhere" ]; then
   # 상대가 아직 자기 블록에서 목록을 싣고 있다. 여기서 공용 블록을 만들면 목록이 두 벌
   # 실린다. 그쪽이 규약을 채택해 그 줄이 사라지면 다음 세션에 저절로 만들어진다.
   ban_wait=1
@@ -247,7 +261,7 @@ fi
 ban_out_note=""
 if [ -n "$ban_outside" ]; then
   if [ "$ban_wait" -eq 1 ]; then
-    ban_out_note="🔵 disciplined-coder: 다른 플러그인이 아직 자기 블록에서 금지 표현 목록을 싣고 있어 공용 블록을 만들지 않았다 — $(printf '%s' "$ban_outside" | tr '\n' ' '). 두 벌이 실리는 것을 막으려는 것이며, 그쪽이 규약을 채택하면 다음 세션에 저절로 만들어진다."
+    ban_out_note="🔵 disciplined-coder: 다른 플러그인이 아직 자기 블록에서 금지 표현 목록을 싣고 있어 공용 블록을 만들지 않았다 — $(printf '%s' "$ban_managed_elsewhere" | tr '\n' ' '). 두 벌이 실리는 것을 막으려는 것이며, 그쪽이 규약을 채택하면 다음 세션에 저절로 만들어진다."
   else
     ban_out_note="🔵 disciplined-coder: 공용 금지 표현 블록 바깥에 목록을 싣는 줄이 있다 — $(printf '%s' "$ban_outside" | tr '\n' ' '). 규약대로 지우지 않았다. 그 줄을 넣는 플러그인이 규약을 채택하면 사라진다."
   fi
