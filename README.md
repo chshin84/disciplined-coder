@@ -62,6 +62,7 @@ done
 | PostToolUse | `hooks/doc_review_posttooluse.sh` | 산출물과 그 폴더의 마크다운에 검진 넛지를 띄운다. `Bash` 로 고친 것도 본다 |
 | PostToolUse | `hooks/doc_word_posttooluse.sh` | 셸로 고친 산출물 `.md` 에 금지 표현이 남으면 알린다. 쓰인 뒤라 막지는 못한다 |
 | Stop | `hooks/spec_review_stop.sh` | 미리뷰 spec·plan 이 남은 채 턴이 끝나는 것을 막는다 |
+| Stop | `hooks/doc_word_stop.sh` | 이 턴에 `git` 으로 바뀐 산출물 `.md` 에 금지 표현이 남으면 알린다. 막지는 않는다 |
 
 봉인 시점은 둘이다. 커밋된 기록은 세션 시작에 `seal_reviews.sh` 가 봉인하고, 회차 기록은 회차 끝에 호출자가 같은 스크립트를 파일 인자와 함께 불러 봉인한다.
 
@@ -70,7 +71,7 @@ done
 여기 넷만 실제로 작업을 막는다. 나머지는 알리기만 한다.
 
 - **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 막고 `review-specs` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 풀린다. 차단은 턴에 한 번이라 두 번째 종료 시도는 통과한다.
-- **산출물 차단** — 사용자가 요구한 산출물 `.md`에 「금지 표현」 목록의 말이 있으면 거부하고 무엇을 무엇으로 고칠지 보인다. 목록은 `korean-banned-words.md`에 있고 KiwoomAX/korean-banned-words 에서 받아 온 생성물이라 손으로 고치지 않는다. 셋은 대상에서 뺀다. 이 플러그인 저장소 자신의 문서와 Claude 메모리(`/.claude/projects/` 아래)와 `docs/superpowers/` 아래다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 적어야 하면 백틱으로 감싼다.
+- **산출물 차단** — 사용자가 요구한 산출물 `.md`에 「금지 표현」 목록의 말이 있으면 거부하고 무엇을 무엇으로 고칠지 보인다. 목록은 `korean-banned-words.md`에 있고 KiwoomAX/korean-banned-words 에서 받아 온 생성물이라 손으로 고치지 않는다. 셋은 대상에서 뺀다. 이 플러그인 저장소 자신의 문서와 Claude 메모리(`/.claude/projects/` 아래)와 `docs/superpowers/` 아래다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 적어야 하면 백틱으로 감싼다. 거부는 `Write`와 `Edit`에만 걸린다. 셸로 고치면 무엇이 쓰일지 미리 알 수 없어 막지 못하고, 쓰인 뒤에 `doc_word_posttooluse.sh`가 알리며 턴이 끝날 때 `doc_word_stop.sh`가 `git`으로 바뀐 파일을 한 번 더 본다.
 - **읽기 전용 차단** — 읽기 전용 속성이 선 파일에 `Write`나 `Edit`을 하려 하면 거부하고 사유를 보인다. 어느 프로젝트의 어느 파일이든 속성만 본다. 풀려면 속성을 풀면 된다.
 - **`python3` 차단** — 윈도우에서 `python3`이 스토어 안내판(`AppInstallerPythonRedirector.exe`)으로 풀릴 때만 그 Bash 명령을 거부하고 `python`이나 `py -3`을 쓰라고 알린다. 맥과 리눅스에서는 걸리지 않는다.
 

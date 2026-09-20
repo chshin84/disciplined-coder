@@ -264,6 +264,28 @@ printf '이 문서는 대상을 지적한다.\n' > "$BW/clean.md"
 check "깨끗한 산출물에는 통지 없음" "[ -z \"\$(JB 'sed -i s/x/y/ $BW/clean.md' | bash '$DWPOST')\" ]"
 check "훅 배선에 Bash 가 들어 있다" "grep -qF 'Write|Edit|Bash' '$HERE/hooks/hooks.json'"
 
+echo "[stop 겹 — 도구를 묻지 않고 결과를 본다]"
+# 명령줄에 대상이 안 나타나는 변경(파이썬 스크립트, git checkout)을 앞 두 겹이 못 본다.
+# 이 겹은 git 이 바뀌었다고 말하는 파일을 보므로 무엇이 바꿨는지 묻지 않는다.
+DWSTOP="$HERE/hooks/doc_word_stop.sh"
+SR="$T/stoprepo"; mkdir -p "$SR"; git -C "$SR" init -q 2>/dev/null || true
+JSTOP() { printf '{"cwd":"%s","stop_hook_active":%s}' "$1" "${2:-false}"; }
+printf '이 문서는 자리를 짚는다.\n' > "$SR/report.md"
+check "바뀐 문서의 금지 표현을 알린다" "JSTOP '$SR' | bash '$DWSTOP' | grep -q systemMessage"
+check "알림이 파일 이름을 담는다"      "JSTOP '$SR' | bash '$DWSTOP' | grep -qF 'report.md'"
+check "턴을 막지는 않는다"             "! JSTOP '$SR' | bash '$DWSTOP' | grep -qF 'permissionDecision'"
+SRCLEAN="$T/stopclean"; mkdir -p "$SRCLEAN"; git -C "$SRCLEAN" init -q 2>/dev/null || true
+printf '이 문서는 대상을 지적한다.\n' > "$SRCLEAN/report.md"
+check "깨끗한 문서에는 알림이 없다"    "[ -z \"\$(JSTOP '$SRCLEAN' | bash '$DWSTOP')\" ]"
+check "git 아닌 폴더 → 무출력"         "[ -z \"\$(JSTOP '$OUTSIDE' | bash '$DWSTOP')\" ]"
+check "이 저장소 자신 → 무출력"        "[ -z \"\$(JSTOP '$HERE' | bash '$DWSTOP')\" ]"
+check "루프가드가 걸린다"              "[ -z \"\$(JSTOP '$SR' true | bash '$DWSTOP')\" ]"
+check "OFF → 무출력"                   "[ -z \"\$(JSTOP '$SR' | DISCIPLINED_CODER_REPLY_CHECK=off bash '$DWSTOP')\" ]"
+# 코드 파일과 spec 은 대상이 아니다. 대상이 넓어지면 알림이 늘 떠 뜻을 잃는다.
+printf 'x = "자리"\n' > "$SR/code.py"; mkdir -p "$SR/docs/superpowers/specs"
+printf '이 문서는 자리를 짚는다.\n' > "$SR/docs/superpowers/specs/s.md"
+check "코드와 spec 은 안 본다"         "[ \"\$(JSTOP '$SR' | bash '$DWSTOP' | grep -cF 'report.md')\" = 1 ]"
+
 echo "[리뷰 기록은 검진 대상이 아니다]"
 # 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
 J2() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s"}}' "$1"; }
