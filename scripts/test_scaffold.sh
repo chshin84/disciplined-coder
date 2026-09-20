@@ -229,6 +229,19 @@ check "목록이 한 벌만 실린다"         "[ \$(grep -c '^@.*korean-banned-
 check "남의 줄을 안 지운다"           "grep -qxF '@kw-ax/korean-banned-words.md' '$UC27'"
 check "기다린다고 알린다"             "printf '%s' \"\$OUT27\" | grep -qF '공용 블록을 만들지 않았다'"
 check "정본 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC27'"
+
+# --- banlist-orphan: 끝나는 짝이 없는 BEGIN 은 블록을 열지 않는다 ---
+# 고아 BEGIN 을 열린 채로 두면 그 뒤의 모든 줄이 남의 블록 안으로 보여, 사용자가 적은 줄까지
+# 기다림의 근거가 되어 공용 블록이 영영 안 생긴다. 이 저장소는 고아 BEGIN 을 이미 겪었다.
+H28="$(mktemp -d)"; P28="$(mktemp -d)"; mkdir -p "$H28/.claude"
+printf '# BEGIN 남의 블록\n무언가\n\n@somewhere/korean-banned-words.md\n' > "$H28/.claude/CLAUDE.md"
+OUT28="$(run "$H28" "$P28")"
+UC28="$H28/.claude/CLAUDE.md"
+echo "[banlist-orphan] 고아 BEGIN 은 블록으로 세지 않는다"
+check "공용 블록을 만든다"            "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC28') -eq 1 ]"
+check "사용자 줄로 보아 알린다"       "printf '%s' \"\$OUT28\" | grep -qF '블록 바깥에 목록을 싣는 줄이 있다'"
+check "기다린다고 알리지 않는다"      "! printf '%s' \"\$OUT28\" | grep -qF '공용 블록을 만들지 않았다'"
+check "남의 줄을 안 지운다"           "grep -qxF '@somewhere/korean-banned-words.md' '$UC28'"
 check "정본 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC26'"
 # 관리블록은 정본 줄 하나뿐이어야 한다. 목록이 거기 남으면 공용 블록과 합쳐 두 벌이 실린다.
 check "관리블록에 군더더기가 안 남는다" "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC26' | wc -l) -eq 3 ]"

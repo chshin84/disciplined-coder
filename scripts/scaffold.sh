@@ -163,30 +163,39 @@ ban_block_import() {
 
 # 규약 3번 조항. 공용 블록 바깥에 목록을 싣는 줄이 있으면 지우지 않고 알리기만 한다. 남의 마커
 # 안일 수 있고, 지워도 그쪽 설치 스크립트가 자기 블록을 다시 쓸 때 되살린다.
-# 우리 관리 블록도 세는 곳에서 뺀다. 옛 판본이 거기에 목록을 두었으므로, 빼지 않으면 갱신하는
-# 세션마다 우리가 우리 줄을 남의 줄로 세어 공용 블록을 영영 못 만든다.
-ban_outside="$( { [ -f "$UC" ] && awk '
-    { l=$0; sub(/\r$/,"",l) }
-    l ~ /^#[ \t]*BEGIN korean-banned-words/ { inb=1; next }
-    l ~ /^#[ \t]*END korean-banned-words/   { inb=0; next }
-    l ~ /^#[ \t]*BEGIN disciplined-coder/   { inm=1; next }
-    l ~ /^#[ \t]*END disciplined-coder/     { inm=0; next }
-    !inb && !inm && l ~ /^@/ && l ~ /korean-banned-words/ { print l }
+#
+# 기다릴지는 그 가운데 남의 마커 블록 안에 있는 줄로만 정한다. 사용자가 적은 줄은 사라질 때를
+# 기약할 수 없어, 그것을 기다리면 플러그인이 하나뿐인 PC 에서 공용 블록이 영영 안 생긴다.
+# 우리 관리 블록 안도 세지 않는다 — 옛 판본이 거기에 목록을 두었으므로, 세면 우리 줄을 남의
+# 줄로 보아 같은 곳에서 멈춘다.
+#
+# 짝이 맞는 BEGIN/END 구간만 블록으로 본다. 끝나는 짝이 없는 BEGIN 을 열린 채로 두면 그 뒤의
+# 모든 줄이 남의 블록 안으로 보여 같은 멈춤이 다른 길로 돌아온다. 이 저장소는 고아 BEGIN 을
+# 이미 겪었고 _managed_block.sh 가 자기 마커에 대해 같은 읽기를 한다.
+#
+# 한 번 읽어 O(어느 블록에도 없음) 와 M(남이 관리) 로 나눈다. 두 벌로 읽으면 한쪽만 고쳐져
+# 두 판정이 갈린다.
+ban_scan="$( { [ -f "$UC" ] && awk '
+    { l=$0; sub(/\r$/,"",l); a[NR]=l }
+    END {
+      n=NR
+      for (i=1;i<=n;i++) {
+        if (a[i] !~ /^#[ \t]*BEGIN[ \t]/) continue
+        for (j=i+1;j<=n;j++) {
+          if (a[j] ~ /^#[ \t]*BEGIN[ \t]/) break
+          if (a[j] ~ /^#[ \t]*END[ \t]/) { for (k=i;k<=j;k++) own[k]=a[i]; break }
+        }
+      }
+      for (i=1;i<=n;i++) {
+        if (a[i] !~ /^@/ || a[i] !~ /korean-banned-words/) continue
+        if (own[i] ~ /^#[ \t]*BEGIN korean-banned-words/) continue
+        if (own[i] ~ /^#[ \t]*BEGIN disciplined-coder/) continue
+        if (own[i] == "") print "O:" a[i]; else print "M:" a[i]
+      }
+    }
   ' "$UC"; } || true )"
-# 그 가운데 남의 마커 블록 안에 있는 줄만 따로 센다. 기다릴지는 이것으로 정한다. 사용자가 손으로
-# 적은 줄까지 기다림의 근거로 쓰면, 플러그인이 하나뿐인 PC 에서 그 줄 하나 때문에 공용 블록이
-# 영영 안 생긴다 — 만들 쪽이 하나뿐이라 아무도 시작하지 못한다. 남의 블록 안의 줄은 그 플러그인이
-# 규약을 채택하면 사라지지만, 사용자 줄은 사용자가 지울 때까지 남는다.
-ban_managed_elsewhere="$( { [ -f "$UC" ] && awk '
-    { l=$0; sub(/\r$/,"",l) }
-    l ~ /^#[ \t]*BEGIN korean-banned-words/ { inb=1; next }
-    l ~ /^#[ \t]*END korean-banned-words/   { inb=0; next }
-    l ~ /^#[ \t]*BEGIN disciplined-coder/   { inm=1; next }
-    l ~ /^#[ \t]*END disciplined-coder/     { inm=0; next }
-    l ~ /^#[ \t]*BEGIN[ \t]/                { ino=1; next }
-    l ~ /^#[ \t]*END[ \t]/                  { ino=0; next }
-    ino && !inb && !inm && l ~ /^@/ && l ~ /korean-banned-words/ { print l }
-  ' "$UC"; } || true )"
+ban_outside="$(printf '%s' "$ban_scan" | sed -n 's/^[OM]://p')"
+ban_managed_elsewhere="$(printf '%s' "$ban_scan" | sed -n 's/^M://p')"
 
 # 무엇을 할지 정한다. ban_action 이 비면 블록을 건드리지 않는다 — 규약이 같거나 상대가 더
 # 최신이면 건드리지 말라고 하므로, 매 세션 블록을 다시 쓰면 두 플러그인이 서로의 판정을 지운다.
