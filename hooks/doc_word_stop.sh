@@ -17,6 +17,7 @@
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
 HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_in_own_repo) 공유(SSOT)
 . "$HOOKDIR/_json_escape.sh"        # JSON 문자열 이스케이프(SSOT) 공유
 . "$HOOKDIR/_banned_words.sh"       # 표 파싱과 본문 맞추기(SSOT) 공유
 . "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
@@ -52,14 +53,7 @@ while IFS= read -r -d '' entry; do
   case "$f" in */.claude/projects/*) continue ;; esac
   case "$f" in docs/superpowers/*|*/docs/superpowers/*) continue ;; esac
   [ -f "$f" ] || continue
-  # 조상 폴더에 정본이 있으면 이 플러그인 저장소 자신의 문서다. Pre·Post 훅과 같은 판정이다.
-  _d="${f%/*}"; [ "$_d" = "$f" ] && _d="."
-  _prev=""; _own=0
-  while [ -n "$_d" ] && [ "$_d" != "$_prev" ]; do
-    if [ -f "$_d/agent-principles.md" ]; then _own=1; break; fi
-    _prev="$_d"; _d="${_d%/*}"
-  done
-  [ "$_own" -eq 1 ] && continue
+  path_in_own_repo "$f" && continue   # 이 저장소 자신의 문서. 판정은 _spec_marker.sh 가 소유한다.
   FILES="${FILES}${f}
 "
 done < <(git status -z --no-renames 2>/dev/null || true)
@@ -67,15 +61,15 @@ done < <(git status -z --no-renames 2>/dev/null || true)
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
-PAIRS="$WORK/pairs"; TOKS="$WORK/toks"
-banned_parse "$BANSRC" "$PAIRS" "$TOKS"
+PAIRS="$WORK/pairs"; TOKS="$WORK/toks"; EXCL="$WORK/excl"
+banned_parse "$BANSRC" "$PAIRS" "$TOKS" "$EXCL"
 [ -s "$TOKS" ] || exit 0   # 검사 불능은 Pre 훅이 알린다.
 
 REPORT=""
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   LC_ALL=C grep -qFf "$TOKS" "$f" || continue   # 빠른 거르기 — 파이썬을 아낀다
-  one="$(banned_report "$PAIRS" "$f")"
+  one="$(banned_report "$PAIRS" "$f" "$EXCL")"
   [ -n "$one" ] || continue
   REPORT="${REPORT}${f}
 ${one}

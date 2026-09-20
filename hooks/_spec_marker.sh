@@ -48,6 +48,25 @@ path_in_project() {  # $1=경로 → 프로젝트 안이면 0
   case "$p" in "$root"/*) return 0 ;; *) return 1 ;; esac
 }
 
+# 이 플러그인 저장소 자신의 문서인지 본다. 조상 폴더에 정본이 있으면 그렇다. 금지 표현 검사가
+# 이 저장소의 문서를 빼는 판정이고, 훅 셋이 같은 판정을 해야 하므로 여기 하나만 둔다(SSOT).
+#
+# 상대경로를 받는 쪽이 있다. git status 가 돌려주는 경로가 레포 루트 기준이라 `skills/x/a.md`
+# 처럼 온다. 폴더가 한 조각만 남으면 `${d%/*}` 가 그 조각을 그대로 돌려주어 루프가 거기서 끝나고,
+# 정작 루트의 정본을 못 본 채 "남의 문서" 로 판정했다. 마지막에 `.` 을 한 번 더 본다.
+path_in_own_repo() {  # $1=경로 → 이 저장소 자신의 문서이면 0
+  local d prev
+  d="${1%/*}"
+  [ "$d" = "$1" ] && d="."
+  prev=""
+  while [ -n "$d" ] && [ "$d" != "$prev" ]; do
+    [ -f "$d/agent-principles.md" ] && return 0
+    prev="$d"
+    case "$d" in */*) d="${d%/*}" ;; .|/) d="" ;; *) d="." ;; esac
+  done
+  return 1
+}
+
 # spec/plan 리뷰 안내문(SSOT). PostToolUse 넛지와 Stop 차단 사유가 같은 문장을 쓴다. 렌즈 구성은
 # review-specs가 정하므로 여기 개수를 박지 않는다.
 SPEC_REVIEW_INSTRUCTION="disciplined-coder review-specs 스킬로 PREP+독립 렌즈 리뷰를 수행하라(어느 렌즈를 돌릴지는 그 스킬이 정한다). 리뷰와 처분 분류가 끝나면 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영하라."

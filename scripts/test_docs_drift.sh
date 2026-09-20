@@ -124,8 +124,10 @@ check "소유자 안에서 다시 정하지 않는다"      "grep -qF '여기서
 echo "[이름은 명사구, 주장은 첫 문장 — 정본과 가독성 렌즈]"
 CANON="$HERE/agent-principles.md"
 READ2="$HERE/skills/lens-readability/SKILL.md"
-# 문서 타입과 수명과 수정 규율은 정본에서 이 스킬로 옮겼다. 정본에는 포인터만 남는다.
-DOCS_SK="$HERE/skills/domain-docs/SKILL.md"
+# 문서 타입과 수명과 수정 규율은 정본이 소유한다. 문서를 만지는 모든 세션에 걸리는 규칙이라
+# 스킬로 두면 여는 판단을 매번 해야 했고, 안 열었을 때의 누락이 조용했다. 타입마다 무엇이
+# 강제하는지는 프로젝트마다 다르므로 그 칸만 저장소 CLAUDE.md 가 갖는다.
+TYPE_TBL="$HERE/CLAUDE.md"
 # 상세는 domain-korean 이 소유하고 정본은 조항만 담는다. 양쪽을 함께 붙든다.
 WK="$HERE/skills/lens-readability/domain-korean.md"
 check "상세 스킬이 있다"                     "[ -f \"$WK\" ]"
@@ -220,7 +222,7 @@ check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거�
 check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$DOCS\""
 check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'review-docs 가 소유' \"\$CALLER\""
 check "정본은 그 규칙을 더 안 적는다"        "! grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' \"\$CANON\""
-check "문서 스킬이 새 소유자를 가리킨다"     "grep -qF '기록 파일의 이름과 회차 표기는 \`review-docs\`가 소유한다' \"\$DOCS_SK\""
+check "정본이 기록 이름의 소유자를 가리킨다" "grep -qF '기록 파일의 이름과 회차 표기는 \`review-docs\`가 소유한다' \"\$CANON\""
 check "원본을 받는 즉시 저장한다"            "grep -qF '받는 즉시' \"\$CALLER\""
 check "원본을 같은 이름 폴더에 둔다"          "grep -qF '같은 이름의 폴더' \"\$CALLER\""
 check "런타임이 기록 제외 이유를 적는다"      "grep -qF '사용자 입력이 로그로' \"\$RUNTIME2\""
@@ -409,7 +411,7 @@ echo "[문서 타입 표] 강제하는 장치 칸이 실물을 가리킨다"
 # 표가 장치를 이름으로만 적으면 실물이 없어도 그 행은 갖춰진 것처럼 읽힌다. 칸을 표가 사는 곳에서
 # 뽑아 백틱 경로면 그 파일이 있는지 보고, 「없다」로 열리면 뒤에 이유가 붙었는지 본다. 둘 다 아니면
 # 실패한다 — 이름만 적고 넘어가는 길을 막는다(FAIL-LOUD). 행을 하나 더해도 저절로 따라온다.
-TYPE_CELLS="$(awk '/^## 문서 타입과 수명/{f=1;next} f&&/^## /{exit} f&&/^\| \*\*/{n=split($0,a,"|"); print a[n-1]}' "$DOCS_SK")"
+TYPE_CELLS="$(awk '/^## 문서 타입마다 무엇이 강제하나/{f=1;next} f&&/^## /{exit} f&&/^\| \*\*/{n=split($0,a,"|"); print a[n-1]}' "$TYPE_TBL")"
 check "문서 타입 표에서 장치 칸을 뽑았다" "[ -n \"\$TYPE_CELLS\" ]"
 TYPE_BAD=""
 while IFS= read -r cell; do
@@ -792,8 +794,15 @@ BANSRC="$HERE/korean-banned-words.md"
 # 표의 행만 본다. 절의 설명 문단에도 백틱이 들어 있어, 절 전체에서 뽑으면 그 문단의 경로와 칸 이름이
 # 금지어로 둔갑한다(2026-09-06 에 실제로 세 건이 그렇게 잡혔다). 그리고 첫 칸에서만 뽑는다 —
 # 대체어 칸에 백틱이 생겨도 금지어로 새지 않게 한다.
-BANROWS="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/ && /문서와 답변/' "$BANSRC" || true)"
-BANLIST="$(printf '%s\n' "$BANROWS" | awk -F'|' '{print $2}' | grep -oE '`[^`]+`' | tr -d '`' || true)"
+# 표를 읽는 것은 hooks/_banned_words.sh 하나다. 전에는 여기가 자기 awk 로 또 읽었는데, 원본이
+# schema 2 로 제외 칸을 더하자 훅과 검사가 서로 다른 것을 보게 됐다. 같은 파서를 쓰면 표의 모양이
+# 바뀌어도 한쪽만 따라가는 일이 없다(`SSOT`).
+. "$HERE/hooks/_banned_words.sh"
+BANWORK="$(mktemp -d)"
+BANPAIRS="$BANWORK/pairs"; BANTOKS="$BANWORK/toks"; BANEXCL="$BANWORK/excl"; BANSCOPES="$BANWORK/scopes"
+banned_parse "$BANSRC" "$BANPAIRS" "$BANTOKS" "$BANEXCL" "$BANSCOPES"
+# 문서에 거는 행만 고른다. scopes 와 pairs 는 행 순서가 같다.
+BANLIST="$(awk -F'	' 'NR==FNR{s[FNR]=$0; next} {if (index(s[FNR], "문서와 답변")) for (i=2;i<=NF;i++) print $i}' "$BANSCOPES" "$BANPAIRS" || true)"
 BAN_LIVE="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^agent-principles.md$' | grep -v '^korean-banned-words.md$' | grep -v '^skills/lens-readability/domain-korean.md$')"
 # 아직 HEAD 에 없는 spec·plan 만 고른다. HEAD 목록이 비면 grep -vxF 가 전부를 지우므로 나눠 다룬다.
 SP_ALL="$(cd "$HERE" && git ls-files 'docs/superpowers/specs/*.md' 'docs/superpowers/plans/*.md')"
@@ -852,17 +861,23 @@ $BANWAIVE_ALL
 WAIVEEOF
   check "유예 목록에 죽은 줄이 없다" "[ -z '$BANWAIVE_DEAD' ]"
 fi
+# 제외 칸을 적용해 한 번에 훑는다. 목록은 레포 루트 기준 상대경로라 그 폴더에서 돈다.
+BANFILES="$BANWORK/files"
+printf '%s
+' "$BAN_DOCS" > "$BANFILES"
+BANSCAN="$(cd "$HERE" && banned_scan "$BANPAIRS" "$BANEXCL" "$BANSCOPES" "문서와 답변" "$BANFILES")"
+check "훑은 결과를 얻었다" "[ -n \"\$BANSCAN\" ]"
 BANHIT=""
 while IFS= read -r w; do
   [ -n "$w" ] || continue
   if [ -n "$BANWAIVE" ] && printf '%s\n' "$BANWAIVE" | grep -qxF -- "$w"; then
     BANWAIVED="$BANWAIVED '$w'"; BANWAIVED_N=$((BANWAIVED_N+1)); continue
   fi
-  hit=""
-  for f in $BAN_DOCS; do
-    if LC_ALL=C.UTF-8 grep -qF -- "$w" "$HERE/$f"; then hit="$hit $f"; fi
-  done
-  check "금지 표현 '$w' 이 없다" "[ -z '$hit' ]"
+  # 걸린 파일은 banned_scan 이 한 번에 낸 표에서 꺼낸다. 낱말마다 문서마다 grep 을 돌리면
+  # 40×25 번이 되고, 제외 칸을 적용하려면 그 자리마다 덮어쓰기를 또 해야 한다.
+  hit="$(printf '%s
+' "$BANSCAN" | awk -F'	' -v w="$w" '$1==w{print $2; exit}')"
+  check "금지 표현 '$w' 이 없다" "[ -z \"\$hit\" ]"
   [ -n "$hit" ] && BANHIT="$BANHIT
     $w:$hit"
 done <<EOF

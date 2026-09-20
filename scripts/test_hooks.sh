@@ -193,16 +193,22 @@ check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/ne
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off fpre '$(J "$T/newdoc.md")')\" ]"
 check "프로젝트 밖 새 문서 → 무출력"     "[ -z \"\$(fpre '$(J "$OUTSIDE/new.md")')\" ]"
 check "새 리뷰 기록 → 무출력"            "[ -z \"\$(fpre '$(J "$T/docs/superpowers/reviews/new-check.md")')\" ]"
-# 오답노트는 양식을 그 로그 자신의 머리말이 정해 두어 domain-docs 양식 제안이 틀린 조언이 된다.
+# 오답노트는 양식을 그 로그 자신의 머리말이 정해 두어 정본의 양식 제안이 틀린 조언이 된다.
 # 검진 넛지가 같은 이유로 같은 경로를 빼고 있으니 양식 제안도 함께 뺀다 — 한쪽만 빼면 같은 파일을
 # 만들 때 한 훅은 조용하고 다른 훅은 떠들어 어느 쪽이 맞는지 알 수 없다.
 check "새 오답노트 색인 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems.md")')\" ]"
 check "새 오답노트 본문 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems/new-lesson.md")')\" ]"
 check "새 문서 넛지가 domain-readme 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'domain-readme'"
-# 넛지가 가리킨 스킬이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로 가리키던 절
-# 이름이 바뀌자 넛지가 없는 곳을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD). 타입과 수명이
-# 정본에서 domain-docs 로 옮겨 가 가리키는 대상이 절에서 스킬로 바뀌었고, 이 검사도 따라 바뀐다.
-NUDGE_SK="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*disciplined-coder \([a-z][a-z-]*\) 에서.*/\1/p")"
+# 넛지가 가리킨 곳이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로 가리키던 절 이름이
+# 바뀌자 넛지가 없는 곳을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD). 타입과 수명이 스킬에서
+# 정본으로 돌아가 가리키는 대상이 스킬에서 절로 바뀌었고, 이 검사도 따라 바뀐다.
+# 부정 대괄호(`[^」]`)를 안 쓴다. 로케일이 UTF-8 이 아니면 sed 가 그것을 바이트로 읽어, 한글의
+# 이어지는 바이트가 」 의 바이트와 겹쳐 매치가 엉뚱한 데서 끊긴다. 메시지에 「…」 절 이 하나뿐이라
+# 탐욕적 `.*` 가 안전하다. 같은 함정을 test_docs_drift.sh 의 대구 검사도 주석으로 적어 두었다.
+NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n 's/.*정본의 「\(.*\)」 절.*/\1/p')"
+check "넛지가 가리킨 절 이름 추출됨"       "[ -n \"\$NUDGE_SEC\" ]"
+check "그 절이 정본에 실재"                "grep -qF \"## \$NUDGE_SEC\" '$HERE/agent-principles.md'"
+NUDGE_SK="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*disciplined-coder \([a-z][a-z-]*\) 를 함께.*/\1/p")"
 check "넛지가 가리킨 스킬 이름 추출됨"     "[ -n \"\$NUDGE_SK\" ]"
 check "그 스킬이 실재"                    "[ -f \"$HERE/skills/\$NUDGE_SK/SKILL.md\" ]"
 
@@ -263,6 +269,47 @@ check "OFF → 무출력"                "[ -z \"\$(JB 'sed -i s/x/y/ $BW/draft.
 printf '이 문서는 대상을 지적한다.\n' > "$BW/clean.md"
 check "깨끗한 산출물에는 통지 없음" "[ -z \"\$(JB 'sed -i s/x/y/ $BW/clean.md' | bash '$DWPOST')\" ]"
 check "훅 배선에 Bash 가 들어 있다" "grep -qF 'Write|Edit|Bash' '$HERE/hooks/hooks.json'"
+
+echo "[제외 칸 — 어간을 넓히고 다른 뜻으로 쓰는 말을 뺀다]"
+# 원본이 schema 2 에서 다섯째 칸 `제외` 를 더했다. 그 칸을 안 읽으면 어간만 가지고 검색해
+# `판정`·`판단` 까지 잡히고, 산출물을 거의 못 쓰게 된다. 표를 읽는 곳이 하나여야 훅과 검사가
+# 같은 것을 본다(SSOT). 픽스처로 보는 이유는 이 저장소의 목록이 아직 schema 1 이기 때문이다.
+. "$HERE/hooks/_banned_words.sh"
+BX="$T/banx"; mkdir -p "$BX"
+cat > "$BX/list.md" <<'BANEOF'
+### 금지 표현
+
+| 쓰지 않는 말 | 대신 쓰는 말 | 적용 대상 | 분류 | 제외 |
+|---|---|---|---|---|
+| `판` | 버전 | 문서와 답변 | 평소에 쓰지 않는 말 | `판정` · `판단` |
+| `짚` | 지적 | 답변과 산출물 | 한자어를 고유어로 되돌린 것 |  |
+BANEOF
+banned_parse "$BX/list.md" "$BX/pairs" "$BX/toks" "$BX/excl" "$BX/scopes"
+check "제외 칸을 읽는다"            "grep -qF '판정' '$BX/excl'"
+check "제외 없는 행은 빈 줄이다"    "[ \"\$(sed -n 2p '$BX/excl')\" = '' ]"
+check "적용 대상을 읽는다"          "[ \"\$(sed -n 1p '$BX/scopes')\" = '문서와 답변' ]"
+printf '판정과 판단만 있다.\n' > "$BX/clean.md"
+printf '새 판을 낸다.\n' > "$BX/dirty.md"
+check "제외 안의 것은 안 잡는다"    "[ -z \"\$(banned_report '$BX/pairs' '$BX/clean.md' '$BX/excl')\" ]"
+check "제외 밖의 것은 잡는다"       "banned_report '$BX/pairs' '$BX/dirty.md' '$BX/excl' | grep -qF '판 -> 버전'"
+# 제외 파일을 안 주면 옛 동작 그대로여야 한다. 옛 목록(schema 1)을 쓰는 PC 가 남아 있다.
+check "제외를 안 주면 전과 같다"    "banned_report '$BX/pairs' '$BX/clean.md' | grep -qF '판 -> 버전'"
+printf 'clean.md\ndirty.md\n' > "$BX/files"
+BXSCAN="$(cd "$BX" && banned_scan "$BX/pairs" "$BX/excl" "$BX/scopes" '문서와 답변' "$BX/files")"
+check "한 번에 훑어 걸린 파일을 낸다" "printf '%s' \"\$BXSCAN\" | grep -qF 'dirty.md'"
+check "제외에 걸린 파일은 안 든다"   "! printf '%s' \"\$BXSCAN\" | grep -qF 'clean.md'"
+check "적용 대상으로 행을 고른다"    "[ \"\$(printf '%s\\n' \"\$BXSCAN\" | grep -c .)\" = 1 ]"
+# 긴 제외어가 짧은 것에 먹히면 안 된다. `판단` 을 먼저 덮으면 `판단력` 이 더는 안 맞는다.
+cat > "$BX/list2.md" <<'BANEOF'
+### 금지 표현
+
+| 쓰지 않는 말 | 대신 쓰는 말 | 적용 대상 | 분류 | 제외 |
+|---|---|---|---|---|
+| `판` | 버전 | 문서와 답변 | 평소에 쓰지 않는 말 | `판단` · `판단력` |
+BANEOF
+banned_parse "$BX/list2.md" "$BX/pairs2" "$BX/toks2" "$BX/excl2" "$BX/scopes2"
+printf '판단력이 있다.\n' > "$BX/long.md"
+check "긴 제외어가 먼저 덮인다"      "[ -z \"\$(banned_report '$BX/pairs2' '$BX/long.md' '$BX/excl2')\" ]"
 
 echo "[stop 겹 — 도구를 묻지 않고 결과를 본다]"
 # 명령줄에 대상이 안 나타나는 변경(파이썬 스크립트, git checkout)을 앞 두 겹이 못 본다.
@@ -459,7 +506,7 @@ check "경로가 없으면 통과한다"               "[ -z \"\$(dw '{}')\" ]"
 # 정본이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.
 # 막지는 않는다. 여기서 막으면 정본을 못 찾는 설치에서 문서 편집이 통째로 멈춘다.
 FAKE="$T/fake"; mkdir -p "$FAKE/hooks" "$FAKE/scripts"
-cp "$DW" "$HERE/hooks/_json_escape.sh" "$HERE/hooks/_banned_words.sh" "$HERE/hooks/_extract_path.sh" "$FAKE/hooks/"
+cp "$DW" "$HERE/hooks/_json_escape.sh" "$HERE/hooks/_banned_words.sh" "$HERE/hooks/_extract_path.sh" "$HERE/hooks/_spec_marker.sh" "$FAKE/hooks/"
 cp "$HERE/scripts/_json_valid.sh" "$FAKE/scripts/"
 DW_NOCANON="$(printf '%s' "$(dwj "$DWDIR/report.md" "$DWBODY")" | bash "$FAKE/hooks/doc_word_pretooluse.sh")"
 check "정본이 없으면 알린다"                 "printf '%s' \"\$DW_NOCANON\" | grep -qF 'systemMessage'"

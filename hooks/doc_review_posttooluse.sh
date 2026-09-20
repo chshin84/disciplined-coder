@@ -7,10 +7,20 @@
 # 2026-09-21 에 한 세션이 sed -i 로 문서 열한 개를 고치는 동안 넛지가 한 번도 안 떴다. 순수 bash.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
+INPUT="$(cat)"
+
+# 무엇도 하기 전에 거른다. Bash 까지 보게 되면서 이 훅이 모든 셸 호출에 걸리므로, 평상시 값이
+# 곧 이 줄이다. file_path 가 있으면 Write·Edit 이라 그대로 가고, 없으면 쓰기 구문이 있을 때만
+# 간다. 둘 다 아니면 헬퍼를 싣지도 대상 뽑기를 부르지도 않는다 — 그 셋이 프로세스 값의 전부다.
+case "$INPUT" in
+  *'"file_path"'*) ;;
+  *sed*|*tee*|*cp\ *|*mv\ *|*'>'*) ;;
+  *) exit 0 ;;
+esac
+
 DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_in_project) 공유(SSOT)
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
-INPUT="$(cat)"
 match=""
 while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue

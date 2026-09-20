@@ -13,11 +13,23 @@
 # 판정되어 어느 쪽이 맞는지 알 수 없게 된다.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
+INPUT="$(cat)"
+
+# 무엇도 하기 전에 거른다. 이 훅은 모든 Bash 호출에 걸리므로 평상시 값이 곧 이 줄이다.
+# 헬퍼 넷을 싣고 대상 뽑기를 부르면 프로세스가 셋 더 뜨는데, 쓰기 구문이 없으면 그 전부가
+# 버려진다. 실측으로 회당 276밀리초였고 이 거르기로 줄인다(2026-09-21, 윈도우 Git Bash).
+# 조건은 _extract_bash_targets.sh 의 것과 같은 낱말이고, 훅 입력이 명령을 담으므로 더 넓다.
+# 넓은 쪽이 안전하다 — 좁으면 뽑을 수 있는 것을 여기서 버린다.
+case "$INPUT" in
+  *sed*|*tee*|*cp\ *|*mv\ *|*'>'*) ;;
+  *) exit 0 ;;
+esac
+
 HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_in_own_repo) 공유(SSOT)
 . "$HOOKDIR/_json_escape.sh"        # JSON 문자열 이스케이프(SSOT) 공유
 . "$HOOKDIR/_banned_words.sh"       # 표 파싱과 본문 맞추기(SSOT) 공유
 . "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
-INPUT="$(cat)"
 
 BANSRC="$HOOKDIR/../korean-banned-words.md"
 [ -f "$BANSRC" ] || exit 0   # 목록이 없다는 사실은 Pre 훅이 이미 알린다. 여기서 두 번 알리지 않는다.
@@ -33,14 +45,7 @@ while IFS= read -r FILE; do
   case "$FILE" in */.claude/projects/*) continue ;; esac
   case "$FILE" in */docs/superpowers/*|docs/superpowers/*) continue ;; esac
   [ -f "$FILE" ] || continue
-  # 조상 폴더에 정본이 있으면 이 플러그인 저장소 자신의 문서다. Pre 훅과 같은 판정이다.
-  _d="${FILE%/*}"; [ "$_d" = "$FILE" ] && _d="."
-  _prev=""; _own=0
-  while [ -n "$_d" ] && [ "$_d" != "$_prev" ]; do
-    if [ -f "$_d/agent-principles.md" ]; then _own=1; break; fi
-    _prev="$_d"; _d="${_d%/*}"
-  done
-  [ "$_own" -eq 1 ] && continue
+  path_in_own_repo "$FILE" && continue   # 이 저장소 자신의 문서. 판정은 _spec_marker.sh 가 소유한다.
   FILES="${FILES}${FILE}
 "
 done <<EOF
@@ -50,8 +55,8 @@ EOF
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
-PAIRS="$WORK/pairs"; TOKS="$WORK/toks"
-banned_parse "$BANSRC" "$PAIRS" "$TOKS"
+PAIRS="$WORK/pairs"; TOKS="$WORK/toks"; EXCL="$WORK/excl"
+banned_parse "$BANSRC" "$PAIRS" "$TOKS" "$EXCL"
 [ -s "$TOKS" ] || exit 0   # 검사 불능은 Pre 훅이 알린다.
 
 REPORT=""
@@ -59,7 +64,7 @@ while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
   # 빠른 거르기. 금지어 바이트가 파일에 하나도 없으면 파이썬을 안 부른다.
   LC_ALL=C grep -qFf "$TOKS" "$FILE" || continue
-  one="$(banned_report "$PAIRS" "$FILE")"
+  one="$(banned_report "$PAIRS" "$FILE" "$EXCL")"
   [ -n "$one" ] || continue
   REPORT="${REPORT}${FILE}
 ${one}

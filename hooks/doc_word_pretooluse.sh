@@ -19,6 +19,7 @@
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
 HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
+. "$HOOKDIR/_spec_marker.sh"    # 경로 술어(path_in_own_repo) 공유(SSOT)
 . "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프(SSOT) 공유
 . "$HOOKDIR/_banned_words.sh"   # 금지 표현 표 파싱(SSOT) 공유
 INPUT="$(cat)"
@@ -29,12 +30,9 @@ case "$FILE" in *.md) ;; *) exit 0 ;; esac
 case "$FILE" in */.claude/projects/*) exit 0 ;; esac
 case "$FILE" in */docs/superpowers/*) exit 0 ;; esac
 
-# 조상 폴더를 거슬러 정본이 있는지 본다. 셸 문자열 연산과 [ -f ] 뿐이라 프로세스를 안 띄운다.
-_d="${FILE%/*}"; _prev=""
-while [ -n "$_d" ] && [ "$_d" != "$_prev" ]; do
-  [ -f "$_d/agent-principles.md" ] && exit 0
-  _prev="$_d"; _d="${_d%/*}"
-done
+# 이 저장소 자신의 문서이면 뺀다. 판정은 _spec_marker.sh 의 path_in_own_repo 가 소유한다 —
+# Post 훅과 Stop 훅이 같은 판정을 해야 같은 파일이 도구에 따라 다르게 걸리지 않는다.
+path_in_own_repo "$FILE" && exit 0
 
 # 표는 정본이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 하나이고
 # scripts/gen_banned_words.py 가 그것을 이 파일로 낸다. 정본에는 포인터만 남는다.
@@ -47,8 +45,8 @@ fi
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
-PAIRS="$WORK/pairs"; TOKS="$WORK/toks"; RAW="$WORK/raw"
-banned_parse "$BANSRC" "$PAIRS" "$TOKS"
+PAIRS="$WORK/pairs"; TOKS="$WORK/toks"; EXCL="$WORK/excl"; RAW="$WORK/raw"
+banned_parse "$BANSRC" "$PAIRS" "$TOKS" "$EXCL"
 if [ ! -s "$TOKS" ]; then
   printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: 「금지 표현」 표에서 검색할 글자를 하나도 못 뽑아 산출물을 검사하지 못했다 — $BANSRC")"
   exit 0
@@ -84,7 +82,7 @@ if not isinstance(text, str):
 sys.stdout.write(text)
 ' "$RAW" > "$BODY" 2>/dev/null || true
 [ -s "$BODY" ] || exit 0
-REPORT="$(banned_report "$PAIRS" "$BODY")"
+REPORT="$(banned_report "$PAIRS" "$BODY" "$EXCL")"
 
 [ -n "$REPORT" ] || exit 0
 
