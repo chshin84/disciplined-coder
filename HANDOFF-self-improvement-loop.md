@@ -25,7 +25,7 @@
 
 ## 시작하기 전에
 
-- 워크트리를 연다. 이름은 `self-improvement-loop`가 좋다. 바탕은 `git pull`을 마친 main이어야 한다. 이 파일은 git 이 추적하므로 워크트리에도 사본이 있다. 사본은 옛 판일 수 있으니 main 폴더의 이 파일을 읽는다.
+- 워크트리를 연다. 이름은 `self-improvement-loop`가 좋다. 바탕은 `git pull`을 마친 main이어야 한다. 이 파일은 git 이 추적하므로 워크트리에도 사본이 있다. 사본은 옛 버전일 수 있으니 main 폴더의 이 파일을 읽는다.
 - 플러그인이 `04e2ef1` 이후인지 확인한다. `/plugin`에서 `disciplined-coder`의 커밋을 보면 된다.
 - `brainstorming`부터 연다. 이 저장소의 절차가 설계를 요구하고, 이식은 새 하위 체계라 architectural이다.
 
