@@ -252,6 +252,55 @@ echo "[banlist-shared] 여러 번 돌려도 같다"
 check "블록이 여전히 하나다"          "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC23') -eq 1 ]"
 check "가리키는 곳이 그대로다"        "sed -n '/BEGIN korean-banned-words/,/END korean-banned-words/p' '$UC23' | grep -qxF '@disciplined-coder/korean-banned-words-dc.md'"
 
+# --- install-current: 설치본이 사본보다 뒤처지면 옮기고 다시 켜라고 알린다 ---
+# 자동 갱신 플래그만으로는 모자라다. 사본을 받아 놓고도 설치본을 안 옮기는 것이 이 PC 에서 실제로
+# 있었다. 훅은 깔려 있는 판으로만 도므로, 이 확인이 없으면 옛 판이 조용히 돈다.
+# claude 를 실제로 부르지 않도록 스텁을 주입한다. 스텁은 받은 인자를 파일에 적어 두어, 무엇을
+# 실행했는지 단언할 수 있게 한다.
+cur_fixture() {  # $1=HOME $2=설치본 커밋 $3=스텁 종료 코드 → 사본의 HEAD 를 출력한다
+  mkdir -p "$1/.claude/plugins/marketplaces/chshin-tools"
+  printf '{ "version": 2, "plugins": { "disciplined-coder@chshin-tools": [ { "scope": "user", "gitCommitSha": "%s" } ] } }\n' "$2" > "$1/.claude/plugins/installed_plugins.json"
+  git init -q "$1/.claude/plugins/marketplaces/chshin-tools"
+  git -C "$1/.claude/plugins/marketplaces/chshin-tools" -c user.email=t@t -c user.name=t commit -q --allow-empty -m x
+  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s/args.txt"\nexit %s\n' "$1" "$3" > "$1/claude-stub"
+  chmod +x "$1/claude-stub"
+  git -C "$1/.claude/plugins/marketplaces/chshin-tools" rev-parse HEAD
+}
+
+H30="$(mktemp -d)"; P30="$(mktemp -d)"; mkdir -p "$H30/.claude"
+cur_fixture "$H30" "0000000000000000000000000000000000000000" 0 > /dev/null
+export DISCIPLINED_CODER_CLAUDE_BIN="$H30/claude-stub"
+OUT30="$(run "$H30" "$P30")"
+unset DISCIPLINED_CODER_CLAUDE_BIN
+echo "[install-current] 뒤처지면 옮기고 다시 켜라고 알린다"
+check "갱신을 실행한다"              "grep -qF 'plugin update disciplined-coder@chshin-tools' '$H30/args.txt'"
+check "다시 켜라고 알린다"           "printf '%s' \"\$OUT30\" | grep -qF '다시 켜야 새 판이 실린다'"
+
+H31="$(mktemp -d)"; P31="$(mktemp -d)"; mkdir -p "$H31/.claude"
+cur_fixture "$H31" "0000000000000000000000000000000000000000" 7 > /dev/null
+export DISCIPLINED_CODER_CLAUDE_BIN="$H31/claude-stub"
+OUT31="$(run "$H31" "$P31")"
+unset DISCIPLINED_CODER_CLAUDE_BIN
+echo "[install-current] 못 옮기면 사유와 직접 실행할 명령을 보인다"
+check "조용히 넘기지 않는다"         "printf '%s' \"\$OUT31\" | grep -qF '옮기지 못했다'"
+check "직접 실행할 명령을 보인다"    "printf '%s' \"\$OUT31\" | grep -qF 'plugin update disciplined-coder@chshin-tools'"
+
+H32="$(mktemp -d)"; P32="$(mktemp -d)"; mkdir -p "$H32/.claude"
+CUR_HEAD="$(cur_fixture "$H32" "dummy" 0)"
+printf '{ "version": 2, "plugins": { "disciplined-coder@chshin-tools": [ { "scope": "user", "gitCommitSha": "%s" } ] } }\n' "$CUR_HEAD" > "$H32/.claude/plugins/installed_plugins.json"
+export DISCIPLINED_CODER_CLAUDE_BIN="$H32/claude-stub"
+OUT32="$(run "$H32" "$P32")"
+unset DISCIPLINED_CODER_CLAUDE_BIN
+echo "[install-current] 최신이면 조용하다"
+check "갱신을 실행하지 않는다"       "[ ! -f '$H32/args.txt' ]"
+check "아무 말도 안 한다"            "! printf '%s' \"\$OUT32\" | grep -qF '설치본이 사본보다'"
+
+H33="$(mktemp -d)"; P33="$(mktemp -d)"; mkdir -p "$H33/.claude/plugins"
+printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }\n' > "$H33/.claude/plugins/installed_plugins.json"
+OUT33="$(run "$H33" "$P33")"
+echo "[install-current] 우리 설치 기록이 없으면 건너뛴다"
+check "아무 말도 안 한다"            "! printf '%s' \"\$OUT33\" | grep -qF '설치본이 사본보다'"
+
 # --- crlf-region: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
 printf 'note\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H6/.claude/CLAUDE.md"

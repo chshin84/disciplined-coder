@@ -12,6 +12,7 @@ PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 . "$(dirname "$0")/_resolve_home.sh"
 . "$(dirname "$0")/_scaffold_common.sh"
 . "$(dirname "$0")/_ensure_autoupdate.sh"
+. "$(dirname "$0")/_ensure_current.sh"
 CLAUDE_HOME="$(resolve_home claude)"
 KDIR="$CLAUDE_HOME/disciplined-coder"
 UC="$CLAUDE_HOME/CLAUDE.md"
@@ -302,6 +303,11 @@ if [ -s "$au_err" ]; then
   done < "$au_err"
 fi
 rm -f "$au_err"
+
+# 4b-2) 설치본이 사본보다 뒤처졌으면 옮기고 다시 켜라고 알린다. 자동 갱신 플래그를 켜는 것(4b)
+#       만으로는 모자라다 — 사본을 새 커밋까지 받아 놓고도 설치본을 안 옮기는 것이 이 PC 에서
+#       실제로 있었다. 규칙은 _ensure_current.sh 가 소유한다. 최신이면 아무것도 출력하지 않는다.
+ensure_install_current "$CLAUDE_HOME" || true
 
 # 4c) 함께 쓰는 플러그인 확인(매 세션): 없을 때만 설치 명령을 알리고 대신 깔지는 않는다. 다른
 #     플러그인을 사용자 대신 까는 것은 지나치다는 결정이 있었다. 깔려 있으면 아무것도 안 나오므로

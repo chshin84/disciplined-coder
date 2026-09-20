@@ -50,6 +50,7 @@ done
 | 이벤트 | 스크립트 | 하는 일 |
 |---|---|---|
 | SessionStart | `scripts/scaffold.sh` | 정본 사본과 `@import` 배선을 만들고 알린다 |
+| SessionStart | `scripts/_ensure_current.sh` | 설치본이 마켓플레이스 사본보다 뒤처지면 새 판으로 옮기고 다시 켜라고 알린다 |
 | SessionStart | `scripts/seal_reviews.sh` | 커밋된 감사 기록을 읽기 전용으로 봉인한다(이 저장소의 프로젝트 훅) |
 | SessionStart | `hooks/rules_nudge_sessionstart.sh` | 이 세션의 규칙 넛지 표시를 지워 다시 알리게 한다 |
 | PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 걸린 Write 와 Edit 을 사유와 함께 거부한다 |
