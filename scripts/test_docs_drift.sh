@@ -916,7 +916,10 @@ anti_count() {  # $1=파일 경로 → 이 문서에 남은 대구의 개수
   ' "$1"
 }
 echo "[대구 한도] 글 한 편에 한 번까지"
-ANTI_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
+# 금지 표현 목록은 뺀다. 원본 저장소가 만든 생성물이라 여기서 고칠 수 없고, 그 표의 분류 설명이
+# 대구를 쓴다. 고칠 수 없는 파일을 세면 검사가 영영 빨간 채로 남아 다른 위반을 가린다. 금지 표현
+# 검사도 같은 이유로 같은 파일을 뺀다.
+ANTI_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh | grep -v '^korean-banned-words.md$')"
 check "검사 대상 문서를 모았다" "[ -n \"\$ANTI_DOCS\" ]"
 # 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.
 ANTI_TMP="$(mktemp -d)"
