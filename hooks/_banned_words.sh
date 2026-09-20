@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 공유 헬퍼: 「금지 표현」 표를 한 번 읽어 두 파일로 낸다. 그 표는 정본이 아니라
-# korean-banned-words-dc.md 에 있고, 그 파일은 외부 저장소의 JSON 에서 만들어 낸 생성물이다.
+# korean-banned-words.md 에 있고, 그 파일은 외부 저장소의 JSON 에서 만들어 낸 생성물이다.
 # 소비자는 hooks/doc_word_pretooluse.sh 다. 답을 검사하던 훅이 값 때문에 걷혀 지금은 하나이고,
 # 표를 읽는 자리를 늘리지 않으려고 파싱은 계속 여기 한 벌만 둔다(SSOT).
 #

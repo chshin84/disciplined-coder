@@ -158,9 +158,16 @@ check "셸 편집도 세션당 한 번이다"                  "[ -z \"\$(cnud '
 check "OFF → 무출력"                                "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off cnud '$(JS s5 "" "$T/src/main.py")')\" ]"
 check "session_id 없음 → 매번 안내"                 "cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md' && cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 cnudh() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$2" bash "$CNUD"; }
-NUDGE_CANON="$(cnudh "$(JS s8 "" "$T/src/main.py")" "$NH" | sed -n 's/.*규칙 정본의 사본은 \(.*\) 에 있다\..*/\1/p')"
+# 넛지가 경로를 둘 알린다. 정본 사본과 한국어 상세이고 놓이는 곳이 서로 다르다 — 정본은 관리
+# 디렉터리로 복사되고 상세는 설치본 root 에만 있다. 뽑을 때 뒤 문장의 '에 있다' 까지 삼키지 않도록
+# 각각 뒤따르는 말로 끊는다. 둘 다 실재해야 한다 — 없는 파일을 열라고 시키지 않는다.
+NUDGE_OUT="$(cnudh "$(JS s8 "" "$T/src/main.py")" "$NH")"
+NUDGE_CANON="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*규칙 정본의 사본은 \(.*\) 에 있다\. 한국어.*/\1/p')"
+NUDGE_WK="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*한국어 문장 규칙의 상세는 \(.*\) 에 있다\..*/\1/p')"
 check "넛지에서 정본 경로가 뽑힌다"                 "[ -n \"\$NUDGE_CANON\" ]"
 check "뽑은 경로에 파일이 실재한다"                 "[ -f \"\$NUDGE_CANON\" ]"
+check "넛지에서 한국어 상세 경로가 뽑힌다"          "[ -n \"\$NUDGE_WK\" ]"
+check "그 상세 경로에도 파일이 실재한다"            "[ -f \"\$NUDGE_WK\" ]"
 check "넛지에 상시 적재라는 거짓 문장이 없다"       "! cnudh '$(JS s8b "" "$T/src/main.py")' '$NH' | grep -qF '상시로 싣고'"
 check "사본이 없으면 그 사실을 알린다"              "cnudh '$(JS s8c "" "$T/src/main.py")' '$T/emptyhome' | grep -qF '사본을 못 찾았다'"
 

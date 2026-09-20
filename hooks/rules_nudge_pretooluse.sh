@@ -30,6 +30,15 @@ if [ -n "$CANON_PATH" ] && [ -f "$CANON_PATH" ]; then
 else
   where="규칙 정본의 사본을 못 찾았다 — disciplined-coder setup-discipline 을 돌려라."
 fi
+# 한국어 상세는 lens-readability 폴더에 놓인 참고서다. 스킬이 아니어서 이름으로 못 열고, 관리
+# 디렉터리에 사본을 두지도 않는다. 그래서 정본 사본과 경로가 달라 여기서 따로 도출한다.
+# 없으면 그 사실을 알린다 — 없는 파일을 열라고 시키지 않는다.
+WK_PATH="$(cd "$DIR/.." 2>/dev/null && pwd)/skills/lens-readability/domain-korean.md"
+if [ -f "$WK_PATH" ]; then
+  wkwhere="한국어 문장 규칙의 상세는 $WK_PATH 에 있다."
+else
+  wkwhere="한국어 문장 규칙의 상세를 담은 domain-korean.md 를 못 찾았다."
+fi
 INPUT="$(cat)"
 
 # stdin JSON 의 최상위 문자열 필드 하나를 뽑는다. 없으면 빈 문자열.
@@ -48,7 +57,7 @@ fi
 # session_id 가 없으면 계약이 깨진 것이다. 표시 파일 없이 매번 알린다 — 조용히 빠지지 않는다(FAIL-LOUD).
 
 # 스킬의 절 이름을 여기 박지 않는다 — 훅은 스킬을 가리키기만 하고 내용을 베끼지 않는다(문서 넛지와 같은 규칙).
-msg="🧑‍💻 이 세션에서 파일을 처음 건드린다 — $where 한국어 문장 규칙의 상세는 disciplined-coder domain-korean 이 갖는다. 서브에이전트에는 정본이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 레포 안에서 도는 워크플로는 이 사본 대신 그 레포의 정본을 넣는다 — 상세는 disciplined-coder dispatching-lenses 가 갖는다. 넛지일 뿐 차단은 아니다."
+msg="🧑‍💻 이 세션에서 파일을 처음 건드린다 — $where $wkwhere 서브에이전트에는 정본이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 레포 안에서 도는 워크플로는 이 사본 대신 그 레포의 정본을 넣는다 — 상세는 disciplined-coder dispatching-lenses 가 갖는다. 넛지일 뿐 차단은 아니다."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

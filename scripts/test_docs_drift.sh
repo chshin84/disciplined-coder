@@ -127,7 +127,7 @@ READ2="$HERE/skills/lens-readability/SKILL.md"
 # 문서 타입과 수명과 수정 규율은 정본에서 이 스킬로 옮겼다. 정본에는 포인터만 남는다.
 DOCS_SK="$HERE/skills/domain-docs/SKILL.md"
 # 상세는 domain-korean 이 소유하고 정본은 조항만 담는다. 양쪽을 함께 붙든다.
-WK="$HERE/skills/domain-korean/SKILL.md"
+WK="$HERE/skills/lens-readability/domain-korean.md"
 check "상세 스킬이 있다"                     "[ -f \"$WK\" ]"
 # 정본이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
 # 그 검사가 우리가 없애려던 중복을 오히려 요구했다. 이제 ID 로 잇고, 지시 문장이 스킬에 그대로
@@ -380,7 +380,7 @@ echo "[첫 문장] 소제목 아래 첫 줄이 산문이다"
 # 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
 # 따라온다(SSOT). 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
 # 한글이 없는 제목은 건너뛴다. READ-FLOW 는 「한국어로 쓸 때」의 규칙이라 영어 절에는 안 걸린다.
-HF_WK="$HERE/skills/domain-korean/SKILL.md"
+HF_WK="$HERE/skills/lens-readability/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
 check "첫 문장 예외를 정본에서 뽑았다" "[ -n \"\$HF_EXC\" ]"
@@ -762,7 +762,7 @@ for f in "$HERE"/skills/*/SKILL.md; do
 done
 
 # --- 금지 표현: 살아 있는 문서에 남지 않는다 ---
-# 목록을 검사에 손으로 적지 않고 korean-banned-words-dc.md 의 「금지 표현」 표에서 도출한다. 말을
+# 목록을 검사에 손으로 적지 않고 korean-banned-words.md 의 「금지 표현」 표에서 도출한다. 말을
 # 더하면 이 검사가 함께 따라온다. 표를 스킬이 아니라 상시 실리는 파일에 두는 이유는 스킬이 열릴
 # 때만 대화에 실려 답을 쓰는 동안 목록이 눈앞에 없었기 때문이다.
 #
@@ -771,7 +771,8 @@ done
 # 걸면 돌아가는 문서 스물두 개를 한꺼번에 다시 써야 한다 — 그 결정은 사용자 몫으로 남겨 두었다.
 #
 # 대상에서 빼는 것이 셋이고 이유가 서로 다르다. 정본 자신은 그 말을 정의하는 표를 담아서 빼고,
-# domain-korean 은 각 항목이 어느 지적에서 나왔는지를 적으며 그 말을 이름으로 불러야 해서 빼며,
+# domain-korean 은 그 말을 지적한 사용자 인용을 그대로 담아서 빼며(예시로 들던 항목은 2026-09-21 에
+# 걷었고 남은 것은 인용뿐이다. 인용은 검사 대상이 아니라는 것이 목록 파일의 규정이다),
 # docs/superpowers/ 아래의 기록(리뷰)과 인수인계는 찍은 뒤 고치지 않거나 소비하고 지우는 것이라 뺀다.
 # 마지막 제외는 audit-repo-docs 의 「대상 아님」과 같은 규정이다.
 #
@@ -787,13 +788,13 @@ done
 # 검사에 걸리고 커밋되면 과거가 된다. 이 저장소는 고친 뒤 검사를 돌리는 규약이라 그때가 커밋 전이다.
 # 표는 정본이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 이고
 # 그 저장소의 render.py 가 만들어 dist/ 에 올린 것을 워크플로가 받아 온다.
-BANSRC="$HERE/korean-banned-words-dc.md"
+BANSRC="$HERE/korean-banned-words.md"
 # 표의 행만 본다. 절의 설명 문단에도 백틱이 들어 있어, 절 전체에서 뽑으면 그 문단의 경로와 칸 이름이
 # 금지어로 둔갑한다(2026-09-06 에 실제로 세 건이 그렇게 잡혔다). 그리고 첫 칸에서만 뽑는다 —
 # 대체어 칸에 백틱이 생겨도 금지어로 새지 않게 한다.
 BANROWS="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/ && /문서와 답변/' "$BANSRC" || true)"
 BANLIST="$(printf '%s\n' "$BANROWS" | awk -F'|' '{print $2}' | grep -oE '`[^`]+`' | tr -d '`' || true)"
-BAN_LIVE="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^agent-principles.md$' | grep -v '^korean-banned-words-dc.md$' | grep -v '^skills/domain-korean/SKILL.md$')"
+BAN_LIVE="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^agent-principles.md$' | grep -v '^korean-banned-words.md$' | grep -v '^skills/lens-readability/domain-korean.md$')"
 # 아직 HEAD 에 없는 spec·plan 만 고른다. HEAD 목록이 비면 grep -vxF 가 전부를 지우므로 나눠 다룬다.
 SP_ALL="$(cd "$HERE" && git ls-files 'docs/superpowers/specs/*.md' 'docs/superpowers/plans/*.md')"
 SP_OLD="$(cd "$HERE" && git ls-tree -r --name-only HEAD -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null | grep '\.md$' || true)"
@@ -818,7 +819,7 @@ echo "[금지 표현] 살아 있는 문서에 남지 않는다"
 check "금지 목록을 생성물에서 도출했다" "[ -n \"\$BANLIST\" ]"
 check "검사 대상 문서를 모았다"       "[ -n \"\$BAN_DOCS\" ]"
 # 앵커가 실제로 잡히는지 먼저 본다 — 목록이나 대상이 비면 아래 단언이 모두 근거 없이 통과한다.
-BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '### 금지 표현' korean-banned-words-dc.md || true)"
+BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '### 금지 표현' korean-banned-words.md || true)"
 check "생성물에 금지 표현 절이 있다"   "[ -n \"\$BAN_SELFTEST\" ]"
 # 답과 산출물에만 거는 행도 실제로 뽑히는지 본다. 이 행들이 사라지면 훅 둘이 검사할 말이
 # 없어지는데, 그 훅들은 조용히 통과하므로 소실을 알아챌 다른 신호가 없다.

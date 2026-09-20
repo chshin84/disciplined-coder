@@ -1,7 +1,7 @@
 name: banned-words-sync
 
 # 금지 표현 목록의 원본은 KiwoomAX/korean-banned-words 의 JSON 하나다. 이 저장소는 그 데이터를
-# 복제하지 않고 생성물(korean-banned-words-dc.md)만 커밋한다. 원본이 바뀌면 이 워크플로가
+# 복제하지 않고 생성물(korean-banned-words.md)만 커밋한다. 원본이 바뀌면 이 워크플로가
 # 다시 만들어 PR 을 연다.
 #
 # 미는 쪽이 아니라 당기는 쪽으로 짠다. 원본 저장소가 이 저장소에 쓰려면 개인 토큰을 시크릿에
@@ -29,19 +29,19 @@ jobs:
       # 문서가 나온다. 실제로 갈라진 것을 확인하고 한 곳으로 모았다.
       - name: 만들어진 목록을 받는다
         run: |
-          curl -fsSL -o korean-banned-words-dc.md \
+          curl -fsSL -o korean-banned-words.md \
             https://raw.githubusercontent.com/KiwoomAX/korean-banned-words/main/dist/korean-banned-words.md
-          test -s korean-banned-words-dc.md
+          test -s korean-banned-words.md
 
       - name: 바뀐 것이 있는지 본다
         id: diff
         run: |
-          if git diff --quiet -- korean-banned-words-dc.md; then
+          if git diff --quiet -- korean-banned-words.md; then
             echo "changed=no" >> "$GITHUB_OUTPUT"
             echo "원본과 같다 — 열 PR 이 없다"
           else
             echo "changed=yes" >> "$GITHUB_OUTPUT"
-            git --no-pager diff --stat -- korean-banned-words-dc.md
+            git --no-pager diff --stat -- korean-banned-words.md
           fi
 
       # 생성물만 바뀌므로 테스트를 함께 돌린다. 목록이 늘면 저장소 문서가 그 말을 품고 있어
@@ -62,7 +62,7 @@ jobs:
           title: '금지 표현 목록을 원본에 맞춘다'
           commit-message: '금지 표현 생성물을 원본에 맞춰 다시 만든다'
           body: |
-            `KiwoomAX/korean-banned-words` 의 데이터가 바뀌어 `korean-banned-words-dc.md` 를 다시 만들었다.
+            `KiwoomAX/korean-banned-words` 의 데이터가 바뀌어 `korean-banned-words.md` 를 다시 만들었다.
 
             손으로 고치지 말고 목록을 바꿀 일이 있으면 원본 저장소를 고쳐라. 여기서 고치면 다음 실행에서 사라진다.
 

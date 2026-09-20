@@ -112,8 +112,8 @@ if [ -f "$UC" ] && grep -qF '@disciplined-coder/agent-principles.md' "$UC"; then
 # 마커는 어느 플러그인도 소유하지 않는 중립 이름이라 사내 kw-control-tower 도 같은 블록을 쓴다.
 BAN_BEGIN='# BEGIN korean-banned-words (shared — do not edit)'
 BAN_END='# END korean-banned-words (shared — do not edit)'
-BAN_IMPORT='@disciplined-coder/korean-banned-words-dc.md'
-BAN_FILE="$KDIR/korean-banned-words-dc.md"
+BAN_IMPORT='@disciplined-coder/korean-banned-words.md'
+BAN_FILE="$KDIR/korean-banned-words.md"
 
 # 판 표시를 읽는다. 목록 파일 머리 20줄 안의 `<!-- 원본 판: schema N, 날짜, 지문 -->` 이고,
 # 그 줄이 머리 20줄 안에 남는 것은 원본 저장소의 render.py 가 만들 때마다 확인하는 계약이다.
@@ -254,7 +254,7 @@ if [ "$had_import" -eq 0 ]; then
     [ -f "$KDIR/$f" ] || continue
     # 목록은 이 보강에서 뺀다. 공용 블록이 정하므로 had_import 와 무관하고, 여기서 흘리면
     # 블록을 안 고친 세션에도 목록이 한 벌 더 실린다.
-    if [ "$f" = "korean-banned-words-dc.md" ]; then continue; fi
+    if [ "$f" = "korean-banned-words.md" ]; then continue; fi
     # 읽기가 거부돼도 훅 전체를 죽이지 않는다. set -e 아래에서 cat 실패는 스캐폴드를 그 자리에서
     # 끝내 @import 배선까지 못 하게 만든다. 대신 못 읽었다는 사실을 stderr로 드러낸다(FAIL-LOUD).
     if ! cat "$KDIR/$f" 2>/dev/null; then

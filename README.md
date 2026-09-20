@@ -69,7 +69,7 @@ done
 여기 넷만 실제로 작업을 막는다. 나머지는 알리기만 한다.
 
 - **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 막고 `review-specs` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 풀린다. 차단은 턴에 한 번이라 두 번째 종료 시도는 통과한다.
-- **산출물 차단** — 사용자가 요구한 산출물 `.md`에 「금지 표현」 목록의 말이 있으면 거부하고 무엇을 무엇으로 고칠지 보인다. 목록은 `korean-banned-words-dc.md`에 있고 KiwoomAX/korean-banned-words 에서 받아 온 생성물이라 손으로 고치지 않는다. 셋은 대상에서 뺀다. 이 플러그인 저장소 자신의 문서와 Claude 메모리(`/.claude/projects/` 아래)와 `docs/superpowers/` 아래다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 적어야 하면 백틱으로 감싼다.
+- **산출물 차단** — 사용자가 요구한 산출물 `.md`에 「금지 표현」 목록의 말이 있으면 거부하고 무엇을 무엇으로 고칠지 보인다. 목록은 `korean-banned-words.md`에 있고 KiwoomAX/korean-banned-words 에서 받아 온 생성물이라 손으로 고치지 않는다. 셋은 대상에서 뺀다. 이 플러그인 저장소 자신의 문서와 Claude 메모리(`/.claude/projects/` 아래)와 `docs/superpowers/` 아래다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 적어야 하면 백틱으로 감싼다.
 - **읽기 전용 차단** — 읽기 전용 속성이 선 파일에 `Write`나 `Edit`을 하려 하면 거부하고 사유를 보인다. 어느 프로젝트의 어느 파일이든 속성만 본다. 풀려면 속성을 풀면 된다.
 - **`python3` 차단** — 윈도우에서 `python3`이 스토어 안내판(`AppInstallerPythonRedirector.exe`)으로 풀릴 때만 그 Bash 명령을 거부하고 `python`이나 `py -3`을 쓰라고 알린다. 맥과 리눅스에서는 걸리지 않는다.
 
