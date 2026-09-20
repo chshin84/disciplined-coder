@@ -207,16 +207,28 @@ check "넛지가 가리킨 스킬 이름 추출됨"     "[ -n \"\$NUDGE_SK\" ]"
 check "그 스킬이 실재"                    "[ -f \"$HERE/skills/\$NUDGE_SK/SKILL.md\" ]"
 
 echo "[doc-review-post]"
-check "문서(.md) → 검진 넛지"            "drev '$(J "$T/existing.md")' | grep -q additionalContext"
+# 거는 대상이 산출물과 그 재료로 좁혀졌다. 확장자 넷은 그 자체로 걸리고, 마크다운은 같은 폴더에
+# 그런 파일이 있을 때만 걸린다. 저장소 작업 문서에 뜨던 넛지가 사라진 것이 이 변경의 핵심이라,
+# 안 뜨는 쪽을 먼저 단언한다 — 뜨는 쪽만 보면 조건이 넓어져도 초록이 된다.
+DLV="$T/deliv-out"; mkdir -p "$DLV"; : > "$DLV/deck.pptx"; printf 'x\n' > "$DLV/draft.md"
+DLVP="$T/deliv-pdf"; mkdir -p "$DLVP"; : > "$DLVP/report.pdf"; printf 'x\n' > "$DLVP/draft.md"
+check "산출물 없는 폴더의 .md → 무출력"  "[ -z \"\$(drev '$(J "$T/existing.md")')\" ]"
+check "산출물(.pptx) → 검진 넛지"        "drev '$(J "$DLV/deck.pptx")' | grep -q additionalContext"
+check "산출물(.pdf) → 검진 넛지"         "drev '$(J "$DLVP/report.pdf")' | grep -q additionalContext"
+check "산출물 옆의 .md → 검진 넛지"      "drev '$(J "$DLV/draft.md")' | grep -q additionalContext"
+check ".pdf 옆의 .md → 검진 넛지"        "drev '$(J "$DLVP/draft.md")' | grep -q additionalContext"
 check "spec 경로 → 무출력"               "[ -z \"\$(drev '$(J "$SP/nomark.md")')\" ]"
 check "plan 경로 → 무출력"               "[ -z \"\$(drev '$(J "$PL/nomark.md")')\" ]"
 check "비문서(.py) → 무출력"             "[ -z \"\$(drev '$(J "$T/src/main.py")')\" ]"
-check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off drev '$(J "$T/existing.md")')\" ]"
+check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off drev '$(J "$DLV/deck.pptx")')\" ]"
 check "프로젝트 밖 문서 → 무출력"        "[ -z \"\$(drev '$(J "$OUTSIDE/notes.md")')\" ]"
-check "상대경로 문서 → 검진 넛지"        "drev '$(J "notes/rel.md")' | grep -q additionalContext"
-check "Windows 형식 경로도 프로젝트 안"  "drev '$(J "$(cygpath -w "$T" 2>/dev/null || printf '%s' "$T")\\\\win.md")' | grep -q additionalContext"
-check "수정 넛지가 review-docs 를 가리킨다  "   "drev '$(J "$T/existing.md")' | grep -qF 'review-docs'"
-check "수정 넛지에 스킬 절 이름을 박지 않는다"   "! drev '$(J "$T/existing.md")' | grep -qF 'Surgical Changes'"
+# 산출물은 저장소 밖 임시 폴더에 놓이는 것이 보통이라 프로젝트 밖이어도 걸려야 한다.
+OUTDLV="$OUTSIDE/deliv"; mkdir -p "$OUTDLV"; : > "$OUTDLV/sheet.xlsx"; printf 'x\n' > "$OUTDLV/draft.md"
+check "프로젝트 밖 산출물 → 검진 넛지"   "drev '$(J "$OUTDLV/sheet.xlsx")' | grep -q additionalContext"
+check "프로젝트 밖 산출물 옆 .md → 넛지" "drev '$(J "$OUTDLV/draft.md")' | grep -q additionalContext"
+check "Windows 형식 경로도 같게 본다"    "drev '$(J "$(cygpath -w "$DLV" 2>/dev/null || printf '%s' "$DLV")\\\\draft.md")' | grep -q additionalContext"
+check "수정 넛지가 review-docs 를 가리킨다  "   "drev '$(J "$DLV/draft.md")' | grep -qF 'review-docs'"
+check "수정 넛지에 스킬 절 이름을 박지 않는다"   "! drev '$(J "$DLV/draft.md")' | grep -qF 'Surgical Changes'"
 check "README 가 규칙 넛지를 적는다"             "grep -qF '규칙 넛지' '$HERE/README.md'"
 
 echo "[리뷰 기록은 검진 대상이 아니다]"
@@ -227,10 +239,12 @@ check "리뷰 기록에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/sup
 # 순환이 생기고, 그것을 매번 건너뛰다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.
 check "오답노트 색인에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/solved_problems.md")')\" ]"
 check "오답노트 본문에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/solved_problems/lesson.md")')\" ]"
-check "다른 문서에는 넛지가 뜬다"  "drev '$(J2 "$T/docs/guide.md")' | grep -q additionalContext"
+check "산출물 폴더의 문서에는 넛지가 뜬다"  "drev '$(J2 "$DLV/draft.md")' | grep -q additionalContext"
 
 echo "[project-solved nudge removed]"
 PN="$(mktemp -d)"
+# 넛지가 걸리는 폴더라야 "옛 넛지 대신 일반 넛지가 뜬다"를 볼 수 있다. 산출물을 하나 둔다.
+: > "$PN/deck.docx"
 in_claudemd() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s/CLAUDE.md"}}' "$1"; }
 OUT_GONE="$(in_claudemd "$PN" | CLAUDE_PROJECT_DIR="$PN" bash "$DREV" 2>&1)" || true
 check "no add-pointer nudge anymore"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'add-pointer'"

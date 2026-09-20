@@ -59,7 +59,7 @@ done
 | PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 세션의 첫 파일 편집 전에 정본 사본의 절대경로와 `domain-korean` 을 알린다 |
 | PreToolUse | `hooks/python3_guard_pretooluse.sh` | 윈도우에서 `python3` 이 스토어 안내판으로 풀릴 때 그 Bash 명령을 거부한다 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan 을 감지해 리뷰를 지시한다 |
-| PostToolUse | `hooks/doc_review_posttooluse.sh` | 고친 문서에 검진 넛지를 띄운다 |
+| PostToolUse | `hooks/doc_review_posttooluse.sh` | 산출물과 그 폴더의 마크다운에 검진 넛지를 띄운다 |
 | Stop | `hooks/spec_review_stop.sh` | 미리뷰 spec·plan 이 남은 채 턴이 끝나는 것을 막는다 |
 
 봉인 시점은 둘이다. 커밋된 기록은 세션 시작에 `seal_reviews.sh` 가 봉인하고, 회차 기록은 회차 끝에 호출자가 같은 스크립트를 파일 인자와 함께 불러 봉인한다.
@@ -75,7 +75,7 @@ done
 
 ### 알리기만 하는 것 넷
 
-spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 `domain-docs`로 타입과 수명을 가리게 하며 README라면 `domain-readme`를 함께 가리키고, `.md`를 고치면 `review-docs`의 검진을 권한다. 그리고 세션에서 파일을 처음 건드리기 전에 정본 사본의 절대경로와 `domain-korean`을 한 번 알린다. 정본은 `@import`로 상시 실리지만 서브에이전트에는 안 실리기 때문이다. 프로젝트 폴더 밖의 문서와 리뷰 기록에는 뜨지 않는다.
+spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 `domain-docs`로 타입과 수명을 가리게 하며 README라면 `domain-readme`를 함께 가리키고, `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 이미 있는 폴더의 `.md`를 고치면 `review-docs`의 검진을 권한다. 저장소에 커밋되는 작업 문서에는 뜨지 않는다 — 남에게 전달될 문서인지는 경로로 알 수 없어 대화 맥락으로 판단한다. 그리고 세션에서 파일을 처음 건드리기 전에 정본 사본의 절대경로와 `domain-korean.md`의 절대경로를 한 번 알린다. 정본은 `@import`로 상시 실리지만 서브에이전트에는 안 실리기 때문이다. 리뷰 기록에는 뜨지 않는다.
 
 ### 세션 시작에 하는 것 셋
 

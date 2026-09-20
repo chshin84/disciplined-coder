@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# PostToolUse(Write|Edit): 문서(.md, spec/plan 제외) 작성/수정 감지 → 비자가 검진 넛지(비블로킹, 게이트 아님).
+# PostToolUse(Write|Edit): 산출물(.pptx·.xlsx·.docx·.pdf)과 그 폴더의 마크다운 작성/수정 감지
+# → 비자가 검진 넛지(비블로킹, 게이트 아님). spec/plan 은 자체 하드 게이트가 맡아 뺀다.
 # 경로는 _extract_path.sh가 추출(다중 순회). 순수 bash.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
@@ -10,7 +11,17 @@ INPUT="$(cat)"
 match=""
 while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
-  case "$FILE" in *.md) ;; *) continue ;; esac          # 문서(.md)만
+  # 거는 대상은 남에게 나가는 산출물과 그 재료다. 사람이 읽을 파일 형식이거나, 그런 파일이
+  # 이미 있는 폴더의 마크다운이다. 저장소에 커밋되는 작업 문서에는 걸지 않는다 — 한 줄만 고쳐도
+  # 뜨던 것이 잦아 실제로는 아무도 안 보게 됐다.
+  #
+  # 폴더에 아직 산출물이 없을 때 처음 쓰는 마크다운은 기계로 못 가린다. 그것이 산출물 재료인지는
+  # 대화 맥락에만 있으므로 review-docs 가 그 판단을 사람과 모델에게 맡긴다. 여기서 추측하지 않는다.
+  case "$FILE" in
+    *.pptx|*.xlsx|*.docx|*.pdf) match="$FILE"; break ;;
+    *.md) ;;
+    *) continue ;;
+  esac
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
   # 리뷰 기록은 검진 대상이 아니다. 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생기고,
   # 그 순환을 매번 무시하다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.
@@ -21,9 +32,17 @@ while IFS= read -r FILE; do
     *docs/superpowers/reviews/*.md) continue ;;
     *solved_problems.md|*solved_problems/*.md) continue ;;
   esac
-  # 프로젝트 밖 문서에는 걸지 않는다. 메모리 파일과 계획 파일을 쓸 때마다 무시해야 할 넛지가 뜨면
-  # 진짜 문서에서도 이 넛지를 흘려보내게 된다 — 위 문단이 적은 피로 기전 그대로다.
-  path_in_project "$FILE" || continue
+  # 같은 폴더에 산출물이 있어야 이 마크다운이 그 재료다. 프로젝트 안팎은 묻지 않는다 — 산출물은
+  # 저장소 밖 임시 폴더에 놓이는 것이 보통이라, 프로젝트 안으로 좁히면 정작 대상이 빠진다.
+  # 메모리와 계획 파일에 넛지가 뜨던 문제는 이 조건이 대신 막는다. 그 폴더에는 산출물이 없다.
+  FDIR="$(dirname "$FILE")"
+  has_deliverable=0
+  # if 로 쓴다. `[ -e x ] && …` 는 조건이 거짓일 때 목록 전체가 1 로 끝나고, set -e 아래에서는
+  # 그것이 훅을 그 자리에서 죽인다. 넛지가 조용히 사라지는 것이 그렇게 생긴다.
+  for cand in "$FDIR"/*.pptx "$FDIR"/*.xlsx "$FDIR"/*.docx "$FDIR"/*.pdf; do
+    if [ -e "$cand" ]; then has_deliverable=1; break; fi
+  done
+  [ "$has_deliverable" -eq 1 ] || continue
   match="$FILE"; break
 done <<EOF
 $(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")
