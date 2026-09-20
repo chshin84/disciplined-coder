@@ -161,11 +161,28 @@ ban_block_import() {
   ' "$UC"
 }
 
+# 규약 3번 조항. 공용 블록 바깥에 목록을 싣는 줄이 있으면 지우지 않고 알리기만 한다. 남의 마커
+# 안일 수 있고, 지워도 그쪽 설치 스크립트가 자기 블록을 다시 쓸 때 되살린다.
+# 우리 관리 블록도 세는 곳에서 뺀다. 옛 판본이 거기에 목록을 두었으므로, 빼지 않으면 갱신하는
+# 세션마다 우리가 우리 줄을 남의 줄로 세어 공용 블록을 영영 못 만든다.
+ban_outside="$( { [ -f "$UC" ] && awk '
+    { l=$0; sub(/\r$/,"",l) }
+    l ~ /^#[ \t]*BEGIN korean-banned-words/ { inb=1; next }
+    l ~ /^#[ \t]*END korean-banned-words/   { inb=0; next }
+    l ~ /^#[ \t]*BEGIN disciplined-coder/   { inm=1; next }
+    l ~ /^#[ \t]*END disciplined-coder/     { inm=0; next }
+    !inb && !inm && l ~ /^@/ && l ~ /korean-banned-words/ { print l }
+  ' "$UC"; } || true )"
+
 # 무엇을 할지 정한다. ban_action 이 비면 블록을 건드리지 않는다 — 규약이 같거나 상대가 더
 # 최신이면 건드리지 말라고 하므로, 매 세션 블록을 다시 쓰면 두 플러그인이 서로의 판정을 지운다.
-ban_action=""; ban_conflict=""
+ban_action=""; ban_conflict=""; ban_wait=0
 ban_cur="$(ban_block_import)"
-if [ -z "$ban_cur" ]; then
+if [ -z "$ban_cur" ] && [ -n "$ban_outside" ]; then
+  # 상대가 아직 자기 블록에서 목록을 싣고 있다. 여기서 공용 블록을 만들면 목록이 두 벌
+  # 실린다. 그쪽이 규약을 채택해 그 줄이 사라지면 다음 세션에 저절로 만들어진다.
+  ban_wait=1
+elif [ -z "$ban_cur" ]; then
   ban_action='없어서 만들었다'
 elif [ "$ban_cur" = "$BAN_IMPORT" ]; then
   :
@@ -223,22 +240,17 @@ if [ "$had_import" -eq 0 ]; then
 fi
 # 무엇을 했는지 알린다. 파일을 고쳤으면 조용히 넘기지 않는다 — 사용자가 열어 둔 레포가 바뀌었을 수
 # 있고, 그 사실은 사본 경로와 함께 눈에 보여야 한다(FAIL-LOUD).
-# 규약 3번 조항. 공용 블록 바깥에 목록을 싣는 줄이 있으면 지우지 않고 알리기만 한다. 남의 마커
-# 안일 수 있고, 지워도 그쪽 설치 스크립트가 자기 블록을 다시 쓸 때 되살린다. 블록을 쓴 뒤에
-# 세는 이유는, 그 전에 세면 방금 우리가 걷어낸 옛 줄까지 세어 없는 중복을 알리기 때문이다.
-ban_outside="$( { [ -f "$UC" ] && awk '
-    { l=$0; sub(/\r$/,"",l) }
-    l ~ /^#[ \t]*BEGIN korean-banned-words/ { inb=1; next }
-    l ~ /^#[ \t]*END korean-banned-words/   { inb=0; next }
-    !inb && l ~ /^@/ && l ~ /korean-banned-words/ { print l }
-  ' "$UC"; } || true )"
 ban_note=""
 if [ -n "$ban_action" ]; then
   ban_note="🔵 disciplined-coder: $UC 의 공용 금지 표현 블록을 고쳤다 — $ban_action."
 fi
 ban_out_note=""
 if [ -n "$ban_outside" ]; then
-  ban_out_note="🔵 disciplined-coder: 공용 금지 표현 블록 바깥에 목록을 싣는 줄이 있다 — $(printf '%s' "$ban_outside" | tr '\n' ' '). 규약대로 지우지 않았다. 그 줄을 넣는 플러그인이 규약을 채택하면 사라진다."
+  if [ "$ban_wait" -eq 1 ]; then
+    ban_out_note="🔵 disciplined-coder: 다른 플러그인이 아직 자기 블록에서 금지 표현 목록을 싣고 있어 공용 블록을 만들지 않았다 — $(printf '%s' "$ban_outside" | tr '\n' ' '). 두 벌이 실리는 것을 막으려는 것이며, 그쪽이 규약을 채택하면 다음 세션에 저절로 만들어진다."
+  else
+    ban_out_note="🔵 disciplined-coder: 공용 금지 표현 블록 바깥에 목록을 싣는 줄이 있다 — $(printf '%s' "$ban_outside" | tr '\n' ' '). 규약대로 지우지 않았다. 그 줄을 넣는 플러그인이 규약을 채택하면 사라진다."
+  fi
 fi
 for note in "$pointer_note" "$ban_note" "$ban_conflict" "$ban_out_note"; do
   if [ -n "$note" ]; then printf '%s\n' "$note"; fi

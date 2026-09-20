@@ -209,10 +209,13 @@ H26="$(mktemp -d)"; P26="$(mktemp -d)"; mkdir -p "$H26/.claude"
 printf '# 내 설정\n\n@somewhere/korean-banned-words.md\n' > "$H26/.claude/CLAUDE.md"
 OUT26="$(run "$H26" "$P26")"
 UC26="$H26/.claude/CLAUDE.md"
-echo "[banlist-shared] 블록 바깥의 줄은 안 지우고 알린다"
+# 상대가 아직 자기 블록에서 목록을 싣는 전환 구간이다. 여기서 공용 블록을 만들면 목록이 두 벌
+# 실려, 이 규약이 없애려던 바로 그 상태가 계속된다. 그래서 만들지 않고 알리기만 한다.
+echo "[banlist-shared] 바깥에 줄이 있으면 블록을 만들지 않는다"
 check "남의 줄을 안 지운다"           "grep -qxF '@somewhere/korean-banned-words.md' '$UC26'"
-check "공용 블록을 만든다"            "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC26') -eq 1 ]"
-check "바깥 줄을 알린다"              "printf '%s' \"\$OUT26\" | grep -qF '블록 바깥에 목록을 싣는 줄이 있다'"
+check "공용 블록을 안 만든다"         "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC26') -eq 0 ]"
+check "목록이 한 벌만 실린다"         "[ \$(grep -c '^@.*korean-banned-words' '$UC26') -eq 1 ]"
+check "기다린다고 알린다"             "printf '%s' \"\$OUT26\" | grep -qF '공용 블록을 만들지 않았다'"
 check "정본 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC26'"
 # 관리블록은 정본 줄 하나뿐이어야 한다. 목록이 거기 남으면 공용 블록과 합쳐 두 벌이 실린다.
 check "관리블록에 군더더기가 안 남는다" "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC26' | wc -l) -eq 3 ]"
