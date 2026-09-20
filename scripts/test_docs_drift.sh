@@ -824,9 +824,39 @@ check "생성물에 금지 표현 절이 있다"   "[ -n \"\$BAN_SELFTEST\" ]"
 # 없어지는데, 그 훅들은 조용히 통과하므로 소실을 알아챌 다른 신호가 없다.
 BANREPLY="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/' "$BANSRC" | grep -F '| 답변과 산출물 |' || true)"
 check "답과 산출물에만 거는 행이 표에 있다" "[ -n \"\$BANREPLY\" ]"
+# 유예. 원본 저장소가 목록에 말을 추가해 살아 있는 문서가 한꺼번에 빨개질 때, 사람이 날짜를
+# 적어 그 검색어만 잠시 검사에서 뺀다. 날짜가 지나면 아무것도 안 해도 저절로 돌아오므로 유예가
+# 영구 면제로 굳지 않는다. 유예 중에도 몇 개가 언제까지 빠져 있는지 매 실행에 뜬다(`FAIL-LOUD`).
+# 어느 말을 왜 언제까지 빼는지는 그 파일 하나가 소유하고 여기서 다시 적지 않는다(`SSOT`).
+BANWAIVER="$HERE/scripts/banned_words_waiver.txt"
+BANWAIVE=""; BANWAIVE_UNTIL=""; BANWAIVED=""; BANWAIVE_ALL=""; BANWAIVED_N=0
+if [ -f "$BANWAIVER" ]; then
+  BANWAIVE_UNTIL="$(grep -oE 'until:[[:space:]]*[0-9]{4}-[0-9]{2}-[0-9]{2}' "$BANWAIVER" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1 || true)"
+  BANWAIVE_ALL="$(grep -v '^#' "$BANWAIVER" | grep -v '^[[:space:]]*$' || true)"
+  # 문자열 비교로 날짜를 견준다 — YYYY-MM-DD 는 사전순이 곧 시간순이다.
+  if [ -n "$BANWAIVE_UNTIL" ] && [ "$(date +%Y-%m-%d)" \< "$BANWAIVE_UNTIL" ]; then
+    BANWAIVE="$BANWAIVE_ALL"
+  else
+    echo "    유예가 끝났다($BANWAIVE_UNTIL) — 금지 표현 검사가 다시 전부 걸린다. $BANWAIVER 를 지우거나 날짜를 다시 적어라."
+  fi
+  check "유예에 날짜가 적혀 있다" "[ -n \"\$BANWAIVE_UNTIL\" ]"
+  # 표에 없는 말이 유예 목록에 남으면, 그 줄은 아무 일도 안 하면서 무언가를 막고 있는 것처럼
+  # 보인다. 원본이 그 항목을 뺐다는 뜻이므로 유예 줄도 함께 걷으라고 알린다.
+  BANWAIVE_DEAD=""
+  while IFS= read -r ww; do
+    [ -n "$ww" ] || continue
+    printf '%s\n' "$BANLIST" | grep -qxF -- "$ww" || BANWAIVE_DEAD="$BANWAIVE_DEAD $ww"
+  done <<WAIVEEOF
+$BANWAIVE_ALL
+WAIVEEOF
+  check "유예 목록에 죽은 줄이 없다" "[ -z '$BANWAIVE_DEAD' ]"
+fi
 BANHIT=""
 while IFS= read -r w; do
   [ -n "$w" ] || continue
+  if [ -n "$BANWAIVE" ] && printf '%s\n' "$BANWAIVE" | grep -qxF -- "$w"; then
+    BANWAIVED="$BANWAIVED '$w'"; BANWAIVED_N=$((BANWAIVED_N+1)); continue
+  fi
   hit=""
   for f in $BAN_DOCS; do
     if LC_ALL=C.UTF-8 grep -qF -- "$w" "$HERE/$f"; then hit="$hit $f"; fi
@@ -839,6 +869,9 @@ $BANLIST
 EOF
 [ -n "$BANHIT" ] && printf '    남은 금지 표현:%s
 ' "$BANHIT"
+if [ -n "$BANWAIVED" ]; then
+  printf '    유예 중(%s 까지) %s 개:%s\n' "$BANWAIVE_UNTIL" "$BANWAIVED_N" "$BANWAIVED"
+fi
 
 # --- 대구 한도: `A가 아니라 B` 는 글 한 편에 한 번까지 ---
 # 규칙은 domain-korean 의 「대구 제한」이 소유한다. 사람 글 스물넷에서 0건인데 AI 글 스물넷에서
