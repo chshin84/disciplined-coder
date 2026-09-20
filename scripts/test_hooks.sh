@@ -231,6 +231,39 @@ check "수정 넛지가 review-docs 를 가리킨다  "   "drev '$(J "$DLV/draft
 check "수정 넛지에 스킬 절 이름을 박지 않는다"   "! drev '$(J "$DLV/draft.md")' | grep -qF 'Surgical Changes'"
 check "README 가 규칙 넛지를 적는다"             "grep -qF '규칙 넛지' '$HERE/README.md'"
 
+echo "[bash 매처 — 셸로 고쳐도 걸린다]"
+# 셸로 고치면 훅이 안 돌던 것이 이 묶음이 막는 것이다. 2026-09-21 에 한 세션이 sed -i 로 문서
+# 열한 개를 고치는 동안 검진 넛지도 금지 표현 검사도 한 번도 안 걸렸다.
+EBT="$HERE/hooks/_extract_bash_targets.sh"
+DWPOST="$HERE/hooks/doc_word_posttooluse.sh"
+JB() { printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$1"; }
+ebt() { JB "$1" | bash "$EBT" | tr '\n' ' '; }
+# 쓰기 구문의 대상만 뽑는다. 읽기 인자를 뽑으면 cat 한 번에 알림이 떠 훅을 끄게 만든다.
+check "sed -i 대상이 뽑힌다"        "[ \"\$(ebt 'sed -i s/a/b/ one.md')\" = 'one.md ' ]"
+check "sed -i 대상 여럿이 뽑힌다"   "[ \"\$(ebt 'sed -i s/a/b/ one.md two.md')\" = 'one.md two.md ' ]"
+check "재지향 대상이 뽑힌다"        "[ \"\$(ebt 'printf x > out.md')\" = 'out.md ' ]"
+check "붙여 쓴 재지향도 뽑힌다"     "[ \"\$(ebt 'cat >dst.md')\" = 'dst.md ' ]"
+check "tee 대상이 뽑힌다"           "[ \"\$(ebt 'tee -a log.md')\" = 'log.md ' ]"
+check "cp 의 목적지만 뽑힌다"       "[ \"\$(ebt 'cp src.md dest.md')\" = 'dest.md ' ]"
+check "git mv 의 목적지만 뽑힌다"   "[ \"\$(ebt 'git mv old.md new.md')\" = 'new.md ' ]"
+check "읽기만 하는 sed 는 안 뽑힌다" "[ -z \"\$(ebt 'sed -n 1,5p onlyread.md')\" ]"
+check "cat 은 안 뽑힌다"            "[ -z \"\$(ebt 'cat notes.md')\" ]"
+check "ls 는 안 뽑힌다"             "[ -z \"\$(ebt 'ls -la')\" ]"
+check "git status 는 안 뽑힌다"     "[ -z \"\$(ebt 'git status --porcelain')\" ]"
+# 넛지와 금지 표현 검사가 실제로 셸 편집에 걸리는지 본다. 뽑기만 되고 훅이 안 부르면 소용없다.
+BW="$T/bash-deliv"; mkdir -p "$BW"; : > "$BW/deck.pptx"
+printf '이 문서는 자리를 짚는다.\n' > "$BW/draft.md"
+check "셸 편집 → 검진 넛지"         "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DREV' | grep -q additionalContext"
+check "셸 읽기 → 검진 넛지 없음"    "[ -z \"\$(JB 'cat $BW/draft.md' | bash '$DREV')\" ]"
+check "셸 편집 → 금지 표현 통지"    "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -q systemMessage"
+check "통지가 파일 이름을 담는다"   "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -qF 'draft.md'"
+check "이 저장소 문서는 대상 아님"  "[ -z \"\$(JB 'sed -i s/x/y/ $HERE/README.md' | bash '$DWPOST')\" ]"
+check "OFF → 무출력"                "[ -z \"\$(JB 'sed -i s/x/y/ $BW/draft.md' | DISCIPLINED_CODER_REPLY_CHECK=off bash '$DWPOST')\" ]"
+# 금지 표현이 없는 산출물에는 통지가 없어야 한다. 늘 뜨면 통지가 뜻을 잃는다.
+printf '이 문서는 대상을 지적한다.\n' > "$BW/clean.md"
+check "깨끗한 산출물에는 통지 없음" "[ -z \"\$(JB 'sed -i s/x/y/ $BW/clean.md' | bash '$DWPOST')\" ]"
+check "훅 배선에 Bash 가 들어 있다" "grep -qF 'Write|Edit|Bash' '$HERE/hooks/hooks.json'"
+
 echo "[리뷰 기록은 검진 대상이 아니다]"
 # 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
 J2() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s"}}' "$1"; }

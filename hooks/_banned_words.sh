@@ -42,3 +42,36 @@ banned_parse() {  # $1=표가 든 파일 경로, $2=pairs 낼 곳, $3=tokens 낼
     END { close(pairs); close(toks) }
   ' "$1"
 }
+
+# 본문에서 금지 표현을 찾아 "걸린 말 · 걸린 말 -> 대체어" 줄들을 낸다. 못 찾으면 아무것도 안 낸다.
+# 맞추는 곳을 여기 하나로 둔다. Pre 는 쓰려는 내용을, Post 는 이미 쓰인 파일을 넘기는데, 맞추는
+# 규칙이 둘이면 같은 문장이 도구에 따라 다르게 판정된다.
+#
+# 코드 블록과 백틱 안은 걷어 낸다. 파일 내용과 식별자를 인용한 것까지 잡으면 거짓 판정이 되어
+# 훅을 끄게 만든다. 금지어를 문서에 적어야 할 때는 백틱으로 감싸면 지나간다.
+banned_report() {  # $1=pairs 경로, $2=검사할 텍스트 파일 → 보고 줄들
+  json_run '
+import re, sys
+
+pairs_path, text_path = sys.argv[1], sys.argv[2]
+
+rows = []
+for line in open(pairs_path, encoding="utf-8"):
+    parts = line.rstrip("\n").split("\t")
+    if len(parts) >= 2:
+        rows.append((parts[1:], parts[0]))
+
+try:
+    text = open(text_path, encoding="utf-8").read()
+except Exception:
+    sys.exit(0)
+
+body = re.sub(r"```.*?```", " ", text, flags=re.S)
+body = re.sub(r"`[^`]*`", " ", body)
+
+for words, repl in rows:
+    found = [w for w in words if w and w in body]
+    if found:
+        print(" · ".join(found) + " -> " + repl)
+' "$1" "$2" 2>/dev/null | tr -d '\r' || true
+}

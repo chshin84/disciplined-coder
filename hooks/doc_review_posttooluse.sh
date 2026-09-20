@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# PostToolUse(Write|Edit): 산출물(.pptx·.xlsx·.docx·.pdf)과 그 폴더의 마크다운 작성/수정 감지
-# → 비자가 검진 넛지(비블로킹, 게이트 아님). spec/plan 은 자체 하드 게이트가 맡아 뺀다.
-# 경로는 _extract_path.sh가 추출(다중 순회). 순수 bash.
+# PostToolUse(Write|Edit|Bash): 산출물(.pptx·.xlsx·.docx·.pdf)과 그 폴더의 마크다운 작성/수정
+# 감지 → 비자가 검진 넛지(비블로킹, 게이트 아님). spec/plan 은 자체 하드 게이트가 맡아 뺀다.
+# 경로는 둘에서 뽑는다. Write·Edit 은 _extract_path.sh 의 file_path 이고, Bash 는
+# _extract_bash_targets.sh 가 명령줄에서 뽑은 쓰기 대상이다. 두 입력에 상대 필드가 없어
+# 그냥 이어 붙여도 섞이지 않는다. Bash 를 넣는 이유는 셸로 고치면 이 훅이 안 돌기 때문이다 —
+# 2026-09-21 에 한 세션이 sed -i 로 문서 열한 개를 고치는 동안 넛지가 한 번도 안 떴다. 순수 bash.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -45,7 +48,7 @@ while IFS= read -r FILE; do
   [ "$has_deliverable" -eq 1 ] || continue
   match="$FILE"; break
 done <<EOF
-$(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")
+$(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh"; printf '%s' "$INPUT" | bash "$DIR/_extract_bash_targets.sh")
 EOF
 [ -n "$match" ] || exit 0
 base="$(basename "$match")"

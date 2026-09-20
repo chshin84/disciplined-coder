@@ -59,7 +59,8 @@ done
 | PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 세션의 첫 파일 편집 전에 정본 사본의 절대경로와 `domain-korean` 을 알린다 |
 | PreToolUse | `hooks/python3_guard_pretooluse.sh` | 윈도우에서 `python3` 이 스토어 안내판으로 풀릴 때 그 Bash 명령을 거부한다 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan 을 감지해 리뷰를 지시한다 |
-| PostToolUse | `hooks/doc_review_posttooluse.sh` | 산출물과 그 폴더의 마크다운에 검진 넛지를 띄운다 |
+| PostToolUse | `hooks/doc_review_posttooluse.sh` | 산출물과 그 폴더의 마크다운에 검진 넛지를 띄운다. `Bash` 로 고친 것도 본다 |
+| PostToolUse | `hooks/doc_word_posttooluse.sh` | 셸로 고친 산출물 `.md` 에 금지 표현이 남으면 알린다. 쓰인 뒤라 막지는 못한다 |
 | Stop | `hooks/spec_review_stop.sh` | 미리뷰 spec·plan 이 남은 채 턴이 끝나는 것을 막는다 |
 
 봉인 시점은 둘이다. 커밋된 기록은 세션 시작에 `seal_reviews.sh` 가 봉인하고, 회차 기록은 회차 끝에 호출자가 같은 스크립트를 파일 인자와 함께 불러 봉인한다.

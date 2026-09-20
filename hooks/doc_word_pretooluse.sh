@@ -65,19 +65,13 @@ esac
 # JSON 처리기는 파이썬 하나다. 고르는 규칙은 scripts/_json_valid.sh 가 소유한다.
 . "$HOOKDIR/../scripts/_json_valid.sh"
 
-REPORT="$(json_run '
-import json, re, sys
-
-pairs_path, raw_path = sys.argv[1], sys.argv[2]
-
-rows = []
-for line in open(pairs_path, encoding="utf-8"):
-    parts = line.rstrip("\n").split("\t")
-    if len(parts) >= 2:
-        rows.append((parts[1:], parts[0]))
-
+# 쓰려는 본문만 꺼내 텍스트 파일로 둔다. 맞추는 것은 _banned_words.sh 의 banned_report 가
+# 맡는다 — Post 훅도 같은 함수를 쓰므로 도구에 따라 판정이 갈리지 않는다(SSOT).
+BODY="$WORK/body"
+json_run '
+import json, sys
 try:
-    o = json.load(open(raw_path, encoding="utf-8"))
+    o = json.load(open(sys.argv[1], encoding="utf-8"))
 except Exception:
     sys.exit(0)
 ti = o.get("tool_input") or {}
@@ -87,15 +81,10 @@ if not isinstance(text, str):
     text = ti.get("new_string")
 if not isinstance(text, str):
     sys.exit(0)
-
-body = re.sub(r"```.*?```", " ", text, flags=re.S)
-body = re.sub(r"`[^`]*`", " ", body)
-
-for words, repl in rows:
-    found = [w for w in words if w and w in body]
-    if found:
-        print(" · ".join(found) + " -> " + repl)
-' "$PAIRS" "$RAW" 2>/dev/null | tr -d '\r' || true)"
+sys.stdout.write(text)
+' "$RAW" > "$BODY" 2>/dev/null || true
+[ -s "$BODY" ] || exit 0
+REPORT="$(banned_report "$PAIRS" "$BODY")"
 
 [ -n "$REPORT" ] || exit 0
 
