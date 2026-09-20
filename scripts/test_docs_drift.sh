@@ -811,7 +811,7 @@ check "목록 파일이 있다"               "[ -f \"\$BANSRC\" ]"
 check "목록이 생성물이라고 밝힌다"     "grep -qF '이 파일은 생성물이다' \"\$BANSRC\""
 check "목록이 원본 저장소를 가리킨다"  "grep -qF 'KiwoomAX/korean-banned-words' \"\$BANSRC\""
 check "받아오는 워크플로가 있다"       "[ -f '$HERE/.github/workflows/banned-words-sync.yml' ]"
-check "워크플로가 원본 dist 를 받는다" "grep -qF 'korean-banned-words/main/dist/korean-banned-words-dc.md' '$HERE/.github/workflows/banned-words-sync.yml'"
+check "워크플로가 원본 dist 를 받는다" "grep -qF 'korean-banned-words/main/dist/korean-banned-words.md' '$HERE/.github/workflows/banned-words-sync.yml'"
 check "이 저장소는 목록을 만들지 않는다" "[ ! -f '$HERE/scripts/gen_banned_words.py' ]"
 
 echo "[금지 표현] 살아 있는 문서에 남지 않는다"
