@@ -797,22 +797,7 @@ BANSRC="$HERE/korean-banned-words.md"
 # 표를 읽는 것은 hooks/_banned_words.sh 하나다. 전에는 여기가 자기 awk 로 또 읽었는데, 원본이
 # schema 2 로 제외 칸을 더하자 훅과 검사가 서로 다른 것을 보게 됐다. 같은 파서를 쓰면 표의 모양이
 # 바뀌어도 한쪽만 따라가는 일이 없다(`SSOT`).
-. "$HERE/hooks/_banned_words.sh"
-BANWORK="$(mktemp -d)"
-BANPAIRS="$BANWORK/pairs"; BANTOKS="$BANWORK/toks"; BANEXCL="$BANWORK/excl"; BANSCOPES="$BANWORK/scopes"
-banned_parse "$BANSRC" "$BANPAIRS" "$BANTOKS" "$BANEXCL" "$BANSCOPES"
-# 문서에 거는 행만 고른다. scopes 와 pairs 는 행 순서가 같다.
-BANLIST="$(awk -F'	' 'NR==FNR{s[FNR]=$0; next} {if (index(s[FNR], "문서와 답변")) for (i=2;i<=NF;i++) print $i}' "$BANSCOPES" "$BANPAIRS" || true)"
-BAN_LIVE="$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^agent-principles.md$' | grep -v '^korean-banned-words.md$' | grep -v '^skills/lens-readability/domain-korean.md$')"
-# 아직 HEAD 에 없는 spec·plan 만 고른다. HEAD 목록이 비면 grep -vxF 가 전부를 지우므로 나눠 다룬다.
-SP_ALL="$(cd "$HERE" && git ls-files 'docs/superpowers/specs/*.md' 'docs/superpowers/plans/*.md')"
-SP_OLD="$(cd "$HERE" && git ls-tree -r --name-only HEAD -- docs/superpowers/specs docs/superpowers/plans 2>/dev/null | grep '\.md$' || true)"
-if [ -n "$SP_OLD" ]; then
-  SP_NEW="$(printf '%s\n' "$SP_ALL" | grep -vxF "$SP_OLD" || true)"
-else
-  SP_NEW="$SP_ALL"
-fi
-BAN_DOCS="$(printf '%s\n%s\n' "$BAN_LIVE" "$SP_NEW" | grep -v '^$' || true)"
+# 표를 파싱해 이 저장소 문서를 검사하던 준비 코드는 2026-09-22 에 걷었다. 사유는 아래 절에 적는다.
 echo "[금지 표현] 목록은 생성물이다"
 # 내용이 원본과 같은지는 네트워크가 필요해 여기서 못 본다. .github/workflows/banned-words-sync.yml
 # 이 하루 한 번 다시 만들어 diff 로 대조한다. 여기서는 손으로 고쳐도 되는 파일처럼 보이지
@@ -824,72 +809,19 @@ check "받아오는 워크플로가 있다"       "[ -f '$HERE/.github/workflows
 check "워크플로가 원본 dist 를 받는다" "grep -qF 'korean-banned-words/main/dist/korean-banned-words.md' '$HERE/.github/workflows/banned-words-sync.yml'"
 check "이 저장소는 목록을 만들지 않는다" "[ ! -f '$HERE/scripts/gen_banned_words.py' ]"
 
-echo "[금지 표현] 살아 있는 문서에 남지 않는다"
-check "금지 목록을 생성물에서 도출했다" "[ -n \"\$BANLIST\" ]"
-check "검사 대상 문서를 모았다"       "[ -n \"\$BAN_DOCS\" ]"
-# 앵커가 실제로 잡히는지 먼저 본다 — 목록이나 대상이 비면 아래 단언이 모두 근거 없이 통과한다.
-BAN_SELFTEST="$(cd "$HERE" && grep -lF -- '### 금지 표현' korean-banned-words.md || true)"
-check "생성물에 금지 표현 절이 있다"   "[ -n \"\$BAN_SELFTEST\" ]"
-# 답과 산출물에만 거는 행도 실제로 뽑히는지 본다. 이 행들이 사라지면 훅 둘이 검사할 말이
-# 없어지는데, 그 훅들은 조용히 통과하므로 소실을 알아챌 다른 신호가 없다.
-BANREPLY="$(awk '/^### 금지 표현/{f=1; next} f && /^#/{exit} f && /^\| `/' "$BANSRC" | grep -F '| 답변과 산출물 |' || true)"
-check "답과 산출물에만 거는 행이 표에 있다" "[ -n \"\$BANREPLY\" ]"
-# 유예. 원본 저장소가 목록에 말을 추가해 살아 있는 문서가 한꺼번에 빨개질 때, 사람이 날짜를
-# 적어 그 검색어만 잠시 검사에서 뺀다. 날짜가 지나면 아무것도 안 해도 저절로 돌아오므로 유예가
-# 영구 면제로 굳지 않는다. 유예 중에도 몇 개가 언제까지 빠져 있는지 매 실행에 뜬다(`FAIL-LOUD`).
-# 어느 말을 왜 언제까지 빼는지는 그 파일 하나가 소유하고 여기서 다시 적지 않는다(`SSOT`).
-BANWAIVER="$HERE/scripts/banned_words_waiver.txt"
-BANWAIVE=""; BANWAIVE_UNTIL=""; BANWAIVED=""; BANWAIVE_ALL=""; BANWAIVED_N=0
-if [ -f "$BANWAIVER" ]; then
-  BANWAIVE_UNTIL="$(grep -oE 'until:[[:space:]]*[0-9]{4}-[0-9]{2}-[0-9]{2}' "$BANWAIVER" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1 || true)"
-  BANWAIVE_ALL="$(grep -v '^#' "$BANWAIVER" | grep -v '^[[:space:]]*$' || true)"
-  # 문자열 비교로 날짜를 견준다 — YYYY-MM-DD 는 사전순이 곧 시간순이다.
-  if [ -n "$BANWAIVE_UNTIL" ] && [ "$(date +%Y-%m-%d)" \< "$BANWAIVE_UNTIL" ]; then
-    BANWAIVE="$BANWAIVE_ALL"
-  else
-    echo "    유예가 끝났다($BANWAIVE_UNTIL) — 금지 표현 검사가 다시 전부 걸린다. $BANWAIVER 를 지우거나 날짜를 다시 적어라."
-  fi
-  check "유예에 날짜가 적혀 있다" "[ -n \"\$BANWAIVE_UNTIL\" ]"
-  # 표에 없는 말이 유예 목록에 남으면, 그 줄은 아무 일도 안 하면서 무언가를 막고 있는 것처럼
-  # 보인다. 원본이 그 항목을 뺐다는 뜻이므로 유예 줄도 함께 걷으라고 알린다.
-  BANWAIVE_DEAD=""
-  while IFS= read -r ww; do
-    [ -n "$ww" ] || continue
-    printf '%s\n' "$BANLIST" | grep -qxF -- "$ww" || BANWAIVE_DEAD="$BANWAIVE_DEAD $ww"
-  done <<WAIVEEOF
-$BANWAIVE_ALL
-WAIVEEOF
-  check "유예 목록에 죽은 줄이 없다" "[ -z '$BANWAIVE_DEAD' ]"
-fi
-# 제외 칸을 적용해 한 번에 훑는다. 목록은 레포 루트 기준 상대경로라 그 폴더에서 돈다.
-BANFILES="$BANWORK/files"
-printf '%s
-' "$BAN_DOCS" > "$BANFILES"
-BANSCAN="$(cd "$HERE" && banned_scan "$BANPAIRS" "$BANEXCL" "$BANSCOPES" "문서와 답변" "$BANFILES")"
-check "훑은 결과를 얻었다" "[ -n \"\$BANSCAN\" ]"
-BANHIT=""
-while IFS= read -r w; do
-  [ -n "$w" ] || continue
-  if [ -n "$BANWAIVE" ] && printf '%s\n' "$BANWAIVE" | grep -qxF -- "$w"; then
-    BANWAIVED="$BANWAIVED '$w'"; BANWAIVED_N=$((BANWAIVED_N+1)); continue
-  fi
-  # 걸린 파일은 banned_scan 이 한 번에 낸 표에서 꺼낸다. 낱말마다 문서마다 grep 을 돌리면
-  # 40×25 번이 되고, 제외 칸을 적용하려면 그 자리마다 덮어쓰기를 또 해야 한다.
-  hit="$(printf '%s
-' "$BANSCAN" | awk -F'	' -v w="$w" '$1==w{print $2; exit}')"
-  check "금지 표현 '$w' 이 없다" "[ -z \"\$hit\" ]"
-  [ -n "$hit" ] && BANHIT="$BANHIT
-    $w:$hit"
-done <<EOF
-$BANLIST
-EOF
-[ -n "$BANHIT" ] && printf '    남은 금지 표현:%s
-' "$BANHIT"
-if [ -n "$BANWAIVED" ]; then
-  printf '    유예 중(%s 까지) %s 개:%s\n' "$BANWAIVE_UNTIL" "$BANWAIVED_N" "$BANWAIVED"
-fi
+# 이 저장소 자신의 문서에는 금지 표현 검사를 걸지 않는다. 사용자가 2026-09-22 에 그렇게 정했다.
+# 근거는 목록의 소유권에 있다. 표는 외부 저장소 KiwoomAX/korean-banned-words 가 소유하고 워크플로가
+# 하루 한 번 받아 온다. 그 표에 낱말이 추가되면 이 저장소의 문서가 아무것도 안 했는데 위반이 되고,
+# 훅 쪽에서는 편집 자체가 거부되어 그 문서를 고치는 작업까지 막힌다. 2026-09-20 에 실제로 그래서
+# 한 달 유예를 두었다가 2026-09-21 에 유예를 끝냈고, 하루 만에 같은 구조가 다시 드러났다.
+#
+# 위반이 있었다는 사실도 알리지 않는다. 알림만 남기면 매 실행에 고칠 수 없는 경고가 쌓여 다른
+# 실패를 가린다. 이 결정은 이 저장소 하나에만 미친다 — 훅이 다른 프로젝트의 산출물에 거는 검사와
+# 답에 거는 지시는 그대로다.
+#
+# 대신 사람이 필요할 때 직접 측정한다. `bash scripts/check_banned_words.sh` 가 그 수단이고 검사
+# 스크립트가 아니므로 이 묶음에서 돌지 않는다.
 
-# --- 대구 한도: `A가 아니라 B` 는 글 한 편에 한 번까지 ---
 # 규칙은 domain-korean 의 「대구 제한」이 소유한다. 사람 글 스물넷에서 0건인데 AI 글 스물넷에서
 # 스물일곱 건 나온 신호라 한도를 두었는데, 세는 곳이 없어 문서 여덟이 넘긴 채로 있었다.
 # 세는 대상에서 빼는 것이 넷이고 이유가 서로 다르다. frontmatter 의 description 은 본문이 아니고,
