@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 공유 헬퍼: 「금지 표현」 표를 한 번 읽어 두 파일로 낸다. 그 표는 정본이 아니라
+# 공유 헬퍼: 「금지 표현」 표를 한 번 읽어 두 파일로 낸다. 그 표는 에이전트원칙이 아니라
 # korean-banned-words.md 에 있고, 그 파일은 외부 저장소의 JSON 에서 만들어 낸 생성물이다.
 # 소비자는 hooks/doc_word_pretooluse.sh 다. 답을 검사하던 훅이 값 때문에 걷혀 지금은 하나이고,
 # 표를 읽는 자리를 늘리지 않으려고 파싱은 계속 여기 한 벌만 둔다(SSOT).
@@ -8,7 +8,7 @@
 # 돌리는 셸 반복으로 짰다가 3MB 기록에서 한 번에 13,057밀리초가 나왔고, 같은 일을 파이썬
 # 한 번으로 하면 1,108밀리초였다. 그래서 셸에서는 프로세스 수를 줄이는 쪽으로만 짠다.
 #
-# 표를 읽는 것은 여기 awk 하나뿐이다. 파이썬은 정본을 다시 파싱하지 않고 여기서 낸 pairs
+# 표를 읽는 것은 여기 awk 하나뿐이다. 파이썬은 에이전트원칙을 다시 파싱하지 않고 여기서 낸 pairs
 # 파일을 읽는다. 파서가 둘이면 표의 모양이 바뀔 때 한쪽만 따라간다.
 
 BANNED_TABLE_HEAD='### 금지 표현'
@@ -73,7 +73,7 @@ banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl(생략 가능), $5=scop
 # 파이썬을 한 번만 부른다. 낱말마다 문서마다 grep 을 돌리면 40×25 번이 된다.
 banned_scan() {  # $1=pairs, $2=excl, $3=scopes, $4=고를 적용 대상(빈 값이면 전부), $5=파일 목록 파일
   json_run '
-import sys
+import re, sys
 
 pairs_path, excl_path, scopes_path, want, files_path = sys.argv[1:6]
 
@@ -96,9 +96,14 @@ for f in read_lines(files_path):
     if not f:
         continue
     try:
-        docs.append((f, open(f, encoding="utf-8", errors="replace").read()))
+        raw = open(f, encoding="utf-8", errors="replace").read()
     except Exception:
         continue
+    # 코드 블록과 백틱 안은 걷는다. banned_report 와 같은 규칙이어야 같은 문장이 통로에 따라
+    # 다르게 판정되지 않는다. 목록 파일이 인용은 검사 대상이 아니라고 규정한다.
+    body = re.sub(r"```.*?```", " ", raw, flags=re.S)
+    body = re.sub(r"`[^`]*`", " ", body)
+    docs.append((f, body))
 
 def masked(b, exclusions):
     for e in sorted(exclusions, key=len, reverse=True):

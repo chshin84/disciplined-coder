@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # PreToolUse(Write|Edit): 사용자가 요구한 산출물 문서에 금지 표현이 들어가면 거부한다.
-# 목록은 korean-banned-words.md 가 담고 정본에는 포인터만 있다. 같은 규칙이 답에도 걸리지만
-# 답 쪽에는 검사하는 기계가 없어, 그 목록이 정본과 함께 실려 지시로만 걸린다.
+# 목록은 korean-banned-words.md 가 담고 에이전트원칙에는 포인터만 있다. 같은 규칙이 답에도 걸리지만
+# 답 쪽에는 검사하는 기계가 없어, 그 목록이 에이전트원칙과 함께 실려 지시로만 걸린다.
 #
 # 무엇을 산출물로 보는가. `.md` 가운데 아래 셋에 안 드는 것 전부다. 사람이 요구해서 만드는 보고서,
 # 제안서, 인수인계, 다른 프로젝트의 README 가 여기 든다.
-#   (1) 이 플러그인 저장소 자신의 문서 — 조상 폴더에 정본이 있으면 뺀다. 그 문서의 금지어를 그냥
+#   (1) 이 플러그인 저장소 자신의 문서 — 조상 폴더에 에이전트원칙이 있으면 뺀다. 그 문서의 금지어를 그냥
 #       두기로 사용자가 정했고, 표와 근거를 적는 문서는 그 말을 이름으로 불러야 한다.
 #   (2) Claude 메모리 — 경로에 `/.claude/projects/` 가 있으면 뺀다. 나에게 남기는 쪽지이지
 #       사람이 요구한 산출물이 아니고, 금지어를 목록으로 적어 둘 곳이다.
@@ -34,8 +34,8 @@ case "$FILE" in */docs/superpowers/*) exit 0 ;; esac
 # Post 훅과 Stop 훅이 같은 판정을 해야 같은 파일이 도구에 따라 다르게 걸리지 않는다.
 path_in_own_repo "$FILE" && exit 0
 
-# 표는 정본이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 하나이고
-# scripts/gen_banned_words.py 가 그것을 이 파일로 낸다. 정본에는 포인터만 남는다.
+# 표는 에이전트원칙이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 하나이고
+# scripts/gen_banned_words.py 가 그것을 이 파일로 낸다. 에이전트원칙에는 포인터만 남는다.
 BANSRC="$HOOKDIR/../korean-banned-words.md"
 if [ ! -f "$BANSRC" ]; then
   # 검사 불능은 통과가 아니다. 막지는 않고 알린다 — 여기서 막으면 편집이 통째로 멈춘다(FAIL-LOUD).

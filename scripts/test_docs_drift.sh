@@ -30,7 +30,7 @@ AGG_LINE="$(grep -F '"lens": "lens-' "$AGG" | head -1 || true)"
 AGGSET="$(printf '%s' "$AGG_LINE" | sed 's/.*"lens"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | tr '|' '\n' | sed 's/^ *//; s/ *$//; s/^lens-//' | grep -v '^$' | sort || true)"
 
 # 캐시 4 — aggregating-lenses가 「공통 계약의 예외」로 적은 렌즈 이름 열거. 손으로 목록을 베끼지
-# 않고 정본 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
+# 않고 에이전트원칙 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
 # 예외 없이 다섯 렌즈 전부에게 강도 그대로의 대조를 요구한다.
 EXC_LENSES="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u || true)"
 is_exc() { printf '%s\n' "$EXC_LENSES" | grep -qxF "$1"; }
@@ -59,14 +59,14 @@ check "계약이 빈손을 정상으로 적는다"           "grep -qF '빈 배�
 check "계약에 등급 라벨이 없다"                 "! grep -qF 'severity' \"\$AGG\""
 check "spec 리뷰에 결정 단계가 없음을 적는다"   "grep -qF 'spec 리뷰에서는 결정 단계가 없다' \"\$AGG\""
 
-check "정본에서 공통 계약 예외 렌즈를 뽑았다" "[ -n \"\$EXC_LENSES\" ]"
+check "에이전트원칙에서 공통 계약 예외 렌즈를 뽑았다" "[ -n \"\$EXC_LENSES\" ]"
 
 echo "[렌즈 계약 — 등급 없음, 근거 필수]"
 for d in "$HERE"/skills/lens-*/; do
   n="$(basename "$d")"; f="$d/SKILL.md"
   check "$n 에 등급 라벨이 없다"          "! grep -qF 'severity' \"$f\""
   if is_exc "$n"; then
-    # 예외 렌즈가 계약에서 빼는 칸은 정본 예외 항목이 "빠지는 칸: `x`·`y`" 로 적는다. 목록을 여기
+    # 예외 렌즈가 계약에서 빼는 칸은 에이전트원칙 예외 항목이 "빠지는 칸: `x`·`y`" 로 적는다. 목록을 여기
     # 손으로 베끼지 않고 거기서 뽑아 그 렌즈의 출력 스키마 줄에 없는지 본다. 예외마다 빠지는 칸이
     # 다르므로 "consequence 가 없다" 하나로 뭉뚱그리면 그 칸을 담는 예외에서 거짓이 된다.
     EXC_BULLET="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -F "\`$n\`" | grep -oE '빠지는 칸: .*$' || true)"
@@ -121,21 +121,21 @@ check "소유자가 한 번씩만 띄운다고 적는다"    "grep -qF '렌즈�
 check "런타임은 서브에이전트 규율 밖이라고 적는다" "grep -qF '리뷰 콜은 제품 코드의 호출이라' \"\$RUNTIME2\""
 check "소유자 안에서 다시 정하지 않는다"      "grep -qF '여기서 다시 정하지 않는다' \"$DISP\""
 
-echo "[이름은 명사구, 주장은 첫 문장 — 정본과 가독성 렌즈]"
+echo "[이름은 명사구, 주장은 첫 문장 — 에이전트원칙과 가독성 렌즈]"
 CANON="$HERE/agent-principles.md"
 READ2="$HERE/skills/lens-readability/SKILL.md"
-# 문서 타입과 수명과 수정 규율은 정본이 소유한다. 문서를 만지는 모든 세션에 걸리는 규칙이라
+# 문서 타입과 수명과 수정 규율은 에이전트원칙이 소유한다. 문서를 만지는 모든 세션에 걸리는 규칙이라
 # 스킬로 두면 여는 판단을 매번 해야 했고, 안 열었을 때의 누락이 조용했다. 타입마다 무엇이
 # 강제하는지는 프로젝트마다 다르므로 그 칸만 저장소 CLAUDE.md 가 갖는다.
 TYPE_TBL="$HERE/CLAUDE.md"
-# 상세는 domain-korean 이 소유하고 정본은 조항만 담는다. 양쪽을 함께 붙든다.
+# 상세는 domain-korean 이 소유하고 에이전트원칙은 조항만 담는다. 양쪽을 함께 붙든다.
 WK="$HERE/skills/lens-readability/domain-korean.md"
 check "상세 스킬이 있다"                     "[ -f \"$WK\" ]"
-# 정본이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
+# 에이전트원칙이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
 # 그 검사가 우리가 없애려던 중복을 오히려 요구했다. 이제 ID 로 잇고, 지시 문장이 스킬에 그대로
 # 있으면 실패한다.
 KO_IDS="$(awk '/^### `PLAIN-KO`/{f=1} f&&/^## /{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
-check "정본에서 한국어 조항 ID 를 뽑았다"    "[ -n \"\$KO_IDS\" ]"
+check "에이전트원칙에서 한국어 조항 ID 를 뽑았다"    "[ -n \"\$KO_IDS\" ]"
 KO_MISS=""
 KO_DUP=""
 for kid in $KO_IDS; do
@@ -149,8 +149,8 @@ done
 [ -n "$KO_DUP" ] && printf '    스킬이 지시를 그대로 옮겨 적은 조항:%s\n' "$KO_DUP"
 check "스킬이 모든 조항 ID 로 근거를 단다"   "[ -z \"\$KO_MISS\" ]"
 check "스킬이 지시 문장을 다시 적지 않는다"  "[ -z \"\$KO_DUP\" ]"
-check "정본이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
-check "정본이 대상을 정확히 가리키게 한다"   "grep -qF '대상의 이름을 그대로 쓴다' \"\$CANON\""
+check "에이전트원칙이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
+check "에이전트원칙이 대상을 정확히 가리키게 한다"   "grep -qF '대상의 이름을 그대로 쓴다' \"\$CANON\""
 check "가독성 렌즈가 이름 형태를 본다"       "grep -qF '이름 형태' \"\$READ2\""
 check "가독성 렌즈가 형태 섞임을 본다"       "grep -qF '형태 섞임' \"\$READ2\""
 check "가독성 렌즈 프롬프트가 고쳐 주게 한다" "grep -qF '명사구로 고쳐 주고' \"\$READ2\""
@@ -185,7 +185,7 @@ echo "[dispatching-lenses — 소유자가 하나다]"
 # 렌즈 운용 규율이 문서 검진 절차와 나뉘어 있던 동안 소유자가 둘이었다. 규율은 이 스킬이 지고
 # review-docs 는 검진 절차만 진다. 절 제목과 띄우는 방법 문장이 양쪽에 함께 있으면 다시 갈린다.
 DISP_PTR='띄우는 방법은 `dispatching-lenses`가 정한다'
-check "review-docs 에 렌즈 운용 절 제목이 없다"        "! grep -qE '^## (렌즈에게 정본을 알리는 법|판단 앞에 기계를 세운다|한 번만 띄우는 렌즈의 규율)$' \"\$DOCS\""
+check "review-docs 에 렌즈 운용 절 제목이 없다"        "! grep -qE '^## (렌즈에게 에이전트원칙을 알리는 법|판단 앞에 기계를 세운다|한 번만 띄우는 렌즈의 규율)$' \"\$DOCS\""
 check "review-docs 가 띄우는 방법을 소유자로 넘긴다"    "! grep -qF '렌즈 결과는' \"\$DOCS\" && grep -qF -- \"\$DISP_PTR\" \"\$DOCS\""
 check "소유자가 띄우는 방법을 적는다"             "grep -qF 'source를 주입' \"\$DISP\" && grep -qF '렌즈 결과는' \"\$DISP\""
 DISP_MISS=""
@@ -216,13 +216,13 @@ check "spec 리뷰가 기록 이름 소유자를 가리킨다" "grep -qF 'review
 check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$DOCS\""
 check "문서 검진 기록의 이름을 적는다"       "grep -qF '-check.md' \"\$DOCS\""
 check "문서 검진 기록은 처리 결과를 뺀다"    "grep -qF '무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다' \"\$DOCS\""
-check "spec 리뷰 기록은 처리 결과를 뺀다"    "grep -qF '어떻게 처리했는지는 담지 않는다' \"\$CALLER\""
+check "spec 리뷰 기록은 처리 결과를 뺀다"    "grep -qF '어떻게 처리했는지는 포함하지 않는다' \"\$CALLER\""
 check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거를 검토 대상 문서 본문에 적는다' \"\$CALLER\""
 # 이름 규칙은 review-docs 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
 check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$DOCS\""
 check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'review-docs 가 소유' \"\$CALLER\""
-check "정본은 그 규칙을 더 안 적는다"        "! grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' \"\$CANON\""
-check "정본이 기록 이름의 소유자를 가리킨다" "grep -qF '기록 파일의 이름과 회차 표기는 \`review-docs\`가 소유한다' \"\$CANON\""
+check "에이전트원칙은 그 규칙을 더 안 적는다"        "! grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' \"\$CANON\""
+check "에이전트원칙이 기록 이름의 소유자를 가리킨다" "grep -qF '기록 파일의 이름과 회차 표기는 \`review-docs\`가 소유한다' \"\$CANON\""
 check "원본을 받는 즉시 저장한다"            "grep -qF '받는 즉시' \"\$CALLER\""
 check "원본을 같은 이름 폴더에 둔다"          "grep -qF '같은 이름의 폴더' \"\$CALLER\""
 check "런타임이 기록 제외 이유를 적는다"      "grep -qF '사용자 입력이 로그로' \"\$RUNTIME2\""
@@ -240,13 +240,13 @@ check "런타임에 다시 리뷰 반복이 없다"        "grep -qF '다시 리
 # --- 렌즈 스키마 사본이 공통 계약과 어긋나지 않는다 ---
 # 여섯 렌즈의 「출력 스키마」 블록은 공통 계약을 그 렌즈의 값으로 채워 보인 사본이다. 사본이므로
 # 손으로 맞추면 갈라진다 — 실제로 `evidence`의 뜻풀이에서 근거 형태 둘이 사라진 채 오래 남았다.
-# 그래서 앵커를 테스트에 박지 않고 정본에서 뽑아 온다. 정본 문안이 바뀌면 이 검사가 함께 따라간다.
+# 그래서 앵커를 테스트에 박지 않고 에이전트원칙에서 뽑아 온다. 에이전트원칙 문안이 바뀌면 이 검사가 함께 따라간다.
 MA="$HERE/skills/aggregating-lenses/SKILL.md"
 CONTRACT_EV="$(grep -o '"evidence": "[^"]*"' "$MA" | head -1 | sed 's/^"evidence": "//; s/"$//')"
 CONTRACT_CONSEQ="$(grep -o '"consequence": "[^"]*"' "$MA" | head -1 | sed 's/^"consequence": "//; s/"$//')"
 echo "[렌즈 스키마 사본]"
-check "정본에서 evidence 뜻풀이를 뽑았다"   "[ -n \"\$CONTRACT_EV\" ]"
-check "정본에서 consequence 뜻풀이를 뽑았다" "[ -n \"\$CONTRACT_CONSEQ\" ]"
+check "에이전트원칙에서 evidence 뜻풀이를 뽑았다"   "[ -n \"\$CONTRACT_EV\" ]"
+check "에이전트원칙에서 consequence 뜻풀이를 뽑았다" "[ -n \"\$CONTRACT_CONSEQ\" ]"
 for L in "$HERE"/skills/lens-*/SKILL.md; do
   n="$(basename "$(dirname "$L")")"
   if is_exc "$n"; then
@@ -254,7 +254,7 @@ for L in "$HERE"/skills/lens-*/SKILL.md; do
   else
     # 계약이 "렌즈 파일에는 자기 type 폐쇄 집합만 정의하고 나머지는 여기를 참조한다"고 정하므로
     # 뜻풀이를 담고 있으면 실패한다. 전에는 반대로 담고 있어야 통과해서 검사가 베끼기를 강제했다.
-    # 「레퍼런스 프롬프트」 절은 예외다 — 그 문장은 정본이 안 실리는 서브에이전트에 그대로 실어
+    # 「레퍼런스 프롬프트」 절은 예외다 — 그 문장은 에이전트원칙이 안 실리는 서브에이전트에 그대로 실어
     # 보내는 페이로드라 복제가 아니다. 그래서 그 절을 떼어 낸 나머지에서만 본다.
     NOPROMPT="$(awk '/^## 레퍼런스 프롬프트/{f=1;next} f&&/^## /{f=0} !f' "$L")"
     check "$n: consequence 뜻풀이를 베끼지 않는다" "! printf '%s' \"\$NOPROMPT\" | grep -qF -- \"\$CONTRACT_CONSEQ\""
@@ -268,9 +268,9 @@ for L in "$HERE"/skills/lens-*/SKILL.md; do
   # 조건부 필드를 렌즈가 다시 규정하면 필수 여부가 두 곳에서 갈린다 — 가리키기만 해야 한다.
   check "$n: principles_applied 규칙을 되풀이하지 않는다" "! grep -qF '제품 런타임 구현에는 요구하지 않는다' '$L'"
 done
-# 렌즈가 계약에 없는 칸을 더할 수 있고, 그 목록은 SSOT 의 「렌즈가 더하는 칸」 절이 소유한다.
+# 렌즈가 계약에 없는 칸을 더할 수 있고, 그 목록은 SSOT 의 「렌즈가 추가하는 칸」 절이 소유한다.
 # 목록을 여기 손으로 적지 않고 그 절에서 뽑아, 렌즈가 쓰는 덧붙임 칸이 다 올라 있는지 본다.
-EXTRA_LISTED="$(awk '/^## 렌즈가 더하는 칸/{f=1;next} f&&/^## /{exit} f' "$MA" | grep -oE '`[a-z_]+`' | tr -d '`' | sort -u)"
+EXTRA_LISTED="$(awk '/^## 렌즈가 추가하는 칸/{f=1;next} f&&/^## /{exit} f' "$MA" | grep -oE '`[a-z_]+`' | tr -d '`' | sort -u)"
 check "SSOT 에서 덧붙이는 칸 목록을 뽑았다" "[ -n \"\$EXTRA_LISTED\" ]"
 # 뽑아 놓고 대조를 안 하면 목록이 낡아도 초록이다. 실제로 그랬고 lens-fit 의 doc_type 이 빠져
 # 있었다. 렌즈 파일이 자기 덧붙임 칸이라 밝힌 이름을 뽑아 위 목록에 다 있는지 본다.
@@ -282,23 +282,23 @@ for xf in "$HERE"/skills/lens-*/SKILL.md; do
     printf '%s
 ' "$EXTRA_LISTED" | grep -qx -- "$xk" || EXTRA_BAD="$EXTRA_BAD [$xn:$xk]"
   done <<INNER
-$(LC_ALL=C.UTF-8 grep -oE '`[a-z_]+`[^`]{0,14}이 렌즈가 더하는 칸' "$xf" | grep -oE '^`[a-z_]+`' | tr -d '`' | sort -u)
+$(LC_ALL=C.UTF-8 grep -oE '`[a-z_]+`[^`]{0,14}이 렌즈가 추가하는 칸' "$xf" | grep -oE '^`[a-z_]+`' | tr -d '`' | sort -u)
 INNER
 done
 [ -n "$EXTRA_BAD" ] && printf '    SSOT 목록에 안 오른 덧붙임 칸:%s
 ' "$EXTRA_BAD"
-check "렌즈가 더하는 칸이 모두 SSOT 목록에 있다" "[ -z \"\$EXTRA_BAD\" ]"
-check "정본이 principles_applied 규칙을 소유한다" "grep -qF '제품 런타임 구현에는 요구하지 않는다' \"\$MA\""
-check "정본이 file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' \"\$MA\""
-check "정본이 principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' \"\$MA\""
+check "렌즈가 추가하는 칸이 모두 SSOT 목록에 있다" "[ -z \"\$EXTRA_BAD\" ]"
+check "에이전트원칙이 principles_applied 규칙을 소유한다" "grep -qF '제품 런타임 구현에는 요구하지 않는다' \"\$MA\""
+check "에이전트원칙이 file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' \"\$MA\""
+check "에이전트원칙이 principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' \"\$MA\""
 
-echo "[렌즈에게 정본을 알리는 법 — dispatching-lenses 한 곳만 규율을 적는다]"
+echo "[렌즈에게 에이전트원칙을 알리는 법 — dispatching-lenses 한 곳만 규율을 적는다]"
 # 전에 여러 문서가 각자 적었다가 하나에서 둘이 빠져 갈라졌다. 소유자를 하나로 두고
 # 나머지는 가리키기만 하게 묶는다. 앵커는 소유자의 절 제목이라 제목을 고치면 실패한다(FAIL-LOUD).
 OWNER_DOC="$HERE/skills/dispatching-lenses/SKILL.md"
-OWNER_ANCHOR='## 렌즈에게 정본을 알리는 법'
+OWNER_ANCHOR='## 렌즈에게 에이전트원칙을 알리는 법'
 # 규율 넷을 알아보는 문구. 소유자에만 있어야 한다.
-RULE_MARKS=('읽기 전용 에이전트도 Read는 갖는다' '비어 있지 않은 배열' '홈 해석이 어긋나는 환경에서')
+RULE_MARKS=('읽기 전용 에이전트도 Read는 보유한다' '비어 있지 않은 배열' '홈 해석이 불일치하는 환경에서')
 check "소유자 절이 있다" "grep -qF -- \"\$OWNER_ANCHOR\" \"\$OWNER_DOC\""
 for m in "${RULE_MARKS[@]}"; do
   check "소유자가 규율을 적는다: $m" "grep -qF -- '$m' \"\$OWNER_DOC\""
@@ -308,7 +308,7 @@ for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestratio
   # 스킬 문서는 파일 이름이 모두 SKILL.md라 부모 디렉터리로 부른다 — 안 그러면 어느 문서가 실패했는지
   # 알 수 없다(`NAME-ITEMS`).
   dn="$(basename "$D")"; [ "$dn" = "SKILL.md" ] && dn="$(basename "$(dirname "$D")")"
-  check "$dn 이 소유자를 가리킨다"        "grep -qF '렌즈에게 정본을 알리는 법' '$D'"
+  check "$dn 이 소유자를 가리킨다"        "grep -qF '렌즈에게 에이전트원칙을 알리는 법' '$D'"
   for m in "${RULE_MARKS[@]}"; do
     check "$dn 이 규율을 베끼지 않는다: $m" "! grep -qF -- '$m' '$D'"
   done
@@ -318,7 +318,7 @@ echo "[소유 표] 소유는 하나뿐이고 나머지는 가리킨다"
 # 소유 선언을 데이터 파일에 적지 않고 문서에서 도출한다. 자기 소유를 밝히는 문장은
 # 「이 <무엇>은 여기가 소유한다」 한 꼴이고, 그 문장이 놓인 절 제목이 소유 표의 키다. 다른 절을
 # 가리키는 문장은 이 꼴을 쓰지 않으므로 포인터가 소유자로 잡히지 않는다.
-# 전에는 「렌즈에게 정본을 알리는 법」 하나에만 이 검사가 걸렸고 가리킬 문서 셋도 손으로 적혀
+# 전에는 「렌즈에게 에이전트원칙을 알리는 법」 하나에만 이 검사가 걸렸고 가리킬 문서 셋도 손으로 적혀
 # 있었다. 넷째 문서가 복제하면 검사가 지나쳤다. 이제 소유자도 대상도 도출한다(SSOT).
 OWN_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
 check "소유 검사 대상 문서를 모았다" "[ -n \"\$OWN_DOCS\" ]"
@@ -385,7 +385,7 @@ echo "[첫 문장] 소제목 아래 첫 줄이 산문이다"
 HF_WK="$HERE/skills/lens-readability/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
-check "첫 문장 예외를 정본에서 뽑았다" "[ -n \"\$HF_EXC\" ]"
+check "첫 문장 예외를 에이전트원칙에서 뽑았다" "[ -n \"\$HF_EXC\" ]"
 HF_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
 check "검사 대상 문서를 모았다(첫 문장)" "[ -n \"\$HF_DOCS\" ]"
 HF_BAD=""
@@ -442,7 +442,7 @@ check "옛 spec 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OL
 check "옛 plan 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDPLAN\""
 
 # 제거된 기능의 설계 문서에도 표시를 요구한다. 목록을 손으로 적지 않고 스캐폴드의 정리 대상
-# (SCAFFOLD_STALE)에서 도출한다 — 그 목록이 "이 레포가 뜯어낸 기능"의 정본이라, 기능을 하나 더
+# (SCAFFOLD_STALE)에서 도출한다 — 그 목록이 "이 레포가 뜯어낸 기능"의 에이전트원칙이라, 기능을 하나 더
 # 걷어내면 그 설계 문서에 표시가 없다는 것이 여기서 실패한다. 표시가 없으면 그 문서는 지금도
 # 실행할 계획으로 읽히고, plan 은 첫머리에서 스스로 태스크 단위 실행을 지시한다.
 STALE_NAMES="$(sed -n 's/^SCAFFOLD_STALE="\(.*\)"$/\1/p' "$HERE/scripts/_scaffold_common.sh" | head -1)"
@@ -459,7 +459,7 @@ for n in $STALE_NAMES; do
 done
 check "제거된 기능의 설계 문서를 하나 이상 훑었다" "[ '$SN' -gt 0 ]"
 
-# 영문 재작성 대응표는 그 재작성이 되돌려져 지금 구조와 안 맞는다. 표시가 없으면 정본이 영문인
+# 영문 재작성 대응표는 그 재작성이 되돌려져 지금 구조와 안 맞는다. 표시가 없으면 에이전트원칙이 영문인
 # 것처럼 읽힌다. 파일 목록은 디렉터리에서 도출한다 — 표가 늘어도 사람이 목록을 맞출 필요가 없다.
 RWDIR="$HERE/docs/superpowers/rewrite-map"
 RWN=0
@@ -472,11 +472,11 @@ done
 check "대응표를 하나 이상 훑었다"           "[ '$RWN' -gt 0 ]"
 
 # --- 프로젝트 파일에 손대는 예외: README 한 곳만 조건을 적는다 ---
-# 전에는 README가 스스로 정본이라고 선언해 놓고 스캐폴드 둘이 조건을 각각 다시
+# 전에는 README가 스스로 에이전트원칙이라고 선언해 놓고 스캐폴드 둘이 조건을 각각 다시
 # 적었다. 예외가 늘거나 조건이 바뀌면 사람이 네 곳을 손으로 맞춰야 하고, 그러면 반드시 갈라진다.
 # 가리키는 절 이름도 함께 확인한다 — 전에 README 절 이름이 바뀌었는데 가리키는 쪽만 옛 이름으로 남았다.
 echo "[프로젝트 파일 예외 — README 한 곳만 조건을 적는다]"
-# 문서를 한 줄로 펴서 본다 — 전에는 정본에서 줄이 바뀌자 같은 문장인데도 검사가 실패했다.
+# 문서를 한 줄로 펴서 본다 — 전에는 에이전트원칙에서 줄이 바뀌자 같은 문장인데도 검사가 실패했다.
 flat() { tr '
 ' ' ' < "$1" | tr -s ' '; }
 OWN_MARKS=('그 블록을 만든 기능이 없어졌으면')
@@ -492,8 +492,8 @@ done
 EXC_SEC="$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$HERE/scripts/scaffold.sh" | sed 's/^「//; s/」$//' | grep -F '프로젝트 폴더' | head -1 || true)"
 check "스캐폴드가 README 절을 가리킨다" "[ -n \"\$EXC_SEC\" ]"
 check "그 절이 README에 실재한다"            "[ -n \"\$EXC_SEC\" ] && grep -qF \"## \$EXC_SEC\" \"\$README\""
-# 정본은 이제 조건을 되풀이하지 않고 README를 가리키기만 한다. 가리키는 문장이 살아 있는지 본다.
-check "정본이 README를 가리킨다"        "grep -qF -- 'README를 참고한다' \"$CANON\""
+# 에이전트원칙은 이제 조건을 되풀이하지 않고 README를 가리키기만 한다. 가리키는 문장이 살아 있는지 본다.
+check "에이전트원칙이 README를 가리킨다"        "grep -qF -- 'README를 참고한다' \"$CANON\""
 
 for D in "$HERE/scripts/scaffold.sh"; do
   dn="$(basename "$D")"
@@ -510,11 +510,11 @@ done
 echo "[설치 확인 명령 — 사용자 셸에서 그대로 돈다]"
 check "README가 훅 전용 변수를 안 쓴다"   "! grep -qF -- 'CLAUDE_PLUGIN_ROOT' \"\$README\""
 # 전에는 이 자리를 grep 'disciplined-coder' 한 줄로 재다가, README 첫 줄 제목에서 이미 걸려
-# 확인 명령을 통째로 지워도 초록인 검사가 됐다. 그래서 후보 이름을 정본에서 도출해 대조한다 —
+# 확인 명령을 통째로 지워도 초록인 검사가 됐다. 그래서 후보 이름을 에이전트원칙에서 도출해 대조한다 —
 # resolve_home이 보는 환경변수(테스트 전용 *_HOME_DIR 제외)가 README 명령에도 다 있어야 한다.
 HOMESH="$HERE/scripts/_resolve_home.sh"
 HOME_CANDS="$(grep -oE '\$\{(CLAUDE_CONFIG_DIR|USERPROFILE|HOME):-\}' "$HOMESH" | sed 's/^\${//; s/:-}$//' | sort -u)"
-check "정본에서 홈 후보 이름을 뽑아냈다" "[ -n \"\$HOME_CANDS\" ]"
+check "에이전트원칙에서 홈 후보 이름을 뽑아냈다" "[ -n \"\$HOME_CANDS\" ]"
 while IFS= read -r v; do
   [ -n "$v" ] || continue
   check "README 확인 명령이 후보를 훑는다: $v" "grep -qE -- '[\$][{]?$v' \"\$README\""
@@ -612,7 +612,7 @@ check "개수를 적은 자리마다 이름이 함께 있다" "[ -z \"\$NUMHIT\"
 [ -n "$NUMHIT" ] && printf '    이름 없이 개수만 박힌 자리:\n%s\n' "$NUMHIT"
 
 # --- 테스트 실행 명령: 앞 스크립트의 실패를 삼키지 않는다 ---
-# CLAUDE.md가 실행 명령의 정본이다. 그 줄이 지워지거나 `for t in ...; do bash "$t"; done` 으로
+# CLAUDE.md가 실행 명령의 에이전트원칙이다. 그 줄이 지워지거나 `for t in ...; do bash "$t"; done` 으로
 # 되돌아가면 마지막 하나의 종료 코드만 남아 앞선 FAIL이 묻히고, 감사는 잘못된 FAIL=0을 보고한다.
 echo "[테스트 실행 명령 — 앞 스크립트의 실패가 안 묻힌다]"
 CMD="$HERE/CLAUDE.md"
@@ -638,8 +638,8 @@ printf '#!/usr/bin/env bash\necho "  PASS: ok"\n' > "$FXG/scripts/test_zzz_ok.sh
 FXGOUT="$(cd "$FXG" && bash -c "$RUNCMD" 2>&1 || true)"
 check "전부 통과하면 ALL PASS라고 한다"       "printf '%s' \"\$FXGOUT\" | grep -qF 'ALL PASS'"
 check "모은 결과를 마지막에 알린다"           "grep -qF -- 'FAILED:' \"\$CMD\""
-# CI도 같은 명령을 돈다. CLAUDE.md와 달리 CI는 정본을 읽을 수 없어 형태를 다시 적을 수밖에 없으니,
-# 적어도 그 형태가 정본과 같은 실패 처리를 하는지 붙든다. `set -e`에 맨 `bash "$t"`면 첫 실패에서
+# CI도 같은 명령을 돈다. CLAUDE.md와 달리 CI는 에이전트원칙을 읽을 수 없어 형태를 다시 적을 수밖에 없으니,
+# 적어도 그 형태가 에이전트원칙과 같은 실패 처리를 하는지 붙든다. `set -e`에 맨 `bash "$t"`면 첫 실패에서
 # 멈춰 뒤 스크립트가 아예 안 돌고, 무엇이 더 깨졌는지 한 회차로는 알 수 없다.
 CI="$HERE/.github/workflows/ci.yml"
 check "CI가 계약 테스트를 돈다"               "grep -qF -- 'for t in scripts/test_*.sh' \"\$CI\""
@@ -669,12 +669,12 @@ done
 
 # --- 새로 만든 스킬이 진입로에 등재된다 ---
 # 스킬을 만들면서 그것을 가리키는 자리를 함께 만들지 않으면, 상황에서 출발한 세션이 그 스킬에 닿지
-# 못한다(실제로 audit-repo-docs 이 정본의 두 표 어디에도 없었다). 그래서 스킬 디렉터리에서 이름을
-# 도출해 정본이나 도메인 목차가 그 이름을 한 번은 부르는지 본다.
+# 못한다(실제로 audit-repo-docs 이 에이전트원칙의 두 표 어디에도 없었다). 그래서 스킬 디렉터리에서 이름을
+# 도출해 에이전트원칙이나 도메인 목차가 그 이름을 한 번은 부르는지 본다.
 echo "[스킬 등재 — 진입로에서 이름이 불린다]"
 for d in "$HERE"/skills/*/; do
   sk="$(basename "$d")"
-  # 진입로는 셋이다 — 정본이 이름을 부르거나, 다른 스킬이 부르거나, 렌즈면 정본의 묶음 표기에 든다.
+  # 진입로는 셋이다 — 에이전트원칙이 이름을 부르거나, 다른 스킬이 부르거나, 렌즈면 에이전트원칙의 묶음 표기에 든다.
   # 자기 SKILL.md 안의 언급은 세지 않는다. 자기가 자기를 부르는 것은 도달이 아니다.
   named=0
   grep -qF -- "$sk" "$HERE/agent-principles.md" && named=1
@@ -685,7 +685,7 @@ for d in "$HERE"/skills/*/; do
     done
   fi
   case "$sk" in lens-*) grep -qF -- 'lens-*' "$HERE/agent-principles.md" && named=1 ;; esac
-  check "$sk 을 정본이나 다른 스킬이 부른다" "[ '$named' = 1 ]"
+  check "$sk 을 에이전트원칙이나 다른 스킬이 부른다" "[ '$named' = 1 ]"
   check "$sk 이 언제 여는지 자기 설명에 적는다" "grep -m1 '^description:' '$d/SKILL.md' | grep -qE '때|연다|쓴다|한다'"
 done
 
@@ -702,13 +702,13 @@ done
 check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
 
 # --- 이독성 규칙의 출처가 세 문서에 걸쳐 이어져 있다 ---
-# 정본은 조항만 담고, domain-korean 이 상세를 담으며, lens-readability 가 그것을 열어 대조한다.
-# 전에 정본을 줄이면서 조항을 스킬로 통째로 내렸더니 렌즈가 가리키는 근거가 정본에서 사라졌는데,
+# 에이전트원칙은 조항만 담고, domain-korean 이 상세를 담으며, lens-readability 가 그것을 열어 대조한다.
+# 전에 에이전트원칙을 줄이면서 조항을 스킬로 통째로 내렸더니 렌즈가 가리키는 근거가 에이전트원칙에서 사라졌는데,
 # 검사가 새 자리를 따라가 버려 끊긴 것을 못 잡았다. 그래서 셋을 한 줄로 함께 붙든다.
-echo "[규칙 출처] 정본 → domain-korean → lens-readability 가 이어져 있다"
+echo "[규칙 출처] 에이전트원칙 → domain-korean → lens-readability 가 이어져 있다"
 RDB_L="$HERE/skills/lens-readability/SKILL.md"
-check "정본에 이름 자리 조항이 있다"     "grep -qF '명사구로 쓰고, 주장은 본문 문장으로 내린다' \"$CANON\""
-check "정본이 상세 소유자를 가리킨다"    "grep -qF 'domain-korean' \"$CANON\""
+check "에이전트원칙에 이름 자리 조항이 있다"     "grep -qF '명사구로 쓰고, 주장은 본문 문장으로 내린다' \"$CANON\""
+check "에이전트원칙이 상세 소유자를 가리킨다"    "grep -qF 'domain-korean' \"$CANON\""
 check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'domain-korean' \"$RDB_L\""
 check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'domain-korean'"
 check "기준 문서가 자기 구실을 밝힌다"   "grep -qF 'lens-readability' \"$WK\""
@@ -729,7 +729,7 @@ check "화이트리스트가 그 목록에서 도출된다"          "grep -qF '
 
 # --- 마켓플레이스 문안이 매니페스트에서 갈라지지 않는다 ---
 # 마켓플레이스 카드는 설치 전 사용자가 보는 첫 문안인데, 걷어낸 solved-log 스캐폴딩을 한동안 계속
-# 광고했다. 같은 사실을 두 파일이 각자 적으면 반드시 갈라지므로, 플러그인 매니페스트를 정본으로
+# 광고했다. 같은 사실을 두 파일이 각자 적으면 반드시 갈라지므로, 플러그인 매니페스트를 에이전트원칙으로
 # 두고 마켓플레이스 항목이 그것과 글자 그대로 같은지 확인한다(`SSOT`).
 # 두 파일을 JSON으로 파싱해 읽는다 — 쉼표 하나가 어긋나 있으면 여기서 실패한다.
 echo "[매니페스트] 마켓플레이스 항목이 플러그인 매니페스트와 같은 문안을 쓴다"
@@ -753,10 +753,10 @@ echo "[README] 잠금 시간을 값으로 적지 않고 상수 자리를 가리�
 check "README가 잠금 시간을 베끼지 않는다" "! grep -qE '잠금(은|이)? *[0-9]+초' '$HERE/README.md'"
 check "README가 상수 자리를 가리킨다"      "grep -qF '_managed_block.sh' '$HERE/README.md'"
 
-# --- 렌즈에게 정본을 알리는 법: dispatching-lenses 한 곳만 내용을 갖는다 ---
+# --- 렌즈에게 에이전트원칙을 알리는 법: dispatching-lenses 한 곳만 내용을 갖는다 ---
 # 다른 스킬은 그 절을 가리키기만 한다. 첫 항목 문장이 다른 스킬에 나타나면 베낀 것이다.
-echo "[렌즈에게 정본을 알리는 법] 다른 스킬이 내용을 베끼지 않는다"
-TELL_SENT='정본 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다'
+echo "[렌즈에게 에이전트원칙을 알리는 법] 다른 스킬이 내용을 베끼지 않는다"
+TELL_SENT='에이전트원칙 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다'
 check "dispatching-lenses 가 그 문장을 갖는다" "grep -qF -- '$TELL_SENT' \"$DISP\""
 for f in "$HERE"/skills/*/SKILL.md; do
   case "$f" in */dispatching-lenses/*) continue ;; esac
@@ -772,23 +772,23 @@ done
 # hooks/doc_word_pretooluse.sh 가 검사한다. 그 말들은 이 저장소의 문서에 아직 남아 있으므로 여기서
 # 걸면 돌아가는 문서 스물두 개를 한꺼번에 다시 써야 한다 — 그 결정은 사용자 몫으로 남겨 두었다.
 #
-# 대상에서 빼는 것이 셋이고 이유가 서로 다르다. 정본 자신은 그 말을 정의하는 표를 담아서 빼고,
+# 대상에서 빼는 것이 셋이고 이유가 서로 다르다. 에이전트원칙 자신은 그 말을 정의하는 표를 담아서 빼고,
 # domain-korean 은 그 말을 지적한 사용자 인용을 그대로 담아서 빼며(예시로 들던 항목은 2026-09-21 에
 # 걷었고 남은 것은 인용뿐이다. 인용은 검사 대상이 아니라는 것이 목록 파일의 규정이다),
 # docs/superpowers/ 아래의 기록(리뷰)과 인수인계는 찍은 뒤 고치지 않거나 소비하고 지우는 것이라 뺀다.
 # 마지막 제외는 audit-repo-docs 의 「대상 아님」과 같은 규정이다.
 #
 # spec·plan 은 그 제외에서 다시 꺼낸다. 전에는 docs/superpowers/ 를 통째로 빼서 이 둘도 함께 빠졌는데,
-# 정본의 문서 타입 표는 설계(spec·plan)를 "계속 살아 있다"고 적으므로 빼는 근거가 정본과 어긋났다.
+# 에이전트원칙의 문서 타입 표는 설계(spec·plan)를 "계속 살아 있다"고 적으므로 빼는 근거가 에이전트원칙과 어긋났다.
 # 실제로 이 저장소의 spec·plan 에 금지 표현이 남아 있었고 그것을 보는 장치가 어디에도 없었다 — 레포
 # 감사는 spec·plan 을 대상에서 빼며 그 근거로 "쓰는 시점에 리뷰를 받는다"를 들고, 그 리뷰인
 # review-specs 는 lens-fit 을 부르지 않았다. 세 곳이 서로에게 미루어 아무도 안 보는 자리가 생겼다.
 #
-# 다만 이미 커밋된 spec·plan 은 대상에서 뺀다. 정본이 "과거 것은 보존 목적이며 활용하지 않는다"고
+# 다만 이미 커밋된 spec·plan 은 대상에서 뺀다. 에이전트원칙이 "과거 것은 보존 목적이며 활용하지 않는다"고
 # 적고 사용자가 새 spec·plan 만 자동 검증하기로 정했으므로, 지난 설계 문서를 소급해 고치지 않는다.
 # 새것을 가르는 방법은 봉인(seal_reviews.sh)이 HEAD 로 기록을 가르는 것을 뒤집은 것이다. 커밋 전이면
 # 검사에 걸리고 커밋되면 과거가 된다. 이 저장소는 고친 뒤 검사를 돌리는 규약이라 그때가 커밋 전이다.
-# 표는 정본이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 이고
+# 표는 에이전트원칙이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 이고
 # 그 저장소의 render.py 가 만들어 dist/ 에 올린 것을 워크플로가 받아 온다.
 BANSRC="$HERE/korean-banned-words.md"
 # 표의 행만 본다. 절의 설명 문단에도 백틱이 들어 있어, 절 전체에서 뽑으면 그 문단의 경로와 칸 이름이

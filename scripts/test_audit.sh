@@ -331,7 +331,7 @@ rj() { json_run "$1" "$RT/round/$2"; }
 # 넣고 그 값이 있는지를 같은 픽스처에서 되읽는 것이라 자기 자신을 증언하는 것과 같다. audit_evidence.sh
 # 가 그 칸을 실제로 읽는지는 위 [F1] 구획이 스키마와 대조해 이미 본다.
 # status 의 닫힌 집합은 이 파일이 손으로 든 리터럴이 아니라 절차 문서(audit-repo-docs SKILL.md)
-# 「판정」 절의 한 문장에서 뽑는다 — 계획 문서는 소비하고 지우는 문서라 정본이 못 된다. 문서가 상태
+# 「판정」 절의 한 문장에서 뽑는다 — 계획 문서는 소비하고 지우는 문서라 에이전트원칙이 못 된다. 문서가 상태
 # 이름을 더하거나 빼면 여기서 같이 갈린다(절차 문서나 이 픽스처 어느 한쪽만 바뀌어도 실패).
 STATUS_SRC="$PDA"
 STATUS_LINE="$(grep -F '`status`가' "$STATUS_SRC" | head -1)"
@@ -353,7 +353,7 @@ LC="$HERE/skills/lens-consistency/SKILL.md"
 check "렌즈가 이름표 묶음 짝을 적는다"                  "grep -qF '## 레포 문서 감사에서의 짝' '$LC'"
 check "렌즈 type 에 duplication 이 있다"                "grep -qF 'duplication' '$LC'"
 check "렌즈가 판정 셋과 narrowed 를 적는다"             "grep -qF '좁혀 적음' '$LC' && grep -qF 'narrowed' '$LC'"
-check "렌즈가 산출물 공백·스코프를 감사에서 뺀다"        "grep -qF '레포 문서 감사에서는 걸지 않는다' '$LC'"
+check "렌즈가 산출물 공백·스코프를 감사에서 뺀다"        "grep -qF '레포 문서 감사에서는 적용하지 않는다' '$LC'"
 check "집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다"  "grep -qF 'narrowed' '$HERE/skills/aggregating-lenses/SKILL.md'"
 check "한 번만 규율에 '대상이 다르면 별개 호출' 이 있다" "grep -qF '대상이 다르면 별개 호출이다' '$HERE/skills/dispatching-lenses/SKILL.md'"
 check "절차의 대체된 문장 셋이 사라졌다"                 "! grep -qF '만은 묶음에 한 번 건다' '$PDA' && ! grep -qF '묶음을 통째로 받는다' '$PDA' && ! grep -qF '묶음 전부를 서로 대조한다' '$LC'"
@@ -364,16 +364,16 @@ check "절차에 「일관성 대조」 절과 걸음 행이 있다"         "gr
 AT_DERIVE='목록은 손으로 적지 말고 `bash scripts/audit_targets.sh`가 내게 한다'
 check "대상 목록을 손으로 적지 않고 스크립트가 낸다"      "grep -qF -- \"\$AT_DERIVE\" '$PDA'"
 check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '$HERE/docs/superpowers/specs/2026-08-30-audit-unification-design.md' | grep -qF '2026-09-02-audit-record-and-diff-design.md'"
-# run.json 이 담을 것의 정본은 「통합 기록」 절의 run.json 서술 한 줄이다. 그 줄이 대상별
+# run.json 이 담을 것의 에이전트원칙은 「통합 기록」 절의 run.json 서술 한 줄이다. 그 줄이 대상별
 # 렌즈 배정과 판정 개수를 여전히 담는다고 적는지, 그리고 픽스처가 그 두 사실을 실제로
-# 담는 필드를 갖는지 양쪽을 대조한다 — 정본 문장이나 픽스처 어느 한쪽만 바뀌어도 실패한다.
+# 담는 필드를 갖는지 양쪽을 대조한다 — 에이전트원칙 문장이나 픽스처 어느 한쪽만 바뀌어도 실패한다.
 PDA_RUNJSON_LINE="$(grep -F '**`run.json`**' "$PDA")"
-check "정본이 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '대상 문서마다 건 렌즈'"
-check "정본이 판정 개수를 담는다고 적는다"               "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '판정 개수'"
+check "에이전트원칙이 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '대상 문서마다 건 렌즈'"
+check "에이전트원칙이 판정 개수를 담는다고 적는다"               "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '판정 개수'"
 # (지운 단언 둘) 픽스처가 대상별 렌즈 배정·판정 개수 필드를 담는다 — 이 파일 바로 위에서 손으로 쓴
-# run.json 리터럴에 그 키가 있는지를 같은 파일에서 되읽는 것이라, 정본 문장이 그 필드를 빼도 이
-# 픽스처는 안 바뀌어 계속 통과한다(F8). 바로 위 두 check(정본이 대상별 렌즈 배정/판정 개수를
-# 담는다고 적는다)가 정본 산문 쪽은 이미 보므로, 나머지는 F4의 metrics 필드 실측(아래
+# run.json 리터럴에 그 키가 있는지를 같은 파일에서 되읽는 것이라, 에이전트원칙 문장이 그 필드를 빼도 이
+# 픽스처는 안 바뀌어 계속 통과한다(F8). 바로 위 두 check(에이전트원칙이 대상별 렌즈 배정/판정 개수를
+# 담는다고 적는다)가 에이전트원칙 산문 쪽은 이미 보므로, 나머지는 F4의 metrics 필드 실측(아래
 # [audit_rounds.sh — 회차 대조와 측정] 구획)이 실제 계산 결과로 대신한다.
 
 echo "[audit_targets.sh — 배제 규칙이 실제로 걸린다]"
@@ -404,14 +404,14 @@ $(ls "$HERE/skills")
 $(ls "$HERE/commands" | sed 's/\.md$//')
 TOPICEOF
 [ -n "$ATP_MISS" ] && echo "    빠진 이름표:$ATP_MISS"
-check "정본 원칙 ID·절 제목·스킬·명령 이름이 모두 있다" "[ -z \"\$ATP_MISS\" ]"
+check "에이전트원칙 원칙 ID·절 제목·스킬·명령 이름이 모두 있다" "[ -z \"\$ATP_MISS\" ]"
 check "중복이 없다" "[ \"\$(printf '%s\n' \"\$ATP_OUT\" | sort | uniq -d | wc -l)\" = 0 ]"
 check "절차의 표 대조가 이 스크립트를 부른다" "grep -qF 'audit_topics.sh' '$PDA'"
 
 echo "[안내 문서 — 실행체가 사라진 것을 반영한다]"
 check "CLAUDE.md 가 감사 기록 봉인을 적는다"  "grep -qF '봉인' '$HERE/CLAUDE.md'"
 check "CLAUDE.md 가 읽기 전용 거부를 적는다"  "grep -qF '읽기 전용' '$HERE/CLAUDE.md'"
-# 「정본」은 agent-principles.md 그 파일 하나를 가리키는 말로 두고, 어떤 사실의 소유자를 가리킬
+# 「에이전트원칙」은 agent-principles.md 그 파일 하나를 가리키는 말로 두고, 어떤 사실의 소유자를 가리킬
 # 때는 「소유한다」를 쓴다. 한 낱말에 뜻이 둘이면 소유 표 도출이 포인터를 소유자로 센다.
 check "CLAUDE.md 가 훅 목록의 소유자를 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -F 'README.md' '$HERE/CLAUDE.md' | grep -qF '소유한다'"
 check "CLAUDE.md 가 훅 개수를 세지 않는다" \

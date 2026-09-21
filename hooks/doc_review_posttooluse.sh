@@ -38,7 +38,7 @@ while IFS= read -r FILE; do
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
   # 리뷰 기록은 검진 대상이 아니다. 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생기고,
   # 그 순환을 매번 무시하다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.
-  # 오답노트도 같은 부류다 — 정본이 문제를 완결할 때마다 교훈을 적으라고 요구하는데 그때마다
+  # 오답노트도 같은 부류다 — 에이전트원칙이 문제를 완결할 때마다 교훈을 적으라고 요구하는데 그때마다
   # 검진을 묻는 걸음이 붙는다. 형식은 스캐폴드가 강제하고 사람이 처음부터 끝까지 읽는 글도 아니라
   # 문체 검진에서 얻을 것이 거의 없다. 색인과 본문 파일을 함께 뺀다.
   case "$FILE" in
@@ -68,7 +68,7 @@ base="$(basename "$match")"
 
 # 렌즈 이름을 여기 박지 않는다 — 구성은 review-docs 가 SSOT이고, 여기 적으면 그 사본이
 # 먼저 낡아 훅이 안내하는 렌즈와 문서가 정하는 렌즈가 조용히 갈라진다(spec 훅도 같은 이유로 위임한다).
-msg="🔎 문서(${base}) 작성/수정됨 — done 하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 정본을 따른다. 넛지일 뿐 차단은 아니다."
+msg="🔎 문서(${base}) 작성/수정됨 — done 하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 에이전트원칙을 따른다. 넛지일 뿐 차단은 아니다."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

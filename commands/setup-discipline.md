@@ -1,9 +1,9 @@
 ---
-description: PC 전역(~/.claude/disciplined-coder/)을 셋업한다. 디시플린 정본(agent-principles.md)을 복사해 최신으로 갱신하고, ~/.claude/CLAUDE.md의 @import 블록을 다시 만들며, ~/.claude/settings.json과 ~/.claude/plugins/known_marketplaces.json의 이 마켓플레이스 항목에 autoUpdate를 넣고, 프로젝트 CLAUDE.md에 남은 옛 관리블록을 걷어내며, 관리 디렉터리의 구 관리파일을 backups로 옮기고 비어 있는 비관리 파일을 지운다. 윈도우에서는 PYTHONUTF8 환경 변수가 비어 있으면 넣는다. 여러 번 실행해도 결과가 같다(멱등).
+description: PC 전역(~/.claude/disciplined-coder/)을 셋업한다. 디시플린 에이전트원칙(agent-principles.md)을 복사해 최신으로 갱신하고, ~/.claude/CLAUDE.md의 @import 블록을 다시 만들며, ~/.claude/settings.json과 ~/.claude/plugins/known_marketplaces.json의 이 마켓플레이스 항목에 autoUpdate를 넣고, 프로젝트 CLAUDE.md에 남은 옛 관리블록을 걷어내며, 관리 디렉터리의 구 관리파일을 backups로 옮기고 비어 있는 비관리 파일을 지운다. 윈도우에서는 PYTHONUTF8 환경 변수가 비어 있으면 넣는다. 여러 번 실행해도 결과가 같다(멱등).
 ---
 
 다음 스크립트를 실행해 PC 전역 디시플린 환경(~/.claude/disciplined-coder/)을 셋업하라 — 디시플린
-정본을 최신으로 갈아 두고 @import 배선을 다시 만드는 일이다:
+에이전트원칙을 최신으로 갈아 두고 @import 연결을 다시 만드는 일이다:
 
 `bash "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.sh"`
 
@@ -23,4 +23,4 @@ description: PC 전역(~/.claude/disciplined-coder/)을 셋업한다. 디시플�
 
 넣는 이유는 이 PC 의 파이썬 기본 인코딩이 cp949 라 한국어 리터럴이 깨지기 때문이다. 이 저장소의
 파이썬 호출은 `scripts/_json_valid.sh` 의 `json_run` 이 프로세스마다 UTF-8 모드를 세워 막지만,
-클로드 코드 밖에서 파이썬을 직접 부를 때는 그 보호가 없다.
+클로드 코드 밖에서 파이썬을 직접 호출할 때는 그 보호가 없다.

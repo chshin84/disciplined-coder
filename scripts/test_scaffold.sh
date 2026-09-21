@@ -31,7 +31,7 @@ echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
 check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/agent-principles.md' '$UC'"
 check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
-# 금지 표현 목록은 중립 이름의 공용 블록이 싣는다. 규약 정본은 KiwoomAX/korean-banned-words 의
+# 금지 표현 목록은 중립 이름의 공용 블록이 싣는다. 규약 에이전트원칙은 KiwoomAX/korean-banned-words 의
 # import-protocol.md 다. 여기는 아무것도 없는 PC 라 우리가 블록을 만들고 우리 목록을 가리킨다.
 check "banlist: 공용 블록을 만든다"       "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC') -eq 1 ]"
 check "banlist: 블록이 우리를 가리킨다"   "sed -n '/BEGIN korean-banned-words/,/END korean-banned-words/p' '$UC' | grep -qxF '@disciplined-coder/korean-banned-words.md'"
@@ -113,7 +113,7 @@ printf '{ this is not json
 set +e; run "$HD" "$PD" >/dev/null 2>&1; rc_d=$?; set -e
 check "깨진 설정에도 스캐폴드가 산다"      "[ $rc_d -eq 0 ]"
 check "깨진 설정을 고치지 않는다"          "grep -qF 'this is not json' '$HD/.claude/settings.json'"
-check "깨진 설정에도 정본은 깔린다"        "[ -f '$HD/.claude/disciplined-coder/agent-principles.md' ]"
+check "깨진 설정에도 에이전트원칙은 깔린다"        "[ -f '$HD/.claude/disciplined-coder/agent-principles.md' ]"
 set +e; ERR_D="$(run "$HD" "$PD" 2>/dev/null)"; set -e
 check "깨진 설정을 조용히 넘기지 않는다"    "printf '%s' \"\$ERR_D\" | grep -qF 'autoUpdate 설정을 건너뛴다'"
 check "읽기 실패는 읽기 실패라고 말한다"    "printf '%s' \"\$ERR_D\" | grep -qF '읽지 못했거나 내용이 JSON이 아니다'"
@@ -160,7 +160,7 @@ check "one region after 3 runs"      "[ \$(grep -cF '# BEGIN disciplined-coder' 
 check "blank lines bounded (<=2)"    "[ \$(grep -c '^\$' '$UC5') -le 2 ]"
 
 # --- banlist-shared: 공용 블록 규약의 판정 절차 ---
-# 규약 정본은 KiwoomAX/korean-banned-words 의 import-protocol.md 다. 목록을 싣는 플러그인이
+# 규약 에이전트원칙은 KiwoomAX/korean-banned-words 의 import-protocol.md 다. 목록을 싣는 플러그인이
 # 둘이라 각자 자기 마커 블록에 두면 두 벌이 실리고 결과가 도는 차례에 따라 갈린다. 아래가
 # 판정 절차의 줄기를 하나씩 확인한다. 우리 판은 생성물에서 읽어 쓴다 — 숫자를 박으면 목록이
 # 갱신될 때마다 이 검사가 거짓으로 통과한다.
@@ -228,7 +228,7 @@ check "공용 블록을 안 만든다"         "[ \$(grep -cF '# BEGIN korean-ba
 check "목록이 한 벌만 실린다"         "[ \$(grep -c '^@.*korean-banned-words' '$UC27') -eq 1 ]"
 check "남의 줄을 안 지운다"           "grep -qxF '@kw-ax/korean-banned-words.md' '$UC27'"
 check "기다린다고 알린다"             "printf '%s' \"\$OUT27\" | grep -qF '공용 블록을 만들지 않았다'"
-check "정본 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC27'"
+check "에이전트원칙 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC27'"
 
 # --- banlist-orphan: 끝나는 짝이 없는 BEGIN 은 블록을 열지 않는다 ---
 # 고아 BEGIN 을 열린 채로 두면 그 뒤의 모든 줄이 남의 블록 안으로 보여, 사용자가 적은 줄까지
@@ -242,8 +242,8 @@ check "공용 블록을 만든다"            "[ \$(grep -cF '# BEGIN korean-ban
 check "사용자 줄로 보아 알린다"       "printf '%s' \"\$OUT28\" | grep -qF '블록 바깥에 목록을 싣는 줄이 있다'"
 check "기다린다고 알리지 않는다"      "! printf '%s' \"\$OUT28\" | grep -qF '공용 블록을 만들지 않았다'"
 check "남의 줄을 안 지운다"           "grep -qxF '@somewhere/korean-banned-words.md' '$UC28'"
-check "정본 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC26'"
-# 관리블록은 정본 줄 하나뿐이어야 한다. 목록이 거기 남으면 공용 블록과 합쳐 두 벌이 실린다.
+check "에이전트원칙 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC26'"
+# 관리블록은 에이전트원칙 줄 하나뿐이어야 한다. 목록이 거기 남으면 공용 블록과 합쳐 두 벌이 실린다.
 check "관리블록에 군더더기가 안 남는다" "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC26' | wc -l) -eq 3 ]"
 
 # 멱등. 바꾼 PC 를 두 번 더 돌려도 블록은 하나이고 가리키는 곳이 그대로다.
@@ -327,8 +327,8 @@ check "2nd run: user content preserved"    "grep -qxF 'IMPORTANT user content af
 check "2nd run: pre-region note preserved" "grep -qxF 'note before' '$UC7'"
 check "2nd run: single managed region"     "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC7') -eq 1 ]"
 
-# --- missing-canon: 정본 소스 부재 → FAIL-LOUD 경고(stderr) + 계속 진행(exit 0) ---
-H8="$(mktemp -d)"; P8="$(mktemp -d)"; ED="$(mktemp -d)"   # ED = 정본 없는 빈 plugin root
+# --- missing-canon: 에이전트원칙 소스 부재 → FAIL-LOUD 경고(stderr) + 계속 진행(exit 0) ---
+H8="$(mktemp -d)"; P8="$(mktemp -d)"; ED="$(mktemp -d)"   # ED = 에이전트원칙 없는 빈 plugin root
 set +e
 ERR8="$(CLAUDE_HOME_DIR="$H8/.claude" CLAUDE_PROJECT_DIR="$P8" CLAUDE_PLUGIN_ROOT="$ED" bash "$SCAFFOLD" 2>/dev/null)"; rc8=$?
 set -e
@@ -371,7 +371,7 @@ if command -v cygpath >/dev/null 2>&1; then
   check "같은 파일: 관리블록이 하나다"       "[ \$(grep -cF '# BEGIN disciplined-coder' '$H24/.claude/CLAUDE.md') -eq 1 ]"
 fi
 
-# --- managed-dir-hygiene: 관리 디렉터리 위생 — 구 관리파일 제거·정본/사용자데이터 보존·빈 고아 제거 ---
+# --- managed-dir-hygiene: 관리 디렉터리 위생 — 구 관리파일 제거·에이전트원칙/사용자데이터 보존·빈 고아 제거 ---
 H10="$(mktemp -d)"; P10="$(mktemp -d)"
 run "$H10" "$P10" >/dev/null
 K10="$H10/.claude/disciplined-coder"
@@ -393,7 +393,7 @@ check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rog
 check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
 
 # --- toggles-removed: 토글 둘(issue-mode·ultracode-review)을 없애고 동작을 하나로 고정했다 ---
-# 모르면 안 쓰게 되는 설정이라 없앴다. 처분은 surface로 고정하고, ultracode 검증은 정본 원칙만 남겼다.
+# 모르면 안 쓰게 되는 설정이라 없앴다. 처분은 surface로 고정하고, ultracode 검증은 에이전트원칙 원칙만 남겼다.
 # 이미 만들어진 상태 파일은 STALE로 지운다 — 화이트리스트에서 빼기만 하면 매 세션 경고가 남는다.
 H12="$(mktemp -d)"; P12="$(mktemp -d)"; K12="$H12/.claude/disciplined-coder"
 echo "[toggles-removed] 토글 커맨드·스크립트·모드 주입이 모두 사라졌다"
@@ -422,7 +422,7 @@ for c in "$HERE"/commands/*.md; do
   check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
 done
 
-# --- workflow-verification-row: 검증 레이어 표에 워크플로 검증 행 존재(정본 계약 가드 — spec 검증 기준) ---
+# --- workflow-verification-row: 검증 레이어 표에 워크플로 검증 행 존재(에이전트원칙 계약 가드 — spec 검증 기준) ---
 # 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(lens-*)과
 # 강제 방식 열이 같은 행에 있음을 보장한다(다른 행·다른 파일의 문자열로 vacuous 통과 방지).
 WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agent-principles.md")"
@@ -477,9 +477,9 @@ check "orphan: blank line right after para one preserved" "blank_follows '$UC19'
 check "orphan: warns BEGIN w/o END"   "printf '%s' \"\$ERR19\" | grep -qF 'BEGIN but no END'"
 check "orphan: marker line gone"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC19') -eq 1 ]"
 
-# --- canon-first-run-only: 정본 stdout 덤프는 첫 설치 세션에만 (이중 주입 회귀 가드) ---
+# --- canon-first-run-only: 에이전트원칙 stdout 덤프는 첫 설치 세션에만 (이중 주입 회귀 가드) ---
 H20="$(mktemp -d)"; P20="$(mktemp -d)"; mkdir -p "$H20/.claude/plugins"
-# 여기서 보려는 것은 정본 덤프가 첫 회차에만 나오는지다. 함께 쓰는 플러그인 알림이 섞이면
+# 여기서 보려는 것은 에이전트원칙 덤프가 첫 회차에만 나오는지다. 함께 쓰는 플러그인 알림이 섞이면
 # "2회차에 아무것도 안 보낸다" 단언이 그 알림 때문에 실패하므로 설치 기록을 넣어 잠재운다.
 printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ], "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
 ' > "$H20/.claude/plugins/installed_plugins.json"
@@ -504,7 +504,7 @@ echo "[crlf-import-line] CRLF import line still counts as present"
 check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "CRLF: sends nothing"           "[ -z \"\$OUT21\" ]"
 
-# --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(정본 계약 가드) ---
+# --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(에이전트원칙 계약 가드) ---
 # 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
 # (vacuous 통과 방지).
 PO_BLOCK="$(awk '/^## 병렬 오케스트레이션/{f=1} f&&/^## /&&!/^## 병렬 오케스트레이션/{exit} f' "$HERE/agent-principles.md")"
@@ -513,7 +513,7 @@ check "병렬 오케스트레이션 heading exists"      "printf '%s' \"\$PO_BLO
 check "병렬 오케스트레이션 points to skill (SSOT)" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
 check "일이 하나뿐이면 낭비라고 적는다"       "printf '%s' \"\$PO_BLOCK\" | grep -qF '일이 하나뿐이면'"
 
-# --- nested-orchestration-skill: nested-orchestration 스킬 존재 + 핵심 절(정본 계약 가드) ---
+# --- nested-orchestration-skill: nested-orchestration 스킬 존재 + 핵심 절(에이전트원칙 계약 가드) ---
 # 단일 목적 파일이라 파일 전역 존재 검사로 충분하다(섹션 경합 없음 — Global Constraint 참조).
 NO_SKILL="$HERE/skills/nested-orchestration/SKILL.md"
 echo "[nested-orchestration-skill] nested-orchestration skill present + structured"
@@ -553,8 +553,8 @@ done
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
 check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
 
-# --- canon-realign: 정본이 원칙을 호명하지 않고 갈래는 걸리는 대상으로 이름 붙는다 ---
-# 접기(3fced53) 뒤에 정본이 원칙 전부를 갖는다. 갈래마다 원칙을 이름으로 다시 부르던 문장 셋은
+# --- canon-realign: 에이전트원칙이 원칙을 호명하지 않고 갈래는 걸리는 대상으로 이름 붙는다 ---
+# 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 갖는다. 갈래마다 원칙을 이름으로 다시 부르던 문장 셋은
 # 「원칙」 절이 이미 선언한 것을 부분집합으로 되풀이해 빠진 것이 안 걸린다는 뜻으로 읽혔다.
 # 이름이 범위를 좁게 말하던 절 하나만 「한국어로 쓸 때」로 바꾸고 나머지 여덟은 그대로 둔다.
 echo "[canon-consolidation] the canon owns every principle; only procedures and per-artifact rules stay skills"
@@ -563,7 +563,7 @@ echo "[canon-consolidation] the canon owns every principle; only procedures and 
 for sec in "원칙" "Karpathy guidelines" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
   check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
 done
-# 카파시 넷은 정본 안의 하위 절이다. Think Before Acting 이 최상위로 올라가면 갈래 셋과 나란히 서서
+# 카파시 넷은 에이전트원칙 안의 하위 절이다. Think Before Acting 이 최상위로 올라가면 갈래 셋과 나란히 서서
 # 어느 작업에 걸리는지가 흐려진다.
 for h in "Think Before Acting" "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
   check "canon: karpathy '$h' is a subsection"       "grep -qE '^### $h\$' '$CANON'"
@@ -588,7 +588,7 @@ check "canon: no roll-call in the Korean section"    "! grep -qF '\`FAIL-LOUD\`�
 check "canon: no roll-call in the document section"  "! grep -qF '\`SSOT\`와 \`NAME-ITEMS\`와 \`EXPLICIT\`이 문서에도 그대로 걸리고' '$CANON'"
 check "canon: no roll-call in the code section"      "! grep -qF '\`FOCUSED\`와 \`SSOT\`와 \`EXPLICIT\`이 코드에 그대로 걸리고' '$CANON'"
 check "canon: old section name is gone everywhere"   "! grep -rqF '대화할 때' '$CANON' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/scripts/scaffold.sh'"
-# 조항 열다섯의 목록은 이 파일이 소유한다. 정본에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
+# 조항 열다섯의 목록은 이 파일이 소유한다. 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
 # 조항이 하나 떨어져도 그 결손을 정답으로 굳힌다.
 for id in FAIL-LOUD FOCUSED EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
   check "canon: clause $id present"                  "grep -qF '**\`$id\`' '$CANON'"
@@ -606,7 +606,7 @@ for id in VOCAB-FREQ SPECIFIC-NAME SINO-KEEP LOANWORD-KEEP \
           EDIT-PRIORITY REWRITE-NOT-ADD; do
   check "canon: korean clause $id present"           "grep -qF '**\`$id\`' '$CANON'"
 done
-# 어제 카파시 절로 녹여 이름까지 뺀 다섯은 되살아나면 안 된다. 정본에서도 살아 있는 문서에서도 본다.
+# 어제 카파시 절로 녹여 이름까지 뺀 다섯은 되살아나면 안 된다. 에이전트원칙에서도 살아 있는 문서에서도 본다.
 for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD; do
   check "canon: old clause $id stays removed"        "! grep -qF '**\`$id\`' '$CANON'"
   check "live docs: no reference to $id"             "! grep -rqF '\`$id\`' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/scripts/scaffold.sh'"
@@ -622,9 +622,9 @@ for sk in review-docs domain-readme; do
   check "skill $sk frontmatter name"                 "grep -qF 'name: $sk' '$HERE/skills/$sk/SKILL.md'"
 done
 
-# --- standing-consent: 렌즈 호출에 대한 상시 허가가 정본에 있다 ---
+# --- standing-consent: 렌즈 호출에 대한 상시 허가가 에이전트원칙에 있다 ---
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
-# 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 정본은 @import로 실리므로 이 한
+# 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 에이전트원칙은 @import로 실리므로 이 한
 # 문장이 있으면 검진이 돈다.
 # 파일 전역 grep이 아니라 '검증 레이어' 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
 # 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
@@ -642,7 +642,7 @@ check "canon: 허가 범위 한정"              "printf '%s' \"\$SC_BLOCK\" | g
 # 렌즈를 범위 밖으로 판단해 조용히 건너뛰게 되고, '막히면 알린다'는 안전장치도 발동하지 않는다.
 check "canon: 선행연구 렌즈를 이름으로 예외" "printf '%s' \"\$SC_BLOCK\" | grep -qF -- 'lens-prior-art'"
 check "canon: 뭉뚱그린 심층조사 표현 없음"   "! printf '%s' \"\$SC_BLOCK\" | grep -qF -- '심층조사'"
-# 정본이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 문장이 실려야 한다.
+# 에이전트원칙이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 문장이 실려야 한다.
 check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$K/agent-principles.md'"
 
 # --- question-tool: 갈림길은 질문 도구로 묻는다 (상시 로드 규칙) ---
@@ -661,10 +661,10 @@ check "canon: 산문 금지 조각은 없다"         "! grep -qF -- 'never in p
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
 check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'Think Before Acting'"
 
-# --- canon-refresh: 이미 옛 정본을 갖고 있는 PC도 갱신을 받는다 ---
-# 갓 설치한 경로만 검사하면, 정본 복사를 '없을 때만'으로 바꿔도 초록이 유지된다. 바로 이웃한 두
+# --- canon-refresh: 이미 옛 에이전트원칙을 갖고 있는 PC도 갱신을 받는다 ---
+# 갓 설치한 경로만 검사하면, 에이전트원칙 복사를 '없을 때만'으로 바꿔도 초록이 유지된다. 바로 이웃한 두
 # 블록(오답노트 생성·머리말 동기화)이 일부러 비덮어쓰기라 통일하자며 그렇게 고치기 쉬운 자리다.
-# 그 순간 이미 깔린 모든 설치가 옛 정본에 멈추는데, 새 문장이 필요한 쪽은 정확히 그 설치들이다.
+# 그 순간 이미 깔린 모든 설치가 옛 에이전트원칙에 멈추는데, 새 문장이 필요한 쪽은 정확히 그 설치들이다.
 HRU="$(mktemp -d)"; PRU="$(mktemp -d)"; mkdir -p "$HRU/.claude/disciplined-coder"
 OLDCANON="$HRU/.claude/disciplined-coder/agent-principles.md"
 printf '# 디시플린 (팀 원칙)\n\n옛 사본이라 새 문장이 없다.\n' > "$OLDCANON"
@@ -683,7 +683,7 @@ check "refs: none dangling"                "[ -z \"\$STALE\" ]"
 
 # --- reach-claims: 무조건적 도달 단정과 @import 오해 표현이 남지 않았다 ---
 # 정확 문자열 하나만 보면 나머지가 거짓인 채로 초록이 되므로 실측한 표현을 배열로 모두 검사한다.
-# 이 배열이 금지 표현군의 정본이다(스펙의 표는 당시 기록일 뿐 대조 대상이 아니다).
+# 이 배열이 금지 표현군의 에이전트원칙이다(스펙의 표는 당시 기록일 뿐 대조 대상이 아니다).
 # 패턴에 백틱이 들어가므로 반드시 작은따옴표 배열로 두고 grep -qF -- 로 넘긴다.
 REACH_DOCS=("$HERE/README.md")
 REACH_BANNED=(
@@ -695,7 +695,7 @@ REACH_BANNED=(
   '모든 서브에이전트에 전달된다'
   '모든 서브에이전트가 그 오답노트를'
   '매 요청 실어 나른다'
-  '매 요청 정본을 실어 준다'
+  '매 요청 에이전트원칙을 실어 준다'
   '새 세션에서만 실행'
 )
 echo "[reach-claims] no unconditional reach claims remain"
@@ -728,11 +728,11 @@ for D in "$HERE"/skills/lens-*/; do
   F="$D/SKILL.md"
   check "lens-$l: SKILL.md 존재"        "[ -f '$F' ]"
   check "lens-$l: principles_applied"   "grep -qF 'principles_applied' '$F'"
-  # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 정본으로 넘긴다. 예전에는 일곱 파일이
-  # 같은 문단을 복제해 지켰는데, 그 사이 정본의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
-  # 필수 여부가 두 곳에서 갈렸다. 지금은 정본 한 곳만 규정하고 렌즈는 가리키기만 한다(`SSOT`).
+  # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 에이전트원칙으로 넘긴다. 예전에는 일곱 파일이
+  # 같은 문단을 복제해 지켰는데, 그 사이 에이전트원칙의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
+  # 필수 여부가 두 곳에서 갈렸다. 지금은 에이전트원칙 한 곳만 규정하고 렌즈는 가리키기만 한다(`SSOT`).
   PA_POINTER='`aggregating-lenses`의 리뷰 산출물 계약이 정한다'
-  check "lens-$l: 규칙을 정본으로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
+  check "lens-$l: 규칙을 에이전트원칙으로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
 done
 check "aggregating-lenses: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/aggregating-lenses/SKILL.md'"
 
@@ -920,7 +920,7 @@ check "포인터: 재실행도 사용자 줄 보존"   "grep -qF '이 줄은 사
 
 # (파) 블록을 걷어내기 전에 사본을 뜬다. 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에
 # 끼워 넣은 줄도 함께 사라진다. 이 파일은 git 밖일 수 있어 사본이 유일한 복구 수단이다
-# (오답노트 머리말과 같은 규율 — 정본이 소유한다).
+# (오답노트 머리말과 같은 규율 — 에이전트원칙이 소유한다).
 HR12="$(mktemp -d)"; PR12="$(mktemp -d)"
 { printf '# 내 프로젝트 지침\n\n'
   printf '# BEGIN disciplined-coder (managed — do not edit)\n'
@@ -982,8 +982,8 @@ printf 'not-a-dependency
 OUT33="$(run "$H33" "$P33")"
 echo "[deps-notice] 함께 쓰는 플러그인 알림"
 check "없으면 superpowers 를 알린다"       "printf '%s' \"\$OUT30a\" | grep -qF 'superpowers@claude-plugins-official'"
-# 카파시는 목록에서 뺐다. 정본이 그 네 절을 이미 담고 있어 함께 깔면 지침이 두 벌이 된다.
-# 낱말 'andrej-karpathy-skills' 의 부재로 재면 안 된다 — 첫 회차 출력에 실리는 정본 덤프가 출처
+# 카파시는 목록에서 뺐다. 에이전트원칙이 그 네 절을 이미 담고 있어 함께 깔면 지침이 두 벌이 된다.
+# 낱말 'andrej-karpathy-skills' 의 부재로 재면 안 된다 — 첫 회차 출력에 실리는 에이전트원칙 덤프가 출처
 # 표기로 그 낱말을 갖고 있어 늘 실패한다. 알림에만 나오는 설치 키로 재야 알림의 부재가 잡힌다.
 check "카파시는 더 권하지 않는다"          "! printf '%s' \"\$OUT30a\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
 # superpowers 는 공식 마켓플레이스라 추가 명령이 없다. 목록의 '-' 가 실제로 그 줄을 뺐는지 본다.

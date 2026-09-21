@@ -133,9 +133,9 @@ check "상대경로(현재 폴더 기준) 읽기 전용 → deny" "( cd '$RO' &&
 check "게이트 OFF 여도 거부한다"               "DISCIPLINED_CODER_REVIEW_GATE=off rpre '$(J "$RO/sealed.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
 check "README 가 이 훅을 적는다"               "grep -qF '읽기 전용 차단' '$HERE/README.md'"
 
-echo "[rules-nudge-pre — 세션의 첫 파일 편집 전에 정본의 절대경로와 domain-korean 을 한 번 알린다]"
+echo "[rules-nudge-pre — 세션의 첫 파일 편집 전에 에이전트원칙의 절대경로와 domain-korean 을 한 번 알린다]"
 # 표시 파일은 TMPDIR 아래에 남으므로 픽스처 폴더로 돌린다 — 안 그러면 스위트를 두 번째 돌릴 때 앞 실행의
-# 표시 파일이 남아 "첫 편집" 검사가 조용히 깨진다(정본의 `IDEMPOTENT`).
+# 표시 파일이 남아 "첫 편집" 검사가 조용히 깨진다(에이전트원칙의 `IDEMPOTENT`).
 # 코드와 문서를 가르지 않는다. 셸 명령의 대상은 실행해 봐야 정해져 편집 전에 가를 방법이 없기 때문이다.
 CNUD="$HERE/hooks/rules_nudge_pretooluse.sh"
 mkdir -p "$T/tmp"
@@ -146,7 +146,7 @@ cnud() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$NH" bash "$CNUD"; 
 JS() { printf '{"session_id":"%s"%s,"tool_input":{"file_path":"%s"}}' "$1" "$2" "$3"; }
 JB() { printf '{"session_id":"%s","tool_name":"Bash","tool_input":{"command":"%s"}}' "$1" "$2"; }
 check "훅 파일이 있다"                              "[ -f '$CNUD' ]"
-check "첫 편집 → 정본 경로 안내      "                "cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
+check "첫 편집 → 에이전트원칙 경로 안내      "                "cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 check "첫 편집 → domain-korean 도 함께 안내"       "cnud '$(JS s1z "" "$T/src/main.py")' | grep -qF 'domain-korean'"
 check "안내가 유효한 JSON"                          "cnud '$(JS s1b "" "$T/src/main.py")' | json_valid_stdin"
 check "안내는 PreToolUse 이벤트를 말한다"            "cnud '$(JS s1c "" "$T/src/main.py")' | grep -qF '\"hookEventName\":\"PreToolUse\"'"
@@ -158,13 +158,13 @@ check "셸 편집도 세션당 한 번이다"                  "[ -z \"\$(cnud '
 check "OFF → 무출력"                                "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off cnud '$(JS s5 "" "$T/src/main.py")')\" ]"
 check "session_id 없음 → 매번 안내"                 "cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md' && cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 cnudh() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$2" bash "$CNUD"; }
-# 넛지가 경로를 둘 알린다. 정본 사본과 한국어 상세이고 놓이는 곳이 서로 다르다 — 정본은 관리
+# 넛지가 경로를 둘 알린다. 에이전트원칙 사본과 한국어 상세이고 놓이는 곳이 서로 다르다 — 에이전트원칙은 관리
 # 디렉터리로 복사되고 상세는 설치본 root 에만 있다. 뽑을 때 뒤 문장의 '에 있다' 까지 삼키지 않도록
 # 각각 뒤따르는 말로 끊는다. 둘 다 실재해야 한다 — 없는 파일을 열라고 시키지 않는다.
 NUDGE_OUT="$(cnudh "$(JS s8 "" "$T/src/main.py")" "$NH")"
-NUDGE_CANON="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*규칙 정본의 사본은 \(.*\) 에 있다\. 한국어.*/\1/p')"
+NUDGE_CANON="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*규칙 에이전트원칙의 사본은 \(.*\) 에 있다\. 한국어.*/\1/p')"
 NUDGE_WK="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*한국어 문장 규칙의 상세는 \(.*\) 에 있다\..*/\1/p')"
-check "넛지에서 정본 경로가 뽑힌다"                 "[ -n \"\$NUDGE_CANON\" ]"
+check "넛지에서 에이전트원칙 경로가 뽑힌다"                 "[ -n \"\$NUDGE_CANON\" ]"
 check "뽑은 경로에 파일이 실재한다"                 "[ -f \"\$NUDGE_CANON\" ]"
 check "넛지에서 한국어 상세 경로가 뽑힌다"          "[ -n \"\$NUDGE_WK\" ]"
 check "그 상세 경로에도 파일이 실재한다"            "[ -f \"\$NUDGE_WK\" ]"
@@ -193,21 +193,21 @@ check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/ne
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off fpre '$(J "$T/newdoc.md")')\" ]"
 check "프로젝트 밖 새 문서 → 무출력"     "[ -z \"\$(fpre '$(J "$OUTSIDE/new.md")')\" ]"
 check "새 리뷰 기록 → 무출력"            "[ -z \"\$(fpre '$(J "$T/docs/superpowers/reviews/new-check.md")')\" ]"
-# 오답노트는 양식을 그 로그 자신의 머리말이 정해 두어 정본의 양식 제안이 틀린 조언이 된다.
+# 오답노트는 양식을 그 로그 자신의 머리말이 정해 두어 에이전트원칙의 양식 제안이 틀린 조언이 된다.
 # 검진 넛지가 같은 이유로 같은 경로를 빼고 있으니 양식 제안도 함께 뺀다 — 한쪽만 빼면 같은 파일을
 # 만들 때 한 훅은 조용하고 다른 훅은 떠들어 어느 쪽이 맞는지 알 수 없다.
 check "새 오답노트 색인 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems.md")')\" ]"
 check "새 오답노트 본문 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems/new-lesson.md")')\" ]"
 check "새 문서 넛지가 domain-readme 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'domain-readme'"
-# 넛지가 가리킨 곳이 실재하는지 본다. 문자열 일치만 보던 시절 정본 영문화로 가리키던 절 이름이
+# 넛지가 가리킨 곳이 실재하는지 본다. 문자열 일치만 보던 시절 에이전트원칙 영문화로 가리키던 절 이름이
 # 바뀌자 넛지가 없는 곳을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD). 타입과 수명이 스킬에서
-# 정본으로 돌아가 가리키는 대상이 스킬에서 절로 바뀌었고, 이 검사도 따라 바뀐다.
+# 에이전트원칙으로 돌아가 가리키는 대상이 스킬에서 절로 바뀌었고, 이 검사도 따라 바뀐다.
 # 부정 대괄호(`[^」]`)를 안 쓴다. 로케일이 UTF-8 이 아니면 sed 가 그것을 바이트로 읽어, 한글의
 # 이어지는 바이트가 」 의 바이트와 겹쳐 매치가 엉뚱한 데서 끊긴다. 메시지에 「…」 절 이 하나뿐이라
 # 탐욕적 `.*` 가 안전하다. 같은 함정을 test_docs_drift.sh 의 대구 검사도 주석으로 적어 두었다.
-NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n 's/.*정본의 「\(.*\)」 절.*/\1/p')"
+NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n 's/.*에이전트원칙의 「\(.*\)」 절.*/\1/p')"
 check "넛지가 가리킨 절 이름 추출됨"       "[ -n \"\$NUDGE_SEC\" ]"
-check "그 절이 정본에 실재"                "grep -qF \"## \$NUDGE_SEC\" '$HERE/agent-principles.md'"
+check "그 절이 에이전트원칙에 실재"                "grep -qF \"## \$NUDGE_SEC\" '$HERE/agent-principles.md'"
 NUDGE_SK="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*disciplined-coder \([a-z][a-z-]*\) 를 함께.*/\1/p")"
 check "넛지가 가리킨 스킬 이름 추출됨"     "[ -n \"\$NUDGE_SK\" ]"
 check "그 스킬이 실재"                    "[ -f \"$HERE/skills/\$NUDGE_SK/SKILL.md\" ]"
@@ -487,7 +487,7 @@ dwj() { printf '{"tool_input":{"file_path":"%s","content":"%s"}}' "$1" "$2"; }
 dwe() { printf '{"tool_input":{"file_path":"%s","old_string":"옛 문장","new_string":"%s"}}' "$1" "$2"; }
 dw() { printf '%s' "$1" | bash "$DW"; }
 DWDIR="$T/deliv"; mkdir -p "$DWDIR/docs/superpowers/specs" "$DWDIR/sub"
-# 저장소 자신으로 보이게 하는 픽스처 — 조상 폴더에 정본이 있으면 대상에서 빠진다.
+# 저장소 자신으로 보이게 하는 픽스처 — 조상 폴더에 에이전트원칙이 있으면 대상에서 빠진다.
 DWREPO="$T/fakerepo"; mkdir -p "$DWREPO/skills"; : > "$DWREPO/agent-principles.md"
 DW_HIT="$(dw "$(dwj "$DWDIR/report.md" "$DWBODY")")"
 check "산출물의 금지 표현을 거부한다"       "printf '%s' \"\$DW_HIT\" | grep -qF '\"permissionDecision\":\"deny\"'"
@@ -503,14 +503,14 @@ check "메모리는 통과한다"                    "[ -z \"\$(dw \"\$(dwj '$T/
 check "설계 문서는 통과한다"                 "[ -z \"\$(dw \"\$(dwj '$DWDIR/docs/superpowers/specs/s.md' '$DWBODY')\")\" ]"
 check "스위치를 끄면 통과한다"               "[ -z \"\$(DISCIPLINED_CODER_REPLY_CHECK=off dw \"\$(dwj '$DWDIR/report.md' '$DWBODY')\")\" ]"
 check "경로가 없으면 통과한다"               "[ -z \"\$(dw '{}')\" ]"
-# 정본이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.
-# 막지는 않는다. 여기서 막으면 정본을 못 찾는 설치에서 문서 편집이 통째로 멈춘다.
+# 에이전트원칙이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.
+# 막지는 않는다. 여기서 막으면 에이전트원칙을 못 찾는 설치에서 문서 편집이 통째로 멈춘다.
 FAKE="$T/fake"; mkdir -p "$FAKE/hooks" "$FAKE/scripts"
 cp "$DW" "$HERE/hooks/_json_escape.sh" "$HERE/hooks/_banned_words.sh" "$HERE/hooks/_extract_path.sh" "$HERE/hooks/_spec_marker.sh" "$FAKE/hooks/"
 cp "$HERE/scripts/_json_valid.sh" "$FAKE/scripts/"
 DW_NOCANON="$(printf '%s' "$(dwj "$DWDIR/report.md" "$DWBODY")" | bash "$FAKE/hooks/doc_word_pretooluse.sh")"
-check "정본이 없으면 알린다"                 "printf '%s' \"\$DW_NOCANON\" | grep -qF 'systemMessage'"
-check "정본이 없을 때 막지는 않는다"         "! printf '%s' \"\$DW_NOCANON\" | grep -qF 'permissionDecision'"
+check "에이전트원칙이 없으면 알린다"                 "printf '%s' \"\$DW_NOCANON\" | grep -qF 'systemMessage'"
+check "에이전트원칙이 없을 때 막지는 않는다"         "! printf '%s' \"\$DW_NOCANON\" | grep -qF 'permissionDecision'"
 
 echo "[README — 배선된 스크립트를 모두 적는다]"
 # 훅이 일곱인데 안내 문서가 넷만 적고 있었다. 목록을 README 에 손으로 적지 않고 배선 파일 둘에서

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Idempotent. SessionStart마다 실행. 지식을 PC(~/.claude/disciplined-coder)에 두고
 # ~/.claude/CLAUDE.md 관리블록이 @import. 프로젝트 폴더에 파일을 새로 만들지는 않는다 —
-# 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 파일」이 정본이다.
+# 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 파일」이 에이전트원칙이다.
 set -euo pipefail
 
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
@@ -47,22 +47,22 @@ utf8_set_user_var() {
   pwsh -NoProfile -Command "[Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User')" >/dev/null 2>&1
 }
 
-# 1) 정본(static) 복사·갱신: principles. src==dst면 생략.
+# 1) 에이전트원칙(static) 복사·갱신: principles. src==dst면 생략.
 for f in $SCAFFOLD_FILES; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
   if [ -f "$src" ]; then
     # 복사가 실패하면 조용히 넘어가지 않는다. 이미 옛 사본이 놓여 있는 PC에서는 파일도 있고
-    # @import 배선도 남아 있어 README가 알려 준 확인 셋을 그대로 통과하므로, 정본만 낡은 채
+    # @import 배선도 남아 있어 README가 알려 준 확인 셋을 그대로 통과하므로, 에이전트원칙만 낡은 채
     # 아무도 모르게 된다(FAIL-LOUD).
     if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else
-      cp "$src" "$dst" || { echo "[disciplined-coder] ERROR: 정본 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)"; exit 1; }
+      cp "$src" "$dst" || { echo "[disciplined-coder] ERROR: 에이전트원칙 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)"; exit 1; }
     fi
   else
     echo "[disciplined-coder] WARNING: source not found at $src"
   fi
 done
 
-# 1b) 관리 디렉터리 위생(멱등): 정책 정본은 _scaffold_common.sh(SCAFFOLD_WHITELIST·STALE).
+# 1b) 관리 디렉터리 위생(멱등): 정책 에이전트원칙은 _scaffold_common.sh(SCAFFOLD_WHITELIST·STALE).
 #     비화이트리스트는 사용자 데이터일 수 있어 — 비었으면 제거, 내용 있으면 surface(FAIL-LOUD).
 scaffold_hygiene "$KDIR"
 
@@ -234,7 +234,7 @@ if [ -n "$ban_action" ]; then
   fi
 fi
 
-# 잠금을 못 잡으면 배선을 안 쓰고 물러난다. 그 사실을 여기서 알린다 — 정본 파일은 깔렸는데
+# 잠금을 못 잡으면 배선을 안 쓰고 물러난다. 그 사실을 여기서 알린다 — 에이전트원칙 파일은 깔렸는데
 # @import만 빠지면 세션은 원칙 없이 도는데 파일이 다 있어 아무도 눈치채지 못한다(`FAIL-LOUD`).
 inject_rc=0
 # 규약이 요구하는 것 — 자기 마커 블록에 목록 @import 를 두지 않는다. 두면 공용 블록에 한 줄,
@@ -247,7 +247,7 @@ if [ "$inject_rc" -ne 0 ]; then
 fi
 
 # 4) 첫 세션 도달 보강: CLAUDE.md는 이 훅보다 먼저 로드되므로, 블록을 방금 만든 세션은
-#    @import만으로 정본에 닿지 못한다. 그 세션에만 stdout(additionalContext)으로 보강한다.
+#    @import만으로 에이전트원칙에 닿지 못한다. 그 세션에만 stdout(additionalContext)으로 보강한다.
 #    이후 세션은 @import 한 경로로만 로드한다 — 같은 내용을 두 번 싣지 않는다.
 if [ "$had_import" -eq 0 ]; then
   for f in $SCAFFOLD_FILES; do
@@ -315,9 +315,9 @@ ensure_install_current "$CLAUDE_HOME" || true
 #     건너뛸 목록을 이 스크립트에 안 적으므로 그 파일 하나로 정해지고 끈 근거도 거기 남는다.
 #     설치 여부는 Claude Code 의 설치 기록 파일의 키로 본다. 마켓플레이스 이름은 설치 방법에 따라
 #     갈리므로 '이름@' 앞부분만 맞대고, 마켓플레이스 인자가 '-' 면 추가 없이 바로 설치한다.
-#     카파시 플러그인은 이 목록에서 뺐다. 정본의 「Karpathy guidelines」 절이 그 네 절을 산출물
+#     카파시 플러그인은 이 목록에서 뺐다. 에이전트원칙의 「Karpathy guidelines」 절이 그 네 절을 산출물
 #     기준으로 일반화해 이미 담고 있어, 함께 깔면 비슷하지만 어긋나는 지침이 매 세션 두 벌 실린다.
-#     정본이 출처를 적어 두므로 어디서 온 것인지는 거기서 확인한다.
+#     에이전트원칙이 출처를 적어 두므로 어디서 온 것인지는 거기서 확인한다.
 DEP_SKIP="$KDIR/plugin-notice.skip"
 DEP_LIST="superpowers|-|superpowers@claude-plugins-official"
 dep_missing=0
@@ -351,7 +351,7 @@ fi
 
 
 # 4e) 핸드오프 잔존 린트: 소비되면 곧바로 지우는 문서가 프로젝트에 남아 있으면 알린다.
-#     정본의 문서 타입 표가 이 타입의 강제 장치로 이 린트를 적는다. 세는 규칙은 audit_targets.sh 와
+#     에이전트원칙의 문서 타입 표가 이 타입의 강제 장치로 이 린트를 적는다. 세는 규칙은 audit_targets.sh 와
 #     같은 HANDOFF- 접두사다. 유예는 건너뛸 목록을 여기 적지 않고 파일 머리의
 #     `handoff-keep-until: YYYY-MM-DD` 를 읽어 정한다 — 목록을 손으로 안 적으므로 날짜가 지나면
 #     저절로 다시 걸리고, 유예의 근거가 그 파일 안에 남는다(SSOT). 값이 0 이면 아무것도 안 낸다.
