@@ -560,14 +560,14 @@ check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가
 echo "[canon-consolidation] the canon owns every principle; only procedures and per-artifact rules stay skills"
 # 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
 # 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
-for sec in "원칙" "Karpathy guidelines" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
+for sec in "원칙" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
   check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
 done
-# 카파시 넷은 에이전트원칙 안의 하위 절이다. Think Before Acting 이 최상위로 올라가면 갈래 셋과 나란히 서서
-# 어느 작업에 걸리는지가 흐려진다.
+# 카파시 절은 2026-09-21 에 해체해 「원칙」으로 흡수했다. 출처로 나뉘던 분류 축이 하나로 합쳐졌다.
+# 하위 소제목 넷이 어느 층으로든 되살아나면 그 축이 다시 갈라진 것이므로 실패다. 원문 문장은
+# 아래 조항 본문에 그대로 남아 있고 이 파일의 영어 단언들이 그것을 붙든다.
 for h in "Think Before Acting" "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
-  check "canon: karpathy '$h' is a subsection"       "grep -qE '^### $h\$' '$CANON'"
-  check "canon: karpathy '$h' is not top-level"      "! grep -qE '^## $h\$' '$CANON'"
+  check "canon: karpathy '$h' stays dissolved"       "! grep -qE '^#+ $h\$' '$CANON'"
 done
 check "canon: Tradeoff line stays"                   "grep -qF '**Tradeoff:**' '$CANON'"
 check "canon: karpathy object is generalized"        "grep -qF 'generalized from code to any artifact' '$CANON'"
@@ -578,8 +578,7 @@ check "canon: pre-existing-dead-code rule stays"     "grep -qF \"Don't remove wh
 check "canon: weak-criteria rule stays"              "grep -qF 'Weak criteria (\"make it work\") need constant clarification' '$CANON'"
 check "canon: trace-to-request rule stays"           "grep -qF 'Every changed line must trace directly to the request.' '$CANON'"
 check "canon: numbered-steps-plan rule stays"        "grep -qF 'For multi-step work, state the plan as numbered steps, each with the check that verifies it.' '$CANON'"
-# 카파시 절의 위 문턱. 제목 줄부터 다음 `## ` 줄 직전까지를 세고 45 를 넘으면 실패다.
-check "canon: karpathy section is 45 lines or fewer" "[ \"\$(awk 'index(\$0,\"## Karpathy guidelines\")==1{s=NR;next} s&&index(\$0,\"## \")==1{print NR-s;exit}' '$CANON')\" -le 45 ]"
+# 흡수한 조항이 실재하는지 본다. 옛 45줄 상한은 셀 절이 없어져 이것으로 바꿨다.
 check "canon: fact-vs-judgment paragraph stays"      "grep -qF '사실과 판단은 다르다' '$CANON'"
 check "canon: local-first convention stays"          "grep -qF '\`LOCAL-FIRST\`는 원칙이 아니라' '$CANON'"
 check "canon: execution evidence rule"               "grep -qF '실행 증거 없이' '$CANON'"
@@ -590,7 +589,7 @@ check "canon: no roll-call in the code section"      "! grep -qF '\`FOCUSED\`와
 check "canon: old section name is gone everywhere"   "! grep -rqF '대화할 때' '$CANON' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/scripts/scaffold.sh'"
 # 조항 열다섯의 목록은 이 파일이 소유한다. 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
 # 조항이 하나 떨어져도 그 결손을 정답으로 굳힌다.
-for id in FAIL-LOUD FOCUSED EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
+for id in FAIL-LOUD FOCUSED ASYNC-FIRST EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS NO-ASSUME STATE-ASSUME NAME-UNRESOLVED ASK-OPTIONS NO-FLEET YAGNI TRACE-REQUEST KEEP-STYLE REPORT-DEAD CHECKABLE IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
   check "canon: clause $id present"                  "grep -qF '**\`$id\`' '$CANON'"
 done
 # 한국어 절은 두 층이다. 묶는 이름은 `###` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라

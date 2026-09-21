@@ -2,62 +2,33 @@
 
 익숙한 말로 쓰되 근거와 과정은 감추지 않는다. 대화 스타일에서 전역 지침과 부딪히면 팀 원칙을 따른다. 원칙 사이에는 우열도 순서도 없다. 상황에 걸리는 것을 모두 적용한다.
 
-이 문서는 원칙과 Karpathy guidelines 를 먼저 정의한다. Karpathy guidelines 는 산출물이면 코드든 문서든 답이든 다 걸린다. 그다음 한국어로 쓸 때와 문서를 쓰고 관리할 때와 코딩할 때로 나누어 그 갈래에만 걸리는 것을 적는다. 한 원칙을 두 번 적지 않는다.
+이 문서는 어느 작업에나 적용되는 원칙을 먼저 정의한다. 그다음 한국어로 쓸 때와 문서를 쓰고 관리할 때와 코딩할 때로 나누어 그 종류에만 적용되는 것을 적는다. 한 원칙을 두 번 적지 않는다.
 
 ## 원칙
 
-어느 작업에나 걸린다.
+어느 작업에나 적용된다. 조항 일부는 `andrej-karpathy-skills` 1.0.0 에서 왔다 — the wording is not
+upstream's, and it is generalized from code to any artifact you produce: an answer, a document, or code.
 
-- **`FAIL-LOUD` (No silent failures)** — 어긋남을 발견하면 바로 드러낸다. 코드에서는 멈추고 오류를 내고, 절차에서는 사용자에게 알리고 계속 간다. 오류를 잡아 놓고 아무 일 없던 것처럼 넘기지 않는다.
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+- **`FAIL-LOUD` (No silent failures)** — 불일치를 발견하면 바로 드러낸다. 코드에서는 멈추고 오류를 내고, 절차에서는 사용자에게 알리고 계속 간다. 오류를 잡아 놓고 아무 일 없던 것처럼 넘기지 않는다.
 - **`FOCUSED` (Do one thing well)** — 한 작업(함수, 파일, 스킬, 서브에이전트와 같이 하나의 업무 단위)은 한 가지 일만 한다. 다른 작업은 내부를 몰라도 입력과 출력만 알면 쓸 수 있게 만든다.
-- **`ASYNC-FIRST` (Run independent work at once)** — 서로 기다릴 이유가 없는 일이 둘 이상이면 차례로 돌리지 말고 한꺼번에 돌린다. 도구 호출도 검사 스크립트도 명령도 같다. 앞의 결과가 뒤의 입력이 될 때만 순서를 지킨다. 순차로 돌리면 기다리는 시간이 그대로 더해지고 그 시간은 부탁한 사람이 낸다. 「병렬 오케스트레이션」 절과는 층이 다르다 — 그 절은 계획과 구현과 리뷰를 한 바퀴씩 가질 만큼 큰 작업 단위를 서브오케스트레이터로 가르고, 이 원칙은 지금 손에 든 일을 순차로 늘어놓지 말라고 한다.
+- **`ASYNC-FIRST` (Run independent work at once)** — 서로 기다릴 이유가 없는 일이 둘 이상이면 차례로 돌리지 말고 한꺼번에 돌린다. 도구 호출도 검사 스크립트도 명령도 같다. 앞의 결과가 뒤의 입력이 될 때만 순서를 지킨다. 순차로 돌리면 기다리는 시간이 그대로 추가되고 그 시간은 부탁한 사람이 낸다. 「병렬 오케스트레이션」 절과는 층이 다르다 — 그 절은 계획과 구현과 리뷰를 한 바퀴씩 보유할 만큼 큰 작업 단위를 서브오케스트레이터로 구분하고, 이 원칙은 지금 손에 든 일을 순차로 늘어놓지 말라고 한다.
 - **`EXPLICIT` (Explicit over implicit)** — 이름과 타입과 계약만으로 동작이 드러나게 한다. Context handed to a subagent is written into its prompt. 상대가 알 것이라 가정하지 않는다.
 - **`SSOT` (Single source of truth)** — 하나의 사실은 한 곳에만 둔다. 다른 데서 필요하면 복제하지 말고 그곳을 참조하거나 거기서 도출한다.
 - **`NAME-ITEMS` (Stable names, not numbers)** — 순서가 없으면 각 항목을 이름으로 부른다. 번호는 거짓 우선순위를 만든다.
 - **`REVERSIBLE` (Reversible decisions)** — 되돌릴 수 있는 결정을 선호한다. 되돌리기 어려운 결정은 그 근거를 남긴다.
 - **`SECRETS` (Secrets stay server-side)** — 키·토큰·비밀번호는 서버에만 두고, 사용자 쪽 브라우저나 앱으로 내보내지 않는다. 프롬프트와 로그에도 비밀과 개인정보를 남기지 않는다.
-
-## Karpathy guidelines
-
-Condensed from `andrej-karpathy-skills` 1.0.0 — the wording is not upstream's, and it is
-generalized from code to any artifact you produce: an answer, a document, or code.
-
-**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
-
-### Think Before Acting
-
-- Don't assume the current state. Measure it in the actual code, data, and environment.
-- State your assumptions explicitly rather than hiding them.
-- When measuring doesn't settle it, or several readings fit, stop and name what is
-  unresolved. Ask as a question with options; never pick silently. How to shape that
-  question — the background in prose before the options — is `UNPACK`'s to say.
-- Don't launch a fleet of subagents for what one call can do.
-
-### Simplicity First
-
-- Nothing beyond what was asked.
-- No abstraction for a single use.
-- No flexibility or configurability that was not requested.
-- No handling for situations that cannot occur.
-- If 50 lines would do, don't ship 200. Would an experienced colleague call this
-  overbuilt? Then simplify.
-
-### Surgical Changes
-
-Every changed line must trace directly to the request.
-
-- Don't improve adjacent material, wording, or formatting, and don't rework what is not
-  broken. Match the existing style, even if you would do it differently.
-- Notice unrelated dead material? Say so — don't delete it.
-- Remove what your own change made unused. Don't remove what was already unused.
-
-### Goal-Driven Execution
-
-Turn the task into something you can check. "Fix the bug" becomes "reproduce it, then make
-the reproduction pass".
-For multi-step work, state the plan as numbered steps, each with the check that verifies it.
-Weak criteria ("make it work") need constant clarification;
-strong criteria let you loop on your own.
+- **`NO-ASSUME` (Measure the state)** — Don't assume the current state. Measure it in the actual code, data, and environment.
+- **`STATE-ASSUME` (Assumptions in the open)** — State your assumptions explicitly rather than hiding them.
+- **`NAME-UNRESOLVED` (Name what is unresolved)** — When measuring doesn't settle it, or several readings fit, stop and name what is unresolved.
+- **`ASK-OPTIONS` (Ask, never pick silently)** — Ask as a question with options; never pick silently. 그 질문을 어떤 형태로 건네는지는 `ASK-CONTEXT` 가 정한다.
+- **`NO-FLEET` (One call before many)** — Don't launch a fleet of subagents for what one call can do.
+- **`YAGNI` (Nothing beyond the request)** — Nothing beyond what was asked. No abstraction for a single use. No flexibility or configurability that was not requested. No handling for situations that cannot occur. If 50 lines would do, don't ship 200.
+- **`TRACE-REQUEST` (Every line traces back)** — Every changed line must trace directly to the request. Don't improve adjacent material, wording, or formatting, and don't rework what is not broken.
+- **`KEEP-STYLE` (Match what is there)** — Match the existing style, even if you would do it differently.
+- **`REPORT-DEAD` (Report dead material, don't delete it)** — Notice unrelated dead material? Say so — don't delete it. Remove what your own change made unused. Don't remove what was already unused.
+- **`CHECKABLE` (Turn the task into a check)** — Turn the task into something you can check. For multi-step work, state the plan as numbered steps, each with the check that verifies it. Weak criteria ("make it work") need constant clarification; strong criteria let you loop on your own.
 
 ## 한국어로 쓸 때
 
