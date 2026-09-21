@@ -13,7 +13,10 @@ SCAFFOLD_WHITELIST="$SCAFFOLD_FILES backups plugin-notice.skip"
 # advisors-index·unsolved_problems도 같은 이유로 여기 있다 — 앞은 domains-index로 이름이 바뀐 옛
 # 파일이고, 뒤는 손유지 백로그라 없앤 기능의 잔재다. 둘 다 내용이 있어 위생 검사가 지우지 못한다.
 # solved_problems는 파일과 디렉터리 둘로 남는다 — 로그를 쪼갠 PC에는 폴더가 남기 때문이다.
-SCAFFOLD_STALE="coding-principles.md issue-mode ultracode-review advisors-index.md unsolved_problems.md solved_problems.md solved_problems domains-index.md"
+# korean-banned-words-dc.md는 목록 파일의 옛 이름이다. 원본 저장소와 이름을 맞추면서 지금 이름으로
+# 바꿨는데, 옛 이름은 내용이 있어 위생 검사가 지우지 못하고 stderr로만 알린다. SessionStart 훅의
+# stderr는 사용자에게 보이지 않으므로 그 알림은 매 세션 나가면서 아무에게도 닿지 않는다.
+SCAFFOLD_STALE="coding-principles.md issue-mode ultracode-review advisors-index.md unsolved_problems.md solved_problems.md solved_problems domains-index.md korean-banned-words-dc.md"
 
 scaffold_hygiene() {  # $1=KDIR
   local kdir="$1" f b w keep

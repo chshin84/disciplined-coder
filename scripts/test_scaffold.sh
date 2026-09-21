@@ -876,10 +876,13 @@ KS="$HRS/.claude/disciplined-coder"
 printf 'old index
 ' > "$KS/advisors-index.md"; printf '내 백로그 한 줄
 ' > "$KS/unsolved_problems.md"
+printf '옛 이름 목록 한 줄
+' > "$KS/korean-banned-words-dc.md"
 ERRS="$(CLAUDE_HOME_DIR="$HRS/.claude" CLAUDE_PROJECT_DIR="$PRS" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
 echo "[stale] renamed and retired managed files are cleared out"
 check "stale: advisors-index 치움"        "[ ! -f '$KS/advisors-index.md' ]"
 check "stale: unsolved_problems 치움"     "[ ! -f '$KS/unsolved_problems.md' ]"
+check "stale: 옛 이름 목록 치움"          "[ ! -f '$KS/korean-banned-words-dc.md' ]"
 check "stale: 잔존 경고 없음"             "! printf '%s' \"\$ERRS\" | grep -qF '비관리 파일'"
 check "stale: 내용은 백업에 남는다"       "grep -rqF '내 백로그 한 줄' '$KS/backups'"
 
