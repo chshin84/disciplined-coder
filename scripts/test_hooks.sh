@@ -347,6 +347,8 @@ echo "[project-solved nudge removed]"
 PN="$(mktemp -d)"
 # 넛지가 걸리는 폴더라야 "옛 넛지 대신 일반 넛지가 뜬다"를 볼 수 있다. 산출물을 하나 둔다.
 : > "$PN/deck.docx"
+# PostToolUse 는 쓰기 뒤에 도므로 실제로는 파일이 있다. 훅이 존재를 확인하므로 픽스처도 만든다.
+: > "$PN/CLAUDE.md"
 in_claudemd() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s/CLAUDE.md"}}' "$1"; }
 OUT_GONE="$(in_claudemd "$PN" | CLAUDE_PROJECT_DIR="$PN" bash "$DREV" 2>&1)" || true
 check "no add-pointer nudge anymore"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'add-pointer'"
