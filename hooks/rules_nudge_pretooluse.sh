@@ -16,6 +16,41 @@
 # 필드의 에이전트원칙: https://code.claude.com/docs/en/hooks
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
+INPUT="$(cat)"
+
+# 표시 파일 확인을 맨 앞에 둔다. 이 훅은 Write·Edit·Bash 마다 도는데 알리는 것은 세션에 한 번뿐이라,
+# 두 번째 호출부터는 여기서 끝나야 한다. 전에는 이 확인이 경로 도출과 메시지 작성 뒤에 있어 매 호출에
+# 프로세스 열다섯이 떴다 — 실측 회당 356밀리초였다(2026-09-23, 윈도우 Git Bash).
+#
+# 키를 뽑는 데 외부 명령을 쓰지 않는다. 전에는 필드마다 printf·grep·head·sed 넷이었고 필드가 둘이라
+# 여덟이었다. 셸 파라미터 확장은 프로세스를 쓰지 않는다.
+# 값을 찍지 않고 변수에 직접 담는다. `$( )` 는 외부 명령이 없어도 서브셸을 하나 만든다.
+json_str() {  # $1=필드 이름, $2=담을 변수 이름
+  local rest
+  printf -v "$2" '%s' ''
+  case "$INPUT" in
+    *"\"$1\""*) rest="${INPUT#*\"$1\"}" ;;
+    *) return 0 ;;
+  esac
+  rest="${rest#*:}"
+  case "$rest" in
+    *'"'*) rest="${rest#*\"}" ;;
+    *) return 0 ;;
+  esac
+  printf -v "$2" '%s' "${rest%%\"*}"
+}
+json_str session_id sid
+json_str agent_id aid
+if [ -n "$sid" ]; then
+  key="$sid${aid:+-$aid}"
+  mdir="${TMPDIR:-/tmp}/disciplined-coder"
+  marker="$mdir/rules-nudge-$key"
+  [ -e "$marker" ] && exit 0
+  mkdir -p "$mdir" && : > "$marker"
+fi
+# session_id 가 없으면 계약이 깨진 것이다. 표시 파일 없이 매번 알린다 — 조용히 빠지지 않는다(FAIL-LOUD).
+
+# 여기부터는 세션에 한 번만 지난다. 경로 도출과 헬퍼 소싱을 이 아래에 둔다.
 DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 # 홈 해석은 scripts/_resolve_home.sh 가 소유한다. 그 파일이 없어도 넛지는 나가야 하므로
@@ -39,22 +74,6 @@ if [ -f "$WK_PATH" ]; then
 else
   wkwhere="한국어 문장 규칙의 상세를 담은 domain-korean.md 를 못 찾았다."
 fi
-INPUT="$(cat)"
-
-# stdin JSON 의 최상위 문자열 필드 하나를 뽑는다. 없으면 빈 문자열.
-json_str() {
-  printf '%s' "$INPUT" | grep -o "\"$1\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)"$/\1/' || true
-}
-sid="$(json_str session_id)"
-aid="$(json_str agent_id)"
-if [ -n "$sid" ]; then
-  key="$sid${aid:+-$aid}"
-  mdir="${TMPDIR:-/tmp}/disciplined-coder"
-  marker="$mdir/rules-nudge-$key"
-  [ -e "$marker" ] && exit 0
-  mkdir -p "$mdir" && : > "$marker"
-fi
-# session_id 가 없으면 계약이 깨진 것이다. 표시 파일 없이 매번 알린다 — 조용히 빠지지 않는다(FAIL-LOUD).
 
 # 스킬의 절 이름을 여기 박지 않는다 — 훅은 스킬을 가리키기만 하고 내용을 베끼지 않는다(문서 넛지와 같은 규칙).
 msg="🧑‍💻 이 세션에서 파일을 처음 건드린다 — $where $wkwhere 서브에이전트에는 에이전트원칙이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 레포 안에서 도는 워크플로는 이 사본 대신 그 레포의 에이전트원칙을 넣는다 — 상세는 disciplined-coder dispatching-lenses 가 갖는다. 넛지일 뿐 차단은 아니다."
