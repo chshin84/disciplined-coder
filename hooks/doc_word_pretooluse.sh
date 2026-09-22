@@ -29,7 +29,9 @@ FILE="$(printf '%s' "$INPUT" | bash "$HOOKDIR/_extract_path.sh" | head -n1)"
 [ -n "$FILE" ] || exit 0
 case "$FILE" in *.md) ;; *) exit 0 ;; esac
 case "$FILE" in */.claude/projects/*) exit 0 ;; esac
-case "$FILE" in */docs/superpowers/*) exit 0 ;; esac
+# 형태 둘을 함께 받는다. `*/docs/...` 는 앞에 무언가가 있어야 맞으므로, 레포 뿌리 기준의
+# `docs/superpowers/a.md` 같은 상대경로가 그 조건을 지나간다. 형제 훅 둘은 이미 둘을 받는다.
+case "$FILE" in */docs/superpowers/*|docs/superpowers/*) exit 0 ;; esac
 
 # 이 저장소 자신의 문서이면 뺀다. 판정은 _spec_marker.sh 의 path_in_own_repo 가 소유한다 —
 # Post 훅과 Stop 훅이 같은 판정을 해야 같은 파일이 도구에 따라 다르게 걸리지 않는다.

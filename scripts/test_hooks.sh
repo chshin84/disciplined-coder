@@ -503,6 +503,9 @@ check "md 가 아니면 통과한다"                "[ -z \"\$(dw \"\$(dwj '$DW
 check "저장소 자신의 문서는 통과한다"        "[ -z \"\$(dw \"\$(dwj '$DWREPO/skills/x.md' '$DWBODY')\")\" ]"
 check "메모리는 통과한다"                    "[ -z \"\$(dw \"\$(dwj '$T/.claude/projects/p/memory/m.md' '$DWBODY')\")\" ]"
 check "설계 문서는 통과한다"                 "[ -z \"\$(dw \"\$(dwj '$DWDIR/docs/superpowers/specs/s.md' '$DWBODY')\")\" ]"
+# 레포 뿌리 기준의 상대경로도 같은 제외를 받아야 한다. `*/docs/...` 만 보면 앞에 무언가가 있어야
+# 맞아서 이 형태가 지나갔고, 형제 훅 둘은 이미 두 형태를 받고 있었다.
+check "설계 문서 상대경로도 통과한다"        "[ -z \"\$(dw \"\$(dwj 'docs/superpowers/specs/s.md' '$DWBODY')\")\" ]"
 check "스위치를 끄면 통과한다"               "[ -z \"\$(DISCIPLINED_CODER_REPLY_CHECK=off dw \"\$(dwj '$DWDIR/report.md' '$DWBODY')\")\" ]"
 check "경로가 없으면 통과한다"               "[ -z \"\$(dw '{}')\" ]"
 # 에이전트원칙이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.
