@@ -150,6 +150,33 @@ done
 check "스킬이 모든 조항 ID 로 근거를 단다"   "[ -z \"\$KO_MISS\" ]"
 check "스킬이 지시 문장을 다시 적지 않는다"  "[ -z \"\$KO_DUP\" ]"
 check "에이전트원칙이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
+
+# 한국어 절 밖의 조항도 같은 방식으로 붙든다. 에이전트원칙이 지시를 소유하고 참고서가 같은 ID 로
+# 근거를 단다. 2026-09-22 에 Karpathy 절을 흡수하고 ID 없던 네 절을 분해하면서 조항이 스물넷
+# 늘었는데, 그것을 잇는 장치가 한국어 절에만 있어 나머지는 근거 없이 늘어날 수 있었다.
+# ID 목록은 에이전트원칙에서 뽑되 한국어 절의 것만 뺀다. 절을 추가하거나 이름을 바꿔도 따라온다.
+DC_WK="$HERE/skills/lens-fit/domain-discipline.md"
+check "원칙 참고서가 있다"                   "[ -f \"$DC_WK\" ]"
+ALL_IDS="$(grep -oE '^- \*\*`[A-Z][A-Z0-9-]*`' "$CANON" | grep -oE '[A-Z][A-Z0-9-]+' | sort -u)"
+DC_IDS="$(printf '%s
+' "$ALL_IDS" | grep -vxF "$KO_IDS" || true)"
+check "한국어 절 밖 조항 ID 를 뽑았다"        "[ -n \"\$DC_IDS\" ]"
+DC_MISS=""
+DC_DUP=""
+for did in $DC_IDS; do
+  grep -qE "^### \`$did\`" "$DC_WK" || DC_MISS="$DC_MISS $did"
+  dc_sent="$(grep -F "**\`$did\`" "$CANON" | sed 's/^.*\*\* — //')"
+  if [ -n "$dc_sent" ]; then
+    if grep -qF "$dc_sent" "$DC_WK"; then DC_DUP="$DC_DUP $did"; fi
+  fi
+done
+[ -n "$DC_MISS" ] && printf '    참고서에 근거가 없는 조항:%s
+' "$DC_MISS"
+[ -n "$DC_DUP" ] && printf '    참고서가 지시를 그대로 옮겨 적은 조항:%s
+' "$DC_DUP"
+check "참고서가 모든 조항 ID 로 근거를 단다"  "[ -z \"\$DC_MISS\" ]"
+check "참고서가 지시 문장을 다시 적지 않는다" "[ -z \"\$DC_DUP\" ]"
+check "에이전트원칙이 그 참고서를 가리킨다"   "grep -qF 'domain-discipline' \"$CANON\""
 check "에이전트원칙이 대상을 정확히 가리키게 한다"   "grep -qF '대상의 이름을 그대로 쓴다' \"\$CANON\""
 check "가독성 렌즈가 이름 형태를 본다"       "grep -qF '이름 형태' \"\$READ2\""
 check "가독성 렌즈가 형태 섞임을 본다"       "grep -qF '형태 섞임' \"\$READ2\""
