@@ -5,31 +5,13 @@
 # 순수 bash(jq 비의존). git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
-HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
+HOOKDIR="${BASH_SOURCE[0]%/*}"; [ "$HOOKDIR" != "${BASH_SOURCE[0]}" ] || HOOKDIR=.
+. "$HOOKDIR/_hook_input.sh"     # 훅 입력 읽기(json_str·slash_norm) 공유
 . "$HOOKDIR/_spec_marker.sh"    # terminal 마커 판정(SSOT) 공유
 . "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프(SSOT) 공유
+. "$HOOKDIR/_stop_preamble.sh"  # 루프가드·cwd·저장소 루트 이동 공유
 INPUT="$(cat)"
-case "$INPUT" in *'"stop_hook_active":true'*|*'"stop_hook_active": true'*) exit 0 ;; esac  # 루프가드
-command -v git >/dev/null 2>&1 || exit 0
-cwd="$(printf '%s' "$INPUT" | sed -n 's/.*"cwd"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1)"
-cwd="$(printf '%s' "$cwd" | tr -s '\\' '/')"
-if [ -n "$cwd" ]; then cd "$cwd" 2>/dev/null || exit 0; fi
-# git이 "저장소가 아니다"라고 답하면 잠글 대상이 없으니 조용히 통과한다(FAIL-OPEN, 문서화된 한계).
-# 그 밖의 실패(소유권 의심·인덱스 손상 등)는 게이트를 검사하지 못한 것이므로 알리고 통과한다 —
-# 아무 신호 없이 열리면 게이트가 꺼진 것을 알아챌 방법이 없다(FAIL-LOUD).
-_gitout="$(git rev-parse --is-inside-work-tree 2>&1)" || {
-  case "$_gitout" in *'not a git repository'*) exit 0 ;; esac
-  printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: git을 읽지 못해 spec 리뷰 게이트를 검사하지 못했다 — $(printf '%s' "$_gitout" | head -n1)")"
-  exit 0
-}
-# 레포 루트로 옮긴 뒤에 찾는다. 아래 두 탐색이 모두 레포 루트 기준 경로를 쓰기 때문이다 —
-# git status 의 pathspec(`docs/superpowers/...`)은 현재 폴더 기준이고, diff-tree 가 돌려주는
-# 경로와 `[ -f "$f" ]` 도 루트 기준이다. 그래서 세션의 작업 폴더가 하위 폴더이면(예: myrepo/backend)
-# 미리뷰 spec 을 하나도 못 찾고 아무 메시지 없이 통과시켰다 — 게이트가 꺼진 것을 알아챌 방법이
-# 없는 조용한 실패다(`FAIL-LOUD`).
-_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
-[ -n "$_root" ] || exit 0
-cd "$_root" 2>/dev/null || exit 0
+stop_enter_repo "spec 리뷰 게이트를 검사하지 못했다"
 
 # 경로는 배열에 모은다 — 공백으로 이어 붙이면 NUL 종료로 얻은 안전성이 그 자리에서 무너진다.
 unreviewed=()

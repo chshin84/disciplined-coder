@@ -6,7 +6,7 @@
 # 값을 채우면 파일 전체가 두 칸 들여쓰기로 다시 찍힌다 — 내용은 그대로이나 서식은 바뀔 수 있어
 # 사본(.bak)을 남기고 바뀐 경로를 호출자가 사용자에게 알린다.
 # 소비자는 scaffold.sh다.
-. "$(dirname "${BASH_SOURCE[0]}")/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
+. "${BASH_SOURCE[0]%/*}/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
 #
 # 종료코드를 나눠 쓰는 까닭: 파이썬은 파싱에 실패해도 1로 끝난다. '고칠 것이 없다'를 1로 두면
 # 깨진 설정이 정상 회차와 같은 값으로 들어와 경고가 죽는다. 그래서 '고칠 것이 없다'를 10으로 옮겼다.
@@ -60,8 +60,8 @@ except Exception:
 sys.exit(0)
 '
   # 인터프리터 고르기는 _json_valid.sh 한 곳이 한다. 파이썬이 없으면 4 — 호출자가 사유를 갈라 알린다.
-  local py; py="$(_json_python)" || return 4
-  rc=0; "$py" -c "$prog" "$f" "$mkt" >/dev/null 2>&1 || rc=$?
+  _json_python || return 4
+  rc=0; "$_JSON_PY" -c "$prog" "$f" "$mkt" >/dev/null 2>&1 || rc=$?
   # 치우기를 rm -rf 로 하는 까닭: 임시 자리에 폴더가 놓여 있으면 rm -f 로는 안 지워져 다음
   # 세션마다 같은 실패가 되풀이된다. 이 이름은 우리가 정한 것이라 지워도 안전하다.
   if [ "$rc" -ne 0 ]; then rm -rf "$tmp"; return "$rc"; fi

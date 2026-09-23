@@ -19,23 +19,19 @@
 # 스위치는 답변 되돌림과 같은 DISCIPLINED_CODER_REPLY_CHECK 다. 같은 규칙이라 따로 두지 않는다.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
-HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
-. "$HOOKDIR/_spec_marker.sh"    # 경로 술어(path_in_own_repo) 공유(SSOT)
+HOOKDIR="${BASH_SOURCE[0]%/*}"; [ "$HOOKDIR" != "${BASH_SOURCE[0]}" ] || HOOKDIR=.
+. "$HOOKDIR/_hook_input.sh"     # 훅 입력 읽기(hook_file_paths) 공유
+. "$HOOKDIR/_spec_marker.sh"    # 경로 술어(path_is_banned_target) 공유(SSOT)
 . "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프(SSOT) 공유
 . "$HOOKDIR/_banned_words.sh"   # 금지 표현 표 파싱(SSOT) 공유
 INPUT="$(cat)"
 
-FILE="$(printf '%s' "$INPUT" | bash "$HOOKDIR/_extract_path.sh" | head -n1)"
+hook_file_paths
+FILE="${FILE_PATHS%%$'\n'*}"
 [ -n "$FILE" ] || exit 0
-case "$FILE" in *.md) ;; *) exit 0 ;; esac
-case "$FILE" in */.claude/projects/*) exit 0 ;; esac
-# 형태 둘을 함께 받는다. `*/docs/...` 는 앞에 무언가가 있어야 맞으므로, 레포 뿌리 기준의
-# `docs/superpowers/a.md` 같은 상대경로가 그 조건을 지나간다. 형제 훅 둘은 이미 둘을 받는다.
-case "$FILE" in */docs/superpowers/*|docs/superpowers/*) exit 0 ;; esac
-
-# 이 저장소 자신의 문서이면 뺀다. 판정은 _spec_marker.sh 의 path_in_own_repo 가 소유한다 —
-# Post 훅과 Stop 훅이 같은 판정을 해야 같은 파일이 도구에 따라 다르게 걸리지 않는다.
-path_in_own_repo "$FILE" && exit 0
+# 위 셋을 빼는 판정은 _spec_marker.sh 의 path_is_banned_target 이 소유한다 — Post 훅과 Stop 훅이
+# 같은 판정을 해야 같은 파일이 도구에 따라 다르게 걸리지 않는다.
+path_is_banned_target "$FILE" || exit 0
 
 # 표는 에이전트원칙이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 하나이고
 # scripts/gen_banned_words.py 가 그것을 이 파일로 낸다. 에이전트원칙에는 포인터만 남는다.

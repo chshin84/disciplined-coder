@@ -22,23 +22,9 @@ INPUT="$(cat)"
 # 두 번째 호출부터는 여기서 끝나야 한다. 전에는 이 확인이 경로 도출과 메시지 작성 뒤에 있어 매 호출에
 # 프로세스 열다섯이 떴다 — 실측 회당 356밀리초였다(2026-09-23, 윈도우 Git Bash).
 #
-# 키를 뽑는 데 외부 명령을 쓰지 않는다. 전에는 필드마다 printf·grep·head·sed 넷이었고 필드가 둘이라
-# 여덟이었다. 셸 파라미터 확장은 프로세스를 쓰지 않는다.
-# 값을 찍지 않고 변수에 직접 담는다. `$( )` 는 외부 명령이 없어도 서브셸을 하나 만든다.
-json_str() {  # $1=필드 이름, $2=담을 변수 이름
-  local rest
-  printf -v "$2" '%s' ''
-  case "$INPUT" in
-    *"\"$1\""*) rest="${INPUT#*\"$1\"}" ;;
-    *) return 0 ;;
-  esac
-  rest="${rest#*:}"
-  case "$rest" in
-    *'"'*) rest="${rest#*\"}" ;;
-    *) return 0 ;;
-  esac
-  printf -v "$2" '%s' "${rest%%\"*}"
-}
+# 키를 뽑는 데 외부 명령을 쓰지 않는다. json_str 은 셸 파라미터 확장만 쓴다(_hook_input.sh).
+DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
+. "$DIR/_hook_input.sh"   # 훅 입력 읽기(json_str) 공유 — 세션 시작 훅과 같은 방식으로 키를 뽑는다
 json_str session_id sid
 json_str agent_id aid
 if [ -n "$sid" ]; then
@@ -50,8 +36,7 @@ if [ -n "$sid" ]; then
 fi
 # session_id 가 없으면 계약이 깨진 것이다. 표시 파일 없이 매번 알린다 — 조용히 빠지지 않는다(FAIL-LOUD).
 
-# 여기부터는 세션에 한 번만 지난다. 경로 도출과 헬퍼 소싱을 이 아래에 둔다.
-DIR="$(cd "$(dirname "$0")" && pwd)"
+# 여기부터는 세션에 한 번만 지난다. 경로 도출과 나머지 헬퍼 소싱을 이 아래에 둔다.
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 # 홈 해석은 scripts/_resolve_home.sh 가 소유한다. 그 파일이 없어도 넛지는 나가야 하므로
 # source 실패를 삼키고 함수가 섰는지로 가른다 — 조용히 빠지지 않는다(FAIL-LOUD).

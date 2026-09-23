@@ -2,6 +2,9 @@
 # scaffold.sh(PC-레벨) 검증. 계약: FAIL=0.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
+# 픽스처는 모두 이 뿌리 아래에 만들고 끝나면 통째로 지운다. mktemp 가 TMPDIR 을 따르므로 아래의
+# mktemp 호출과 이 검사가 부르는 스크립트의 임시 파일이 모두 여기로 온다.
+TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TMP"
 SCAFFOLD="$HERE/scripts/scaffold.sh"
 
 pass=0; fail=0
@@ -1034,5 +1037,20 @@ echo "[handoff-lint] 핸드오프 잔존 린트"
 check "유예 날짜가 남았으면 안 알린다"   "! printf '%s' \"\$OUTHO\" | grep -qF 'HANDOFF-later.md'"
 check "유예 날짜가 지났으면 알린다"      "printf '%s' \"\$OUTHO\" | grep -qF 'HANDOFF-expired.md'"
 check "유예 표시가 없으면 알린다"        "printf '%s' \"\$OUTHO\" | grep -qF 'HANDOFF-plain.md'"
+
+echo "[파이썬 고르기 — 한 프로세스에서 한 번만 찾고 윈도우는 python 이 먼저다]"
+# 윈도우의 python3 은 스토어 안내판일 수 있어 먼저 부르면 실패하는 데만 프로세스를 쓴다. 맥·리눅스는
+# python 이 없거나 파이썬 2 일 수 있어 python3 이 먼저다. 둘 다 부르는 이름을 기록하는 가짜로 본다 —
+# 찾기 한 번과 실행 두 번이면 같은 이름이 세 번 적힌다.
+PSH="$TEST_TMP/py-shim"; mkdir -p "$PSH"; PLOG="$TEST_TMP/py.log"
+for pn in python python3; do printf '#!/usr/bin/env bash\necho %s >> "%s"\nexit 0\n' "$pn" "$PLOG" > "$PSH/$pn"; done
+chmod +x "$PSH"/*
+py_probe() {  # $1=OSTYPE → 불린 이름을 차례로
+  : > "$PLOG"
+  ( PATH="$PSH:$PATH"; OSTYPE="$1"; unset _JSON_PY; . "$2"; json_run x; json_run y ) >/dev/null 2>&1 || true
+  tr '\n' ' ' < "$PLOG"
+}
+check "윈도우는 python 을 먼저 고르고 한 번만 찾는다" "[ \"\$(py_probe msys '$HERE/scripts/_json_valid.sh')\" = 'python python python ' ]"
+check "맥·리눅스는 python3 을 먼저 고르고 한 번만 찾는다" "[ \"\$(py_probe linux-gnu '$HERE/scripts/_json_valid.sh')\" = 'python3 python3 python3 ' ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

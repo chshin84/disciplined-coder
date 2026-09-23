@@ -3,6 +3,9 @@
 # 스크립트는 픽스처 저장소에서 실제로 돌린다. 레포의 파일과 색인은 바꾸지 않는다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
+# 픽스처는 모두 이 뿌리 아래에 만들고 끝나면 통째로 지운다. mktemp 가 TMPDIR 을 따르므로 아래의
+# mktemp 호출과 이 검사가 부르는 스크립트의 임시 파일이 모두 여기로 온다.
+TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TMP"
 pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
 . "$HERE/scripts/_json_valid.sh"   # json_run — 파이썬 이름은 여기가 고른다

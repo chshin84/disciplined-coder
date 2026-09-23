@@ -32,20 +32,25 @@ path_is_specplan() {  # $1=경로 → spec/plan 경로면 0
 
 # 프로젝트 안의 경로인가. 문서 넛지 훅이 메모리 파일이나 계획 파일처럼 프로젝트 밖 문서에 걸리지
 # 않게 한다. 기준은 CLAUDE_PROJECT_DIR이고 없으면 현재 폴더다. 상대경로는 프로젝트 안으로 본다.
-# 훅 입력은 Windows 형식(D:\...)이고 셸의 현재 폴더는 POSIX 형식(/d/...)이라 cygpath가 있으면 한
-# 형식으로 모은 뒤 대소문자를 무시하고 견준다.
-_path_norm() {  # $1=경로 → stdout: 슬래시·소문자로 정규화한 경로
-  local p="$1"
-  if command -v cygpath >/dev/null 2>&1; then p="$(cygpath -m "$p" 2>/dev/null || printf '%s' "$p")"; fi
-  printf '%s' "$p" | tr -s '\\' '/' | tr 'A-Z' 'a-z'
-}
+# 훅 입력은 Windows 형식(D:\...)이고 셸의 현재 폴더는 POSIX 형식(/d/...)일 수 있다. 두 형식이
+# 다를 때만 cygpath 로 POSIX 쪽을 Windows 형식으로 옮긴다. 같으면 옮길 것이 없어 프로세스를 안 띄운다.
+# 슬래시를 모은 뒤 대소문자를 무시하고 견준다. slash_norm 은 _hook_input.sh 에 있어 호출자가 함께 싣는다.
+_path_is_win() { case "$1" in [A-Za-z]:*) return 0 ;; esac; return 1; }
 path_in_project() {  # $1=경로 → 프로젝트 안이면 0
-  local p root
-  case "$1" in /*|[A-Za-z]:*) ;; *) return 0 ;; esac
-  p="$(_path_norm "$1")"
-  root="$(_path_norm "${CLAUDE_PROJECT_DIR:-$PWD}")"
+  local p="$1" root="${CLAUDE_PROJECT_DIR:-$PWD}" nocase=0 inside=1
+  case "$p" in /*|[A-Za-z]:*) ;; *) return 0 ;; esac
+  if _path_is_win "$p" && ! _path_is_win "$root"; then
+    if command -v cygpath >/dev/null 2>&1; then root="$(cygpath -m "$root" 2>/dev/null || printf '%s' "$root")"; fi
+  elif ! _path_is_win "$p" && _path_is_win "$root"; then
+    if command -v cygpath >/dev/null 2>&1; then p="$(cygpath -m "$p" 2>/dev/null || printf '%s' "$p")"; fi
+  fi
+  slash_norm p; slash_norm root
   root="${root%/}"
-  case "$p" in "$root"/*) return 0 ;; *) return 1 ;; esac
+  shopt -q nocasematch && nocase=1
+  shopt -s nocasematch
+  [[ $p == "$root"/* ]] && inside=0
+  [ "$nocase" = 1 ] || shopt -u nocasematch
+  return "$inside"
 }
 
 # 이 플러그인 저장소 자신의 문서인지 본다. 조상 폴더에 에이전트원칙이 있으면 그렇다. 금지 표현 검사가
@@ -75,6 +80,25 @@ path_in_own_repo() {  # $1=경로 → 이 저장소 자신의 문서이면 0
       *) if [ "$abs" = 1 ]; then d=""; else d="."; fi ;;
     esac
   done
+  return 1
+}
+
+# 금지 표현 검사의 대상인가(SSOT). Pre·Post·Stop 훅 셋이 같은 제외를 써야 같은 파일이 도구에 따라
+# 다르게 판정되지 않는다. 대상은 `.md` 가운데 아래 셋에 안 드는 것이다.
+#   Claude 메모리(`/.claude/projects/`) — 나에게 남기는 쪽지이고 금지어를 목록으로 적어 둘 곳이다.
+#   `docs/superpowers/` 아래 — spec·plan·리뷰 기록이다. 레포 뿌리 기준 상대경로(git status)도 받는다.
+#   이 저장소 자신의 문서 — path_in_own_repo 가 판정한다.
+path_is_banned_target() {  # $1=경로 → 검사 대상이면 0
+  case "$1" in *.md) ;; *) return 1 ;; esac
+  case "$1" in */.claude/projects/*|*/docs/superpowers/*|docs/superpowers/*) return 1 ;; esac
+  path_in_own_repo "$1" && return 1
+  return 0
+}
+
+# 리뷰 기록인가. 양식은 검진 절이 정하고, 검진 넛지가 뜨면 기록에 대한 기록을 또 쓰는 순환이 생긴다.
+# 새 문서 넛지와 검진 넛지가 함께 뺀다 — 한쪽만 빼면 같은 파일에 한 훅은 조용하고 다른 훅은 떠든다.
+path_is_review_record() {  # $1=경로 → 리뷰 기록이면 0
+  case "$1" in *docs/superpowers/reviews/*.md) return 0 ;; esac
   return 1
 }
 

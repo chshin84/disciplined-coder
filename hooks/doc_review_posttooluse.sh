@@ -1,25 +1,31 @@
 #!/usr/bin/env bash
 # PostToolUse(Write|Edit|Bash): 산출물(.pptx·.xlsx·.docx·.pdf)과 그 폴더의 마크다운 작성/수정
 # 감지 → 비자가 검진 넛지(비블로킹, 게이트 아님). spec/plan 은 자체 하드 게이트가 맡아 뺀다.
-# 경로는 둘에서 뽑는다. Write·Edit 은 _extract_path.sh 의 file_path 이고, Bash 는
-# _extract_bash_targets.sh 가 명령줄에서 뽑은 쓰기 대상이다. 두 입력에 상대 필드가 없어
-# 그냥 이어 붙여도 섞이지 않는다. Bash 를 넣는 이유는 셸로 고치면 이 훅이 안 돌기 때문이다 —
-# 2026-09-21 에 한 세션이 sed -i 로 문서 열한 개를 고치는 동안 넛지가 한 번도 안 떴다. 순수 bash.
+# 경로는 도구에 따라 한 곳에서 뽑는다. Write·Edit 은 훅 입력의 file_path 이고, Bash 는
+# _extract_bash_targets.sh 가 명령줄에서 뽑은 쓰기 대상이다. Bash 를 넣는 이유는 셸로 고치면 이
+# 훅이 안 돌기 때문이다 — 2026-09-21 에 한 세션이 sed -i 로 문서 열한 개를 고치는 동안 넛지가 한
+# 번도 안 떴다. 순수 bash.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 INPUT="$(cat)"
+DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
+. "$DIR/_hook_input.sh"    # 훅 입력 읽기와 쓰기 구문 판정 공유
 
 # 무엇도 하기 전에 거른다. Bash 까지 보게 되면서 이 훅이 모든 셸 호출에 걸리므로, 평상시 값이
-# 곧 이 줄이다. file_path 가 있으면 Write·Edit 이라 그대로 가고, 없으면 쓰기 구문이 있을 때만
-# 간다. 둘 다 아니면 헬퍼를 싣지도 대상 뽑기를 부르지도 않는다 — 그 셋이 프로세스 값의 전부다.
-case "$INPUT" in
-  *'"file_path"'*) ;;
-  *sed*|*tee*|*cp\ *|*mv\ *|*'>'*) ;;
-  *) exit 0 ;;
-esac
+# 곧 이 줄이다. Bash 는 명령만 꺼내 쓰기 구문이 있을 때만 대상 뽑기를 부른다(판정은 형제 훅과
+# 같은 bash_cmd_writes). 그 밖의 도구는 file_path 만 본다.
+json_str tool_name TOOL
+if [ "$TOOL" = "Bash" ]; then
+  hook_command
+  bash_cmd_writes "$CMD" || exit 0
+  TARGETS="$(printf '%s' "$INPUT" | bash "$DIR/_extract_bash_targets.sh" || true)"
+else
+  hook_file_paths
+  TARGETS="$FILE_PATHS"
+fi
+[ -n "$TARGETS" ] || exit 0
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
-. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_in_project) 공유(SSOT)
+. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_is_review_record) 공유(SSOT)
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 match=""
 while IFS= read -r FILE; do
@@ -42,19 +48,18 @@ while IFS= read -r FILE; do
   # 형제 훅 doc_word_posttooluse.sh 에는 같은 줄이 이미 있었다.
   [ -f "$FILE" ] || continue
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
-  # 리뷰 기록은 검진 대상이 아니다. 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생기고,
-  # 그 순환을 매번 무시하다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.
+  # 리뷰 기록은 검진 대상이 아니다(판정은 _spec_marker.sh 의 path_is_review_record).
+  if path_is_review_record "$FILE"; then continue; fi
   # 오답노트도 같은 부류다 — 에이전트원칙이 문제를 완결할 때마다 교훈을 적으라고 요구하는데 그때마다
   # 검진을 묻는 걸음이 붙는다. 형식은 스캐폴드가 강제하고 사람이 처음부터 끝까지 읽는 글도 아니라
   # 문체 검진에서 얻을 것이 거의 없다. 색인과 본문 파일을 함께 뺀다.
   case "$FILE" in
-    *docs/superpowers/reviews/*.md) continue ;;
     *solved_problems.md|*solved_problems/*.md) continue ;;
   esac
   # 같은 폴더에 산출물이 있어야 이 마크다운이 그 재료다. 프로젝트 안팎은 묻지 않는다 — 산출물은
   # 저장소 밖 임시 폴더에 놓이는 것이 보통이라, 프로젝트 안으로 좁히면 정작 대상이 빠진다.
   # 메모리와 계획 파일에 넛지가 뜨던 문제는 이 조건이 대신 막는다. 그 폴더에는 산출물이 없다.
-  FDIR="$(dirname "$FILE")"
+  case "$FILE" in */*) FDIR="${FILE%/*}" ;; *) FDIR=. ;; esac
   has_deliverable=0
   # if 로 쓴다. `[ -e x ] && …` 는 조건이 거짓일 때 목록 전체가 1 로 끝나고, set -e 아래에서는
   # 그것이 훅을 그 자리에서 죽인다. 넛지가 조용히 사라지는 것이 그렇게 생긴다.
@@ -64,10 +69,10 @@ while IFS= read -r FILE; do
   [ "$has_deliverable" -eq 1 ] || continue
   match="$FILE"; break
 done <<EOF
-$(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh"; printf '%s' "$INPUT" | bash "$DIR/_extract_bash_targets.sh")
+$TARGETS
 EOF
 [ -n "$match" ] || exit 0
-base="$(basename "$match")"
+base="${match##*/}"
 
 # (제거됨) 오답노트 발견·복구 넛지 — /add-pointer 폐지와 함께 뺐다. 빈 템플릿을 미리 만들라는
 # 권유였는데, 빈 파일은 recall이 발화해도 얻는 교훈이 0이다. 이제 교훈이 생긴 시점에 만든다.

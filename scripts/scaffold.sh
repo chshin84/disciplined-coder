@@ -4,15 +4,17 @@
 # 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 파일」이 에이전트원칙이다.
 set -euo pipefail
 
-PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
+# 이 스크립트의 폴더. dirname 프로세스를 띄우지 않고 확장으로 구한다. 슬래시 없이 불렸으면 현재 폴더다.
+SDIR="${BASH_SOURCE[0]%/*}"; [ "$SDIR" != "${BASH_SOURCE[0]}" ] || SDIR=.
+PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$SDIR/.." && pwd)}"
 
 # Claude 설정 홈 해석 — 공유 헬퍼(SSOT). 도메인 PC의 네트워크 홈 리다이렉트로 bash $HOME이
 # os.homedir(USERPROFILE)과 어긋나면 @import 가 조용히 빠지므로 우선순위 해석을
 # _resolve_home.sh 한 곳에 둔다.
-. "$(dirname "$0")/_resolve_home.sh"
-. "$(dirname "$0")/_scaffold_common.sh"
-. "$(dirname "$0")/_ensure_autoupdate.sh"
-. "$(dirname "$0")/_ensure_current.sh"
+. "$SDIR/_resolve_home.sh"
+. "$SDIR/_scaffold_common.sh"
+. "$SDIR/_ensure_autoupdate.sh"
+. "$SDIR/_ensure_current.sh"
 CLAUDE_HOME="$(resolve_home claude)"
 KDIR="$CLAUDE_HOME/disciplined-coder"
 UC="$CLAUDE_HOME/CLAUDE.md"
@@ -25,8 +27,8 @@ mkdir -p "$KDIR"
 # 테스트는 DISCIPLINED_CODER_UTF8_STATE 로 결과를 주입해 OS 와 레지스트리를 안 본다.
 utf8_user_var_state() {
   if [ -n "${DISCIPLINED_CODER_UTF8_STATE:-}" ]; then printf '%s' "$DISCIPLINED_CODER_UTF8_STATE"; return 0; fi
-  case "$(uname -s 2>/dev/null || echo unknown)" in
-    MINGW*|MSYS*|CYGWIN*) ;;
+  case "${OSTYPE:-}" in
+    msys*|cygwin*) ;;
     *) printf 'not-windows'; return 0 ;;
   esac
   # //v 는 Git Bash 가 /v 로 되돌린다. /v 로 쓰면 경로로 바꿔 버려 reg 가 못 알아듣는다.
@@ -67,7 +69,7 @@ done
 scaffold_hygiene "$KDIR"
 
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
-. "$(dirname "$0")/_managed_block.sh"
+. "$SDIR/_managed_block.sh"
 
 # 3a) 없앤 기능(/add-pointer)이 프로젝트 CLAUDE.md에 심어 두던 옛 관리블록을 걷어낸다. 지금은
 #     아무것도 그 블록을 다시 만들지 않으므로 남아 있으면 갱신되지 않는 고아다. 마커가 같으니
@@ -285,6 +287,9 @@ done
 #     그 함수는 실패마다 사유를 stderr 로 찍고 모든 갈래에서 0 으로 끝난다. 종료 코드는 통로가 못
 #     되므로 stderr 를 받아 stdout 으로 옮긴다. 함수의 stdout 은 바뀐 파일 목록을 돌려주는 반환
 #     통로라 거기 섞으면 "켰다" 머리말 아래 거짓 통지가 된다.
+# 파이썬 인터프리터를 여기서 한 번 골라 둔다. 아래 두 확인은 명령 치환 안에서 돌아, 거기서 처음
+# 고르면 고른 결과가 그 서브셸과 함께 사라지고 확인마다 다시 찾는다. 없으면 각 확인이 사유를 알린다.
+_json_python || true
 au_err="$(mktemp)"
 autoupdated="$(ensure_marketplace_autoupdate "$CLAUDE_HOME" "$PLUGIN_ROOT" 2>"$au_err" || true)"
 #     켰다는 사실은 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않는다. 옛 관리블록을

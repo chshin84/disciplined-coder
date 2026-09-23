@@ -45,7 +45,7 @@ scaffold_hygiene() {  # $1=KDIR
   fi
   for f in "$kdir"/*; do
     [ -e "$f" ] || continue
-    b="$(basename "$f")"
+    b="${f##*/}"
     keep=0; for w in $SCAFFOLD_WHITELIST; do [ "$b" = "$w" ] && { keep=1; break; }; done
     [ "$keep" = 1 ] && continue
     if [ -d "$f" ]; then

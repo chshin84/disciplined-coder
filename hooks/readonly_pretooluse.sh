@@ -4,9 +4,11 @@
 # 같은 뜻이다. 끄는 스위치를 두지 않는다(DISCIPLINED_CODER_REVIEW_GATE 도 미치지 않는다). 풀려면 속성을
 # 풀면 되고 그 길은 셸이다. Write 는 훅 없이도 EPERM 으로 막히므로 이 훅의 몫은 왜 막혔는지 말하는 것이다.
 set -euo pipefail
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
+. "$DIR/_hook_input.sh"    # 훅 입력 읽기(hook_file_paths·slash_norm) 공유
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 INPUT="$(cat)"
+hook_file_paths
 match=""
 while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
@@ -14,7 +16,7 @@ while IFS= read -r FILE; do
   [ -w "$FILE" ] && continue            # 쓸 수 있으면 훅의 일이 아니다
   match="$FILE"; break
 done <<EOF
-$(printf '%s' "$INPUT" | bash "$DIR/_extract_path.sh")
+$FILE_PATHS
 EOF
 [ -n "$match" ] || exit 0
 reason="읽기 전용 파일은 고치지 않는다. 속성을 세운 쪽에 뜻이 있다 — 감사 기록이면 고치지 말고 새 기록을 더한다. 파일: $match"

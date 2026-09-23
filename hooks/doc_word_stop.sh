@@ -18,32 +18,17 @@
 # 문서, Claude 메모리, docs/superpowers/ 아래)도 같다.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
-HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
-. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_in_own_repo) 공유(SSOT)
+HOOKDIR="${BASH_SOURCE[0]%/*}"; [ "$HOOKDIR" != "${BASH_SOURCE[0]}" ] || HOOKDIR=.
+. "$HOOKDIR/_hook_input.sh"         # 훅 입력 읽기(json_str·slash_norm) 공유
+. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_is_banned_target) 공유(SSOT)
 . "$HOOKDIR/_json_escape.sh"        # JSON 문자열 이스케이프(SSOT) 공유
-. "$HOOKDIR/_banned_words.sh"       # 표 파싱과 본문 맞추기(SSOT) 공유
-. "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
+. "$HOOKDIR/_stop_preamble.sh"      # 루프가드·cwd·저장소 루트 이동 공유
 INPUT="$(cat)"
-case "$INPUT" in *'"stop_hook_active":true'*|*'"stop_hook_active": true'*) exit 0 ;; esac  # 루프가드
-command -v git >/dev/null 2>&1 || exit 0
 
 BANSRC="$HOOKDIR/../korean-banned-words.md"
 [ -f "$BANSRC" ] || exit 0   # 목록이 없다는 사실은 Pre 훅이 알린다. 여기서 두 번 알리지 않는다.
 
-cwd="$(printf '%s' "$INPUT" | sed -n 's/.*"cwd"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1)"
-cwd="$(printf '%s' "$cwd" | tr -s '\\' '/')"
-if [ -n "$cwd" ]; then cd "$cwd" 2>/dev/null || exit 0; fi
-# 저장소가 아니면 볼 것이 없다(FAIL-OPEN). 그 밖의 실패는 검사하지 못한 것이므로 알린다(FAIL-LOUD).
-_gitout="$(git rev-parse --is-inside-work-tree 2>&1)" || {
-  case "$_gitout" in *'not a git repository'*) exit 0 ;; esac
-  printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: git 을 읽지 못해 바뀐 문서의 금지 표현을 검사하지 못했다 — $(printf '%s' "$_gitout" | head -n1)")"
-  exit 0
-}
-# 레포 루트에서 본다. git status 가 돌려주는 경로가 루트 기준이라, 하위 폴더에서 돌면 파일을
-# 하나도 못 찾고 조용히 통과한다. spec 게이트가 같은 곳에서 같은 실패를 겪었다.
-_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
-[ -n "$_root" ] || exit 0
-cd "$_root" 2>/dev/null || exit 0
+stop_enter_repo "바뀐 문서의 금지 표현을 검사하지 못했다"
 
 # 검사할 파일을 먼저 추린다. 하나도 없으면 표 파싱까지 가지 않는다 — 매 턴 치르는 값이다.
 # -z 로 NUL 종료 raw 경로를 받는다. 공백과 비아스키가 든 경로가 그래야 안 깨진다.
@@ -51,16 +36,15 @@ FILES=""
 while IFS= read -r -d '' entry; do
   f="${entry:3}"
   [ -n "$f" ] || continue
-  case "$f" in *.md) ;; *) continue ;; esac
-  case "$f" in */.claude/projects/*) continue ;; esac
-  case "$f" in docs/superpowers/*|*/docs/superpowers/*) continue ;; esac
+  path_is_banned_target "$f" || continue   # 제외 규칙은 _spec_marker.sh 가 소유한다.
   [ -f "$f" ] || continue
-  path_in_own_repo "$f" && continue   # 이 저장소 자신의 문서. 판정은 _spec_marker.sh 가 소유한다.
   FILES="${FILES}${f}
 "
 done < <(git status -z --no-renames --untracked-files=all 2>/dev/null || true)
 [ -n "$FILES" ] || exit 0
 
+. "$HOOKDIR/_banned_words.sh"            # 표 파싱과 본문 맞추기(SSOT) 공유
+. "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 PAIRS="$WORK/pairs"; TOKS="$WORK/toks"; EXCL="$WORK/excl"

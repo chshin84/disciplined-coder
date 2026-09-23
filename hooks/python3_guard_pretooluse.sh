@@ -12,7 +12,7 @@ set -euo pipefail
 INPUT="$(cat)"
 
 # 무엇도 하기 전에 거른다. 이 훅은 모든 Bash 호출에 걸리므로 평상시 값이 곧 이 줄이다.
-# 아래 python3_target 은 uname 과 readlink 를 부르고, 그 뒤가 _extract_command.sh 와 awk 라
+# 아래 python3_target 은 readlink 를 부르고, 그 뒤가 _extract_command.sh 와 awk 라
 # 프로세스 넷이 매번 뜬다. 실측으로 회당 332밀리초였고 이 거르기로 75밀리초가 된다
 # (2026-09-23, 윈도우 Git Bash). 75밀리초는 bash 를 시작하는 값이라 더 줄일 수 없다.
 # 명령에 python3 이라는 글자가 아예 없으면 아래 awk 가 잡을 것도 없으므로 동작은 같다.
@@ -20,15 +20,15 @@ INPUT="$(cat)"
 case "$INPUT" in *python3*) ;; *) exit 0 ;; esac
 
 # 거르기를 지난 뒤에야 폴더를 구하고 헬퍼를 싣는다. 소싱도 프로세스를 하나 쓴다.
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 
 # python3 이 무엇으로 풀리는지 낸다. 테스트는 DISCIPLINED_CODER_PYTHON3_STATE 로 결과를 주입해
 # OS 와 PATH 를 안 본다 — 그것이 없으면 CI(ubuntu)와 윈도우 PC 에서 결과가 갈린다.
 python3_target() {
   if [ -n "${DISCIPLINED_CODER_PYTHON3_STATE:-}" ]; then printf '%s' "$DISCIPLINED_CODER_PYTHON3_STATE"; return 0; fi
-  case "$(uname -s 2>/dev/null || echo unknown)" in
-    MINGW*|MSYS*|CYGWIN*) ;;
+  case "${OSTYPE:-}" in
+    msys*|cygwin*) ;;
     *) printf 'not-windows'; return 0 ;;
   esac
   p="$(command -v python3 2>/dev/null || true)"

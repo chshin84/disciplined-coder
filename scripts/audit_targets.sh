@@ -13,10 +13,13 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 cd "$ROOT"
-git ls-files '*.md' \
-  | { grep -v '^docs/superpowers/' || true; } \
-  | { grep -vE '(^|/)HANDOFF-[^/]*$' || true; } \
-  | while IFS= read -r f; do
-      head -12 "$f" | grep -qi 'superseded' && continue
-      printf '%s\n' "$f"
-    done
+# awk 하나로 거른다. 파일마다 head 와 grep 을 띄우면 문서 수만큼 프로세스가 뜬다.
+# 머리 12줄에 superseded 가 있으면(대소문자 무시) 대체된 설계 문서라 뺀다. 못 여는 파일은 남긴다.
+git ls-files '*.md' | LC_ALL=C awk '
+  /^docs\/superpowers\// || /(^|\/)HANDOFF-[^\/]*$/ { next }
+  {
+    f = $0; hit = 0
+    for (i = 0; i < 12 && (getline line < f) > 0; i++) if (tolower(line) ~ /superseded/) { hit = 1; break }
+    close(f)
+    if (!hit) print f
+  }'

@@ -16,20 +16,15 @@ set -euo pipefail
 INPUT="$(cat)"
 
 # 무엇도 하기 전에 거른다. 이 훅은 모든 Bash 호출에 걸리므로 평상시 값이 곧 이 줄이다.
-# 헬퍼 넷을 싣고 대상 뽑기를 부르면 프로세스가 셋 더 뜨는데, 쓰기 구문이 없으면 그 전부가
-# 버려진다. 실측으로 회당 276밀리초였고 이 거르기로 줄인다(2026-09-21, 윈도우 Git Bash).
-# 조건은 _extract_bash_targets.sh 의 것과 같은 낱말이고, 훅 입력이 명령을 담으므로 더 넓다.
-# 넓은 쪽이 안전하다 — 좁으면 뽑을 수 있는 것을 여기서 버린다.
-case "$INPUT" in
-  *sed*|*tee*|*cp\ *|*mv\ *|*'>'*) ;;
-  *) exit 0 ;;
-esac
+# 명령만 셸 확장으로 꺼내 쓰기 구문이 있는지 본다. 판정은 _hook_input.sh 의 bash_cmd_writes 가
+# 소유하고 형제 훅과 대상 뽑기가 같은 것을 쓴다. 쓰기 구문이 없으면 프로세스를 하나도 안 띄운다.
+HOOKDIR="${BASH_SOURCE[0]%/*}"; [ "$HOOKDIR" != "${BASH_SOURCE[0]}" ] || HOOKDIR=.
+. "$HOOKDIR/_hook_input.sh"         # 훅 입력 읽기와 쓰기 구문 판정 공유
+hook_command
+bash_cmd_writes "$CMD" || exit 0
 
-HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
-. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_in_own_repo) 공유(SSOT)
+. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_is_banned_target) 공유(SSOT)
 . "$HOOKDIR/_json_escape.sh"        # JSON 문자열 이스케이프(SSOT) 공유
-. "$HOOKDIR/_banned_words.sh"       # 표 파싱과 본문 맞추기(SSOT) 공유
-. "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
 
 BANSRC="$HOOKDIR/../korean-banned-words.md"
 [ -f "$BANSRC" ] || exit 0   # 목록이 없다는 사실은 Pre 훅이 이미 알린다. 여기서 두 번 알리지 않는다.
@@ -41,17 +36,17 @@ TARGETS="$(printf '%s' "$INPUT" | bash "$HOOKDIR/_extract_bash_targets.sh" 2>/de
 FILES=""
 while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
-  case "$FILE" in *.md) ;; *) continue ;; esac
-  case "$FILE" in */.claude/projects/*) continue ;; esac
-  case "$FILE" in */docs/superpowers/*|docs/superpowers/*) continue ;; esac
+  path_is_banned_target "$FILE" || continue   # 제외 규칙은 _spec_marker.sh 가 소유한다.
   [ -f "$FILE" ] || continue
-  path_in_own_repo "$FILE" && continue   # 이 저장소 자신의 문서. 판정은 _spec_marker.sh 가 소유한다.
   FILES="${FILES}${FILE}
 "
 done <<EOF
 $TARGETS
 EOF
 [ -n "$FILES" ] || exit 0
+
+. "$HOOKDIR/_banned_words.sh"            # 표 파싱과 본문 맞추기(SSOT) 공유
+. "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT

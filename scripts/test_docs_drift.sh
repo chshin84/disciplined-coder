@@ -9,6 +9,9 @@
 # 낫다고 보아 그대로 둔다(FAIL-LOUD). 실패하면 앵커를 새 문구로 맞추면 된다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
+# 픽스처는 모두 이 뿌리 아래에 만들고 끝나면 통째로 지운다. mktemp 가 TMPDIR 을 따르므로 아래의
+# mktemp 호출과 이 검사가 부르는 스크립트의 임시 파일이 모두 여기로 온다.
+TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TMP"
 README="$HERE/README.md"
 CALLER="$HERE/skills/review-specs/SKILL.md"
 AGG="$HERE/skills/aggregating-lenses/SKILL.md"
@@ -347,45 +350,43 @@ echo "[소유 표] 소유는 하나뿐이고 나머지는 가리킨다"
 # 가리키는 문장은 이 꼴을 쓰지 않으므로 포인터가 소유자로 잡히지 않는다.
 # 전에는 「렌즈에게 에이전트원칙을 알리는 법」 하나에만 이 검사가 걸렸고 가리킬 문서 셋도 손으로 적혀
 # 있었다. 넷째 문서가 복제하면 검사가 지나쳤다. 이제 소유자도 대상도 도출한다(SSOT).
-OWN_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
+# 감사 대상 목록은 아래 세 구획(소유 표·첫 문장·대구 한도)이 함께 쓴다. 한 번만 뽑는다.
+AUDIT_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
+OWN_DOCS="$AUDIT_DOCS"
 check "소유 검사 대상 문서를 모았다" "[ -n \"\$OWN_DOCS\" ]"
-OWN_TSV=""
-for od in $OWN_DOCS; do
-  OWN_TSV="$OWN_TSV$(awk -v file="$od" '
+# 문서마다 awk·grep 을 따로 띄우지 않고 awk 한 번으로 모든 문서를 읽는다. 문서 경로는 레포 상대다.
+OWN_TSV="$(cd "$HERE" && awk '
+    FNR == 1 { title = "" }
     /^#{1,3} / { title=$0; sub(/^#+ /, "", title) }
-    /여기가 소유한다/ { if (title != "") print title "\t" file }' "$HERE/$od")
-"
-done
-OWN_TSV="$(printf '%s' "$OWN_TSV" | grep -v '^$' | sort || true)"
+    /여기가 소유한다/ { if (title != "") print title "\t" FILENAME }' $OWN_DOCS | sort || true)"
 check "소유 선언을 뽑았다" "[ -n \"\$OWN_TSV\" ]"
 # 앵커 자가시험 — 목록이 비면 아래 단언이 모두 근거 없이 통과한다.
 check "알려진 소유자가 표에 있다" "printf '%s' \"\$OWN_TSV\" | grep -qF '한 번만 띄우는 렌즈의 규율'"
 OWN_DUP="$(printf '%s' "$OWN_TSV" | cut -f1 | sort | uniq -d || true)"
 [ -n "$OWN_DUP" ] && printf '    둘 이상이 소유한 절:%s\n' "$(printf '%s' "$OWN_DUP" | tr '\n' ' ')"
 check "같은 절을 둘 이상이 소유하지 않는다" "[ -z \"\$OWN_DUP\" ]"
-OWN_BAD=""
-while IFS="$(printf '\t')" read -r otitle oowner; do
-  [ -n "$otitle" ] || continue
-  case "$oowner" in
-    skills/*/SKILL.md) oname="$(basename "$(dirname "$oowner")")" ;;
-    *) oname="$(basename "$oowner")" ;;
-  esac
-  oshort="${otitle%% (*}"   # 제목이 괄호를 달면 가리키는 쪽은 괄호 앞까지만 적는다
-  for og in $OWN_DOCS; do
-    [ "$og" = "$oowner" ] && continue
-    # 파일이 아니라 그 줄을 본다. 파일 단위로 보면 소유자를 다른 데서 한 번 부른 문서가 이 줄에서
-    # 포인터를 빠뜨려도 통과한다.
-    while IFS= read -r oline; do
-      [ -n "$oline" ] || continue
-      printf '%s' "$oline" | grep -qF "$oname" && continue
-      OWN_BAD="$OWN_BAD [$og→「$otitle」]"; break
-    done <<INNER
-$(grep -F "「$otitle」" "$HERE/$og"; [ "$oshort" = "$otitle" ] || grep -F "「$oshort」" "$HERE/$og"; true)
-INNER
-  done
-done <<EOF
-$OWN_TSV
-EOF
+# 소유 표를 먼저 읽고 문서를 한 번씩 훑는다. 소유자의 이름은 스킬이면 폴더 이름, 아니면 파일 이름이다.
+# 제목이 괄호를 달면 가리키는 쪽은 괄호 앞까지만 적으므로 그 앞부분으로도 찾는다.
+# 파일이 아니라 그 줄을 본다. 파일 단위로 보면 소유자를 다른 데서 한 번 부른 문서가 이 줄에서
+# 포인터를 빠뜨려도 통과한다. 절마다 문서 하나에 한 번만 적고, 출력은 소유 표 순서를 따른다.
+OWN_BAD="$( [ -n "$OWN_TSV" ] || exit 0; cd "$HERE" && printf '%s\n' "$OWN_TSV" | LC_ALL=C awk -F'\t' '
+  NR == FNR {
+    if ($1 == "") next
+    n++; T[n] = $1; O[n] = $2; nm = $2
+    if (nm ~ /^skills\/.*\/SKILL\.md$/) sub(/\/SKILL\.md$/, "", nm)
+    sub(/.*\//, "", nm); N[n] = nm
+    S[n] = T[n]; p = index(T[n], " ("); if (p) S[n] = substr(T[n], 1, p - 1)
+    next
+  }
+  {
+    for (i = 1; i <= n; i++) {
+      if (FILENAME == O[i] || ((FILENAME, i) in done)) continue
+      if (!index($0, "「" T[i] "」") && !(S[i] != T[i] && index($0, "「" S[i] "」"))) continue
+      if (index($0, N[i])) continue
+      done[FILENAME, i] = 1; B[i] = B[i] " [" FILENAME "→「" T[i] "」]"
+    }
+  }
+  END { for (i = 1; i <= n; i++) printf "%s", B[i] }' - $OWN_DOCS )"
 # 소유자로 불리는데 스스로 선언하지 않은 절을 잡는다. 그런 절은 소유 표에 안 올라 위 단언 둘이
 # 아예 안 본다 — 조용히 빠지는 것을 막는다(FAIL-LOUD). 제목이 괄호를 달고 갈리므로 참조가 제목의
 # 앞부분과 맞으면 같은 절로 본다.
@@ -393,9 +394,9 @@ OWN_TITLES="$(printf '%s' "$OWN_TSV" | cut -f1)"
 OWN_UNDECL=""
 while IFS= read -r rtitle; do
   [ -n "$rtitle" ] || continue
-  printf '%s\n' "$OWN_TITLES" | grep -qF -- "$rtitle" || OWN_UNDECL="$OWN_UNDECL [「$rtitle」]"
+  [[ $OWN_TITLES == *"$rtitle"* ]] || OWN_UNDECL="$OWN_UNDECL [「$rtitle」]"
 done <<EOF
-$(for og in $OWN_DOCS; do LC_ALL=C.UTF-8 grep -oE '「[^」]+」[^「]{0,20}소유한다' "$HERE/$og" | sed 's/」.*//; s/^「//'; done | sort -u)
+$(cd "$HERE" && LC_ALL=C.UTF-8 grep -ohE '「[^」]+」[^「]{0,20}소유한다' $OWN_DOCS | sed 's/」.*//; s/^「//' | sort -u)
 EOF
 [ -n "$OWN_UNDECL" ] && printf '    소유자로 불리는데 선언이 없는 절:%s\n' "$OWN_UNDECL"
 check "소유자로 불리는 절이 스스로 선언한다" "[ -z \"\$OWN_UNDECL\" ]"
@@ -413,7 +414,7 @@ HF_WK="$HERE/skills/lens-readability/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
 check "첫 문장 예외를 에이전트원칙에서 뽑았다" "[ -n \"\$HF_EXC\" ]"
-HF_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
+HF_DOCS="$AUDIT_DOCS"
 check "검사 대상 문서를 모았다(첫 문장)" "[ -n \"\$HF_DOCS\" ]"
 HF_BAD=""
 for hf in $HF_DOCS; do
@@ -878,7 +879,7 @@ echo "[대구 한도] 글 한 편에 한 번까지"
 # 금지 표현 목록은 뺀다. 원본 저장소가 만든 생성물이라 여기서 고칠 수 없고, 그 표의 분류 설명이
 # 대구를 쓴다. 고칠 수 없는 파일을 세면 검사가 영영 빨간 채로 남아 다른 위반을 가린다. 금지 표현
 # 검사도 같은 이유로 같은 파일을 뺀다.
-ANTI_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh | grep -v '^korean-banned-words.md$')"
+ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v '^korean-banned-words.md$')"
 check "검사 대상 문서를 모았다" "[ -n \"\$ANTI_DOCS\" ]"
 # 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.
 ANTI_TMP="$(mktemp -d)"

@@ -2,6 +2,9 @@
 # 훅 스크립트 검증. 계약: FAIL=0 (매직넘버 금지 — 개수는 테스트가 센다).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
+# 픽스처는 모두 이 뿌리 아래에 만들고 끝나면 통째로 지운다. mktemp 가 TMPDIR 을 따르므로 아래의
+# mktemp 호출과 이 검사가 부르는 스크립트의 임시 파일이 모두 여기로 온다.
+TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TMP"
 PTU="$HERE/hooks/spec_review_posttooluse.sh"
 STOP="$HERE/hooks/spec_review_stop.sh"
 FPRE="$HERE/hooks/doc_format_pretooluse.sh"
@@ -13,8 +16,7 @@ stop() { printf '%s' "$1" | bash "$STOP"; }
 fpre() { printf '%s' "$1" | bash "$FPRE"; }
 drev() { printf '%s' "$1" | bash "$DREV"; }
 J() { printf '{"tool_input":{"file_path":"%s"}}' "$1"; }
-EXTRACT="$HERE/hooks/_extract_path.sh"
-extract() { printf '%s' "$1" | bash "$EXTRACT"; }
+extract() { ( INPUT="$1"; . "$HERE/hooks/_hook_input.sh"; hook_file_paths; printf '%s' "$FILE_PATHS" ); }
 . "$HERE/scripts/_json_valid.sh"   # JSON 유효성 검사기(공유)
 
 T="$(mktemp -d)"; SP="$T/docs/superpowers/specs"; PL="$T/docs/superpowers/plans"; mkdir -p "$SP" "$PL" "$T/src"
@@ -273,6 +275,34 @@ check "OFF → 무출력"                "[ -z \"\$(JB 'sed -i s/x/y/ $BW/draft.
 printf '이 문서는 대상을 지적한다.\n' > "$BW/clean.md"
 check "깨끗한 산출물에는 통지 없음" "[ -z \"\$(JB 'sed -i s/x/y/ $BW/clean.md' | bash '$DWPOST')\" ]"
 check "훅 배선에 Bash 가 들어 있다" "grep -qF 'Write|Edit|Bash' '$HERE/hooks/hooks.json'"
+
+echo "[bash 거르기 — 명령만 보고 낱말 경계로 가른다]"
+# 셸 훅 둘은 모든 Bash 호출에 걸린다. 거르기가 훅 입력 전체를 보면 tool_response 의 "passed" 속 sed 와
+# 2>/dev/null 의 > 가 걸려 거의 모든 호출이 대상 뽑기까지 간다. 뽑기가 도는지는 awk 를 기록하는
+# 가짜로 본다 — 거르기에서 빠지면 awk 도 파이썬도 안 뜬다.
+GSH="$T/gate-shim"; mkdir -p "$GSH"; GLOG="$T/gate.log"
+REALAWK_H="$(command -v awk)"
+printf '#!/usr/bin/env bash\necho awk >> "%s"\nexec "%s" "$@"\n' "$GLOG" "$REALAWK_H" > "$GSH/awk"
+for gp in python python3; do printf '#!/usr/bin/env bash\necho %s >> "%s"\nexit 1\n' "$gp" "$GLOG" > "$GSH/$gp"; done
+chmod +x "$GSH"/*
+gate_runs() {  # $1=훅, $2=훅 입력 → 뽑기나 파이썬이 떴으면 0
+  : > "$GLOG"
+  printf '%s' "$2" | PATH="$GSH:$PATH" bash "$1" >/dev/null 2>&1 || true
+  [ -s "$GLOG" ]
+}
+GI_LS='{"tool_name":"Bash","tool_input":{"command":"ls","description":"List files"},"tool_response":{"stdout":"12 tests passed","stderr":""}}'
+GI_NULL='{"tool_name":"Bash","tool_input":{"command":"git log 2>/dev/null","description":"Show log"},"tool_response":{"stdout":"abc","stderr":""}}'
+GI_SED="{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"sed -i 's/a/b/' $BW/draft.md\"},\"tool_response\":{\"stdout\":\"\",\"stderr\":\"\"}}"
+GI_ECHO="{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"echo hi > $BW/draft.md\"},\"tool_response\":{\"stdout\":\"\",\"stderr\":\"\"}}"
+GI_QUOTE="{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"echo \\\"hi\\\" > $BW/draft.md\"},\"tool_response\":{\"stdout\":\"\",\"stderr\":\"\"}}"
+for gh in "$DREV" "$DWPOST"; do
+  ghn="$(basename "$gh" .sh)"
+  check "$ghn: 출력에 passed 가 든 ls 는 거르기에서 빠진다" "! gate_runs '$gh' '$GI_LS'"
+  check "$ghn: 2>/dev/null 은 쓰기가 아니다"                "! gate_runs '$gh' '$GI_NULL'"
+  check "$ghn: sed -i 는 지나간다"                          "gate_runs '$gh' \"\$GI_SED\""
+  check "$ghn: > 재지향은 지나간다"                         "gate_runs '$gh' '$GI_ECHO'"
+  check "$ghn: 따옴표 뒤의 재지향도 지나간다"               "gate_runs '$gh' \"\$GI_QUOTE\""
+done
 
 echo "[제외 칸 — 어간을 넓히고 다른 뜻으로 쓰는 말을 뺀다]"
 # 원본이 schema 2 에서 다섯째 칸 `제외` 를 더했다. 그 칸을 안 읽으면 어간만 가지고 검색해
@@ -544,7 +574,7 @@ check "경로가 없으면 통과한다"               "[ -z \"\$(dw '{}')\" ]"
 # 에이전트원칙이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.
 # 막지는 않는다. 여기서 막으면 에이전트원칙을 못 찾는 설치에서 문서 편집이 통째로 멈춘다.
 FAKE="$T/fake"; mkdir -p "$FAKE/hooks" "$FAKE/scripts"
-cp "$DW" "$HERE/hooks/_json_escape.sh" "$HERE/hooks/_banned_words.sh" "$HERE/hooks/_extract_path.sh" "$HERE/hooks/_spec_marker.sh" "$FAKE/hooks/"
+cp "$DW" "$HERE/hooks/_json_escape.sh" "$HERE/hooks/_banned_words.sh" "$HERE/hooks/_hook_input.sh" "$HERE/hooks/_spec_marker.sh" "$FAKE/hooks/"
 cp "$HERE/scripts/_json_valid.sh" "$FAKE/scripts/"
 DW_NOCANON="$(printf '%s' "$(dwj "$DWDIR/report.md" "$DWBODY")" | bash "$FAKE/hooks/doc_word_pretooluse.sh")"
 check "에이전트원칙이 없으면 알린다"                 "printf '%s' \"\$DW_NOCANON\" | grep -qF 'systemMessage'"
