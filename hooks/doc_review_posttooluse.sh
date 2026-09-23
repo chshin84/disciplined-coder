@@ -3,8 +3,7 @@
 # 감지 → 비자가 검진 넛지(비블로킹, 게이트 아님). spec/plan 은 자체 하드 게이트가 맡아 뺀다.
 # 경로는 도구에 따라 한 곳에서 뽑는다. Write·Edit 은 훅 입력의 file_path 이고, Bash 는
 # _extract_bash_targets.sh 가 명령줄에서 뽑은 쓰기 대상이다. Bash 를 넣는 이유는 셸로 고치면 이
-# 훅이 안 돌기 때문이다 — 2026-09-21 에 한 세션이 sed -i 로 문서 열한 개를 고치는 동안 넛지가 한
-# 번도 안 떴다. jq 비의존.
+# 훅이 안 돌기 때문이다. jq 비의존.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 INPUT="$(cat)"
@@ -43,9 +42,7 @@ while IFS= read -r FILE; do
   esac
   # 그 경로에 파일이 실제로 있는지 먼저 본다. 셸 명령에서 뽑은 대상은 `cd` 를 반영하지 않아
   # 폴더가 빠지거나 다른 폴더 기준일 수 있고, 그러면 아래 `dirname` 이 훅이 도는 세션 폴더로
-  # 풀린다. 2026-09-22 에 한 세션이 메모리 폴더에 쓴 문서를 두고 세션 폴더의 산출물을 보고
-  # 넛지를 냈다. 파일을 쓰지도 않는 명령에도 떴다. 존재 확인이 그 둘을 함께 거른다 —
-  # 형제 훅 doc_word_posttooluse.sh 에는 같은 줄이 이미 있었다.
+  # 풀려 엉뚱한 폴더의 산출물을 보고 넛지를 낸다. 존재 확인은 파일을 쓰지 않는 명령도 함께 거른다.
   [ -f "$FILE" ] || continue
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
   # 리뷰 기록은 검진 대상이 아니다(판정은 _spec_marker.sh 의 path_is_review_record).

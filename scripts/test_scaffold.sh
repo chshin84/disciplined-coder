@@ -364,13 +364,13 @@ fi
 # 같은 파일이다. 문자열로만 견주던 판본은 Windows 형식과 POSIX 형식을 다른 파일로 보아 매 세션 전역
 # 관리블록을 걷어냈다가 다시 넣고 사본을 하나씩 쌓았다.
 if command -v cygpath >/dev/null 2>&1; then
-  H24="$(mktemp -d)"; mkdir -p "$H24/.claude"; P24="$(cygpath -w "$H24/.claude")"
-  CLAUDE_HOME_DIR="$H24/.claude" CLAUDE_PROJECT_DIR="$P24" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" >/dev/null 2>&1 || true
-  OUT24="$(CLAUDE_HOME_DIR="$H24/.claude" CLAUDE_PROJECT_DIR="$P24" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>/dev/null)"
+  HSF="$(mktemp -d)"; mkdir -p "$HSF/.claude"; PSF="$(cygpath -w "$HSF/.claude")"
+  CLAUDE_HOME_DIR="$HSF/.claude" CLAUDE_PROJECT_DIR="$PSF" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" >/dev/null 2>&1 || true
+  OUTSF="$(CLAUDE_HOME_DIR="$HSF/.claude" CLAUDE_PROJECT_DIR="$PSF" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>/dev/null)"
   echo "[same-file] a project CLAUDE.md that is the global CLAUDE.md is left alone"
-  check "같은 파일: 걷어냈다는 알림이 없다"  "! printf '%s' \"\$OUT24\" | grep -qF '옛 관리블록'"
-  check "같은 파일: 사본을 쌓지 않는다"      "! ls '$H24/.claude/disciplined-coder/backups' 2>/dev/null | grep -q '^CLAUDE.md'"
-  check "같은 파일: 관리블록이 하나다"       "[ \$(grep -cF '# BEGIN disciplined-coder' '$H24/.claude/CLAUDE.md') -eq 1 ]"
+  check "같은 파일: 걷어냈다는 알림이 없다"  "! printf '%s' \"\$OUTSF\" | grep -qF '옛 관리블록'"
+  check "같은 파일: 사본을 쌓지 않는다"      "! ls '$HSF/.claude/disciplined-coder/backups' 2>/dev/null | grep -q '^CLAUDE.md'"
+  check "같은 파일: 관리블록이 하나다"       "[ \$(grep -cF '# BEGIN disciplined-coder' '$HSF/.claude/CLAUDE.md') -eq 1 ]"
 fi
 
 # --- managed-dir-hygiene: 관리 디렉터리 위생 — 구 관리파일 제거·에이전트원칙/사용자데이터 보존·빈 고아 제거 ---
@@ -404,25 +404,6 @@ echo "[stale-toggle-files] 남은 토글 상태 파일을 지운다"
 check "잔존 issue-mode 를 지운다"            "[ ! -f '$K12/issue-mode' ]"
 check "잔존 ultracode-review 를 지운다"      "[ ! -f '$K12/ultracode-review' ]"
 check "잔존 파일에 경고를 남기지 않는다"     "! printf '%s' \"\$ERR12b\" | grep -qF '비관리 파일'"
-
-# --- readme-commands-drift: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (열거는 사용 절 한 곳) ---
-# 파일 전체가 아니라 '### 커맨드' 절만 검사한다 — 커맨드명이 다른 문단에 등장해
-# 목록 누락이 vacuous 통과하는 것을 막는다.
-CMD_SECTION="$(awk '/^## 커맨드/{f=1} f&&/^## /&&!/^## 커맨드/{exit} f' "$HERE/README.md")"
-echo "[readme-commands-drift] README commands section covers commands/ dir"
-for c in "$HERE"/commands/*.md; do
-  n="/$(basename "$c" .md)"
-  check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
-done
-
-# --- workflow-verification: 「검증」 절이 렌즈와 기록을 요구한다(에이전트원칙 계약 가드) ---
-# 파일 전역 grep이 아니라 「검증」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
-# vacuous 통과하지 않게 한다).
-WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agent-principles.md")"
-echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
-check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
-check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'lens-*'"
-check "검증 기록은 호출자 스킬이 요구한다" "grep -qF '합치기가 끝나면 기록 파일에 쓴다' \"$HERE/skills/review-specs/SKILL.md\" && grep -qF 'docs/superpowers/reviews/' \"$HERE/skills/review-docs/SKILL.md\""
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
 # 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
@@ -496,146 +477,28 @@ echo "[crlf-import-line] CRLF import line still counts as present"
 check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린 (팀 원칙)'"
 check "CRLF: sends nothing"           "[ -z \"\$OUT21\" ]"
 
-# --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(에이전트원칙 계약 가드) ---
-# 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
-# (vacuous 통과 방지).
-PO_BLOCK="$(awk '/^## 병렬 오케스트레이션/{f=1} f&&/^## /&&!/^## 병렬 오케스트레이션/{exit} f' "$HERE/agent-principles.md")"
-echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
-check "병렬 오케스트레이션 heading exists"      "printf '%s' \"\$PO_BLOCK\" | grep -qF '## 병렬 오케스트레이션'"
-check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
-check "일이 하나뿐이면 낭비라고 적는다"       "printf '%s' \"\$PO_BLOCK\" | grep -qF '일이 하나뿐이면'"
-
-# --- nested-orchestration-skill: nested-orchestration 스킬 존재 + 핵심 절(에이전트원칙 계약 가드) ---
-# 단일 목적 파일이라 파일 전역 존재 검사로 충분하다(섹션 경합 없음 — Global Constraint 참조).
-NO_SKILL="$HERE/skills/nested-orchestration/SKILL.md"
-echo "[nested-orchestration-skill] nested-orchestration skill present + structured"
-check "skill file exists"             "[ -f '$NO_SKILL' ]"
-check "frontmatter name correct"      "grep -qE '^name: *nested-orchestration' '$NO_SKILL'"
-check "has routing (2층 위임)"         "grep -qF 'dispatching-parallel-agents' '$NO_SKILL'"
-check "has L2 template ownership blk"  "grep -qF '구간 소유권(엄수)' '$NO_SKILL'"
-check "has output contract blk"        "grep -qF '산출 계약' '$NO_SKILL'"
-check "points to SDD (no reimpl)"      "grep -qF 'subagent-driven-development' '$NO_SKILL'"
-
 # --- adjacent-openers: 인접 여는 마커 가드 — 첫 BEGIN이 뒤쪽 닫는 마커까지 훑어 사용자 줄을 삼키면 안 된다 ---
 # 모양: 여는마커 / 사용자줄 / 여는마커 / 본문 / 닫는마커. _managed_block.sh 내부 while 루프의
 # "다음 여는 마커를 만나면 멈춘다" 가드가 없으면, 첫 BEGIN(고아)이 END 탐색을 두 번째 BEGIN 너머까지
 # 계속해 사이에 낀 사용자 줄까지 완결 영역으로 오판해 통째로 삭제한다.
-H22="$(mktemp -d)"; P22="$(mktemp -d)"; mkdir -p "$H22/.claude"
+HAO="$(mktemp -d)"; PAO="$(mktemp -d)"; mkdir -p "$HAO/.claude"
 { printf '# BEGIN disciplined-coder (managed — do not edit)\n'
   printf 'USER LINE BETWEEN TWO OPENERS\n'
   printf '# BEGIN disciplined-coder (managed — do not edit)\n'
   printf '@disciplined-coder/agent-principles.md\n'
   printf '# END disciplined-coder (managed — do not edit)\n'
-} > "$H22/.claude/CLAUDE.md"
-run "$H22" "$P22" >/dev/null
-UC22="$H22/.claude/CLAUDE.md"
+} > "$HAO/.claude/CLAUDE.md"
+run "$HAO" "$PAO" >/dev/null
+UCAO="$HAO/.claude/CLAUDE.md"
 echo "[adjacent-openers] adjacent opening-marker guard: inner scan must not skip past a second opener"
-check "user line between two openers preserved" "grep -qxF 'USER LINE BETWEEN TWO OPENERS' '$UC22'"
-check "single managed region after run"         "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC22') -eq 1 ]"
+check "user line between two openers preserved" "grep -qxF 'USER LINE BETWEEN TWO OPENERS' '$UCAO'"
+check "single managed region after run"         "[ \$(grep -cF '# BEGIN disciplined-coder' '$UCAO') -eq 1 ]"
 
-# --- canon-sections: 절차 절을 번호가 아니라 이름으로 부른다 (NAME-ITEMS) ---
-# 번호는 항목을 지우거나 끼워 넣는 순간 가리키는 대상이 달라져 조용히 어긋난다. 제목에 이미 이름이
-# 있으므로 그 이름으로 부르고, 옛 서수 제목이 되살아나지 않는지 함께 본다.
-CANON="$HERE/agent-principles.md"
-echo "[canon-sections] procedure sections are named, not numbered"
-# 절 이름의 실재는 아래 [canon-realign] 의 절 목록 검사가 본다.
-# 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
-# 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
-check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
-
-# --- canon-realign: 에이전트원칙이 원칙을 호명하지 않고 갈래는 걸리는 대상으로 이름 붙는다 ---
-# 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 갖는다. 갈래마다 원칙을 이름으로 다시 부르던 문장 셋은
-# 「원칙」 절이 이미 선언한 것을 부분집합으로 되풀이해 빠진 것이 안 걸린다는 뜻으로 읽혔다.
-# 이름이 범위를 좁게 말하던 절 하나만 「한국어로 쓸 때」로 바꾸고 나머지 여덟은 그대로 둔다.
-echo "[canon-realign] the canon owns every principle; only procedures and per-artifact rules stay skills"
-# 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
-# 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
-for sec in "원칙" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
-  check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
-done
-check "canon: tradeoff line stays"                   "grep -qF '**균형:**' '$CANON'"
-check "karpathy source is credited in the reference" "grep -qF 'andrej-karpathy-skills' '$HERE/skills/lens-fit/domain-discipline.md'"
-check "canon: subagent fleet rule stays"             "grep -qF '서브에이전트를 실행하지 않는다' '$CANON'"
-check "canon: measure-the-state rule stays"          "grep -qF '현재 상태를 짐작하지 않고' '$CANON'"
-check "canon: impossible-case rule stays"            "grep -qF '일어날 수 없는 상황의 처리를 넣지 않는다' '$CANON'"
-check "canon: pre-existing-dead-code rule stays"     "grep -qF '원래부터 쓰이지 않던 것은 지우지 않는다' '$CANON'"
-check "canon: weak-criteria rule stays"              "grep -qF '약한 기준은 구체적인 입력과 기대 결과로 바꾼다' '$CANON'"
-check "canon: numbered-steps-plan rule stays"        "grep -qF '번호 붙인 단계마다 확인 방법을 적는다' '$CANON'"
-# 조항 ID 목록은 근거를 적는 두 참고서의 `### \`ID\`` 제목에서 도출한다(「삭제한 조항」 절은 뺀다).
-# 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어 조항이 떨어져도 그 결손을 정답으로
-# 굳히고, 목록을 여기 손으로 적으면 조항을 더할 때 이쪽이 낡는다. 방향은 참고서 → 에이전트원칙이다.
-ref_clause_ids() {
-  local f
-  for f in "$HERE/skills/lens-fit/domain-discipline.md" "$HERE/skills/lens-readability/domain-korean.md"; do
-    awk '{ sub(/\r$/, "") } /^## 삭제한 조항/ { exit } /^### `[A-Z0-9-]+`$/ { gsub(/^### `|`$/, ""); print }' "$f"
-  done
-}
-missing_clause_ids() {  # $1=에이전트원칙 → 참고서에 근거가 있는데 원칙에 없는 ID
-  local id miss=""
-  for id in $(ref_clause_ids); do grep -qF "**\`$id\`" "$1" || miss="$miss $id"; done
-  printf '%s' "$miss"
-}
-REF_IDS="$(ref_clause_ids)"
-check "canon: clause IDs derived from the references" "[ -n \"\$REF_IDS\" ]"
-MISS_IDS="$(missing_clause_ids "$CANON")"
-check "canon: every clause with a rationale in the references is in agent-principles (reference → principles)" "[ -z \"\$MISS_IDS\" ]"
-[ -n "$MISS_IDS" ] && echo "    참고서에 근거가 있는데 에이전트원칙에 없는 조항(참고서 → 에이전트원칙 방향):$MISS_IDS"
-# 도출 검사가 결손을 실제로 잡는지 임시 사본에서 본다. 조항 하나를 지운 사본이 통과하면 검사가 무의미하다.
-CANON_CUT="$(mktemp)"; grep -vF '**`YAGNI`' "$CANON" > "$CANON_CUT"
-check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids '$CANON_CUT')\" = ' YAGNI' ]"
-# 한국어 절은 두 층이다. 묶는 이름은 `###` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
-# 검사해야 이름만 남고 지시가 빠지거나 그 반대인 상태를 잡는다. 원자 지시 층은 위의 도출 검사가 본다.
-for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK REVISE-ORDER; do
-  check "canon: korean group $g present"             "grep -qE '^### \`$g\`' '$CANON'"
-done
-# 조항을 더하려면 CLAUDE.md 가 정한 클린룸 소거 시험을 거쳐야 한다. 시험으로 지운 조항 ID 가
-# 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
-REVIVED_IDS=""
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
-  grep -qF "**\`$id\`" "$CANON" && REVIVED_IDS="$REVIVED_IDS $id"
-done
-check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
-# 접으면서 새로 선 스킬 둘이 실재하고 이름이 디렉터리와 맞는다.
-for sk in review-docs domain-readme; do
-  check "skill $sk exists"                           "[ -f '$HERE/skills/$sk/SKILL.md' ]"
-  check "skill $sk frontmatter name"                 "grep -qF 'name: $sk' '$HERE/skills/$sk/SKILL.md'"
-done
-
-# --- standing-consent: 렌즈 호출에 대한 상시 허가가 에이전트원칙에 있다 ---
-# 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
-# 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 에이전트원칙은 @import로 실리므로 이 한
-# 문장이 있으면 검진이 돈다.
-# 파일 전역 grep이 아니라 「검증」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
-# 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
-# 절을 뽑는 계산과 "검증 절이 잡힌다" 단언은 위 [workflow-verification] 의 WF_BLOCK 을 그대로 쓴다.
-# 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
-# 명령 치환으로 실행되어, 검사가 엉뚱한 문자열을 찾으면서도 초록으로 남는다.
-CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 본다'
-SC_SCOPE='허가는 `lens-*` 호출에만 미친다'
-echo "[standing-consent] lens calls carry the user's standing consent"
-check "canon: 상시 허가 문장"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- '$CONSENT'"
-check "canon: 허가 범위 한정"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- \"\$SC_SCOPE\""
-# 선행연구 렌즈는 이름을 대서 예외로 못 박아야 한다. 이름이 lens-*라 허가에 들면서 동시에 웹에
-# 나가는 유일한 렌즈라, 뭉뚱그린 말로 제외하면 같은 렌즈를 열고 닫는 문장이 된다. 그 상태에서는
-# 렌즈를 범위 밖으로 판단해 조용히 건너뛰게 되고, '막히면 알린다'는 안전장치도 발동하지 않는다.
-check "canon: 선행연구 렌즈를 이름으로 예외" "printf '%s' \"\$WF_BLOCK\" | grep -qF -- 'lens-prior-art'"
-check "canon: 뭉뚱그린 심층조사 표현 없음"   "! printf '%s' \"\$WF_BLOCK\" | grep -qF -- '심층조사'"
+# --- canon-installed: 갓 설치한 PC의 사본에도 상시 허가 문장이 실린다 ---
 # 에이전트원칙이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 문장이 실려야 한다.
+CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 본다'
+echo "[canon-installed] the installed canon copy carries the standing consent"
 check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$K/agent-principles.md'"
-
-# --- question-tool: 갈림길은 질문 도구로 묻는다 (상시 로드 규칙) ---
-# 이 규칙이 리뷰 스킬 한 곳에만 있으면 그 스킬을 열지 않은 세션에는 닿지 않는다. 실제로 문서 검진
-# 세션이 다시 돌릴지를 평문으로 물어 선택 대화창이 뜨지 않았다. 묻는 방식은 특정 절차의 성질이 아니라
-# 소통 규칙이므로 상시 로드되는 항목에 두고, 리뷰 스킬은 그것을 가리키기만 한다.
-SR="$HERE/skills/review-specs/SKILL.md"
-SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
-echo "[question-tool] the fork-in-the-road question rule is always loaded"
-# 묻는 방식은 두 곳이 나눠 갖는다. 선택지로 물으라는 것은 `ASK-OPTIONS` 가, 선택지 앞에 배경을
-# 산문으로 두라는 것은 한국어 절의 `ASK-CONTEXT` 가 정한다.
-check "canon: 선택지 질문 규칙"             "grep -qF -- '선택지를 붙인 질문으로 묻고' '$CANON'"
-check "canon: 묻는 방식은 한국어 절이 갖는다" "grep -qF '**\`ASK-CONTEXT\`' '$CANON'"
-check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
-check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- '\`ASK-OPTIONS\`'"
 
 # --- canon-refresh: 이미 옛 에이전트원칙을 갖고 있는 PC도 갱신을 받는다 ---
 # 갓 설치한 경로만 검사하면, 에이전트원칙 복사를 '없을 때만'으로 바꿔도 초록이 유지된다.
@@ -648,46 +511,8 @@ echo "[canon-refresh] an existing older canon copy is refreshed, not left behind
 check "옛 사본이 갱신된다"                 "grep -qF -- '$CONSENT' '$OLDCANON'"
 check "옛 내용이 남지 않는다"              "! grep -qF '옛 사본이라 새 문장이 없다' '$OLDCANON'"
 
-# --- section-refs: 옛 절 참조가 남지 않았다 (git 추적 파일, 스펙 아카이브 제외) ---
-# 절을 한글 순서 기호로 가리키던 옛 참조는 어디에도 남으면 안 된다. 이름이 바뀌었기 때문이다.
-# 이 검사도 위와 같은 로케일 함정을 밟으므로 반드시 UTF-8 로케일에서 돌린다.
-# 이 주석 자체가 검색 패턴과 겹치지 않게 쓴다 — 겹치면 검사가 스스로를 잡아 영원히 FAIL한다.
-echo "[section-refs] no dangling ordinal references"
-STALE="$(cd "$HERE" && export LC_ALL=C.UTF-8 && git ls-files -z | xargs -0 grep -l '§[가나다라마]\|절차 [가나다라마]' 2>/dev/null | grep -v '^docs/superpowers/' || true)"
-check "refs: none dangling"                "[ -z \"\$STALE\" ]"
-
-check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 실린다고 가정하지 않는다' '$CANON'"
-
-# --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
-# 전에는 셋이 규율 넷을 각자 적고 이 검사가 그 사본들을 맞춰 세웠다. 사본이라 갈라졌다 — 한 곳에서
-# 재시도 금지 항목만 빠져 그 경로가 금지된 재시도를 허용한 채 오래 남았고, DESIGN-NOTES 쪽은 넷 중
-# 둘만 갖고 있었다. 지금은 `dispatching-lenses`가 규율을 소유하고 나머지는 가리키기만 한다.
-# 소유자가 규율을 갖는지와 다른 문서가 베끼지 않는지는 `test_docs_drift.sh`가 본다. 여기서는 호출자
-# 셋이 그 소유자에 닿는지와 런타임 중립만 본다.
-echo "[lens-contract] callers reach the canon-path rules and stay runtime-neutral"
-for s in review-specs review-docs nested-orchestration; do
-  F="$HERE/skills/$s/SKILL.md"
-  check "$s: 규율 소유자에 닿는다"          "grep -qF 'dispatching-lenses' '$F'"
-  # 런타임 중립: 특정 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
-  check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
-  check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
-done
-# 렌즈 목록은 손으로 적지 않고 디렉터리에서 도출한다 — 렌즈를 더해도 사람이 목록을 맞출 필요가 없다.
-for D in "$HERE"/skills/lens-*/; do
-  l="$(basename "$D" | sed 's/^lens-//')"
-  F="$D/SKILL.md"
-  check "lens-$l: SKILL.md 존재"        "[ -f '$F' ]"
-  check "lens-$l: principles_applied"   "grep -qF 'principles_applied' '$F'"
-  # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 aggregating-lenses 로 넘긴다. 예전에는 일곱 파일이
-  # 같은 문단을 복제해 지켰는데, 그 사이 aggregating-lenses 의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
-  # 필수 여부가 두 곳에서 갈렸다. 지금은 aggregating-lenses 한 곳만 규정하고 렌즈는 가리키기만 한다.
-  PA_POINTER='`aggregating-lenses`의 리뷰 산출물 계약이 정한다'
-  check "lens-$l: 규칙을 aggregating-lenses 로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
-done
-check "aggregating-lenses: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/aggregating-lenses/SKILL.md'"
-
 # --- 동시 진입: 창을 여럿 열면 SessionStart가 같은 ~/.claude/CLAUDE.md를 동시에 고친다 ---
-# 락이 없던 판본은 사용자 본문을 통째로 잃고 관리블록을 여러 벌 남겼다(실측: 사용자 2줄 → 0줄, 블록 6~11개).
+# 락이 없으면 사용자 본문을 통째로 잃고 관리블록이 여러 벌 남는다.
 # 순차 멱등성 테스트는 이 경로를 구조적으로 밟지 못하므로 별도로 동시 실행한다.
 CT="$(mktemp -d)"; CU="$CT/CLAUDE.md"
 printf 'user line one\n\nuser line two\n' > "$CU"
@@ -802,21 +627,6 @@ check "걷어내기 실패: 사본은 남는다"          "[ -s '$AT/backup.bak'
 check "스캐폴드가 4를 알린다"                 "grep -qF 'prc\" -eq 4' '$HERE/scripts/scaffold.sh'"
 
 
-# --- 커맨드가 시키는 보고를 스크립트가 실제로 낼 수 있다 ---
-# 전에는 두 스캐폴드에 값을 한 번도 안 받는 created 변수와 그것을 조건으로 삼는 보고 줄이 있었고,
-# 커맨드는 그 보고를 근거로 새로 생긴 파일과 이미 있던 파일을 알리라고 지시했다. 스크립트가 그
-# 사실을 안 내므로 지시를 따르려면 지어내야 했다. 죽은 변수가 되살아나면 여기서 실패한다.
-echo "[setup-report] the command may only ask for facts the script actually emits"
-SDC="$HERE/commands/setup-discipline.md"
-check "커맨드가 스크립트 출력을 전하라 한다" "grep -qF '스크립트가 낸 출력' '$SDC'"
-
-
-# --- 매니페스트 version 계약 ---
-# Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin).
-# 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다
-# 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다.
-check "Claude 매니페스트에 version 없음"  "! grep -qE '\"version\"[[:space:]]*:' '$HERE/.claude-plugin/plugin.json'"
-
 HRS="$(mktemp -d)"; PRS="$(mktemp -d)"; mkdir -p "$HRS/.claude/disciplined-coder"
 KS="$HRS/.claude/disciplined-coder"
 printf 'old index
@@ -845,7 +655,7 @@ check "stale-dir: 내용은 백업에 남는다"    "grep -rqF '쪼갠 오답노
 check "stale-dir: 해소 못 할 경고가 없다"  "! printf '%s' \"\$ERRSD\" | grep -qF '비관리 디렉터리'"
 
 
-# (타) 없앤 기능이 프로젝트 CLAUDE.md에 심어 둔 옛 관리블록을 걷어낸다. 전역 블록은 건드리지 않는다.
+# --- project-old-block: 없앤 기능이 프로젝트 CLAUDE.md에 심어 둔 옛 관리블록을 걷어낸다. 전역 블록은 건드리지 않는다.
 HR11="$(mktemp -d)"; PR11="$(mktemp -d)"
 { printf '# 내 프로젝트 지침\n\n'
   printf '이 줄은 사용자 것이라 남아야 한다.\n\n'
@@ -855,7 +665,7 @@ HR11="$(mktemp -d)"; PR11="$(mktemp -d)"
   printf '# END disciplined-coder (managed — do not edit)\n'
 } > "$PR11/CLAUDE.md"
 OUTR11="$(run "$HR11" "$PR11")"
-echo "[stale] the retired project pointer block is removed"
+echo "[project-old-block] the retired project pointer block is removed"
 check "포인터: 블록 제거"                 "! grep -qF 'BEGIN disciplined-coder' '$PR11/CLAUDE.md'"
 check "포인터: 본문도 제거"               "! grep -qF '옛 포인터 본문' '$PR11/CLAUDE.md'"
 check "포인터: 사용자 줄 보존"            "grep -qF '이 줄은 사용자 것이라 남아야 한다' '$PR11/CLAUDE.md'"
@@ -864,7 +674,7 @@ check "포인터: 전역 블록은 그대로"        "[ \$(grep -cF '# BEGIN dis
 run "$HR11" "$PR11" >/dev/null
 check "포인터: 재실행도 사용자 줄 보존"   "grep -qF '이 줄은 사용자 것이라 남아야 한다' '$PR11/CLAUDE.md'"
 
-# (파) 블록을 걷어내기 전에 사본을 뜬다. 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에
+# --- project-old-block-backup: 블록을 걷어내기 전에 사본을 뜬다. 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에
 # 끼워 넣은 줄도 함께 사라진다. 이 파일은 git 밖일 수 있어 사본이 유일한 복구 수단이다
 # (규율은 _managed_block.sh 가 소유한다).
 HR12="$(mktemp -d)"; PR12="$(mktemp -d)"
@@ -875,12 +685,12 @@ HR12="$(mktemp -d)"; PR12="$(mktemp -d)"
   printf '# END disciplined-coder (managed — do not edit)\n'
 } > "$PR12/CLAUDE.md"
 OUTR12="$(run "$HR12" "$PR12")"
-echo "[stale] removing the retired block leaves a copy behind"
+echo "[project-old-block-backup] removing the retired block leaves a copy behind"
 check "포인터: 블록 안 줄이 사본에 남는다" "grep -rqF '블록 안에 사람이 끼워 넣은 줄' '$HR12/.claude/disciplined-coder/backups'"
 check "포인터: 사본 경로를 알린다"        "printf '%s' \"\$OUTR12\" | grep -qF '사본:'"
 check "포인터: 사본은 전역에 쌓인다"      "[ ! -d '$PR12/backups' ]"
 
-# (하) 사본을 못 뜨면 블록을 걷어내지 않는다. 못 뜨는 채로 걷어내면 되돌릴 방법이 없기 때문이다.
+# --- project-old-block-nobackup: 사본을 못 뜨면 블록을 걷어내지 않는다. 못 뜨는 채로 걷어내면 되돌릴 방법이 없기 때문이다.
 # backups 자리를 파일이 막고 있으면 mkdir이 실패한다 — 권한이나 백신이 막는 PC를 흉내 낸 것이다.
 HR13="$(mktemp -d)"; PR13="$(mktemp -d)"; mkdir -p "$HR13/.claude/disciplined-coder"
 printf 'backups 자리를 파일이 막고 있다\n' > "$HR13/.claude/disciplined-coder/backups"
@@ -889,7 +699,7 @@ printf 'backups 자리를 파일이 막고 있다\n' > "$HR13/.claude/discipline
   printf '# END disciplined-coder (managed — do not edit)\n'
 } > "$PR13/CLAUDE.md"
 OUTR13="$(run "$HR13" "$PR13")"
-echo "[stale] a block that cannot be copied is left alone"
+echo "[project-old-block-nobackup] a block that cannot be copied is left alone"
 check "사본 실패: 블록을 안 걷어낸다"     "grep -qF 'BEGIN disciplined-coder' '$PR13/CLAUDE.md'"
 check "사본 실패: 사유를 알린다"          "printf '%s' \"\$OUTR13\" | grep -qF '사본을 뜨지 못해'"
 check "사본 실패: 나머지 셋업은 돈다"     "[ -f '$HR13/.claude/disciplined-coder/agent-principles.md' ]"
@@ -906,36 +716,36 @@ echo "[stale-keep] a stale file survives when its backup cannot be written"
 check "stale-keep: 내용이 든 파일이 남는다" "[ -f '$KK1/coding-principles.md' ]"
 check "stale-keep: 조용히 넘어가지 않는다" "printf '%s' \"$ERRK1\" | grep -qF -- '사본으로 못 옮겨 그대로 두었다'"
 # --- deps-notice: 함께 쓰는 플러그인 확인 — 매 세션, 없을 때만, 건너뛸 이름은 skip 파일이 정한다 ---
-H30="$(mktemp -d)"; P30="$(mktemp -d)"
-OUT30a="$(run "$H30" "$P30")"
-OUT30b="$(run "$H30" "$P30")"
-H31="$(mktemp -d)"; P31="$(mktemp -d)"; mkdir -p "$H31/.claude/plugins"
+HDN1="$(mktemp -d)"; PDN1="$(mktemp -d)"
+OUTDN1a="$(run "$HDN1" "$PDN1")"
+OUTDN1b="$(run "$HDN1" "$PDN1")"
+HDN2="$(mktemp -d)"; PDN2="$(mktemp -d)"; mkdir -p "$HDN2/.claude/plugins"
 printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
-' > "$H31/.claude/plugins/installed_plugins.json"
-OUT31="$(run "$H31" "$P31")"
+' > "$HDN2/.claude/plugins/installed_plugins.json"
+OUTDN2="$(run "$HDN2" "$PDN2")"
 # 건너뛰기: 첫 회차로 관리 디렉터리를 만든 뒤 이름 하나를 적고 다시 돌린다.
-H32="$(mktemp -d)"; P32="$(mktemp -d)"
-run "$H32" "$P32" >/dev/null
+HDN3="$(mktemp -d)"; PDN3="$(mktemp -d)"
+run "$HDN3" "$PDN3" >/dev/null
 printf 'superpowers
-' > "$H32/.claude/disciplined-coder/plugin-notice.skip"
-OUT32="$(run "$H32" "$P32")"
+' > "$HDN3/.claude/disciplined-coder/plugin-notice.skip"
+OUTDN3="$(run "$HDN3" "$PDN3")"
 # skip 은 적힌 이름만 잠재운다. 다른 이름을 적어 두고도 알림이 그대로 나오는지 따로 본다 —
 # 이 단언이 없으면 skip 파일이 있기만 하면 통째로 조용해지는 구현도 초록으로 지나간다.
-H33="$(mktemp -d)"; P33="$(mktemp -d)"
-run "$H33" "$P33" >/dev/null
+HDN4="$(mktemp -d)"; PDN4="$(mktemp -d)"
+run "$HDN4" "$PDN4" >/dev/null
 printf 'not-a-dependency
-' > "$H33/.claude/disciplined-coder/plugin-notice.skip"
-OUT33="$(run "$H33" "$P33")"
+' > "$HDN4/.claude/disciplined-coder/plugin-notice.skip"
+OUTDN4="$(run "$HDN4" "$PDN4")"
 echo "[deps-notice] 함께 쓰는 플러그인 알림"
-check "없으면 superpowers 를 알린다"       "printf '%s' \"\$OUT30a\" | grep -qF 'superpowers@claude-plugins-official'"
+check "없으면 superpowers 를 알린다"       "printf '%s' \"\$OUTDN1a\" | grep -qF 'superpowers@claude-plugins-official'"
 # superpowers 는 공식 마켓플레이스라 추가 명령이 없다. 목록의 '-' 가 실제로 그 줄을 뺐는지 본다.
-check "superpowers 는 마켓플레이스 추가가 없다" "[ \$(printf '%s' \"\$OUT30a\" | grep -cF 'claude plugin marketplace add') -eq 0 ]"
-check "끄는 방법을 함께 알린다"            "printf '%s' \"\$OUT30a\" | grep -qF 'plugin-notice.skip'"
-check "둘째 세션에도 그대로 알린다"        "printf '%s' \"\$OUT30b\" | grep -qF 'superpowers@claude-plugins-official'"
-check "깔렸으면 조용하다"                  "! printf '%s' \"\$OUT31\" | grep -qF 'claude plugin install'"
-check "깔렸어도 셋업은 돈다"               "[ -f '$H31/.claude/disciplined-coder/agent-principles.md' ]"
-check "skip 에 적힌 것은 안 알린다"        "! printf '%s' \"\$OUT32\" | grep -qF 'superpowers@claude-plugins-official'"
-check "skip 에 없는 것은 그대로 알린다"    "printf '%s' \"\$OUT33\" | grep -qF 'superpowers@claude-plugins-official'"
+check "superpowers 는 마켓플레이스 추가가 없다" "[ \$(printf '%s' \"\$OUTDN1a\" | grep -cF 'claude plugin marketplace add') -eq 0 ]"
+check "끄는 방법을 함께 알린다"            "printf '%s' \"\$OUTDN1a\" | grep -qF 'plugin-notice.skip'"
+check "둘째 세션에도 그대로 알린다"        "printf '%s' \"\$OUTDN1b\" | grep -qF 'superpowers@claude-plugins-official'"
+check "깔렸으면 조용하다"                  "! printf '%s' \"\$OUTDN2\" | grep -qF 'claude plugin install'"
+check "깔렸어도 셋업은 돈다"               "[ -f '$HDN2/.claude/disciplined-coder/agent-principles.md' ]"
+check "skip 에 적힌 것은 안 알린다"        "! printf '%s' \"\$OUTDN3\" | grep -qF 'superpowers@claude-plugins-official'"
+check "skip 에 없는 것은 그대로 알린다"    "printf '%s' \"\$OUTDN4\" | grep -qF 'superpowers@claude-plugins-official'"
 
 echo "[notice-encoding] user-facing notices are not double-encoded"
 check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COMMON\""
@@ -943,20 +753,20 @@ check "notice: 공통 헬퍼에 깨진 표시 없음" "! grep -qF -- 'ð' \"$COM
 # --- utf8-set: 변수가 비었을 때만 넣는다. 0 은 일부러 끈 것이라 손대지 않는다 ---
 # 레지스트리를 실제로 바꾸지 않도록 상태를 주입한다. 주입이 걸려 있으면 setter 가 실제 호출을
 # 건너뛰므로, 여기서 보는 것은 어느 상태에서 넣기로 판단하는가다.
-H22="$(mktemp -d)"; P22="$(mktemp -d)"
-OUT22a="$(DISCIPLINED_CODER_UTF8_STATE=unset run "$H22" "$P22")"
-H23="$(mktemp -d)"; P23="$(mktemp -d)"
-OUT23="$(DISCIPLINED_CODER_UTF8_STATE=on run "$H23" "$P23")"
-H24="$(mktemp -d)"; P24="$(mktemp -d)"
-OUT24="$(DISCIPLINED_CODER_UTF8_STATE=off run "$H24" "$P24")"
-H25="$(mktemp -d)"; P25="$(mktemp -d)"
-OUT25="$(DISCIPLINED_CODER_UTF8_STATE=not-windows run "$H25" "$P25")"
+HU1="$(mktemp -d)"; PU1="$(mktemp -d)"
+OUTU1="$(DISCIPLINED_CODER_UTF8_STATE=unset run "$HU1" "$PU1")"
+HU2="$(mktemp -d)"; PU2="$(mktemp -d)"
+OUTU2="$(DISCIPLINED_CODER_UTF8_STATE=on run "$HU2" "$PU2")"
+HU3="$(mktemp -d)"; PU3="$(mktemp -d)"
+OUTU3="$(DISCIPLINED_CODER_UTF8_STATE=off run "$HU3" "$PU3")"
+HU4="$(mktemp -d)"; PU4="$(mktemp -d)"
+OUTU4="$(DISCIPLINED_CODER_UTF8_STATE=not-windows run "$HU4" "$PU4")"
 echo "[utf8-set] PYTHONUTF8 은 비었을 때만 넣는다"
-check "비면 넣고 넣었다고 알린다"     "printf '%s' \"\$OUT22a\" | grep -qF 'PYTHONUTF8=1 을 넣었다'"
-check "끄는 방법을 함께 알린다"       "printf '%s' \"\$OUT22a\" | grep -qF '0 으로 두면'"
-check "값이 있으면 조용하다"          "! printf '%s' \"\$OUT23\" | grep -qF 'PYTHONUTF8'"
-check "0 이면 손대지 않는다"          "! printf '%s' \"\$OUT24\" | grep -qF 'PYTHONUTF8'"
-check "윈도우가 아니면 조용하다"      "! printf '%s' \"\$OUT25\" | grep -qF 'PYTHONUTF8'"
+check "비면 넣고 넣었다고 알린다"     "printf '%s' \"\$OUTU1\" | grep -qF 'PYTHONUTF8=1 을 넣었다'"
+check "끄는 방법을 함께 알린다"       "printf '%s' \"\$OUTU1\" | grep -qF '0 으로 두면'"
+check "값이 있으면 조용하다"          "! printf '%s' \"\$OUTU2\" | grep -qF 'PYTHONUTF8'"
+check "0 이면 손대지 않는다"          "! printf '%s' \"\$OUTU3\" | grep -qF 'PYTHONUTF8'"
+check "윈도우가 아니면 조용하다"      "! printf '%s' \"\$OUTU4\" | grep -qF 'PYTHONUTF8'"
 
 # --- handoff-lint: 남은 핸드오프를 세션 시작에 알리고, 머리의 유예 날짜가 지나지 않았으면 조용하다 ---
 # CLAUDE.md 의 문서 타입 표가 이 린트를 핸드오프 타입의 강제 장치로 적는다. 글자가 아니라 동작으로 본다.

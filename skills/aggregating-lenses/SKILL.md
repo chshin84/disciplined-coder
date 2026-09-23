@@ -1,6 +1,6 @@
 ---
 name: aggregating-lenses
-description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판정이 서로 상충하는 곳과 아무도 안 본 렌즈를 짚는 집계 단계. accept/regenerate/escalate 결정은 제품 런타임에서만 내고, spec·plan 리뷰와 문서 검진에서는 결정 없이 병합한 목록만 호출자에게 넘긴다.
+description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판정이 서로 상충하는 곳과 아무도 안 본 렌즈를 짚는 집계 단계.
 ---
 # aggregating-lenses — 집계와 런타임 전용 결정 (코드 설계도)
 
@@ -57,7 +57,7 @@ description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판
 - `lens-prior-art` — 맞댈 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다. `evidence`는 인용이나 경로나 URL 이고, 인용 검증은 호출자(`review-specs`)가 자기 도구로 한다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`.
 
 ## 처분 — 호출자의 몫
-렌즈는 처분을 고르지 않는다. 처분 축이 맥락마다 다르고, 사용자를 멈춰 세울지는 호출자의 책임이다.
+렌즈는 처분을 고르지 않는다. 처분 축이 맥락마다 다르고, 사용자를 멈춰 세울지는 호출자의 책임이다. accept/regenerate/escalate 결정은 제품 런타임에서만 내고, spec·plan 리뷰와 문서 검진에서는 결정 없이 병합한 목록만 호출자에게 넘긴다.
 
 - **spec 리뷰**(`review-specs`) — spec 리뷰에서는 결정 단계가 없다. 「하는 일」의 세 걸음까지만 한다. 발견을 어떻게 가르는지는 `review-specs`의 「처분」 절이 정한다.
 - **제품 런타임**(`review-llm-calls`) — 제품 코드가 `type` 값으로 행동을 정하는 표를 보유한다. 상충이나 커버리지 공백이 있으면 사람에게 올린다.

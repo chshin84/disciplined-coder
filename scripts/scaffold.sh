@@ -49,7 +49,7 @@ utf8_set_user_var() {
   pwsh -NoProfile -Command "[Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User')" >/dev/null 2>&1
 }
 
-# 1) 에이전트원칙(static) 복사·갱신: principles. src==dst면 생략.
+# [principles-copy] 에이전트원칙(static) 복사·갱신: principles. src==dst면 생략.
 for f in $SCAFFOLD_FILES; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
   if [ -f "$src" ]; then
@@ -64,14 +64,14 @@ for f in $SCAFFOLD_FILES; do
   fi
 done
 
-# 1b) 관리 디렉터리 위생(멱등): 정책 원본은 _scaffold_common.sh(SCAFFOLD_WHITELIST·STALE).
+# [managed-dir-hygiene] 관리 디렉터리 위생(멱등): 정책 원본은 _scaffold_common.sh(SCAFFOLD_WHITELIST·STALE).
 #     비화이트리스트는 사용자 데이터일 수 있어 — 비었으면 제거, 내용 있으면 surface.
 scaffold_hygiene "$KDIR"
 
-# 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
+# [global-managed-block] ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
 . "$SDIR/_managed_block.sh"
 
-# 3a) 없앤 기능(/add-pointer)이 프로젝트 CLAUDE.md에 심어 두던 옛 관리블록을 걷어낸다. 지금은
+# [project-old-block] 없앤 기능(/add-pointer)이 프로젝트 CLAUDE.md에 심어 두던 옛 관리블록을 걷어낸다. 지금은
 #     아무것도 그 블록을 다시 만들지 않으므로 남아 있으면 갱신되지 않는 고아다. 마커가 같으니
 #     전역 CLAUDE.md와 같은 파일이면 건너뛴다 — 그건 이 훅이 매 세션 다시 만드는 정상 블록이다.
 #     같은 파일인지는 문자열이 아니라 -ef 로 본다. 작업 폴더가 ~/.claude 이면 Windows 형식 경로와
@@ -225,7 +225,7 @@ else
     esac
   fi
 fi
-# 3d) 공용 금지 표현 블록을 쓴다. 고칠 것이 있을 때만 쓴다(위에서 정했다). 아래 관리블록
+# [banlist-block] 공용 금지 표현 블록을 쓴다. 고칠 것이 있을 때만 쓴다(위에서 정했다). 아래 관리블록
 #     주입보다 먼저 쓴다. 둘은 같은 파일의 같은 락을 차례로 잡는다.
 if [ -n "$ban_action" ]; then
   ban_rc=0
@@ -248,7 +248,7 @@ if [ "$inject_rc" -ne 0 ]; then
   echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라."
 fi
 
-# 4) 첫 세션 도달 보강: CLAUDE.md는 이 훅보다 먼저 로드되므로, 블록을 방금 만든 세션은
+# [first-session-dump] 첫 세션 도달 보강: CLAUDE.md는 이 훅보다 먼저 로드되므로, 블록을 방금 만든 세션은
 #    @import만으로 에이전트원칙에 닿지 못한다. 그 세션에만 stdout(additionalContext)으로 보강한다.
 #    이후 세션은 @import 한 경로로만 로드한다 — 같은 내용을 두 번 싣지 않는다.
 if [ "$had_import" -eq 0 ]; then
@@ -282,7 +282,7 @@ for note in "$pointer_note" "$ban_note" "$ban_conflict" "$ban_out_note"; do
   if [ -n "$note" ]; then printf '%s\n' "$note"; fi
 done
 
-# 4b) 마켓플레이스 자동 갱신(멱등): 사용자가 손으로 켜지 않아도 깃허브의 갱신이 따라오게 한다.
+# [marketplace-autoupdate] 마켓플레이스 자동 갱신(멱등): 사용자가 손으로 켜지 않아도 깃허브의 갱신이 따라오게 한다.
 #     규칙과 안전장치는 _ensure_autoupdate.sh가 소유한다 — 우리 항목만, 키가 없을 때만, 사본을 남기고.
 #     그 함수는 실패마다 사유를 stderr 로 찍고 모든 갈래에서 0 으로 끝난다. 종료 코드는 통로가 못
 #     되므로 stderr 를 받아 stdout 으로 옮긴다. 함수의 stdout 은 바뀐 파일 목록을 돌려주는 반환
@@ -309,12 +309,12 @@ if [ -s "$au_err" ]; then
 fi
 rm -f "$au_err"
 
-# 4b-2) 설치본이 사본보다 뒤처졌으면 옮기고 다시 켜라고 알린다. 자동 갱신 플래그를 켜는 것(4b)
+# [install-current] 설치본이 사본보다 뒤처졌으면 옮기고 다시 켜라고 알린다. 자동 갱신 플래그를 켜는 것
 #       만으로는 모자라다 — 사본을 새 커밋까지 받아 놓고도 설치본을 안 옮기는 것이 이 PC 에서
 #       실제로 있었다. 규칙은 _ensure_current.sh 가 소유한다. 최신이면 아무것도 출력하지 않는다.
 ensure_install_current "$CLAUDE_HOME" || true
 
-# 4c) 함께 쓰는 플러그인 확인(매 세션): 없을 때만 설치 명령을 알리고 대신 깔지는 않는다. 다른
+# [deps-notice] 함께 쓰는 플러그인 확인(매 세션): 없을 때만 설치 명령을 알리고 대신 깔지는 않는다. 다른
 #     플러그인을 사용자 대신 까는 것은 지나치다는 결정이 있었다. 깔려 있으면 아무것도 안 나오므로
 #     매 세션 돌아도 조용하다. 안 깔기로 정했으면 plugin-notice.skip 에 이름을 한 줄 적어 끈다 —
 #     건너뛸 목록을 이 스크립트에 안 적으므로 그 파일 하나로 정해지고 끈 근거도 거기 남는다.
@@ -340,7 +340,7 @@ if [ "$dep_missing" -eq 1 ]; then
   echo "  안 깔기로 정했으면 그 이름을 $DEP_SKIP 에 한 줄씩 적으면 이 알림이 조용해진다."
 fi
 
-# 4d) PYTHONUTF8 을 넣는다(알리는 데서 그치지 않고 실제로 넣는다): 매 세션 확인하고 변수가 비었을
+# [utf8-set] PYTHONUTF8 을 넣는다(알리는 데서 그치지 않고 실제로 넣는다): 매 세션 확인하고 변수가 비었을
 #     때만 넣으므로 여러 번 돌아도 결과가 같다. 값이 0 이면 일부러 끈 것으로 보고 손대지 않는다.
 #     전역 설정의 autoUpdate 를 false 로 둔 것을 존중하는 규칙과 같은 방식이다.
 #     이 PC 의 파이썬은 기본 인코딩이 cp949 라 한국어 리터럴이 깨진다. 저장소 자신의 파이썬 호출은
@@ -354,7 +354,7 @@ if [ "$(utf8_user_var_state)" = "unset" ]; then
 fi
 
 
-# 4e) 핸드오프 잔존 린트: 소비되면 곧바로 지우는 문서가 프로젝트에 남아 있으면 알린다.
+# [handoff-lint] 핸드오프 잔존 린트: 소비되면 곧바로 지우는 문서가 프로젝트에 남아 있으면 알린다.
 #     이 저장소 CLAUDE.md 의 「문서 타입마다 무엇이 강제하나」 표가 핸드오프의 강제 장치로 이 린트를 적는다. 세는 규칙은 audit_targets.sh 와
 #     같은 HANDOFF- 접두사다. 유예는 건너뛸 목록을 여기 적지 않고 파일 머리의
 #     `handoff-keep-until: YYYY-MM-DD` 를 읽어 정한다 — 목록을 손으로 안 적으므로 날짜가 지나면

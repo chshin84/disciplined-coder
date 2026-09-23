@@ -146,7 +146,7 @@ mkdir -p "$T/tmp"
 NH="$T/nudgehome"; mkdir -p "$NH/disciplined-coder"; printf 'x\n' > "$NH/disciplined-coder/agent-principles.md"
 cnud() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$NH" bash "$CNUD"; }
 JS() { printf '{"session_id":"%s"%s,"tool_input":{"file_path":"%s"}}' "$1" "$2" "$3"; }
-JB() { printf '{"session_id":"%s","tool_name":"Bash","tool_input":{"command":"%s"}}' "$1" "$2"; }
+JBS() { printf '{"session_id":"%s","tool_name":"Bash","tool_input":{"command":"%s"}}' "$1" "$2"; }  # 세션 id 를 싣는다. 아래 JB 는 명령만 싣는다
 check "훅 파일이 있다"                              "[ -f '$CNUD' ]"
 check "첫 편집 → 에이전트원칙 경로 안내"                "cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 check "첫 편집 → domain-korean 도 함께 안내"       "cnud '$(JS s1z "" "$T/src/main.py")' | grep -qF 'domain-korean'"
@@ -155,8 +155,8 @@ check "안내는 PreToolUse 이벤트를 말한다"            "cnud '$(JS s1c "
 check "같은 키 둘째 편집 → 무출력"                  "[ -z \"\$(cnud '$(JS s1 "" "$T/src/other.py")')\" ]"
 check "같은 세션 다른 agent_id → 다시 안내"         "cnud '$(JS s1 ',"agent_id":"a1"' "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 check "문서(.md)도 대상이다"                        "cnud '$(JS s2 "" "$T/existing.md")' | grep -qF 'agent-principles.md'"
-check "셸 편집(sed -i)도 대상이다"                  "cnud '$(JB s7 'sed -i s/a/b/ src/main.py')' | grep -qF 'agent-principles.md'"
-check "셸 편집도 세션당 한 번이다"                  "[ -z \"\$(cnud '$(JB s7 'sed -i s/c/d/ src/other.py')')\" ]"
+check "셸 편집(sed -i)도 대상이다"                  "cnud '$(JBS s7 'sed -i s/a/b/ src/main.py')' | grep -qF 'agent-principles.md'"
+check "셸 편집도 세션당 한 번이다"                  "[ -z \"\$(cnud '$(JBS s7 'sed -i s/c/d/ src/other.py')')\" ]"
 check "OFF → 무출력"                                "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off cnud '$(JS s5 "" "$T/src/main.py")')\" ]"
 check "session_id 없음 → 매번 안내"                 "cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md' && cnud '$(J "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 cnudh() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$2" bash "$CNUD"; }
@@ -235,8 +235,7 @@ check "수정 넛지가 렌즈 이름을 적지 않는다"      "! drev '$(J "$D
 check "README 가 규칙 넛지를 적는다"             "grep -qF '규칙 넛지' '$HERE/README.md'"
 
 echo "[bash 매처 — 셸로 고쳐도 걸린다]"
-# 셸로 고치면 훅이 안 돌던 것이 이 묶음이 막는 것이다. 2026-09-21 에 한 세션이 sed -i 로 문서
-# 열한 개를 고치는 동안 검진 넛지도 금지 표현 검사도 한 번도 안 걸렸다.
+# 셸로 고치면 Write·Edit 훅이 안 돌아 검진 넛지도 금지 표현 검사도 빠지는 것을 이 묶음이 막는다.
 EBT="$HERE/hooks/_extract_bash_targets.sh"
 DWPOST="$HERE/hooks/doc_word_posttooluse.sh"
 JB() { printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$1"; }

@@ -145,8 +145,7 @@ check "스킬이 지시 문장을 다시 적지 않는다"  "[ -z \"\$KO_DUP\" ]
 check "에이전트원칙이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
 
 # 한국어 절 밖의 조항도 같은 방식으로 붙든다. 에이전트원칙이 지시를 소유하고 참고서가 같은 ID 로
-# 근거를 단다. 2026-09-22 에 카파시 절을 흡수하고 ID 없던 네 절을 분해하면서 조항이 스물넷
-# 늘었는데, 그것을 잇는 장치가 한국어 절에만 있어 나머지는 근거 없이 늘어날 수 있었다.
+# 근거를 단다. 잇는 장치가 한국어 절에만 있으면 나머지 조항은 근거 없이 늘어날 수 있다.
 # ID 목록은 에이전트원칙에서 뽑되 한국어 절의 것만 뺀다. 절을 추가하거나 이름을 바꿔도 따라온다.
 DC_WK="$HERE/skills/lens-fit/domain-discipline.md"
 check "원칙 참고서가 있다"                   "[ -f \"$DC_WK\" ]"
@@ -900,5 +899,202 @@ bash "$SEAL" --root "$SEAL_G" >/dev/null 2>&1 || true
 check "인자 없는 봉인이 HEAD 의 기록을 전부 읽기 전용으로 만든다" "[ ! -w '$SEAL_G/docs/superpowers/reviews/r1.md' ] && [ ! -w '$SEAL_G/docs/superpowers/reviews/r1/run.json' ]"
 check "HEAD 에 없는 파일은 건드리지 않는다"     "[ -w '$SEAL_G/docs/superpowers/reviews/untracked.md' ]"
 check "이 레포의 SessionStart 가 봉인을 건다"  "grep -qF 'seal_reviews.sh' '$HERE/.claude/settings.json'"
+
+# ===== 에이전트원칙과 README와 스킬 문서의 문구 계약 =====
+# 스캐폴드를 실행하지 않고 문서끼리의 계약만 본다.
+
+# --- readme-commands-drift: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (열거는 사용 절 한 곳) ---
+# 파일 전체가 아니라 '### 커맨드' 절만 검사한다 — 커맨드명이 다른 문단에 등장해
+# 목록 누락이 vacuous 통과하는 것을 막는다.
+CMD_SECTION="$(awk '/^## 커맨드/{f=1} f&&/^## /&&!/^## 커맨드/{exit} f' "$HERE/README.md")"
+echo "[readme-commands-drift] README commands section covers commands/ dir"
+for c in "$HERE"/commands/*.md; do
+  n="/$(basename "$c" .md)"
+  check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
+done
+
+# --- workflow-verification: 「검증」 절이 렌즈와 기록을 요구한다(에이전트원칙 계약 가드) ---
+# 파일 전역 grep이 아니라 「검증」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
+# vacuous 통과하지 않게 한다).
+WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agent-principles.md")"
+echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
+check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
+check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'lens-*'"
+check "검증 기록은 호출자 스킬이 요구한다" "grep -qF '합치기가 끝나면 기록 파일에 쓴다' \"$HERE/skills/review-specs/SKILL.md\" && grep -qF 'docs/superpowers/reviews/' \"$HERE/skills/review-docs/SKILL.md\""
+
+# --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(에이전트원칙 계약 가드) ---
+# 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
+# (vacuous 통과 방지).
+PO_BLOCK="$(awk '/^## 병렬 오케스트레이션/{f=1} f&&/^## /&&!/^## 병렬 오케스트레이션/{exit} f' "$HERE/agent-principles.md")"
+echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
+check "병렬 오케스트레이션 heading exists"      "printf '%s' \"\$PO_BLOCK\" | grep -qF '## 병렬 오케스트레이션'"
+check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
+check "일이 하나뿐이면 낭비라고 적는다"       "printf '%s' \"\$PO_BLOCK\" | grep -qF '일이 하나뿐이면'"
+
+# --- nested-orchestration-skill: nested-orchestration 스킬 존재 + 핵심 절(에이전트원칙 계약 가드) ---
+# 단일 목적 파일이라 파일 전역 존재 검사로 충분하다(섹션 경합 없음 — Global Constraint 참조).
+NO_SKILL="$HERE/skills/nested-orchestration/SKILL.md"
+echo "[nested-orchestration-skill] nested-orchestration skill present + structured"
+check "skill file exists"             "[ -f '$NO_SKILL' ]"
+check "frontmatter name correct"      "grep -qE '^name: *nested-orchestration' '$NO_SKILL'"
+check "has routing (2층 위임)"         "grep -qF 'dispatching-parallel-agents' '$NO_SKILL'"
+check "has L2 template ownership blk"  "grep -qF '구간 소유권(엄수)' '$NO_SKILL'"
+check "has output contract blk"        "grep -qF '산출 계약' '$NO_SKILL'"
+check "points to SDD (no reimpl)"      "grep -qF 'subagent-driven-development' '$NO_SKILL'"
+
+# --- canon-sections: 절차 절을 번호가 아니라 이름으로 부른다 (NAME-ITEMS) ---
+# 번호는 항목을 지우거나 끼워 넣는 순간 가리키는 대상이 달라져 조용히 어긋난다. 제목에 이미 이름이
+# 있으므로 그 이름으로 부르고, 옛 서수 제목이 되살아나지 않는지 함께 본다.
+CANON="$HERE/agent-principles.md"
+echo "[canon-sections] procedure sections are named, not numbered"
+# 절 이름의 실재는 아래 [canon-realign] 의 절 목록 검사가 본다.
+# 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
+# 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
+check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
+
+# --- canon-realign: 에이전트원칙이 원칙을 호명하지 않고 갈래는 걸리는 대상으로 이름 붙는다 ---
+# 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 갖는다. 갈래마다 원칙을 이름으로 다시 부르던 문장 셋은
+# 「원칙」 절이 이미 선언한 것을 부분집합으로 되풀이해 빠진 것이 안 걸린다는 뜻으로 읽혔다.
+# 이름이 범위를 좁게 말하던 절 하나만 「한국어로 쓸 때」로 바꾸고 나머지 여덟은 그대로 둔다.
+echo "[canon-realign] the canon owns every principle; only procedures and per-artifact rules stay skills"
+# 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
+# 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
+for sec in "원칙" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
+  check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
+done
+check "canon: tradeoff line stays"                   "grep -qF '**균형:**' '$CANON'"
+check "karpathy source is credited in the reference" "grep -qF 'andrej-karpathy-skills' '$HERE/skills/lens-fit/domain-discipline.md'"
+check "canon: subagent fleet rule stays"             "grep -qF '서브에이전트를 실행하지 않는다' '$CANON'"
+check "canon: measure-the-state rule stays"          "grep -qF '현재 상태를 짐작하지 않고' '$CANON'"
+check "canon: impossible-case rule stays"            "grep -qF '일어날 수 없는 상황의 처리를 넣지 않는다' '$CANON'"
+check "canon: pre-existing-dead-code rule stays"     "grep -qF '원래부터 쓰이지 않던 것은 지우지 않는다' '$CANON'"
+check "canon: weak-criteria rule stays"              "grep -qF '약한 기준은 구체적인 입력과 기대 결과로 바꾼다' '$CANON'"
+check "canon: numbered-steps-plan rule stays"        "grep -qF '번호 붙인 단계마다 확인 방법을 적는다' '$CANON'"
+# 조항 ID 목록은 근거를 적는 두 참고서의 `### \`ID\`` 제목에서 도출한다(「삭제한 조항」 절은 뺀다).
+# 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어 조항이 떨어져도 그 결손을 정답으로
+# 굳히고, 목록을 여기 손으로 적으면 조항을 더할 때 이쪽이 낡는다. 방향은 참고서 → 에이전트원칙이다.
+ref_clause_ids() {
+  local f
+  for f in "$HERE/skills/lens-fit/domain-discipline.md" "$HERE/skills/lens-readability/domain-korean.md"; do
+    awk '{ sub(/\r$/, "") } /^## 삭제한 조항/ { exit } /^### `[A-Z0-9-]+`$/ { gsub(/^### `|`$/, ""); print }' "$f"
+  done
+}
+missing_clause_ids() {  # $1=에이전트원칙 → 참고서에 근거가 있는데 원칙에 없는 ID
+  local id miss=""
+  for id in $(ref_clause_ids); do grep -qF "**\`$id\`" "$1" || miss="$miss $id"; done
+  printf '%s' "$miss"
+}
+REF_IDS="$(ref_clause_ids)"
+check "canon: clause IDs derived from the references" "[ -n \"\$REF_IDS\" ]"
+MISS_IDS="$(missing_clause_ids "$CANON")"
+check "canon: every clause with a rationale in the references is in agent-principles (reference → principles)" "[ -z \"\$MISS_IDS\" ]"
+[ -n "$MISS_IDS" ] && echo "    참고서에 근거가 있는데 에이전트원칙에 없는 조항(참고서 → 에이전트원칙 방향):$MISS_IDS"
+# 도출 검사가 결손을 실제로 잡는지 임시 사본에서 본다. 조항 하나를 지운 사본이 통과하면 검사가 무의미하다.
+CANON_CUT="$(mktemp)"; grep -vF '**`YAGNI`' "$CANON" > "$CANON_CUT"
+check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids '$CANON_CUT')\" = ' YAGNI' ]"
+# 한국어 절은 두 층이다. 묶는 이름은 `###` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
+# 검사해야 이름만 남고 지시가 빠지거나 그 반대인 상태를 잡는다. 원자 지시 층은 위의 도출 검사가 본다.
+for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK REVISE-ORDER; do
+  check "canon: korean group $g present"             "grep -qE '^### \`$g\`' '$CANON'"
+done
+# 조항을 더하려면 CLAUDE.md 가 정한 클린룸 소거 시험을 거쳐야 한다. 시험으로 지운 조항 ID 가
+# 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
+REVIVED_IDS=""
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
+  grep -qF "**\`$id\`" "$CANON" && REVIVED_IDS="$REVIVED_IDS $id"
+done
+check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
+# 접으면서 새로 선 스킬 둘이 실재하고 이름이 디렉터리와 맞는다.
+for sk in review-docs domain-readme; do
+  check "skill $sk exists"                           "[ -f '$HERE/skills/$sk/SKILL.md' ]"
+  check "skill $sk frontmatter name"                 "grep -qF 'name: $sk' '$HERE/skills/$sk/SKILL.md'"
+done
+
+# --- standing-consent: 렌즈 호출에 대한 상시 허가가 에이전트원칙에 있다 ---
+# 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
+# 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 에이전트원칙은 @import로 실리므로 이 한
+# 문장이 있으면 검진이 돈다.
+# 파일 전역 grep이 아니라 「검증」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
+# 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
+# 절을 뽑는 계산과 "검증 절이 잡힌다" 단언은 위 [workflow-verification] 의 WF_BLOCK 을 그대로 쓴다.
+# 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
+# 명령 치환으로 실행되어, 검사가 엉뚱한 문자열을 찾으면서도 초록으로 남는다.
+CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 본다'
+SC_SCOPE='허가는 `lens-*` 호출에만 미친다'
+echo "[standing-consent] lens calls carry the user's standing consent"
+check "canon: 상시 허가 문장"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- '$CONSENT'"
+check "canon: 허가 범위 한정"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- \"\$SC_SCOPE\""
+# 선행연구 렌즈는 이름을 대서 예외로 못 박아야 한다. 이름이 lens-*라 허가에 들면서 동시에 웹에
+# 나가는 유일한 렌즈라, 뭉뚱그린 말로 제외하면 같은 렌즈를 열고 닫는 문장이 된다. 그 상태에서는
+# 렌즈를 범위 밖으로 판단해 조용히 건너뛰게 되고, '막히면 알린다'는 안전장치도 발동하지 않는다.
+check "canon: 선행연구 렌즈를 이름으로 예외" "printf '%s' \"\$WF_BLOCK\" | grep -qF -- 'lens-prior-art'"
+check "canon: 뭉뚱그린 심층조사 표현 없음"   "! printf '%s' \"\$WF_BLOCK\" | grep -qF -- '심층조사'"
+
+# --- question-tool: 갈림길은 질문 도구로 묻는다 (상시 로드 규칙) ---
+# 이 규칙이 리뷰 스킬 한 곳에만 있으면 그 스킬을 열지 않은 세션에는 닿지 않는다. 실제로 문서 검진
+# 세션이 다시 돌릴지를 평문으로 물어 선택 대화창이 뜨지 않았다. 묻는 방식은 특정 절차의 성질이 아니라
+# 소통 규칙이므로 상시 로드되는 항목에 두고, 리뷰 스킬은 그것을 가리키기만 한다.
+SR="$HERE/skills/review-specs/SKILL.md"
+SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
+echo "[question-tool] the fork-in-the-road question rule is always loaded"
+# 묻는 방식은 두 곳이 나눠 갖는다. 선택지로 물으라는 것은 `ASK-OPTIONS` 가, 선택지 앞에 배경을
+# 산문으로 두라는 것은 한국어 절의 `ASK-CONTEXT` 가 정한다.
+check "canon: 선택지 질문 규칙"             "grep -qF -- '선택지를 붙인 질문으로 묻고' '$CANON'"
+check "canon: 묻는 방식은 한국어 절이 갖는다" "grep -qF '**\`ASK-CONTEXT\`' '$CANON'"
+check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
+check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- '\`ASK-OPTIONS\`'"
+
+# --- section-refs: 옛 절 참조가 남지 않았다 (git 추적 파일, 스펙 아카이브 제외) ---
+# 절을 한글 순서 기호로 가리키던 옛 참조는 어디에도 남으면 안 된다. 이름이 바뀌었기 때문이다.
+# 이 검사도 위와 같은 로케일 함정을 밟으므로 반드시 UTF-8 로케일에서 돌린다.
+# 이 주석 자체가 검색 패턴과 겹치지 않게 쓴다 — 겹치면 검사가 스스로를 잡아 영원히 FAIL한다.
+echo "[section-refs] no dangling ordinal references"
+STALE="$(cd "$HERE" && export LC_ALL=C.UTF-8 && git ls-files -z | xargs -0 grep -l '§[가나다라마]\|절차 [가나다라마]' 2>/dev/null | grep -v '^docs/superpowers/' || true)"
+check "refs: none dangling"                "[ -z \"\$STALE\" ]"
+
+check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 실린다고 가정하지 않는다' '$CANON'"
+
+# --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
+# 전에는 셋이 규율 넷을 각자 적고 이 검사가 그 사본들을 맞춰 세웠다. 사본이라 갈라졌다 — 한 곳에서
+# 재시도 금지 항목만 빠져 그 경로가 금지된 재시도를 허용한 채 오래 남았고, DESIGN-NOTES 쪽은 넷 중
+# 둘만 갖고 있었다. 지금은 `dispatching-lenses`가 규율을 소유하고 나머지는 가리키기만 한다.
+# 소유자가 규율을 갖는지와 다른 문서가 베끼지 않는지는 `test_docs_drift.sh`가 본다. 여기서는 호출자
+# 셋이 그 소유자에 닿는지와 런타임 중립만 본다.
+echo "[lens-contract] callers reach the canon-path rules and stay runtime-neutral"
+for s in review-specs review-docs nested-orchestration; do
+  F="$HERE/skills/$s/SKILL.md"
+  check "$s: 규율 소유자에 닿는다"          "grep -qF 'dispatching-lenses' '$F'"
+  # 런타임 중립: 특정 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
+  check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
+  check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
+done
+# 렌즈 목록은 손으로 적지 않고 디렉터리에서 도출한다 — 렌즈를 더해도 사람이 목록을 맞출 필요가 없다.
+for D in "$HERE"/skills/lens-*/; do
+  l="$(basename "$D" | sed 's/^lens-//')"
+  F="$D/SKILL.md"
+  check "lens-$l: SKILL.md 존재"        "[ -f '$F' ]"
+  check "lens-$l: principles_applied"   "grep -qF 'principles_applied' '$F'"
+  # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 aggregating-lenses 로 넘긴다. 예전에는 일곱 파일이
+  # 같은 문단을 복제해 지켰는데, 그 사이 aggregating-lenses 의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
+  # 필수 여부가 두 곳에서 갈렸다. 지금은 aggregating-lenses 한 곳만 규정하고 렌즈는 가리키기만 한다.
+  PA_POINTER='`aggregating-lenses`의 리뷰 산출물 계약이 정한다'
+  check "lens-$l: 규칙을 aggregating-lenses 로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
+done
+check "aggregating-lenses: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/aggregating-lenses/SKILL.md'"
+
+# --- 커맨드가 시키는 보고를 스크립트가 실제로 낼 수 있다 ---
+# 전에는 두 스캐폴드에 값을 한 번도 안 받는 created 변수와 그것을 조건으로 삼는 보고 줄이 있었고,
+# 커맨드는 그 보고를 근거로 새로 생긴 파일과 이미 있던 파일을 알리라고 지시했다. 스크립트가 그
+# 사실을 안 내므로 지시를 따르려면 지어내야 했다. 죽은 변수가 되살아나면 여기서 실패한다.
+echo "[setup-report] the command may only ask for facts the script actually emits"
+SDC="$HERE/commands/setup-discipline.md"
+check "커맨드가 스크립트 출력을 전하라 한다" "grep -qF '스크립트가 낸 출력' '$SDC'"
+
+
+# --- 매니페스트 version 계약 ---
+# Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin).
+# 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다
+# 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다.
+check "Claude 매니페스트에 version 없음"  "! grep -qE '\"version\"[[:space:]]*:' '$HERE/.claude-plugin/plugin.json'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

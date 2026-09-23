@@ -8,14 +8,10 @@ SCAFFOLD_FILES="agent-principles.md korean-banned-words.md"
 # plugin-notice.skip 은 함께 쓰는 플러그인 알림을 끄려고 사용자가 이름을 적는 파일이라, 스캐폴드가
 # 만들지도 지우지도 않지만 잔존 경고를 내서도 안 된다.
 SCAFFOLD_WHITELIST="$SCAFFOLD_FILES backups plugin-notice.skip"
-# 구 관리파일은 매 세션 조용히 지운다. issue-mode·ultracode-review는 토글이던 상태 파일인데,
-# 토글을 없애면서 화이트리스트에서만 빼면 내용이 있어 '비관리 파일' 경고로 영원히 남는다.
-# advisors-index·unsolved_problems도 같은 이유로 여기 있다 — 앞은 domains-index로 이름이 바뀐 옛
-# 파일이고, 뒤는 손유지 백로그라 없앤 기능의 잔재다. 둘 다 내용이 있어 위생 검사가 지우지 못한다.
-# solved_problems는 파일과 디렉터리 둘로 남는다 — 로그를 쪼갠 PC에는 폴더가 남기 때문이다.
-# korean-banned-words-dc.md는 목록 파일의 옛 이름이다. 원본 저장소와 이름을 맞추면서 지금 이름으로
-# 바꿨는데, 옛 이름은 내용이 있어 위생 검사가 지우지 못하고 stderr로만 알린다. SessionStart 훅의
-# stderr는 사용자에게 보이지 않으므로 그 알림은 매 세션 나가면서 아무에게도 닿지 않는다.
+# 구 관리파일은 매 세션 조용히 치운다. 화이트리스트에서 빼기만 하면 내용이 있는 파일은 위생 검사가
+# 지우지 못하고 '비관리 파일' 경고를 stderr 로만 내는데, SessionStart 훅의 stderr 는 사용자에게
+# 보이지 않아 그 경고가 매 세션 아무에게도 닿지 않는다. 없앤 토글의 상태 파일, 이름이 바뀐 옛 파일,
+# 없앤 기능의 잔재가 여기 든다. solved_problems 는 로그를 쪼갠 PC 에 디렉터리로도 남아 둘 다 적는다.
 SCAFFOLD_STALE="coding-principles.md issue-mode ultracode-review advisors-index.md unsolved_problems.md solved_problems.md solved_problems domains-index.md korean-banned-words-dc.md"
 
 scaffold_hygiene() {  # $1=KDIR

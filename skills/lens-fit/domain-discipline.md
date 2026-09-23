@@ -32,7 +32,7 @@
 ### `NAME-ITEMS`
 
 번호는 항목을 지우거나 끼워 넣는 순간 가리키는 대상이 달라지고, 그 변화가 조용히 일어난다.
-`scripts/test_scaffold.sh` 의 「canon-sections」 묶음이 옛 서수 제목이 되살아나지 않는지 함께 본다.
+`scripts/test_docs_drift.sh` 의 「canon-sections」 묶음이 옛 서수 제목이 되살아나지 않는지 함께 본다.
 순서가 있는 계획은 이 조항 밖이다 — `CHECKABLE` 이 단계에 번호를 붙이라고 한다.
 
 ### `REVERSIBLE`
