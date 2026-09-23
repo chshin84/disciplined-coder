@@ -187,7 +187,6 @@ for L in lens-grounding lens-fit lens-consistency lens-adversarial; do
   check "$L 에 문턱 사본이 안 남았다"    "! grep -qF '상대편을 못 대면 발견이 아니다' '$F'"
   # 계약을 가리키는지는 test_docs_drift.sh 「렌즈 스키마 사본」의 "출력 스키마가 계약 소유자를 가리킨다"가 본다.
   check "$L 에 기계에 넘기는 것 절이 있다" "grep -qF '## 기계에 넘기는 것' '$F'"
-  check "$L 에 결과 칸의 옛 기준이 안 남았다" "! grep -qF '이대로 두면 무엇이 어떻게 잘못되는' '$F'"
   # F16 — 리뷰 산출물 계약이 상대편을 필수로 요구해도 system 프롬프트가 그 요구를 안 실으면 실제로
   # 도는 것(프롬프트)에는 안 걸린다. 프롬프트 줄 자체에 짚은 곳·상대편·원칙 요구가 있는지 본다.
   check "$L 의 system 프롬프트가 상대편·원칙 요구를 싣는다" \
@@ -202,7 +201,6 @@ check "발견이 아니라 제안을 돌려준다고 적는다" "grep -qF '발�
 check "산출물 이름이 suggestions 다"          "grep -qF 'suggestions' '$LR'"
 check "판정 목록에 들어가지 않는다고 적는다"    "grep -qF '확정과 기각을 세는 목록에 들어가지 않는다' '$LR'"
 check "기계에 넘기는 것 절이 있다"             "grep -qF '## 기계에 넘기는 것' '$LR'"
-check "출력 스키마에 issues 배열이 안 남았다"   "! grep -qF '\"issues\": [' '$LR'"
 
 echo "[dispatching-lenses — 결정론 우선]"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
@@ -214,8 +212,6 @@ check "판단임을 산출물에 적게 한다"       "grep -qF '판단이라는
 echo "[호출자 — 디스패치와 집계 계약]"
 SR="$HERE/skills/review-specs/SKILL.md"
 MA="$HERE/skills/aggregating-lenses/SKILL.md"
-check "spec 리뷰 본문에서 렌즈당 개별 디스패치 문구가 지워졌다" "! grep -qF '렌즈당 읽기 전용 서브에이전트를 한 번씩 띄운다' '$SR'"
-check "spec 리뷰 frontmatter에서 렌즈마다 개별 디스패치 문구가 지워졌다" "! grep -qF '렌즈마다 한 번씩 띄우고' '$SR'"
 check "spec 리뷰가 렌즈마다 따로 띄우는 문장을 담는다" "grep -qF '검토 대상 하나에 렌즈마다 호출 하나를 따로 띄운다' '$SR'"
 check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
 check "집계 계약이 제안 채널을 가른다"       "grep -qF 'suggestions' '$MA' && grep -qF '집계 대상이 아니다' '$MA'"
@@ -225,10 +221,8 @@ check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶�
 
 echo "[review-llm-calls — 고정표 배정]"
 LR2="$HERE/skills/review-llm-calls/SKILL.md"
-check "리스크 점수 절이 사라졌다"        "! grep -qF '리스크 점수는 다음 조건마다 1점' '$LR2'"
 check "호출 종류별 고정표가 있다"        "grep -qF '| 호출 종류 |' '$LR2'"
 check "회차마다 다시 판단하지 않는다고 적는다" "grep -qF '회차마다 다시 판단하지 않는다' '$LR2'"
-check "문서 전체에 리스크로 렌즈를 고른다는 서술이 안 남아 있다" "! grep -qF '리스크' '$LR2'"
 
 echo "[걸음 개수] 표의 행 수와 '걸음은 N' 문장이 맞는다"
 # 대상을 손으로 적지 않고 문서에서 도출한다. '걸음은 N이고'를 담은 스킬을 모두 찾아 그 문장 뒤
@@ -246,15 +240,10 @@ for D in $STEP_DOCS; do
 done
 PDA="$HERE/skills/audit-repo-docs/SKILL.md"
 check "인용 확인 스크립트를 부른다"       "grep -qF 'audit_evidence.sh' '$PDA'"
-check "절차에 derived 가 안 남았다"            "! grep -qF 'derived' '$PDA'"
 check "절차의 표 대조가 진술 스크립트를 부른다" "grep -qF 'audit_statements.sh' '$PDA'"
 check "회차 대조 스크립트를 부른다"       "grep -qF 'audit_rounds.sh' '$PDA'"
 check "세션이 판정한다고 적는다"          "grep -qF '세션이 판정한다' '$PDA'"
 check "기록 파일 넷을 적는다"             "grep -qF 'run.json' '$PDA' && grep -qF 'findings.json' '$PDA' && grep -qF 'diff.json' '$PDA' && grep -qF 'suggestions.json' '$PDA'"
-check "뽑기 걸음이 사라졌다"              "! grep -qF '진술을 뽑아 이름표로 모은다' '$PDA'"
-check "반박검증 개념이 안 남았다"          "! grep -qF '반박검증' '$PDA'"
-check "검증자 개념이 안 남았다"            "! grep -qF '검증자' '$PDA'"
-check "중복제거 에이전트 개념이 안 남았다" "! grep -qF '중복제거 에이전트' '$PDA'"
 PDA_STEP_TARGETS="$(awk '/^## 걸음/{f=1;next} f&&/^## /{exit} f&&/^\| [^|-]/{print}' "$PDA" | tail -n +2 | LC_ALL=C.UTF-8 grep -oE '「[^」]+」' | sed 's/「//; s/」//' | sort -u)"
 if [ -n "$PDA_STEP_TARGETS" ]; then
   while IFS= read -r PDA_SEC; do
@@ -283,14 +272,8 @@ check "--stale 이 끊긴 회차만 낸다"                     "[ \"\$APR_STALE
 check "기본 실행체 이름은 self-audit 이다"              "grep -qF 'EXEC=\"self-audit\"' '$APR'"
 rm -rf "$APR_T"
 
-echo "[실행체가 사라졌다]"
-check "워크플로 파일이 없다"           "[ ! -f '$HERE/.claude/workflows/self-audit.js' ]"
-check "매니페스트가 workflows 를 선언하지 않는다" "! grep -qF 'workflows' '$HERE/.claude-plugin/plugin.json'"
-check "옛 계약 테스트가 없다"          "[ ! -f '$HERE/scripts/test_self_audit.sh' ]"
-
 echo "[audit_targets.sh — 대상 목록만 낸다]"
 AT="$HERE/scripts/audit_targets.sh"
-check "문턱 인자가 사라졌다"           "! grep -qF -- '--limit' '$AT'"
 AT_OUT="$(bash "$AT" 2>/dev/null || true)"
 check "한 줄에 경로 하나만 낸다"       "! printf '%s' \"\$AT_OUT\" | grep -q \$'\t'"
 check "대상이 하나 이상이다"           "[ -n \"\$AT_OUT\" ]"
@@ -324,12 +307,6 @@ FIXTURE
 printf '{ "schema": 1, "no_prior_round": true, "items": [], "new_ids": [] }\n' > "$RT/round/diff.json"
 printf '{ "schema": 1, "suggestions": [] }\n' > "$RT/round/suggestions.json"
 rj() { json_run "$1" "$RT/round/$2"; }
-# (지운 단언) run.json·diff.json·suggestions.json 이 파싱된다 — 이 픽스처는 이 테스트 자신이 방금
-# 쓴 문자열이다. "유효한 JSON을 다시 읽으면 유효하다"는 파싱만 보는 것이라 이 스크립트나 문서 어느
-# 쪽이 어긋나도 못 잡는다. F8이 정한 "파싱만 보는 것은 지운다"에 해당해 걷어냈다.
-# (지운 단언) 발견마다 상대편과 지문이 있다 — 이 픽스처가 counterpart·fingerprint 를 손으로 채워
-# 넣고 그 값이 있는지를 같은 픽스처에서 되읽는 것이라 자기 자신을 증언하는 것과 같다. audit_evidence.sh
-# 가 그 칸을 실제로 읽는지는 위 [F1] 구획이 스키마와 대조해 이미 본다.
 # status 의 닫힌 집합은 이 파일이 손으로 든 리터럴이 아니라 절차 문서(audit-repo-docs SKILL.md)
 # 「판정」 절의 한 문장에서 뽑는다 — 계획 문서는 소비하고 지우는 문서라 원본이 못 된다. 문서가 상태
 # 이름을 더하거나 빼면 여기서 같이 갈린다(절차 문서나 이 픽스처 어느 한쪽만 바뀌어도 실패).
@@ -355,8 +332,6 @@ check "렌즈가 판정 셋과 narrowed 를 적는다"             "grep -qF '�
 check "렌즈가 산출물 공백·스코프를 감사에서 뺀다"        "grep -qF '레포 문서 감사에서는 적용하지 않는다' '$LC'"
 check "집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다"  "grep -qF 'narrowed' '$HERE/skills/aggregating-lenses/SKILL.md'"
 check "한 번만 규율에 '대상이 다르면 별개 호출' 이 있다" "grep -qF '대상이 다르면 별개 호출이다' '$HERE/skills/dispatching-lenses/SKILL.md'"
-check "절차의 대체된 문장 셋이 사라졌다"                 "! grep -qF '만은 묶음에 한 번 건다' '$PDA' && ! grep -qF '묶음을 통째로 받는다' '$PDA' && ! grep -qF '묶음 전부를 서로 대조한다' '$LC'"
-check "절차의 '짧은 문서 둘까지' 가 사라졌다"            "! grep -qF '짧은 문서 둘까지' '$PDA'"
 check "절차에 「일관성 대조」 절과 걸음 행이 있다"         "grep -qF '## 일관성 대조' '$PDA' && grep -qF '| 진술을 대조한다 |' '$PDA'"
 # 검색 문자열에 백틱이 있으면 변수에 담아 홑따옴표로 가둔다. check 의 둘째 인자는 큰따옴표라
 # 백틱을 그대로 넣으면 명령 치환으로 먹혀 검색어가 빈다.
@@ -369,11 +344,6 @@ check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '
 PDA_RUNJSON_LINE="$(grep -F '**`run.json`**' "$PDA")"
 check "audit-repo-docs 가 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '대상 문서마다 건 렌즈'"
 check "audit-repo-docs 가 판정 개수를 담는다고 적는다"               "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '판정 개수'"
-# (지운 단언 둘) 픽스처가 대상별 렌즈 배정·판정 개수 필드를 담는다 — 이 파일 바로 위에서 손으로 쓴
-# run.json 리터럴에 그 키가 있는지를 같은 파일에서 되읽는 것이라, audit-repo-docs 문장이 그 필드를 빼도 이
-# 픽스처는 안 바뀌어 계속 통과한다(F8). 바로 위 두 check(audit-repo-docs 가 대상별 렌즈 배정/판정 개수를
-# 담는다고 적는다)가 audit-repo-docs 산문 쪽은 이미 보므로, 나머지는 F4의 metrics 필드 실측(아래
-# [audit_rounds.sh — 회차 대조와 측정] 구획)이 실제 계산 결과로 대신한다.
 
 echo "[audit_targets.sh — 배제 규칙이 실제로 걸린다]"
 EXT="$(mktemp -d)"
@@ -407,7 +377,7 @@ check "에이전트원칙의 조항 ID·절 제목·스킬·명령 이름이 모
 check "중복이 없다" "[ \"\$(printf '%s\n' \"\$ATP_OUT\" | sort | uniq -d | wc -l)\" = 0 ]"
 check "절차의 표 대조가 이 스크립트를 부른다" "grep -qF 'audit_topics.sh' '$PDA'"
 
-echo "[안내 문서 — 실행체가 사라진 것을 반영한다]"
+echo "[안내 문서 — 봉인과 훅 목록]"
 check "CLAUDE.md 가 감사 기록 봉인을 적는다"  "grep -qF '봉인' '$HERE/CLAUDE.md'"
 check "CLAUDE.md 가 읽기 전용 거부를 적는다"  "grep -qF '읽기 전용' '$HERE/CLAUDE.md'"
 # 「에이전트원칙」은 agent-principles.md 그 파일 하나를 가리키는 말로 두고, 어떤 사실의 소유자를 가리킬

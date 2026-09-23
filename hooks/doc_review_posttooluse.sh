@@ -50,12 +50,6 @@ while IFS= read -r FILE; do
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
   # 리뷰 기록은 검진 대상이 아니다(판정은 _spec_marker.sh 의 path_is_review_record).
   if path_is_review_record "$FILE"; then continue; fi
-  # 오답노트도 같은 부류다 — 에이전트원칙이 문제를 완결할 때마다 교훈을 적으라고 요구하는데 그때마다
-  # 검진을 묻는 걸음이 붙는다. 형식은 스캐폴드가 강제하고 사람이 처음부터 끝까지 읽는 글도 아니라
-  # 문체 검진에서 얻을 것이 거의 없다. 색인과 본문 파일을 함께 뺀다.
-  case "$FILE" in
-    *solved_problems.md|*solved_problems/*.md) continue ;;
-  esac
   # 같은 폴더에 산출물이 있어야 이 마크다운이 그 재료다. 프로젝트 안팎은 묻지 않는다 — 산출물은
   # 저장소 밖 임시 폴더에 놓이는 것이 보통이라, 프로젝트 안으로 좁히면 정작 대상이 빠진다.
   # 메모리와 계획 파일에 넛지가 뜨던 문제는 이 조건이 대신 막는다. 그 폴더에는 산출물이 없다.
@@ -71,9 +65,6 @@ $TARGETS
 EOF
 [ -n "$match" ] || exit 0
 base="${match##*/}"
-
-# (제거됨) 오답노트 발견·복구 넛지 — /add-pointer 폐지와 함께 뺐다. 빈 템플릿을 미리 만들라는
-# 권유였는데, 빈 파일은 recall이 발화해도 얻는 교훈이 0이다. 이제 교훈이 생긴 시점에 만든다.
 
 # 렌즈 이름을 여기 박지 않는다 — 구성은 review-docs 가 소유하고, 여기 적으면 그 사본이
 # 먼저 낡아 훅이 안내하는 렌즈와 문서가 정하는 렌즈가 조용히 갈라진다(spec 훅도 같은 이유로 위임한다).

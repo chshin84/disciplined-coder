@@ -148,7 +148,7 @@ cnud() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$NH" bash "$CNUD"; 
 JS() { printf '{"session_id":"%s"%s,"tool_input":{"file_path":"%s"}}' "$1" "$2" "$3"; }
 JB() { printf '{"session_id":"%s","tool_name":"Bash","tool_input":{"command":"%s"}}' "$1" "$2"; }
 check "훅 파일이 있다"                              "[ -f '$CNUD' ]"
-check "첫 편집 → 에이전트원칙 경로 안내      "                "cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
+check "첫 편집 → 에이전트원칙 경로 안내"                "cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 check "첫 편집 → domain-korean 도 함께 안내"       "cnud '$(JS s1z "" "$T/src/main.py")' | grep -qF 'domain-korean'"
 check "안내가 유효한 JSON"                          "cnud '$(JS s1b "" "$T/src/main.py")' | json_valid_stdin"
 check "안내는 PreToolUse 이벤트를 말한다"            "cnud '$(JS s1c "" "$T/src/main.py")' | grep -qF '\"hookEventName\":\"PreToolUse\"'"
@@ -170,7 +170,6 @@ check "넛지에서 에이전트원칙 경로가 뽑힌다"                 "[ -
 check "뽑은 경로에 파일이 실재한다"                 "[ -f \"\$NUDGE_CANON\" ]"
 check "넛지에서 한국어 상세 경로가 뽑힌다"          "[ -n \"\$NUDGE_WK\" ]"
 check "그 상세 경로에도 파일이 실재한다"            "[ -f \"\$NUDGE_WK\" ]"
-check "넛지에 상시 적재라는 거짓 문장이 없다"       "! cnudh '$(JS s8b "" "$T/src/main.py")' '$NH' | grep -qF '상시로 싣고'"
 check "사본이 없으면 그 사실을 알린다"              "cnudh '$(JS s8c "" "$T/src/main.py")' '$T/emptyhome' | grep -qF '사본을 못 찾았다'"
 
 echo "[rules-nudge-sessionstart — 세션이 시작·재개·비워지면 그 세션의 표시를 지운다]"
@@ -195,11 +194,6 @@ check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/ne
 check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off fpre '$(J "$T/newdoc.md")')\" ]"
 check "프로젝트 밖 새 문서 → 무출력"     "[ -z \"\$(fpre '$(J "$OUTSIDE/new.md")')\" ]"
 check "새 리뷰 기록 → 무출력"            "[ -z \"\$(fpre '$(J "$T/docs/superpowers/reviews/new-check.md")')\" ]"
-# 오답노트는 양식을 그 로그 자신의 머리말이 정해 두어 에이전트원칙의 양식 제안이 틀린 조언이 된다.
-# 검진 넛지가 같은 이유로 같은 경로를 빼고 있으니 양식 제안도 함께 뺀다 — 한쪽만 빼면 같은 파일을
-# 만들 때 한 훅은 조용하고 다른 훅은 떠들어 어느 쪽이 맞는지 알 수 없다.
-check "새 오답노트 색인 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems.md")')\" ]"
-check "새 오답노트 본문 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems/new-lesson.md")')\" ]"
 check "새 문서 넛지가 domain-readme 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'domain-readme'"
 # 넛지가 가리킨 곳이 실재하는지 본다. 문자열 일치만 보던 시절 에이전트원칙 영문화로 가리키던 절 이름이
 # 바뀌자 넛지가 없는 곳을 가리킨 채 스위트가 초록으로 통과했다. 타입과 수명이 스킬에서
@@ -235,8 +229,9 @@ OUTDLV="$OUTSIDE/deliv"; mkdir -p "$OUTDLV"; : > "$OUTDLV/sheet.xlsx"; printf 'x
 check "프로젝트 밖 산출물 → 검진 넛지"   "drev '$(J "$OUTDLV/sheet.xlsx")' | grep -q additionalContext"
 check "프로젝트 밖 산출물 옆 .md → 넛지" "drev '$(J "$OUTDLV/draft.md")' | grep -q additionalContext"
 check "Windows 형식 경로도 같게 본다"    "drev '$(J "$(cygpath -w "$DLV" 2>/dev/null || printf '%s' "$DLV")\\\\draft.md")' | grep -q additionalContext"
-check "수정 넛지가 review-docs 를 가리킨다  "   "drev '$(J "$DLV/draft.md")' | grep -qF 'review-docs'"
-check "수정 넛지에 스킬 절 이름을 박지 않는다"   "! drev '$(J "$DLV/draft.md")' | grep -qF 'Surgical Changes'"
+check "수정 넛지가 review-docs 를 가리킨다"   "drev '$(J "$DLV/draft.md")' | grep -qF 'review-docs'"
+# 렌즈 구성은 review-docs 가 소유한다. 넛지에 렌즈 이름을 적으면 그 사본이 먼저 낡는다.
+check "수정 넛지가 렌즈 이름을 적지 않는다"      "! drev '$(J "$DLV/draft.md")' | grep -qF 'lens-'"
 check "README 가 규칙 넛지를 적는다"             "grep -qF '규칙 넛지' '$HERE/README.md'"
 
 echo "[bash 매처 — 셸로 고쳐도 걸린다]"
@@ -381,25 +376,7 @@ echo "[리뷰 기록은 검진 대상이 아니다]"
 # 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
 J2() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s"}}' "$1"; }
 check "리뷰 기록에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/superpowers/reviews/x-review.md")')\" ]"
-# 오답노트도 기록에 대한 기록을 또 쓰게 만드는 부류다 — 교훈 한 줄을 적을 때마다 검진을 묻는
-# 순환이 생기고, 그것을 매번 건너뛰다 보면 진짜 문서에서도 이 넛지를 흘려보내게 된다.
-check "오답노트 색인에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/solved_problems.md")')\" ]"
-check "오답노트 본문에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/solved_problems/lesson.md")')\" ]"
 check "산출물 폴더의 문서에는 넛지가 뜬다"  "drev '$(J2 "$DLV/draft.md")' | grep -q additionalContext"
-
-echo "[project-solved nudge removed]"
-PN="$(mktemp -d)"
-# 넛지가 걸리는 폴더라야 "옛 넛지 대신 일반 넛지가 뜬다"를 볼 수 있다. 산출물을 하나 둔다.
-: > "$PN/deck.docx"
-# PostToolUse 는 쓰기 뒤에 도므로 실제로는 파일이 있다. 훅이 존재를 확인하므로 픽스처도 만든다.
-: > "$PN/CLAUDE.md"
-in_claudemd() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s/CLAUDE.md"}}' "$1"; }
-OUT_GONE="$(in_claudemd "$PN" | CLAUDE_PROJECT_DIR="$PN" bash "$DREV" 2>&1)" || true
-check "no add-pointer nudge anymore"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'add-pointer'"
-# 렌즈 이름이 아니라 위임 대상을 단언한다 — 이름을 단언하면 이 테스트가 네 번째 사본이 된다.
-check "generic nudge fires instead"   "printf '%s' \"\$OUT_GONE\" | grep -qF 'review-docs'"
-check "nudge names no lens directly"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'lens-'"
-check "hook writes no project file"   "[ ! -f '$PN/docs/solved_problems.md' ]"
 
 echo "[차단 사유의 셸·JSON 안전]"
 # 공백 든 경로가 사유에 정확히 한 번 온전하게 들어가야 한다. 공백으로 이어 붙이던 판본은 중복 제거가

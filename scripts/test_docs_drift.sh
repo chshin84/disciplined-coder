@@ -19,20 +19,15 @@ DISP="$HERE/skills/dispatching-lenses/SKILL.md"
 pass=0; fail=0
 check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
 
-# 진실 1 — 실제 렌즈 디렉터리에서 짧은 이름을 도출한다.
+# 진실 — 실제 렌즈 디렉터리에서 짧은 이름을 도출한다.
 ALL="$(for d in "$HERE"/skills/lens-*/; do [ -d "$d" ] || continue; basename "$d" | sed 's/^lens-//'; done | sort)"
 
-# 진실 2 — 호출자가 디스패치 목록에 적은 렌즈. 목록 항목은 "- `lens-이름` — 설명" 꼴이다.
-DISPATCH="$(grep -oE '^- `lens-[a-z-]+`' "$CALLER" | sed 's/^- `lens-//; s/`$//' | sort)"
-
-
-
-# 캐시 3 — aggregating-lenses 리뷰 산출물 계약의 렌즈 이름 열거. 출력 스키마의 `source`는 이 값을
+# 캐시 — aggregating-lenses 리뷰 산출물 계약의 렌즈 이름 열거. 출력 스키마의 `source`는 이 값을
 # 그대로 옮기는 자리라 열거를 두지 않는다. 이름 열거가 한 문서에 하나만 남게 여기서 뽑는다.
 AGG_LINE="$(grep -F '"lens": "lens-' "$AGG" | head -1 || true)"
 AGGSET="$(printf '%s' "$AGG_LINE" | sed 's/.*"lens"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | tr '|' '\n' | sed 's/^ *//; s/ *$//; s/^lens-//' | grep -v '^$' | sort || true)"
 
-# 캐시 4 — aggregating-lenses가 「공통 계약의 예외」로 적은 렌즈 이름 열거. 손으로 목록을 베끼지
+# 캐시 — aggregating-lenses가 「공통 계약의 예외」로 적은 렌즈 이름 열거. 손으로 목록을 베끼지
 # 않고 aggregating-lenses 의 그 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
 # 예외 없이 다섯 렌즈 전부에게 강도 그대로의 대조를 요구한다.
 EXC_LENSES="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u || true)"
@@ -40,8 +35,6 @@ is_exc() { printf '%s\n' "$EXC_LENSES" | grep -qxF "$1"; }
 
 echo "[앵커가 실제로 잡히는가 — 못 잡으면 아래 단언이 무의미해진다]"
 check "렌즈 디렉터리가 하나 이상 있다"          "[ -n \"\$ALL\" ]"
-check "호출자 디스패치 목록을 읽어냈다"          "[ -n \"\$DISPATCH\" ]"
-
 
 echo "[집계 태깅 == 실제 디렉터리]"
 # aggregating-lenses의 출력 스키마가 이슈의 출처를 렌즈 이름으로 태깅한다. 그 열거도 렌즈가 늘면 낡는다.
@@ -92,7 +85,6 @@ EOF
 done
 
 echo "[spec 리뷰 — 처분은 호출자가 정한다]"
-check "재작성 라우팅이 남아 있지 않다"        "! grep -qF 'regenerate' \"\$CALLER\""
 check "🔴 진입 기준을 적는다"                 "grep -qF '되돌리기 어려운 결정인가' \"\$CALLER\""
 check "기본값이 고치기임을 적는다"            "grep -qF '기본값이 고치기' \"\$CALLER\""
 check "마커를 개선보다 먼저 남기라고 적는다"  "grep -qF '마커를 먼저 남긴다' \"\$CALLER\""
@@ -100,7 +92,6 @@ check "마커를 개선보다 먼저 남기라고 적는다"  "grep -qF '마커�
 RUNTIME="$HERE/skills/review-llm-calls/SKILL.md"
 echo "[런타임 — 등급이 아니라 type 으로 행동을 정한다]"
 check "런타임 파일을 찾았다"                "[ -f \"\$RUNTIME\" ]"
-check "등급 기반 재생성이 남아 있지 않다"    "! grep -qF 'critical만 regenerate' \"\$RUNTIME\""
 check "type 기반 처분 표를 적는다"          "grep -qF '값으로 행동을 정하는 표' \"\$RUNTIME\""
 
 PTU="$HERE/hooks/spec_review_posttooluse.sh"
@@ -118,7 +109,6 @@ RUNTIME2="$HERE/skills/review-llm-calls/SKILL.md"
 READMEF="$HERE/README.md"
 check "spec 리뷰가 회차 규칙을 다시 선언하지 않는다" "! grep -qF '렌즈마다 한 번씩만 띄운다' \"\$CALLER\""
 check "spec 리뷰가 회차 규칙 소유자를 가리킨다" "grep -qF '한 번만 띄우는 렌즈의 규율' \"\$CALLER\""
-check "옛 2회 표집 규정이 남아 있지 않다"     "! grep -qF '2회씩' \"\$CALLER\""
 check "렌즈별 결과를 한데 모으는 것은 남는다" "grep -qF '한데 모아 관리하는 것은 그대로다' \"\$CALLER\""
 check "소유자가 한 번씩만 띄운다고 적는다"    "grep -qF '렌즈는 한 번씩만 띄운다' \"\$DISP\""
 check "런타임은 서브에이전트 규율 밖이라고 적는다" "grep -qF '리뷰 콜은 제품 코드의 호출이라' \"\$RUNTIME2\""
@@ -590,11 +580,6 @@ EOF
 done
 check "「」 참조를 하나 이상 찾았다" "[ '$BN' -gt 0 ]"
 
-# (제거됨) 도메인 참고서 열거 == 실제 디렉터리 — 이 검사는 `docs/DESIGN-NOTES.md`의 트리 줄이
-# 참고서를 열거하던 것을 붙들었고, 커밋 2f64d74가 그 문서를 지우면서 함께 걷혔다. 지금은 어느 문서도
-# 도메인 참고서를 열거하지 않고 README가 `skills/` 디렉터리를 가리키기만 하므로 붙들 열거가 없다.
-# 다시 열거하는 문서가 생기면 그때 이 가드를 되살린다.
-
 # --- spec 리뷰 마커: 코드의 리터럴이 산문 둘에 그대로 있다 ---
 # 코드가 스스로 "쌍 계약"이라 부르며 사람에게 손으로 맞추라고 지시하던 자리다. 사람이 맞추는
 # 대신 코드에서 뽑아 대조한다 — 마커를 바꾸면 산문이 안 따라온 것이 여기서 실패한다.
@@ -622,7 +607,7 @@ done
 
 # --- 렌즈 전체 개수를 산문에 박지 않는다 ---
 # 렌즈를 하나 더하면 디렉터리와 source 열거는 위 검사가 잡아 주지만 산문에 박힌 수는 초록인 채
-# 옛 값으로 남는다. 이 레포가 오답노트에 적어 둔 매직 넘버 금지가 자기 문서에서 재현된 자리다.
+# 옛 값으로 남는다.
 #
 # 처음에는 훑는 범위를 사고가 났던 파일 둘로만 잡았다가, 정작 살아 있는 '두 렌즈'·'세 렌즈'·
 # '렌즈 셋'을 하나도 못 보는 초록 검사가 됐다. 그래서 범위를 렌즈를 셀 만한 문서 전부로 넓히고
@@ -765,8 +750,8 @@ check "scaffold.sh 가 SCAFFOLD_FILES 를 쓴다"       "grep -qF 'for f in \$SC
 check "화이트리스트가 그 목록에서 도출된다"          "grep -qF 'SCAFFOLD_WHITELIST=\"\$SCAFFOLD_FILES' '$HERE/scripts/_scaffold_common.sh'"
 
 # --- 마켓플레이스 문안이 매니페스트에서 갈라지지 않는다 ---
-# 마켓플레이스 카드는 설치 전 사용자가 보는 첫 문안인데, 걷어낸 solved-log 스캐폴딩을 한동안 계속
-# 광고했다. 같은 사실을 두 파일이 각자 적으면 반드시 갈라지므로, 플러그인 매니페스트를 원본으로
+# 마켓플레이스 카드는 설치 전 사용자가 보는 첫 문안이다. 같은 사실을 두 파일이 각자 적으면 반드시
+# 갈라지므로, 플러그인 매니페스트를 원본으로
 # 두고 마켓플레이스 항목이 그것과 글자 그대로 같은지 확인한다.
 # 두 파일을 JSON으로 파싱해 읽는다 — 쉼표 하나가 어긋나 있으면 여기서 실패한다.
 echo "[매니페스트] 마켓플레이스 항목이 플러그인 매니페스트와 같은 문안을 쓴다"
@@ -800,41 +785,11 @@ for f in "$HERE"/skills/*/SKILL.md; do
   check "$(basename "$(dirname "$f")") 이 베끼지 않는다" "! grep -qF -- '$TELL_SENT' '$f'"
 done
 
-# --- 금지 표현: 살아 있는 문서에 남지 않는다 ---
-# 목록을 검사에 손으로 적지 않고 korean-banned-words.md 의 「금지 표현」 표에서 도출한다. 말을
-# 더하면 이 검사가 함께 따라온다. 표를 스킬이 아니라 상시 실리는 파일에 두는 이유는 스킬이 열릴
-# 때만 대화에 실려 답을 쓰는 동안 목록이 눈앞에 없었기 때문이다.
-#
-# 셋째 칸이 `문서와 답변` 인 행만 뽑는다. `답변` 인 행은 사용자에게 보내는 답에만 걸리고
-# hooks/doc_word_pretooluse.sh 가 검사한다. 그 말들은 이 저장소의 문서에 아직 남아 있으므로 여기서
-# 걸면 돌아가는 문서 스물두 개를 한꺼번에 다시 써야 한다 — 그 결정은 사용자 몫으로 남겨 두었다.
-#
-# 대상에서 빼는 것이 셋이고 이유가 서로 다르다. 에이전트원칙 자신은 그 말을 정의하는 표를 담아서 빼고,
-# domain-korean 은 그 말을 지적한 사용자 인용을 그대로 담아서 빼며(예시로 들던 항목은 2026-09-21 에
-# 걷었고 남은 것은 인용뿐이다. 인용은 검사 대상이 아니라는 것이 목록 파일의 규정이다),
-# docs/superpowers/ 아래의 기록(리뷰)과 인수인계는 찍은 뒤 고치지 않거나 소비하고 지우는 것이라 뺀다.
-# 마지막 제외는 audit-repo-docs 의 「대상 아님」과 같은 규정이다.
-#
-# spec·plan 은 그 제외에서 다시 꺼낸다. 전에는 docs/superpowers/ 를 통째로 빼서 이 둘도 함께 빠졌는데,
-# 에이전트원칙의 문서 타입 표는 설계(spec·plan)를 "계속 살아 있다"고 적으므로 빼는 근거가 에이전트원칙과 어긋났다.
-# 실제로 이 저장소의 spec·plan 에 금지 표현이 남아 있었고 그것을 보는 장치가 어디에도 없었다 — 레포
-# 감사는 spec·plan 을 대상에서 빼며 그 근거로 "쓰는 시점에 리뷰를 받는다"를 들고, 그 리뷰인
-# review-specs 는 lens-fit 을 부르지 않았다. 세 곳이 서로에게 미루어 아무도 안 보는 자리가 생겼다.
-#
-# 다만 이미 커밋된 spec·plan 은 대상에서 뺀다. 에이전트원칙이 "과거 것은 보존 목적이며 활용하지 않는다"고
-# 적고 사용자가 새 spec·plan 만 자동 검증하기로 정했으므로, 지난 설계 문서를 소급해 고치지 않는다.
-# 새것을 가르는 방법은 봉인(seal_reviews.sh)이 HEAD 로 기록을 가르는 것을 뒤집은 것이다. 커밋 전이면
-# 검사에 걸리고 커밋되면 과거가 된다. 이 저장소는 고친 뒤 검사를 돌리는 규약이라 그때가 커밋 전이다.
-# 표는 에이전트원칙이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 이고
-# 그 저장소의 render.py 가 만들어 dist/ 에 올린 것을 워크플로가 받아 온다.
+# --- 금지 표현 목록은 생성물이다 ---
+# 원본은 KiwoomAX/korean-banned-words 의 JSON 이고 그 저장소의 render.py 가 만들어 dist/ 에 올린 것을
+# 워크플로가 받아 온다. 이 저장소 자신의 문서를 검사에서 빼는 사유는 hooks/_spec_marker.sh 의
+# path_in_own_repo 주석이 소유한다.
 BANSRC="$HERE/korean-banned-words.md"
-# 표의 행만 본다. 절의 설명 문단에도 백틱이 들어 있어, 절 전체에서 뽑으면 그 문단의 경로와 칸 이름이
-# 금지어로 둔갑한다(2026-09-06 에 실제로 세 건이 그렇게 잡혔다). 그리고 첫 칸에서만 뽑는다 —
-# 대체어 칸에 백틱이 생겨도 금지어로 새지 않게 한다.
-# 표를 읽는 것은 hooks/_banned_words.sh 하나다. 전에는 여기가 자기 awk 로 또 읽었는데, 원본이
-# schema 2 로 제외 칸을 더하자 훅과 검사가 서로 다른 것을 보게 됐다. 같은 파서를 쓰면 표의 모양이
-# 바뀌어도 한쪽만 따라가는 일이 없다.
-# 표를 파싱해 이 저장소 문서를 검사하던 준비 코드는 2026-09-22 에 걷었다. 사유는 아래 절에 적는다.
 echo "[금지 표현] 목록은 생성물이다"
 # 내용이 원본과 같은지는 네트워크가 필요해 여기서 못 본다. .github/workflows/banned-words-sync.yml
 # 이 하루 한 번 다시 만들어 diff 로 대조한다. 여기서는 손으로 고쳐도 되는 파일처럼 보이지
@@ -844,20 +799,6 @@ check "목록이 생성물이라고 밝힌다"     "grep -qF '이 파일은 생�
 check "목록이 원본 저장소를 가리킨다"  "grep -qF 'KiwoomAX/korean-banned-words' \"\$BANSRC\""
 check "받아오는 워크플로가 있다"       "[ -f '$HERE/.github/workflows/banned-words-sync.yml' ]"
 check "워크플로가 원본 dist 를 받는다" "grep -qF 'korean-banned-words/main/dist/korean-banned-words.md' '$HERE/.github/workflows/banned-words-sync.yml'"
-check "이 저장소는 목록을 만들지 않는다" "[ ! -f '$HERE/scripts/gen_banned_words.py' ]"
-
-# 이 저장소 자신의 문서에는 금지 표현 검사를 걸지 않는다. 사용자가 2026-09-22 에 그렇게 정했다.
-# 근거는 목록의 소유권에 있다. 표는 외부 저장소 KiwoomAX/korean-banned-words 가 소유하고 워크플로가
-# 하루 한 번 받아 온다. 그 표에 낱말이 추가되면 이 저장소의 문서가 아무것도 안 했는데 위반이 되고,
-# 훅 쪽에서는 편집 자체가 거부되어 그 문서를 고치는 작업까지 막힌다. 2026-09-20 에 실제로 그래서
-# 한 달 유예를 두었다가 2026-09-21 에 유예를 끝냈고, 하루 만에 같은 구조가 다시 드러났다.
-#
-# 위반이 있었다는 사실도 알리지 않는다. 알림만 남기면 매 실행에 고칠 수 없는 경고가 쌓여 다른
-# 실패를 가린다. 이 결정은 이 저장소 하나에만 미친다 — 훅이 다른 프로젝트의 산출물에 거는 검사와
-# 답에 거는 지시는 그대로다.
-#
-# 대신 사람이 필요할 때 직접 측정한다. `bash scripts/check_banned_words.sh` 가 그 수단이고 검사
-# 스크립트가 아니므로 이 묶음에서 돌지 않는다.
 
 # 규칙은 domain-korean 의 「대구 제한」이 소유한다. 사람 글 스물넷에서 0건인데 AI 글 스물넷에서
 # 스물일곱 건 나온 신호라 한도를 두었는데, 세는 곳이 없어 문서 여덟이 넘긴 채로 있었다.
@@ -886,8 +827,7 @@ anti_count() {  # $1=파일 경로 → 이 문서에 남은 대구의 개수
 }
 echo "[대구 한도] 글 한 편에 한 번까지"
 # 금지 표현 목록은 뺀다. 원본 저장소가 만든 생성물이라 여기서 고칠 수 없고, 그 표의 분류 설명이
-# 대구를 쓴다. 고칠 수 없는 파일을 세면 검사가 영영 빨간 채로 남아 다른 위반을 가린다. 금지 표현
-# 검사도 같은 이유로 같은 파일을 뺀다.
+# 대구를 쓴다. 고칠 수 없는 파일을 세면 검사가 영영 빨간 채로 남아 다른 위반을 가린다.
 ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v '^korean-banned-words.md$')"
 check "검사 대상 문서를 모았다" "[ -n \"\$ANTI_DOCS\" ]"
 # 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.

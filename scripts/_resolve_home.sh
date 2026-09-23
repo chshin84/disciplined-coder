@@ -2,7 +2,7 @@
 # 공유: 런타임 설정 홈을 우선순위대로 해석해 stdout으로 반환.
 # 소비자는 이 파일을 source하는 모든 스크립트다 — 이름을 여기 열거하면 그 목록이 먼저 낡는다(도출 우선).
 # 도메인 PC는 네트워크 홈 리다이렉트(HOMEDRIVE=U:)로 bash $HOME이 os.homedir(USERPROFILE)과
-# 어긋날 수 있어, 잘못된 곳에 쓰면 @import·solved·모드가 조용히 누락된다.
+# 어긋날 수 있어, 잘못된 곳에 쓰면 @import 와 관리 파일이 조용히 누락된다.
 # Usage: HOME_DIR="$(resolve_home claude)"   # ~/.claude
 # 우선순위(claude): CLAUDE_HOME_DIR(테스트) → CLAUDE_CONFIG_DIR(Claude Code 오버라이드) →
 #                   USERPROFILE/.claude(Windows=os.homedir) → $HOME/.claude(mac·Linux 폴백)

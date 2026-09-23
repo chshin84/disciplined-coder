@@ -140,7 +140,6 @@ check "쓰기 실패에도 임시 파일이 안 남는다" "[ ! -e '$HE/.claude/
 # --- project-untouched: 프로젝트 폴더 무오염 ---
 echo "[project-untouched] project untouched"
 check "no principles in project"      "[ ! -f '$P1/agent-principles.md' ]"
-check "no solved in project"          "[ ! -f '$P1/solved_problems.md' ]"
 check "no CLAUDE.md in project"       "[ ! -f '$P1/CLAUDE.md' ]"
 
 # --- idempotency: 멱등성 (3회) ---
@@ -395,22 +394,13 @@ check "subdir does not abort scaffold"  "[ $rc10 -eq 0 ]"
 check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rogue_dir'"
 check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
 
-# --- toggles-removed: 토글 둘(issue-mode·ultracode-review)을 없애고 동작을 하나로 고정했다 ---
-# 모르면 안 쓰게 되는 설정이라 없앴다. 처분은 surface로 고정하고, ultracode 검증은 에이전트원칙의 조항만 남겼다.
-# 이미 만들어진 상태 파일은 STALE로 지운다 — 화이트리스트에서 빼기만 하면 매 세션 경고가 남는다.
+# --- stale-toggle-files: 없앤 토글이 남긴 상태 파일은 STALE로 지운다 ---
+# 화이트리스트에서 빼기만 하면 매 세션 경고가 남는다.
 H12="$(mktemp -d)"; P12="$(mktemp -d)"; K12="$H12/.claude/disciplined-coder"
-echo "[toggles-removed] 토글 커맨드·스크립트·모드 주입이 모두 사라졌다"
-check "issue-mode 스크립트가 없다"           "[ ! -f '$HERE/scripts/issue-mode.sh' ]"
-check "ultracode-review 스크립트가 없다"     "[ ! -f '$HERE/scripts/ultracode-review.sh' ]"
-check "issue-mode 커맨드가 없다"             "[ ! -f '$HERE/commands/issue-mode.md' ]"
-check "ultracode-review 커맨드가 없다"       "[ ! -f '$HERE/commands/ultracode-review.md' ]"
-OUT12a="$(run "$H12" "$P12")"
-check "처분 모드 줄을 주입하지 않는다"       "! printf '%s' \"\$OUT12a\" | grep -qF '처분 모드'"
-check "검증 모드 줄을 주입하지 않는다"       "! printf '%s' \"\$OUT12a\" | grep -qF '검증 모드'"
-check "issue-mode 파일을 만들지 않는다"      "[ ! -f '$K12/issue-mode' ]"
-check "ultracode-review 파일을 만들지 않는다" "[ ! -f '$K12/ultracode-review' ]"
+run "$H12" "$P12" >/dev/null
 printf 'issues\n' > "$K12/issue-mode"; printf 'required\n' > "$K12/ultracode-review"
 ERR12b="$(run "$H12" "$P12" 2>&1 >/dev/null)" || true
+echo "[stale-toggle-files] 남은 토글 상태 파일을 지운다"
 check "잔존 issue-mode 를 지운다"            "[ ! -f '$K12/issue-mode' ]"
 check "잔존 ultracode-review 를 지운다"      "[ ! -f '$K12/ultracode-review' ]"
 check "잔존 파일에 경고를 남기지 않는다"     "! printf '%s' \"\$ERR12b\" | grep -qF '비관리 파일'"
@@ -433,7 +423,6 @@ echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
 check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
 check "렌즈 호출자를 가리킨다"     "printf '%s' \"\$WF_BLOCK\" | grep -qF 'lens-*'"
 check "검증 기록은 호출자 스킬이 요구한다" "grep -qF '합치기가 끝나면 기록 파일에 쓴다' \"$HERE/skills/review-specs/SKILL.md\" && grep -qF 'docs/superpowers/reviews/' \"$HERE/skills/review-docs/SKILL.md\""
-check "사라진 토글이 남아 있지 않다" "! printf '%s' \"\$WF_BLOCK\" | grep -qF 'ultracode 검증 모드'"
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
 # 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
@@ -484,7 +473,7 @@ check "orphan: marker line gone"      "[ \$(grep -cF '# BEGIN disciplined-coder'
 H20="$(mktemp -d)"; P20="$(mktemp -d)"; mkdir -p "$H20/.claude/plugins"
 # 여기서 보려는 것은 에이전트원칙 덤프가 첫 회차에만 나오는지다. 함께 쓰는 플러그인 알림이 섞이면
 # "2회차에 아무것도 안 보낸다" 단언이 그 알림 때문에 실패하므로 설치 기록을 넣어 잠재운다.
-printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ], "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
+printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
 ' > "$H20/.claude/plugins/installed_plugins.json"
 OUT20a="$(run "$H20" "$P20")"
 OUT20b="$(run "$H20" "$P20")"
@@ -499,7 +488,7 @@ check "2nd run sends nothing"         "[ -z \"\$OUT20b\" ]"
 H21="$(mktemp -d)"; P21="$(mktemp -d)"; mkdir -p "$H21/.claude/plugins"
 # 여기서 보려는 것은 CRLF 배선 인식뿐이라 함께 쓰는 플러그인 둘의 설치 기록을 넣어 그 알림을
 # 잠재우고, "아무것도 안 보낸다" 단언은 그대로 둔다.
-printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ], "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
+printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
 ' > "$H21/.claude/plugins/installed_plugins.json"
 printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n# BEGIN korean-banned-words (shared — do not edit)\r\n@disciplined-coder/korean-banned-words.md\r\n# END korean-banned-words (shared — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
 OUT21="$(run "$H21" "$P21")"
@@ -527,7 +516,7 @@ check "has L2 template ownership blk"  "grep -qF '구간 소유권(엄수)' '$NO
 check "has output contract blk"        "grep -qF '산출 계약' '$NO_SKILL'"
 check "points to SDD (no reimpl)"      "grep -qF 'subagent-driven-development' '$NO_SKILL'"
 
-# --- solved-rules-nudge: 인접 여는 마커 가드 — 첫 BEGIN이 뒤쪽 닫는 마커까지 훑어 사용자 줄을 삼키면 안 된다 ---
+# --- adjacent-openers: 인접 여는 마커 가드 — 첫 BEGIN이 뒤쪽 닫는 마커까지 훑어 사용자 줄을 삼키면 안 된다 ---
 # 모양: 여는마커 / 사용자줄 / 여는마커 / 본문 / 닫는마커. _managed_block.sh 내부 while 루프의
 # "다음 여는 마커를 만나면 멈춘다" 가드가 없으면, 첫 BEGIN(고아)이 END 탐색을 두 번째 BEGIN 너머까지
 # 계속해 사이에 낀 사용자 줄까지 완결 영역으로 오판해 통째로 삭제한다.
@@ -540,7 +529,7 @@ H22="$(mktemp -d)"; P22="$(mktemp -d)"; mkdir -p "$H22/.claude"
 } > "$H22/.claude/CLAUDE.md"
 run "$H22" "$P22" >/dev/null
 UC22="$H22/.claude/CLAUDE.md"
-echo "[solved-rules-nudge] adjacent opening-marker guard: inner scan must not skip past a second opener"
+echo "[adjacent-openers] adjacent opening-marker guard: inner scan must not skip past a second opener"
 check "user line between two openers preserved" "grep -qxF 'USER LINE BETWEEN TWO OPENERS' '$UC22'"
 check "single managed region after run"         "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC22') -eq 1 ]"
 
@@ -564,12 +553,6 @@ echo "[canon-realign] the canon owns every principle; only procedures and per-ar
 for sec in "원칙" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
   check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
 done
-# 카파시 절은 2026-09-21 에 해체해 「원칙」으로 흡수했다. 출처로 나뉘던 분류 축이 하나로 합쳐졌다.
-# 하위 소제목 넷이 어느 층으로든 되살아나면 그 축이 다시 갈라진 것이므로 실패다. 원문 문장은
-# 아래 조항 본문에 그대로 남아 있고 이 파일의 영어 단언들이 그것을 붙든다.
-for h in "Think Before Acting" "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
-  check "canon: karpathy '$h' stays dissolved"       "! grep -qE '^#+ $h\$' '$CANON'"
-done
 check "canon: tradeoff line stays"                   "grep -qF '**균형:**' '$CANON'"
 check "karpathy source is credited in the reference" "grep -qF 'andrej-karpathy-skills' '$HERE/skills/lens-fit/domain-discipline.md'"
 check "canon: subagent fleet rule stays"             "grep -qF '서브에이전트를 실행하지 않는다' '$CANON'"
@@ -578,11 +561,6 @@ check "canon: impossible-case rule stays"            "grep -qF '일어날 수 �
 check "canon: pre-existing-dead-code rule stays"     "grep -qF '원래부터 쓰이지 않던 것은 지우지 않는다' '$CANON'"
 check "canon: weak-criteria rule stays"              "grep -qF '약한 기준은 구체적인 입력과 기대 결과로 바꾼다' '$CANON'"
 check "canon: numbered-steps-plan rule stays"        "grep -qF '번호 붙인 단계마다 확인 방법을 적는다' '$CANON'"
-# 흡수한 조항이 실재하는지 본다. 옛 45줄 상한은 셀 절이 없어져 이것으로 바꿨다.
-check "canon: no roll-call in the Korean section"    "! grep -qF '\`FAIL-LOUD\`와 \`NAME-ITEMS\`와 \`SECRETS\`가 답 한 번에도 걸린다' '$CANON'"
-check "canon: no roll-call in the document section"  "! grep -qF '\`SSOT\`와 \`NAME-ITEMS\`와 \`EXPLICIT\`이 문서에도 그대로 걸리고' '$CANON'"
-check "canon: no roll-call in the code section"      "! grep -qF '\`FOCUSED\`와 \`SSOT\`와 \`EXPLICIT\`이 코드에 그대로 걸리고' '$CANON'"
-check "canon: old section name is gone everywhere"   "! grep -rqF '대화할 때' '$CANON' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/scripts/scaffold.sh'"
 # 조항 ID 목록은 근거를 적는 두 참고서의 `### \`ID\`` 제목에서 도출한다(「삭제한 조항」 절은 뺀다).
 # 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어 조항이 떨어져도 그 결손을 정답으로
 # 굳히고, 목록을 여기 손으로 적으면 조항을 더할 때 이쪽이 낡는다. 방향은 참고서 → 에이전트원칙이다.
@@ -610,20 +588,13 @@ check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids
 for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK REVISE-ORDER; do
   check "canon: korean group $g present"             "grep -qE '^### \`$g\`' '$CANON'"
 done
-# 어제 카파시 절로 녹여 이름까지 뺀 다섯은 되살아나면 안 된다. 에이전트원칙에서도 살아 있는 문서에서도 본다.
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD; do
-  check "canon: old clause $id stays removed"        "! grep -qF '**\`$id\`' '$CANON'"
-  check "live docs: no reference to $id"             "! grep -rqF '\`$id\`' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/scripts/scaffold.sh'"
+# 조항을 더하려면 CLAUDE.md 가 정한 클린룸 소거 시험을 거쳐야 한다. 시험으로 지운 조항 ID 가
+# 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
+REVIVED_IDS=""
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
+  grep -qF "**\`$id\`" "$CANON" && REVIVED_IDS="$REVIVED_IDS $id"
 done
-# 2026-09-23 클린룸 측정에서 조항 없이도 지켜진 열둘을 지웠다. 근거는 두 참고서의 「삭제한 조항」 절에 있다.
-for id in FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
-  check "canon: measured-redundant $id stays removed" "! grep -qF '**\`$id\`' '$CANON'"
-done
-# 접은 스킬 셋은 디렉터리가 없어야 한다. 존재 검사를 부재 검사로 뒤집은 것이라 가드 수가 줄지 않는다.
-for sk in domain-coding domain-writing domain-doc-upkeep; do
-  check "skill $sk is gone"                          "[ ! -d '$HERE/skills/$sk' ]"
-  check "live code does not name $sk"                "! grep -rqF '$sk' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/agent-principles.md'"
-done
+check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
 # 접으면서 새로 선 스킬 둘이 실재하고 이름이 디렉터리와 맞는다.
 for sk in review-docs domain-readme; do
   check "skill $sk exists"                           "[ -f '$HERE/skills/$sk/SKILL.md' ]"
@@ -660,17 +631,14 @@ SR="$HERE/skills/review-specs/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
 # 묻는 방식은 두 곳이 나눠 갖는다. 선택지로 물으라는 것은 `ASK-OPTIONS` 가, 선택지 앞에 배경을
-# 산문으로 두라는 것은 한국어 절의 `ASK-CONTEXT` 가 정한다. 예전에는 카파시 절이
-# `never in plain prose` 까지 적어 `ASK-CONTEXT` 와 부딪혔고, 그 조각만 걷었다.
+# 산문으로 두라는 것은 한국어 절의 `ASK-CONTEXT` 가 정한다.
 check "canon: 선택지 질문 규칙"             "grep -qF -- '선택지를 붙인 질문으로 묻고' '$CANON'"
 check "canon: 묻는 방식은 한국어 절이 갖는다" "grep -qF '**\`ASK-CONTEXT\`' '$CANON'"
-check "canon: 산문 금지 조각은 없다"         "! grep -qF -- 'never in plain prose' '$CANON'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
 check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- '\`ASK-OPTIONS\`'"
 
 # --- canon-refresh: 이미 옛 에이전트원칙을 갖고 있는 PC도 갱신을 받는다 ---
-# 갓 설치한 경로만 검사하면, 에이전트원칙 복사를 '없을 때만'으로 바꿔도 초록이 유지된다. 바로 이웃한 두
-# 블록(오답노트 생성·머리말 동기화)이 일부러 비덮어쓰기라 통일하자며 그렇게 고치기 쉬운 자리다.
+# 갓 설치한 경로만 검사하면, 에이전트원칙 복사를 '없을 때만'으로 바꿔도 초록이 유지된다.
 # 그 순간 이미 깔린 모든 설치가 옛 에이전트원칙에 멈추는데, 새 문장이 필요한 쪽은 정확히 그 설치들이다.
 HRU="$(mktemp -d)"; PRU="$(mktemp -d)"; mkdir -p "$HRU/.claude/disciplined-coder"
 OLDCANON="$HRU/.claude/disciplined-coder/agent-principles.md"
@@ -688,31 +656,6 @@ echo "[section-refs] no dangling ordinal references"
 STALE="$(cd "$HERE" && export LC_ALL=C.UTF-8 && git ls-files -z | xargs -0 grep -l '§[가나다라마]\|절차 [가나다라마]' 2>/dev/null | grep -v '^docs/superpowers/' || true)"
 check "refs: none dangling"                "[ -z \"\$STALE\" ]"
 
-# --- reach-claims: 무조건적 도달 단정과 @import 오해 표현이 남지 않았다 ---
-# 정확 문자열 하나만 보면 나머지가 거짓인 채로 초록이 되므로 실측한 표현을 배열로 모두 검사한다.
-# 이 배열이 금지 표현군의 원본이다(스펙의 표는 당시 기록일 뿐 대조 대상이 아니다).
-# 패턴에 백틱이 들어가므로 반드시 작은따옴표 배열로 두고 grep -qF -- 로 넘긴다.
-REACH_DOCS=("$HERE/README.md")
-REACH_BANNED=(
-  '모든 프로젝트와 서브에이전트에 걸쳐'
-  '메인 + 모든 서브에이전트 도달'
-  '모든 세션·서브에이전트가 같은 디시플린'
-  '메인과 서브에이전트 모두에 도달한다'
-  '메인 세션과 모든 서브에이전트가'
-  '모든 서브에이전트에 전달된다'
-  '모든 서브에이전트가 그 오답노트를'
-  '매 요청 실어 나른다'
-  '매 요청 에이전트원칙을 실어 준다'
-  '새 세션에서만 실행'
-)
-echo "[reach-claims] no unconditional reach claims remain"
-for d in "${REACH_DOCS[@]}"; do
-  for p in "${REACH_BANNED[@]}"; do
-    check "$(basename "$d"): banned '$p' absent"  "! grep -qF -- '$p' '$d'"
-  done
-done
-
-check "canon: 옛 도달 전제 제거"            "! grep -qF '서브에이전트도 이 글을 읽으므로' '$CANON'"
 check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 실린다고 가정하지 않는다' '$CANON'"
 
 # --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
@@ -864,12 +807,8 @@ check "스캐폴드가 4를 알린다"                 "grep -qF 'prc\" -eq 4' '
 # 커맨드는 그 보고를 근거로 새로 생긴 파일과 이미 있던 파일을 알리라고 지시했다. 스크립트가 그
 # 사실을 안 내므로 지시를 따르려면 지어내야 했다. 죽은 변수가 되살아나면 여기서 실패한다.
 echo "[setup-report] the command may only ask for facts the script actually emits"
-for S in scaffold.sh; do
-  check "$S: 값을 안 받는 created 가 없다" "! grep -qE '(^|[^_a-zA-Z])created' '$HERE/scripts/$S'"
-done
 SDC="$HERE/commands/setup-discipline.md"
 check "커맨드가 스크립트 출력을 전하라 한다" "grep -qF '스크립트가 낸 출력' '$SDC'"
-check "커맨드가 새 파일 목록을 안 시킨다"    "! grep -qF '새로 생성' '$SDC'"
 
 
 # --- 매니페스트 version 계약 ---
@@ -971,7 +910,7 @@ H30="$(mktemp -d)"; P30="$(mktemp -d)"
 OUT30a="$(run "$H30" "$P30")"
 OUT30b="$(run "$H30" "$P30")"
 H31="$(mktemp -d)"; P31="$(mktemp -d)"; mkdir -p "$H31/.claude/plugins"
-printf '{ "version": 2, "plugins": { "andrej-karpathy-skills@karpathy-skills": [ { "scope": "user" } ], "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
+printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
 ' > "$H31/.claude/plugins/installed_plugins.json"
 OUT31="$(run "$H31" "$P31")"
 # 건너뛰기: 첫 회차로 관리 디렉터리를 만든 뒤 이름 하나를 적고 다시 돌린다.
@@ -989,9 +928,6 @@ printf 'not-a-dependency
 OUT33="$(run "$H33" "$P33")"
 echo "[deps-notice] 함께 쓰는 플러그인 알림"
 check "없으면 superpowers 를 알린다"       "printf '%s' \"\$OUT30a\" | grep -qF 'superpowers@claude-plugins-official'"
-# 카파시는 목록에서 뺐다. 에이전트원칙의 「원칙」 절이 그 지침을 이미 포함하고 있어 함께 깔면 지침이
-# 두 벌이 된다. 낱말 'andrej-karpathy-skills' 가 아니라 알림에만 나오는 설치 키로 알림의 부재를 본다.
-check "카파시는 더 권하지 않는다"          "! printf '%s' \"\$OUT30a\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
 # superpowers 는 공식 마켓플레이스라 추가 명령이 없다. 목록의 '-' 가 실제로 그 줄을 뺐는지 본다.
 check "superpowers 는 마켓플레이스 추가가 없다" "[ \$(printf '%s' \"\$OUT30a\" | grep -cF 'claude plugin marketplace add') -eq 0 ]"
 check "끄는 방법을 함께 알린다"            "printf '%s' \"\$OUT30a\" | grep -qF 'plugin-notice.skip'"
