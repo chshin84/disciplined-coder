@@ -576,20 +576,15 @@ check "canon: measure-the-state rule stays"          "grep -qF \"Don't assume th
 check "canon: impossible-case rule stays"            "grep -qF 'No handling for situations that cannot occur' '$CANON'"
 check "canon: pre-existing-dead-code rule stays"     "grep -qF \"Don't remove what was already unused\" '$CANON'"
 check "canon: weak-criteria rule stays"              "grep -qF 'Weak criteria (\"make it work\") need constant clarification' '$CANON'"
-check "canon: trace-to-request rule stays"           "grep -qF 'Every changed line must trace directly to the request.' '$CANON'"
 check "canon: numbered-steps-plan rule stays"        "grep -qF 'For multi-step work, state the plan as numbered steps, each with the check that verifies it.' '$CANON'"
 # 흡수한 조항이 실재하는지 본다. 옛 45줄 상한은 셀 절이 없어져 이것으로 바꿨다.
-check "canon: fact-vs-judgment paragraph stays"      "grep -qF '사실과 판단은 다르다' '$CANON'"
-check "canon: local-first convention stays"          "grep -qF '\`LOCAL-FIRST\`는 원칙이 아니라' '$CANON'"
-check "canon: execution evidence rule"               "grep -qF '실행 증거 없이' '$CANON'"
-check "canon: subagent prompt context rule"          "grep -qF 'Context handed to a subagent is written into its prompt' '$CANON'"
 check "canon: no roll-call in the Korean section"    "! grep -qF '\`FAIL-LOUD\`와 \`NAME-ITEMS\`와 \`SECRETS\`가 답 한 번에도 걸린다' '$CANON'"
 check "canon: no roll-call in the document section"  "! grep -qF '\`SSOT\`와 \`NAME-ITEMS\`와 \`EXPLICIT\`이 문서에도 그대로 걸리고' '$CANON'"
 check "canon: no roll-call in the code section"      "! grep -qF '\`FOCUSED\`와 \`SSOT\`와 \`EXPLICIT\`이 코드에 그대로 걸리고' '$CANON'"
 check "canon: old section name is gone everywhere"   "! grep -rqF '대화할 때' '$CANON' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/scripts/scaffold.sh'"
 # 조항 열다섯의 목록은 이 파일이 소유한다. 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
 # 조항이 하나 떨어져도 그 결손을 정답으로 굳힌다.
-for id in FAIL-LOUD FOCUSED ASYNC-FIRST EXPLICIT SSOT NAME-ITEMS REVERSIBLE SECRETS NO-ASSUME STATE-ASSUME NAME-UNRESOLVED ASK-OPTIONS NO-FLEET YAGNI TRACE-REQUEST KEEP-STYLE REPORT-DEAD CHECKABLE IDEMPOTENT EXPLAIN-STRUCTURE LOCAL-FIRST; do
+for id in FOCUSED ASYNC-FIRST NAME-ITEMS REVERSIBLE SECRETS NO-ASSUME STATE-ASSUME ASK-OPTIONS NO-FLEET YAGNI REPORT-DEAD CHECKABLE EXPLAIN-STRUCTURE; do
   check "canon: clause $id present"                  "grep -qF '**\`$id\`' '$CANON'"
 done
 # 한국어 절은 두 층이다. 묶는 이름은 `###` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
@@ -597,10 +592,10 @@ done
 for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK REVISE-ORDER; do
   check "canon: korean group $g present"             "grep -qE '^### \`$g\`' '$CANON'"
 done
-for id in VOCAB-FREQ SPECIFIC-NAME SINO-KEEP LOANWORD-KEEP \
+for id in VOCAB-FREQ SPECIFIC-NAME SINO-KEEP \
           NO-MID-MOD NO-STACK-MOD KEEP-CONNECT ANTI-LIMIT COMMA-CUT \
           FULL-SENTENCE LABEL-NOUN ONE-ENDING \
-          BOTTOM-LINE SECTION-HEAD LEXICAL-CHAIN BULLET-SCOPE ONE-IDEA \
+          BOTTOM-LINE SECTION-HEAD BULLET-SCOPE ONE-IDEA \
           TERM-EXPLAIN TERM-ONE ASK-CONTEXT NO-ANALOGY \
           EDIT-PRIORITY REWRITE-NOT-ADD; do
   check "canon: korean clause $id present"           "grep -qF '**\`$id\`' '$CANON'"
@@ -609,6 +604,10 @@ done
 for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD; do
   check "canon: old clause $id stays removed"        "! grep -qF '**\`$id\`' '$CANON'"
   check "live docs: no reference to $id"             "! grep -rqF '\`$id\`' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/scripts/scaffold.sh'"
+done
+# 2026-09-23 클린룸 측정에서 조항 없이도 지켜진 열둘을 지웠다. 근거는 두 참고서의 「삭제한 조항」 절에 있다.
+for id in FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
+  check "canon: measured-redundant $id stays removed" "! grep -qF '**\`$id\`' '$CANON'"
 done
 # 접은 스킬 셋은 디렉터리가 없어야 한다. 존재 검사를 부재 검사로 뒤집은 것이라 가드 수가 줄지 않는다.
 for sk in domain-coding domain-writing domain-doc-upkeep; do
@@ -658,7 +657,7 @@ check "canon: 선택지 질문 규칙"             "grep -qF -- 'Ask as a questi
 check "canon: 묻는 방식은 한국어 절이 갖는다" "grep -qF '**\`ASK-CONTEXT\`' '$CANON'"
 check "canon: 산문 금지 조각은 없다"         "! grep -qF -- 'never in plain prose' '$CANON'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
-check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- 'Think Before Acting'"
+check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- '\`ASK-OPTIONS\`'"
 
 # --- canon-refresh: 이미 옛 에이전트원칙을 갖고 있는 PC도 갱신을 받는다 ---
 # 갓 설치한 경로만 검사하면, 에이전트원칙 복사를 '없을 때만'으로 바꿔도 초록이 유지된다. 바로 이웃한 두

@@ -135,7 +135,7 @@ check "README 가 이 훅을 적는다"               "grep -qF '읽기 전용 �
 
 echo "[rules-nudge-pre — 세션의 첫 파일 편집 전에 에이전트원칙의 절대경로와 domain-korean 을 한 번 알린다]"
 # 표시 파일은 TMPDIR 아래에 남으므로 픽스처 폴더로 돌린다 — 안 그러면 스위트를 두 번째 돌릴 때 앞 실행의
-# 표시 파일이 남아 "첫 편집" 검사가 조용히 깨진다(에이전트원칙의 `IDEMPOTENT`).
+# 표시 파일이 남아 "첫 편집" 검사가 조용히 깨진다. 두 번 돌려도 결과가 같아야 한다.
 # 코드와 문서를 가르지 않는다. 셸 명령의 대상은 실행해 봐야 정해져 편집 전에 가를 방법이 없기 때문이다.
 CNUD="$HERE/hooks/rules_nudge_pretooluse.sh"
 mkdir -p "$T/tmp"

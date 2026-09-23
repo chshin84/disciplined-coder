@@ -39,7 +39,7 @@ done
 
 ## 프로젝트 폴더에 생기는 파일
 
-새로 생기는 파일은 없다. 원칙은 `agent-principles.md` 한 곳에 둔다. 그 에이전트원칙이 원칙과 Karpathy guidelines(산출물이면 무엇에나 거는 지침)와 한국어로 쓸 때와 문서를 쓰고 관리할 때와 코딩할 때의 규칙을 보유한다. 절차와 산출물 한 종류에만 적용되는 규칙은 `skills/` 아래 스킬로 둔다. SessionStart hook이 원칙을 `~/.claude/disciplined-coder/`에 셋업하고, `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다. 금지 표현 목록은 그 관리블록이 아니라 중립 이름의 공용 블록이 `@import` 한다. 규약은 KiwoomAX/korean-banned-words 의 `import-protocol.md`가 소유하고 사내 `kw-control-tower`도 같은 블록을 쓴다. 블록이 가리키는 목록이 우리 것보다 낡았을 때만 바꾸고, 버전이 같은데 내용이 다르면 어느 쪽이 새것인지 알 수 없으므로 그대로 두고 알린다.
+새로 생기는 파일은 없다. 원칙은 `agent-principles.md` 한 곳에 둔다. 그 에이전트원칙이 원칙과 한국어로 쓸 때와 문서를 쓰고 관리할 때와 코딩할 때의 규칙을 보유한다. 절차와 산출물 한 종류에만 적용되는 규칙은 `skills/` 아래 스킬로 둔다. SessionStart hook이 원칙을 `~/.claude/disciplined-coder/`에 셋업하고, `~/.claude/CLAUDE.md`의 관리블록이 `@import`로 주입한다. 금지 표현 목록은 그 관리블록이 아니라 중립 이름의 공용 블록이 `@import` 한다. 규약은 KiwoomAX/korean-banned-words 의 `import-protocol.md`가 소유하고 사내 `kw-control-tower`도 같은 블록을 쓴다. 블록이 가리키는 목록이 우리 것보다 낡았을 때만 바꾸고, 버전이 같은데 내용이 다르면 어느 쪽이 새것인지 알 수 없으므로 그대로 두고 알린다.
 
 이 플러그인이 프로젝트 파일을 고치는 예외는 하나이고 그 조건은 여기가 정한다. 그 레포 `CLAUDE.md`에 관리블록이 남아 있고 그 블록을 만든 기능이 없어졌으면, 사본을 전역 백업에 복사한 뒤 제거한다. 조건이 하나 더 붙는다. 그 파일이 전역 `~/.claude/CLAUDE.md`와 같은 파일이면 건드리지 않는다 — 그것은 이 훅이 매 세션 다시 만드는 정상 블록이다. 같은 파일인지는 경로 문자열 대신 `-ef`로 본다. 작업 폴더가 `~/.claude`이면 윈도우 형식 경로와 POSIX 형식 경로가 같은 파일을 가리키는데 문자열로 견주면 다른 파일로 보인다. 그때의 잠금 대기 시간은 `scripts/_managed_block.sh`의 상수가 정한다.
 
@@ -84,7 +84,7 @@ spec이나 plan을 쓰면 리뷰를 지시하고, 새 `.md`를 만들면 에이�
 새 세션을 열 때마다 이 셋이 돈다. 모두 알리고 지나가며 되돌릴 수 있다.
 
 - 에이전트원칙 사본과 `@import` 연결을 만들고 알린다. 다른 곳이 금지 표현 목록을 이미 싣고 있으면 그 줄은 건너뛴다.
-- superpowers 가 이 PC에 없으면 설치 명령으로 알린다. 대신 깔지는 않는다. `~/.claude/disciplined-coder/plugin-notice.skip` 에 이름을 한 줄 적으면 조용해진다. 카파시(Andrej Karpathy)의 `andrej-karpathy-skills` 는 이 목록에 없다. 에이전트원칙의 「Karpathy guidelines」 절이 그 네 절을 코드에서 산출물로 일반화해 줄여 포함하고 있어, 함께 깔면 비슷하지만 불일치하는 지침이 두 벌 실린다.
+- superpowers 가 이 PC에 없으면 설치 명령으로 알린다. 대신 깔지는 않는다. `~/.claude/disciplined-coder/plugin-notice.skip` 에 이름을 한 줄 적으면 조용해진다. 카파시(Andrej Karpathy)의 `andrej-karpathy-skills` 는 이 목록에 없다. 에이전트원칙의 「원칙」 절이 그 네 절을 코드에서 산출물로 일반화해 줄여 포함하고 있어, 함께 깔면 비슷하지만 불일치하는 지침이 두 벌 실린다.
 - 윈도우이고 사용자 환경 변수 `PYTHONUTF8` 이 비어 있으면 값 `1` 을 넣고 넣었다고 알린다. 값이 `0` 이면 일부러 끈 것으로 보고 손대지 않는다.
 
 ### 끄는 법
