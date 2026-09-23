@@ -1,6 +1,6 @@
 ---
 name: aggregating-lenses
-description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판정이 서로 상충하는 곳과 아무도 안 본 렌즈를 짚는 집계 단계. accept/regenerate/escalate 결정은 제품 런타임에서만 내고, spec·plan 리뷰와 문서 검진에서는 결정 없이 병합한 목록만 호출자에게 넘긴다. 렌즈가 아니다. 코드 설계도이며 내용 재판단은 하지 않는다.
+description: 렌즈를 둘 이상 돌린 뒤에 연다. 그 출력을 모아 판정이 서로 상충하는 곳과 아무도 안 본 렌즈를 짚는 집계 단계. accept/regenerate/escalate 결정은 제품 런타임에서만 내고, spec·plan 리뷰와 문서 검진에서는 결정 없이 병합한 목록만 호출자에게 넘긴다.
 ---
 # aggregating-lenses — 집계와 런타임 전용 결정 (코드 설계도)
 

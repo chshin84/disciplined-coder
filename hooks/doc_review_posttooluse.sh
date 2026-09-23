@@ -68,7 +68,7 @@ base="${match##*/}"
 
 # 렌즈 이름을 여기 박지 않는다 — 구성은 review-docs 가 소유하고, 여기 적으면 그 사본이
 # 먼저 낡아 훅이 안내하는 렌즈와 문서가 정하는 렌즈가 조용히 갈라진다(spec 훅도 같은 이유로 위임한다).
-msg="🔎 문서(${base}) 작성/수정됨 — done 하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 에이전트원칙을 따른다. 넛지일 뿐 차단은 아니다."
+msg="🔎 문서(${base}) 작성/수정됨 — 완료로 보고하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 에이전트원칙을 따른다. 넛지일 뿐 차단은 아니다."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

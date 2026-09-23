@@ -1,6 +1,6 @@
 ---
 name: lens-consistency
-description: 문서의 내부 모순과 이름·타입 드리프트를 보고, spec·plan 에는 커버리지 공백과 산출물 공백과 스코프까지 보는 렌즈. review-specs의 설계 문서 리뷰와 audit-repo-docs의 레포 문서 감사가 읽기 전용 서브에이전트로 호출한다.
+description: 문서의 내부 모순과 이름·타입 드리프트를 보고, spec·plan 에는 커버리지 공백과 산출물 공백과 스코프까지 보는 렌즈. 호출자가 이름으로 지정해 읽기 전용 서브에이전트로 실행한다.
 ---
 # lens-consistency — 내부 정합성·커버리지 렌즈 (프롬프트 설계도)
 

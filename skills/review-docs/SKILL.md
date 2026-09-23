@@ -1,6 +1,6 @@
 ---
 name: review-docs
-description: 남에게 전달될 문서와 .pptx·.xlsx·.docx·.pdf 산출물과 그 직전 마크다운을 렌즈로 검진하는 절차다. 그런 문서를 고쳐 놓고 done 하기 전에, 외부에 공개하기 전에, 검진 기록을 남길 때 연다. 저장소에 커밋되는 작업 문서는 대상이 아니다. 어느 렌즈를 적용하고 언제 묻고 언제 건너뛰는지와 결과를 어디에 어떤 이름으로 남기는지를 포함한다. 레포 전체를 한 회차로 훑는 감사는 audit-repo-docs가, spec·plan 리뷰는 review-specs가 소유한다.
+description: 남에게 전달될 문서와 .pptx·.xlsx·.docx·.pdf 산출물과 그 직전 마크다운을 렌즈로 검진하는 절차다. 그런 문서를 고쳐 놓고 완료로 보고하기 전에, 외부에 공개하기 전에, 검진 기록을 남길 때 연다. 저장소에 커밋되는 작업 문서는 대상이 아니다. 레포 전체를 한 회차로 훑는 감사는 audit-repo-docs가, spec·plan 리뷰는 review-specs가 소유한다.
 ---
 # review-docs — 문서 하나를 검진하는 절차
 

@@ -1,6 +1,6 @@
 ---
 name: domain-plugin
-description: Claude Code 플러그인·마켓플레이스를 만들 때 참조하는 도메인 참고서다. 설계와 개발 단계에서 연다.
+description: Claude Code 플러그인·마켓플레이스를 만들 때, 훅을 만들 때, 플러그인이나 스크립트가 ~/.claude/settings.json 같은 사용자 설정 파일을 고치게 할 때 참조하는 도메인 참고서다. 설계와 개발 단계에서 연다.
 ---
 # 플러그인 관리 도메인 참고서
 

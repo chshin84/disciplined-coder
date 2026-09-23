@@ -1,6 +1,6 @@
 ---
 name: review-specs
-description: Claude가 brainstorming/writing-plans로 만든 spec·plan(메타 산출물)을 독립 렌즈들(lens-grounding·lens-consistency·lens-adversarial·lens-fit, 그리고 spec에 한해 제안·승인 뒤 붙는 lens-prior-art)로 검증하고, 발견을 🔴와 고칠 것으로 가르는 호출자. 검토 대상 하나에 렌즈마다 호출 하나를 따로 띄우고, 그 결과를 한데 모아 리뷰 기록으로 남긴다. superpowers 경로에 spec이나 plan을 쓰면 훅이 강제한다. 제품 런타임 콜을 다루지 않고 Claude 자신의 설계 문서를 리뷰한다.
+description: superpowers 경로(docs/superpowers/specs·plans)에 spec이나 plan을 쓴 뒤 연다. 그때는 훅이 이 스킬을 지시한다. spec·plan 리뷰를 요청받았을 때도 연다. Claude 자신의 설계 문서를 독립 렌즈로 검증해 리뷰 기록으로 남기는 절차이며, 제품이 런타임에 LLM을 호출하는 기능은 review-llm-calls가 맡는다.
 ---
 # review-specs — spec/plan 독립 리뷰 호출자
 
