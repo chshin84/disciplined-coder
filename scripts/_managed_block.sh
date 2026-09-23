@@ -12,7 +12,7 @@
 # 이 파일을 사본으로 가져가는 쪽은 source 앞뒤에 이 값만 세우면 되고 함수 시그니처는 그대로다.
 # 여기서 경로나 판정을 만들지 마라 — 그러면 사본 쪽에서 조용히 다른 동작이 된다.
 MANAGED_TAG="${MANAGED_TAG:-disciplined-coder}"
-# 표준 관리블록 마커(SSOT). 소비자(scaffold)는 begin/end를 인자로 넘긴다.
+# 표준 관리블록 마커. 소비자(scaffold)는 begin/end를 인자로 넘긴다.
 MANAGED_BEGIN="# BEGIN $MANAGED_TAG (managed — do not edit)"
 MANAGED_END="# END $MANAGED_TAG (managed — do not edit)"
 # 고아 주석은 마커 집합의 파생값이라 인자를 늘리지 않고 함수가 모듈 상수를 직접 읽는다(비대칭 의도).
@@ -22,8 +22,8 @@ MANAGED_ORPHAN="# ($MANAGED_TAG: orphan BEGIN neutralized — END missing)"
 # startup·resume·clear마다 돈다. 창을 둘 이상 동시에 열면 두 프로세스의 read-modify-write가 겹쳐
 # 사용자가 손으로 적은 지침이 조각날 수 있다. 그래서 대상 파일마다 락을 잡고 직렬화하며, 임시 파일도
 # 결정론적 이름 대신 mktemp로 유일하게 만든다(PC 오답노트 — 결정론적 파일명과 공유 스크래치의 조합).
-# 마커 영역을 걷어내는 awk 프로그램(에이전트원칙). 주입과 제거가 같은 규칙을 쓰도록 문자열로 떼어 둔다 —
-# 두 벌로 두면 한쪽만 고쳐져 '주입은 지우는데 제거는 남기는' 어긋남이 조용히 생긴다(SSOT).
+# 마커 영역을 걷어내는 awk 프로그램(원본). 주입과 제거가 같은 규칙을 쓰도록 문자열로 떼어 둔다 —
+# 두 벌로 두면 한쪽만 고쳐져 '주입은 지우는데 제거는 남기는' 어긋남이 조용히 생긴다.
 # 함수로 떼지 않고 문자열로 두는 이유는, 락을 푸는 RETURN 트랩이 중첩 함수 반환에서 먼저 터질 수
 # 있어 append 전에 락이 풀리는 조용한 회귀를 만들기 때문이다.
 MANAGED_STRIP_AWK='
@@ -54,7 +54,7 @@ MANAGED_TRIM_AWK='{ l=$0; sub(/\r$/,"",l); if (l ~ /[^ \t]/) last=NR; line[NR]=$
 
 # 락을 잡는다. 잡으면 그 락의 주인 토큰을 stdout으로 돌려주고, 푸는 것은 managed_block_unlock 이
 # 그 토큰을 받아 맡는다. 죽은 프로세스가 남긴 락에 영원히 갇히지 않도록 한 락이 10초를 넘게 잡혀
-# 있으면 빼앗고 경고한다(`FAIL-LOUD`). 잡는 코드를 이 함수 한 곳에 두는 이유는 호출자가 둘이라
+# 있으면 빼앗고 경고한다. 잡는 코드를 이 함수 한 곳에 두는 이유는 호출자가 둘이라
 # 한쪽만 고치면 옛 갈래가 남기 때문이다.
 #
 # **주인 토큰을 두는 이유는 빼앗긴 옛 주인이 새 주인의 락을 지우기 때문이다.** 토큰이 없으면 푸는
@@ -145,7 +145,7 @@ managed_block_unlock() {  # $1=락 디렉터리 경로, $2=managed_block_lock �
 # 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에 끼워 넣은 줄도 함께 사라진다. 그 파일은
 # git 밖일 수 있어 사본이 유일한 복구 수단이다 — 그래서 사본 경로를 인자로 받아 여기서 직접 뜨고,
 # 못 뜨면 아예 걷어내지 않는다(오답노트 머리말과 같은 규율. 호출자가 기억하게 두지 않으려고 함수
-# 안에 둔다 — `FAIL-LOUD`).
+# 안에 둔다).
 # 리턴: 0=걷어냄, 1=대상이 없어 아무것도 안 함, 2=사본을 못 떠서 걷어내지 않음,
 #       3=락을 못 잡아 걷어내지 않음, 4=변환이 실패해 원본을 그대로 두었음.
 # 호출은 반드시 `|| rc=$?`로 감싼다(set -e).
@@ -165,7 +165,7 @@ managed_block_remove() {
   tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
   trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock" "$tok"' RETURN
   # 두 변환의 종료 코드를 각각 본다. 앞이 실패한 채로 넘어가면 빈 임시 파일이 원본을 덮어,
-  # 사람이 적은 줄이 사라진다(`FAIL-LOUD`).
+  # 사람이 적은 줄이 사라진다.
   awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" -v tag="$MANAGED_TAG" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 4
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 4
   mv "$norm" "$uc" || return 4
@@ -174,7 +174,7 @@ managed_block_remove() {
 
 # 리턴: 0=넣었음, 1=락을 못 잡아 아무것도 안 함, 2=변환이 실패해 원본을 그대로 두었음.
 # 락을 못 잡았으면 파일을 건드리지 않고 물러난다 — 반쪽만 쓴 관리블록을 남기는 것보다 안 쓰는
-# 것이 낫고, 못 썼다는 사실은 managed_block_lock 이 이미 stderr 로 알렸다(`FAIL-LOUD`).
+# 것이 낫고, 못 썼다는 사실은 managed_block_lock 이 이미 stderr 로 알렸다.
 managed_block_inject() {
   local uc="$1" begin="$2" end="$3" body tmp norm lock tok
   body="$(cat)"

@@ -31,4 +31,4 @@ spec 리뷰와 문서 검진과 레포 문서 감사에서는 문서 밖을 반�
 ```
 { "lens": "lens-grounding", "read": [ "..." ], "issues": [ { "where": "...", "type": "omission|contradiction|unsupported|mismatch", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "..." ], "notes": "" }
 ```
-필드의 뜻과 공통 규칙은 `aggregating-lenses`의 리뷰 산출물 계약이 SSOT다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다. `principles_applied`를 언제 요구하는지는 `aggregating-lenses`의 리뷰 산출물 계약이 정한다. 여기서 다시 정하지 않는다.
+필드의 뜻과 공통 규칙은 `aggregating-lenses`의 리뷰 산출물 계약이 소유한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다. `principles_applied`를 언제 요구하는지는 `aggregating-lenses`의 리뷰 산출물 계약이 정한다. 여기서 다시 정하지 않는다.

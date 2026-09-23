@@ -19,9 +19,9 @@ printf 'x\n상대편 문장은 저기 있다.\ny\n' > "$EVT/other.md"
 cat > "$EVT/findings.json" <<'FIXTURE'
 { "schema": 1, "findings": [
   { "id": "r#001", "file": "doc.md", "evidence": "어긋난 문장이 여기 있다.",
-    "counterpart_file": "other.md", "counterpart": "상대편 문장은 저기 있다.", "principle": "SSOT" },
+    "counterpart_file": "other.md", "counterpart": "상대편 문장은 저기 있다.", "principle": "FOCUSED" },
   { "id": "r#002", "file": "doc.md", "evidence": "이 문장은 파일에 없다.",
-    "counterpart_file": "other.md", "counterpart": "상대편 문장은 저기 있다.", "principle": "SSOT" }
+    "counterpart_file": "other.md", "counterpart": "상대편 문장은 저기 있다.", "principle": "FOCUSED" }
 ] }
 FIXTURE
 EV_OUT="$(bash "$EV" --root "$EVT" "$EVT/findings.json" 2>/dev/null || true)"
@@ -72,14 +72,14 @@ cat > "$ART/2026-01-01-self-audit/findings.json" <<'FIXTURE'
 { "schema": 1, "findings": [
   { "id": "p#001", "fingerprint": "aaaaaaaaaaaa", "status": "confirmed", "title": "남은 것",
     "file": "doc.md", "evidence": "남아 있는 어긋난 문장.",
-    "counterpart_file": "other.md", "counterpart": "상대편 문장.", "principle": "SSOT", "lens": "lens-grounding" },
+    "counterpart_file": "other.md", "counterpart": "상대편 문장.", "principle": "FOCUSED", "lens": "lens-grounding" },
   { "id": "p#002", "fingerprint": "bbbbbbbbbbbb", "status": "confirmed", "title": "사라진 것",
     "file": "doc.md", "evidence": "이제 없는 문장.",
-    "counterpart_file": "other.md", "counterpart": "상대편 문장.", "principle": "SSOT", "lens": "lens-fit" },
+    "counterpart_file": "other.md", "counterpart": "상대편 문장.", "principle": "FOCUSED", "lens": "lens-fit" },
   { "id": "p#003", "fingerprint": "cccccccccccc", "status": "rejected", "title": "기각된 것",
     "verdict_reason": "정당한 좁혀 적기다",
     "file": "doc.md", "evidence": "남아 있는 어긋난 문장.",
-    "counterpart_file": "other.md", "counterpart": "상대편 문장.", "principle": "SSOT", "lens": "lens-fit" }
+    "counterpart_file": "other.md", "counterpart": "상대편 문장.", "principle": "FOCUSED", "lens": "lens-fit" }
 ] }
 FIXTURE
 cat > "$ART/prior-diff.json" <<'FIXTURE'
@@ -152,7 +152,7 @@ cat > "$VR/findings.json" <<'FIXTURE'
 { "schema": 1, "findings": [
   { "id": "v#001", "fingerprint": "aaaaaaaaaaaa", "status": "confirmed", "title": "t",
     "file": "a.md", "evidence": "e", "counterpart_file": "b.md", "counterpart": "c",
-    "principle": "SSOT", "consequence": "지금 이렇게 되어 있다", "lens": "lens-fit",
+    "principle": "FOCUSED", "consequence": "지금 이렇게 되어 있다", "lens": "lens-fit",
     "evidence_found": true, "counterpart_found": true } ] }
 FIXTURE
 printf '{ "schema": 1, "no_prior_round": true, "items": [], "new_ids": ["v#001"] }\n' > "$VR/diff.json"
@@ -169,7 +169,7 @@ cat > "$VR/findings.json" <<'FIXTURE'
 { "schema": 1, "findings": [
   { "id": "v#002", "fingerprint": "aaaaaaaaaaaa", "status": "rejected", "title": "t",
     "file": "a.md", "evidence": "e", "counterpart_file": "b.md", "counterpart": "c",
-    "principle": "SSOT", "lens": "lens-fit", "evidence_found": true, "counterpart_found": true } ] }
+    "principle": "FOCUSED", "lens": "lens-fit", "evidence_found": true, "counterpart_found": true } ] }
 FIXTURE
 check "사유 없는 기각을 잡는다" "[ -f '$AV' ] && ! bash '$AV' '$VR' >/dev/null 2>&1"
 rm -rf "$VT"
@@ -179,7 +179,7 @@ check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF 'lens-<렌�
 echo "[렌즈 — 발견의 문턱과 기계에 넘기는 것]"
 # 문턱은 aggregating-lenses 「리뷰 산출물 계약」이 소유한다. 전에는 같은 세 문단이 렌즈 파일 넷에 같은
 # 글자로 있었고 이 검사가 그 사본들을 맞춰 세웠다. 지금은 소유자에서 한 번 보고, 렌즈 파일에는
-# 사본이 안 남았는지만 본다(SSOT).
+# 사본이 안 남았는지만 본다.
 check "aggregating-lenses 가 상대편을 필수로 적는다" "grep -qF 'counterpart' '$MA' && grep -qF '상대편을 못 대면 발견이 아니다' '$MA'"
 check "aggregating-lenses 가 결과 기준을 적는다"     "grep -qF '지금 무엇이 그렇게 되어 있는지' '$MA' && grep -qF '앞으로 벌어질 일을 적지 않는다' '$MA'"
 for L in lens-grounding lens-fit lens-consistency lens-adversarial; do
@@ -235,7 +235,7 @@ check "문서 전체에 리스크로 렌즈를 고른다는 서술이 안 남아
 
 echo "[걸음 개수] 표의 행 수와 '걸음은 N' 문장이 맞는다"
 # 대상을 손으로 적지 않고 문서에서 도출한다. '걸음은 N이고'를 담은 스킬을 모두 찾아 그 문장 뒤
-# 같은 절의 표 행 수와 맞댄다. 같은 꼴의 문서가 하나 늘면 이 검사가 저절로 그것을 본다(SSOT).
+# 같은 절의 표 행 수와 맞댄다. 같은 꼴의 문서가 하나 늘면 이 검사가 저절로 그것을 본다.
 # 전에는 audit-repo-docs 하나만 봤고, 같은 꼴인 review-specs 의 「절차」 표는 아무도 안 붙들어
 # 행을 더하면 조용히 낡았다.
 KO_NUM() { case "$1" in 하나) echo 1;; 둘) echo 2;; 셋) echo 3;; 넷) echo 4;; 다섯) echo 5;; 여섯) echo 6;; 일곱) echo 7;; 여덟) echo 8;; 아홉) echo 9;; 열) echo 10;; 열하나) echo 11;; 열둘) echo 12;; *) echo 0;; esac; }
@@ -322,7 +322,7 @@ cat > "$RT/round/findings.json" <<'FIXTURE'
 { "schema": 1, "findings": [
   { "id": "r#001", "fingerprint": "aaaaaaaaaaaa", "status": "confirmed", "title": "t",
     "file": "a.md", "evidence": "e", "counterpart_file": "b.md", "counterpart": "c",
-    "principle": "SSOT", "consequence": "지금 이렇게 되어 있다", "lens": "lens-fit" } ] }
+    "principle": "FOCUSED", "consequence": "지금 이렇게 되어 있다", "lens": "lens-fit" } ] }
 FIXTURE
 printf '{ "schema": 1, "no_prior_round": true, "items": [], "new_ids": [] }\n' > "$RT/round/diff.json"
 printf '{ "schema": 1, "suggestions": [] }\n' > "$RT/round/suggestions.json"
@@ -334,7 +334,7 @@ rj() { json_run "$1" "$RT/round/$2"; }
 # 넣고 그 값이 있는지를 같은 픽스처에서 되읽는 것이라 자기 자신을 증언하는 것과 같다. audit_evidence.sh
 # 가 그 칸을 실제로 읽는지는 위 [F1] 구획이 스키마와 대조해 이미 본다.
 # status 의 닫힌 집합은 이 파일이 손으로 든 리터럴이 아니라 절차 문서(audit-repo-docs SKILL.md)
-# 「판정」 절의 한 문장에서 뽑는다 — 계획 문서는 소비하고 지우는 문서라 에이전트원칙이 못 된다. 문서가 상태
+# 「판정」 절의 한 문장에서 뽑는다 — 계획 문서는 소비하고 지우는 문서라 원본이 못 된다. 문서가 상태
 # 이름을 더하거나 빼면 여기서 같이 갈린다(절차 문서나 이 픽스처 어느 한쪽만 바뀌어도 실패).
 STATUS_SRC="$PDA"
 STATUS_LINE="$(grep -F '`status`가' "$STATUS_SRC" | head -1)"
@@ -367,16 +367,16 @@ check "절차에 「일관성 대조」 절과 걸음 행이 있다"         "gr
 AT_DERIVE='목록은 손으로 적지 말고 `bash scripts/audit_targets.sh`가 내게 한다'
 check "대상 목록을 손으로 적지 않고 스크립트가 낸다"      "grep -qF -- \"\$AT_DERIVE\" '$PDA'"
 check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '$HERE/docs/superpowers/specs/2026-08-30-audit-unification-design.md' | grep -qF '2026-09-02-audit-record-and-diff-design.md'"
-# run.json 이 담을 것의 에이전트원칙은 「통합 기록」 절의 run.json 서술 한 줄이다. 그 줄이 대상별
+# run.json 이 담을 것의 원본은 audit-repo-docs 「통합 기록」 절의 run.json 서술 한 줄이다. 그 줄이 대상별
 # 렌즈 배정과 판정 개수를 여전히 담는다고 적는지, 그리고 픽스처가 그 두 사실을 실제로
-# 담는 필드를 갖는지 양쪽을 대조한다 — 에이전트원칙 문장이나 픽스처 어느 한쪽만 바뀌어도 실패한다.
+# 담는 필드를 갖는지 양쪽을 대조한다 — audit-repo-docs 문장이나 픽스처 어느 한쪽만 바뀌어도 실패한다.
 PDA_RUNJSON_LINE="$(grep -F '**`run.json`**' "$PDA")"
-check "에이전트원칙이 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '대상 문서마다 건 렌즈'"
-check "에이전트원칙이 판정 개수를 담는다고 적는다"               "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '판정 개수'"
+check "audit-repo-docs 가 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '대상 문서마다 건 렌즈'"
+check "audit-repo-docs 가 판정 개수를 담는다고 적는다"               "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '판정 개수'"
 # (지운 단언 둘) 픽스처가 대상별 렌즈 배정·판정 개수 필드를 담는다 — 이 파일 바로 위에서 손으로 쓴
-# run.json 리터럴에 그 키가 있는지를 같은 파일에서 되읽는 것이라, 에이전트원칙 문장이 그 필드를 빼도 이
-# 픽스처는 안 바뀌어 계속 통과한다(F8). 바로 위 두 check(에이전트원칙이 대상별 렌즈 배정/판정 개수를
-# 담는다고 적는다)가 에이전트원칙 산문 쪽은 이미 보므로, 나머지는 F4의 metrics 필드 실측(아래
+# run.json 리터럴에 그 키가 있는지를 같은 파일에서 되읽는 것이라, audit-repo-docs 문장이 그 필드를 빼도 이
+# 픽스처는 안 바뀌어 계속 통과한다(F8). 바로 위 두 check(audit-repo-docs 가 대상별 렌즈 배정/판정 개수를
+# 담는다고 적는다)가 audit-repo-docs 산문 쪽은 이미 보므로, 나머지는 F4의 metrics 필드 실측(아래
 # [audit_rounds.sh — 회차 대조와 측정] 구획)이 실제 계산 결과로 대신한다.
 
 echo "[audit_targets.sh — 배제 규칙이 실제로 걸린다]"
@@ -407,7 +407,7 @@ $(ls "$HERE/skills")
 $(ls "$HERE/commands" | sed 's/\.md$//')
 TOPICEOF
 [ -n "$ATP_MISS" ] && echo "    빠진 이름표:$ATP_MISS"
-check "에이전트원칙 원칙 ID·절 제목·스킬·명령 이름이 모두 있다" "[ -z \"\$ATP_MISS\" ]"
+check "에이전트원칙의 조항 ID·절 제목·스킬·명령 이름이 모두 있다" "[ -z \"\$ATP_MISS\" ]"
 check "중복이 없다" "[ \"\$(printf '%s\n' \"\$ATP_OUT\" | sort | uniq -d | wc -l)\" = 0 ]"
 check "절차의 표 대조가 이 스크립트를 부른다" "grep -qF 'audit_topics.sh' '$PDA'"
 

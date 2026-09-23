@@ -4,7 +4,7 @@
 # 경로는 도구에 따라 한 곳에서 뽑는다. Write·Edit 은 훅 입력의 file_path 이고, Bash 는
 # _extract_bash_targets.sh 가 명령줄에서 뽑은 쓰기 대상이다. Bash 를 넣는 이유는 셸로 고치면 이
 # 훅이 안 돌기 때문이다 — 2026-09-21 에 한 세션이 sed -i 로 문서 열한 개를 고치는 동안 넛지가 한
-# 번도 안 떴다. 순수 bash.
+# 번도 안 떴다. jq 비의존.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 INPUT="$(cat)"
@@ -25,8 +25,8 @@ else
 fi
 [ -n "$TARGETS" ] || exit 0
 
-. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_is_review_record) 공유(SSOT)
-. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
+. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_is_review_record) 공유
+. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유
 match=""
 while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
@@ -61,8 +61,6 @@ while IFS= read -r FILE; do
   # 메모리와 계획 파일에 넛지가 뜨던 문제는 이 조건이 대신 막는다. 그 폴더에는 산출물이 없다.
   case "$FILE" in */*) FDIR="${FILE%/*}" ;; *) FDIR=. ;; esac
   has_deliverable=0
-  # if 로 쓴다. `[ -e x ] && …` 는 조건이 거짓일 때 목록 전체가 1 로 끝나고, set -e 아래에서는
-  # 그것이 훅을 그 자리에서 죽인다. 넛지가 조용히 사라지는 것이 그렇게 생긴다.
   for cand in "$FDIR"/*.pptx "$FDIR"/*.xlsx "$FDIR"/*.docx "$FDIR"/*.pdf; do
     if [ -e "$cand" ]; then has_deliverable=1; break; fi
   done
@@ -77,7 +75,7 @@ base="${match##*/}"
 # (제거됨) 오답노트 발견·복구 넛지 — /add-pointer 폐지와 함께 뺐다. 빈 템플릿을 미리 만들라는
 # 권유였는데, 빈 파일은 recall이 발화해도 얻는 교훈이 0이다. 이제 교훈이 생긴 시점에 만든다.
 
-# 렌즈 이름을 여기 박지 않는다 — 구성은 review-docs 가 SSOT이고, 여기 적으면 그 사본이
+# 렌즈 이름을 여기 박지 않는다 — 구성은 review-docs 가 소유하고, 여기 적으면 그 사본이
 # 먼저 낡아 훅이 안내하는 렌즈와 문서가 정하는 렌즈가 조용히 갈라진다(spec 훅도 같은 이유로 위임한다).
 msg="🔎 문서(${base}) 작성/수정됨 — done 하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 에이전트원칙을 따른다. 넛지일 뿐 차단은 아니다."
 esc="$(escape_for_json "$msg")"

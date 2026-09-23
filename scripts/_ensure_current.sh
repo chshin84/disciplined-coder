@@ -12,7 +12,7 @@
 # 옮긴 뒤에 반드시 다시 켜라고 말한다. `claude plugin update` 의 도움말이 "restart required to
 # apply" 라고 적고 있다. 옮겼다고만 알리면 사용자는 고쳐진 줄 알고 그 세션을 계속 쓰는데 실제로는
 # 옛 판이 돈다.
-. "${BASH_SOURCE[0]%/*}/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
+. "${BASH_SOURCE[0]%/*}/_json_valid.sh"   # 파이썬 인터프리터 고르기
 
 # $1=설정 홈(~/.claude). 사용자에게 보일 줄을 stdout 으로 낸다. 어느 갈래에서도 0 으로 끝난다 —
 # 갱신 확인이 세션 시작을 막지 않는다.

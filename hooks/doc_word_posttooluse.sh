@@ -23,11 +23,12 @@ HOOKDIR="${BASH_SOURCE[0]%/*}"; [ "$HOOKDIR" != "${BASH_SOURCE[0]}" ] || HOOKDIR
 hook_command
 bash_cmd_writes "$CMD" || exit 0
 
-. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_is_banned_target) 공유(SSOT)
-. "$HOOKDIR/_json_escape.sh"        # JSON 문자열 이스케이프(SSOT) 공유
+. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_is_banned_target) 공유
+. "$HOOKDIR/_json_escape.sh"        # JSON 문자열 이스케이프 공유
 
 BANSRC="$HOOKDIR/../korean-banned-words.md"
-[ -f "$BANSRC" ] || exit 0   # 목록이 없다는 사실은 Pre 훅이 이미 알린다. 여기서 두 번 알리지 않는다.
+[ -f "$BANSRC" ] || exit 0   # 목록이 없다는 사실은 Pre 훅이 Write·Edit 로 .md 를 쓸 때만 알린다.
+#                              셸로만 쓰는 세션에서는 아무도 알리지 않는다(알려진 한계).
 
 TARGETS="$(printf '%s' "$INPUT" | bash "$HOOKDIR/_extract_bash_targets.sh" 2>/dev/null || true)"
 [ -n "$TARGETS" ] || exit 0
@@ -45,8 +46,8 @@ $TARGETS
 EOF
 [ -n "$FILES" ] || exit 0
 
-. "$HOOKDIR/_banned_words.sh"            # 표 파싱과 본문 맞추기(SSOT) 공유
-. "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
+. "$HOOKDIR/_banned_words.sh"            # 표 파싱과 본문 맞추기 공유
+. "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT

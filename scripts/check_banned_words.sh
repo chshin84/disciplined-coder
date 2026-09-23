@@ -25,7 +25,7 @@ if [ ! -f "$BANSRC" ]; then
 fi
 
 # 표 파싱과 본문 맞추기는 훅과 같은 함수를 쓴다. 파서가 둘이면 표의 모양이 바뀔 때 한쪽만
-# 따라가고, 그러면 여기서 본 결과와 훅이 거부하는 것이 갈린다(`SSOT`).
+# 따라가고, 그러면 여기서 본 결과와 훅이 거부하는 것이 갈린다.
 . "$HERE/scripts/_json_valid.sh"
 . "$HERE/hooks/_banned_words.sh"
 

@@ -2,13 +2,13 @@
 # Stop: 미리뷰 spec/plan이 남으면 종료 차단(하드 게이트). 루프가드: stop_hook_active.
 # 탐지: git 신규(미추적·추가) spec/plan + HEAD 커밋이 추가한 spec/plan 중 마지막 줄이 terminal
 # 마커가 아닌 것(Fix C — 같은 턴 커밋 우회 차단). 기존 파일 수정은 제외(Fix A).
-# 순수 bash(jq 비의존). git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).
+# jq 비의존. git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 HOOKDIR="${BASH_SOURCE[0]%/*}"; [ "$HOOKDIR" != "${BASH_SOURCE[0]}" ] || HOOKDIR=.
 . "$HOOKDIR/_hook_input.sh"     # 훅 입력 읽기(json_str·slash_norm) 공유
-. "$HOOKDIR/_spec_marker.sh"    # terminal 마커 판정(SSOT) 공유
-. "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프(SSOT) 공유
+. "$HOOKDIR/_spec_marker.sh"    # terminal 마커 판정 공유
+. "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프 공유
 . "$HOOKDIR/_stop_preamble.sh"  # 루프가드·cwd·저장소 루트 이동 공유
 INPUT="$(cat)"
 stop_enter_repo "spec 리뷰 게이트를 검사하지 못했다"

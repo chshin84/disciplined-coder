@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # 문서의 렌즈 열거가 진실과 어긋나지 않는지 검증. 계약: FAIL=0 (매직넘버 금지 — 개수는 테스트가 센다).
 #
-# 두 불변식을 단언한다. 어느 쪽도 개수를 박지 않고 두 집합의 일치를 본다.
+# 아래 불변식을 단언한다. 개수를 박지 않고 두 집합의 일치를 본다.
 #   집계 태깅   — aggregating-lenses가 source 값으로 적은 렌즈 == 같은 디렉터리 집합
-# 두 번째의 권위 있는 출처는 호출자 스킬이고 산문의 열거는 그 캐시다(SSOT).
+# 권위 있는 출처는 디렉터리이고 산문의 열거는 그 캐시다.
 #
 # 인지한 대가: 앵커가 산문 문구라 표현을 고치면 내용이 멀쩡해도 실패한다. 조용히 통과하는 것보다
-# 낫다고 보아 그대로 둔다(FAIL-LOUD). 실패하면 앵커를 새 문구로 맞추면 된다.
+# 낫다고 보아 그대로 둔다. 실패하면 앵커를 새 문구로 맞추면 된다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 # 픽스처는 모두 이 뿌리 아래에 만들고 끝나면 통째로 지운다. mktemp 가 TMPDIR 을 따르므로 아래의
@@ -33,7 +33,7 @@ AGG_LINE="$(grep -F '"lens": "lens-' "$AGG" | head -1 || true)"
 AGGSET="$(printf '%s' "$AGG_LINE" | sed 's/.*"lens"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | tr '|' '\n' | sed 's/^ *//; s/ *$//; s/^lens-//' | grep -v '^$' | sort || true)"
 
 # 캐시 4 — aggregating-lenses가 「공통 계약의 예외」로 적은 렌즈 이름 열거. 손으로 목록을 베끼지
-# 않고 에이전트원칙 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
+# 않고 aggregating-lenses 의 그 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
 # 예외 없이 다섯 렌즈 전부에게 강도 그대로의 대조를 요구한다.
 EXC_LENSES="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u || true)"
 is_exc() { printf '%s\n' "$EXC_LENSES" | grep -qxF "$1"; }
@@ -62,14 +62,14 @@ check "계약이 빈손을 정상으로 적는다"           "grep -qF '빈 배�
 check "계약에 등급 라벨이 없다"                 "! grep -qF 'severity' \"\$AGG\""
 check "spec 리뷰에 결정 단계가 없음을 적는다"   "grep -qF 'spec 리뷰에서는 결정 단계가 없다' \"\$AGG\""
 
-check "에이전트원칙에서 공통 계약 예외 렌즈를 뽑았다" "[ -n \"\$EXC_LENSES\" ]"
+check "aggregating-lenses 에서 공통 계약 예외 렌즈를 뽑았다" "[ -n \"\$EXC_LENSES\" ]"
 
 echo "[렌즈 계약 — 등급 없음, 근거 필수]"
 for d in "$HERE"/skills/lens-*/; do
   n="$(basename "$d")"; f="$d/SKILL.md"
   check "$n 에 등급 라벨이 없다"          "! grep -qF 'severity' \"$f\""
   if is_exc "$n"; then
-    # 예외 렌즈가 계약에서 빼는 칸은 에이전트원칙 예외 항목이 "빠지는 칸: `x`·`y`" 로 적는다. 목록을 여기
+    # 예외 렌즈가 계약에서 빼는 칸은 aggregating-lenses 의 예외 항목이 "빠지는 칸: `x`·`y`" 로 적는다. 목록을 여기
     # 손으로 베끼지 않고 거기서 뽑아 그 렌즈의 출력 스키마 줄에 없는지 본다. 예외마다 빠지는 칸이
     # 다르므로 "consequence 가 없다" 하나로 뭉뚱그리면 그 칸을 담는 예외에서 거짓이 된다.
     EXC_BULLET="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -F "\`$n\`" | grep -oE '빠지는 칸: .*$' || true)"
@@ -155,7 +155,7 @@ check "스킬이 지시 문장을 다시 적지 않는다"  "[ -z \"\$KO_DUP\" ]
 check "에이전트원칙이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
 
 # 한국어 절 밖의 조항도 같은 방식으로 붙든다. 에이전트원칙이 지시를 소유하고 참고서가 같은 ID 로
-# 근거를 단다. 2026-09-22 에 Karpathy 절을 흡수하고 ID 없던 네 절을 분해하면서 조항이 스물넷
+# 근거를 단다. 2026-09-22 에 카파시 절을 흡수하고 ID 없던 네 절을 분해하면서 조항이 스물넷
 # 늘었는데, 그것을 잇는 장치가 한국어 절에만 있어 나머지는 근거 없이 늘어날 수 있었다.
 # ID 목록은 에이전트원칙에서 뽑되 한국어 절의 것만 뺀다. 절을 추가하거나 이름을 바꿔도 따라온다.
 DC_WK="$HERE/skills/lens-fit/domain-discipline.md"
@@ -270,13 +270,13 @@ check "런타임에 다시 리뷰 반복이 없다"        "grep -qF '다시 리
 # --- 렌즈 스키마 사본이 공통 계약과 어긋나지 않는다 ---
 # 여섯 렌즈의 「출력 스키마」 블록은 공통 계약을 그 렌즈의 값으로 채워 보인 사본이다. 사본이므로
 # 손으로 맞추면 갈라진다 — 실제로 `evidence`의 뜻풀이에서 근거 형태 둘이 사라진 채 오래 남았다.
-# 그래서 앵커를 테스트에 박지 않고 에이전트원칙에서 뽑아 온다. 에이전트원칙 문안이 바뀌면 이 검사가 함께 따라간다.
+# 그래서 앵커를 테스트에 박지 않고 aggregating-lenses 에서 뽑아 온다. 그 문안이 바뀌면 이 검사가 함께 따라간다.
 MA="$HERE/skills/aggregating-lenses/SKILL.md"
 CONTRACT_EV="$(grep -o '"evidence": "[^"]*"' "$MA" | head -1 | sed 's/^"evidence": "//; s/"$//')"
 CONTRACT_CONSEQ="$(grep -o '"consequence": "[^"]*"' "$MA" | head -1 | sed 's/^"consequence": "//; s/"$//')"
 echo "[렌즈 스키마 사본]"
-check "에이전트원칙에서 evidence 뜻풀이를 뽑았다"   "[ -n \"\$CONTRACT_EV\" ]"
-check "에이전트원칙에서 consequence 뜻풀이를 뽑았다" "[ -n \"\$CONTRACT_CONSEQ\" ]"
+check "aggregating-lenses 에서 evidence 뜻풀이를 뽑았다"   "[ -n \"\$CONTRACT_EV\" ]"
+check "aggregating-lenses 에서 consequence 뜻풀이를 뽑았다" "[ -n \"\$CONTRACT_CONSEQ\" ]"
 for L in "$HERE"/skills/lens-*/SKILL.md; do
   n="$(basename "$(dirname "$L")")"
   if is_exc "$n"; then
@@ -298,10 +298,10 @@ for L in "$HERE"/skills/lens-*/SKILL.md; do
   # 조건부 필드를 렌즈가 다시 규정하면 필수 여부가 두 곳에서 갈린다 — 가리키기만 해야 한다.
   check "$n: principles_applied 규칙을 되풀이하지 않는다" "! grep -qF '제품 런타임 구현에는 요구하지 않는다' '$L'"
 done
-# 렌즈가 계약에 없는 칸을 더할 수 있고, 그 목록은 SSOT 의 「렌즈가 추가하는 칸」 절이 소유한다.
+# 렌즈가 계약에 없는 칸을 더할 수 있고, 그 목록은 aggregating-lenses 의 「렌즈가 추가하는 칸」 절이 소유한다.
 # 목록을 여기 손으로 적지 않고 그 절에서 뽑아, 렌즈가 쓰는 덧붙임 칸이 다 올라 있는지 본다.
 EXTRA_LISTED="$(awk '/^## 렌즈가 추가하는 칸/{f=1;next} f&&/^## /{exit} f' "$MA" | grep -oE '`[a-z_]+`' | tr -d '`' | sort -u)"
-check "SSOT 에서 덧붙이는 칸 목록을 뽑았다" "[ -n \"\$EXTRA_LISTED\" ]"
+check "aggregating-lenses 에서 덧붙이는 칸 목록을 뽑았다" "[ -n \"\$EXTRA_LISTED\" ]"
 # 뽑아 놓고 대조를 안 하면 목록이 낡아도 초록이다. 실제로 그랬고 lens-fit 의 doc_type 이 빠져
 # 있었다. 렌즈 파일이 자기 덧붙임 칸이라 밝힌 이름을 뽑아 위 목록에 다 있는지 본다.
 EXTRA_BAD=""
@@ -315,16 +315,16 @@ for xf in "$HERE"/skills/lens-*/SKILL.md; do
 $(LC_ALL=C.UTF-8 grep -oE '`[a-z_]+`[^`]{0,14}이 렌즈가 추가하는 칸' "$xf" | grep -oE '^`[a-z_]+`' | tr -d '`' | sort -u)
 INNER
 done
-[ -n "$EXTRA_BAD" ] && printf '    SSOT 목록에 안 오른 덧붙임 칸:%s
+[ -n "$EXTRA_BAD" ] && printf '    aggregating-lenses 목록에 안 오른 덧붙임 칸:%s
 ' "$EXTRA_BAD"
-check "렌즈가 추가하는 칸이 모두 SSOT 목록에 있다" "[ -z \"\$EXTRA_BAD\" ]"
-check "에이전트원칙이 principles_applied 규칙을 소유한다" "grep -qF '제품 런타임 구현에는 요구하지 않는다' \"\$MA\""
-check "에이전트원칙이 file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' \"\$MA\""
-check "에이전트원칙이 principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' \"\$MA\""
+check "렌즈가 추가하는 칸이 모두 aggregating-lenses 목록에 있다" "[ -z \"\$EXTRA_BAD\" ]"
+check "aggregating-lenses 가 principles_applied 규칙을 소유한다" "grep -qF '제품 런타임 구현에는 요구하지 않는다' \"\$MA\""
+check "aggregating-lenses 가 file 칸을 필수로 적는다"      "grep -qF -- '\"file\":' \"\$MA\""
+check "aggregating-lenses 가 principle 칸을 필수로 적는다" "grep -qF -- '\"principle\":' \"\$MA\""
 
 echo "[렌즈에게 에이전트원칙을 알리는 법 — dispatching-lenses 한 곳만 규율을 적는다]"
 # 전에 여러 문서가 각자 적었다가 하나에서 둘이 빠져 갈라졌다. 소유자를 하나로 두고
-# 나머지는 가리키기만 하게 묶는다. 앵커는 소유자의 절 제목이라 제목을 고치면 실패한다(FAIL-LOUD).
+# 나머지는 가리키기만 하게 묶는다. 앵커는 소유자의 절 제목이라 제목을 고치면 실패한다.
 OWNER_DOC="$HERE/skills/dispatching-lenses/SKILL.md"
 OWNER_ANCHOR='## 렌즈에게 에이전트원칙을 알리는 법'
 # 규율 넷을 알아보는 문구. 소유자에만 있어야 한다.
@@ -349,7 +349,7 @@ echo "[소유 표] 소유는 하나뿐이고 나머지는 가리킨다"
 # 「이 <무엇>은 여기가 소유한다」 한 꼴이고, 그 문장이 놓인 절 제목이 소유 표의 키다. 다른 절을
 # 가리키는 문장은 이 꼴을 쓰지 않으므로 포인터가 소유자로 잡히지 않는다.
 # 전에는 「렌즈에게 에이전트원칙을 알리는 법」 하나에만 이 검사가 걸렸고 가리킬 문서 셋도 손으로 적혀
-# 있었다. 넷째 문서가 복제하면 검사가 지나쳤다. 이제 소유자도 대상도 도출한다(SSOT).
+# 있었다. 넷째 문서가 복제하면 검사가 지나쳤다. 이제 소유자도 대상도 도출한다.
 # 감사 대상 목록은 아래 세 구획(소유 표·첫 문장·대구 한도)이 함께 쓴다. 한 번만 뽑는다.
 AUDIT_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
 OWN_DOCS="$AUDIT_DOCS"
@@ -388,7 +388,7 @@ OWN_BAD="$( [ -n "$OWN_TSV" ] || exit 0; cd "$HERE" && printf '%s\n' "$OWN_TSV" 
   }
   END { for (i = 1; i <= n; i++) printf "%s", B[i] }' - $OWN_DOCS )"
 # 소유자로 불리는데 스스로 선언하지 않은 절을 잡는다. 그런 절은 소유 표에 안 올라 위 단언 둘이
-# 아예 안 본다 — 조용히 빠지는 것을 막는다(FAIL-LOUD). 제목이 괄호를 달고 갈리므로 참조가 제목의
+# 아예 안 본다 — 조용히 빠지는 것을 막는다. 제목이 괄호를 달고 갈리므로 참조가 제목의
 # 앞부분과 맞으면 같은 절로 본다.
 OWN_TITLES="$(printf '%s' "$OWN_TSV" | cut -f1)"
 OWN_UNDECL=""
@@ -408,12 +408,12 @@ echo "[첫 문장] 소제목 아래 첫 줄이 산문이다"
 # 빈 줄을 건너뛴 첫 줄이 불릿·표·코드블록·인용·번호목록이면 결론 문장이 아니다. 그 줄이 산문인데
 # 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
 # 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
-# 따라온다(SSOT). 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
+# 따라온다. 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
 # 한글이 없는 제목은 건너뛴다. READ-FLOW 는 「한국어로 쓸 때」의 규칙이라 영어 절에는 안 걸린다.
 HF_WK="$HERE/skills/lens-readability/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
-check "첫 문장 예외를 에이전트원칙에서 뽑았다" "[ -n \"\$HF_EXC\" ]"
+check "첫 문장 예외를 domain-korean 에서 뽑았다" "[ -n \"\$HF_EXC\" ]"
 HF_DOCS="$AUDIT_DOCS"
 check "검사 대상 문서를 모았다(첫 문장)" "[ -n \"\$HF_DOCS\" ]"
 HF_BAD=""
@@ -438,7 +438,7 @@ check "소제목 아래 첫 줄이 모두 산문이다" "[ -z \"\$HF_BAD\" ]"
 echo "[문서 타입 표] 강제하는 장치 칸이 실물을 가리킨다"
 # 표가 장치를 이름으로만 적으면 실물이 없어도 그 행은 갖춰진 것처럼 읽힌다. 칸을 표가 사는 곳에서
 # 뽑아 백틱 경로면 그 파일이 있는지 보고, 「없다」로 열리면 뒤에 이유가 붙었는지 본다. 둘 다 아니면
-# 실패한다 — 이름만 적고 넘어가는 길을 막는다(FAIL-LOUD). 행을 하나 더해도 저절로 따라온다.
+# 실패한다 — 이름만 적고 넘어가는 길을 막는다. 행을 하나 더해도 저절로 따라온다.
 TYPE_CELLS="$(awk '/^## 문서 타입마다 무엇이 강제하나/{f=1;next} f&&/^## /{exit} f&&/^\| \*\*/{n=split($0,a,"|"); print a[n-1]}' "$TYPE_TBL")"
 check "문서 타입 표에서 장치 칸을 뽑았다" "[ -n \"\$TYPE_CELLS\" ]"
 TYPE_BAD=""
@@ -470,7 +470,7 @@ check "옛 spec 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OL
 check "옛 plan 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDPLAN\""
 
 # 제거된 기능의 설계 문서에도 표시를 요구한다. 목록을 손으로 적지 않고 스캐폴드의 정리 대상
-# (SCAFFOLD_STALE)에서 도출한다 — 그 목록이 "이 레포가 뜯어낸 기능"의 에이전트원칙이라, 기능을 하나 더
+# (SCAFFOLD_STALE)에서 도출한다 — 그 목록이 "이 레포가 뜯어낸 기능"의 원본이라, 기능을 하나 더
 # 걷어내면 그 설계 문서에 표시가 없다는 것이 여기서 실패한다. 표시가 없으면 그 문서는 지금도
 # 실행할 계획으로 읽히고, plan 은 첫머리에서 스스로 태스크 단위 실행을 지시한다.
 STALE_NAMES="$(sed -n 's/^SCAFFOLD_STALE="\(.*\)"$/\1/p' "$HERE/scripts/_scaffold_common.sh" | head -1)"
@@ -500,11 +500,11 @@ done
 check "대응표를 하나 이상 훑었다"           "[ '$RWN' -gt 0 ]"
 
 # --- 프로젝트 파일에 손대는 예외: README 한 곳만 조건을 적는다 ---
-# 전에는 README가 스스로 에이전트원칙이라고 선언해 놓고 스캐폴드 둘이 조건을 각각 다시
+# 전에는 README가 스스로 원본이라고 선언해 놓고 스캐폴드 둘이 조건을 각각 다시
 # 적었다. 예외가 늘거나 조건이 바뀌면 사람이 네 곳을 손으로 맞춰야 하고, 그러면 반드시 갈라진다.
 # 가리키는 절 이름도 함께 확인한다 — 전에 README 절 이름이 바뀌었는데 가리키는 쪽만 옛 이름으로 남았다.
 echo "[프로젝트 파일 예외 — README 한 곳만 조건을 적는다]"
-# 문서를 한 줄로 펴서 본다 — 전에는 에이전트원칙에서 줄이 바뀌자 같은 문장인데도 검사가 실패했다.
+# 문서를 한 줄로 펴서 본다 — 전에는 원본 문서에서 줄이 바뀌자 같은 문장인데도 검사가 실패했다.
 flat() { tr '
 ' ' ' < "$1" | tr -s ' '; }
 OWN_MARKS=('그 블록을 만든 기능이 없어졌으면')
@@ -520,7 +520,7 @@ done
 EXC_SEC="$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$HERE/scripts/scaffold.sh" | sed 's/^「//; s/」$//' | grep -F '프로젝트 폴더' | head -1 || true)"
 check "스캐폴드가 README 절을 가리킨다" "[ -n \"\$EXC_SEC\" ]"
 check "그 절이 README에 실재한다"            "[ -n \"\$EXC_SEC\" ] && grep -qF \"## \$EXC_SEC\" \"\$README\""
-# 에이전트원칙은 이제 조건을 되풀이하지 않고 README를 가리키기만 한다. 가리키는 문장이 살아 있는지 본다.
+# CLAUDE.md는 이제 조건을 되풀이하지 않고 README를 가리키기만 한다. 가리키는 문장이 살아 있는지 본다.
 check "CLAUDE.md가 README를 가리킨다"          "grep -qF -- 'README를 참고한다' \"$HERE/CLAUDE.md\""
 
 for D in "$HERE/scripts/scaffold.sh"; do
@@ -538,11 +538,11 @@ done
 echo "[설치 확인 명령 — 사용자 셸에서 그대로 돈다]"
 check "README가 훅 전용 변수를 안 쓴다"   "! grep -qF -- 'CLAUDE_PLUGIN_ROOT' \"\$README\""
 # 전에는 이 자리를 grep 'disciplined-coder' 한 줄로 재다가, README 첫 줄 제목에서 이미 걸려
-# 확인 명령을 통째로 지워도 초록인 검사가 됐다. 그래서 후보 이름을 에이전트원칙에서 도출해 대조한다 —
+# 확인 명령을 통째로 지워도 초록인 검사가 됐다. 그래서 후보 이름을 _resolve_home.sh 에서 도출해 대조한다 —
 # resolve_home이 보는 환경변수(테스트 전용 *_HOME_DIR 제외)가 README 명령에도 다 있어야 한다.
 HOMESH="$HERE/scripts/_resolve_home.sh"
 HOME_CANDS="$(grep -oE '\$\{(CLAUDE_CONFIG_DIR|USERPROFILE|HOME):-\}' "$HOMESH" | sed 's/^\${//; s/:-}$//' | sort -u)"
-check "에이전트원칙에서 홈 후보 이름을 뽑아냈다" "[ -n \"\$HOME_CANDS\" ]"
+check "_resolve_home.sh 에서 홈 후보 이름을 뽑아냈다" "[ -n \"\$HOME_CANDS\" ]"
 while IFS= read -r v; do
   [ -n "$v" ] || continue
   check "README 확인 명령이 후보를 훑는다: $v" "grep -qE -- '[\$][{]?$v' \"\$README\""
@@ -640,7 +640,7 @@ check "개수를 적은 자리마다 이름이 함께 있다" "[ -z \"\$NUMHIT\"
 [ -n "$NUMHIT" ] && printf '    이름 없이 개수만 박힌 자리:\n%s\n' "$NUMHIT"
 
 # --- 테스트 실행 명령: 앞 스크립트의 실패를 삼키지 않는다 ---
-# CLAUDE.md가 실행 명령의 에이전트원칙이다. 그 줄이 지워지거나 `for t in ...; do bash "$t"; done` 으로
+# CLAUDE.md가 실행 명령의 원본이다. 그 줄이 지워지거나 `for t in ...; do bash "$t"; done` 으로
 # 되돌아가면 마지막 하나의 종료 코드만 남아 앞선 FAIL이 묻히고, 감사는 잘못된 FAIL=0을 보고한다.
 echo "[테스트 실행 명령 — 앞 스크립트의 실패가 안 묻힌다]"
 CMD="$HERE/CLAUDE.md"
@@ -666,8 +666,8 @@ printf '#!/usr/bin/env bash\necho "  PASS: ok"\n' > "$FXG/scripts/test_zzz_ok.sh
 FXGOUT="$(cd "$FXG" && bash -c "$RUNCMD" 2>&1 || true)"
 check "전부 통과하면 ALL PASS라고 한다"       "printf '%s' \"\$FXGOUT\" | grep -qF 'ALL PASS'"
 check "모은 결과를 마지막에 알린다"           "grep -qF -- 'FAILED:' \"\$CMD\""
-# CI도 같은 명령을 돈다. CLAUDE.md와 달리 CI는 에이전트원칙을 읽을 수 없어 형태를 다시 적을 수밖에 없으니,
-# 적어도 그 형태가 에이전트원칙과 같은 실패 처리를 하는지 붙든다. `set -e`에 맨 `bash "$t"`면 첫 실패에서
+# CI도 같은 명령을 돈다. CLAUDE.md와 달리 CI는 CLAUDE.md를 읽을 수 없어 형태를 다시 적을 수밖에 없으니,
+# 적어도 그 형태가 CLAUDE.md의 명령과 같은 실패 처리를 하는지 붙든다. `set -e`에 맨 `bash "$t"`면 첫 실패에서
 # 멈춰 뒤 스크립트가 아예 안 돌고, 무엇이 더 깨졌는지 한 회차로는 알 수 없다.
 CI="$HERE/.github/workflows/ci.yml"
 check "CI가 계약 테스트를 돈다"               "grep -qF -- 'for t in scripts/test_*.sh' \"\$CI\""
@@ -757,8 +757,8 @@ check "화이트리스트가 그 목록에서 도출된다"          "grep -qF '
 
 # --- 마켓플레이스 문안이 매니페스트에서 갈라지지 않는다 ---
 # 마켓플레이스 카드는 설치 전 사용자가 보는 첫 문안인데, 걷어낸 solved-log 스캐폴딩을 한동안 계속
-# 광고했다. 같은 사실을 두 파일이 각자 적으면 반드시 갈라지므로, 플러그인 매니페스트를 에이전트원칙으로
-# 두고 마켓플레이스 항목이 그것과 글자 그대로 같은지 확인한다(`SSOT`).
+# 광고했다. 같은 사실을 두 파일이 각자 적으면 반드시 갈라지므로, 플러그인 매니페스트를 원본으로
+# 두고 마켓플레이스 항목이 그것과 글자 그대로 같은지 확인한다.
 # 두 파일을 JSON으로 파싱해 읽는다 — 쉼표 하나가 어긋나 있으면 여기서 실패한다.
 echo "[매니페스트] 마켓플레이스 항목이 플러그인 매니페스트와 같은 문안을 쓴다"
 JSONPROG='
@@ -776,7 +776,7 @@ check "두 문안이 같다"                         "[ '$MKCMP' = 'SAME' ]"
 
 # --- README가 잠금 상수를 베껴 적지 않는다 ---
 # 전에는 대기 시간 두 값을 README가 숫자로 적어, 상수가 바뀌면 알려 주는 것 없이 틀린 값이 됐다.
-# 값을 적지 말고 상수가 사는 자리를 가리키게 한다(`SSOT`).
+# 값을 적지 말고 상수가 사는 자리를 가리키게 한다.
 echo "[README] 잠금 시간을 값으로 적지 않고 상수 자리를 가리킨다"
 check "README가 잠금 시간을 베끼지 않는다" "! grep -qE '잠금(은|이)? *[0-9]+초' '$HERE/README.md'"
 check "README가 상수 자리를 가리킨다"      "grep -qF '_managed_block.sh' '$HERE/README.md'"
@@ -824,7 +824,7 @@ BANSRC="$HERE/korean-banned-words.md"
 # 대체어 칸에 백틱이 생겨도 금지어로 새지 않게 한다.
 # 표를 읽는 것은 hooks/_banned_words.sh 하나다. 전에는 여기가 자기 awk 로 또 읽었는데, 원본이
 # schema 2 로 제외 칸을 더하자 훅과 검사가 서로 다른 것을 보게 됐다. 같은 파서를 쓰면 표의 모양이
-# 바뀌어도 한쪽만 따라가는 일이 없다(`SSOT`).
+# 바뀌어도 한쪽만 따라가는 일이 없다.
 # 표를 파싱해 이 저장소 문서를 검사하던 준비 코드는 2026-09-22 에 걷었다. 사유는 아래 절에 적는다.
 echo "[금지 표현] 목록은 생성물이다"
 # 내용이 원본과 같은지는 네트워크가 필요해 여기서 못 본다. .github/workflows/banned-words-sync.yml

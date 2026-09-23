@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # PreToolUse(Write|Edit): 새 문서(.md, spec/plan 제외) 생성 감지 → 에이전트원칙의 타입·수명 판단 제안(비블로킹).
-# 경로는 _hook_input.sh 의 hook_file_paths 가 추출(다중 경로 순회). 순수 bash.
+# 경로는 _hook_input.sh 의 hook_file_paths 가 추출(다중 경로 순회). jq 비의존.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
 . "$DIR/_hook_input.sh"    # 훅 입력 읽기(hook_file_paths·slash_norm) 공유
-. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_is_review_record·path_in_project) 공유(SSOT)
-. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
+. "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_is_review_record·path_in_project) 공유
+. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유
 INPUT="$(cat)"
 hook_file_paths
 match=""
@@ -29,7 +29,7 @@ done <<EOF
 $FILE_PATHS
 EOF
 [ -n "$match" ] || exit 0
-msg="📝 새 문서 작성 — 쓰기 전에 원칙 에이전트원칙의 「문서를 쓰고 관리할 때」 절로 이 문서의 타입과 수명을 가리고, 결론을 앞에 두고 내용을 배치하라. 에이전트원칙은 @import 로 이미 실려 있다. README 라면 disciplined-coder domain-readme 를 함께 열어라."
+msg="📝 새 문서 작성 — 쓰기 전에 에이전트원칙의 「문서를 쓰고 관리할 때」 절로 이 문서의 타입과 수명을 가리고, 결론을 앞에 두고 내용을 배치하라. 에이전트원칙은 @import 로 이미 실려 있다. README 라면 disciplined-coder domain-readme 를 함께 열어라."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

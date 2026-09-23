@@ -5,7 +5,7 @@
 #
 # 무엇을 산출물로 보는가. `.md` 가운데 아래 셋에 안 드는 것 전부다. 사람이 요구해서 만드는 보고서,
 # 제안서, 인수인계, 다른 프로젝트의 README 가 여기 든다.
-#   (1) 이 플러그인 저장소 자신의 문서 — 조상 폴더에 에이전트원칙이 있으면 뺀다. 2026-09-22 에
+#   (1) 이 플러그인 저장소 자신의 문서 — 조상 폴더에 agent-principles.md 가 있으면 뺀다. 2026-09-22 에
 #       사용자가 이 제외를 영구로 정했고 위반이 있었다는 통지도 남기지 않기로 했다. 그 문서의 금지어를 그냥
 #       두기로 사용자가 정했고, 표와 근거를 적는 문서는 그 말을 이름으로 불러야 한다.
 #   (2) Claude 메모리 — 경로에 `/.claude/projects/` 가 있으면 뺀다. 나에게 남기는 쪽지이지
@@ -16,14 +16,15 @@
 # 코드 블록과 백틱 안은 검사하지 않는다. 파일 내용과 식별자를 인용한 것까지 잡으면 거짓 거부가
 # 되어 훅을 끄게 만든다. 금지어를 문서에 적어야 할 때는 백틱으로 감싸면 지나간다.
 #
-# 스위치는 답변 되돌림과 같은 DISCIPLINED_CODER_REPLY_CHECK 다. 같은 규칙이라 따로 두지 않는다.
+# 스위치는 DISCIPLINED_CODER_REPLY_CHECK 다. 답을 검사하던 훅이 걷힌 뒤에도 사용자 설정과 이어져
+# 있어 이름을 그대로 둔다.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
 HOOKDIR="${BASH_SOURCE[0]%/*}"; [ "$HOOKDIR" != "${BASH_SOURCE[0]}" ] || HOOKDIR=.
 . "$HOOKDIR/_hook_input.sh"     # 훅 입력 읽기(hook_file_paths) 공유
-. "$HOOKDIR/_spec_marker.sh"    # 경로 술어(path_is_banned_target) 공유(SSOT)
-. "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프(SSOT) 공유
-. "$HOOKDIR/_banned_words.sh"   # 금지 표현 표 파싱(SSOT) 공유
+. "$HOOKDIR/_spec_marker.sh"    # 경로 술어(path_is_banned_target) 공유
+. "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프 공유
+. "$HOOKDIR/_banned_words.sh"   # 금지 표현 표 파싱 공유
 INPUT="$(cat)"
 
 hook_file_paths
@@ -37,7 +38,7 @@ path_is_banned_target "$FILE" || exit 0
 # scripts/gen_banned_words.py 가 그것을 이 파일로 낸다. 에이전트원칙에는 포인터만 남는다.
 BANSRC="$HOOKDIR/../korean-banned-words.md"
 if [ ! -f "$BANSRC" ]; then
-  # 검사 불능은 통과가 아니다. 막지는 않고 알린다 — 여기서 막으면 편집이 통째로 멈춘다(FAIL-LOUD).
+  # 검사 불능은 통과가 아니다. 막지는 않고 알린다 — 여기서 막으면 편집이 통째로 멈춘다.
   printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: 금지 표현 목록을 찾지 못해 산출물을 검사하지 못했다 — $BANSRC")"
   exit 0
 fi
@@ -63,7 +64,7 @@ esac
 . "$HOOKDIR/../scripts/_json_valid.sh"
 
 # 쓰려는 본문만 꺼내 텍스트 파일로 둔다. 맞추는 것은 _banned_words.sh 의 banned_report 가
-# 맡는다 — Post 훅도 같은 함수를 쓰므로 도구에 따라 판정이 갈리지 않는다(SSOT).
+# 맡는다 — Post 훅도 같은 함수를 쓰므로 도구에 따라 판정이 갈리지 않는다.
 #
 # Edit 의 new_string 은 조각이라 코드 블록 울타리가 조각 밖에 있다. 그래서 지금 파일에 치환을
 # 적용한 결과 문서에서 코드 블록과 백틱을 걷고, 새로 들어간 글자 가운데 산문으로 남은 것만 넘긴다.

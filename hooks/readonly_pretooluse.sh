@@ -6,7 +6,7 @@
 set -euo pipefail
 DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
 . "$DIR/_hook_input.sh"    # 훅 입력 읽기(hook_file_paths·slash_norm) 공유
-. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
+. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유
 INPUT="$(cat)"
 hook_file_paths
 match=""

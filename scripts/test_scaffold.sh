@@ -34,7 +34,7 @@ echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
 check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/agent-principles.md' '$UC'"
 check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
-# 금지 표현 목록은 중립 이름의 공용 블록이 싣는다. 규약 에이전트원칙은 KiwoomAX/korean-banned-words 의
+# 금지 표현 목록은 중립 이름의 공용 블록이 싣는다. 규약 원본은 KiwoomAX/korean-banned-words 의
 # import-protocol.md 다. 여기는 아무것도 없는 PC 라 우리가 블록을 만들고 우리 목록을 가리킨다.
 check "banlist: 공용 블록을 만든다"       "[ \$(grep -cF '# BEGIN korean-banned-words' '$UC') -eq 1 ]"
 check "banlist: 블록이 우리를 가리킨다"   "sed -n '/BEGIN korean-banned-words/,/END korean-banned-words/p' '$UC' | grep -qxF '@disciplined-coder/korean-banned-words.md'"
@@ -79,7 +79,7 @@ SET_A="$HA/.claude/settings.json"; KNOWN_A="$HA/.claude/plugins/known_marketplac
 echo "[marketplace-autoupdate] 자동 갱신을 켠다"
 # 켰다는 사실은 stderr 가 아니라 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않고,
 # 옛 관리블록을 걷어낸 알림(pointer_note)이 이미 쓰는 통로가 stdout 이다. 사용자 설정 파일을 고쳐
-# 놓고 아무도 모르게 두면 안 된다(FAIL-LOUD).
+# 놓고 아무도 모르게 두면 안 된다.
 check "켰다는 알림이 stdout 으로 나간다"  "printf '%s' \"\$OUT_A\" | grep -qF '자동 갱신을 켰'"
 check "알림에 고친 파일 경로가 있다"       "printf '%s' \"\$OUT_A\" | grep -qF 'settings.json'"
 check "우리 항목에 autoUpdate가 켜졌다"   "[ \"\$(json_autoupdate '$SET_A' \"\$MKT\")\" = 'true' ]"
@@ -163,7 +163,7 @@ check "one region after 3 runs"      "[ \$(grep -cF '# BEGIN disciplined-coder' 
 check "blank lines bounded (<=2)"    "[ \$(grep -c '^\$' '$UC5') -le 2 ]"
 
 # --- banlist-shared: 공용 블록 규약의 판정 절차 ---
-# 규약 에이전트원칙은 KiwoomAX/korean-banned-words 의 import-protocol.md 다. 목록을 싣는 플러그인이
+# 규약 원본은 KiwoomAX/korean-banned-words 의 import-protocol.md 다. 목록을 싣는 플러그인이
 # 둘이라 각자 자기 마커 블록에 두면 두 벌이 실리고 결과가 도는 차례에 따라 갈린다. 아래가
 # 판정 절차의 줄기를 하나씩 확인한다. 우리 판은 생성물에서 읽어 쓴다 — 숫자를 박으면 목록이
 # 갱신될 때마다 이 검사가 거짓으로 통과한다.
@@ -330,12 +330,12 @@ check "2nd run: user content preserved"    "grep -qxF 'IMPORTANT user content af
 check "2nd run: pre-region note preserved" "grep -qxF 'note before' '$UC7'"
 check "2nd run: single managed region"     "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC7') -eq 1 ]"
 
-# --- missing-canon: 에이전트원칙 소스 부재 → FAIL-LOUD 경고(stderr) + 계속 진행(exit 0) ---
+# --- missing-canon: 에이전트원칙 소스 부재 → 경고(stderr) + 계속 진행(exit 0) ---
 H8="$(mktemp -d)"; P8="$(mktemp -d)"; ED="$(mktemp -d)"   # ED = 에이전트원칙 없는 빈 plugin root
 set +e
 ERR8="$(CLAUDE_HOME_DIR="$H8/.claude" CLAUDE_PROJECT_DIR="$P8" CLAUDE_PLUGIN_ROOT="$ED" bash "$SCAFFOLD" 2>/dev/null)"; rc8=$?
 set -e
-echo "[missing-canon] missing source → FAIL-LOUD warning, exit 0"
+echo "[missing-canon] missing source → warning, exit 0"
 check "missing source warns to stdout"      "printf '%s' \"\$ERR8\" | grep -qF 'WARNING: source not found'"
 check "missing source still exit 0"         "[ $rc8 -eq 0 ]"
 
@@ -396,7 +396,7 @@ check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rog
 check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
 
 # --- toggles-removed: 토글 둘(issue-mode·ultracode-review)을 없애고 동작을 하나로 고정했다 ---
-# 모르면 안 쓰게 되는 설정이라 없앴다. 처분은 surface로 고정하고, ultracode 검증은 에이전트원칙 원칙만 남겼다.
+# 모르면 안 쓰게 되는 설정이라 없앴다. 처분은 surface로 고정하고, ultracode 검증은 에이전트원칙의 조항만 남겼다.
 # 이미 만들어진 상태 파일은 STALE로 지운다 — 화이트리스트에서 빼기만 하면 매 세션 경고가 남는다.
 H12="$(mktemp -d)"; P12="$(mktemp -d)"; K12="$H12/.claude/disciplined-coder"
 echo "[toggles-removed] 토글 커맨드·스크립트·모드 주입이 모두 사라졌다"
@@ -415,7 +415,7 @@ check "잔존 issue-mode 를 지운다"            "[ ! -f '$K12/issue-mode' ]"
 check "잔존 ultracode-review 를 지운다"      "[ ! -f '$K12/ultracode-review' ]"
 check "잔존 파일에 경고를 남기지 않는다"     "! printf '%s' \"\$ERR12b\" | grep -qF '비관리 파일'"
 
-# --- readme-commands-drift: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (SSOT — 열거는 사용 절 한 곳) ---
+# --- readme-commands-drift: README 커맨드 절 ↔ commands/ 디렉터리 드리프트 가드 (열거는 사용 절 한 곳) ---
 # 파일 전체가 아니라 '### 커맨드' 절만 검사한다 — 커맨드명이 다른 문단에 등장해
 # 목록 누락이 vacuous 통과하는 것을 막는다.
 CMD_SECTION="$(awk '/^## 커맨드/{f=1} f&&/^## /&&!/^## 커맨드/{exit} f' "$HERE/README.md")"
@@ -425,9 +425,9 @@ for c in "$HERE"/commands/*.md; do
   check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
 done
 
-# --- workflow-verification-row: 검증 레이어 표에 워크플로 검증 행 존재(에이전트원칙 계약 가드 — spec 검증 기준) ---
-# 파일 전역 grep이 아니라 트리거 문자열이 있는 '그 행 한 줄'을 뽑아 검사한다 — 호출자 열(lens-*)과
-# 강제 방식 열이 같은 행에 있음을 보장한다(다른 행·다른 파일의 문자열로 vacuous 통과 방지).
+# --- workflow-verification: 「검증」 절이 렌즈와 기록을 요구한다(에이전트원칙 계약 가드) ---
+# 파일 전역 grep이 아니라 「검증」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
+# vacuous 통과하지 않게 한다).
 WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agent-principles.md")"
 echo "[workflow-verification] 검증 절이 렌즈와 기록을 요구한다"
 check "검증 절이 잡힌다"           "[ -n \"\$WF_BLOCK\" ]"
@@ -513,7 +513,7 @@ check "CRLF: sends nothing"           "[ -z \"\$OUT21\" ]"
 PO_BLOCK="$(awk '/^## 병렬 오케스트레이션/{f=1} f&&/^## /&&!/^## 병렬 오케스트레이션/{exit} f' "$HERE/agent-principles.md")"
 echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
 check "병렬 오케스트레이션 heading exists"      "printf '%s' \"\$PO_BLOCK\" | grep -qF '## 병렬 오케스트레이션'"
-check "병렬 오케스트레이션 points to skill (SSOT)" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
+check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
 check "일이 하나뿐이면 낭비라고 적는다"       "printf '%s' \"\$PO_BLOCK\" | grep -qF '일이 하나뿐이면'"
 
 # --- nested-orchestration-skill: nested-orchestration 스킬 존재 + 핵심 절(에이전트원칙 계약 가드) ---
@@ -560,7 +560,7 @@ check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가
 # 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 갖는다. 갈래마다 원칙을 이름으로 다시 부르던 문장 셋은
 # 「원칙」 절이 이미 선언한 것을 부분집합으로 되풀이해 빠진 것이 안 걸린다는 뜻으로 읽혔다.
 # 이름이 범위를 좁게 말하던 절 하나만 「한국어로 쓸 때」로 바꾸고 나머지 여덟은 그대로 둔다.
-echo "[canon-consolidation] the canon owns every principle; only procedures and per-artifact rules stay skills"
+echo "[canon-realign] the canon owns every principle; only procedures and per-artifact rules stay skills"
 # 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
 # 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
 for sec in "원칙" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
@@ -636,7 +636,7 @@ done
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
 # 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 에이전트원칙은 @import로 실리므로 이 한
 # 문장이 있으면 검진이 돈다.
-# 파일 전역 grep이 아니라 '검증 레이어' 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
+# 파일 전역 grep이 아니라 「검증」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
 # 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
 SC_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$CANON")"
 # 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
@@ -658,11 +658,11 @@ check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$
 # --- question-tool: 갈림길은 질문 도구로 묻는다 (상시 로드 규칙) ---
 # 이 규칙이 리뷰 스킬 한 곳에만 있으면 그 스킬을 열지 않은 세션에는 닿지 않는다. 실제로 문서 검진
 # 세션이 다시 돌릴지를 평문으로 물어 선택 대화창이 뜨지 않았다. 묻는 방식은 특정 절차의 성질이 아니라
-# 소통 규칙이므로 상시 로드되는 항목에 두고, 리뷰 스킬은 그것을 가리키기만 한다(SSOT).
+# 소통 규칙이므로 상시 로드되는 항목에 두고, 리뷰 스킬은 그것을 가리키기만 한다.
 SR="$HERE/skills/review-specs/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
-# 묻는 방식은 두 곳이 나눠 갖는다. 선택지로 물으라는 것은 카파시 절이, 선택지 앞에 배경을
+# 묻는 방식은 두 곳이 나눠 갖는다. 선택지로 물으라는 것은 `ASK-OPTIONS` 가, 선택지 앞에 배경을
 # 산문으로 두라는 것은 한국어 절의 `ASK-CONTEXT` 가 정한다. 예전에는 카파시 절이
 # `never in plain prose` 까지 적어 `ASK-CONTEXT` 와 부딪혔고, 그 조각만 걷었다.
 check "canon: 선택지 질문 규칙"             "grep -qF -- '선택지를 붙인 질문으로 묻고' '$CANON'"
@@ -693,7 +693,7 @@ check "refs: none dangling"                "[ -z \"\$STALE\" ]"
 
 # --- reach-claims: 무조건적 도달 단정과 @import 오해 표현이 남지 않았다 ---
 # 정확 문자열 하나만 보면 나머지가 거짓인 채로 초록이 되므로 실측한 표현을 배열로 모두 검사한다.
-# 이 배열이 금지 표현군의 에이전트원칙이다(스펙의 표는 당시 기록일 뿐 대조 대상이 아니다).
+# 이 배열이 금지 표현군의 원본이다(스펙의 표는 당시 기록일 뿐 대조 대상이 아니다).
 # 패턴에 백틱이 들어가므로 반드시 작은따옴표 배열로 두고 grep -qF -- 로 넘긴다.
 REACH_DOCS=("$HERE/README.md")
 REACH_BANNED=(
@@ -732,17 +732,17 @@ for s in review-specs review-docs nested-orchestration; do
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
 done
-# 렌즈 목록은 손으로 적지 않고 디렉터리에서 도출한다 — 렌즈를 더해도 사람이 목록을 맞출 필요가 없다(SSOT).
+# 렌즈 목록은 손으로 적지 않고 디렉터리에서 도출한다 — 렌즈를 더해도 사람이 목록을 맞출 필요가 없다.
 for D in "$HERE"/skills/lens-*/; do
   l="$(basename "$D" | sed 's/^lens-//')"
   F="$D/SKILL.md"
   check "lens-$l: SKILL.md 존재"        "[ -f '$F' ]"
   check "lens-$l: principles_applied"   "grep -qF 'principles_applied' '$F'"
-  # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 에이전트원칙으로 넘긴다. 예전에는 일곱 파일이
-  # 같은 문단을 복제해 지켰는데, 그 사이 에이전트원칙의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
-  # 필수 여부가 두 곳에서 갈렸다. 지금은 에이전트원칙 한 곳만 규정하고 렌즈는 가리키기만 한다(`SSOT`).
+  # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 aggregating-lenses 로 넘긴다. 예전에는 일곱 파일이
+  # 같은 문단을 복제해 지켰는데, 그 사이 aggregating-lenses 의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
+  # 필수 여부가 두 곳에서 갈렸다. 지금은 aggregating-lenses 한 곳만 규정하고 렌즈는 가리키기만 한다.
   PA_POINTER='`aggregating-lenses`의 리뷰 산출물 계약이 정한다'
-  check "lens-$l: 규칙을 에이전트원칙으로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
+  check "lens-$l: 규칙을 aggregating-lenses 로 넘긴다" "grep -qF -- \"\$PA_POINTER\" '$F'"
 done
 check "aggregating-lenses: 집계 대상 아님 명시" "grep -qF '집계 대상이 아니다' '$HERE/skills/aggregating-lenses/SKILL.md'"
 
@@ -930,7 +930,7 @@ check "포인터: 재실행도 사용자 줄 보존"   "grep -qF '이 줄은 사
 
 # (파) 블록을 걷어내기 전에 사본을 뜬다. 걷어내기는 마커 사이를 통째로 버리므로, 사람이 그 안에
 # 끼워 넣은 줄도 함께 사라진다. 이 파일은 git 밖일 수 있어 사본이 유일한 복구 수단이다
-# (오답노트 머리말과 같은 규율 — 에이전트원칙이 소유한다).
+# (규율은 _managed_block.sh 가 소유한다).
 HR12="$(mktemp -d)"; PR12="$(mktemp -d)"
 { printf '# 내 프로젝트 지침\n\n'
   printf '# BEGIN disciplined-coder (managed — do not edit)\n'
@@ -992,9 +992,8 @@ printf 'not-a-dependency
 OUT33="$(run "$H33" "$P33")"
 echo "[deps-notice] 함께 쓰는 플러그인 알림"
 check "없으면 superpowers 를 알린다"       "printf '%s' \"\$OUT30a\" | grep -qF 'superpowers@claude-plugins-official'"
-# 카파시는 목록에서 뺐다. 에이전트원칙이 그 네 절을 이미 담고 있어 함께 깔면 지침이 두 벌이 된다.
-# 낱말 'andrej-karpathy-skills' 의 부재로 재면 안 된다 — 첫 회차 출력에 실리는 에이전트원칙 덤프가 출처
-# 표기로 그 낱말을 갖고 있어 늘 실패한다. 알림에만 나오는 설치 키로 재야 알림의 부재가 잡힌다.
+# 카파시는 목록에서 뺐다. 에이전트원칙의 「원칙」 절이 그 지침을 이미 포함하고 있어 함께 깔면 지침이
+# 두 벌이 된다. 낱말 'andrej-karpathy-skills' 가 아니라 알림에만 나오는 설치 키로 알림의 부재를 본다.
 check "카파시는 더 권하지 않는다"          "! printf '%s' \"\$OUT30a\" | grep -qF 'andrej-karpathy-skills@karpathy-skills'"
 # superpowers 는 공식 마켓플레이스라 추가 명령이 없다. 목록의 '-' 가 실제로 그 줄을 뺐는지 본다.
 check "superpowers 는 마켓플레이스 추가가 없다" "[ \$(printf '%s' \"\$OUT30a\" | grep -cF 'claude plugin marketplace add') -eq 0 ]"

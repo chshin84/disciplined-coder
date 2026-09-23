@@ -76,7 +76,7 @@ check "passed 마커 후 → 통과"            "[ -z \"\$(stop '{\"cwd\":\"$G\"
 printf 'draft\n<!-- spec-review: escalated lenses=3 date=2026-06-14 -->\n' > "$G/docs/superpowers/specs/new.md"
 check "escalated 마커 후 → 통과"         "[ -z \"\$(stop '{\"cwd\":\"$G\"}')\" ]"
 # 파일명 파싱 강건성: git porcelain이 따옴표로 감싸거나(공백·비ASCII) 리네임 화살표로 합치면
-# 게이트가 조용히 우회되면 안 된다(FAIL-LOUD). new.md 는 위에서 escalated(리뷰됨)이므로 차단 안 됨.
+# 게이트가 조용히 우회되면 안 된다. new.md 는 위에서 escalated(리뷰됨)이므로 차단 안 됨.
 printf 'draft\n' > "$G/docs/superpowers/specs/my spec.md"
 check "공백 파일명 미리뷰 spec → block"  "stop '{\"cwd\":\"$G\"}' | grep -q '\"block\"'"
 rm "$G/docs/superpowers/specs/my spec.md"
@@ -135,7 +135,7 @@ check "상대경로(현재 폴더 기준) 읽기 전용 → deny" "( cd '$RO' &&
 check "게이트 OFF 여도 거부한다"               "DISCIPLINED_CODER_REVIEW_GATE=off rpre '$(J "$RO/sealed.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
 check "README 가 이 훅을 적는다"               "grep -qF '읽기 전용 차단' '$HERE/README.md'"
 
-echo "[rules-nudge-pre — 세션의 첫 파일 편집 전에 에이전트원칙의 절대경로와 domain-korean 을 한 번 알린다]"
+echo "[rules-nudge-pre — 세션의 첫 도구 호출에 에이전트원칙의 절대경로와 domain-korean 을 한 번 알린다]"
 # 표시 파일은 TMPDIR 아래에 남으므로 픽스처 폴더로 돌린다 — 안 그러면 스위트를 두 번째 돌릴 때 앞 실행의
 # 표시 파일이 남아 "첫 편집" 검사가 조용히 깨진다. 두 번 돌려도 결과가 같아야 한다.
 # 코드와 문서를 가르지 않는다. 셸 명령의 대상은 실행해 봐야 정해져 편집 전에 가를 방법이 없기 때문이다.
@@ -164,7 +164,7 @@ cnudh() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$2" bash "$CNUD"; 
 # 디렉터리로 복사되고 상세는 설치본 root 에만 있다. 뽑을 때 뒤 문장의 '에 있다' 까지 삼키지 않도록
 # 각각 뒤따르는 말로 끊는다. 둘 다 실재해야 한다 — 없는 파일을 열라고 시키지 않는다.
 NUDGE_OUT="$(cnudh "$(JS s8 "" "$T/src/main.py")" "$NH")"
-NUDGE_CANON="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*규칙 에이전트원칙의 사본은 \(.*\) 에 있다\. 한국어.*/\1/p')"
+NUDGE_CANON="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*에이전트원칙의 사본은 \(.*\) 에 있다\. 한국어.*/\1/p')"
 NUDGE_WK="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*한국어 문장 규칙의 상세는 \(.*\) 에 있다\..*/\1/p')"
 check "넛지에서 에이전트원칙 경로가 뽑힌다"                 "[ -n \"\$NUDGE_CANON\" ]"
 check "뽑은 경로에 파일이 실재한다"                 "[ -f \"\$NUDGE_CANON\" ]"
@@ -202,7 +202,7 @@ check "새 오답노트 색인 → 무출력"        "[ -z \"\$(fpre '$(J "$T/do
 check "새 오답노트 본문 → 무출력"        "[ -z \"\$(fpre '$(J "$T/docs/solved_problems/new-lesson.md")')\" ]"
 check "새 문서 넛지가 domain-readme 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'domain-readme'"
 # 넛지가 가리킨 곳이 실재하는지 본다. 문자열 일치만 보던 시절 에이전트원칙 영문화로 가리키던 절 이름이
-# 바뀌자 넛지가 없는 곳을 가리킨 채 스위트가 초록으로 통과했다(FAIL-LOUD). 타입과 수명이 스킬에서
+# 바뀌자 넛지가 없는 곳을 가리킨 채 스위트가 초록으로 통과했다. 타입과 수명이 스킬에서
 # 에이전트원칙으로 돌아가 가리키는 대상이 스킬에서 절로 바뀌었고, 이 검사도 따라 바뀐다.
 # 부정 대괄호(`[^」]`)를 안 쓴다. 로케일이 UTF-8 이 아니면 sed 가 그것을 바이트로 읽어, 한글의
 # 이어지는 바이트가 」 의 바이트와 겹쳐 매치가 엉뚱한 데서 끊긴다. 메시지에 「…」 절 이 하나뿐이라
@@ -307,7 +307,7 @@ done
 echo "[제외 칸 — 어간을 넓히고 다른 뜻으로 쓰는 말을 뺀다]"
 # 원본이 schema 2 에서 다섯째 칸 `제외` 를 더했다. 그 칸을 안 읽으면 어간만 가지고 검색해
 # `판정`·`판단` 까지 잡히고, 산출물을 거의 못 쓰게 된다. 표를 읽는 곳이 하나여야 훅과 검사가
-# 같은 것을 본다(SSOT). 픽스처로 보는 이유는 이 저장소의 목록이 아직 schema 1 이기 때문이다.
+# 같은 것을 본다. 픽스처로 보아 저장소 목록의 내용에 기대지 않는다.
 . "$HERE/hooks/_banned_words.sh"
 BX="$T/banx"; mkdir -p "$BX"
 cat > "$BX/list.md" <<'BANEOF'
@@ -396,7 +396,7 @@ PN="$(mktemp -d)"
 in_claudemd() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s/CLAUDE.md"}}' "$1"; }
 OUT_GONE="$(in_claudemd "$PN" | CLAUDE_PROJECT_DIR="$PN" bash "$DREV" 2>&1)" || true
 check "no add-pointer nudge anymore"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'add-pointer'"
-# 렌즈 이름이 아니라 위임 대상을 단언한다 — 이름을 단언하면 이 테스트가 네 번째 사본이 된다(SSOT).
+# 렌즈 이름이 아니라 위임 대상을 단언한다 — 이름을 단언하면 이 테스트가 네 번째 사본이 된다.
 check "generic nudge fires instead"   "printf '%s' \"\$OUT_GONE\" | grep -qF 'review-docs'"
 check "nudge names no lens directly"  "! printf '%s' \"\$OUT_GONE\" | grep -qF 'lens-'"
 check "hook writes no project file"   "[ ! -f '$PN/docs/solved_problems.md' ]"
@@ -571,18 +571,18 @@ check "replace_all 은 모든 자리를 판정한다"      "dw \"\$(dwe2 '$DWDIR
 check "replace_all 이 아니면 첫 자리만 판정한다" "[ -z \"\$(dw \"\$(dwe2 '$DWDIR/replall.md' 'echo old' 'echo 자리')\")\" ]"
 check "스위치를 끄면 통과한다"               "[ -z \"\$(DISCIPLINED_CODER_REPLY_CHECK=off dw \"\$(dwj '$DWDIR/report.md' '$DWBODY')\")\" ]"
 check "경로가 없으면 통과한다"               "[ -z \"\$(dw '{}')\" ]"
-# 에이전트원칙이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.
-# 막지는 않는다. 여기서 막으면 에이전트원칙을 못 찾는 설치에서 문서 편집이 통째로 멈춘다.
+# 금지 표현 목록(korean-banned-words.md)이 없으면 조용히 통과하지 않고 알린다 — 검사 불능은 통과가 아니다.
+# 막지는 않는다. 여기서 막으면 목록을 못 찾는 설치에서 문서 편집이 통째로 멈춘다.
 FAKE="$T/fake"; mkdir -p "$FAKE/hooks" "$FAKE/scripts"
 cp "$DW" "$HERE/hooks/_json_escape.sh" "$HERE/hooks/_banned_words.sh" "$HERE/hooks/_hook_input.sh" "$HERE/hooks/_spec_marker.sh" "$FAKE/hooks/"
 cp "$HERE/scripts/_json_valid.sh" "$FAKE/scripts/"
 DW_NOCANON="$(printf '%s' "$(dwj "$DWDIR/report.md" "$DWBODY")" | bash "$FAKE/hooks/doc_word_pretooluse.sh")"
-check "에이전트원칙이 없으면 알린다"                 "printf '%s' \"\$DW_NOCANON\" | grep -qF 'systemMessage'"
-check "에이전트원칙이 없을 때 막지는 않는다"         "! printf '%s' \"\$DW_NOCANON\" | grep -qF 'permissionDecision'"
+check "금지 표현 목록이 없으면 알린다"              "printf '%s' \"\$DW_NOCANON\" | grep -qF 'systemMessage'"
+check "금지 표현 목록이 없을 때 막지는 않는다"      "! printf '%s' \"\$DW_NOCANON\" | grep -qF 'permissionDecision'"
 
 echo "[README — 배선된 스크립트를 모두 적는다]"
 # 훅이 일곱인데 안내 문서가 넷만 적고 있었다. 목록을 README 에 손으로 적지 않고 배선 파일 둘에서
-# 도출해 맞댄다. 훅을 더하거나 빼면 여기서 함께 갈린다(SSOT).
+# 도출해 맞댄다. 훅을 더하거나 빼면 여기서 함께 갈린다.
 HOOK_WIRED="$(grep -ohE '[a-z_]+\.sh' "$HERE/hooks/hooks.json" "$HERE/.claude/settings.json" | sort -u)"
 check "배선 파일에서 스크립트 이름을 뽑았다" "[ -n \"\$HOOK_WIRED\" ]"
 HOOK_MISS=""

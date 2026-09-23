@@ -21,7 +21,7 @@ case "$INPUT" in *python3*) ;; *) exit 0 ;; esac
 
 # 거르기를 지난 뒤에야 폴더를 구하고 헬퍼를 싣는다. 소싱도 프로세스를 하나 쓴다.
 DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
-. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
+. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유
 
 # python3 이 무엇으로 풀리는지 낸다. 테스트는 DISCIPLINED_CODER_PYTHON3_STATE 로 결과를 주입해
 # OS 와 PATH 를 안 본다 — 그것이 없으면 CI(ubuntu)와 윈도우 PC 에서 결과가 갈린다.

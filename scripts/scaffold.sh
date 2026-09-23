@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Idempotent. SessionStart마다 실행. 지식을 PC(~/.claude/disciplined-coder)에 두고
 # ~/.claude/CLAUDE.md 관리블록이 @import. 프로젝트 폴더에 파일을 새로 만들지는 않는다 —
-# 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 파일」이 에이전트원칙이다.
+# 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 파일」이 원본이다.
 set -euo pipefail
 
 # 이 스크립트의 폴더. dirname 프로세스를 띄우지 않고 확장으로 구한다. 슬래시 없이 불렸으면 현재 폴더다.
 SDIR="${BASH_SOURCE[0]%/*}"; [ "$SDIR" != "${BASH_SOURCE[0]}" ] || SDIR=.
 PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$SDIR/.." && pwd)}"
 
-# Claude 설정 홈 해석 — 공유 헬퍼(SSOT). 도메인 PC의 네트워크 홈 리다이렉트로 bash $HOME이
+# Claude 설정 홈 해석 — 공유 헬퍼. 도메인 PC의 네트워크 홈 리다이렉트로 bash $HOME이
 # os.homedir(USERPROFILE)과 어긋나면 @import 가 조용히 빠지므로 우선순위 해석을
 # _resolve_home.sh 한 곳에 둔다.
 . "$SDIR/_resolve_home.sh"
@@ -45,7 +45,7 @@ utf8_set_user_var() {
   if [ -n "${DISCIPLINED_CODER_UTF8_STATE:-}" ]; then return 0; fi
   # PowerShell 7(`pwsh`)을 전제로 한다. 윈도우에 늘 있는 5.1(`powershell`)로 물러서지 않는다.
   # 없으면 아래 WARNING 이 뜨고 사용자가 직접 넣는다 — 조용히 5.1 로 내려가면 이 플러그인이
-  # 무엇을 전제로 도는지가 PC 마다 갈린다(FAIL-LOUD).
+  # 무엇을 전제로 도는지가 PC 마다 갈린다.
   pwsh -NoProfile -Command "[Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User')" >/dev/null 2>&1
 }
 
@@ -55,7 +55,7 @@ for f in $SCAFFOLD_FILES; do
   if [ -f "$src" ]; then
     # 복사가 실패하면 조용히 넘어가지 않는다. 이미 옛 사본이 놓여 있는 PC에서는 파일도 있고
     # @import 배선도 남아 있어 README가 알려 준 확인 셋을 그대로 통과하므로, 에이전트원칙만 낡은 채
-    # 아무도 모르게 된다(FAIL-LOUD).
+    # 아무도 모르게 된다.
     if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else
       cp "$src" "$dst" || { echo "[disciplined-coder] ERROR: 에이전트원칙 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)"; exit 1; }
     fi
@@ -64,8 +64,8 @@ for f in $SCAFFOLD_FILES; do
   fi
 done
 
-# 1b) 관리 디렉터리 위생(멱등): 정책 에이전트원칙은 _scaffold_common.sh(SCAFFOLD_WHITELIST·STALE).
-#     비화이트리스트는 사용자 데이터일 수 있어 — 비었으면 제거, 내용 있으면 surface(FAIL-LOUD).
+# 1b) 관리 디렉터리 위생(멱등): 정책 원본은 _scaffold_common.sh(SCAFFOLD_WHITELIST·STALE).
+#     비화이트리스트는 사용자 데이터일 수 있어 — 비었으면 제거, 내용 있으면 surface.
 scaffold_hygiene "$KDIR"
 
 # 3) ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
@@ -99,7 +99,7 @@ if [ -f "$PCLAUDE" ] && ! { [ "$PCLAUDE" = "$UC" ] || [ "$PCLAUDE" -ef "$UC" ]; 
   fi
 fi
 
-# 마커는 _managed_block.sh의 MANAGED_BEGIN/END(SSOT)를 쓴다.
+# 마커는 _managed_block.sh의 MANAGED_BEGIN/END를 쓴다.
 # 스킬(domain-*/lens-*)은 플러그인에서 온디맨드 — 복사/주입 안 함.
 # 첫 설치 판정은 반드시 주입 '전에' 한다 — 주입 후엔 항상 존재해 판정이 무의미해진다.
 # -x(줄 전체 일치)를 쓰지 않는 이유: CRLF 파일에서 줄 끝 CR 때문에 영원히 거짓이 되어
@@ -225,8 +225,8 @@ else
     esac
   fi
 fi
-# 3d) 공용 금지 표현 블록을 쓴다. 고칠 것이 있을 때만 쓴다(위에서 정했다). 관리블록 주입 뒤에
-#     두는 이유는 둘이 같은 파일의 같은 락을 차례로 잡아야 하기 때문이다.
+# 3d) 공용 금지 표현 블록을 쓴다. 고칠 것이 있을 때만 쓴다(위에서 정했다). 아래 관리블록
+#     주입보다 먼저 쓴다. 둘은 같은 파일의 같은 락을 차례로 잡는다.
 if [ -n "$ban_action" ]; then
   ban_rc=0
   printf '%s\n' "$BAN_IMPORT" | managed_block_inject "$UC" "$BAN_BEGIN" "$BAN_END" || ban_rc=$?
@@ -237,7 +237,7 @@ if [ -n "$ban_action" ]; then
 fi
 
 # 잠금을 못 잡으면 배선을 안 쓰고 물러난다. 그 사실을 여기서 알린다 — 에이전트원칙 파일은 깔렸는데
-# @import만 빠지면 세션은 원칙 없이 도는데 파일이 다 있어 아무도 눈치채지 못한다(`FAIL-LOUD`).
+# @import만 빠지면 세션은 원칙 없이 도는데 파일이 다 있어 아무도 눈치채지 못한다.
 inject_rc=0
 # 규약이 요구하는 것 — 자기 마커 블록에 목록 @import 를 두지 않는다. 두면 공용 블록에 한 줄,
 # 여기에 한 줄이 되어 중복이 늘어난다. 이 블록은 매 세션 통째로 다시 쓰이므로 자기 줄을 계속
@@ -258,14 +258,14 @@ if [ "$had_import" -eq 0 ]; then
     # 블록을 안 고친 세션에도 목록이 한 벌 더 실린다.
     if [ "$f" = "korean-banned-words.md" ]; then continue; fi
     # 읽기가 거부돼도 훅 전체를 죽이지 않는다. set -e 아래에서 cat 실패는 스캐폴드를 그 자리에서
-    # 끝내 @import 배선까지 못 하게 만든다. 대신 못 읽었다는 사실을 stderr로 드러낸다(FAIL-LOUD).
+    # 끝내 @import 배선까지 못 하게 만든다. 대신 못 읽었다는 사실을 stderr로 드러낸다.
     if ! cat "$KDIR/$f" 2>/dev/null; then
       echo "[disciplined-coder] WARNING: cannot read $KDIR/$f — 이 세션의 stdout 보강에서 빠진다"
     fi
   done
 fi
 # 무엇을 했는지 알린다. 파일을 고쳤으면 조용히 넘기지 않는다 — 사용자가 열어 둔 레포가 바뀌었을 수
-# 있고, 그 사실은 사본 경로와 함께 눈에 보여야 한다(FAIL-LOUD).
+# 있고, 그 사실은 사본 경로와 함께 눈에 보여야 한다.
 ban_note=""
 if [ -n "$ban_action" ]; then
   ban_note="🔵 disciplined-coder: $UC 의 공용 금지 표현 블록을 고쳤다 — $ban_action."
@@ -293,7 +293,7 @@ _json_python || true
 au_err="$(mktemp)"
 autoupdated="$(ensure_marketplace_autoupdate "$CLAUDE_HOME" "$PLUGIN_ROOT" 2>"$au_err" || true)"
 #     켰다는 사실은 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않는다. 옛 관리블록을
-#     걷어낸 알림과 같은 통로다. 사용자 설정 파일을 고쳐 놓고 아무도 모르게 두지 않는다(FAIL-LOUD).
+#     걷어낸 알림과 같은 통로다. 사용자 설정 파일을 고쳐 놓고 아무도 모르게 두지 않는다.
 if [ -n "$autoupdated" ]; then
   echo "🔵 disciplined-coder: 이 플러그인의 자동 갱신을 켰다(마켓플레이스 항목에 autoUpdate 만 넣었고 다른 설정은 그대로다). 고친 파일과 그 사본(.bak):"
   printf '%s
@@ -320,9 +320,8 @@ ensure_install_current "$CLAUDE_HOME" || true
 #     건너뛸 목록을 이 스크립트에 안 적으므로 그 파일 하나로 정해지고 끈 근거도 거기 남는다.
 #     설치 여부는 Claude Code 의 설치 기록 파일의 키로 본다. 마켓플레이스 이름은 설치 방법에 따라
 #     갈리므로 '이름@' 앞부분만 맞대고, 마켓플레이스 인자가 '-' 면 추가 없이 바로 설치한다.
-#     카파시 플러그인은 이 목록에서 뺐다. 에이전트원칙의 「Karpathy guidelines」 절이 그 네 절을 산출물
-#     기준으로 일반화해 이미 담고 있어, 함께 깔면 비슷하지만 어긋나는 지침이 매 세션 두 벌 실린다.
-#     에이전트원칙이 출처를 적어 두므로 어디서 온 것인지는 거기서 확인한다.
+#     카파시 플러그인은 이 목록에서 뺐다. 에이전트원칙의 「원칙」 절이 그 지침을 산출물 기준으로
+#     일반화해 이미 포함하고 있어, 함께 깔면 비슷하지만 서로 다른 지침이 매 세션 두 벌 실린다.
 DEP_SKIP="$KDIR/plugin-notice.skip"
 DEP_LIST="superpowers|-|superpowers@claude-plugins-official"
 dep_missing=0
@@ -356,10 +355,10 @@ fi
 
 
 # 4e) 핸드오프 잔존 린트: 소비되면 곧바로 지우는 문서가 프로젝트에 남아 있으면 알린다.
-#     에이전트원칙의 문서 타입 표가 이 타입의 강제 장치로 이 린트를 적는다. 세는 규칙은 audit_targets.sh 와
+#     이 저장소 CLAUDE.md 의 「문서 타입마다 무엇이 강제하나」 표가 핸드오프의 강제 장치로 이 린트를 적는다. 세는 규칙은 audit_targets.sh 와
 #     같은 HANDOFF- 접두사다. 유예는 건너뛸 목록을 여기 적지 않고 파일 머리의
 #     `handoff-keep-until: YYYY-MM-DD` 를 읽어 정한다 — 목록을 손으로 안 적으므로 날짜가 지나면
-#     저절로 다시 걸리고, 유예의 근거가 그 파일 안에 남는다(SSOT). 값이 0 이면 아무것도 안 낸다.
+#     저절로 다시 걸리고, 유예의 근거가 그 파일 안에 남는다. 값이 0 이면 아무것도 안 낸다.
 if [ -n "${CLAUDE_PROJECT_DIR:-}" ] && [ -d "${CLAUDE_PROJECT_DIR:-}" ]; then
   ho_today="$(date +%Y-%m-%d)"
   ho_left=""

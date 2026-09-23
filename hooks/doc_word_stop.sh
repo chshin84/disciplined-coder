@@ -11,7 +11,7 @@
 # 그쪽은 Post 겹이 맡는다. 두 겹이 서로의 사각을 덮는 구조이고 어느 하나로는 다 못 막는다.
 #
 # 막지 않는다. 턴이 끝나는 것을 막으면 고치지 못하는 상황에서 빠져나갈 길이 없고, 이 검사는
-# 이미 쓰인 뒤라 막아도 되돌릴 것이 없다. 알리는 것으로 끝낸다(FAIL-LOUD). 막지 않으면 Claude 에게
+# 이미 쓰인 뒤라 막아도 되돌릴 것이 없다. 알리는 것으로 끝낸다. 막지 않으면 Claude 에게
 # 닿는 통로가 없으므로 알림은 사용자에게 하는 말로 쓴다.
 #
 # 대상을 가르는 규칙과 맞추는 규칙은 Pre·Post 훅과 같은 곳에서 온다. 제외 셋(이 저장소 자신의
@@ -20,13 +20,14 @@ set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
 HOOKDIR="${BASH_SOURCE[0]%/*}"; [ "$HOOKDIR" != "${BASH_SOURCE[0]}" ] || HOOKDIR=.
 . "$HOOKDIR/_hook_input.sh"         # 훅 입력 읽기(json_str·slash_norm) 공유
-. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_is_banned_target) 공유(SSOT)
-. "$HOOKDIR/_json_escape.sh"        # JSON 문자열 이스케이프(SSOT) 공유
+. "$HOOKDIR/_spec_marker.sh"        # 경로 술어(path_is_banned_target) 공유
+. "$HOOKDIR/_json_escape.sh"        # JSON 문자열 이스케이프 공유
 . "$HOOKDIR/_stop_preamble.sh"      # 루프가드·cwd·저장소 루트 이동 공유
 INPUT="$(cat)"
 
 BANSRC="$HOOKDIR/../korean-banned-words.md"
-[ -f "$BANSRC" ] || exit 0   # 목록이 없다는 사실은 Pre 훅이 알린다. 여기서 두 번 알리지 않는다.
+[ -f "$BANSRC" ] || exit 0   # 목록이 없다는 사실은 Pre 훅이 Write·Edit 로 .md 를 쓸 때만 알린다.
+#                              셸로만 쓰는 세션에서는 아무도 알리지 않는다(알려진 한계).
 
 stop_enter_repo "바뀐 문서의 금지 표현을 검사하지 못했다"
 
@@ -43,8 +44,8 @@ while IFS= read -r -d '' entry; do
 done < <(git status -z --no-renames --untracked-files=all 2>/dev/null || true)
 [ -n "$FILES" ] || exit 0
 
-. "$HOOKDIR/_banned_words.sh"            # 표 파싱과 본문 맞추기(SSOT) 공유
-. "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기(SSOT)
+. "$HOOKDIR/_banned_words.sh"            # 표 파싱과 본문 맞추기 공유
+. "$HOOKDIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 PAIRS="$WORK/pairs"; TOKS="$WORK/toks"; EXCL="$WORK/excl"

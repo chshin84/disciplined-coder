@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 기록을 봉인한다 — 파일 인자를 읽기 전용(chmod a-w)으로 만들고, 파일 인자가 없으면 --root(기본은 레포 루트)의
-# HEAD 에 있는 docs/superpowers/reviews/ 아래 파일 전부를 그렇게 한다. 여러 번 돌려도 같다(IDEMPOTENT).
+# HEAD 에 있는 docs/superpowers/reviews/ 아래 파일 전부를 그렇게 한다. 여러 번 돌려도 같다.
 # 읽기 전용 속성은 만든 쪽의 의도라 어느 저장소에서든 같은 뜻이고, 훅(hooks/readonly_pretooluse.sh)은
 # 이 속성만 읽는다. git은 이 속성을 옮기지 않으므로 새 클론에서는 SessionStart 훅이 이 스크립트를 다시 돈다.
 set -euo pipefail
