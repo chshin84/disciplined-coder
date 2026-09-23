@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Stop: 이 턴에 바뀐 산출물 문서에 금지 표현이 남았으면 알린다(비블로킹).
+# Stop: 커밋되지 않은 산출물 문서에 금지 표현이 남았으면 사용자에게 알린다(비블로킹).
+# 이 턴에 바뀐 것만 가려 보지 않는다. 커밋 전 문서는 턴마다 다시 알린다.
 #
 # 앞의 두 훅은 도구를 본다. Pre 는 Write·Edit 의 내용을 보고 막고, Post 는 셸 명령에서 뽑은
 # 대상을 본다. 그래서 명령줄에 대상이 안 나타나면 둘 다 못 본다 — 파이썬 스크립트가 내부에서
@@ -10,7 +11,8 @@
 # 그쪽은 Post 겹이 맡는다. 두 겹이 서로의 사각을 덮는 구조이고 어느 하나로는 다 못 막는다.
 #
 # 막지 않는다. 턴이 끝나는 것을 막으면 고치지 못하는 상황에서 빠져나갈 길이 없고, 이 검사는
-# 이미 쓰인 뒤라 막아도 되돌릴 것이 없다. 알리는 것으로 끝낸다(FAIL-LOUD).
+# 이미 쓰인 뒤라 막아도 되돌릴 것이 없다. 알리는 것으로 끝낸다(FAIL-LOUD). 막지 않으면 Claude 에게
+# 닿는 통로가 없으므로 알림은 사용자에게 하는 말로 쓴다.
 #
 # 대상을 가르는 규칙과 맞추는 규칙은 Pre·Post 훅과 같은 곳에서 온다. 제외 셋(이 저장소 자신의
 # 문서, Claude 메모리, docs/superpowers/ 아래)도 같다.
@@ -56,7 +58,7 @@ while IFS= read -r -d '' entry; do
   path_in_own_repo "$f" && continue   # 이 저장소 자신의 문서. 판정은 _spec_marker.sh 가 소유한다.
   FILES="${FILES}${f}
 "
-done < <(git status -z --no-renames 2>/dev/null || true)
+done < <(git status -z --no-renames --untracked-files=all 2>/dev/null || true)
 [ -n "$FILES" ] || exit 0
 
 WORK="$(mktemp -d)"
@@ -79,7 +81,7 @@ $FILES
 EOF
 [ -n "$REPORT" ] || exit 0
 
-MSG="disciplined-coder: 이 턴에 바뀐 산출물 문서에 「금지 표현」 목록의 말이 남아 있다. 아래를 대체어로 고쳐라. 어느 도구가 고쳤는지와 무관하게 git 으로 바뀐 파일을 본 것이라, 앞의 두 훅이 못 본 것도 여기 든다. 코드 블록과 백틱 안은 검사하지 않았다.
+MSG="disciplined-coder: 커밋되지 않은 산출물 문서에 「금지 표현」 목록의 말이 남아 있다. 아래는 파일마다 검출한 말과 그 대체어다. 어느 도구가 고쳤는지와 무관하게 git 이 바뀌었다고 알린 파일을 본 결과이고, 코드 블록과 백틱 안은 검사하지 않았다. 이 알림은 사용자에게만 보이므로 고치려면 Claude 에게 요청한다.
 
 $REPORT"
 printf '{"systemMessage":"%s"}\n' "$(escape_for_json "$MSG")"

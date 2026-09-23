@@ -68,28 +68,67 @@ esac
 
 # 쓰려는 본문만 꺼내 텍스트 파일로 둔다. 맞추는 것은 _banned_words.sh 의 banned_report 가
 # 맡는다 — Post 훅도 같은 함수를 쓰므로 도구에 따라 판정이 갈리지 않는다(SSOT).
-BODY="$WORK/body"
+#
+# Edit 의 new_string 은 조각이라 코드 블록 울타리가 조각 밖에 있다. 그래서 지금 파일에 치환을
+# 적용한 결과 문서에서 코드 블록과 백틱을 걷고, 새로 들어간 글자 가운데 산문으로 남은 것만 넘긴다.
+# 결과 문서 전체를 판정하지 않는 것은 다른 문장에 원래 있던 말 때문에 무관한 편집이 거부되지
+# 않게 하려는 것이다. 파일을 못 읽거나 old_string 이 없으면 전처럼 new_string 만 본다.
+BODY="$WORK/body"; FALLBACK="$WORK/fallback"
+EDITPATH=""
+case "$INPUT" in
+  *'"old_string"'*)
+    EDITPATH="$FILE"
+    if command -v cygpath >/dev/null 2>&1; then EDITPATH="$(cygpath -m "$FILE" 2>/dev/null || printf '%s' "$FILE")"; fi ;;
+esac
 json_run '
-import json, sys
+import json, re, sys
 try:
     o = json.load(open(sys.argv[1], encoding="utf-8"))
 except Exception:
     sys.exit(0)
 ti = o.get("tool_input") or {}
-# Write 는 content 로, Edit 은 new_string 으로 새 본문을 준다. 둘 다 없으면 검사할 것이 없다.
+# Write 는 content 로 새 본문 전체를 준다.
 text = ti.get("content")
-if not isinstance(text, str):
-    text = ti.get("new_string")
-if not isinstance(text, str):
+if isinstance(text, str):
+    sys.stdout.write(text)
     sys.exit(0)
-sys.stdout.write(text)
-' "$RAW" > "$BODY" 2>/dev/null || true
+new = ti.get("new_string")
+if not isinstance(new, str):
+    sys.exit(0)
+old = ti.get("old_string")
+cur = None
+if sys.argv[2] and isinstance(old, str) and old:
+    try:
+        cur = open(sys.argv[2], encoding="utf-8").read()
+    except Exception:
+        cur = None
+if cur is None or old not in cur:
+    open(sys.argv[3], "w").close()
+    sys.stdout.write(new)
+    sys.exit(0)
+# 치환을 적용하며 새 글자가 놓이는 구간을 적어 둔다.
+pieces = cur.split(old) if ti.get("replace_all") else cur.split(old, 1)
+doc, spans = pieces[0], []
+for p in pieces[1:]:
+    spans.append((len(doc), len(doc) + len(new)))
+    doc += new + p
+# 코드 블록과 백틱 안을 같은 길이의 공백으로 덮어 위치를 보존한다. 규칙은 banned_report 와 같다.
+blank = lambda m: re.sub(r"[^\n]", " ", m.group(0))
+doc = re.sub(r"```.*?```", blank, doc, flags=re.S)
+doc = re.sub(r"`[^`]*`", blank, doc)
+sys.stdout.write("\n".join(doc[a:b] for a, b in spans))
+' "$RAW" "$EDITPATH" "$FALLBACK" > "$BODY" 2>/dev/null || true
 [ -s "$BODY" ] || exit 0
 REPORT="$(banned_report "$PAIRS" "$BODY" "$EXCL")"
 
 [ -n "$REPORT" ] || exit 0
 
-REASON="이 문서에 「금지 표현」 목록의 말이 들어 있다. 아래를 대체어로 고쳐 다시 써라. 코드 블록과 백틱 안은 검사하지 않았으므로 걸린 것은 모두 산문에 있고, 그 말 자체를 문서에 적어야 하면 백틱으로 감싸라.
+if [ -f "$FALLBACK" ]; then
+  WHERE="Edit 을 지금 파일에 적용해 보지 못해 new_string 조각만 검사했다. 조각이 파일의 코드 블록 안에 들어간다면 울타리를 못 봐 산문으로 판정한 것이다."
+else
+  WHERE="코드 블록과 백틱 안은 검사하지 않았으므로 걸린 것은 모두 산문에 있다."
+fi
+REASON="이 문서에 「금지 표현」 목록의 말이 들어 있다. 아래를 대체어로 고쳐 다시 써라. $WHERE 그 말 자체를 문서에 적어야 하면 백틱으로 감싸라.
 
 $REPORT
 

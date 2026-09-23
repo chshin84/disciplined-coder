@@ -62,7 +62,7 @@ done
 | PostToolUse | `hooks/doc_review_posttooluse.sh` | `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 있는 폴더의 `.md`를 고치면 `review-docs` 검진을 권한다. `Bash`로 고친 것도 본다 | 알림 |
 | PostToolUse | `hooks/doc_word_posttooluse.sh` | 셸로 고친 산출물 `.md`에 금지 표현이 남으면 알린다 | 알림 |
 | Stop | `hooks/spec_review_stop.sh` | 리뷰하지 않은 spec·plan이 남은 채 턴이 끝나는 것을 막는다 | 막음 |
-| Stop | `hooks/doc_word_stop.sh` | 이 턴에 `git`으로 바뀐 산출물 `.md`에 금지 표현이 남으면 알린다 | 알림 |
+| Stop | `hooks/doc_word_stop.sh` | 커밋되지 않은 산출물 `.md`에 금지 표현이 남으면 사용자에게 알린다 | 알림 |
 
 검진 넛지는 저장소에 커밋되는 작업 문서와 리뷰 기록에는 뜨지 않는다. 남에게 전달될 문서인지는 경로로 알 수 없어 대화 맥락으로 판단한다.
 

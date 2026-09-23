@@ -261,7 +261,11 @@ BW="$T/bash-deliv"; mkdir -p "$BW"; : > "$BW/deck.pptx"
 printf '이 문서는 자리를 짚는다.\n' > "$BW/draft.md"
 check "셸 편집 → 검진 넛지"         "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DREV' | grep -q additionalContext"
 check "셸 읽기 → 검진 넛지 없음"    "[ -z \"\$(JB 'cat $BW/draft.md' | bash '$DREV')\" ]"
-check "셸 편집 → 금지 표현 통지"    "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -q systemMessage"
+# 통지는 Claude 가 받아야 고친다. systemMessage 는 사용자 화면에만 가므로 additionalContext 로 낸다.
+check "셸 편집 → 금지 표현 통지"    "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -qF '\"additionalContext\"'"
+check "통지는 PostToolUse 이벤트다" "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -qF '\"hookEventName\":\"PostToolUse\"'"
+check "통지가 JSON 으로 파싱된다"   "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | json_valid_stdin"
+check "통지를 사용자 화면용으로 내지 않는다" "! JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -qF 'systemMessage'"
 check "통지가 파일 이름을 담는다"   "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -qF 'draft.md'"
 check "이 저장소 문서는 대상 아님"  "[ -z \"\$(JB 'sed -i s/x/y/ $HERE/README.md' | bash '$DWPOST')\" ]"
 check "OFF → 무출력"                "[ -z \"\$(JB 'sed -i s/x/y/ $BW/draft.md' | DISCIPLINED_CODER_REPLY_CHECK=off bash '$DWPOST')\" ]"
@@ -332,6 +336,16 @@ check "OFF → 무출력"                   "[ -z \"\$(JSTOP '$SR' | DISCIPLINED
 printf 'x = "자리"\n' > "$SR/code.py"; mkdir -p "$SR/docs/superpowers/specs"
 printf '이 문서는 자리를 짚는다.\n' > "$SR/docs/superpowers/specs/s.md"
 check "코드와 spec 은 안 본다"         "[ \"\$(JSTOP '$SR' | bash '$DWSTOP' | grep -cF 'report.md')\" = 1 ]"
+# 새 폴더 안의 새 파일은 git status 가 폴더 한 줄로만 돌려준다. 파일 단위로 펼치지 않으면 새 폴더에
+# 만든 보고서가 전부 빠진다.
+SRD="$T/stopdir"; mkdir -p "$SRD/reports"; git -C "$SRD" init -q 2>/dev/null || true
+printf '이 문서는 자리를 짚는다.\n' > "$SRD/reports/new.md"
+check "새 폴더 안의 새 문서도 본다"    "JSTOP '$SRD' | bash '$DWSTOP' | grep -qF 'reports/new.md'"
+# Stop 은 막지 않으므로 Claude 에게 닿는 통로가 없다. 알림은 사용자에게 하는 말이어야 하고, 대상은
+# 이 턴에 바뀐 문서가 아니라 커밋되지 않은 문서 전부다.
+check "알림이 대상을 커밋 전 문서로 적는다" "JSTOP '$SR' | bash '$DWSTOP' | grep -qF '커밋되지 않은'"
+check "알림이 이 턴이라고 적지 않는다"      "! JSTOP '$SR' | bash '$DWSTOP' | grep -qF '이 턴에'"
+check "알림이 Claude 에게 명령하지 않는다"  "! JSTOP '$SR' | bash '$DWSTOP' | grep -qF '고쳐라'"
 
 echo "[리뷰 기록은 검진 대상이 아니다]"
 # 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
@@ -506,6 +520,25 @@ check "설계 문서는 통과한다"                 "[ -z \"\$(dw \"\$(dwj '$D
 # 레포 뿌리 기준의 상대경로도 같은 제외를 받아야 한다. `*/docs/...` 만 보면 앞에 무언가가 있어야
 # 맞아서 이 형태가 지나갔고, 형제 훅 둘은 이미 두 형태를 받고 있었다.
 check "설계 문서 상대경로도 통과한다"        "[ -z \"\$(dw \"\$(dwj 'docs/superpowers/specs/s.md' '$DWBODY')\")\" ]"
+# 이 저장소를 cwd 로 연 세션에서 저장소 밖에 쓰는 산출물이 제외로 새면 안 된다. 절대경로가 조상을
+# 다 올라간 뒤 현재 폴더(.)로 물러서면 이 저장소의 에이전트원칙을 보고 제외해 버린다.
+check "저장소 cwd 에서 밖의 윈도우 경로는 거부한다(슬래시)" "( cd '$HERE' && dw \"\$(dwj 'Z:/outside/report.md' '$DWBODY')\" ) | grep -qF 'deny'"
+check "저장소 cwd 에서 밖의 윈도우 경로는 거부한다(역슬래시)" "( cd '$HERE' && dw \"\$(dwj 'Z:\\\\outside\\\\report.md' '$DWBODY')\" ) | grep -qF 'deny'"
+check "저장소 cwd 에서 밖의 POSIX 경로는 거부한다" "( cd '$HERE' && dw \"\$(dwj '$DWDIR/report.md' '$DWBODY')\" ) | grep -qF 'deny'"
+check "상대경로는 현재 폴더 기준으로 제외한다"     "[ -z \"\$( cd '$DWREPO' && dw \"\$(dwj 'x.md' '$DWBODY')\" )\" ]"
+# Edit 은 조각만 오므로 울타리가 조각 밖에 있다. 파일에 적용한 결과로 울타리를 알아본 뒤 새로 들어간
+# 글자만 판정한다. 파일의 다른 문장에 원래 있던 말까지 잡으면 무관한 편집이 거부된다.
+dwe2() { printf '{"tool_name":"Edit","tool_input":{"file_path":"%s","old_string":"%s","new_string":"%s"%s}}' "$1" "$2" "$3" "${4:-}"; }
+printf '# 제목\n\n```sh\necho old\n```\n\n본문 문장이다.\n' > "$DWDIR/fenced.md"
+check "코드 블록 안을 고치는 Edit 은 통과한다"   "[ -z \"\$(dw \"\$(dwe2 '$DWDIR/fenced.md' 'echo old' 'echo 자리')\")\" ]"
+check "산문을 고치는 Edit 은 거부한다"           "dw \"\$(dwe2 '$DWDIR/fenced.md' '본문 문장이다.' '$DWBODY')\" | grep -qF 'deny'"
+check "적용한 결과를 본 거부는 산문이라고 적는다" "dw \"\$(dwe2 '$DWDIR/fenced.md' '본문 문장이다.' '$DWBODY')\" | grep -qF '모두 산문에 있다'"
+check "적용하지 못한 거부는 조각만 봤다고 적는다" "dw \"\$(dwe2 '$DWDIR/fenced.md' '없는 문장' '$DWBODY')\" | grep -qF 'new_string 조각만'"
+printf '# 제목\n\n이 자리는 원래 있던 문장이다.\n\n고칠 문장이다.\n' > "$DWDIR/preexisting.md"
+check "원래 있던 말은 무관한 Edit 을 막지 않는다" "[ -z \"\$(dw \"\$(dwe2 '$DWDIR/preexisting.md' '고칠 문장이다.' '고친 문장이다.')\")\" ]"
+printf '```sh\necho old\n```\n\necho old 는 산문이다.\n' > "$DWDIR/replall.md"
+check "replace_all 은 모든 자리를 판정한다"      "dw \"\$(dwe2 '$DWDIR/replall.md' 'echo old' 'echo 자리' ',\"replace_all\":true')\" | grep -qF 'deny'"
+check "replace_all 이 아니면 첫 자리만 판정한다" "[ -z \"\$(dw \"\$(dwe2 '$DWDIR/replall.md' 'echo old' 'echo 자리')\")\" ]"
 check "스위치를 끄면 통과한다"               "[ -z \"\$(DISCIPLINED_CODER_REPLY_CHECK=off dw \"\$(dwj '$DWDIR/report.md' '$DWBODY')\")\" ]"
 check "경로가 없으면 통과한다"               "[ -z \"\$(dw '{}')\" ]"
 # 에이전트원칙이 없으면 조용히 통과하지 않고 알린다(FAIL-LOUD) — 검사 불능은 통과가 아니다.

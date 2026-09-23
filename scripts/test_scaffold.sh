@@ -242,9 +242,9 @@ check "공용 블록을 만든다"            "[ \$(grep -cF '# BEGIN korean-ban
 check "사용자 줄로 보아 알린다"       "printf '%s' \"\$OUT28\" | grep -qF '블록 바깥에 목록을 싣는 줄이 있다'"
 check "기다린다고 알리지 않는다"      "! printf '%s' \"\$OUT28\" | grep -qF '공용 블록을 만들지 않았다'"
 check "남의 줄을 안 지운다"           "grep -qxF '@somewhere/korean-banned-words.md' '$UC28'"
-check "에이전트원칙 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC26'"
+check "에이전트원칙 줄은 그대로 쓴다"         "grep -qxF '@disciplined-coder/agent-principles.md' '$UC28'"
 # 관리블록은 에이전트원칙 줄 하나뿐이어야 한다. 목록이 거기 남으면 공용 블록과 합쳐 두 벌이 실린다.
-check "관리블록에 군더더기가 안 남는다" "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC26' | wc -l) -eq 3 ]"
+check "관리블록에 군더더기가 안 남는다" "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC28' | wc -l) -eq 3 ]"
 
 # 멱등. 바꾼 PC 를 두 번 더 돌려도 블록은 하나이고 가리키는 곳이 그대로다.
 run "$H23" "$P23" >/dev/null; run "$H23" "$P23" >/dev/null
@@ -582,23 +582,32 @@ check "canon: no roll-call in the Korean section"    "! grep -qF '\`FAIL-LOUD\`�
 check "canon: no roll-call in the document section"  "! grep -qF '\`SSOT\`와 \`NAME-ITEMS\`와 \`EXPLICIT\`이 문서에도 그대로 걸리고' '$CANON'"
 check "canon: no roll-call in the code section"      "! grep -qF '\`FOCUSED\`와 \`SSOT\`와 \`EXPLICIT\`이 코드에 그대로 걸리고' '$CANON'"
 check "canon: old section name is gone everywhere"   "! grep -rqF '대화할 때' '$CANON' '$HERE/skills' '$HERE/README.md' '$HERE/CLAUDE.md' '$HERE/hooks' '$HERE/scripts/scaffold.sh'"
-# 조항 열다섯의 목록은 이 파일이 소유한다. 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어,
-# 조항이 하나 떨어져도 그 결손을 정답으로 굳힌다.
-for id in FOCUSED ASYNC-FIRST NAME-ITEMS REVERSIBLE SECRETS NO-ASSUME STATE-ASSUME ASK-OPTIONS NO-FLEET YAGNI REPORT-DEAD CHECKABLE EXPLAIN-STRUCTURE; do
-  check "canon: clause $id present"                  "grep -qF '**\`$id\`' '$CANON'"
-done
+# 조항 ID 목록은 근거를 적는 두 참고서의 `### \`ID\`` 제목에서 도출한다(「삭제한 조항」 절은 뺀다).
+# 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어 조항이 떨어져도 그 결손을 정답으로
+# 굳히고, 목록을 여기 손으로 적으면 조항을 더할 때 이쪽이 낡는다. 방향은 참고서 → 에이전트원칙이다.
+ref_clause_ids() {
+  local f
+  for f in "$HERE/skills/lens-fit/domain-discipline.md" "$HERE/skills/lens-readability/domain-korean.md"; do
+    awk '{ sub(/\r$/, "") } /^## 삭제한 조항/ { exit } /^### `[A-Z0-9-]+`$/ { gsub(/^### `|`$/, ""); print }' "$f"
+  done
+}
+missing_clause_ids() {  # $1=에이전트원칙 → 참고서에 근거가 있는데 원칙에 없는 ID
+  local id miss=""
+  for id in $(ref_clause_ids); do grep -qF "**\`$id\`" "$1" || miss="$miss $id"; done
+  printf '%s' "$miss"
+}
+REF_IDS="$(ref_clause_ids)"
+check "canon: clause IDs derived from the references" "[ -n \"\$REF_IDS\" ]"
+MISS_IDS="$(missing_clause_ids "$CANON")"
+check "canon: every clause with a rationale in the references is in agent-principles (reference → principles)" "[ -z \"\$MISS_IDS\" ]"
+[ -n "$MISS_IDS" ] && echo "    참고서에 근거가 있는데 에이전트원칙에 없는 조항(참고서 → 에이전트원칙 방향):$MISS_IDS"
+# 도출 검사가 결손을 실제로 잡는지 임시 사본에서 본다. 조항 하나를 지운 사본이 통과하면 검사가 무의미하다.
+CANON_CUT="$(mktemp)"; grep -vF '**`YAGNI`' "$CANON" > "$CANON_CUT"
+check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids '$CANON_CUT')\" = ' YAGNI' ]"
 # 한국어 절은 두 층이다. 묶는 이름은 `###` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
-# 검사해야 이름만 남고 지시가 빠지거나 그 반대인 상태를 잡는다.
+# 검사해야 이름만 남고 지시가 빠지거나 그 반대인 상태를 잡는다. 원자 지시 층은 위의 도출 검사가 본다.
 for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK REVISE-ORDER; do
   check "canon: korean group $g present"             "grep -qE '^### \`$g\`' '$CANON'"
-done
-for id in VOCAB-FREQ SPECIFIC-NAME SINO-KEEP \
-          NO-MID-MOD NO-STACK-MOD KEEP-CONNECT ANTI-LIMIT COMMA-CUT \
-          FULL-SENTENCE LABEL-NOUN ONE-ENDING \
-          BOTTOM-LINE SECTION-HEAD BULLET-SCOPE ONE-IDEA \
-          TERM-EXPLAIN TERM-ONE ASK-CONTEXT NO-ANALOGY \
-          EDIT-PRIORITY REWRITE-NOT-ADD; do
-  check "canon: korean clause $id present"           "grep -qF '**\`$id\`' '$CANON'"
 done
 # 어제 카파시 절로 녹여 이름까지 뺀 다섯은 되살아나면 안 된다. 에이전트원칙에서도 살아 있는 문서에서도 본다.
 for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD; do
@@ -1013,5 +1022,17 @@ check "끄는 방법을 함께 알린다"       "printf '%s' \"\$OUT22a\" | grep
 check "값이 있으면 조용하다"          "! printf '%s' \"\$OUT23\" | grep -qF 'PYTHONUTF8'"
 check "0 이면 손대지 않는다"          "! printf '%s' \"\$OUT24\" | grep -qF 'PYTHONUTF8'"
 check "윈도우가 아니면 조용하다"      "! printf '%s' \"\$OUT25\" | grep -qF 'PYTHONUTF8'"
+
+# --- handoff-lint: 남은 핸드오프를 세션 시작에 알리고, 머리의 유예 날짜가 지나지 않았으면 조용하다 ---
+# CLAUDE.md 의 문서 타입 표가 이 린트를 핸드오프 타입의 강제 장치로 적는다. 글자가 아니라 동작으로 본다.
+HHO="$(mktemp -d)"; PHO="$(mktemp -d)"
+printf '<!-- handoff-keep-until: 2999-12-31 -->\n# 인계\n' > "$PHO/HANDOFF-later.md"
+printf '<!-- handoff-keep-until: 2000-01-01 -->\n# 인계\n' > "$PHO/HANDOFF-expired.md"
+printf '# 인계\n' > "$PHO/HANDOFF-plain.md"
+OUTHO="$(run "$HHO" "$PHO")"
+echo "[handoff-lint] 핸드오프 잔존 린트"
+check "유예 날짜가 남았으면 안 알린다"   "! printf '%s' \"\$OUTHO\" | grep -qF 'HANDOFF-later.md'"
+check "유예 날짜가 지났으면 알린다"      "printf '%s' \"\$OUTHO\" | grep -qF 'HANDOFF-expired.md'"
+check "유예 표시가 없으면 알린다"        "printf '%s' \"\$OUTHO\" | grep -qF 'HANDOFF-plain.md'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
