@@ -549,9 +549,7 @@ check "single managed region after run"         "[ \$(grep -cF '# BEGIN discipli
 # 있으므로 그 이름으로 부르고, 옛 서수 제목이 되살아나지 않는지 함께 본다.
 CANON="$HERE/agent-principles.md"
 echo "[canon-sections] procedure sections are named, not numbered"
-for s in "원칙" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
-  check "canon: section '$s' present"      "grep -qE '^## $s\$' '$CANON'"
-done
+# 절 이름의 실재는 아래 [canon-realign] 의 절 목록 검사가 본다.
 # 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
 # 한글을 문자 단위로 매치하지 못하고, 그러면 옛 서수 제목이 되살아나도 이 검사가 잡지 못한다.
 check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가나다라마]\.' '$CANON'"
@@ -638,20 +636,19 @@ done
 # 문장이 있으면 검진이 돈다.
 # 파일 전역 grep이 아니라 「검증」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
 # 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
-SC_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$CANON")"
+# 절을 뽑는 계산과 "검증 절이 잡힌다" 단언은 위 [workflow-verification] 의 WF_BLOCK 을 그대로 쓴다.
 # 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
 # 명령 치환으로 실행되어, 검사가 엉뚱한 문자열을 찾으면서도 초록으로 남는다.
 CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 본다'
 SC_SCOPE='허가는 `lens-*` 호출에만 미친다'
 echo "[standing-consent] lens calls carry the user's standing consent"
-check "검증 절이 잡힌다"                   "[ -n \"\$SC_BLOCK\" ]"
-check "canon: 상시 허가 문장"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- '$CONSENT'"
-check "canon: 허가 범위 한정"              "printf '%s' \"\$SC_BLOCK\" | grep -qF -- \"\$SC_SCOPE\""
+check "canon: 상시 허가 문장"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- '$CONSENT'"
+check "canon: 허가 범위 한정"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- \"\$SC_SCOPE\""
 # 선행연구 렌즈는 이름을 대서 예외로 못 박아야 한다. 이름이 lens-*라 허가에 들면서 동시에 웹에
 # 나가는 유일한 렌즈라, 뭉뚱그린 말로 제외하면 같은 렌즈를 열고 닫는 문장이 된다. 그 상태에서는
 # 렌즈를 범위 밖으로 판단해 조용히 건너뛰게 되고, '막히면 알린다'는 안전장치도 발동하지 않는다.
-check "canon: 선행연구 렌즈를 이름으로 예외" "printf '%s' \"\$SC_BLOCK\" | grep -qF -- 'lens-prior-art'"
-check "canon: 뭉뚱그린 심층조사 표현 없음"   "! printf '%s' \"\$SC_BLOCK\" | grep -qF -- '심층조사'"
+check "canon: 선행연구 렌즈를 이름으로 예외" "printf '%s' \"\$WF_BLOCK\" | grep -qF -- 'lens-prior-art'"
+check "canon: 뭉뚱그린 심층조사 표현 없음"   "! printf '%s' \"\$WF_BLOCK\" | grep -qF -- '심층조사'"
 # 에이전트원칙이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 문장이 실려야 한다.
 check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$K/agent-principles.md'"
 

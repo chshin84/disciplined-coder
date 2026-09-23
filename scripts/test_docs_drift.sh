@@ -206,10 +206,18 @@ for L in "$HERE"/skills/lens-*/SKILL.md; do
   check "$NAME 프롬프트가 여러 각도를 시킨다"  "grep -F -- '- system:' \"$L\" | grep -qF '항목마다 따로 훑고'"
 done
 
-echo "[렌즈끼리 볼 것을 나눠 주지 않는다 — 세 호출자 모두]"
-check "spec 리뷰가 나눠 주지 않는다"          "grep -qF '렌즈끼리 볼 것을 나눠 주지 않는다' \"\$CALLER\""
-check "소유자가 나눠 주지 않는다"             "grep -qF '렌즈끼리 볼 것을 나눠 주지 않는다' \"\$DISP\""
-check "런타임이 나눠 주지 않는다"             "grep -qF '렌즈끼리 볼 것을 나눠 주지 않는다' \"\$RUNTIME2\""
+echo "[렌즈끼리 볼 것을 나눠 주지 않는다 — 소유자 하나, 호출자는 가리킨다]"
+# 디스패치 규율이라 dispatching-lenses 가 규칙과 근거를 진다. 전에는 세 파일 모두에 같은 문구를
+# 요구해 검사가 베끼기를 강제했다. 호출자에는 소유자를 가리키는 문장과 근거 사본이 없는지만 본다.
+SPLIT_RULE='렌즈끼리 볼 것을 나눠 주지 않는다'
+SPLIT_WHY='빼 주는 것이 없었다'
+SPLIT_PTR='나눠 주지 않는 규칙과 그 근거는 `dispatching-lenses`'
+check "소유자가 규칙을 적는다"                "grep -qF -- \"\$SPLIT_RULE\" \"\$DISP\" && grep -qF -- \"\$SPLIT_WHY\" \"\$DISP\""
+for f in "$CALLER" "$RUNTIME2"; do
+  fn="$(basename "$(dirname "$f")")"
+  check "$fn 이 소유자를 가리킨다"          "grep -qF -- \"\$SPLIT_PTR\" '$f'"
+  check "$fn 에 규칙과 근거 사본이 없다"    "! grep -qF -- \"\$SPLIT_RULE\" '$f' && ! grep -qF -- \"\$SPLIT_WHY\" '$f'"
+done
 
 echo "[dispatching-lenses — 소유자가 하나다]"
 # 렌즈 운용 규율이 문서 검진 절차와 나뉘어 있던 동안 소유자가 둘이었다. 규율은 이 스킬이 지고
@@ -244,14 +252,14 @@ check "렌즈 파일에 문턱 첫 문장이 안 남았다"          "! grep -qF
 echo "[기록 — 자리와 담을 것]"
 check "spec 리뷰가 기록 이름 소유자를 가리킨다" "grep -qF 'review-docs 가 소유하므로' \"\$CALLER\""
 check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$DOCS\""
-check "문서 검진 기록의 이름을 적는다"       "grep -qF '-check.md' \"\$DOCS\""
+check "문서 검진 기록의 종류를 적는다"       "grep -qF -- '문서 검진의 종류는 \`check\`' \"\$DOCS\""
 check "문서 검진 기록은 처리 결과를 뺀다"    "grep -qF '무엇을 고쳤고 무엇을 넘겼는지는 적지 않는다' \"\$DOCS\""
 check "spec 리뷰 기록은 처리 결과를 뺀다"    "grep -qF '어떻게 처리했는지는 포함하지 않는다' \"\$CALLER\""
 check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거를 검토 대상 문서 본문에 적는다' \"\$CALLER\""
 # 이름 규칙은 review-docs 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
 check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$DOCS\""
 check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'review-docs 가 소유' \"\$CALLER\""
-check "에이전트원칙은 그 규칙을 더 안 적는다"        "! grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' \"\$CANON\""
+check "에이전트원칙은 그 규칙을 더 안 적는다"        "! grep -qF '<렌즈 스킬 이름>-<띄운 횟수>.json' \"\$CANON\""
 check "에이전트원칙이 기록 이름의 소유자를 가리킨다" "grep -qF '기록 파일의 이름과 회차 표기는 \`review-docs\`가 소유한다' \"\$CANON\""
 check "원본을 받는 즉시 저장한다"            "grep -qF '받는 즉시' \"\$CALLER\""
 check "원본을 같은 이름 폴더에 둔다"          "grep -qF '같은 이름의 폴더' \"\$CALLER\""
@@ -266,6 +274,7 @@ check "🔴 반영도 다시 리뷰 대상이다"          "grep -qF '를 반영
 check "무엇이 남았는지 문서에 안 적는다"      "grep -qF '문서에 적지 않는다' \"\$CALLER\""
 check "문서 검진에 재검진 반복이 없다"        "grep -qF '다시 검진하지는 않는다' \"\$DOCS\""
 check "런타임에 다시 리뷰 반복이 없다"        "grep -qF '다시 리뷰하지는 않는다' \"\$RUNTIME2\""
+check "재검진 금지는 dispatching-lenses 가 소유한다" "grep -qF '반영한 뒤 다시 띄우지 않는다' \"\$DISP\""
 
 # --- 렌즈 스키마 사본이 공통 계약과 어긋나지 않는다 ---
 # 여섯 렌즈의 「출력 스키마」 블록은 공통 계약을 그 렌즈의 값으로 채워 보인 사본이다. 사본이므로
@@ -507,11 +516,11 @@ echo "[프로젝트 파일 예외 — README 한 곳만 조건을 적는다]"
 # 문서를 한 줄로 펴서 본다 — 전에는 원본 문서에서 줄이 바뀌자 같은 문장인데도 검사가 실패했다.
 flat() { tr '
 ' ' ' < "$1" | tr -s ' '; }
-OWN_MARKS=('그 블록을 만든 기능이 없어졌으면')
-COPY_MARKS=('그 블록을 만든 기능이 없어졌으면')
+# 소유자에는 있어야 하고 사본에는 없어야 하는 조건 문구다. 두 검사가 같은 목록을 본다.
+EXC_MARKS=('그 블록을 만든 기능이 없어졌으면')
 check "README가 예외를 열거한다"        "grep -qF -- '이 플러그인이 프로젝트 파일을 고치는 예외' \"\$README\""
 check "README가 예외 조건을 소유한다"    "grep -qF -- '그 조건은 여기가 정한다' \"\$README\""
-for m in "${OWN_MARKS[@]}"; do
+for m in "${EXC_MARKS[@]}"; do
   check "README가 조건을 적는다: $m"    "flat \"\$README\" | grep -qF -- '$m'"
 done
 # 이 뽑아내기는 반드시 UTF-8 로케일에서 돈다. 바이트로 보면 [^」] 가 한글 음절의 이음 바이트까지
@@ -526,7 +535,7 @@ check "CLAUDE.md가 README를 가리킨다"          "grep -qF -- 'README를 참
 for D in "$HERE/scripts/scaffold.sh"; do
   dn="$(basename "$D")"
   check "$dn 이 README 절을 가리킨다"   "grep -qF -- '프로젝트 폴더에 생기는 파일' '$D'"
-  for m in "${COPY_MARKS[@]}"; do
+  for m in "${EXC_MARKS[@]}"; do
     check "$dn 이 조건을 베끼지 않는다: $m" "! flat '$D' | grep -qF -- '$m'"
   done
 done

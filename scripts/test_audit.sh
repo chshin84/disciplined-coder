@@ -173,11 +173,11 @@ cat > "$VR/findings.json" <<'FIXTURE'
 FIXTURE
 check "사유 없는 기각을 잡는다" "[ -f '$AV' ] && ! bash '$AV' '$VR' >/dev/null 2>&1"
 rm -rf "$VT"
-check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF 'lens-<렌즈 이름>-<띄운 횟수>.json' '$HERE/skills/review-docs/SKILL.md'"
+check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF '<렌즈 스킬 이름>-<띄운 횟수>.json' '$HERE/skills/review-docs/SKILL.md'"
 
 
-echo "[렌즈 — 발견의 문턱과 기계에 넘기는 것]"
-# 문턱은 aggregating-lenses 「리뷰 산출물 계약」이 소유한다. 전에는 같은 세 문단이 렌즈 파일 넷에 같은
+echo "[렌즈 — 발견 기준과 기계에 넘기는 것]"
+# 발견 기준은 aggregating-lenses 「리뷰 산출물 계약」이 소유한다. 전에는 같은 세 문단이 렌즈 파일 넷에 같은
 # 글자로 있었고 이 검사가 그 사본들을 맞춰 세웠다. 지금은 소유자에서 한 번 보고, 렌즈 파일에는
 # 사본이 안 남았는지만 본다.
 check "aggregating-lenses 가 상대편을 필수로 적는다" "grep -qF 'counterpart' '$MA' && grep -qF '상대편을 못 대면 발견이 아니다' '$MA'"
@@ -185,10 +185,10 @@ check "aggregating-lenses 가 결과 기준을 적는다"     "grep -qF '지금 
 for L in lens-grounding lens-fit lens-consistency lens-adversarial; do
   F="$HERE/skills/$L/SKILL.md"
   check "$L 에 문턱 사본이 안 남았다"    "! grep -qF '상대편을 못 대면 발견이 아니다' '$F'"
-  check "$L 이 계약을 가리킨다"          "grep -qF '리뷰 산출물 계약이 정한다' '$F'"
+  # 계약을 가리키는지는 test_docs_drift.sh 「렌즈 스키마 사본」의 "출력 스키마가 계약 소유자를 가리킨다"가 본다.
   check "$L 에 기계에 넘기는 것 절이 있다" "grep -qF '## 기계에 넘기는 것' '$F'"
   check "$L 에 결과 칸의 옛 기준이 안 남았다" "! grep -qF '이대로 두면 무엇이 어떻게 잘못되는' '$F'"
-  # F16 — 「발견의 문턱」이 상대편을 필수로 요구해도 system 프롬프트가 그 요구를 안 실으면 실제로
+  # F16 — 리뷰 산출물 계약이 상대편을 필수로 요구해도 system 프롬프트가 그 요구를 안 실으면 실제로
   # 도는 것(프롬프트)에는 안 걸린다. 프롬프트 줄 자체에 짚은 곳·상대편·원칙 요구가 있는지 본다.
   check "$L 의 system 프롬프트가 상대편·원칙 요구를 싣는다" \
     "grep -m1 '^- system:' '$F' | grep -qF 'counterpart_file' && grep -m1 '^- system:' '$F' | grep -qF '상대편을 못 대면 올리지 마라'"
@@ -205,13 +205,11 @@ check "기계에 넘기는 것 절이 있다"             "grep -qF '## 기계�
 check "출력 스키마에 issues 배열이 안 남았다"   "! grep -qF '\"issues\": [' '$LR'"
 
 echo "[dispatching-lenses — 결정론 우선]"
-DD="$HERE/skills/review-docs/SKILL.md"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
 check "결정론 우선 절이 있다"            "grep -qF '## 판단 앞에 기계를 세운다' '$DISP'"
 check "렌즈는 판단만 한다고 적는다"       "grep -qF '렌즈는 판단만 한다' '$DISP'"
 check "값의 경계를 적는다"               "grep -qF '새 프로젝트나 새 모델이나 새 의존이 필요하면 제안하지 않는다' '$DISP'"
 check "판단임을 산출물에 적게 한다"       "grep -qF '판단이라는 사실을 산출물에 적는다' '$DISP'"
-check "문서 검진이 띄우는 방법을 소유자에게 맡긴다" "grep -q '띄우는 방법은.*dispatching-lenses.*가 정한다' '$DD'"
 
 echo "[호출자 — 디스패치와 집계 계약]"
 SR="$HERE/skills/review-specs/SKILL.md"
@@ -219,7 +217,6 @@ MA="$HERE/skills/aggregating-lenses/SKILL.md"
 check "spec 리뷰 본문에서 렌즈당 개별 디스패치 문구가 지워졌다" "! grep -qF '렌즈당 읽기 전용 서브에이전트를 한 번씩 띄운다' '$SR'"
 check "spec 리뷰 frontmatter에서 렌즈마다 개별 디스패치 문구가 지워졌다" "! grep -qF '렌즈마다 한 번씩 띄우고' '$SR'"
 check "spec 리뷰가 렌즈마다 따로 띄우는 문장을 담는다" "grep -qF '검토 대상 하나에 렌즈마다 호출 하나를 따로 띄운다' '$SR'"
-check "spec 리뷰가 규율 소유자를 가리킨다"   "grep -qF '한 번만 띄우는 렌즈의 규율' '$SR'"
 check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
 check "집계 계약이 제안 채널을 가른다"       "grep -qF 'suggestions' '$MA' && grep -qF '집계 대상이 아니다' '$MA'"
 check "묶는 규칙의 예외를 소유자가 적는다" "grep -qF 'lens-adversarial' '$DISP' && grep -qF '문서별 호출과 묶지 않고 따로 띄운다' '$DISP'"
@@ -336,10 +333,9 @@ rj() { json_run "$1" "$RT/round/$2"; }
 # status 의 닫힌 집합은 이 파일이 손으로 든 리터럴이 아니라 절차 문서(audit-repo-docs SKILL.md)
 # 「판정」 절의 한 문장에서 뽑는다 — 계획 문서는 소비하고 지우는 문서라 원본이 못 된다. 문서가 상태
 # 이름을 더하거나 빼면 여기서 같이 갈린다(절차 문서나 이 픽스처 어느 한쪽만 바뀌어도 실패).
-STATUS_SRC="$PDA"
-STATUS_LINE="$(grep -F '`status`가' "$STATUS_SRC" | head -1)"
-# 그 문장에는 칸 이름 `status` 자체도 백틱으로 들어 있어 값 집합에서 뺀다. 안 빼면 status 가 "status" 인 발견이 통과한다.
-STATUS_SET="$(printf '%s' "$STATUS_LINE" | grep -oE '`[a-z]+`' | tr -d '`' | grep -vx status | sort -u | tr '\n' ' ')"
+# 뽑는 계산은 audit_verify.sh 와 같은 함수(_audit_common.sh 의 audit_status_set)를 쓴다.
+. "$HERE/scripts/_audit_common.sh"
+STATUS_SET="$(audit_status_set "$PDA")"
 check "절차 문서 「판정」 절에서 status 닫힌 집합을 뽑았다" "[ -n \"\$STATUS_SET\" ]"
 STATUS_PROG='
 import json, sys

@@ -590,7 +590,7 @@ while IFS= read -r sname; do
   [ -n "$sname" ] || continue
   if ! grep -qF "$sname" "$HERE/README.md"; then HOOK_MISS="$HOOK_MISS $sname"; fi
 done <<EOF
-$(grep -ohE '[a-z_]+\.sh' "$HERE/hooks/hooks.json" "$HERE/.claude/settings.json" | sort -u)
+$HOOK_WIRED
 EOF
 [ -n "$HOOK_MISS" ] && echo "    README 에 빠진 스크립트:$HOOK_MISS"
 check "README 가 배선된 스크립트를 모두 적는다" "[ -z \"\$HOOK_MISS\" ]"
