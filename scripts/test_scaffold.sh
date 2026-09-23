@@ -546,7 +546,7 @@ check "single managed region after run"         "[ \$(grep -cF '# BEGIN discipli
 # 있으므로 그 이름으로 부르고, 옛 서수 제목이 되살아나지 않는지 함께 본다.
 CANON="$HERE/agent-principles.md"
 echo "[canon-sections] procedure sections are named, not numbered"
-for s in "원칙" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
+for s in "원칙" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
   check "canon: section '$s' present"      "grep -qE '^## $s\$' '$CANON'"
 done
 # 한글 탐지는 반드시 UTF-8 로케일에서 한다. 기본 C 로케일의 grep은 대괄호 범위를 바이트로 대조해
@@ -560,7 +560,7 @@ check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가
 echo "[canon-consolidation] the canon owns every principle; only procedures and per-artifact rules stay skills"
 # 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
 # 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
-for sec in "원칙" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션" "이 파일의 취급"; do
+for sec in "원칙" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
   check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
 done
 # 카파시 절은 2026-09-21 에 해체해 「원칙」으로 흡수했다. 출처로 나뉘던 분류 축이 하나로 합쳐졌다.
@@ -569,14 +569,14 @@ done
 for h in "Think Before Acting" "Simplicity First" "Surgical Changes" "Goal-Driven Execution"; do
   check "canon: karpathy '$h' stays dissolved"       "! grep -qE '^#+ $h\$' '$CANON'"
 done
-check "canon: Tradeoff line stays"                   "grep -qF '**Tradeoff:**' '$CANON'"
-check "canon: karpathy object is generalized"        "grep -qF 'generalized from code to any artifact' '$CANON'"
-check "canon: subagent fleet rule stays"             "grep -qF \"Don't launch a fleet of subagents for what one call can do\" '$CANON'"
-check "canon: measure-the-state rule stays"          "grep -qF \"Don't assume the current state\" '$CANON'"
-check "canon: impossible-case rule stays"            "grep -qF 'No handling for situations that cannot occur' '$CANON'"
-check "canon: pre-existing-dead-code rule stays"     "grep -qF \"Don't remove what was already unused\" '$CANON'"
-check "canon: weak-criteria rule stays"              "grep -qF 'Weak criteria (\"make it work\") need constant clarification' '$CANON'"
-check "canon: numbered-steps-plan rule stays"        "grep -qF 'For multi-step work, state the plan as numbered steps, each with the check that verifies it.' '$CANON'"
+check "canon: tradeoff line stays"                   "grep -qF '**균형:**' '$CANON'"
+check "karpathy source is credited in the reference" "grep -qF 'andrej-karpathy-skills' '$HERE/skills/lens-fit/domain-discipline.md'"
+check "canon: subagent fleet rule stays"             "grep -qF '서브에이전트를 실행하지 않는다' '$CANON'"
+check "canon: measure-the-state rule stays"          "grep -qF '현재 상태를 짐작하지 않고' '$CANON'"
+check "canon: impossible-case rule stays"            "grep -qF '일어날 수 없는 상황의 처리를 넣지 않는다' '$CANON'"
+check "canon: pre-existing-dead-code rule stays"     "grep -qF '원래부터 쓰이지 않던 것은 지우지 않는다' '$CANON'"
+check "canon: weak-criteria rule stays"              "grep -qF '약한 기준은 구체적인 입력과 기대 결과로 바꾼다' '$CANON'"
+check "canon: numbered-steps-plan rule stays"        "grep -qF '번호 붙인 단계마다 확인 방법을 적는다' '$CANON'"
 # 흡수한 조항이 실재하는지 본다. 옛 45줄 상한은 셀 절이 없어져 이것으로 바꿨다.
 check "canon: no roll-call in the Korean section"    "! grep -qF '\`FAIL-LOUD\`와 \`NAME-ITEMS\`와 \`SECRETS\`가 답 한 번에도 걸린다' '$CANON'"
 check "canon: no roll-call in the document section"  "! grep -qF '\`SSOT\`와 \`NAME-ITEMS\`와 \`EXPLICIT\`이 문서에도 그대로 걸리고' '$CANON'"
@@ -653,7 +653,7 @@ echo "[question-tool] the fork-in-the-road question rule is always loaded"
 # 묻는 방식은 두 곳이 나눠 갖는다. 선택지로 물으라는 것은 카파시 절이, 선택지 앞에 배경을
 # 산문으로 두라는 것은 한국어 절의 `ASK-CONTEXT` 가 정한다. 예전에는 카파시 절이
 # `never in plain prose` 까지 적어 `ASK-CONTEXT` 와 부딪혔고, 그 조각만 걷었다.
-check "canon: 선택지 질문 규칙"             "grep -qF -- 'Ask as a question with options' '$CANON'"
+check "canon: 선택지 질문 규칙"             "grep -qF -- '선택지를 붙인 질문으로 묻고' '$CANON'"
 check "canon: 묻는 방식은 한국어 절이 갖는다" "grep -qF '**\`ASK-CONTEXT\`' '$CANON'"
 check "canon: 산문 금지 조각은 없다"         "! grep -qF -- 'never in plain prose' '$CANON'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"

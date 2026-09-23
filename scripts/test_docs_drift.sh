@@ -520,7 +520,7 @@ EXC_SEC="$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$HERE/scripts/scaffold.sh" |
 check "스캐폴드가 README 절을 가리킨다" "[ -n \"\$EXC_SEC\" ]"
 check "그 절이 README에 실재한다"            "[ -n \"\$EXC_SEC\" ] && grep -qF \"## \$EXC_SEC\" \"\$README\""
 # 에이전트원칙은 이제 조건을 되풀이하지 않고 README를 가리키기만 한다. 가리키는 문장이 살아 있는지 본다.
-check "에이전트원칙이 README를 가리킨다"        "grep -qF -- 'README를 참고한다' \"$CANON\""
+check "CLAUDE.md가 README를 가리킨다"          "grep -qF -- 'README를 참고한다' \"$HERE/CLAUDE.md\""
 
 for D in "$HERE/scripts/scaffold.sh"; do
   dn="$(basename "$D")"
