@@ -7,7 +7,8 @@ SCAFFOLD_FILES="agent-principles.md korean-banned-words.md"
 # 목록 밖을 훑는다. 파일 이름을 다른 곳에 다시 적지 않는다 — 여기만 고친다.
 # plugin-notice.skip 은 함께 쓰는 플러그인 알림을 끄려고 사용자가 이름을 적는 파일이라, 스캐폴드가
 # 만들지도 지우지도 않지만 잔존 경고를 내서도 안 된다.
-SCAFFOLD_WHITELIST="$SCAFFOLD_FILES backups plugin-notice.skip"
+# update.seen 과 update.stuck 은 hooks/update_check_sessionstart.sh 가 쓰는 갱신 확인 기록이다.
+SCAFFOLD_WHITELIST="$SCAFFOLD_FILES backups plugin-notice.skip update.seen update.stuck"
 # 구 관리파일은 매 세션 조용히 치운다. 화이트리스트에서 빼기만 하면 내용이 있는 파일은 위생 검사가
 # 지우지 못하고 '비관리 파일' 경고를 stderr 로만 내는데, SessionStart 훅의 stderr 는 사용자에게
 # 보이지 않아 그 경고가 매 세션 아무에게도 닿지 않는다. 없앤 토글의 상태 파일, 이름이 바뀐 옛 파일,

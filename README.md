@@ -50,7 +50,7 @@ done
 | 이벤트 | 스크립트 | 하는 일 | 차단 여부 |
 |---|---|---|---|
 | SessionStart | `scripts/scaffold.sh` | 원칙 사본과 `@import` 연결을 만들고 알린다 | 알림 |
-| SessionStart | `scripts/_ensure_current.sh` | 설치본이 원격 저장소보다 뒤처지면 새 버전으로 옮기고 다시 켜라고 알린다 | 알림 |
+| SessionStart | `hooks/update_check_sessionstart.sh` | 설치본이 원격 저장소보다 뒤처지면 새 버전으로 옮기고, 사용자 화면과 Claude의 첫 답에서 다시 켜라고 요구한다 | 알림 |
 | SessionStart | `scripts/seal_reviews.sh` | 커밋된 감사 기록을 읽기 전용으로 봉인한다(이 저장소의 프로젝트 hook) | 알림 |
 | SessionStart | `hooks/rules_nudge_sessionstart.sh` | 이 세션의 규칙 넛지 표시를 지워 다시 알리게 한다 | 알림 |
 | PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 대한 Write와 Edit을 사유와 함께 거부한다 | 차단 |
@@ -81,6 +81,7 @@ done
 
 - **원칙 연결** — 원칙 사본과 금지 표현 목록 사본을 놓고, 관리블록에 두 파일의 `@import`를 쓴다. 예전 버전이 만든 공용 블록(`# BEGIN korean-banned-words`)이 남아 있으면 다음 세션에 지운다. 지우기 전에 사본을 `~/.claude/disciplined-coder/backups/`에 남긴다. 그 블록의 끝 줄이 없으면 파일을 고치지 않고 알린다.
 - **superpowers 안내** — superpowers가 이 PC에 없으면 설치 명령을 알린다. 대신 설치하지는 않는다. `~/.claude/disciplined-coder/plugin-notice.skip`에 이름을 한 줄 적으면 알림이 멈춘다. `andrej-karpathy-skills`는 함께 설치하지 않기를 권한다. 에이전트원칙의 「원칙」 절이 같은 지침을 포함하고 있어, 함께 설치하면 비슷하지만 다른 지침이 두 벌 실린다.
+- **플러그인 갱신** — 설치된 이 플러그인의 커밋을 원격 HEAD와 비교한다. 원격은 `curl`로 2초 안에 읽고, 못 읽거나 마켓플레이스가 브랜치를 지정했으면 마켓플레이스 사본과 비교한다. 뒤처졌으면 `claude plugin marketplace update`와 `claude plugin update`를 차례로 실행하고, 화면에 다시 켜라고 띄운다. 같은 원격 커밋으로 한 번 실패했으면 다시 시도하지 않고 직접 실행할 명령만 알린다. 세션 사이에 자동 갱신이 설치본을 옮겼으면 그 사실도 알린다. 기록은 `~/.claude/disciplined-coder/update.seen`과 `update.stuck`이다.
 - **`PYTHONUTF8`** — 윈도우이고 사용자 환경 변수 `PYTHONUTF8`이 비어 있으면 `1`을 넣는다. 값이 `0`이면 일부러 끈 것으로 보고 손대지 않는다.
 
 ### 끄는 법

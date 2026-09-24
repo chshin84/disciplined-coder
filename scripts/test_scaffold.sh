@@ -230,72 +230,114 @@ check "사본을 뜨지 않는다"             "[ \"\$(bak_count '$H25')\" -eq 0
 check "에이전트원칙 줄은 그대로 쓴다"  "MB_SEC '$UC25' | grep -qxF '@disciplined-coder/agent-principles.md'"
 
 # --- install-current: 설치본이 원격보다 뒤처지면 옮기고 다시 켜라고 알린다 ---
-# 자동 갱신 플래그만으로는 모자라다. 사본을 받아 놓고도 설치본을 안 옮기는 것이 이 PC 에서 실제로
-# 있었다. 훅은 깔려 있는 판으로만 도므로, 이 확인이 없으면 옛 판이 조용히 돈다.
-# claude 를 실제로 부르지 않도록 스텁을 주입한다. 스텁은 받은 인자를 파일에 적어 두어, 무엇을
-# 실행했는지 단언할 수 있게 한다.
-cur_fixture() {  # $1=HOME $2=설치본 커밋 $3=스텁 종료 코드 → 사본의 HEAD 를 출력한다
-  mkdir -p "$1/.claude/plugins/marketplaces/chshin-tools"
+# 갱신 확인은 scaffold 가 아니라 hooks/update_check_sessionstart.sh 가 실행한다. claude 와 curl 을
+# 실제로 부르지 않도록 스텁을 주입한다. claude 스텁은 받은 인자를 args.txt 에 적어 무엇을 실행했는지
+# 단언하게 하고, curl 스텁은 remote.txt 의 커밋을 git smart HTTP 의 pkt-line 형식으로 낸다.
+run_uc() { CLAUDE_HOME_DIR="$1/.claude" DISCIPLINED_CODER_CLAUDE_BIN="$1/claude-stub" DISCIPLINED_CODER_CURL_BIN="$1/curl-stub" CLAUDE_PLUGIN_ROOT="${2:-}" bash "$HERE/hooks/update_check_sessionstart.sh" < /dev/null; }
+uc_fixture() {  # $1=HOME $2=설치본 커밋 $3=claude 스텁 종료 코드 $4=원격 커밋(빈 값이면 원격을 못 읽는다) $5=source 의 ref → 사본의 HEAD 를 출력한다
+  local m="$1/.claude/plugins/marketplaces/chshin-tools" ref=""
+  mkdir -p "$m"
+  if [ -n "${5:-}" ]; then ref=", \"ref\": \"$5\""; fi
   printf '{ "version": 2, "plugins": { "disciplined-coder@chshin-tools": [ { "scope": "user", "gitCommitSha": "%s" } ] } }\n' "$2" > "$1/.claude/plugins/installed_plugins.json"
-  git init -q "$1/.claude/plugins/marketplaces/chshin-tools"
-  git -C "$1/.claude/plugins/marketplaces/chshin-tools" -c user.email=t@t -c user.name=t commit -q --allow-empty -m x
+  printf '{ "chshin-tools": { "source": { "source": "github", "repo": "chshin84/disciplined-coder"%s } } }\n' "$ref" > "$1/.claude/plugins/known_marketplaces.json"
+  git init -q "$m"; git -C "$m" -c user.email=t@t -c user.name=t commit -q --allow-empty -m x
   printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s/args.txt"\nexit %s\n' "$1" "$3" > "$1/claude-stub"
-  chmod +x "$1/claude-stub"
-  git -C "$1/.claude/plugins/marketplaces/chshin-tools" rev-parse HEAD
+  printf '%s' "${4:-}" > "$1/remote.txt"
+  # 실제 응답처럼 길이 접두사 4자와 NUL 이 섞인 줄을 낸다. 길이 접두사를 커밋으로 잘못 읽으면 실패한다.
+  cat > "$1/curl-stub" <<STUB
+#!/usr/bin/env bash
+printf '%s\n' "\$*" >> "$1/curl-args.txt"
+r="\$(cat "$1/remote.txt")"; [ -n "\$r" ] || exit 22
+printf '001e# service=git-upload-pack\n0000015b%s HEAD\0multi_ack side-band\n003f%s refs/heads/main\n0000' "\$r" "\$r"
+STUB
+  chmod +x "$1/claude-stub" "$1/curl-stub"
+  git -C "$m" rev-parse HEAD
 }
+A40="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; B40="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"; C40="cccccccccccccccccccccccccccccccccccccccc"
+first_line() { json_run 'import json,sys; print(json.load(sys.stdin)["systemMessage"].splitlines()[0])'; }
 
-H30="$(mktemp -d)"; P30="$(mktemp -d)"; mkdir -p "$H30/.claude"
-cur_fixture "$H30" "0000000000000000000000000000000000000000" 0 > /dev/null
-export DISCIPLINED_CODER_CLAUDE_BIN="$H30/claude-stub"
-OUT30="$(run "$H30" "$P30")"
-unset DISCIPLINED_CODER_CLAUDE_BIN
-echo "[install-current] 뒤처지면 옮기고 다시 켜라고 알린다"
-check "갱신을 실행한다"              "grep -qF 'plugin update disciplined-coder@chshin-tools' '$H30/args.txt'"
-check "다시 켜라고 알린다"           "printf '%s' \"\$OUT30\" | grep -qF '다시 켜야 새 판이 실린다'"
+# 마켓플레이스 새로고침은 세션 시작 훅보다 늦게 도착해, 훅이 실행되는 시점에는 로컬 사본도 옛 커밋이다.
+# 사본과 무관하게 원격이 앞서 있으면 사본을 먼저 원격에 맞추고 설치본을 옮겨야 한다.
+H30="$(mktemp -d)"; uc_fixture "$H30" "$A40" 0 "$B40" > /dev/null
+OUT30="$(run_uc "$H30")"
+echo "[install-current] 원격이 앞서면 사본과 설치본을 차례로 옮기고 다시 켜라고 요구한다"
+check "원격을 info/refs 로 2초 안에 읽는다" "grep -qF -- '-m 2 https://github.com/chshin84/disciplined-coder.git/info/refs?service=git-upload-pack' '$H30/curl-args.txt'"
+check "사본을 먼저 원격에 맞춘다"    "[ \"\$(head -1 '$H30/args.txt')\" = 'plugin marketplace update chshin-tools' ]"
+check "그다음 설치본을 옮긴다"       "[ \"\$(sed -n 2p '$H30/args.txt')\" = 'plugin update disciplined-coder@chshin-tools' ]"
+check "첫 줄에서 다시 켜라고 한다"   "[ \"\$(printf '%s' \"\$OUT30\" | first_line)\" = 'disciplined-coder: 다시 켜야 새 버전이 적용됩니다.' ]"
+check "커밋을 7자리로 적는다"        "printf '%s' \"\$OUT30\" | grep -qF '(aaaaaaa → bbbbbbb)'"
+check "응답이 JSON 이다"             "printf '%s' \"\$OUT30\" | json_valid_stdin"
+check "Claude 에게 요구하게 한다"    "printf '%s' \"\$OUT30\" | grep -qF '다시 켜 달라고 요구하라'"
+check "옮긴 커밋을 본 것으로 적는다" "[ \"\$(cat '$H30/.claude/disciplined-coder/update.seen')\" = '$B40' ]"
 
-H31="$(mktemp -d)"; P31="$(mktemp -d)"; mkdir -p "$H31/.claude"
-cur_fixture "$H31" "0000000000000000000000000000000000000000" 7 > /dev/null
-export DISCIPLINED_CODER_CLAUDE_BIN="$H31/claude-stub"
-OUT31="$(run "$H31" "$P31")"
-unset DISCIPLINED_CODER_CLAUDE_BIN
-echo "[install-current] 못 옮기면 사유와 직접 실행할 명령을 보인다"
-check "조용히 넘기지 않는다"         "printf '%s' \"\$OUT31\" | grep -qF '옮기지 못했다'"
-check "직접 실행할 명령을 보인다"    "printf '%s' \"\$OUT31\" | grep -qF 'plugin update disciplined-coder@chshin-tools'"
+H31="$(mktemp -d)"; uc_fixture "$H31" "$A40" 7 "$B40" > /dev/null
+OUT31="$(run_uc "$H31")"
+OUT31b="$(run_uc "$H31")"
+echo "[install-current] 못 옮기면 실패와 명령을 알리고, 같은 원격 커밋으로는 다시 시도하지 않는다"
+check "조용히 넘기지 않는다"         "printf '%s' \"\$OUT31\" | grep -qF '옮기지 못했다(aaaaaaa → bbbbbbb, 종료 코드 7)'"
+check "다시 켜라고 하지 않는다"      "! printf '%s' \"\$OUT31\" | grep -qF '다시 켜'"
+check "직접 실행할 명령을 보인다"    "printf '%s' \"\$OUT31\" | grep -qF 'plugin marketplace update chshin-tools && '"
+check "Claude 에게 묻게 한다"        "printf '%s' \"\$OUT31\" | grep -qF '대신 실행할지 물어라'"
+check "다음 세션에는 갱신을 안 실행한다" "[ \"\$(grep -c 'plugin marketplace update' '$H31/args.txt')\" -eq 1 ]"
+check "다음 세션에도 알린다"         "printf '%s' \"\$OUT31b\" | grep -qF '이미 갱신에 실패해 다시 시도하지 않았다'"
+printf '%s' "$C40" > "$H31/remote.txt"
+run_uc "$H31" > /dev/null
+check "원격에 새 커밋이 생기면 다시 시도한다" "[ \"\$(grep -c 'plugin marketplace update' '$H31/args.txt')\" -eq 2 ]"
 
-H32="$(mktemp -d)"; P32="$(mktemp -d)"; mkdir -p "$H32/.claude"
-CUR_HEAD="$(cur_fixture "$H32" "dummy" 0)"
-printf '{ "version": 2, "plugins": { "disciplined-coder@chshin-tools": [ { "scope": "user", "gitCommitSha": "%s" } ] } }\n' "$CUR_HEAD" > "$H32/.claude/plugins/installed_plugins.json"
-export DISCIPLINED_CODER_CLAUDE_BIN="$H32/claude-stub"
-OUT32="$(run "$H32" "$P32")"
-unset DISCIPLINED_CODER_CLAUDE_BIN
-echo "[install-current] 최신이면 조용하다"
+H32="$(mktemp -d)"; uc_fixture "$H32" "$A40" 0 "$A40" > /dev/null
+OUT32="$(run_uc "$H32")"
+echo "[install-current] 원격과 같으면 조용하다"
 check "갱신을 실행하지 않는다"       "[ ! -f '$H32/args.txt' ]"
-check "아무 말도 안 한다"            "! printf '%s' \"\$OUT32\" | grep -qF '설치본이 원격보다'"
+check "아무것도 출력하지 않는다"     "[ -z \"\$OUT32\" ]"
 
-# 마켓플레이스 새로고침은 세션 시작 훅보다 늦게 도착해, 훅이 도는 시점에는 로컬 사본도 옛 커밋이다.
-# 사본과 설치본이 같아도 원격이 앞서 있으면 사본을 먼저 원격에 맞추고 설치본을 옮겨야 한다.
-H34="$(mktemp -d)"; P34="$(mktemp -d)"; mkdir -p "$H34/.claude"
-OLD34="$(cur_fixture "$H34" "dummy" 0)"
-printf '{ "version": 2, "plugins": { "disciplined-coder@chshin-tools": [ { "scope": "user", "gitCommitSha": "%s" } ] } }
-' "$OLD34" > "$H34/.claude/plugins/installed_plugins.json"
-git clone -q --bare "$H34/.claude/plugins/marketplaces/chshin-tools" "$H34/remote.git"
-git -C "$H34/.claude/plugins/marketplaces/chshin-tools" remote add origin "$H34/remote.git"
-git clone -q "$H34/remote.git" "$H34/work"
-git -C "$H34/work" -c user.email=t@t -c user.name=t commit -q --allow-empty -m y
-git -C "$H34/work" push -q origin HEAD
-export DISCIPLINED_CODER_CLAUDE_BIN="$H34/claude-stub"
-OUT34="$(run "$H34" "$P34")"
-unset DISCIPLINED_CODER_CLAUDE_BIN
-echo "[install-current] 사본이 설치본과 같아도 원격이 앞서면 옮긴다"
-check "사본을 먼저 원격에 맞춘다"    "[ \"\$(head -1 '$H34/args.txt')\" = 'plugin marketplace update chshin-tools' ]"
-check "그다음 설치본을 옮긴다"       "[ \"\$(sed -n 2p '$H34/args.txt')\" = 'plugin update disciplined-coder@chshin-tools' ]"
-check "다시 켜라고 알린다"           "printf '%s' \"\$OUT34\" | grep -qF '다시 켜야 새 판이 실린다'"
-
-H33="$(mktemp -d)"; P33="$(mktemp -d)"; mkdir -p "$H33/.claude/plugins"
+H33="$(mktemp -d)"; mkdir -p "$H33/.claude/plugins"
 printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }\n' > "$H33/.claude/plugins/installed_plugins.json"
-OUT33="$(run "$H33" "$P33")"
+OUT33="$(run_uc "$H33")"
 echo "[install-current] 우리 설치 기록이 없으면 건너뛴다"
-check "아무 말도 안 한다"            "! printf '%s' \"\$OUT33\" | grep -qF '설치본이 원격보다'"
+check "아무것도 출력하지 않는다"     "[ -z \"\$OUT33\" ]"
+
+H34="$(mktemp -d)"; CUR34="$(uc_fixture "$H34" "dummy" 0 "")"
+sed -i "s/dummy/$CUR34/" "$H34/.claude/plugins/installed_plugins.json"
+OUT34="$(run_uc "$H34")"
+git -C "$H34/.claude/plugins/marketplaces/chshin-tools" -c user.email=t@t -c user.name=t commit -q --allow-empty -m y
+run_uc "$H34" > /dev/null
+echo "[install-current] 원격을 못 읽으면 사본과 비교한다"
+check "사본과 같으면 조용하다"       "[ -z \"\$OUT34\" ]"
+check "사본이 앞서면 옮긴다"         "grep -qF 'plugin update disciplined-coder@chshin-tools' '$H34/args.txt'"
+
+H35="$(mktemp -d)"; CUR35="$(uc_fixture "$H35" "dummy" 0 "$B40" "v1")"
+sed -i "s/dummy/$CUR35/" "$H35/.claude/plugins/installed_plugins.json"
+OUT35="$(run_uc "$H35")"
+echo "[install-current] 배포처가 ref 를 지정했으면 원격 기본 브랜치와 비교하지 않는다"
+check "원격을 읽지 않는다"           "[ ! -f '$H35/curl-args.txt' ]"
+check "사본과 같으면 조용하다"       "[ -z \"\$OUT35\" ]"
+
+# 세션 사이에 자동 갱신이 설치본을 옮긴 상황. 이 세션이 새 버전으로 실행되는지는 실행 중인 플러그인
+# 폴더 이름으로 판정한다.
+H36="$(mktemp -d)"; uc_fixture "$H36" "$A40" 0 "$A40" > /dev/null
+OUT36a="$(run_uc "$H36" "/x/cache/chshin-tools/disciplined-coder/aaaaaaaaaaaa")"
+sed -i "s/$A40/$B40/" "$H36/.claude/plugins/installed_plugins.json"; printf '%s' "$B40" > "$H36/remote.txt"
+OUT36="$(run_uc "$H36" "/x/cache/chshin-tools/disciplined-coder/bbbbbbbbbbbb")"
+OUT36c="$(run_uc "$H36" "/x/cache/chshin-tools/disciplined-coder/bbbbbbbbbbbb")"
+echo "[install-current] 세션 사이에 자동 갱신이 옮겼으면 알린다"
+check "처음 본 PC 에서는 조용하다"   "[ -z \"\$OUT36a\" ]"
+check "옮긴 사실을 알린다"           "printf '%s' \"\$OUT36\" | grep -qF '자동 갱신이 설치본을 옮겼다(aaaaaaa → bbbbbbb). 이 세션에 새 버전이 적용되어 있다.'"
+check "새 버전으로 실행 중이면 다시 켜라고 하지 않는다" "! printf '%s' \"\$OUT36\" | grep -qF '다시 켜'"
+check "한 번만 알린다"               "[ -z \"\$OUT36c\" ]"
+
+H37="$(mktemp -d)"; uc_fixture "$H37" "$B40" 0 "$B40" > /dev/null
+mkdir -p "$H37/.claude/disciplined-coder"; printf '%s\n' "$A40" > "$H37/.claude/disciplined-coder/update.seen"
+OUT37="$(run_uc "$H37" "/x/cache/chshin-tools/disciplined-coder/aaaaaaaaaaaa")"
+echo "[install-current] 옛 버전으로 실행 중이면 다시 켜라고 요구한다"
+check "다시 켜라고 한다"             "printf '%s' \"\$OUT37\" | grep -qF 'disciplined-coder: 다시 켜야 새 버전이 적용됩니다.'"
+check "옛 버전으로 실행된다고 적는다" "printf '%s' \"\$OUT37\" | grep -qF '이 세션은 옛 버전으로 실행된다'"
+
+H38="$(mktemp -d)"; P38="$(mktemp -d)"; mkdir -p "$H38/.claude/disciplined-coder"
+printf 'x\n' > "$H38/.claude/disciplined-coder/update.seen"; printf 'y\n' > "$H38/.claude/disciplined-coder/update.stuck"
+run "$H38" "$P38" > /dev/null 2>&1
+echo "[install-current] 스캐폴드 위생 검사가 갱신 기록을 지우지 않는다"
+check "update.seen 이 남는다"        "[ -f '$H38/.claude/disciplined-coder/update.seen' ]"
+check "update.stuck 이 남는다"       "[ -f '$H38/.claude/disciplined-coder/update.stuck' ]"
 
 # --- crlf-region: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
