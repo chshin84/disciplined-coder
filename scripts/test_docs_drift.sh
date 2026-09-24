@@ -1000,7 +1000,7 @@ done
 # 조항을 더하려면 CLAUDE.md 가 정한 클린룸 소거 시험을 거쳐야 한다. 시험으로 지운 조항 ID 가
 # 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
 REVIVED_IDS=""
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
   grep -qF "**\`$id\`" "$CANON" && REVIVED_IDS="$REVIVED_IDS $id"
 done
 check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
@@ -1037,10 +1037,10 @@ check "canon: 뭉뚱그린 심층조사 표현 없음"   "! printf '%s' \"\$WF_B
 SR="$HERE/skills/review-specs/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
-# 묻는 방식은 두 곳이 나눠 갖는다. 선택지로 물으라는 것은 `ASK-OPTIONS` 가, 선택지 앞에 배경을
-# 산문으로 두라는 것은 한국어 절의 `ASK-CONTEXT` 가 정한다.
-check "canon: 선택지 질문 규칙"             "grep -qF -- '선택지를 붙인 질문으로 묻고' '$CANON'"
-check "canon: 묻는 방식은 한국어 절이 갖는다" "grep -qF '**\`ASK-CONTEXT\`' '$CANON'"
+# 언제 묻는지와 어떻게 묻는지를 `ASK-OPTIONS` 하나가 정한다(2026-09-24 에 `ASK-CONTEXT` 를 합쳤다).
+check "canon: 조용히 고르지 않고 묻는다"     "grep -qF -- '조용히 하나를 고르지 않고 묻는다' '$CANON'"
+check "canon: 정할 것이 여럿이면 하나씩 묻는다" "grep -qF -- '하나씩 차례로 묻는다' '$CANON'"
+check "canon: 묻기 전에 대목적과 구조를 되짚는다" "grep -qF -- '대목적과 구조만 기억한다고 보고' '$CANON'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
 check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- '\`ASK-OPTIONS\`'"
 
