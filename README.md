@@ -18,7 +18,7 @@
 목록이 안 나오면 원인은 아래 중 하나다.
 
 - **스코프** — 플러그인 스코프가 user가 아니어서 hook이 실행되지 않았다. 설치할 때 스코프를 따로 주지 않았다면 기본값이 user이므로 이 원인이 아니다. 터미널에서 `claude plugin install disciplined-coder@chshin-tools --scope user`로 다시 설치한다.
-- **셋업 오류** — 세션 시작 알림에 `ERROR`가 찍혔다. 원칙 복사나 `@import` 연결이 실패한 것이고, 연결이 실패하면 그 세션에는 원칙이 실리지 않는다. `/setup-discipline`으로 다시 실행하고, 또 `ERROR`가 찍히면 그 메시지를 이슈로 올린다.
+- **셋업 오류** — 세션 시작 알림에 `ERROR`가 출력되었다. 원칙 복사나 `@import` 연결이 실패한 것이고, 연결이 실패하면 그 세션에는 원칙이 실리지 않는다. `/setup-discipline`으로 다시 실행하고, 또 `ERROR`가 출력되면 그 메시지를 이슈로 올린다.
 - **설정 홈 불일치** — 셋업이 쓴 설정 홈과 지금 세션이 읽는 설정 홈이 다르다. 회사 PC의 홈 리다이렉트로 bash의 `$HOME`과 Windows의 `USERPROFILE`이 다를 때 생긴다. 실제 홈을 아래로 확인하고 `/setup-discipline`으로 다시 실행한다.
 
 ```bash
