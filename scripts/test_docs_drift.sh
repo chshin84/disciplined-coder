@@ -169,7 +169,7 @@ done
 check "참고서가 모든 조항 ID 로 근거를 단다"  "[ -z \"\$DC_MISS\" ]"
 check "참고서가 지시 문장을 다시 적지 않는다" "[ -z \"\$DC_DUP\" ]"
 check "에이전트원칙이 그 참고서를 가리킨다"   "grep -qF 'domain-discipline' \"$CANON\""
-check "에이전트원칙이 대상을 정확히 가리키게 한다"   "grep -qF '대상의 이름을 그대로 쓴다' \"\$CANON\""
+check "에이전트원칙이 대상을 정확히 가리키게 한다"   "grep -qF '대상의 이름을 그대로 써라' \"\$CANON\""
 check "가독성 렌즈가 이름 형태를 본다"       "grep -qF '이름 형태' \"\$READ2\""
 check "가독성 렌즈가 형태 섞임을 본다"       "grep -qF '형태 섞임' \"\$READ2\""
 check "가독성 렌즈 프롬프트가 고쳐 주게 한다" "grep -qF '명사구로 고쳐 주고' \"\$READ2\""
@@ -728,7 +728,7 @@ check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
 # 검사가 새 자리를 따라가 버려 끊긴 것을 못 잡았다. 그래서 셋을 한 줄로 함께 붙든다.
 echo "[규칙 출처] 에이전트원칙 → domain-korean → lens-readability 가 이어져 있다"
 RDB_L="$HERE/skills/lens-readability/SKILL.md"
-check "에이전트원칙에 이름 자리 조항이 있다"     "grep -qF '명사구로 쓴다. 부족한 내용은 본문에 작성하라' \"$CANON\""
+check "에이전트원칙에 이름 자리 조항이 있다"     "grep -qF '명사구로 써라. 부족한 내용은 본문에 작성하라' \"$CANON\""
 check "에이전트원칙이 상세 소유자를 가리킨다"    "grep -qF 'domain-korean' \"$CANON\""
 check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'domain-korean' \"$RDB_L\""
 check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'domain-korean'"
@@ -964,12 +964,12 @@ for sec in "원칙" "한국어 지시사항" "문서를 쓰고 관리할 때" "�
 done
 check "canon: tradeoff line stays"                   "grep -qF '**균형:**' '$CANON'"
 check "karpathy source is credited in the reference" "grep -qF 'andrej-karpathy-skills' '$HERE/skills/lens-fit/domain-discipline.md'"
-check "canon: subagent fleet rule stays"             "grep -qF '서브에이전트를 실행하지 않는다' '$CANON'"
-check "canon: measure-the-state rule stays"          "grep -qF '현재 상태를 짐작하지 않고' '$CANON'"
-check "canon: impossible-case rule stays"            "grep -qF '일어날 수 없는 상황의 처리를 넣지 않는다' '$CANON'"
-check "canon: pre-existing-dead-code rule stays"     "grep -qF '원래부터 쓰이지 않던 것은 지우지 않는다' '$CANON'"
-check "canon: weak-criteria rule stays"              "grep -qF '약한 기준은 구체적인 입력과 기대 결과로 바꾼다' '$CANON'"
-check "canon: numbered-steps-plan rule stays"        "grep -qF '번호 붙인 단계마다 확인 방법을 적는다' '$CANON'"
+check "canon: subagent fleet rule stays"             "grep -qF '서브에이전트를 실행하지 마라' '$CANON'"
+check "canon: measure-the-state rule stays"          "grep -qF '현재 상태를 짐작하지 말고' '$CANON'"
+check "canon: impossible-case rule stays"            "grep -qF '일어날 수 없는 상황의 처리를 넣지 마라' '$CANON'"
+check "canon: pre-existing-dead-code rule stays"     "grep -qF '원래부터 쓰이지 않던 것은 지우지 마라' '$CANON'"
+check "canon: weak-criteria rule stays"              "grep -qF '약한 기준은 구체적인 입력과 기대 결과로 바꿔라' '$CANON'"
+check "canon: numbered-steps-plan rule stays"        "grep -qF '번호 붙인 단계마다 확인 방법을 적어라' '$CANON'"
 # 조항 ID 목록은 근거를 적는 두 참고서의 `### \`ID\`` 제목에서 도출한다(「삭제한 조항」 절은 뺀다).
 # 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어 조항이 떨어져도 그 결손을 정답으로
 # 굳히고, 목록을 여기 손으로 적으면 조항을 더할 때 이쪽이 낡는다. 방향은 참고서 → 에이전트원칙이다.
@@ -1019,7 +1019,7 @@ done
 # 절을 뽑는 계산과 "검증 절이 잡힌다" 단언은 위 [workflow-verification] 의 WF_BLOCK 을 그대로 쓴다.
 # 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
 # 명령 치환으로 실행되어, 검사가 엉뚱한 문자열을 찾으면서도 초록으로 남는다.
-CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 본다'
+CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 보라'
 SC_SCOPE='허가는 `lens-*` 호출에만 미친다'
 echo "[standing-consent] lens calls carry the user's standing consent"
 check "canon: 상시 허가 문장"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- '$CONSENT'"
@@ -1038,9 +1038,9 @@ SR="$HERE/skills/review-specs/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
 # 언제 묻는지와 어떻게 묻는지를 `ASK-OPTIONS` 하나가 정한다(2026-09-24 에 `ASK-CONTEXT` 를 합쳤다).
-check "canon: 정해지지 않으면 묻는다"         "grep -qF -- '해석이 여럿이면 묻는다' '$CANON'"
-check "canon: 정할 것이 여럿이면 하나씩 묻는다" "grep -qF -- '하나씩 차례로 묻는다' '$CANON'"
-check "canon: 묻기 전에 대목적과 구조를 되짚는다" "grep -qF -- '대목적과 구조만 기억한다고 가정한다' '$CANON'"
+check "canon: 정해지지 않으면 묻는다"         "grep -qF -- '해석이 여럿이면 물어라' '$CANON'"
+check "canon: 정할 것이 여럿이면 하나씩 묻는다" "grep -qF -- '하나씩 차례로 물어라' '$CANON'"
+check "canon: 묻기 전에 대목적과 구조를 되짚는다" "grep -qF -- '대목적과 구조만 기억한다고 가정하라' '$CANON'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
 check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- '\`ASK-OPTIONS\`'"
 
@@ -1052,7 +1052,7 @@ echo "[section-refs] no dangling ordinal references"
 STALE="$(cd "$HERE" && export LC_ALL=C.UTF-8 && git ls-files -z | xargs -0 grep -l '§[가나다라마]\|절차 [가나다라마]' 2>/dev/null | grep -v '^docs/superpowers/' || true)"
 check "refs: none dangling"                "[ -z \"\$STALE\" ]"
 
-check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 실린다고 가정하지 않는다' '$CANON'"
+check "canon: 실린다고 가정하지 않는다"     "grep -qF '이 문서가 실린다고 가정하지 마라' '$CANON'"
 
 # --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
 # 전에는 셋이 규율 넷을 각자 적고 이 검사가 그 사본들을 맞춰 세웠다. 사본이라 갈라졌다 — 한 곳에서

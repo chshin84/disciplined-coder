@@ -496,7 +496,7 @@ check "single managed region after run"         "[ \$(grep -cF '# BEGIN discipli
 
 # --- canon-installed: 갓 설치한 PC의 사본에도 상시 허가 문장이 실린다 ---
 # 에이전트원칙이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 문장이 실려야 한다.
-CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 본다'
+CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 보라'
 echo "[canon-installed] the installed canon copy carries the standing consent"
 check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$K/agent-principles.md'"
 
