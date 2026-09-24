@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# 회차 폴더의 기록 넷과 렌즈 원본을 검수한다. 픽스처가 아니라 실제 기록을 본다. test_audit.sh 는
+# 차수 폴더의 기록 넷과 렌즈 원본을 검수한다. 픽스처가 아니라 실제 기록을 본다. test_audit.sh 는
 # 픽스처의 형태를 보고 이 스크립트는 봉인 전의 실제 회차를 본다.
 #
 # 판정 상태의 닫힌 집합은 여기서 리터럴로 박지 않고 절차 문서에서 뽑는다.
 # 렌즈 원본 이름 규칙은 review-docs 가 소유한다. 그 규칙이 정한 꼴이
-# `<렌즈 스킬 이름>-<띄운 횟수>.json`(스킬 이름이 `lens-` 로 시작한다) 이고 아래 정규식이 그것을 옮긴 것이다. 그 행이
+# `<렌즈 스킬 이름>-<실행 횟수>.json`(스킬 이름이 `lens-` 로 시작한다) 이고 아래 정규식이 그것을 옮긴 것이다. 그 행이
 # 바뀌면 여기도 함께 바꾼다 — test_audit.sh 가 그 행의 실재를 검사한다.
 #
-# 사용: audit_verify.sh <회차 폴더>   (어긋난 것을 stdout 으로 적고 하나라도 있으면 1로 끝난다)
+# 사용: audit_verify.sh <차수 폴더>   (어긋난 것을 stdout 으로 적고 하나라도 있으면 1로 끝난다)
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 . "$HERE/scripts/_json_valid.sh"   # json_run — 파이썬 이름은 여기가 고른다
 . "$HERE/scripts/_audit_common.sh" # audit_status_set — status 집합 뽑기 공유
 DIR="${1:-}"
-[ -n "$DIR" ] && [ -d "$DIR" ] || { echo "사용: audit_verify.sh <회차 폴더>" >&2; exit 2; }
+[ -n "$DIR" ] && [ -d "$DIR" ] || { echo "사용: audit_verify.sh <차수 폴더>" >&2; exit 2; }
 PDA="$HERE/skills/audit-repo-docs/SKILL.md"
 STATUS_SET="$(audit_status_set "$PDA")"
 [ -n "$STATUS_SET" ] || { echo "절차 문서에서 status 닫힌 집합을 못 뽑았다: $PDA" >&2; exit 2; }

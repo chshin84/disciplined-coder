@@ -248,7 +248,7 @@ check "대신 근거를 설계 문서 본문에 적는다"   "grep -qF '근거�
 # 이름 규칙은 review-docs 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
 check "기록 이름 규칙을 소유자가 적는다"     "grep -qF '-review-2.md' \"\$DOCS\""
 check "호출자는 그 규칙의 소유자를 가리킨다" "grep -qF 'review-docs 가 소유' \"\$CALLER\""
-check "에이전트원칙은 그 규칙을 더 안 적는다"        "! grep -qF '<렌즈 스킬 이름>-<띄운 횟수>.json' \"\$CANON\""
+check "에이전트원칙은 그 규칙을 더 안 적는다"        "! grep -qF '<렌즈 스킬 이름>-<실행 횟수>.json' \"\$CANON\""
 check "에이전트원칙이 기록 이름의 소유자를 가리킨다" "grep -qF '기록 파일의 이름과 차수 표기는 \`review-docs\`가 소유한다' \"\$CANON\""
 check "원본을 받는 즉시 저장한다"            "grep -qF '받는 즉시' \"\$CALLER\""
 check "원본을 같은 이름 폴더에 둔다"          "grep -qF '같은 이름의 폴더' \"\$CALLER\""

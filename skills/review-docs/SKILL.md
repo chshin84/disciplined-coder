@@ -55,4 +55,4 @@ description: 남에게 전달될 문서와 .pptx·.xlsx·.docx·.pdf 산출물�
 
 이 규칙은 여기가 소유한다. 문서 검진과 spec·plan 리뷰와 레포 감사와 워크플로 검증이 모두 이 규칙을 따른다.
 
-기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md` 하나다. 종류는 넷이다. `review`는 spec·plan 리뷰이고, `check`는 문서 검진과 워크플로 검증이고, `prior-art`는 선행연구 대조이고, `audit`은 레포 감사다. 레포 감사는 주제가 `self`라 `2026-09-05-self-audit.md` 형태가 된다. 같은 날 같은 주제의 두 번째 차수는 종류 뒤에 차수를 붙인다(`-review-2.md`·`-audit-2.md`). 앞 차수를 덮거나 이어 붙이지 않는다. 렌즈별 원본은 요약문과 같은 이름의 폴더에 `<렌즈 스킬 이름>-<띄운 횟수>.json`(예: `lens-grounding-1.json`)으로 둔다. 스킬 디렉터리 이름을 그대로 쓰므로 `lens-` 접두사를 떼지 않으며, 그 이름은 `scripts/audit_verify.sh`가 검사한다. 이 규칙 전의 기록은 이름이 달라도 고치지 않는다.
+기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md` 하나다. 종류는 넷이다. `review`는 spec·plan 리뷰이고, `check`는 문서 검진과 워크플로 검증이고, `prior-art`는 선행연구 대조이고, `audit`은 레포 감사다. 레포 감사는 주제가 `self`라 `2026-09-05-self-audit.md` 형태가 된다. 같은 날 같은 주제의 두 번째 차수는 종류 뒤에 차수를 붙인다(`-review-2.md`·`-audit-2.md`). 앞 차수를 덮거나 이어 붙이지 않는다. 렌즈별 원본은 요약문과 같은 이름의 폴더에 `<렌즈 스킬 이름>-<실행 횟수>.json`(예: `lens-grounding-1.json`)으로 둔다. 스킬 디렉터리 이름을 그대로 쓰므로 `lens-` 접두사를 떼지 않으며, 그 이름은 `scripts/audit_verify.sh`가 검사한다. 이 규칙 전의 기록은 이름이 달라도 고치지 않는다.
