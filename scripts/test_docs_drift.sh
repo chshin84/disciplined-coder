@@ -407,7 +407,7 @@ echo "[첫 문장] 소제목 아래 첫 줄이 산문이다"
 # 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
 # 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
 # 따라온다. 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
-# 한글이 없는 제목은 건너뛴다. READ-FLOW 는 「한국어로 쓸 때」의 규칙이라 영어 절에는 안 걸린다.
+# 한글이 없는 제목은 건너뛴다. READ-FLOW 는 「한국어 지시사항」의 규칙이라 영어 절에는 안 걸린다.
 HF_WK="$HERE/skills/lens-readability/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
@@ -728,7 +728,7 @@ check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
 # 검사가 새 자리를 따라가 버려 끊긴 것을 못 잡았다. 그래서 셋을 한 줄로 함께 붙든다.
 echo "[규칙 출처] 에이전트원칙 → domain-korean → lens-readability 가 이어져 있다"
 RDB_L="$HERE/skills/lens-readability/SKILL.md"
-check "에이전트원칙에 이름 자리 조항이 있다"     "grep -qF '명사구로 쓰고, 주장은 본문 문장으로 내린다' \"$CANON\""
+check "에이전트원칙에 이름 자리 조항이 있다"     "grep -qF '명사구로 쓴다. 부족한 내용은 본문에 작성하라' \"$CANON\""
 check "에이전트원칙이 상세 소유자를 가리킨다"    "grep -qF 'domain-korean' \"$CANON\""
 check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'domain-korean' \"$RDB_L\""
 check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'domain-korean'"
@@ -955,11 +955,11 @@ check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가
 # --- canon-realign: 에이전트원칙이 원칙을 호명하지 않고 갈래는 걸리는 대상으로 이름 붙는다 ---
 # 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 갖는다. 갈래마다 원칙을 이름으로 다시 부르던 문장 셋은
 # 「원칙」 절이 이미 선언한 것을 부분집합으로 되풀이해 빠진 것이 안 걸린다는 뜻으로 읽혔다.
-# 이름이 범위를 좁게 말하던 절 하나만 「한국어로 쓸 때」로 바꾸고 나머지 여덟은 그대로 둔다.
+# 이름이 범위를 좁게 말하던 절 하나만 「한국어 지시사항」로 바꾸고 나머지 여덟은 그대로 둔다.
 echo "[canon-realign] the canon owns every principle; only procedures and per-artifact rules stay skills"
 # 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
 # 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
-for sec in "원칙" "한국어로 쓸 때" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
+for sec in "원칙" "한국어 지시사항" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
   check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
 done
 check "canon: tradeoff line stays"                   "grep -qF '**균형:**' '$CANON'"
@@ -1000,7 +1000,7 @@ done
 # 조항을 더하려면 CLAUDE.md 가 정한 클린룸 소거 시험을 거쳐야 한다. 시험으로 지운 조항 ID 가
 # 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
 REVIVED_IDS=""
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
   grep -qF "**\`$id\`" "$CANON" && REVIVED_IDS="$REVIVED_IDS $id"
 done
 check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
@@ -1038,9 +1038,9 @@ SR="$HERE/skills/review-specs/SKILL.md"
 SR_ASK="$(grep -F '물을 때는' "$SR" || true)"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
 # 언제 묻는지와 어떻게 묻는지를 `ASK-OPTIONS` 하나가 정한다(2026-09-24 에 `ASK-CONTEXT` 를 합쳤다).
-check "canon: 조용히 고르지 않고 묻는다"     "grep -qF -- '조용히 하나를 고르지 않고 묻는다' '$CANON'"
+check "canon: 정해지지 않으면 묻는다"         "grep -qF -- '해석이 여럿이면 묻는다' '$CANON'"
 check "canon: 정할 것이 여럿이면 하나씩 묻는다" "grep -qF -- '하나씩 차례로 묻는다' '$CANON'"
-check "canon: 묻기 전에 대목적과 구조를 되짚는다" "grep -qF -- '대목적과 구조만 기억한다고 보고' '$CANON'"
+check "canon: 묻기 전에 대목적과 구조를 되짚는다" "grep -qF -- '대목적과 구조만 기억한다고 가정한다' '$CANON'"
 check "spec-review: 묻는 방식 줄이 있다"    "[ -n \"\$SR_ASK\" ]"
 check "spec-review: 규칙을 재정의 말고 인용" "printf '%s' \"\$SR_ASK\" | grep -qF -- '\`ASK-OPTIONS\`'"
 

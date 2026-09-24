@@ -40,7 +40,7 @@ check "banlist: 공용 블록을 만든다"       "[ \$(grep -cF '# BEGIN korean
 check "banlist: 블록이 우리를 가리킨다"   "sed -n '/BEGIN korean-banned-words/,/END korean-banned-words/p' '$UC' | grep -qxF '@disciplined-coder/korean-banned-words.md'"
 check "banlist: 관리블록에는 목록이 없다" "! sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC' | grep -q 'korean-banned-words'"
 check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words.md' ]"
-check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린 (팀 원칙)'"
+check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린코더(혹은 dc코더)'"
 
 # 마켓플레이스 항목의 autoUpdate 값을 읽어 출력한다($1=파일 $2=항목 이름). 없으면 none을 찍는다.
 # grep으로 파일 전체를 훑으면 우리 항목에 붙었는지 남의 항목에 붙었는지 못 가리므로 항목을 지목해 읽는다.
@@ -459,8 +459,8 @@ printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { 
 OUT20a="$(run "$H20" "$P20")"
 OUT20b="$(run "$H20" "$P20")"
 echo "[canon-first-run-only] canon dumped on first run only"
-check "1st run dumps principles"      "printf '%s' \"\$OUT20a\" | grep -qF '# 디시플린 (팀 원칙)'"
-check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# 디시플린 (팀 원칙)'"
+check "1st run dumps principles"      "printf '%s' \"\$OUT20a\" | grep -qF '# 디시플린코더(혹은 dc코더)'"
+check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# 디시플린코더(혹은 dc코더)'"
 # 토글이 사라져 2회차에는 보낼 것이 없다. 빈 문자열을 단언해 두면 무엇이 새로 새어 나와도 실패한다
 # — 부정 단언만 남기면 스크립트가 아무것도 못 내도 통과하는 vacuous 구멍이 생긴다.
 check "2nd run sends nothing"         "[ -z \"\$OUT20b\" ]"
@@ -474,7 +474,7 @@ printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { 
 printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n# END disciplined-coder (managed — do not edit)\r\n# BEGIN korean-banned-words (shared — do not edit)\r\n@disciplined-coder/korean-banned-words.md\r\n# END korean-banned-words (shared — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
 OUT21="$(run "$H21" "$P21")"
 echo "[crlf-import-line] CRLF import line still counts as present"
-check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린 (팀 원칙)'"
+check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린코더(혹은 dc코더)'"
 check "CRLF: sends nothing"           "[ -z \"\$OUT21\" ]"
 
 # --- adjacent-openers: 인접 여는 마커 가드 — 첫 BEGIN이 뒤쪽 닫는 마커까지 훑어 사용자 줄을 삼키면 안 된다 ---
