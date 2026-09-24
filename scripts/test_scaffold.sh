@@ -229,7 +229,7 @@ check "짝이 없다고 알린다"             "printf '%s' \"\$OUT25\" | grep -
 check "사본을 뜨지 않는다"             "[ \"\$(bak_count '$H25')\" -eq 0 ]"
 check "에이전트원칙 줄은 그대로 쓴다"  "MB_SEC '$UC25' | grep -qxF '@disciplined-coder/agent-principles.md'"
 
-# --- install-current: 설치본이 사본보다 뒤처지면 옮기고 다시 켜라고 알린다 ---
+# --- install-current: 설치본이 원격보다 뒤처지면 옮기고 다시 켜라고 알린다 ---
 # 자동 갱신 플래그만으로는 모자라다. 사본을 받아 놓고도 설치본을 안 옮기는 것이 이 PC 에서 실제로
 # 있었다. 훅은 깔려 있는 판으로만 도므로, 이 확인이 없으면 옛 판이 조용히 돈다.
 # claude 를 실제로 부르지 않도록 스텁을 주입한다. 스텁은 받은 인자를 파일에 적어 두어, 무엇을
@@ -270,13 +270,32 @@ OUT32="$(run "$H32" "$P32")"
 unset DISCIPLINED_CODER_CLAUDE_BIN
 echo "[install-current] 최신이면 조용하다"
 check "갱신을 실행하지 않는다"       "[ ! -f '$H32/args.txt' ]"
-check "아무 말도 안 한다"            "! printf '%s' \"\$OUT32\" | grep -qF '설치본이 사본보다'"
+check "아무 말도 안 한다"            "! printf '%s' \"\$OUT32\" | grep -qF '설치본이 원격보다'"
+
+# 마켓플레이스 새로고침은 세션 시작 훅보다 늦게 도착해, 훅이 도는 시점에는 로컬 사본도 옛 커밋이다.
+# 사본과 설치본이 같아도 원격이 앞서 있으면 사본을 먼저 원격에 맞추고 설치본을 옮겨야 한다.
+H34="$(mktemp -d)"; P34="$(mktemp -d)"; mkdir -p "$H34/.claude"
+OLD34="$(cur_fixture "$H34" "dummy" 0)"
+printf '{ "version": 2, "plugins": { "disciplined-coder@chshin-tools": [ { "scope": "user", "gitCommitSha": "%s" } ] } }
+' "$OLD34" > "$H34/.claude/plugins/installed_plugins.json"
+git clone -q --bare "$H34/.claude/plugins/marketplaces/chshin-tools" "$H34/remote.git"
+git -C "$H34/.claude/plugins/marketplaces/chshin-tools" remote add origin "$H34/remote.git"
+git clone -q "$H34/remote.git" "$H34/work"
+git -C "$H34/work" -c user.email=t@t -c user.name=t commit -q --allow-empty -m y
+git -C "$H34/work" push -q origin HEAD
+export DISCIPLINED_CODER_CLAUDE_BIN="$H34/claude-stub"
+OUT34="$(run "$H34" "$P34")"
+unset DISCIPLINED_CODER_CLAUDE_BIN
+echo "[install-current] 사본이 설치본과 같아도 원격이 앞서면 옮긴다"
+check "사본을 먼저 원격에 맞춘다"    "[ \"\$(head -1 '$H34/args.txt')\" = 'plugin marketplace update chshin-tools' ]"
+check "그다음 설치본을 옮긴다"       "[ \"\$(sed -n 2p '$H34/args.txt')\" = 'plugin update disciplined-coder@chshin-tools' ]"
+check "다시 켜라고 알린다"           "printf '%s' \"\$OUT34\" | grep -qF '다시 켜야 새 판이 실린다'"
 
 H33="$(mktemp -d)"; P33="$(mktemp -d)"; mkdir -p "$H33/.claude/plugins"
 printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }\n' > "$H33/.claude/plugins/installed_plugins.json"
 OUT33="$(run "$H33" "$P33")"
 echo "[install-current] 우리 설치 기록이 없으면 건너뛴다"
-check "아무 말도 안 한다"            "! printf '%s' \"\$OUT33\" | grep -qF '설치본이 사본보다'"
+check "아무 말도 안 한다"            "! printf '%s' \"\$OUT33\" | grep -qF '설치본이 원격보다'"
 
 # --- crlf-region: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
