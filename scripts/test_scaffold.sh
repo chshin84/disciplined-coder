@@ -495,8 +495,9 @@ check "user line between two openers preserved" "grep -qxF 'USER LINE BETWEEN TW
 check "single managed region after run"         "[ \$(grep -cF '# BEGIN disciplined-coder' '$UCAO') -eq 1 ]"
 
 # --- canon-installed: 갓 설치한 PC의 사본에도 상시 허가 문장이 실린다 ---
-# 에이전트원칙이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 문장이 실려야 한다.
-CONSENT='렌즈 호출은 사용자가 상시 허용한 것으로 보라'
+# 에이전트원칙이 곧 주입 경로이므로, 갓 설치한 PC의 관리 디렉터리 사본에도 그 조항이 실려야 한다.
+# 문장이 아니라 조항 ID 로 본다 — 문구를 다듬어도 조항이 남아 있으면 통과한다.
+CONSENT='**`LENS-ALLOWED`'
 echo "[canon-installed] the installed canon copy carries the standing consent"
 check "설치본에도 상시 허가 문장"          "grep -qF -- '$CONSENT' '$K/agent-principles.md'"
 
