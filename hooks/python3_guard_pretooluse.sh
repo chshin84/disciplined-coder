@@ -75,7 +75,7 @@ END {
 ')"
 [ -n "$HIT" ] || exit 0
 
-reason="이 PC 에서 python3 은 파이썬이 아니다. 마이크로소프트 스토어로 보내는 안내판이라 'Python' 이라는 낱말만 찍고 종료 코드 49 로 끝나므로, 스크립트가 통째로 안 돌아도 성공처럼 보인다. python 이나 py -3 으로 부르라. python3 이 가리키는 실물: $TARGET"
+reason="이 PC 에서 python3 은 파이썬이 아니다. 마이크로소프트 스토어로 보내는 안내판이라 'Python' 이라는 낱말만 출력하고 종료 코드 49 로 끝나므로, 스크립트가 전혀 실행되지 않아도 성공처럼 보인다. python 이나 py -3 으로 실행하라. python3 이 가리키는 실물: $TARGET"
 esc="$(escape_for_json "$reason")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$esc"
 exit 0

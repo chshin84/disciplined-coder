@@ -19,7 +19,7 @@ done <<EOF
 $FILE_PATHS
 EOF
 [ -n "$match" ] || exit 0
-reason="읽기 전용 파일은 고치지 않는다. 속성을 세운 쪽에 뜻이 있다 — 감사 기록이면 고치지 말고 새 기록을 더한다. 파일: $match"
+reason="읽기 전용 파일은 고치지 않는다. 속성을 설정한 쪽에 의도가 있다 — 감사 기록이면 고치지 말고 새 기록을 추가한다. 파일: $match"
 esc="$(escape_for_json "$reason")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$esc"
 exit 0

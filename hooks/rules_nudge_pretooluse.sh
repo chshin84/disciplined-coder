@@ -56,11 +56,11 @@ WK_PATH="$(cd "$DIR/.." 2>/dev/null && pwd)/skills/lens-readability/domain-korea
 if [ -f "$WK_PATH" ]; then
   wkwhere="한국어 문장 규칙의 상세는 $WK_PATH 에 있다."
 else
-  wkwhere="한국어 문장 규칙의 상세를 담은 domain-korean.md 를 못 찾았다."
+  wkwhere="한국어 문장 규칙의 상세를 포함한 domain-korean.md 를 찾지 못했다."
 fi
 
 # 스킬의 절 이름을 여기 박지 않는다 — 훅은 스킬을 가리키기만 하고 내용을 베끼지 않는다(문서 넛지와 같은 규칙).
-msg="🧑‍💻 이 세션의 첫 도구 호출이다 — $where $wkwhere 서브에이전트에는 에이전트원칙이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 레포 안에서 도는 워크플로는 이 사본 대신 그 레포의 에이전트원칙을 넣는다 — 상세는 disciplined-coder dispatching-lenses 가 갖는다. 넛지일 뿐 차단은 아니다."
+msg="🧑‍💻 이 세션의 첫 도구 호출이다 — $where $wkwhere 서브에이전트에는 에이전트원칙이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 레포 안에서 실행되는 워크플로는 이 사본 대신 그 레포의 에이전트원칙을 넣는다 — 상세는 disciplined-coder dispatching-lenses 가 소유한다. 넛지일 뿐 차단은 아니다."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

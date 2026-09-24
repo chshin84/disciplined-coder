@@ -120,15 +120,15 @@ REPORT="$(banned_report "$PAIRS" "$BODY" "$EXCL")"
 [ -n "$REPORT" ] || exit 0
 
 if [ -f "$FALLBACK" ]; then
-  WHERE="Edit 을 지금 파일에 적용해 보지 못해 new_string 조각만 검사했다. 조각이 파일의 코드 블록 안에 들어간다면 울타리를 못 봐 산문으로 판정한 것이다."
+  WHERE="Edit 을 지금 파일에 적용해 보지 못해 new_string 조각만 검사했다. 조각이 파일의 코드 블록 안에 들어간다면 코드 블록 경계를 보지 못해 산문으로 판정했다."
 else
-  WHERE="코드 블록과 백틱 안은 검사하지 않았으므로 걸린 것은 모두 산문에 있다."
+  WHERE="코드 블록과 백틱 안은 검사하지 않았으므로 검출된 말은 모두 산문에 있다."
 fi
 REASON="이 문서에 「금지 표현」 목록의 말이 들어 있다. 아래를 대체어로 고쳐 다시 써라. $WHERE 그 말 자체를 문서에 적어야 하면 백틱으로 감싸라.
 
 $REPORT
 
-이 검사는 사용자가 요구한 산출물 문서에 걸린다. 이 플러그인 저장소의 문서와 Claude 메모리와 docs/superpowers/ 아래는 대상이 아니다."
+이 검사는 사용자가 요구한 산출물 문서에 적용된다. 이 플러그인 저장소의 문서와 Claude 메모리와 docs/superpowers/ 아래는 대상이 아니다."
 
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$(escape_for_json "$REASON")"
 exit 0

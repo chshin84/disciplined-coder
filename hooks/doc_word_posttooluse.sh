@@ -69,7 +69,7 @@ $FILES
 EOF
 [ -n "$REPORT" ] || exit 0
 
-MSG="disciplined-coder: 셸로 고친 산출물 문서에 「금지 표현」 목록의 말이 남아 있다. 아래를 대체어로 고쳐라. 셸 편집은 쓰기 전에 막을 수 없어 쓰인 뒤에 알린다. 코드 블록과 백틱 안은 검사하지 않았다.
+MSG="disciplined-coder: 셸로 고친 산출물 문서에 「금지 표현」 목록의 말이 남아 있다. 아래를 대체어로 고쳐라. 셸 편집은 쓰기 전에 차단할 수 없어 쓰인 뒤에 알린다. 코드 블록과 백틱 안은 검사하지 않았다.
 
 $REPORT"
 # Claude 가 받아야 고친다. systemMessage 는 사용자 화면에만 가므로 additionalContext 로 낸다.
