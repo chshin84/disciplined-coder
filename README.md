@@ -39,7 +39,7 @@ done
 
 ## 프로젝트 폴더에 생기는 파일
 
-새로 생기는 파일은 없다. SessionStart hook이 `agent-principles.md`를 `~/.claude/disciplined-coder/`에 복사하고, `~/.claude/CLAUDE.md`의 관리블록이 그 사본을 `@import`로 싣는다. 절차와 산출물 한 종류에만 적용되는 규칙은 `skills/` 아래 스킬로 두고 필요할 때 연다. 금지 표현 목록은 중립 이름의 공용 블록이 따로 싣는다. 그 규약은 KiwoomAX/korean-banned-words 의 `import-protocol.md`가 소유하고, 사내 `kw-control-tower`도 같은 블록을 쓴다.
+새로 생기는 파일은 없다. SessionStart hook이 `agent-principles.md`를 `~/.claude/disciplined-coder/`에 복사하고, `~/.claude/CLAUDE.md`의 관리블록이 그 사본을 `@import`로 싣는다. 절차와 산출물 한 종류에만 적용되는 규칙은 `skills/` 아래 스킬로 두고 필요할 때 연다. 금지 표현 목록 `korean-banned-words.md`도 같은 폴더에 복사하고 같은 관리블록이 `@import`로 싣는다. 다른 플러그인이 목록을 싣고 있어도 이 플러그인은 자기 관리블록에서 목록을 싣는다.
 
 이 플러그인이 프로젝트 파일을 고치는 예외는 하나이고 그 조건은 여기가 정한다. 그 레포 `CLAUDE.md`에 관리블록이 남아 있고 그 블록을 만든 기능이 없어졌으면, 사본을 전역 백업에 복사한 뒤 제거한다. 그 파일이 전역 `~/.claude/CLAUDE.md`와 같은 파일이면 건드리지 않는다. 잠금 대기 시간은 `scripts/_managed_block.sh`의 상수가 정한다.
 
@@ -79,7 +79,7 @@ done
 
 새 세션을 열 때마다 아래를 확인하고, 바꾼 것은 알린다. 전역 설정을 바꾸기 전에 남긴 사본(`.bak`)으로 되돌릴 수 있다.
 
-- **원칙 연결** — 원칙 사본과 `@import` 연결을 만든다. 다른 곳이 금지 표현 목록을 이미 싣고 있으면 그 줄은 생략한다.
+- **원칙 연결** — 원칙 사본과 금지 표현 목록 사본을 놓고, 관리블록에 두 파일의 `@import`를 쓴다. 예전 버전이 만든 공용 블록(`# BEGIN korean-banned-words`)이 남아 있으면 다음 세션에 지운다. 지우기 전에 사본을 `~/.claude/disciplined-coder/backups/`에 남긴다. 그 블록의 끝 줄이 없으면 파일을 고치지 않고 알린다.
 - **superpowers 안내** — superpowers가 이 PC에 없으면 설치 명령을 알린다. 대신 설치하지는 않는다. `~/.claude/disciplined-coder/plugin-notice.skip`에 이름을 한 줄 적으면 알림이 멈춘다. `andrej-karpathy-skills`는 함께 설치하지 않기를 권한다. 에이전트원칙의 「원칙」 절이 같은 지침을 포함하고 있어, 함께 설치하면 비슷하지만 다른 지침이 두 벌 실린다.
 - **`PYTHONUTF8`** — 윈도우이고 사용자 환경 변수 `PYTHONUTF8`이 비어 있으면 `1`을 넣는다. 값이 `0`이면 일부러 끈 것으로 보고 손대지 않는다.
 

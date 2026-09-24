@@ -199,7 +199,7 @@
 
 목록의 원본은 KiwoomAX/korean-banned-words 의 JSON 하나가 소유하고 항목마다의 근거도 그 파일의
 `evidence` 칸이 소유한다. 그 저장소의 `render.py` 가 만들어 둔 것을
-워크플로가 받아 `korean-banned-words.md` 로 두고, `~/.claude/CLAUDE.md` 의 공용 블록이
+워크플로가 받아 `korean-banned-words.md` 로 두고, `~/.claude/CLAUDE.md` 의 관리블록이
 `@import` 로 싣는다. 목록을 스킬에 두지 않는 이유는 스킬이
 열릴 때만 대화에 실리기 때문이다. 목록이 스킬에 있으면 평상시 답을 쓰는 동안 눈앞에 없고,
 그러면 문자열로 검색해 거르라는 지시를 실행할 수 없다.
