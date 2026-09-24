@@ -204,7 +204,7 @@ check "기계에 넘기는 것 절이 있다"             "grep -qF '## 기계�
 
 echo "[dispatching-lenses — 결정론 우선]"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
-check "결정론 우선 절이 있다"            "grep -qF '## 판단 앞에 기계를 세운다' '$DISP'"
+check "결정론 우선 절이 있다"            "grep -qF '## 판단 앞에 기계 검사를 둔다' '$DISP'"
 check "렌즈는 판단만 한다고 적는다"       "grep -qF '렌즈는 판단만 한다' '$DISP'"
 check "값의 경계를 적는다"               "grep -qF '새 프로젝트나 새 모델이나 새 의존이 필요하면 제안하지 않는다' '$DISP'"
 check "판단임을 산출물에 적게 한다"       "grep -qF '판단이라는 사실을 산출물에 적는다' '$DISP'"
@@ -212,31 +212,31 @@ check "판단임을 산출물에 적게 한다"       "grep -qF '판단이라는
 echo "[호출자 — 디스패치와 집계 계약]"
 SR="$HERE/skills/review-specs/SKILL.md"
 MA="$HERE/skills/aggregating-lenses/SKILL.md"
-check "spec 리뷰가 렌즈마다 따로 띄우는 문장을 담는다" "grep -qF '검토 대상 하나에 렌즈마다 호출 하나를 따로 띄운다' '$SR'"
+check "spec 리뷰가 렌즈마다 따로 실행하는 문장을 담는다" "grep -qF '검토 대상 하나에 렌즈마다 호출 하나를 따로 실행한다' '$SR'"
 check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
 check "집계 계약이 제안 채널을 가른다"       "grep -qF 'suggestions' '$MA' && grep -qF '집계 대상이 아니다' '$MA'"
-check "묶는 규칙의 예외를 소유자가 적는다" "grep -qF 'lens-adversarial' '$DISP' && grep -qF '문서별 호출과 묶지 않고 따로 띄운다' '$DISP'"
-check "spec 리뷰가 그 예외를 베끼지 않는다" "! grep -qF '자세가 반대인 \`lens-adversarial\`만 따로 띄운다' '$SR'"
-check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "grep -qF '대상마다 따로 띄우는 이 절차에서 예외는 \`lens-prior-art\` 하나이며' '$SR'"
+check "묶는 규칙의 예외를 소유자가 적는다" "grep -qF 'lens-adversarial' '$DISP' && grep -qF '문서별 호출과 묶지 않고 따로 실행한다' '$DISP'"
+check "spec 리뷰가 그 예외를 베끼지 않는다" "! grep -qF '자세가 반대인 \`lens-adversarial\`만 따로 실행한다' '$SR'"
+check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "grep -qF '대상마다 따로 실행하는 이 절차에서 예외는 \`lens-prior-art\` 하나이며' '$SR'"
 
 echo "[review-llm-calls — 고정표 배정]"
 LR2="$HERE/skills/review-llm-calls/SKILL.md"
 check "호출 종류별 고정표가 있다"        "grep -qF '| 호출 종류 |' '$LR2'"
-check "회차마다 다시 판단하지 않는다고 적는다" "grep -qF '회차마다 다시 판단하지 않는다' '$LR2'"
+check "차수마다 다시 판단하지 않는다고 적는다" "grep -qF '차수마다 다시 판단하지 않는다' '$LR2'"
 
-echo "[걸음 개수] 표의 행 수와 '걸음은 N' 문장이 맞는다"
-# 대상을 손으로 적지 않고 문서에서 도출한다. '걸음은 N이고'를 담은 스킬을 모두 찾아 그 문장 뒤
+echo "[단계 개수] 표의 행 수와 '단계는 N' 문장이 맞는다"
+# 대상을 손으로 적지 않고 문서에서 도출한다. '단계는 N이고'를 담은 스킬을 모두 찾아 그 문장 뒤
 # 같은 절의 표 행 수와 맞댄다. 같은 꼴의 문서가 하나 늘면 이 검사가 저절로 그것을 본다.
 # 전에는 audit-repo-docs 하나만 봤고, 같은 꼴인 review-specs 의 「절차」 표는 아무도 안 붙들어
 # 행을 더하면 조용히 낡았다.
 KO_NUM() { case "$1" in 하나) echo 1;; 둘) echo 2;; 셋) echo 3;; 넷) echo 4;; 다섯) echo 5;; 여섯) echo 6;; 일곱) echo 7;; 여덟) echo 8;; 아홉) echo 9;; 열) echo 10;; 열하나) echo 11;; 열둘) echo 12;; *) echo 0;; esac; }
-STEP_DOCS="$(LC_ALL=C.UTF-8 grep -lE '걸음은 [^ ]+이고' "$HERE"/skills/*/SKILL.md || true)"
-check "걸음 문장을 담은 문서를 찾았다" "[ -n \"\$STEP_DOCS\" ]"
+STEP_DOCS="$(LC_ALL=C.UTF-8 grep -lE '단계는 [^ ]+이고' "$HERE"/skills/*/SKILL.md || true)"
+check "단계 문장을 담은 문서를 찾았다" "[ -n \"\$STEP_DOCS\" ]"
 for D in $STEP_DOCS; do
   dn="$(basename "$(dirname "$D")")"
-  said="$(LC_ALL=C.UTF-8 grep -oE '걸음은 [^ ]+이고' "$D" | head -1 | sed 's/걸음은 //; s/이고//')"
-  rows="$(awk '!f && /걸음은 [^ ]+이고/ {f=1; next} f && /^## / {exit} f && /^\| [^|-]/ {n++} END{print (n>0 ? n-1 : 0)}' "$D")"
-  check "$dn 의 걸음 표 행 수와 '걸음은 $said' 가 맞는다" "[ \"$rows\" = \"\$(KO_NUM '$said')\" ]"
+  said="$(LC_ALL=C.UTF-8 grep -oE '단계는 [^ ]+이고' "$D" | head -1 | sed 's/단계는 //; s/이고//')"
+  rows="$(awk '!f && /단계는 [^ ]+이고/ {f=1; next} f && /^## / {exit} f && /^\| [^|-]/ {n++} END{print (n>0 ? n-1 : 0)}' "$D")"
+  check "$dn 의 단계 표 행 수와 '단계는 $said' 가 맞는다" "[ \"$rows\" = \"\$(KO_NUM '$said')\" ]"
 done
 PDA="$HERE/skills/audit-repo-docs/SKILL.md"
 check "인용 확인 스크립트를 부른다"       "grep -qF 'audit_evidence.sh' '$PDA'"
@@ -244,13 +244,13 @@ check "절차의 표 대조가 진술 스크립트를 부른다" "grep -qF 'audi
 check "회차 대조 스크립트를 부른다"       "grep -qF 'audit_rounds.sh' '$PDA'"
 check "세션이 판정한다고 적는다"          "grep -qF '세션이 판정한다' '$PDA'"
 check "기록 파일 넷을 적는다"             "grep -qF 'run.json' '$PDA' && grep -qF 'findings.json' '$PDA' && grep -qF 'diff.json' '$PDA' && grep -qF 'suggestions.json' '$PDA'"
-PDA_STEP_TARGETS="$(awk '/^## 걸음/{f=1;next} f&&/^## /{exit} f&&/^\| [^|-]/{print}' "$PDA" | tail -n +2 | LC_ALL=C.UTF-8 grep -oE '「[^」]+」' | sed 's/「//; s/」//' | sort -u)"
+PDA_STEP_TARGETS="$(awk '/^## 단계/{f=1;next} f&&/^## /{exit} f&&/^\| [^|-]/{print}' "$PDA" | tail -n +2 | LC_ALL=C.UTF-8 grep -oE '「[^」]+」' | sed 's/「//; s/」//' | sort -u)"
 if [ -n "$PDA_STEP_TARGETS" ]; then
   while IFS= read -r PDA_SEC; do
-    check "걸음 표가 가리키는 '$PDA_SEC' 절이 실제로 있다" "grep -qxF '## $PDA_SEC' '$PDA'"
+    check "단계 표가 가리키는 '$PDA_SEC' 절이 실제로 있다" "grep -qxF '## $PDA_SEC' '$PDA'"
   done <<< "$PDA_STEP_TARGETS"
 fi || true
-check "적대적 렌즈를 저장소 전체에 따로 띄운다고 적는다" "grep -qF 'lens-adversarial' '$PDA' && grep -qF '저장소 전체를 입력으로 따로 한 번 띄운다' '$PDA'"
+check "적대적 렌즈를 저장소 전체에 따로 실행한다고 적는다" "grep -qF 'lens-adversarial' '$PDA' && grep -qF '저장소 전체를 입력으로 따로 한 번 실행한다' '$PDA'"
 check "따로 도는 이유가 자세 차이라고 적는다"           "grep -qF '자세가 반대' '$PDA' || grep -qF '설계를 공격하는 자세' '$PDA'"
 
 echo "[audit_prior_rounds.sh — 앞선 회차 고르기]"
@@ -332,7 +332,7 @@ check "렌즈가 판정 셋과 narrowed 를 적는다"             "grep -qF '�
 check "렌즈가 산출물 공백·스코프를 감사에서 뺀다"        "grep -qF '레포 문서 감사에서는 적용하지 않는다' '$LC'"
 check "집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다"  "grep -qF 'narrowed' '$HERE/skills/aggregating-lenses/SKILL.md'"
 check "한 번만 규율에 '대상이 다르면 별개 호출' 이 있다" "grep -qF '대상이 다르면 별개 호출이다' '$HERE/skills/dispatching-lenses/SKILL.md'"
-check "절차에 「일관성 대조」 절과 걸음 행이 있다"         "grep -qF '## 일관성 대조' '$PDA' && grep -qF '| 진술을 대조한다 |' '$PDA'"
+check "절차에 「일관성 대조」 절과 단계 행이 있다"         "grep -qF '## 일관성 대조' '$PDA' && grep -qF '| 진술을 대조한다 |' '$PDA'"
 # 검색 문자열에 백틱이 있으면 변수에 담아 홑따옴표로 가둔다. check 의 둘째 인자는 큰따옴표라
 # 백틱을 그대로 넣으면 명령 치환으로 먹혀 검색어가 빈다.
 AT_DERIVE='목록은 손으로 적지 말고 `bash scripts/audit_targets.sh`가 내게 한다'
@@ -342,7 +342,7 @@ check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '
 # 렌즈 배정과 판정 개수를 여전히 담는다고 적는지, 그리고 픽스처가 그 두 사실을 실제로
 # 담는 필드를 갖는지 양쪽을 대조한다 — audit-repo-docs 문장이나 픽스처 어느 한쪽만 바뀌어도 실패한다.
 PDA_RUNJSON_LINE="$(grep -F '**`run.json`**' "$PDA")"
-check "audit-repo-docs 가 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '대상 문서마다 건 렌즈'"
+check "audit-repo-docs 가 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '대상 문서마다 적용한 렌즈'"
 check "audit-repo-docs 가 판정 개수를 담는다고 적는다"               "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '판정 개수'"
 
 echo "[audit_targets.sh — 배제 규칙이 실제로 걸린다]"

@@ -103,14 +103,14 @@ check "PostToolUse 훅이 공유 안내문을 쓴다"       "grep -qF 'SPEC_REVI
 check "Stop 훅이 공유 안내문을 쓴다"              "grep -qF 'SPEC_REVIEW_INSTRUCTION' \"\$STOPH\""
 check "훅이 안내문을 따로 베끼지 않는다"          "! grep -qF '마커를 먼저 남기고' \"\$PTU\" \"\$STOPH\""
 
-echo "[리뷰 절차 — 렌즈를 한 번씩 띄우고 결과를 한데 모은다]"
+echo "[리뷰 절차 — 렌즈를 한 번씩 실행하고 결과를 한데 모은다]"
 DOCS="$HERE/skills/review-docs/SKILL.md"
 RUNTIME2="$HERE/skills/review-llm-calls/SKILL.md"
 READMEF="$HERE/README.md"
-check "spec 리뷰가 회차 규칙을 다시 선언하지 않는다" "! grep -qF '렌즈마다 한 번씩만 띄운다' \"\$CALLER\""
-check "spec 리뷰가 회차 규칙 소유자를 가리킨다" "grep -qF '한 번만 띄우는 렌즈의 규율' \"\$CALLER\""
+check "spec 리뷰가 회차 규칙을 다시 선언하지 않는다" "! grep -qF '렌즈마다 한 번씩만 실행한다' \"\$CALLER\""
+check "spec 리뷰가 회차 규칙 소유자를 가리킨다" "grep -qF '한 번만 실행하는 렌즈의 규율' \"\$CALLER\""
 check "렌즈별 결과를 한데 모으는 것은 남는다" "grep -qF '한데 모아 관리하는 것은 그대로다' \"\$CALLER\""
-check "소유자가 한 번씩만 띄운다고 적는다"    "grep -qF '렌즈는 한 번씩만 띄운다' \"\$DISP\""
+check "소유자가 한 번씩만 실행한다고 적는다"    "grep -qF '렌즈는 한 번씩만 실행한다' \"\$DISP\""
 check "런타임은 서브에이전트 규율 밖이라고 적는다" "grep -qF '리뷰 콜은 제품 코드의 호출이라' \"\$RUNTIME2\""
 check "소유자 안에서 다시 정하지 않는다"      "grep -qF '여기서 다시 정하지 않는다' \"$DISP\""
 
@@ -179,20 +179,20 @@ check "그 가드가 프롬프트에도 실린다"       "grep -qF '식별자·�
 echo "[검진 개시 — 묻는 자리와 건너뛰는 자리]"
 check "검진을 열기 전에 제시한다"            "grep -qF '검진을 열기 전에 사용자에게 제시한다' \"\$DOCS\""
 check "계약이 바뀌면 묻는다"                  "grep -qF '계약·규칙·동작 변경' \"\$DOCS\""
-check "표현만 다듬었으면 건너뛴다"            "grep -qF '골랐을 뿐이면 건너뛴다' \"\$DOCS\""
-check "건너뛰면 알린다"                       "grep -qF '건너뛰었다고 한 줄 알린다' \"\$DOCS\""
+check "표현만 다듬었으면 생략한다"            "grep -qF '골랐을 뿐이면 생략한다' \"\$DOCS\""
+check "생략하면 알린다"                       "grep -qF '생략했다고 한 줄 알린다' \"\$DOCS\""
 
-echo "[한 번만 띄우므로 지킬 것 — 소유자와 여섯 렌즈 프롬프트]"
+echo "[한 번만 실행하므로 지킬 것 — 소유자와 여섯 렌즈 프롬프트]"
 # 선언 문구는 「소유 표」 블록이 정한 한 꼴을 쓴다. 옛 꼴('여기가 소유자다')로 되돌아가면 그 절이
 # 소유 표에서 빠지므로 여기서도 함께 빨개진다.
-check "dispatching-lenses가 그 규칙의 소유자다" "grep -A1 -F '## 한 번만 띄우는 렌즈의 규율' \"\$DISP\" | grep -qF '여기가 소유한다'"
+check "dispatching-lenses가 그 규칙의 소유자다" "grep -A1 -F '## 한 번만 실행하는 렌즈의 규율' \"\$DISP\" | grep -qF '여기가 소유한다'"
 check "중첩 금지를 적는다"                    "grep -qF '렌즈는 서브에이전트를 새로 열지 않는다' \"\$DISP\""
 check "이어 묻기를 적는다"                    "grep -qF '대화 턴을' \"\$DISP\""
 check "3층 오케스트레이션 예외를 적는다"      "grep -qF '3층 오케스트레이션은 이 금지의 예외다' \"\$DISP\""
 for L in "$HERE"/skills/lens-*/SKILL.md; do
   NAME="$(basename "$(dirname "$L")")"
   check "$NAME 프롬프트가 중첩을 금지한다"    "grep -F -- '- system:' \"$L\" | grep -qF '서브에이전트를 새로 열지 마라'"
-  check "$NAME 프롬프트가 여러 각도를 시킨다"  "grep -F -- '- system:' \"$L\" | grep -qF '항목마다 따로 훑고'"
+  check "$NAME 프롬프트가 여러 관점을 시킨다"  "grep -F -- '- system:' \"$L\" | grep -qF '항목마다 따로 검토하고'"
 done
 
 echo "[렌즈끼리 볼 것을 나눠 주지 않는다 — 소유자 하나, 호출자는 가리킨다]"
@@ -210,11 +210,11 @@ done
 
 echo "[dispatching-lenses — 소유자가 하나다]"
 # 렌즈 운용 규율이 문서 검진 절차와 나뉘어 있던 동안 소유자가 둘이었다. 규율은 이 스킬이 지고
-# review-docs 는 검진 절차만 진다. 절 제목과 띄우는 방법 문장이 양쪽에 함께 있으면 다시 갈린다.
-DISP_PTR='띄우는 방법은 `dispatching-lenses`가 정한다'
-check "review-docs 에 렌즈 운용 절 제목이 없다"        "! grep -qE '^## (렌즈에게 에이전트원칙을 알리는 법|판단 앞에 기계를 세운다|한 번만 띄우는 렌즈의 규율)$' \"\$DOCS\""
-check "review-docs 가 띄우는 방법을 소유자로 넘긴다"    "! grep -qF '렌즈 결과는' \"\$DOCS\" && grep -qF -- \"\$DISP_PTR\" \"\$DOCS\""
-check "소유자가 띄우는 방법을 적는다"             "grep -qF 'source를 주입' \"\$DISP\" && grep -qF '렌즈 결과는' \"\$DISP\""
+# review-docs 는 검진 절차만 진다. 절 제목과 실행하는 방법 문장이 양쪽에 함께 있으면 다시 갈린다.
+DISP_PTR='실행하는 방법은 `dispatching-lenses`가 정한다'
+check "review-docs 에 렌즈 운용 절 제목이 없다"        "! grep -qE '^## (렌즈에게 에이전트원칙을 알리는 법|판단 앞에 기계 검사를 둔다|한 번만 실행하는 렌즈의 규율)$' \"\$DOCS\""
+check "review-docs 가 실행하는 방법을 소유자로 넘긴다"    "! grep -qF '렌즈 결과는' \"\$DOCS\" && grep -qF -- \"\$DISP_PTR\" \"\$DOCS\""
+check "소유자가 실행하는 방법을 적는다"             "grep -qF 'source를 주입' \"\$DISP\" && grep -qF '렌즈 결과는' \"\$DISP\""
 DISP_MISS=""
 while IFS= read -r n; do
   [ -n "$n" ] || continue
@@ -263,7 +263,7 @@ check "🔴 반영도 다시 리뷰 대상이다"          "grep -qF '를 반영
 check "무엇이 남았는지 문서에 안 적는다"      "grep -qF '문서에 적지 않는다' \"\$CALLER\""
 check "문서 검진에 재검진 반복이 없다"        "grep -qF '다시 검진하지는 않는다' \"\$DOCS\""
 check "런타임에 다시 리뷰 반복이 없다"        "grep -qF '다시 리뷰하지는 않는다' \"\$RUNTIME2\""
-check "재검진 금지는 dispatching-lenses 가 소유한다" "grep -qF '반영한 뒤 다시 띄우지 않는다' \"\$DISP\""
+check "재검진 금지는 dispatching-lenses 가 소유한다" "grep -qF '반영한 뒤 다시 실행하지 않는다' \"\$DISP\""
 
 # --- 렌즈 스키마 사본이 공통 계약과 어긋나지 않는다 ---
 # 여섯 렌즈의 「출력 스키마」 블록은 공통 계약을 그 렌즈의 값으로 채워 보인 사본이다. 사본이므로
@@ -359,7 +359,7 @@ OWN_TSV="$(cd "$HERE" && awk '
     /여기가 소유한다/ { if (title != "") print title "\t" FILENAME }' $OWN_DOCS | sort || true)"
 check "소유 선언을 뽑았다" "[ -n \"\$OWN_TSV\" ]"
 # 앵커 자가시험 — 목록이 비면 아래 단언이 모두 근거 없이 통과한다.
-check "알려진 소유자가 표에 있다" "printf '%s' \"\$OWN_TSV\" | grep -qF '한 번만 띄우는 렌즈의 규율'"
+check "알려진 소유자가 표에 있다" "printf '%s' \"\$OWN_TSV\" | grep -qF '한 번만 실행하는 렌즈의 규율'"
 OWN_DUP="$(printf '%s' "$OWN_TSV" | cut -f1 | sort | uniq -d || true)"
 [ -n "$OWN_DUP" ] && printf '    둘 이상이 소유한 절:%s\n' "$(printf '%s' "$OWN_DUP" | tr '\n' ' ')"
 check "같은 절을 둘 이상이 소유하지 않는다" "[ -z \"\$OWN_DUP\" ]"
