@@ -47,7 +47,7 @@ fi
 if [ -n "$CANON_PATH" ] && [ -f "$CANON_PATH" ]; then
   where="에이전트원칙의 사본은 $CANON_PATH 에 있다."
 else
-  where="에이전트원칙의 사본을 못 찾았다 — disciplined-coder setup-discipline 을 돌려라."
+  where="에이전트원칙의 사본을 못 찾았다 — 새 세션을 열면 셋업이 다시 실행된다."
 fi
 # 한국어 상세는 lens-readability 폴더에 놓인 참고서다. 스킬이 아니어서 이름으로 못 열고, 관리
 # 디렉터리에 사본을 두지도 않는다. 그래서 에이전트원칙 사본과 경로가 달라 여기서 따로 도출한다.

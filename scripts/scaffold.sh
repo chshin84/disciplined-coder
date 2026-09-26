@@ -169,7 +169,7 @@ inject_rc=0
 printf '%s\n' '@disciplined-coder/agent-principles.md' '@disciplined-coder/korean-banned-words.md' \
   | managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" || inject_rc=$?
 if [ "$inject_rc" -ne 0 ]; then
-  echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열거나 /setup-discipline 을 실행하라."
+  echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열어라."
 fi
 
 # [first-session-dump] 첫 세션 도달 보강: CLAUDE.md는 이 훅보다 먼저 로드되므로, 블록을 방금 만든 세션은

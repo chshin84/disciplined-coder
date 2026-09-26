@@ -1090,16 +1090,6 @@ for D in "$HERE"/skills/lens-*/; do
 done
 check "aggregating-lenses: 출력 스키마 절이 principles_applied 를 따로 다룬다" "sec_has_id '$HERE/skills/aggregating-lenses/SKILL.md' '출력 스키마' principles_applied"
 
-# --- 커맨드가 시키는 보고를 스크립트가 실제로 낼 수 있다 ---
-# 전에는 두 스캐폴드에 값을 한 번도 안 받는 created 변수와 그것을 조건으로 삼는 보고 줄이 있었고,
-# 커맨드는 그 보고를 근거로 새로 생긴 파일과 이미 있던 파일을 알리라고 지시했다. 스크립트가 그
-# 사실을 안 내므로 지시를 따르려면 지어내야 했다. 죽은 변수가 되살아나면 여기서 실패한다.
-echo "[setup-report] the command may only ask for facts the script actually emits"
-SDC="$HERE/commands/setup-discipline.md"
-# 짧은 조각 — 커맨드 문서는 절 제목이 없는 한 문단이라 열쇠를 둘 곳이 없다.
-check "커맨드가 스크립트 출력을 전하라 한다" "grep -qF '낸 출력' '$SDC'"
-
-
 # --- 매니페스트 version 계약 ---
 # Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin).
 # 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다
