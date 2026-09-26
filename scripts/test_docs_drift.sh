@@ -408,12 +408,12 @@ check "소유자로 불리는 절이 스스로 선언한다" "[ -z \"\$OWN_UNDEC
 check "절 이름을 담은 문서가 소유자를 가리킨다" "[ -z \"\$OWN_BAD\" ]"
 
 echo "[첫 문장] 소제목 아래 첫 줄이 산문이다"
-# READ-FLOW 가 "소제목 바로 아래 첫 문장에 그 절의 결론을 적는다"고 정하는데 재는 곳이 없었다.
+# LABEL-NOUN 의 헤드 메시지가 "제목 바로 아래 첫 줄에 그 단위의 결론을 문장으로 쓴다"고 정한다.
 # 빈 줄을 건너뛴 첫 줄이 불릿·표·코드블록·인용·번호목록이면 결론 문장이 아니다. 그 줄이 산문인데
 # 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
 # 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
 # 따라온다. 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
-# 한글이 없는 제목은 건너뛴다. READ-FLOW 는 「한국어 지시사항」의 규칙이라 영어 절에는 안 걸린다.
+# LABEL-NOUN 은 「원칙」 절의 규칙이라 영어 제목에도 적용한다.
 HF_WK="$HERE/skills/lens-readability/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
@@ -427,7 +427,6 @@ for hf in $HF_DOCS; do
     BEGIN { n=split(exc, E, "\n") }
     /^#{2,3} / {
       title=$0; sub(/^#+ /, "", title)
-      if (title !~ /[가-힣]/) next
       first=""
       while ((getline line) > 0) { if (line ~ /^[ \t]*$/) continue; first=line; break }
       if (first == "") next
@@ -735,7 +734,7 @@ check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
 # 검사가 새 자리를 따라가 버려 끊긴 것을 못 잡았다. 그래서 셋을 한 줄로 함께 붙든다.
 echo "[규칙 출처] 에이전트원칙 → domain-korean → lens-readability 가 이어져 있다"
 RDB_L="$HERE/skills/lens-readability/SKILL.md"
-check "에이전트원칙에 이름 자리 조항이 있다"     "has_clause \"$CANON\" LABEL-NOUN"
+check "에이전트원칙에 한국어 조항이 있다"       "has_clause \"$CANON\" ONE-ENDING"
 check "에이전트원칙이 상세 소유자를 가리킨다"    "grep -qF 'domain-korean' \"$CANON\""
 check "렌즈가 기준 문서를 가리킨다"      "grep -qF 'domain-korean' \"$RDB_L\""
 check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'domain-korean'"
