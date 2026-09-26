@@ -808,7 +808,7 @@ check "목록이 원본 저장소를 가리킨다"  "grep -qF 'KiwoomAX/korean-b
 check "받아오는 워크플로가 있다"       "[ -f '$HERE/.github/workflows/banned-words-sync.yml' ]"
 check "워크플로가 원본 dist 를 받는다" "grep -qF 'korean-banned-words/main/dist/korean-banned-words.md' '$HERE/.github/workflows/banned-words-sync.yml'"
 
-# 규칙은 domain-korean 의 「대구 제한」이 소유한다. 사람 글 스물넷에서 0건인데 AI 글 스물넷에서
+# 사람 글 스물넷에서 0건인데 AI 글 스물넷에서
 # 스물일곱 건 나온 신호라 한도를 두었는데, 세는 곳이 없어 문서 여덟이 넘긴 채로 있었다.
 # 세는 대상에서 빼는 것이 넷이고 이유가 서로 다르다. frontmatter 의 description 은 본문이 아니고,
 # 「레퍼런스 프롬프트」 절은 서브에이전트로 실어 보내는 페이로드이며, 백틱 안은 규칙이 자기 형태를
