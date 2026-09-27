@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Stop: 커밋되지 않은 산출물 문서에 금지 표현이 남았으면 사용자에게 알린다(비블로킹).
-# 이 턴에 바뀐 것만 가려 보지 않는다. 커밋 전 문서는 턴마다 다시 알린다.
+# 이 턴에 바뀐 것만 가려 보지 않는다. 다만 같은 세션에서 알림 내용이 직전과 같으면 다시 알리지
+# 않는다. 커밋되지 않은 옛 파일 하나 때문에 같은 알림이 30시간 동안 137번 뜬 세션이 있었다
+# (2026-09-27, quant_structure). 내용이 바뀌면 다시 알리고, 세션 ID 를 못 읽으면 턴마다 알린다.
 #
 # 앞의 두 훅은 도구를 본다. Pre 는 Write·Edit 의 내용을 보고 막고, Post 는 셸 명령에서 뽑은
 # 대상을 본다. 그래서 명령줄에 대상이 안 나타나면 둘 다 못 본다 — 파이썬 스크립트가 내부에서
@@ -65,6 +67,18 @@ done <<EOF
 $FILES
 EOF
 [ -n "$REPORT" ] || exit 0
+
+# 같은 세션에 같은 알림은 한 번만 낸다. 세션 ID 와 알림 내용의 체크섬을 임시 폴더에 적어 두고
+# 다음 턴에 대조한다. 세션 ID 는 파일 이름이 되므로 영숫자와 -·_ 만 남긴다.
+json_str session_id SID
+SID="${SID//[^A-Za-z0-9_-]/}"
+if [ -n "$SID" ]; then
+  SEEN_DIR="${TMPDIR:-/tmp}/disciplined-coder-doc-word"
+  mkdir -p "$SEEN_DIR" 2>/dev/null || true
+  SUM="$(printf '%s' "$REPORT" | cksum)"; SUM="${SUM%% *}"
+  if [ -f "$SEEN_DIR/$SID" ] && [ "$(cat "$SEEN_DIR/$SID" 2>/dev/null)" = "$SUM" ]; then exit 0; fi
+  printf '%s' "$SUM" > "$SEEN_DIR/$SID" 2>/dev/null || true
+fi
 
 MSG="disciplined-coder: 커밋되지 않은 산출물 문서에 「금지 표현」 목록의 말이 남아 있다. 아래는 파일마다 검출한 말과 그 대체어다. 어느 도구가 고쳤는지와 무관하게 git 이 바뀌었다고 알린 파일을 본 결과이고, 코드 블록과 백틱 안은 검사하지 않았다. 이 알림은 사용자에게만 보이므로 고치려면 Claude 에게 요청한다.
 

@@ -370,6 +370,17 @@ check "새 폴더 안의 새 문서도 본다"    "JSTOP '$SRD' | bash '$DWSTOP'
 check "알림이 대상을 커밋 전 문서로 적는다" "JSTOP '$SR' | bash '$DWSTOP' | grep -qF '커밋되지 않은'"
 check "알림이 이 턴이라고 적지 않는다"      "! JSTOP '$SR' | bash '$DWSTOP' | grep -qF '이 턴에'"
 check "알림이 Claude 에게 명령하지 않는다"  "! JSTOP '$SR' | bash '$DWSTOP' | grep -qF '고쳐라'"
+# 같은 세션에 같은 알림은 한 번만 낸다. 커밋되지 않은 옛 파일 하나 때문에 같은 알림이 137번 뜬
+# 세션이 있었다. 내용이 바뀌거나 세션이 바뀌면 다시 알린다. 기록 폴더는 테스트 임시 폴더로 돌린다.
+JSTOPS() { printf '{"cwd":"%s","stop_hook_active":false,"session_id":"%s"}' "$1" "$2"; }
+mkdir -p "$T/seen"   # 훅이 이 폴더에서 mktemp 로 작업 폴더도 만든다
+DWS() { TMPDIR="$T/seen" bash "$DWSTOP"; }
+check "같은 세션 첫 알림은 낸다"       "JSTOPS '$SR' s1 | DWS | grep -q systemMessage"
+check "같은 세션 같은 알림은 다시 안 낸다" "[ -z \"\$(JSTOPS '$SR' s1 | DWS)\" ]"
+check "다른 세션이면 다시 낸다"        "JSTOPS '$SR' s2 | DWS | grep -q systemMessage"
+printf '이 문서는 대상을 막는다.\n' >> "$SR/report.md"
+check "내용이 바뀌면 다시 낸다"        "JSTOPS '$SR' s1 | DWS | grep -q systemMessage"
+check "세션 ID 가 없으면 턴마다 낸다"  "JSTOP '$SR' | DWS | grep -q systemMessage && JSTOP '$SR' | DWS | grep -q systemMessage"
 
 echo "[리뷰 기록은 검진 대상이 아니다]"
 # 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
