@@ -1,0 +1,110 @@
+{
+  "lens": "lens-consistency",
+  "read": [
+    "D:/projects/Structure/disciplined-coder/agent-principles.md",
+    "D:/projects/Structure/disciplined-coder/skills/lens-consistency/SKILL.md",
+    "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-09-28-titles-split-design.md",
+    "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/d64885db-ddb8-44fc-a856-abb6e319a9dc/scratchpad/titles-evidence.md",
+    "D:/projects/Structure/disciplined-coder/CLAUDE.md (「에이전트원칙을 고칠 때」 절)",
+    "D:/projects/Structure/disciplined-coder/skills/lens-fit/domain-discipline.md (제목 목록과 95~154행)",
+    "D:/projects/Structure/disciplined-coder/skills/lens-readability/domain-korean.md (제목 목록과 120~159행)",
+    "D:/projects/Structure/disciplined-coder/skills/lens-readability/SKILL.md (17·45·62·92행)",
+    "D:/projects/Structure/disciplined-coder/scripts/test_docs_drift.sh (124~181·405~440·960~1019행)",
+    "D:/projects/Structure/disciplined-coder/scripts/test_audit.sh (372~392행)",
+    "D:/projects/Structure/disciplined-coder/scripts/audit_topics.sh (grep 결과)",
+    "D:/projects/Structure/disciplined-coder/skills/review-docs/SKILL.md (32~34행)",
+    "D:/projects/Structure/disciplined-coder/README.md (grep 결과)"
+  ],
+  "issues": [
+    {
+      "where": "바뀌는 파일 표의 skills/lens-fit/domain-discipline.md 행",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 새 원자 조항 TITLE-LAYERS·TITLE-CLAIM·TITLE-PROOF 는 「원칙」 절(한국어 절 밖)에 굵은 ID 불릿으로 들어가므로 드리프트 검사가 domain-discipline.md 에 조항마다 `### \\`ID\\`` 제목을 요구한다. 그런데 spec 은 `### LABEL-NOUN` 절 하나를 다시 쓴다고만 적고, 새 ID 셋의 근거 절을 만드는 작업을 적지 않는다.",
+      "file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-09-28-titles-split-design.md",
+      "evidence": "`skills/lens-fit/domain-discipline.md` | `### LABEL-NOUN` 절을 `TITLES` 묶음의 근거로 다시 쓴다.",
+      "counterpart_file": "D:/projects/Structure/disciplined-coder/scripts/test_docs_drift.sh",
+      "counterpart": "ALL_IDS=\"$(grep -oE '^- \\*\\*`[A-Z][A-Z0-9-]*`' \"$CANON\" ...)\" ... grep -qE \"^### \\`$did\\`\" \"$DC_WK\" || DC_MISS=\"$DC_MISS $did\" ... check \"참고서가 모든 조항 ID 로 근거를 단다\"",
+      "principle": "CHECKABLE",
+      "consequence": "현재 spec 대로 고치면 KO_IDS 추출 범위(`### PLAIN-KO` 부터)가 TITLES 를 포함하지 않으므로 세 ID 가 DC_MISS 에 올라 「확인 방법」의 ALL PASS 조건을 만족하지 못한다."
+    },
+    {
+      "where": "바뀌는 파일 표의 domain-discipline.md 행과 새 조항 절",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 참고서에 묶음 이름 TITLES 를 `### \\`TITLES\\`` 로 적으면 참고서→원칙 방향 검사가 에이전트원칙에서 `**\\`TITLES\\`` 를 찾는데, 에이전트원칙은 TITLES 를 굵은 불릿이 아니라 `###` 제목으로 둔다. domain-discipline.md 는 「원칙」이 `##` 절이라 domain-korean.md 처럼 묶음을 `## GROUP — 이름` 층으로 둘 수도 없다. spec 은 참고서 안에서 묶음을 어느 층의 제목으로 둘지 정하지 않는다.",
+      "file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-09-28-titles-split-design.md",
+      "evidence": "`LABEL-NOUN` 한 조항을 「원칙」 절 안의 묶음 `TITLES` 로 바꾼다.",
+      "counterpart_file": "D:/projects/Structure/disciplined-coder/scripts/test_docs_drift.sh",
+      "counterpart": "awk '... /^### `[A-Z0-9-]+`$/ { gsub(/^### `|`$/, \"\"); print }' ... grep -qF \"**\\`$id\\`\" \"$1\" || miss=\"$miss $id\"",
+      "principle": "CHECKABLE",
+      "consequence": "domain-discipline.md 는 현재 「## 원칙」 아래에 조항마다 `###` 만 두고 묶음 층이 없으므로, 묶음 근거를 쓰는 방식에 따라 검사 실패나 구조 불일치가 생기며 그 선택이 spec 에 없다."
+    },
+    {
+      "where": "바뀌는 파일 표의 skills/lens-readability/SKILL.md 행",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 표는 17행의 고정 규칙만 고친다고 적는데, 같은 파일의 관찰 목록(45행)과 제목 판정 설명(62행)과 레퍼런스 프롬프트(92행)도 LABEL-NOUN·헤드 메시지·'제목은 명사구, 결론은 아래 첫 줄' 규칙을 싣고 있다.",
+      "file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-09-28-titles-split-design.md",
+      "evidence": "고정 규칙에서 \"결론이 든 제목은 명사구로 고치고 결론을 아래 줄로 내린다\"를 지운다.",
+      "counterpart_file": "D:/projects/Structure/disciplined-coder/skills/lens-readability/SKILL.md",
+      "counterpart": "92행: 「원칙」 절의 `LABEL-NOUN`을 고정 규칙으로 읽어라 ... 제목이 명사구여도 결론·판단·결과 수치를 포함하면 개념만 가리키는 이름으로 고치고, 그 내용은 제목 아래 첫 줄(헤드 메시지)로 내려 적어 줘라. / 62행: 제목과 소제목은 명사구인지 보고 ... 주장은 바로 아래 첫 문장이 맡는다",
+      "principle": "LABEL-NOUN(개정 대상), TITLE-LAYERS",
+      "consequence": "표대로만 고치면 렌즈 프롬프트는 여전히 LABEL-NOUN 만 고정 규칙으로 읽고 결론형 슬라이드 제목을 명사구로 되돌리라고 지시하며, 이는 spec 「확인 방법」의 렌즈 항목과 모순된다."
+    },
+    {
+      "where": "확인 방법의 포인터 항목과 바뀌는 파일 표의 scripts/test_docs_drift.sh 행",
+      "type": "contradiction",
+      "claim": "확인 방법은 살아 있는 문서에서 '헤드 메시지'가 domain-discipline.md 경위 서술 말고는 0건이어야 한다고 하는데, 바뀌는 파일 표는 test_docs_drift.sh 주석에서 LABEL-NOUN 만 TITLE-LAYERS 로 바꾼다고 적는다. 그 주석 줄은 '헤드 메시지'를 함께 담고 있다.",
+      "file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-09-28-titles-split-design.md",
+      "evidence": "「첫 문장」 검사 주석의 `LABEL-NOUN` 을 `TITLE-LAYERS` 로 바꾼다. / `grep -rn \"헤드 메시지\"` 가 살아 있는 문서에서 `domain-discipline.md` 의 경위 서술 말고는 0건이다.",
+      "counterpart_file": "D:/projects/Structure/disciplined-coder/scripts/test_docs_drift.sh",
+      "counterpart": "411행: # LABEL-NOUN 의 헤드 메시지가 \"제목 바로 아래 첫 줄에 그 단위의 결론을 문장으로 쓴다\"고 정한다.",
+      "principle": "CHECKABLE",
+      "consequence": "표대로 ID 만 바꾸면 이 주석에 '헤드 메시지'가 남는다. 스크립트가 '살아 있는 문서'에 드는지도 spec 이 정하지 않아 포인터 확인의 판정이 갈린다."
+    },
+    {
+      "where": "새 조항 절의 SECTION-HEAD 관계 항목과 바뀌는 파일 표",
+      "type": "drift",
+      "claim": "SECTION-HEAD 의 '소제목'을 '절 제목'으로 바꿔 용어를 맞춘다고 하지만, 같은 검사를 가리키는 test_docs_drift.sh 의 표시문과 check 이름은 '소제목 아래 첫 줄'이라는 옛 용어를 유지하며 바뀌는 파일 표에 들어 있지 않다. domain-korean.md 의 SECTION-HEAD 근거 절도 '소제목으로 나눠 준 글'이라고 적는다.",
+      "file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-09-28-titles-split-design.md",
+      "evidence": "문구를 \"절 제목으로 끊어라\"로 바꾼다. 행동을 바꾸는 변경이 아니라 용어를 맞추는 변경이다.",
+      "counterpart_file": "D:/projects/Structure/disciplined-coder/scripts/test_docs_drift.sh",
+      "counterpart": "410행: echo \"[첫 문장] 소제목 아래 첫 줄이 산문이다\" / 439행: check \"소제목 아래 첫 줄이 모두 산문이다\"",
+      "principle": "TERM-ONE",
+      "consequence": "변경 뒤에는 에이전트원칙이 '절 제목'이라 부르는 대상을 검사 출력과 참고서가 계속 '소제목'이라 부르게 되고, TITLE-LAYERS 가 전달 문서에서 금지하는 '### 소제목 층'과 같은 낱말이 된다."
+    },
+    {
+      "where": "새 조항 절의 '가정 — ### 금지의 범위' 항목",
+      "type": "drift",
+      "claim": "spec 은 ### 금지 범위를 '남에게 전달되는 문서와 발표자료'로 적으면서 이것이 review-docs 「셋째 렌즈를 추가하는 조건」의 구분과 같다고 한다. 그런데 그 절은 '사람이 처음부터 끝까지 읽는 문서'와 '필요한 절만 찾아 읽는 참조물'로 나눈다. 같은 경계를 두 이름으로 가리키고, 두 이름이 덮는 문서 집합도 다르다.",
+      "file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-09-28-titles-split-design.md",
+      "evidence": "금지는 남에게 전달되는 문서와 발표자료로 한정했다. 이 구분은 `review-docs` 의 「셋째 렌즈를 추가하는 조건」이 쓰는 구분과 같다.",
+      "counterpart_file": "D:/projects/Structure/disciplined-coder/skills/review-docs/SKILL.md",
+      "counterpart": "사람이 처음부터 끝까지 읽는 문서에는 `lens-readability`를 셋째 렌즈로 추가한다. ... 필요한 절만 찾아 읽는 참조물에는 자동으로 적용하지 않는다.",
+      "principle": "TERM-ONE",
+      "consequence": "TITLE-LAYERS 문구는 '남에게 전달되는 문서'를 쓰므로, 남에게 배포되는 참조물(스킬·참고서)은 ### 금지에 걸린다. spec 이 근거로 든 review-docs 구분으로 보면 같은 참조물이 금지 대상에서 빠진다."
+    },
+    {
+      "where": "효과 측정 절",
+      "type": "contradiction",
+      "claim": "spec 이 스스로 따르는 저장소 규칙(CLAUDE.md 「에이전트원칙을 고칠 때」)은 조항마다 서로 다른 과제 3개를 실행하라고 한다. spec 은 과제 다섯 개의 같은 출력을 조항별로 채점했고 조건마다 1회만 실행했다. 우선순위 문장과 40자 상한은 측정하지 않았다고 스스로 밝히면서도 에이전트원칙에 넣는다.",
+      "file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-09-28-titles-split-design.md",
+      "evidence": "조항마다 과제 3개를 따로 실행하는 대신 같은 출력을 조항별 기준으로 채점했다. 우선순위 문장과 40자 상한은 시험 뒤에 넣었으므로 측정되지 않았다.",
+      "counterpart_file": "D:/projects/Structure/disciplined-coder/CLAUDE.md",
+      "counterpart": "조항 추가와 문구 변경 — 클린룸 소거 시험으로 효과를 확인한다. 조항마다 서로 다른 과제 3개를 CLAUDE.md가 빈 모델과 그 조항만 실은 모델에서 실행하고, 개선이 없으면 과제 2개를 더 실행한다.",
+      "principle": "NO-ASSUME",
+      "consequence": "spec 이 정한 최종 문구(우선순위 문장, TITLE-CLAIM 의 40자 상한, B안이 빠진 묶음)는 저장소 규칙이 요구하는 시험을 거치지 않은 채 바뀌는 파일 표로 넘어간다. 측정은 B안과 TEMPLATE-FIRST 가 든 앞선 판에서 이루어졌다."
+    },
+    {
+      "where": "새 조항 절의 TITLES 블록",
+      "type": "drift",
+      "claim": "「원칙」 절의 다른 조항은 모두 `**\\`ID\\` (영문 풀이)**` 꼴인데, 새 LABEL-NOUN 과 TITLE-* 불릿은 영문 풀이가 없는 「한국어 지시사항」 묶음 꼴이다. LABEL-NOUN 은 그 과정에서 기존 영문 풀이 '(Headings name, head messages conclude)'를 잃는다. 이 변경은 spec 에 적혀 있지 않다.",
+      "file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-09-28-titles-split-design.md",
+      "evidence": "- **`LABEL-NOUN`** — 불릿 라벨과 표 머리와 차트의 축과 범례는 명사구로 쓰고, 대상을 식별하는 수치는 괄호에 둬라.",
+      "counterpart_file": "D:/projects/Structure/disciplined-coder/agent-principles.md",
+      "counterpart": "- **`LABEL-NOUN` (Headings name, head messages conclude)** — ... / - **`CHECKABLE` (Turn the task into a check)** — ...",
+      "principle": "ONE-ENDING",
+      "consequence": "변경 뒤 「원칙」 절 한 곳에 두 불릿 형식이 섞인다. 기존 풀이는 헤드 메시지를 전제하므로, 풀이를 남기면 새 규칙과 어긋나고 지우면 형식이 갈린다. spec 은 둘 중 어느 쪽인지 정하지 않는다."
+    }
+  ],
+  "principles_applied": ["NO-ASSUME", "STATE-ASSUME", "FOCUSED", "NO-FLEET", "CHECKABLE", "TERM-ONE", "WRITTEN-ONLY", "NO-MIRROR", "FULL-SENTENCE"],
+  "notes": "체크리스트 항목마다 검토한 결과를 적는다. 모순 항목에서 B안 철회와 측정 절의 B안 언급은 모순이 아니다. spec 이 측정 초안이 B안을 포함한 앞선 판이었다고 명시하기 때문이다. 우선순위 문장은 「바꾸는 이유」·새 조항 블록·측정 표 세 곳에서 뜻이 같다. 블록은 '이 묶음보다 그 형식을 우선하라'라고 적어 비교 대상을 하나 더 밝힐 뿐이다. '원칙 절 끝' 배치는 현재 「원칙」 절에 `###` 가 없고 CHECKABLE 뒤가 곧 `## 한국어 지시사항` 이므로 구조상 충돌하지 않는다. 묶음 형식은 한국어 묶음과 같다(`### \\`ID\\` — 한국어 이름`, 적용 조건 한 문장, 굵은 ID 불릿). 다만 test_docs_drift.sh 1006행의 묶음 존재 검사는 한국어 묶음 여섯만 열거하므로 TITLES 묶음 제목에는 가드가 없다. 그래서 발견으로 올리지 않고 여기에 적는다. ID 충돌 항목에서 TITLES·TITLE-LAYERS·TITLE-CLAIM·TITLE-PROOF 는 기존 ID 와 겹치지 않고, 되살림 금지 목록(1012행)에도 없다. audit_topics.sh 와 test_audit.sh 의 ID 추출은 `^- \\*\\*\\`` 꼴이라 새 불릿을 자동으로 따라간다. 참조처 항목에서 README.md 는 LABEL-NOUN·헤드 메시지·SECTION-HEAD 를 언급하지 않으므로 표에서 빠져도 공백이 아니다. korean-banned-words.md 77행과 audit-repo-docs/SKILL.md 131행의 '소제목'은 일반 명사로 쓰였다고 보아 올리지 않았다. domain-korean.md 의 '두 곳'은 129행과 134행으로 확인했다. 스코프 항목에서 「범위 밖」의 두 항목은 본문과 겹치지 않는다. 산출물 항목에서는 바뀌는 파일 표가 파일과 바뀌는 내용을 정하므로 산출물 공백을 찾지 못했다. 추가로 확인할 것이 셋 있다. 첫째, TITLE-LAYERS 가 옛 LABEL-NOUN 의 '문서 제목 아래 요약'을 어느 층으로 옮기는지 명시하지 않는다(`#` 이 목차라면 문서 전체의 본문 제목이 어디인지). 둘째, domain-discipline.md 132행의 '식별자는 제목에 둘 수 있다'는 예외가 TITLE-LAYERS 의 '목차에 수치를 넣지 마라'와 함께 남는지 확인해야 한다. 셋째, 「확인 방법」의 '살아 있는 문서'가 scripts/ 를 포함하는지 확인해야 한다."
+}

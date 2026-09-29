@@ -12,6 +12,7 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 . "$HERE/scripts/_json_valid.sh"   # json_run — 파이썬 이름은 여기가 고른다
+. "$HERE/scripts/_audit_common.sh" # AUDIT_PY_TEXT — norm·text 공유
 CMD="${1:-}"; [ "$#" -gt 0 ] && shift
 ROOT="$HERE"; TOKENS=0; SECS=0; A=""; B=""; PRIOR=""; PRIOR_DIFF=""
 while [ "$#" -gt 0 ]; do
@@ -27,19 +28,10 @@ done
 case "$CMD" in
   diff)
     [ -n "$A" ] || { echo "사용: audit_rounds.sh diff [--root DIR] [--prior <앞선 findings.json>] [--prior-diff <앞선 diff.json>] <이번 findings.json>" >&2; exit 2; }
-    json_run '
+    json_run "$AUDIT_PY_TEXT"'
 import json, os, re, sys
 sys.stdout.reconfigure(encoding="utf-8", newline=chr(10))
 root, cur_p, prior_p, prior_diff_p = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-def norm(s): return re.sub(r"\s+", " ", s or "").strip()
-cache = {}
-def text(p):
-    p = (p or "").split(":")[0]
-    if not p: return None
-    if p not in cache:
-        try: cache[p] = norm(open(os.path.join(root, p), encoding="utf-8").read())
-        except Exception: cache[p] = None
-    return cache[p]
 cur = json.load(open(cur_p, encoding="utf-8"))
 cur_fp = {}
 for f in cur.get("findings", []):

@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-# scaffold.sh에서 분리한 관리 디렉터리 정책(SSOT) — 여기가 정본.
+# scaffold.sh에서 분리한 관리 디렉터리 정책 — 원본은 이 파일이다.
 
-# 관리 디렉터리에 두는 정본 파일. 두 스캐폴드가 복사하고 주입하는 것이 이 목록이다.
-SCAFFOLD_FILES="agent-principles.md"
-# 화이트리스트는 정본 파일에 backups 디렉터리와 사용자가 쓰는 파일을 더한 것이다. 위생 검사가 이
+# 관리 디렉터리에 두는 파일. 스캐폴드가 복사하고 주입하는 것이 이 목록이다.
+SCAFFOLD_FILES="agent-principles.md korean-banned-words.md"
+# 화이트리스트는 이 파일들에 backups 디렉터리와 사용자가 쓰는 파일을 더한 것이다. 위생 검사가 이
 # 목록 밖을 훑는다. 파일 이름을 다른 곳에 다시 적지 않는다 — 여기만 고친다.
 # plugin-notice.skip 은 함께 쓰는 플러그인 알림을 끄려고 사용자가 이름을 적는 파일이라, 스캐폴드가
 # 만들지도 지우지도 않지만 잔존 경고를 내서도 안 된다.
-SCAFFOLD_WHITELIST="$SCAFFOLD_FILES backups plugin-notice.skip"
-# 구 관리파일은 매 세션 조용히 지운다. issue-mode·ultracode-review는 토글이던 상태 파일인데,
-# 토글을 없애면서 화이트리스트에서만 빼면 내용이 있어 '비관리 파일' 경고로 영원히 남는다.
-# advisors-index·unsolved_problems도 같은 이유로 여기 있다 — 앞은 domains-index로 이름이 바뀐 옛
-# 파일이고, 뒤는 손유지 백로그라 없앤 기능의 잔재다. 둘 다 내용이 있어 위생 검사가 지우지 못한다.
-# solved_problems는 파일과 디렉터리 둘로 남는다 — 로그를 쪼갠 PC에는 폴더가 남기 때문이다.
-SCAFFOLD_STALE="coding-principles.md issue-mode ultracode-review advisors-index.md unsolved_problems.md solved_problems.md solved_problems domains-index.md"
+# update.seen 과 update.stuck 은 hooks/update_check_sessionstart.sh 가 쓰는 갱신 확인 기록이다.
+SCAFFOLD_WHITELIST="$SCAFFOLD_FILES backups plugin-notice.skip update.seen update.stuck"
+# 구 관리파일은 매 세션 조용히 치운다. 화이트리스트에서 빼기만 하면 내용이 있는 파일은 위생 검사가
+# 지우지 못하고 '비관리 파일' 경고를 stderr 로만 내는데, SessionStart 훅의 stderr 는 사용자에게
+# 보이지 않아 그 경고가 매 세션 아무에게도 닿지 않는다. 없앤 토글의 상태 파일, 이름이 바뀐 옛 파일,
+# 없앤 기능의 잔재가 여기 든다. solved_problems 는 로그를 쪼갠 PC 에 디렉터리로도 남아 둘 다 적는다.
+SCAFFOLD_STALE="coding-principles.md issue-mode ultracode-review advisors-index.md unsolved_problems.md solved_problems.md solved_problems domains-index.md korean-banned-words-dc.md"
 
 scaffold_hygiene() {  # $1=KDIR
   local kdir="$1" f b w keep
@@ -42,7 +42,7 @@ scaffold_hygiene() {  # $1=KDIR
   fi
   for f in "$kdir"/*; do
     [ -e "$f" ] || continue
-    b="$(basename "$f")"
+    b="${f##*/}"
     keep=0; for w in $SCAFFOLD_WHITELIST; do [ "$b" = "$w" ] && { keep=1; break; }; done
     [ "$keep" = 1 ] && continue
     if [ -d "$f" ]; then

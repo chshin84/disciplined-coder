@@ -1,35 +1,17 @@
 #!/usr/bin/env bash
 # Stop: 미리뷰 spec/plan이 남으면 종료 차단(하드 게이트). 루프가드: stop_hook_active.
 # 탐지: git 신규(미추적·추가) spec/plan + HEAD 커밋이 추가한 spec/plan 중 마지막 줄이 terminal
-# 마커가 아닌 것(Fix C — 같은 턴 커밋 우회 차단). 기존 파일 수정은 제외(Fix A).
-# 순수 bash(jq 비의존). git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).
+# 마커가 아닌 것(HEAD 쪽은 같은 턴에 커밋해 게이트를 비켜 가는 것을 막는다). 기존 파일 수정은 제외.
+# jq 비의존. git/디렉터리 없으면 FAIL-OPEN(작업불능 방지 — 알려진 한계).
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
-HOOKDIR="$(cd "$(dirname "$0")" && pwd)"
-. "$HOOKDIR/_spec_marker.sh"    # terminal 마커 판정(SSOT) 공유
-. "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프(SSOT) 공유
+HOOKDIR="${BASH_SOURCE[0]%/*}"; [ "$HOOKDIR" != "${BASH_SOURCE[0]}" ] || HOOKDIR=.
+. "$HOOKDIR/_hook_input.sh"     # 훅 입력 읽기(json_str·slash_norm) 공유
+. "$HOOKDIR/_spec_marker.sh"    # terminal 마커 판정 공유
+. "$HOOKDIR/_json_escape.sh"    # JSON 문자열 이스케이프 공유
+. "$HOOKDIR/_stop_preamble.sh"  # 루프가드·cwd·저장소 루트 이동 공유
 INPUT="$(cat)"
-case "$INPUT" in *'"stop_hook_active":true'*|*'"stop_hook_active": true'*) exit 0 ;; esac  # 루프가드
-command -v git >/dev/null 2>&1 || exit 0
-cwd="$(printf '%s' "$INPUT" | sed -n 's/.*"cwd"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1)"
-cwd="$(printf '%s' "$cwd" | tr -s '\\' '/')"
-if [ -n "$cwd" ]; then cd "$cwd" 2>/dev/null || exit 0; fi
-# git이 "저장소가 아니다"라고 답하면 잠글 대상이 없으니 조용히 통과한다(FAIL-OPEN, 문서화된 한계).
-# 그 밖의 실패(소유권 의심·인덱스 손상 등)는 게이트를 검사하지 못한 것이므로 알리고 통과한다 —
-# 아무 신호 없이 열리면 게이트가 꺼진 것을 알아챌 방법이 없다(FAIL-LOUD).
-_gitout="$(git rev-parse --is-inside-work-tree 2>&1)" || {
-  case "$_gitout" in *'not a git repository'*) exit 0 ;; esac
-  printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: git을 읽지 못해 spec 리뷰 게이트를 검사하지 못했다 — $(printf '%s' "$_gitout" | head -n1)")"
-  exit 0
-}
-# 레포 루트로 옮긴 뒤에 찾는다. 아래 두 탐색이 모두 레포 루트 기준 경로를 쓰기 때문이다 —
-# git status 의 pathspec(`docs/superpowers/...`)은 현재 폴더 기준이고, diff-tree 가 돌려주는
-# 경로와 `[ -f "$f" ]` 도 루트 기준이다. 그래서 세션의 작업 폴더가 하위 폴더이면(예: myrepo/backend)
-# 미리뷰 spec 을 하나도 못 찾고 아무 메시지 없이 통과시켰다 — 게이트가 꺼진 것을 알아챌 방법이
-# 없는 조용한 실패다(`FAIL-LOUD`).
-_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
-[ -n "$_root" ] || exit 0
-cd "$_root" 2>/dev/null || exit 0
+stop_enter_repo "spec 리뷰 게이트를 검사하지 못했다"
 
 # 경로는 배열에 모은다 — 공백으로 이어 붙이면 NUL 종료로 얻은 안전성이 그 자리에서 무너진다.
 unreviewed=()
@@ -38,14 +20,14 @@ unreviewed=()
 while IFS= read -r -d '' entry; do
   f="${entry:3}"
   [ -n "$f" ] || continue
-  # Fix A: 신규(미추적 ??·추가 A)만 하드게이트 — 기존 spec 수정(상태 strip 등)엔 안 건다(넛지는 PostToolUse가).
+  # 신규(미추적 ??·추가 A)만 하드게이트 — 기존 spec 수정(상태 strip 등)엔 안 건다(넛지는 PostToolUse가).
   case "${entry:0:2}" in '??'|A*) ;; *) continue ;; esac
   path_is_specplan "$f" || continue
   [ -f "$f" ] || continue
   marker_is_terminal "$f" || unreviewed+=("$f")
 done < <(git status -z --porcelain --untracked-files=all --no-renames -- $SPECPLAN_DIRS 2>/dev/null)
 
-# Fix C: 같은 턴 커밋 우회 차단 — HEAD 커밋이 추가(A)한 spec/plan도 검사한다.
+# 같은 턴 커밋 우회 차단 — HEAD 커밋이 추가(A)한 spec/plan도 검사한다.
 # 경계는 직전 커밋 하나: 과거 이력을 소급 차단하지 않는다(훅 도입 전 무마커 레거시가 있는
 # 레포에서 상시 차단 → 게이트 영구 off라는 더 나쁜 드리프트를 피한다). 루트 커밋(--root 미사용)
 # ·머지 커밋(-m 미사용)·다중 커밋 우회는 알려진 한계(레거시 임포트 오차단 회피와 같은 근거).

@@ -5,6 +5,7 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 . "$HERE/scripts/_json_valid.sh"   # json_run — 파이썬 이름은 여기가 고른다
+. "$HERE/scripts/_audit_common.sh" # AUDIT_PY_TEXT — norm·text 공유
 ROOT="$HERE"; IN=""
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -13,19 +14,10 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 [ -n "$IN" ] || { echo "사용: audit_evidence.sh [--root DIR] <findings.json>" >&2; exit 2; }
-json_run '
+json_run "$AUDIT_PY_TEXT"'
 import json, os, re, sys, hashlib
 sys.stdout.reconfigure(encoding="utf-8", newline=chr(10))
 root, path = sys.argv[1], sys.argv[2]
-def norm(s): return re.sub(r"\s+", " ", s or "").strip()
-cache = {}
-def text(p):
-    p = (p or "").split(":")[0]
-    if not p: return None
-    if p not in cache:
-        try: cache[p] = norm(open(os.path.join(root, p), encoding="utf-8").read())
-        except Exception: cache[p] = None
-    return cache[p]
 d = json.load(open(path, encoding="utf-8"))
 for f in d.get("findings", []):
     ev, cp = norm(f.get("evidence")), norm(f.get("counterpart"))

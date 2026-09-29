@@ -8,7 +8,11 @@
 # 게이트 환경변수와 무관하다 — 지우는 것은 안내가 아니라 청소다.
 set -euo pipefail
 INPUT="$(cat)"
-sid="$(printf '%s' "$INPUT" | grep -o '"session_id"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)"$/\1/' || true)"
+# 키는 PreToolUse 훅과 같은 json_str 로 뽑는다. 두 훅이 다른 방식으로 뽑으면 같은 입력에서 다른 값이
+# 나와 표시 파일을 지우지 못한다.
+DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
+. "$DIR/_hook_input.sh"
+json_str session_id sid
 [ -n "$sid" ] || exit 0
 mdir="${TMPDIR:-/tmp}/disciplined-coder"
 # 서브에이전트 몫은 agent_id 가 뒤에 붙으므로 글롭으로 함께 지운다. 없으면 -f 가 조용히 넘어간다.

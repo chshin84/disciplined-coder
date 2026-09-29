@@ -9,16 +9,23 @@
 # 경로에 WindowsApps 가 들었는지로 가르지 않는 것은 스토어로 깐 진짜 파이썬도 거기 놓이기 때문이다.
 # WindowsApps 의 python3.exe 는 실물을 가리키는 링크라 readlink 로 그 실물의 이름을 볼 수 있다.
 set -euo pipefail
-DIR="$(cd "$(dirname "$0")" && pwd)"
-. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유(SSOT)
 INPUT="$(cat)"
+
+# 무엇도 하기 전에 거른다. 이 훅은 모든 Bash 호출에 걸리고 아래는 프로세스 넷을 띄우므로, 평상시
+# 호출은 여기서 끝낸다. 명령에 python3 이라는 글자가 아예 없으면 아래 awk 가 잡을 것도 없으므로 동작은 같다.
+# 훅 입력 전체를 보므로 명령만 보는 것보다 넓다. 넓은 쪽이 안전하다 — 좁으면 잡을 것을 버린다.
+case "$INPUT" in *python3*) ;; *) exit 0 ;; esac
+
+# 거르기를 지난 뒤에야 폴더를 구하고 헬퍼를 싣는다. 소싱도 프로세스를 하나 쓴다.
+DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
+. "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유
 
 # python3 이 무엇으로 풀리는지 낸다. 테스트는 DISCIPLINED_CODER_PYTHON3_STATE 로 결과를 주입해
 # OS 와 PATH 를 안 본다 — 그것이 없으면 CI(ubuntu)와 윈도우 PC 에서 결과가 갈린다.
 python3_target() {
   if [ -n "${DISCIPLINED_CODER_PYTHON3_STATE:-}" ]; then printf '%s' "$DISCIPLINED_CODER_PYTHON3_STATE"; return 0; fi
-  case "$(uname -s 2>/dev/null || echo unknown)" in
-    MINGW*|MSYS*|CYGWIN*) ;;
+  case "${OSTYPE:-}" in
+    msys*|cygwin*) ;;
     *) printf 'not-windows'; return 0 ;;
   esac
   p="$(command -v python3 2>/dev/null || true)"
@@ -68,7 +75,7 @@ END {
 ')"
 [ -n "$HIT" ] || exit 0
 
-reason="이 PC 에서 python3 은 파이썬이 아니다. 마이크로소프트 스토어로 보내는 안내판이라 'Python' 이라는 낱말만 찍고 종료 코드 49 로 끝나므로, 스크립트가 통째로 안 돌아도 성공처럼 보인다. python 이나 py -3 으로 부르라. python3 이 가리키는 실물: $TARGET"
+reason="이 PC 에서 python3 은 파이썬이 아니다. 마이크로소프트 스토어로 보내는 안내판이라 'Python' 이라는 낱말만 출력하고 종료 코드 49 로 끝나므로, 스크립트가 전혀 실행되지 않아도 성공처럼 보인다. python 이나 py -3 으로 실행하라. python3 이 가리키는 실물: $TARGET"
 esc="$(escape_for_json "$reason")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$esc"
 exit 0
