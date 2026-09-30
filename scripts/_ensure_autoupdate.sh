@@ -15,7 +15,7 @@
 # 쓰기 실패에 자리를 따로 잡는 까닭: 읽기 실패와 같은 값이면 "읽지 못했거나 내용이 JSON이 아니다"로
 # 알려져, 멀쩡한 설정 파일을 뜯어보게 만든다.
 
-# $1=설정 홈(~/.claude), $2=플러그인 루트. 바뀐 파일이 있으면 그 경로를 한 줄씩 출력한다.
+# $1=설정 홈(~/.claude), $2=플러그인 루트. 바뀐 파일이 있으면 "<바뀐 경로>|<사본 경로>"를 한 줄씩 출력한다.
 ensure_marketplace_autoupdate() {
   local home="$1" root="$2" mkt_json="$2/.claude-plugin/marketplace.json" f rc
   if [ ! -f "$mkt_json" ]; then
@@ -35,9 +35,9 @@ ensure_marketplace_autoupdate() {
   done
 }
 
-# $1=고칠 파일, $2=marketplace.json. 고쳤으면 경로를 출력하고 0. 위 종료코드 표를 따른다.
+# $1=고칠 파일, $2=marketplace.json. 고쳤으면 "<경로>|<사본 경로>"를 출력하고 0. 위 종료코드 표를 따른다.
 _autoupdate_patch() {
-  local f="$1" mkt="$2" tmp="$1.dc-tmp" rc
+  local f="$1" mkt="$2" tmp="$1.dc-tmp" rc bak
   local prog='
 import json,sys,io
 f,mktf=sys.argv[1],sys.argv[2]
@@ -66,7 +66,8 @@ sys.exit(0)
   # 세션마다 같은 실패가 되풀이된다. 이 이름은 우리가 정한 것이라 지워도 안전하다.
   if [ "$rc" -ne 0 ]; then rm -rf "$tmp"; return "$rc"; fi
   [ -s "$tmp" ] || { rm -rf "$tmp"; return 5; }
-  cp "$f" "$f.$(date +%Y%m%d-%H%M%S).bak" || { rm -rf "$tmp"; return 5; }
+  bak="$f.$(date +%Y%m%d-%H%M%S).bak"
+  cp "$f" "$bak" || { rm -rf "$tmp"; return 5; }
   mv "$tmp" "$f" || { rm -rf "$tmp"; return 5; }
-  echo "$f"
+  echo "$f|$bak"
 }

@@ -4,7 +4,7 @@
 
 ## 설치
 
-스코프는 user여야 모든 프로젝트에서 hook이 실행된다. Windows는 [Git Bash](https://git-scm.com/downloads)와 [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows)을 먼저 설치한다. hook이 `bash`로 스크립트를 실행하고, 환경 변수를 넣는 단계가 `pwsh`를 호출하기 때문이다. 윈도우 기본 5.1(`powershell`)로는 동작하지 않는다. 마켓플레이스 자동 갱신과 갱신 확인과 금지 표현 검사에는 파이썬이 필요하다. 파이썬이 없으면 이 셋은 알림 없이 건너뛴다.
+스코프는 user여야 모든 프로젝트에서 hook이 실행된다. Windows는 [Git Bash](https://git-scm.com/downloads)와 [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows)을 먼저 설치한다. hook이 `bash`로 스크립트를 실행하고, 환경 변수를 넣는 단계가 `pwsh`를 호출하기 때문이다. 윈도우 기본 5.1(`powershell`)로는 동작하지 않는다. 마켓플레이스 자동 갱신과 갱신 확인과 금지 표현 검사에는 파이썬이 필요하다. 파이썬이 없으면 갱신 확인과 금지 표현 검사는 알림 없이 통과하고, 자동 갱신 설정은 WARNING 을 낸다.
 
 ```text
 /plugin marketplace add chshin84/disciplined-coder

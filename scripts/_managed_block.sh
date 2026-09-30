@@ -170,11 +170,11 @@ managed_block_remove() {
   return 0
 }
 
-# 리턴: 0=넣었음, 1=락을 못 잡아 아무것도 안 함, 2=변환이 실패해 원본을 그대로 두었음.
+# 리턴: 0=넣었거나 이미 같다, 1=락을 못 잡아 아무것도 안 함, 2=변환이 실패해 원본을 그대로 두었음.
 # 락을 못 잡았으면 파일을 건드리지 않고 물러난다 — 반쪽만 쓴 관리블록을 남기는 것보다 안 쓰는
-# 것이 낫고, 못 썼다는 사실은 managed_block_lock 이 이미 stderr 로 알렸다.
+# 것이 낫고, 못 썼다는 사실은 managed_block_lock 이 stderr 로 알린다. 호출자가 그 stderr 를 stdout 에 합쳐 사용자에게 닿게 한다.
 managed_block_inject() {
-  local uc="$1" begin="$2" end="$3" body tmp norm lock tok cur rest
+  local uc="$1" begin="$2" end="$3" body tmp norm lock tok cur rest rest2
   body="$(cat)"
   [ -e "$uc" ] || : > "$uc"
   # 같은 블록이 하나만 들어 있고 고아 주석도 없으면 손대지 않는다. 매 세션 다시 쓰면 그 사이에
@@ -182,7 +182,8 @@ managed_block_inject() {
   cur="$(<"$uc")"
   if [[ $cur == *"$begin"$'\n'"$body"$'\n'"$end"* ]] && [[ $cur != *"$MANAGED_ORPHAN"* ]]; then
     rest="${cur#*"$begin"}"
-    [[ $rest == *"$begin"* ]] || return 0
+    rest2="${cur#*"$end"}"
+    [[ $rest != *"$begin"* && $rest2 != *"$end"* ]] && return 0
   fi
 
   lock="$uc.lock"

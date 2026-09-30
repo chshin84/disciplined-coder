@@ -87,7 +87,7 @@ scaffold_hygiene "$KDIR" 2>&1
 
 # [project-old-block] 없앤 기능(/add-pointer)이 프로젝트 CLAUDE.md에 심어 두던 옛 관리블록을 걷어낸다. 지금은
 #     아무것도 그 블록을 다시 만들지 않으므로 남아 있으면 갱신되지 않는 고아다. 마커가 같으니
-#     전역 CLAUDE.md와 같은 파일이면 건너뛴다 — 그건 이 훅이 매 세션 다시 만드는 정상 블록이다.
+#     전역 CLAUDE.md와 같은 파일이면 건너뛴다 — 그건 이 훅이 내용이 다를 때만 다시 만드는 정상 블록이다.
 #     같은 파일인지는 문자열이 아니라 -ef 로 본다. 작업 폴더가 ~/.claude 이면 Windows 형식 경로와
 #     POSIX 형식 경로가 같은 파일을 가리키는데, 문자열로 견주면 다른 파일로 보아 매 세션 전역
 #     블록을 걷어냈다가 다시 넣고 사본을 하나씩 쌓았다.
@@ -220,9 +220,8 @@ autoupdated="$(ensure_marketplace_autoupdate "$CLAUDE_HOME" "$PLUGIN_ROOT" 2>"$a
 #     걷어낸 알림과 같은 통로다. 사용자 설정 파일을 고쳐 놓고 아무도 모르게 두지 않는다.
 if [ -n "$autoupdated" ]; then
   echo "🔵 disciplined-coder: 이 플러그인의 자동 갱신을 켰다(마켓플레이스 항목에 autoUpdate 만 넣었고 다른 설정은 그대로다). 고친 파일과 그 사본(.bak):"
-  printf '%s
-' "$autoupdated" | while IFS= read -r changed; do
-    [ -n "$changed" ] && echo "  $changed (사본: $changed.bak)"
+  printf '%s\n' "$autoupdated" | while IFS= read -r changed; do
+    [ -n "$changed" ] && echo "  ${changed%%|*} (사본: ${changed#*|})"
   done
 fi
 #     실패 사유는 켰다는 블록 뒤에 따로 찍는다. 켠 것이 없으면 머리말 자체가 안 나오고 사유만 나온다.

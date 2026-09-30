@@ -94,6 +94,8 @@ check "알려진 마켓플레이스에도 켜졌다"     "[ \"\$(json_autoupdate
 check "남의 마켓플레이스는 그대로다"       "[ \"\$(json_autoupdate '$SET_A' 'somebody-else')\" = 'none' ]"
 check "다른 설정이 보존된다"              "grep -qF '\"theme\"' '$SET_A' && grep -qF 'PreToolUse' '$SET_A'"
 check "사본을 남긴다"                     "ls '$(dirname "$SET_A")'/settings.json.*.bak >/dev/null 2>&1"
+BAK_SHOWN_A="$(printf '%s' "$OUT_A" | grep -F 'settings.json' | sed -n 's/.*(사본: \(.*\))$/\1/p' | head -n 1)"
+check "알림이 보여 준 사본 경로가 실제 파일이다"  "[ -n \"\$BAK_SHOWN_A\" ] && [ -f \"\$BAK_SHOWN_A\" ]"
 BEFORE_A="$(cat "$SET_A")"
 run "$HA" "$PA" >/dev/null 2>&1
 check "두 번째 실행에서 안 바뀐다"         "[ \"\$BEFORE_A\" = \"\$(cat '$SET_A')\" ]"
@@ -353,6 +355,14 @@ check "갱신을 실행하지 않는다"   "[ ! -f '$HAU1/args.txt' ]"
 check "원격도 읽지 않는다"       "[ ! -f '$HAU1/curl-args.txt' ]"
 check "아무것도 출력하지 않는다" "[ -z \"\$OUTAU1\" ]"
 
+HAUSET1="$(mktemp -d)"; uc_fixture "$HAUSET1" "$A40" 0 "$B40" > /dev/null
+printf '{ "extraKnownMarketplaces": { "chshin-tools": { "autoUpdate": false, "source": { "source": "github", "repo": "chshin84/disciplined-coder" } } } }\n' > "$HAUSET1/.claude/settings.json"
+OUTAUSET1="$(run_uc "$HAUSET1")"
+echo "[install-current] settings.json 에서만 autoUpdate 를 false 로 둬도 확인도 알림도 하지 않는다"
+check "갱신을 실행하지 않는다"   "[ ! -f '$HAUSET1/args.txt' ]"
+check "원격도 읽지 않는다"       "[ ! -f '$HAUSET1/curl-args.txt' ]"
+check "아무것도 출력하지 않는다" "[ -z \"\$OUTAUSET1\" ]"
+
 HAU2="$(mktemp -d)"; uc_fixture "$HAU2" "$A40" 0 "$B40" > /dev/null
 mkdir -p "$HAU2/.claude/disciplined-coder/update.lock"
 run_uc "$HAU2" > /dev/null
@@ -384,6 +394,15 @@ printf 'note\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@discipli
 run "$H6" "$P6" >/dev/null
 echo "[crlf-region] CRLF region recognized"
 check "CRLF region not duplicated"   "[ \$(grep -cF '# BEGIN disciplined-coder' '$H6/.claude/CLAUDE.md') -eq 1 ]"
+
+# --- stray-end: 정상 블록이 있고 블록 밖에 짝 없는 END 한 줄이 더 있으면 다음 세션이 그 줄을 치운다 ---
+H6S="$(mktemp -d)"; P6S="$(mktemp -d)"; mkdir -p "$H6S/.claude"
+run "$H6S" "$P6S" >/dev/null
+printf 'user line\n# END disciplined-coder (managed — do not edit)\n' >> "$H6S/.claude/CLAUDE.md"
+run "$H6S" "$P6S" >/dev/null
+echo "[stray-end] 블록 밖의 짝 없는 END 를 치운다"
+check "END 마커가 하나만 남는다"     "[ \$(grep -cF '# END disciplined-coder' '$H6S/.claude/CLAUDE.md') -eq 1 ]"
+check "BEGIN 마커도 하나다"          "[ \$(grep -cF '# BEGIN disciplined-coder' '$H6S/.claude/CLAUDE.md') -eq 1 ]"
 
 # --- malformed-region: 깨진 관리영역(BEGIN 있고 END 없음) → 비파괴 스킵(strip 안 함) ---
 H7="$(mktemp -d)"; P7="$(mktemp -d)"; mkdir -p "$H7/.claude"
