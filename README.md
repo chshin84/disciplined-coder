@@ -49,13 +49,13 @@ done
 | 이벤트 | 스크립트 | 하는 일 | 차단 여부 |
 |---|---|---|---|
 | SessionStart | `scripts/scaffold.sh` | 원칙 사본과 `@import` 연결을 만들고 알린다 | 알림 |
-| SessionStart | `hooks/update_check_sessionstart.sh` | 설치본이 원격 저장소보다 뒤처지면 새 버전으로 옮기고, 사용자 화면과 Claude의 첫 답에서 다시 켜라고 요구한다 | 알림 |
+| SessionStart | `hooks/update_check_sessionstart.sh` | 설치본이 원격 저장소보다 뒤처지면 새 버전으로 옮기고, 사용자 화면과 Claude의 첫 답에서 다시 켜라고 요구한다. 새로 켤 때(startup)만 확인한다. 자동 갱신을 꺼 두었으면 아무것도 하지 않는다 | 알림 |
 | SessionStart | `scripts/seal_reviews.sh` | 커밋된 감사 기록을 읽기 전용으로 봉인한다(이 저장소의 프로젝트 hook) | 알림 |
-| SessionStart | `hooks/rules_nudge_sessionstart.sh` | 이 세션의 규칙 넛지 표시를 지워 다시 알리게 한다 | 알림 |
+| SessionStart | `hooks/rules_nudge_sessionstart.sh` | 이 세션의 규칙 넛지 표시를 지워 다시 알리게 한다. 대화가 압축(compact)된 뒤에도 지운다. startup 에서는 spec 게이트가 쓰는 세션 시작 표시도 남긴다 | 알림 |
 | PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 대한 Write와 Edit을 사유와 함께 거부한다 | 차단 |
 | PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md`를 만들면 에이전트원칙의 「문서를 쓰고 관리할 때」로 타입과 수명을 가리게 하고, README면 `domain-readme`를 함께 가리킨다 | 알림 |
 | PreToolUse | `hooks/doc_word_pretooluse.sh` | 산출물 `.md`에 금지 표현이 들어가면 거부한다 | 차단 |
-| PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 규칙 넛지. 세션의 첫 파일 편집 전에 원칙 사본과 `domain-korean.md`의 절대경로를 한 번 알린다. 서브에이전트에는 원칙이 실리지 않기 때문이다 | 알림 |
+| PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 규칙 넛지. 세션의 첫 Write·Edit·Bash 호출 전에 원칙 사본과 `domain-korean.md`와 `domain-discipline.md`의 절대경로를 한 번 알린다. 서브에이전트에는 원칙이 실리지 않기 때문이다 | 알림 |
 | PreToolUse | `hooks/python3_guard_pretooluse.sh` | 윈도우에서 `python3`이 스토어 안내판으로 풀릴 때 그 Bash 명령을 거부한다 | 차단 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan을 감지해 리뷰를 지시한다 | 알림 |
 | PostToolUse | `hooks/doc_review_posttooluse.sh` | `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 있는 폴더의 `.md`를 고치면 `review-docs` 검진을 권한다. `Bash`로 고친 것도 본다 | 알림 |

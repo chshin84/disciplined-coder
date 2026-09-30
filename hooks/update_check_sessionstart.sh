@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SessionStart(startup|resume|clear): 설치본이 원격보다 뒤처졌으면 새 버전으로 옮기고, 사용자에게 다시
+# SessionStart(startup): 설치본이 원격보다 뒤처졌으면 새 버전으로 옮기고, 사용자에게 다시
 # 켜라고 요구한다. 비교와 갱신 규칙은 scripts/_ensure_current.sh 가 소유한다.
 # scaffold.sh 에서 떼어 낸 이유는 출력 형식이다. scaffold 의 평문 stdout 은 Claude 의 맥락에만 들어가
 # 사용자 화면에 안 보인다. 여기서는 JSON 한 줄로 내어, systemMessage 로 사용자 화면에 띄우고

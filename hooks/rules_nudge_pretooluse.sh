@@ -52,15 +52,19 @@ fi
 # 한국어 상세는 lens-readability 폴더에 놓인 참고서다. 스킬이 아니어서 이름으로 못 열고, 관리
 # 디렉터리에 사본을 두지도 않는다. 그래서 에이전트원칙 사본과 경로가 달라 여기서 따로 도출한다.
 # 없으면 그 사실을 알린다 — 없는 파일을 열라고 시키지 않는다.
-WK_PATH="$(cd "$DIR/.." 2>/dev/null && pwd)/skills/lens-readability/domain-korean.md"
+# 에이전트원칙 3행은 두 근거 파일을 저장소 상대 경로로 가리켜 다른 프로젝트에서는 열리지 않는다. 그 절대경로를 여기서 알린다.
+PLUGIN_DIR="$(cd "$DIR/.." 2>/dev/null && pwd)"
+WK_PATH="$PLUGIN_DIR/skills/lens-readability/domain-korean.md"
+DD_PATH="$PLUGIN_DIR/skills/lens-fit/domain-discipline.md"
 if [ -f "$WK_PATH" ]; then
   wkwhere="한국어 문장 규칙의 상세는 $WK_PATH 에 있다."
 else
   wkwhere="한국어 문장 규칙의 상세를 포함한 domain-korean.md 를 찾지 못했다."
 fi
+if [ -f "$DD_PATH" ]; then ddwhere="조항마다의 근거는 $DD_PATH 에 있다."; else ddwhere=""; fi
 
 # 스킬의 절 이름을 여기 박지 않는다 — 훅은 스킬을 가리키기만 하고 내용을 베끼지 않는다(문서 넛지와 같은 규칙).
-msg="🧑‍💻 이 세션의 첫 도구 호출이다 — $where $wkwhere 서브에이전트에는 에이전트원칙이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 레포 안에서 실행되는 워크플로는 이 사본 대신 그 레포의 에이전트원칙을 넣는다 — 상세는 disciplined-coder dispatching-lenses 가 소유한다. 넛지일 뿐 차단은 아니다."
+msg="🧑‍💻 이 세션의 첫 도구 호출이다 — $ddwhere $where $wkwhere 서브에이전트에는 에이전트원칙이 안 실리므로 그 경로를 프롬프트에 직접 넣어라. 레포 안에서 실행되는 워크플로는 이 사본 대신 그 레포의 에이전트원칙을 넣는다 — 상세는 disciplined-coder dispatching-lenses 가 소유한다. 넛지일 뿐 차단은 아니다."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

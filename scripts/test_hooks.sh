@@ -202,6 +202,9 @@ cnudh() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$2" bash "$CNUD"; 
 NUDGE_OUT="$(cnudh "$(JS s8 "" "$T/src/main.py")" "$NH")"
 NUDGE_CANON="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*에이전트원칙의 사본은 \(.*\) 에 있다\. 한국어.*/\1/p')"
 NUDGE_WK="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*한국어 문장 규칙의 상세는 \(.*\) 에 있다\..*/\1/p')"
+NUDGE_DD="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*조항마다의 근거는 \(.*\) 에 있다\. 에이전트원칙의 사본은.*/\1/p')"
+check "넛지에서 조항 근거 경로가 뽑힌다"   "[ -n \"\$NUDGE_DD\" ]"
+check "그 근거 경로에 파일이 실재한다"     "[ -f \"\$NUDGE_DD\" ]"
 check "넛지에서 에이전트원칙 경로가 뽑힌다"                 "[ -n \"\$NUDGE_CANON\" ]"
 check "뽑은 경로에 파일이 실재한다"                 "[ -f \"\$NUDGE_CANON\" ]"
 check "넛지에서 한국어 상세 경로가 뽑힌다"          "[ -n \"\$NUDGE_WK\" ]"
@@ -468,6 +471,10 @@ for hj in "$HERE"/hooks/hooks*.json; do
 done
 check "배선이 가리키는 스크립트가 모두 존재" "[ -z \"\$missing\" ]"
 [ -n "$missing" ] && echo "    없는 파일:$missing"
+ssm() { json_run 'import json,sys; d=json.load(sys.stdin)["hooks"]["SessionStart"]; print([g.get("matcher","") for g in d for h in g["hooks"] if sys.argv[1] in h["command"]][0])' "$1" < "$HJ"; }
+check "갱신 확인은 startup 에서만 실행한다"   "[ \"\$(ssm update_check_sessionstart.sh)\" = 'startup' ]"
+check "넛지 표시는 compact 에도 지운다"       "ssm rules_nudge_sessionstart.sh | grep -qw compact"
+check "스캐폴드는 compact 에 실행하지 않는다" "! ssm scaffold.sh | grep -qw compact"
 
 # 훅 스크립트를 만들어 놓고 배선을 잊는 것을 막는다. 밑줄로 시작하는 것은 공유 헬퍼라 제외한다.
 # 확장자로 훑지 않는다 — 확장자 없는 훅 파일이 글롭에서 빠지면 배선 누락을 못 잡는다.

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# SessionStart(startup|resume|clear): 이 세션의 규칙 넛지 표시 파일을 지운다.
+# SessionStart(startup|resume|clear|compact): 이 세션의 규칙 넛지 표시 파일을 지운다.
 # 표시 파일은 "이 맥락에서 이미 알렸다"를 뜻한다. 세션이 새로 시작하거나 재개되거나 비워지면 스킬이 다시
 # 안 실린 맥락이므로 표시도 지운다. 재개한 세션이 같은 session_id 를 다시 받는지는 훅 문서가 정하지 않고
 # 이 PC 의 전사 파일로도 갈리지 않았는데, 이 훅이 있으면 어느 쪽이든 맞는다 — 아이디가 새로 나면 없는
