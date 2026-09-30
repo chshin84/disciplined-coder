@@ -964,11 +964,11 @@ check "canon: no ordinal sections left"    "! LC_ALL=C.UTF-8 grep -qE '^### [가
 # --- canon-realign: 에이전트원칙이 원칙을 호명하지 않고 갈래는 걸리는 대상으로 이름 붙는다 ---
 # 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 갖는다. 갈래마다 원칙을 이름으로 다시 부르던 문장 셋은
 # 「원칙」 절이 이미 선언한 것을 부분집합으로 되풀이해 빠진 것이 안 걸린다는 뜻으로 읽혔다.
-# 이름이 범위를 좁게 말하던 절 하나만 「한국어 지시사항」로 바꾸고 나머지 여덟은 그대로 둔다.
+# 이름이 범위를 좁게 말하던 절 하나만 「출력지시」로 바꾸고 나머지 여덟은 그대로 둔다.
 echo "[canon-realign] the canon owns every principle; only procedures and per-artifact rules stay skills"
 # 제목 검사는 줄 전체를 앵커로 잡는다. `grep -F '## Think Before Acting'` 은 `### Think Before Acting` 을
 # 부분 문자열로 맞혀 절이 안 올라가도 초록이 된다.
-for sec in "원칙" "한국어 지시사항" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
+for sec in "원칙" "출력지시" "문서를 쓰고 관리할 때" "코딩할 때" "검증" "미해결의 처분" "병렬 오케스트레이션"; do
   check "canon: section '$sec' present"              "grep -qE '^## $sec\$' '$CANON'"
 done
 check "canon: tradeoff line stays"                   "grep -qF '**균형:**' '$CANON'"
