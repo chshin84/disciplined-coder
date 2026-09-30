@@ -3,6 +3,8 @@
 # 외부 명령을 띄우지 않는다. 훅은 Write·Edit·Bash 마다 돌아 프로세스 하나가 곧 매 호출의 값이다.
 # 읽는 입력은 호출자의 $INPUT 이다. 값은 찍지 않고 변수에 담는다 — `$( )` 는 외부 명령이 없어도
 # 서브셸을 하나 만든다. jq 에 기대지 않는다.
+# 입력이 작은 훅(Bash 전용·SessionStart·Stop)은 stdin 을 `IFS= read -r -d '' INPUT || true` 로 읽는다.
+# Write·Edit 를 받는 훅은 `$(cat)` 을 유지한다 — read 는 한 바이트씩 읽어 큰 content 에서 cat 보다 느리다.
 
 json_str() {  # $1=필드 이름, $2=담을 변수 이름. 첫 따옴표에서 끊고 이스케이프는 되돌리지 않는다.
   local rest
@@ -21,10 +23,13 @@ json_str() {  # $1=필드 이름, $2=담을 변수 이름. 첫 따옴표에서 �
 
 slash_norm() {  # $1=변수 이름. 역슬래시를 슬래시로 바꾸고 이어진 슬래시를 하나로 줄인다(tr -s '\\' '/').
   # 지역 변수 이름을 호출자와 겹치지 않게 짓는다. 겹치면 printf -v 가 호출자가 아니라 여기 것을 고친다.
-  local _sn_v="${!1}" _sn_one='/' _sn_two='//'
+  # UNC(//server/share)는 앞머리 두 슬래시가 경로의 일부다. 하나로 줄이면 Git Bash 가 다른 경로로 풀어
+  # 있는 파일을 없는 파일로 판정한다. 그래서 앞머리만 한 글자 되살린다.
+  local _sn_v="${!1}" _sn_one='/' _sn_two='//' _sn_lead=''
   _sn_v="${_sn_v//\\//}"
+  [[ $_sn_v == //* ]] && _sn_lead='/'
   while [[ $_sn_v == *"$_sn_two"* ]]; do _sn_v="${_sn_v//"$_sn_two"/$_sn_one}"; done
-  printf -v "$1" '%s' "$_sn_v"
+  printf -v "$1" '%s' "$_sn_lead$_sn_v"
 }
 
 # Write·Edit 의 file_path 값을 모두 FILE_PATHS 에 담는다(한 줄에 하나, 슬래시 정규화, 중복 제거).

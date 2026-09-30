@@ -41,6 +41,14 @@ echo "[extract]"
 check "Claude file_path → 경로 1개"        "[ \"\$(extract '$(J "$T/src/a.md")')\" = '$T/src/a.md' ]"
 check "빈 입력 → 무출력"                    "[ -z \"\$(extract '{}')\" ]"
 check "Claude backslash path → normalized" "[ \"\$(extract '$(J 'C:\\\\dir\\\\f.md')')\" = 'C:/dir/f.md' ]"
+check "UNC 경로의 앞머리 두 슬래시를 보존한다" "[ \"\$(extract '$(J '\\\\\\\\srv\\\\share\\\\a.md')')\" = '//srv/share/a.md' ]"
+# 입력이 작은 훅만 read 로 읽는다. read 는 파이프를 한 바이트씩 읽어 큰 Write 입력에서 cat 보다 느리다
+# (2026-09-30 실측: 2KB 4ms 대 31ms, 50KB 62ms 대 30ms, 200KB 274ms 대 31ms).
+for small in python3_guard_pretooluse.sh doc_word_posttooluse.sh rules_nudge_sessionstart.sh; do
+  check "$small 은 stdin 을 read 로 읽는다" "! grep -qF 'INPUT=\"\$(cat)\"' '$HERE/hooks/$small' && grep -qF \"IFS= read -r -d ''\" '$HERE/hooks/$small'"
+done
+check "Write 를 받는 훅은 cat 을 유지한다" "grep -qF 'INPUT=\"\$(cat)\"' '$HERE/hooks/doc_word_pretooluse.sh'"
+check "명령 파서는 하나다"                     "[ ! -e \"\$HERE/hooks/_extract_command.sh\" ]"
 
 echo "[ptu]"
 check "spec 미마커 → 리뷰 지시"          "ptu '$(J "$SP/nomark.md")' | grep -q additionalContext"
@@ -239,7 +247,7 @@ echo "[bash 매처 — 셸로 고쳐도 걸린다]"
 EBT="$HERE/hooks/_extract_bash_targets.sh"
 DWPOST="$HERE/hooks/doc_word_posttooluse.sh"
 JB() { printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$1"; }
-ebt() { JB "$1" | bash "$EBT" | tr '\n' ' '; }
+ebt() { ( . "$HERE/hooks/_hook_input.sh"; . "$EBT"; bash_write_targets "$1" ) | tr '\n' ' '; }
 # 쓰기 구문의 대상만 뽑는다. 읽기 인자를 뽑으면 cat 한 번에 알림이 떠 훅을 끄게 만든다.
 check "sed -i 대상이 뽑힌다"        "[ \"\$(ebt 'sed -i s/a/b/ one.md')\" = 'one.md ' ]"
 check "sed -i 대상 여럿이 뽑힌다"   "[ \"\$(ebt 'sed -i s/a/b/ one.md two.md')\" = 'one.md two.md ' ]"
@@ -460,7 +468,7 @@ check "제어 문자가 결과에 안 남는다" \
 echo "[python3-guard] 윈도우에서 안내판으로 풀리는 python3 만 막는다"
 # 상태를 주입해 OS 와 PATH 를 안 본다 — 그것이 없으면 CI(ubuntu)와 윈도우 PC 에서 결과가 갈린다.
 P3G="$HERE/hooks/python3_guard_pretooluse.sh"
-XCMD="$HERE/hooks/_extract_command.sh"
+xcmd() { ( INPUT="$1"; . "$HERE/hooks/_hook_input.sh"; hook_command; printf '%s' "$CMD" ); }
 REDIR="/c/Program Files/WindowsApps/Microsoft.DesktopAppInstaller_1.29.290.0_x64__8wekyb3d8bbwe/AppInstallerPythonRedirector.exe"
 JC() { printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$1"; }
 p3() { JC "$1" | DISCIPLINED_CODER_PYTHON3_STATE="${2:-$REDIR}" bash "$P3G"; }
@@ -505,9 +513,9 @@ check "거부 응답이 JSON 으로 파싱된다"     "printf '%s' \"\$D1\" | js
 check "거부 사유가 부를 이름을 말한다"     "printf '%s' \"\$D1\" | grep -q 'py -3'"
 check "거부 사유가 가리키는 실물을 적는다" "printf '%s' \"\$D1\" | grep -qF 'AppInstallerPythonRedirector'"
 # 명령 뽑기 — 큰따옴표가 든 명령이 첫 \" 에서 잘리면 그 뒤의 명령어를 훅이 못 본다.
-EX1="$(printf '{"tool_input":{"command":"echo \\"a\\" && python3 x.py"}}' | bash "$XCMD")"
+EX1="$(xcmd '{"tool_input":{"command":"echo \"a\" && python3 x.py"}}')"
 check "따옴표가 든 명령을 끝까지 뽑는다"   "[ \"\$EX1\" = 'echo \"a\" && python3 x.py' ]"
-check "command 가 없으면 무출력"           "[ -z \"\$(printf '{}' | bash '$XCMD')\" ]"
+check "command 가 없으면 무출력"           "[ -z \"\$(xcmd '{}')\" ]"
 
 echo "[산출물 차단 — 산출물 문서의 금지 표현을 거부한다]"
 # 대상을 가리는 규칙이 넷이라(확장자·저장소 자신·메모리·설계 문서) 규칙마다 픽스처를 둔다.

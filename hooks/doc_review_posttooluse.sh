@@ -17,7 +17,8 @@ json_str tool_name TOOL
 if [ "$TOOL" = "Bash" ]; then
   hook_command
   bash_cmd_writes "$CMD" || exit 0
-  TARGETS="$(printf '%s' "$INPUT" | bash "$DIR/_extract_bash_targets.sh" || true)"
+  . "$DIR/_extract_bash_targets.sh"
+  TARGETS="$(bash_write_targets "$CMD" || true)"
 else
   hook_file_paths
   TARGETS="$FILE_PATHS"

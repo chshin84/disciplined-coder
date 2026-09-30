@@ -9,7 +9,7 @@
 # 경로에 WindowsApps 가 들었는지로 가르지 않는 것은 스토어로 깐 진짜 파이썬도 거기 놓이기 때문이다.
 # WindowsApps 의 python3.exe 는 실물을 가리키는 링크라 readlink 로 그 실물의 이름을 볼 수 있다.
 set -euo pipefail
-INPUT="$(cat)"
+IFS= read -r -d '' INPUT || true
 
 # 무엇도 하기 전에 거른다. 이 훅은 모든 Bash 호출에 걸리고 아래는 프로세스 넷을 띄우므로, 평상시
 # 호출은 여기서 끝낸다. 명령에 python3 이라는 글자가 아예 없으면 아래 awk 가 잡을 것도 없으므로 동작은 같다.
@@ -40,7 +40,8 @@ case "$TARGET" in
   *) exit 0 ;;              # 맥·리눅스이거나, 안 풀리거나, 파이썬으로 풀린다 — 훅의 일이 아니다
 esac
 
-CMD="$(printf '%s' "$INPUT" | bash "$DIR/_extract_command.sh")"
+. "$DIR/_hook_input.sh"   # 명령 꺼내기(hook_command) 공유 — 파서를 한 곳에 둔다
+hook_command
 [ -n "$CMD" ] || exit 0
 
 # 명령어로 놓인 python3 만 잡는다. 따옴표 안을 공백으로 지우고 셸 구분자로 갈라, 각 조각의 첫 낱말이

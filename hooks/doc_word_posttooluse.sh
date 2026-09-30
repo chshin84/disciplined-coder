@@ -12,7 +12,7 @@
 # 판정되어 어느 쪽이 맞는지 알 수 없게 된다.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
-INPUT="$(cat)"
+IFS= read -r -d '' INPUT || true
 
 # 무엇도 하기 전에 거른다. 이 훅은 모든 Bash 호출에 걸리므로 평상시 값이 곧 이 줄이다.
 # 명령만 셸 확장으로 꺼내 쓰기 구문이 있는지 본다. 판정은 _hook_input.sh 의 bash_cmd_writes 가
@@ -29,7 +29,8 @@ BANSRC="$HOOKDIR/../korean-banned-words.md"
 [ -f "$BANSRC" ] || exit 0   # 목록이 없다는 사실은 Pre 훅이 Write·Edit 로 .md 를 쓸 때만 알린다.
 #                              셸로만 쓰는 세션에서는 아무도 알리지 않는다(알려진 한계).
 
-TARGETS="$(printf '%s' "$INPUT" | bash "$HOOKDIR/_extract_bash_targets.sh" 2>/dev/null || true)"
+. "$HOOKDIR/_extract_bash_targets.sh"
+TARGETS="$(bash_write_targets "$CMD" 2>/dev/null || true)"
 [ -n "$TARGETS" ] || exit 0
 
 # 검사할 파일을 먼저 추린다. 하나도 없으면 표 파싱까지 가지 않는다 — 셸 명령마다 치르는 값이다.
