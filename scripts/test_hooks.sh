@@ -6,7 +6,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 # mktemp 호출과 이 검사가 부르는 스크립트의 임시 파일이 모두 여기로 온다.
 TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TMP"
 PTU="$HERE/hooks/spec_review_posttooluse.sh"
-STOP="$HERE/hooks/spec_review_stop.sh"
+STOP="$HERE/hooks/stop_gates.sh"
 FPRE="$HERE/hooks/doc_format_pretooluse.sh"
 DREV="$HERE/hooks/doc_review_posttooluse.sh"
 pass=0; fail=0
@@ -129,6 +129,31 @@ check "HEAD spec에 마커 추가 후 → 통과(Fix C)"    "[ -z \"\$(stop '{\"
 ( cd "$G3" && git add -A && git commit -qm 'mark reviewed' )
 check "마커 커밋 후(HEAD=수정 커밋) → 통과(Fix C)" "[ -z \"\$(stop '{\"cwd\":\"$G3\"}')\" ]"
 
+# 세션이 시작되기 전에 만든 초안은 이 세션의 일이 아니다(FOCUSED). 표시가 없으면 지금처럼 전부 본다.
+G4="$(mktemp -d)"; ( cd "$G4" && git init -q && git config user.email t@t && git config user.name t )
+mkdir -p "$G4/docs/superpowers/specs"; printf 'old draft\n' > "$G4/docs/superpowers/specs/old.md"
+touch -d '2000-01-01' "$G4/docs/superpowers/specs/old.md"
+mkdir -p "$TMPDIR/disciplined-coder"; : > "$TMPDIR/disciplined-coder/session-start-s9"
+check "세션 전 초안은 막지 않는다"          "[ -z \"\$(stop '{\"cwd\":\"$G4\",\"session_id\":\"s9\"}')\" ]"
+check "세션 표시가 없으면 전부 본다"        "stop '{\"cwd\":\"$G4\",\"session_id\":\"s10\"}' | grep -q '\"block\"'"
+check "세션 ID 가 없으면 전부 본다"         "stop '{\"cwd\":\"$G4\"}' | grep -q '\"block\"'"
+printf 'new draft\n' > "$G4/docs/superpowers/specs/new.md"
+check "세션 중 새 초안은 막는다"            "stop '{\"cwd\":\"$G4\",\"session_id\":\"s9\"}' | grep -q '\"block\"'"
+# 두 검사가 한 턴에 함께 걸리면 한 응답에 둘 다 담는다.
+printf '이 "문서"는 자리를\n짚는다.\n' > "$G4/report.md"
+BOTH="$(stop "{\"cwd\":\"$G4\",\"session_id\":\"s9\"}")"
+check "두 검사가 한 응답에 담긴다"          "printf '%s' \"\$BOTH\" | grep -q '\"block\"' && printf '%s' \"\$BOTH\" | grep -q systemMessage"
+check "합친 응답이 유효한 JSON"             "printf '%s' \"\$BOTH\" | json_valid_stdin"
+OFFS="$(DISCIPLINED_CODER_REVIEW_GATE=off stop "{\"cwd\":\"$G4\"}")"
+check "REVIEW_GATE=off 는 spec 차단을 끈다"      "! printf '%s' \"\$OFFS\" | grep -q '\"block\"'"
+check "REVIEW_GATE=off 여도 금지어 알림은 남는다" "printf '%s' \"\$OFFS\" | grep -q systemMessage"
+# 금지어 쪽이 실패해도 spec 차단은 나가야 한다. banned_parse 가 awk 로 표를 읽으므로 실패하는 가짜 awk 를
+# PATH 앞에 둬 그 실패 경로를 밟는다. 원래는 목록을 chmod a-r 로 읽을 수 없게 하려 했으나 윈도우 NTFS 에서는
+# 읽기가 막히지 않았고(bash -x 로 확인), 표 머리 없는 목록은 awk 가 성공하고 토큰이 비어 다른 경로로 빠졌다.
+FAILW="$(mktemp -d)"; printf '#!/usr/bin/env bash\nexit 2\n' > "$FAILW/awk"; chmod +x "$FAILW/awk"
+check "금지어 검사가 실패해도 spec 차단은 나간다" "printf '{\"cwd\":\"%s\",\"session_id\":\"s9\"}' '$G4' | PATH='$FAILW':\"\$PATH\" bash '$STOP' | grep -q '\"block\"'"
+check "금지어 검사가 실패하면 알림은 없다"        "! printf '{\"cwd\":\"%s\",\"session_id\":\"s9\"}' '$G4' | PATH='$FAILW':\"\$PATH\" bash '$STOP' | grep -q systemMessage"
+
 echo "[readonly-pre — 읽기 전용 파일은 고치지 않는다]"
 RPRE="$HERE/hooks/readonly_pretooluse.sh"
 rpre() { printf '%s' "$1" | bash "$RPRE"; }
@@ -192,6 +217,14 @@ check "세션 시작 훅 파일이 있다"                    "[ -f '$CSTA' ]"
 check "세션 시작은 아무것도 안 낸다"                "[ -z \"\$(csta '$(JSS s9)')\" ]"
 check "세션 시작이 표시를 지워 다시 알린다"         "csta '$(JSS s1)' && cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 check "세션 시작이 서브에이전트 표시도 지워 다시 알린다" "cnud '$(JS s1 ',"agent_id":"a1"' "$T/src/main.py")' | grep -qF 'agent-principles.md'"
+JSU() { printf '{"session_id":"%s","hook_event_name":"SessionStart","source":"%s"}' "$1" "$2"; }
+printf '%s' "$(JSU st1 startup)" | bash "$CSTA"
+check "startup 이면 세션 시작 표시를 남긴다"   "[ -f \"\$TMPDIR/disciplined-coder/session-start-st1\" ]"
+touch -d '2000-01-01' "$TMPDIR/disciplined-coder/session-start-st1"
+printf '%s' "$(JSU st1 startup)" | bash "$CSTA"
+check "있는 표시는 다시 쓰지 않는다"          "[ ! \"\$TMPDIR/disciplined-coder/session-start-st1\" -nt \"\$HERE/README.md\" ]"
+printf '%s' "$(JSU st2 resume)" | bash "$CSTA"
+check "resume 에서는 표시를 새로 만들지 않는다" "[ ! -e \"\$TMPDIR/disciplined-coder/session-start-st2\" ]"
 
 echo "[doc-format-pre]"
 printf 'x\n' > "$T/existing.md"
@@ -350,7 +383,7 @@ check "긴 제외어가 먼저 덮인다"      "[ -z \"\$(banned_report '$BX/pai
 echo "[stop 겹 — 도구를 묻지 않고 결과를 본다]"
 # 명령줄에 대상이 안 나타나는 변경(파이썬 스크립트, git checkout)을 앞 두 겹이 못 본다.
 # 이 겹은 git 이 바뀌었다고 말하는 파일을 보므로 무엇이 바꿨는지 묻지 않는다.
-DWSTOP="$HERE/hooks/doc_word_stop.sh"
+DWSTOP="$HERE/hooks/stop_gates.sh"
 SR="$T/stoprepo"; mkdir -p "$SR"; git -C "$SR" init -q 2>/dev/null || true
 JSTOP() { printf '{"cwd":"%s","stop_hook_active":%s}' "$1" "${2:-false}"; }
 printf '이 문서는 자리를 짚는다.\n' > "$SR/report.md"
@@ -361,12 +394,12 @@ SRCLEAN="$T/stopclean"; mkdir -p "$SRCLEAN"; git -C "$SRCLEAN" init -q 2>/dev/nu
 printf '이 문서는 대상을 지적한다.\n' > "$SRCLEAN/report.md"
 check "깨끗한 문서에는 알림이 없다"    "[ -z \"\$(JSTOP '$SRCLEAN' | bash '$DWSTOP')\" ]"
 check "git 아닌 폴더 → 무출력"         "[ -z \"\$(JSTOP '$OUTSIDE' | bash '$DWSTOP')\" ]"
-check "이 저장소 자신 → 무출력"        "[ -z \"\$(JSTOP '$HERE' | bash '$DWSTOP')\" ]"
+check "이 저장소 자신 → 무출력"        "[ -z \"\$(JSTOP '$HERE' | DISCIPLINED_CODER_REVIEW_GATE=off bash '$DWSTOP')\" ]"
 check "루프가드가 걸린다"              "[ -z \"\$(JSTOP '$SR' true | bash '$DWSTOP')\" ]"
 check "OFF → 무출력"                   "[ -z \"\$(JSTOP '$SR' | DISCIPLINED_CODER_REPLY_CHECK=off bash '$DWSTOP')\" ]"
 # 코드 파일과 spec 은 대상이 아니다. 대상이 넓어지면 알림이 늘 떠 뜻을 잃는다.
 printf 'x = "자리"\n' > "$SR/code.py"; mkdir -p "$SR/docs/superpowers/specs"
-printf '이 문서는 자리를 짚는다.\n' > "$SR/docs/superpowers/specs/s.md"
+printf '이 문서는 자리를 짚는다.\n<!-- spec-review: passed -->\n' > "$SR/docs/superpowers/specs/s.md"
 check "코드와 spec 은 안 본다"         "[ \"\$(JSTOP '$SR' | bash '$DWSTOP' | grep -cF 'report.md')\" = 1 ]"
 # 새 폴더 안의 새 파일은 git status 가 폴더 한 줄로만 돌려준다. 파일 단위로 펼치지 않으면 새 폴더에
 # 만든 보고서가 전부 빠진다.
@@ -448,6 +481,8 @@ for f in "$HERE"/hooks/*; do
 done
 check "모든 훅 스크립트가 어딘가에 배선되어 있다" "[ -z \"\$unwired\" ]"
 [ -n "$unwired" ] && echo "    어느 배선 파일에도 없는 훅:$unwired"
+check "Stop 은 훅 하나만 실행한다" "[ \"\$(json_run 'import json,sys; print(sum(len(g[\"hooks\"]) for g in json.load(sys.stdin)[\"hooks\"][\"Stop\"]))' < '$HJ')\" = 1 ]"
+check "stop_gates.sh 는 stdin 을 read 로 읽는다" "grep -qF \"IFS= read -r -d ''\" '$HERE/hooks/stop_gates.sh'"
 
 # --- JSON 이스케이프: 제어 문자가 날것으로 안 나간다 ---
 # 개행·복귀·탭만 다루면 그 밖의 0x20 미만 문자가 문자열 값에 날것으로 들어가고, 응답이 파싱되지

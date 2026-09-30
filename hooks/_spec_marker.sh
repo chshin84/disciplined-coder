@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 공유: spec/plan 문서의 마지막 비공백 줄이 terminal 마커(passed|escalated)인지 판정.
-# spec_review_posttooluse.sh·spec_review_stop.sh가 같은 마커 계약을 한 곳에서 쓰도록 단일화한다.
+# spec_review_posttooluse.sh·stop_gates.sh가 같은 마커 계약을 한 곳에서 쓰도록 단일화한다.
 # 마커·경로 규약의 코드 원본은 이 파일이다(바꾸려면 여기를 고친다). 산문(review-specs·README)이
 # 여기와 같은 마커를 적는지는 scripts/test_docs_drift.sh가 코드에서 뽑아 대조한다.
 # 마커는 줄 전체여야 한다. 문자열 일부로 찾으면 마커를 산문으로 언급하기만 한 문서도 통과해

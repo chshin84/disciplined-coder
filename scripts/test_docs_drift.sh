@@ -102,7 +102,7 @@ check "런타임 파일을 찾았다"                "[ -f \"\$RUNTIME\" ]"
 check "조립 절이 type 값으로 accept·escalate 를 가른다" "sec_has_id \"\$RUNTIME\" '조립' type && sec_has_id \"\$RUNTIME\" '조립' accept && sec_has_id \"\$RUNTIME\" '조립' escalate"
 
 PTU="$HERE/hooks/spec_review_posttooluse.sh"
-STOPH="$HERE/hooks/spec_review_stop.sh"
+STOPH="$HERE/hooks/stop_gates.sh"
 SPECM="$HERE/hooks/_spec_marker.sh"
 echo "[훅 안내문 — 마커를 개선보다 먼저, 문안은 한 곳에]"
 check "공유 안내문이 마커 선기록을 지시한다"     "grep -qF '마커를 먼저 남기고' \"\$SPECM\""

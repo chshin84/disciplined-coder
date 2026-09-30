@@ -60,8 +60,7 @@ done
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan을 감지해 리뷰를 지시한다 | 알림 |
 | PostToolUse | `hooks/doc_review_posttooluse.sh` | `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 있는 폴더의 `.md`를 고치면 `review-docs` 검진을 권한다. `Bash`로 고친 것도 본다 | 알림 |
 | PostToolUse | `hooks/doc_word_posttooluse.sh` | 셸로 고친 산출물 `.md`에 금지 표현이 남으면 알린다 | 알림 |
-| Stop | `hooks/spec_review_stop.sh` | 리뷰하지 않은 spec·plan이 남은 채 턴이 끝나는 것을 차단한다 | 차단 |
-| Stop | `hooks/doc_word_stop.sh` | 커밋되지 않은 산출물 `.md`에 금지 표현이 남으면 사용자에게 알린다 | 알림 |
+| Stop | `hooks/stop_gates.sh` | 이 세션에 새로 생긴 미리뷰 spec·plan이 남은 채 턴이 끝나는 것을 차단하고, 커밋되지 않은 산출물 `.md`에 금지 표현이 남으면 사용자에게 알린다 | 차단 |
 
 검진 넛지는 저장소에 커밋되는 작업 문서와 리뷰 기록에는 뜨지 않는다. 남에게 전달될 문서인지는 경로로 알 수 없어 대화 맥락으로 판단한다.
 
@@ -69,7 +68,7 @@ done
 
 표에서 「차단」인 hook이 작업을 멈췄을 때 푸는 방법이다.
 
-- **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 새 `.md`가 생긴 채 턴을 끝내려 하면 차단하고 `review-specs` 수행을 지시한다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 풀린다. 차단은 턴에 한 번이라 두 번째 종료 시도는 통과한다.
+- **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 이 세션이 시작된 뒤 새 `.md`가 생긴 채 턴을 끝내려 하면 차단하고 `review-specs` 수행을 지시한다. 세션이 시작되기 전부터 있던 미추적 초안은 차단하지 않는다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 풀린다. 차단은 턴에 한 번이라 두 번째 종료 시도는 통과한다.
 - **산출물 차단** — 사용자가 요구한 산출물 `.md`에 「금지 표현」 목록의 말이 있으면 거부하고 무엇을 무엇으로 고칠지 보인다. 이 플러그인 저장소의 문서, Claude 메모리(`/.claude/projects/` 아래), `docs/superpowers/` 아래는 대상이 아니다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 적어야 하면 백틱으로 감싼다. 셸로 고친 파일은 쓰기 전에 알 수 없어 차단하지 못하고, 쓰인 뒤와 턴이 끝날 때 알린다.
 - **읽기 전용 차단** — 읽기 전용 속성이 붙은 파일에 대한 `Write`와 `Edit`을 거부한다. 어느 프로젝트의 어느 파일이든 속성만 본다. 속성을 풀면 풀린다.
 - **`python3` 차단** — 윈도우에서 `python3`이 스토어 안내판(`AppInstallerPythonRedirector.exe`)으로 풀릴 때만 거부하고 `python`이나 `py -3`을 쓰라고 알린다. 맥과 리눅스에는 적용되지 않는다.
@@ -87,8 +86,8 @@ done
 
 hook은 환경 변수 두 개로 끈다.
 
-- **`DISCIPLINED_CODER_REVIEW_GATE=off`** — `spec_review_posttooluse.sh`, `spec_review_stop.sh`, `doc_format_pretooluse.sh`, `doc_review_posttooluse.sh`, `rules_nudge_pretooluse.sh`를 끈다.
-- **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `doc_word_stop.sh`)을 끈다. 금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.
+- **`DISCIPLINED_CODER_REVIEW_GATE=off`** — `spec_review_posttooluse.sh`, `stop_gates.sh`의 spec 검사, `doc_format_pretooluse.sh`, `doc_review_posttooluse.sh`, `rules_nudge_pretooluse.sh`를 끈다.
+- **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `stop_gates.sh`의 금지 표현 검사)을 끈다. 금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.
 
 읽기 전용 차단, `python3` 차단, 세션 시작의 셋업은 끄는 변수가 없다. 두 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
 

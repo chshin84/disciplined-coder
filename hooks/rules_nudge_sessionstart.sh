@@ -6,6 +6,7 @@
 # 파일을 지우는 무해한 동작이고, 재사용되면 넛지가 제대로 다시 걸린다. 이 훅이 지우는 것은 이 세션
 # 자신의 표시뿐이다. 다른 세션이 남긴 표시 파일은 손대지 않고 운영체제의 임시 폴더 정리에 맡긴다.
 # 게이트 환경변수와 무관하다 — 지우는 것은 안내가 아니라 청소다.
+# spec 게이트가 쓰는 세션 시작 표시도 여기서 남긴다. startup 에서만, 이미 있으면 다시 쓰지 않는다.
 set -euo pipefail
 IFS= read -r -d '' INPUT || true
 # 키는 PreToolUse 훅과 같은 json_str 로 뽑는다. 두 훅이 다른 방식으로 뽑으면 같은 입력에서 다른 값이
@@ -17,4 +18,10 @@ json_str session_id sid
 mdir="${TMPDIR:-/tmp}/disciplined-coder"
 # 서브에이전트 몫은 agent_id 가 뒤에 붙으므로 글롭으로 함께 지운다. 없으면 -f 가 조용히 넘어간다.
 rm -f "$mdir/rules-nudge-$sid" "$mdir/rules-nudge-$sid"-* 2>/dev/null || true
+# spec 게이트(stop_gates.sh)가 쓰는 세션 시작 표시. startup 에서만, 없을 때만 만든다.
+json_str source src
+ssid="${sid//[^A-Za-z0-9_-]/}"
+if [ "$src" = "startup" ] && [ -n "$ssid" ] && [ ! -e "$mdir/session-start-$ssid" ]; then
+  mkdir -p "$mdir" 2>/dev/null && : > "$mdir/session-start-$ssid" 2>/dev/null || true
+fi
 exit 0

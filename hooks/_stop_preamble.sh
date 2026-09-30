@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 공유: Stop 훅 둘(spec_review_stop.sh·doc_word_stop.sh)의 공통 머리. 루프가드를 보고, 훅 입력의 cwd 로
+# 공유: Stop 진입 스크립트(stop_gates.sh)의 머리. 루프가드를 보고, 훅 입력의 cwd 로
 # 옮긴 뒤 저장소 루트로 옮긴다. 볼 것이 없으면 그 자리에서 훅을 끝낸다(exit 0).
 # 호출자가 $INPUT 을 채우고 _hook_input.sh 와 _json_escape.sh 를 먼저 싣는다.
 #
@@ -16,12 +16,13 @@ stop_enter_repo() {  # $1=git 을 못 읽었을 때 알림에 넣을 "무엇을 
   json_str cwd cwd
   slash_norm cwd
   if [ -n "$cwd" ]; then cd "$cwd" 2>/dev/null || exit 0; fi
-  gitout="$(git rev-parse --is-inside-work-tree 2>&1)" || {
-    case "$gitout" in *'not a git repository'*) exit 0 ;; esac
+  gitout="$(git rev-parse --show-toplevel 2>&1)" || {
+    case "$gitout" in *'not a git repository'*|*'must be run in a work tree'*) exit 0 ;; esac
     printf '{"systemMessage":"%s"}\n' "$(escape_for_json "disciplined-coder: git 을 읽지 못해 $1 — ${gitout%%$'\n'*}")"
     exit 0
   }
-  root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  # 성공해도 git 이 stderr 에 경고 줄을 낼 수 있다. 경로는 마지막 줄이다.
+  root="${gitout##*$'\n'}"
   [ -n "$root" ] || exit 0
   cd "$root" 2>/dev/null || exit 0
 }
