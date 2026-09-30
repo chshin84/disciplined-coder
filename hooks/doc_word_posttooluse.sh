@@ -10,6 +10,7 @@
 # 대상을 가르는 규칙과 맞추는 규칙은 Pre 훅과 같은 곳에서 온다. 제외 셋(이 저장소 자신의 문서,
 # Claude 메모리, docs/superpowers/ 아래)도 같다. 규칙이 갈리면 같은 파일이 도구에 따라 다르게
 # 판정되어 어느 쪽이 맞는지 알 수 없게 된다.
+# 예외는 파이썬이 없을 때다. 본문을 추리는 단계가 파이썬이라 그때는 알림 없이 통과한다(2026-09-30 사용자 결정, README 「설치」에 적었다).
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" = "off" ] && exit 0
 IFS= read -r -d '' INPUT || true

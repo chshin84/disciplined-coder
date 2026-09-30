@@ -1,10 +1,10 @@
 # disciplined-coder
 
-팀 엔지니어링 원칙을 모든 Claude Code 세션에 자동으로 실어 주는 플러그인이다. 원칙 파일 하나를 모든 프로젝트에 싣고, 문서를 쓰고 고칠 때 리뷰와 검진을 안내하며, 몇 가지 위험한 편집을 차단한다. 작업 폴더에 원칙 사본은 생기지 않는다.
+팀 엔지니어링 원칙을 모든 Claude Code 세션에 자동으로 실어 주는 플러그인이다. 원칙 파일 하나를 모든 프로젝트에 싣고, 문서를 쓰고 고칠 때 리뷰와 검진을 안내하며, 몇 가지 위험한 편집을 차단한다. 작업 폴더에 원칙 사본은 생기지 않는다. 본인과 사내 한국어 사용자를 위해 만든 플러그인이라, 한국어 금지 표현 목록을 모든 세션에 싣고 사내 저장소를 목록의 원본으로 가리킨다.
 
 ## 설치
 
-스코프는 user여야 모든 프로젝트에서 hook이 실행된다. Windows는 [Git Bash](https://git-scm.com/downloads)와 [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows)을 먼저 설치한다. hook이 `bash`로 스크립트를 실행하고, 환경 변수를 넣는 단계가 `pwsh`를 호출하기 때문이다. 윈도우 기본 5.1(`powershell`)로는 동작하지 않는다. 마켓플레이스 자동 갱신에는 파이썬이 필요하다.
+스코프는 user여야 모든 프로젝트에서 hook이 실행된다. Windows는 [Git Bash](https://git-scm.com/downloads)와 [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows)을 먼저 설치한다. hook이 `bash`로 스크립트를 실행하고, 환경 변수를 넣는 단계가 `pwsh`를 호출하기 때문이다. 윈도우 기본 5.1(`powershell`)로는 동작하지 않는다. 마켓플레이스 자동 갱신과 갱신 확인과 금지 표현 검사에는 파이썬이 필요하다. 파이썬이 없으면 이 셋은 알림 없이 건너뛴다.
 
 ```text
 /plugin marketplace add chshin84/disciplined-coder
@@ -44,7 +44,7 @@ done
 
 ## 하드 게이트와 넛지와 전역 설정 수정
 
-이 플러그인이 세션에 적용하는 hook은 아래가 전부이고, 이 목록은 여기가 소유한다. 연결 파일은 둘이다. `hooks/hooks.json`은 어디서나 적용되는 hook이고, `.claude/settings.json`은 이 저장소에서만 실행되는 프로젝트 hook이다. 대화 답마다 실행되는 hook은 없다.
+이 플러그인이 세션에 적용하는 hook은 아래가 전부이고, 이 목록은 여기가 소유한다. 연결 파일은 둘이다. `hooks/hooks.json`은 어디서나 적용되는 hook이고, `.claude/settings.json`은 이 저장소에서만 실행되는 프로젝트 hook이다. 턴이 끝날 때마다 `hooks/stop_gates.sh` 하나가 실행된다. git 상태만 보며 대화 기록은 읽지 않는다.
 
 | 이벤트 | 스크립트 | 하는 일 | 차단 여부 |
 |---|---|---|---|
