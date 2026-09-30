@@ -13,7 +13,7 @@ description: 렌즈를 둘 이상 실행한 뒤에 연다. 그 출력을 한 목
 렌즈들의 이슈를 한 목록으로 모으고 커버리지 공백을 표시하는 데서 멈춘다.
 
 - **집계** — 모든 렌즈의 이슈를 한 목록으로 모으고, 항목마다 어느 렌즈에서 왔는지를 `source`에 적는다. 등급이 없으므로 정렬 기준을 두지 않는다.
-- **커버리지 공백** — 리스크에 비추어 봤어야 할 렌즈를 아무도 안 봤으면 그 렌즈를 더 호출하라고 권한다.
+- **커버리지 공백** — 배정된 렌즈가 결과 JSON 을 돌려주지 않았거나, 리스크에 비추어 봤어야 할 렌즈를 아무도 안 봤으면 그 사실을 표시한다. 배정이 고정된 호출자는 다시 호출하지 않고 기록에 적는다.
 
 ## 리뷰 산출물 계약 (렌즈 공통)
 이 계약은 여기가 소유한다. 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.
@@ -67,7 +67,7 @@ description: 렌즈를 둘 이상 실행한 뒤에 연다. 그 출력을 한 목
 `decision`과 `retry_count`는 런타임 전용이다. spec 리뷰에서는 결정 단계가 없으므로 이 둘을 내지 않고, 병합한 목록을 `review-specs`의 「합치기」 절로 넘긴다.
 
 ```
-{ "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "type": "...", "source": "<렌즈 리턴의 lens 값>", "where": "...", "claim": "...", "consequence": "...", "evidence": "..." } ], "retry_count": 0 }
+{ "decision": "accept|regenerate|escalate", "reason": "...", "aggregated": [ { "type": "...", "source": "<렌즈 리턴의 lens 값>", "where": "...", "claim": "...", "consequence": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "..." } ], "retry_count": 0 }
 ```
 
 집계 항목의 `source`는 렌즈 리턴의 `lens` 값을 그대로 옮긴다. 렌즈 이름 열거는 위 「리뷰 산출물 계약」의 `lens` 하나뿐이다.
