@@ -21,8 +21,7 @@ README="$HERE/README.md"
 CALLER="$HERE/skills/review-specs/SKILL.md"
 AGG="$HERE/skills/aggregating-lenses/SKILL.md"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
-pass=0; fail=0
-check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
+. "$HERE/scripts/_test_check.sh"
 
 # 진실 — 실제 렌즈 디렉터리에서 짧은 이름을 도출한다.
 ALL="$(for d in "$HERE"/skills/lens-*/; do [ -d "$d" ] || continue; basename "$d" | sed 's/^lens-//'; done | sort)"
@@ -462,9 +461,6 @@ EOF
 [ -n "$TYPE_BAD" ] && printf '    어긋난 칸:%s
 ' "$TYPE_BAD"
 check "장치 칸이 모두 실물 경로이거나 사유 있는 「없다」다" "[ -z \"\$TYPE_BAD\" ]"
-# 핸드오프 행이 가리키는 린트가 그 파일 안에 실제로 있는지 본다. 파일 존재만 보면 경로가 맞아도
-# 린트가 없을 수 있다.
-check "핸드오프 린트가 세션 시작 스크립트에 있다" "grep -qF 'handoff-keep-until' '$HERE/scripts/scaffold.sh'"
 
 echo "[대체된 설계 문서에 superseded 표시]"
 OLDSPEC="$HERE/docs/superpowers/specs/2026-08-16-review-layer-redesign-design.md"

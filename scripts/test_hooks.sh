@@ -9,8 +9,7 @@ PTU="$HERE/hooks/spec_review_posttooluse.sh"
 STOP="$HERE/hooks/stop_gates.sh"
 FPRE="$HERE/hooks/doc_format_pretooluse.sh"
 DREV="$HERE/hooks/doc_review_posttooluse.sh"
-pass=0; fail=0
-check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
+. "$HERE/scripts/_test_check.sh"
 ptu() { printf '%s' "$1" | bash "$PTU"; }
 stop() { printf '%s' "$1" | bash "$STOP"; }
 fpre() { printf '%s' "$1" | bash "$FPRE"; }

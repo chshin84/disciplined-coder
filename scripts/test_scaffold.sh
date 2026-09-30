@@ -7,8 +7,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TMP"
 SCAFFOLD="$HERE/scripts/scaffold.sh"
 
-pass=0; fail=0
-check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
+. "$HERE/scripts/_test_check.sh"
 
 # 이웃 관계 검사: 파일에서 pattern과 정확히 일치하는 첫 줄 '바로 다음 줄'이 빈 줄인지 확인한다.
 # 전역 grep -c '^$' 카운트는 관리블록이 항상 넣는 구분 빈 줄과 뒤섞여 무조건 참이 되므로 쓰지 않는다.

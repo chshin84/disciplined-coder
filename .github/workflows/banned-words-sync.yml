@@ -46,13 +46,24 @@ jobs:
 
       # 생성물만 바뀌므로 테스트를 함께 돌린다. 목록이 늘면 저장소 문서가 그 말을 품고 있어
       # 검사가 실패할 수 있고, 그것은 사람이 판단할 일이라 PR 에 실패를 붙여 보낸다.
+      # `GITHUB_TOKEN` 으로 연 PR 에는 다른 워크플로가 실행되지 않으므로 결과는 본문으로만 전달된다.
       - name: 계약 테스트
+        id: tests
         if: steps.diff.outputs.changed == 'yes'
-        continue-on-error: true
         run: |
-          bad=""
-          for t in scripts/test_*.sh; do bash "$t" || bad="$bad $t"; done
-          [ -z "$bad" ] || echo "FAILED:$bad"
+          d="$(mktemp -d)"
+          for t in scripts/test_*.sh; do ( bash "$t" > "$d/$(basename "$t").log" 2>&1 || echo "$t" >> "$d/bad" ) & done
+          wait
+          if [ -s "$d/bad" ]; then
+            {
+              echo 'result<<RESULT_EOF'
+              echo '계약 테스트가 실패했다.'
+              while read -r t; do echo "- $t"; grep 'FAIL:' "$d/$(basename "$t").log" | head -20 | sed 's/^/  /'; done < "$d/bad"
+              echo 'RESULT_EOF'
+            } >> "$GITHUB_OUTPUT"
+          else
+            echo 'result=계약 테스트가 모두 통과했다.' >> "$GITHUB_OUTPUT"
+          fi
 
       - name: PR 을 연다
         if: steps.diff.outputs.changed == 'yes'
@@ -67,4 +78,6 @@ jobs:
             손으로 고치지 말고 목록을 바꿀 일이 있으면 원본 저장소를 고쳐라. 여기서 고치면 다음 실행에서 사라진다.
 
             계약 테스트 결과를 함께 보라. 목록에 항목이 늘면 이 저장소의 살아 있는 문서가 그 말을 품고 있어 검사가 실패할 수 있고, 그때는 문서를 고칠지 그 항목을 원본에서 끌지 사람이 정해야 한다.
+
+            ${{ steps.tests.outputs.result }}
           delete-branch: true

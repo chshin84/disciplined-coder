@@ -8,8 +8,7 @@
 # 단언을 붙이지 마라. 그것은 이 검사가 걷어내려는 것과 같은 물건이다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
-pass=0; fail=0
-check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
+. "$HERE/scripts/_test_check.sh"
 
 echo "[검사 블록마다 단언이 있다]"
 SN=0

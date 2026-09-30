@@ -21,6 +21,8 @@ if [ "${#files[@]}" -eq 0 ]; then
     if [ -n "$rel" ]; then files+=("$ROOT/$rel"); fi
   done < <(cd "$ROOT" && git ls-tree -r --name-only HEAD -- docs/superpowers/reviews 2>/dev/null)
 fi
+# 목록이 비면 여기서 끝낸다. set -u 아래 빈 배열 펼치기는 bash 4.4 미만(맥 기본 3.2)에서 unbound 로 죽는다.
+if [ "${#files[@]}" -eq 0 ]; then echo "sealed: 0"; exit 0; fi
 n=0
 for f in "${files[@]}"; do
   [ -f "$f" ] || continue

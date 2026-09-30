@@ -6,8 +6,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 # 픽스처는 모두 이 뿌리 아래에 만들고 끝나면 통째로 지운다. mktemp 가 TMPDIR 을 따르므로 아래의
 # mktemp 호출과 이 검사가 부르는 스크립트의 임시 파일이 모두 여기로 온다.
 TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TMP"
-pass=0; fail=0
-check() { if eval "$2"; then echo "  PASS: $1"; pass=$((pass+1)); else echo "  FAIL: $1"; fail=$((fail+1)); fi; }
+. "$HERE/scripts/_test_check.sh"
 . "$HERE/scripts/_json_valid.sh"   # json_run — 파이썬 이름은 여기가 고른다
 # 문서 계약은 산문 문장 대신 조항 ID·절 제목·소유 선언·포인터로 본다. 함수와 규칙은 그 파일 머리에 있다.
 # 구조로 못 적는 곳만 가장 짧은 고유 조각을 남기고 그 자리에 '짧은 조각' 이라고 적었다.
@@ -396,5 +395,11 @@ check "CLAUDE.md 가 읽기 전용 거부를 적는다"  "grep -qF '읽기 전�
 check "CLAUDE.md 가 훅 목록의 소유자를 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -F 'README.md' '$HERE/CLAUDE.md' | grep -qF '소유한다'"
 check "CLAUDE.md 가 훅 개수를 세지 않는다" \
   "! grep -qE '훅 (한|하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)' '$HERE/CLAUDE.md' && ! grep -qE '(하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)(개|가지)?(의)? 훅' '$HERE/CLAUDE.md' && ! grep -qE '훅 [0-9]+개' '$HERE/CLAUDE.md' && ! grep -qE '[0-9]+ ?개의 훅' '$HERE/CLAUDE.md'"
+
+echo "[seal_reviews.sh — 봉인할 기록이 없어도 끝난다]"
+SE="$(mktemp -d)"; git -C "$SE" init -q
+set +e; SEOUT="$(bash "$HERE/scripts/seal_reviews.sh" --root "$SE" 2>&1)"; SERC=$?; set -e
+check "빈 저장소에서 0 으로 끝난다" "[ '$SERC' -eq 0 ]"
+check "봉인 개수 0 을 알린다"        "[ \"\$SEOUT\" = 'sealed: 0' ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
