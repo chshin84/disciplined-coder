@@ -257,7 +257,7 @@ check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superp
 check "문서 검진 기록 절이 종류 check 를 적는다" "sec_has_id \"\$DOCS\" '기록' check"
 # 이름 규칙은 review-docs 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
 check "기록 이름 규칙 절이 차수 꼴을 적는다"   "sec_has \"\$DOCS\" '기록 파일 이름 규칙' '-review-2.md'"
-check "에이전트원칙은 그 규칙을 더 안 적는다"        "! grep -qF '<렌즈 스킬 이름>-<실행 횟수>.json' \"\$CANON\""
+check "에이전트원칙은 그 규칙을 더 안 적는다"        "! grep -qF '<렌즈 스킬 이름>-<순번>.json' \"\$CANON\""
 check "에이전트원칙이 기록 이름의 소유자를 가리킨다" "sec_has_id \"\$CANON\" '문서 타입과 수명' review-docs && sec_has \"\$CANON\" '문서 타입과 수명' '소유'"
 check "원본을 같은 이름 폴더에 둔다"          "sec_has \"\$CALLER\" '리뷰 기록' '**같은 이름의 폴더**'"
 check "런타임이 기록 제외 이유를 조항 ID 로 적는다" "sec_has_id \"\$RUNTIME2\" '조립' SECRETS"
@@ -334,7 +334,7 @@ OWNER_DOC="$HERE/skills/dispatching-lenses/SKILL.md"
 OWNER_SEC='렌즈에게 에이전트원칙을 알리는 법'
 # 규율 넷을 알아보는 짧은 조각. 소유자에만 있어야 한다. 사본 쪽에 제목이나 소유 선언 없이 불릿만
 # 옮겨 적으면 구조로는 안 잡히므로 조각을 남긴다.
-RULE_MARKS=('Read는 보유한다' '비어 있지 않은 배열' '홈 해석이')
+RULE_MARKS=('Read는 보유한다' '무엇을 하는지는' '홈 해석이')
 check "소유자 절이 소유를 밝히고 principles_applied 를 요구한다" "owns_sec \"\$OWNER_DOC\" \"\$OWNER_SEC\" && sec_has_id \"\$OWNER_DOC\" \"\$OWNER_SEC\" principles_applied"
 check "소유자가 규율 조각을 모두 적는다" "sec_has \"\$OWNER_DOC\" \"\$OWNER_SEC\" '${RULE_MARKS[0]}' && sec_has \"\$OWNER_DOC\" \"\$OWNER_SEC\" '${RULE_MARKS[1]}' && sec_has \"\$OWNER_DOC\" \"\$OWNER_SEC\" '${RULE_MARKS[2]}'"
 # 가리키기만 해야 하는 문서들. 그 절을 두거나 규율 조각을 다시 적으면 실패한다.
@@ -1091,5 +1091,10 @@ check "aggregating-lenses: 출력 스키마 절이 principles_applied 를 따로
 # 값을 넣으면 버전 문자열 비교로 전환돼 값을 올리지 않는 한 새 커밋이 배포되지 않는다. 한 번 넣었다
 # 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다.
 check "Claude 매니페스트에 version 없음"  "! grep -qE '\"version\"[[:space:]]*:' '$HERE/.claude-plugin/plugin.json'"
+
+echo "[YAGNI 정리 — 쓰이지 않던 장치를 지웠다]"
+check "집계에 상충 감지 단계가 없다"         "! grep -qF '**상충 감지**' '$HERE/skills/aggregating-lenses/SKILL.md'"
+check "readability 에 목적 둘 예외가 없다"   "! grep -qF '목적이 둘이면' '$HERE/skills/lens-readability/SKILL.md'"
+check "MANAGED_TAG 를 밖에서 바꿀 수 없다"   "grep -qxF 'MANAGED_TAG=\"disciplined-coder\"' '$HERE/scripts/_managed_block.sh'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

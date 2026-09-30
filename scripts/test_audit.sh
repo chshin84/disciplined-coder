@@ -175,7 +175,8 @@ cat > "$VR/findings.json" <<'FIXTURE'
 FIXTURE
 check "사유 없는 기각을 잡는다" "[ -f '$AV' ] && ! bash '$AV' '$VR' >/dev/null 2>&1"
 rm -rf "$VT"
-check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF '<렌즈 스킬 이름>-<실행 횟수>.json' '$HERE/skills/review-docs/SKILL.md'"
+check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF '<렌즈 스킬 이름>-<순번>.json' '$HERE/skills/review-docs/SKILL.md'"
+check "target 칸을 집계 계약이 정의한다" "grep -qF '| \`target\` |' '$HERE/skills/aggregating-lenses/SKILL.md'"
 
 
 echo "[렌즈 — 발견 기준과 기계에 넘기는 것]"
