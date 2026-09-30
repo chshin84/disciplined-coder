@@ -180,9 +180,7 @@ managed_block_inject() {
   # 같은 블록이 하나만 들어 있고 고아 주석도 없으면 손대지 않는다. 매 세션 다시 쓰면 그 사이에
   # 시작하는 다른 창이 블록 없는 파일을 읽을 수 있고, 락과 임시 파일에 프로세스 열 개 남짓이 든다.
   cur="$(<"$uc")"
-  if [[ $cur == *"$begin"$'
-'"$body"$'
-'"$end"* ]] && [[ $cur != *"$MANAGED_ORPHAN"* ]]; then
+  if [[ $cur == *"$begin"$'\n'"$body"$'\n'"$end"* ]] && [[ $cur != *"$MANAGED_ORPHAN"* ]]; then
     rest="${cur#*"$begin"}"
     [[ $rest == *"$begin"* ]] || return 0
   fi
@@ -197,14 +195,10 @@ managed_block_inject() {
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 2
   # 완성본을 임시 파일에 다 만든 뒤 한 번에 옮긴다. 옮긴 뒤 덧붙이면 그 사이에 블록 없는 파일이 놓인다.
   {
-    if [ -s "$norm" ]; then printf '
-'; fi
-    printf '%s
-' "$begin"
-    printf '%s
-' "$body"
-    printf '%s
-' "$end"
+    if [ -s "$norm" ]; then printf '\n'; fi
+    printf '%s\n' "$begin"
+    printf '%s\n' "$body"
+    printf '%s\n' "$end"
   } >> "$norm" || return 2
   mv "$norm" "$uc" || return 2
 }
