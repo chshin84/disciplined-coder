@@ -339,6 +339,32 @@ echo "[install-current] 스캐폴드 위생 검사가 갱신 기록을 지우지
 check "update.seen 이 남는다"        "[ -f '$H38/.claude/disciplined-coder/update.seen' ]"
 check "update.stuck 이 남는다"       "[ -f '$H38/.claude/disciplined-coder/update.stuck' ]"
 
+HAU1="$(mktemp -d)"; uc_fixture "$HAU1" "$A40" 0 "$B40" > /dev/null
+printf '{ "chshin-tools": { "autoUpdate": false, "source": { "source": "github", "repo": "chshin84/disciplined-coder" } } }\n' > "$HAU1/.claude/plugins/known_marketplaces.json"
+OUTAU1="$(run_uc "$HAU1")"
+echo "[install-current] autoUpdate 를 false 로 두면 확인도 알림도 하지 않는다"
+check "갱신을 실행하지 않는다"   "[ ! -f '$HAU1/args.txt' ]"
+check "원격도 읽지 않는다"       "[ ! -f '$HAU1/curl-args.txt' ]"
+check "아무것도 출력하지 않는다" "[ -z \"\$OUTAU1\" ]"
+
+HAU2="$(mktemp -d)"; uc_fixture "$HAU2" "$A40" 0 "$B40" > /dev/null
+mkdir -p "$HAU2/.claude/disciplined-coder/update.lock"
+run_uc "$HAU2" > /dev/null
+echo "[install-current] 다른 창이 갱신 중이면 이 창은 갱신하지 않는다"
+check "잠금이 있으면 갱신을 실행하지 않는다"     "[ ! -f '$HAU2/args.txt' ]"
+touch -d '2000-01-01' "$HAU2/.claude/disciplined-coder/update.lock"
+run_uc "$HAU2" > /dev/null
+check "10분 지난 잠금은 치우고 그 실행은 물러난다" "[ ! -f '$HAU2/args.txt' ] && [ ! -e '$HAU2/.claude/disciplined-coder/update.lock' ]"
+run_uc "$HAU2" > /dev/null
+check "다음 실행이 갱신한다"                     "[ -f '$HAU2/args.txt' ]"
+check "끝나면 잠금을 푼다"                       "[ ! -e '$HAU2/.claude/disciplined-coder/update.lock' ]"
+
+HAU3="$(mktemp -d)"; uc_fixture "$HAU3" "$A40" 124 "$B40" > /dev/null
+OUTAU3="$(run_uc "$HAU3")"
+echo "[install-current] 시간 초과도 같은 커밋으로는 다시 시도하지 않는다"
+check "시간 초과를 알린다"                     "printf '%s' \"\$OUTAU3\" | grep -qF '60초'"
+check "update.stuck 을 남긴다"                 "[ -f '$HAU3/.claude/disciplined-coder/update.stuck' ]"
+
 # --- crlf-region: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
 printf 'note\r\n# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H6/.claude/CLAUDE.md"

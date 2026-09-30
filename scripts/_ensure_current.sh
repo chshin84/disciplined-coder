@@ -14,6 +14,9 @@
 #   생기면 다시 시도한다. 기록은 update.stuck 이다.
 # - 세션 사이에 자동 갱신이 설치본을 옮겼으면 알린다. 지난 세션에 본 커밋은 update.seen 이다.
 #   이 세션이 새 버전으로 실행되는지는 실행 중인 CLAUDE_PLUGIN_ROOT 의 폴더 이름으로 판정한다.
+# - 배포처나 설정에서 autoUpdate 를 false 로 두었으면 아무것도 하지 않는다.
+# - 두 갱신 명령에는 60초 상한과 잠금을 둔다. 시간 초과도 다른 실패와 같이 update.stuck 에 적는다 —
+#   늘 멈추는 망에서 startup 마다 최대 120초를 기다리지 않게 한다.
 #
 # 옮긴 뒤에는 반드시 다시 켜라고 말한다. `claude plugin update` 의 도움말이 "restart required to
 # apply" 라고 적고 있다. 실패했으면 다시 켜도 새 버전이 안 실리므로, 실패 사실과 직접 실행할 명령을
@@ -24,7 +27,7 @@
 # $1=설정 홈(~/.claude). 사용자에게 보일 줄을 stdout 으로 낸다. 어느 분기에서도 0 으로 끝난다 —
 # 갱신 확인이 세션 시작을 막지 않는다.
 ensure_install_current() {
-  local home="$1" inst out id sha url ref name dir head rc bin curl kdir seen stuck restart=0 notes="" root
+  local home="$1" inst out id sha url ref name dir head rc bin curl kdir seen stuck restart=0 notes="" root au lock tmo
   inst="$home/plugins/installed_plugins.json"
   [ -f "$inst" ] || return 0
 
@@ -35,23 +38,31 @@ import json,sys,io,os
 d=json.load(io.open(sys.argv[1],encoding="utf-8")).get("plugins",{})
 for k,v in d.items():
     if k.startswith("disciplined-coder@"):
+        mk=k.split("@",1)[1]
         for e in v:
             s=e.get("gitCommitSha")
             if s:
-                url=ref=""
+                url=ref=au=""
                 if os.path.isfile(sys.argv[2]):
-                    src=json.load(io.open(sys.argv[2],encoding="utf-8")).get(k.split("@",1)[1],{}).get("source",{})
+                    m=json.load(io.open(sys.argv[2],encoding="utf-8")).get(mk,{})
+                    if m.get("autoUpdate") is False: au="off"
+                    src=m.get("source",{})
                     ref=src.get("ref","")
                     if src.get("source")=="github" and src.get("repo"):
                         url="https://github.com/"+src["repo"]+".git"
                     elif str(src.get("url","")).startswith("https://"):
                         url=src["url"]
-                print("|".join([k,s,url,ref])); sys.exit(0)
+                if os.path.isfile(sys.argv[3]):
+                    x=json.load(io.open(sys.argv[3],encoding="utf-8")).get("extraKnownMarketplaces",{})
+                    if isinstance(x,dict) and isinstance(x.get(mk),dict) and x[mk].get("autoUpdate") is False: au="off"
+                print("|".join([k,s,url,ref,au])); sys.exit(0)
 sys.exit(1)
 '
-  out="$(json_run "$prog" "$inst" "$home/plugins/known_marketplaces.json" 2>/dev/null)" || return 0
-  IFS='|' read -r id sha url ref <<< "$out"
+  out="$(json_run "$prog" "$inst" "$home/plugins/known_marketplaces.json" "$home/settings.json" 2>/dev/null)" || return 0
+  IFS='|' read -r id sha url ref au <<< "$out"
   [ -n "$id" ] && [ -n "$sha" ] || return 0
+  # 사용자가 자동 갱신을 꺼 두었으면 확인도 알림도 하지 않는다(2026-09-30 사용자 결정).
+  [ "$au" = "off" ] && return 0
   name="${id#*@}"
   dir="$home/plugins/marketplaces/$name"
   kdir="$home/disciplined-coder"; mkdir -p "$kdir"
@@ -90,10 +101,23 @@ sys.exit(1)
       notes="${notes:+$notes
 }설치본이 원격보다 뒤처져 있다(${sha:0:7} → ${head:0:7}). 이 커밋으로는 이미 갱신에 실패해 다시 시도하지 않았다. 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
     else
+      # 창 둘이 동시에 열리면 한 창만 옮긴다. 잠금은 폴더 만들기로 잡는다. 10분이 지난 잠금은 끊긴 창이
+      # 남긴 것으로 보고 치우되, 치운 창은 그 실행에서 물러난다. 치우고 곧바로 잡으면 그 사이에 다른 창이
+      # 끼어들어 둘 다 잡을 수 있다(_managed_block.sh 71-73행과 같은 이유). 다음 세션이 잡는다.
+      lock="$kdir/update.lock"
+      if [ -d "$lock" ] && [ -n "$(find "$lock" -maxdepth 0 -mmin +10 2>/dev/null)" ]; then
+        rmdir "$lock" 2>/dev/null || true
+        return 0
+      fi
+      mkdir "$lock" 2>/dev/null || return 0
+      # 두 명령에 60초 상한을 둔다. GNU timeout 만 쓴다 — 윈도우 System32 의 timeout.exe 는 뜻이 다른
+      # 명령이고 --version 을 모른다. GNU timeout 이 없으면(맥 기본) 상한 없이 실행한다.
+      tmo=""; timeout --version >/dev/null 2>&1 && tmo="timeout 60"
       # 로컬 사본이 옛 커밋이면 plugin update 가 옮길 새 버전이 없으므로 사본부터 원격에 맞춘다.
       rc=0
-      "$bin" plugin marketplace update "$name" >/dev/null 2>&1 || rc=$?
-      [ "$rc" -eq 0 ] && { "$bin" plugin update "$id" >/dev/null 2>&1 || rc=$?; }
+      $tmo "$bin" plugin marketplace update "$name" >/dev/null 2>&1 || rc=$?
+      [ "$rc" -eq 0 ] && { $tmo "$bin" plugin update "$id" >/dev/null 2>&1 || rc=$?; }
+      rmdir "$lock" 2>/dev/null || true
       if [ "$rc" -eq 0 ]; then
         restart=1
         rm -f "$kdir/update.stuck"
@@ -102,8 +126,13 @@ sys.exit(1)
 }설치본을 원격에 맞춰 옮겼다(${sha:0:7} → ${head:0:7}). 클로드 코드는 켤 때 플러그인을 읽으므로 이 세션은 옛 버전으로 실행된다."
       else
         printf '%s\n' "$head" > "$kdir/update.stuck"
-        notes="${notes:+$notes
+        if [ "$rc" -eq 124 ]; then
+          notes="${notes:+$notes
+}설치본이 원격보다 뒤처졌는데 갱신 명령이 60초 안에 끝나지 않아 멈췄다(${sha:0:7} → ${head:0:7}). 원격에 새 커밋이 생기기 전에는 다시 시도하지 않는다. 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
+        else
+          notes="${notes:+$notes
 }설치본이 원격보다 뒤처졌는데 옮기지 못했다(${sha:0:7} → ${head:0:7}, 종료 코드 $rc). 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
+        fi
       fi
     fi
   fi
