@@ -27,7 +27,7 @@
 # $1=설정 홈(~/.claude). 사용자에게 보일 줄을 stdout 으로 낸다. 어느 분기에서도 0 으로 끝난다 —
 # 갱신 확인이 세션 시작을 막지 않는다.
 ensure_install_current() {
-  local home="$1" inst out id sha url ref name dir head rc bin curl kdir seen stuck restart=0 notes="" root au lock tmo
+  local home="$1" inst out id sha url ref name dir head rc bin curl kdir seen stuck restart=0 notes="" root au lock tmo got
   inst="$home/plugins/installed_plugins.json"
   [ -f "$inst" ] || return 0
 
@@ -104,12 +104,14 @@ sys.exit(1)
       # 창 둘이 동시에 열리면 한 창만 옮긴다. 잠금은 폴더 만들기로 잡는다. 10분이 지난 잠금은 끊긴 창이
       # 남긴 것으로 보고 치우되, 치운 창은 그 실행에서 물러난다. 치우고 곧바로 잡으면 그 사이에 다른 창이
       # 끼어들어 둘 다 잡을 수 있다(_managed_block.sh 71-73행과 같은 이유). 다음 세션이 잡는다.
-      lock="$kdir/update.lock"
+      # 잠금 때문에 갱신을 건너뛰어도 함수를 끝내지 않는다. 앞에서 모은 자동 갱신 알림을 아래에서 낸다.
+      lock="$kdir/update.lock"; got=0
       if [ -d "$lock" ] && [ -n "$(find "$lock" -maxdepth 0 -mmin +10 2>/dev/null)" ]; then
         rmdir "$lock" 2>/dev/null || true
-        return 0
+      elif mkdir "$lock" 2>/dev/null; then
+        got=1
       fi
-      mkdir "$lock" 2>/dev/null || return 0
+      if [ "$got" -eq 1 ]; then
       # 두 명령에 60초 상한을 둔다. GNU timeout 만 쓴다 — 윈도우 System32 의 timeout.exe 는 뜻이 다른
       # 명령이고 --version 을 모른다. GNU timeout 이 없으면(맥 기본) 상한 없이 실행한다.
       tmo=""; timeout --version >/dev/null 2>&1 && tmo="timeout 60"
@@ -133,6 +135,7 @@ sys.exit(1)
           notes="${notes:+$notes
 }설치본이 원격보다 뒤처졌는데 옮기지 못했다(${sha:0:7} → ${head:0:7}, 종료 코드 $rc). 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
         fi
+      fi
       fi
     fi
   fi

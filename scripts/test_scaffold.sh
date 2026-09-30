@@ -359,6 +359,13 @@ run_uc "$HAU2" > /dev/null
 check "다음 실행이 갱신한다"                     "[ -f '$HAU2/args.txt' ]"
 check "끝나면 잠금을 푼다"                       "[ ! -e '$HAU2/.claude/disciplined-coder/update.lock' ]"
 
+HAU4="$(mktemp -d)"; uc_fixture "$HAU4" "$B40" 0 "$C40" > /dev/null
+mkdir -p "$HAU4/.claude/disciplined-coder/update.lock"; printf '%s\n' "$A40" > "$HAU4/.claude/disciplined-coder/update.seen"
+OUTAU4="$(run_uc "$HAU4" "/x/cache/chshin-tools/disciplined-coder/aaaaaaaaaaaa")"
+echo "[install-current] 잠금 때문에 갱신을 건너뛰어도 자동 갱신 알림은 낸다"
+check "갱신은 실행하지 않는다"   "[ ! -f '$HAU4/args.txt' ]"
+check "자동 갱신 알림을 낸다"    "printf '%s' \"\$OUTAU4\" | grep -qF '자동 갱신이 설치본을 옮겼다(aaaaaaa → bbbbbbb)'"
+
 HAU3="$(mktemp -d)"; uc_fixture "$HAU3" "$A40" 124 "$B40" > /dev/null
 OUTAU3="$(run_uc "$HAU3")"
 echo "[install-current] 시간 초과도 같은 커밋으로는 다시 시도하지 않는다"
