@@ -4,7 +4,7 @@
 # 지킬 규칙은 skills/domain-plugin/SKILL.md 「사용자 설정 파일을 고칠 때 지킬 것」이 소유한다(대상 좁히기·
 # 사용자 결정 존중·사본과 재검증·사유를 구분한 통지·처리기 하나·서식 변경 고지). 여기 다시 적지 않는다.
 # 값을 채우면 파일 전체가 두 칸 들여쓰기로 다시 찍힌다 — 내용은 그대로이나 서식은 바뀔 수 있어
-# 사본(.bak)을 남기고 바뀐 경로를 호출자가 사용자에게 알린다.
+# 시각을 붙인 사본(<파일>.<시각>.bak)을 남기고 바뀐 경로를 호출자가 사용자에게 알린다.
 # 소비자는 scaffold.sh다.
 . "${BASH_SOURCE[0]%/*}/_json_valid.sh"   # 파이썬 인터프리터 고르기
 #
@@ -66,7 +66,7 @@ sys.exit(0)
   # 세션마다 같은 실패가 되풀이된다. 이 이름은 우리가 정한 것이라 지워도 안전하다.
   if [ "$rc" -ne 0 ]; then rm -rf "$tmp"; return "$rc"; fi
   [ -s "$tmp" ] || { rm -rf "$tmp"; return 5; }
-  cp "$f" "$f.bak" || { rm -rf "$tmp"; return 5; }
+  cp "$f" "$f.$(date +%Y%m%d-%H%M%S).bak" || { rm -rf "$tmp"; return 5; }
   mv "$tmp" "$f" || { rm -rf "$tmp"; return 5; }
   echo "$f"
 }

@@ -30,6 +30,12 @@ utf8_user_var_state() {
     msys*|cygwin*) ;;
     *) printf 'not-windows'; return 0 ;;
   esac
+  # 프로세스 환경에 값이 이미 있으면 레지스트리를 읽지 않는다. 레지스트리를 보는 이유는 넣은 직후
+  # 세션에 프로세스 환경이 비어 있는 것 하나라, 값이 있으면 결론이 같고 프로세스 넷(reg·awk·tr·tail)만 든다.
+  case "${PYTHONUTF8:-}" in
+    1) printf 'on'; return 0 ;;
+    0) printf 'off'; return 0 ;;
+  esac
   # //v 는 Git Bash 가 /v 로 되돌린다. /v 로 쓰면 경로로 바꿔 버려 reg 가 못 알아듣는다.
   # 상태를 넷으로 가른다. 'off' 는 사용자가 값을 0 으로 적어 일부러 끈 것이라 손대지 않는다.
   utf8_q="$(reg query "HKCU\\Environment" //v PYTHONUTF8 2>/dev/null || true)"
@@ -55,8 +61,17 @@ for f in $SCAFFOLD_FILES; do
     # 복사가 실패하면 조용히 넘어가지 않는다. 이미 옛 사본이 놓여 있는 PC에서는 파일도 있고
     # @import 배선도 남아 있어 README가 알려 준 확인 셋을 그대로 통과하므로, 에이전트원칙만 낡은 채
     # 아무도 모르게 된다.
-    if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :; else
-      cp "$src" "$dst" || { echo "[disciplined-coder] ERROR: 에이전트원칙 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다)"; exit 1; }
+    # 같으면 다시 쓰지 않는다. cp 는 대상을 비운 뒤 쓰므로 그 순간 다른 창이 @import 로 읽으면 반쪽 파일이
+    # 실린다. 그래서 옆 이름에 복사한 뒤 mv 로 한 번에 바꾼다. 복사가 실패해도 뒤 단계(관리블록·자동 갱신·
+    # 핸드오프 린트)는 이어서 실행한다.
+    if [ "$src" = "$dst" ] || { [ -e "$dst" ] && [ "$src" -ef "$dst" ]; }; then :
+    elif [ -f "$dst" ] && [ "$(<"$src")" = "$(<"$dst")" ]; then :
+    else
+      tmpc="$dst.dc-new.$$"
+      if cp "$src" "$tmpc" 2>/dev/null && mv "$tmpc" "$dst" 2>/dev/null; then :; else
+        rm -f "$tmpc" 2>/dev/null || true
+        echo "[disciplined-coder] ERROR: 에이전트원칙 복사 실패 — $src → $dst (이전 사본이 있으면 그것이 그대로 쓰인다). 나머지 셋업은 계속한다."
+      fi
     fi
   else
     echo "[disciplined-coder] WARNING: source not found at $src"
@@ -65,7 +80,7 @@ done
 
 # [managed-dir-hygiene] 관리 디렉터리 위생(멱등): 정책 원본은 _scaffold_common.sh(SCAFFOLD_WHITELIST·STALE).
 #     비화이트리스트는 사용자 데이터일 수 있어 — 비었으면 제거, 내용 있으면 surface.
-scaffold_hygiene "$KDIR"
+scaffold_hygiene "$KDIR" 2>&1
 
 # [global-managed-block] ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
 . "$SDIR/_managed_block.sh"
@@ -167,7 +182,7 @@ inject_rc=0
 # 관리블록은 에이전트원칙과 금지 표현 목록을 함께 싣는다. 다른 플러그인이 목록을 싣고 있어도
 # 이 두 줄은 그대로 쓴다.
 printf '%s\n' '@disciplined-coder/agent-principles.md' '@disciplined-coder/korean-banned-words.md' \
-  | managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" || inject_rc=$?
+  | managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" 2>&1 || inject_rc=$?
 if [ "$inject_rc" -ne 0 ]; then
   echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열어라."
 fi

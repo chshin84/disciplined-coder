@@ -42,6 +42,13 @@ check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words.md' 
 # 첫 세션은 @import 가 아직 안 실렸으므로 목록도 에이전트원칙과 함께 stdout 으로 보강한다.
 check "banlist: 첫 세션 stdout 에 목록도 실린다" "printf '%s' \"\$OUT\" | grep -qxF \"\$(head -1 '$HERE/korean-banned-words.md')\""
 check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린코더(혹은 dc코더)'"
+touch -d '2000-01-01' "$UC"; REF5="$(mktemp)"; touch -d '2001-01-01' "$REF5"
+run "$H1" "$P1" > /dev/null
+check "같은 블록이면 전역 CLAUDE.md 를 다시 쓰지 않는다" "[ ! '$UC' -nt '$REF5' ]"
+touch -d '2000-01-01' "$K/agent-principles.md"
+run "$H1" "$P1" > /dev/null
+check "같은 원칙 사본은 다시 복사하지 않는다"            "[ ! '$K/agent-principles.md' -nt '$REF5' ]"
+rm -f "$REF5"
 
 # 마켓플레이스 항목의 autoUpdate 값을 읽어 출력한다($1=파일 $2=항목 이름). 없으면 none을 찍는다.
 # grep으로 파일 전체를 훑으면 우리 항목에 붙었는지 남의 항목에 붙었는지 못 가리므로 항목을 지목해 읽는다.
@@ -87,7 +94,7 @@ check "우리 항목에 autoUpdate가 켜졌다"   "[ \"\$(json_autoupdate '$SET
 check "알려진 마켓플레이스에도 켜졌다"     "[ \"\$(json_autoupdate '$KNOWN_A' \"\$MKT\")\" = 'true' ]"
 check "남의 마켓플레이스는 그대로다"       "[ \"\$(json_autoupdate '$SET_A' 'somebody-else')\" = 'none' ]"
 check "다른 설정이 보존된다"              "grep -qF '\"theme\"' '$SET_A' && grep -qF 'PreToolUse' '$SET_A'"
-check "사본을 남긴다"                     "[ -f '$SET_A.bak' ]"
+check "사본을 남긴다"                     "ls '$(dirname "$SET_A")'/settings.json.*.bak >/dev/null 2>&1"
 BEFORE_A="$(cat "$SET_A")"
 run "$HA" "$PA" >/dev/null 2>&1
 check "두 번째 실행에서 안 바뀐다"         "[ \"\$BEFORE_A\" = \"\$(cat '$SET_A')\" ]"
@@ -99,7 +106,7 @@ cat > "$HB/.claude/settings.json" <<EOF
 EOF
 run "$HB" "$PB" >/dev/null 2>&1
 check "꺼 둔 값을 되돌리지 않는다"         "[ \"\$(json_autoupdate '$HB/.claude/settings.json' \"\$MKT\")\" = 'false' ]"
-check "꺼 둔 파일은 다시 쓰이지도 않는다"  "[ ! -f '$HB/.claude/settings.json.bak' ]"
+check "꺼 둔 파일은 다시 쓰이지도 않는다"  "! ls '$HB/.claude'/settings.json.*.bak >/dev/null 2>&1"
 
 # 우리 항목이 없으면 아무것도 만지지 않는다
 HC="$(mktemp -d)"; PC2="$(mktemp -d)"; mkdir -p "$HC/.claude"
@@ -108,7 +115,7 @@ printf '{ "extraKnownMarketplaces": { "somebody-else": { "source": { "source": "
 BEFORE_C="$(cat "$HC/.claude/settings.json")"
 run "$HC" "$PC2" >/dev/null 2>&1
 check "우리 항목이 없으면 안 만진다"       "[ \"\$BEFORE_C\" = \"\$(cat '$HC/.claude/settings.json')\" ]"
-check "사본도 안 만든다"                  "[ ! -f '$HC/.claude/settings.json.bak' ]"
+check "사본도 안 만든다"                  "! ls '$HC/.claude'/settings.json.*.bak >/dev/null 2>&1"
 
 # 깨진 JSON은 손대지 않고 스캐폴드도 죽지 않는다
 HD="$(mktemp -d)"; PD="$(mktemp -d)"; mkdir -p "$HD/.claude"
@@ -383,7 +390,7 @@ check "CRLF region not duplicated"   "[ \$(grep -cF '# BEGIN disciplined-coder' 
 H7="$(mktemp -d)"; P7="$(mktemp -d)"; mkdir -p "$H7/.claude"
 { printf 'note before\n'; printf '# BEGIN disciplined-coder (managed — do not edit)\n'; \
   printf '@disciplined-coder/agent-principles.md\n'; printf 'IMPORTANT user content after malformed begin\n'; } > "$H7/.claude/CLAUDE.md"
-ERR7="$(run "$H7" "$P7" 2>&1 >/dev/null)" || true
+ERR7="$(run "$H7" "$P7" 2>/dev/null)" || true
 UC7="$H7/.claude/CLAUDE.md"
 echo "[malformed-region] malformed region (BEGIN w/o END) → non-destructive"
 check "malformed: user content preserved"  "grep -qxF 'IMPORTANT user content after malformed begin' '$UC7'"
@@ -392,7 +399,7 @@ check "malformed: warns BEGIN without END"  "printf '%s' \"\$ERR7\" | grep -qF '
 check "malformed: complete region appended" "[ \$(grep -cF '# END disciplined-coder' '$UC7') -ge 1 ]"
 
 # --- malformed-region-rerun: 깨진 관리영역 2회차 실행 — 1회차가 다음 실행의 파괴를 준비하면 안 된다 ---
-ERR7b="$(run "$H7" "$P7" 2>&1 >/dev/null)" || true
+ERR7b="$(run "$H7" "$P7" 2>/dev/null)" || true
 echo "[malformed-region-rerun] malformed region 2nd run → still non-destructive"
 check "2nd run: user content preserved"    "grep -qxF 'IMPORTANT user content after malformed begin' '$UC7'"
 check "2nd run: pre-region note preserved" "grep -qxF 'note before' '$UC7'"
@@ -451,7 +458,7 @@ printf '내 개인 메모\n'   > "$K10/my_notes.md"             # 정체 모를 
 : > "$K10/orphan_empty.md"                                 # 빈 고아 → 제거
 mkdir -p "$K10/rogue_dir"                                  # 하위 디렉터리 → 중단 없이 surface
 set +e
-ERR10="$(run "$H10" "$P10" 2>&1 >/dev/null)"; rc10=$?
+ERR10="$(run "$H10" "$P10" 2>/dev/null)"; rc10=$?
 set -e
 echo "[managed-dir-hygiene] managed-dir hygiene (whitelist pruning)"
 check "stale coding-principles pruned"  "[ ! -f '$K10/coding-principles.md' ]"
@@ -468,7 +475,7 @@ check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
 H12="$(mktemp -d)"; P12="$(mktemp -d)"; K12="$H12/.claude/disciplined-coder"
 run "$H12" "$P12" >/dev/null
 printf 'issues\n' > "$K12/issue-mode"; printf 'required\n' > "$K12/ultracode-review"
-ERR12b="$(run "$H12" "$P12" 2>&1 >/dev/null)" || true
+ERR12b="$(run "$H12" "$P12" 2>/dev/null)" || true
 echo "[stale-toggle-files] 남은 토글 상태 파일을 지운다"
 check "잔존 issue-mode 를 지운다"            "[ ! -f '$K12/issue-mode' ]"
 check "잔존 ultracode-review 를 지운다"      "[ ! -f '$K12/ultracode-review' ]"
@@ -509,7 +516,7 @@ H19="$(mktemp -d)"; P19="$(mktemp -d)"; mkdir -p "$H19/.claude"
   printf '\n'
   printf 'para two\n'
 } > "$H19/.claude/CLAUDE.md"
-ERR19="$(run "$H19" "$P19" 2>&1 >/dev/null)" || true
+ERR19="$(run "$H19" "$P19" 2>/dev/null)" || true
 UC19="$H19/.claude/CLAUDE.md"
 echo "[orphan-opener] orphan opener drops only its own line"
 check "orphan: head preserved"        "grep -qxF 'head note' '$UC19'"
@@ -704,7 +711,7 @@ printf 'old index
 ' > "$KS/unsolved_problems.md"
 printf '옛 이름 목록 한 줄
 ' > "$KS/korean-banned-words-dc.md"
-ERRS="$(CLAUDE_HOME_DIR="$HRS/.claude" CLAUDE_PROJECT_DIR="$PRS" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
+ERRS="$(CLAUDE_HOME_DIR="$HRS/.claude" CLAUDE_PROJECT_DIR="$PRS" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>/dev/null)" || true
 echo "[stale] renamed and retired managed files are cleared out"
 check "stale: advisors-index 치움"        "[ ! -f '$KS/advisors-index.md' ]"
 check "stale: unsolved_problems 치움"     "[ ! -f '$KS/unsolved_problems.md' ]"
@@ -718,7 +725,7 @@ check "stale: 내용은 백업에 남는다"       "grep -rqF '내 백로그 한
 HSD="$(mktemp -d)"; PSD="$(mktemp -d)"; mkdir -p "$HSD/.claude/disciplined-coder/solved_problems"
 KSD="$HSD/.claude/disciplined-coder"
 printf '쪼갠 오답노트 한 줄\n' > "$KSD/solved_problems/2026-01-01.md"
-ERRSD="$(CLAUDE_HOME_DIR="$HSD/.claude" CLAUDE_PROJECT_DIR="$PSD" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>&1 >/dev/null)" || true
+ERRSD="$(CLAUDE_HOME_DIR="$HSD/.claude" CLAUDE_PROJECT_DIR="$PSD" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>/dev/null)" || true
 echo "[stale-dir] a retired managed directory is filed away, not warned about forever"
 check "stale-dir: 디렉터리를 치운다"       "[ ! -d '$KSD/solved_problems' ]"
 check "stale-dir: 내용은 백업에 남는다"    "grep -rqF '쪼갠 오답노트 한 줄' '$KSD/backups'"

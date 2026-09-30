@@ -9,9 +9,7 @@
 # 본문 줄을 지우지 않는 이유: 본문에 빈 줄이 포함될 수 있어 '본문과 같은 줄 제거'는 사용자 파일의 빈 줄을 전멸시킨다.
 # 이름표. 이 값은 사람이 읽는 메시지에만 쓰이고 동작에는 쓰이지 않는다 — 마커는 함수 인자로 들어오고
 # 락 경로는 대상 파일에서 나오므로, 이 값을 바꿔도 갈라지는 것은 stderr 문구와 고아 주석뿐이다.
-# 이 파일을 사본으로 가져가는 쪽은 source 앞뒤에 이 값만 세우면 되고 함수 시그니처는 그대로다.
-# 여기서 경로나 판정을 만들지 마라 — 그러면 사본 쪽에서 조용히 다른 동작이 된다.
-MANAGED_TAG="${MANAGED_TAG:-disciplined-coder}"
+MANAGED_TAG="disciplined-coder"
 # 표준 관리블록 마커. 소비자(scaffold)는 begin/end를 인자로 넘긴다.
 MANAGED_BEGIN="# BEGIN $MANAGED_TAG (managed — do not edit)"
 MANAGED_END="# END $MANAGED_TAG (managed — do not edit)"
@@ -176,24 +174,37 @@ managed_block_remove() {
 # 락을 못 잡았으면 파일을 건드리지 않고 물러난다 — 반쪽만 쓴 관리블록을 남기는 것보다 안 쓰는
 # 것이 낫고, 못 썼다는 사실은 managed_block_lock 이 이미 stderr 로 알렸다.
 managed_block_inject() {
-  local uc="$1" begin="$2" end="$3" body tmp norm lock tok
+  local uc="$1" begin="$2" end="$3" body tmp norm lock tok cur rest
   body="$(cat)"
-  touch "$uc"
+  [ -e "$uc" ] || : > "$uc"
+  # 같은 블록이 하나만 들어 있고 고아 주석도 없으면 손대지 않는다. 매 세션 다시 쓰면 그 사이에
+  # 시작하는 다른 창이 블록 없는 파일을 읽을 수 있고, 락과 임시 파일에 프로세스 열 개 남짓이 든다.
+  cur="$(<"$uc")"
+  if [[ $cur == *"$begin"$'
+'"$body"$'
+'"$end"* ]] && [[ $cur != *"$MANAGED_ORPHAN"* ]]; then
+    rest="${cur#*"$begin"}"
+    [[ $rest == *"$begin"* ]] || return 0
+  fi
 
   lock="$uc.lock"
   tok="$(managed_block_lock "$lock")" || return 1
   tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
   # 중간에 죽어도 임시 파일과 락을 남기지 않는다.
   trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock" "$tok"' RETURN
-  # 걷어내기와 같은 이유로 두 변환의 종료 코드를 각각 본다. 이쪽은 사본을 뜨지 않으므로 원본을
-  # 잘못 덮으면 되돌릴 수단이 아예 없다.
+  # 걷어내기와 같은 이유로 두 변환의 종료 코드를 각각 본다.
   awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" -v tag="$MANAGED_TAG" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 2
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 2
-  mv "$norm" "$uc" || return 2
+  # 완성본을 임시 파일에 다 만든 뒤 한 번에 옮긴다. 옮긴 뒤 덧붙이면 그 사이에 블록 없는 파일이 놓인다.
   {
-    if [ -s "$uc" ]; then printf '\n'; fi
-    printf '%s\n' "$begin"
-    printf '%s\n' "$body"
-    printf '%s\n' "$end"
-  } >> "$uc"
+    if [ -s "$norm" ]; then printf '
+'; fi
+    printf '%s
+' "$begin"
+    printf '%s
+' "$body"
+    printf '%s
+' "$end"
+  } >> "$norm" || return 2
+  mv "$norm" "$uc" || return 2
 }
