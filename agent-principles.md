@@ -19,7 +19,7 @@
 - **`RUN-IT` (Run it, show it)** — 사용자에게 입력할 명령을 알려 주지 말고 직접 실행하고, 실행한 명령과 그 출력을 함께 보여라.
 - **`NO-FLEET` (One call before many)** — 파일 10개 이하를 읽거나 Grep과 Read 몇 번으로 끝나는 일에는 서브에이전트를 실행하지 마라.
 - **`YAGNI` (Nothing beyond the request)** — 요청한 것 이상을 만들지 마라. 한 번만 쓰는 추상화, 요청하지 않은 설정 가능성, 일어날 수 없는 상황의 처리를 넣지 마라. 50줄로 될 일을 200줄로 만들지 마라.
-- **`REPORT-DEAD` (Report dead material, don't delete it)** — 요청과 무관한 죽은 코드나 문서를 발견하면 알려라. 내 변경으로 쓰이지 않게 된 것은 지우고, 원래부터 쓰이지 않던 것은 지우지 마라.
+- **`REPORT-DEAD` (Report dead material, don't delete it)** — 요청과 무관한 죽은 코드나 문서를 발견하면 지우지 말고 알려라. 이번 작업의 변경으로 쓰이지 않게 된 코드와 문서는 지워라.
 - **`CHECKABLE` (Turn the task into a check)** — 작업을 확인할 수 있는 기준으로 바꿔라. 단계가 셋 이상이거나 파일 셋 이상을 고치면 번호 붙인 단계마다 확인 방법을 적어라. '되게 해 줘' 같은 약한 기준은 구체적인 입력과 기대 결과로 바꿔라.
 
 ### `TITLES` — 제목과 계층
