@@ -440,3 +440,5 @@ git commit -m "배정표 재발과 옛 절 포인터를 막는 검사를 넣는�
 - [ ] **Step 6: 병합 전 알림**
 
 e4의 묶음이 main에 푸시되었는지 사용자에게 확인한다. 푸시되었으면 `git fetch` 뒤 `git merge origin/main`으로 받아 충돌을 풀고 「전체 검사」를 다시 실행한다. 아직이면 e4에 이 브랜치가 끝났다고 알리고 병합은 기다린다.
+
+<!-- spec-review: escalated -->
