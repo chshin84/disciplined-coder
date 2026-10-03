@@ -246,6 +246,12 @@ check "lens-consistency 가 짝 주는 법을 렌즈 그룹으로 넘긴다" "po
 check "lens-prior-art 가 spec 리뷰 전용이라고 적지 않는다"      "! grep -qF 'spec에 한해' \"\$LPA\" && ! grep -qF 'spec 리뷰와 사용자의 직접 요청)에만' \"\$LPA\" && grep -qF '「렌즈 그룹」' \"\$LPA\""
 check "lens-readability 대상이 통독 문서가 아니라 전달 문서다" "! grep -qF '처음부터 끝까지' \"\$LRD\" && grep -qF '남에게 전달하는 문서' \"\$LRD\""
 
+for CF in review-docs audit-repo-docs review-specs; do
+  check "$CF 에 배정표 절이 다시 생기지 않았다" "! has_sec '$HERE/skills/$CF/SKILL.md' '렌즈 배정 기준' && ! has_sec '$HERE/skills/$CF/SKILL.md' '셋째 렌즈를 추가하는 조건'"
+done
+OLD_PTR="$(grep -rlF -e '「예외 목록」' -e '「렌즈 배정 기준」' -e '「셋째 렌즈를 추가하는 조건」' -e '문서 종류에 따라 렌즈' -e '표가 \`lens-readability\`' "$HERE/skills" "$HERE/README.md" || true)"
+check "스킬과 README 가 없어진 절과 배정표를 가리키지 않는다" "[ -z \"\$OLD_PTR\" ]"
+
 echo "[따르는 문서 — 이름과 문턱 사본]"
 # 렌즈 스키마의 lens 값은 디렉터리 이름과 같은 한 문자열이다. 짧은 이름이 남으면 기록 파일 이름과
 # findings 의 lens 칸이 갈린다.
