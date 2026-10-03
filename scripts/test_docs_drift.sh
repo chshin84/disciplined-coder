@@ -249,7 +249,7 @@ check "lens-readability 대상이 통독 문서가 아니라 전달 문서다" "
 for CF in review-docs audit-repo-docs review-specs; do
   check "$CF 에 배정표 절이 다시 생기지 않았다" "! has_sec '$HERE/skills/$CF/SKILL.md' '렌즈 배정 기준' && ! has_sec '$HERE/skills/$CF/SKILL.md' '셋째 렌즈를 추가하는 조건'"
 done
-OLD_PTR="$(grep -rlF -e '「예외 목록」' -e '「렌즈 배정 기준」' -e '「셋째 렌즈를 추가하는 조건」' -e '문서 종류에 따라 렌즈' -e '표가 \`lens-readability\`' "$HERE/skills" "$HERE/README.md" || true)"
+OLD_PTR="$(grep -rlF -e '「예외 목록」' -e '「렌즈 배정 기준」' -e '「셋째 렌즈를 추가하는 조건」' -e '문서 종류에 따라 렌즈' -e '표가 `lens-readability`' "$HERE/skills" "$HERE/README.md" || true)"
 check "스킬과 README 가 없어진 절과 배정표를 가리키지 않는다" "[ -z \"\$OLD_PTR\" ]"
 
 echo "[따르는 문서 — 이름과 문턱 사본]"
