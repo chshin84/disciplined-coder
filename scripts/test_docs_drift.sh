@@ -230,9 +230,15 @@ while IFS= read -r n; do
   [ -n "$n" ] || continue
   if [ ! -d "$HERE/skills/$n" ]; then DISP_MISS="$DISP_MISS $n"; fi
 done <<EOF
-$(awk '/^## 예외 목록/{f=1;next} /^## /{f=0} f' "$DISP" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u)
+$(awk '/^## 렌즈 그룹/{f=1;next} /^## /{f=0} f' "$DISP" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u)
 EOF
-check "예외 목록의 렌즈가 모두 실재한다"          "[ -z \"\$DISP_MISS\" ]"
+check "렌즈 그룹 표의 렌즈가 모두 실재한다"      "[ -z \"\$DISP_MISS\" ]"
+GROUP_MISS=""
+for d in "$HERE"/skills/lens-*/; do
+  n="$(basename "$d")"
+  sec_has_id "$DISP" '렌즈 그룹' "$n" || GROUP_MISS="$GROUP_MISS $n"
+done
+check "실재하는 렌즈가 모두 렌즈 그룹 표에 있다" "[ -z \"\$GROUP_MISS\" ]"
 
 echo "[따르는 문서 — 이름과 문턱 사본]"
 # 렌즈 스키마의 lens 값은 디렉터리 이름과 같은 한 문자열이다. 짧은 이름이 남으면 기록 파일 이름과

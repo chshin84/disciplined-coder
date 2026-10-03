@@ -221,9 +221,9 @@ MA="$HERE/skills/aggregating-lenses/SKILL.md"
 check "spec 리뷰가 렌즈마다 따로 실행하는 절을 두고 묶기 규칙을 소유자로 넘긴다" "has_sec '$SR' '2) 디스패치' && points_to '$SR' '\`dispatching-lenses\`' '「따로 실행할 때와 묶을 때」'"
 check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
 check "집계 계약이 제안 채널을 가른다"       "owns_sec '$MA' '렌즈가 추가하는 칸' && sec_has_id '$MA' '렌즈가 추가하는 칸' suggestions"
-check "묶는 규칙의 예외를 소유자가 적는다" "owns_sec '$DISP' '예외 목록' && sec_has_id '$DISP' '예외 목록' lens-adversarial"
+check "렌즈 그룹을 소유자가 적는다" "owns_sec '$DISP' '렌즈 그룹' && sec_has_id '$DISP' '렌즈 그룹' lens-adversarial"
 # 사본 쪽에 그 절이 없는지는 구조로 보고, 불릿만 옮겨 적는 사본은 짧은 조각으로 본다.
-check "spec 리뷰가 그 예외를 베끼지 않는다" "! has_sec '$SR' '예외 목록' && ! has_sec '$SR' '따로 실행할 때와 묶을 때' && ! grep -qF '자세가 반대인' '$SR'"
+check "spec 리뷰가 그 그룹 규칙을 베끼지 않는다" "! has_sec '$SR' '렌즈 그룹' && ! has_sec '$SR' '따로 실행할 때와 묶을 때' && ! grep -qF '자세가 반대인' '$SR'"
 # 한 줄에 lens-prior-art 이름과 '예외' 가 함께 있는지를 본다.
 check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "points_to '$SR' '예외' '\`lens-prior-art\` 하나'"
 
