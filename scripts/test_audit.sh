@@ -226,6 +226,9 @@ check "렌즈 그룹을 소유자가 적는다" "owns_sec '$DISP' '렌즈 그룹
 check "spec 리뷰가 그 그룹 규칙을 베끼지 않는다" "! has_sec '$SR' '렌즈 그룹' && ! has_sec '$SR' '따로 실행할 때와 묶을 때' && ! grep -qF '자세가 반대인' '$SR'"
 # 한 줄에 lens-prior-art 이름과 '예외' 가 함께 있는지를 본다.
 check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "points_to '$SR' '예외' '\`lens-prior-art\` 하나'"
+check "spec 리뷰가 필요할 때 그룹 공통 규칙을 렌즈 그룹으로 넘긴다" "sec_has '$SR' '선행연구 렌즈의 제안과 승인' '「렌즈 그룹」' && ! grep -qF '제안했든 안 했든 그 판정과 이유를 리뷰 보고에 적는 것은 무조건이다' '$SR'"
+check "spec 리뷰가 선행연구를 준비 단계에서 제안한다"            "sec_has '$SR' '1) PREP' '「선행연구 렌즈의 제안과 승인」' && ! grep -qF '리뷰 결과를 전달할 때 선행연구 대조를 실행할지' '$SR'"
+check "spec 리뷰 기록이 선행연구 승인 여부를 남긴다"            "sec_has '$SR' '리뷰 기록' '승인 여부'"
 
 echo "[review-llm-calls — 고정표 배정]"
 LR2="$HERE/skills/review-llm-calls/SKILL.md"
