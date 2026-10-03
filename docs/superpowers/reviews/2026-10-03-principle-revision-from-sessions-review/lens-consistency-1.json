@@ -1,0 +1,24 @@
+{
+  "lens": "lens-consistency",
+  "target": "docs/superpowers/specs/2026-10-03-principle-revision-from-sessions-design.md",
+  "read": ["skills/lens-consistency/SKILL.md", "agent-principles.md", "docs/superpowers/specs/2026-10-03-principle-revision-from-sessions-design.md", "CLAUDE.md", "docs/superpowers/specs/2026-09-28-titles-split-design.md (절 제목만)"],
+  "issues": [
+    {"where": "범위 밖 / 산출물을 둘 곳", "type": "contradiction", "claim": "범위 밖은 원칙·참고서·CLAUDE.md 만 고친다고 하는데 산출물 표와 사용자 결정에는 메모리 쓰기가 있다.", "principle": "모순", "consequence": "메모리가 수정 대상인지 두 절이 다르게 적는다."},
+    {"where": "일회성 처분", "type": "contradiction", "claim": "일회성을 기록도 보고도 하지 않으면 사용자가 올릴 수 없다.", "principle": "모순", "consequence": "일회성 묶음을 보여 주는 단계가 없다."},
+    {"where": "조항 퇴고 3·4단계 / 사용자에게 올리는 결정", "type": "contradiction", "claim": "판정 뒤 곧장 반영으로 가며, 조항 후보 채택과 의미 변경을 묻는 단계가 번호 절차에 없다.", "principle": "모순", "consequence": "새 조항과 의미 변경이 확인 없이 반영·푸시된다."},
+    {"where": "조항 퇴고 3단계 판정", "type": "contradiction", "claim": "'적거나 같으면 채택'과 '개선도 악화도 없으면 2개 더'가 같은 경우를 다르게 처리한다.", "principle": "모순", "consequence": "동점 처리가 정해지지 않았다."},
+    {"where": "퇴고 기준 표 아래 문단", "type": "contradiction", "claim": "새 기준의 근거 발화를 spec 「리뷰가 바꾼 것」 뒤에 적게 했으나, 발화 원문을 커밋하지 않는다는 규칙과 퇴고 기준을 CLAUDE.md 에 둔다는 규칙과 부딪히고 그 절은 아직 없다.", "principle": "모순", "consequence": "새 기준을 적을 곳과 근거 발화의 커밋 여부가 다르게 적혀 있다."},
+    {"where": "처분 표", "type": "gap", "claim": "새 퇴고 기준으로 보내는 처분이 없다.", "principle": "커버리지 공백", "consequence": "퇴고 기준 발화가 어디로 가는지 지목할 수 없다."},
+    {"where": "확인 방법", "type": "gap", "claim": "근거 후보·맥락·삭제 이력 있음 처분의 확인 방법과 커밋 단위, kw-plugins 알림 확인이 없다.", "principle": "산출물 공백", "consequence": "세 처분은 끝났는지 확인할 방법이 없다."},
+    {"where": "조항 퇴고 — 넣지 않거나 삭제하는 결과", "type": "gap", "claim": "기각·삭제 결과의 측정과 근거를 어디에 적는지 없다. 저장소 규칙은 「삭제한 조항」에 둔다.", "principle": "산출물 공백", "consequence": "기각 후보와 삭제 조항의 기록 단계가 없다."},
+    {"where": "대상 목록의 '출력지시 머리말'", "type": "contradiction", "claim": "조항 ID 가 없는데 측정을 참고서 조항 절에 적게 한다.", "principle": "모순", "consequence": "머리말의 측정을 둘 절이 없다."},
+    {"where": "확인 방법 — 퇴고 기준", "type": "contradiction", "claim": "test_docs_drift.sh 하나만 요구하는데 저장소 규칙은 검사 전체와 validate 를 요구한다.", "principle": "모순", "consequence": "두 목표의 완료 판정 범위가 다르다."},
+    {"where": "퇴고 기준 표 '지시와 근거의 분리' 행", "type": "drift", "claim": "사례는 명령형 기준이고, CLAUDE.md 의 같은 이름 불릿과 다른 내용을 가리키게 된다.", "principle": "드리프트", "consequence": "한 이름이 두 기준을 가리킨다."},
+    {"where": "목표 / 처분 표 / 조항 퇴고 / 사용자 결정", "type": "drift", "claim": "새로 찾은 기준·행동을 바꾸는 기준·조항 후보·새 조항이 같은 대상이고, '기준'이 퇴고 기준·행동 기준·두 세션 기준·판정 기준을 함께 가리킨다.", "principle": "TERM-ONE", "consequence": "목표의 '기준'이 무엇인지 판정할 수 없다."},
+    {"where": "원칙의 자기 적용 행", "type": "drift", "claim": "'참고서'를 이 행에서만 '근거 문서'라고 부른다.", "principle": "TERM-ONE", "consequence": "같은 파일 묶음에 두 이름이 있다."},
+    {"where": "조항 퇴고 5단계 커밋", "type": "contradiction", "claim": "조항마다 묻지 않고 푸시하는데 REVERSIBLE 은 밖으로 보내는 작업을 확인받게 한다.", "principle": "REVERSIBLE", "consequence": "푸시가 확인 목록 밖에서 자동 실행된다."},
+    {"where": "산출물 표 후보 목록 / 절차 전체", "type": "scope", "claim": "후보는 plan 이 실행할 추출·대조 뒤에야 나오므로 plan 을 쓸 때 후보 작업을 알 수 없다.", "principle": "스코프", "consequence": "plan 을 실행 중에 고치는지, 단계를 나누는지 정해지지 않았다."}
+  ],
+  "principles_applied": ["TERM-ONE", "REVERSIBLE", "CHECKABLE", "NO-TODO-DOC", "DOC-PLACE", "FOCUSED"],
+  "notes": "plan 이 없어 커버리지는 spec 내부로만 보았다. Explore 서브에이전트에 전역 원칙 사본이 실리는지 측정하지 않았으니 plan 단계에서 측정해야 한다. 「리뷰가 바꾼 것」 절이 아직 없다."
+}

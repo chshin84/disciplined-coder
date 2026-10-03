@@ -1,0 +1,16 @@
+{
+  "lens": "lens-fit",
+  "target": "docs/superpowers/plans/2026-10-03-principle-revision-from-sessions.md",
+  "doc_type": "설계 (spec·plan)",
+  "read": ["skills/lens-fit/SKILL.md", "agent-principles.md", "skills/lens-readability/domain-korean.md", "plan"],
+  "issues": [
+    {"where": "작업 7, 작업 8", "type": "constraint", "claim": "번호 붙인 단계 중 작업 7과 8에만 확인 방법이 없다.", "principle": "CHECKABLE", "consequence": "두 작업은 끝났는지 판정할 기준이 없다."},
+    {"where": "「조항 하나의 시험 규격」 '조건'·'과제' 불릿", "type": "style", "claim": "불릿 한 항목이 두세 문장이다.", "principle": "BULLET-SCOPE", "consequence": "한 불릿에 여러 내용이 들어 있다."},
+    {"where": "작업 4 첫 문장", "type": "style", "claim": "'묶음' 앞에 수식어 셋이 쌓여 조항 후보 목록이 같은 무리인지 구문으로 정해지지 않는다.", "principle": "NO-STACK-MOD", "consequence": "두 가지로 읽힌다."},
+    {"where": "작업 5 첫 문장", "type": "style", "claim": "관형절 '처분이 퇴고 기준인'이 문장 중간에 끼었다.", "principle": "NO-MID-MOD", "consequence": "추가 대상이 늦게 확정된다."},
+    {"where": "작업 8 첫 문장", "type": "style", "claim": "관형절 'kw-plugins 를 맡은'이 문장 중간에 끼었다.", "principle": "NO-MID-MOD", "consequence": "한 문장에 관형절이 둘이다."},
+    {"where": "작업 9", "type": "style", "claim": "'검사 전체'가 넓은 말이라 validate 포함 여부가 적혀 있지 않다.", "principle": "SPECIFIC-NAME", "consequence": "작업 5와 범위가 같은지 정해지지 않는다."}
+  ],
+  "principles_applied": ["DOC-TYPE", "NAME-ITEMS", "CHECKABLE", "LABEL-NOUN", "SPECIFIC-NAME", "KO-SYNTAX", "PROSE-FORM", "READ-FLOW", "COUNT-EARNS"],
+  "notes": "번호 목록은 실제 순서가 있다. 「순서」 절이 작업 8의 위치를 정하지 않는다(상대편 문장이 없어 올리지 않음). 20건, 과제 3개, 1회는 설계 값이다. TERM-EXPLAIN 과 spec 절 이름 실재는 범위 밖이었다."
+}
