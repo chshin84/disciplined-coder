@@ -236,7 +236,7 @@ check "렌즈 그룹 표의 렌즈가 모두 실재한다"      "[ -z \"\$DISP_M
 GROUP_MISS=""
 for d in "$HERE"/skills/lens-*/; do
   n="$(basename "$d")"
-  sec_has_id "$DISP" '렌즈 그룹' "$n" || GROUP_MISS="$GROUP_MISS $n"
+  awk '/^## 렌즈 그룹/{f=1;next} /^## /{f=0} f && /^\| `lens-/' "$DISP" | grep -q "^| \`$n\` |" || GROUP_MISS="$GROUP_MISS $n"
 done
 check "실재하는 렌즈가 모두 렌즈 그룹 표에 있다" "[ -z \"\$GROUP_MISS\" ]"
 LCON="$HERE/skills/lens-consistency/SKILL.md"
