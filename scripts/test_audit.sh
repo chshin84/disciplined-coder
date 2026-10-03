@@ -261,6 +261,11 @@ fi || true
 check "적대적 렌즈를 저장소 전체에 따로 실행한다고 적는다" "sec_has_id '$PDA' '실행할 때 지킬 것' lens-adversarial && sec_has '$PDA' '단계' '저장소 전체'"
 # 짧은 조각 — 이유는 절 안의 한 문장이라 열쇠가 없다. 낱말 하나만 본다.
 check "따로 도는 이유가 자세 차이라고 적는다"           "sec_has '$PDA' '실행할 때 지킬 것' '자세'"
+check "감사에 렌즈 적용 절이 있고 렌즈 배정 기준 절이 없다" "has_sec '$PDA' '렌즈 적용' && ! has_sec '$PDA' '렌즈 배정 기준'"
+check "단계 표가 렌즈 적용 절을 가리킨다"                 "sec_has '$PDA' '단계' '「렌즈 적용」'"
+check "렌즈 적용 절이 렌즈 그룹을 가리킨다"               "sec_has '$PDA' '렌즈 적용' '「렌즈 그룹」'"
+check "문서 종류별로 렌즈를 고르지 않는다"                "! grep -qF '문서 종류에 따라 렌즈' '$PDA' && ! grep -qF '같은 문서 종류끼리' '$PDA'"
+check "에이전트원칙 직접 읽기 규칙이 남아 있다"           "sec_has '$PDA' '렌즈 적용' '호출자가 직접 읽는다'"
 
 echo "[audit_prior_rounds.sh — 앞선 회차 고르기]"
 APR="$HERE/scripts/audit_prior_rounds.sh"
