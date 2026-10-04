@@ -289,7 +289,7 @@ check "문서 검진이 재검진 금지를 소유자로 넘긴다" "points_to \
 check "문서 검진에 필요할 때 렌즈 절이 있고 셋째 렌즈 절이 없다" "has_sec \"\$DOCS\" '필요할 때 렌즈' && ! has_sec \"\$DOCS\" '셋째 렌즈를 추가하는 조건'"
 check "그 절이 공통 규칙을 렌즈 그룹으로 넘긴다"               "sec_has \"\$DOCS\" '필요할 때 렌즈' '「렌즈 그룹」'"
 check "그 절이 선행연구 인용 검증을 spec 리뷰 절로 넘긴다"     "sec_has \"\$DOCS\" '필요할 때 렌즈' '「웹에 나가는 렌즈의 인용 검증」'"
-check "공개 문서가 readability 를 묻지 않고 거치지 않는다"     "! grep -qF '\`lens-fit\`과 \`lens-readability\` 검수를 거친다' \"\$DOCS\""
+check "공개 문서가 readability 를 묻지 않고 거치지 않는다"     "! grep -qF '\`lens-fit\`과 \`lens-readability\` 검수를 거친다' \"\$DOCS\" && sec_has \"\$DOCS\" '외부에 공개하는 문서' '검진 전 질문에서 제안한다'"
 check "런타임이 재리뷰 금지를 소유자로 넘긴다" "points_to \"\$RUNTIME2\" '\`dispatching-lenses\`' '「한 번만 실행하는 렌즈의 규율」'"
 check "재검진 금지는 dispatching-lenses 가 소유하고 spec 리뷰의 반복 절을 가리킨다" "points_to \"\$DISP\" '\`review-specs\`' '「작업 순서와 다시 리뷰」'"
 
