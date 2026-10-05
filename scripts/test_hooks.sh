@@ -339,6 +339,8 @@ JSTOP() { printf '{"cwd":"%s","stop_hook_active":%s}' "$1" "${2:-false}"; }
 printf '이 문서는 자리를 짚는다.\n' > "$SR/report.md"
 check "바뀐 문서의 금지 표현을 알린다" "JSTOP '$SR' | bash '$DWSTOP' | grep -q systemMessage"
 check "알림이 파일 이름을 담는다"      "JSTOP '$SR' | bash '$DWSTOP' | grep -qF 'report.md'"
+# 금지 표현 알림만 있으면 턴을 막지 않는다. Stop 훅은 decision 칸으로 막으므로 그 칸이 없는지 본다.
+check "알림만 있으면 턴을 막지 않는다"  "! JSTOP '$SR' | bash '$DWSTOP' | grep -qF '\"decision\"'"
 SRCLEAN="$T/stopclean"; mkdir -p "$SRCLEAN"; git -C "$SRCLEAN" init -q 2>/dev/null || true
 printf '이 문서는 대상을 지적한다.\n' > "$SRCLEAN/report.md"
 check "깨끗한 문서에는 알림이 없다"    "[ -z \"\$(JSTOP '$SRCLEAN' | bash '$DWSTOP')\" ]"
