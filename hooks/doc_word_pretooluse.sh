@@ -34,8 +34,7 @@ FILE="${FILE_PATHS%%$'\n'*}"
 # 같은 판정을 해야 같은 파일이 도구에 따라 다르게 걸리지 않는다.
 path_is_banned_target "$FILE" || exit 0
 
-# 표는 에이전트원칙이 아니라 생성물에 있다. 원본은 KiwoomAX/korean-banned-words 의 JSON 하나이고
-# scripts/gen_banned_words.py 가 그것을 이 파일로 낸다. 에이전트원칙에는 포인터만 남는다.
+# 표는 에이전트원칙이 아니라 목록 파일 korean-banned-words.md 에 있다. 에이전트원칙에는 포인터만 남는다.
 BANSRC="$HOOKDIR/../korean-banned-words.md"
 if [ ! -f "$BANSRC" ]; then
   # 검사 불능은 통과가 아니다. 막지는 않고 알린다 — 여기서 막으면 편집이 통째로 멈춘다.

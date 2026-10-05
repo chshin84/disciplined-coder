@@ -810,21 +810,13 @@ for f in "$HERE"/skills/*/SKILL.md; do
   check "$(basename "$(dirname "$f")") 이 베끼지 않는다" "! has_sec '$f' '렌즈에게 에이전트원칙을 알리는 법' && ! grep -qF -- '$TELL_SENT' '$f'"
 done
 
-# --- 금지 표현 목록은 생성물이다 ---
-# 원본은 KiwoomAX/korean-banned-words 의 JSON 이고 그 저장소의 render.py 가 만들어 dist/ 에 올린 것을
-# 워크플로가 받아 온다. 이 저장소 자신의 문서를 검사에서 빼는 사유는 hooks/_spec_marker.sh 의
-# path_in_own_repo 주석이 소유한다.
+# --- 금지 표현 목록과 근거 ---
+# 목록 파일이 원본이고 근거는 docs/ 의 근거 파일에 있다. 이 저장소 자신의 문서를 검사에서 빼는 사유는
+# hooks/_spec_marker.sh 의 path_in_own_repo 주석이 소유한다.
 BANSRC="$HERE/korean-banned-words.md"
-echo "[금지 표현] 목록은 생성물이다"
-# 내용이 원본과 같은지는 네트워크가 필요해 여기서 못 본다. .github/workflows/banned-words-sync.yml
-# 이 하루 한 번 다시 만들어 diff 로 대조한다. 여기서는 손으로 고쳐도 되는 파일처럼 보이지
-# 않게 하는 표시와 만드는 수단이 실재하는지만 본다.
-check "목록 파일이 있다"               "[ -f \"\$BANSRC\" ]"
-# 짧은 조각 — 다른 저장소가 만드는 생성물이라 이 저장소가 열쇠를 정할 수 없다.
-check "목록이 생성물이라고 밝힌다"     "grep -qF '생성물' \"\$BANSRC\""
-check "목록이 원본 저장소를 가리킨다"  "grep -qF 'KiwoomAX/korean-banned-words' \"\$BANSRC\""
-check "받아오는 워크플로가 있다"       "[ -f '$HERE/.github/workflows/banned-words-sync.yml' ]"
-check "워크플로가 원본 dist 를 받는다" "grep -qF 'korean-banned-words/main/dist/korean-banned-words.md' '$HERE/.github/workflows/banned-words-sync.yml'"
+echo "[금지 표현] 목록 파일과 근거 파일"
+check "목록 파일이 있다" "[ -f \"\$BANSRC\" ]"
+check "근거 파일이 있다" "[ -f '$HERE/docs/korean-banned-words-evidence.md' ]"
 
 # 사람 글 스물넷에서 0건인데 AI 글 스물넷에서
 # 스물일곱 건 나온 신호라 한도를 두었는데, 세는 곳이 없어 문서 여덟이 넘긴 채로 있었다.
@@ -852,9 +844,9 @@ anti_count() {  # $1=파일 경로 → 이 문서에 남은 대구의 개수
   ' "$1"
 }
 echo "[대구 한도] 글 한 편에 한 번까지"
-# 금지 표현 목록은 뺀다. 원본 저장소가 만든 생성물이라 여기서 고칠 수 없고, 그 표의 분류 설명이
-# 대구를 쓴다. 고칠 수 없는 파일을 세면 검사가 영영 빨간 채로 남아 다른 위반을 가린다.
-ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v '^korean-banned-words.md$')"
+# 금지 표현 목록과 근거 파일은 뺀다. 목록은 표의 분류 설명이, 근거 파일은 고쳐 쓰지 않는 사용자 원문
+# 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다.
+ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$')"
 check "검사 대상 문서를 모았다" "[ -n \"\$ANTI_DOCS\" ]"
 # 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.
 ANTI_TMP="$(mktemp -d)"

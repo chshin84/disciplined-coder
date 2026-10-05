@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 공유 헬퍼: 「금지 표현」 표를 한 번 읽어 여러 파일로 낸다. 그 표는 에이전트원칙이 아니라
-# korean-banned-words.md 에 있고, 그 파일은 외부 저장소의 JSON 에서 만들어 낸 생성물이다.
+# korean-banned-words.md 에 있고, 그 파일이 목록의 원본이다.
 # 소비자는 doc_word 훅 셋(pretooluse·posttooluse·stop)과 scripts/check_banned_words.sh 다.
 # 표를 읽는 자리를 늘리지 않으려고 파싱은 여기 한 벌만 둔다.
 #
