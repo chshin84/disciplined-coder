@@ -823,7 +823,8 @@ RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=M --numstat --
 check "규칙이 들어온 뒤 이력에 고친 기록이 없다" "[ -z \"\$RV_HIST\" ]"
 # 지우기는 다룬 작업이 병합된 뒤 보존 태그(archive/*)를 단 커밋 위에서만 한다(에이전트원칙 「문서 타입과 수명」).
 # 지운 커밋의 부모를 archive 태그가 가리켜야 한다 — 원문이 태그로 남아야 봉인의 목적이 지켜진다.
-RV_DEL="$(cd "$HERE" && for c in $(git log --since=2026-09-02 --diff-filter=D --format=%H -- "$RVDIR" docs/superpowers/plans 2>/dev/null); do
+# 이 규칙은 2026-10-06에 들어왔다. 그 전의 지우기(빈 파일 정리, 기능 제거 때의 plan)는 옛 규칙 아래에서 처리했다.
+RV_DEL="$(cd "$HERE" && for c in $(git log --since="2026-10-06 00:00:00 +0900" --diff-filter=D --format=%H -- "$RVDIR" docs/superpowers/plans 2>/dev/null); do
   git tag --points-at "$c^" 2>/dev/null | grep -q '^archive/' || echo "$c"; done)"
 [ -n "$RV_DEL" ] && printf '    보존 태그 없이 기록이나 plan 을 지운 커밋:
 %s
