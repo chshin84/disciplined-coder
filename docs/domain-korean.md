@@ -189,7 +189,7 @@ quant_structure 세션(2026-09-26~27)에서 한국어 사용자에게 본답 전
 ### `SECTION-HEAD`
 
 절 제목으로 나눠 준 글이 회상 8.12개 대 5.71개로 앞섰다. 절의 이름과 첫 문장에 무엇을 쓰는지는
-2026-09-28부터 「원칙」 절의 `TITLE-LAYERS` 가 정하고, 그 근거는 `skills/lens-fit/domain-discipline.md`
+2026-09-28부터 「원칙」 절의 `TITLE-LAYERS` 가 정하고, 그 근거는 `docs/domain-discipline.md`
 의 같은 ID 절에 있다. 이 조항은 끊는 기준만 맡는다. 2026-09-28에 문구의 "소제목"을 "절 제목"으로
 바꿨다. 남에게 전달되는 문서에는 `###` 층을 두지 않으므로 긴 글은 `##` 절로 끊는다.
 
@@ -378,10 +378,10 @@ trial 33개를 지웠다. 두 숫자는 사용자가 의미 없다고 든 오류
 2026-09-23에 `LOANWORD-KEEP` 과 `LEXICAL-CHAIN` 을 에이전트원칙에서 지웠다. CLAUDE.md 가 빈 Opus 5.5 와
 그 조항 한 줄만 실은 Opus 5.5 에 조항마다 서로 다른 질문 넷을 주었더니, 조항이 없어도 넷 모두 조항대로
 썼다. 다시 넣으려면 조항 없는 모델이 어기는 질문을 먼저 보인다. 측정 방법은
-`skills/lens-fit/domain-discipline.md` 의 같은 절과 같다.
+`docs/domain-discipline.md` 의 같은 절과 같다.
 
 2026-09-24에 `ASK-CONTEXT` 를 `ASK-OPTIONS` 에 합쳤다. 이 조항은 UNPACK 절 인용의 "앞뒤 설명
-잘라먹고" 에서 나왔고, 그 근거는 이제 `skills/lens-fit/domain-discipline.md` 의 `ASK-OPTIONS` 절이
+잘라먹고" 에서 나왔고, 그 근거는 이제 `docs/domain-discipline.md` 의 `ASK-OPTIONS` 절이
 이어받는다.
 
 2026-09-24에 사용자가 `SINO-KEEP` 을 지웠다. 그 뜻은 `VOCAB-PREF` 가 이어받았고 근거도 그 절로 옮겼다.

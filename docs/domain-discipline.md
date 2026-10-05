@@ -7,7 +7,7 @@
 하라는 문장을 여기 다시 적지 않고 조항 ID로 가리킨다. 같은 문장이 양쪽에 있으면
 `scripts/test_docs_drift.sh` 가 차단한다.
 
-대상은 한국어 절 밖의 조항이다. 한국어 절의 근거는 `skills/lens-readability/domain-korean.md` 에 있다.
+대상은 한국어 절 밖의 조항이다. 한국어 절의 근거는 `docs/domain-korean.md` 에 있다.
 
 조항에 적힌 수치 중 사소한 작업의 경계(파일 하나, 20줄), `NO-FLEET` 의 파일 10개, `CHECKABLE` 의 셋,
 `SUB-ORCHESTRATE` 의 작업 다섯은 측정값이 아니다. 2026-09-24에 모호한 기준을 없애려고 사용자와 합의한

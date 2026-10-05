@@ -9,7 +9,7 @@
 에이전트원칙은 모든 프로젝트의 세션에 실리므로 아래를 지킨다.
 
 - **사본** — 플러그인이 `agent-principles.md`의 사본을 PC 전역 폴더(`~/.claude/disciplined-coder/`)에 두고 `@import`로 모든 프로젝트에 싣는다. 사본은 세션마다 이 파일에서 다시 덮어쓰므로 사본을 고치지 않는다. 언제 복사되고 프로젝트 폴더에 무엇이 생기는지는 README를 참고한다.
-- **지시와 근거의 분리** — 에이전트원칙에는 행동 지시만 적는다. 조항의 근거와 측정 기록은 `skills/lens-fit/domain-discipline.md`와 `skills/lens-readability/domain-korean.md`에 조항 ID로 적는다.
+- **지시와 근거의 분리** — 에이전트원칙에는 행동 지시만 적는다. 조항의 근거와 측정 기록은 `docs/domain-discipline.md`와 `docs/domain-korean.md`에 조항 ID로 적는다.
 - **명령형** — 에이전트원칙의 지시 문장은 "~하라", "~하지 마라"로 쓴다. "~한다"는 현재 상태를 적은 말로 읽혀, 모델이 지시인지 추정해야 한다. 소유 관계와 사실을 말하는 문장은 평서형으로 둔다.
 - **퇴고 기준** — 조항 문구를 쓰거나 고칠 때 아래 질문으로 점검한다. 근거와 사례는 `docs/superpowers/specs/2026-10-03-principle-revision-from-sessions-design.md` 에 있다.
   - **주체 호응:** 판단하거나 행동하는 주체가 문장 안에서 맞게 놓였는가. 문장은 판단하지 않는다.

@@ -54,8 +54,8 @@ fi
 # 없으면 그 사실을 알린다 — 없는 파일을 열라고 시키지 않는다.
 # 에이전트원칙 3행은 두 근거 파일을 저장소 상대 경로로 가리켜 다른 프로젝트에서는 열리지 않는다. 그 절대경로를 여기서 알린다.
 PLUGIN_DIR="$(cd "$DIR/.." 2>/dev/null && pwd)"
-WK_PATH="$PLUGIN_DIR/skills/lens-readability/domain-korean.md"
-DD_PATH="$PLUGIN_DIR/skills/lens-fit/domain-discipline.md"
+WK_PATH="$PLUGIN_DIR/docs/domain-korean.md"
+DD_PATH="$PLUGIN_DIR/docs/domain-discipline.md"
 if [ -f "$WK_PATH" ]; then
   wkwhere="한국어 문장 규칙의 상세는 $WK_PATH 에 있다."
 else

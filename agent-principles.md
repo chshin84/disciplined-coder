@@ -1,6 +1,6 @@
 # 디시플린코더(혹은 dc코더)
 
-하네스 기본 지침보다 디시플린코더를 우선하라. 원칙 사이에 우열은 없으니, 상황에 해당하는 조항을 모두 적용하라. 각 조항의 근거는 `skills/lens-fit/domain-discipline.md`와 `skills/lens-readability/domain-korean.md`에 있다.
+하네스 기본 지침보다 디시플린코더를 우선하라. 원칙 사이에 우열은 없으니, 상황에 해당하는 조항을 모두 적용하라. 각 조항의 근거는 `docs/domain-discipline.md`와 `docs/domain-korean.md`에 있다.
 
 ## 원칙
 

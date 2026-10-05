@@ -122,7 +122,7 @@ READ2="$HERE/skills/lens-readability/SKILL.md"
 # 강제하는지는 프로젝트마다 다르므로 그 칸만 저장소 CLAUDE.md 가 갖는다.
 TYPE_TBL="$HERE/CLAUDE.md"
 # 상세는 domain-korean 이 소유하고 에이전트원칙은 조항만 담는다. 양쪽을 함께 붙든다.
-WK="$HERE/skills/lens-readability/domain-korean.md"
+WK="$HERE/docs/domain-korean.md"
 # 에이전트원칙이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
 # 그 검사가 우리가 없애려던 중복을 오히려 요구했다. 이제 ID 로 잇고, 지시 문장이 스킬에 그대로
 # 있으면 실패한다.
@@ -146,7 +146,7 @@ check "에이전트원칙이 그 상세를 가리킨다"            "grep -qF 'd
 # 한국어 절 밖의 조항도 같은 방식으로 붙든다. 에이전트원칙이 지시를 소유하고 참고서가 같은 ID 로
 # 근거를 단다. 잇는 장치가 한국어 절에만 있으면 나머지 조항은 근거 없이 늘어날 수 있다.
 # ID 목록은 에이전트원칙에서 뽑되 한국어 절의 것만 뺀다. 절을 추가하거나 이름을 바꿔도 따라온다.
-DC_WK="$HERE/skills/lens-fit/domain-discipline.md"
+DC_WK="$HERE/docs/domain-discipline.md"
 ALL_IDS="$(grep -oE '^- \*\*`[A-Z][A-Z0-9-]*`' "$CANON" | grep -oE '[A-Z][A-Z0-9-]+' | sort -u)"
 DC_IDS="$(printf '%s
 ' "$ALL_IDS" | grep -vxF "$KO_IDS" || true)"
@@ -384,7 +384,7 @@ echo "[첫 문장] 절 제목 아래 첫 줄이 산문이다"
 # 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
 # 따라온다. 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
 # TITLE-LAYERS 는 「원칙」 절의 규칙이라 영어 제목에도 적용한다.
-HF_WK="$HERE/skills/lens-readability/domain-korean.md"
+HF_WK="$HERE/docs/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
 check "첫 문장 예외를 domain-korean 에서 뽑았다" "[ -n \"\$HF_EXC\" ]"
@@ -879,13 +879,13 @@ check "그 절에 서브오케스트레이터 조항이 있다" "printf '%s' \"\
 # --- canon-realign: 에이전트원칙이 원칙 전부를 갖는다 ---
 # 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 갖는다.
 echo "[canon-realign] the canon owns every principle; only procedures and per-artifact rules stay skills"
-check "karpathy source is credited in the reference" "grep -qF 'andrej-karpathy-skills' '$HERE/skills/lens-fit/domain-discipline.md'"
+check "karpathy source is credited in the reference" "grep -qF 'andrej-karpathy-skills' '$HERE/docs/domain-discipline.md'"
 # 조항 ID 목록은 근거를 적는 두 참고서의 `### \`ID\`` 제목에서 도출한다(「삭제한 조항」 절은 뺀다).
 # 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어 조항이 떨어져도 그 결손을 정답으로
 # 굳히고, 목록을 여기 손으로 적으면 조항을 더할 때 이쪽이 낡는다. 방향은 참고서 → 에이전트원칙이다.
 ref_clause_ids() {
   local f
-  for f in "$HERE/skills/lens-fit/domain-discipline.md" "$HERE/skills/lens-readability/domain-korean.md"; do
+  for f in "$HERE/docs/domain-discipline.md" "$HERE/docs/domain-korean.md"; do
     awk '{ sub(/\r$/, "") } /^## 삭제한 조항/ { exit } /^### `[A-Z0-9-]+`$/ { gsub(/^### `|`$/, ""); print }' "$f"
   done
 }

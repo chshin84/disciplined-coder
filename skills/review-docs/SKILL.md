@@ -8,7 +8,7 @@ description: 남에게 전달될 문서와 .html·.pptx·.xlsx·.docx·.pdf 산�
 
 ## `lens-fit`에 넘기는 계약
 
-이 계약은 여기가 소유한다. 계약은 둘의 경로다. 에이전트원칙 `agent-principles.md`와 `skills/lens-readability/domain-korean.md`다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 둘을 넘긴다.
+이 계약은 여기가 소유한다. 계약은 둘의 경로다. 에이전트원칙 `agent-principles.md`와 `docs/domain-korean.md`다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 둘을 넘긴다.
 
 넘기지 않으면 그 렌즈는 계약을 모른 채 실행되어 형식만 본다. `lens-readability`를 실행하지 않은 문서도 이 경로로 에이전트원칙의 한국어 조항을 검사받는다.
 
