@@ -45,4 +45,6 @@
 
 `d=$(mktemp -d); for t in scripts/test_*.sh; do ( bash "$t" > "$d/$(basename "$t").log" 2>&1 || echo "$t" >> "$d/bad" ) & done; wait; if [ -s "$d/bad" ]; then echo "FAILED:"; while read -r t; do echo "--- $t"; grep 'FAIL:' "$d/$(basename "$t").log"; done < "$d/bad"; else echo "ALL PASS"; fi`
 
+테스트나 문서를 줄이는 차수에는 `domain-pruning` 「절차」의 결함 주입을 이 저장소의 핵심 계약 넷에 한다. 리뷰 기록을 보존 태그 없이 지우기, 대체된 spec의 superseded 표시 지우기, settings.json 사본(.bak) 만들기 없애기, 읽기 전용 차단 훅 무력화다. 각 결함에서 검사가 실패해야 한다.
+
 검사 스크립트를 동시에 실행하고 실패한 이름을 모아 마지막에 알린다. 차례로 이어 실행하면 마지막 하나의 결과만 남아 앞의 실패가 묻히고, 동시에 실행하면 전체 시간이 줄어든다(실측은 `domain-discipline.md`의 `ASYNC-FIRST` 절). `claude plugin validate ./`는 `version` 경고 하나만 내면 정상이다.
