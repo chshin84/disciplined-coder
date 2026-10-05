@@ -435,9 +435,7 @@ check "장치 칸이 모두 실물 경로이거나 사유 있는 「없다」다
 
 echo "[대체된 설계 문서에 superseded 표시]"
 OLDSPEC="$HERE/docs/superpowers/specs/2026-08-16-review-layer-redesign-design.md"
-OLDPLAN="$HERE/docs/superpowers/plans/2026-08-16-review-layer-redesign.md"
 check "옛 spec 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDSPEC\""
-check "옛 plan 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDPLAN\""
 
 # 제거된 기능의 설계 문서에도 표시를 요구한다. 목록을 손으로 적지 않고 스캐폴드의 정리 대상
 # (SCAFFOLD_STALE)에서 도출한다 — 그 목록이 "이 레포가 뜯어낸 기능"의 원본이라, 기능을 하나 더
@@ -818,12 +816,19 @@ RV_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$RVDIR
 %s
 ' "$RV_TREE" | sed 's/^/      /'
 check "작업 트리에 고치거나 지운 기록이 없다" "[ -z \"\$RV_TREE\" ]"
-RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=MD --numstat --format= -- "$RVDIR" 2>/dev/null \
-  | awk -F'\t' 'NF==3 && !($1=="0" && $2=="0") { print $3 }' || true)"
-[ -n "$RV_HIST" ] && printf '    규칙 뒤 이력에서 고치거나 지운 기록:
+RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=M --numstat --format= -- "$RVDIR" 2>/dev/null   | awk -F'	' 'NF==3 && !($1=="0" && $2=="0") { print $3 }' || true)"
+[ -n "$RV_HIST" ] && printf '    규칙 뒤 이력에서 고친 기록:
 %s
 ' "$RV_HIST" | sed 's/^/      /'
-check "규칙이 들어온 뒤 이력에 고치거나 지운 기록이 없다" "[ -z \"\$RV_HIST\" ]"
+check "규칙이 들어온 뒤 이력에 고친 기록이 없다" "[ -z \"\$RV_HIST\" ]"
+# 지우기는 다룬 작업이 병합된 뒤 보존 태그(archive/*)를 단 커밋 위에서만 한다(에이전트원칙 「문서 타입과 수명」).
+# 지운 커밋의 부모를 archive 태그가 가리켜야 한다 — 원문이 태그로 남아야 봉인의 목적이 지켜진다.
+RV_DEL="$(cd "$HERE" && for c in $(git log --since=2026-09-02 --diff-filter=D --format=%H -- "$RVDIR" docs/superpowers/plans 2>/dev/null); do
+  git tag --points-at "$c^" 2>/dev/null | grep -q '^archive/' || echo "$c"; done)"
+[ -n "$RV_DEL" ] && printf '    보존 태그 없이 기록이나 plan 을 지운 커밋:
+%s
+' "$RV_DEL" | sed 's/^/      /'
+check "기록과 plan 은 보존 태그를 단 뒤에만 지웠다" "[ -z \"\$RV_DEL\" ]"
 
 # --- 봉인: 기록은 만든 직후에 읽기 전용이 된다 ---
 # 읽기 전용 속성은 git이 옮기지 않아 새 클론에서는 풀려 있다. 그래서 SessionStart 훅이 세션마다 다시

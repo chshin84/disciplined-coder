@@ -263,6 +263,14 @@ action title 조합과 같은 구조다.
 모델 4건, 현행 문안 0건, 새 문안 0건이었다. 빈 모델은 API 계약 절에 pydantic 모델의 필드 표를 손으로 옮겨
 적었다. 새 문안이 현행과 같아 채택했다.
 
+2026-10-06에 설계 행과 기록 행을 고쳤다. 사용자가 저장소 규모를 줄이기로 정했고, 실행이 끝난 plan과 병합된 작업의
+기록이 저장소 문서의 대부분(약 52,000줄)을 차지했다. 선행연구는 결정 기록은 짧게 남기되 쓸모가 끝난 문서는 지우거나
+폐기 표시하라고 하고([Software Engineering at Google 10장](https://abseil.io/resources/swe-book/html/ch10.html)),
+기록은 보존 기간을 정해 원래 시스템 밖으로 옮기라고 한다([NIST SP 800-92](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-92.pdf)).
+그래서 spec은 결정 기록으로 남기고, plan과 기록은 git 보존 태그를 단 뒤 작업 트리에서 지운다. 원문이 태그와 이력에
+남으므로 사후 수정을 금지하는 봉인의 목적은 그대로다. 차수 대조에 쓰는 최근 감사 기록은 남겨 위 문단의 구별을 지킨다.
+첫 정리는 태그 `archive/2026-10-06-plans-and-reviews` 를 단 뒤에 했다.
+
 ### `MANAGED-BLOCK`
 
 자동 생성 구간과 사용자 콘텐츠가 섞이면 다시 만들 때 사용자 것을 지운다. 마커로 감싸면 그 안만

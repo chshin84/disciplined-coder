@@ -33,8 +33,8 @@
 |---|---|
 | **상태** (roadmap) | 없다. 무엇과 대조할지는 그 프로젝트의 코드와 인프라가 정한다 |
 | **절차·계약** | 문서와 코드를 대조하는 테스트 `scripts/test_docs_drift.sh` |
-| **설계** (spec·plan) | 대체된 문서의 superseded 표시를 검사한다 `scripts/test_docs_drift.sh` |
-| **기록** (reviews) | 있는 기록의 수정을 거부하는 훅 `hooks/readonly_pretooluse.sh` 와 지운 기록을 잡는 검사 `scripts/test_docs_drift.sh` |
+| **설계** (spec·plan) | 대체된 spec의 superseded 표시와, 보존 태그 없이 지운 plan을 검사한다 `scripts/test_docs_drift.sh` |
+| **기록** (reviews) | 있는 기록의 수정을 거부하는 훅 `hooks/readonly_pretooluse.sh` 와, 고친 기록과 보존 태그 없이 지운 기록을 잡는 검사 `scripts/test_docs_drift.sh` |
 | **핸드오프** | 세션 시작에 잔존을 세어 알린다 `scripts/scaffold.sh` |
 | **맥락** (Claude 메모리) | 없다. 메모리가 git 밖이라 검사가 닿지 않는다 |
 | **규범·인덱스** | 없다. 포인터만 두므로 낡을 상태가 없다 |
