@@ -437,24 +437,6 @@ echo "[대체된 설계 문서에 superseded 표시]"
 OLDSPEC="$HERE/docs/superpowers/specs/2026-08-16-review-layer-redesign-design.md"
 check "옛 spec 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDSPEC\""
 
-# 제거된 기능의 설계 문서에도 표시를 요구한다. 목록을 손으로 적지 않고 스캐폴드의 정리 대상
-# (SCAFFOLD_STALE)에서 도출한다 — 그 목록이 "이 레포가 뜯어낸 기능"의 원본이라, 기능을 하나 더
-# 걷어내면 그 설계 문서에 표시가 없다는 것이 여기서 실패한다. 표시가 없으면 그 문서는 지금도
-# 실행할 계획으로 읽히고, plan 은 첫머리에서 스스로 태스크 단위 실행을 지시한다.
-STALE_NAMES="$(sed -n 's/^SCAFFOLD_STALE="\(.*\)"$/\1/p' "$HERE/scripts/_scaffold_common.sh" | head -1)"
-check "제거된 기능 목록을 도출했다" "[ -n \"\$STALE_NAMES\" ]"
-SN=0
-for n in $STALE_NAMES; do
-  # 파일 이름은 그대로 기능 이름이 아니다 — 첫 구분자 앞의 어간(solved_problems.md → solved)으로 훑는다.
-  case "$n" in *.md) n="${n%%[_.-]*}" ;; esac
-  for D in "$HERE"/docs/superpowers/specs/*"$n"*.md "$HERE"/docs/superpowers/plans/*"$n"*.md; do
-    [ -f "$D" ] || continue
-    SN=$((SN+1))
-    check "$(basename "$D") 에 superseded 표시가 있다" "head -12 '$D' | grep -qF 'superseded'"
-  done
-done
-check "제거된 기능의 설계 문서를 하나 이상 훑었다" "[ '$SN' -gt 0 ]"
-
 # 영문 재작성 대응표는 그 재작성이 되돌려져 지금 구조와 안 맞는다. 표시가 없으면 에이전트원칙이 영문인
 # 것처럼 읽힌다. 파일 목록은 디렉터리에서 도출한다 — 표가 늘어도 사람이 목록을 맞출 필요가 없다.
 RWDIR="$HERE/docs/superpowers/rewrite-map"

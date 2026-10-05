@@ -85,6 +85,8 @@ scaffold_hygiene "$KDIR" 2>&1
 # [global-managed-block] ~/.claude/CLAUDE.md 관리블록 재생성(멱등, CRLF 내성). 상대 @import(= ~/.claude 기준).
 . "$SDIR/_managed_block.sh"
 
+# 은퇴 조건(이 블록과 아래 [banlist-migrate]): 옛 블록이 남은 PC 가 없다는 것을 배포 현황으로 확인하면 지운다.
+#     남은 블록은 낡은 지시를 세션에 실으므로 확인 전에는 지우지 않는다(2026-10-06 사용자 결정).
 # [project-old-block] 없앤 기능(/add-pointer)이 프로젝트 CLAUDE.md에 심어 두던 옛 관리블록을 걷어낸다. 지금은
 #     아무것도 그 블록을 다시 만들지 않으므로 남아 있으면 갱신되지 않는 고아다. 마커가 같으니
 #     전역 CLAUDE.md와 같은 파일이면 건너뛴다 — 그건 이 훅이 내용이 다를 때만 다시 만드는 정상 블록이다.

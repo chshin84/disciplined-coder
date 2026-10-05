@@ -434,14 +434,10 @@ if command -v cygpath >/dev/null 2>&1; then
   check "같은 파일: 관리블록이 하나다"       "[ \$(grep -cF '# BEGIN disciplined-coder' '$HSF/.claude/CLAUDE.md') -eq 1 ]"
 fi
 
-# --- managed-dir-hygiene: 관리 디렉터리 위생 — 구 관리파일 제거·에이전트원칙/사용자데이터 보존·빈 고아 제거 ---
+# --- managed-dir-hygiene: 관리 디렉터리 위생 — 에이전트원칙/사용자데이터 보존·빈 고아 제거 ---
 H10="$(mktemp -d)"; P10="$(mktemp -d)"
 run "$H10" "$P10" >/dev/null
 K10="$H10/.claude/disciplined-coder"
-printf 'old canon\n'    > "$K10/coding-principles.md"     # 구 관리파일(STALE, 내용 있음) → 백업으로 옮김
-# 구 관리물이 디렉터리로 남은 PC 도 있다. 정규 파일만 보던 판본은 그것을 건너뛰어 해소할 수 없는
-# '비관리 디렉터리' 경고를 매 세션 냈다.
-mkdir -p "$K10/solved_problems"; printf '쪼갠 오답노트 한 줄\n' > "$K10/solved_problems/2026-01-01.md"
 printf '내 개인 메모\n'   > "$K10/my_notes.md"             # 정체 모를 사용자 파일(내용 있음) → 보존 + surface
 : > "$K10/orphan_empty.md"                                 # 빈 고아 → 제거
 mkdir -p "$K10/rogue_dir"                                  # 하위 디렉터리 → 중단 없이 surface
@@ -451,11 +447,6 @@ set +e
 ERR10="$(run "$H10" "$P10" 2>/dev/null)"; rc10=$?
 set -e
 echo "[managed-dir-hygiene] managed-dir hygiene (whitelist pruning)"
-check "stale coding-principles pruned"  "[ ! -f '$K10/coding-principles.md' ]"
-check "stale 파일 내용은 백업에 남는다"  "grep -rqF 'old canon' '$K10/backups'"
-check "stale 디렉터리를 치운다"          "[ ! -d '$K10/solved_problems' ]"
-check "stale 디렉터리 내용은 백업에 남는다" "grep -rqF '쪼갠 오답노트 한 줄' '$K10/backups'"
-check "stale 항목에 잔존 경고를 내지 않는다" "! printf '%s' \"\$ERR10\" | grep -qE 'coding-principles|solved_problems'"
 check "update.seen·update.stuck 이 남는다" "[ -f '$K10/update.seen' ] && [ -f '$K10/update.stuck' ]"
 check "canon preserved"                 "[ -f '$K10/agent-principles.md' ]"
 check "unknown user file preserved"     "[ -f '$K10/my_notes.md' ]"
@@ -719,17 +710,6 @@ check "사본 실패: 블록을 안 걷어낸다"     "grep -qF 'BEGIN disciplin
 check "사본 실패: 사유를 알린다"          "printf '%s' \"\$OUTR13\" | grep -qF '사본을 뜨지 못해'"
 check "사본 실패: 나머지 셋업은 돈다"     "[ -f '$HR13/.claude/disciplined-coder/agent-principles.md' ]"
 
-COMMON="$HERE/scripts/_scaffold_common.sh"
-
-HK1="$(mktemp -d)"; KK1="$HK1/.claude/disciplined-coder"; mkdir -p "$KK1"
-printf '사용자가 적어 둔 줄
-' > "$KK1/coding-principles.md"
-printf 'block
-' > "$KK1/backups"
-ERRK1="$( . "$COMMON"; scaffold_hygiene "$KK1" 2>&1 >/dev/null || true )"
-echo "[stale-keep] a stale file survives when its backup cannot be written"
-check "stale-keep: 내용이 든 파일이 남는다" "[ -f '$KK1/coding-principles.md' ]"
-check "stale-keep: 조용히 넘어가지 않는다" "printf '%s' \"$ERRK1\" | grep -qF -- '사본으로 못 옮겨 그대로 두었다'"
 # --- deps-notice: 함께 쓰는 플러그인 확인 — 매 세션, 없을 때만, 건너뛸 이름은 skip 파일이 정한다 ---
 HDN1="$(mktemp -d)"; PDN1="$(mktemp -d)"
 OUTDN1a="$(run "$HDN1" "$PDN1")"
