@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 공유 헬퍼: 「금지 표현」 표를 한 번 읽어 여러 파일로 낸다. 그 표는 에이전트원칙이 아니라
-# korean-banned-words.md 에 있고, 그 파일은 외부 저장소의 JSON 에서 만들어 낸 생성물이다.
+# korean-banned-words.md 에 있고, 그 파일이 목록의 원본이다.
 # 소비자는 doc_word 훅 셋(pretooluse·posttooluse·stop)과 scripts/check_banned_words.sh 다.
 # 표를 읽는 자리를 늘리지 않으려고 파싱은 여기 한 벌만 둔다.
 #
@@ -14,19 +14,17 @@ BANNED_TABLE_HEAD='### 금지 표현'
 
 # 표를 파일 넷까지 낸다. pairs 는 한 행에 "대체어<탭>글자<탭>글자…", tokens 는 글자만 한 줄에 하나,
 # excl 은 한 행에 그 행의 제외어를 탭으로 이은 것이고, scopes 는 한 행에 그 행의 적용 대상이다
-# (두 파일 모두 행 순서가 pairs 와 같다). excl 과 scopes 는 생략할 수 있다.
+# (두 파일 모두 행 순서가 pairs 와 같다). scopes 는 생략할 수 있다.
 #
-# 제외 칸은 schema 2 에서 생겼다. 어간을 넓히고 다른 뜻으로 쓰이는 말을 제외로 빼는 방식이라,
-# 그 칸을 안 읽으면 어간만 가지고 검색해 `판정`·`시간이 걸`·`이걸`·`담당` 까지 전부 잡힌다.
-# 그 상태에서는 거짓 검출이 많아 산출물을 거의 못 쓴다.
-# 칸이 없는 옛 표에서는 excl 행이 빈 줄이 되고 동작이 전과 같다.
+# 목록은 어간을 넓히고 다른 뜻으로 쓰이는 말을 제외 칸으로 뺀다. 그 칸을 안 읽으면 어간만 가지고
+# 검색해 `판정`·`시간이 걸`·`이걸`·`담당` 까지 전부 잡혀 산출물을 거의 못 쓴다.
 # 표의 행만 본다 — 절의 설명 문단에도 백틱이 있어 절 전체를 뽑으면 그 문단의 경로가 금지어가 된다.
 # 첫 칸에서만 글자를 뽑아 대체어 칸에 백틱이 생겨도 금지어로 새지 않게 한다.
 # 로케일을 C 로 둔다. 가르는 글자가 세로줄과 백틱뿐인데 둘 다 아스키이고, UTF-8 이어보기 바이트는
 # 0x80 이상이라 한국어 안에 그 두 글자가 나타날 수 없다. 그래서 바이트로 갈라도 결과가 같다.
 # C 로 두는 까닭은 UTF-8 로케일보다 빠르기 때문이다.
-banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl(생략 가능), $5=scopes(생략 가능)
-  local excl="${4:-/dev/null}" scopes="${5:-/dev/null}"
+banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl, $5=scopes(생략 가능)
+  local excl="$4" scopes="${5:-/dev/null}"
   LC_ALL=C awk -v h="$BANNED_TABLE_HEAD" -v pairs="$2" -v toks="$3" -v excl="$excl" -v scopes="$scopes" '
     index($0, h) == 1 { f = 1; next }
     f && /^#/ { exit }
@@ -45,16 +43,13 @@ banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl(생략 가능), $5=scop
         print t > toks
       }
       print out > pairs
-      # 제외 칸은 여섯째다. 옛 표에는 그 칸이 없어 빈 줄이 나가고, 그러면 제외가 없는 것과 같다.
-      # pairs 와 같은 횟수로 한 줄씩 내보내 두 파일의 행이 맞는다.
+      # 제외 칸은 여섯째다. pairs 와 같은 횟수로 한 줄씩 내보내 두 파일의 행이 맞는다.
       ex = ""
-      if (n >= 6) {
-        k = split(c[6], eparts, "`")
-        for (i = 2; i <= k; i += 2) {
-          e = eparts[i]
-          if (e == "") continue
-          ex = (ex == "") ? e : ex "\t" e
-        }
+      k = split(c[6], eparts, "`")
+      for (i = 2; i <= k; i += 2) {
+        e = eparts[i]
+        if (e == "") continue
+        ex = (ex == "") ? e : ex "\t" e
       }
       print ex > excl
       # 적용 대상은 넷째 칸이다. 어느 행이 문서에만 걸리고 어느 행이 답변까지 걸리는지를
@@ -69,7 +64,7 @@ banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl(생략 가능), $5=scop
 
 # 문서 여럿을 한 번에 훑어 "금지어<탭>걸린 파일들" 줄을 낸다. 제외 칸을 적용한 뒤에 찾는다.
 # 검사 스크립트가 쓰던 자기 파서를 없애려고 둔다 — 파서가 둘이면 표의 모양이 바뀔 때 한쪽만
-# 따라가고, schema 2 가 실제로 그 일을 일으켰다.
+# 따라간다. 제외 칸이 생겼을 때 실제로 그랬다.
 # 파이썬을 한 번만 부른다. 낱말마다 문서마다 grep 을 돌리면 40×25 번이 된다.
 banned_scan() {  # $1=pairs, $2=excl, $3=scopes, $4=고를 적용 대상(빈 값이면 전부), $5=파일 목록 파일
   json_run '
@@ -128,12 +123,11 @@ for i, words in enumerate(rows):
 #
 # 코드 블록과 백틱 안은 걷어 낸다. 파일 내용과 식별자를 인용한 것까지 잡으면 거짓 판정이 되어
 # 훅을 끄게 만든다. 금지어를 문서에 적어야 할 때는 백틱으로 감싸면 지나간다.
-banned_report() {  # $1=pairs 경로, $2=검사할 텍스트 파일, $3=excl 경로(생략 가능) → 보고 줄들
+banned_report() {  # $1=pairs 경로, $2=검사할 텍스트 파일, $3=excl 경로 → 보고 줄들
   json_run '
 import re, sys
 
-pairs_path, text_path = sys.argv[1], sys.argv[2]
-excl_path = sys.argv[3] if len(sys.argv) > 3 else None
+pairs_path, text_path, excl_path = sys.argv[1:4]
 
 rows = []
 for line in open(pairs_path, encoding="utf-8"):
@@ -143,12 +137,11 @@ for line in open(pairs_path, encoding="utf-8"):
 
 # 제외 목록은 행 순서가 pairs 와 같다. 파일이 없거나 짧으면 그 행은 제외가 없는 것으로 본다.
 excls = []
-if excl_path:
-    try:
-        for line in open(excl_path, encoding="utf-8"):
-            excls.append([e for e in line.rstrip("\n").split("\t") if e])
-    except Exception:
-        excls = []
+try:
+    for line in open(excl_path, encoding="utf-8"):
+        excls.append([e for e in line.rstrip("\n").split("\t") if e])
+except Exception:
+    excls = []
 
 try:
     text = open(text_path, encoding="utf-8").read()
@@ -174,5 +167,5 @@ for i, (words, repl) in enumerate(rows):
     found = [w for w in words if w and w in target]
     if found:
         print(" · ".join(found) + " -> " + repl)
-' "$1" "$2" ${3:+"$3"} 2>/dev/null | tr -d '\r' || true
+' "$1" "$2" "$3" 2>/dev/null | tr -d '\r' || true
 }

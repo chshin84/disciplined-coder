@@ -303,7 +303,7 @@ check "> 재지향은 지나간다"                         "gate_runs '$GI_ECHO
 check "따옴표 뒤의 재지향도 지나간다"               "gate_runs \"\$GI_QUOTE\""
 
 echo "[제외 칸 — 어간을 넓히고 다른 뜻으로 쓰는 말을 뺀다]"
-# 원본이 schema 2 에서 다섯째 칸 `제외` 를 더했다. 그 칸을 안 읽으면 어간만 가지고 검색해
+# 목록의 다섯째 칸은 `제외` 다. 그 칸을 안 읽으면 어간만 가지고 검색해
 # `판정`·`판단` 까지 잡히고, 산출물을 거의 못 쓰게 된다. 표를 읽는 곳이 하나여야 훅과 검사가
 # 같은 것을 본다. 픽스처로 보아 저장소 목록의 내용에 기대지 않는다.
 . "$HERE/hooks/_banned_words.sh"
@@ -322,8 +322,6 @@ printf '판정과 판단만 있다.\n' > "$BX/clean.md"
 printf '새 판을 낸다.\n' > "$BX/dirty.md"
 check "제외 안의 것은 안 잡는다"    "[ -z \"\$(banned_report '$BX/pairs' '$BX/clean.md' '$BX/excl')\" ]"
 check "제외 밖의 것은 잡는다"       "banned_report '$BX/pairs' '$BX/dirty.md' '$BX/excl' | grep -qF '판 -> 버전'"
-# 제외 파일을 안 주면 옛 동작 그대로여야 한다. 옛 목록(schema 1)을 쓰는 PC 가 남아 있다.
-check "제외를 안 주면 전과 같다"    "banned_report '$BX/pairs' '$BX/clean.md' | grep -qF '판 -> 버전'"
 printf 'clean.md\ndirty.md\n' > "$BX/files"
 BXSCAN="$(cd "$BX" && banned_scan "$BX/pairs" "$BX/excl" "$BX/scopes" '문서와 답변' "$BX/files")"
 check "한 번에 훑어 걸린 파일을 낸다" "printf '%s' \"\$BXSCAN\" | grep -qF 'dirty.md'"

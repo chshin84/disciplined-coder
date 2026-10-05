@@ -34,15 +34,13 @@ trap 'rm -rf "$W"' EXIT
 banned_parse "$BANSRC" "$W/pairs" "$W/toks" "$W/excl" "$W/scopes"
 
 # 대상은 살아 있는 문서다. 기록과 설계 문서는 찍은 뒤 고치지 않거나 보존 목적이라 뺀다. 목록
-# 파일 자신은 생성물이고 표가 그 낱말을 이름으로 적으므로 뺀다.
+# 파일은 표가 그 낱말을 이름으로 적고, 근거 파일은 그 낱말과 사용자 원문을 인용하므로 뺀다.
 git ls-files '*.md' \
   | grep -v '^docs/superpowers/' \
-  | grep -v '^korean-banned-words.md$' \
+  | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$' \
   > "$W/files"
 
 N="$(wc -l < "$W/files" | tr -d ' ')"
-STAMP="$(grep -oE 'schema [0-9]+, [0-9-]+, [0-9a-f]+' "$BANSRC" | head -1 || echo '버전 표시 없음')"
-echo "목록: $STAMP"
 echo "대상: 살아 있는 문서 ${N}개 / 적용 대상: ${WANT:-전부}"
 echo
 
