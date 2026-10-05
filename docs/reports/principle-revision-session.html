@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>원칙 퇴고 세션 보고</title>
+<style>
+/* BEGIN report-base */
+/* 보고서 규격 기준 CSS — 각 HTML의 <style> 맨 앞에 그대로 붙여 넣는다.
+   규칙의 근거와 금지 목록은 같은 폴더의 보고서-규격.md에 있다. */
+:root{
+  --paper:#FFFFFF; --ink:#111418; --ink-2:#3F4650; --ink-3:#686F7C;
+  --rule:#111418; --hair:#D6D9DE; --tint:#F4F4F1; --chg:#E6ECF4;
+  --accent:#1F3A5F; --accent-2:#5E7189; --neg:#A8322A;
+  --s1:#1F3A5F; --s2:#437163; --s3:#B07A2A; --s4:#868B94;
+  --sans:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --mono:"D2Coding",Consolas,ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#15171A; --ink:#E9EBEE; --ink-2:#BCC2CA; --ink-3:#8D949E;
+    --rule:#E9EBEE; --hair:#343941; --tint:#1D2024; --chg:#26313F;
+    --accent:#9DB7D8; --accent-2:#5B6E89; --neg:#E0776C;
+    --s1:#9DB7D8; --s2:#90C0B1; --s3:#D6A45A; --s4:#838993;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#15171A; --ink:#E9EBEE; --ink-2:#BCC2CA; --ink-3:#8D949E;
+  --rule:#E9EBEE; --hair:#343941; --tint:#1D2024; --chg:#26313F;
+  --accent:#9DB7D8; --accent-2:#5B6E89; --neg:#E0776C;
+  --s1:#9DB7D8; --s2:#90C0B1; --s3:#D6A45A; --s4:#838993;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.75 var(--sans);
+  font-variant-numeric:tabular-nums;word-break:keep-all;padding:48px 16px 72px}
+.doc{max-width:880px;margin:0 auto}
+p{margin:0 0 .9em}
+p:last-child{margin-bottom:0}
+b,strong{font-weight:600}
+a{color:var(--accent);text-underline-offset:2px}
+code,.code{font-family:var(--mono);font-size:.88em;color:var(--ink-2)}
+
+/* 머리말: 소속·날짜 한 줄, 제목, 리드, 이중 괘선 */
+.doc-head{padding-bottom:8px}
+.doc-meta{font-size:13px;color:var(--ink-3);margin:0 0 10px}
+h1{font-size:30px;line-height:1.3;font-weight:700;margin:0 0 14px;letter-spacing:-.01em}
+.lede{font-size:17px;color:var(--ink-2);max-width:68ch;margin:0}
+
+/* 절: 카드 없이 괘선과 여백으로 구분 */
+section{margin-top:56px}
+h2{font-size:21px;line-height:1.4;font-weight:700;margin:0 0 16px}
+h3{font-size:16px;line-height:1.5;font-weight:600;margin:28px 0 8px}
+.prose{max-width:68ch;color:var(--ink)}
+.note,.cap{font-size:13px;line-height:1.6;color:var(--ink-3)}
+
+/* 핵심 수치: 타일 대신 괘선 사이의 한 줄 표 */
+.keyfig{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border-top:1px solid var(--rule);border-bottom:1px solid var(--hair);margin:24px 0 0}
+.keyfig{grid-template-rows:auto auto auto}
+.keyfig>div{padding:12px 16px 12px 0;display:grid;grid-row:span 3;grid-template-rows:subgrid;row-gap:0;align-content:start}
+.keyfig>div+div{padding-left:16px;border-left:1px solid var(--hair)}
+.keyfig .k{display:block;font-size:13px;line-height:1.5;color:var(--ink-3);padding-bottom:4px}
+.keyfig .v{display:block;font-size:18px;font-weight:600;line-height:1.4;color:var(--ink)}
+.keyfig .d{display:block;font-size:13px;color:var(--ink-2)}
+
+/* 요지: 문서당 한 번. 옅은 바탕 하나만 허용하고 색 띠는 쓰지 않는다 */
+.gist{background:var(--tint);padding:20px 24px;margin-top:32px}
+.gist h2{font-size:17px;margin-bottom:8px}
+.gist ul{margin:0;padding-left:1.2em}
+.gist li+li{margin-top:4px}
+
+/* 주석성 문단과 대체됨 배너: 굵은 머리말과 위 괘선으로 구분하고 상자나 왼쪽 색 띠를 쓰지 않는다 */
+.aside,.superseded{margin:16px 0;padding-top:10px;border-top:1px solid var(--hair);font-size:15px;color:var(--ink-2)}
+.aside>b:first-child{color:var(--ink)}
+.aside.warn>b:first-child,.superseded>b:first-child{color:var(--neg)}
+
+/* 표: 위아래 괘선만 쓰는 형식 */
+.tbl{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.55}
+caption{caption-side:top;text-align:left;font-weight:600;font-size:15px;padding-bottom:6px;color:var(--ink)}
+thead th{font-size:13px;font-weight:600;color:var(--ink-2);text-align:left;padding:8px 12px 6px 0;border-top:1.5px solid var(--rule);border-bottom:1px solid var(--rule);vertical-align:bottom}
+td{padding:8px 12px 8px 0;border-bottom:1px solid var(--hair);vertical-align:top}
+tbody tr:last-child td{border-bottom:1.5px solid var(--rule)}
+table:has(tfoot) tbody tr:last-child td{border-bottom:1px solid var(--rule)}
+tfoot td{font-weight:600;border-bottom:1.5px solid var(--rule)}
+th.n,td.n{text-align:right;white-space:nowrap}
+th:last-child,td:last-child{padding-right:0}
+tr.pick td{font-weight:600}
+tr.pick td:first-child{box-shadow:none}
+td.chg{font-weight:600;background:var(--chg)} /* 전후 표의 바뀐 칸 */
+
+/* 확인 상태: 글자는 작성자가 마크업에 쓴다(실행으로 확인함·추론함·가정함). data-state는 테두리 색만 고른다 */
+.state[data-state]{display:inline-block;font-size:12.5px;line-height:1.5;color:var(--ink-2);border:1px solid var(--hair);padding:0 6px;white-space:nowrap}
+.state[data-state="run"]{border-color:var(--accent)}
+.state[data-state="infer"]{border-color:var(--s3)}
+.state[data-state="assume"]{border-color:var(--neg)}
+
+/* 도표: 제목(메시지), 단위·기간, 본체, 자료 출처 순서 */
+figure{margin:24px 0}
+figcaption .t{display:block;font-weight:600;font-size:15px}
+figcaption .u{display:block;font-size:13px;color:var(--ink-3)}
+.src{font-size:12.5px;color:var(--ink-3);margin-top:8px}
+svg text{font-family:var(--sans);fill:var(--ink)}
+
+/* 가로 막대 */
+.bars{display:grid;gap:8px;margin-top:12px}
+.brow{display:grid;grid-template-columns:minmax(150px,240px) 1fr 52px;gap:12px;align-items:center;font-size:14px}
+.brow .l{color:var(--ink-2)}
+.brow .l b{color:var(--ink)}
+.track{position:relative;height:12px}
+.fill{position:absolute;left:0;top:0;height:12px;background:var(--accent-2);width:var(--w)}
+.fill.pick{background:var(--accent)}
+.ref{position:absolute;top:-5px;bottom:-5px;width:0;border-left:1px dashed var(--ink-3)}
+.brow .n{text-align:right;font-weight:600}
+
+/* 시각화: 차트 상자, Mermaid 도식. 규칙은 시각화.md에 있다. 애니메이션 조작 UI는 report-demo.css에 있다 */
+.viz{height:320px;margin-top:12px}
+.viz-fail{display:flex;align-items:center;font-size:13px;color:var(--ink-3);border:1px solid var(--hair);padding:0 12px;min-height:48px}
+pre.mermaid{margin:12px 0 0;font:inherit;font-size:13px;white-space:pre;overflow-x:auto;color:var(--ink-3)}
+pre.mermaid.rendered{white-space:normal;text-align:center;color:var(--ink)}
+pre.mermaid rect{rx:0;ry:0}
+
+/* 번호 목록 형태의 단계 */
+.steps{list-style:none;margin:0;padding:0;counter-reset:st}
+.steps>li{counter-increment:st;display:grid;grid-template-columns:2.2em 1fr;gap:0 8px;padding:14px 0;border-bottom:1px solid var(--hair)}
+.steps>li::before{content:counter(st) ".";font-weight:600;color:var(--ink-3)}
+
+/* 정의 목록: 용어 열은 내용 폭과 14em 중 작은 값이고 풀이가 바로 옆에 온다. 목록 위에 '용어' 머리글을 보인다 */
+.gloss{display:grid;grid-template-columns:fit-content(14em) 1fr;margin:24px 0 0}
+.gloss::before{content:"용어";grid-column:1/-1;font-size:13px;font-weight:600;color:var(--ink-2);padding-bottom:6px}
+.gloss>dt,.gloss>dd,.gloss>div{padding:10px 0;border-top:1px solid var(--hair)}
+.gloss>div{grid-column:1/-1;display:grid;grid-template-columns:subgrid}
+.gloss>div>dt,.gloss>div>dd{padding-top:0;padding-bottom:0}
+.gloss dt{font-weight:600}
+.gloss dd{margin:0;padding-left:24px;color:var(--ink-2);font-size:14.5px}
+
+/* 페이지형 문서: <main class="doc paged">. 한 페이지씩 넘겨 보고, 인쇄하면 페이지마다 나뉜다 */
+.pager{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;border-bottom:1px solid var(--hair);padding:0 0 10px;margin:0 0 8px;font-size:13px;color:var(--ink-3)}
+.pager button{font:inherit;font-size:13px;background:var(--paper);color:var(--ink);border:1px solid var(--hair);padding:3px 12px;cursor:pointer}
+.pager button:disabled{color:var(--ink-3);cursor:default}
+.pager .cnt{min-width:4.5em;color:var(--ink-2)}
+.toc{font-size:13px;line-height:1.9;color:var(--ink-3);margin:0 0 8px}
+.toc a{color:var(--ink-2);text-decoration:none}
+.toc a.on{color:var(--accent);font-weight:600;text-decoration:underline}
+.toc a.core::before,.toc a.key::before{display:inline-block;margin-right:3px;color:var(--accent)}
+.toc a.core::before{content:"\2605"} /* 최고 핵심 페이지(★, 1개) */
+.toc a.key::before{content:"\2606"} /* 뚜렷이 중요한 페이지(☆, 최대 2개) */
+.page{margin-top:32px}
+.js .page{display:none}
+.js .page.on{display:block}
+.page>.sec{font-size:13px;font-weight:600;line-height:1.5;color:var(--accent);margin:0 0 4px} /* 절 이름: 목차 링크 글과 같다. 바로 아래 h2가 결론 제목이다 */
+.pno{font-size:12.5px;color:var(--ink-3);margin:0 0 6px}
+@media screen{.js .pno{display:none}} /* 스크립트가 도는 화면에서는 넘김 막대의 번호만 보인다. 인쇄와 스크립트 없는 화면에서는 보인다 */
+.paged .lede,.paged .prose{max-width:none}
+.page td:first-child{white-space:nowrap}
+.nw{white-space:nowrap}
+
+/* 페이지 안의 블록: 요점 목록, 블록 머리(근거·중요 포인트·유의사항·출처) */
+.pts{margin:0 0 6px;padding-left:1.2em;max-width:none}
+.pts li+li{margin-top:4px}
+.pts li>b:first-child{color:var(--ink)}
+.page>h2+ul.pts{margin-bottom:8px}
+.blk{margin:28px 0 6px;font-size:16px}
+.blk.warn b{color:var(--neg)}
+.src-list{font-size:13px;color:var(--ink-2)}
+.src-list a{word-break:break-all}
+
+footer{margin-top:64px;border-top:1px solid var(--rule);padding-top:12px;font-size:13px;color:var(--ink-3)}
+footer p{margin:0 0 4px}
+
+@media (max-width:760px){
+  body{padding-top:32px}
+  h1{font-size:25px}
+  .keyfig>div+div{border-left:none;padding-left:0}
+  .keyfig>div{border-bottom:1px solid var(--hair)}
+  .gloss{grid-template-columns:fit-content(7.5em) 1fr}.gloss dd{padding-left:14px} /* 좁은 화면에서도 용어와 풀이를 한 줄에 둔다 */
+  .brow{grid-template-columns:110px 1fr 44px;font-size:13px}
+}
+@media screen and (max-width:760px){
+  .tbl th,.tbl td{min-width:56px}
+  .tbl:has(tr>:nth-child(3))::before{content:"표가 화면보다 넓으면 옆으로 밀어 볼 수 있습니다";display:block;font-size:12.5px;color:var(--ink-3);padding-bottom:4px}
+}
+@media print{
+  .js .page{display:block}
+  .pager,.toc{display:none}
+  .page{break-before:page}
+  @page{size:A4;margin:16mm 14mm}
+  body{padding:0;font-size:10.5pt}
+  section,figure,table,.gist{break-inside:avoid}
+  h2,h3{break-after:avoid}
+  a{color:inherit;text-decoration:none}
+  .viz{height:auto}
+  .viz>div{width:100%!important}
+  pre.mermaid svg{width:100%;max-width:100%;height:auto}
+}
+/* 애니메이션 조작 UI(RC.demo의 버튼·자막·단계 목록). C1 소유. build.py가 report-base.css 뒤에 이어 넣는다. 규칙은 시각화.md에 있다 */
+.demo-ctl{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-top:10px;font-size:13px;color:var(--ink-3)}
+.demo-ctl button{font:inherit;font-size:13px;background:var(--paper);color:var(--ink);border:1px solid var(--hair);padding:3px 12px;cursor:pointer}
+.demo-ctl button:disabled{color:var(--ink-3);cursor:default}
+.demo-ctl .cnt{min-width:3.5em;color:var(--ink-2)}
+.demo-cap{font-size:14.5px;color:var(--ink-2);margin:6px 0 0}
+.demo-cap{min-height:1.5em}
+.demo-cap.rc-off{visibility:hidden}
+.demo-steps{display:none;font-size:13px;color:var(--ink-2);margin:8px 0 0;padding-left:1.4em}
+.demo-scen{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:13px}
+.demo-scen button{font:inherit;font-size:13px;background:var(--paper);color:var(--ink-2);border:1px solid var(--hair);padding:2px 10px;cursor:pointer}
+.demo-scen button.on{color:var(--ink);border-color:var(--ink-3)}
+.demo-static .demo-ctl,.demo-static .demo-cap,.demo-static .demo-scen{display:none}
+.demo-static .demo-steps{display:block}
+.rc-scroll{overflow-x:auto;max-width:100%}
+.rc-scroll>svg{display:block}
+@media screen and (max-width:760px){ /* 도식이 스크롤 상자보다 넓을 때(엔진이 rc-over를 단다) 넓은 표의 단서와 같은 글자 모양으로 알린다 */
+  .rc-scroll.rc-over::before{content:"도식이 화면보다 넓으면 옆으로 밀어 볼 수 있습니다";display:block;position:sticky;left:0;text-align:left;font-size:12.5px;color:var(--ink-3);padding-bottom:4px}
+}
+@media print{
+  .demo-ctl,.demo-cap,.demo-scen{display:none}
+  .demo-steps{display:block}
+  .rc-scroll{overflow:visible}
+  .rc-scroll>svg{min-width:0 !important}
+}
+/* END report-base */
+/* 문서 전용: 표 안 식별자가 하이픈에서 끊기지 않게 한다 */
+.tbl td code { white-space: nowrap; }
+</style>
+</head>
+<body>
+<main class="doc paged" data-kind="wrapup">
+<nav class="pager">
+  <button type="button" class="prev">이전</button>
+  <span class="cnt"></span>
+  <button type="button" class="next">다음</button>
+</nav>
+<p class="toc"><a href="#p1">1. 요약</a> · <a href="#p2">2. 작업 흐름</a> · <a href="#p3" class="core">3. 바뀐 것</a> · <a href="#p4">4. 새 조항</a> · <a href="#p5">5. 처음 요청 대비 달성</a> · <a href="#p6">6. 남은 일</a> · <a href="#p7">7. 결정 요청</a> · <a href="#p8">8. 검증 범위</a></p>
+
+<section class="page summary" id="p1">
+  <p class="pno">1 / 8</p>
+  <div class="doc-head">
+    <p class="doc-meta">disciplined-coder 원칙 퇴고 세션 · 2026년 10월 3일~4일</p>
+    <h1>원칙 퇴고 세션 마무리 보고</h1>
+    <p class="basis">기준: 커밋 5f976c5~436dc6b와 5f3f04c, 설계 문서 docs/superpowers/specs/2026-10-03-principle-revision-from-sessions-design.md, 세션 기록 9748acd8-bbae-41f0-8d2d-29c4dff8e6fd.jsonl</p>
+    <p class="lede">원칙 퇴고 세션은 dc코더 원칙에 새 조항 6개를 넣고 기존 조항 7개와 출력지시 머리말을 고쳤으며, 조항 1개를 지웠습니다. 이 보고서는 그 세션이 무엇을 하려 했고 무엇을 했으며, 그 결과 모든 프로젝트의 세션에 실리는 원칙이 어떻게 바뀌었는지에 답합니다.</p>
+  </div>
+  <div class="keyfig">
+    <div data-src="p4"><span class="k">새 조항의 빈 모델 위반</span><span class="v">23건 → 0건</span><span class="d">새 조항 6개의 클린룸 시험 합계</span></div>
+    <div data-src="p3"><span class="k">고친 조항의 빈 모델 위반</span><span class="v">26건 → 0건</span><span class="d"><code>COUNT-EARNS</code> 문구 변경 포함</span></div>
+    <div data-src="p2"><span class="k">원격 main 반영 커밋</span><span class="v">17개</span><span class="d">5f976c5~436dc6b, 5f3f04c</span></div>
+    <div data-src="p6"><span class="k">남은 일</span><span class="v">3건</span><span class="d">모두 결정 요청과 연결</span></div>
+  </div>
+  <div class="gist">
+    <h2>요약</h2>
+    <ul>
+      <li data-src="p2 p3">세션은 quant_structure 설계 문서의 개수 표기에 대한 사용자 지적에서 출발했고, 같은 퇴고 기준을 원칙 전체로 넓혔습니다(<a href="#p2">작업 흐름</a>).</li>
+      <li data-src="p3">고친 조항은 주로 판단 주체와 낱말의 범위를 바로잡았고, 바꾼 문안은 클린룸 시험에서 현행 문안보다 위반이 많지 않았습니다(<a href="#p3">바뀐 것</a>).</li>
+      <li data-src="p4">새 조항은 세션 기록 73개에서 두 세션 이상 되풀이된 사용자 지시만 후보로 올렸고, 빈 모델이 어긴 후보만 채택했습니다(<a href="#p4">새 조항</a>).</li>
+      <li data-src="p5">처음 요청은 모두 달성했고, 세션이 제안한 후속 작업인 quant_structure 설계 문서 수정은 범위 밖이라 하지 않았습니다(<a href="#p5">처음 요청 대비 달성</a>).</li>
+      <li data-src="p7">보고서 스킬의 글쓰기 규칙 사본이 2026-09-28 버전이라 새 조항이 빠져 있으며, 다시 복사하기를 권장합니다(<a href="#p7">결정 요청</a>).</li>
+    </ul>
+  </div>
+  <dl class="gloss">
+    <div><dt>dc코더</dt><dd>disciplined-coder 플러그인입니다. 원칙 파일 <code>agent-principles.md</code>를 모든 프로젝트의 세션에 싣습니다.</dd></div>
+    <div><dt>조항</dt><dd>원칙 파일의 지시 한 항목입니다. <code>COUNT-EARNS</code>처럼 영문 이름으로 가리킵니다.</dd></div>
+    <div><dt>참고서</dt><dd>조항의 근거와 측정 기록을 적는 <code>domain-discipline.md</code>와 <code>domain-korean.md</code>입니다.</dd></div>
+    <div><dt>클린룸 소거 시험</dt><dd>지침이 없는 모델과 조항 하나만 실은 모델에 같은 과제를 주고 위반 수를 비교하는 시험입니다.</dd></div>
+    <div><dt>빈 모델</dt><dd>클린룸 시험에서 지침을 싣지 않은 조건입니다.</dd></div>
+    <div><dt>현행 문안과 새 문안</dt><dd>문구를 바꿀 때 비교하는 조건으로, 바꾸기 전 문구와 바꾼 뒤 문구를 각각 실은 조건입니다.</dd></div>
+    <div><dt>렌즈</dt><dd>문서를 한 관점에서 검토하는 읽기 전용 서브에이전트입니다. 선행연구 렌즈는 웹에서 선행 사례를 찾습니다.</dd></div>
+    <div><dt>렌즈 그룹 세션</dt><dd>같은 기간에 같은 저장소에서 렌즈 재분류를 맡은 다른 세션(e5fa1a58)입니다. 별도 보고서가 있습니다.</dd></div>
+    <div><dt>CSV</dt><dd>값을 쉼표로 나눠 적은 표 형식의 글 파일(Comma-Separated Values)입니다.</dd></div>
+    <div><dt>HTML</dt><dd>웹 브라우저로 여는 문서 형식입니다. 이 보고서도 HTML 파일입니다.</dd></div>
+    <div><dt>확인 상태</dt><dd>결론 줄 앞의 표시로, 실행으로 확인함·추론함·가정함 중 하나입니다.</dd></div>
+  </dl>
+  <p class="blk"><b>출처</b></p>
+  <ul class="pts src-list">
+    <li>조항 변경 전후: <code>git diff 5f976c5^ 77b1e6f -- agent-principles.md CLAUDE.md</code></li>
+    <li>조항별 측정 기록: <code>skills/lens-fit/domain-discipline.md</code>, <code>skills/lens-readability/domain-korean.md</code>의 각 조항 절</li>
+    <li>사용자 지시와 세션 진행: 세션 기록 <code>9748acd8-bbae-41f0-8d2d-29c4dff8e6fd.jsonl</code></li>
+    <li>커밋 17개: <code>git log --first-parent 5f976c5^..436dc6b</code>(16개)와 <code>5f3f04c</code></li>
+    <li>남은 일 3건: 「남은 일」 표의 행</li>
+    <li>사본 상태: <code>~/.claude/skills/writing-html-reports/글쓰기-규칙.md</code> 머리 주석(2026-09-28 복사)</li>
+  </ul>
+</section>
+
+<section class="page" id="p2">
+  <p class="pno">2 / 8</p>
+  <p class="sec">작업 흐름</p>
+  <h2>개수 표기 지적 하나가 원칙 14개 조항 변경으로 이어졌다</h2>
+  <ul class="pts">
+    <li><span class="state" data-state="infer">추론함</span> 사용자는 quant_structure 설계 문서의 "CSV 38개", "사건 75줄" 같은 개수가 시간이 지나면 불일치를 낳는다고 지적했고, 세션은 그 판정 기준을 선행연구에서 찾았습니다(<code>9748acd8-bbae-41f0-8d2d-29c4dff8e6fd.jsonl</code> 10-03 11:49).</li>
+    <li><span class="state" data-state="infer">추론함</span> <code>COUNT-EARNS</code>를 다듬으며 쓴 퇴고 기준을 사용자가 모든 조항에 한 조항씩 적용하라고 지시해, 작업이 원칙 전체로 넓어졌습니다(세션 기록 10-03 13:26).</li>
+    <li><span class="state" data-state="run">실행으로 확인함</span> 바뀐 조항은 새 조항 6개, 고친 조항 7개, 지운 조항 1개입니다(<code>git diff 5f976c5^ 77b1e6f -- agent-principles.md</code>).</li>
+  </ul>
+  <p class="blk"><b>근거</b></p>
+  <div class="tbl"><table>
+    <thead><tr><th>단계</th><th>시각(KST)</th><th>산출물</th><th>커밋</th></tr></thead>
+    <tbody>
+      <tr><td>개수 표기 진단</td><td>10-03 11:49</td><td>설계 문서 개수 표기 57건을 분류했고, 46건이 지우거나 이름으로 바꿀 대상이었습니다</td><td>없음</td></tr>
+      <tr><td>선행연구 대조</td><td>10-03 11:57</td><td>반사실 판정(숫자가 바뀌면 판단도 바뀌는지)을 주 기준으로 정했습니다</td><td>없음</td></tr>
+      <tr><td>조항 추가와 문구 정돈</td><td>10-03 12:38</td><td><code>COUNT-EARNS</code>를 넣고 판단 주체를 "결론이나 결정"으로 고쳤습니다</td><td>5f976c5, 4edfe8e</td></tr>
+      <tr><td>설계와 계획</td><td>10-03 13:48</td><td>세션 기록 기반 퇴고의 spec과 plan을 쓰고 렌즈 리뷰를 거쳤으며, 같은 커밋에서 퇴고 기준을 <code>CLAUDE.md</code>에 넣었습니다</td><td>6229aa1</td></tr>
+      <tr><td>세션 기록 추출</td><td>10-03 14:11</td><td>세션 73개에서 사용자 발화 2,265건을 뽑아 조항 후보 8개를 찾았습니다</td><td>없음</td></tr>
+      <tr><td>조항별 퇴고</td><td>10-03 17:30~</td><td>조항마다 문안 제안, 클린룸 시험, 반영 순서로 진행했습니다</td><td>6165df7~4d5360c</td></tr>
+      <tr><td>새 조항 반영</td><td>10-03 22:12</td><td>후보 5개를 조항으로 넣고 원격 main에 올렸습니다</td><td>71520da~436dc6b</td></tr>
+      <tr><td>승인 예외 일반화</td><td>10-04 02:04</td><td>렌즈 그룹 세션의 요청으로 <code>LENS-ALLOWED</code>를 고쳤습니다</td><td>5f3f04c</td></tr>
+      <tr><td>렌즈 그룹 병합본 반영</td><td>10-04 10:42</td><td>렌즈 그룹 세션의 병합 결과를 검사한 뒤 원격에 올렸습니다</td><td>1b3edd5</td></tr>
+    </tbody>
+  </table></div>
+  <p class="blk"><b>중요 포인트</b></p>
+  <ul class="pts">
+    <li>시각은 세션 기록의 사용자 발화와 커밋 시각을 KST로 옮긴 값입니다. 조항별 퇴고 단계는 조항마다 커밋을 하나씩 남겼습니다.</li>
+    <li>마지막 단계의 1b3edd5는 렌즈 그룹 세션이 만든 병합 커밋이며, 이 세션은 검사와 원격 반영만 맡았습니다.</li>
+  </ul>
+  <p class="blk warn"><b>유의사항</b></p>
+  <ul class="pts">
+    <li>세션 도중 대화가 한 번 압축되어, 압축 전 진행 내용은 압축 요약과 커밋 기록으로 복원했습니다.</li>
+  </ul>
+  <p class="blk"><b>출처</b></p>
+  <ul class="pts src-list">
+    <li>커밋 목록: <code>git log --first-parent 5f976c5^..436dc6b</code>, <code>git log -1 5f3f04c</code></li>
+    <li>세션 기록: <code>9748acd8-bbae-41f0-8d2d-29c4dff8e6fd.jsonl</code>(사용자 발화 시각)</li>
+  </ul>
+</section>
+
+<section class="page core" id="p3" data-part="changed">
+  <p class="pno">3 / 8</p>
+  <p class="sec">바뀐 것</p>
+  <h2>고친 조항 7개의 새 문안은 시험 위반이 0건이었다</h2>
+  <ul class="pts">
+    <li><span class="state" data-state="infer">추론함</span> 바꾼 문안의 시험 위반은 모든 조항에서 0건이었고, 빈 모델 위반은 합계 26건이었습니다(참고서 각 조항 절의 측정 문단, <code>domain-discipline.md</code>·<code>domain-korean.md</code>).</li>
+    <li><span class="state" data-state="run">실행으로 확인함</span> <code>REWRITE-TO-ADD</code>는 빈 모델이 과제 5개를 모두 지켜 사용자 결정으로 지웠습니다(커밋 4c36c61).</li>
+    <li><span class="state" data-state="run">실행으로 확인함</span> 퇴고 기준 네 질문(주체 호응, 범위의 정확성, 한 조항 한 관심사, 원칙의 자기 적용)을 저장소 <code>CLAUDE.md</code>에 넣었습니다(커밋 6229aa1).</li>
+  </ul>
+  <p class="blk"><b>근거</b></p>
+  <div class="tbl"><table>
+    <thead><tr><th>조항</th><th>변경 전</th><th>변경 후</th><th>위반(빈 모델/현행/새 문안)</th></tr></thead>
+    <tbody>
+      <tr><td><code>FOCUSED</code></td><td>한 작업(함수, 파일, 스킬, 서브에이전트와 같이 하나의 업무 단위)은 한 가지 일만 하게 하라</td><td class="chg">함수·파일·스킬·서브에이전트 같은 구성 단위는 한 가지 일만 하게 만들어라</td><td>2 / 0 / 0</td></tr>
+      <tr><td><code>NAME-ITEMS</code></td><td>각 항목은 이름으로 가리켜라. 번호는 거짓 우선순위를 만든다</td><td class="chg">각 항목을 번호 대신 이름으로 가리켜라(근거 문장은 참고서로 옮김)</td><td>2 / 0 / 0</td></tr>
+      <tr><td><code>REPORT-DEAD</code></td><td>내 변경으로 쓰이지 않게 된 것은 지워라</td><td class="chg">이번 작업의 변경으로 쓰이지 않게 된 코드와 문서는 지워라</td><td>1 / 0 / 0</td></tr>
+      <tr><td><code>YAGNI</code></td><td>50줄로 될 일을 200줄로 만들지 마라</td><td class="chg">같은 일을 더 짧게 할 수 있으면 짧게 다시 써라</td><td>3 / 0 / 0</td></tr>
+      <tr><td><code>DOC-TYPE</code></td><td>문서를 만지기 전에 … 진실인 코드와 인프라를 가리켜라</td><td class="chg">문서를 만들거나 고치기 전에 … 원본인 코드와 인프라를 가리켜라</td><td>4 / 0 / 0</td></tr>
+      <tr><td><code>RESOLVE-NOW</code></td><td>지금 할 수 있다면 즉시 하라</td><td class="chg">해결되지 않은 문제를 지금 해결할 수 있으면 즉시 해결하라. 미루거나 넘기려면 먼저 물어라</td><td>2 / 1 / 0</td></tr>
+      <tr><td><code>LENS-ALLOWED</code></td><td>웹에 나가는 <code>lens-prior-art</code>는 그때마다 승인을 받아라</td><td class="chg">호출 절차가 사용자 승인을 요구하는 렌즈는 그 절차대로 그때마다 승인을 받아라</td><td>0 / 0 / 0</td></tr>
+      <tr><td>출력지시 머리말</td><td>직역체는 대화의 품질을 극도로 떨어뜨린다</td><td class="chg">이유 문장을 참고서 머리 문단으로 옮김</td><td>0 / 0 / 0</td></tr>
+      <tr><td><code>REWRITE-TO-ADD</code></td><td>내용이 부족하면 글을 한 번 더 고치면서 자연스럽게 내용을 추가하라</td><td class="chg">삭제</td><td>0 / 1 / 해당 없음</td></tr>
+    </tbody>
+  </table></div>
+  <p class="blk"><b>중요 포인트</b></p>
+  <ul class="pts">
+    <li>위반 열의 빈 모델 값이 0인 조항은 새 문안이 현행보다 나쁘지 않다는 저장소 규칙으로 채택했습니다. <code>LENS-ALLOWED</code>는 현행 문안 조건의 서브에이전트가 오독 여지를 스스로 적어 바꿀 이유가 확인되었습니다.</li>
+    <li><code>COUNT-EARNS</code>의 문구 변경(빈 모델 12건)은 새 조항 페이지에 함께 적었고, 빈 모델 위반 26건에는 이 12건이 들어 있습니다.</li>
+  </ul>
+  <p class="blk warn"><b>유의사항</b></p>
+  <ul class="pts">
+    <li>시험은 조건마다 1회만 실행했고 채점은 세션 혼자 했으므로, 위반 수 차이에는 실행마다 생기는 변동이 섞여 있을 수 있습니다.</li>
+  </ul>
+  <p class="blk"><b>출처</b></p>
+  <ul class="pts src-list">
+    <li>문구 변경 전후: <code>git diff 5f976c5^ 77b1e6f -- agent-principles.md</code></li>
+    <li>위반 수: <code>skills/lens-fit/domain-discipline.md</code>의 각 조항 절 「측정」 문단</li>
+    <li>삭제 기록: <code>skills/lens-readability/domain-korean.md</code>의 「삭제한 조항」 절</li>
+  </ul>
+</section>
+
+<section class="page" id="p4">
+  <p class="pno">4 / 8</p>
+  <p class="sec">새 조항</p>
+  <h2>새 조항 6개는 빈 모델 위반 23건을 0건으로 줄였다</h2>
+  <ul class="pts">
+    <li><span class="state" data-state="run">실행으로 확인함</span> 후보 8개 중 빈 모델이 어긴 후보 5개와 <code>COUNT-EARNS</code>를 조항으로 넣었습니다(커밋 5f976c5, 71520da~436dc6b).</li>
+    <li><span class="state" data-state="infer">추론함</span> 세션 병행과 위임 진행 후보는 빈 모델이 과제 5개를 모두 지켜, 조항이 없어도 모델이 이미 지킨다고 판단해 넣지 않았습니다(세션 기록 10-03 22:12 보고).</li>
+    <li><span class="state" data-state="infer">추론함</span> 이미 지운 적이 있는 조항(하나의 사실은 한 곳에, 멱등, 사실과 판단 구분)은 세션 기록에 다시 나왔지만, 빈 모델이 어기는 과제를 보이지 못해 되살리지 않았습니다.</li>
+  </ul>
+  <p class="blk"><b>근거</b></p>
+  <div class="tbl"><table>
+    <thead><tr><th>조항</th><th>위치</th><th>지시 내용</th><th>위반(빈 모델/새 문안)</th></tr></thead>
+    <tbody>
+      <tr><td><code>COUNT-EARNS</code></td><td><code>UNPACK</code></td><td>값이 달라지면 결론이나 결정이 바뀌는 숫자만 적고, 대상을 개수로 가리키지 않습니다</td><td>12 / 0</td></tr>
+      <tr><td><code>EVIDENCE-FIRST</code></td><td>원칙</td><td>판단과 기준값을 추측으로 정하지 않고 출처를 적으며, 근거 없는 제약은 두지 않습니다</td><td>4 / 0</td></tr>
+      <tr><td><code>KEEP-FAILED</code></td><td>원칙</td><td>실패한 시도와 그 이유를 근거와 함께 남깁니다</td><td>1 / 0</td></tr>
+      <tr><td><code>SUBJECT-OBJECT</code></td><td><code>KO-SYNTAX</code></td><td>판단하고 행동하는 주체를 사람이나 도구로 적습니다</td><td>2 / 0</td></tr>
+      <tr><td><code>STATUS-FIRST</code></td><td><code>READ-FLOW</code></td><td>진행 상황을 물으면 사용자가 정할 일과 남은 문제부터 적습니다</td><td>2 / 0</td></tr>
+      <tr><td><code>NO-SQUEEZE</code></td><td><code>UNPACK</code></td><td>형식이나 분량에 맞추려고 내용을 압축하지 않습니다</td><td>2 / 0</td></tr>
+    </tbody>
+  </table></div>
+  <p class="blk"><b>중요 포인트</b></p>
+  <ul class="pts">
+    <li><code>COUNT-EARNS</code>는 반사실 판정과 구조 금지를 함께 둔 A안을 채택했습니다. 구조 금지만 둔 안은 맨 개수 5건을, 반사실 판정만 둔 안은 2건을 남겼습니다.</li>
+    <li><code>EVIDENCE-FIRST</code>는 근거 조사 우선 후보와 근거 있는 제약 후보를 하나로 합친 조항입니다.</li>
+  </ul>
+  <p class="blk warn"><b>유의사항</b></p>
+  <ul class="pts">
+    <li><code>KEEP-FAILED</code> 새 문안 시험은 Explore 에이전트가 안전장치 오류로 두 번 중단되어 general-purpose 에이전트로 다시 실행했습니다. 이 사실은 참고서 측정 기록에 있습니다.</li>
+    <li><code>KEEP-FAILED</code>·<code>STATUS-FIRST</code>·<code>NO-SQUEEZE</code>는 "시험 결과가 분명하면 묻지 말라"는 사용자 지시에 따라 승인을 묻지 않고 반영했습니다.</li>
+  </ul>
+  <p class="blk"><b>출처</b></p>
+  <ul class="pts src-list">
+    <li>후보 추출과 대조: 세션 기록 10-03 14:11 보고(세션 73개, 발화 2,265건)</li>
+    <li>조항별 측정: <code>skills/lens-fit/domain-discipline.md</code>, <code>skills/lens-readability/domain-korean.md</code>의 조항 절</li>
+    <li>반영 커밋: 5f976c5, 4edfe8e, 71520da, 25a58f5, 805ce70, 83affd8, 436dc6b</li>
+  </ul>
+</section>
+
+<section class="page" id="p5" data-part="achieved">
+  <p class="pno">5 / 8</p>
+  <p class="sec">처음 요청 대비 달성</p>
+  <h2>사용자 요청 7건을 모두 달성했다</h2>
+  <ul class="pts">
+    <li><span class="state" data-state="run">실행으로 확인함</span> 원칙 변경은 모두 원격 main에 있으며, 로컬과 원격이 같은 커밋을 가리킵니다(<code>git rev-parse --short HEAD origin/main</code> 출력 <code>a1f53f9</code> 두 줄).</li>
+    <li><span class="state" data-state="infer">추론함</span> quant_structure 설계 문서 수정은 사용자가 요청한 일이 아니라 세션이 제안한 후속 작업이므로 달성 판정에서 뺐습니다.</li>
+  </ul>
+  <p class="blk"><b>근거</b></p>
+  <div class="tbl"><table>
+    <thead><tr><th>요청 항목</th><th>결과</th><th>근거</th></tr></thead>
+    <tbody>
+      <tr><td>개수 표기가 의미 있는지 판단</td><td>달성</td><td>설계 문서 57건을 분류해 46건이 지울 대상임을 보임</td></tr>
+      <tr><td>선행연구로 판정 기준 파악</td><td>달성</td><td>반사실 판정을 주 기준으로, 표지어를 보조 신호로 정함</td></tr>
+      <tr><td>변형을 두고 클린룸 시험 후 dc코더 반영과 푸시</td><td>달성</td><td>세 안을 시험해 A안 채택, 커밋 5f976c5 푸시</td></tr>
+      <tr><td><code>COUNT-EARNS</code> 문구 정돈</td><td>달성</td><td>판단 주체를 결론이나 결정으로 수정함, 커밋 4edfe8e</td></tr>
+      <tr><td>같은 퇴고를 다른 조항에 한 조항씩 적용</td><td>달성</td><td>조항 7개와 머리말을 조항마다 시험 후 반영</td></tr>
+      <tr><td>모든 세션에서 기준과 암묵지를 찾아 둘 곳 결정</td><td>달성</td><td>퇴고 기준은 <code>CLAUDE.md</code>에, 행동 지시는 시험을 통과한 5개만 원칙에 넣음</td></tr>
+      <tr><td>작업 결과의 HTML 보고서</td><td>달성</td><td>세션 임시 폴더에 보고서 3편을 만듦</td></tr>
+    </tbody>
+  </table></div>
+  <p class="blk"><b>중요 포인트</b></p>
+  <ul class="pts">
+    <li>요청 항목은 사용자 발화를 기준으로 묶었습니다. git 명의 확인과 푸시 상태 질문처럼 바로 답한 질문은 뺐습니다.</li>
+  </ul>
+  <p class="blk warn"><b>유의사항</b></p>
+  <ul class="pts">
+    <li>세션이 만든 보고서 3편은 세션 임시 폴더에 있어 정리 시점에 지워질 수 있습니다.</li>
+  </ul>
+  <p class="blk"><b>출처</b></p>
+  <ul class="pts src-list">
+    <li>사용자 요청: 세션 기록 <code>9748acd8-bbae-41f0-8d2d-29c4dff8e6fd.jsonl</code>의 사용자 발화</li>
+    <li>보고서 3편: 그 세션 임시 폴더의 <code>report.html</code>, <code>revision-report.html</code>, <code>session-report.html</code></li>
+  </ul>
+</section>
+
+<section class="page" id="p6" data-part="remaining">
+  <p class="pno">6 / 8</p>
+  <p class="sec">남은 일</p>
+  <h2>남은 일 3건은 모두 저장소 밖의 사본과 다른 세션이 맡는다</h2>
+  <ul class="pts">
+    <li><span class="state" data-state="run">실행으로 확인함</span> 보고서 스킬의 글쓰기 규칙 사본에는 새 조항의 영문 이름이 하나도 없습니다(<code>grep -c "COUNT-EARNS\|EVIDENCE-FIRST\|NO-SQUEEZE" 글쓰기-규칙.md</code> 출력 <code>0</code>).</li>
+    <li><span class="state" data-state="assume">가정함</span> kw-plugins 알림과 quant_structure 설계 문서 수정은 그 저장소를 직접 읽지 않아, 다른 세션이 이미 처리했는지 확인하지 않았습니다.</li>
+  </ul>
+  <p class="blk"><b>근거</b></p>
+  <div class="tbl"><table>
+    <thead><tr><th>남은 일</th><th>처분</th><th>권장안</th><th>예정 시점</th></tr></thead>
+    <tbody>
+      <tr><td>보고서 스킬 글쓰기 규칙 사본 갱신</td><td>지금 함</td><td>현재 원칙에서 다시 복사하고 머리 주석의 날짜와 커밋을 수정함</td><td>결정 직후</td></tr>
+      <tr><td>kw-plugins 근거 사본 알림</td><td>미룸</td><td>kw-plugins 세션을 열 때 새 조항과 측정 기록 변경을 전함</td><td>kw-plugins 세션을 다음에 열 때</td></tr>
+      <tr><td>quant_structure 설계 문서의 개수 표기 수정</td><td>미룸</td><td>그 저장소를 맡은 세션에 57건 분류 결과를 메시지로 보냄</td><td>그 세션을 다음에 열 때</td></tr>
+    </tbody>
+  </table></div>
+  <p class="blk"><b>중요 포인트</b></p>
+  <ul class="pts">
+    <li>세 일의 대상은 보고서 스킬 폴더, kw-plugins, quant_structure로 모두 dc코더 저장소 밖에 있습니다. 저장소 검사(<code>scripts/test_*.sh</code>)는 저장소 안 파일만 보므로, 처리하지 않아도 그 결과는 바뀌지 않습니다.</li>
+  </ul>
+  <p class="blk warn"><b>유의사항</b></p>
+  <ul class="pts">
+    <li>글쓰기 규칙 사본이 옛 버전이어도 원칙 사본(<code>~/.claude/disciplined-coder/agent-principles.md</code>)은 세션마다 전역에 실리므로, 이 보고서는 새 조항을 적용해 썼습니다. 사본을 서브에이전트에 넘기는 작업에서는 새 조항이 빠집니다.</li>
+  </ul>
+  <p class="blk"><b>출처</b></p>
+  <ul class="pts src-list">
+    <li>사본 머리 주석: <code>~/.claude/skills/writing-html-reports/글쓰기-규칙.md</code>(a44efae에서 2026-09-28 복사)</li>
+    <li>알림 필요 근거: Claude 메모리 <code>kw-subset-sync.md</code>(근거 절을 고치면 kw-plugins에 알림)</li>
+    <li>미처리 보고: 세션 기록 10-03 12:38, 22:12 보고의 「남은 일」</li>
+  </ul>
+</section>
+
+<section class="page" id="p7" data-part="decisions">
+  <p class="pno">7 / 8</p>
+  <p class="sec">결정 요청</p>
+  <h2>정할 사항 3건 중 사본 갱신이 가장 먼저다</h2>
+  <ul class="pts">
+    <li><span class="state" data-state="infer">추론함</span> 보고서 스킬은 서브에이전트에 글쓰기 규칙 사본 경로를 넘기므로, 사본을 그대로 두면 위임한 보고서에서 <code>COUNT-EARNS</code> 같은 새 조항이 지켜지지 않는다고 판단합니다(<code>SKILL.md</code> 「서브에이전트 위임」).</li>
+    <li><span class="state" data-state="infer">추론함</span> 다른 저장소의 일은 메시지로만 묻는다는 사용자 결정이 있어, 두 미룬 일의 권장안을 메시지 방식으로 정했습니다(메모리 <code>other-sessions-message-only.md</code>).</li>
+  </ul>
+  <p class="blk"><b>근거</b></p>
+  <div class="tbl"><table>
+    <thead><tr><th>정할 사항</th><th>선택안</th><th>권장안과 이유</th><th>기각한 대안과 이유</th></tr></thead>
+    <tbody>
+      <tr><td>글쓰기 규칙 사본<br>(결정 요청)</td><td>다시 복사<br>그대로 둠<br>원본 경로를 가리키게 바꿈</td><td>다시 복사. 사본 하나만 고치면 되고 되돌리기 쉬움</td><td>그대로 두면 새 조항 6개와 고친 문구가 위임 작업에서 빠짐. 원본 경로를 가리키게 하면 플러그인이 없는 컴퓨터에서 스킬이 깨짐</td></tr>
+      <tr><td>kw-plugins 알림<br>(결정 요청)</td><td>다음 세션에서 알림<br>알리지 않음</td><td>다음 세션에서 알림. 그쪽 근거 사본이 옛 측정 기록을 계속 인용하지 않게 함</td><td>알리지 않으면 대조 검사가 없어 불일치가 드러나지 않음</td></tr>
+      <tr><td>quant_structure 문서 수정<br>(결정 요청)</td><td>맡은 세션에 메시지<br>이 저장소 세션이 직접 수정<br>하지 않음</td><td>맡은 세션에 메시지. 사용자 결정(다른 세션 저장소는 메시지로만)에 맞음</td><td>직접 수정은 그 세션 작업과 충돌할 수 있음. 하지 않으면 지적한 불일치가 문서에 남음</td></tr>
+      <tr><td>git 커밋 명의<br>(결정한 사항, 10-03)</td><td>gmail 유지<br>회사 메일로 변경</td><td>gmail 유지, 앞으로 묻지 않음</td><td>회사 메일 변경은 사용자가 원하지 않음</td></tr>
+      <tr><td>암묵지를 둘 곳<br>(결정한 사항, 10-03)</td><td>원칙에 모두 넣음<br>별도 docs 문서<br>기준은 <code>CLAUDE.md</code>, 행동은 시험 통과분만 원칙</td><td>기준은 <code>CLAUDE.md</code>, 행동은 시험 통과분만 원칙</td><td>원칙에 모두 넣으면 모든 세션의 적재 비용이 늘고 효과 증거가 없음. 별도 문서는 처분 규칙 없이 쌓여 낡음</td></tr>
+      <tr><td><code>REWRITE-TO-ADD</code><br>(결정한 사항, 10-03)</td><td>삭제<br>유지</td><td>삭제. 빈 모델이 과제 5개를 모두 지킴</td><td>유지하면 효과 없는 조항이 모든 세션에 실림</td></tr>
+    </tbody>
+  </table></div>
+  <p class="blk"><b>중요 포인트</b></p>
+  <ul class="pts">
+    <li>결정한 사항은 세션 중 사용자가 고른 선택이며, 기각한 대안은 그때 세션이 제시한 이유입니다.</li>
+  </ul>
+  <p class="blk warn"><b>유의사항</b></p>
+  <ul class="pts">
+    <li>사본을 다시 복사하면 check.py가 쓰는 금지어 사본과 복사 시점이 달라집니다. 금지어 사본은 이번 결정 대상에 넣지 않았습니다.</li>
+  </ul>
+  <p class="blk"><b>출처</b></p>
+  <ul class="pts src-list">
+    <li>위임 규칙: <code>~/.claude/skills/writing-html-reports/SKILL.md</code> 「서브에이전트 위임」</li>
+    <li>사용자 결정: 세션 기록 10-03 11:42(명의), 13:48(둘 곳), 17:42(삭제)</li>
+    <li>메모리: <code>git-identity-dont-ask.md</code>, <code>other-sessions-message-only.md</code></li>
+  </ul>
+</section>
+
+<section class="page" id="p8" data-part="verification">
+  <p class="pno">8 / 8</p>
+  <p class="sec">검증 범위</p>
+  <h2>현재 main은 검사 전체를 통과하고 원격과 같다</h2>
+  <ul class="pts">
+    <li><span class="state" data-state="run">실행으로 확인함</span> 2026-10-05에 저장소 검사 전체를 다시 실행했고 결과는 <code>ALL PASS</code>였습니다.</li>
+    <li><span class="state" data-state="assume">가정함</span> 클린룸 시험의 채점은 세션 혼자 했고 다른 채점자와 대조하지 않았으므로, 위반 수가 정확하다고 가정합니다.</li>
+  </ul>
+  <p class="blk"><b>근거</b></p>
+  <div class="tbl"><table>
+    <thead><tr><th>확인 사항</th><th>명령</th><th>결과</th></tr></thead>
+    <tbody>
+      <tr><td>저장소 검사 전체</td><td><code>scripts/test_*.sh</code> 동시 실행</td><td><code>ALL PASS</code></td></tr>
+      <tr><td>로컬과 원격 main</td><td><code>git rev-parse --short HEAD origin/main</code></td><td>둘 다 <code>a1f53f9</code></td></tr>
+      <tr><td>조항 문구 변경 전후</td><td><code>git diff 5f976c5^ 77b1e6f -- agent-principles.md</code></td><td>「바뀐 것」과 「새 조항」 표와 일치</td></tr>
+      <tr><td>글쓰기 규칙 사본의 새 조항</td><td><code>grep -c</code></td><td>0건</td></tr>
+      <tr><td>클린룸 시험 재실행</td><td>실행하지 않음</td><td>확인하지 않음</td></tr>
+      <tr><td>kw-plugins와 quant_structure 상태</td><td>실행하지 않음</td><td>확인하지 않음</td></tr>
+    </tbody>
+  </table></div>
+  <p class="blk"><b>중요 포인트</b></p>
+  <ul class="pts">
+    <li>위반 수는 이 보고서가 다시 시험한 값이 아니고, 참고서에 남은 측정 기록을 옮긴 값입니다.</li>
+  </ul>
+  <p class="blk warn"><b>유의사항</b></p>
+  <ul class="pts">
+    <li>현재 main에는 이 세션 뒤의 커밋 a1f53f9(금지 표현 생성물 갱신)가 있으므로, 검사 결과는 그 커밋까지 포함한 상태의 결과입니다.</li>
+  </ul>
+  <p class="blk"><b>출처</b></p>
+  <ul class="pts src-list">
+    <li>검사 명령: 저장소 <code>CLAUDE.md</code> 「변경 뒤 실행」</li>
+    <li>측정 기록: <code>skills/lens-fit/domain-discipline.md</code>, <code>skills/lens-readability/domain-korean.md</code></li>
+  </ul>
+</section>
+</main>
+<script>
+document.documentElement.classList.add('js');
+(function () {
+  var pages = Array.prototype.slice.call(document.querySelectorAll('section.page'));
+  var links = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var cnt = document.querySelector('.pager .cnt');
+  var prev = document.querySelector('.pager .prev');
+  var next = document.querySelector('.pager .next');
+  var cur = 0;
+  function show(i) {
+    cur = Math.max(0, Math.min(pages.length - 1, i));
+    var id = pages[cur].id;
+    pages.forEach(function (p, k) { p.classList.toggle('on', k === cur); });
+    links.forEach(function (a) { a.classList.toggle('on', a.getAttribute('href') === '#' + id); });
+    cnt.textContent = (cur + 1) + ' / ' + pages.length;
+    prev.disabled = cur === 0;
+    next.disabled = cur === pages.length - 1;
+  }
+  function indexOfHash() {
+    var m = /^#(p\d+)$/.exec(location.hash);
+    if (!m) return -1;
+    for (var k = 0; k < pages.length; k++) { if (pages[k].id === m[1]) return k; }
+    return -1;
+  }
+  function go(i) {
+    show(i);
+    history.replaceState(null, '', '#' + pages[cur].id);
+  }
+  prev.addEventListener('click', function () { go(cur - 1); });
+  next.addEventListener('click', function () { go(cur + 1); });
+  document.addEventListener('keydown', function (e) {
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    if (e.key === 'ArrowLeft') go(cur - 1);
+    if (e.key === 'ArrowRight') go(cur + 1);
+  });
+  window.addEventListener('hashchange', function () {
+    var i = indexOfHash();
+    if (i >= 0) show(i);
+  });
+  var start = indexOfHash();
+  show(start >= 0 ? start : 0);
+})();
+</script>
+</body>
+</html>
