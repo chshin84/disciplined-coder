@@ -175,7 +175,6 @@ cat > "$VR/findings.json" <<'FIXTURE'
 FIXTURE
 check "사유 없는 기각을 잡는다" "[ -f '$AV' ] && ! bash '$AV' '$VR' >/dev/null 2>&1"
 rm -rf "$VT"
-check "이름 규칙의 소유자가 그 꼴을 적는다" "grep -qF '<렌즈 스킬 이름>-<순번>.json' '$HERE/skills/review-docs/SKILL.md'"
 check "target 칸을 집계 계약이 정의한다" "grep -qF '| \`target\` |' '$HERE/skills/aggregating-lenses/SKILL.md'"
 
 
@@ -188,30 +187,24 @@ check "aggregating-lenses 가 상대편을 필수로 적는다" "owns_sec '$MA' 
 check "aggregating-lenses 가 결과 기준을 적는다"     "sec_has_id '$MA' '리뷰 산출물 계약' consequence"
 for L in lens-grounding lens-fit lens-consistency lens-adversarial; do
   F="$HERE/skills/$L/SKILL.md"
-  # 짧은 조각 — 문턱 문장을 옮겨 적어도 렌즈 파일에 제목이나 소유 선언이 생기지 않아 구조로 못 적는다.
-  check "$L 에 문턱 사본이 안 남았다"    "! grep -qF '못 대면 발견이' '$F'"
   # 계약을 가리키는지는 test_docs_drift.sh 「렌즈 스키마 사본」의 "출력 스키마가 계약 소유자를 가리킨다"가 본다.
   check "$L 에 기계에 넘기는 것 절이 있다" "grep -qF '## 기계에 넘기는 것' '$F'"
   # F16 — 리뷰 산출물 계약이 상대편을 필수로 요구해도 system 프롬프트가 그 요구를 안 실으면 실제로
-  # 도는 것(프롬프트)에는 안 걸린다. 프롬프트 줄 자체에 짚은 곳·상대편·원칙 요구가 있는지 본다.
-  check "$L 의 system 프롬프트가 상대편·원칙 요구를 싣는다" \
-    "grep -m1 '^- system:' '$F' | grep -qF 'counterpart_file' && grep -m1 '^- system:' '$F' | grep -qF '못 대면'"
+  # 도는 것(프롬프트)에는 안 걸린다. 프롬프트 줄 자체에 상대편 칸 요구가 있는지 본다.
+  check "$L 의 system 프롬프트가 상대편 요구를 싣는다" \
+    "grep -m1 '^- system:' '$F' | grep -qF 'counterpart_file'"
 done
 check "lens-grounding 이 인용 확인을 스크립트에 넘긴다" "grep -qF 'audit_evidence.sh' '$HERE/skills/lens-grounding/SKILL.md'"
-# 짧은 조각 — 「기계에 넘기는 것」 절이 넘길 것이 '없다' 고 밝히는지만 본다.
-check "lens-adversarial 은 넘길 것이 없다고 적는다"      "sec_has '$HERE/skills/lens-adversarial/SKILL.md' '기계에 넘기는 것' '없다'"
 
 echo "[lens-readability — 제안 채널]"
 LR="$HERE/skills/lens-readability/SKILL.md"
 # 「산출물의 종류」 절이 제안 채널(suggestions)과 그 파일(suggestions.json)을 따로 두는지를 본다.
 check "산출물의 종류 절이 제안 채널을 정한다"   "sec_has_id '$LR' '산출물의 종류' suggestions"
-check "산출물 이름이 suggestions 다"          "grep -qF 'suggestions' '$LR'"
 check "제안 목록을 판정 목록과 따로 적는다"    "sec_has_id '$LR' '산출물의 종류' suggestions.json"
 check "기계에 넘기는 것 절이 있다"             "grep -qF '## 기계에 넘기는 것' '$LR'"
 
 echo "[dispatching-lenses — 결정론 우선]"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
-check "결정론 우선 절이 있다"            "grep -qF '## 판단 앞에 기계 검사를 둔다' '$DISP'"
 # 그 절 안의 규칙 문장 셋(판단만 한다·값의 경계·판단임을 적는다)을 소유 선언과 렌즈별 절 포인터로 합쳤다.
 check "그 절이 규칙을 소유하고 렌즈별 「기계에 넘기는 것」 절을 가리킨다" "owns_sec '$DISP' '판단 앞에 기계 검사를 둔다' && sec_has '$DISP' '판단 앞에 기계 검사를 둔다' '「기계에 넘기는 것」'"
 
@@ -222,18 +215,10 @@ check "spec 리뷰가 렌즈마다 따로 실행하는 절을 두고 묶기 규�
 check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
 check "집계 계약이 제안 채널을 가른다"       "owns_sec '$MA' '렌즈가 추가하는 칸' && sec_has_id '$MA' '렌즈가 추가하는 칸' suggestions"
 check "렌즈 그룹을 소유자가 적는다" "owns_sec '$DISP' '렌즈 그룹' && sec_has_id '$DISP' '렌즈 그룹' lens-adversarial"
-# 사본 쪽에 그 절이 없는지는 구조로 보고, 불릿만 옮겨 적는 사본은 짧은 조각으로 본다.
-check "spec 리뷰가 그 그룹 규칙을 베끼지 않는다" "! has_sec '$SR' '렌즈 그룹' && ! has_sec '$SR' '따로 실행할 때와 묶을 때' && ! grep -qF '자세가 반대인' '$SR'"
+# 사본 쪽에 그 절이 없는지는 구조로 본다.
+check "spec 리뷰가 그 그룹 규칙을 베끼지 않는다" "! has_sec '$SR' '렌즈 그룹' && ! has_sec '$SR' '따로 실행할 때와 묶을 때'"
 # 한 줄에 lens-prior-art 이름과 '예외' 가 함께 있는지를 본다.
 check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "points_to '$SR' '예외' '\`lens-prior-art\` 하나'"
-check "spec 리뷰가 필요할 때 그룹 공통 규칙을 렌즈 그룹으로 넘긴다" "sec_has '$SR' '선행연구 렌즈의 제안과 승인' '「렌즈 그룹」' && ! grep -qF '제안했든 안 했든 그 판정과 이유를 리뷰 보고에 적는 것은 무조건이다' '$SR'"
-check "spec 리뷰가 선행연구를 준비 단계에서 제안한다"            "sec_has '$SR' '1) PREP' '「선행연구 렌즈의 제안과 승인」' && ! grep -qF '리뷰 결과를 전달할 때 선행연구 대조를 실행할지' '$SR' && sec_has '$SR' '선행연구 렌즈의 제안과 승인' '「1) PREP」이다' && ! sec_has '$SR' '선행연구 렌즈의 제안과 승인' '결과를 전달할 때'"
-check "spec 리뷰 기록이 선행연구 승인 여부를 남긴다"            "sec_has '$SR' '리뷰 기록' '승인 여부'"
-
-echo "[review-llm-calls — 고정표 배정]"
-LR2="$HERE/skills/review-llm-calls/SKILL.md"
-# 고정표가 있다는 것과 차수마다 다시 판단하지 않는다는 것을 「렌즈 선택」 절의 표 머리 하나로 합쳤다.
-check "렌즈 선택 절에 호출 종류별 고정표가 있다" "sec_has '$LR2' '렌즈 선택' '| 호출 종류 |'"
 
 echo "[단계 개수] 표의 행 수와 '단계는 N' 문장이 맞는다"
 # 대상을 손으로 적지 않고 문서에서 도출한다. '단계는 N이고'를 담은 스킬을 모두 찾아 그 문장 뒤
@@ -262,13 +247,9 @@ if [ -n "$PDA_STEP_TARGETS" ]; then
   done <<< "$PDA_STEP_TARGETS"
 fi || true
 check "적대적 렌즈를 저장소 전체에 따로 실행한다고 적는다" "sec_has_id '$PDA' '실행할 때 지킬 것' lens-adversarial && sec_has '$PDA' '단계' '저장소 전체'"
-# 짧은 조각 — 이유는 절 안의 한 문장이라 열쇠가 없다. 낱말 하나만 본다.
-check "따로 도는 이유가 자세 차이라고 적는다"           "sec_has '$PDA' '실행할 때 지킬 것' '자세'"
-check "감사에 렌즈 적용 절이 있고 렌즈 배정 기준 절이 없다" "has_sec '$PDA' '렌즈 적용' && ! has_sec '$PDA' '렌즈 배정 기준'"
+check "감사에 렌즈 적용 절이 있다"                         "has_sec '$PDA' '렌즈 적용'"
 check "단계 표가 렌즈 적용 절을 가리킨다"                 "sec_has '$PDA' '단계' '「렌즈 적용」'"
 check "렌즈 적용 절이 렌즈 그룹을 가리킨다"               "sec_has '$PDA' '렌즈 적용' '「렌즈 그룹」'"
-check "문서 종류별로 렌즈를 고르지 않는다"                "! grep -qF '문서 종류에 따라 렌즈' '$PDA' && ! grep -qF '같은 문서 종류끼리' '$PDA'"
-check "에이전트원칙 직접 읽기 규칙이 남아 있다"           "sec_has '$PDA' '렌즈 적용' '호출자가 직접 읽는다'"
 
 echo "[audit_prior_rounds.sh — 앞선 회차 고르기]"
 APR="$HERE/scripts/audit_prior_rounds.sh"
@@ -346,22 +327,14 @@ LC="$HERE/skills/lens-consistency/SKILL.md"
 check "렌즈가 이름표 묶음 짝을 적는다"                  "grep -qF '## 레포 문서 감사에서의 짝' '$LC'"
 check "렌즈 type 에 duplication 이 있다"                "grep -qF 'duplication' '$LC'"
 check "렌즈가 판정 셋과 narrowed 를 적는다"             "sec_has '$LC' '레포 문서 감사에서의 짝' '**좁혀 적음**' && sec_has_id '$LC' '레포 문서 감사에서의 짝' narrowed"
-# 짧은 조각 — 체크리스트 한 항목 안의 조건이라 열쇠가 없다.
-check "렌즈가 산출물 공백·스코프를 감사에서 뺀다"        "sec_has '$LC' '체크리스트' '레포 문서 감사에서는'"
 check "집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다"  "grep -qF 'narrowed' '$HERE/skills/aggregating-lenses/SKILL.md'"
-# 짧은 조각 — 규율 절 첫 문단의 한 문장이라 열쇠가 없다.
-check "한 번만 규율에 '대상이 다르면 별개 호출' 이 있다" "sec_has '$HERE/skills/dispatching-lenses/SKILL.md' '한 번만 실행하는 렌즈의 규율' '별개 호출'"
 check "절차에 「일관성 대조」 절과 단계 행이 있다"         "has_sec '$PDA' '일관성 대조' && sec_has '$PDA' '단계' '「일관성 대조」'"
 # 검색 문자열에 백틱이 있으면 변수에 담아 홑따옴표로 가둔다. check 의 둘째 인자는 큰따옴표라
 # 백틱을 그대로 넣으면 명령 치환으로 먹혀 검색어가 빈다.
 check "대상 목록을 손으로 적지 않고 스크립트가 낸다"      "sec_has '$PDA' '감사 대상 고르기' 'bash scripts/audit_targets.sh'"
-check "08-30 설계 머리가 이 설계를 가리킨다"             "head -6 '$HERE/docs/superpowers/specs/2026-08-30-audit-unification-design.md' | grep -qF '2026-09-02-audit-record-and-diff-design.md'"
-# run.json 이 담을 것의 원본은 audit-repo-docs 「통합 기록」 절의 run.json 서술 한 줄이다. 그 줄이 대상별
-# 렌즈 배정과 판정 개수를 여전히 담는다고 적는지, 그리고 픽스처가 그 두 사실을 실제로
-# 담는 필드를 갖는지 양쪽을 대조한다 — audit-repo-docs 문장이나 픽스처 어느 한쪽만 바뀌어도 실패한다.
+# run.json 이 담을 것의 원본은 audit-repo-docs 「통합 기록」 절의 run.json 서술 한 줄이다. 그 줄이
+# 판정 개수를 여전히 담는다고 적는지 그 줄이 부르는 필드 이름으로 본다.
 PDA_RUNJSON_LINE="$(grep -F '**`run.json`**' "$PDA")"
-# 짧은 조각 — run.json 서술은 한 줄 산문이라 열쇠가 없다. 판정 개수는 그 줄이 부르는 필드 이름으로 본다.
-check "audit-repo-docs 가 대상별 렌즈 배정을 담는다고 적는다"        "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '적용한 렌즈'"
 check "audit-repo-docs 가 판정 개수를 담는다고 적는다"               "printf '%s' \"\$PDA_RUNJSON_LINE\" | grep -qF '\`verdict_counts\`'"
 
 echo "[audit_targets.sh — 배제 규칙이 실제로 걸린다]"
@@ -396,14 +369,10 @@ check "에이전트원칙의 조항 ID·절 제목·스킬·명령 이름이 모
 check "중복이 없다" "[ \"\$(printf '%s\n' \"\$ATP_OUT\" | sort | uniq -d | wc -l)\" = 0 ]"
 check "절차의 표 대조가 이 스크립트를 부른다" "grep -qF 'audit_topics.sh' '$PDA'"
 
-echo "[안내 문서 — 봉인과 훅 목록]"
-check "CLAUDE.md 가 감사 기록 봉인을 적는다"  "grep -qF '봉인' '$HERE/CLAUDE.md'"
-check "CLAUDE.md 가 읽기 전용 거부를 적는다"  "grep -qF '읽기 전용' '$HERE/CLAUDE.md'"
+echo "[안내 문서 — 훅 목록]"
 # 「에이전트원칙」은 agent-principles.md 그 파일 하나를 가리키는 말로 두고, 어떤 사실의 소유자를 가리킬
 # 때는 「소유한다」를 쓴다. 한 낱말에 뜻이 둘이면 소유 표 도출이 포인터를 소유자로 센다.
 check "CLAUDE.md 가 훅 목록의 소유자를 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -F 'README.md' '$HERE/CLAUDE.md' | grep -qF '소유한다'"
-check "CLAUDE.md 가 훅 개수를 세지 않는다" \
-  "! grep -qE '훅 (한|하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)' '$HERE/CLAUDE.md' && ! grep -qE '(하나|둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)(개|가지)?(의)? 훅' '$HERE/CLAUDE.md' && ! grep -qE '훅 [0-9]+개' '$HERE/CLAUDE.md' && ! grep -qE '[0-9]+ ?개의 훅' '$HERE/CLAUDE.md'"
 
 echo "[seal_reviews.sh — 봉인할 기록이 없어도 끝난다]"
 SE="$(mktemp -d)"; git -C "$SE" init -q

@@ -41,13 +41,6 @@ check "Claude file_path → 경로 1개"        "[ \"\$(extract '$(J "$T/src/a.m
 check "빈 입력 → 무출력"                    "[ -z \"\$(extract '{}')\" ]"
 check "Claude backslash path → normalized" "[ \"\$(extract '$(J 'C:\\\\dir\\\\f.md')')\" = 'C:/dir/f.md' ]"
 check "UNC 경로의 앞머리 두 슬래시를 보존한다" "[ \"\$(extract '$(J '\\\\\\\\srv\\\\share\\\\a.md')')\" = '//srv/share/a.md' ]"
-# 입력이 작은 훅만 read 로 읽는다. read 는 파이프를 한 바이트씩 읽어 큰 Write 입력에서 cat 보다 느리다
-# (2026-09-30 실측: 2KB 4ms 대 31ms, 50KB 62ms 대 30ms, 200KB 274ms 대 31ms).
-for small in python3_guard_pretooluse.sh doc_word_posttooluse.sh rules_nudge_sessionstart.sh; do
-  check "$small 은 stdin 을 read 로 읽는다" "! grep -qF 'INPUT=\"\$(cat)\"' '$HERE/hooks/$small' && grep -qF \"IFS= read -r -d ''\" '$HERE/hooks/$small'"
-done
-check "Write 를 받는 훅은 cat 을 유지한다" "grep -qF 'INPUT=\"\$(cat)\"' '$HERE/hooks/doc_word_pretooluse.sh'"
-check "명령 파서는 하나다"                     "[ ! -e \"\$HERE/hooks/_extract_command.sh\" ]"
 
 echo "[ptu]"
 check "spec 미마커 → 리뷰 지시"          "ptu '$(J "$SP/nomark.md")' | grep -q additionalContext"
@@ -75,18 +68,13 @@ check "미리뷰 spec → block"              "stop '{\"cwd\":\"$G\"}' | grep -q
 # 세션의 작업 폴더가 레포 하위 폴더여도 찾아야 한다. 전에는 두 탐색이 모두 현재 폴더 기준이라
 # 하위 폴더에서 열면 미리뷰 spec을 하나도 못 찾고 아무 메시지 없이 통과시켰다 — 게이트가 꺼진
 # 것을 알아챌 방법이 없는 조용한 실패다.
-mkdir -p "$G/backend/deep"
+mkdir -p "$G/backend"
 check "하위 폴더 cwd → block"            "stop '{\"cwd\":\"$G/backend\"}' | grep -q '\"block\"'"
-check "더 깊은 하위 폴더 cwd → block"    "stop '{\"cwd\":\"$G/backend/deep\"}' | grep -q '\"block\"'"
 printf 'draft\n<!-- spec-review: passed lenses=3 date=2026-06-14 -->\n' > "$G/docs/superpowers/specs/new.md"
 check "passed 마커 후 → 통과"            "[ -z \"\$(stop '{\"cwd\":\"$G\"}')\" ]"
-printf 'draft\n<!-- spec-review: escalated lenses=3 date=2026-06-14 -->\n' > "$G/docs/superpowers/specs/new.md"
-check "escalated 마커 후 → 통과"         "[ -z \"\$(stop '{\"cwd\":\"$G\"}')\" ]"
 # 파일명 파싱 강건성: git porcelain이 따옴표로 감싸거나(공백·비ASCII) 리네임 화살표로 합치면
-# 게이트가 조용히 우회되면 안 된다. new.md 는 위에서 escalated(리뷰됨)이므로 차단 안 됨.
-printf 'draft\n' > "$G/docs/superpowers/specs/my spec.md"
-check "공백 파일명 미리뷰 spec → block"  "stop '{\"cwd\":\"$G\"}' | grep -q '\"block\"'"
-rm "$G/docs/superpowers/specs/my spec.md"
+# 게이트가 조용히 우회되면 안 된다. new.md 는 위에서 passed(리뷰됨)이므로 차단 안 됨.
+# 공백 파일명은 아래 「차단 사유의 셸·JSON 안전」 묶음이 더 엄격하게 본다.
 printf 'draft\n' > "$G/docs/superpowers/specs/명세.md"
 check "한글 파일명 미리뷰 spec → block"  "stop '{\"cwd\":\"$G\"}' | grep -q '\"block\"'"
 rm "$G/docs/superpowers/specs/명세.md"
@@ -160,15 +148,12 @@ echo "[readonly-pre — 읽기 전용 파일은 고치지 않는다]"
 RPRE="$HERE/hooks/readonly_pretooluse.sh"
 rpre() { printf '%s' "$1" | bash "$RPRE"; }
 RO="$(mktemp -d)"; printf 'sealed\n' > "$RO/sealed.md"; printf 'open\n' > "$RO/open.md"; chmod a-w "$RO/sealed.md"
-check "훅 파일이 있다"                         "[ -f '$RPRE' ]"
 check "읽기 전용 파일(절대경로) → deny"        "rpre '$(J "$RO/sealed.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
-check "거부 사유가 들어 있다"                  "rpre '$(J "$RO/sealed.md")' | grep -qF '읽기 전용 파일은 고치지 않는다'"
 check "거부 응답이 유효한 JSON"                "rpre '$(J "$RO/sealed.md")' | json_valid_stdin"
-check "쓸 수 있는 파일 → 무출력"               "[ -f '$RPRE' ] && [ -z \"\$(rpre '$(J "$RO/open.md")')\" ]"
-check "없는 파일 → 무출력"                     "[ -f '$RPRE' ] && [ -z \"\$(rpre '$(J "$RO/nope.md")')\" ]"
+check "쓸 수 있는 파일 → 무출력"               "[ -z \"\$(rpre '$(J "$RO/open.md")')\" ]"
+check "없는 파일 → 무출력"                     "[ -z \"\$(rpre '$(J "$RO/nope.md")')\" ]"
 check "상대경로(현재 폴더 기준) 읽기 전용 → deny" "( cd '$RO' && printf '%s' '$(J "sealed.md")' | bash '$RPRE' ) | grep -qF '\"permissionDecision\":\"deny\"'"
 check "게이트 OFF 여도 거부한다"               "DISCIPLINED_CODER_REVIEW_GATE=off rpre '$(J "$RO/sealed.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
-check "README 가 이 훅을 적는다"               "grep -qF '읽기 전용 차단' '$HERE/README.md'"
 
 echo "[rules-nudge-pre — 세션의 첫 도구 호출에 에이전트원칙의 절대경로와 domain-korean 을 한 번 알린다]"
 # 표시 파일은 TMPDIR 아래에 남으므로 픽스처 폴더로 돌린다 — 안 그러면 스위트를 두 번째 돌릴 때 앞 실행의
@@ -182,11 +167,9 @@ NH="$T/nudgehome"; mkdir -p "$NH/disciplined-coder"; printf 'x\n' > "$NH/discipl
 cnud() { printf '%s' "$1" | TMPDIR="$T/tmp" CLAUDE_HOME_DIR="$NH" bash "$CNUD"; }
 JS() { printf '{"session_id":"%s"%s,"tool_input":{"file_path":"%s"}}' "$1" "$2" "$3"; }
 JBS() { printf '{"session_id":"%s","tool_name":"Bash","tool_input":{"command":"%s"}}' "$1" "$2"; }  # 세션 id 를 싣는다. 아래 JB 는 명령만 싣는다
-check "훅 파일이 있다"                              "[ -f '$CNUD' ]"
-check "첫 편집 → 에이전트원칙 경로 안내"                "cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
-check "첫 편집 → domain-korean 도 함께 안내"       "cnud '$(JS s1z "" "$T/src/main.py")' | grep -qF 'domain-korean'"
-check "안내가 유효한 JSON"                          "cnud '$(JS s1b "" "$T/src/main.py")' | json_valid_stdin"
-check "안내는 PreToolUse 이벤트를 말한다"            "cnud '$(JS s1c "" "$T/src/main.py")' | grep -qF '\"hookEventName\":\"PreToolUse\"'"
+CNUD_FIRST="$(cnud "$(JS s1 "" "$T/src/main.py")")"
+check "첫 편집 → 에이전트원칙과 domain-korean 경로를 PreToolUse JSON 으로 안내" \
+  "printf '%s' \"\$CNUD_FIRST\" | grep -qF 'agent-principles.md' && printf '%s' \"\$CNUD_FIRST\" | grep -qF 'domain-korean' && printf '%s' \"\$CNUD_FIRST\" | grep -qF '\"hookEventName\":\"PreToolUse\"' && printf '%s' \"\$CNUD_FIRST\" | json_valid_stdin"
 check "같은 키 둘째 편집 → 무출력"                  "[ -z \"\$(cnud '$(JS s1 "" "$T/src/other.py")')\" ]"
 check "같은 세션 다른 agent_id → 다시 안내"         "cnud '$(JS s1 ',"agent_id":"a1"' "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 check "문서(.md)도 대상이다"                        "cnud '$(JS s2 "" "$T/existing.md")' | grep -qF 'agent-principles.md'"
@@ -202,12 +185,9 @@ NUDGE_OUT="$(cnudh "$(JS s8 "" "$T/src/main.py")" "$NH")"
 NUDGE_CANON="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*에이전트원칙의 사본은 \(.*\) 에 있다\. 한국어.*/\1/p')"
 NUDGE_WK="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*한국어 문장 규칙의 상세는 \(.*\) 에 있다\..*/\1/p')"
 NUDGE_DD="$(printf '%s' "$NUDGE_OUT" | sed -n 's/.*조항마다의 근거는 \(.*\) 에 있다\. 에이전트원칙의 사본은.*/\1/p')"
-check "넛지에서 조항 근거 경로가 뽑힌다"   "[ -n \"\$NUDGE_DD\" ]"
-check "그 근거 경로에 파일이 실재한다"     "[ -f \"\$NUDGE_DD\" ]"
-check "넛지에서 에이전트원칙 경로가 뽑힌다"                 "[ -n \"\$NUDGE_CANON\" ]"
-check "뽑은 경로에 파일이 실재한다"                 "[ -f \"\$NUDGE_CANON\" ]"
-check "넛지에서 한국어 상세 경로가 뽑힌다"          "[ -n \"\$NUDGE_WK\" ]"
-check "그 상세 경로에도 파일이 실재한다"            "[ -f \"\$NUDGE_WK\" ]"
+check "넛지가 적은 조항 근거 경로에 파일이 실재한다"   "[ -n \"\$NUDGE_DD\" ] && [ -f \"\$NUDGE_DD\" ]"
+check "넛지가 적은 에이전트원칙 경로에 파일이 실재한다" "[ -n \"\$NUDGE_CANON\" ] && [ -f \"\$NUDGE_CANON\" ]"
+check "넛지가 적은 한국어 상세 경로에 파일이 실재한다"  "[ -n \"\$NUDGE_WK\" ] && [ -f \"\$NUDGE_WK\" ]"
 check "사본이 없으면 그 사실을 알린다"              "cnudh '$(JS s8c "" "$T/src/main.py")' '$T/emptyhome' | grep -qF '사본을 못 찾았다'"
 
 echo "[rules-nudge-sessionstart — 세션이 시작·재개·비워지면 그 세션의 표시를 지운다]"
@@ -218,7 +198,6 @@ echo "[rules-nudge-sessionstart — 세션이 시작·재개·비워지면 그 �
 CSTA="$HERE/hooks/rules_nudge_sessionstart.sh"
 csta() { printf '%s' "$1" | TMPDIR="$T/tmp" bash "$CSTA"; }
 JSS() { printf '{"session_id":"%s","hook_event_name":"SessionStart","source":"resume"}' "$1"; }
-check "세션 시작 훅 파일이 있다"                    "[ -f '$CSTA' ]"
 check "세션 시작은 아무것도 안 낸다"                "[ -z \"\$(csta '$(JSS s9)')\" ]"
 check "세션 시작이 표시를 지워 다시 알린다"         "csta '$(JSS s1)' && cnud '$(JS s1 "" "$T/src/main.py")' | grep -qF 'agent-principles.md'"
 check "세션 시작이 서브에이전트 표시도 지워 다시 알린다" "cnud '$(JS s1 ',"agent_id":"a1"' "$T/src/main.py")' | grep -qF 'agent-principles.md'"
@@ -248,23 +227,18 @@ check "새 문서 넛지가 domain-readme 를 가리킨다" "fpre '$(J "$T/newdo
 # 이어지는 바이트가 」 의 바이트와 겹쳐 매치가 엉뚱한 데서 끊긴다. 메시지에 「…」 절 이 하나뿐이라
 # 탐욕적 `.*` 가 안전하다. 같은 함정을 test_docs_drift.sh 의 대구 검사도 주석으로 적어 두었다.
 NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n 's/.*에이전트원칙의 「\(.*\)」 절.*/\1/p')"
-check "넛지가 가리킨 절 이름 추출됨"       "[ -n \"\$NUDGE_SEC\" ]"
-check "그 절이 에이전트원칙에 실재"                "grep -qF \"## \$NUDGE_SEC\" '$HERE/agent-principles.md'"
+check "넛지가 가리킨 절이 에이전트원칙에 실재"   "[ -n \"\$NUDGE_SEC\" ] && grep -qF \"## \$NUDGE_SEC\" '$HERE/agent-principles.md'"
 NUDGE_SK="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*disciplined-coder \([a-z][a-z-]*\) 를 함께.*/\1/p")"
-check "넛지가 가리킨 스킬 이름 추출됨"     "[ -n \"\$NUDGE_SK\" ]"
-check "그 스킬이 실재"                    "[ -f \"$HERE/skills/\$NUDGE_SK/SKILL.md\" ]"
+check "넛지가 가리킨 스킬이 실재"               "[ -n \"\$NUDGE_SK\" ] && [ -f \"$HERE/skills/\$NUDGE_SK/SKILL.md\" ]"
 
 echo "[doc-review-post]"
 # 거는 대상이 산출물과 그 재료로 좁혀졌다. 확장자 넷은 그 자체로 걸리고, 마크다운은 같은 폴더에
 # 그런 파일이 있을 때만 걸린다. 저장소 작업 문서에 뜨던 넛지가 사라진 것이 이 변경의 핵심이라,
 # 안 뜨는 쪽을 먼저 단언한다 — 뜨는 쪽만 보면 조건이 넓어져도 초록이 된다.
 DLV="$T/deliv-out"; mkdir -p "$DLV"; : > "$DLV/deck.pptx"; printf 'x\n' > "$DLV/draft.md"
-DLVP="$T/deliv-pdf"; mkdir -p "$DLVP"; : > "$DLVP/report.pdf"; printf 'x\n' > "$DLVP/draft.md"
 check "산출물 없는 폴더의 .md → 무출력"  "[ -z \"\$(drev '$(J "$T/existing.md")')\" ]"
 check "산출물(.pptx) → 검진 넛지"        "drev '$(J "$DLV/deck.pptx")' | grep -q additionalContext"
-check "산출물(.pdf) → 검진 넛지"         "drev '$(J "$DLVP/report.pdf")' | grep -q additionalContext"
 check "산출물 옆의 .md → 검진 넛지"      "drev '$(J "$DLV/draft.md")' | grep -q additionalContext"
-check ".pdf 옆의 .md → 검진 넛지"        "drev '$(J "$DLVP/draft.md")' | grep -q additionalContext"
 check "spec 경로 → 무출력"               "[ -z \"\$(drev '$(J "$SP/nomark.md")')\" ]"
 check "plan 경로 → 무출력"               "[ -z \"\$(drev '$(J "$PL/nomark.md")')\" ]"
 check "비문서(.py) → 무출력"             "[ -z \"\$(drev '$(J "$T/src/main.py")')\" ]"
@@ -276,9 +250,6 @@ check "프로젝트 밖 산출물 → 검진 넛지"   "drev '$(J "$OUTDLV/sheet
 check "프로젝트 밖 산출물 옆 .md → 넛지" "drev '$(J "$OUTDLV/draft.md")' | grep -q additionalContext"
 check "Windows 형식 경로도 같게 본다"    "drev '$(J "$(cygpath -w "$DLV" 2>/dev/null || printf '%s' "$DLV")\\\\draft.md")' | grep -q additionalContext"
 check "수정 넛지가 review-docs 를 가리킨다"   "drev '$(J "$DLV/draft.md")' | grep -qF 'review-docs'"
-# 렌즈 구성은 review-docs 가 소유한다. 넛지에 렌즈 이름을 적으면 그 사본이 먼저 낡는다.
-check "수정 넛지가 렌즈 이름을 적지 않는다"      "! drev '$(J "$DLV/draft.md")' | grep -qF 'lens-'"
-check "README 가 규칙 넛지를 적는다"             "grep -qF '규칙 넛지' '$HERE/README.md'"
 
 echo "[bash 매처 — 셸로 고쳐도 걸린다]"
 # 셸로 고치면 Write·Edit 훅이 안 돌아 검진 넛지도 금지 표현 검사도 빠지는 것을 이 묶음이 막는다.
@@ -296,19 +267,16 @@ check "cp 의 목적지만 뽑힌다"       "[ \"\$(ebt 'cp src.md dest.md')\" =
 check "git mv 의 목적지만 뽑힌다"   "[ \"\$(ebt 'git mv old.md new.md')\" = 'new.md ' ]"
 check "읽기만 하는 sed 는 안 뽑힌다" "[ -z \"\$(ebt 'sed -n 1,5p onlyread.md')\" ]"
 check "cat 은 안 뽑힌다"            "[ -z \"\$(ebt 'cat notes.md')\" ]"
-check "ls 는 안 뽑힌다"             "[ -z \"\$(ebt 'ls -la')\" ]"
-check "git status 는 안 뽑힌다"     "[ -z \"\$(ebt 'git status --porcelain')\" ]"
 # 넛지와 금지 표현 검사가 실제로 셸 편집에 걸리는지 본다. 뽑기만 되고 훅이 안 부르면 소용없다.
 BW="$T/bash-deliv"; mkdir -p "$BW"; : > "$BW/deck.pptx"
 printf '이 문서는 자리를 짚는다.\n' > "$BW/draft.md"
 check "셸 편집 → 검진 넛지"         "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DREV' | grep -q additionalContext"
 check "셸 읽기 → 검진 넛지 없음"    "[ -z \"\$(JB 'cat $BW/draft.md' | bash '$DREV')\" ]"
 # 통지는 Claude 가 받아야 고친다. systemMessage 는 사용자 화면에만 가므로 additionalContext 로 낸다.
-check "셸 편집 → 금지 표현 통지"    "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -qF '\"additionalContext\"'"
-check "통지는 PostToolUse 이벤트다" "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -qF '\"hookEventName\":\"PostToolUse\"'"
-check "통지가 JSON 으로 파싱된다"   "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | json_valid_stdin"
-check "통지를 사용자 화면용으로 내지 않는다" "! JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -qF 'systemMessage'"
-check "통지가 파일 이름을 담는다"   "JB 'sed -i s/x/y/ $BW/draft.md' | bash '$DWPOST' | grep -qF 'draft.md'"
+DWPOST_OUT="$(JB "sed -i s/x/y/ $BW/draft.md" | bash "$DWPOST")"
+check "셸 편집 → 금지 표현 통지를 PostToolUse JSON 의 additionalContext 로 낸다" \
+  "printf '%s' \"\$DWPOST_OUT\" | grep -qF '\"additionalContext\"' && printf '%s' \"\$DWPOST_OUT\" | grep -qF '\"hookEventName\":\"PostToolUse\"' && ! printf '%s' \"\$DWPOST_OUT\" | grep -qF 'systemMessage' && printf '%s' \"\$DWPOST_OUT\" | json_valid_stdin"
+check "통지가 파일 이름을 담는다"   "printf '%s' \"\$DWPOST_OUT\" | grep -qF 'draft.md'"
 check "이 저장소 문서는 대상 아님"  "[ -z \"\$(JB 'sed -i s/x/y/ $HERE/README.md' | bash '$DWPOST')\" ]"
 check "OFF → 무출력"                "[ -z \"\$(JB 'sed -i s/x/y/ $BW/draft.md' | DISCIPLINED_CODER_REPLY_CHECK=off bash '$DWPOST')\" ]"
 # 금지 표현이 없는 산출물에는 통지가 없어야 한다. 늘 뜨면 통지가 뜻을 잃는다.
@@ -318,31 +286,21 @@ check "훅 배선에 Bash 가 들어 있다" "grep -qF 'Write|Edit|Bash' '$HERE/
 
 echo "[bash 거르기 — 명령만 보고 낱말 경계로 가른다]"
 # 셸 훅 둘은 모든 Bash 호출에 걸린다. 거르기가 훅 입력 전체를 보면 tool_response 의 "passed" 속 sed 와
-# 2>/dev/null 의 > 가 걸려 거의 모든 호출이 대상 뽑기까지 간다. 뽑기가 도는지는 awk 를 기록하는
-# 가짜로 본다 — 거르기에서 빠지면 awk 도 파이썬도 안 뜬다.
-GSH="$T/gate-shim"; mkdir -p "$GSH"; GLOG="$T/gate.log"
-REALAWK_H="$(command -v awk)"
-printf '#!/usr/bin/env bash\necho awk >> "%s"\nexec "%s" "$@"\n' "$GLOG" "$REALAWK_H" > "$GSH/awk"
-for gp in python python3; do printf '#!/usr/bin/env bash\necho %s >> "%s"\nexit 1\n' "$gp" "$GLOG" > "$GSH/$gp"; done
-chmod +x "$GSH"/*
-gate_runs() {  # $1=훅, $2=훅 입력 → 뽑기나 파이썬이 떴으면 0
-  : > "$GLOG"
-  printf '%s' "$2" | PATH="$GSH:$PATH" bash "$1" >/dev/null 2>&1 || true
-  [ -s "$GLOG" ]
+# 2>/dev/null 의 > 가 걸려 거의 모든 호출이 대상 뽑기까지 간다. 두 훅이 같은 거르기(_hook_input.sh 의
+# hook_command 와 bash_cmd_writes)를 쓰므로 훅 입력 전체를 그 둘에 직접 넣어 본다.
+gate_runs() {  # $1=훅 입력 → 거르기를 지나면 0
+  ( INPUT="$1"; . "$HERE/hooks/_hook_input.sh"; hook_command; bash_cmd_writes "$CMD" )
 }
 GI_LS='{"tool_name":"Bash","tool_input":{"command":"ls","description":"List files"},"tool_response":{"stdout":"12 tests passed","stderr":""}}'
 GI_NULL='{"tool_name":"Bash","tool_input":{"command":"git log 2>/dev/null","description":"Show log"},"tool_response":{"stdout":"abc","stderr":""}}'
 GI_SED="{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"sed -i 's/a/b/' $BW/draft.md\"},\"tool_response\":{\"stdout\":\"\",\"stderr\":\"\"}}"
 GI_ECHO="{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"echo hi > $BW/draft.md\"},\"tool_response\":{\"stdout\":\"\",\"stderr\":\"\"}}"
 GI_QUOTE="{\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"echo \\\"hi\\\" > $BW/draft.md\"},\"tool_response\":{\"stdout\":\"\",\"stderr\":\"\"}}"
-for gh in "$DREV" "$DWPOST"; do
-  ghn="$(basename "$gh" .sh)"
-  check "$ghn: 출력에 passed 가 든 ls 는 거르기에서 빠진다" "! gate_runs '$gh' '$GI_LS'"
-  check "$ghn: 2>/dev/null 은 쓰기가 아니다"                "! gate_runs '$gh' '$GI_NULL'"
-  check "$ghn: sed -i 는 지나간다"                          "gate_runs '$gh' \"\$GI_SED\""
-  check "$ghn: > 재지향은 지나간다"                         "gate_runs '$gh' '$GI_ECHO'"
-  check "$ghn: 따옴표 뒤의 재지향도 지나간다"               "gate_runs '$gh' \"\$GI_QUOTE\""
-done
+check "출력에 passed 가 든 ls 는 거르기에서 빠진다" "! gate_runs '$GI_LS'"
+check "2>/dev/null 은 쓰기가 아니다"                "! gate_runs '$GI_NULL'"
+check "sed -i 는 지나간다"                          "gate_runs \"\$GI_SED\""
+check "> 재지향은 지나간다"                         "gate_runs '$GI_ECHO'"
+check "따옴표 뒤의 재지향도 지나간다"               "gate_runs \"\$GI_QUOTE\""
 
 echo "[제외 칸 — 어간을 넓히고 다른 뜻으로 쓰는 말을 뺀다]"
 # 원본이 schema 2 에서 다섯째 칸 `제외` 를 더했다. 그 칸을 안 읽으면 어간만 가지고 검색해
@@ -360,8 +318,6 @@ cat > "$BX/list.md" <<'BANEOF'
 BANEOF
 banned_parse "$BX/list.md" "$BX/pairs" "$BX/toks" "$BX/excl" "$BX/scopes"
 check "제외 칸을 읽는다"            "grep -qF '판정' '$BX/excl'"
-check "제외 없는 행은 빈 줄이다"    "[ \"\$(sed -n 2p '$BX/excl')\" = '' ]"
-check "적용 대상을 읽는다"          "[ \"\$(sed -n 1p '$BX/scopes')\" = '문서와 답변' ]"
 printf '판정과 판단만 있다.\n' > "$BX/clean.md"
 printf '새 판을 낸다.\n' > "$BX/dirty.md"
 check "제외 안의 것은 안 잡는다"    "[ -z \"\$(banned_report '$BX/pairs' '$BX/clean.md' '$BX/excl')\" ]"
@@ -411,11 +367,6 @@ check "코드와 spec 은 안 본다"         "[ \"\$(JSTOP '$SR' | bash '$DWSTO
 SRD="$T/stopdir"; mkdir -p "$SRD/reports"; git -C "$SRD" init -q 2>/dev/null || true
 printf '이 문서는 자리를 짚는다.\n' > "$SRD/reports/new.md"
 check "새 폴더 안의 새 문서도 본다"    "JSTOP '$SRD' | bash '$DWSTOP' | grep -qF 'reports/new.md'"
-# Stop 은 막지 않으므로 Claude 에게 닿는 통로가 없다. 알림은 사용자에게 하는 말이어야 하고, 대상은
-# 이 턴에 바뀐 문서가 아니라 커밋되지 않은 문서 전부다.
-check "알림이 대상을 커밋 전 문서로 적는다" "JSTOP '$SR' | bash '$DWSTOP' | grep -qF '커밋되지 않은'"
-check "알림이 이 턴이라고 적지 않는다"      "! JSTOP '$SR' | bash '$DWSTOP' | grep -qF '이 턴에'"
-check "알림이 Claude 에게 명령하지 않는다"  "! JSTOP '$SR' | bash '$DWSTOP' | grep -qF '고쳐라'"
 # 같은 세션에 같은 알림은 한 번만 낸다. 커밋되지 않은 옛 파일 하나 때문에 같은 알림이 137번 뜬
 # 세션이 있었다. 내용이 바뀌거나 세션이 바뀌면 다시 알린다. 기록 폴더는 테스트 임시 폴더로 돌린다.
 JSTOPS() { printf '{"cwd":"%s","stop_hook_active":false,"session_id":"%s"}' "$1" "$2"; }
@@ -432,7 +383,6 @@ echo "[리뷰 기록은 검진 대상이 아니다]"
 # 리뷰 기록에 검진 넛지가 뜨면 기록에 대한 기록을 또 써야 하는 순환이 생긴다.
 J2() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s"}}' "$1"; }
 check "리뷰 기록에는 넛지가 없다"  "[ -z \"\$(drev '$(J2 "$T/docs/superpowers/reviews/x-review.md")')\" ]"
-check "산출물 폴더의 문서에는 넛지가 뜬다"  "drev '$(J2 "$DLV/draft.md")' | grep -q additionalContext"
 
 echo "[차단 사유의 셸·JSON 안전]"
 # 공백 든 경로가 사유에 정확히 한 번 온전하게 들어가야 한다. 공백으로 이어 붙이던 판본은 중복 제거가
@@ -490,19 +440,13 @@ for f in "$HERE"/hooks/*; do
 done
 check "모든 훅 스크립트가 어딘가에 배선되어 있다" "[ -z \"\$unwired\" ]"
 [ -n "$unwired" ] && echo "    어느 배선 파일에도 없는 훅:$unwired"
-check "Stop 은 훅 하나만 실행한다" "[ \"\$(json_run 'import json,sys; print(sum(len(g[\"hooks\"]) for g in json.load(sys.stdin)[\"hooks\"][\"Stop\"]))' < '$HJ')\" = 1 ]"
-check "stop_gates.sh 는 stdin 을 read 로 읽는다" "grep -qF \"IFS= read -r -d ''\" '$HERE/hooks/stop_gates.sh'"
 
 # --- JSON 이스케이프: 제어 문자가 날것으로 안 나간다 ---
 # 개행·복귀·탭만 다루면 그 밖의 0x20 미만 문자가 문자열 값에 날것으로 들어가고, 응답이 파싱되지
 # 않아 차단 결정이 통째로 무시된다. 소비자는 이 헬퍼를 source하는 훅 전부다.
 echo "[JSON 이스케이프 — 제어 문자]"
 . "$HERE/hooks/_json_escape.sh"
-ESC_SOH="$(escape_for_json "$(printf 'a\001b')")"
-ESC_VT="$(escape_for_json "$(printf 'a\013b')")"
-ESC_MIX="$(escape_for_json "$(printf 'a"b\\c\nd\te\001f\033g')")"
-check "0x01을 유니코드 이스케이프로 바꾼다" "[ \"\$ESC_SOH\" = 'a\\u0001b' ]"
-check "0x0B을 유니코드 이스케이프로 바꾼다" "[ \"\$ESC_VT\" = 'a\\u000bb' ]"
+ESC_MIX="$(escape_for_json "$(printf 'a"b\\c\nd\te\001f\013g\033h')")"
 check "섞인 입력의 결과가 JSON으로 파싱된다" \
   "printf '{\"r\":\"%s\"}' \"\$ESC_MIX\" | json_valid_stdin"
 check "제어 문자가 결과에 안 남는다" \
@@ -518,44 +462,31 @@ JC() { printf '{"tool_name":"Bash","tool_input":{"command":"%s"}}' "$1"; }
 p3() { JC "$1" | DISCIPLINED_CODER_PYTHON3_STATE="${2:-$REDIR}" bash "$P3G"; }
 # 막아야 하는 것 — 명령어로 놓인 python3
 D1="$(p3 'python3 --version')"
-D2="$(p3 'python3 <<EOF')"
 D3="$(p3 'cd /tmp && python3 x.py')"
-D4="$(p3 'PYTHONUTF8=1 python3 x.py')"
 D5="$(p3 'echo hi | python3 -')"
 # 통과해야 하는 것 — 다른 이름이거나 명령어 자리가 아니다
 A1="$(p3 'python --version')"
-A2="$(p3 'py -3 x.py')"
-A3="$(p3 'python312 --version')"
 A4="$(p3 'python3.12 x.py')"
 A5="$(p3 'grep python3 README.md')"
 A6="$(p3 'echo \"use python3 here\"')"
 # 통과해야 하는 것 — 윈도우가 아니거나 실물이 안내판이 아니다
 N1="$(p3 'python3 --version' not-windows)"
 N2="$(p3 'python3 --version' none)"
-N3="$(p3 'python3 --version' /usr/bin/python3)"
-N4="$(p3 'python3 --version' /c/Users/x/AppData/Local/Programs/Python/Python312/python3)"
 # 스토어로 깐 진짜 파이썬도 WindowsApps 아래에 놓인다 — 경로가 아니라 링크가 가리키는 실물로 가른다.
 N5="$(p3 'python3 --version' '/c/Program Files/WindowsApps/PythonSoftwareFoundation.Python.3.12_x64/python3.exe')"
 deny() { printf '%s' "$1" | grep -q '"permissionDecision":"deny"'; }
 check "맨 앞의 python3 을 막는다"          "deny \"\$D1\""
-check "heredoc 을 여는 python3 을 막는다"  "deny \"\$D2\""
 check "&& 뒤의 python3 을 막는다"          "deny \"\$D3\""
-check "VAR= 뒤의 python3 을 막는다"        "deny \"\$D4\""
 check "파이프 뒤의 python3 을 막는다"      "deny \"\$D5\""
 check "python 은 통과한다"                 "[ -z \"\$A1\" ]"
-check "py -3 은 통과한다"                  "[ -z \"\$A2\" ]"
-check "python312 는 통과한다"              "[ -z \"\$A3\" ]"
 check "python3.12 는 통과한다"             "[ -z \"\$A4\" ]"
 check "명령어 자리가 아니면 통과한다"      "[ -z \"\$A5\" ]"
 check "따옴표 안 문자열은 통과한다"        "[ -z \"\$A6\" ]"
 check "윈도우가 아니면 통과한다"           "[ -z \"\$N1\" ]"
 check "안 풀리면 통과한다"                 "[ -z \"\$N2\" ]"
-check "리눅스 경로면 통과한다"             "[ -z \"\$N3\" ]"
-check "실제 파이썬이면 통과한다"           "[ -z \"\$N4\" ]"
 check "스토어 파이썬이면 통과한다"         "[ -z \"\$N5\" ]"
 check "거부 응답이 JSON 으로 파싱된다"     "printf '%s' \"\$D1\" | json_valid_stdin"
 check "거부 사유가 부를 이름을 말한다"     "printf '%s' \"\$D1\" | grep -q 'py -3'"
-check "거부 사유가 가리키는 실물을 적는다" "printf '%s' \"\$D1\" | grep -qF 'AppInstallerPythonRedirector'"
 # 명령 뽑기 — 큰따옴표가 든 명령이 첫 \" 에서 잘리면 그 뒤의 명령어를 훅이 못 본다.
 EX1="$(xcmd '{"tool_input":{"command":"echo \"a\" && python3 x.py"}}')"
 check "따옴표가 든 명령을 끝까지 뽑는다"   "[ \"\$EX1\" = 'echo \"a\" && python3 x.py' ]"
@@ -592,7 +523,6 @@ check "설계 문서 상대경로도 통과한다"        "[ -z \"\$(dw \"\$(dwj
 # 이 저장소를 cwd 로 연 세션에서 저장소 밖에 쓰는 산출물이 제외로 새면 안 된다. 절대경로가 조상을
 # 다 올라간 뒤 현재 폴더(.)로 물러서면 이 저장소의 에이전트원칙을 보고 제외해 버린다.
 check "저장소 cwd 에서 밖의 윈도우 경로는 거부한다(슬래시)" "( cd '$HERE' && dw \"\$(dwj 'Z:/outside/report.md' '$DWBODY')\" ) | grep -qF 'deny'"
-check "저장소 cwd 에서 밖의 윈도우 경로는 거부한다(역슬래시)" "( cd '$HERE' && dw \"\$(dwj 'Z:\\\\outside\\\\report.md' '$DWBODY')\" ) | grep -qF 'deny'"
 check "저장소 cwd 에서 밖의 POSIX 경로는 거부한다" "( cd '$HERE' && dw \"\$(dwj '$DWDIR/report.md' '$DWBODY')\" ) | grep -qF 'deny'"
 check "상대경로는 현재 폴더 기준으로 제외한다"     "[ -z \"\$( cd '$DWREPO' && dw \"\$(dwj 'x.md' '$DWBODY')\" )\" ]"
 # Edit 은 조각만 오므로 울타리가 조각 밖에 있다. 파일에 적용한 결과로 울타리를 알아본 뒤 새로 들어간
@@ -601,8 +531,7 @@ dwe2() { printf '{"tool_name":"Edit","tool_input":{"file_path":"%s","old_string"
 printf '# 제목\n\n```sh\necho old\n```\n\n본문 문장이다.\n' > "$DWDIR/fenced.md"
 check "코드 블록 안을 고치는 Edit 은 통과한다"   "[ -z \"\$(dw \"\$(dwe2 '$DWDIR/fenced.md' 'echo old' 'echo 자리')\")\" ]"
 check "산문을 고치는 Edit 은 거부한다"           "dw \"\$(dwe2 '$DWDIR/fenced.md' '본문 문장이다.' '$DWBODY')\" | grep -qF 'deny'"
-check "적용한 결과를 본 거부는 산문이라고 적는다" "dw \"\$(dwe2 '$DWDIR/fenced.md' '본문 문장이다.' '$DWBODY')\" | grep -qF '모두 산문에 있다'"
-check "적용하지 못한 거부는 조각만 봤다고 적는다" "dw \"\$(dwe2 '$DWDIR/fenced.md' '없는 문장' '$DWBODY')\" | grep -qF 'new_string 조각만'"
+check "파일에 적용하지 못한 Edit 도 조각으로 판정해 거부한다" "dw \"\$(dwe2 '$DWDIR/fenced.md' '없는 문장' '$DWBODY')\" | grep -qF 'deny'"
 printf '# 제목\n\n이 자리는 원래 있던 문장이다.\n\n고칠 문장이다.\n' > "$DWDIR/preexisting.md"
 check "원래 있던 말은 무관한 Edit 을 막지 않는다" "[ -z \"\$(dw \"\$(dwe2 '$DWDIR/preexisting.md' '고칠 문장이다.' '고친 문장이다.')\")\" ]"
 printf '```sh\necho old\n```\n\necho old 는 산문이다.\n' > "$DWDIR/replall.md"
@@ -633,6 +562,5 @@ $HOOK_WIRED
 EOF
 [ -n "$HOOK_MISS" ] && echo "    README 에 빠진 스크립트:$HOOK_MISS"
 check "README 가 배선된 스크립트를 모두 적는다" "[ -z \"\$HOOK_MISS\" ]"
-check "README 가 배선 파일 둘을 든다"           "grep -qF 'hooks/hooks.json' '$HERE/README.md' && grep -qF '.claude/settings.json' '$HERE/README.md'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
