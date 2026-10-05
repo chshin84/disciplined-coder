@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse(Bash): 윈도우에서 python3 이 마이크로소프트 스토어 안내판으로 풀릴 때만 그 명령을 거부한다.
+# PreToolUse(Bash|PowerShell): 윈도우에서 python3 이 마이크로소프트 스토어 안내판으로 풀릴 때만 그 명령을 거부한다.
 # 안내판(AppInstallerPythonRedirector)은 `Python` 이라는 낱말만 찍고 종료 코드 49 로 끝난다. 출력이
 # 있어 돌아간 것처럼 보이므로 heredoc 스크립트가 통째로 안 돌아도 눈에 안 띈다. 세션 시작 점검으로는
 # 이것을 못 잡는다 — 환경이 갖춰졌는지가 아니라 부르는 순간의 문제라 그 명령을 세울 곳이 여기다.
@@ -47,9 +47,27 @@ hook_command
 # 명령어로 놓인 python3 만 잡는다. 따옴표 안을 공백으로 지우고 셸 구분자로 갈라, 각 조각의 첫 낱말이
 # python3 인지 본다. 앞의 VAR=값 은 걷어낸다. 뒤에 글자나 숫자나 점이 붙으면(python312·python3.12)
 # 다른 이름이라 안 잡는다.
+# heredoc 본문은 데이터라 빈 줄로 바꾼다. 커밋 메시지 본문의 한 줄이 python3 으로 시작해 거부된 일이
+# 있었다. `bash <<EOF` 처럼 본문을 셸이 실행하는 드문 형태는 놓친다. PowerShell 의 here-string 은
+# 따옴표로 열고 닫으므로 아래 따옴표 처리가 이미 지운다.
 HIT="$(printf '%s' "$CMD" | awk '
 BEGIN { SQ = sprintf("%c", 39); DQ = sprintf("%c", 34); BS = sprintf("%c", 92) }
-{ buf = buf $0 "\n" }
+{
+  line = $0
+  if (hd != "") {
+    t = line; if (strip) sub(/^\t+/, "", t)
+    if (t == hd) hd = ""
+    buf = buf "\n"; next
+  }
+  buf = buf line "\n"
+  # <<< 는 here-string 이라 본문이 없다. 여는 << 앞 글자가 < 이면 건너뛴다.
+  if (match(line, /<<-?[ \t]*[^ \t<>;|&()]+/) && substr(line, RSTART - 1, 1) != "<") {
+    d = substr(line, RSTART + 2, RLENGTH - 2)
+    strip = (substr(d, 1, 1) == "-"); if (strip) d = substr(d, 2)
+    sub(/^[ \t]+/, "", d); gsub(SQ, "", d); gsub(DQ, "", d)
+    hd = d
+  }
+}
 END {
   n = length(buf); q = ""; out = ""
   for (i = 1; i <= n; i++) {

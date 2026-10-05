@@ -56,7 +56,7 @@ done
 | PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md`를 만들면 에이전트원칙의 「문서를 쓰고 관리할 때」로 타입과 수명을 가리게 하고, README면 `domain-readme`를 함께 가리킨다 | 알림 |
 | PreToolUse | `hooks/doc_word_pretooluse.sh` | 산출물 `.md`에 금지 표현이 들어가면 거부한다 | 차단 |
 | PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 규칙 넛지. 세션의 첫 Write·Edit·Bash 호출 전에 원칙 사본과 `domain-korean.md`와 `domain-discipline.md`의 절대경로를 한 번 알린다. 서브에이전트에는 원칙이 실리지 않기 때문이다 | 알림 |
-| PreToolUse | `hooks/python3_guard_pretooluse.sh` | 윈도우에서 `python3`이 스토어 안내판으로 풀릴 때 그 Bash 명령을 거부한다 | 차단 |
+| PreToolUse | `hooks/python3_guard_pretooluse.sh` | 윈도우에서 `python3`이 스토어 안내판으로 풀릴 때 그 Bash·PowerShell 명령을 거부한다 | 차단 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan을 감지해 리뷰를 지시한다 | 알림 |
 | PostToolUse | `hooks/doc_review_posttooluse.sh` | `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 있는 폴더의 `.md`를 고치면 `review-docs` 검진을 권한다. `Bash`로 고친 것도 본다 | 알림 |
 | PostToolUse | `hooks/doc_word_posttooluse.sh` | 셸로 고친 산출물 `.md`에 금지 표현이 남으면 알린다 | 알림 |
