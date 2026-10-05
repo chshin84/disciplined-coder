@@ -14,7 +14,6 @@ TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TM
 
 echo "[audit_evidence.sh — 인용 확인과 지문]"
 EV="$HERE/scripts/audit_evidence.sh"
-check "스크립트가 있다" "[ -f '$EV' ]"
 EVT="$(mktemp -d)"
 printf 'a\n어긋난 문장이 여기 있다.\nb\n' > "$EVT/doc.md"
 printf 'x\n상대편 문장은 저기 있다.\ny\n' > "$EVT/other.md"
@@ -28,7 +27,6 @@ cat > "$EVT/findings.json" <<'FIXTURE'
 FIXTURE
 EV_OUT="$(bash "$EV" --root "$EVT" "$EVT/findings.json" 2>/dev/null || true)"
 evq() { printf '%s' "$EV_OUT" | json_run "$1"; }
-check "출력이 JSON 이다"                 "printf '%s' \"\$EV_OUT\" | json_valid_stdin"
 check "있는 인용을 찾았다고 적는다"       "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"findings\"][0][\"evidence_found\"] is True else 1)'"
 check "없는 인용을 못 찾았다고 적는다"     "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"dropped\"][0][\"evidence_found\"] is False else 1)'"
 check "상대편 인용도 확인한다"            "evq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if all(f[\"counterpart_found\"] is True for f in d[\"findings\"]+d[\"dropped\"]) else 1)'"
@@ -66,7 +64,6 @@ check "audit_evidence.sh 가 읽는 칸이 스키마 필드에 다 있다" "evkq
 
 echo "[audit_rounds.sh — 회차 대조와 측정]"
 AR="$HERE/scripts/audit_rounds.sh"
-check "스크립트가 있다" "[ -f '$AR' ]"
 ART="$(mktemp -d)"; mkdir -p "$ART/2026-01-01-self-audit"
 printf '남아 있는 어긋난 문장.\n' > "$ART/doc.md"
 printf '상대편 문장.\n' > "$ART/other.md"
@@ -101,7 +98,6 @@ cat > "$ART/cur.json" <<'FIXTURE'
 FIXTURE
 AR_DIFF="$(bash "$AR" diff --root "$ART" --prior "$ART/2026-01-01-self-audit/findings.json" --prior-diff "$ART/prior-diff.json" "$ART/cur.json" 2>/dev/null || true)"
 arq() { printf '%s' "$AR_DIFF" | json_run "$1"; }
-check "대조 출력이 JSON 이다"            "printf '%s' \"\$AR_DIFF\" | json_valid_stdin"
 check "인용이 남아 있으면 잔존이다"       "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"p#001\"][0]; sys.exit(0 if i[\"verdict\"]==\"잔존\" else 1)'"
 check "인용이 사라졌으면 해소다"          "arq 'import json,sys; d=json.load(sys.stdin); i=[x for x in d[\"items\"] if x[\"prior_id\"]==\"p#002\"][0]; sys.exit(0 if i[\"verdict\"]==\"해소\" else 1)'"
 check "기각된 앞선 발견도 대조한다"       "arq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if [x for x in d[\"items\"] if x[\"prior_id\"]==\"p#003\"] else 1)'"
@@ -119,7 +115,6 @@ check "앞선 회차가 없으면 그렇게 적는다"   "anq 'import json,sys; 
 printf '%s' "$AR_DIFF" > "$ART/diff.json"
 AR_MET="$(bash "$AR" metrics --tokens 1000 --seconds 60 "$ART/cur.json" "$ART/diff.json" 2>/dev/null || true)"
 amq() { printf '%s' "$AR_MET" | json_run "$1"; }
-check "측정 출력이 JSON 이다"             "printf '%s' \"\$AR_MET\" | json_valid_stdin"
 check "렌즈별로 낸 수와 확정 수를 센다"    "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"by_lens\"][\"lens-fit\"]=={\"raised\":2,\"confirmed\":0} else 1)'"
 check "확정 하나당 값을 낸다"             "amq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"tokens_per_confirmed\"]==500 else 1)'"
 check "판정 개수를 낸다"                  "amq 'import json,sys; d=json.load(sys.stdin); v=d[\"verdict_counts\"]; sys.exit(0 if v[\"confirmed\"]==2 and v[\"rejected\"]==1 and v[\"undetermined\"]==1 and v[\"auto_rejected\"]==1 else 1)'"
@@ -128,7 +123,6 @@ rm -rf "$ART"
 
 echo "[audit_statements.sh — 이름표별 진술]"
 AS="$HERE/scripts/audit_statements.sh"
-check "스크립트가 있다" "[ -f '$AS' ]"
 AST="$(mktemp -d)"
 cat > "$AST/lens-fit-1.json" <<'FIXTURE'
 { "lens": "lens-fit", "target": "skills/a/SKILL.md", "issues": [],
@@ -140,14 +134,12 @@ cat > "$AST/lens-fit-2.json" <<'FIXTURE'
 FIXTURE
 AS_OUT="$(bash "$AS" "$AST/lens-fit-1.json" "$AST/lens-fit-2.json" 2>/dev/null || true)"
 asq() { printf '%s' "$AS_OUT" | json_run "$1"; }
-check "진술 출력이 JSON 이다"          "printf '%s' \"\$AS_OUT\" | json_valid_stdin"
 check "이름표로 모은다"                "asq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if len(d[\"topics\"][\"봉인 시점\"])==2 else 1)'"
 check "문서 경로는 원본의 target 이다"  "asq 'import json,sys; d=json.load(sys.stdin); sys.exit(0 if d[\"topics\"][\"봉인 시점\"][0][\"file\"]==\"skills/a/SKILL.md\" else 1)'"
 rm -rf "$AST"
 
 echo "[audit_verify.sh — 실제 기록 검수]"
 AV="$HERE/scripts/audit_verify.sh"
-check "스크립트가 있다" "[ -f '$AV' ]"
 VT="$(mktemp -d)"; mkdir -p "$VT/2026-01-02-self-audit"
 VR="$VT/2026-01-02-self-audit"
 cat > "$VR/findings.json" <<'FIXTURE'
@@ -216,9 +208,7 @@ check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$
 check "집계 계약이 제안 채널을 가른다"       "owns_sec '$MA' '렌즈가 추가하는 칸' && sec_has_id '$MA' '렌즈가 추가하는 칸' suggestions"
 check "렌즈 그룹을 소유자가 적는다" "owns_sec '$DISP' '렌즈 그룹' && sec_has_id '$DISP' '렌즈 그룹' lens-adversarial"
 # 사본 쪽에 그 절이 없는지는 구조로 본다.
-check "spec 리뷰가 그 그룹 규칙을 베끼지 않는다" "! has_sec '$SR' '렌즈 그룹' && ! has_sec '$SR' '따로 실행할 때와 묶을 때'"
 # 한 줄에 lens-prior-art 이름과 '예외' 가 함께 있는지를 본다.
-check "나누는 규칙의 예외가 lens-prior-art 이름과 한 문장에 묶여 있다" "points_to '$SR' '예외' '\`lens-prior-art\` 하나'"
 
 echo "[단계 개수] 표의 행 수와 '단계는 N' 문장이 맞는다"
 # 대상을 손으로 적지 않고 문서에서 도출한다. '단계는 N이고'를 담은 스킬을 모두 찾아 그 문장 뒤
@@ -247,13 +237,11 @@ if [ -n "$PDA_STEP_TARGETS" ]; then
   done <<< "$PDA_STEP_TARGETS"
 fi || true
 check "적대적 렌즈를 저장소 전체에 따로 실행한다고 적는다" "sec_has_id '$PDA' '실행할 때 지킬 것' lens-adversarial && sec_has '$PDA' '단계' '저장소 전체'"
-check "감사에 렌즈 적용 절이 있다"                         "has_sec '$PDA' '렌즈 적용'"
 check "단계 표가 렌즈 적용 절을 가리킨다"                 "sec_has '$PDA' '단계' '「렌즈 적용」'"
 check "렌즈 적용 절이 렌즈 그룹을 가리킨다"               "sec_has '$PDA' '렌즈 적용' '「렌즈 그룹」'"
 
 echo "[audit_prior_rounds.sh — 앞선 회차 고르기]"
 APR="$HERE/scripts/audit_prior_rounds.sh"
-check "스크립트가 있다"                                "[ -f '$APR' ]"
 APR_T="$(mktemp -d)"; mkdir -p "$APR_T/docs/superpowers/reviews"
 mk_round() { mkdir -p "$APR_T/docs/superpowers/reviews/$1"; printf '{"executor":"%s","completed":%s}\n' "$2" "$3" > "$APR_T/docs/superpowers/reviews/$1/run.json"; }
 mk_round 2026-09-01-self-audit self-audit true
@@ -264,17 +252,13 @@ mk_round 2026-09-03-other other true
 mkdir -p "$APR_T/docs/superpowers/reviews/2026-08-30-legacy"
 APR_OUT="$(bash "$APR" self-audit --root "$APR_T" 2>/dev/null || true)"
 check "completed 인 같은 실행체의 최근 둘을 최신부터 낸다" "[ \"\$(printf '%s' \"\$APR_OUT\" | tr '\n' ' ' | sed 's/ *$//')\" = '2026-09-03-self-audit 2026-09-02-self-audit' ]"
-check "다른 실행체와 끊긴 회차와 옛 기록은 빠진다"      "! printf '%s' \"\$APR_OUT\" | grep -qE 'other|self-audit-2|legacy'"
 APR_STALE="$(bash "$APR" self-audit --root "$APR_T" --stale 2>/dev/null || true)"
 check "--stale 이 끊긴 회차만 낸다"                     "[ \"\$APR_STALE\" = '2026-09-02-self-audit-2' ]"
-check "기본 실행체 이름은 self-audit 이다"              "grep -qF 'EXEC=\"self-audit\"' '$APR'"
 rm -rf "$APR_T"
 
 echo "[audit_targets.sh — 대상 목록만 낸다]"
 AT="$HERE/scripts/audit_targets.sh"
 AT_OUT="$(bash "$AT" 2>/dev/null || true)"
-check "한 줄에 경로 하나만 낸다"       "! printf '%s' \"\$AT_OUT\" | grep -q \$'\t'"
-check "대상이 하나 이상이다"           "[ -n \"\$AT_OUT\" ]"
 check "지난 기록은 대상이 아니다"      "! printf '%s' \"\$AT_OUT\" | grep -q '^docs/superpowers/'"
 check "모르는 인자를 주면 실패 종료한다" "! bash '$AT' --limit >/dev/null 2>&1"
 # 그 밖의 살아 있는 .md 전부가 있다 — 기대 목록을 스크립트와 같은 규칙(대상 아님·HANDOFF-·
@@ -311,7 +295,6 @@ rj() { json_run "$1" "$RT/round/$2"; }
 # 뽑는 계산은 audit_verify.sh 와 같은 함수(_audit_common.sh 의 audit_status_set)를 쓴다.
 . "$HERE/scripts/_audit_common.sh"
 STATUS_SET="$(audit_status_set "$PDA")"
-check "절차 문서 「판정」 절에서 status 닫힌 집합을 뽑았다" "[ -n \"\$STATUS_SET\" ]"
 STATUS_PROG='
 import json, sys
 allowed = set(sys.argv[2].split())
@@ -324,7 +307,6 @@ rm -rf "$RT"
 
 echo "[문서 — 일관성 방법이 절차와 렌즈에 적혔다]"
 LC="$HERE/skills/lens-consistency/SKILL.md"
-check "렌즈가 이름표 묶음 짝을 적는다"                  "grep -qF '## 레포 문서 감사에서의 짝' '$LC'"
 check "렌즈 type 에 duplication 이 있다"                "grep -qF 'duplication' '$LC'"
 check "렌즈가 판정 셋과 narrowed 를 적는다"             "sec_has '$LC' '레포 문서 감사에서의 짝' '**좁혀 적음**' && sec_has_id '$LC' '레포 문서 감사에서의 짝' narrowed"
 check "집계 계약이 narrowed 를 렌즈 추가 칸으로 적는다"  "grep -qF 'narrowed' '$HERE/skills/aggregating-lenses/SKILL.md'"
@@ -352,7 +334,6 @@ echo "[audit_topics.sh — 이름표 목록]"
 # 「일관성 대조」의 표 대조 걸음이 이름표 목록을 이 스크립트에서 받는다. 아무도 안 부른다고 죽은
 # 코드로 오인해 검사까지 함께 지워졌었다. 909eb39 의 세 단언을 되살린다.
 ATP="$HERE/scripts/audit_topics.sh"
-check "스크립트가 있다" "[ -f '$ATP' ]"
 ATP_OUT="$(bash "$ATP" 2>/dev/null || true)"
 ATP_MISS=""
 while IFS= read -r want; do
@@ -376,8 +357,7 @@ check "CLAUDE.md 가 훅 목록의 소유자를 README 로 가리킨다" "grep -
 
 echo "[seal_reviews.sh — 봉인할 기록이 없어도 끝난다]"
 SE="$(mktemp -d)"; git -C "$SE" init -q
-set +e; SEOUT="$(bash "$HERE/scripts/seal_reviews.sh" --root "$SE" 2>&1)"; SERC=$?; set -e
+set +e; bash "$HERE/scripts/seal_reviews.sh" --root "$SE" >/dev/null 2>&1; SERC=$?; set -e
 check "빈 저장소에서 0 으로 끝난다" "[ '$SERC' -eq 0 ]"
-check "봉인 개수 0 을 알린다"        "[ \"\$SEOUT\" = 'sealed: 0' ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

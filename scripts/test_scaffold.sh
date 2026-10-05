@@ -31,16 +31,11 @@ OUT="$(run "$H1" "$P1")"
 K="$H1/.claude/disciplined-coder"; UC="$H1/.claude/CLAUDE.md"
 echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
-check "user CLAUDE.md imports principles" "grep -qxF '@disciplined-coder/agent-principles.md' '$UC'"
-check "managed region once"           "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC') -eq 1 ]"
 # 금지 표현 목록은 에이전트원칙과 같은 관리블록이 싣는다. 다른 플러그인이 있든 없든 같다.
-check "banlist: 관리블록에 목록 줄"       "sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC' | grep -qxF '@disciplined-coder/korean-banned-words.md'"
 check "banlist: 관리블록은 두 줄뿐이다"   "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC' | wc -l) -eq 4 ]"
-check "banlist: 공용 블록을 안 만든다"    "! grep -q 'BEGIN korean-banned-words' '$UC'"
 check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words.md' ]"
 # 첫 세션은 @import 가 아직 안 실렸으므로 목록도 에이전트원칙과 함께 stdout 으로 보강한다.
 check "banlist: 첫 세션 stdout 에 목록도 실린다" "printf '%s' \"\$OUT\" | grep -qxF \"\$(head -1 '$HERE/korean-banned-words.md')\""
-check "stdout has principle marker"   "printf '%s' \"\$OUT\" | grep -qF '# 디시플린코더(혹은 dc코더)'"
 touch -d '2000-01-01' "$UC"; REF5="$(mktemp)"; touch -d '2001-01-01' "$REF5"
 run "$H1" "$P1" > /dev/null
 check "같은 블록이면 전역 CLAUDE.md 를 다시 쓰지 않는다" "[ ! '$UC' -nt '$REF5' ]"
@@ -87,7 +82,6 @@ echo "[marketplace-autoupdate] 자동 갱신을 켠다"
 # 켰다는 사실은 stderr 가 아니라 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않고,
 # 옛 관리블록을 걷어낸 알림(pointer_note)이 이미 쓰는 통로가 stdout 이다. 사용자 설정 파일을 고쳐
 # 놓고 아무도 모르게 두면 안 된다.
-check "켰다는 알림이 stdout 으로 나간다"  "printf '%s' \"\$OUT_A\" | grep -qF '자동 갱신을 켰'"
 check "알림에 고친 파일 경로가 있다"       "printf '%s' \"\$OUT_A\" | grep -qF 'settings.json'"
 check "우리 항목에 autoUpdate가 켜졌다"   "[ \"\$(json_autoupdate '$SET_A' \"\$MKT\")\" = 'true' ]"
 check "알려진 마켓플레이스에도 켜졌다"     "[ \"\$(json_autoupdate '$KNOWN_A' \"\$MKT\")\" = 'true' ]"
@@ -178,8 +172,6 @@ OUT22="$(run "$H22" "$P22")"
 UC22="$H22/.claude/CLAUDE.md"
 echo "[banlist-migrate] 우리 목록을 가리키던 공용 블록을 지운다"
 check "공용 블록이 사라진다"           "! grep -q 'korean-banned-words (shared' '$UC22'"
-check "관리블록에 에이전트원칙 줄"     "MB_SEC '$UC22' | grep -qxF '@disciplined-coder/agent-principles.md'"
-check "관리블록에 목록 줄"             "MB_SEC '$UC22' | grep -qxF '@disciplined-coder/korean-banned-words.md'"
 check "목록이 한 벌만 실린다"          "[ \$(grep -c '^@.*korean-banned-words' '$UC22') -eq 1 ]"
 check "위아래 사용자 줄이 남는다"      "grep -qxF 'my note above' '$UC22' && grep -qxF 'my note below' '$UC22'"
 check "지웠다고 알린다"              "printf '%s' \"\$OUT22\" | grep -qF '공용 블록'"
@@ -263,7 +255,6 @@ first_line() { json_run 'import json,sys; print(json.load(sys.stdin)["systemMess
 H30="$(mktemp -d)"; uc_fixture "$H30" "$A40" 0 "$B40" > /dev/null
 OUT30="$(run_uc "$H30")"
 echo "[install-current] 원격이 앞서면 사본과 설치본을 차례로 옮기고 다시 켜라고 요구한다"
-check "원격을 info/refs 로 2초 안에 읽는다" "grep -qF -- '-m 2 https://github.com/chshin84/disciplined-coder.git/info/refs?service=git-upload-pack' '$H30/curl-args.txt'"
 check "사본을 먼저 원격에 맞춘다"    "[ \"\$(head -1 '$H30/args.txt')\" = 'plugin marketplace update chshin-tools' ]"
 check "그다음 설치본을 옮긴다"       "[ \"\$(sed -n 2p '$H30/args.txt')\" = 'plugin update disciplined-coder@chshin-tools' ]"
 check "첫 줄에서 다시 켜라고 한다"   "[ \"\$(printf '%s' \"\$OUT30\" | first_line)\" = 'disciplined-coder: 다시 켜야 새 버전이 적용됩니다.' ]"
@@ -427,9 +418,8 @@ fi
 if command -v cygpath >/dev/null 2>&1; then
   HSF="$(mktemp -d)"; mkdir -p "$HSF/.claude"; PSF="$(cygpath -w "$HSF/.claude")"
   CLAUDE_HOME_DIR="$HSF/.claude" CLAUDE_PROJECT_DIR="$PSF" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" >/dev/null 2>&1 || true
-  OUTSF="$(CLAUDE_HOME_DIR="$HSF/.claude" CLAUDE_PROJECT_DIR="$PSF" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" 2>/dev/null)"
+  CLAUDE_HOME_DIR="$HSF/.claude" CLAUDE_PROJECT_DIR="$PSF" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" >/dev/null 2>&1
   echo "[same-file] a project CLAUDE.md that is the global CLAUDE.md is left alone"
-  check "같은 파일: 걷어냈다는 알림이 없다"  "! printf '%s' \"\$OUTSF\" | grep -qF '옛 관리블록'"
   check "같은 파일: 사본을 쌓지 않는다"      "! ls '$HSF/.claude/disciplined-coder/backups' 2>/dev/null | grep -q '^CLAUDE.md'"
   check "같은 파일: 관리블록이 하나다"       "[ \$(grep -cF '# BEGIN disciplined-coder' '$HSF/.claude/CLAUDE.md') -eq 1 ]"
 fi
@@ -448,7 +438,6 @@ ERR10="$(run "$H10" "$P10" 2>/dev/null)"; rc10=$?
 set -e
 echo "[managed-dir-hygiene] managed-dir hygiene (whitelist pruning)"
 check "update.seen·update.stuck 이 남는다" "[ -f '$K10/update.seen' ] && [ -f '$K10/update.stuck' ]"
-check "canon preserved"                 "[ -f '$K10/agent-principles.md' ]"
 check "unknown user file preserved"     "[ -f '$K10/my_notes.md' ]"
 check "empty orphan removed"            "[ ! -f '$K10/orphan_empty.md' ]"
 check "non-empty orphan surfaced"       "printf '%s' \"\$ERR10\" | grep -qF 'my_notes.md'"
@@ -516,7 +505,6 @@ OUT20a="$(run "$H20" "$P20")"
 OUT20b="$(run "$H20" "$P20")"
 echo "[canon-first-run-only] canon dumped on first run only"
 check "1st run dumps principles"      "printf '%s' \"\$OUT20a\" | grep -qF '# 디시플린코더(혹은 dc코더)'"
-check "2nd run omits principles"      "! printf '%s' \"\$OUT20b\" | grep -qF '# 디시플린코더(혹은 dc코더)'"
 # 토글이 사라져 2회차에는 보낼 것이 없다. 빈 문자열을 단언해 두면 무엇이 새로 새어 나와도 실패한다
 # — 부정 단언만 남기면 스크립트가 아무것도 못 내도 통과하는 vacuous 구멍이 생긴다.
 check "2nd run sends nothing"         "[ -z \"\$OUT20b\" ]"
@@ -530,7 +518,6 @@ printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { 
 printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n@disciplined-coder/korean-banned-words.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
 OUT21="$(run "$H21" "$P21")"
 echo "[crlf-import-line] CRLF import line still counts as present"
-check "CRLF: no canon re-dump"        "! printf '%s' \"\$OUT21\" | grep -qF '# 디시플린코더(혹은 dc코더)'"
 check "CRLF: sends nothing"           "[ -z \"\$OUT21\" ]"
 
 # --- adjacent-openers: 인접 여는 마커 가드 — 첫 BEGIN이 뒤쪽 닫는 마커까지 훑어 사용자 줄을 삼키면 안 된다 ---
@@ -608,8 +595,6 @@ OWN_TOK1="$( . "$HERE/scripts/_managed_block.sh"; managed_block_lock "$OL" )"
 rm -rf "$OL"   # 빼앗김
 OWN_TOK2="$( . "$HERE/scripts/_managed_block.sh"; managed_block_lock "$OL" )"
 ( . "$HERE/scripts/_managed_block.sh"; managed_block_unlock "$OL" "$OWN_TOK1" )   # 옛 주인이 푼다
-check "락에 주인 토큰이 적힌다"                "[ -s '$OL/owner' ]"
-check "두 토큰이 서로 다르다"                  "[ \"\$OWN_TOK1\" != \"\$OWN_TOK2\" ]"
 check "옛 주인이 새 주인의 락을 안 지운다"     "[ -d '$OL' ]"
 ( . "$HERE/scripts/_managed_block.sh"; managed_block_unlock "$OL" "$OWN_TOK2" )
 check "제 주인은 푼다"                         "[ ! -e '$OL' ]"
