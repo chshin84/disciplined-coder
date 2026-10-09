@@ -1,0 +1,159 @@
+{
+  "lens": "lens-adversarial",
+  "target": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+  "read": [
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+    "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/brainstorming/SKILL.md (40~55행, 198~206행)",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/subagent-driven-development/SKILL.md (15~35행, 70~80행, 335~342행, ledger·worktree grep)",
+    "D:/projects/disciplined-coder/skills/dispatching-lenses/SKILL.md",
+    "D:/projects/disciplined-coder/skills/review-specs/SKILL.md",
+    "D:/projects/disciplined-coder/hooks/_spec_marker.sh",
+    "D:/projects/disciplined-coder/CLAUDE.md",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-07-large-dev-directive-check/target-directive.md",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-09-nested-orchestration-large-dev-review.md (20~60행)",
+    "D:/projects/disciplined-coder/scripts/test_docs_drift.sh (160~164행, 784~790행)",
+    "D:/projects/disciplined-coder/docs/domain-discipline.md (13행)",
+    "C:/Program Files/Git/mingw64/share/doc/git-doc/howto/revert-a-faulty-merge.adoc (55~75행)",
+    "C:/Program Files/Git/mingw64/share/doc/git-doc/diff-options.adoc (320행)"
+  ],
+  "issues": [
+    {
+      "where": "「결정」의 「병합과 되돌림」(73행)과 「확인 방법」 3번 「새 가드레일」(126행)",
+      "type": "failure-mode",
+      "claim": "현재 세션은 통합 확인이 실패한 병합을 `git revert -m 1`로 되돌린 뒤 서브 세션이 고친 같은 워크스트림 브랜치를 다시 `--no-ff`로 병합한다. git은 되돌린 병합을 여전히 공통 이력으로 보므로, 재병합에는 수정 커밋만 들어오고 처음 병합의 변경은 빠진다. 설계는 재병합 전에 되돌림을 되돌리는 절차(revert the revert)를 두지 않았고, 확인 방법도 되돌림 뒤 재병합을 시험하지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "73행 \"실패하면 `git revert -m 1`로 그 병합을 되돌리고, 원인이 ... 워크스트림 내부면 그 서브 세션으로 보낸다.\" 50행 \"통합 실패 수정 ... 그 워크스트림의 서브 세션에 이어 쓰기로 보낸다.\" 126행의 확인은 범위 대조와 마커만 시험한다.",
+      "counterpart_file": "C:/Program Files/Git/mingw64/share/doc/git-doc/howto/revert-a-faulty-merge.adoc",
+      "counterpart": "55~57행 \"If you merge the updated side branch (with D at its tip), none of the changes made in A or B will be in the result, because they were reverted by W.\" 66~69행 \"future merges will see that merge as the last shared state - and the revert that reverted the merge brought in will not affect that at all.\"",
+      "principle": "NO-ASSUME, CHECKABLE",
+      "consequence": "지금 설계에는 통합 실패를 고친 워크스트림을 재병합할 때 앞서 되돌린 변경을 복원하는 단계가 없다. 그래서 재병합 뒤 통합 브랜치에는 수정 커밋만 있고 그 워크스트림의 원래 구현은 빠진 상태가 된다."
+    },
+    {
+      "where": "「결정」의 「문서 수명과 진행 위치」(75행) 마지막 두 문장",
+      "type": "failure-mode",
+      "claim": "진행 위치 도출은 통합 브랜치에 병합된 `ws/*` 브랜치를 끝난 워크스트림으로 판정한다. 그런데 73행의 되돌림을 거친 브랜치도 병합 이력은 남으므로 끝난 것으로 판정된다. 되돌림 커밋을 함께 보라는 규칙이 없다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "75행 \"통합 브랜치에 병합된 `ws/<개발 이름>/*` 브랜치는 끝난 워크스트림이고, 병합되지 않은 브랜치는 진행 중이며\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "73행 \"실패하면 `git revert -m 1`로 그 병합을 되돌리고\" — 되돌린 뒤에도 병합 커밋은 통합 브랜치 이력에 남는다(revert-a-faulty-merge.adoc 66~69행).",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 도출 규칙대로라면 세션이 끊긴 뒤 재개한 현재 세션은 통합 실패로 되돌려 수정 중인 워크스트림을 끝난 워크스트림으로 판정한다."
+    },
+    {
+      "where": "「결정」의 「경로와 브랜치 이름」(67행)과 「검증하지 않은 가정」의 「워크트리의 기준 커밋」(138행)",
+      "type": "failure-mode",
+      "claim": "설계는 브랜치 이름 `ws/<개발 이름>/<워크스트림 id>`와 그 기준 커밋을 정하지만, 누가 그 브랜치를 어느 커밋에서 만드는지는 적지 않는다. 고칠 스킬은 `Agent`의 `isolation:'worktree'`를 권하는데, 이 경로로 만든 워크트리의 브랜치 이름과 기준 커밋은 설계가 정하지 못한다. 진행 위치 도출(75행), 범위 대조(63행), 되돌림 차수 세기(48행)가 모두 이 브랜치 이름과 기준에 기대므로, 한 번 어긋나면 세 장치가 함께 무너진다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "67행 \"통합 브랜치는 `dev/<개발 이름>`, 워크스트림 브랜치는 `ws/<개발 이름>/<워크스트림 id>`로 짓는다.\" 138행 \"`isolation:'worktree'`가 후속 워크스트림의 워크트리를 어느 커밋에서 만드는지 확인하지 않았다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "18행 \"잠기는 즉시 워크트리를 만들고(`using-git-worktrees`, 또는 `Agent`의 `isolation:'worktree'`) L2를 백그라운드로 디스패치한다.\"",
+      "principle": "NO-ASSUME, STATE-ASSUME",
+      "consequence": "지금 설계에는 디스패치 전에 현재 세션이 `dev/<개발 이름>` 끝에서 `ws/...` 브랜치를 만들라는 지시가 없다. 그래서 브랜치 생성은 하네스 기본값에 맡겨져 있고, 그 기본값이 이름 규칙과 맞는지는 확인되지 않았다."
+    },
+    {
+      "where": "「결정」의 「수정 범위 강제」(63행)의 `git diff --name-only` 명령과 「확인 방법」 3번(126행)",
+      "type": "risk",
+      "claim": "`git diff --name-only`는 이름 변경 감지가 켜져 있으면 바뀐 뒤 경로만 출력한다. 서브 세션이 허용 경로 밖 파일(공용 파일이나 다른 워크스트림 파일)을 허용 경로 안으로 옮기면, 출력에는 허용 경로 안의 새 이름만 나와 범위 대조를 통과하고 원래 파일의 삭제는 드러나지 않는다. 확인 방법도 이 경우를 시험하지 않는다. `--no-renames` 한 낱말을 명령에 더하면 완화된다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "63행 \"`git diff --name-only <통합 브랜치>...<워크스트림 브랜치>`로 변경 파일을 구해 허용 경로와 대조하고\" 126행 \"허용 경로 밖 파일 하나를 더하면 그 파일이 출력된다.\" — 추가만 시험하고 이동은 시험하지 않는다.",
+      "counterpart_file": "C:/Program Files/Git/mingw64/share/doc/git-doc/diff-options.adoc",
+      "counterpart": "320행 `--name-only`: \"Show only the name of each changed file in the post-image tree.\"",
+      "principle": "CHECKABLE, NO-ASSUME",
+      "consequence": "지금 적힌 명령으로는 허용 경로 밖 파일을 허용 경로 안으로 옮긴 변경이 범위 대조를 통과한다."
+    },
+    {
+      "where": "「결정」의 「수정 범위 강제」(63행) 마지막 두 문장과 「이어받는 검증」(85~91행)",
+      "type": "risk",
+      "claim": "설계는 브랜치 쌍 교집합 검사를 빼면서 \"허용 경로가 겹치지 않고\"를 전제로 삼는다. 그러나 큰 명세에 적은 pathspec끼리 겹치지 않는지 확인하는 장치는 없다. `src/**`와 `src/pages/home/**`처럼 한쪽이 다른 쪽을 포함하는 패턴은 사람 눈으로 놓치기 쉽다. 빠지는 교집합 검사는 2026-07-05 스파이크에서 실제로 충돌을 잡은 유일한 검증된 가드인데, 「이어받는 검증」은 이 결과를 옮기지 않았다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "63행 \"지금의 브랜치 쌍 교집합 검사는 뺀다. 동시에 진행하는 워크스트림의 허용 경로가 겹치지 않고 각 브랜치가 범위 대조를 통과하면 교집합은 빌 수밖에 없다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+      "counterpart": "24행 \"교집합 검사가 정상 작동했고, **리포트 파일 충돌을 잡아냈다** ... 부정 대조(가짜 겹침 주입)도 정확히 FAIL-LOUD.\"",
+      "principle": "NO-ASSUME, KEEP-FAILED",
+      "consequence": "지금 설계에서는 겹치는 pathspec 두 개가 큰 명세에 적혀도 기계 검사가 그 겹침을 잡지 않는다. 두 워크스트림이 같은 파일을 고치면 범위 대조를 각각 통과하고 병합 단계에서야 드러난다."
+    },
+    {
+      "where": "「결정」의 「공용 파일」(61행) 셋째 문장",
+      "type": "failure-mode",
+      "claim": "현재 세션이 공용 파일을 통합 브랜치에서 고친 뒤 이어 쓰기로 알리기만 하고, 서브 세션이 통합 브랜치를 자기 워크스트림 브랜치에 받아들이라는 지시는 없다. 받아들이지 않으면 서브 세션의 워크트리에는 바뀐 의존성 목록이나 라우팅 표가 없어 테스트가 실패한다. 서브 세션이 스스로 공용 파일을 고쳐 메우면 범위 대조에서 되돌려진다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "61행 \"현재 세션이 통합 브랜치에서 고친 뒤 이어 쓰기로 알린다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "63행 \"범위 밖 파일이 있으면 병합하지 않고 그 서브 세션에 되돌린다.\" — 공용 파일은 61행에서 현재 세션 소유로 허용 경로 밖이다.",
+      "principle": "CHECKABLE",
+      "consequence": "지금 설계에서는 공용 파일 변경이 통합 브랜치에만 있고, 서브 세션의 워크스트림 브랜치로 옮겨지는 단계가 적혀 있지 않다."
+    },
+    {
+      "where": "「이어받는 검증」의 「리포트 위치」(91행)와 「이어 쓰기의 예외」(48행) 마지막 문장, 「통합」(71행)",
+      "type": "failure-mode",
+      "claim": "리포트는 프로젝트 밖 스크래치에 두고 커밋하지 않는다. 그런데 세션이 끊겼을 때의 대체 경로(48행)는 리포트를 넣어 새 서브 세션을 시작하고, 병합 전 검사(71행)는 `escalated` 마커의 🔴가 해소되었는지를 리포트에서 확인한다. 현재 하네스의 스크래치는 세션마다 경로가 다르다(가정: 이 세션 환경 설명이 스크래치를 session-specific으로 적는다). 그래서 끊긴 뒤 재개한 현재 세션은 앞 세션의 리포트 경로를 git에서도 대화에서도 찾을 수 없다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "91행 \"리포트는 프로젝트 밖 스크래치에 두고 커밋하지 않는다.\" 48행 \"세션이 끊겨 식별자가 사라지면 워크스트림 브랜치·하부 명세·리포트를 넣어 새 서브 세션을 시작한다.\" 71행 \"마커가 `escalated`이면 리포트에서 그 🔴가 사용자 답으로 해소되었는지 확인하고\"",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "30행 \"리포트는 프로젝트 밖 스크래치의 워크스트림별 고유 경로(예: `report-<workstream>.md`)에 쓰고 병합될 브랜치에는 커밋하지 않는다.\"",
+      "principle": "NO-ASSUME, STATE-ASSUME",
+      "consequence": "지금 설계에서 리포트 경로는 현재 세션의 대화에만 있다. 세션이 끊기면 48행의 대체 경로와 71행의 escalated 해소 확인이 입력을 잃는다."
+    },
+    {
+      "where": "「결정」의 「문서 수명과 진행 위치」(75행)의 세 상태 구분",
+      "type": "failure-mode",
+      "claim": "진행 위치 도출은 시작 전, 진행 중, 끝남 셋만 구분한다. 하부 명세가 `AWAITING_APPROVAL`로 멈춘 상태와, 현재 세션이 승인해 plan·구현이 진행 중인 상태가 둘 다 '병합되지 않은 브랜치'로 같게 보인다. 승인 여부는 git 어디에도 남지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "75행 \"진행 위치는 상태 문서 없이 git에서 도출한다. ... 병합되지 않은 브랜치는 진행 중이며\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "42행 \"리뷰를 반영하면 서브 세션은 상태 `AWAITING_APPROVAL`과 하부 명세 경로를 돌려주고 멈춘다. 현재 세션은 ... 승인하면 같은 서브 세션에 이어 쓰기로 plan과 구현을 지시한다.\"",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 도출 규칙으로는 세션이 끊긴 뒤 재개한 현재 세션이 승인 대기 중인 워크스트림과 승인을 받아 구현 중인 워크스트림을 구별하지 못한다."
+    },
+    {
+      "where": "「바뀌는 파일」의 `agent-principles.md` 후보 문안(111행) 괄호 \"(태스크 다섯 이상)\"",
+      "type": "failure-mode",
+      "claim": "후보 문안은 나눌 조건을 \"각 일이 plan을 따로 둘 만큼(태스크 다섯 이상)\"으로 둔다. 태스크는 plan을 써야 생기는 단위인데, 설계는 분해 판단을 plan이 생기기 전 brainstorming 대화 안으로 옮기려 한다. 판단 시점에 셀 수 없는 수를 조건으로 두면, 모델은 plan을 먼저 쓰고 세거나 조건을 건너뛴다. 앞쪽은 「늦은 트리거」를 되살린다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "111행 \"각 일이 plan을 따로 둘 만큼(태스크 다섯 이상) 크면, 차례로 명세·plan·구현을 직접 진행하지 말고\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "29행 \"플랜이 생긴 시점에는 현재 세션이 이미 명세와 plan을 썼다.\" 38행 \"분해 판단은 brainstorming 대화 안에서 나오므로\"",
+      "principle": "CHECKABLE",
+      "consequence": "지금 후보 문안의 크기 조건은 plan 안의 태스크 수로 적혀 있고, 그 수는 문안이 개입하려는 시점에는 아직 없다."
+    },
+    {
+      "where": "「확인 방법」 5번 「트리거 채택 판정」(128행)과 「바뀌는 파일」의 `skills/nested-orchestration/SKILL.md` 항목(110행)",
+      "type": "failure-mode",
+      "claim": "클린룸 시험에서 새 문안을 채택하지 않으면 `SUB-ORCHESTRATE`는 \"일이 하나뿐이면 서브오케스트레이터를 두지 마라\"로 남는다. 그런데 110행은 스킬 description과 본문에 큰 개발 분할을 무조건 넣는다. 설계는 불채택일 때 스킬 변경을 어떻게 할지 적지 않아, 실행이 계획대로 끝나도 원칙과 스킬이 서로 반대를 지시하는 상태로 병합될 수 있다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "128행 \"같으면 과제 둘을 더 실행해 다섯 과제 합계가 현행보다 나쁘지 않을 때 채택하고, 나쁘면 채택하지 않는다.\" 110행 \"description에 큰 개발 분할을 넣고 ... 큰 개발 분할 ... 절을 둔다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "146행 \"일이 하나뿐이면 서브오케스트레이터를 두지 마라. 방법은 `nested-orchestration`이 소유한다.\"",
+      "principle": "REVERSIBLE, CHECKABLE",
+      "consequence": "지금 설계는 원칙 문안의 채택만 시험 결과에 묶고, 스킬 변경은 시험 결과와 무관하게 실행하도록 적혀 있다."
+    },
+    {
+      "where": "「결정」의 「이어 쓰기의 예외」(48행) 첫 세 문장",
+      "type": "over-engineering",
+      "claim": "넷째 수정부터 새 서브 세션과 더 강한 모델로 바꾸는 규칙은 아직 관찰된 적 없는 상황(같은 워크스트림의 통합 실패 세 번)을 위한 것이다. 그 차수도 되돌림 커밋 수로 세는데, 범위 대조나 마커 확인에서 병합 전에 되돌린 경우는 되돌림 커밋이 생기지 않아 세지 않는다. 원인이 계약이라 큰 명세로 보낸 되돌림은 워크스트림 탓이 아닌데도 센다. 규칙을 빼고 첫 큰 개발의 측정 트레일러(77행 `Integration-Failures:`)로 필요를 확인한 뒤 정하는 편이 짧고 틀린 셈을 남기지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "48행 \"넷째부터는 새 서브 세션을 더 강한 모델로 시작한다 ... 차수는 통합 브랜치의 되돌림 커밋 수로 세므로\" 93행 \"이 설계가 새로 둔 규칙은 스파이크 범위 밖이다. 이어 쓰기 재개 ...\" — 통합 실패 반복의 실측 근거가 없다. 단순화 근거: 77행이 이미 통합 실패 횟수를 트레일러로 세므로, 규칙 없이도 다음 개발에서 필요 여부를 판단할 자료가 남는다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "63행 \"범위 밖 파일이 있으면 병합하지 않고 그 서브 세션에 되돌린다.\" 71행 \"해소되지 않았으면 병합하지 않는다.\" 73행 \"원인이 계약이면 큰 명세로\" — 앞의 둘은 되돌림 커밋을 만들지 않고 뒤의 하나는 워크스트림과 무관한 되돌림 커밋을 만든다.",
+      "principle": "YAGNI, EVIDENCE-FIRST",
+      "consequence": "지금 적힌 셈법은 병합 전에 되돌린 수정 요청을 세지 않고, 계약 원인으로 되돌린 병합은 그 워크스트림의 실패 차수로 센다."
+    }
+  ],
+  "principles_applied": [
+    "YAGNI",
+    "REVERSIBLE",
+    "NO-ASSUME",
+    "STATE-ASSUME",
+    "EVIDENCE-FIRST",
+    "CHECKABLE",
+    "KEEP-FAILED",
+    "NO-FLEET",
+    "WRITTEN-ONLY",
+    "SPECIFIC-NAME",
+    "SUBJECT-OBJECT"
+  ],
+  "notes": "검토한 관점은 넷이다. 실패 모드에서는 설계가 맞아도 실행이 끊기거나 git 동작이 전제와 달라 실패하는 길을 보았다(되돌림 뒤 재병합, 진행 위치 도출, 브랜치 생성 주체, 공용 파일 전파, 세션 단절 뒤 리포트와 승인 상태, 트리거 조건의 시점, 클린룸 불채택 시의 잔여 상태). 과설계에서는 관찰되지 않은 상황을 위한 규칙을 보았고 「이어 쓰기의 예외」만 올렸다. 측정 트레일러와 결정 기록은 지시문에서 이어받은 요구라 과설계로 올리지 않았다. 비가역에서는 main 병합이 사용자 승인 뒤로 묶여 있고(73행), agent-principles 변경은 클린룸 시험과 git으로 되돌릴 수 있어 올릴 것이 없었다. 2026-07-05 설계에 superseded를 다는 것도 표시 하나라 되돌릴 수 있다. 위험에서는 범위 대조 명령의 이름 변경 누락과, 교집합 검사를 뺀 뒤 pathspec 겹침이 검사되지 않는 것을 올렸다.\n\n더 확인할 것이 셋 있다. 첫째로 `Agent`의 `isolation:'worktree'`가 만드는 브랜치 이름과 기준 커밋을 실측해야 한다. 셋째 지적의 심각도가 그 결과에 달려 있고, 하네스 문서나 스파이크 기록이 이 저장소에 없어 확인하지 못했다. 둘째로 스크래치 디렉터리가 세션마다 달라지는지는 이 세션 환경 설명의 문구(session-specific)에 기대 가정했다. 일곱째 지적은 그 가정에 서 있으므로, 앞 세션의 스크래치가 새 세션에서 같은 경로로 열리는지 확인해야 한다. 셋째로 `git diff --name-only`의 이름 변경 출력은 git 문서(diff-options.adoc 320행)로 확인했고, 읽기 전용 지시 때문에 스크래치 저장소에서 실행해 보지는 않았다. 확인 방법 3번을 실행할 때 이동 사례를 함께 넣으면 실측된다.\n\n지적하지 않은 것도 적는다. 서브 세션마다 하부 명세 렌즈 넷과 plan 렌즈 넷을 실행하는 비용은 dispatching-lenses 47행의 예외로 덮여 있어 올리지 않았다. 실행 중 메시지 수신, 끝난 서브 세션의 재개, subagent_tokens 범위는 설계가 이미 「검증하지 않은 가정」에 대체 경로와 함께 적어 두었으므로 중복으로 올리지 않았다."
+}

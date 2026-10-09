@@ -1,0 +1,131 @@
+{
+  "lens": "lens-fit",
+  "target": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+  "doc_type": "설계 (spec·plan) — 이 문서는 nested-orchestration을 고치는 채택안과 그 근거(「결정」, 「근거와 한계」)를 담고 있으며, 파일 경로가 docs/superpowers/specs/ 아래에 있다는 사실보다 설계 근거를 포함한다는 내용을 근거로 이 행을 골랐다.",
+  "read": [
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "D:/projects/disciplined-coder/docs/domain-korean.md",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+    "D:/projects/disciplined-coder/scripts/test_docs_drift.sh"
+  ],
+  "issues": [
+    {
+      "where": "「확인 방법」 4행(82행)",
+      "type": "constraint",
+      "claim": "설계 타입 문서에 다른 세션의 진행 상태를 적었다. 문서 타입 표에서 진행 상태는 상태 타입이 포함하는 내용이다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "gm-dashboard 세션은 지시문으로 진행 중이라 이 설계의 검증 대상으로 쓰지 않고",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "「문서 타입과 수명」 표 상태 행: \"진행 상태와 다음 단계\" / 설계 행: \"설계 근거\"",
+      "principle": "DOC-TYPE",
+      "consequence": "spec 본문에 '진행 중'이라는 시점 상태가 들어 있다. 그 세션이 끝난 뒤에도 문서는 진행 중이라고 적은 채로 남는다."
+    },
+    {
+      "where": "「용어」 표의 '뜻' 열(11~17행)",
+      "type": "style",
+      "claim": "같은 열의 셀 말끝이 하나로 맞춰지지 않았다. 몇 셀은 '~않는다'·'~그대로다'로 끝나는 문장이고, 나머지 셀은 명사구로 끝난다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "현재 세션 행 \"…직접 쓰지 않는다\", 워커 행 \"서브 세션이 실행하는 구현자와 렌즈\", 워크스트림 행 \"서브 세션 하나가 맡는 작업 단위\", 태스크 행 \"…superpowers 명칭 그대로다\"",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "PROSE-FORM 「ONE-ENDING」: 한 표와 한 목록… 안에서 같은 구실을 하는 요소끼리 말끝을 하나로 맞춰라",
+      "principle": "ONE-ENDING",
+      "consequence": "'뜻' 열에서 문장으로 끝나는 셀과 명사구로 끝나는 셀이 섞여 있다."
+    },
+    {
+      "where": "「바꾸는 이유」 23행, 「근거와 한계」 54행, 「결정」 41행, 「확인 방법」 82행",
+      "type": "style",
+      "claim": "목록 앞에서 개수를 예고하거나 다른 절의 목록을 개수로 가리켰다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "\"원인은 셋이다.\"(23행), \"지시문은 근거 문장 셋을 출처 없이 단정했고\"(54행, 아래 표가 행 넷을 담고 있다), \"SDD의 네 사유(비가역 작업, …)\"(41행), \"측정 세 항목을 받아\"(82행, 「결정」의 측정 항목을 개수로 가리킨다)",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "UNPACK 「COUNT-EARNS」: 대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라",
+      "principle": "COUNT-EARNS",
+      "consequence": "같은 사실이 개수와 목록 두 곳에 적혀 있다. 54행은 '셋'이라고 적었지만 바로 아래 표의 행은 넷이라 지금도 개수와 목록이 맞지 않는다."
+    },
+    {
+      "where": "「결정」 절 불릿 전체(35~50행), 「바꾸는 이유」 불릿(25~27행)",
+      "type": "format",
+      "claim": "불릿 한 항목이 여러 문장으로 되어 있는데 산문으로 쓰지 않고 불릿으로 두었다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "예: \"- **수정 범위 강제:** 큰 명세에 워크스트림마다 … 대조한다. 범위 밖 파일이 있으면 … 되돌린다. 동시에 진행한 워크스트림에는 … 한다. 지금 검사는 … 잡지 못한다.\"(43행)",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "READ-FLOW 「BULLET-SCOPE」: 불릿은 같은 종류를 늘어놓을 때만 쓰고, 한 항목이 여러 문장이 되면 산문으로 써라",
+      "principle": "BULLET-SCOPE",
+      "consequence": "「결정」 절의 불릿 항목이 모두 문장 셋에서 넷으로 되어 있다."
+    },
+    {
+      "where": "머리 단락(3행), 「확인 방법」 3번(81행)",
+      "type": "style",
+      "claim": "단락 하나가 다섯 문장으로 되어 있어 단락 길이 상한을 넘는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "3행: \"이 설계는 2026-10-09에 썼다. … 고친다. 출발점은 … 있다. 2026-10-07에 … 처분했다. 아래 「결정」이 그 처분이다.\" / 81행: \"클린룸 소거 시험을 한다. … 준다. … 센다. … 실행한다. … 확인한다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "READ-FLOW 「ONE-IDEA」: 단락은 네 문장 이하로 끊어라",
+      "principle": "ONE-IDEA",
+      "consequence": "두 단락이 각각 다섯 문장이다."
+    },
+    {
+      "where": "「용어」 표와 36·68행, 23·27·68행, 11·68행",
+      "type": "style",
+      "claim": "용어 표가 정한 이름과 다른 이름으로 같은 대상을 가리켰다. 명세(spec)를 '스펙'으로, 워크스트림의 분할 단위를 '하위 시스템'·'하위 프로젝트'로, plan을 '계획'으로 섞어 썼다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "\"지금 스킬은 스펙을 현재 세션이 잠그고\"(36행), \"하위 시스템을 차례로 직접 진행한다\"(23행), \"하위 시스템마다 서브 세션을 두어 맡겨라\"(68행 후보 문안), \"워크스트림의 명세·계획·구현은 직접 쓰지 않는다\"(11행) 대 \"plan부터 시작하게 하는데\"(36행)",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "UNPACK 「TERM-ONE」: 한 개념에는 한 용어만 쓰고",
+      "principle": "TERM-ONE",
+      "consequence": "용어 표는 '이 문서와 고칠 스킬 안에서 아래 뜻으로만 쓴다'고 정했다. 그런데 원칙에 들어갈 68행 후보 문안은 '워크스트림' 대신 '하위 시스템'을 쓰고, '명세'와 '계획'을 plan과 함께 쓴다."
+    },
+    {
+      "where": "38·39·41행의 'SDD', 49행의 'Stop 게이트', 46행의 'spec-review 마커'",
+      "type": "style",
+      "claim": "저장소와 하네스 안에서만 통하는 이름을 처음 나올 때 풀지 않았다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "\"SDD도 같은 기준이다(75행 …)\"(38행), \"`review-specs`와 Stop 게이트가 그대로 적용된다\"(49행)",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "UNPACK 「TERM-EXPLAIN」: 저장소 안에서만 통하는 이름과 그 분야의 용어는 답마다 처음 나올 때 한 줄로 풀어라",
+      "principle": "TERM-EXPLAIN",
+      "consequence": "SDD가 superpowers:subagent-driven-development를 가리킨다는 풀이가 문서 어디에도 없다. Stop 게이트와 spec-review 마커도 풀이 없이 쓰였다."
+    },
+    {
+      "where": "「확인 방법」 77행, 「근거와 한계」 54행",
+      "type": "style",
+      "claim": "판단할 수 없는 대상을 판단의 주체로 썼다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "\"각 단계는 아래 기준으로 완료를 판정한다.\"(77행), \"지시문은 근거 문장 셋을 출처 없이 단정했고\"(54행)",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "KO-SYNTAX 「SUBJECT-OBJECT」: 판단하고 행동하는 주체를 사람이나 도구로 적고, 문장이나 문서를 판단의 주체로 쓰지 마라",
+      "principle": "SUBJECT-OBJECT",
+      "consequence": "77행에는 완료를 누가 판정하는지(현재 세션인지 사용자인지)가 적혀 있지 않고, '단계'가 판정의 주어로 쓰였다."
+    },
+    {
+      "where": "3행, 88행",
+      "type": "style",
+      "claim": "관형절을 문장 중간에 끼웠고, 명사 앞에 수식어를 둘 이상 두었다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "\"출발점은 사용자가 gm-dashboard 세션(`D:\\test\\gm_dashboard`, 2026-10-07)에 붙여 넣은 「큰 개발의 명세 분할 지시문」이고\"(3행), \"끝난 지 오래된 백그라운드 서브 세션이\"(88행)",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "KO-SYNTAX 「NO-MID-MOD」: 관형절을 문장 중간에 끼우지 마라 / 「NO-STACK-MOD」: 명사 앞에 수식어를 2개 이상 두지 마라",
+      "principle": "NO-MID-MOD, NO-STACK-MOD",
+      "consequence": "3행에서는 주어 '출발점은'과 서술부 사이에 관형절이 끼어 있다. 88행에서는 '서브 세션' 앞에 수식어 '끝난 지 오래된'과 '백그라운드'가 겹쳐 있다."
+    }
+  ],
+  "principles_applied": [
+    "DOC-TYPE",
+    "ONE-ENDING",
+    "COUNT-EARNS",
+    "BULLET-SCOPE",
+    "ONE-IDEA",
+    "TERM-ONE",
+    "TERM-EXPLAIN",
+    "SUBJECT-OBJECT",
+    "NO-MID-MOD",
+    "NO-STACK-MOD",
+    "ANTI-LIMIT",
+    "COMMA-CUT",
+    "WRITTEN-ONLY",
+    "FULL-SENTENCE",
+    "NAME-ITEMS",
+    "CHECKABLE"
+  ],
+  "notes": "검토한 관점은 다음과 같다. 형식 관점에서는 표·불릿·번호 목록의 쓰임을 보았다. 스타일 관점에서는 출력지시 조항(PLAIN-KO·KO-SYNTAX·PROSE-FORM·READ-FLOW·UNPACK)을 보았다. 오염 관점에서는 설계 타입이 포함하지 않는 진행 상태가 들어 있는지를 보았다. 호환 관점에서는 L1·L2·L3와 '서브오케스트레이터'를 바꿀 때 다운스트림이 깨지는지를 보았다. 규율 관점에서는 DOC-TYPE·CHECKABLE·NAME-ITEMS를 보았다. 금지 낱말은 지시에 따라 보지 않았다. 호환 관점의 확인 결과는 이렇다. 저장소 전체에서 `L[123]`·'서브오케스트레이터'가 나오는 파일은 skills/review-specs, skills/dispatching-lenses, skills/nested-orchestration, agent-principles.md, scripts/test_docs_drift.sh였다. test_docs_drift.sh는 789행의 검사 라벨에만 '서브오케스트레이터'를 쓰고, 실제로는 `SUB-ORCHESTRATE` ID를 grep하므로 문구를 바꿔도 깨지지 않는다. 다만 그 라벨은 「바뀌는 파일」에 들어 있지 않다. 확인 방법 1번의 grep 범위는 skills와 agent-principles.md뿐이라 그 라벨은 검출되지 않으며, 지적으로 올릴 만큼 구체적인 결과가 없어 notes에만 적는다. TITLES 묶음(TITLE-LAYERS 등)은 판정하지 않았다. 원칙은 그 묶음을 '남에게 전달되는 문서와 발표자료'에 적용하고, 「검증」 절은 spec·plan과 '남에게 전달될 산출물'을 구분해 적는다. 그래서 spec이 그 묶음의 적용 대상인지가 계약 안에서 정해지지 않았다. ANTI-LIMIT('아니라' 대구 48행 한 번)과 COMMA-CUT, WRITTEN-ONLY에서는 위반을 찾지 못했다. 「확인 방법」의 번호 목록은 CHECKABLE이 요구하는 번호 단계라 NAME-ITEMS 위반으로 보지 않았다. 더 확인할 것이 하나 남아 있다. 54행 '근거 문장 셋'과 표 네 행의 불일치가 내용 오류인지는 lens-consistency가 확인해야 한다. 이 렌즈는 개수 표기 형식만 보았다."
+}

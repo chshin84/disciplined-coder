@@ -1,0 +1,166 @@
+{
+  "lens": "lens-fit",
+  "target": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+  "doc_type": "설계 (spec·plan) — 이 문서는 큰 개발 분할을 구현하는 태스크와 단계, 그 설계 근거(조건 문안과 가드레일 명령의 이유)를 담는다. 진행 상태 보고나 1회성 인계를 담지 않으므로 「문서 타입과 수명」 표의 설계 행으로 골랐다. 체크박스(`- [ ]`)는 superpowers plan 형식이며 진행 값이 채워져 있지 않으므로 상태 행의 '진행 상태'로 보지 않았다.",
+  "read": [
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "D:/projects/disciplined-coder/docs/domain-korean.md",
+    "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+    "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+    "D:/projects/disciplined-coder/scripts/test_docs_drift.sh (160-162, 280-292, 786-789, 862-875행)"
+  ],
+  "issues": [
+    {
+      "where": "Task 1 Step 1 새 문안(조건 C)의 `SUB-ORCHESTRATE` 줄",
+      "type": "style",
+      "claim": "에이전트원칙에 들어갈 새 조항 문장 하나에 연결어미 뒤 쉼표가 둘 있다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:123",
+      "evidence": "서로 독립된 일이 둘 이상이거나 개발 하나가 독립된 하위 시스템 여럿으로 나뉘고, 각 일이 plan을 따로 둘 만큼(태스크 다섯 이상으로 예상될 만큼) 크면, 차례로 명세·plan·구현을 직접 진행하지 말라.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:57",
+      "counterpart": "`COMMA-CUT` — 연결어미 뒤 쉼표는 한 문장에 하나까지만 써라.",
+      "principle": "COMMA-CUT",
+      "consequence": "Task 2 Step 1이 이 문안을 그대로 `agent-principles.md`에 옮기게 되어 있어, 현행 문안(쉼표 하나)에 없던 위반이 원칙 본문에 들어간다."
+    },
+    {
+      "where": "Task 1 Step 1 새 문안(조건 C)의 `SUB-ORCHESTRATE` 줄",
+      "type": "style",
+      "claim": "같은 조항 안에서 금지 명령의 말끝이 '말라'와 '마라'로 갈린다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:123",
+      "evidence": "…직접 진행하지 말라. … 나눌 일이 하나뿐이면 맡기지 마라.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:65",
+      "counterpart": "`ONE-ENDING` — 한 표와 한 목록과 한 다이어그램과 한 차트 안에서 같은 구실을 하는 요소끼리 말끝을 하나로 맞춰라. (에이전트원칙의 다른 금지 명령은 모두 '마라'로 끝난다. 예: 146행 '두지 마라')",
+      "principle": "ONE-ENDING",
+      "consequence": "에이전트원칙 목록에서 이 조항만 '말라'를 쓰고, 같은 조항 안의 다음 문장은 '마라'를 쓴다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 frontmatter `description`",
+      "type": "style",
+      "claim": "description 마지막 앞 문장에 연결어미 뒤 쉼표가 둘 있다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:316",
+      "evidence": "하던 일은 같은 서브 세션을 이어 쓰고, 수정 범위는 병합 전에 기계로 대조하며, 진행 위치는 git에서 도출한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:57",
+      "counterpart": "`COMMA-CUT` — 연결어미 뒤 쉼표는 한 문장에 하나까지만 써라.",
+      "principle": "COMMA-CUT",
+      "consequence": "스킬 목록에 실리는 description 문장 하나가 '쓰고,'와 '대조하며,' 두 쉼표로 세 절을 잇는다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「HARD-GATE 예외」·「디스패치 템플릿」·「재구현 금지」",
+      "type": "style",
+      "claim": "용어 표가 '큰 명세'·'하부 명세'를 정해 두었는데 본문이 같은 대상을 spec·스펙으로도 부른다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:381",
+      "evidence": "381행 \"spec 승인은 현재 세션이 맡는다\", 394행 \"스펙 이탈\", 439행 \"아이디어에서 스펙까지는 `brainstorming`\" (용어 표 330~331행은 '큰 명세'·'하부 명세')",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:82",
+      "counterpart": "`TERM-ONE` — 한 개념에는 한 용어만 쓰고, 답이 바뀌어도 같은 대상을 같은 이름으로 가리켜라.",
+      "principle": "TERM-ONE",
+      "consequence": "한 스킬 안에서 같은 설계 문서를 명세·spec·스펙 세 이름으로 부른다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「라우팅」·「재구현 금지」",
+      "type": "style",
+      "claim": "본문 전체가 plan이라고 부르는 문서를 두 곳에서 '계획'으로 부른다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:337",
+      "evidence": "337행 \"단위가 계획·리뷰 루프 없는 단일 태스크이면\", 439행 \"계획은 `writing-plans`\" (343·373·394행 등은 'plan')",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:82",
+      "counterpart": "`TERM-ONE` — 한 개념에는 한 용어만 쓰고, 답이 바뀌어도 같은 대상을 같은 이름으로 가리켜라.",
+      "principle": "TERM-ONE",
+      "consequence": "같은 산출물을 plan과 계획 두 이름으로 부른다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「가드레일」 절",
+      "type": "style",
+      "claim": "가드레일 불릿 항목 하나하나가 여러 문장으로 되어 있고, 시험 병합 항목은 다섯 문장이다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:424",
+      "evidence": "- **시험 병합** — `git switch -c try/<id> dev/<개발>`로 … 실행한다. 통과하면 … 실행한다. 실패하면 … 보낸다. 통합 브랜치는 … 생기지 않는다. 되돌린 병합은 … 처리하지 않는다. (421~427행의 다른 항목도 두 문장 이상)",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:74",
+      "counterpart": "`BULLET-SCOPE` — 불릿은 같은 종류를 늘어놓을 때만 쓰고, 한 항목이 여러 문장이 되면 산문으로 써라.",
+      "principle": "BULLET-SCOPE",
+      "consequence": "「가드레일」 절의 일곱 불릿이 모두 여러 문장이며, 시험 병합 불릿은 명령 순서와 실패 처리와 revert를 쓰지 않는 이유를 한 항목에 담는다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「디스패치 템플릿」 4번 항목(방식)",
+      "type": "style",
+      "claim": "번호 항목 하나가 여덟 문장으로 된 한 단락이다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:392",
+      "evidence": "4. **방식** — 하부 명세에는 … 늘어놓지 않는다. 하부 명세를 … 멈춘다. 승인 메시지를 받으면 … 진행한다. 아래 HARD-GATE 예외 문장을 그대로 넣는다: \"…\" 렌즈를 실행하기 전에 … 읽는다. 서브 세션은 … 있다. 구현자에게든 … 넣는다. 통합 브랜치가 바뀌었다는 … 잇는다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:75",
+      "counterpart": "`ONE-IDEA` — 한 문장에 한 개념만 두고, 단락은 네 문장 이하로 끊어라.",
+      "principle": "ONE-IDEA",
+      "consequence": "하부 명세 범위, 리뷰 순서, HARD-GATE 문장, 렌즈 규율, 경로 주입, 통합 브랜치 동기화가 한 단락 여덟 문장에 들어 있다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「디스패치 템플릿」 4번 항목과 절 제목",
+      "type": "style",
+      "claim": "다른 문서의 목록을 개수로 가리키고, 절 제목에서 목록 개수를 예고한다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:392",
+      "evidence": "392행 \"서브 세션은 그 규율을 여는 호출자 넷 중 하나이고\", 385행 \"## 디스패치 템플릿 — 여섯 블록\"",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:84",
+      "counterpart": "`COUNT-EARNS` — … 대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라.",
+      "principle": "COUNT-EARNS",
+      "consequence": "dispatching-lenses의 호출자 목록이 바뀌어도 이 스킬의 '넷'은 그대로 남고, 절 제목 '여섯 블록'은 Task 4 Interfaces(301행)의 절 이름 목록에도 같은 개수로 박혀 있다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「이어 쓰기와 재개」",
+      "type": "style",
+      "claim": "저장소 안에서만 통하는 약어 SDD 를 처음 나오는 곳에서 풀지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:402",
+      "evidence": "워크스트림 브랜치·하부 명세·plan과 워크트리에 남은 SDD ledger를 넣어 새 서브 세션을 시작한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:81",
+      "counterpart": "`TERM-EXPLAIN` — 저장소 안에서만 통하는 이름과 그 분야의 용어는 답마다 처음 나올 때 한 줄로 풀어라.",
+      "principle": "TERM-EXPLAIN",
+      "consequence": "스킬 본문에서 SDD 가 `subagent-driven-development`의 약어라는 설명 없이 402·406·445행에 쓰인다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「큰 개발 분할」 근거와 한계 문단, 「가드레일」 교집합 검사",
+      "type": "style",
+      "claim": "누가 나누지 않고 누가 고정하는지, 누가 검사를 두는지를 생략한다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:363",
+      "evidence": "363행 \"그래서 작은 개발은 나누지 않고, 나눌 때는 계약과 결정 기록을 먼저 고정한다.\", 422행 \"허용 경로 패턴끼리 겹치는지는 사람이 놓치기 쉬워 이 검사를 함께 둔다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:58",
+      "counterpart": "`SUBJECT-OBJECT` — 누가 누구에게 무엇을 하는지 생략하지 마라. 판단하고 행동하는 주체를 사람이나 도구로 적고…",
+      "principle": "SUBJECT-OBJECT",
+      "consequence": "두 문장 모두 행동 주체(현재 세션 또는 이 스킬)가 빠져 있다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「이어 쓰기와 재개」 첫 단락",
+      "type": "style",
+      "claim": "관형절이 문장 중간에 끼어 있다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:398",
+      "evidence": "하던 일을 이어 가면 맥락이 증분으로 쌓인다는 사용자 판단에 따른 규칙이고, 같은 에이전트 재개와 새 에이전트에 파일을 넘기는 방식을 비교한 연구는 찾지 못했다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:53",
+      "counterpart": "`NO-MID-MOD` — 관형절을 문장 중간에 끼우지 마라.",
+      "principle": "NO-MID-MOD",
+      "consequence": "'맥락이 증분으로 쌓인다는'과 '새 에이전트에 파일을 넘기는'이 문장 중간에서 명사를 꾸민다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「가드레일」 크래시와 멈춤, 「관측성」",
+      "type": "style",
+      "claim": "표준 용어가 아닌 영어 낱말을 한글로 음차해 쓴다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md:426",
+      "evidence": "426행 \"CLI 드릴인으로 실행 상태를 확인하고\", 435행 \"각 서브 세션의 라이브 세션에 드릴인된다\"",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md:44",
+      "counterpart": "`VOCAB-PREF` — … 표준 용어가 영어 원어이면 원어로 쓰고 처음 나올 때 한 줄로 풀어라. 용어를 새로 짓거나 고유명사를 한글로 음차하지 말고…",
+      "principle": "VOCAB-PREF",
+      "consequence": "'드릴인'이 원어 표기나 풀이 없이 두 절에 쓰인다(현행 스킬 43·48행에서 이어진 표기다)."
+    }
+  ],
+  "principles_applied": [
+    "DOC-TYPE",
+    "COMMA-CUT",
+    "ONE-ENDING",
+    "TERM-ONE",
+    "TERM-EXPLAIN",
+    "BULLET-SCOPE",
+    "ONE-IDEA",
+    "COUNT-EARNS",
+    "SUBJECT-OBJECT",
+    "NO-MID-MOD",
+    "VOCAB-PREF",
+    "ANTI-LIMIT",
+    "WRITTEN-ONLY",
+    "FULL-SENTENCE",
+    "NAME-ITEMS",
+    "TITLE-LAYERS",
+    "LABEL-NOUN"
+  ],
+  "notes": "검토한 관점: 형식(plan 구조와 Task 4 스킬 frontmatter·절 구성), 스타일(에이전트원칙 「출력지시」 조항, 근거는 domain-korean), 오염(설계 행이 포함하지 말라는 것), 호환(test_docs_drift.sh 162·284-289·786-789·867-871행 검사와 스킬 절 이름 참조), 규율(에이전트원칙 전반). 지시대로 금지 낱말은 보지 않았다. 오염: 문서 타입 표의 설계 행에는 포함하지 말라는 항목이 없어 표 행을 상대편으로 올린 지적은 없다. 호환: 새 스킬은 `dispatching-lenses`와 「렌즈에게 에이전트원칙을 알리는 법」을 한 줄에 두고(392행) 그 절을 스스로 두지 않으며, `Explore`와 관리 디렉터리 경로를 쓰지 않는다. 옛 절 이름(「L2 디스패치 템플릿」「사람 대화 불가」 등)을 superpowers 경로 밖에서 참조하는 파일은 찾지 못했다. 형식: plan 머리의 영어 안내문과 Goal·Architecture·Files·Expected 같은 영어 라벨은 출력지시와 어긋나 보인다. 다만 에이전트원칙 95행이 'spec과 plan을 쓰는 방법은 superpowers가 소유'한다고 하므로 writing-plans 템플릿으로 보고 올리지 않았다. `###` Task 제목도 같은 이유와 TITLES 적용 범위(남에게 전달되는 문서) 때문에 올리지 않았다. Task 1 Step 2의 과제 문장과 구어('진행해 줘')는 서브에이전트에 실어 보내는 인용이라 KO-SYNTAX 대상에서 뺐다. 지적 가운데 '여섯 블록', '호출자 넷', '드릴인', SDD 미풀이는 현행 스킬에도 있던 표기를 이어받은 것이다. 더 확인할 것: 새 문안 C의 영문 이름이 '(One sub-orchestrator per independent job)'에서 '(One subagent per independent job or subsystem)'로 바뀌므로, docs/domain-discipline.md와 다른 스킬이 옛 영문 이름을 인용하는지 grep으로 확인해야 한다. 이번 검토에서는 그 파일을 열지 않았다."
+}

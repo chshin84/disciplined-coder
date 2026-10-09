@@ -1,0 +1,226 @@
+{
+  "lens": "lens-consistency",
+  "read": [
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+    "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+    "D:/projects/disciplined-coder/skills/dispatching-lenses/SKILL.md",
+    "D:/projects/disciplined-coder/skills/review-specs/SKILL.md",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/brainstorming/SKILL.md",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/subagent-driven-development/SKILL.md"
+  ],
+  "issues": [
+    {
+      "where": "진행 규칙 — 질문",
+      "type": "contradiction",
+      "claim": "원문은 멈춘 서브에이전트를 SendMessage로 재개해 답을 전달한다고 정한다. 그러나 원문이 따른다고 밝힌 nested-orchestration은 정지된 L2를 되살리지 않고 새 L2를 재디스패치한다고 정한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "메인 세션이 사용자에게 하나씩 묻고, 답을 같은 서브에이전트에 이어서 전달한다(SendMessage 로 재개).",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "답이 오면 L1은 정지된 L2를 되살리지 않고, 답을 스펙에 접어 넣어 그 워크트리에 새 L2를 재디스패치한다.",
+      "principle": "같은 상황에 대한 재개 방식은 한 가지여야 한다(FOCUSED, 소유 문서 우선).",
+      "consequence": "두 문서를 한 스킬에 합치면 질문에 대한 답을 받은 뒤 재개하는 방법이 SendMessage 재개와 새 L2 재디스패치로 두 가지가 된다. 원문은 재디스패치에 넣을 브랜치명과 앞선 리포트 경로를 언급하지 않는다."
+    },
+    {
+      "where": "인계 — 진행 방법",
+      "type": "contradiction",
+      "claim": "원문은 서브에이전트가 절 범위에서 브레인스토밍부터 명세 작성과 명세 검토까지 진행한다고 정한다. nested-orchestration은 스펙을 L1이 사람과 함께 brainstorming으로 잠그고 스펙 국면 리뷰도 L1이 마친 뒤에 L2가 writing-plans부터 시작한다고 정한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "진행 방법: superpowers 의 브레인스토밍 → 명세 작성 → 명세 검토 → 계획 → 구현을 이 절 범위에서 진행한다",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "L1(메인, 사람과 함께) — 스펙을 하나씩 `brainstorming`으로 잠근다. … L2(자율 서브오케스트레이터, 사람 대화 불가) — 잠긴 스펙으로 `writing-plans` 다음 `subagent-driven-development`를 … 스펙 국면은 L1이 `review-specs`로 이미 마쳤고",
+      "principle": "원문이 따르겠다고 밝힌 실행 규약과 단계 배분이 일치해야 한다.",
+      "consequence": "원문에서 절 명세를 쓰고 검토하는 주체는 서브에이전트(L2)이다. nested-orchestration에서는 L1이 스펙 작성과 스펙 리뷰를 맡고, L2 단계 목록에는 브레인스토밍과 스펙 리뷰가 없다."
+    },
+    {
+      "where": "진행 규칙 — 명세 분량(절 명세 검토 주체)",
+      "type": "contradiction",
+      "claim": "원문은 절 명세를 사용자가 검토하지 않는다고 정한다. 그러면서 서브에이전트에게 superpowers 브레인스토밍을 진행하게 한다. superpowers brainstorming의 HARD-GATE는 architectural 경로에서 사람이 작성된 spec을 검토하고 승인해야 writing-plans로 넘어가게 한다. 서브에이전트는 사람과 대화하지 못한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "사용자가 직접 검토하는 문서는 큰 명세와 계약으로 한정하고, 절 명세는 검토 서브에이전트와 메인 세션이 검토한다.",
+      "counterpart_file": "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/brainstorming/SKILL.md",
+      "counterpart": "Architectural: the human partner reviews and approves the written spec, then reviews the written implementation plan and selects its execution method. … written-spec approval only permits invoking writing-plans.",
+      "principle": "호출하는 스킬의 하드 게이트와 호출자의 규칙이 부딪히면 어느 쪽이 이기는지 적어야 한다.",
+      "consequence": "서브에이전트가 brainstorming을 그대로 따르면 사람의 spec 승인을 기다려야 하므로 writing-plans로 넘어가지 못한다. 원문은 이 게이트를 무엇이 대신하는지 적지 않았다."
+    },
+    {
+      "where": "진행 규칙 — 질문",
+      "type": "contradiction",
+      "claim": "원문은 확인이 필요하면 서브에이전트가 멈추게 한다. 서브에이전트가 실행하는 subagent-driven-development는 모호함과 충돌을 스스로 판정하고 계속 진행하며, 멈추는 사유를 네 가지로 한정한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "확인이 필요하면 보고의 「질문」 절에 적고 멈춘다.",
+      "counterpart_file": "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/subagent-driven-development/SKILL.md",
+      "counterpart": "A running plan does not wait on a human. Conflicts, ambiguities, plan defects, a cap you would have asked to exceed — decide them. … Four things stop you, and only these",
+      "principle": "같은 실행자에게 주는 정지 조건은 하나로 정해야 한다.",
+      "consequence": "구현 단계의 서브에이전트에게는 '확인이 필요하면 멈춘다'와 'Ruling을 남기고 계속 간다'는 두 지시가 함께 주어진다. 원문은 어느 단계에서 어느 지시가 우선하는지 적지 않았다."
+    },
+    {
+      "where": "진행 규칙 — 실행 순서 / 통합",
+      "type": "contradiction",
+      "claim": "원문 안에서 동시 진행 규칙과 순차 시작 규칙이 부딪힌다. 진행 규칙은 의존이 없고 파일 범위가 겹치지 않는 절을 동시에 진행하게 한다. 통합 절은 다음 절을 앞 절의 통합 확인을 통과한 뒤에 시작하게 한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "의존 순서가 없고 수정 파일 범위가 겹치지 않는 절만 동시에 진행하고, 나머지는 차례로 진행한다.",
+      "counterpart_file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "counterpart": "앞 절의 오류가 뒤 절의 전제가 되지 않도록, 다음 절은 이 확인을 통과한 뒤에 시작한다.",
+      "principle": "한 문서 안의 규칙끼리 모순이 없어야 한다.",
+      "consequence": "통합 절의 '다음 절'은 의존하는 절로 한정되어 있지 않다. 그래서 독립된 절도 앞 절의 통합 확인을 기다려야 하는지가 정해져 있지 않다."
+    },
+    {
+      "where": "진행 규칙 — 강제",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 원문은 절마다 정한 수정 가능 파일 범위를 nested-orchestration의 소유권 검사로 강제한다고 적는다. 그러나 그 검사는 브랜치끼리 변경 파일이 겹치는지만 보고, 브랜치가 선언된 범위 안에 머물렀는지는 보지 않는다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "수정할 수 있는 파일 범위는 지시문에만 두지 않고 nested-orchestration 의 소유권 검사로 강제한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "L1은 취합 때 각 브랜치의 변경 파일 집합(`git diff --name-only base..branch`)을 구한 뒤 브랜치를 둘씩 짝지어 모든 쌍의 교집합을 확인한다.",
+      "principle": "강제한다고 적은 규칙은 그것을 실제로 검사하는 단계에 이어져야 한다.",
+      "consequence": "절 하나가 다른 절이 건드리지 않은 범위 밖 파일(예: 메인 세션이 커밋한 계약 코드)을 고쳐도 교집합 검사는 통과한다. 이 검사는 순차로 진행된 절 사이에는 쌍을 이루지 않는다."
+    },
+    {
+      "where": "인계 — 결정 기록 파일 / 문서 보관",
+      "type": "gap",
+      "claim": "산출물 공백이다. 결정 기록 파일의 위치와 형식과 기록하는 주체가 적혀 있지 않다. '절이 끝날 때마다 … 추가한다'에는 주어가 없다. 원문은 결정 기록을 저장소에 보존한다고만 적는다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "절이 끝날 때마다 그 절에서 확정된 결정, 바뀐 계약, 실제로 만든 공개 인터페이스를 이 파일에 추가한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "고정 경로로 커밋하면 워크스트림끼리 병합 충돌이 난다.",
+      "principle": "산출물에는 무엇을 누가 어떤 형태로 어디에 남기는지를 적어야 한다.",
+      "consequence": "서브에이전트가 각자의 워크트리에서 결정 기록 파일에 추가하면 같은 고정 경로를 여러 브랜치가 고치게 된다. 그러면 소유권 교집합 검사에 걸려 병합이 멈춘다. 메인 세션이 추가하는지 서브에이전트가 추가하는지는 정해져 있지 않다."
+    },
+    {
+      "where": "진행 규칙 — 질문·범위(보고의 「질문」 절과 「제안」 절)",
+      "type": "drift",
+      "claim": "원문이 가리키는 보고의 「질문」 절과 「제안」 절은 nested-orchestration의 산출 계약에 없다. 원문이 결정 기록에 옮기라는 '실제로 만든 공개 인터페이스'는 짝 문서에서 '발행 스키마 실제 모양'이라는 이름으로 나온다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "확인이 필요하면 보고의 「질문」 절에 적고 멈춘다. … 범위 밖 아이디어는 「제안」 절에 적고",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "상세는 리포트 파일에 쓰고(변경 파일과 테스트 최종 결과와 발행 스키마 실제 모양과 스펙 이탈과 브랜치명을 포함한다), L1으로 리턴하는 것은 상태와 블로커와 한 줄 요약과 리포트 경로뿐이다.",
+      "principle": "같은 산출물은 같은 이름과 같은 항목으로 불러야 한다(TERM-ONE).",
+      "consequence": "L2 산출 계약의 리포트 항목과 리턴 항목에는 질문 절과 제안 절이 없다. 같은 대상을 두 문서가 '공개 인터페이스'와 '발행 스키마'라는 다른 이름으로 부른다."
+    },
+    {
+      "where": "문서 보관",
+      "type": "contradiction",
+      "claim": "원문은 절별 계획과 검토 기록을 저장소에 보존하고 사용자 확인 없이는 지우지 않게 한다. 에이전트원칙의 문서 수명 표는 병합된 plan과 다룬 작업이 병합된 reviews를 git 보존 태그를 단 뒤 지우게 한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "큰 명세, 결정 기록, 절별 명세와 계획, 검토 기록, 측정 기록은 저장소에 보존한다. 지우기 전에는 사용자 확인을 받는다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "plan은 실행이 끝나 병합되면 git 보존 태그를 단 뒤 지워라. … 다룬 작업이 병합되면 git 보존 태그를 단 뒤 지우되, 차수 대조에 쓰는 최근 기록은 남겨라.",
+      "principle": "DOC-TYPE — 문서마다 수명 표의 타입을 정하고 그 노후 방지 방법을 따른다.",
+      "consequence": "절별 plan과 검토 기록의 처분이 수명 표와 다르게 정해져 있다. 결정 기록과 측정 기록은 수명 표의 어느 타입인지 정해져 있지 않다."
+    },
+    {
+      "where": "문서 보관 — 재개",
+      "type": "contradiction",
+      "claim": "원문은 세션이 끊기면 저장소에 둔 문서와 커밋으로 진행 위치를 판정하게 한다. 원문을 담을 nested-orchestration은 영속되는 오케스트레이션 상태 문서를 만들지 않고 인플라이트 상태를 대화로만 든다고 비목표로 정한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "세션이 끊기면 재개하는 세션은 이 문서들과 커밋으로 진행 위치를 판정한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "영속되는 오케스트레이션 상태 문서는 만들지 않는다. 인플라이트 상태는 세션 대화 상태로만 든다.",
+      "principle": "추가될 스킬의 비목표와 추가할 규칙이 부딪히지 않아야 한다.",
+      "consequence": "원문은 결정 기록과 측정 기록을 진행 위치 판정에 쓴다. 그래서 이 두 기록은 nested-orchestration이 만들지 않겠다고 정한 영속 상태 문서 구실을 한다."
+    },
+    {
+      "where": "진행 규칙 — 검토 범위",
+      "type": "contradiction",
+      "claim": "원문은 명세 검토자와 코드 검토자에게 지적 범위를 정확성, 명시된 요구, 계약 위반으로 한정하게 한다. 이 규칙은 렌즈끼리 볼 것을 나눠 주지 않는다는 규율과 부딪힌다. SDD의 리뷰어에게 지적을 미리 거르지 말라는 규칙과도 부딪힌다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "명세와 코드 검토 서브에이전트에게 지적 범위를 정확성, 명시된 요구, 계약 위반으로 한정하게 한다.",
+      "counterpart_file": "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/subagent-driven-development/SKILL.md",
+      "counterpart": "Do not pre-judge findings for the reviewer — never instruct a reviewer to ignore or not flag a specific issue. … The reviewer's template already carries the process rules (YAGNI, test hygiene, review method)",
+      "principle": "dispatching-lenses 「실행하는 방법」 — 렌즈끼리 볼 것을 나눠 주지 않는다. 렌즈 체크리스트는 각 렌즈 스킬이 소유한다.",
+      "consequence": "L2가 실행하는 lens-consistency(산출물 공백, 드리프트, 스코프)와 lens-adversarial(과설계, YAGNI)의 체크리스트 항목은 원문의 한정 범위 밖에 놓인다. SDD 태스크 리뷰어 템플릿의 YAGNI와 테스트 위생 항목도 범위 밖에 놓인다."
+    },
+    {
+      "where": "진행 규칙 — 검토 범위(짝 문서)",
+      "type": "drift",
+      "claim": "원문은 절 명세를 검토할 때 큰 명세와 결정 기록을 짝 문서로 준다. dispatching-lenses는 review-specs와 L2에서 lens-consistency의 전체 입력을 검토 대상 하나와 그 짝 문서(plan이면 spec)로 정하고, spec의 짝은 정하지 않는다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "절 명세를 검토할 때는 큰 명세와 결정 기록을 짝 문서로 함께 준다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/dispatching-lenses/SKILL.md",
+      "counterpart": "| `review-specs`와 L2 | 검토 대상 문서 하나(spec 또는 plan) | 검토 대상 문서 하나와 그 짝 문서(plan이면 spec) |",
+      "principle": "렌즈 입력은 dispatching-lenses 「렌즈 그룹」이 소유한다. 호출자는 가리키기만 한다.",
+      "consequence": "두 문서는 절 명세를 검토하는 렌즈의 입력을 다르게 정한다. 원문은 짝 문서를 어느 렌즈에 주는지 적지 않았다. 표는 lens-adversarial에 검토 대상 하나만 준다."
+    },
+    {
+      "where": "큰 명세 — 계약 코드 선작성",
+      "type": "contradiction",
+      "claim": "원문은 메인 세션이 계획 없이 계약 스텁과 타입과 계약 테스트 코드를 먼저 만들어 커밋하게 한다. brainstorming의 HARD-GATE는 architectural 경로에서 spec 승인 뒤에 writing-plans만 허용하고, 계획 전의 제품 코드 작성을 금지한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "메인 세션은 절 사이 계약을 스텁, 타입, 계약 테스트 코드로 먼저 만들어 커밋한다.",
+      "counterpart_file": "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/brainstorming/SKILL.md",
+      "counterpart": "Before taking any implementation action, including invoking an implementation skill, writing product code, scaffolding … complete the selected path's prerequisites … written-spec approval only permits invoking writing-plans.",
+      "principle": "원문이 따른다고 밝힌 superpowers 흐름의 게이트와 원문의 단계가 일치해야 한다.",
+      "consequence": "계약 코드는 plan도 SDD 리뷰도 거치지 않고 base에 커밋된다. 원문은 이것이 superpowers 게이트의 예외라는 사실과 그 근거를 적지 않았다."
+    },
+    {
+      "where": "큰 명세 — 검증",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 원문은 큰 명세를 사용자 승인으로만 확정한다. 에이전트원칙이 spec에 요구하는 렌즈 검증(review-specs)으로 이어지는 단계는 원문에 없다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "메인 세션은 큰 명세에 아래를 적고 사용자 승인을 받는다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "`NO-RAW-OUTPUT` (No unreviewed output) — 위 대상은 렌즈 검증을 거친 뒤에 결과로 삼아라.",
+      "principle": "NO-RAW-OUTPUT — spec·plan은 렌즈 검증을 거친다.",
+      "consequence": "메인 세션의 역할 목록에 큰 명세 리뷰가 없다. 큰 명세를 superpowers 기본 경로 밖에 두면 훅 게이트도 적용되지 않는다. 원문은 큰 명세를 어디에 두는지 적지 않았다."
+    },
+    {
+      "where": "통합",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 원문의 절별 통합 확인에는 nested-orchestration의 병합 전 검사가 이어져 있지 않다. 소유권 교집합과 plan 리뷰 마커 확인이 그것이다. 절 명세에 대해서는 spec-review 마커를 확인하는 가드가 어느 쪽에도 없다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "메인 세션은 절의 구현이 끝날 때마다 계약 테스트와 통합 확인 방법을 실행한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "L1 은 병합 전에 브랜치마다 `git diff --name-only --diff-filter=A base..branch -- docs/superpowers/plans` 로 추가된 plan 을 구하고, 각 파일 마지막 줄에 `spec-review` 마커가 있는지 확인한다.",
+      "principle": "원문이 따른다고 밝힌 규약의 가드는 원문의 해당 단계에서 호출되어야 한다.",
+      "consequence": "원문의 통합 절에는 병합 시점과 병합 전 검사가 적혀 있지 않다. 원문에서는 L2가 절 명세를 docs/superpowers/specs에 쓰지만, nested-orchestration의 마커 확인은 plans 경로만 본다."
+    },
+    {
+      "where": "측정",
+      "type": "gap",
+      "claim": "산출물 공백이자 커버리지 공백이다. 측정 기록의 위치와 형식이 적혀 있지 않다. '검토 지적의 채택 수와 기각 수'와 '절별 토큰 사용량'을 가져올 출처가 짝 문서에 없다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "검토 지적의 채택 수와 기각 수 … 절별 토큰 사용량",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/review-specs/SKILL.md",
+      "counterpart": "각 지적을 어떻게 처리했는지는 포함하지 않는다. 처리는 기록을 쓴 뒤에 정해지는데 이 파일은 고치지 않기 때문이다.",
+      "principle": "측정 항목은 그 값을 내는 단계에 이어져야 한다.",
+      "consequence": "review-specs의 리뷰 기록은 처리 결과를 담지 않고, 처분을 채택과 기각이 아니라 🔴와 고칠 것으로 나눈다. nested-orchestration의 L2 리포트 항목에도 채택 수와 토큰 수가 없다. nested-orchestration 「관측성」은 '집계 대시보드와 메트릭은 볼 수 없'다고 적는다."
+    },
+    {
+      "where": "나눌지 판단 / 서두",
+      "type": "scope",
+      "claim": "원문의 분할 기준은 에이전트원칙 SUB-ORCHESTRATE가 정한 nested-orchestration 트리거와 다르다. 원문은 의존 순서가 있는 절과 순차 진행까지 다룬다. 트리거는 서로 독립된 일이 둘 이상이고 일마다 작업 다섯 이상일 때이고, nested-orchestration은 독립된 플랜의 병렬 실행만 다룬다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "한 명세에 독립된 하위 시스템이 여럿 섞이거나 한 세션이 전체 코드와 결정을 다 들고 있을 수 없으면 절로 나눈다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "서로 독립된 일이 둘 이상이고 각 일이 plan 문서를 따로 둘 만큼(작업 다섯 이상) 크면, 일마다 서브오케스트레이터를 두어 동시에 진행하라. 일이 하나뿐이면 서브오케스트레이터를 두지 마라.",
+      "principle": "FOCUSED — 추가하는 규칙은 그 스킬의 트리거와 범위 안에 있어야 한다. 선언한 규칙을 호출하는 곳이 있어야 한다.",
+      "consequence": "원문은 하나의 큰 개발을 의존 관계가 있는 절로 나누는 경우까지 다룬다. 그러나 nested-orchestration을 여는 트리거(SUB-ORCHESTRATE와 스킬 description)는 그런 경우를 가리키지 않는다. 따라서 원문의 '나눌지 판단' 단계를 호출하는 곳이 없다."
+    },
+    {
+      "where": "전반 — 용어",
+      "type": "drift",
+      "claim": "원문은 메인 세션, 서브에이전트, 절, 큰 명세, 명세, 계획이라는 용어를 쓴다. 추가될 스킬은 같은 대상을 L1, L2(서브오케스트레이터), 워크스트림, 스펙, 플랜으로 부른다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "절로 나누면 메인 세션은 감독만 한다. … 절의 명세·계획·구현 코드는 직접 쓰지 않는다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "L2는 서브오케스트레이터를, L3는 구현자와 렌즈를 가리킨다.",
+      "principle": "TERM-ONE — 한 개념에는 한 용어만 쓴다.",
+      "consequence": "원문을 그대로 추가하면 한 스킬 안에서 같은 실행자가 '서브에이전트'와 'L2'로 불린다. 원문의 '서브에이전트'는 L2와 L3(검토 서브에이전트)를 함께 가리킨다."
+    }
+  ],
+  "principles_applied": [
+    "FOCUSED",
+    "NO-ASSUME",
+    "STATE-ASSUME",
+    "NO-FLEET",
+    "DOC-TYPE",
+    "NO-RAW-OUTPUT",
+    "SUB-ORCHESTRATE",
+    "TERM-ONE",
+    "SPECIFIC-NAME",
+    "WRITTEN-ONLY",
+    "SUBJECT-OBJECT"
+  ],
+  "notes": "검토한 관점은 다섯이다. 모순 관점에서는 원문 내부의 규칙끼리, 그리고 원문과 nested-orchestration, brainstorming HARD-GATE, SDD 정지 규칙, 에이전트원칙 문서 수명 표 사이를 대조하였다. 커버리지 공백 관점에서는 원문이 선언한 규칙(소유권 강제, 통합 확인, 측정, 큰 명세 확정)이 짝 문서의 어느 단계로 이어지는지 추적하였다. 산출물 공백 관점에서는 결정 기록, 측정 기록, 보고의 질문 절과 제안 절, 큰 명세의 위치와 형식과 작성 주체를 보았다. 드리프트 관점에서는 원문 용어와 nested-orchestration 용어, 원문의 보고 항목과 L2 산출 계약, 렌즈 입력 표를 대조하였다. 스코프 관점에서는 원문의 분할 기준을 SUB-ORCHESTRATE 트리거와 nested-orchestration의 라우팅과 비교하였다. 추가로 확인할 것이 셋 남았다. 첫째, nested-orchestration이 가리키는 설계 문서 docs/superpowers/specs/2026-07-05-nested-orchestration-design.md의 「검증 상태」는 열지 않았다. 의존 절의 순차 실행이 그 문서의 비목표인지 확인하려면 이 문서를 열어야 한다. 둘째, SDD의 implementer-prompt.md와 task-reviewer-prompt.md는 짝 문서가 이름으로 가리키지만 열지 않았다. 검토 범위를 한정하는 원문 규칙이 템플릿의 리뷰 항목과 얼마나 부딪히는지 구체적으로 확인하려면 이 두 파일을 열어야 한다. 셋째, review-specs의 훅이 superpowers 기본 경로 밖의 큰 명세에 적용되는지는 훅 스크립트를 열어 확인해야 한다. 이 셋째 확인은 배경 범위 밖이라 하지 않았다. 원문 13행의 '효과가 보고되었지만'은 출처가 없으나, 근거 대조는 lens-grounding이 보는 관점이라 지적하지 않았다."
+}

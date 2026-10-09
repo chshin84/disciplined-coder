@@ -1,0 +1,149 @@
+{
+  "lens": "lens-grounding",
+  "target": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+  "read": [
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+    "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+    "D:/projects/disciplined-coder/skills/dispatching-lenses/SKILL.md (47·70·71·77·83·96·106행과 L1/L2/메인 세션 grep)",
+    "D:/projects/disciplined-coder/skills/review-specs/SKILL.md (64·131행과 L1/L2/메인 세션 grep)",
+    "D:/projects/disciplined-coder/docs/domain-discipline.md (10~15행, 350~365행)",
+    "D:/projects/disciplined-coder/scripts/test_docs_drift.sh (155~170, 280~292, 395~410, 603~611, 640~720, 780~792, 860~875, 892행)",
+    "D:/projects/disciplined-coder/scripts/_doc_keys.sh",
+    "D:/projects/disciplined-coder/scripts/_test_check.sh",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md (머리와 superseded grep)",
+    "D:/projects/disciplined-coder/CLAUDE.md",
+    "C:/Users/CHSHIN/.claude/CLAUDE.md",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/using-git-worktrees/SKILL.md",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/subagent-driven-development/SKILL.md",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/brainstorming/SKILL.md (44~50, 200~205행)",
+    "D:/projects/disciplined-coder/docs/대화전문-2026-10-06_07.md (Specification Gap·BenchAgent·CodeTeam 수치 grep)",
+    "git status --short, git worktree list, .worktrees 존재 여부"
+  ],
+  "issues": [
+    {
+      "where": "Task 4 Step 2 교체 본문의 절 순서(「용어」「라우팅」「큰 개발 분할」), Task 4 Interfaces의 절 이름 목록",
+      "type": "contradiction",
+      "claim": "plan은 「큰 개발 분할」 절을 「라우팅」 뒤에 둔다. spec은 그 절을 「라우팅」 앞에 두라고 적는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "301행 \"스킬 절 이름 「용어」「라우팅」「큰 개발 분할」「흐름」…\", 333행 `## 라우팅`, 341행 `## 큰 개발 분할`",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "133행 \"「라우팅」 앞에 큰 개발 분할 절을 두고, 나눌지 판단·큰 명세·…를 넣는다.\"",
+      "principle": "NO-ASSUME",
+      "consequence": "plan대로 교체하면 스킬에서 「큰 개발 분할」이 「라우팅」 다음 절로 놓이고, spec이 정한 배치와 다르다."
+    },
+    {
+      "where": "Global Constraints 19행",
+      "type": "mismatch",
+      "claim": "plan은 `Explore`와 `~/.claude/disciplined-coder/` 검사가 867~871행에 있다고 적는다. 실제로 두 검사는 871행과 872행에 있고, 867~870행은 for 문과 주석이다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "19행 \"스킬 본문에 `Explore`와 `~/.claude/disciplined-coder/`를 쓰지 않는다(`test_docs_drift.sh` 867~871행).\"",
+      "counterpart_file": "D:/projects/disciplined-coder/scripts/test_docs_drift.sh",
+      "counterpart": "871행 `check \"$s: Claude 전용 종류 이름 없음\"    \"! grep -qF 'Explore' '$F'\"`, 872행 `check \"$s: 관리 디렉터리 절대경로 없음\"   \"! grep -qF '~/.claude/disciplined-coder/' '$F'\"`",
+      "principle": "NO-ASSUME",
+      "consequence": "plan이 적은 행 범위에는 관리 디렉터리 경로 검사(872행)가 들어 있지 않다. spec 160행도 같은 867~871행을 적는다."
+    },
+    {
+      "where": "Task 3 Step 1, Global Constraints 22행, Task 2 Interfaces 181행",
+      "type": "mismatch",
+      "claim": "Task 3 Step 1은 405행 바로 아래에 두 줄을 먼저 넣고 나서 같은 단계에서 \"789행의 라벨\"을 바꾸라고 한다. 두 줄을 넣으면 그 라벨 줄은 791행으로 밀린다. Task 4 이후 단계가 참조하는 786~789행과 867~871행도 같은 이유로 2행씩 밀린다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "248행 \"`check \"옛 spec 에 superseded 표시가 있다\"` 줄 바로 아래에 두 줄을 넣는다.\", 255행 \"같은 파일 789행의 라벨 … 를 … 로 바꾼다.\", 22행 \"(786~789행)\"",
+      "counterpart_file": "D:/projects/disciplined-coder/scripts/test_docs_drift.sh",
+      "counterpart": "405행 `check \"옛 spec 에 superseded 표시가 있다\" …`, 789행 `check \"그 절에 서브오케스트레이터 조항이 있다\" …`",
+      "principle": "NO-ASSUME",
+      "consequence": "plan은 Task 3 이전 파일의 행 번호를 Task 3 삽입 이후의 단계와 제약에도 그대로 쓴다."
+    },
+    {
+      "where": "Task 0 Step 2 Expected 76행",
+      "type": "mismatch",
+      "claim": "기대 출력은 옮긴 뒤 사용자 파일 두 묶음만 남는다고 적는다. 실제 미추적 목록에는 저장소 루트의 `agents.md`도 있고, plan은 이 파일을 옮기지도 언급하지도 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "58행 \"`docs/대화전문-2026-10-06_07.md`와 `2026-09-10-canon-slimming-for-opus5-review-2*`는 사용자 파일이라 옮기지 않는다.\", 76행 \"사용자 파일 두 묶음만 남는다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder (git status --short 실측)",
+      "counterpart": "`?? agents.md`, `?? docs/superpowers/reviews/2026-09-10-canon-slimming-for-opus5-review-2.md`, `?? …-review-2/`, `?? \"docs/대화전문-2026-10-06_07.md\"`",
+      "principle": "NO-ASSUME",
+      "consequence": "Step 2를 실행하면 `git status --short`에 `agents.md`가 함께 남아 Expected 문구와 다르게 나온다."
+    },
+    {
+      "where": "Task 0 Step 1",
+      "type": "contradiction",
+      "claim": "plan은 `superpowers:using-git-worktrees`를 따른다면서 `git worktree add ../dc-nested-large-dev`를 바로 실행한다. 그 스킬은 사용자 동의를 먼저 확인하고, 네이티브 도구를 우선하라고 적는다. 수동 git 경로는 네이티브 도구가 없을 때만 쓰고, 기본 위치를 `.worktrees/`로 두고, `git check-ignore` 확인을 거치게 한다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "47행 \"`superpowers:using-git-worktrees`를 따른다. 명령은 아래와 같다.\", 51행 `git worktree add ../dc-nested-large-dev -b nested-large-dev main`",
+      "counterpart_file": "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/using-git-worktrees/SKILL.md",
+      "counterpart": "10행 \"Prefer your platform's native worktree tools. Fall back to manual git worktrees only when no native tool is available.\", 41행 \"ask for consent before creating a worktree\", 76행 \"default to `.worktrees/` at the project root\", 80행 \"MUST verify directory is ignored before creating worktree\"",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "Step 1은 동의 확인과 네이티브 도구 확인, ignore 확인 없이 저장소 밖 형제 디렉터리에 워크트리를 만든다. 이 세션에는 `EnterWorktree`가 지연 도구로 등록되어 있다."
+    },
+    {
+      "where": "Task 1 Step 3·Step 5, Global Constraints 18행",
+      "type": "contradiction",
+      "claim": "plan은 과제 다섯으로 시작하고, 동률이면 둘을 더해 일곱 과제 합계로 채택을 정한다. 저장소 CLAUDE.md의 클린룸 소거 시험은 과제 셋으로 시작하고, 동률이면 둘을 더해 다섯 과제 합계로 정한다. plan은 이 차이의 근거를 적지 않았다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "142행 \"과제 다섯(B1·B2·B3·I1·S1)과 조건 셋의 조합마다\", 167행 \"같으면 B4·B5를 B·C 조건으로 더 실행하고, 일곱 과제 합계가 현행보다 나쁘지 않으면 채택안\"",
+      "counterpart_file": "D:/projects/disciplined-coder/CLAUDE.md",
+      "counterpart": "19행 \"조항마다 서로 다른 과제 3개를 … 실행하고 … 문구 변경은 … 같으면 과제 2개를 더 실행해 다섯 과제 합계가 현행보다 나쁘지 않을 때 채택한다.\"",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "plan의 채택 기준은 CLAUDE.md가 정한 과제 수와 다르다. spec 157~158행도 같은 일곱 과제 기준을 적고, 그 차이의 근거는 spec에도 없다."
+    },
+    {
+      "where": "Task 1 Step 1·Step 3 (조건 A '빈 모델'의 성립)",
+      "type": "omission",
+      "claim": "클린룸 소거 시험은 'CLAUDE.md가 빈 모델'을 조건으로 둔다. 그런데 이 PC의 전역 CLAUDE.md는 현행 에이전트원칙(현행 SUB-ORCHESTRATE 포함)을 @import한다. plan은 세션 안에서 실행한 서브에이전트에 그 메모리가 실리는지 확인하는 단계도, 실리지 않는다고 보는 가정의 명시도 두지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "126행 \"조건 A(빈 모델)는 조항을 싣지 않는다.\", 142행 \"서브에이전트 하나를 백그라운드로 실행한다\"",
+      "counterpart_file": "C:/Users/CHSHIN/.claude/CLAUDE.md",
+      "counterpart": "7행 `@disciplined-coder/agent-principles.md` (BEGIN disciplined-coder managed 블록), 그리고 D:/projects/disciplined-coder/CLAUDE.md 19행 \"CLAUDE.md가 빈 모델과 그 조항만 실은 모델에서 실행하고\"",
+      "principle": "STATE-ASSUME",
+      "consequence": "plan은 조건 A와 C가 현행 문안 없이 실행된다고 전제하지만, 그 전제를 확인하는 단계도 가정이라는 표시도 없다."
+    },
+    {
+      "where": "Task 2 Step 3 측정 문단 템플릿",
+      "type": "contradiction",
+      "claim": "템플릿은 과제 수를 꺾쇠 `<과제 수>`로 비워 두면서 과제 구성은 '큰 개발 요청 셋'으로 고정해 적는다. Task 1 Step 5에서 동률이 나와 B4·B5를 더 실행하면 큰 개발 요청은 다섯이 된다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "208~209행 \"클린룸 소거 시험을 과제 <과제 수>개로 실행했고 … 과제는 큰 개발 요청 셋, 서로 무관한 일 둘을 함께 맡기는 요청 하나, 작은 개발 요청 하나였다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "136~137행 B4·B5 \"추가(같을 때만)\", 167행 \"같으면 B4·B5를 B·C 조건으로 더 실행하고, 일곱 과제 합계가\"",
+      "principle": "NO-ASSUME",
+      "consequence": "추가 실행이 일어나면 꺾쇠만 바꿔 채운 참고서 문단은 과제 수 7과 '큰 개발 요청 셋'을 함께 적는다. 게다가 B4·B5는 B·C 조건에서만 실행하므로 조건 A의 과제 수도 다르다."
+    },
+    {
+      "where": "Review Focus 33행 「escalated 마커」",
+      "type": "mismatch",
+      "claim": "Review Focus는 마커가 있기만 하면 통과하던 검사가 🔴 미해소 문서를 들이는 위험을 Task 6 시나리오 D가 고정한다고 적는다. 시나리오 D는 마커가 없는 문서만 검사한다. 스크립트의 `nomarker`는 `escalated` 마커를 `passed`와 똑같이 통과시킨다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "33행 \"마커가 있기만 하면 통과하던 검사가 🔴 미해소 문서를 들인다. 기대 동작은 마커 없는 문서가 출력되는 것이다 … Task 6 시나리오 D가 고정한다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "571행 `tail -n 1 \"$f\" | grep -q '^<!-- spec-review: \\(passed\\|escalated\\)' || echo \"$f\"`, 572~574행 시나리오 D는 마커 없음/passed 두 경우만 검사",
+      "principle": "CHECKABLE",
+      "consequence": "Task 6에는 escalated 마커가 붙은 문서를 넣는 시나리오가 없고, 그런 문서는 `nomarker`에서 통과로 처리된다."
+    },
+    {
+      "where": "Task 4 Step 2 「흐름」 6단계와 「가드레일」",
+      "type": "omission",
+      "claim": "현행 스킬은 통합 단계에서 최종 브랜치 리뷰를 실행하고, 그 리뷰를 '최종 방벽'이라고 적는다. plan의 교체본은 이 리뷰를 흐름과 가드레일에서 모두 뺀다. spec의 결정과 「바뀌는 파일」에는 이 리뷰를 없앤다는 처분이 없다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "374행 \"6. **통합(현재 세션)** — 「가드레일」의 병합 전 검사와 시험 병합으로 통합 브랜치에 넣는다.\" (교체본 전체에 '최종 브랜치 리뷰' 없음)",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "20행 \"소유권을 기계로 검증한 뒤 병합하고 최종 브랜치 리뷰를 실행한다.\", 37행 \"최종 방벽은 L1의 통합검증과 최종 브랜치 리뷰다.\"",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "교체 뒤 스킬의 통합 절차는 범위 대조, 교집합 검사, 마커 확인, 시험 병합만 남는다. 최종 브랜치 리뷰를 언제 누가 하는지는 어디에도 적혀 있지 않다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "STATE-ASSUME",
+    "EVIDENCE-FIRST",
+    "CHECKABLE",
+    "FOCUSED",
+    "NO-FLEET",
+    "NAME-ITEMS",
+    "SPECIFIC-NAME",
+    "WRITTEN-ONLY",
+    "SUBJECT-OBJECT"
+  ],
+  "notes": "검토 관점은 체크리스트 항목별로 따로 적는다. [누락] spec 「바뀌는 파일」의 항목(description, 템플릿의 HARD-GATE 예외·명세 분량·제안, 비목표 문구, 포인터 이동, 용어 교체, 원칙·참고서·렌즈 문서·옛 설계·검사 스크립트)을 plan의 Task와 하나씩 대조했다. 현행 스킬의 내용 가운데 교체본에서 빠진 것도 찾았다. 최종 브랜치 리뷰 외에 리스크 비례 렌즈 선택 안내(현행 28행)와 '잔존 위험' 문단(현행 37행)도 빠졌다. 렌즈 선택 안내는 「멈추는 기준」 둘째 사유와 dispatching-lenses가 일부 맡는다고 보아 지적으로 올리지 않았다. [모순] spec·CLAUDE.md·using-git-worktrees·SDD·brainstorming과 plan의 주장을 대조했다. SDD의 정지 사유 넷(27~30행), ledger, 'R≤3 resume implementer'(75행), brainstorming 203행·46~49행은 plan·spec의 인용과 맞는다. [환각] 교체본 「근거와 한계」의 Specification Gap(58%→25%)·BenchAgent(6종 중 5종, 2.56~11.29%p)·CodeTeam·Contract-Coding 서술을 대화전문 1296·1309·1336행과 대조했고, 일치한다. 2026-07 스파이크의 약 40k 토큰은 현행 스킬 45행에서 왔다. [불일치] plan이 적은 행 번호를 실제 파일과 대조했다. agent-principles 142~146, domain-discipline 13·355~360, test_docs_drift 162·284~289·403~405·786~789, dispatching-lenses 47·70·71·77·83·96·106, review-specs 64·131의 '바꾸기 전' 문구는 모두 맞는다. 867~871만 어긋난다. 검사 함수 출력 형식은 `  FAIL: <라벨>`이고(_test_check.sh 5행, 앞에 공백 둘), plan 263행은 '형식 그대로'라고 적어 모순은 없다. 옛 nested 설계에는 지금 'superseded'가 없으므로 Task 3 Step 2의 FAIL 기대는 성립한다. 새 description에는 ': '와 ' #'이 없어 603~611행 frontmatter 검사를 통과한다. 교체본에는 TELL_SENT('렌즈가 직접 읽게')와 '가/이 아니라' 대구가 없다. Task 6 스크립트의 ok 호출은 12개이고, 호출자 실측 PASS=12 FAIL=0과 맞는다. 커밋 귀속 두 줄도 호출자가 준 문구와 일치한다. [더 확인할 것] 첫째, Agent 도구로 실행한 서브에이전트에 사용자 전역 CLAUDE.md(@import된 에이전트원칙)가 실리는지는 이 렌즈가 실측하지 못했다. 하네스 훅은 '서브에이전트에는 에이전트원칙이 안 실린다'고 넛지했다. 이 사실이 Task 1 조건 A·C가 성립하는지를 정하므로 호출자가 확인해야 한다. 둘째, 교체본의 마커 확인은 '각 파일 마지막 줄'을 어느 체크아웃에서 읽는지 적지 않는다. Task 6 스크립트는 ws 브랜치를 체크아웃한 작업 트리에서 `tail`로 읽는다. 현재 세션의 작업 트리가 통합 브랜치라면 추가된 파일이 없어 명령이 그대로 통하지 않을 수 있다. plan 301행의 '「가드레일」의 명령을 그대로 쓴다'가 이 부분까지 성립하는지는 호출자가 확인해야 한다. 셋째, Task 6 Step 3은 리뷰 마커가 붙은 spec 중간에 줄을 더한다. 그 뒤 Stop 게이트가 재리뷰를 요구하는지는 확인하지 않았다."
+}

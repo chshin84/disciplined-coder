@@ -1,0 +1,188 @@
+{
+  "lens": "lens-fit",
+  "doc_type": "절차·계약 (operations·setup·contract). 후보가 담은 것은 큰 개발을 절로 나눌지 판단하는 방법과 메인 세션·서브에이전트의 수행 방법이다. 진행 상태 값이나 1회성 인계 내용은 담고 있지 않다. 그래서 「문서 타입과 수명」 표의 '수행 방법과 스키마 계약' 행에 해당한다. 다만 후보는 다른 문서(결정 기록, 측정 기록)를 상태 문서로 운영하라고 지시하므로, 그 지시는 표의 다른 행과 대조하였다.",
+  "read": [
+    "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "D:/projects/disciplined-coder/docs/domain-korean.md",
+    "D:/projects/disciplined-coder/CLAUDE.md",
+    "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md"
+  ],
+  "issues": [
+    {
+      "where": "「진행 규칙」 절의 '질문' 항목(41행)",
+      "type": "compat",
+      "claim": "후보는 질문으로 멈춘 서브에이전트를 SendMessage로 되살려 답을 전달하라고 지시한다. 편입될 스킬의 재개 규약은 정지된 L2를 되살리지 말고 새 L2를 재디스패치하라고 정한다. 두 규약이 같은 스킬 안에서 정면으로 충돌한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "메인 세션이 사용자에게 하나씩 묻고, 답을 같은 서브에이전트에 이어서 전달한다(SendMessage 로 재개).",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "「사람 대화 불가 — BLOCKED와 재개」 절(35행): 답이 오면 L1은 정지된 L2를 되살리지 않고, 답을 스펙에 접어 넣어 그 워크트리에 새 L2를 재디스패치한다.",
+      "principle": "편입 대상 스킬과의 하위 호환(재개 규약)",
+      "consequence": "후보를 그대로 넣으면 한 스킬에 재개 방법이 두 가지 들어간다. 하나는 같은 서브에이전트를 이어서 쓰는 방법이고, 다른 하나는 새 L2를 재디스패치하는 방법이다. 두 방법 중 무엇을 따를지 정하는 문장은 없다."
+    },
+    {
+      "where": "「진행 규칙」 절의 '질문'·'범위' 항목(41~42행)",
+      "type": "schema",
+      "claim": "후보는 서브에이전트 보고에 「질문」 절과 「제안」 절을 두게 한다. 기존 산출 계약은 L1로 돌려주는 내용을 상태, 블로커, 한 줄 요약, 리포트 경로로 한정하고, 사람 결정이 필요할 때는 상태 BLOCKED와 질문을 돌려주게 한다. 후보는 보고 스키마를 기존 계약과 다르게 정의한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "확인이 필요하면 보고의 「질문」 절에 적고 멈춘다. / 범위 밖 아이디어는 「제안」 절에 적고",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "「L2 디스패치 템플릿 — 여섯 블록」의 '산출 계약' 블록(30행): L1으로 리턴하는 것은 상태와 블로커와 한 줄 요약과 리포트 경로뿐이다. 그리고 「사람 대화 불가 — BLOCKED와 재개」(33행): 상태 `BLOCKED`와 질문을 리턴한다.",
+      "principle": "편입 대상 스킬과의 하위 호환(산출 계약 스키마)",
+      "consequence": "같은 스킬 안에 서브에이전트 보고 형식이 두 가지 정의된다. 「질문」·「제안」 절이 상태 값 BLOCKED와 어떻게 대응하는지, 리포트 파일과 리턴 메시지 중 어디에 들어가는지는 후보에 적혀 있지 않다."
+    },
+    {
+      "where": "「인계」 절의 입력 목록 '진행 방법' 항목(37행)과 머리말(3행)",
+      "type": "compat",
+      "claim": "후보는 서브에이전트가 자기 절 범위에서 브레인스토밍부터 진행하게 한다. 기존 스킬은 사람과 대화하는 brainstorming을 L1이 맡게 하고, L2는 사람과 대화할 수 없으며 잠긴 스펙에서 writing-plans부터 시작한다고 정한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "진행 방법: superpowers 의 브레인스토밍 → 명세 작성 → 명세 검토 → 계획 → 구현을 이 절 범위에서 진행한다",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "「흐름 — 파이프라인 세 단계」(18~19행): L1(메인, 사람과 함께) — 스펙을 하나씩 `brainstorming`으로 잠근다. / L2(자율 서브오케스트레이터, 사람 대화 불가) — 잠긴 스펙으로 `writing-plans` 다음 `subagent-driven-development`를 …",
+      "principle": "편입 대상 스킬과의 하위 호환(층별 책임 분담)",
+      "consequence": "후보는 사람 대화가 전제인 브레인스토밍 단계를 사람과 대화할 수 없는 하위 층에 배정한다. 기존 「흐름」 절은 같은 단계를 L1에 배정한다."
+    },
+    {
+      "where": "「문서 보관」 절(64행)과 「인계」 절의 결정 기록 파일(29행), 「측정」 절(55행)",
+      "type": "constraint",
+      "claim": "후보는 결정 기록, 측정 기록 같은 영속 오케스트레이션 상태 문서를 두고, 재개하는 세션이 그 문서로 진행 위치를 판정하게 한다. 기존 스킬은 영속 오케스트레이션 상태 문서를 비목표로 못 박고 인플라이트 상태를 세션 대화 상태로만 든다고 정한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "세션이 끊기면 재개하는 세션은 이 문서들과 커밋으로 진행 위치를 판정한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "「한계」 절의 비목표(56행): 영속되는 오케스트레이션 상태 문서는 만들지 않는다. 인플라이트 상태는 세션 대화 상태로만 든다. 그리고 frontmatter description(3행): 재개는 무상태다.",
+      "principle": "편입 대상 스킬과의 하위 호환(비목표·무상태 재개)",
+      "consequence": "후보를 넣으면 같은 스킬의 description과 「한계」 절은 무상태 재개를 선언하는데, 새 절은 상태 문서에 기댄 재개를 지시한다."
+    },
+    {
+      "where": "「문서 보관」 절(64행)",
+      "type": "constraint",
+      "claim": "후보는 절별 계획과 검토 기록을 저장소에 보존하고 지우기 전에 사용자 확인을 받게 한다. 문서 타입 표는 plan을 병합 뒤 보존 태그를 단 다음 지우게 하고, 기록(reviews)도 병합 뒤 보존 태그를 단 다음 지우게 한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "큰 명세, 결정 기록, 절별 명세와 계획, 검토 기록, 측정 기록은 저장소에 보존한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "「문서 타입과 수명」 표의 '설계 (spec·plan)' 행: plan은 실행이 끝나 병합되면 git 보존 태그를 단 뒤 지워라. 그리고 '기록 (reviews)' 행: 다룬 작업이 병합되면 git 보존 태그를 단 뒤 지우되 …",
+      "principle": "DOC-TYPE / 「문서 타입과 수명」 표",
+      "consequence": "후보는 표가 지우라고 정한 plan과 검토 기록을 보존 대상으로 묶는다. 결정 기록과 측정 기록이 표의 어느 타입에 드는지도 후보는 정하지 않았다."
+    },
+    {
+      "where": "「나눌지 판단」 절(7행)과 머리말(3행)",
+      "type": "compat",
+      "claim": "후보의 발동 조건은 '개발 하나가 명세 하나에 담기에 너무 큰 경우'이다. 스킬 description과 「라우팅」 절, 그리고 에이전트원칙의 트리거는 '독립된 일이나 멀티태스크 플랜이 둘 이상인 경우'이다. 후보는 원칙과 description에 없는 조건으로 이 스킬을 쓰게 한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "개발이 명세 하나에 담기에 너무 크면 큰 명세를 절로 나누고, 절마다 서브에이전트가 그 흐름을 진행한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "「병렬 오케스트레이션」의 `SUB-ORCHESTRATE`: 서로 독립된 일이 둘 이상이고 각 일이 plan 문서를 따로 둘 만큼(작업 다섯 이상) 크면 … 일이 하나뿐이면 서브오케스트레이터를 두지 마라. 그리고 nested-orchestration SKILL.md 3행 description: 멀티태스크 플랜이 둘 이상일 때.",
+      "principle": "SUB-ORCHESTRATE / 편입 대상 스킬과의 하위 호환(트리거·라우팅)",
+      "consequence": "description과 원칙의 트리거는 '큰 개발 하나'를 가리키지 않는다. 그래서 그런 상황의 세션은 이 스킬을 열 근거를 얻지 못한다. 또 후보의 절은 의존 순서를 가질 수 있어(21행) 원칙이 말하는 '서로 독립된 일'에 들지 않는다."
+    },
+    {
+      "where": "머리말(3행), 「진행 규칙」 절의 '강제' 항목(46행)",
+      "type": "format",
+      "claim": "후보는 자기를 담을 스킬을 바깥 스킬처럼 'nested-orchestration 을 따른다'라고 가리킨다. 기존 스킬은 자기 방법을 '이 스킬이 정한다'고 쓰고 다른 절은 「절 이름」으로 가리킨다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "서브에이전트 실행 규약은 nested-orchestration 을 따른다. / nested-orchestration 의 소유권 검사로 강제한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "7행: 방법은 이 스킬이 정한다. 그리고 37행: 아래 「가드레일」의 plan 리뷰 마커 확인이 …",
+      "principle": "편입 대상 스킬의 기존 형식(소유 선언과 절 참조 방식)",
+      "consequence": "편입 뒤 nested-orchestration 안의 한 절이 같은 스킬을 외부 참조처럼 부르게 된다. 이 참조는 어느 절(「L2 디스패치 템플릿」, 「가드레일」)을 가리키는지 특정하지 않는다."
+    },
+    {
+      "where": "「진행 규칙」 절의 '강제' 항목(46행)",
+      "type": "compat",
+      "claim": "후보는 절마다 정한 '수정할 수 있는 파일 범위'를 기존 소유권 검사가 강제한다고 적는다. 기존 검사는 브랜치끼리 변경 파일의 교집합을 확인할 뿐이고, 각 워크스트림이 허용 범위 안을 고쳤는지는 확인하지 않는다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "수정할 수 있는 파일 범위는 지시문에만 두지 않고 nested-orchestration 의 소유권 검사로 강제한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "「가드레일」의 '구간 소유권 강제'(42행): 각 브랜치의 변경 파일 집합(`git diff --name-only base..branch`)을 구한 뒤 브랜치를 둘씩 짝지어 모든 쌍의 교집합을 확인한다.",
+      "principle": "편입 대상 스킬과의 하위 호환(기존 가드레일의 입력·출력)",
+      "consequence": "후보가 기대는 '허용 범위 대조' 기능은 기존 가드레일에 없다. 후보는 순차로 진행하는 절(47행)도 두는데, 이 경우 짝지을 동시 브랜치가 없어 교집합 검사가 실행될 대상도 없다."
+    },
+    {
+      "where": "문서 전체의 제목 구조(1행 `#`, 5·9·15·27·39·49·53·62행 `##`)",
+      "type": "format",
+      "claim": "후보는 자기 `#` 제목 아래에 `##` 절 여럿을 둔 독립 문서 형태다. 편입 대상 스킬은 `#` 제목 하나 아래 `##` 절만 두고 `###` 층을 쓰지 않는다. 후보를 '절로 추가'하면 제목 층이 맞지 않는다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "# 큰 개발의 명세 분할 지시문 … ## 나눌지 판단 … ## 메인 세션의 역할 …",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "5행 `# nested-orchestration — 3층 병렬 오케스트레이션` 아래 `## 라우팅`부터 `## 한계`까지 모든 절이 `##` 한 층이다. 그리고 agent-principles `TITLE-LAYERS`: 문서에는 `###` 소제목 층을 두지 마라.",
+      "principle": "편입 대상 스킬의 기존 형식(절 구성) / TITLE-LAYERS",
+      "consequence": "그대로 붙이면 SKILL.md에 `#` 제목이 둘 생긴다. 한 단계씩 내리면 `###` 층이 생긴다."
+    },
+    {
+      "where": "후보 전체의 용어(메인 세션·서브에이전트·명세·계획·절)",
+      "type": "style",
+      "claim": "후보는 기존 스킬이 L1·L2·L3, 스펙, 플랜, 서브오케스트레이터로 부르는 대상을 메인 세션, 서브에이전트, 명세, 계획이라는 다른 이름으로 부른다. 또 '절'이라는 낱말 하나를 개발 분할 단위와 보고서의 절(「질문」 절, 「제안」 절)에 함께 쓴다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "11행 '메인 세션은 감독만 한다', 37행 '명세 작성 → 명세 검토 → 계획', 41행 '보고의 「질문」 절에 적고', 47행 '나머지 절만 동시에 진행하고'",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "「UNPACK」의 `TERM-ONE`: 한 개념에는 한 용어만 쓰고, 답이 바뀌어도 같은 대상을 같은 이름으로 가리켜라. (대조 용어는 nested-orchestration SKILL.md 18~23행의 L1·L2·L3, 스펙, 플랜, 서브오케스트레이터)",
+      "principle": "TERM-ONE",
+      "consequence": "편입 뒤 한 스킬 안에서 같은 층과 같은 문서가 두 이름으로 불린다. 후보 안의 '절'은 개발 단위와 보고서 절이라는 두 뜻으로 쓰인다."
+    },
+    {
+      "where": "「메인 세션의 역할」 절(13행), 「나눌지 판단」 절(7행), 「큰 명세」 절(25행)",
+      "type": "constraint",
+      "claim": "후보는 설계 결정의 근거를 출처 없이 적는다. '효과가 보고되었다'는 보고자와 출처가 없다. 인계 비용 판단과 산문 계약의 실패 단정도 출처나 측정 없이 제약의 근거로 쓰인다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "단위마다 새 맥락으로 작업하는 방식은 긴 개발에서 효과가 보고되었지만, 부분 정보만 받은 작업자는 통합에서 실패하기 쉽다. / 작은 개발을 나누면 인계 비용이 이득보다 크다. / 산문으로만 적은 계약은 통합에서 어긋난다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "「원칙」의 `EVIDENCE-FIRST`: 판단, 설계 결정, 제약, 기준값을 추측으로 정하지 말고 … 출처와 함께 적어라. 근거를 찾지 못한 제약은 두지 마라.",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "후보의 근거 문장 셋에는 출처, 날짜, 측정이 하나도 붙어 있지 않다. 13행은 이 근거에서 「인계」와 「측정」을 '반드시 지킨다'는 제약을 끌어낸다."
+    },
+    {
+      "where": "「인계」 절의 입력 목록(33~37행)",
+      "type": "style",
+      "claim": "같은 구실을 하는 목록 항목 중 33~36행은 명사구로 끝나고, 37행만 '진행한다'라는 서술문으로 끝난다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "- 큰 명세 경로와 맡은 절 … - 진행 방법: superpowers 의 브레인스토밍 → … → 구현을 이 절 범위에서 진행한다",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "「PROSE-FORM」의 `ONE-ENDING`: 한 표와 한 목록 … 안에서 같은 구실을 하는 요소끼리 말끝을 하나로 맞춰라.",
+      "principle": "ONE-ENDING",
+      "consequence": "입력 목록 다섯 항목 중 하나만 서술문으로 끝난다. 23행 '통합 확인 방법' 항목도 '완료인지'라는 의문형 절로 끝나, 명사구로 끝나는 19~22행과 말끝이 다르다."
+    },
+    {
+      "where": "「진행 규칙」 절의 불릿(41~45행)",
+      "type": "style",
+      "claim": "불릿 한 항목이 여러 문장으로 되어 있다. 41행 '질문' 항목은 네 문장, 44행 '검토 범위' 항목은 세 문장, 42·43·45행은 각각 두 문장이다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "- **질문:** 서브에이전트는 사용자에게 직접 묻지 못한다. 확인이 필요하면 … 멈춘다. 메인 세션이 … 전달한다(SendMessage 로 재개).",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "「READ-FLOW」의 `BULLET-SCOPE`: 불릿은 같은 종류를 늘어놓을 때만 쓰고, 한 항목이 여러 문장이 되면 산문으로 써라.",
+      "principle": "BULLET-SCOPE",
+      "consequence": "「진행 규칙」 절의 불릿 일곱 개 중 다섯 개가 두 문장 이상으로 되어 있다."
+    },
+    {
+      "where": "「나눌지 판단」 절의 단락(7행)",
+      "type": "style",
+      "claim": "한 단락에 문장이 다섯 개 있다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "메인 세션은 … 판단한다. 다룰 수 있으면 … 진행한다. 한 명세에 … 절로 나눈다. 나누기 전에 … 승인받는다. 작은 개발을 나누면 인계 비용이 이득보다 크다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "「READ-FLOW」의 `ONE-IDEA`: 한 문장에 한 개념만 두고, 단락은 네 문장 이하로 끊어라.",
+      "principle": "ONE-IDEA",
+      "consequence": "7행 단락은 판단 절차, 승인 절차, 분할 비용 근거를 한 단락에 다섯 문장으로 담고 있다."
+    }
+  ],
+  "principles_applied": [
+    "DOC-TYPE",
+    "「문서 타입과 수명」 표(설계 행, 기록 행)",
+    "SUB-ORCHESTRATE",
+    "EVIDENCE-FIRST",
+    "TERM-ONE",
+    "ONE-ENDING",
+    "BULLET-SCOPE",
+    "ONE-IDEA",
+    "TITLE-LAYERS",
+    "COMMA-CUT",
+    "ANTI-LIMIT",
+    "NO-MID-MOD",
+    "NO-STACK-MOD",
+    "FULL-SENTENCE",
+    "LABEL-NOUN",
+    "WRITTEN-ONLY",
+    "CLAUDE.md 「에이전트원칙을 고칠 때」의 명령형 구분",
+    "nested-orchestration SKILL.md의 절 구성·소유 선언·「재구현 금지」·재개 규약·산출 계약·가드레일·비목표"
+  ],
+  "notes": "검토한 관점을 항목마다 적는다. 형식 관점에서는 제목 층(`#`/`##`)과 절 참조 방식이 편입 대상 스킬과 맞는지 보았다. 스타일 관점에서는 domain-korean과 에이전트원칙의 출력지시 조항을 대조하였다. COMMA-CUT, ANTI-LIMIT, NO-MID-MOD, WRITTEN-ONLY에서는 위반을 찾지 못하였다. 3·37행의 화살표는 문장 안 보조이므로 FULL-SENTENCE 위반으로 보지 않았다. 오염 관점에서는 이 저장소에만 있는 경로나 상태 값이 들어갔는지 보았고, 그런 것은 없었다. 호환 관점에서는 기존 SKILL.md의 재개, 산출 계약, 층별 책임, 가드레일, 비목표, description 트리거와 대조하였다. 규율 관점에서는 에이전트원칙의 문서 타입 표, SUB-ORCHESTRATE, EVIDENCE-FIRST와 대조하였다. 문체는 CLAUDE.md 기준으로 판단하였다. CLAUDE.md의 명령형 규칙은 에이전트원칙에만 적용되고, 기존 스킬은 평서형으로 쓰여 있다. 후보도 평서형이므로 문체 구분 위반으로 올리지 않았다. 「재구현 금지」는 후보가 brainstorming·writing-plans를 이름으로 부를 뿐 그 절차를 다시 쓰지 않으므로 위반으로 올리지 않았다. 다만 51행 '확인 명령의 실제 출력을 보기 전에는 완료로 보고하지 않는다'는 superpowers:verification-before-completion과 겹칠 수 있다. 이 스킬은 「재구현 금지」 목록에 없어 상대편으로 삼지 않았다. BULLET-SCOPE 지적과 관련해, 기존 SKILL.md도 여러 문장짜리 굵은 라벨 불릿을 쓴다(18~20행, 25~30행, 42~45행). 후보가 기존 형식을 따랐다고 볼 여지가 있다. 47행(독립 절은 동시 진행)과 51행(다음 절은 통합 확인 통과 뒤 시작)이 서로 부딪히는지는 내용 정합성 문제라 이 렌즈의 범위 밖이다. lens-consistency로 확인할 필요가 있다. 금지 낱말은 지시대로 보지 않았다. 다섯 파일 모두 열었으며 못 연 계약은 없다."
+}

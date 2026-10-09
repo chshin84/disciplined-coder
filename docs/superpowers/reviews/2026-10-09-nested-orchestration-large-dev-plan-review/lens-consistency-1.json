@@ -1,0 +1,119 @@
+{
+  "lens": "lens-consistency",
+  "target": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+  "read": [
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+    "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+    "D:/projects/disciplined-coder/skills/dispatching-lenses/SKILL.md",
+    "D:/projects/disciplined-coder/CLAUDE.md",
+    "D:/projects/disciplined-coder/docs/domain-discipline.md (1~20행, 350~365행)",
+    "D:/projects/disciplined-coder/skills/review-specs/SKILL.md (L1·L2·메인 세션·spec-review 마커 grep)",
+    "D:/projects/disciplined-coder/scripts/test_docs_drift.sh (155~170, 280~292, 400~410, 780~795, 860~875행과 grep)",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md (superseded grep과 첫 세 줄)"
+  ],
+  "issues": [
+    {
+      "where": "Task 4 Step 2 스킬 본문의 절 순서(「라우팅」 다음 「큰 개발 분할」)",
+      "type": "drift",
+      "claim": "spec 은 큰 개발 분할 절을 「라우팅」 앞에 두라고 정했는데, plan 이 교체하는 스킬 본문은 그 절을 「라우팅」 뒤에 둔다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "Produces: 스킬 절 이름 「용어」「라우팅」「큰 개발 분할」「흐름」…",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "「라우팅」 앞에 큰 개발 분할 절을 두고, 나눌지 판단·큰 명세·계약 코드·결정 기록·공용 파일·경로와 브랜치 이름과 「근거와 한계」 표의 문장을 넣는다.",
+      "principle": "짝 문서 사이 정합성(spec 이 정한 구조를 plan 이 그대로 옮긴다)",
+      "consequence": "plan 의 SKILL.md 교체본은 「용어」→「라우팅」→「큰 개발 분할」 순서로 적혀 있고, spec 의 배치 지시와 다르다."
+    },
+    {
+      "where": "Task 1 Step 5 이후 불채택 분기와 Task 2·Task 7",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 과 Global Constraints 는 문안을 채택하지 않아도 사용자가 정하면 나머지를 진행할 수 있다고 적는데, plan 에는 그 경우를 다루는 작업이 없다. Task 2 는 조건 C 문안을 무조건 넣고, Task 7 은 채택 여부를 따지지 않고 용어 grep 을 실행한다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "Task 2 Step 1: `agent-principles.md`의 「병렬 오케스트레이션」 머리 문장과 `SUB-ORCHESTRATE` 줄을 Task 1 Step 1의 새 문안(조건 C)으로 바꾼다. / Task 7 Step 1: grep -nE 'L[123]|서브오케스트레이터|sub-orchestrator' … agent-principles.md …",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "3. **용어:** 원칙 문안을 채택했으면 `grep -nE …`의 출력이 비어 있다. / 문안을 채택하지 않으면 스킬과 원칙이 서로 반대를 지시하게 되므로, 그때는 나머지 변경을 진행할지 사용자가 정한다.",
+      "principle": "spec 의 조건부 요구가 plan 의 작업으로 이어져야 한다(커버리지)",
+      "consequence": "불채택 뒤 진행을 고르면 Task 2 Step 1 이 채택되지 않은 조건 C 문안을 agent-principles.md 에 넣게 되어 있고, Task 2 Step 3 의 참고서 문단도 \"지금 문구는\"으로 새 문안을 현행처럼 적는다. 현행 문안을 남기는 경우에는 agent-principles.md 146행의 '서브오케스트레이터'·'sub-orchestrator' 때문에 Task 7 Step 1 의 기대값(출력 없음)이 성립하지 않는다."
+    },
+    {
+      "where": "Review Focus 「escalated 마커」 항목과 Task 6 시나리오 D",
+      "type": "contradiction",
+      "claim": "Review Focus 는 escalated 마커가 붙은 미해소 문서를 들이는 실패를 시나리오 D 가 고정한다고 적는다. 그러나 시나리오 D 는 마커가 없는 문서만 검사하고, escalated 마커를 단 문서는 nomarker 정규식에서 통과로 처리된다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "**escalated 마커:** 마커가 있기만 하면 통과하던 검사가 🔴 미해소 문서를 들인다. 기대 동작은 마커 없는 문서가 출력되는 것이다(escalated 해소 확인은 결정 기록을 사람이 대조). Task 6 시나리오 D가 고정한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "nomarker(){ … tail -n 1 \"$f\" | grep -q '^<!-- spec-review: \\(passed\\|escalated\\)' || echo \"$f\"; }",
+      "principle": "문서 내부 정합성(검사가 고정한다고 주장한 실패 모드와 실제 검사 대상이 같아야 한다)",
+      "consequence": "Task 6 스크립트에는 escalated 마커를 단 문서를 만드는 시나리오가 없고, 그런 문서는 nomarker 가 출력하지 않는다. 표제에 적힌 실패 모드(🔴 미해소 문서의 통과)를 기계로 확인하는 단계는 plan 어디에도 없다."
+    },
+    {
+      "where": "Task 3 Step 1 의 행 번호와 Global Constraints 의 행 번호",
+      "type": "drift",
+      "claim": "Task 3 Step 1 은 405행 아래에 두 줄을 먼저 넣은 뒤 '같은 파일 789행'의 라벨을 바꾸라고 적는다. 삽입 뒤에는 그 라벨이 791행으로 밀린다. Global Constraints 와 Task 2 Interfaces 의 786~789행, 867~871행 표기도 Task 3 이후에는 실제 위치와 어긋난다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "`check \"옛 spec 에 superseded 표시가 있다\"` 줄 바로 아래에 두 줄을 넣는다. … 같은 파일 789행의 라벨 `\"그 절에 서브오케스트레이터 조항이 있다\"`를 …로 바꾼다.",
+      "counterpart_file": "D:/projects/disciplined-coder/scripts/test_docs_drift.sh",
+      "counterpart": "405:check \"옛 spec 에 superseded 표시가 있다\" … / 789:check \"그 절에 서브오케스트레이터 조항이 있다\" …",
+      "principle": "이름·위치 참조의 드리프트(행 번호 대신 라벨 같은 안정된 이름으로 가리킨다)",
+      "consequence": "지금 test_docs_drift.sh 에서 superseded 검사는 405행, 대상 라벨은 789행에 있다. plan 의 단계 순서대로 실행하면 그 라벨은 791행에 있게 되고, plan 이 적은 789행에는 다른 줄이 놓인다."
+    },
+    {
+      "where": "Task 6 시나리오 B",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 확인 방법 5 는 허용 경로 밖 파일을 '추가'했을 때 그 파일이 출력되어야 한다고 요구한다. 시나리오 B 는 주석으로 '파일 추가'라 적으면서 실제로는 이미 추적 중인 src/shared/routes.txt 를 고친다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "# 시나리오 B: 허용 경로 밖 파일 추가\necho hack >> src/shared/routes.txt; git add -A; git commit -qm b-out",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "허용 경로 밖 파일을 추가하거나 허용 경로 밖 파일을 안으로 옮기면 그 파일이 출력된다.",
+      "principle": "spec 의 확인 기준이 plan 의 검사로 이어져야 한다(커버리지)와 주석·코드 사이 정합성",
+      "consequence": "src/shared/routes.txt 는 base 커밋에서 이미 만들어진 파일이므로, 시나리오 B 는 기존 파일 수정만 검사한다. 허용 경로 밖에 새 파일을 만드는 경우를 실행하는 시나리오는 스크립트에 없다."
+    },
+    {
+      "where": "Task 2 Step 3 측정 문단과 Task 1 Step 5 의 추가 과제",
+      "type": "contradiction",
+      "claim": "측정 문단은 과제 수를 꺾쇠로 비워 두면서도 과제 구성(큰 개발 셋·무관한 일 둘 하나·작은 개발 하나)과 '조건마다 1회'를 고정 문장으로 적는다. Task 1 Step 5 의 추가 실행에서는 B4·B5 를 B·C 조건에만 더 돌리므로 과제가 일곱이 되고, 빈 모델 조건은 다섯 과제만 받는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "**측정.** 2026-10-09에 클린룸 소거 시험을 과제 <과제 수>개로 실행했고, 조건마다 1회였다. 과제는 큰 개발 요청 셋, 서로 무관한 일 둘을 함께 맡기는 요청 하나, 작은 개발 요청 하나였다. 위반(…)은 빈 모델 <A>건, 현행 문안 <B>건, 새 문안 <C>건이었다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "같으면 B4·B5를 B·C 조건으로 더 실행하고, 일곱 과제 합계가 현행보다 나쁘지 않으면 채택안",
+      "principle": "문서 내부 정합성(같은 측정의 과제 수와 구성이 한 문단 안에서 맞아야 한다)",
+      "consequence": "추가 실행 경로를 밟으면 <과제 수> 에 7 을 넣어도 다음 문장은 큰 개발 요청을 셋으로 적고, A·B·C 위반 수는 서로 다른 과제 수에서 센 값이 한 문장에 나란히 놓인다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문의 「흐름」 마무리 단계와 「디스패치 템플릿」 블록 6",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 은 서브 세션이 리포트 「제안」에 적은 범위 밖 아이디어를 현재 세션이 모아 사용자에게 보인다고 정했다. plan 의 스킬 본문은 서브 세션이 「제안」을 적으라는 지시만 두고, 현재 세션이 그것을 모아 보이는 단계는 두지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "7. **마무리(현재 세션)** — 「측정」 값을 사용자에게 보고한다. / 리포트에는 … 범위 밖 아이디어(「제안」) … 를 적는다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "서브 세션은 범위 밖 아이디어를 리포트의 「제안」 항목에 적고, 현재 세션이 모아 사용자에게 보인다.",
+      "principle": "규칙을 선언하면 그것을 소비하는 곳이 있어야 한다(커버리지)",
+      "consequence": "교체본 SKILL.md 에서 「제안」은 서브 세션의 리포트 항목으로만 나오고, 「흐름」과 「가드레일」과 「측정」 어디에도 현재 세션이 「제안」을 읽거나 사용자에게 보이는 지시가 없다."
+    },
+    {
+      "where": "Task 4 Step 2 스킬 본문 「디스패치 템플릿」 블록 3",
+      "type": "drift",
+      "claim": "spec 은 공용 파일 변경이 필요한 서브 세션이 바꿀 내용을 적고 BLOCKED 로 멈춘다고 정했는데, 스킬 교체본은 '바꿀 내용을 적고'를 빼고 멈추라고만 적는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "공용 파일이나 계약 변경이 필요하면 고치지 않고 `BLOCKED`로 멈춘다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "서브 세션은 소유하지 않은 공용 파일 변경이 필요하면 바꿀 내용을 적고 `BLOCKED`로 멈춘다.",
+      "principle": "spec 결정의 문구가 산출물에 빠짐없이 옮겨져야 한다(드리프트)",
+      "consequence": "교체본 SKILL.md 의 디스패치 템플릿과 「멈추는 기준」에는 BLOCKED 와 함께 무엇을 돌려줄지(바꿀 내용)가 적혀 있지 않고, 상태·질문만 돌려주라고 적혀 있다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "STATE-ASSUME",
+    "EVIDENCE-FIRST",
+    "NO-FLEET",
+    "ASYNC-FIRST",
+    "NAME-ITEMS",
+    "SPECIFIC-NAME",
+    "WRITTEN-ONLY",
+    "FULL-SENTENCE",
+    "TERM-ONE"
+  ],
+  "notes": "검토 관점은 다섯이다. 모순에서는 Review Focus 와 Task 6 시나리오가 실제로 고정하는 것을 대조하였고, Task 1·Task 2 사이 측정 기술도 대조하였다. 커버리지 공백에서는 spec 「결정」 각 항목과 「바뀌는 파일」·「확인 방법」 1~6 을 plan 작업과 교체본 SKILL.md 에 하나씩 대응시켰다. 산출물 공백에서는 각 Task 의 Files·Interfaces·Expected 가 무엇을 어디에 내놓는지 확인하였다. Task 1 응답 파일(cleanroom/)과 Task 6 스크립트는 저장소 밖 스크래치에 놓인다고 적혀 있어 공백으로 보지 않았다. 드리프트에서는 용어(L1·L2·서브오케스트레이터·메인 세션), 행 번호, 절 이름, 마커 형식을 실제 파일과 대조하였다. dispatching-lenses 의 L2·서브오케스트레이터 출현 행(47·70·71·77·83·96·106)과 review-specs 의 64·131행은 plan 표와 일치하였다. 교체본 SKILL.md 에서 L[123]·서브오케스트레이터·메인 세션·Explore 는 검출되지 않았다. 2026-07-05 설계에는 현재 'superseded'가 없어 Task 3 Step 2 의 FAIL 기대는 성립한다. 스코프에서는 rewrite-map 제외와 review-specs 의 일반 '메인 세션' 유지가 spec 과 일치함을 확인하였고, 지적할 것을 찾지 못하였다. 추가로 확인할 것은 셋이다. (1) Task 1 의 클린룸 서브에이전트가 이 저장소의 CLAUDE.md 나 전역 @import 된 agent-principles 사본을 받는지는 확인하지 않았다. 받는다면 spec 이 정의한 'CLAUDE.md가 빈 모델' 조건 A 가 성립하지 않으므로, 하네스에서 서브에이전트에 실리는 메모리를 실측해야 한다. (2) Task 2 Step 3 의 새 참고서 문단은 조항 조건문을 인용한다. test_docs_drift.sh 109행 근처의 '같은 문장이 양쪽에' 검사가 지금은 조항 ID 기준이라 걸리지 않을 것으로 보지만, 판정 함수 본문은 읽지 않았다. (3) spec 「문서 수명」(워크스트림 plan·리뷰 기록을 개발 전체가 main 에 병합된 뒤 지우는 시점)이 교체본 SKILL.md 에 없다. 에이전트원칙 문서 수명 표가 이미 덮는다고 보아 올리지 않았으며, 스킬에 시점을 적어야 하는지는 작성자가 판단할 일이다."
+}
