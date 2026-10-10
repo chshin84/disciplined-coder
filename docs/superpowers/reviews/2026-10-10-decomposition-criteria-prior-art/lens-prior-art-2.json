@@ -1,0 +1,121 @@
+{
+  "lens": "lens-prior-art",
+  "target": "분해 단위 기준의 재현성 — 범위: 분해 절차",
+  "search_status": "ok",
+  "read": [
+    "skills/lens-prior-art/SKILL.md",
+    "agent-principles.md",
+    "skills/nested-orchestration/SKILL.md (31~40행)",
+    "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md (180~274행)",
+    "https://contextmapper.org/docs/service-cutter-context-map-suggestions/",
+    "https://contextmapper.org/docs/service-cutter/",
+    "https://contextmapper.org/docs/service-cutter-config-file/",
+    "https://eprints.ost.ch/476/",
+    "https://research.tue.nl/en/publications/multi-level-flow-based-markov-clustering-for-design-structure-mat/",
+    "https://www.scitepress.org/Papers/2016/56930/pdf/index.html",
+    "https://axiomaticdesign.com/?p=1164",
+    "https://github.com/SAP/curated-resources-for-domain-driven-design/blob/main/knowledgebase/tools/eventstorming.md",
+    "https://arxiv.org/abs/2601.23141v1",
+    "https://arxiv.org/abs/2609.20308",
+    "https://arxiv.org/abs/1901.07700",
+    "https://arxiv.org/abs/2311.04643",
+    "https://arxiv.org/abs/1709.07538",
+    "https://www.arxiv.org/abs/2108.13553",
+    "https://2013.icse-conferences.org/content/obtaining-ground-truth-software-architectures.html"
+  ],
+  "issues": [
+    {
+      "where": "SKILL 35행 「묶는 단위」 첫 문장, spec 266행 「묶는 단위 시험」",
+      "type": "known-failure",
+      "claim": "선행 분해 절차는 모두 분해 결과의 재현성을 입력 원소의 고정에 기대는데, 이 설계는 입력 원소인 하위 프로젝트 목록을 해석 판단(brainstorming)에 남겨 두었다.",
+      "consequence": "묶는 규칙을 결정적으로 적용해도 하위 프로젝트를 몇 개로 열거하느냐에 따라 워크스트림 수가 달라지고, 증상의 발생 지점이 열거 단계로 옮겨 갔을 뿐 남아 있을 수 있다. 「묶는 단위 시험」은 하위 프로젝트 다섯을 고정했으므로 열거 단계의 변동은 시험되지 않았다.",
+      "evidence": "Service Cutter 는 속성까지 적은 엔티티와 유스케이스를 입력으로 요구하고 Without attributes, we cannot derive nanoentities and Service Cutter cannot calculate decompositions 라고 적는다(원소는 도구 밖에서 고정). EventStorming 기반 bounded context 식별은 경계 기준을 heuristics 로 두고 결과 수를 3~8개 목표치로만 제시한다. ICSE 2013 ground-truth 연구는 시스템을 잘 아는 엔지니어가 드물어 정답 구축 자체가 장애라고 적었다. 열거 단계가 변동의 원천이라는 판단은 렌즈 추론이다.",
+      "citations": [
+        {
+          "url": "https://contextmapper.org/docs/service-cutter-context-map-suggestions/",
+          "kind": "vendor",
+          "opened": true
+        },
+        {
+          "url": "https://eprints.ost.ch/476/",
+          "kind": "preprint",
+          "opened": true
+        },
+        {
+          "url": "https://github.com/SAP/curated-resources-for-domain-driven-design/blob/main/knowledgebase/tools/eventstorming.md",
+          "kind": "vendor",
+          "opened": true
+        },
+        {
+          "url": "https://2013.icse-conferences.org/content/obtaining-ground-truth-software-architectures.html",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "spec 266행 「묶는 단위 시험」, 268~272행",
+      "type": "weak-baseline",
+      "claim": "재현성을 워크스트림 개수와 쌍 판정 일치로만 보았고 분할 간 유사도 지표(MoJoFM 등)나 고정된 지표 파이프라인과 비교되지 않았다.",
+      "consequence": "개수가 같아도 하위 프로젝트가 다른 워크스트림에 들어가는 차이를 잡지 못하고, 개수가 달라도 경계 대부분이 같은 경우를 구별하지 못한다.",
+      "evidence": "마이크로서비스 분해 비교 연구(arXiv 2601.23141)는 기존 평가가 inconsistent benchmark systems, incompatible metrics, and limited reproducibility 때문에 비교가 어렵다고 보고 하나의 지표 파이프라인(Structural Modularity, Interface Number, Inter-partition Communication, Non-Extreme Distribution)으로 다시 측정했다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/abs/2601.23141v1",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "SKILL 37행 설계 의존 조건과 40행 실행 의존 구분",
+      "type": "weak-baseline",
+      "claim": "의존 관계로 합치거나 순서를 매기는 판정은 DSM 과 axiomatic design 설계 행렬이 표준화한 절차인데, 설계 의존이면 합친다는 규칙은 그 기준선(한 방향 의존은 순서로, 순환·결합만 묶음)과 비교되지 않았다.",
+      "consequence": "한 방향 설계 의존도 합치므로 의존이 사슬로 이어지면 여러 하위 프로젝트가 한 워크스트림으로 뭉칠 수 있다.",
+      "evidence": "Axiomatic design 은 FR×DP 행렬이 대각이면 uncoupled, 삼각이면 decoupled(순서가 정해지면 독립 공리 만족), 그 밖이면 coupled 로 분류한다. DSM 군집화는 원소 간 의존 행렬을 입력으로 받아 내부 상호작용을 최대화하도록 묶는다. 이 설계의 규칙은 하위 프로젝트×하위 프로젝트 이진 DSM 의 연결 요소를 구하는 것과 같다(렌즈 추론).",
+      "citations": [
+        {
+          "url": "https://axiomaticdesign.com/?p=1164",
+          "kind": "vendor",
+          "opened": true
+        },
+        {
+          "url": "https://research.tue.nl/en/publications/multi-level-flow-based-markov-clustering-for-design-structure-mat/",
+          "kind": "peer-reviewed",
+          "opened": true
+        },
+        {
+          "url": "https://www.scitepress.org/Papers/2016/56930/pdf/index.html",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "not_found": [
+    "같은 요구를 LLM 에 반복 입력했을 때 분해 개수·경계 변동을 측정한 연구를 찾지 못했다(2026 석사 논문은 403).",
+    "사람 판정자 사이 모듈 분해 일치도 수치를 찾지 못했다.",
+    "DSM partitioning 원전·교재 장을 열지 못했다.",
+    "Service Cutter 원 논문은 봇 차단으로 열지 못했다.",
+    "Garcia 외(ASE 2013) 결과는 요약으로만 보아 인용에서 뺐다.",
+    "요구 단계 분해의 결정성을 LLM 대화 안에서 실행한 선행 사례를 찾지 못했다."
+  ],
+  "disclosures": [
+    "Service Cutter 학위 논문은 preprint 로 두었다.",
+    "Context Mapper·axiomaticdesign.com·SAP 저장소는 vendor 로 분류했다.",
+    "WebFetch 요약 모델을 거친 인용이다.",
+    "첫째 이슈는 렌즈 추론이며 측정하지 않았다.",
+    "Markov 군집화 연구의 비교 우위 주장은 원문 페이지에 없어 인용하지 않았다."
+  ],
+  "principles_applied": [
+    "EVIDENCE-FIRST",
+    "STATE-ASSUME",
+    "SECRETS",
+    "NO-ASSUME",
+    "WRITTEN-ONLY",
+    "SUBJECT-OBJECT",
+    "TERM-EXPLAIN",
+    "FULL-SENTENCE"
+  ],
+  "notes": "결말: Service Cutter 는 대부분 적절, 일부 부적절 판정 뒤 유지보수가 멈추고 Context Mapper v6.10.0 에서 비활성화되었으며 결과를 워크숍 입력으로 보라고 적혀 있다. 절차별: DSM 군집화는 입력이 원소×원소 의존 행렬이고 알고리즘에 따라 결정성이 다르며(Markov 군집화는 매개변수 고정 시 결정적), 원소 열 개 안팎이면 대화 안에서 표로 실행 가능하다. DSM partitioning 은 강결합 요소와 위상 정렬이라 결정적이다. Axiomatic design 은 행렬 형태 판정은 결정적이나 FR·DP 열거는 판단이다. EventStorming 은 사람 워크숍 전제다. Service Cutter 는 그래프가 커서 대화 안에서 무겁다. 코드 기반 자동 분해는 요구 단계에 맞지 않는다. LLM 기반 분해는 프롬프트 방식이 입도를 바꾼다(2609.20308 초록). 옮길 후보: 원소 고정 먼저(기능 요구나 파일 목록을 먼저 고정하고 사용자 승인), 이진 DSM 표 기록(방향 포함 설계 의존·경로 겹침을 표로 남기고 연결 요소 또는 강결합 요소로 묶음), 한 방향 의존과 순환 구분, 분할 유사도로 재현성 측정, 크기 균형 점검(Non-Extreme Distribution). 원본 notes 전문은 세션 대화에 있고 이 사본은 줄여 옮겼다."
+}

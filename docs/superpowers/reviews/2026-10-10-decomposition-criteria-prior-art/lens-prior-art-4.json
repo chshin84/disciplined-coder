@@ -1,0 +1,76 @@
+{
+  "lens": "lens-prior-art",
+  "target": "분해 단위 기준의 재현성 — 범위: 분할 일치도 측정 방법",
+  "search_status": "ok",
+  "read": [
+    "skills/lens-prior-art/SKILL.md",
+    "agent-principles.md",
+    "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md (180~274행, 「2026-10-10 개정」)",
+    "https://scikit-learn.org/stable/modules/clustering.html",
+    "https://arxiv.org/abs/2011.08708v1",
+    "https://www.jmlr.org/papers/v11/vinh10a.html",
+    "https://arxiv.org/html/2311.04643",
+    "https://ar5iv.labs.arxiv.org/html/1903.06895",
+    "https://sol.sbc.org.br/index.php/vem/article/view/7583",
+    "https://en.wikipedia.org/wiki/Fleiss%27s_kappa",
+    "https://arxiv.org/abs/1007.1075",
+    "https://arxiv.org/abs/2408.04667",
+    "https://arxiv.org/abs/2602.11619"
+  ],
+  "issues": [
+    {
+      "where": "「2026-10-10 개정」 「묶는 단위」와 「묶는 단위 시험」(196~198행, 266행), 다음 단계의 일치도 측정 계획",
+      "type": "known-failure",
+      "claim": "ARI·AMI·MoJoFM 같은 분할 비교 지표는 두 분할이 같은 원소 집합을 나눈 것이라고 전제한다. 그런데 이 설계에서는 LLM이 원소(하위 프로젝트)를 만들고 그 원소를 다시 묶는다. 같은 요청을 여러 번 분해시키면 원소 목록부터 달라질 수 있다.",
+      "consequence": "문서 198행은 같은 채권 도구 요청을 세션마다 넷과 셋으로 묶었다고 적는다. 이 차이에는 하위 프로젝트를 뽑는 단계의 차이와 묶는 단계의 차이가 섞여 있다. 원소 목록을 고정하지 않으면 표준 지표는 계산되지 않는다. 손으로 원소를 맞춰 계산하더라도 두 단계의 불일치가 한 수치에 섞인다. 266행의 시험은 하위 프로젝트 다섯을 같은 입력으로 주어 원소를 고정했으므로 묶는 단계만 쟀다.",
+      "evidence": "scikit-learn 문서의 ARI·AMI 예시는 같은 길이의 라벨 배열 두 개를 받는다(같은 원소 n개를 전제한다). Recover and RELAX(arXiv 1903.06895)는 MoJoFM을 mno(A,B)로 정의한다. mno(A,B)는 분할 A를 B로 바꾸는 이동·병합 연산의 최소 횟수이고, 두 분할이 같은 원소 집합을 나눈다고 전제한다. 「원소 집합이 달라지면 계산되지 않는다」는 판단은 정의에서 렌즈가 도출한 것이다. 네 축 대조: 소프트웨어 아키텍처 복원 연구와 이 설계는 목적이 다르다. 복원 연구는 정답 분해와의 거리를 재고, 이 설계는 반복 실행 사이의 재현성을 잰다. 메커니즘도 다르다. 복원 연구는 원소(파일)가 고정된 군집화이고, 이 설계는 원소까지 LLM이 생성한다. 평가는 같다(분할 사이의 유사도). 적용 대상은 다르다(코드 파일과 개발 요청의 하위 프로젝트). 따라서 이 사례는 같은 사례가 아니며, 지표의 전제만 이 설계로 옮겨 온다.",
+      "citations": [
+        { "url": "https://scikit-learn.org/stable/modules/clustering.html", "kind": "vendor", "opened": true },
+        { "url": "https://ar5iv.labs.arxiv.org/html/1903.06895", "kind": "preprint", "opened": true },
+        { "url": "lens-derived: 두 정의에서 '같은 원소 집합 전제'를 도출함", "kind": "lens-derived", "opened": true }
+      ]
+    },
+    {
+      "where": "「묶는 단위」 규칙(196행)과 「묶는 단위 시험」(266행)을 기존 방식과 비교하는 계획",
+      "type": "known-failure",
+      "claim": "분할 일치도 지표는 군집 수와 원소 수의 영향을 받는다. 그런데 새 규칙은 하위 프로젝트마다 워크스트림 하나를 기본값으로 두고 조건이 맞을 때만 합친다. 그래서 새 규칙은 모두 단원소 군집인 분할을 내기 쉽고, 비교 대상인 기존 방식(「함께 바뀌는 코드를 묶는다」)은 군집 수가 적은 분할을 낸다.",
+      "consequence": "266행의 시험에서 세 결과는 모두 다섯 원소를 다섯 워크스트림으로 나눈 단원소 분할이었다. 이 분할은 합치는 경로를 한 번도 거치지 않았다. 이런 결과로 새 규칙과 기존 방식의 재현성을 같은 지표로 비교하면, 일치도의 차이가 규칙의 명확성에서 왔는지 기본값이 퇴화한 분할(모두 단원소)이라서 생겼는지 구별할 수 없다. 지표 쪽 문제도 있다. MoJoFM은 군집이 많은 분할을 선호한다. ARI는 원소 수가 작을 때 기댓값 보정이 흔들리며, 두 분할이 모두 단원소이면 분모가 0이 되어 관례값을 쓴다.",
+      "evidence": "arXiv 2311.04643(HTML 본문)은 「MoJoFM prefers architectures with many small clusters」라고 쓰고 그 이유를 군집 둘을 병합하는 비용이 낮기 때문이라고 적는다. 같은 논문은 a2a가 군집 수에 대한 선호가 거의 없지만 변동 폭이 좁다고 적는다. Sundqvist 외(arXiv 2011.08708)는 ARI가 다항 모형에서 편향되고 그 차이가 작은 n에서 크다고 적으며, 초기하 가정이 「forces the size of the clusters」라고 비판한다. Vinh 외(JMLR 2010)는 원소 수가 군집 수에 비해 작을 때 우연 보정이 특히 중요하다고 적는다. scikit-learn 문서는 NMI·MI가 우연 보정이 없어 군집 수가 늘면 값이 커진다고 쓰고, 표본이 작거나 군집이 많으면 ARI 같은 보정 지표를 쓰라고 권한다. 「두 분할이 모두 단원소이면 ARI 분모가 0이 된다」는 판단은 ARI 정의에서 렌즈가 도출한 것이다. 네 축 대조: 목적(분할 비교 지표의 성질)은 이 설계의 측정 목적과 다르지만, 평가 도구로 같은 지표를 쓰려 하므로 그 성질이 그대로 옮겨 온다.",
+      "citations": [
+        { "url": "https://arxiv.org/html/2311.04643", "kind": "preprint", "opened": true },
+        { "url": "https://arxiv.org/abs/2011.08708v1", "kind": "peer-reviewed", "opened": true },
+        { "url": "https://www.jmlr.org/papers/v11/vinh10a.html", "kind": "peer-reviewed", "opened": true },
+        { "url": "https://scikit-learn.org/stable/modules/clustering.html", "kind": "vendor", "opened": true },
+        { "url": "lens-derived: 단원소 분할끼리의 ARI 분모가 0이 되는 경우", "kind": "lens-derived", "opened": true }
+      ]
+    },
+    {
+      "where": "「묶는 단위 시험」(266행)과 「멈추는 기준 시험」(260~264행)의 반복 수",
+      "type": "weak-baseline",
+      "claim": "반복 실행 일치도를 잰 선행 사례가 쓴 단순한 기준선과 이 설계의 측정은 비교되지 않았다. 기준선의 하나는 N회 실행 사이의 완전 일치율이고(TARa@N), 다른 하나는 N회당 서로 다른 결과의 개수다. 우연 일치의 기준선과도 비교되지 않았다.",
+      "consequence": "문서는 같은 입력으로 세 번 실행해 세 결과가 같았다고만 적는다. 원소가 다섯이면 가능한 분할은 52개뿐이다. 게다가 규칙의 기본값이 단원소 분할이므로, 세 결과가 일치한 것이 우연이나 기본값 대비 얼마나 높은지 판정할 수 없다. 문서 264행과 272행도 조건마다 과제당 1회라 판정 근거가 되지 못한다고 스스로 적는다.",
+      "evidence": "Atil 외(arXiv 2408.04667)는 결정적으로 설정한 LLM 다섯 개를 과제 여덟 개에서 10회씩 실행했다. 이 연구는 원출력과 파싱한 답의 완전 일치율(TARr@N, TARa@N)을 보고했고, 정확도는 실행마다 최대 15% 달라졌다. Mehta(arXiv 2602.11619, 2026 프리프린트, ICML 2026 워크숍)는 같은 입력에서 에이전트를 10회 실행해 서로 다른 행동 경로의 수(2.3~4.2개)를 셌다. 이 연구는 단일 실행 평가가 모델 순위를 29.3% 잘못 매긴다고 보고했다. 네 축 대조: 목적(반복 실행의 재현성)과 평가(실행 사이의 일치)는 같다. 메커니즘과 적용 대상은 다르다. 두 연구는 답이나 행동 경로를 비교했고 분할을 비교하지 않았다. 대상도 QA·SWE-bench 과제이며 개발 분해가 아니다. 가능한 분할 52개는 원소 5개의 벨 수로, 렌즈가 계산한 값이다.",
+      "citations": [
+        { "url": "https://arxiv.org/abs/2408.04667", "kind": "preprint", "opened": true },
+        { "url": "https://arxiv.org/abs/2602.11619", "kind": "preprint", "opened": true },
+        { "url": "lens-derived: Bell(5)=52", "kind": "lens-derived", "opened": true }
+      ]
+    }
+  ],
+  "not_found": [
+    "ARI의 해석 기준값(0.90 탁월, 0.80 좋음, 0.65 보통)은 검색 결과에 나왔으나 출처로 보이는 2006년 BMC Bioinformatics 그림 캡션(PMC1525209)과 Steinley(2004) 원문을 확인하지 못해 근거로 쓰지 않았다.",
+    "EdgeSim·MeCl(Mitchell·Mancoridis, ICSM 2001)의 원문은 열지 못했다. sbc.org.br 연구(2019)는 정답 모델이 있을 때 MeCl이 가장 적합하다고 결론지었으나 원소 수가 큰 실제 시스템 대상이다.",
+    "MoJoFM이 같은 엔티티를 전제하므로 진화 연구에 맞지 않는다는 문장은 검색 요약에만 나왔다.",
+    "원소가 5~10개인 아주 작은 분할에서 ARI·AMI·MoJoFM의 분산이나 기준값을 직접 보고한 연구는 찾지 못했다.",
+    "LLM이 같은 개발 요청을 여러 번 분해하게 하고 그 분할의 일치도를 잰 선행 사례는 찾지 못했다. 못 찾았다는 사실은 독창성의 근거가 아니다.",
+    "군집화 안정성 문헌(von Luxburg 2010)은 초록만 열었고, 공동 할당 행렬 같은 합의 군집화 기법의 원문은 열지 않았다."
+  ],
+  "disclosures": [
+    "PDF로 받은 문서 세 개는 본문을 추출하지 못해 1903.06895와 2311.04643은 HTML판을 열어 대조했다.",
+    "Sundqvist 외(arXiv 2011.08708)는 Computational Statistics(2023) 게재로 검색되어 peer-reviewed로 표시했으나 연 것은 arXiv 초록이다.",
+    "WebFetch는 작은 모델이 페이지를 요약해 돌려주므로 인용문은 그 요약을 거친 것이다.",
+    "Fleiss kappa의 Landis·Koch 구간표는 근거 없는 의견에 기댄다는 비판이 있어 기준값으로 권하지 않는다."
+  ],
+  "principles_applied": ["EVIDENCE-FIRST", "STATE-ASSUME", "SECRETS", "NO-ASSUME", "WRITTEN-ONLY", "NAME-ITEMS"],
+  "notes": "지표별 정리: ARI 는 군집 수가 달라도 비교 가능하고 우연 보정이 되지만 작은 n 에서 편향되며 두 분할이 모두 단원소이거나 한 군집이면 퇴화한다. AMI 는 우연 보정이 되고 작은 n 에서 특히 필요하다. NMI 는 보정이 없어 원소 5~10개에서는 쓰지 않는 편이 낫다. MoJoFM 은 정답 기준 비대칭 지표이고 군집이 많은 분할을 선호하며, 반복 실행 사이에는 대칭 거리(MoJo 최소 연산 수)가 맞다. EdgeSim·MeCl 은 간선 가중치가 필요하다. Fleiss kappa 는 원소 쌍마다 '같은 워크스트림인가'를 이진 판정으로 보면 적용할 수 있다(쌍이 독립이 아닌 한계). 제안하는 측정(렌즈 제안·가정): 분해 단계와 묶는 단계를 나눠 잰다. 주 지표는 N회 사이 완전 일치율과 N회당 서로 다른 분할 수, 보조 지표는 실행 쌍 ARI 평균과 공동 할당 행렬. 기준값은 출처 미확인 구간 대신 원소 5~10개 분할을 전수 열거해 무작위 분할의 ARI 분포를 우연 기준선으로 쓰고(Bell(5)=52, Bell(10)=115975), '무조건 분리' 기준선도 함께 보고한다. 실험 설계: 요청·조건마다 10회, 요청 5~8개, 합칠 쌍을 정답으로 심은 요청을 절반 이상, 같은 요청에서 짝지어 비교하고 요청 단위 부트스트랩이나 순열 검정으로 구간을 낸다. 더 확인할 것: ARI 구간 원출처, Mitchell·Mancoridis(2001) 원문."
+}

@@ -141,6 +141,6 @@ spec·plan과 남에게 전달될 산출물에는 검증 과정을 적용하라.
 
 ## 병렬 오케스트레이션
 
-독립된 큰 일이 둘 이상이거나 큰 개발 하나가 하위 시스템 여럿으로 나뉘면 한 세션이 차례로 진행하지 말고 서브에이전트에 나눠 맡겨라.
+큰 개발 요청과, 서로 독립된 큰 작업이 둘 이상인 요청에 적용하라.
 
-- **`SUB-ORCHESTRATE` (One subagent per independent job or subsystem)** — 서로 독립된 일이 둘 이상이거나 개발 하나가 독립된 하위 시스템 여럿으로 나뉘는 상황에서 각 일이 plan을 따로 둘 만큼(태스크 다섯 이상으로 예상될 만큼) 크면, 차례로 명세·plan·구현을 직접 진행하지 마라. 나눌 근거를 보여 사용자 승인을 받은 뒤 일마다 서브에이전트에 맡겨라. 나눌 일이 하나뿐이면 맡기지 마라. 방법은 `nested-orchestration`이 소유한다.
+- **`SUB-ORCHESTRATE` (Decide on delegating before sequencing)** — superpowers brainstorming을 따르다가 개발을 하위 프로젝트로 분해하기로 했을 때 `nested-orchestration`으로 서브에이전트에 맡길지 판단하라. 설계 문서가 승인되어 plan을 쓰기 전에도 같은 판단을 하라. 맡기려면 근거를 보여 사용자 승인을 받아라. 기준과 방법은 `nested-orchestration`이 소유한다.

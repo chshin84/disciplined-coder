@@ -1,0 +1,77 @@
+{ "lens": "lens-adversarial",
+  "read": [
+    "C:/Users/ho381/.claude/plugins/cache/chshin-tools/disciplined-coder/f9752ace24b9/skills/lens-adversarial/SKILL.md",
+    "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t7/prep3.md",
+    "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md (180~286행, 「2026-10-10 개정」)",
+    "D:/projects/Structure/disciplined-coder/skills/nested-orchestration/SKILL.md (전체)",
+    "D:/projects/Structure/disciplined-coder/agent-principles.md (142~147행)",
+    "D:/projects/Structure/disciplined-coder/docs/domain-discipline.md (354~380행)",
+    "D:/projects/Structure/disciplined-coder/docs/superpowers/reviews/2026-10-10-nested-orchestration-large-dev-review-2.md",
+    "docs/superpowers/reviews 목록 (2026-10-10-sub-orchestrate-criteria-prior-art.md 와 2026-10-10-decomposition-criteria-prior-art.md 가 둘 다 있음을 확인)"
+  ],
+  "issues": [
+    {
+      "where": "skills/nested-orchestration/SKILL.md 「라우팅」 둘째·넷째 불릿(80·82행)과 「나누는 기준」 31행",
+      "type": "failure-mode",
+      "claim": "첫 층 워크스트림이 둘 이상이지만 그중 하나라도 태스크 다섯 미만으로 예상되는 큰 개발은 라우팅의 어느 불릿에도 들지 않는다. 둘째 불릿은 「나누는 기준」(각 워크스트림이 다섯 이상)을 요구하고, 고친 넷째 불릿은 동시에 시작할 수 있는 워크스트림이 하나뿐인 경우만 직접 진행으로 보낸다. 순환만 합치는 규칙으로 바뀌면서 작은 하위 프로젝트를 이웃 워크스트림에 흡수하는 경로도 사라졌다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "31행 \"동시에 시작할 수 있는 워크스트림(「묶는 단위」의 첫 층)이 둘 이상이고, 각 워크스트림이 plan을 따로 둘 만큼(태스크 다섯 이상으로 예상될 만큼) 크면 나눈다\" / 82행 \"서로 독립된 큰 작업이 하나뿐이고 큰 개발에서 동시에 시작할 수 있는 워크스트림도 하나뿐이면 현재 세션은 superpowers 흐름을 직접 진행한다\" / 37행 \"나머지는 하위 프로젝트 하나를 워크스트림 하나로 둔다\". 단순화 근거: 넷째 불릿을 2차 리뷰 전처럼 '「나누는 기준」에 들지 않으면 직접 진행'으로 되돌리면 빈칸이 닫힌다. 다른 저장소 예외는 65행이 따로 적고 있다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "192행 \"계약 코드를 고정한 뒤 동시에 시작할 수 있는 워크스트림이 둘 이상이고, 각 워크스트림이 plan을 따로 둘 만큼(태스크 다섯 이상으로 예상될 만큼) 크면 나눈다\" / 276행 \"순환만 합치는 조건의 분할은 ... '무조건 분리' 기준선과 같았다\"",
+      "principle": "REVERSIBLE 이 아니라 라우팅 완결성의 실패 모드다(이 렌즈의 실패 모드 축).",
+      "consequence": "지금 「라우팅」은 첫 층 둘 이상·일부 워크스트림 다섯 미만인 경우를 아무 불릿으로도 보내지 않는다. 33행 끝 \"기준에 들지 않으면 현재 세션은 superpowers 흐름을 그대로 따른다\"와 82행이 서로 다른 조건으로 직접 진행을 정의하고 있다."
+    },
+    {
+      "where": "skills/nested-orchestration/SKILL.md 「흐름」 96행 첫 문장",
+      "type": "failure-mode",
+      "claim": "경로 겹침을 합치는 조건에서 빼고 같은 파일을 공용 파일로 돌렸는데, 96행은 아직 '수정 허용 경로가 겹치지 않는' 것을 동시 진행 조건으로 둔다. 「묶는 단위」의 첫 층(동시에 시작할 수 있다)과 96행의 동시 진행 집합이 다르게 정의되어, 첫 층이 둘 이상이라 나눴는데 허용 경로가 겹쳐 실제로는 차례로 진행하는 경우와, 그때 어느 쪽이 먼저인지를 정하는 규칙이 없다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "96행 \"의존 순서가 없고 수정 허용 경로가 겹치지 않는 워크스트림은 동시에 진행한다.\" 단순화 근거: 41행이 같은 파일을 현재 세션 소유로 돌리므로 '수정 허용 경로가 겹치지 않는' 조건을 지우고 의존 순서만 남기면 37행 정의와 하나가 된다. 겹침은 160행 교집합 검사가 병합 전에 잡는다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "37행 \"선행 워크스트림이 없는 워크스트림들이 첫 층이며 동시에 시작할 수 있다\" / 41행 \"두 워크스트림이 같은 파일을 고쳐야 하면 현재 세션이 그 파일을 맡고 ... 경로 겹침을 ... 합치는 조건으로 쓰지 않는다\"",
+      "principle": "처분이 남긴 모순(경로 겹침 제거의 잔재)",
+      "consequence": "지금 스킬은 '동시에 시작할 수 있는 워크스트림'을 37행은 의존만으로, 96행은 의존과 경로 겹침으로 정한다."
+    },
+    {
+      "where": "skills/nested-orchestration/SKILL.md 「서로 독립된 큰 작업」 65행의 다른 저장소 문장, 「흐름」 2단계 89행, 「가드레일」 158~166행",
+      "type": "failure-mode",
+      "claim": "2차 지적을 처분하며 다른 저장소의 작업을 저장소마다 큰 명세와 통합 브랜치로 맡기게 했지만, 89행은 현재 세션이 자기 체크아웃에 남고 cd 와 EnterWorktree 를 쓰지 않는다고 하고, 가드레일의 git diff·git switch·git merge 명령은 모두 현재 세션 체크아웃에서 실행하는 형태다. 현재 세션의 체크아웃이 없는 다른 저장소에서 워크트리 생성·수정 범위 대조·시험 병합을 어디서 실행하는지 적혀 있지 않다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "65행 \"작업들이 다른 저장소에 있으면 현재 세션은 저장소마다 큰 명세와 통합 브랜치를 따로 두며\" / 89행 \"`EnterWorktree`와 `cd`는 쓰지 않는다. 현재 세션이 자기 체크아웃을 떠나면 시험 병합과 다른 워크트리 생성을 할 수 없기 때문이다\" / 166행 \"`git switch -c try/<id> dev/<개발>`\"",
+      "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "204행 \"작업들이 다른 저장소에 있으면 현재 세션은 저장소마다 큰 명세와 통합 브랜치를 따로 두고, 작업마다 서브 세션에 맡긴다\"",
+      "principle": "처분이 남긴 모순(다른 저장소 처분과 단일 체크아웃 전제)",
+      "consequence": "지금 다른 저장소 경로를 따르는 현재 세션은 89행의 금지와 166행의 git switch 를 동시에 지킬 방법이 스킬에 없다. 위험 완화로는 65행에 '다른 저장소의 명령은 git -C <그 저장소 경로> 로 실행한다' 한 문장이면 되지만, 그 저장소에서 git switch 가 사용자의 작업 트리를 바꾸는 문제는 남으므로 이 처리는 호출자가 정할 일이다."
+    },
+    {
+      "where": "skills/nested-orchestration/SKILL.md 「묶는 단위」 39행 근거 문단",
+      "type": "risk",
+      "claim": "스킬은 순환만 합치는 규칙의 근거로 '다섯 요청 모두 5회 같은 분할'만 적는다. spec 은 그 분할이 '무조건 분리' 기준선과 거의 같았고, 주문 처리에 심은 상태 변경 순환을 모든 실행이 형식만 알면 되는 관계(0)로 보아 합치지 않았다고 적는다. 즉 재현된 것은 합치지 않는 쪽이고, 진짜 순환을 찾는 능력은 측정에서 한 번도 확인되지 않았다. 스킬만 읽는 세션은 이 한계를 모른다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "39행 \"이 방식은 다섯 요청 모두에서 5회 같은 분할을 냈다\". 완화 근거: 「근거와 한계」가 Specification Gap 의 분할 손실을 이미 인정하므로, 순환을 놓치면 그 손실이 그대로 생긴다는 점을 39행에 한 문장으로 적으면 기능 추가 없이 승인 단계(33행)에서 사용자가 표를 볼 때 판단 근거가 된다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "276행 \"순환만 합치는 조건의 분할은 ... 하나를 빼면 '무조건 분리' 기준선과 같았다. 주문 처리 요청에 심은 상태 변경 순환은 모든 실행이 자료 형식만 알면 되는 관계로 보고 설계 의존으로 세지 않았다.\"",
+      "principle": "근거가 결과를 과장하지 않는다(완화해야 할 위험)",
+      "consequence": "지금 스킬의 근거 문단은 재현성만 적고, 심은 순환을 한 번도 잡지 못했다는 측정 결과는 spec 에만 있다."
+    },
+    {
+      "where": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md 188행 「바꾼 이유」 셋째 문단",
+      "type": "risk",
+      "claim": "개정 절이 선행연구 기록을 두 파일로 가리킨다. 188행은 sub-orchestrate-criteria-prior-art.md 를, 198행·226행은 decomposition-criteria-prior-art.md 를 인용하는데 어느 것이 지금 결정의 근거인지, 앞 것이 대체되었는지 적혀 있지 않다. 두 파일 모두 저장소에 있다.",
+      "file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "188행 \"그 기록은 `docs/superpowers/reviews/2026-10-10-sub-orchestrate-criteria-prior-art.md`에 있다\"",
+      "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "198행 \"선행연구 대조(`docs/superpowers/reviews/2026-10-10-decomposition-criteria-prior-art.md`)가 세 결함을 지적했다\"",
+      "principle": "근거 추적성",
+      "consequence": "지금 개정 절은 서로 다른 선행연구 기록 둘을 관계 설명 없이 인용한다."
+    }
+  ],
+  "principles_applied": [
+    "실패 모드: 설계대로 해서 실패했다고 놓고 원인을 찾음(라우팅 빈칸, 동시 진행 정의 불일치, 다른 저장소 실행 위치)",
+    "과설계·YAGNI: 이번 변경에서 새 일반화는 찾지 못함",
+    "비가역: 새로 든 비가역 결정은 없음. 하위 프로젝트 목록 고정은 사용자 결정이라 재론하지 않음",
+    "위험 완화: 근거 문단의 한계 표시",
+    "가드: 기능 추가 제안 없음, 사용자가 정한 것(순환만 합침, 목록 승인 고정, 태스크 다섯, 상한 유보, 시험 판정 기준)은 재론하지 않음"
+  ],
+  "notes": "검토 관점: 실패 모드, 과설계, 비가역, 위험을 차례로 따로 봤다. 2차에서 처분한 지적은 다시 올리지 않았다. 다만 처분이 끝났는지 확인하지 못한 것이 둘 있어 여기에 적는다. (1) agent-principles.md 144행 머리 문장은 여전히 '큰 개발을 하위 프로젝트로 분해할 때'로 적용 범위를 정하는데, 조항(146행)의 둘째 시점과 SKILL 29행은 하위 프로젝트로 분해하지 않은 큰 개발도 설계 승인 뒤에 판단하게 한다. 또 조항 문장은 '하위 프로젝트를 차례로 직접 진행하기 전에'라 분해하지 않은 개발에는 맞지 않는다. 2차의 '머리 문장의 적용 조건이 조항의 둘째 시점보다 좁다'는 지적이 이 상태로 처분(유지)된 것이면 무시해도 된다. 다만 spec 280행의 검증하지 않은 가정(v7 HARD-GATE 를 넘는가)이 바로 이 시점이라 영향이 크다. (2) 2차의 '태스크 다섯 미만 후보의 처리가 없다'는 지금도 규칙이 없다. 첫째 이슈는 이것을 다시 올린 것이 아니라, 넷째 불릿을 좁히고 한 방향 합치기를 없앤 뒤 새로 생긴 라우팅 빈칸으로 올렸다. 더 확인할 것: 재현성 측정 원본(t6/result.txt)은 열지 않았다. spec 276행의 '기준선과 같았다'는 서술은 spec 문장으로만 받았다."
+}

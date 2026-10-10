@@ -1,0 +1,29 @@
+{
+  "lens": "lens-fit",
+  "target": "spec 「2026-10-10 개정」, agent-principles.md 「병렬 오케스트레이션」, skills/nested-orchestration/SKILL.md 오늘 바뀐 문단 (1차 반영본)",
+  "doc_type": "spec 개정 절은 「설계」, SKILL.md 는 「절차·계약」, 원칙 절은 「규범·인덱스」 행이다. 상태는 없었다.",
+  "read": ["skills/lens-fit/SKILL.md", "agent-principles.md", "docs/domain-korean.md", "CLAUDE.md", "docs/superpowers/reviews/2026-10-10-nested-orchestration-large-dev-review.md", "docs/superpowers/reviews/2026-10-10-nested-orchestration-large-dev-review/lens-fit-1.json", "spec 150~257행", "skills/nested-orchestration/SKILL.md"],
+  "issues": [
+    {"where": "SKILL 「나누는 기준」 마지막 문장", "type": "style", "claim": "brainstorming 을 하위 프로젝트로 나누는 주체로 다시 썼다.", "evidence": "31행", "principle": "SUBJECT-OBJECT"},
+    {"where": "원칙 SUB-ORCHESTRATE, SKILL 「나눌지 판단하는 시점」 첫 문장", "type": "style", "claim": "'나누다'가 한 문장에서 분해와 위임 두 개념을 가리켜 '나누기로 했을 때 나눌지 판단하라'로 읽힌다.", "evidence": "원칙 146행, SKILL 27행", "principle": "TERM-ONE, 퇴고 기준 「범위의 정확성」"},
+    {"where": "원칙 머리 문장과 SUB-ORCHESTRATE", "type": "style", "claim": "머리 문장과 조항이 같은 조건·같은 지시를 다시 적는 포함 중복이다.", "evidence": "144행, 146행", "principle": "퇴고 기준 「범위의 정확성」, EDIT-PRIORITY"},
+    {"where": "원칙 머리 문장", "type": "constraint", "claim": "스킬·spec 은 '서로 독립된 큰 일'로 통일했지만 원칙은 '독립된 큰 일'이다.", "evidence": "144행", "principle": "TERM-ONE"},
+    {"where": "SKILL 「나눌지 판단하는 시점」 둘째 문단, spec 「바꾼 이유」", "type": "style", "claim": "'하위 시스템'이 용어 표 없이 '하위 프로젝트'와 함께 쓰인다.", "evidence": "SKILL 29행, spec 186행", "principle": "TERM-EXPLAIN, TERM-ONE"},
+    {"where": "SKILL 「묶는 단위」 첫 문장", "type": "style", "claim": "불릿 앞에 '두 조건' 개수를 예고했다.", "evidence": "35행", "principle": "COUNT-EARNS"},
+    {"where": "SKILL 「묶는 단위」 불릿", "type": "style", "claim": "불릿 한 항목이 두 문장이다.", "evidence": "37·38행", "principle": "BULLET-SCOPE"},
+    {"where": "SKILL 「묶는 단위」 끝 문단", "type": "style", "claim": "'앞 하위 프로젝트'와 '앞 워크스트림'이 같은 관계를 가리키고, 한 문장에 정의와 지시가 있으며 적는 주체가 빠졌다.", "evidence": "40행", "principle": "TERM-ONE, ONE-IDEA, SUBJECT-OBJECT"},
+    {"where": "SKILL 용어 표 「하위 프로젝트」 행", "type": "style", "claim": "다른 행은 명사구인데 이 행만 두 문장이다.", "evidence": "21행", "principle": "ONE-ENDING"},
+    {"where": "SKILL 「공용 파일」, spec 「잠금 파일」", "type": "style", "claim": "단락이 네 문장을 넘는다.", "evidence": "SKILL 58행, spec 204행", "principle": "ONE-IDEA"},
+    {"where": "SKILL 「흐름」 4단계", "type": "style", "claim": "항목 하나가 다섯 문장이고 개념이 여럿이다.", "evidence": "88행", "principle": "ONE-IDEA, BULLET-SCOPE"},
+    {"where": "SKILL 「멈추는 기준」 범위 밖 문단, spec 「범위 밖 결정」", "type": "style", "claim": "단락이 다섯 문장이고 '그 목록'이 무엇인지 이름이 없다.", "evidence": "SKILL 139행, spec 210행", "principle": "SPECIFIC-NAME, ONE-IDEA"},
+    {"where": "SKILL 「멈추는 기준」 범위 밖 항목 불릿", "type": "style", "claim": "같은 구실 불릿의 말끝이 절·명사구·명사 나열로 섞였다.", "evidence": "133~137행", "principle": "ONE-ENDING"},
+    {"where": "SKILL 「측정」", "type": "style", "claim": "단락이 일곱 문장이고 '판정 수'를 '센다'의 주체로 썼다.", "evidence": "167행", "principle": "ONE-IDEA, SUBJECT-OBJECT"},
+    {"where": "spec 「2026-10-10 개정」 여러 문단", "type": "style", "claim": "절·기준·값·URL·과제·조건을 판단·행동의 주체로 썼다.", "evidence": "182·198·212·214·216·236·237·247행", "principle": "SUBJECT-OBJECT"},
+    {"where": "spec 「바꾼 이유」 첫째·셋째 문단", "type": "style", "claim": "한 문장에 두 개념이 남았고 '세 경로 분류'를 풀지 않았으며 그 문장이 어느 이유에 속하는지 없다.", "evidence": "184행, 188행", "principle": "ONE-IDEA, TERM-EXPLAIN, SUBJECT-OBJECT"},
+    {"where": "spec 「묶는 단위」", "type": "style", "claim": "'파일' 앞 수식어가 둘이고 정의와 확인 방법이 한 문장이며 주체가 없다.", "evidence": "196행", "principle": "NO-STACK-MOD, ONE-IDEA"},
+    {"where": "spec 「근거」 표 「반영」 열", "type": "style", "claim": "같은 열의 말끝이 명사구·'-음'·절로 섞였다.", "evidence": "220~226행", "principle": "ONE-ENDING"},
+    {"where": "spec 「확인 방법」 3·4항", "type": "constraint", "claim": "3항에 판정 기준과 경위가 섞였고 4항은 확인 방법이 아니라 후속 지시다.", "evidence": "236·237행", "principle": "CHECKABLE, ONE-IDEA"}
+  ],
+  "principles_applied": ["DOC-TYPE", "SUBJECT-OBJECT", "TERM-ONE", "TERM-EXPLAIN", "SPECIFIC-NAME", "COUNT-EARNS", "BULLET-SCOPE", "ONE-IDEA", "ONE-ENDING", "NO-STACK-MOD", "NO-MID-MOD", "ANTI-LIMIT", "COMMA-CUT", "WRITTEN-ONLY", "FULL-SENTENCE", "CHECKABLE", "EDIT-PRIORITY", "CLAUDE.md 명령형", "CLAUDE.md 퇴고 기준"],
+  "notes": "1차 지적 중 개수 예고, 라우팅 주체, description·27행 주체, 원칙 머리 문장 무조건 명령, 조항 중복·영어 이름, '큰 일' 정의, 머리 문장 혼용, 다문장 불릿, 「근거와 한계」 9문장, '+' 기호, 개정 머리 따르는 주체는 해소. SKILL 31행 주체, 원칙 '독립된 큰 일', 개정 머리 '이 절은 고치고', 184행 두 개념은 남음. 새로 생긴 것은 묶는 단위 개수 예고·다문장 불릿, 긴 단락들, 표 말끝, 사물 주어. 각 지적의 file·counterpart 원문은 세션 대화의 렌즈 원본에 있으며 이 사본은 필드를 줄여 옮겼다. lens-consistency 몫: SKILL 52행과 54행·흐름 1단계의 dev 기준 커밋 차이, 아직 없는 pathspec 비교."
+}

@@ -1,0 +1,88 @@
+{ "lens": "lens-consistency",
+  "read": [
+    "C:/Users/ho381/.claude/plugins/cache/chshin-tools/disciplined-coder/f9752ace24b9/skills/lens-consistency/SKILL.md",
+    "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t7/prep3.md",
+    "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md (180~286행)",
+    "D:/projects/Structure/disciplined-coder/skills/nested-orchestration/SKILL.md",
+    "D:/projects/Structure/disciplined-coder/agent-principles.md (140~146행)",
+    "D:/projects/Structure/disciplined-coder/docs/domain-discipline.md (1~20행, 350~393행)",
+    "D:/projects/Structure/disciplined-coder/docs/superpowers/reviews/2026-10-10-nested-orchestration-large-dev-review-2.md",
+    "docs/superpowers/reviews 의 prior-art 파일 목록(ls)"
+  ],
+  "issues": [
+    {
+      "where": "SKILL 「묶는 단위」 37행 / 「흐름」 96행",
+      "type": "contradiction",
+      "claim": "경로 겹침을 합치는 조건에서 뺀 뒤, 첫 층의 정의와 동시 진행 조건이 서로 다르다. 37행은 선행 워크스트림이 없으면 첫 층이고 동시에 시작할 수 있다고 정하는데, 96행은 의존 순서가 없는 것에 더해 수정 허용 경로가 겹치지 않아야 동시에 진행한다고 정한다. 「나누는 기준」은 37행의 첫 층으로 '둘 이상'을 센다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "선행 워크스트림이 없는 워크스트림들이 첫 층이며 동시에 시작할 수 있다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "의존 순서가 없고 수정 허용 경로가 겹치지 않는 워크스트림은 동시에 진행한다.",
+      "principle": "같은 대상(동시에 시작할 수 있는 워크스트림)은 한 정의만 가져야 한다",
+      "consequence": "허용 경로가 겹치는 첫 층 워크스트림 둘은 37행과 「나누는 기준」으로는 동시 시작으로 세어져 분할 근거가 되지만, 96행으로는 동시에 진행하지 못한다. 겹칠 때 어느 쪽을 먼저 하는지는 어디에도 적혀 있지 않다. 41행은 같은 파일을 현재 세션의 공용 파일로 돌린다고 적지만, 96행의 조건을 지우거나 그 조건과 관계를 맺는 문장은 없다."
+    },
+    {
+      "where": "SKILL 「라우팅」 7행·82행 / 「나누는 기준」 33행",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 넷째 불릿을 '동시에 시작할 수 있는 워크스트림도 하나뿐이면'으로 좁힌 뒤에는, 첫 층은 둘 이상이지만 태스크 다섯 미만으로 예상되는 워크스트림이 있어 「나누는 기준」에 들지 않는 경우를 어느 불릿도 받지 않는다. 7행은 언제 쓰는지를 「라우팅」이 정한다고 적었는데, 이 경우의 처리는 33행 본문에만 있다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "서로 독립된 큰 작업이 하나뿐이고 큰 개발에서 동시에 시작할 수 있는 워크스트림도 하나뿐이면 현재 세션은 superpowers 흐름을 직접 진행한다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "언제 이 스킬을 쓰는지는 「라우팅」이 정하고, 방법은 이 스킬이 정한다. / 기준에 들지 않으면 현재 세션은 superpowers 흐름을 그대로 따른다.",
+      "principle": "소유자로 선언한 절이 그 판단의 모든 경우를 덮어야 한다",
+      "consequence": "「라우팅」만 읽으면 첫 층 둘 이상이고 태스크가 다섯에 못 미치는 큰 개발은 둘째 불릿(기준에 듦)에도 넷째 불릿(직접 진행)에도 들지 않는다. 처리 방법은 「큰 개발 분할」 33행 끝 문장에서만 찾을 수 있다."
+    },
+    {
+      "where": "agent-principles 「병렬 오케스트레이션」 머리 문장 / spec 「바꾼 이유」·「원칙 조항」, SKILL 29행",
+      "type": "contradiction",
+      "claim": "처분이 남긴 모순이다. 머리 문장을 적용 범위만 적도록 줄였지만, 그 범위는 여전히 '큰 개발을 하위 프로젝트로 분해할 때'다. 조항을 원칙에 남긴 이유는 v7에서 분해되지 않는 큰 개발이 설계 승인 뒤 writing-plans로 곧장 가는 것을 덮어쓰기 위해서였는데, 그 경우가 머리 문장의 범위 밖에 있다. 조항 둘째 시점의 '하위 프로젝트를 차례로 직접 진행하기 전에'도 분해하지 않은 큰 개발에는 걸리지 않는다.",
+      "file": "agent-principles.md",
+      "evidence": "큰 개발을 하위 프로젝트로 분해할 때와 서로 독립된 큰 작업이 둘 이상일 때 적용하라.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "하위 시스템이 여럿인 큰 개발 하나가 v7에서 분해되지 않아 … 트리거되지 않을 것으로 추정했다 / superpowers의 차례 진행과 writing-plans 직행을 덮어쓰는 근거를 사용자 지시에 두려고 조항을 원칙에 남긴다 (SKILL 29행: 하위 프로젝트로 분해하지 않은 큰 개발도 여기서 판단한다)",
+      "principle": "문서가 스스로 정한 목적(조항을 남긴 이유)을 그 조항의 문면이 어기면 안 된다",
+      "consequence": "원칙 문면대로라면 v7에서 분해하지 않은 큰 개발은 적용 범위 밖이다. 이 경우를 판단 시점에 넣은 문장은 스킬 29행뿐이며, spec 194행이 조항으로 덮으려 한 writing-plans 직행은 조항의 근거를 받지 못한다."
+    },
+    {
+      "where": "SKILL description·27행·31행·80행 / agent-principles 조항",
+      "type": "drift",
+      "claim": "2차 처분에서 동사를 '분해'와 '맡김'으로 나눈 것은 원칙에만 반영되었다. 스킬은 '나누다'를 계속 두 뜻으로 쓴다. description은 '하위 프로젝트로 나누기로 했을 때'라고 써서 분해의 뜻으로 쓰고, 「나누는 기준」의 '크면 나눈다'와 「라우팅」의 '나눠 맡길 단위'는 맡김의 뜻으로 쓴다. 원칙 조항이 가리키는 판단은 '맡길지 판단'인데, 스킬에서 그에 해당하는 절 이름은 「나눌지 판단하는 시점」이다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "superpowers brainstorming을 따르던 세션이 개발을 하위 프로젝트로 나누기로 했을 때 … / **나누는 기준.** … 크면 나눈다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "개발을 하위 프로젝트로 분해하기로 했을 때와 … `nested-orchestration`으로 서브에이전트에 맡길지 판단하라.",
+      "principle": "같은 행위는 한 이름으로 가리킨다(용어 드리프트 금지)",
+      "consequence": "원칙은 '분해'와 '맡김'을 구분하지만, 같은 대상을 다루는 스킬 description과 본문은 '나누다' 하나로 두 행위를 함께 가리킨다. 2차 리뷰의 '나누다 두 뜻' 지적은 스킬 쪽에서는 해소되지 않았다."
+    },
+    {
+      "where": "domain-discipline `SUB-ORCHESTRATE` 「측정(2026-10-10)」 끝 문장 / spec 「원칙 문구 재시험」 둘째 문단",
+      "type": "contradiction",
+      "claim": "2차 리뷰 뒤 재시험의 결과를 두 문서가 다르게 적는다. spec에 따르면 스킬을 고친 뒤 다시 실행한 세션은 독립된 큰 작업 두 세션뿐이고, 채권 도구와 README 세션은 고치기 전 첫 실행의 결과다. domain-discipline은 고친 뒤 네 세션이 모두 의도대로 동작했다고 적는다.",
+      "file": "docs/domain-discipline.md",
+      "evidence": "스킬의 다른 저장소 문장을 고친 뒤 네 세션 모두 의도대로 동작했다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "현재 세션이 「서로 독립된 큰 작업」과 「라우팅」 넷째 불릿을 고친 뒤 두 세션을 다시 실행하자 둘 다 작업마다 맡기는 근거를 보이고 승인을 물었다.",
+      "principle": "같은 측정 사실은 문서마다 같은 범위로 적는다",
+      "consequence": "domain-discipline만 읽으면 「라우팅」 넷째 불릿을 고친 문안으로 작은 개발(README)과 채권 도구도 다시 시험한 것처럼 읽힌다. spec에 따르면 넷째 불릿을 좁힌 뒤의 README·채권 세션은 실행되지 않았다."
+    },
+    {
+      "where": "spec 「판단 시점」 190행 / 「묶는 단위」 196행, SKILL 「큰 명세」 항목",
+      "type": "drift",
+      "claim": "설계 승인 뒤에 나누는 경로에서 설계 문서에 보강할 항목을 spec 190행이 나열하는데, 그 목록에 '의존 순서'가 없다. 같은 개정 절 196행은 한 방향 의존을 큰 명세의 의존 순서에 적으라고 새로 정했다. 스킬 「큰 명세」 항목에도 의존 순서가 있다.",
+      "file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "설계 문서에 워크스트림·계약·허용 경로·소유 표·결정 기록을 보강해 큰 명세로 삼은 뒤 다시 승인받는다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "남은 한 방향 의존은 큰 명세의 의존 순서에 적는다. (SKILL 47행: 의존 순서: 다른 워크스트림의 산출물이 있어야 시작할 수 있는 워크스트림)",
+      "principle": "한 문서 안의 같은 목록은 새 규칙과 함께 갱신한다",
+      "consequence": "spec 190행의 보강 목록에는 의존 순서·공통 제약·통합 확인 방법이 없다. 스킬 「큰 명세」의 항목 목록과도 다르다."
+    }
+  ],
+  "principles_applied": [
+    "lens-consistency 체크리스트: 모순, 커버리지 공백, 산출물 공백, 드리프트, 스코프",
+    "상대편을 지목할 수 없는 발견은 올리지 않음",
+    "2차 리뷰에서 처분한 지적은 다시 올리지 않고, 처분 뒤 새로 생긴 문제와 처분이 남긴 모순만 올림",
+    "사용자가 정한 것(순환만 합침, 목록은 승인으로 고정, 태스크 다섯, 상한 유보, 판정 기준)은 재론하지 않음",
+    "agent-principles.md 한국어 문어체"
+  ],
+  "notes": "관점별로 검토한 결과다. (1) 모순: 첫 층 정의와 「흐름」 96행, 원칙 머리 문장과 조항을 남긴 이유, domain-discipline과 spec의 재시험 기술을 대조했다. (2) 커버리지: 넷째 불릿을 좁혀 생긴 「라우팅」의 빈 경우를 찾았다. spec 개정 절의 결정(묶는 단위, 나누는 기준, 서로 독립된 큰 작업, 잠금 파일, 공유 가정 전파, 범위 밖 결정, 판정 기록 확인, 측정, 검증하지 않은 가정의 후속 판단)이 스킬로 이어지는지는 모두 지목할 수 있었다. (3) 산출물: spec 「바뀌는 파일」과 「확인 방법」이 있다. 확인 방법 1·2를 직접 대조했고 통과한다(agent-principles에 '태스크 다섯' 없음, SKILL 31행에 '나누는 기준.' 있음, domain-discipline 인용이 조항 첫 문장과 같음). domain-discipline 12~15행 인용도 실제 행과 맞다. (4) 드리프트: 선행연구 기록 경로 두 개(sub-orchestrate-criteria-prior-art.md, decomposition-criteria-prior-art.md)는 둘 다 실재하는 서로 다른 기록이라 올리지 않았다. (5) 스코프: 개정 절이 스킬·원칙·domain-discipline 세 파일만 고치므로 문제를 찾지 못했다. 올리지 않은 것: 원칙 조항에 '서로 독립된 큰 작업' 시점이 없고 머리 문장에만 있는 점은 2차에서 지적된 것이고 처분 방식을 확인할 수 없어 올리지 않았다. 다른 저장소 작업에서 「흐름」 2단계의 'cd 금지'와 git 명령이 어느 저장소를 대상으로 하는지 적혀 있지 않은 점도 2차의 '저장소 하나 전제' 지적과 겹칠 수 있어 올리지 않았다. 호출자가 처분 기록으로 이 둘이 해소됐는지 확인해야 한다. 나누는 기준의 '각 워크스트림이 다섯 이상'이 첫 층만 뜻하는지 이후 층까지 뜻하는지도 문면으로 정해지지 않는다. 이것은 2차의 '태스크 다섯 미만 후보' 지적과 겹치므로 확인만 권한다."
+}
