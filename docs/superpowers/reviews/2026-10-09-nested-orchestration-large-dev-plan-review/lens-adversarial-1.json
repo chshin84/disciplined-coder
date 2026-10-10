@@ -1,0 +1,166 @@
+{
+  "lens": "lens-adversarial",
+  "target": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+  "read": [
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+    "D:/projects/disciplined-coder/CLAUDE.md",
+    "D:/projects/disciplined-coder/scripts/test_docs_drift.sh (1-40, 160-162, 280-292, 403-414, 786-789, 862-875행)",
+    "D:/projects/disciplined-coder/skills/dispatching-lenses/SKILL.md (grep: L1·L2·서브오케스트레이터·메인 세션)",
+    "D:/projects/disciplined-coder/skills/review-specs/SKILL.md (grep: L1·L2·메인 세션·spec-review 마커)",
+    "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md (grep: 현행 L1·L2 용어)",
+    "D:/projects/disciplined-coder/docs/domain-discipline.md (10-15, 350-365행)",
+    "D:/projects/disciplined-coder/README.md (grep: 사본·@import)",
+    "C:/Users/CHSHIN/.claude/CLAUDE.md (grep: 관리블록)",
+    "git status --short, git worktree list (메인 체크아웃)"
+  ],
+  "issues": [
+    {
+      "where": "Task 2 Step 5, Task 3 Step 2·Step 4·Step 5, Task 4 Step 1·Step 3·Step 4, Task 5 Step 3·Step 4, Task 6 Step 3, Task 7 Step 2·Step 3의 bash 블록 첫 줄",
+      "type": "failure-mode",
+      "claim": "이 명령 블록들에는 `cd /d/projects/dc-nested-large-dev`가 없다. 실행자가 subagent-driven-development의 구현 서브에이전트이면 Bash 호출마다 작업 디렉터리가 메인 체크아웃으로 돌아간다. 그러면 검사는 고치지 않은 main 사본에서 돌고, `git add`와 `git commit`은 main 브랜치에 들어간다. Task 2 Step 4와 Task 7 Step 1만 cd를 둔다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "Task 3 Step 2: \"bash scripts/test_docs_drift.sh 2>&1 | grep -F '옛 nested 설계'\" / Task 4 Step 4: \"git add skills/nested-orchestration/SKILL.md\" (둘 다 cd가 없다)",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "Task 0 Interfaces: \"Produces: 워크트리 `../dc-nested-large-dev`, 브랜치 `nested-large-dev`. 이후 모든 Task는 이 워크트리에서 실행한다.\"",
+      "principle": "CHECKABLE, REVERSIBLE",
+      "consequence": "지금 메인 체크아웃 D:/projects/disciplined-coder는 main 브랜치(3eae984)에 있다. 위 Step들의 명령에는 워크트리를 가리키는 경로가 하나도 없다."
+    },
+    {
+      "where": "Task 0 Step 2의 Expected 줄과 for 루프의 경로 목록, Task 0 Step 3의 git add 경로",
+      "type": "failure-mode",
+      "claim": "Expected는 '사용자 파일 두 묶음만 남는다'이지만 메인 체크아웃에는 미추적 `agents.md`가 더 있다. 이 plan의 리뷰 기록도 실행 전에 reviews/에 생기는데 이동 목록에 없다. 그래서 Expected가 맞지 않고, 실행자는 멈추거나 즉석에서 목록을 늘린다. 이름이 `…-large-dev-review*`와 맞지 않으면 plan 리뷰 기록은 커밋에서 빠진다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "\"Expected: `git status --short`에 위 경로가 더 나오지 않고, 사용자 파일 두 묶음만 남는다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/agents.md",
+      "counterpart": "git status --short 출력: \"?? agents.md\" (에이전트원칙의 옛 사본이다)",
+      "principle": "NO-ASSUME, CHECKABLE",
+      "consequence": "현재 git status --short에는 사용자 파일 두 묶음 외에 `?? agents.md`가 나온다. Task 0의 이동 목록에는 plan 리뷰 기록 경로가 없다."
+    },
+    {
+      "where": "Task 2 Step 1(조건 없는 교체 지시)과 Task 7 Step 1의 Expected",
+      "type": "failure-mode",
+      "claim": "Task 1 Step 5는 불채택이어도 Task 2 이후를 진행하는 길을 연다. 그러나 Task 2 Step 1은 조건 없이 조건 C 문안을 넣으라고 한다. Task 7 Step 1도 조건 없이 agent-principles.md에서 '서브오케스트레이터|sub-orchestrator'가 비어 있기를 기대한다. 불채택 뒤 진행하는 길에서 실행자는 사용자가 거부한 문안을 넣거나 Task 7에서 실패한다. spec 확인 방법 3은 '원칙 문안을 채택했으면'이라는 조건을 단다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "Task 2 Step 1: \"`SUB-ORCHESTRATE` 줄을 Task 1 Step 1의 새 문안(조건 C)으로 바꾼다.\" / Task 7 Step 1: \"Expected: 세 명령 모두 출력 없음.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "확인 방법 3: \"원칙 문안을 채택했으면 `grep -nE 'L[123]|서브오케스트레이터|sub-orchestrator' ...`의 출력이 비어 있다.\" / plan Global Constraints: \"채택하지 않으면 Task 2 이후를 진행할지 사용자가 정한다.\"",
+      "principle": "CHECKABLE, ASK-OPTIONS",
+      "consequence": "agent-principles.md 146행에는 지금 '서브오케스트레이터'와 'sub-orchestrator'가 모두 있다. plan에는 불채택 길에서 Task 2 Step 1·Step 3과 Task 7 Step 1을 어떻게 할지 적은 줄이 없다."
+    },
+    {
+      "where": "Task 2 Step 3의 측정 문단('과제는 큰 개발 요청 셋, 서로 무관한 일 둘을 함께 맡기는 요청 하나, 작은 개발 요청 하나였다')",
+      "type": "failure-mode",
+      "claim": "Task 1 Step 5에서 B4·B5를 더 실행하면 과제는 일곱이다. 그런데 측정 문단은 과제 구성을 다섯 과제로 고정해 적는다. 꺾쇠 자리만 채우면 참고서에 남는 측정 기록이 틀린다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "\"클린룸 소거 시험을 과제 <과제 수>개로 실행했고, 조건마다 1회였다. 과제는 큰 개발 요청 셋, 서로 무관한 일 둘을 함께 맡기는 요청 하나, 작은 개발 요청 하나였다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "Task 1 Step 5: \"같으면 B4·B5를 B·C 조건으로 더 실행하고, 일곱 과제 합계가 현행보다 나쁘지 않으면 채택안\"",
+      "principle": "EVIDENCE-FIRST, KEEP-FAILED",
+      "consequence": "Task 2 Step 4의 확인 grep은 꺾쇠가 남았는지만 본다. 과제 구성 문장은 고정 문자열이라 검사에 걸리지 않는다."
+    },
+    {
+      "where": "Task 1 Step 3(서브에이전트로 조건을 실행하는 단락)",
+      "type": "risk",
+      "claim": "클린룸 서브에이전트에는 하네스가 스킬 목록을 싣는다. 그 목록에는 현행 nested-orchestration description('멀티태스크 플랜이 둘 이상일 때')이 들어 있다. 그래서 조건 A·B·C는 모두 옛 description과 함께 측정된다. 배포되는 조합은 새 원칙 문안과 Task 4의 새 description이므로 이 조합은 측정되지 않는다. 조건 C에서는 새 원칙과 옛 description이 서로 다른 시점을 가리킨다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "\"과제 다섯(B1·B2·B3·I1·S1)과 조건 셋의 조합마다 서브에이전트 하나를 백그라운드로 실행한다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "Task 4 Step 2 frontmatter: \"description: 기능 여럿이 섞인 큰 개발을 하위 시스템마다 나눠 맡길 때와, 서로 독립된 멀티태스크 일이 둘 이상일 때 연다.\"",
+      "principle": "NO-ASSUME, STATE-ASSUME",
+      "consequence": "이 렌즈는 같은 하네스의 서브에이전트로 실행되었다. 이 렌즈가 받은 스킬 목록에도 'disciplined-coder:nested-orchestration: 멀티태스크 플랜이 둘 이상일 때 3층(오케스트레이터→서브오케스트레이터→…)'이 실려 있다. plan의 판정 기록 지시에는 이 오염을 적으라는 줄이 없다."
+    },
+    {
+      "where": "Task 4 Step 2 「가드레일」의 '진행 위치' 항목",
+      "type": "failure-mode",
+      "claim": "'dev에 병합된 ws 브랜치는 끝난 워크스트림'은 git의 병합 판정(조상 관계)에 기댄다. 그런데 「흐름」 2는 ws 브랜치를 dev 끝에서 만든다. 아직 커밋이 없는 브랜치도 dev의 조상이라 '병합됨'으로 나온다. 세션이 끊겨 이 규칙으로 재개하면 하부 명세를 쓰던 워크스트림이 끝난 것으로 분류되어 재개되지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "\"`dev/<개발>`에 병합된 `ws/<개발>/*` 브랜치는 끝난 워크스트림이다. 병합되지 않은 브랜치는 plan이 있으면 승인 뒤 진행 중이고, 하부 명세만 있으면 승인 대기이며, 둘 다 없으면 하부 명세 작성 중이다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "Task 4 Step 2 「흐름」 2: \"`using-git-worktrees`로 `dev/<개발 이름>`의 끝에서 `ws/<개발 이름>/<워크스트림 id>` 브랜치와 워크트리를 만들고\"",
+      "principle": "NO-ASSUME, CHECKABLE",
+      "consequence": "skill 문안은 '병합됨'을 판정할 명령을 적지 않는다. Task 6 스크립트에도 진행 위치 시나리오가 없다. 따라서 '하부 명세 작성 중' 분류는 '병합됨' 분류에 먼저 가려진다."
+    },
+    {
+      "where": "Task 4 Step 2 「가드레일」의 '리뷰 마커 확인' 항목('각 파일 마지막 줄에 `spec-review` 마커가 있는지 확인한다')",
+      "type": "failure-mode",
+      "claim": "skill은 추가된 문서의 경로만 diff로 구하고 그 파일을 어디서 읽을지 적지 않는다. 현재 세션의 체크아웃에는 ws 브랜치의 하부 명세가 없다. 그 파일은 ws 워크트리에만 있으므로 `tail`은 실패하고 모든 문서가 '마커 없음'으로 나온다. Task 6 스크립트는 ws/x/b를 체크아웃한 채 작업 트리에서 `tail`을 실행해 통과하므로 이 차이를 잡지 못한다. 그런데 Task 6 Step 3은 PASS를 skill 명령의 검증으로 본다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "Task 4 「가드레일」: \"`git diff --name-only --diff-filter=A dev/<개발>...ws/<개발>/<id> -- docs/superpowers/specs docs/superpowers/plans`로 추가된 하부 명세와 plan을 구하고, 각 파일 마지막 줄에 `spec-review` 마커가 있는지 확인한다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "Task 6 Step 1 스크립트: \"nomarker(){ git diff --name-only --diff-filter=A \"dev/x...ws/x/$1\" ... | while read -r f; do tail -n 1 \"$f\" | ...\" (직전 줄들은 ws/x/b가 체크아웃된 상태에서 커밋한다)",
+      "principle": "CHECKABLE, NO-ASSUME",
+      "consequence": "Task 6 스크립트는 워크트리를 하나도 만들지 않는다. 모든 브랜치를 한 체크아웃에서 switch로 오간다. skill 「흐름」 2는 ws 브랜치마다 별도 워크트리를 둔다. 브랜치에서 읽는 형태(`git show ws/<개발>/<id>:<경로> | tail -n 1`)는 skill과 스크립트 어디에도 없다."
+    },
+    {
+      "where": "Task 4 Step 2 「흐름」 2(isolation:'worktree'를 쓰지 않는다는 문장)와 「디스패치 템플릿」 1 역할 선언('너는 워크트리 `<경로>`의 브랜치 … 에 있다')",
+      "type": "risk",
+      "claim": "isolation을 쓰지 않으면 서브 세션의 작업 디렉터리는 워크트리가 아니다. 그 서브 세션이 SDD로 실행하는 구현 워커의 작업 디렉터리도 워크트리가 아니다. 템플릿은 서브 세션에 경로만 알릴 뿐, 워커 디스패치마다 그 경로를 넘기라는 지시가 없다. 그래서 워커가 메인 체크아웃의 파일을 고칠 수 있다. 2026-07 스파이크(SC1·SC2)는 옛 skill이 isolation을 허용하던 때의 결과다. 새 방식은 스파이크 범위 밖이다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "\"`Agent`의 `isolation:'worktree'`는 브랜치 이름과 기준 커밋을 정할 수 없어 쓰지 않는다.\" / \"1. **역할 선언** — \"너는 자율 서브 세션이다. … 너는 워크트리 `<경로>`의 브랜치 `ws/<개발 이름>/<워크스트림 id>`에 있다.\"\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "「이어받는 판단과 검증」: \"이 설계가 새로 둔 규칙은 스파이크 범위 밖이다.\" / 현행 skill 18행: \"(`using-git-worktrees`, 또는 `Agent`의 `isolation:'worktree'`)\"",
+      "principle": "STATE-ASSUME, REVERSIBLE",
+      "consequence": "plan의 Task 6은 git 명령만 실측한다. 서브 세션과 워커가 어느 디렉터리에서 실행되는지 확인하는 Task는 없다. spec 「검증하지 않은 가정」에도 이 항목이 없다."
+    },
+    {
+      "where": "Task 4 Step 2 「큰 개발 분할」의 '경로와 브랜치 이름' 단락(자기 문서 경로 `docs/superpowers/{specs,plans,reviews}/*-<개발 이름>-<워크스트림 id>*`)",
+      "type": "risk",
+      "claim": "자기 문서 패턴은 id 뒤가 열려 있다. 그래서 한 id가 다른 id의 접두어이면(예: api와 apigw) `*-x-api*`가 `…-x-apigw-design.md`와 맞는다. 이때 한 워크스트림이 다른 워크스트림의 하부 명세·plan을 고쳐도 범위 대조를 통과한다. Task 6 스크립트는 id를 a와 b로만 시험해 이 경우를 보지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "\"모든 워크스트림의 허용 경로에는 자기 문서 경로 `docs/superpowers/{specs,plans,reviews}/*-<개발 이름>-<워크스트림 id>*`가 기본으로 들어간다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "Task 6 Step 1: \"src/$id/*|docs/superpowers/specs/*-x-$id*|docs/superpowers/plans/*-x-$id*|docs/superpowers/reviews/*-x-$id*) return 0;;\" 와 워크스트림 a·b",
+      "principle": "CHECKABLE",
+      "consequence": "skill은 워크스트림 id를 '영문 소문자'로만 제한하고, 서로 접두어가 되지 않아야 한다는 제약은 두지 않는다. 하부 명세와 plan의 경로 형식은 `-<id>-design.md`와 `-<id>.md`라서 id 뒤를 닫은 패턴으로도 모두 덮인다."
+    },
+    {
+      "where": "Task 6 Step 2의 `S=/c/Users/CHSHIN/AppData/Local/Temp/claude/.../607e2448-.../scratchpad` 줄",
+      "type": "failure-mode",
+      "claim": "Step 1은 스크립트를 '세션 스크래치'에 쓰라고 하지만 Step 2는 이 plan을 쓴 세션의 스크래치 경로를 박아 둔다. 실행 세션이 다르면 스크래치 경로도 다르다. 그러면 Step 1에서 쓴 스크립트를 Step 2가 찾지 못한다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "\"S=/c/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "counterpart": "Task 6 Files: \"Create(저장소 밖): 세션 스크래치 `guard_check.sh`\"",
+      "principle": "NO-ASSUME",
+      "consequence": "Task 6 Step 2의 경로에는 세션 ID 607e2448-8311-4ad1-affd-526a5edf0aa4가 들어 있다. 이 값은 plan을 실행하는 세션과 무관하다."
+    },
+    {
+      "where": "Task 6 Step 1 스크립트의 'ok \"시나리오E 되돌림 커밋 없음\"' 줄과 'ok \"시나리오A 대조: main 기준 두 점 diff 는 선행 파일을 낸다\"' 줄",
+      "type": "over-engineering",
+      "claim": "'되돌림 커밋 없음'은 스크립트가 git revert를 한 번도 실행하지 않으므로 실패할 수 없다. 'main 기준 두 점 diff' 검사는 skill이 쓰지 않는 명령의 git 동작을 확인할 뿐이다. 두 검사 모두 skill 명령의 결함을 잡지 못하면서 PASS 수만 늘린다. 둘을 지우면 PASS 수가 실제 결함 주입 수와 같아진다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "\"ok \\\"시나리오E 되돌림 커밋 없음\\\" '! git log --oneline dev/x | grep -qi revert'\" / \"ok \\\"시나리오A 대조: main 기준 두 점 diff 는 선행 파일을 낸다\\\" 'git diff --name-only main..ws/x/b | grep -q \\\"^src/a/\\\"'\"",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "확인 방법 5: 범위 대조 통과, 범위 밖 추가·이동 검출, 마커 없는 문서 검출, 실패 뒤 dev 불변, 재시도에 처음 변경과 수정 포함만 요구한다.",
+      "principle": "YAGNI, CHECKABLE",
+      "consequence": "호출자 실측 PASS=12에는 실패할 수 없는 검사 하나와 skill 명령 밖의 검사 하나가 들어 있다."
+    },
+    {
+      "where": "Task 3 Step 1의 '같은 파일 789행의 라벨' 문장과 Global Constraints의 test_docs_drift.sh 행 번호(786~789행, 867~871행)",
+      "type": "failure-mode",
+      "claim": "Task 3 Step 1은 먼저 405행 아래에 두 줄을 넣으라고 한다. 그다음에 '789행'을 고치라고 하므로, 그 시점에 라벨은 791행에 있다. 실행자가 행 번호로 편집하면 엉뚱한 줄을 바꾼다. Global Constraints와 Task 2 Interfaces의 786~789행 표기도 Task 3 뒤에는 맞지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/plans/2026-10-09-nested-orchestration-large-dev.md",
+      "evidence": "\"`check \\\"옛 spec 에 superseded 표시가 있다\\\"` 줄 바로 아래에 두 줄을 넣는다. … 같은 파일 789행의 라벨 … 을 … 로 바꾼다.\"",
+      "counterpart_file": "D:/projects/disciplined-coder/scripts/test_docs_drift.sh",
+      "counterpart": "405행: check \"옛 spec 에 superseded 표시가 있다\" / 789행: check \"그 절에 서브오케스트레이터 조항이 있다\"",
+      "principle": "SPECIFIC-NAME, CHECKABLE",
+      "consequence": "현재 삽입 위치(405행)는 789행보다 앞이다. plan은 라벨 줄을 행 번호와 문자열로 함께 가리킨다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "STATE-ASSUME",
+    "EVIDENCE-FIRST",
+    "YAGNI",
+    "REVERSIBLE",
+    "CHECKABLE",
+    "NO-FLEET",
+    "SPECIFIC-NAME",
+    "WRITTEN-ONLY",
+    "FULL-SENTENCE",
+    "SUB-ORCHESTRATE"
+  ],
+  "notes": "검토 관점은 네 가지다. 실패 모드에서는 계획이 틀려서 실패하는 길과, 계획이 맞아도 실행자가 따르지 못하거나 중간에 끊기는 길을 함께 보았다. 끊기는 길로는 작업 디렉터리 초기화, 불채택 분기, 하드코딩 경로, 행 번호 이동을 확인했다. 과설계는 Task 6 스크립트에서 실패할 수 없는 검사를 찾았다. 비가역은 Task 0의 미추적 파일 mv와 main 브랜치 오염 가능성을 보았다. mv는 같은 드라이브 안의 이름 바꾸기라 따로 올리지 않았다. main 오염은 첫 지적(cd 부재)에 포함했다. 위험은 클린룸 측정의 오염, 서브 세션과 워커의 작업 디렉터리, 자기 문서 패턴의 접두어 충돌을 보았다.\n\n올리지 않은 것과 그 이유는 아래와 같다. 첫째, 클린룸 시험을 조건마다 1회만 하고 작성 세션이 직접 판정하는 문제는 저장소 CLAUDE.md 「조항 추가와 문구 변경」이 정한 절차를 따른 것이다. plan에서 고칠 줄이 없어 올리지 않았다. 둘째, 측정 트레일러와 교집합 검사는 spec 「결정」이 사용자 처분으로 채택한 것이라 과설계로 올리지 않았다.\n\n더 확인할 것은 아래와 같다.\n- 서브에이전트의 Bash 작업 디렉터리가 호출마다 부모의 주 디렉터리로 돌아간다는 근거는 이 렌즈가 받은 환경 지시 한 줄뿐이다. 실행 중인 SDD 구현자와 nested 서브 세션에서도 같은지는 실측하지 않았다. 첫 지적과 여덟째 지적의 확인 방법은 서브에이전트 하나에 `pwd`를 두 번 실행시켜 보는 것이다.\n- 하네스가 Agent 서브에이전트에 ~/.claude/CLAUDE.md(에이전트원칙 사본을 @import함)를 싣는지 확인하지 않았다. README 58행은 서브에이전트에 원칙이 실리지 않는다고 적는다. 실린다면 클린룸 조건 A와 C가 현행 SUB-ORCHESTRATE로 오염된다.\n- Task 6 Step 3은 passed 마커가 붙은 spec 끝 절에 한 줄을 더한다. 기존 spec을 고칠 때 Stop 리뷰 게이트가 다시 발동하는지는 hooks를 읽지 않아 확인하지 못했다.\n- 여섯째 지적(진행 위치)은 `git branch --merged`의 조상 판정에 근거한다. 스크래치 저장소에서 직접 재현하지는 않았다(읽기 전용 제약)."
+}

@@ -1,0 +1,193 @@
+{
+  "lens": "lens-grounding",
+  "target": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+  "read": [
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+    "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/brainstorming/SKILL.md (38~56행, 203행)",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/subagent-driven-development/SKILL.md (15~31행, 70~115행, 330~345행)",
+    "D:/projects/disciplined-coder/skills/dispatching-lenses/SKILL.md",
+    "D:/projects/disciplined-coder/skills/review-specs/SKILL.md",
+    "D:/projects/disciplined-coder/docs/domain-discipline.md (13행, 350~360행)",
+    "D:/projects/disciplined-coder/CLAUDE.md",
+    "D:/projects/disciplined-coder/scripts/test_docs_drift.sh (155~170행, 278~300행, 398~416행, 783~789행, 860~880행)",
+    "D:/projects/disciplined-coder/docs/대화전문-2026-10-06_07.md (156, 1210, 1258~1263, 1296, 1309, 1332~1342, 1365~1368, 1386, 1401, 1616, 1669~1697, 1804행)",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-07-large-dev-directive-check.md",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-07-large-dev-directive-check/target-directive.md",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-09-nested-orchestration-large-dev-review.md",
+    "D:/projects/disciplined-coder/docs/superpowers/rewrite-map/spec-review-nested.md (머리)",
+    "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/gm.md",
+    "D:/test/gm_dashboard/GlobalMarket_Dashboard/docs/superpowers/specs/2026-10-07-gm-dashboard-design.md (14, 27, 71~96, 332~334, 378~382행)",
+    "실측: grep -rnw 'L[123]' skills/nested-orchestration/SKILL.md → 8줄, -w 없이 16줄 / 확인 방법 1의 grep 두 개를 현재 트리에 실행"
+  ],
+  "issues": [
+    {
+      "where": "「근거와 한계」 표 셋째 행",
+      "type": "mismatch",
+      "claim": "CodeTeam·Contract-Coding이 계약 코드화의 설계 사례로 인용되었다는 근거 행 번호가 틀렸다. 1263행에는 두 이름이 없다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "계약을 코드로 고정하는 방식은 CodeTeam·Contract-Coding의 설계 사례로 인용되었고, 산문과 코드를 비교한 결과는 없다(1263행)",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/대화전문-2026-10-06_07.md",
+      "counterpart": "1263행은 Specification Gap을 들어 '인터페이스 계약의 상세도'를 말한다. 두 이름은 1386행 '계약은 코드로: … (CodeTeam, Contract-Coding 방식)'과 1336·1342행에 나온다.",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "후보가 가리키는 1263행을 열면 CodeTeam·Contract-Coding이라는 낱말이 없다."
+    },
+    {
+      "where": "「근거와 한계」 표 넷째 행",
+      "type": "mismatch",
+      "claim": "후보는 '연산량 동일' 조건과 '6종 중 5종' 수치를 한 결과처럼 묶었다. 출처에서 연산량을 맞춘 것은 Tran·Kiela이고, 6종 중 5종은 BenchAgent의 '정규화된 조건' 결과다. 대화는 Tran·Kiela가 코딩이 아니라는 이유로 이 근거를 버렸다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "연산량을 같게 맞춘 비교에서 고정 역할 다중 에이전트 6종 중 5종이 단일 과제 벤치마크에서 단일 에이전트보다 2.6~11.3%p 뒤졌다(Tran·Kiela 2026, BenchAgent 2026, 프리프린트, 1365행·1681행) | 수치와 두 조건(연산량 동일, 단일 과제)을 함께 적는다",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/대화전문-2026-10-06_07.md",
+      "counterpart": "1296행: 'Tran·Kiela(2026)는 추론 토큰을 같게 맞추면 … 평가는 다중 홉 추론으로 코딩이 아니며 … BenchAgent(Fu 등, 2026)는 … 벤치마크 10종을 정규화된 조건에서 실행했다. 고정 다중 에이전트 시스템 6종 중 … 나머지 다섯은 2.56~11.29%p 뒤졌다.' 1688행: Tran·Kiela는 '적용 대상이 달라 이 제안의 근거로 쓸 수 없습니다'. 1804행: 'Tran·Kiela … (버림)'.",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "후보는 스킬에 적을 문장의 조건으로 '연산량 동일'을 지정한다. 그런데 출처에는 6종 중 5종 결과에 이 조건이 붙어 있지 않고, 이 조건을 낸 연구는 대화에서 버린 근거다."
+    },
+    {
+      "where": "「결정」 — 에이전트 이어 쓰기",
+      "type": "unsupported",
+      "claim": "후보는 dispatching-lenses의 10분의 1을 캐시 이득의 근거로 인용했다. 그런데 출처는 이 배수를 사용자가 정한 정책값이라고 적고, 측정값으로 적지 않았다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "`dispatching-lenses`는 한 에이전트 안에서 렌즈를 이어 적용하면 캐시로 뒤 렌즈의 읽기 값이 첫 렌즈의 10분의 1로 떨어진다고 적는다(57행).",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/dispatching-lenses/SKILL.md",
+      "counterpart": "57행: '이 배수는 사용자가 정한 정책값이라 바꾸려면 사용자에게 물어야 한다. … 상한 10개와 경계 다섯 개는 2026-09-24에 정한 값이며 측정값이 아니다.'",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "이어 쓰기 결정의 캐시 근거가 정책값에 기대고 있는데, 후보 본문은 그 값을 관측된 캐시 효과처럼 옮겼다."
+    },
+    {
+      "where": "「결정」 — 에이전트 이어 쓰기 / 「근거와 한계」",
+      "type": "omission",
+      "claim": "같은 에이전트를 재개하는 방식과 새 에이전트에 파일을 넘기는 방식을 비교한 연구가 없다는 한계가 출처에 있다. 후보의 「근거와 한계」는 이 한계를 옮기지 않았다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "사용자는 하던 일을 이어 가면 맥락이 오염이 아니라 증분으로 쌓이고 캐시 이득이 있다고 판단했다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/대화전문-2026-10-06_07.md",
+      "counterpart": "1332행: '같은 설계자를 재개(SendMessage)하는 방식과 새 에이전트에 명세 파일을 넘기는 방식을 비교한 연구를 찾지 못했다.'",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "「근거와 한계」 표는 분할 구조의 근거만 다룬다. 이어 쓰기에 비교 연구가 없다는 점은 후보 어디에도 적혀 있지 않다."
+    },
+    {
+      "where": "「결정」 — 공용 파일",
+      "type": "contradiction",
+      "claim": "후보는 gm-dashboard 큰 명세가 '같은 방식'을 썼다고 적는다. 그런데 gm-dashboard는 의존성 목록과 잠금 파일을 워크스트림(절)에 맡겼다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "의존성 목록, 라우팅 표, 설정 등록부, 잠금 파일처럼 여러 워크스트림이 고쳐야 하는 파일은 현재 세션이 소유한다. … gm-dashboard 큰 명세도 같은 방식으로 메인 세션 소유 파일을 두었다.",
+      "counterpart_file": "D:/test/gm_dashboard/GlobalMarket_Dashboard/docs/superpowers/specs/2026-10-07-gm-dashboard-design.md",
+      "counterpart": "76~77행: '백엔드 기반 | … `pyproject.toml`, `uv.lock`', '공용 부품 | … `src/frontend/package.json`, `src/frontend/package-lock.json`'. 94행: '의존성 파일의 소유 절이 이미 끝났으면 메인 세션이 의존성 파일을 고친다.'",
+      "principle": "NO-ASSUME",
+      "consequence": "gm-dashboard에서 메인 세션이 소유한 공용 파일은 라우팅·진입점·설정 파일뿐이다. 의존성 파일과 잠금 파일은 절이 소유하므로, 후보가 이를 '같은 방식'의 사례로 든 것은 출처와 다르다."
+    },
+    {
+      "where": "「확인 방법」 4·5",
+      "type": "contradiction",
+      "claim": "후보는 처음부터 과제를 다섯 개 정해 두고, 결과가 같으면 '과제 둘을 더 실행해 다섯 과제 합계'로 판정한다고 적었다. 둘을 더하면 일곱이 되므로 저장소 규칙의 '3개 + 2개 = 5개' 틀과 맞지 않는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "과제는 큰 개발 요청 셋, 서로 무관한 일 둘을 함께 맡기는 요청 하나, 작은 개발 요청 하나다. … 같으면 과제 둘을 더 실행해 다섯 과제 합계가 현행보다 나쁘지 않을 때 채택하고",
+      "counterpart_file": "D:/projects/disciplined-coder/CLAUDE.md",
+      "counterpart": "19행: '조항마다 서로 다른 과제 3개를 … 실행하고 … 문구 변경은 … 같으면 과제 2개를 더 실행해 다섯 과제 합계가 현행보다 나쁘지 않을 때 채택한다.'",
+      "principle": "CHECKABLE",
+      "consequence": "후보의 기준대로 시험하면 처음 실행하는 과제가 이미 다섯 개다. 그 상태에서 둘을 더 실행한 뒤에 '다섯 과제 합계'로 판정하라는 문장은 어느 다섯 과제를 합산하는지 정하지 못한다."
+    },
+    {
+      "where": "「확인 방법」 2",
+      "type": "omission",
+      "claim": "후보는 이번 변경에 영향받는 기존 검사를 162행과 786~789행 둘로 한정했다. 그런데 nested-orchestration SKILL.md에는 다른 검사도 걸려 있다. 하나는 dispatching-lenses 「렌즈에게 에이전트원칙을 알리는 법」을 가리키는지 보는 검사이고, 다른 하나는 런타임 중립 검사다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "이번 변경에 영향받는 기존 검사는 `test_docs_drift.sh` 162행(…)과 786~789행(…)이다.",
+      "counterpart_file": "D:/projects/disciplined-coder/scripts/test_docs_drift.sh",
+      "counterpart": "284~289행: `for D in … skills/nested-orchestration/SKILL.md …; do … check \"$dn 이 소유자를 가리킨다\" \"points_to '$D' 'dispatching-lenses' \\\"\\$OWNER_SEC\\\"\"`. 867~871행: `for s in review-specs review-docs nested-orchestration; do … ! grep -qF 'Explore' … ! grep -qF '~/.claude/disciplined-coder/'`",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 SKILL.md에서 이 포인터는 「L2 디스패치 템플릿」 넷째 블록에만 있다. 그런데 후보는 이 템플릿을 고칠 절로 지정하면서도 이 검사를 영향 목록에 넣지 않았다."
+    },
+    {
+      "where": "「바뀌는 파일」 — docs/domain-discipline.md",
+      "type": "omission",
+      "claim": "후보는 domain-discipline.md에서 '작업 다섯'을 '태스크 다섯'으로 바꾸는 일만 적었다. 그런데 그 절은 현행 조항 문구를 통째로 인용하고 있어서, 조항 문안을 바꾸면 인용 전체가 낡는다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "`docs/domain-discipline.md` — 13행과 `SUB-ORCHESTRATE` 절의 '작업 다섯'을 '태스크 다섯'으로 바꾸고, 바꾼 이유와 클린룸 측정 기록을 적는다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/domain-discipline.md",
+      "counterpart": "358~359행: '지금 문구는 \"각 일이 plan 문서를 따로 둘 만큼(작업 다섯 이상) 크면\"이다.'",
+      "principle": "NO-ASSUME",
+      "consequence": "후보 문안이 채택되면 조항은 '서로 독립된 일이 둘 이상이거나 개발 하나가 … plan을 따로 둘 만큼(태스크 다섯 이상)'으로 바뀐다. 그런데 근거 문서는 '지금 문구'로 옛 조건절을 그대로 들고 있게 된다."
+    },
+    {
+      "where": "「바뀌는 파일」 — skills/nested-orchestration/SKILL.md 「한계」",
+      "type": "omission",
+      "claim": "스킬 「한계」의 비목표 문단은 영속되는 상태 문서를 두지 않고 인플라이트 상태를 대화에만 든다고 적는다. 후보는 결정 기록 파일, git 트레일러, git에서 도출하는 진행 위치를 새로 두면서도 「한계」는 포인터만 바꾼다고 적었다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "「한계」는 이 설계의 「이어받는 검증」을 가리킨다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "56행: '**비목표** — … 영속되는 오케스트레이션 상태 문서는 만들지 않는다. 인플라이트 상태는 세션 대화 상태로만 든다.'",
+      "principle": "NO-ASSUME",
+      "consequence": "후보대로 고치면 스킬에서 비목표 문단('대화 상태로만 든다')과 새 규칙('진행 위치는 상태 문서 없이 git에서 도출한다', 결정 기록 파일)이 함께 남는다. 2026-10-07 검토 기록 35행도 이 충돌을 지적했다."
+    },
+    {
+      "where": "「이어받는 검증」",
+      "type": "omission",
+      "claim": "후보는 스파이크 결과에서 3층 중첩(SC2)을 옮기지 않았다. 서브 세션이 워커를 실행할 수 있다는 근거는 이 결과뿐이다. 후보는 스킬 「한계」가 이 절을 가리키게 하고 2026-07-05 설계에는 superseded를 단다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "2026-07-05 설계의 스파이크(시험 구현) 결과 중 이 설계에서도 유효한 결과는 아래와 같다. 그 설계는 이 설계로 대체되므로 스킬은 이 절을 가리킨다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+      "counterpart": "21행: '**3층 중첩(SC2)**: 두 L2가 각각 L3(구현자 1 + 읽기전용 리뷰어 1)를 띄움(자기보고 — PONG 프로브가 능력은 이미 증명). 통과(자기보고).'",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "스킬이 가리킬 절에는 서브 세션이 워커를 실행한다는 검증 결과도, 그 결과가 자기보고였다는 한계도 없다."
+    },
+    {
+      "where": "「용어」 표 — 워커",
+      "type": "contradiction",
+      "claim": "후보는 L3를 '워커'로 부른다. 그런데 후보가 판단을 이어받는다고 적은 2026-07-05 설계는 '워커'를 2층 용어로 보고 L3에 쓰지 않기로 정했다. 후보는 이 판단을 뒤집은 이유를 적지 않았다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "| 워커 | 서브 세션이 실행하는 구현자와 렌즈 | L3 |",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+      "counterpart": "70~71행: '용어는 고정한다 — L2는 **서브오케스트레이터**, L3는 **구현자·리뷰어**(‘워커’는 2층 경로 용어이므로 3층 L3에는 쓰지 않는다).'",
+      "principle": "TERM-ONE",
+      "consequence": "바뀌는 파일 목록은 2026-07-05 설계에 '판단은 이 설계가 이어받는다'고 적게 한다. 그런데 후보는 같은 대상에 그 설계가 금지한 이름을 쓴다."
+    },
+    {
+      "where": "「결정」 — 문서 수명과 진행 위치",
+      "type": "unsupported",
+      "claim": "후보는 에이전트원칙의 수명 표를 따른다고 하면서 결정 기록을 설계(spec) 타입으로 분류했다. 그러나 수명 표의 설계 타입은 spec·plan뿐이고, 결정 기록은 표에 없다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "에이전트원칙의 문서 수명 표를 따른다. 큰 명세·하부 명세·결정 기록은 설계(spec) 타입으로 보존한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "110행: '| **설계** (spec·plan) | 설계 근거 | spec은 배포된 뒤에도 지우지 말고, 대체된 spec에는 superseded를 표시하라. …'",
+      "principle": "DOC-TYPE",
+      "consequence": "결정 기록은 `docs/superpowers/decisions/`에 두기로 되어 있다. 그런데 CLAUDE.md 「문서 타입마다 무엇이 강제하나」의 설계 행이 가리키는 장치(superseded 표시 검사)는 specs 경로의 spec만 본다."
+    },
+    {
+      "where": "「결정」 — 검토 범위",
+      "type": "omission",
+      "claim": "후보는 하부 명세 비대를 지시문의 「명세 분량」 규칙에 맡긴다고 적었다. 그런데 어느 결정도, 바뀌는 파일 목록도 이 규칙(일어날 수 없는 예외를 적지 않는다)을 스킬로 옮기지 않는다. 지시문의 범위 규칙(범위 밖 아이디어를 「제안」 절로 올린다)도 채택하는지 기각하는지 적혀 있지 않다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "하부 명세의 비대는 쓰는 쪽 규칙(「명세 분량」: 일어날 수 없는 예외를 적지 않는다)과 `lens-adversarial`의 YAGNI 지적이 맡는다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-07-large-dev-directive-check/target-directive.md",
+      "counterpart": "42행: '**범위:** … 범위 밖 아이디어는 「제안」 절에 적고, 메인 세션이 모아 사용자에게 보인다.' 43행: '**명세 분량:** 절 명세에는 … 일어날 수 없는 예외 사례를 늘어놓지 않는다.'",
+      "principle": "NO-ASSUME",
+      "consequence": "후보가 검토 범위 한정을 빼는 근거로 든 「명세 분량」은 지금 지시문에만 있다. 후보의 변경 목록에는 이 규칙이 스킬에 들어간다는 항목이 없다."
+    },
+    {
+      "where": "「결정」 — 수정 범위 강제",
+      "type": "omission",
+      "claim": "후보는 허용 경로의 예로 소스 경로만 들었다. 서브 세션이 자기 브랜치에 커밋하는 하부 명세·plan·리뷰 기록 경로를 허용 경로에 넣으라는 규칙은 없다. 출처인 gm-dashboard 큰 명세는 이 경로를 명시해 두었다.",
+      "file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "큰 명세에 워크스트림마다 수정 허용 경로를 git pathspec 형식(예: `src/frontend/src/pages/home/**`)으로 적는다. … 범위 밖 파일이 있으면 병합하지 않고 그 서브 세션에 되돌린다.",
+      "counterpart_file": "D:/test/gm_dashboard/GlobalMarket_Dashboard/docs/superpowers/specs/2026-10-07-gm-dashboard-design.md",
+      "counterpart": "71행: '모든 절은 이 표의 파일에 더해 자기 절 id 가 이름에 든 하부 명세·계획·리뷰 기록(`docs/superpowers/{specs,plans,reviews}/*-<절 id>-*`)을 쓸 수 있다.'",
+      "principle": "CHECKABLE",
+      "consequence": "후보 「통합」은 추가된 하부 명세·plan이 워크스트림 브랜치에 있다고 보고 마커를 확인한다. 그런데 후보의 허용 경로 규칙에는 그 문서들이 들어가지 않아, 범위 대조에서 범위 밖 파일로 출력된다."
+    }
+  ],
+  "principles_applied": [
+    "EVIDENCE-FIRST",
+    "NO-ASSUME",
+    "STATE-ASSUME",
+    "CHECKABLE",
+    "DOC-TYPE",
+    "TERM-ONE",
+    "NO-FLEET",
+    "WRITTEN-ONLY",
+    "SUBJECT-OBJECT"
+  ],
+  "notes": "검토한 관점: [누락] 출처에 있는데 후보가 옮기지 않은 한계·검증 결과·영향받는 검사·비목표·지시문 규칙을 보았다. [모순] gm-dashboard 큰 명세, 2026-07-05 설계, CLAUDE.md, 스킬 본문과 후보의 서술을 대조했다. [환각] 출처 없이 단정한 근거를 보았다. 10분의 1 배수와 결정 기록의 타입 분류가 여기에 걸렸다. [불일치] 행 번호·인용문·수치·식별자를 원문과 하나씩 대조했다. 아래 항목은 원문과 일치했다: brainstorming 46~49·203행, SDD 19~31·75·339행과 정지 사유 넷, dispatching-lenses 47·70·71·77·83·96·106행과 「실행하는 방법」의 규칙, review-specs 64·131·116행과 기록에 처분을 넣지 않는다는 규칙, domain-discipline 13행, test_docs_drift 162·786~789행, CLAUDE.md의 version 경고 규칙, 대화전문 156·1210·1368·1401·1694행, gm.md 132행의 '절 = 컴포넌트라고 보면 되나?', gm 세션에서 계약 코드가 plan→plan 리뷰→실행 방식 선택 순서로 진행된 사실, 2026-07-05 스파이크의 자율 완결·압축 리턴·BLOCKED 정직성·재디스패치·리포트 충돌, 하네스 사실 (a)~(d). grep 실측도 -w 8줄, 없이 16줄로 같았다. 확인 방법 1의 grep을 지금 트리에 실행하면 nested-orchestration 16줄, dispatching-lenses 7줄, review-specs 2줄, agent-principles 146행이 나온다. 이는 후보의 바뀌는 파일 목록과 맞는다(SKILL.md 48행 「관측성」의 L2도 '용어 표의 이름으로 바꾼다'에 든다). 2026-08-16 spec에 대한 superseded 검사(test_docs_drift.sh 403~405행)는 이미 있다. 따라서 2026-07-05 설계용 검사를 '추가'한다는 서술은 맞다. 더 확인할 것: (1) 용어 이름(2026-10-09), 이어 쓰기 유지 결정(2026-10-09), 처분(2026-10-07~09)이 사용자 결정이라는 서술은 대화전문(2026-10-07까지)과 두 리뷰 기록 어디에도 없다. 오늘 세션의 대화에서 나왔을 수 있으나 제공된 출처로는 확인할 수 없어 근거 없음으로 둔다. 호출자가 그 대화를 대조해야 한다. (2) 대화전문 1616행의 '기능마다 새 맥락'이 '인용 없는 답'이라는 서술은 1616·1679행이 URL 없이 Anthropic 글을 이름으로만 든다는 점에서 대체로 맞다. 다만 원문 글은 아무도 열지 않았다. (3) 후보 머리의 '같은 날 이 spec을 렌즈로 리뷰했고'는 리뷰 기록 파일이 있어 맞다. 그러나 문서 끝의 `escalated` 마커에 해당하는 🔴(재개 경로 단순화)가 사용자 답으로 해소되었는지는 출처에 기록이 없다."
+}

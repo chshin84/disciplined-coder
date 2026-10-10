@@ -1,0 +1,138 @@
+{
+  "lens": "lens-adversarial",
+  "read": [
+    "D:/projects/disciplined-coder/agent-principles.md",
+    "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+    "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+    "D:/projects/disciplined-coder/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/brainstorming/SKILL.md (승인 게이트와 분해 관련 줄을 Grep으로 확인했다)",
+    "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/subagent-driven-development/SKILL.md (질문·정지·BLOCKED 관련 줄을 Grep으로 확인했다)",
+    "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/gm.md",
+    "D:/test/gm_dashboard/GlobalMarket_Dashboard/docs/superpowers/specs/2026-10-07-gm-dashboard-design.md (57-106줄, 312-405줄)"
+  ],
+  "issues": [
+    {
+      "where": "directive.md 「진행 규칙」의 **질문** 항목(41줄)의 'SendMessage 로 재개' 문구",
+      "type": "failure-mode",
+      "claim": "지시문은 멈춘 서브에이전트를 SendMessage로 되살려 답을 이어 전달하라고 정한다. 추가될 스킬은 정지된 L2를 되살리지 않고 답을 스펙에 접어 새 L2를 재디스패치하라고 정하며, 설계 문서가 실측으로 검증한 재개 경로도 재디스패치 하나뿐이다. 실패했다고 놓으면 원인은 검증되지 않은 재개 경로를 택한 데 있다. 세션이 끊기면 서브에이전트 식별자가 대화에만 있으므로 '같은 서브에이전트'를 다시 찾을 수 없고, 두 재개 규칙이 한 스킬 안에서 충돌한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "메인 세션이 사용자에게 하나씩 묻고, 답을 같은 서브에이전트에 이어서 전달한다(SendMessage 로 재개).",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "답이 오면 L1은 정지된 L2를 되살리지 않고, 답을 스펙에 접어 넣어 그 워크트리에 새 L2를 재디스패치한다. (35줄) / 설계 문서 26-27줄: 새 L2를 재디스패치 → … 무상태 재개가 실제로 작동.",
+      "principle": "NO-ASSUME, FOCUSED",
+      "consequence": "지시문 41줄은 SendMessage 재개를 지시하고 SKILL.md 35줄은 재디스패치를 지시한다. 설계 문서 「검증 상태」에는 SendMessage 재개를 실측한 항목이 없다."
+    },
+    {
+      "where": "directive.md 「진행 규칙」의 **강제** 항목(46줄)",
+      "type": "failure-mode",
+      "claim": "지시문은 절마다 정한 수정 가능 파일 범위를 nested-orchestration의 소유권 검사로 강제한다고 적는다. 그러나 그 검사는 동시에 끝난 브랜치끼리 변경 파일 집합의 교집합만 본다. 허용 목록 밖 파일(메인 세션 소유 계약 코드, 이미 병합된 앞 절의 파일, 누구도 고치지 않는 셸 파일)을 고친 브랜치는 다른 브랜치와 겹치지 않는 한 통과한다. 의존 순서 때문에 차례로 진행하는 절은 비교할 짝 브랜치가 없어 검사가 아무것도 잡지 못한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "수정할 수 있는 파일 범위는 지시문에만 두지 않고 nested-orchestration 의 소유권 검사로 강제한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "L1은 취합 때 각 브랜치의 변경 파일 집합(`git diff --name-only base..branch`)을 구한 뒤 브랜치를 둘씩 짝지어 모든 쌍의 교집합을 확인한다. (42줄)",
+      "principle": "NO-ASSUME",
+      "consequence": "SKILL.md 42줄의 검사는 브랜치 쌍의 교집합만 정의한다. gm 큰 명세 341줄은 '수정 범위 밖 파일의 부재'를 통과 조건으로 적지만 그 검사를 실행하는 명령은 어디에도 정의되어 있지 않다."
+    },
+    {
+      "where": "directive.md 「인계」의 진행 방법 불릿(37줄)과 「진행 규칙」의 **명세 분량** 항목(43줄)",
+      "type": "failure-mode",
+      "claim": "지시문은 서브에이전트가 절 범위에서 superpowers 브레인스토밍과 명세 작성을 진행하게 한다. superpowers brainstorming은 질문을 한 번에 하나씩 사람에게 묻고, 설계와 작성된 spec 둘 다 사람의 명시적 승인을 받아야 writing-plans로 넘어가는 HARD-GATE를 둔다. 서브에이전트는 사람과 대화할 수 없고, 지시문 43줄은 절 명세의 사용자 검토를 없앴다. 실패했다고 놓으면 서브에이전트는 게이트를 건너뛰고 스스로 승인한 것으로 처리하거나, 질문마다 멈춰 재개 왕복이 브레인스토밍 질문 수만큼 늘어난다. 추가될 스킬도 L2의 출발점을 이미 잠긴 스펙으로 정하고 있어 L2 안의 브레인스토밍과 맞지 않는다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "진행 방법: superpowers 의 브레인스토밍 → 명세 작성 → 명세 검토 → 계획 → 구현을 이 절 범위에서 진행한다 / 사용자가 직접 검토하는 문서는 큰 명세와 계약으로 한정하고, 절 명세는 검토 서브에이전트와 메인 세션이 검토한다.",
+      "counterpart_file": "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/brainstorming/SKILL.md",
+      "counterpart": "Architectural: the human partner reviews and approves the written spec … written-spec approval only permits invoking writing-plans. (46-49줄) / SKILL.md 19줄: 잠긴 스펙으로 `writing-plans` 다음 `subagent-driven-development`를 … 실행 / 스펙 국면은 L1이 `review-specs`로 이미 마쳤고",
+      "principle": "FOCUSED, NO-ASSUME",
+      "consequence": "brainstorming SKILL.md는 사람 승인 없이 writing-plans로 넘어가는 경로를 두지 않는다. 지시문 43줄은 절 명세를 사람이 검토하지 않게 정한다. nested-orchestration SKILL.md 19줄은 L2가 잠긴 스펙을 받는다고 정한다."
+    },
+    {
+      "where": "directive.md 「진행 규칙」의 **질문** 항목(41줄)의 '확인이 필요하면 … 멈춘다' 조건",
+      "type": "failure-mode",
+      "claim": "지시문은 확인이 필요한 모든 경우에 서브에이전트가 멈추게 한다. 서브에이전트가 구현 단계에서 따르는 subagent-driven-development는 모호함과 계획 결함을 스스로 판정하고 계속 진행하며, 정해진 네 가지 사유에서만 멈추라고 정한다. 추가될 스킬도 사람 결정(🔴)에서만 BLOCKED로 멈추게 한다. 정지 기준이 셋으로 갈려 서브에이전트가 어느 기준을 따를지 정해지지 않는다. 지시문 기준을 따르면 절마다 정지가 잦아지고, SDD 기준을 따르면 지시문의 질문 경로가 쓰이지 않는다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "확인이 필요하면 보고의 「질문」 절에 적고 멈춘다.",
+      "counterpart_file": "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/subagent-driven-development/SKILL.md",
+      "counterpart": "Continuous execution: Do not pause to check in with your human partner between tasks. … The only reasons to stop are the four named below (17줄 이하) / nested-orchestration SKILL.md 33줄: L2가 사람 결정(🔴)에 부딪히면 그 지점에서 조기 종료하고 상태 `BLOCKED`와 질문을 리턴한다.",
+      "principle": "FOCUSED",
+      "consequence": "지시문 41줄은 '확인이 필요하면' 멈추라 하고, SDD는 네 사유에서만 멈추라 하며, SKILL.md 33줄은 🔴에서만 멈추라 한다. 세 문서 어디에도 우선순위가 적혀 있지 않다."
+    },
+    {
+      "where": "directive.md 「진행 규칙」의 **계약 변경** 항목(45줄)의 '영향받는 절에 전달한다' 문구",
+      "type": "risk",
+      "claim": "계약 변경을 지금 채택하면 메인 세션이 큰 명세와 계약 코드를 고친 뒤 영향받는 절에 전달한다고 지시문은 적는다. 동시에 진행 중인 절은 백그라운드로 실행되어 실행 도중 받을 채널이 없고, 그 절의 브랜치는 옛 계약 커밋에서 갈라져 있다. 전달 방법(중단 후 재디스패치, 리베이스 주체)이 정해져 있지 않아 옛 계약으로 끝난 브랜치가 통합 확인에서 실패한다. 단순화로 없앨 수 없는 위험이므로 전달 방법을 줄 단위로 정해 완화해야 한다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "채택하면 큰 명세와 계약 코드를 고친 뒤 영향받는 절에 전달한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md",
+      "counterpart": "L2가 사람 결정(🔴)에 부딪히면 mid-run으로 무언가를 surface하려 하지 않는다(백그라운드라 즉시 채널이 없다). (92-93줄)",
+      "principle": "REVERSIBLE, NO-ASSUME",
+      "consequence": "지시문 45줄은 '전달한다'만 적고 실행 중인 절을 멈출지, 새 계약 커밋 위로 다시 디스패치할지를 적지 않는다. 설계 문서 92-93줄은 실행 중인 L2로 가는 채널이 없다고 적는다."
+    },
+    {
+      "where": "directive.md 「문서 보관」 절(64줄)의 '재개하는 세션은 이 문서들과 커밋으로 진행 위치를 판정한다' 문장과 「측정」 절(55-60줄)",
+      "type": "over-engineering",
+      "claim": "지시문은 결정 기록과 측정 기록을 저장소에 영속하고 세션 재개 때 진행 위치를 문서로 판정하게 한다. 추가될 스킬은 영속 오케스트레이션 상태 문서와 메트릭을 비목표로 두고 인플라이트 상태를 대화에만 든다. 같은 스킬에 넣으면 비목표와 본문이 서로 부정한다. 측정 기록은 gm 큰 명세 리뷰에서 소비 단계가 없다는 지적을 받았고, 사용자의 지시라는 이유만으로 유지되었다. 단순화 근거: 진행 위치는 브랜치와 커밋, SDD ledger로 이미 도출할 수 있으므로 별도 문서로 판정할 필요가 없다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "큰 명세, 결정 기록, 절별 명세와 계획, 검토 기록, 측정 기록은 저장소에 보존한다. … 세션이 끊기면 재개하는 세션은 이 문서들과 커밋으로 진행 위치를 판정한다. / 단순화 근거: SDD SKILL.md 500줄 'The ledger is what survives compaction', nested-orchestration SKILL.md 35줄의 브랜치 기반 재디스패치",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "**비목표** — `Workflow` 결정론 버전과 집계 UI 대시보드와 영속되는 오케스트레이션 상태 문서는 만들지 않는다. 인플라이트 상태는 세션 대화 상태로만 든다. (56줄)",
+      "principle": "YAGNI, DOC-TYPE",
+      "consequence": "gm 큰 명세 382-384줄은 `docs/superpowers/metrics.md`를 두고, 402줄은 '측정 기록은 리뷰가 소비 단계가 없다고 지적했지만, 사용자의 개발 지시가 요구하므로 유지했다'고 적는다. SKILL.md 56줄은 영속 상태 문서를 비목표로 둔다."
+    },
+    {
+      "where": "directive.md 「문서 보관」 절(64줄)의 '절별 명세와 계획 … 저장소에 보존한다' 문장",
+      "type": "irreversible",
+      "claim": "지시문은 절별 계획과 검토 기록을 저장소에 보존하고 지울 때 사용자 확인을 받게 한다. 에이전트원칙의 문서 수명 표는 plan을 병합 뒤 보존 태그를 달고 지우고, 기록도 병합 뒤 태그를 달고 지우도록 정한다. 절이 일곱 개면 계획과 리뷰 기록이 절마다 쌓여 다음 개발에서 과거 계획을 활용하게 되며, 에이전트원칙이 금지한 '과거 것의 활용'이 생긴다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "큰 명세, 결정 기록, 절별 명세와 계획, 검토 기록, 측정 기록은 저장소에 보존한다. 지우기 전에는 사용자 확인을 받는다.",
+      "counterpart_file": "D:/projects/disciplined-coder/agent-principles.md",
+      "counterpart": "plan은 실행이 끝나 병합되면 git 보존 태그를 단 뒤 지워라. 과거 것은 보존만 하고 활용하지 마라 (110줄) / 기록 … 다룬 작업이 병합되면 git 보존 태그를 단 뒤 지우되 (111줄)",
+      "principle": "DOC-TYPE",
+      "consequence": "지시문 64줄은 plan과 검토 기록의 영구 보존을 지시하고, agent-principles.md 110-111줄은 병합 뒤 태그와 삭제를 지시한다."
+    },
+    {
+      "where": "directive.md 첫 문단(3줄)과 「나눌지 판단」 절(7줄), 그리고 이 지시문을 넣을 SKILL.md frontmatter description(3줄)",
+      "type": "over-engineering",
+      "claim": "지시문의 분할 대상은 의존 순서로 이어진 절들이다. nested-orchestration의 트리거는 서로 독립된 멀티태스크 플랜이 둘 이상인 경우이다. 의존 사슬을 다루는 절차를 같은 스킬에 넣으면 스킬이 두 트리거를 갖게 된다. 또 '큰 개발을 하위 프로젝트로 나누고 각자 spec→plan→구현 주기를 갖게 한다'는 판단은 superpowers brainstorming이 이미 소유한다. 단순화 근거: 나눌지 판단은 brainstorming 202-203줄에 맡기고, 지시문에는 그 결과를 nested-orchestration에 넘기는 방법만 남기면 된다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "한 명세에 독립된 하위 시스템이 여럿 섞이거나 한 세션이 전체 코드와 결정을 다 들고 있을 수 없으면 절로 나눈다. / 단순화 근거: brainstorming SKILL.md 203줄 'If the project is too large for a single spec, help the user decompose into sub-projects … Each sub-project gets its own spec → plan → implementation cycle.'",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "description: 멀티태스크 플랜이 둘 이상일 때 … (3줄) / 아이디어에서 스펙까지는 `brainstorming` … 이 소유한다. (51줄) / agent-principles.md 146줄: 서로 독립된 일이 둘 이상이고",
+      "principle": "FOCUSED, YAGNI",
+      "consequence": "SKILL.md 51줄은 아이디어에서 스펙까지를 brainstorming이 소유한다고 적는데, 지시문 7줄은 분할 판단 기준을 따로 정한다. 지시문 7줄의 '한 세션이 다 들고 있을 수 없으면'에는 측정 방법이 없다."
+    },
+    {
+      "where": "directive.md 「진행 규칙」의 **검토 범위** 항목(44줄)의 '정확성, 명시된 요구, 계약 위반으로 한정' 문구",
+      "type": "failure-mode",
+      "claim": "지시문은 검토 서브에이전트의 지적 범위를 셋으로 한정한다. 추가될 스킬에서 L2는 plan 국면에 review-specs를, 실행 국면에 lens-adversarial 같은 렌즈를 돌리며, 이 렌즈들은 실패 모드·과설계·비가역을 보도록 계약되어 있다. 같은 스킬 안에서 렌즈 계약과 지시문의 범위 제한이 충돌해, L2가 렌즈 프롬프트를 고쳐 쓰거나 지시문을 무시하게 된다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "명세와 코드 검토 서브에이전트에게 지적 범위를 정확성, 명시된 요구, 계약 위반으로 한정하게 한다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "플랜 국면은 L2가 자율로 `review-specs`를 실행해 … 실행 국면은 SDD 의 태스크 리뷰어와 리스크 비례 `lens-*`가 맡는다. (19줄) / 필요하면 `lens-grounding`과 `lens-adversarial`을 추가한다. (28줄)",
+      "principle": "FOCUSED",
+      "consequence": "SKILL.md 19·28줄은 범위 제한 없이 review-specs와 lens-adversarial을 실행하게 하고, 지시문 44줄은 같은 검토자의 범위를 셋으로 줄인다."
+    },
+    {
+      "where": "directive.md 「통합」 절(51줄)의 '절 내부면 해당 서브에이전트로 되돌린다' 문구",
+      "type": "failure-mode",
+      "claim": "통합 확인은 절의 구현이 끝나 서브에이전트가 이미 종료된 뒤에 실행된다. 지시문은 실패를 '해당 서브에이전트'로 되돌리라고 적지만 종료된 서브에이전트를 이어 쓰는 경로는 검증되지 않았고, 추가될 스킬은 종료된 L2를 되살리지 않는다. 되돌릴 대상과 방법이 정해지지 않아 메인 세션이 스스로 절 코드를 고치게 되고, 이는 지시문 11줄의 '절의 구현 코드는 직접 쓰지 않는다'를 어긴다.",
+      "file": "C:/Users/CHSHIN/AppData/Local/Temp/claude/D--projects-disciplined-coder/607e2448-8311-4ad1-affd-526a5edf0aa4/scratchpad/directive.md",
+      "evidence": "실패하면 원인이 계약이면 큰 명세로, 절 내부면 해당 서브에이전트로 되돌린다.",
+      "counterpart_file": "D:/projects/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "counterpart": "답이 오면 L1은 정지된 L2를 되살리지 않고, … 그 워크트리에 새 L2를 재디스패치한다. 재디스패치 프롬프트에는 여섯 블록에 추가해 이어받을 브랜치명과 앞선 L2의 리포트 경로를 넣는다. (35줄)",
+      "principle": "NO-ASSUME",
+      "consequence": "지시문 51줄은 '해당 서브에이전트'라고만 적고, SKILL.md 35줄은 종료된 L2 대신 새 L2를 재디스패치하는 방법만 정의한다."
+    }
+  ],
+  "principles_applied": [
+    "YAGNI",
+    "FOCUSED",
+    "REVERSIBLE",
+    "NO-ASSUME",
+    "STATE-ASSUME",
+    "DOC-TYPE",
+    "EVIDENCE-FIRST",
+    "WRITTEN-ONLY",
+    "SPECIFIC-NAME",
+    "SUBJECT-OBJECT"
+  ],
+  "notes": "검토 관점: 체크리스트 네 항목을 따로 검토하였다. 실패 모드에서는 재개 경로(SendMessage와 재디스패치의 충돌), 소유권 강제의 실제 범위, 서브에이전트 안 브레인스토밍의 사람 승인 게이트, 정지 기준의 삼중화, 통합 실패의 되돌림 대상을 보았다. 설계가 맞는데도 실패하는 길로는 세션 단절 뒤 서브에이전트 식별자 소실, 실행 중 절에 계약 변경을 전달할 채널 부재를 보았다. 과설계에서는 측정 기록과 진행 위치 판정 문서, 분할 판단의 brainstorming 중복을 보았다. 비가역에서는 plan과 검토 기록의 영구 보존을 보았다. 위험에서는 계약 변경 중 동시 진행 절의 옛 계약 기반 브랜치를 보았다.\n\n추가로 확인할 것: (1) 「측정」 절의 '절별 토큰 사용량'은 백그라운드 Agent 완료 통지에 L3까지 포함한 토큰 합계가 실리는지 확인해야 한다. 실리지 않으면 기록할 수 없는 항목이지만 이 세션에서 실측하지 못해 발견으로 올리지 않았다. (2) SendMessage가 종료된 백그라운드 서브에이전트를 실제로 재개하는지, 세션 재시작 뒤에도 식별자가 유효한지는 실측이 필요하다. 첫 번째 발견은 실측 부재를 근거로 삼았다. (3) 지시문 47줄(의존·범위가 겹치지 않는 절만 동시 진행)과 51줄(다음 절은 확인 통과 뒤 시작)은 '다음 절'이 의존하는 절만을 뜻하는지 모든 절을 뜻하는지 문면으로 정해지지 않는다. gm 큰 명세 332줄은 의존하는 절로 좁혀 해석했으므로 실패 사례가 관찰되지 않아 올리지 않았다. (4) SKILL.md 44줄의 plan 리뷰 마커 확인은 절별 spec에는 적용되지 않는다. 세 번째 발견과 원인이 같아 따로 올리지 않았다."
+}
