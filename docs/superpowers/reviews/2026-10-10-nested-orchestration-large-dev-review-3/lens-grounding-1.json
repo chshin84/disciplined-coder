@@ -1,0 +1,67 @@
+{ "lens": "lens-grounding",
+  "read": [
+    "C:/Users/ho381/.claude/plugins/cache/chshin-tools/disciplined-coder/f9752ace24b9/skills/lens-grounding/SKILL.md",
+    "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t7/prep3.md",
+    "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md (180~286행, 「2026-10-10 개정」 절)",
+    "D:/projects/Structure/disciplined-coder/skills/nested-orchestration/SKILL.md (전체)",
+    "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t6/result.txt",
+    "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t6/make.py",
+    "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t6/score.py",
+    "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t6/elem.json",
+    "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t6/out/ (파일 수 100 확인, s2_R4_*·s2_R1_*·s2_R2_A_*·s2_R3_B_1 원본)",
+    "D:/projects/Structure/disciplined-coder/docs/superpowers/reviews/2026-10-10-decomposition-criteria-prior-art.md (DSM·axiomatic·순환 언급 행)",
+    "D:/projects/Structure/disciplined-coder/docs/superpowers/reviews/2026-10-10-nested-orchestration-large-dev-review-2.md (존재 확인과 키워드 검색)"
+  ],
+  "issues": [
+    {
+      "where": "spec 「2026-10-10 개정」 「재현성 측정」 둘째 문단(274행)",
+      "type": "mismatch",
+      "claim": "순환만 합치는 조건에서 의존 판정이 '5회 중 1~2회' 달랐다고 적었으나, result.txt 에서는 해당 세 요청 모두 다른 판정이 정확히 1회다. 2회 다른 요청은 없다.",
+      "file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "evidence": "순환만 합치는 조건도 의존 판정은 세 요청에서 5회 중 1~2회 달랐지만, 순환이 생기지 않아 분할은 바뀌지 않았다.",
+      "counterpart_file": "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t6/result.txt",
+      "counterpart": "R2 B ... edges 4회 [] / edges 1회 [(1, 3)]; R3 B ... edges 4회 [(2, 1), (3, 2), (4, 3)] / edges 1회 [(2, 1), (3, 1), (3, 2), (4, 3)]; R5 B ... edges 4회 [(2, 3), (3, 2)] / edges 1회 [(2, 3), (3, 2), (5, 2), (5, 3)]",
+      "principle": "숫자는 출처와 일치해야 한다",
+      "consequence": "spec 이 측정 원본에 없는 '2회' 불일치를 기록하고 있어, 순환만 합치는 조건의 의존 판정이 실제보다 흔들린 것으로 적혀 있다."
+    },
+    {
+      "where": "spec 「재현성 측정」 둘째 문단(274행)과 SKILL 「묶는 단위」 셋째 문단(39행)",
+      "type": "mismatch",
+      "claim": "이전 규칙(조건 A)이 주문 처리와 서로 독립된 두 일에서 '실행마다' 분할이 달랐다고 적었으나, 원본에서 주문 처리는 5회 중 4회가 같은 분할이고 1회만 달랐으며, 서로 독립된 두 일도 5회 중 2회씩 같은 분할이 두 가지 있었다. 즉 매 실행이 서로 다르지는 않았다.",
+      "file": "D:/projects/Structure/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "evidence": "한 방향 의존도 합치던 이전 규칙은 두 요청에서 실행마다 분할이 달랐고, 순차 이전 요청에서는 사슬 전체를 하나로 합쳤다.",
+      "counterpart_file": "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t6/result.txt",
+      "counterpart": "R4 A | [4, 4, 4, 2, 4] | 2/5 | 4/5 | 0.60 ... 4회 [(1,), (2,), (3,), (4,)] / 1회 [(1, 2, 3), (4,)]; R5 A | [3, 4, 4, 2, 2] | 3/5 | 2/5 | 0.43 ... 2회 ... 2회 ... 1회",
+      "principle": "숫자·주장은 출처와 일치해야 하며 확인되지 않은 정도를 단정하지 않는다",
+      "consequence": "SKILL 과 spec(274행 '실행마다 분할이 달랐고(ARI 0.60, 0.43)')이 같은 과장을 쓰고 있어, 이전 규칙의 재현성이 원본(최빈 분할 4/5, 2/5)보다 낮게 적혀 있다."
+    },
+    {
+      "where": "SKILL 「나누는 기준」 둘째 문단(33행)과 spec 「기준의 소유」(192행)",
+      "type": "mismatch",
+      "claim": "SKILL 은 '같은 요청의 하위 프로젝트 목록이 실행마다 달랐으므로'라고, spec 192행은 '목록을 만드는 단계가 두 방식 모두 재현되지 않았기 때문'이라고 일반화한다. 그런데 원본에서 이름을 옮기는 조건(B)은 채권 도구와 주문 처리에서 5회가 같은 목록이었다. spec 278행도 이 사실을 적고 있다.",
+      "file": "D:/projects/Structure/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "evidence": "2026-10-10 측정에서 같은 요청의 하위 프로젝트 목록이 실행마다 달랐으므로, 현재 세션은 목록을 규칙으로 정하지 않고 사용자 승인으로 고정한다.",
+      "counterpart_file": "C:/Users/ho381/AppData/Local/Temp/claude/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/scratchpad/t6/result.txt",
+      "counterpart": "R1 B | [5, 5, 5, 5, 5] | 1/5 | 원소 수 일치 5/5; R4 B | [7, 7, 7, 7, 7] | 1/5 | 원소 수 일치 0/5",
+      "principle": "근거를 일반화할 때 출처의 범위를 넘지 않는다",
+      "consequence": "SKILL 의 근거 문장이 측정 원본과 spec 278행('채권 도구와 주문 처리에서는 5회가 같았으나')보다 강하게 적혀 있다. 실제로 재현되지 않은 것은 요청에 따라 다르다(superpowers 식 R1 5/5 상이, 이름 옮김 R3·R5 흔들림)."
+    },
+    {
+      "where": "SKILL 「묶는 단위」 셋째 문단(39행)",
+      "type": "omission",
+      "claim": "SKILL 은 순환만 합치는 방식이 다섯 요청 모두에서 5회 같은 분할을 냈다는 것만 근거로 적는다. 같은 측정에서 그 분할이 위키 역할 정의·문서별 접근 제어 합침 하나를 빼면 '무조건 분리'와 같았고, 주문 처리에 심은 상태 변경 순환을 어느 실행도 설계 의존으로 세지 않았다는 사실은 빠져 있다. spec 276행에는 이 두 사실이 적혀 있다.",
+      "file": "D:/projects/Structure/disciplined-coder/skills/nested-orchestration/SKILL.md",
+      "evidence": "2026-10-10 측정에서 하위 프로젝트 목록을 고정한 요청 다섯을 5회씩 묶었을 때, 이 방식은 다섯 요청 모두에서 5회 같은 분할을 냈다.",
+      "counterpart_file": "D:/projects/Structure/disciplined-coder/docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+      "counterpart": "순환만 합치는 조건의 분할은 서로 독립된 두 일의 위키 역할 정의와 문서별 접근 제어를 합친 것 하나를 빼면 '무조건 분리' 기준선과 같았다. 주문 처리 요청에 심은 상태 변경 순환은 모든 실행이 자료 형식만 알면 되는 관계로 보고 설계 의존으로 세지 않았다.",
+      "principle": "근거를 인용할 때 그 근거의 한계를 함께 적는다",
+      "consequence": "SKILL 만 읽는 세션은 이 재현성이 합치는 경로를 거의 거치지 않은 결과라는 것을 알 수 없다. 원본에서 순환 합침은 R5 B 한 번뿐이고, R4 의 edges 는 A·B 열 실행 모두 빈 목록이다."
+    }
+  ],
+  "principles_applied": [
+    "숫자·인용·식별자는 출처와 일치해야 한다",
+    "확인되지 않은 정도를 단정하지 않는다",
+    "근거를 인용할 때 범위와 한계를 함께 적는다"
+  ],
+  "notes": "검토 관점은 누락, 모순, 환각, 불일치 네 가지를 따로 보았다. 원본과 일치를 확인한 항목은 다음과 같다. 실행 100회(out 파일 100개, s1·s2 각 5요청×2조건×5회). 우연 기준선 1/15~1/52(score.py 의 1/B(n), n=4·5). 순환만 합치는 조건(make.py S2 B)은 다섯 요청 모두 최빈 분할 5/5에 ARI 1.00이다. 이전 규칙의 순차 이전 R3 A 는 5회 모두 [(1,2,3,4)]이다. ARI 0.60·0.43 도 맞다. R5 B 의 합침 (2,3) 은 edges (2,3)·(3,2) 순환에서 나왔고, R4 는 A·B 열 실행 모두 edges 가 비어 있다. 열거 단계의 R1 A 원소 5~7개·5/5 상이·공통 데이터 모델 3회, R3 B 8~11개, R5 B 2~5개도 맞다. 조건 A/B 와 '이전 규칙/순환만' 및 'superpowers 식/이름 옮김'의 대응은 make.py 의 S1·S2 문구로 확인했다. 참고로 R4 A 의 이탈 실행(4번)은 edges 가 빈 채 [1,2,3]을 합쳤으므로, 그 흔들림은 한 방향 의존이 아니라 경로 겹침 조건에서 온 것으로 보인다(산출물에 합친 사유가 없어 추정이다). SKILL 39행의 '한 방향 의존도 합치던 이전 규칙'은 규칙의 이름으로 읽히므로 발견으로 올리지 않았다. 선행연구 기록 15·25행이 DSM·axiomatic design 의 '순환만 합침' 주장을 받치는 것도 확인했다. 2차 리뷰 기록에서는 같은 수치를 지적한 항목을 키워드 검색으로 찾지 못했으나 전문은 읽지 않았다. 따라서 위 발견이 2차 처분과 겹치는지는 호출자가 대조해야 한다."
+}
