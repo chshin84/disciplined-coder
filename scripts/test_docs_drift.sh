@@ -891,4 +891,11 @@ check "aggregating-lenses: 출력 스키마 절이 principles_applied 를 따로
 # 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다.
 check "Claude 매니페스트에 version 없음"  "! grep -qE '\"version\"[[:space:]]*:' '$HERE/.claude-plugin/plugin.json'"
 
+echo "[nested-message-format] nested-orchestration 메시지 형식 절"
+NO_DOC="$HERE/skills/nested-orchestration/SKILL.md"
+check "「메시지 형식」 절이 있다" "has_sec \"\$NO_DOC\" '메시지 형식'"
+for ID in AWAITING_APPROVAL DONE FAILED CANCELED user-decision contract-change shared-file-change dependency-add test-double-add review-red review-gap sdd-stop APPROVE REVISE ANSWER BASE-UPDATED CONTRACT-CHANGED ASSUMPTION-ADDED DEPENDENCY-REQUEST INTEGRATION-FAILED CANCEL Format-Deviations:; do
+  check "「메시지 형식」에 $ID 가 있다" "sec_has_id \"\$NO_DOC\" '메시지 형식' '$ID'"
+done
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
