@@ -83,7 +83,7 @@ done
 
 ### 끄는 법
 
-hook은 환경 변수 두 개로 끈다.
+hook은 아래 환경 변수로 끈다.
 
 - **`DISCIPLINED_CODER_REVIEW_GATE=off`** — `spec_review_posttooluse.sh`, `stop_gates.sh`의 spec 검사, `doc_format_pretooluse.sh`, `doc_review_posttooluse.sh`, `rules_nudge_pretooluse.sh`, `nested_judgment_pretooluse.sh`를 끈다.
 - **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `stop_gates.sh`의 금지 표현 검사)을 끈다. 금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.
