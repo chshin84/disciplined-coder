@@ -435,6 +435,6 @@ NP-bond-agg 큰 명세는 `rules`·`runner`를 합친 워크스트림을 `inputs
 
 순서를 넣은 문안은 bond-tool 5회, report-quality 5회, auth-migration 4회, order-processing 5회, two-jobs 0회, npb 4회였다. two-jobs 의 5회는 모두 FAQ 색인과 검색을 합쳤고, 이유는 색인의 형태소 분석과 검색 질의 분석이 색인 의미를 함께 정해야 한다는 것이었다. 사용자는 결과를 본 뒤 two-jobs 의 기대 분할을 이 합침으로 정정하는 안을 골랐고, 정정한 정답으로 다시 채점한 판정은 ADOPT 였다(two-jobs 5회). 현행 규칙은 두 측정 모두 order-processing 0회, npb 0회였다.
 
-다시 만든 목록은 2026-10-10 입력과 같지 않다. 처음 재생성한 목록은 요청 이름만으로는 나눌 근거가 없어, 현재 세션은 서브에이전트에 기능 범위를 정해 3~6개로 나누게 했다. 형식 오류로 다시 실행한 회차는 없다. 첫 측정의 `runs.log`는 61행인데, 첫 행은 본 실행 전에 `new__npb__1`을 한 번 돌린 시범 실행이고 그 출력은 본 실행이 덮어썼다. 기록은 `docs/superpowers/reviews/2026-10-11-shared-definition-grouping-check/`와 `-check-2/`에 있다.
+다시 만든 목록은 2026-10-10 입력과 같지 않다. 처음 재생성한 목록은 요청 이름만으로는 나눌 근거가 없어, 현재 세션은 서브에이전트에 기능 범위를 정해 3~6개로 나누게 했다. 형식 오류로 다시 실행한 회차는 없다. 첫 측정의 `runs.log`는 61행인데, 첫 행은 본 실행 전에 `new__npb__1`을 한 번 돌린 시범 실행이고 그 출력은 본 실행이 덮어썼다. 최종 브랜치 리뷰가 소유가 둘 이상인 항목의 미합침과 받기만 하는 사용 쪽의 의존 값을 지적해, 현재 세션은 「판정」을 지금 문장으로 고쳤다. 고친 문안은 order-processing, npb, auth-migration 에서 5회 모두 기대 분할을 냈다(`-check-3/`). 기록은 `docs/superpowers/reviews/2026-10-11-shared-definition-grouping-check/`, `-check-2/`, `-check-3/`에 있다.
 
 <!-- spec-review: passed -->

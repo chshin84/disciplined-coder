@@ -1,0 +1,15 @@
+{"run": "new__auth-migration__1", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__auth-migration__2", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__auth-migration__3", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__auth-migration__4", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__auth-migration__5", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__order-processing__1", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__order-processing__2", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__order-processing__3", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__order-processing__4", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__order-processing__5", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__npb__1", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__npb__2", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__npb__3", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__npb__4", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__npb__5", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
