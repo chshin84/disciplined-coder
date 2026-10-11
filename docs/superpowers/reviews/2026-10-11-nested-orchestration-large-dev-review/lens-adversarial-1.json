@@ -1,0 +1,80 @@
+{
+ "lens": "lens-adversarial",
+ "target": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md (2026-10-11 개정 — 묶는 단위)",
+ "issues": [
+  {
+   "where": "「측정」 328행 첫째·넷째 기준",
+   "type": "failure-mode",
+   "claim": "4/5 합침 허용과 '5회 같은 분할 비율이 현행보다 낮지 않다'가 충돌한다. 현행은 2026-10-10 에 모든 요청 5회 동일(ARI 1.00)이므로 4/5 합침은 넷째 기준에서 실패해 사실상 5/5 를 요구한다.",
+   "evidence": "328행, 286행",
+   "principle": "CHECKABLE"
+  },
+  {
+   "where": "「측정」 328행 첫째·둘째 기준",
+   "type": "failure-mode",
+   "claim": "표적 요청 기준이 목표 쌍 합침만 보고 나머지까지 합쳤는지 보지 않는다. 합침 사슬로 NP-bond-agg 다섯이 전부 하나가 되어도 통과하며, 그러면 시작 워크스트림이 하나라 위임이 조용히 사라진다. 기대 결과를 분할 전체(사용자가 고른 넷)로 적어야 한다.",
+   "evidence": "328행, 308행, 302행",
+   "principle": "CHECKABLE"
+  },
+  {
+   "where": "「측정」 328행 셋째 기준",
+   "type": "failure-mode",
+   "claim": "나머지 네 요청에 떼어낼 수 없는 공유 정의가 없다는 가정을 확인하지 않았다. 현행 규칙의 결과를 정답으로 삼으므로, 새 규칙이 올바르게 합치면 실패 판정이 난다. 측정 전에 요청마다 기대 분할을 먼저 적어 두면 '기대와 같음'을 확인할 수 있다.",
+   "evidence": "328행, 284행, 304행",
+   "principle": "NO-ASSUME"
+  },
+  {
+   "where": "「측정」 326행 입력 재구성",
+   "type": "risk",
+   "claim": "규칙을 쓴 현재 세션이 입력을 만들고 채점·판정까지 한다. 입력 설명에 정답 단서가 들어가면 규칙이 아닌 문구의 효과를 측정한다. NP-bond-agg 는 기록 943행 원문 목록을, 주문 처리는 정답을 모르는 별도 서브에이전트가 요청 문장만으로 쓰게 하면 분리된다.",
+   "evidence": "326행, 296행",
+   "principle": "EVIDENCE-FIRST"
+  },
+  {
+   "where": "「공유 정의 표」 306·308행",
+   "type": "failure-mode",
+   "claim": "정의 주인이 없음이거나 둘 이상인 행의 합침 대상이 정해지지 않고, '쓰거나 읽는' 행 정의와 '쓰는 하위 프로젝트' 칸이 달라 읽기만 하는 쪽을 합칠지 실행마다 다르게 해석된다.",
+   "evidence": "306행, 308행",
+   "principle": "CHECKABLE"
+  },
+  {
+   "where": "「계약 표와의 연결」 310·312행",
+   "type": "failure-mode",
+   "claim": "주인 없음 떼어냄 행은 제공자 칸을 채울 수 없고, 다른 세션 계약 표 칸에는 일반 의미 칸이 없어 시간·결측 밖의 의미를 옮길 곳이 없다.",
+   "evidence": "310행, 312행, LENS_BG 9행",
+   "principle": "TERM-ONE"
+  },
+  {
+   "where": "「검증 의존」 316행",
+   "type": "failure-mode",
+   "claim": "상호 검증 의존에서 첫 문장대로면 어느 쪽도 병합할 수 없는 교착이 생기고, 먼저 병합하는 쪽은 기각한 Verified 안과 같은 미검증 기간을 만든다. 상호 쌍을 한 번의 시험 병합으로 함께 넣으면 예외와 미검증 기간이 사라진다.",
+   "evidence": "316행, 318행",
+   "principle": "CHECKABLE"
+  },
+  {
+   "where": "「검증 의존」 316행 실패 처리",
+   "type": "failure-mode",
+   "claim": "원인이 이미 병합된 대상 쪽이면 복귀 경로가 닫히지 않는다. 원인 쪽 수정이 통합 브랜치에 들어온 뒤 검증 의존 쪽의 병합 전 검사를 다시 실행한다는 문장이 필요하다. 사슬이면 실패가 마지막 병합에 몰린다.",
+   "evidence": "314행, SKILL 「흐름」 6단계",
+   "principle": "CHECKABLE"
+  },
+  {
+   "where": "300행과 306행",
+   "type": "risk",
+   "claim": "공유 정의 표를 승인 근거에 넣는다는 문장이 본문에 없다. 현행 스킬은 순환 누락 위험을 의존 표를 승인 근거에 넣어 사용자가 보게 하는 장치로 완화했으나 새 표에는 이 장치가 명시되지 않았다.",
+   "evidence": "300행, SKILL 「묶는 단위」",
+   "principle": "STATE-ASSUME"
+  }
+ ],
+ "principles_applied": [
+  "CHECKABLE",
+  "NO-ASSUME",
+  "STATE-ASSUME",
+  "EVIDENCE-FIRST",
+  "YAGNI",
+  "REVERSIBLE",
+  "TERM-ONE",
+  "KO-SYNTAX"
+ ],
+ "notes": "원본의 evidence·counterpart 를 행 번호로 줄여 옮겼다. 렌즈 notes 요지: 비가역 지적 없음. 설계 의존 표 정의만 넓히는 단순화 안은 한 방향 의존만 생겨 합침이 일어나지 않으므로 올리지 않았다. 5회의 통계적 힘은 첫째·둘째 지적이 더 구체적이라 따로 올리지 않았다. NP-bond-agg JSONL 943·1204·1205행은 자동 모드 분류기가 읽기를 거부해 확인하지 못했다."
+}
