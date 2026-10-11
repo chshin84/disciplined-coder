@@ -1,0 +1,134 @@
+{
+ "lens": "lens-fit",
+ "target": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md (2026-10-11 개정 — 묶는 단위)",
+ "doc_type": "설계(spec·plan), 타입 행 위반 없음",
+ "issues": [
+  {
+   "where": "302행",
+   "claim": "'가장 큰 명세 공백'이 '큰 명세' 용어와 겹쳐 두 가지로 읽힌다.",
+   "principle": "VOCAB-PREF, TERM-ONE"
+  },
+  {
+   "where": "302행 셋째·넷째 문장",
+   "claim": "행위자가 다른 사건 두 개를 '~고,'로 한 문장에 이었다.",
+   "principle": "ONE-IDEA"
+  },
+  {
+   "where": "304행 첫 문장",
+   "claim": "현행 규칙을 판별 주체로 썼고 관형절이 문장 중간에 끼었다.",
+   "principle": "SUBJECT-OBJECT, NO-MID-MOD"
+  },
+  {
+   "where": "304행 셋째 문장",
+   "claim": "'분할이'가 큰 명세를 다시 쓰고 승인받은 주어로 놓였고, 평가와 경과가 한 문장에 있다.",
+   "principle": "SUBJECT-OBJECT, ONE-IDEA"
+  },
+  {
+   "where": "306·310행",
+   "claim": "'쓰는'이 기록과 사용 두 뜻으로 읽힌다.",
+   "principle": "VOCAB-PREF, TERM-ONE"
+  },
+  {
+   "where": "306행 둘째 문장",
+   "claim": "행 정의와 칸 목록과 괄호 정의를 한 문장에 실었다.",
+   "principle": "ONE-IDEA"
+  },
+  {
+   "where": "306행 '정의 주인'",
+   "claim": "같은 문서는 소유 관계를 '소유'로 적는데 '주인'이라는 새 용어를 지었다.",
+   "principle": "TERM-ONE, VOCAB-PREF"
+  },
+  {
+   "where": "308행",
+   "claim": "다섯 문장 문단이고 '합침이 이어지면 함께 묶는다'에 주체·목적어가 없고, 마지막 문장이 두 항목 판정을 싣는다.",
+   "principle": "ONE-IDEA, SUBJECT-OBJECT"
+  },
+  {
+   "where": "310행",
+   "claim": "다섯 문장 문단이고 '이렇게 잇는다'에 주체가 없다.",
+   "principle": "ONE-IDEA, SUBJECT-OBJECT"
+  },
+  {
+   "where": "312행 셋째 문장",
+   "claim": "관형절이 중간에 끼었고 '바꿨다'의 주체가 없다.",
+   "principle": "NO-MID-MOD, SUBJECT-OBJECT"
+  },
+  {
+   "where": "314행 첫 문장",
+   "claim": "'큰 명세에 적은' 관형절이 중간에 끼었다.",
+   "principle": "NO-MID-MOD"
+  },
+  {
+   "where": "316행",
+   "claim": "다섯 문장 문단이고 '통합 검증'과 '통합 확인'이 같은 개념에 쓰였다.",
+   "principle": "TERM-ONE, ONE-IDEA"
+  },
+  {
+   "where": "318행",
+   "claim": "'기각한 대안은 둘이다'로 개수를 예고했다.",
+   "principle": "COUNT-EARNS"
+  },
+  {
+   "where": "318행 셋째 문장",
+   "claim": "대안 이름이 관형절 두 겹으로만 주어졌다.",
+   "principle": "NO-STACK-MOD"
+  },
+  {
+   "where": "320행",
+   "claim": "'분할'이 묶음 결과와 DSM partitioning 번역어 두 개념을 가리킨다.",
+   "principle": "TERM-ONE, VOCAB-PREF"
+  },
+  {
+   "where": "322행",
+   "claim": "여섯 문장 문단이고 '이 스킬은 합친다'로 문서를 주체로 썼고, 개수 예고와 '뒤의' 순서 지칭을 썼다.",
+   "principle": "SUBJECT-OBJECT, COUNT-EARNS, ONE-IDEA"
+  },
+  {
+   "where": "326행",
+   "claim": "다섯 문장 문단이고 요청을 '다섯 요청'처럼 개수로 가리키며 한 문장에 세 개념을 실었다.",
+   "principle": "COUNT-EARNS, ONE-IDEA"
+  },
+  {
+   "where": "328행",
+   "type": "format",
+   "claim": "기준 다섯을 산문 일곱 문장으로 늘어놓았고 규칙을 채택 주체로 썼다. 앞 개정 절 「확인 방법」은 판정 주체와 번호 목록을 쓴다.",
+   "principle": "BULLET-SCOPE, ONE-IDEA, SUBJECT-OBJECT, COUNT-EARNS"
+  },
+  {
+   "where": "330행",
+   "claim": "'두 줄'로 개수 지칭했다.",
+   "principle": "COUNT-EARNS"
+  },
+  {
+   "where": "332행",
+   "claim": "연결어미 쉼표가 둘이고 판정 주체와 기대 출력이 없다.",
+   "principle": "COMMA-CUT, SUBJECT-OBJECT, CHECKABLE"
+  },
+  {
+   "where": "298행 제목",
+   "type": "format",
+   "claim": "앞 개정 절 제목 형식과 다르고 '묶는 단위'가 세 곳에서 쓰인다.",
+   "principle": "앞 절 형식과의 일치"
+  }
+ ],
+ "principles_applied": [
+  "TITLE-LAYERS",
+  "ONE-IDEA",
+  "NO-MID-MOD",
+  "NO-STACK-MOD",
+  "SUBJECT-OBJECT",
+  "COUNT-EARNS",
+  "TERM-ONE",
+  "TERM-EXPLAIN",
+  "VOCAB-PREF",
+  "COMMA-CUT",
+  "ANTI-LIMIT",
+  "KEEP-CONNECT",
+  "BULLET-SCOPE",
+  "FULL-SENTENCE",
+  "WRITTEN-ONLY",
+  "CHECKABLE",
+  "NAME-ITEMS"
+ ],
+ "notes": "원본의 evidence·counterpart·consequence 를 줄여 옮겼다. 렌즈 notes 요지: ### 소제목 없음, ANTI-LIMIT 0회. 324행은 4c 변경을 '「큰 명세」의 계약 표 칸'으로, LENS_BG 는 별도 「계약 표」 절로 적어 서술이 다르다."
+}
