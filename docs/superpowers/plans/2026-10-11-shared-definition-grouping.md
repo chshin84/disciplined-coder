@@ -318,3 +318,5 @@ Expected: `Validation passed` 가 출력된다.
 
 Run: `git add -A docs/superpowers/specs skills/nested-orchestration && git commit -m "공유 항목 표 측정 결과를 설계와 스킬에 적는다"`
 Expected: 커밋이 만들어진다. 현재 세션은 superpowers:finishing-a-development-branch 로 main 병합과 푸시를 사용자에게 묻는다.
+
+<!-- spec-review: escalated -->
