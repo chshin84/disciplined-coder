@@ -552,18 +552,22 @@ echo "[nested-judgment-pre — 새 spec 을 쓰기 전에 나눠 맡길지 판�
 NJP="$HERE/hooks/nested_judgment_pretooluse.sh"
 njp() { printf '%s' "$1" | TMPDIR="$T/tmp" bash "$NJP"; }
 NJ_FIRST="$(njp "$(JS n1 "" "$SP/new-design.md")")"
-check "새 spec 첫 Write → deny 하고 nested-orchestration 을 가리킨다" \
-  "printf '%s' \"\$NJ_FIRST\" | grep -qF '\"permissionDecision\":\"deny\"' && printf '%s' \"\$NJ_FIRST\" | grep -qF 'nested-orchestration' && printf '%s' \"\$NJ_FIRST\" | json_valid_stdin"
+check "새 spec 첫 Write → deny 하고 사유에 맡기는 기준과 nested-orchestration 이 있다"   "printf '%s' \"\$NJ_FIRST\" | grep -qF '\"permissionDecision\":\"deny\"' && printf '%s' \"\$NJ_FIRST\" | grep -qF '태스크 다섯' && printf '%s' \"\$NJ_FIRST\" | grep -qF 'nested-orchestration' && printf '%s' \"\$NJ_FIRST\" | json_valid_stdin"
+# 표시는 세션 단위다 — 맡기기로 판단한 뒤 큰 명세를 다른 경로에 쓸 때 다시 거부하지 않는다.
 check "같은 세션 같은 경로 재시도 → 무출력"     "[ -z \"\$(njp '$(JS n1 "" "$SP/new-design.md")')\" ]"
-check "다른 세션 같은 경로 → deny"              "njp '$(JS n2 "" "$SP/new-design.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
-check "같은 세션 다른 새 spec → deny"           "njp '$(JS n1 "" "$SP/another-design.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+check "같은 세션 다른 새 spec → 무출력"         "[ -z \"\$(njp '$(JS n1 "" "$SP/another-design.md")')\" ]"
+check "다른 세션 → deny"                        "njp '$(JS n2 "" "$SP/new-design.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+# 표시 파일을 만들지 못하면 재시도를 셀 수 없으므로 거부하지 않는다(fail-open). TMPDIR 을 일반 파일로 둬 mkdir 을 실패시킨다.
+: > "$T/njp-notdir"
+check "표시 폴더를 만들 수 없으면 → deny 없음"  "! printf '%s' '$(JS n8 "" "$SP/new-design.md")' | TMPDIR='$T/njp-notdir' bash '$NJP' | grep -qF 'deny'"
 check "이미 있는 spec → 무출력"                 "[ -z \"\$(njp '$(JS n3 "" "$SP/nomark.md")')\" ]"
 check "새 plan → 무출력"                        "[ -z \"\$(njp '$(JS n4 "" "$PL/new-plan.md")')\" ]"
 check "서브에이전트(agent_id) → 무출력"         "[ -z \"\$(njp '$(JS n5 ',"agent_id":"a1"' "$SP/new-design.md")')\" ]"
 check "프로젝트 밖 spec → 무출력"               "[ -z \"\$(njp '$(JS n6 "" "$OUTSIDE/docs/superpowers/specs/x.md")')\" ]"
 check "OFF → 무출력"                            "[ -z \"\$(DISCIPLINED_CODER_REVIEW_GATE=off njp '$(JS n7 "" "$SP/new-design.md")')\" ]"
 check "session_id 없음 → 무출력(재시도를 셀 수 없어 거부하지 않는다)" "[ -z \"\$(njp '$(J "$SP/new-design.md")')\" ]"
-check "Write 매처로 배선되어 있다"              "grep -B4 'nested_judgment_pretooluse.sh' '$HERE/hooks/hooks.json' | grep -q '\"matcher\": \"Write\"'"
+ptm() { json_run 'import json,sys; d=json.load(sys.stdin)["hooks"]["PreToolUse"]; print([g.get("matcher","") for g in d for h in g["hooks"] if sys.argv[1] in h["command"]][0])' "$1" < "$HJ"; }
+check "PreToolUse 의 Write 매처로 배선되어 있다" "[ \"\$(ptm nested_judgment_pretooluse.sh)\" = 'Write' ]"
 
 echo "[README — 배선된 스크립트를 모두 적는다]"
 # 훅이 일곱인데 안내 문서가 넷만 적고 있었다. 목록을 README 에 손으로 적지 않고 배선 파일 둘에서
