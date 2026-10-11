@@ -20,40 +20,6 @@ UC="$CLAUDE_HOME/CLAUDE.md"
 
 mkdir -p "$KDIR"
 
-# 윈도우 사용자 환경 변수 PYTHONUTF8 을 읽는다. 프로세스 환경이 아니라 레지스트리를 보는 이유는,
-# SetEnvironmentVariable('User') 이 레지스트리만 바꿔 이미 뜬 Claude Code 의 환경에는 안 실리기
-# 때문이다. 프로세스 환경을 보면 넣은 뒤에도 계속 "비어 있다"가 참이라 안내가 되풀이된다.
-# 테스트는 DISCIPLINED_CODER_UTF8_STATE 로 결과를 주입해 OS 와 레지스트리를 안 본다.
-utf8_user_var_state() {
-  if [ -n "${DISCIPLINED_CODER_UTF8_STATE:-}" ]; then printf '%s' "$DISCIPLINED_CODER_UTF8_STATE"; return 0; fi
-  case "${OSTYPE:-}" in
-    msys*|cygwin*) ;;
-    *) printf 'not-windows'; return 0 ;;
-  esac
-  # 프로세스 환경에 값이 이미 있으면 레지스트리를 읽지 않는다. 레지스트리를 보는 이유는 넣은 직후
-  # 세션에 프로세스 환경이 비어 있는 것 하나라, 값이 있으면 결론이 같고 프로세스 넷(reg·awk·tr·tail)만 든다.
-  case "${PYTHONUTF8:-}" in
-    1) printf 'on'; return 0 ;;
-    0) printf 'off'; return 0 ;;
-  esac
-  # //v 는 Git Bash 가 /v 로 되돌린다. /v 로 쓰면 경로로 바꿔 버려 reg 가 못 알아듣는다.
-  # 상태를 넷으로 가른다. 'off' 는 사용자가 값을 0 으로 적어 일부러 끈 것이라 손대지 않는다.
-  utf8_q="$(reg query "HKCU\\Environment" //v PYTHONUTF8 2>/dev/null || true)"
-  if [ -z "$utf8_q" ]; then printf 'unset'; return 0; fi
-  utf8_v="$(printf '%s' "$utf8_q" | awk '/PYTHONUTF8/ { print $NF }' | tr -d '\r' | tail -1)"
-  if [ "$utf8_v" = "0" ]; then printf 'off'; else printf 'on'; fi
-}
-
-# 사용자 환경 변수를 넣는다. 레지스트리를 바꾸므로 상태 주입이 걸린 시험에서는 실제로 부르지 않는다.
-# 넣는 곳을 여기 하나로 둔다. 같은 일을 커맨드에서도 하면 어느 쪽이 진짜인지 흐려진다.
-utf8_set_user_var() {
-  if [ -n "${DISCIPLINED_CODER_UTF8_STATE:-}" ]; then return 0; fi
-  # PowerShell 7(`pwsh`)을 전제로 한다. 윈도우에 늘 있는 5.1(`powershell`)로 물러서지 않는다.
-  # 없으면 아래 WARNING 이 뜨고 사용자가 직접 넣는다 — 조용히 5.1 로 내려가면 이 플러그인이
-  # 무엇을 전제로 도는지가 PC 마다 갈린다.
-  pwsh -NoProfile -Command "[Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User')" >/dev/null 2>&1
-}
-
 # [principles-copy] 에이전트원칙(static) 복사·갱신: principles. src==dst면 생략.
 for f in $SCAFFOLD_FILES; do
   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
@@ -258,19 +224,6 @@ $DEP_LIST
 DEPEOF
 if [ "$dep_missing" -eq 1 ]; then
   echo "  안 깔기로 정했으면 그 이름을 $DEP_SKIP 에 한 줄씩 적으면 이 알림이 조용해진다."
-fi
-
-# [utf8-set] PYTHONUTF8 을 넣는다(알리는 데서 그치지 않고 실제로 넣는다): 매 세션 확인하고 변수가 비었을
-#     때만 넣으므로 여러 번 돌아도 결과가 같다. 값이 0 이면 일부러 끈 것으로 보고 손대지 않는다.
-#     전역 설정의 autoUpdate 를 false 로 둔 것을 존중하는 규칙과 같은 방식이다.
-#     이 PC 의 파이썬은 기본 인코딩이 cp949 라 한국어 리터럴이 깨진다. 저장소 자신의 파이썬 호출은
-#     json_run 이 프로세스마다 세워 두지만 클로드 코드 밖에서는 그 보호가 없다.
-if [ "$(utf8_user_var_state)" = "unset" ]; then
-  if utf8_set_user_var; then
-    echo "🔵 disciplined-coder: 윈도우 사용자 환경 변수 PYTHONUTF8=1 을 넣었다(파이썬 한국어 깨짐 방지). 새로 여는 터미널부터 걸린다. 끄려면 그 변수를 0 으로 두면 다시 넣지 않는다."
-  else
-    echo "[disciplined-coder] WARNING: PYTHONUTF8 을 넣지 못했다. PowerShell 7(pwsh)이 깔려 있는지 보고, 직접 넣으려면 pwsh 로 [Environment]::SetEnvironmentVariable('PYTHONUTF8','1','User') 를 실행한다."
-  fi
 fi
 
 

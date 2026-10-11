@@ -57,7 +57,6 @@ done
 | PreToolUse | `hooks/doc_word_pretooluse.sh` | 산출물 `.md`에 금지 표현이 들어가면 거부한다 | 차단 |
 | PreToolUse | `hooks/nested_judgment_pretooluse.sh` | 프로젝트 안에 새 spec을 처음 쓰려 하면 세션마다 경로당 한 번 거부하고, 사유에 적은 기준으로 `nested-orchestration`에 나눠 맡길지 먼저 판단하게 한다. 서브에이전트의 Write는 보지 않는다 | 차단 |
 | PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 규칙 넛지. 세션의 첫 Write·Edit·Bash 호출 전에 원칙 사본과 `domain-korean.md`와 `domain-discipline.md`의 절대경로를 한 번 알린다. 서브에이전트에는 원칙이 실리지 않기 때문이다 | 알림 |
-| PreToolUse | `hooks/python3_guard_pretooluse.sh` | 윈도우에서 `python3`이 스토어 안내판으로 풀릴 때 그 Bash·PowerShell 명령을 거부한다 | 차단 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan을 감지해 리뷰를 지시한다 | 알림 |
 | PostToolUse | `hooks/doc_review_posttooluse.sh` | `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 있는 폴더의 `.md`를 고치면 `review-docs` 검진을 권한다. `Bash`로 고친 것도 본다 | 알림 |
 | PostToolUse | `hooks/doc_word_posttooluse.sh` | 셸로 고친 산출물 `.md`에 금지 표현이 남으면 알린다 | 알림 |
@@ -73,7 +72,6 @@ done
 - **산출물 차단** — 사용자가 요구한 산출물 `.md`에 「금지 표현」 목록의 말이 있으면 거부하고 무엇을 무엇으로 고칠지 보인다. 이 플러그인 저장소의 문서, Claude 메모리(`/.claude/projects/` 아래), `docs/superpowers/` 아래는 대상이 아니다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 적어야 하면 백틱으로 감싼다. 셸로 고친 파일은 쓰기 전에 알 수 없어 차단하지 못하고, 쓰인 뒤와 턴이 끝날 때 알린다.
 - **나눠 맡길지 판단 차단** — `docs/superpowers/specs/`에 새 `.md`를 처음 `Write`하면 세션마다 경로당 한 번 거부하고, 서브 세션에 맡길지 판단하라고 지시한다. 거부 사유에 맡기는 기준이 있어, 기준에 들 때만 `nested-orchestration`을 연다. 기준에 들지 않으면 판단과 근거를 한 문장으로 사용자에게 알린 뒤 같은 `Write`를 다시 실행하면 통과한다. 맡기기로 하면 큰 명세를 거부된 같은 경로에 쓰므로 다시 거부되지 않는다. 이미 있는 spec을 고치는 것과 plan과 서브에이전트의 `Write`는 거부하지 않는다.
 - **읽기 전용 차단** — 읽기 전용 속성이 붙은 파일에 대한 `Write`와 `Edit`을 거부한다. 어느 프로젝트의 어느 파일이든 속성만 본다. 속성을 풀면 풀린다.
-- **`python3` 차단** — 윈도우에서 `python3`이 스토어 안내판(`AppInstallerPythonRedirector.exe`)으로 풀릴 때만 거부하고 `python`이나 `py -3`을 쓰라고 알린다. 맥과 리눅스에는 적용되지 않는다.
 
 ### 세션 시작에 바꾸는 전역 설정
 
@@ -82,7 +80,6 @@ done
 - **원칙 연결** — 원칙 사본과 금지 표현 목록 사본을 놓고, 관리블록에 두 파일의 `@import`를 쓴다. 예전 버전이 만든 공용 블록(`# BEGIN korean-banned-words`)이 남아 있으면 다음 세션에 지운다. 지우기 전에 사본을 `~/.claude/disciplined-coder/backups/`에 남긴다. 그 블록의 끝 줄이 없으면 파일을 고치지 않고 알린다.
 - **superpowers 안내** — superpowers가 이 PC에 없으면 설치 명령을 알린다. 대신 설치하지는 않는다. `~/.claude/disciplined-coder/plugin-notice.skip`에 이름을 한 줄 적으면 알림이 멈춘다. `andrej-karpathy-skills`는 함께 설치하지 않기를 권한다. 에이전트원칙의 「원칙」 절이 같은 지침을 포함하고 있어, 함께 설치하면 비슷하지만 다른 지침이 두 벌 실린다.
 - **플러그인 갱신** — 마켓플레이스나 설정에서 `autoUpdate`를 `false`로 두었으면 확인하지 않는다. 설치된 이 플러그인의 커밋을 원격 HEAD와 비교한다. 원격은 `curl`로 2초 안에 읽고, 못 읽거나 마켓플레이스가 브랜치를 지정했으면 마켓플레이스 사본과 비교한다. 뒤처졌으면 `claude plugin marketplace update`와 `claude plugin update`를 차례로 실행하고(각 60초 상한, 창 여럿이 동시에 열리면 한 창만), 화면에 다시 켜라고 띄운다. 같은 원격 커밋으로 한 번 실패했으면 다시 시도하지 않고 직접 실행할 명령만 알린다. 세션 사이에 자동 갱신이 설치본을 옮겼으면 그 사실도 알린다. 기록은 `~/.claude/disciplined-coder/update.seen`과 `update.stuck`이다.
-- **`PYTHONUTF8`** — 윈도우이고 사용자 환경 변수 `PYTHONUTF8`이 비어 있으면 `1`을 넣는다. 값이 `0`이면 일부러 끈 것으로 보고 손대지 않는다.
 
 ### 끄는 법
 
@@ -91,7 +88,7 @@ hook은 환경 변수 두 개로 끈다.
 - **`DISCIPLINED_CODER_REVIEW_GATE=off`** — `spec_review_posttooluse.sh`, `stop_gates.sh`의 spec 검사, `doc_format_pretooluse.sh`, `doc_review_posttooluse.sh`, `rules_nudge_pretooluse.sh`, `nested_judgment_pretooluse.sh`를 끈다.
 - **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `stop_gates.sh`의 금지 표현 검사)을 끈다. 금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.
 
-읽기 전용 차단, `python3` 차단, 세션 시작의 셋업은 끄는 변수가 없다. 두 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
+읽기 전용 차단과 세션 시작의 셋업은 끄는 변수가 없다. 두 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
 
 ## 주의
 
