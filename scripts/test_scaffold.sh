@@ -15,12 +15,6 @@ blank_follows() {  # $1=file $2=exact-line-pattern
   awk -v pat="$2" 'matched && !verified { verified=1; if ($0=="") ok=1 } $0==pat { matched=1 } END { exit (ok==1 ? 0 : 1) }' "$1"
 }
 
-# PYTHONUTF8 안내는 OS 와 레지스트리를 읽어 판정하므로 픽스처마다 상태를 주입해 고정한다. run() 을
-# 거치지 않고 $SCAFFOLD 를 직접 부르는 픽스처가 여럿이라 헬퍼가 아니라 파일 머리에서 내보낸다.
-# 이것이 없으면 CI(ubuntu)와 변수를 넣은 윈도우 PC 와 안 넣은 PC 에서 결과가 갈린다.
-: "${UTF8_STATE:=on}"
-export DISCIPLINED_CODER_UTF8_STATE="$UTF8_STATE"
-
 run() {  # $1=HOME dir, $2=project dir  → echoes scaffold stdout
   CLAUDE_HOME_DIR="$1/.claude" CLAUDE_PROJECT_DIR="$2" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD"
 }
@@ -721,18 +715,6 @@ check "끄는 방법을 함께 알린다"            "printf '%s' \"\$OUTDN1a\" 
 check "깔렸으면 조용하다"                  "! printf '%s' \"\$OUTDN2\" | grep -qF 'claude plugin install'"
 check "skip 에 적힌 것은 안 알린다"        "! printf '%s' \"\$OUTDN3\" | grep -qF 'superpowers@claude-plugins-official'"
 check "skip 에 없는 것은 그대로 알린다"    "printf '%s' \"\$OUTDN4\" | grep -qF 'superpowers@claude-plugins-official'"
-
-# --- utf8-set: 변수가 비었을 때만 넣는다. 0 은 일부러 끈 것이라 손대지 않는다 ---
-# 레지스트리를 실제로 바꾸지 않도록 상태를 주입한다. 주입이 걸려 있으면 setter 가 실제 호출을
-# 건너뛰므로, 여기서 보는 것은 어느 상태에서 넣기로 판단하는가다.
-HU1="$(mktemp -d)"; PU1="$(mktemp -d)"
-OUTU1="$(DISCIPLINED_CODER_UTF8_STATE=unset run "$HU1" "$PU1")"
-HU3="$(mktemp -d)"; PU3="$(mktemp -d)"
-OUTU3="$(DISCIPLINED_CODER_UTF8_STATE=off run "$HU3" "$PU3")"
-echo "[utf8-set] PYTHONUTF8 은 비었을 때만 넣는다"
-check "비면 넣고 넣었다고 알린다"     "printf '%s' \"\$OUTU1\" | grep -qF 'PYTHONUTF8=1 을 넣었다'"
-check "끄는 방법을 함께 알린다"       "printf '%s' \"\$OUTU1\" | grep -qF '0 으로 두면'"
-check "0 이면 손대지 않는다"          "! printf '%s' \"\$OUTU3\" | grep -qF 'PYTHONUTF8'"
 
 # --- handoff-lint: 남은 핸드오프를 세션 시작에 알리고, 머리의 유예 날짜가 지나지 않았으면 조용하다 ---
 # CLAUDE.md 의 문서 타입 표가 이 린트를 핸드오프 타입의 강제 장치로 적는다. 글자가 아니라 동작으로 본다.

@@ -94,7 +94,7 @@ sys.exit(1)
      || case "$sha" in "$head"*) true ;; *) false ;; esac; then
     rm -f "$kdir/update.stuck"
   else
-    # 시험에서 실제 명령을 실행하지 않도록 주입한다. PYTHONUTF8 상태를 주입하는 것과 같은 방식이다.
+    # 시험에서 실제 명령을 실행하지 않도록 주입한다.
     bin="${DISCIPLINED_CODER_CLAUDE_BIN:-claude}"
     stuck="$(cat "$kdir/update.stuck" 2>/dev/null || true)"
     if [ "$stuck" = "$head" ]; then
