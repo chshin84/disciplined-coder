@@ -406,4 +406,4 @@ ARI(Adjusted Rand Index)는 두 분할이 같은 원소를 같은 묶음에 넣�
 4. `grep -n '2026-10-11 개정' skills/nested-orchestration/SKILL.md`가 설계 문서를 가리키는 포인터 줄을 출력한다.
 5. CLAUDE.md 「변경 뒤 실행」의 검사가 ALL PASS 를 내고, `claude plugin validate ./`가 통과한다.
 
-<!-- spec-review: escalated -->
+<!-- spec-review: passed -->
