@@ -552,11 +552,23 @@ echo "[nested-judgment-pre — 새 spec 을 쓰기 전에 나눠 맡길지 판�
 NJP="$HERE/hooks/nested_judgment_pretooluse.sh"
 njp() { printf '%s' "$1" | TMPDIR="$T/tmp" bash "$NJP"; }
 NJ_FIRST="$(njp "$(JS n1 "" "$SP/new-design.md")")"
-check "새 spec 첫 Write → deny 하고 사유에 맡기는 기준과 nested-orchestration 이 있다"   "printf '%s' \"\$NJ_FIRST\" | grep -qF '\"permissionDecision\":\"deny\"' && printf '%s' \"\$NJ_FIRST\" | grep -qF '태스크 다섯' && printf '%s' \"\$NJ_FIRST\" | grep -qF 'nested-orchestration' && printf '%s' \"\$NJ_FIRST\" | json_valid_stdin"
-# 표시는 세션 단위다 — 맡기기로 판단한 뒤 큰 명세를 다른 경로에 쓸 때 다시 거부하지 않는다.
+check "새 spec 첫 Write → deny 하고 사유에 맡기는 기준과 nested-orchestration 이 있다" \
+  "printf '%s' \"\$NJ_FIRST\" | grep -qF '\"permissionDecision\":\"deny\"' && printf '%s' \"\$NJ_FIRST\" | grep -qF '태스크 다섯' && printf '%s' \"\$NJ_FIRST\" | grep -qF 'nested-orchestration' && printf '%s' \"\$NJ_FIRST\" | json_valid_stdin"
+# 큰 명세를 거부된 이 경로에 쓰라고 지시해야 맡기기로 한 뒤 다시 거부되지 않는다.
+check "사유가 큰 명세를 거부된 이 경로에 쓰라고 지시한다" "printf '%s' \"\$NJ_FIRST\" | grep -qF '이 경로'"
+# 표시는 경로 단위다 — 작은 spec 을 먼저 쓴 세션도 뒤의 큰 spec 에서 다시 판단한다.
 check "같은 세션 같은 경로 재시도 → 무출력"     "[ -z \"\$(njp '$(JS n1 "" "$SP/new-design.md")')\" ]"
-check "같은 세션 다른 새 spec → 무출력"         "[ -z \"\$(njp '$(JS n1 "" "$SP/another-design.md")')\" ]"
-check "다른 세션 → deny"                        "njp '$(JS n2 "" "$SP/new-design.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+check "같은 세션 다른 새 spec → deny"           "njp '$(JS n1 "" "$SP/another-design.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+check "다른 세션 같은 경로 → deny"              "njp '$(JS n2 "" "$SP/new-design.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+# 표시 키를 해시로 만든다 — 문자를 _ 로 바꾸면 한글 이름만 다른 두 spec 이 같은 키가 된다.
+check "한글 이름만 다른 spec 첫째 → deny"       "njp '$(JS n9 "" "$SP/채권-design.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+check "한글 이름만 다른 spec 둘째 → deny"       "njp '$(JS n9 "" "$SP/주식-design.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+# D:/x 와 /d/x 는 같은 파일이므로 같은 키여야 한다. 표기 변환에 cygpath 가 필요해 없는 환경에서는 검사하지 않는다.
+if command -v cygpath >/dev/null 2>&1; then
+  NJ_WIN="$(cygpath -m "$SP/drive-design.md")"
+  check "드라이브 표기(D:/) 첫 Write → deny"           "njp '$(JS n10 "" "$NJ_WIN")' | grep -qF '\"permissionDecision\":\"deny\"'"
+  check "같은 파일의 POSIX 표기(/d/) → 무출력"       "[ -z \"\$(njp '$(JS n10 "" "$SP/drive-design.md")')\" ]"
+fi
 # 표시 파일을 만들지 못하면 재시도를 셀 수 없으므로 거부하지 않는다(fail-open). TMPDIR 을 일반 파일로 둬 mkdir 을 실패시킨다.
 : > "$T/njp-notdir"
 check "표시 폴더를 만들 수 없으면 → deny 없음"  "! printf '%s' '$(JS n8 "" "$SP/new-design.md")' | TMPDIR='$T/njp-notdir' bash '$NJP' | grep -qF 'deny'"
