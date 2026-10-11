@@ -873,6 +873,9 @@ for s in review-specs review-docs nested-orchestration; do
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"
 done
+NO_REF="$HERE/skills/nested-orchestration/references/sub-session-protocol.md"
+check "nested-orchestration 프로토콜: Claude 전용 종류 이름 없음"  "! grep -qF 'Explore' '$NO_REF'"
+check "nested-orchestration 프로토콜: 관리 디렉터리 절대경로 없음" "! grep -qF '~/.claude/disciplined-coder/' '$NO_REF'"
 # 렌즈 목록은 손으로 적지 않고 디렉터리에서 도출한다 — 렌즈를 더해도 사람이 목록을 맞출 필요가 없다.
 for D in "$HERE"/skills/lens-*/; do
   l="$(basename "$D" | sed 's/^lens-//')"
@@ -891,14 +894,41 @@ check "aggregating-lenses: 출력 스키마 절이 principles_applied 를 따로
 # 되돌린 이력이 있어 사람 기억에 맡기지 않고 테스트로 고정한다.
 check "Claude 매니페스트에 version 없음"  "! grep -qE '\"version\"[[:space:]]*:' '$HERE/.claude-plugin/plugin.json'"
 
-echo "[nested-message-format] nested-orchestration 메시지 형식 절"
+echo "[nested-message-format] nested-orchestration 메시지 이름은 프로토콜 파일의 표에서만 정의한다"
+# 메시지 형식과 멈추는 기준은 서브 세션이 읽는 프로토콜 파일에 있고, SKILL.md 는 현재 세션의 절차만 둔다.
+# 정의된 이름은 손으로 적지 않고 프로토콜 파일 「메시지 형식」 절의 표 첫 칸(머리줄·사유 코드)에서 뽑는다.
+# 쓰인 이름은 두 파일에서 백틱으로 감싼 대문자 이름과 `BLOCKED <코드>` 의 코드다. 정의되지 않은 이름을
+# 쓰면 실패한다 — 메시지를 지우거나 이름을 바꾸고 한쪽만 고친 상태를 잡는다.
 NO_DOC="$HERE/skills/nested-orchestration/SKILL.md"
-check "「메시지 형식」 절이 있다" "has_sec \"\$NO_DOC\" '메시지 형식'"
-for ID in AWAITING_APPROVAL DONE FAILED CANCELED user-decision contract-change shared-file-change dependency-add test-double-add review-red review-gap sdd-stop APPROVE REVISE ANSWER BASE-UPDATED CONTRACT-CHANGED ASSUMPTION-ADDED DEPENDENCY-REQUEST INTEGRATION-FAILED CANCEL Format-Deviations:; do
-  check "「메시지 형식」에 $ID 가 있다" "sec_has_id \"\$NO_DOC\" '메시지 형식' '$ID'"
+NO_PROTO="$HERE/skills/nested-orchestration/references/sub-session-protocol.md"
+check "프로토콜 파일이 있다" "[ -f \"\$NO_PROTO\" ]"
+check "프로토콜 파일에 「메시지 형식」 절이 있다" "has_sec \"\$NO_PROTO\" '메시지 형식'"
+check "프로토콜 파일에 「멈추는 기준」 절이 있다" "has_sec \"\$NO_PROTO\" '멈추는 기준'"
+# 같은 규칙을 두 곳에 두지 않는다 — SKILL.md 에 그 절이 다시 생기면 실패한다.
+check "SKILL.md 에 「메시지 형식」 절이 없다" "! has_sec \"\$NO_DOC\" '메시지 형식'"
+check "SKILL.md 에 「멈추는 기준」 절이 없다" "! has_sec \"\$NO_DOC\" '멈추는 기준'"
+nested_defined() {  # 프로토콜 파일 「메시지 형식」 표의 첫 칸 이름
+  doc_sec "$NO_PROTO" '메시지 형식' | grep -oE '^\| `[A-Za-z_-]+' | sed 's/^| `//' | LC_ALL=C sort -u
+}
+nested_used() {  # $@=파일 → 쓰인 메시지 이름과 사유 코드
+  # 표 첫 칸의 소문자 이름은 SKILL.md 「BLOCKED 처리」 표의 사유 코드다.
+  cat "$@" | grep -oE '`[A-Z][A-Z_]*(-[A-Z]+)*`|`BLOCKED [a-z-]+`|^\| `[a-z][a-z-]*`' | sed 's/^| //' | tr -d '`' | sed 's/^BLOCKED //' | LC_ALL=C sort -u
+}
+nested_undefined() {  # $@=파일 → 정의되지 않은 이름
+  comm -23 <(nested_used "$@") <(nested_defined)
+}
+NO_DEF="$(nested_defined)"
+check "정의된 이름을 표에서 뽑았다" "grep -qx 'BLOCKED' <<<\"\$NO_DEF\" && grep -qx 'user-decision' <<<\"\$NO_DEF\""
+NO_UNDEF="$(nested_undefined "$NO_DOC" "$NO_PROTO")"
+[ -n "$NO_UNDEF" ] && echo "    정의되지 않은 메시지 이름:$(printf ' %s' $NO_UNDEF)"
+check "두 파일이 쓰는 메시지 이름이 모두 표에 정의되어 있다" "[ -z \"\$NO_UNDEF\" ]"
+# 결함 주입 — 정의되지 않은 이름을 넣은 사본에서 검사가 그 이름을 잡아야 한다.
+NO_CUT="$(mktemp)"; { cat "$NO_DOC"; printf '%s\n' '`BOGUS-MESSAGE` 와 `BLOCKED bogus-code`' '| `bogus-row`(유형) | 할 일 | 메시지 |'; } > "$NO_CUT"
+check "도출 검사가 정의되지 않은 이름을 잡는다" "[ \"\$(nested_undefined '$NO_CUT' | tr '\n' ' ')\" = 'BOGUS-MESSAGE bogus-code bogus-row ' ]"
+# SKILL.md 가 서브 세션에 넘기는 곳과 메시지를 처리하는 곳이 프로토콜 파일을 가리킨다.
+check "SKILL.md 머리가 프로토콜 파일 경로를 적는다" "grep -qF 'references/sub-session-protocol.md' \"\$NO_DOC\""
+for sec in '디스패치 템플릿' '받은 메시지 처리' '이어 쓰기와 재개'; do
+  check "「$sec」이 프로토콜 파일을 가리킨다" "sec_has \"\$NO_DOC\" '$sec' '프로토콜 파일'"
 done
-check "「디스패치 템플릿」이 「메시지 형식」을 가리킨다" "sec_has \"\$NO_DOC\" '디스패치 템플릿' '「메시지 형식」'"
-check "「멈추는 기준」이 「메시지 형식」을 가리킨다" "sec_has \"\$NO_DOC\" '멈추는 기준' '「메시지 형식」'"
-check "「이어 쓰기와 재개」가 「메시지 형식」을 가리킨다" "sec_has \"\$NO_DOC\" '이어 쓰기와 재개' '「메시지 형식」'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
