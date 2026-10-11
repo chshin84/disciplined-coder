@@ -4,7 +4,7 @@ description: 렌즈를 둘 이상 실행한 뒤에 연다. 그 출력을 한 목
 ---
 # aggregating-lenses — 집계와 런타임 전용 결정 (코드 설계도)
 
-렌즈들이 끝난 뒤 그 결과를 모아 다음 행동을 정하는 단계이며, 렌즈가 아니다. 프롬프트가 아니라 결정론적 코드로 구현한다.
+렌즈들이 끝난 뒤 그 결과를 모아 다음 행동을 정하는 단계이며, 렌즈가 아니다. 제품 런타임에서는 프롬프트가 아니라 결정론적 코드로 구현한다. 제품 코드가 없는 절차에서는 메인 세션이 직접 집계하며, 그 방법은 아래 「구현 형태 (맥락 의존)」가 정한다.
 
 ## 판단 재귀 회피 (핵심 제약)
 렌즈 출력의 구조만 본다. "어느 렌즈가 옳다" 같은 내용 재판단이나 가중치 부여는 하지 않는다. 재귀의 끝은 사람이다.
@@ -53,7 +53,7 @@ description: 렌즈를 둘 이상 실행한 뒤에 연다. 그 출력을 한 목
 `lens-readability`와 `lens-prior-art`는 빠지는 칸이 서로 달라 예외마다 따로 적는다.
 
 - `lens-readability` — 대조할 상대편이 없어 위 공통 계약을 따르지 않는다. 제안이라서 「집계」·「커버리지 공백」 어디에도 들어가지 않는다. 대신 들어가는 칸과 스키마는 `skills/lens-readability/SKILL.md`가 소유한다. 빠지는 칸: `type`·`claim`·`file`·`evidence`·`counterpart_file`·`counterpart`·`principle`·`consequence`.
-- `lens-prior-art` — 대조할 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다. `evidence`는 인용이나 경로나 URL 이고, 인용 검증은 호출자(`review-specs`)가 자기 도구로 한다. 빠지는 칸: `counterpart_file`·`counterpart`·`principle`.
+- `lens-prior-art` — 대조할 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다. `evidence`는 인용이나 경로나 URL 이고, 인용 검증은 호출자(`review-specs`, `review-docs`)가 자기 도구로 한다. 빠지는 칸: `file`·`counterpart_file`·`counterpart`·`principle`.
 
 ## 처분 — 호출자의 몫
 렌즈는 처분을 고르지 않는다. 처분 축이 맥락마다 다르고, 사용자를 멈추게 할지는 호출자의 책임이다. accept/regenerate/escalate 결정은 제품 런타임에서만 내고, spec·plan 리뷰와 문서 검진에서는 결정 없이 병합한 목록만 호출자에게 넘긴다.

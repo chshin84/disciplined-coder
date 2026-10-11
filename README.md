@@ -4,7 +4,7 @@
 
 ## 설치
 
-스코프는 user여야 모든 프로젝트에서 hook이 실행된다. Windows는 [Git Bash](https://git-scm.com/downloads)와 [PowerShell 7](https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows)을 먼저 설치한다. hook이 `bash`로 스크립트를 실행하고, 환경 변수를 넣는 단계가 `pwsh`를 호출하기 때문이다. 윈도우 기본 5.1(`powershell`)로는 동작하지 않는다. 마켓플레이스 자동 갱신과 갱신 확인과 금지 표현 검사에는 파이썬이 필요하다. 파이썬이 없으면 갱신 확인과 금지 표현 검사는 알림 없이 통과하고, 자동 갱신 설정은 WARNING 을 낸다.
+스코프는 user여야 모든 프로젝트에서 hook이 실행된다. Windows는 [Git Bash](https://git-scm.com/downloads)를 먼저 설치한다. hook이 `bash`로 스크립트를 실행하기 때문이다. 마켓플레이스 자동 갱신과 갱신 확인과 금지 표현 검사에는 파이썬이 필요하다. 파이썬이 없으면 갱신 확인과 금지 표현 검사는 알림 없이 통과하고, 자동 갱신 설정은 WARNING 을 낸다.
 
 ```text
 /plugin marketplace add chshin84/disciplined-coder
@@ -13,7 +13,7 @@
 
 ## 동작 확인과 복구
 
-새 세션을 한 번 열면 셋업이 끝난다. 세션 시작 알림에 `ERROR`나 `WARNING` 줄이 없으면 정상이다. 정상일 때도 원칙 전문과 갱신 알림이 출력되므로 오류 줄이 있는지로 판단한다. `/show-principles`를 실행해 원칙 목록이 나오면 된다.
+새 세션을 한 번 열면 셋업이 끝난다. 세션 시작 알림에 `ERROR`나 `WARNING` 줄이 없으면 정상이다. 원칙 연결을 처음 만든 세션이나 갱신이 있던 세션에는 정상이어도 알림이 출력되므로 오류 줄이 있는지로 판단한다. `/show-principles`를 실행해 원칙 목록이 나오면 된다.
 
 목록이 안 나오면 원인은 아래 중 하나다.
 
@@ -50,7 +50,7 @@ done
 |---|---|---|---|
 | SessionStart | `scripts/scaffold.sh` | 원칙 사본과 `@import` 연결을 만들고 알린다 | 알림 |
 | SessionStart | `hooks/update_check_sessionstart.sh` | 설치본이 원격 저장소보다 뒤처지면 새 버전으로 옮기고, 사용자 화면과 Claude의 첫 답에서 다시 켜라고 요구한다. 새로 켤 때(startup)만 확인한다. 자동 갱신을 꺼 두었으면 아무것도 하지 않는다 | 알림 |
-| SessionStart | `scripts/seal_reviews.sh` | 커밋된 감사 기록을 읽기 전용으로 봉인한다(이 저장소의 프로젝트 hook) | 알림 |
+| SessionStart | `scripts/seal_reviews.sh` | 커밋된 리뷰 기록(`docs/superpowers/reviews/` 아래 전부)을 읽기 전용으로 봉인한다(이 저장소의 프로젝트 hook) | 알림 |
 | SessionStart | `hooks/rules_nudge_sessionstart.sh` | 이 세션의 규칙 넛지 표시를 지워 다시 알리게 한다. 대화가 압축(compact)된 뒤에도 지운다. startup 에서는 spec 게이트가 쓰는 세션 시작 표시도 남긴다 | 알림 |
 | PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 대한 Write와 Edit을 사유와 함께 거부한다 | 차단 |
 | PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md`를 만들면 에이전트원칙의 「문서를 쓰고 관리할 때」로 타입과 수명을 가리게 하고, README면 `domain-readme`를 함께 가리킨다 | 알림 |
@@ -75,7 +75,7 @@ done
 
 ### 세션 시작에 바꾸는 전역 설정
 
-새 세션을 열 때마다 아래를 확인하고, 바꾼 것은 알린다. 전역 설정을 바꾸기 전에 남긴 사본(`<파일>.<시각>.bak`)으로 되돌릴 수 있다.
+새 세션을 열 때마다 아래를 확인한다. 관리블록 밖의 전역 설정(옛 공용 블록 삭제와 `autoUpdate` 설정)은 바꾸기 전에 사본(`.bak`)을 남기고 바꾼 것을 알린다. 관리블록 안은 매번 원본으로 다시 쓰므로 사본을 남기지 않는다.
 
 - **원칙 연결** — 원칙 사본과 금지 표현 목록 사본을 놓고, 관리블록에 두 파일의 `@import`를 쓴다. 예전 버전이 만든 공용 블록(`# BEGIN korean-banned-words`)이 남아 있으면 다음 세션에 지운다. 지우기 전에 사본을 `~/.claude/disciplined-coder/backups/`에 남긴다. 그 블록의 끝 줄이 없으면 파일을 고치지 않고 알린다.
 - **superpowers 안내** — superpowers가 이 PC에 없으면 설치 명령을 알린다. 대신 설치하지는 않는다. `~/.claude/disciplined-coder/plugin-notice.skip`에 이름을 한 줄 적으면 알림이 멈춘다. `andrej-karpathy-skills`는 함께 설치하지 않기를 권한다. 에이전트원칙의 「원칙」 절이 같은 지침을 포함하고 있어, 함께 설치하면 비슷하지만 다른 지침이 두 벌 실린다.
