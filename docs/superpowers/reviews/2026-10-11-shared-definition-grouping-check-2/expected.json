@@ -1,0 +1,166 @@
+{
+ "bond-tool": {
+  "pairs": [],
+  "partition": [
+   [
+    "marketdata"
+   ],
+   [
+    "pricing"
+   ],
+   [
+    "risk"
+   ],
+   [
+    "portfolio"
+   ],
+   [
+    "reporting"
+   ]
+  ]
+ },
+ "report-quality": {
+  "pairs": [],
+  "partition": [
+   [
+    "parser"
+   ],
+   [
+    "numbercheck"
+   ],
+   [
+    "stylecheck"
+   ],
+   [
+    "sourcecheck"
+   ],
+   [
+    "dashboard"
+   ]
+  ]
+ },
+ "auth-migration": {
+  "pairs": [],
+  "partition": [
+   [
+    "inventory"
+   ],
+   [
+    "adapter"
+   ],
+   [
+    "newprovider"
+   ],
+   [
+    "accountmigrate"
+   ],
+   [
+    "cutover"
+   ]
+  ]
+ },
+ "order-processing": {
+  "pairs": [
+   {
+    "a": "orderstate",
+    "b": "payment",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   },
+   {
+    "a": "orderstate",
+    "b": "inventory",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   },
+   {
+    "a": "orderstate",
+    "b": "shipping",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   },
+   {
+    "a": "orderstate",
+    "b": "cancellation",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   },
+   {
+    "a": "payment",
+    "b": "inventory",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   },
+   {
+    "a": "payment",
+    "b": "shipping",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   },
+   {
+    "a": "payment",
+    "b": "cancellation",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   },
+   {
+    "a": "inventory",
+    "b": "shipping",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   },
+   {
+    "a": "inventory",
+    "b": "cancellation",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   },
+   {
+    "a": "shipping",
+    "b": "cancellation",
+    "reason": "상태 변경 의미를 서로 알아야 한다(서브에이전트 이유 원문은 approval.md)"
+   }
+  ],
+  "partition": [
+   [
+    "orderstate",
+    "payment",
+    "inventory",
+    "shipping",
+    "cancellation"
+   ]
+  ]
+ },
+ "two-jobs": {
+  "pairs": [],
+  "partition": [
+   [
+    "logarchive"
+   ],
+   [
+    "logretention"
+   ],
+   [
+    "faqindex"
+   ],
+   [
+    "faqsearch"
+   ]
+  ]
+ },
+ "npb": {
+  "pairs": [
+   {
+    "a": "rules",
+    "b": "runner",
+    "reason": "사용자가 NP-bond-agg 기록 1205행에서 고른 분할"
+   }
+  ],
+  "partition": [
+   [
+    "inputs"
+   ],
+   [
+    "market"
+   ],
+   [
+    "rules",
+    "runner"
+   ],
+   [
+    "stats"
+   ]
+  ]
+ }
+}
