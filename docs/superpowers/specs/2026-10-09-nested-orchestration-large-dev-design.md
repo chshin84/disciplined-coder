@@ -339,7 +339,7 @@ ARI(Adjusted Rand Index)는 두 분할이 같은 원소를 같은 묶음에 넣�
 
 ## 2026-10-11 개정 — 묶는 단위
 
-2026-10-11에 사용자가 분할 기준을 다시 보게 했다. 이 개정은 스킬의 「묶는 단위」와 그 근거 문단, 「맡기는 기준」의 승인 근거, 「큰 명세」 항목 목록의 의존 순서 줄, 「흐름」의 통합·마무리 단계와 의존 순서 문단, 「가드레일」의 병합 전 검사, 설계 문서를 가리키는 포인터 문장을 고친다. 「큰 명세」 항목 목록에는 「공유 정의」 줄을 새로 둔다. 위 절의 문장은 기록으로 남기며, 이 설계를 읽고 구현하는 세션은 위 절과 이 절이 다르면 이 절을 따른다.
+2026-10-11에 사용자가 분할 기준을 다시 보게 했다. 이 개정은 스킬의 「묶는 단위」와 그 근거 문단, 「맡기는 기준」의 승인 근거, 「큰 명세」 항목 목록의 의존 순서 줄, 「흐름」의 통합·마무리 단계와 의존 순서 문단, 「가드레일」의 병합 전 검사, 설계 문서를 가리키는 포인터 문장을 고친다. 위 절의 문장은 기록으로 남기며, 이 설계를 읽고 구현하는 세션은 위 절과 이 절이 다르면 이 절을 따른다.
 
 **바꾼 이유.** NP-bond-agg 세션(2026-10-11, 기록 `~/.claude/projects/D--projects-Quant-NP-bond-agg/38538d4d-1094-4aed-86b5-6886010ad780.jsonl`)은 설계 의존 표를 모두 0으로 적고 다섯 워크스트림으로 나눴다(기록 943행). 큰 명세 3차 리뷰에서 `lens-adversarial`은 `rules`와 `runner`를 나눈 데서 명세 공백이 가장 크게 생기며, 두 워크스트림을 합치면 규칙 상태 계약이 사라진다고 지적했다(1186행). 같은 리뷰에서 `lens-consistency`는 규칙 입력의 내용과 호출 방향이 정해지지 않았다고 지적했다(1158행). 그 세션은 다섯을 유지하려면 현재 세션이 규칙 내부 상태(정지·배율·진입)를 미리 정해야 한다고 적었다(1204행). 사용자는 두 워크스트림을 합쳐 넷으로 나누는 안을 골랐다(1205행).
 
@@ -359,7 +359,7 @@ ARI(Adjusted Rand Index)는 두 분할이 같은 원소를 같은 묶음에 넣�
 
 현재 세션은 행을 옮길 때 하위 프로젝트 이름을 워크스트림 id로 바꾸고, 합침 행은 워크스트림 내부로 넘겨 표에서 뺀다. 이 연결 규칙은 스킬 「묶는 단위」가 소유하며, 「계약 표」 절에는 다시 적지 않는다. 현재 세션이 같은 항목 목록을 두 번 만들지 않게 하려는 규칙이다.
 
-큰 명세의 「공유 정의」에는 워크스트림 경계를 넘지 않는 관례와 용어(구간 경계, 단위 관례, 용어 풀이)만 둔다. 경계를 넘는 자료의 의미는 계약 표의 한 행에 적는다. 처음에 현재 세션은 의미를 「공유 정의」에, 형식을 계약 코드에 두는 안을 냈다. `disciplined-coder-4c` 세션이 그 안은 같은 항목을 두 곳에 적게 한다고 검토했고, 사용자가 지금 안을 승인했다.
+경계를 넘는 자료의 의미는 계약 표의 한 행에 적는다. 경계를 넘지 않는 관례와 용어 풀이(구간 경계, 단위 관례)는 큰 명세의 「결정 기록」에 적는다. 처음에 현재 세션은 의미를 새 「공유 정의」 줄에, 형식을 계약 코드에 두는 안을 냈다. `disciplined-coder-4c` 세션은 그 안이 같은 항목을 두 곳에 적게 한다고 검토했다. 리뷰에서 `lens-consistency`는 남은 「공유 정의」 줄도 「결정 기록」의 명명 관례와 겹친다고 지적했고, 사용자는 새 줄을 두지 않기로 했다.
 
 **검증 의존.** X의 설계와 단위 시험은 계약 스텁으로 진행할 수 있다. 그런데 X의 통합 확인에 Y의 실제 구현이 필요하면 X는 Y에 검증 의존한다. 통합 확인은 큰 명세가 워크스트림마다 적는 확인 방법이다. 검증 의존은 시작을 늦추지 않으므로 시작 워크스트림 판정을 바꾸지 않는다.
 
@@ -373,13 +373,15 @@ ARI(Adjusted Rand Index)는 두 분할이 같은 원소를 같은 묶음에 넣�
 
 기각한 둘째 대안은 트레일러 기록 안이다. 이 안은 검증 의존 워크스트림을 먼저 병합하고, 나중에 통합 확인을 실행한 병합 커밋에 `Verified:` 트레일러를 남긴다. 이 안에서는 트레일러가 하나 늘고, 검증되지 않은 워크스트림이 통합 브랜치에 있는 기간에 생긴 실패의 처리 순서를 따로 정해야 한다.
 
-**근거 수정.** 스킬 「묶는 단위」와 위 「2026-10-10 개정」의 「묶는 단위」는 순환만 합치는 근거로 DSM 분할을 들었다. Wikipedia 「Design structure matrix」는 "Static DSMs are usually analyzed with clustering algorithms"라고 적고, partitioning·tearing·sequencing 은 time-based DSM 의 분석 기법으로 적는다. dsmweb 「Tearing a DSM」도 tear 를 과정 속 결합된 태스크에서 피드백 표시를 고르는 일로 정의한다. 하위 프로젝트를 워크스트림으로 묶는 일은 동시에 존재하는 구성 요소를 묶는 일이므로, 근거는 강하게 결합된 요소를 한 군집으로 묶는 clustering 이다.
+**근거 수정.** 스킬 「묶는 단위」와 위 「2026-10-10 개정」의 「묶는 단위」는 순환만 합치는 근거로 'DSM 분할'을 들었으나 어느 DSM 종류인지 밝히지 않았다. Wikipedia 「Design structure matrix」는 "Static DSMs are usually analyzed with clustering algorithms"라고 적고, partitioning·tearing·sequencing 은 time-based DSM 의 분석 기법으로 적는다. 설계 의존 표는 "X를 설계하려면 Y의 실제 결과를 보아야 하는" 설계 활동 사이 선후 관계를 적고 의존 순서와 시작 워크스트림을 도출하므로 time-based DSM 이다. 그래서 순환을 한 묶음으로 찾고 나머지를 순서로 두는 근거는 partitioning 이다.
 
-현재 세션은 강한 결합 중 설계 의존 순환과 떼어낼 수 없는 공유 항목만 합친다. 공유 항목을 합치는 근거는 Parnas(1972)의 권고 1번 "A data structure, its internal linkings, accessing procedures and modifying procedures are part of a single module. They are not shared by many modules as is conventionally done."이다. 현재 세션은 이 문장을 원문 PDF 텍스트에서 확인했다. 이 권고는 자료 구조와 그 수정 절차를 묶는 근거이므로, 접근 절차만 호출하는 사용 하위 프로젝트는 합치지 않는다.
+공유 항목 표는 동시에 존재하는 하위 프로젝트 사이의 결합을 적으므로 static DSM 이고, 강하게 결합된 요소를 한 군집으로 묶는 근거는 clustering 이다. `disciplined-coder-4c` 세션의 선행연구 렌즈는 묶는 일 전체를 static DSM 으로 보고 partitioning 인용을 틀린 전제로 판정했다(`2026-10-11-contract-table-prior-art.md`). 이 개정의 `lens-grounding`은 설계 의존 표의 칸이 활동 선후 관계라고 지적했다. 그래서 그 전제 반박은 설계 의존 표에는 해당하지 않고 공유 항목 표에만 해당하며, 사용자가 표마다 근거를 나누는 안을 골랐다.
+
+현재 세션은 공유 항목 표에서 떼어낼 수 없는 항목만 합친다. 그 근거는 Parnas(1972)의 권고 1번 "A data structure, its internal linkings, accessing procedures and modifying procedures are part of a single module. They are not shared by many modules as is conventionally done."이다. 현재 세션은 이 문장을 원문 PDF 텍스트에서 확인했다. 이 권고는 자료 구조와 그 수정 절차를 묶는 근거이므로, 접근 절차만 호출하는 사용 하위 프로젝트는 합치지 않는다.
 
 한 방향 설계 의존은 합치지 않고 순서로 둔다. 검증 의존의 근거는 RUP 「Plan System Integration」의 "For each build, define which subsystems should go into it, and which other subsystems must be available as stubs."와 평가 질문 "Is the integration order coordinated with the order in which components are developed?"이다. LLM 에 같은 개발 요청을 여러 번 분해시켜 일치도를 잰 선행 사례는 2026-10-10 대조(`docs/superpowers/reviews/2026-10-10-decomposition-criteria-prior-art.md`)가 찾지 못했다. 스킬 근거 문단의 axiomatic design 문장은 이 개정이 대조하지 않았으므로 그대로 둔다.
 
-**다른 세션과의 경계.** 같은 날 `disciplined-coder-4c` 세션이 스킬 「큰 명세」 항목 목록의 계약 줄, 새 「계약 표」 절, 「계약 코드」의 스텁 연결, 「공용 파일」의 공용 설정 분할, 「승인 항목」의 시간·결측 의미 대조를 고친다. 이 개정은 그 절들을 고치지 않는다. 「큰 명세」 항목 목록에서 이 개정이 고치는 줄은 의존 순서 줄과 「공유 정의」 줄이다. 두 세션은 결정마다 서로 검토했고, `disciplined-coder-4c` 세션이 먼저 main 에 병합한다.
+**다른 세션과의 경계.** 같은 날 `disciplined-coder-4c` 세션이 스킬 「큰 명세」 항목 목록의 계약 줄, 새 「계약 표」 절, 「계약 코드」의 스텁 연결, 「공용 파일」의 공용 설정 분할, 「승인 항목」의 시간·결측 의미 대조를 고친다. 이 개정은 그 절들을 고치지 않는다. 「큰 명세」 항목 목록에서 이 개정이 고치는 줄은 의존 순서 줄 하나다. 두 세션은 결정마다 서로 검토했고, `disciplined-coder-4c` 세션이 먼저 main 에 병합한다.
 
 **측정 입력.** 현재 세션은 묶는 단계만 측정한다. 요청은 채권 도구, 보고서 품질 개선, 인증 라이브러리 순차 이전, 주문 처리, 서로 독립된 두 작업, NP-bond-agg 이다. NP-bond-agg 목록은 기록 943행의 하위 프로젝트 목록을 그대로 쓰고, 통합 확인을 판정할 수 있도록 큰 명세의 워크스트림별 통합 확인 방법을 함께 준다.
 
