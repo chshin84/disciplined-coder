@@ -1,0 +1,1 @@
+{"tables": "| X→Y | parser | numbercheck | stylecheck | sourcecheck | dashboard |\n|---|---|---|---|---|---|\n| parser | - | 0 | 0 | 0 | 0 |\n| numbercheck | 0 | - | 0 | 0 | 0 |\n| stylecheck | 0 | 0 | - | 0 | 0 |\n| sourcecheck | 0 | 0 | 0 | - | 0 |\n| dashboard | 0 | 0 | 0 | 0 | - |", "partition": [["parser"], ["numbercheck"], ["stylecheck"], ["sourcecheck"], ["dashboard"]]}
