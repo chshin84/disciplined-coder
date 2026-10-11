@@ -897,5 +897,8 @@ check "「메시지 형식」 절이 있다" "has_sec \"\$NO_DOC\" '메시지 �
 for ID in AWAITING_APPROVAL DONE FAILED CANCELED user-decision contract-change shared-file-change dependency-add test-double-add review-red review-gap sdd-stop APPROVE REVISE ANSWER BASE-UPDATED CONTRACT-CHANGED ASSUMPTION-ADDED DEPENDENCY-REQUEST INTEGRATION-FAILED CANCEL Format-Deviations:; do
   check "「메시지 형식」에 $ID 가 있다" "sec_has_id \"\$NO_DOC\" '메시지 형식' '$ID'"
 done
+check "「디스패치 템플릿」이 「메시지 형식」을 가리킨다" "sec_has \"\$NO_DOC\" '디스패치 템플릿' '「메시지 형식」'"
+check "「멈추는 기준」이 「메시지 형식」을 가리킨다" "sec_has \"\$NO_DOC\" '멈추는 기준' '「메시지 형식」'"
+check "「이어 쓰기와 재개」가 「메시지 형식」을 가리킨다" "sec_has \"\$NO_DOC\" '이어 쓰기와 재개' '「메시지 형식」'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
