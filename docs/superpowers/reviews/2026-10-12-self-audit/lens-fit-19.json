@@ -1,0 +1,53 @@
+{
+ "target": "skills/lens-prior-art/SKILL.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — 렌즈 체크리스트, 상한과 가드(수행 방법), 출력 스키마와 search_status 표(계약)를 포함한다",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md"
+ ],
+ "issues": [
+  {
+   "where": "「출력 스키마 (공통 + 이 렌즈의 넷)」 절 제목",
+   "type": "style",
+   "claim": "절 제목이 추가 칸을 이름 대신 개수로 가리킨다",
+   "file": "skills/lens-prior-art/SKILL.md",
+   "evidence": "## 출력 스키마 (공통 + 이 렌즈의 넷)",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라.",
+   "principle": "COUNT-EARNS",
+   "consequence": "절 제목의 '넷'이 search_status·citations·not_found·disclosures 를 이름 없이 개수로 가리키고 있다"
+  },
+  {
+   "where": "「출력 스키마」 절의 search_status 문단",
+   "type": "style",
+   "claim": "표 앞에 경우의 개수를 예고하고 '넷'을 대명사처럼 쓴다",
+   "file": "skills/lens-prior-art/SKILL.md",
+   "evidence": "빈 `issues`는 네 가지 다른 사정에서 나오는데 집계 단계는 넷을 구별하지 못하고 모두 발견 없음으로 읽는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라.",
+   "principle": "COUNT-EARNS",
+   "consequence": "search_status 값의 개수가 바로 아래 표의 네 행과 문장 두 곳에 함께 적혀 있다"
+  },
+  {
+   "where": "「가드」 절의 불릿들",
+   "type": "style",
+   "claim": "가드 불릿 여러 항목이 각각 두세 문장의 논증이다",
+   "file": "skills/lens-prior-art/SKILL.md",
+   "evidence": "- 참신함을 채점하지 않는다. 이슈가 되는 순간은 선행 결과가 이 설계의 전제를 반박하거나, 알려진 실패 원인이 이 설계에도 남아 있을 때뿐이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "불릿은 같은 종류를 늘어놓을 때만 쓰고, 한 항목이 여러 문장이 되면 산문으로 써라.",
+   "principle": "BULLET-SCOPE",
+   "consequence": "「가드」 절의 불릿은 모두 두 문장 이상으로 되어 있다"
+  }
+ ],
+ "principles_applied": [
+  "COUNT-EARNS",
+  "BULLET-SCOPE",
+  "COMMA-CUT",
+  "ANTI-LIMIT",
+  "SECRETS",
+  "DOC-TYPE"
+ ],
+ "notes": "검토 관점: 형식, 스타일, 오염, 호환, 규율. 「실행할 때 지킬 상한」의 '통상 둘'·'여섯'은 사용자가 정한 정책값이라 COUNT-EARNS 가 허용하는 설계 값으로 보았다. '네 축'은 목적·메커니즘·평가·적용 대상을 묶어 부르는 이름으로 쓰여 올리지 않았다. 상태 기재는 없다."
+}

@@ -1,0 +1,44 @@
+{
+ "target": "docs/korean-banned-words-evidence.md",
+ "lens": "lens-fit",
+ "doc_type": "설계 — 이 문서는 금지 표현 항목마다 넣고 끈 결정의 근거(사용자 지시 원문·측정치)를 포함하며 수행 방법이나 진행 상태를 주 내용으로 포함하지 않는다",
+ "read": [
+  "docs/korean-banned-words-evidence.md",
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/lens-fit/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "## 규칙: 불릿은 같은 종류를 늘어놓을 때만 쓴다. 외 같은 형태의 절 제목",
+   "type": "style",
+   "claim": "하단 규칙 절들의 ## 절 제목이 개념 명사구가 아니라 마침표로 끝나는 규칙 문장이다. TITLE-LAYERS 는 ## 절 제목을 목차로 보고 명사구로 쓰라고 한다.",
+   "file": "docs/korean-banned-words-evidence.md",
+   "evidence": "## 규칙: 불릿은 같은 종류를 늘어놓을 때만 쓴다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목차는 개념만 가리키는 명사구로 쓰고 결론·수치를 넣지 마라.",
+   "principle": "TITLE-LAYERS",
+   "consequence": "근거 파일의 규칙 절 일곱 곳의 ## 제목이 '## 규칙: <문장>.' 형태의 단정문으로 되어 있다."
+  },
+  {
+   "where": "각 항목 절의 첫 문장",
+   "type": "constraint",
+   "claim": "항목마다 분류와 켜짐·꺼짐 상태를 다시 적는데, 이 값은 목록 파일(korean-banned-words.md)의 분류 칸과 '꺼 둔 항목' 문단에서 도출할 수 있다. DOC-TYPE 은 도출할 수 있으면 원본을 가리키라고 한다.",
+   "file": "docs/korean-banned-words-evidence.md",
+   "evidence": "분류는 「한자어를 고유어로 되돌린 것」이고 켜져 있다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "도출할 수 있으면 원본인 코드와 인프라를 가리키고, 가드가 없으면 추가를 권하라.",
+   "principle": "DOC-TYPE",
+   "consequence": "분류와 켜짐 상태라는 같은 사실이 목록 파일과 근거 파일 두 곳에 적혀 있고, 근거 파일 쪽을 목록과 대조하는 검사는 test_docs_drift.sh 에 파일 존재 확인뿐이다."
+  }
+ ],
+ "principles_applied": [
+  "TITLE-LAYERS",
+  "DOC-TYPE",
+  "ANTI-LIMIT",
+  "COMMA-CUT",
+  "FULL-SENTENCE",
+  "SUBJECT-OBJECT"
+ ],
+ "notes": "검토한 관점: 형식(절 구조 '## `토큰`' 과 '분류는 …이고 …있다' / '근거 종류는 …이고 날짜는 …이다' 문형이 항목마다 일정함), 오염(없음), 호환(test_docs_drift.sh 는 이 파일의 존재만 확인하고 대구 한도 검사에서 뺌), 규율(타입 행 확인 뒤 TITLE-LAYERS·COMMA-CUT·ANTI-LIMIT 검토). ANTI-LIMIT 은 '빈도 때문이 아니라' 등이 인용문(>) 안에 있어 대상에서 뺐다. COMMA-CUT 은 정규식으로 문장마다 세어 인용 밖 위반 없음. 올리지 않은 것: '다시 켤 때의 표 칸은 금지어 …, 대신 쓰는 말 …, 적용 대상 …, 제외 없음 이다.' 문장은 명사 조각을 쉼표로 이은 형태라 FULL-SENTENCE 의심이 있으나 서술어로 끝나 판정을 보류했다. TITLE-LAYERS 의 적용 대상이 '남에게 전달되는 문서'라 이 저장소 문서에도 적용되는지는 호출자가 정할 사항이며, domain-korean.md 의 SECTION-HEAD 절이 test_docs_drift.sh 가 저장소 문서에 첫 문장 규칙을 적용한다고 적어 적용되는 것으로 보았다. 금지 낱말 목록은 지시대로 보지 않았다."
+}

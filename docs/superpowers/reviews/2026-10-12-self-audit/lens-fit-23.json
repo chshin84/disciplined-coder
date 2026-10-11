@@ -1,0 +1,64 @@
+{
+ "target": "skills/review-docs/SKILL.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — 문서 검진을 수행하는 방법과 lens-fit 계약·기록 파일 이름 규칙(계약)을 포함한다",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md"
+ ],
+ "issues": [
+  {
+   "where": "「`lens-fit`에 넘기는 계약」 절 셋째 문단 끝",
+   "type": "constraint",
+   "claim": "절차·계약 타입 문서에 방법이 아닌 저장소의 현재 검사 유무를 적었다",
+   "file": "skills/review-docs/SKILL.md",
+   "evidence": "개조식은 그것을 잡는 검사가 이 저장소에 없어 렌즈가 그대로 받는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "| **절차·계약** (operations·setup·contract) | 수행 방법과 스키마 계약 | 상태를 적지 말고 방법만 적어라 |",
+   "principle": "DOC-TYPE",
+   "consequence": "review-docs 본문에 '개조식 검사가 이 저장소에 없다'는 현재 상태가 방법 문장과 함께 적혀 있다"
+  },
+  {
+   "where": "「언제 여는지」 첫 문단과 셋째 문단",
+   "type": "style",
+   "claim": "목록 앞에 개수를 예고한다. 적용 대상과 제시 종류를 바로 뒤에서 이름으로 적는다",
+   "file": "skills/review-docs/SKILL.md",
+   "evidence": "적용 대상은 셋이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라.",
+   "principle": "COUNT-EARNS",
+   "consequence": "'적용 대상은 셋이다', '종류는 셋이고, 생략하기로 정했을 때 지킬 의무가 하나 더 붙는다', '계약은 둘의 경로다', 「기록 파일 이름 규칙」의 '종류는 넷이다'가 바로 뒤 목록과 개수를 두 곳에 함께 적고 있다"
+  },
+  {
+   "where": "「기록 파일 이름 규칙」 절",
+   "type": "style",
+   "claim": "한 문장에 연결어미 뒤 쉼표가 셋 있다",
+   "file": "skills/review-docs/SKILL.md",
+   "evidence": "`review`는 spec·plan 리뷰이고, `check`는 문서 검진과 워크플로 검증이고, `prior-art`는 선행연구 대조이고, `audit`은 레포 감사다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "연결어미 뒤 쉼표는 한 문장에 하나까지만 써라.",
+   "principle": "COMMA-CUT",
+   "consequence": "기록 종류 네 가지의 정의가 쉼표 세 개로 한 문장에 이어져 있다"
+  },
+  {
+   "where": "「언제 여는지」 절의 제시 종류 불릿",
+   "type": "style",
+   "claim": "제시 종류 불릿이 각각 두 문장 이상의 논증이다",
+   "file": "skills/review-docs/SKILL.md",
+   "evidence": "- **계약·규칙·동작 변경** — 묻는다. 문서가 지시하는 내용이 달라졌으므로 검진이 새로 볼 것이 있다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "불릿은 같은 종류를 늘어놓을 때만 쓰고, 한 항목이 여러 문장이 되면 산문으로 써라.",
+   "principle": "BULLET-SCOPE",
+   "consequence": "제시 종류 불릿 중 계약·규칙·동작 변경과 애매한 변경 항목이 판정과 그 이유를 두 문장 이상으로 적고 있다"
+  }
+ ],
+ "principles_applied": [
+  "DOC-TYPE",
+  "COUNT-EARNS",
+  "COMMA-CUT",
+  "BULLET-SCOPE",
+  "ANTI-LIMIT",
+  "ASK-OPTIONS"
+ ],
+ "notes": "검토 관점: 형식, 스타일, 오염, 호환, 규율. 문서 타입은 절차·계약으로 가렸고 그 행의 '상태를 적지 말고' 를 먼저 보았다. '이 저장소의 문서는 일부러 그 검사에서 뺐다'는 사용자 결정에 근거한 범위 규정으로 보아 상태로 올리지 않았다. 「기록 파일 이름 규칙」 절은 한 문단에 여러 규칙(이름 형식·종류·차수·원본 폴더·순번·검사 스크립트)을 몰아 적어 ONE-IDEA 의 '단락은 네 문장 이하' 를 넘지만, 규칙 소유 절이라 나눌 방향이 둘 이상이어서 올리지 않았다. 호출자가 다시 볼 만하다."
+}

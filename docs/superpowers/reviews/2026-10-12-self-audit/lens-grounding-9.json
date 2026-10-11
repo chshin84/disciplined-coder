@@ -1,0 +1,147 @@
+{
+ "target": "skills/aggregating-lenses/SKILL.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/review-llm-calls/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "scripts/audit_evidence.sh",
+  "scripts/audit_verify.sh",
+  "scripts/audit_statements.sh",
+  "scripts/test_docs_drift.sh"
+ ],
+ "issues": [
+  {
+   "where": "머리 문단",
+   "type": "contradiction",
+   "claim": "머리 문단은 집계를 프롬프트가 아니라 결정론적 코드로 구현한다고 조건 없이 단정하지만, 같은 문서의 「구현 형태」 절은 spec/plan 리뷰·문서 검진·레포 문서 감사에서 메인 세션이 직접 집계한다고 적는다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "프롬프트가 아니라 결정론적 코드로 구현한다.",
+   "counterpart_file": "skills/aggregating-lenses/SKILL.md",
+   "counterpart": "제품 코드가 없으므로 메인 세션이 위 「하는 일」의 두 단계를 직접 따라 집계한다.",
+   "principle": "NO-ASSUME",
+   "consequence": "제품 런타임을 뺀 모든 호출자(review-specs·review-docs·audit-repo-docs)에서 집계를 하는 주체는 지금 결정론적 코드가 아니라 메인 세션이다."
+  },
+  {
+   "where": "「공통 계약의 예외」 lens-prior-art 항목",
+   "type": "omission",
+   "claim": "lens-prior-art 의 인용 검증 주체를 review-specs 하나로만 적지만, lens-prior-art 를 실행하는 호출자에는 review-docs 도 있다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "인용 검증은 호출자(`review-specs`)가 자기 도구로 한다.",
+   "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+   "counterpart": "| `lens-prior-art` | 필요할 때 | 외부 탐색 | 설계와 웹 | 없음 | `review-specs`, `review-docs` |",
+   "principle": "SUBJECT-OBJECT",
+   "consequence": "review-docs 가 lens-prior-art 를 실행한 차수의 인용 검증 주체가 aggregating-lenses 에는 적혀 있지 않고, review-docs 「필요할 때 렌즈」 절만 review-specs 의 절차를 따르라고 적는다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "aggregating-lenses",
+   "statement": "집계는 렌즈 출력의 구조만 보고 내용 재판단이나 가중치 부여를 하지 않는다.",
+   "evidence": "렌즈 출력의 구조만 본다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "하는 일은 집계와 커버리지 공백 표시까지다.",
+   "evidence": "렌즈들의 이슈를 한 목록으로 모으고 커버리지 공백을 표시하는 데서 멈춘다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "렌즈 공통 리뷰 산출물 계약은 aggregating-lenses 가 소유한다.",
+   "evidence": "이 계약은 여기가 소유한다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "등급 라벨을 두지 않는다.",
+   "evidence": "등급 라벨을 두지 않는다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "상대편을 대지 못하는 지적은 발견으로 올리지 않는다.",
+   "evidence": "**상대편을 못 대면 발견이 아니다.**"
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "consequence 를 구체적으로 못 적는 발견은 올리지 않는다.",
+   "evidence": "`consequence`를 구체적으로 못 적는 발견은 올리지 않는다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "read 가 비면 호출자가 보고에 적고 자동 재시도는 하지 않는다.",
+   "evidence": "`read`가 비어 있으면 호출자가 자기 보고에 적는다."
+  },
+  {
+   "topic": "LENS-ALLOWED",
+   "statement": "principles_applied 는 Claude 서브에이전트로 실행한 리뷰에서만 요구한다.",
+   "evidence": "Claude 서브에이전트로 실행한 리뷰에서만 호출자가 이 값을 요구한다."
+  },
+  {
+   "topic": "lens-readability",
+   "statement": "lens-readability 는 상대편이 없어 공통 계약을 따르지 않고 스키마는 그 렌즈 파일이 소유한다.",
+   "evidence": "대조할 상대편이 없어 위 공통 계약을 따르지 않는다."
+  },
+  {
+   "topic": "lens-prior-art",
+   "statement": "lens-prior-art 는 상대편이 레포 밖이라 counterpart_file·counterpart·principle 칸이 빠진다.",
+   "evidence": "대조할 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "spec 리뷰에는 결정 단계가 없고 발견 구분은 review-specs 「처분」 절이 정한다.",
+   "evidence": "spec 리뷰에서는 결정 단계가 없다."
+  },
+  {
+   "topic": "review-llm-calls",
+   "statement": "제품 런타임에서는 제품 코드가 type 값으로 행동을 정하는 표를 보유한다.",
+   "evidence": "제품 코드가 `type` 값으로 행동을 정하는 표를 보유한다."
+  },
+  {
+   "topic": "review-llm-calls",
+   "statement": "런타임 재시도에는 상한을 둔다.",
+   "evidence": "재시도에 상한(예: 1~2회)을 둬 무한 루프와 비용 폭주를 방지한다."
+  },
+  {
+   "topic": "audit-repo-docs",
+   "statement": "문서 검진과 레포 문서 감사는 결정 없이 병합과 커버리지 공백 표시까지만 한다.",
+   "evidence": "결정 없이 병합과 커버리지 공백 표시까지만 하고"
+  },
+  {
+   "topic": "audit-repo-docs",
+   "statement": "statements 칸을 요구하는 주체는 audit-repo-docs 의 「진술 받기」 단계다.",
+   "evidence": "요구하는 주체는 `audit-repo-docs`의 「진술 받기」 단계다"
+  },
+  {
+   "topic": "review-docs",
+   "statement": "멀티에이전트 워크플로의 집계 결과는 review-docs 이름 규칙의 check 기록에 적는다.",
+   "evidence": "그 결과를 `review-docs`의 「기록 파일 이름 규칙」이 정한 `check` 기록에 적는다."
+  },
+  {
+   "topic": "lens-fit",
+   "statement": "doc_type 은 lens-fit 이 추가하는 칸이다.",
+   "evidence": "| `doc_type` | `lens-fit` | 그 문서를 어느 타입으로 가렸는지다 |"
+  },
+  {
+   "topic": "lens-consistency",
+   "statement": "narrowed 와 pairs 는 lens-consistency 가 추가하는 칸이다.",
+   "evidence": "| `narrowed` | `lens-consistency` | 정당한 좁혀 적기로 판정한 짝의 개수다 |"
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "STATE-ASSUME",
+  "SPECIFIC-NAME",
+  "SUBJECT-OBJECT",
+  "WRITTEN-ONLY"
+ ],
+ "notes": "검토한 관점: 누락, 모순, 환각(근거 없음), 불일치(숫자·인용·식별자). 확인해서 문제가 없던 항목: lens 열거와 skills/ 디렉터리의 렌즈 6개 일치, fingerprint 를 audit_evidence.sh 가 evidence·counterpart·principle 로 만드는 방식, target 칸을 audit_verify.sh 가 검사하고 audit_statements.sh 가 쓰는 것, 「렌즈가 추가하는 칸」 표와 lens-prior-art(search_status·citations·not_found·disclosures)·lens-readability(purpose·rewrite)·lens-fit(doc_type)·lens-consistency(narrowed·pairs) 스키마, review-specs 의 「처분」·「합치기」 절 실재. 더 확인할 것: lens-readability 스키마는 rewrite 를 null 로 두라고 하고 이 문서 표는 '비운다'고 적어, null 과 빈 문자열 중 무엇을 뜻하는지 lens-fit 쪽에서 볼 만하다."
+}

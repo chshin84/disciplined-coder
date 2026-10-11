@@ -1,0 +1,103 @@
+{
+ "lens": "lens-adversarial",
+ "target": "repo",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/nested-orchestration/SKILL.md",
+  "skills/nested-orchestration/references/sub-session-protocol.md",
+  "hooks/nested_judgment_pretooluse.sh",
+  "hooks/hooks.json",
+  "hooks/_spec_marker.sh",
+  "hooks/stop_gates.sh",
+  "hooks/_stop_preamble.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "scripts/audit_targets.sh",
+  "scripts/_json_valid.sh",
+  "scripts/test_hooks.sh",
+  "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+  "docs/superpowers/reviews/2026-10-12-nested-orchestration-large-dev-review.md",
+  "git log -15 --stat",
+  "git show 67ac723"
+ ],
+ "issues": [
+  {
+   "where": "nested-orchestration SKILL.md 「흐름」 1단계 준비의 cp 문장과 8단계 정리의 지울 목록",
+   "type": "failure-mode",
+   "claim": "현재 세션은 큰 명세를 자기 체크아웃에 쓰고 리뷰한 뒤 cp 로 통합용 워크트리에 옮겨 커밋한다. 원본과 review-specs 가 자기 체크아웃에 남긴 리뷰 기록은 어느 단계에서도 지우거나 커밋하지 않는다. 사용자 체크아웃에서 dev/<개발 이름>을 main 에 병합하면 같은 경로의 미추적 파일 때문에 git 이 병합을 거부하고, 큰 명세의 리뷰 기록은 통합 브랜치에 들어가지 않는다. 1단계에 원본 삭제(또는 cp 대상에 리뷰 기록 포함)를 적거나 8단계 목록에 원본을 넣으면 완화된다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "자기 체크아웃에서 쓰고 리뷰한 큰 명세는 `cp`로 통합용 워크트리의 같은 상대 경로에 옮겨 커밋한다.",
+   "counterpart_file": "skills/nested-orchestration/SKILL.md",
+   "counterpart": "목록은 각 워크스트림 워크트리의 SDD 작업 공간(`.superpowers/sdd/`), 워크스트림 워크트리, 통합용 워크트리, `ws/<개발 이름>/*`·`dev/<개발 이름>`·남은 `try/*` 브랜치, 리포트 폴더 `<git common dir>/nested/<개발 이름>/`이다.",
+   "principle": "CHECKABLE",
+   "consequence": "흐름은 원본 큰 명세와 그 리뷰 기록을 사용자 체크아웃에 미추적 파일로 남기고, 정리 목록에도 그 파일이 없다. 큰 명세의 리뷰 기록을 통합 브랜치로 옮기는 단계도 없다."
+  },
+  {
+   "where": "nested-orchestration SKILL.md 「이어 쓰기와 재개」 둘째 문단 첫 문장과 「받은 메시지 처리」 「FAILED와 CANCELED」의 CANCELED 문장",
+   "type": "failure-mode",
+   "claim": "서브에이전트 실행 화면으로 들어가는 조작은 사용자만 할 수 있는데, 스킬은 그 확인을 현재 세션의 단계로 적었다. 현재 세션은 이 확인을 수행하지 못하므로 CANCELED 뒤 정리와 재개 판단이 실행되지 않거나 확인 없이 진행된다. 주체를 사용자로 바꿔 현재 세션이 사용자에게 확인을 요청하게 적으면 완화된다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "완료 통지가 오지 않는 서브 세션이 있으면 현재 세션은 CLI의 서브에이전트 화면에서 그 세션으로 들어가 실행 상태를 확인한다.",
+   "counterpart_file": "skills/nested-orchestration/SKILL.md",
+   "counterpart": "수동 `Agent` 중첩은 `/workflows` 집계 대시보드에 뜨지 않는다. 대신 CLI가 서브에이전트를 표시하고, 사용자는 그 항목을 더블클릭해 각 서브 세션의 실행 화면으로 들어간다. 집계 대시보드와 메트릭은 볼 수 없고, 어떤 워크트리가 어느 서브 세션에 배정됐는지도 화면에 나오지 않는다.",
+   "principle": "SUBJECT-OBJECT",
+   "consequence": "190행 재개 판단과 178행 CANCELED 처리는 현재 세션이 CLI 화면을 본다고 적었고, 228행은 그 화면에 들어가는 주체를 사용자로 적었다."
+  },
+  {
+   "where": "nested-orchestration SKILL.md 「큰 개발 분할」 「계약 표」 셋째 문단의 NP-bond-agg 두 문장",
+   "type": "risk",
+   "claim": "모든 프로젝트에 실리는 절차 문서에 다른 저장소의 진행 중인 개발 하나에 대한 상태와 삭제 조건이 들어 있다. 삭제 조건(그 개발의 main 병합)은 이 저장소의 어느 검사도 관측할 수 없어 문장이 남는다. 이 상태는 근거 문서 「2026-10-11 개정」 쪽이나 그 개발의 큰 명세로 옮기면 스킬이 절차만 포함한다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "이 개정 시점에 이미 진행 중이던 큰 명세(NP-bond-agg)는 계약 표 없이 그 큰 명세의 계약 항목으로 대조한다. 이 문장은 그 개발이 main 에 병합되면 지운다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "| **절차·계약** (operations·setup·contract) | 수행 방법과 스키마 계약 | 상태를 적지 말고 방법만 적어라 |",
+   "principle": "DOC-TYPE",
+   "consequence": "절차 문서인 SKILL.md 가 다른 저장소의 개발 진행 상태를 포함하고, 그 문장의 삭제 시점을 알리는 장치가 이 저장소에 없다."
+  },
+  {
+   "where": "nested-orchestration SKILL.md 「흐름」 7단계 마무리의 '첫 큰 개발이면' 문장",
+   "type": "failure-mode",
+   "claim": "어느 개발이 첫 큰 개발인지 기록하는 곳이 없어 현재 세션은 조건을 판정하지 못한다. 설계 문서는 결과를 「이어받는 판단과 검증」에 추가하라고 하지만, 다른 프로젝트에서는 설계 문서가 플러그인 설치 폴더에만 있어 추가할 원본이 그 세션에 없다. 조건을 '사용자가 측정을 요청한 개발'처럼 판정할 수 있는 말로 바꾸고 결과는 사용자 보고까지만 하게 하면 완화된다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "첫 큰 개발이면 설계 문서 「2026-10-11 개정 — 검진 반영」의 「첫 큰 개발에서 측정」 항목도 세어 보고한다.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+   "counterpart": "**첫 큰 개발에서 측정.** 아래 값은 트레일러로 남기지 않는다. 현재 세션은 첫 큰 개발의 마무리 보고에서 이 값을 세어 사용자에게 보고하고, 결과는 「이어받는 판단과 검증」에 추가한다. 첫 큰 개발을 진행하는 현재 세션은 스킬만 열므로, 구현하는 세션은 스킬 「흐름」 마무리 단계에 이 항목을 가리키는 포인터를 남긴다.",
+   "principle": "NO-ASSUME",
+   "consequence": "스킬의 조건 '첫 큰 개발'을 판정할 기록이 어디에도 없고, SKILL.md 7행은 다른 프로젝트에서 근거 문서가 사용자 저장소가 아니라 플러그인 설치 폴더에 있다고 적었다."
+  },
+  {
+   "where": "nested-orchestration SKILL.md 「계약 코드」 셋째 문단(계약 코드의 SDD 문장)과 「가드레일」 「리뷰 마커 확인」 첫 문장",
+   "type": "risk",
+   "claim": "Stop 게이트는 훅 입력의 cwd 저장소만 본다. 현재 세션의 cwd 는 자기 체크아웃이고 계약 코드 plan 은 통합용 워크트리에 쓰고 커밋하므로, 계약 코드 plan 의 미리뷰를 차단하는 장치가 없다. 스킬은 게이트가 적용되지 않는 문서로 서브 세션 문서만 적어, 현재 세션은 자기 plan 이 게이트 안에 있다고 믿는다. 「리뷰 마커 확인」 첫 문장에 통합용 워크트리의 현재 세션 문서도 예외라고 적고 계약 코드 plan 의 마커를 커밋 전에 확인하게 하면 완화된다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "계약 코드도 writing-plans, plan 리뷰, 사용자 plan 검토, 실행 순서로 진행한다.",
+   "counterpart_file": "hooks/_stop_preamble.sh",
+   "counterpart": "if [ -n \"$cwd\" ]; then cd \"$cwd\" 2>/dev/null || exit 0; fi",
+   "principle": "CHECKABLE",
+   "consequence": "stop_gates.sh 는 cwd 저장소의 git status 와 HEAD 커밋만 보므로 통합용 워크트리에 커밋한 계약 코드 plan 은 게이트 밖이고, 스킬 200행은 게이트 예외를 서브 세션 문서로만 적었다."
+  },
+  {
+   "where": "nested-orchestration SKILL.md 「결정 기록」 둘째 문단의 `결정 기록:` 제목 조건",
+   "type": "over-engineering",
+   "claim": "시험 병합 전 확인은 `결정 기록:` 제목 커밋만 뺀다. 그런데 통합 때마다 현재 세션이 큰 명세에 커밋하는 `확정한 결정` 옮겨 적기와 '확정 예정' 칸 채우기는 ANSWER 답이 아니어서 이 제목을 쓰지 못한다. 그래서 통합이 한 번 일어날 때마다 남은 모든 워크스트림이 그 커밋 때문에 BASE-UPDATED 왕복을 거쳐야 병합된다. 워크스트림이 n 개이면 왕복이 n 제곱에 비례해 늘어난다. 그 워크스트림의 계약 행이나 공유 가정을 바꾸지 않는 큰 명세 커밋도 제목 예외에 넣으면 왕복이 줄어든다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "「결정 기록」만 바꾸고, 요청한 서브 세션 하나에 `ANSWER`로 보낸 답만 적은 커밋은 제목을 `결정 기록:`으로 시작한다.",
+   "counterpart_file": "skills/nested-orchestration/SKILL.md",
+   "counterpart": "통과하면 현재 세션은 `git switch dev/<개발>`, `git merge --ff-only try/<id>`, `git branch -D try/<id>`를 실행하고, 그 리포트의 `확정한 결정`을 「결정 기록」에 옮기고 `확정한 계약 의미`로 계약 표의 '확정 예정' 칸을 채운다.",
+   "principle": "YAGNI",
+   "consequence": "통합 뒤 옮겨 적기 커밋은 큰 명세 경로를 바꾸고 `결정 기록:` 제목 조건에 들지 않으므로, 206행 확인이 이후 병합할 모든 워크스트림에서 그 커밋을 출력한다."
+  }
+ ],
+ "principles_applied": [
+  "CHECKABLE",
+  "SUBJECT-OBJECT",
+  "DOC-TYPE",
+  "NO-ASSUME",
+  "YAGNI",
+  "REVERSIBLE",
+  "NO-ASSUME",
+  "EVIDENCE-FIRST"
+ ],
+ "notes": "검토한 관점: 실패 모드(실행이 계획을 안 따르거나 끊기는 길 포함), 과설계, 비가역, 완화할 위험을 항목마다 따로 보았다. 비가역 관점에서는 발견이 없다. main 병합과 정리 삭제는 모두 사용자 승인 뒤로 적혀 있고, 되돌림 대신 시험 병합을 쓰는 근거도 있다. nested_judgment_pretooluse.sh 는 경로당 한 번 거부, 서브에이전트 제외, fail-open 이 설계 문서·README·test_hooks.sh 와 맞아 발견으로 올리지 않았다. 표시 파일(TMPDIR/disciplined-coder/nested-judged-*)을 지우는 장치가 없다는 점은 결과가 파일 누적뿐이라 올리지 않았다. 최근 커밋 67ac723(PYTHONUTF8·python3 차단 이전) 뒤 남은 참조는 scripts/_json_valid.sh 의 프로세스 단위 PYTHONUTF8=1 뿐이며 이는 환경 설정이 아니라 호출 인자라 문제가 아니다. 더 확인할 것: (가) 리포트 경로 `<git common dir>/nested/...` 는 .git 아래인데, Claude Code 가 .git 쓰기를 보호 경로로 다뤄 백그라운드 서브 세션에서 권한 확인을 요구하는지 이 저장소 안에서는 확인할 수 없었다. 요구한다면 서브 세션이 리포트를 쓰지 못하고 멈춘다. 설계 문서에 이 경로의 쓰기 실측이 있는지 찾지 못했으므로 실제 서브 세션에서 한 번 Write 를 실행해 확인해야 한다. (나) 「진행 위치」(218행)는 APPROVE 뒤 plan 커밋 전의 서브 세션을 '승인 대기'로 판정한다. 192행이 리포트의 마지막 메시지로 응답 여부를 정하므로 재시작 뒤 APPROVE 를 다시 보내는 정도로 끝나 올리지 않았다. (다) 설계 문서 77행의 '자기 체크아웃에서 git worktree add' 문장과 스킬 123행의 'git -C <통합용 워크트리> worktree add'의 차이는 개정 절이 대체한 것인지 이 렌즈 범위에서 판정하지 않았고 lens-consistency 의 대조 대상이다."
+}

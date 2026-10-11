@@ -1,0 +1,297 @@
+{
+ "schema": 1,
+ "executor": "self-audit",
+ "commit": "bd51ebb018fbb2f5552ced509eaee746925664bf",
+ "tree_clean": true,
+ "started_at": "2026-10-11T15:39:56Z",
+ "finished_at": "2026-10-11T16:10:11Z",
+ "completed": true,
+ "steps_done": [
+  "targets",
+  "machine-checks",
+  "review",
+  "adversarial",
+  "evidence",
+  "consistency",
+  "rounds-diff",
+  "verdict",
+  "record"
+ ],
+ "tokens_method": "서브에이전트 완료 통지마다 보고된 subagent_tokens 를 그대로 더한 값이다(묶음 호출의 두 턴은 통지마다 따로 더했다). 메인 세션 토큰은 세지 않았으므로 하한이다. 두 번째로 세는 법(세션 잔여 토큰 차이)은 메인 세션의 수정 작업이 섞여 렌즈 비용만 분리할 수 없어 쓰지 않았다.",
+ "lens_calls": 22,
+ "subagents": 13,
+ "subagent_cap": "문서 단위 그룹 묶음 9개와 lens-adversarial 1개로 첫 단계 10개, lens-readability 1개는 별도 단계, lens-consistency 2개는 그다음 단계다. 잘라 낸 호출은 없다.",
+ "machine_checks": {
+  "contract_tests": "scripts/test_*.sh 를 동시에 실행해 모두 통과했다(시작 시점 bd51ebb).",
+  "targets_script": "bash scripts/audit_targets.sh 가 스물다섯을 냈다.",
+  "topics_script": "bash scripts/audit_topics.sh 의 이름표를 statements 요구에 넣었다.",
+  "prior_rounds_script": "bash scripts/audit_prior_rounds.sh 가 2026-09-06-self-audit 와 2026-09-05-self-audit-2 를 냈고, --stale 은 비었다.",
+  "evidence_script": "audit_evidence.sh 를 시작 커밋 bd51ebb 의 워크트리에 실행해 162건 중 161건이 통과했다. 남은 1건(lens-consistency-2 의 하향 메시지 행)은 렌즈 실행 중 세션이 커밋한 9fafabe 의 문장을 인용해 그 커밋 워크트리로 확인했다.",
+  "style_metrics": "이 저장소는 금지 표현을 세지 않는다(hooks/_spec_marker.sh 의 path_in_own_repo)."
+ },
+ "targets": [
+  {
+   "path": "CLAUDE.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit",
+    "lens-readability"
+   ],
+   "reason": "렌즈 그룹 + 필요할 때 그룹(사용자 승인)"
+  },
+  {
+   "path": "README.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit",
+    "lens-readability"
+   ],
+   "reason": "렌즈 그룹 + 필요할 때 그룹(사용자 승인)"
+  },
+  {
+   "path": "agent-principles.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit",
+    "lens-readability"
+   ],
+   "reason": "렌즈 그룹 + 필요할 때 그룹(사용자 승인)"
+  },
+  {
+   "path": "commands/show-principles.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit",
+    "lens-readability"
+   ],
+   "reason": "렌즈 그룹 + 필요할 때 그룹(사용자 승인)"
+  },
+  {
+   "path": "docs/domain-discipline.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "docs/domain-korean.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "docs/korean-banned-words-evidence.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "korean-banned-words.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/aggregating-lenses/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/audit-repo-docs/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/dispatching-lenses/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/domain-plugin/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/domain-pruning/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/domain-readme/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/lens-adversarial/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/lens-consistency/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/lens-fit/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/lens-grounding/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/lens-prior-art/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/lens-readability/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/nested-orchestration/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/nested-orchestration/references/sub-session-protocol.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/review-docs/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/review-llm-calls/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "skills/review-specs/SKILL.md",
+   "lenses": [
+    "lens-grounding",
+    "lens-fit"
+   ],
+   "reason": "렌즈 그룹"
+  },
+  {
+   "path": "repo",
+   "lenses": [
+    "lens-adversarial"
+   ],
+   "reason": "렌즈 그룹 — 묶음 전체 그룹, 저장소 전체 입력. 사용자 요청으로 nested-orchestration 을 중점 대상으로 지정했다"
+  },
+  {
+   "path": "pairs",
+   "lenses": [
+    "lens-consistency"
+   ],
+   "reason": "렌즈 그룹 — 값이 다른 짝 묶음 한 호출"
+  },
+  {
+   "path": "owners",
+   "lenses": [
+    "lens-consistency"
+   ],
+   "reason": "렌즈 그룹 — 소유를 선언한 문서 여덟을 한 호출로 묶었다"
+  }
+ ],
+ "scope_notes": [
+  "lens-readability 는 남에게 전달되는 문서 넷(README.md, CLAUDE.md, commands/show-principles.md, agent-principles.md)에 제안했고 사용자가 승인했다.",
+  "lens-prior-art 는 감사 절차가 제안하지 않는다.",
+  "묶은 호출은 1턴 lens-grounding, 2턴 lens-fit 으로 SendMessage 이어 쓰기로 턴을 나눴다.",
+  "렌즈는 저장소를 읽기 전용으로 다루고 결과를 세션 스크래치패드에만 썼다. 세션이 원본을 문서와 렌즈마다 나눠 이 폴더에 옮겼다.",
+  "렌즈 실행 중 세션이 nested-orchestration 수정을 시작해, lens-consistency-2 는 일부 수정된 파일을 읽었다. 그 렌즈가 notes 에 적었고 이미 해소된 2건은 올리지 않았다."
+ ],
+ "metrics": {
+  "by_lens": {
+   "lens-adversarial": {
+    "raised": 6,
+    "confirmed": 6
+   },
+   "lens-consistency": {
+    "raised": 12,
+    "confirmed": 12
+   },
+   "lens-fit": {
+    "raised": 91,
+    "confirmed": 87
+   },
+   "lens-grounding": {
+    "raised": 53,
+    "confirmed": 52
+   }
+  },
+  "confirmed": 157,
+  "tokens": 3688078,
+  "seconds": 1815,
+  "tokens_per_confirmed": 23490,
+  "resolved_rate": 0.958,
+  "verdict_counts": {
+   "confirmed": 157,
+   "rejected": 5,
+   "undetermined": 0,
+   "auto_rejected": 0
+  }
+ }
+}

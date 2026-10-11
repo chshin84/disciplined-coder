@@ -1,0 +1,112 @@
+{
+ "target": "skills/dispatching-lenses/SKILL.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/review-llm-calls/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "docs/domain-discipline.md"
+ ],
+ "issues": [
+  {
+   "where": "「실행하는 방법」 넷째 문단",
+   "type": "contradiction",
+   "claim": "「렌즈 이름 표준」이 짧은 이름을 금지하는데, 같은 문서 「실행하는 방법」이 짧은 이름 grounding·fit 으로 렌즈를 가리킨다.",
+   "file": "skills/dispatching-lenses/SKILL.md",
+   "evidence": "`grounding`이 외부 사실의 근거를 보고 `fit`이 양식과 계약을 보므로 원래 보는 대상이 나뉘어 있다.",
+   "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+   "counterpart": "짧은 이름(`grounding`)은 쓰지 않는다.",
+   "principle": "TERM-ONE",
+   "consequence": "렌즈 이름 표준을 소유한 dispatching-lenses 자신이 「실행하는 방법」에서 lens-grounding·lens-fit 을 짧은 이름 `grounding`·`fit` 으로 적고 있다."
+  },
+  {
+   "where": "「한 번만 실행하는 렌즈의 규율」 첫 문단",
+   "type": "omission",
+   "claim": "한 호출에 여러 대상을 묶는 예외를 「렌즈 그룹」이 정한다고 적지만, 「렌즈 그룹」은 필요할 때 그룹만 묶을 수 있다고 적고 문서 단위 그룹의 입력은 '문서 하나'로 둔다. 실제 문서 단위 그룹의 다문서 묶음은 audit-repo-docs 가 자기 규칙으로 정한다.",
+   "file": "skills/dispatching-lenses/SKILL.md",
+   "evidence": "어느 렌즈에 무엇을 어떻게 묶어 주는지는 아래 「렌즈 그룹」이 정한다.",
+   "counterpart_file": "skills/audit-repo-docs/SKILL.md",
+   "counterpart": "이 규칙은 이 절차에서 `dispatching-lenses`의 「한 번만 실행하는 렌즈의 규율」이 정한 \"대상이 다르면 별개 호출\"을 대신한다.",
+   "principle": "DOC-PLACE",
+   "consequence": "audit-repo-docs 는 lens-grounding·lens-fit 에 문서 여러 개를 한 호출(9개 이하 묶음)로 주는데, dispatching-lenses 의 「렌즈 그룹」 표는 두 렌즈의 입력을 '문서 하나'로 적고 다문서 묶음 규칙을 필요할 때 그룹에만 두어, 지목된 소유 절에 그 예외가 없다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈마다 따로 실행하는 것이 기본이고 합산과 반박은 호출자가 직접 한다.",
+   "evidence": "렌즈마다 따로 실행하는 것이 기본이다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈끼리 볼 것을 나눠 주지 않는다.",
+   "evidence": "렌즈끼리 볼 것을 나눠 주지 않는다."
+  },
+  {
+   "topic": "LENS-ALLOWED",
+   "statement": "에이전트원칙 경로를 실행 시점에 도출해 프롬프트에 넣고 렌즈가 직접 읽게 한다.",
+   "evidence": "에이전트원칙 경로를 프롬프트에 넣어 렌즈가 직접 읽게 한다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "결정론 검사가 답하는 것은 먼저 기계로 돌리고 렌즈는 판단만 한다.",
+   "evidence": "렌즈는 판단만 한다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈는 어느 호출자에서나 한 번씩만 실행한다.",
+   "evidence": "렌즈는 어느 호출자에서나 한 번씩만 실행한다."
+  },
+  {
+   "topic": "NO-FLEET",
+   "statement": "한 단계가 실행하는 에이전트는 10개 이하이고 넘으면 자른 것을 산출물에 남긴다.",
+   "evidence": "한 단계가 실행하는 에이전트는 10개 이하로 한다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "nested-orchestration 의 3층 구조는 에이전트 증설 금지의 예외다.",
+   "evidence": "3층 오케스트레이션은 이 금지의 예외다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "반영 뒤 재실행은 하지 않고, 반복은 spec·plan 리뷰에만 둔다.",
+   "evidence": "반영한 뒤 다시 실행하지 않는다."
+  },
+  {
+   "topic": "audit-repo-docs",
+   "statement": "렌즈를 한 호출에 묶는 것은 대상 문서가 여섯 개 이상인 단계(레포 문서 감사)에만 쓴다.",
+   "evidence": "대상 문서가 여섯 개 이상인 단계에만 쓴다."
+  },
+  {
+   "topic": "lens-adversarial",
+   "statement": "lens-adversarial 은 어느 렌즈와도 한 컨텍스트에 두지 않는다.",
+   "evidence": "`lens-adversarial`은 어느 렌즈와도 한 컨텍스트에 두지 않는다."
+  },
+  {
+   "topic": "lens-readability",
+   "statement": "lens-readability 는 남에게 전달하는 문서이고 목적 한 줄을 적을 수 있을 때 제안하며 spec·plan 에는 제안하지 않는다.",
+   "evidence": "spec과 plan에는 제안하지 않는다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈 이름은 lens- 접두사가 붙은 스킬 디렉터리 이름 하나로 쓰고 짧은 이름은 쓰지 않는다.",
+   "evidence": "짧은 이름(`grounding`)은 쓰지 않는다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "SPECIFIC-NAME",
+  "TERM-ONE",
+  "DOC-PLACE",
+  "STATE-ASSUME"
+ ],
+ "notes": "체크리스트 네 항목을 따로 검토했다. 호출자 목록(review-specs·review-docs·audit-repo-docs·nested-orchestration 서브 세션)과 각 호출자의 포인터, test_docs_drift.sh 의 '렌즈가 직접 읽게' 조각 검사, lens-prior-art 「실행할 때 지킬 상한」, review-specs 「작업 순서와 다시 리뷰」, review-llm-calls 가 가리키는 절 이름, audit-repo-docs 의 lens-adversarial·lens-consistency 입력, domain-discipline.md 의 2026-09-24 합의 기록을 대조했고 일치했다. 캐시 배수(3 대 1.2)는 문서 안 산술로만 확인했고 실측 근거는 열지 않았다."
+}

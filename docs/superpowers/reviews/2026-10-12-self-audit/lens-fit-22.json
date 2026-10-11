@@ -1,0 +1,48 @@
+{
+ "target": "skills/nested-orchestration/references/sub-session-protocol.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — 서브 세션이 따르는 메시지 형식·멈추는 기준·리포트 스키마라는 수행 방법과 스키마 계약을 포함하고, 진행 상태나 다음 단계는 포함하지 않는다",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/lens-fit/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "「메시지 형식」 유형 표의 `SDD 정지` 행",
+   "type": "style",
+   "claim": "이름을 괄호로 모두 적은 목록 앞에 '네 가지'라는 개수를 예고한다.",
+   "file": "skills/nested-orchestration/references/sub-session-protocol.md",
+   "evidence": "SDD가 멈추고 사람에게 물으라고 하는 네 가지",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목록 앞에 개수를 예고하지 마라",
+   "principle": "COUNT-EARNS",
+   "consequence": "정지 사유 목록과 그 개수가 한 칸에 함께 적혀 있어, 같은 사실이 개수와 목록 두 곳에 있다."
+  },
+  {
+   "where": "「리포트」 첫 문단 마지막 문장",
+   "type": "style",
+   "claim": "절 이름을 괄호로 모두 적은 목록 앞에 '세 절'이라는 개수를 예고한다.",
+   "file": "skills/nested-orchestration/references/sub-session-protocol.md",
+   "evidence": "판정을 적는 세 절(`명세 이탈`, `스스로 판정한 모호함`, `SDD 판정과 남은 지적`)의 마지막 칸은",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목록 앞에 개수를 예고하지 마라",
+   "principle": "COUNT-EARNS",
+   "consequence": "판정 절의 목록과 그 개수가 한 문장에 함께 적혀 있어, 같은 사실이 개수와 목록 두 곳에 있다."
+  }
+ ],
+ "principles_applied": [
+  "DOC-TYPE",
+  "COUNT-EARNS",
+  "ONE-IDEA",
+  "SUBJECT-OBJECT",
+  "ANTI-LIMIT",
+  "COMMA-CUT",
+  "ONE-ENDING",
+  "FULL-SENTENCE",
+  "TERM-ONE",
+  "WRITTEN-ONLY",
+  "NAME-ITEMS"
+ ],
+ "notes": "검토한 관점은 형식·스타일·오염·호환·규율이다. 문서 타입은 절차·계약으로 가렸고, 그 행이 금지한 진행 상태는 들어 있지 않다. 단락은 모두 네 문장 이하이고, `A가 아니라 B` 대구는 없다. 연결어미 뒤 쉼표가 한 문장에 둘 이상인 문장은 찾지 못했다. 표의 같은 열끼리 말끝이 맞다. 처리 주체는 문장마다 '서브 세션'이나 '현재 세션'으로 적혀 있다. 금지 낱말 목록은 지시대로 보지 않았다. TITLES 묶음은 남에게 전달되는 문서에만 적용되는데, 이 파일은 플러그인 내부 참조 문서라 적용하지 않았다."
+}

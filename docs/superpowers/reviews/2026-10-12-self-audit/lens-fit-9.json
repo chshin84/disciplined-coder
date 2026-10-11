@@ -1,0 +1,58 @@
+{
+ "target": "skills/aggregating-lenses/SKILL.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — 이 문서는 렌즈 공통 산출물 스키마 계약과 집계 수행 방법을 포함하고 진행 상태는 포함하지 않는다.",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/lens-fit/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "「리뷰 산출물 계약」 절 「발견 하나는」 문단",
+   "type": "style",
+   "claim": "발견이 지는 칸 목록 앞에 개수를 예고한다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "발견 하나는 넷을 진다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목록 앞에 개수를 예고하지 마라",
+   "principle": "COUNT-EARNS",
+   "consequence": "괄호 안 네 칸의 나열과 '넷'이 두 곳에 같은 사실로 적혀 있다."
+  },
+  {
+   "where": "「리뷰 산출물 계약」 절 principles_applied 문단",
+   "type": "style",
+   "claim": "한 단락이 다섯 문장이다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "렌즈 파일은 이 규칙을 되풀이하지 않고 여기를 가리킨다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "단락은 네 문장 이하로 끊어라",
+   "principle": "ONE-IDEA",
+   "consequence": "요구 시점, 이유, 런타임 제외, 렌즈 파일의 참조 규칙이 한 단락에 함께 들어 있다."
+  },
+  {
+   "where": "「공통 계약의 예외」 절 lens-readability 불릿",
+   "type": "style",
+   "claim": "불릿 한 항목이 세 문장이다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "제안이라서 「집계」·「커버리지 공백」 어디에도 들어가지 않는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "한 항목이 여러 문장이 되면 산문으로 써라",
+   "principle": "BULLET-SCOPE",
+   "consequence": "예외 이유, 집계 제외, 스키마 소유, 빠지는 칸이 불릿 한 항목 안에 들어 있고 lens-prior-art 불릿도 같은 형태다."
+  }
+ ],
+ "principles_applied": [
+  "DOC-TYPE",
+  "COUNT-EARNS",
+  "ONE-IDEA",
+  "BULLET-SCOPE",
+  "SUBJECT-OBJECT",
+  "ANTI-LIMIT",
+  "WRITTEN-ONLY",
+  "ONE-ENDING",
+  "LABEL-NOUN",
+  "SECTION-HEAD"
+ ],
+ "notes": "검토한 관점: 형식(머리말, 코드 블록 스키마, 표), 스타일(출력지시 조항), 오염, 호환(스키마 키가 렌즈 파일들과 하위 호환되는지), 규율(문서 타입 표 포함). 금지 낱말은 계약대로 보지 않았다. 문서 타입은 절차·계약으로 가렸고 상태 기술은 없었다. ANTI-LIMIT 은 '아니라' 대구가 한 번이라 통과했다. 「렌즈가 추가하는 칸」 표의 '포함하는 것' 칸은 '~다' 로 끝나 ONE-ENDING 에 맞다. 호환: 출력 스키마의 aggregated 항목에 principle 칸이 없지만 fingerprint 계산은 audit_evidence.sh 가 렌즈 원본에서 하므로 형식 문제로 올리지 않았다."
+}

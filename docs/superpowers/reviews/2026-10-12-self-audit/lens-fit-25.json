@@ -1,0 +1,136 @@
+{
+ "target": "skills/review-specs/SKILL.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — spec·plan 리뷰를 어떤 순서로 수행하는지라는 수행 방법을 포함하고, 진행 상태나 다음 단계는 포함하지 않는다(「작업 순서와 다시 리뷰」도 남은 일을 문서에 적지 않는다고 정한다)",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/lens-fit/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "「절차」 첫 문장",
+   "type": "style",
+   "claim": "단계 표 앞에 '아홉'이라는 개수를 예고한다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "단계는 아홉이고 순서가 있다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목록 앞에 개수를 예고하지 마라",
+   "principle": "COUNT-EARNS",
+   "consequence": "단계 표의 행과 그 개수가 두 곳에 적혀 있어, 표에 행을 추가하면 개수 문장만 그대로 남는다."
+  },
+  {
+   "where": "「절차」 표 뒤 문단",
+   "type": "style",
+   "claim": "외부 문서 목록 앞에 '넷'이라는 개수를 예고한다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "이 문서 밖에서 가져올 것이 넷이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목록 앞에 개수를 예고하지 마라",
+   "principle": "COUNT-EARNS",
+   "consequence": "가져올 문서의 목록과 그 개수가 이어진 두 문장에 함께 적혀 있다."
+  },
+  {
+   "where": "「리뷰 기록」 기록 내용 문단",
+   "type": "style",
+   "claim": "기록 항목 목록 앞에 '다섯'이라는 개수를 예고한다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "기록에 포함하는 것은 다섯이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목록 앞에 개수를 예고하지 마라",
+   "principle": "COUNT-EARNS",
+   "consequence": "기록 항목의 목록과 그 개수가 한 문단에 함께 적혀 있다."
+  },
+  {
+   "where": "「처분」 첫 문단",
+   "type": "style",
+   "claim": "🔴 기준 목록 앞에 '셋'이라는 개수를 예고한다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "병합한 발견을 메인 세션이 둘로 구분한다. `🔴`로 올리는 기준은 셋이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목록 앞에 개수를 예고하지 마라",
+   "principle": "COUNT-EARNS",
+   "consequence": "🔴 기준의 불릿 목록과 그 개수가 두 곳에 적혀 있고, 다음 문단도 '셋 중 어디에도'로 개수를 대명사처럼 쓴다."
+  },
+  {
+   "where": "「합치기」 첫 문단",
+   "type": "style",
+   "claim": "질문 목록 앞에 '셋'이라는 개수를 예고한다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "지적마다 셋을 묻는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목록 앞에 개수를 예고하지 마라",
+   "principle": "COUNT-EARNS",
+   "consequence": "질문의 불릿 목록과 그 개수가 두 곳에 적혀 있다."
+  },
+  {
+   "where": "「2) 디스패치」 첫 문단",
+   "type": "style",
+   "claim": "한 단락이 여덟 문장이고, 호출 수 계산·읽기 전용 수단·독립성 강제라는 서로 다른 개념을 함께 다룬다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "검토 대상 하나에 렌즈마다 호출 하나를 따로 실행한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "한 문장에 한 개념만 두고, 단락은 네 문장 이하로 끊어라.",
+   "principle": "ONE-IDEA",
+   "consequence": "「2) 디스패치」 첫 단락이 네 문장 한도를 넘는 여덟 문장으로 되어 있다."
+  },
+  {
+   "where": "「2) 디스패치」 둘째 문단",
+   "type": "style",
+   "claim": "한 단락이 여섯 문장이다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "렌즈를 실행하는 횟수는 `dispatching-lenses`의 「한 번만 실행하는 렌즈의 규율」이 정한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "한 문장에 한 개념만 두고, 단락은 네 문장 이하로 끊어라.",
+   "principle": "ONE-IDEA",
+   "consequence": "실행 횟수 단락이 네 문장 한도를 넘는 여섯 문장으로 되어 있다."
+  },
+  {
+   "where": "「선행연구 렌즈의 제안과 승인」 제안 시점 문단",
+   "type": "style",
+   "claim": "한 단락이 여섯 문장이고, 제안 시점·실행 방식·통상과 최대한 선택·미정일 때의 기본값을 함께 다룬다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "제안 시점은 렌즈를 실행하기 전 「1) PREP」이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "한 문장에 한 개념만 두고, 단락은 네 문장 이하로 끊어라.",
+   "principle": "ONE-IDEA",
+   "consequence": "제안 시점 단락이 네 문장 한도를 넘는 여섯 문장으로 되어 있다."
+  },
+  {
+   "where": "「선행연구 렌즈의 제안과 승인」 웹 도구 문단",
+   "type": "style",
+   "claim": "누가 알리고 누가 확인하는지가 빠져 있다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "웹 도구가 없으면 실행할 수 없다고 알린다. 실행하려는 에이전트가 웹 검색과 웹 페치를 보유하는지 먼저 확인한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "판단하고 행동하는 주체를 사람이나 도구로 적고, 문장이나 문서를 판단의 주체로 쓰지 마라.",
+   "principle": "SUBJECT-OBJECT",
+   "consequence": "두 문장 모두 주어가 없어, 메인 세션이 할 일인지 렌즈가 할 일인지 문장 안에 적혀 있지 않다."
+  },
+  {
+   "where": "「선행연구 렌즈의 제안과 승인」 구분 문단",
+   "type": "style",
+   "claim": "spec 과 plan 을 구분하는 주체가 빠져 있다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "spec인지 plan인지부터 구분한다. 훅이 넘기는 것은 파일 이름이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "판단하고 행동하는 주체를 사람이나 도구로 적고, 문장이나 문서를 판단의 주체로 쓰지 마라.",
+   "principle": "SUBJECT-OBJECT",
+   "consequence": "구분하는 문장에 주어가 없고, 같은 단락의 '보고에 적는다'도 주어 없이 이어진다."
+  }
+ ],
+ "principles_applied": [
+  "DOC-TYPE",
+  "COUNT-EARNS",
+  "ONE-IDEA",
+  "SUBJECT-OBJECT",
+  "ANTI-LIMIT",
+  "COMMA-CUT",
+  "ONE-ENDING",
+  "FULL-SENTENCE",
+  "TERM-ONE",
+  "WRITTEN-ONLY",
+  "NAME-ITEMS"
+ ],
+ "notes": "검토한 관점은 형식·스타일·오염·호환·규율이다. 문서 타입은 절차·계약으로 가렸다. 2) 디스패치 둘째 문단의 '전에는 두 번씩 실행했고' 문장은 줄인 경위를 적은 근거이며, 진행 상태로 보지 않았다. `A가 아니라 B` 대구는 「한계」에 한 번뿐이라 ANTI-LIMIT 를 지킨다. 「절차」 표의 단계 열은 말끝이 '~한다'로 맞다. 「1) PREP」·「2) 디스패치」·「선행연구 렌즈의 제안과 승인」·「3) 메타 집계」가 `###` 층이지만, TITLES 묶음은 남에게 전달되는 문서에만 적용되고 이 파일은 플러그인 내부 스킬이라 TITLE-LAYERS 로 올리지 않았다. 호출자가 이 파일을 남에게 전달되는 문서로 본다면 이 판정을 다시 해야 한다. 「2) 디스패치」의 lens-adversarial 설명('완화만 가능한 위험 넷을 찾는다')도 개수를 대명사처럼 쓴 사례지만, 이 낱말은 한 구에 섞여 있어 별도 발견으로 올리지 않았다. 금지 낱말 목록은 지시대로 보지 않았다."
+}
