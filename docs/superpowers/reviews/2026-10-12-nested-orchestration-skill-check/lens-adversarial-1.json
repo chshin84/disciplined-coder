@@ -1,0 +1,138 @@
+{
+  "lens": "lens-adversarial",
+  "target": "skills/nested-orchestration/SKILL.md + references/sub-session-protocol.md",
+  "read": [
+    "skills/lens-adversarial/SKILL.md",
+    "skills/aggregating-lenses/SKILL.md (리뷰 산출물 계약 절)",
+    "agent-principles.md",
+    "skills/nested-orchestration/SKILL.md",
+    "skills/nested-orchestration/references/sub-session-protocol.md",
+    "git diff d5fb6d7 e8492a8 -- skills/ (protocol, review-specs 부분과 stat)",
+    "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md (「2026-10-12 개정 — 명세 단계와 다시 나누기」 691-820행)"
+  ],
+  "issues": [
+    {
+      "where": "SKILL.md 「명세 단계」 둘째 문단 첫 문장(72행)과 「진행 위치」 표 첫 행(246행)",
+      "type": "failure-mode",
+      "claim": "대기 장벽과 진행 위치 표지가 명세 서브 세션의 완료를 'spec 브랜치에 하부 명세가 커밋됨'으로 판정한다. 그런데 명세 서브 세션은 커밋한 뒤에도 리뷰를 반영하고 `작성 기록`을 채우고 나서야 `DONE`을 보낸다. 그래서 첫 커밋만 있고 아직 실행 중인 서브 세션도 끝난 것으로 보인다. 특히 재시작한 현재 세션은 대화 기억 없이 이 표지만 보므로, 장벽을 넘어 리뷰 전 초안과 빈 작성 기록으로 완전체 명세를 쓰기 시작한다. 완화: 두 곳의 완료 조건을 'DONE을 받아 처리함(또는 spec-review 마커가 붙은 하부 명세가 있음)'으로 좁힌다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "현재 세션은 모든 임시 워크스트림이 하부 명세를 커밋했거나 범위에서 빠진 뒤에 완전체 명세를 쓴다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "명세 서브 세션은 자기 하부 명세를 쓰고 리뷰해 커밋하고, 리포트의 `작성 기록` 절에 고른 대안과 기각 이유, 읽은 코드와 자료, 열린 질문을 적은 뒤 `DONE`을 돌려주고 끝난다.",
+      "principle": "NO-ASSUME",
+      "consequence": "장벽 문장(72행)과 진행 위치 표 첫 행(246행)은 모두 '하부 명세가 커밋됨'을 완료 조건으로 적는다. DONE 수신, 리뷰 마커, 작성 기록은 이 조건에 들지 않는다."
+    },
+    {
+      "where": "SKILL.md 「판정 기록 확인」 둘째 문장(226행), 「리뷰 마커 확인」 마지막 문장(224행), 프로토콜 「하향 메시지」 표 `REVISE` 행의 '다음 응답' 칸",
+      "type": "failure-mode",
+      "claim": "명세 서브 세션은 DONE을 보내고 끝나며, 사용자 결정에 따라 유지하지 않는다. 그런데 명세 서브 세션의 DONE에서 사용자가 판정을 뒤집거나 escalated 🔴 답이 하부 명세를 바꿔야 하면, 스킬은 끝난 그 세션에 REVISE를 보내라고 한다. 「명세 단계」는 같은 상황에서 답을 「결정 기록」에 커밋하라고만 한다. 프로토콜 REVISE 행에는 큰 개발에서 하부 명세를 고친 뒤의 다음 응답이 없다. 실행자는 끝난 세션에 REVISE를 보내고 응답 형식을 추측하거나, 하부 명세를 고치지 않고 넘어간다. 완화: 명세 서브 세션이 대상이면 「리뷰 마커 확인」의 괄호 규칙처럼 RESTART를 보내도록 두 문장을 맞추고, REVISE 행의 다음 응답에 '명세 서브 세션은 DONE'을 적는다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "마지막 칸이 '예'(범위 밖 항목에 가깝다)인 줄만 사용자에게 묻고, 사용자가 판정을 뒤집으면 `REVISE`를 보낸다.",
+      "counterpart_file": "skills/nested-orchestration/references/sub-session-protocol.md",
+      "counterpart": "다른 저장소의 독립 작업에서 대상이 하부 명세면 `AWAITING_APPROVAL`, 구현이나 plan 이면 `DONE`, 응답이면 고친 같은 상향 메시지",
+      "principle": "CHECKABLE",
+      "consequence": "명세 서브 세션 DONE 뒤의 판정 번복과 🔴 답은 두 절차로 갈린다. 「판정 기록 확인」(226행)과 「리뷰 마커 확인」(224행)은 끝난 세션에 REVISE를 보내라고 하고, 「명세 단계」(70행)는 「결정 기록」 커밋만 적는다. 프로토콜 REVISE 행에는 이때의 다음 응답이 없다."
+    },
+    {
+      "where": "SKILL.md 「명세 단계」 둘째 문단 마지막 문장(72행)과 「완전체 명세」 둘째 문단·「겹침 판정」(76·78행)",
+      "type": "failure-mode",
+      "claim": "한 곳은 현재 세션이 맡긴 하부 명세를 직접 쓰지 않는다고 금지한다. 다른 곳은 현재 세션이 하부 명세를 골격에 맞춰 고치고 정의를 지우라고 지시한다. 실행자가 금지 문장을 따르면 겹침 판정과 골격 대조를 건너뛰거나, 이미 끝난 명세 서브 세션에 수정을 맡기려 한다. 단순화: 72행 문장의 범위를 '처음부터 쓰지 않는다(빠진 하부 명세를 대신 쓰지 않는다)'로 좁힌다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "현재 세션은 맡긴 하부 명세를 직접 쓰지 않는다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "경계를 넘는 자료를 두 하부 명세가 다르게 정했으면 그 자료의 소유 하위 프로젝트 쪽 정의를 경계 절에 적고, 다른 쪽 하부 명세에서는 그 정의를 지우고 경계 절을 가리킨다.",
+      "principle": "CHECKABLE",
+      "consequence": "같은 파일 안에서 72행은 하부 명세를 직접 쓰지 말라고 하고, 76·78행은 현재 세션이 하부 명세를 고치고 정의를 지우라고 한다."
+    },
+    {
+      "where": "SKILL.md 「리뷰 마커 확인」 첫 문단(222행)",
+      "type": "failure-mode",
+      "claim": "준비 단계 이후 현재 세션은 큰 명세 초안을 통합용 워크트리에 커밋하지 않은 채 둔다. 완전체 명세와 다시 나눈 분할 초안도 여기에 든다. 그런데 Stop 게이트는 통합용 워크트리에 적용되지 않는다. 직접 마커를 확인하라는 문장은 계약 코드 plan만 다룬다. 그래서 두 번의 승인 대상 문서가 review-specs 마커 없이 커밋되어도 막는 곳이 없다. 완화: 222행의 직접 확인 대상에 '통합용 워크트리에서 고친 큰 명세'를 더한다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "현재 세션은 계약 코드 plan 을 커밋하기 전에 그 파일의 마지막 비공백 줄이 아래 마커인지 직접 확인한다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "현재 세션은 사용자 승인을 받은 뒤에만 큰 명세의 새 절을 `dev/<개발>`에 커밋하고, 초안은 통합용 워크트리에 커밋하지 않은 채로 둔다.",
+      "principle": "NO-RAW-OUTPUT",
+      "consequence": "222행은 게이트가 적용되지 않는 통합용 워크트리 문서로 계약 코드 plan만 들고, 직접 확인 대상도 계약 코드 plan 하나로 적는다. 완전체 명세와 다시 나눈 분할을 커밋하기 전의 마커 확인은 어디에도 없다."
+    },
+    {
+      "where": "SKILL.md 「리뷰 마커 확인」 둘째 문단 둘째 문장(224행)과 「완전체 명세」 둘째 문단(76행)",
+      "type": "risk",
+      "claim": "하부 명세의 마커는 '옮기기 전'에 한 번만 확인한다. 그 뒤 현재 세션은 겹침 판정과 골격 대조로 하부 명세 본문을 고친다. 고친 파일에는 명세 서브 세션이 받은 옛 `passed` 마커가 그대로 남는다. 완전체 명세의 review-specs가 가리킨 하부 명세 파일까지 다시 보는지는 적혀 있지 않다. 구현 서브 세션은 「절 배정」으로 이 파일을 입력으로 받는다. 완화: 76행에 완전체 명세 리뷰 대상에 고친 하부 명세 파일을 넣는다고 적는다. 기능 추가가 아니라 대상 명시다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "현재 세션은 관례 골격을 기준표로 삼아 하부 명세마다 대조하고, 골격과 다르게 쓴 곳을 골격에 맞춰 고친다. 현재 세션은 완전체 명세를 `review-specs`로 리뷰한 뒤 사용자 승인을 받는다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "하부 명세는 완전체 명세로 옮기기 전에 `spec/<개발>/<임시 id>` 브랜치에서",
+      "principle": "NO-RAW-OUTPUT",
+      "consequence": "하부 명세의 리뷰 마커 확인은 옮기기 전에 한 번뿐이다. 옮긴 뒤 현재 세션이 고친 하부 명세 파일의 리뷰 범위는 76행에 적혀 있지 않다."
+    },
+    {
+      "where": "SKILL.md 「진행 위치」 표 셋째 행과 그 아래 문단 마지막 문장들(248·252행), 「흐름」 6단계(147행)",
+      "type": "failure-mode",
+      "claim": "현재 세션은 「절 배정」을 담은 큰 명세를 커밋한 다음에 계약 코드를 만든다. 계약 코드는 writing-plans, plan 리뷰, 사용자 검토, SDD 순서로 진행한다. 계약 코드를 만드는 도중 현재 세션이 재시작하면 표지는 '구현 단계'를 낸다. 브랜치가 없는 워크스트림은 모두 '시작 전'이 된다. 그러면 현재 세션은 계약 코드가 없거나 절반만 된 통합 브랜치에서 구현 서브 세션을 디스패치한다. 6단계에도 계약 코드가 통합 브랜치에 있어야 한다는 조건이 없다. 완화: 셋째 행이나 6단계에 '계약 코드(계약 테스트)가 dev에 커밋되기 전은 계약 코드 작성 중'을 적는다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "큰 명세 목록에 있는데 브랜치가 없는 워크스트림은 시작 전이다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "다시 나눈 분할이 승인되면 현재 세션은 통합 브랜치에 큰 명세를 커밋하고 계약을 타입·시그니처·계약 테스트 코드로 만들고, 계약 코드의 경로를 소유 표에 현재 세션 소유로 적는다.",
+      "principle": "NO-ASSUME",
+      "consequence": "진행 위치 표에는 「절 배정」 커밋과 계약 코드 완료 사이의 단계가 없다. 「흐름」 6단계에도 계약 코드가 있어야 디스패치한다는 조건이 없다."
+    },
+    {
+      "where": "SKILL.md 「가드레일」 첫 문장(218행)",
+      "type": "failure-mode",
+      "claim": "가드레일은 모든 서브 세션의 DONE에 적용되고, 수정 범위 대조와 시험 병합까지 차례로 하라고 한다. 그런데 이 검사의 명령은 `ws/<개발>/<id>`로만 적혀 있다. 명세 서브 세션의 브랜치는 병합하지 않고 경로 checkout으로만 옮긴다. 명세 서브 세션의 DONE을 받은 실행자는 spec 브랜치로 명령을 바꿔 시험 병합을 시도하거나, 무엇을 건너뛸지 스스로 정한다. 단순화: 218행을 구현 서브 세션의 DONE으로 좁힌다. 명세 서브 세션 DONE에 적용할 검사(리뷰 마커 확인, 판정 기록 확인)는 「명세 단계」에 한 줄로 가리킨다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "현재 세션은 서브 세션이 `DONE`을 돌려주면 아래 검사를 차례로 한다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "현재 세션은 각 `spec/<개발 이름>/<임시 id>` 브랜치의 하부 명세와 그 리뷰 기록을 `git -C <통합용 워크트리> checkout spec/<개발 이름>/<임시 id> -- <경로>`로 통합용 워크트리에 옮긴다.",
+      "principle": "FOCUSED",
+      "consequence": "218행은 DONE을 보낸 서브 세션을 가리지 않는다. 그 아래 「수정 범위 대조」와 「시험 병합」의 명령은 `ws/<개발>/<id>` 브랜치만 적는다."
+    },
+    {
+      "where": "SKILL.md 「다시 나누기」 둘째 문단 마지막 문장(82행)과 「흐름」 10단계(151행)",
+      "type": "failure-mode",
+      "claim": "다시 나눈 결과 시작 워크스트림이 하나뿐이면 현재 세션이 직접 진행한다. 이때 이미 dev 통합 브랜치와 통합용 워크트리와 spec/* 브랜치·워크트리와 리포트 폴더가 있다. 그런데 어느 체크아웃에서 진행하는지와 이것들을 언제 지우는지가 적혀 있지 않다. 정리 단계는 구현 워크스트림 병합 뒤인 9단계 다음에만 있다. 이 경로에서는 「절 배정」도 커밋되지 않으므로, 재시작한 현재 세션은 진행 위치를 '다시 나누기 단계'로 판정한다. 완화: 82행에 직접 진행할 체크아웃(통합용 워크트리)과 '끝나면 10단계 정리를 한다'를 적는다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "다시 나눈 결과 시작 워크스트림이 하나뿐이면 현재 세션은 사용자에게 알리고, 완전체 명세로 `writing-plans`부터 직접 진행한다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "「겹침 판정」은 있고 「절 배정」이 없다 | 다시 나누기 단계",
+      "principle": "REPORT-DEAD",
+      "consequence": "82행 경로에는 작업할 체크아웃도 정리 시점도 적혀 있지 않다. 진행 위치 표는 이 경로가 끝날 때까지 '다시 나누기 단계'를 낸다. 정리 목록(151행)은 main 병합 뒤 10단계에만 있다."
+    },
+    {
+      "where": "SKILL.md 「명세 단계」 첫 문단(70행)과 「완전체 명세」 둘째 문단(76행)",
+      "type": "risk",
+      "claim": "명세 단계 중에 현재 세션은 먼저 끝난 명세 서브 세션의 '예' 줄 답을 「결정 기록」에 커밋한다. 아직 실행 중인 다른 명세 서브 세션은 옛 기준 커밋의 「결정 기록」으로 하부 명세를 쓴다. 명세 단계에는 BASE-UPDATED 전파가 없다. 완전체 명세에서 하는 대조는 관례 골격만 기준표로 삼는다. 그래서 명세 단계 중에 들어온 사용자 답과 어긋난 하부 명세가 완전체 명세에 남는다. 완화: 76행의 대조 기준표를 '관례 골격과 「결정 기록」'으로 넓힌다. 새 단계는 필요 없다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "현재 세션은 관례 골격을 기준표로 삼아 하부 명세마다 대조하고, 골격과 다르게 쓴 곳을 골격에 맞춰 고친다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "현재 세션은 명세 서브 세션의 `DONE`을 받으면 리포트의 `스스로 판정한 모호함`에서 마지막 칸이 '예'인 줄을 사용자에게 묻고 답을 「결정 기록」에 커밋한다.",
+      "principle": "CHECKABLE",
+      "consequence": "명세 단계 중의 「결정 기록」 커밋은 실행 중인 명세 서브 세션에 전해지지 않는다. 완전체 명세의 대조 기준은 관례 골격 하나로만 적혀 있다."
+    },
+    {
+      "where": "SKILL.md 「시험 병합」 첫 문장의 `git log` 경로 목록(230행)",
+      "type": "risk",
+      "claim": "구현 서브 세션의 입력은 「절 배정」이 가리키는 하부 명세 파일이다. 이 파일은 큰 명세 경로와 다른 파일이다. 디스패치 뒤 contract-change를 채택하거나 범위를 바꾸면 현재 세션이 큰 명세를 고친다. 이때 하부 명세 파일이 바뀌어도 시험 병합 전 확인이 보는 경로에 그 파일이 없다. 그래서 바뀐 하부 명세를 받지 않은 워크스트림도 병합된다. 완화: 경로 목록에 「절 배정」의 하부 명세 경로(`docs/superpowers/specs/*-<개발>-spec*-design.md`)를 넣는다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "ws/<개발>/<id>..dev/<개발> -- <계약 코드 경로> <큰 명세 경로> <의존성 목록·잠금 파일 경로>",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "큰 명세 본문은 각 하부 명세를 가리키고, 공유 결정 절과 경계 절과 「겹침 판정」 절을 새로 둔다.",
+      "principle": "CHECKABLE",
+      "consequence": "230행의 확인 경로는 계약 코드와 큰 명세 한 파일과 의존성 파일뿐이다. 「절 배정」이 가리키는 하부 명세 파일은 이 경로에 들지 않는다."
+    },
+    {
+      "where": "SKILL.md 「흐름」 4단계 마지막 문장(145행)과 「측정」 첫 문단(256행)",
+      "type": "risk",
+      "claim": "Spec-Tokens와 Spec-Wait는 명세 서브 세션들의 완료 통지와 기다린 시간을 더한 값이다. 이 값은 현재 세션의 대화에만 있다. 현재 세션이 명세 단계 중에 재시작하면 git에서 이 값을 되살릴 길이 없다. 그런데도 4단계는 트레일러를 꼭 넣으라고 한다. 실행자는 값을 지어내거나 멈춘다. 완화: 145행에 '재시작으로 잃은 값은 미상으로 적는다'를 둔다.",
+      "file": "skills/nested-orchestration/SKILL.md",
+      "evidence": "커밋 메시지에는 명세 단계의 토큰 합과 가장 늦은 명세 서브 세션을 기다린 시간을 `Spec-Tokens:`와 `Spec-Wait:` 트레일러로 넣는다.",
+      "counterpart_file": "skills/nested-orchestration/SKILL.md",
+      "counterpart": "현재 세션은 상태 문서 없이 git에서 진행 위치를 도출한다.",
+      "principle": "STATE-ASSUME",
+      "consequence": "145행은 두 트레일러를 무조건 요구한다. 그 값의 출처는 대화 속 완료 통지뿐이고, 재시작 뒤 값을 무엇으로 적을지는 정해져 있지 않다."
+    }
+  ],
+  "principles_applied": ["NO-ASSUME", "STATE-ASSUME", "CHECKABLE", "NO-RAW-OUTPUT", "FOCUSED", "REPORT-DEAD", "YAGNI", "REVERSIBLE"],
+  "notes": "검토한 관점은 아래와 같다. 실패 모드는 요청이 든 단계 사이 인계, 재시작 복구, 명세 서브 세션 실패, 다시 나누기 뒤 디스패치, 시험 병합 전 확인, 정리를 항목마다 따로 보았다. 그 밖에 실행자가 계획을 안 따르는 길로 문장 사이 모순과 끝난 세션에 보내는 메시지를 보았다. 과설계는 Spec-Tokens·Spec-Wait 트레일러, 「절 배정」, 겹침 판정 표를 보았다. 모두 사용자 결정이나 측정 합의에 묶여 있어 올리지 않았다. 비가역은 정리 단계의 한 번 확인 뒤 일괄 삭제와 하부 명세 직접 수정을 보았다. 정리는 REVERSIBLE대로 확인을 받으므로 올리지 않았다. 위험은 위 발견에 넣었다. 사용자 결정 사항(명세 단계와 다시 나누기 구조, 관례 골격, 작성 기록, '다르면 따로 둠', 대기 장벽, 소유 워크스트림 구현, 태스크 다섯)은 바꾸자고 하지 않았다. 대기 장벽 발견은 장벽 자체가 아니라 완료 판정 표지만 다룬다. 더 확인할 것은 아래와 같다. (1) 완료한 서브에이전트에 SendMessage 이어 쓰기가 되는지 확인해야 한다. 근거 문서도 실행 중 수신을 검증하지 않은 가정으로 둔다. 이어 쓰기가 되면 명세 서브 세션에 보내는 REVISE 발견의 결과가 '응답 형식 부재'로 좁아지고, 안 되면 REVISE 자체가 실패한다. (2) review-specs가 큰 명세가 가리키는 하부 명세 파일까지 렌즈 입력에 넣는지 확인해야 한다. review-specs의 PREP 규칙을 열지 않아 하부 명세 마커 발견은 risk로만 올렸다. (3) 시험 병합 경로 목록 발견에서 하부 명세 경로 패턴 `*-<개발>-spec*-design.md`는 임시 id가 `spec`으로 시작한다는 규칙에서 추론한 예시이며 실행해 보지 않았다. 고칠 줄을 지목하지 못한 원인으로는 한 가지가 남는다. 명세 서브 세션이 BLOCKED contract-change를 보낼 때 계약 표가 아직 없으므로 받은 메시지 처리 표의 contract-change 행(계약 코드 수정, 제공자·소비자에 CONTRACT-CHANGED)이 맞지 않는다. 다만 명세 단계에서 이 사유가 실제로 쓰이는지는 문서 안에서 판정하지 못해 올리지 않았다."
+}

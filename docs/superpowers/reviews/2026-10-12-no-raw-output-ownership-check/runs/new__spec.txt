@@ -1,0 +1,19 @@
+```json
+{
+  "lenses_to_run": ["lens-grounding", "lens-fit", "lens-adversarial", "lens-consistency"],
+  "proposals": [
+    {
+      "lens": "lens-prior-art",
+      "action": "제안",
+      "reason": "이 팀이 처음 도입하는 설계(결제 실패 재시도)라서, 이미 알려진 방식을 웹에서 찾아볼 가치가 큽니다. 이 렌즈는 필요할 때 그룹에 속하고 표에서 review-specs가 실행하는 호출자로 적혀 있습니다. 나는 사용자와 대화하는 메인 세션이므로 물어볼 수 있습니다. 렌즈 그룹 공통 규칙의 '제안과 승인'에 따라 실행 여부를 묻습니다. 또 웹에 나가는 렌즈라서 LENS-ALLOWED의 단서에 따라 그때마다 승인을 받아야 합니다. 기록을 쓰거나 봉인하기 전에 승인 여부가 정해지도록 하고, 제안 여부·승인 여부와 각각의 이유를 그 차수의 기록에 적습니다."
+    },
+    {
+      "lens": "lens-readability",
+      "action": "제안 안 함",
+      "reason": "발동 기준에 'spec과 plan에는 제안하지 않는다'고 적혀 있습니다. 실행하는 호출자도 review-docs와 audit-repo-docs뿐이고 review-specs는 없습니다. 제안하지 않았다는 사실과 그 이유는 판정 기록에 남깁니다."
+    }
+  ],
+  "authority": "원칙 「검증」의 NO-RAW-OUTPUT(spec은 렌즈 검증을 거친 뒤에 결과로 삼음)과 LENS-ALLOWED(lens-* 호출은 상시 허용, 웹에 나가는 lens-prior-art는 그때마다 승인). 렌즈 그룹 문서의 「렌즈 그룹」 표(그룹과 실행하는 호출자 칸), 호출자별 전체 입력 표(review-specs 행), 필요할 때 그룹 공통 규칙(제안과 승인, 제안 시점, 판정 기록), lens-readability 발동 기준.",
+  "ambiguity": "(1) 표의 '실행하는 호출자' 칸에 '메인 세션'이 없습니다. spec을 쓴 메인 세션이 review-specs 호출자라고 가정해야 묶음 전체 그룹(adversarial, consistency)과 prior-art가 대상이 됩니다. 이 대응은 주어진 문서에 명시되어 있지 않습니다. (2) lens-prior-art의 발동 기준은 '각 호출자가 정한다'고만 되어 있고, review-specs 쪽 기준은 주어지지 않았습니다. 그래서 제안 판단은 '처음 해 보는 방식'이라는 상황에 기댄 추정입니다. (3) review-specs에서 lens-consistency의 입력은 '검토 대상 문서와 그 짝 문서(plan이면 spec)'인데, 대상이 spec일 때 짝이 무엇인지는 적혀 있지 않습니다. 새 spec이라 plan도 아직 없을 수 있어서, spec 하나만으로 실행하는지 불분명합니다. (4) 문서 단위 그룹을 따로 실행할지 묶어 실행할지는 「따로 실행할 때와 묶을 때」 절이 정한다고 하는데, 그 절이 주어지지 않았습니다. 원칙도 '언제 어떻게'는 dispatching-lenses가 정한다고 하는데, 그 문서 역시 주어지지 않았습니다."
+}
+```

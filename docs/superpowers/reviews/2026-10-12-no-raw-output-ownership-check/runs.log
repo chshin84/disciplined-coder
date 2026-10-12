@@ -1,0 +1,10 @@
+{"run": "current__spec", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "current__guide", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "current__subspec", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__spec", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__guide", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__subspec", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "current__audit", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "current__proposal", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__audit", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
+{"run": "new__proposal", "num_turns": 1, "is_error": false, "models": ["claude-opus-5-5"]}
