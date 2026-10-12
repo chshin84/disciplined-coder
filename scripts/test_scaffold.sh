@@ -259,16 +259,49 @@ check "옮긴 커밋을 본 것으로 적는다" "[ \"\$(cat '$H30/.claude/disci
 H31="$(mktemp -d)"; uc_fixture "$H31" "$A40" 7 "$B40" > /dev/null
 OUT31="$(run_uc "$H31")"
 OUT31b="$(run_uc "$H31")"
-echo "[install-current] 못 옮기면 실패와 명령을 알리고, 같은 원격 커밋으로는 다시 시도하지 않는다"
+echo "[install-current] 못 옮기면 실패와 명령을 알리고, 그날은 다시 시도하지 않는다"
 check "조용히 넘기지 않는다"         "printf '%s' \"\$OUT31\" | grep -qF '옮기지 못했다(aaaaaaa → bbbbbbb, 종료 코드 7)'"
 check "다시 켜라고 하지 않는다"      "! printf '%s' \"\$OUT31\" | grep -qF '다시 켜'"
 check "직접 실행할 명령을 보인다"    "printf '%s' \"\$OUT31\" | grep -qF 'plugin marketplace update chshin-tools && '"
 check "Claude 에게 묻게 한다"        "printf '%s' \"\$OUT31\" | grep -qF '대신 실행할지 물어라'"
 check "다음 세션에는 갱신을 안 실행한다" "[ \"\$(grep -c 'plugin marketplace update' '$H31/args.txt')\" -eq 1 ]"
-check "다음 세션에도 알린다"         "printf '%s' \"\$OUT31b\" | grep -qF '이미 갱신에 실패해 다시 시도하지 않았다'"
-printf '%s' "$C40" > "$H31/remote.txt"
+check "다음 세션에도 알린다"         "printf '%s' \"\$OUT31b\" | grep -qF '오늘 이미 갱신에 실패해 다시 시도하지 않았다'"
+printf '2000-01-01\n' > "$H31/.claude/disciplined-coder/update.stuck"
 run_uc "$H31" > /dev/null
-check "원격에 새 커밋이 생기면 다시 시도한다" "[ \"\$(grep -c 'plugin marketplace update' '$H31/args.txt')\" -eq 2 ]"
+check "날짜가 바뀌면 다시 시도한다"  "[ \"\$(grep -c 'plugin marketplace update' '$H31/args.txt')\" -eq 2 ]"
+printf '%s\n' "$B40" > "$H31/.claude/disciplined-coder/update.stuck"
+run_uc "$H31" > /dev/null
+check "커밋을 적은 옛 기록이면 다시 시도한다" "[ \"\$(grep -c 'plugin marketplace update' '$H31/args.txt')\" -eq 3 ]"
+
+# 편집기가 사본 폴더를 잡으면 marketplace update 가 폴더 이름을 못 바꿔 "because it is in use" 로
+# 실패한다. 그때는 사본 폴더 안에서 git 으로 원격을 받아 옮긴다. origin 은 로컬 저장소로 흉내 낸다.
+lock_fixture() {  # $1=HOME $2=origin 의 marketplace.json 내용 → origin 의 HEAD 를 출력한다
+  local m="$1/.claude/plugins/marketplaces/chshin-tools" o="$1/origin"
+  uc_fixture "$1" "$A40" 0 "$B40" > /dev/null
+  git init -q "$o"; mkdir -p "$o/.claude-plugin"; printf '%s' "$2" > "$o/.claude-plugin/marketplace.json"
+  git -C "$o" add -A; git -C "$o" -c user.email=t@t -c user.name=t commit -q -m new
+  git -C "$m" remote add origin "$o"
+  cat > "$1/claude-stub" <<STUB
+#!/usr/bin/env bash
+printf '%s\n' "\$*" >> "$1/args.txt"
+case "\$*" in *"marketplace update"*) echo "Could not replace the marketplace directory because it is in use" >&2; exit 1 ;; esac
+exit 0
+STUB
+  git -C "$o" rev-parse HEAD
+}
+H38="$(mktemp -d)"; O38="$(lock_fixture "$H38" '{"name":"chshin-tools"}')"
+OUT38="$(run_uc "$H38")"
+echo "[install-current] 사본 폴더가 잡혀 있으면 폴더 안 git 으로 옮긴다"
+check "사본이 origin 의 커밋으로 옮겨진다" "[ \"\$(git -C '$H38/.claude/plugins/marketplaces/chshin-tools' rev-parse HEAD)\" = '$O38' ]"
+check "이어서 설치본을 옮긴다"           "grep -qxF 'plugin update disciplined-coder@chshin-tools' '$H38/args.txt'"
+check "다시 켜라고 한다"                 "printf '%s' \"\$OUT38\" | grep -qF '다시 켜야'"
+H39="$(mktemp -d)"; lock_fixture "$H39" '{ broken' > /dev/null
+OLD39="$(git -C "$H39/.claude/plugins/marketplaces/chshin-tools" rev-parse HEAD)"
+OUT39="$(run_uc "$H39")"
+echo "[install-current] 받은 커밋의 marketplace.json 이 깨졌으면 사본을 옮기지 않는다"
+check "사본이 그대로다"                  "[ \"\$(git -C '$H39/.claude/plugins/marketplaces/chshin-tools' rev-parse HEAD)\" = '$OLD39' ]"
+check "설치본을 옮기지 않는다"           "! grep -qF 'plugin update disciplined-coder' '$H39/args.txt'"
+check "실패를 알린다"                    "printf '%s' \"\$OUT39\" | grep -qF '옮기지 못했다'"
 
 H32="$(mktemp -d)"; uc_fixture "$H32" "$A40" 0 "$A40" > /dev/null
 OUT32="$(run_uc "$H32")"
@@ -355,9 +388,9 @@ check "자동 갱신 알림을 낸다"    "printf '%s' \"\$OUTAU4\" | grep -qF '
 
 HAU3="$(mktemp -d)"; uc_fixture "$HAU3" "$A40" 124 "$B40" > /dev/null
 OUTAU3="$(run_uc "$HAU3")"
-echo "[install-current] 시간 초과도 같은 커밋으로는 다시 시도하지 않는다"
+echo "[install-current] 시간 초과도 그날은 다시 시도하지 않는다"
 check "시간 초과를 알린다"                     "printf '%s' \"\$OUTAU3\" | grep -qF '60초'"
-check "update.stuck 을 남긴다"                 "[ -f '$HAU3/.claude/disciplined-coder/update.stuck' ]"
+check "update.stuck 에 오늘 날짜를 남긴다"     "[ \"\$(cat '$HAU3/.claude/disciplined-coder/update.stuck')\" = \"\$(date +%F)\" ]"
 
 # --- crlf-region: CRLF 관리영역 인식 ---
 H6="$(mktemp -d)"; P6="$(mktemp -d)"; mkdir -p "$H6/.claude"
