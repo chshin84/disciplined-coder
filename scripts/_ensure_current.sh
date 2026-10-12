@@ -4,18 +4,27 @@
 #
 # 자동 갱신 플래그만으로는 모자라다. Claude Code 의 마켓플레이스 새로고침은 세션 시작 훅보다
 # 2~4분 뒤에 비동기로 도착하므로, 훅이 도는 시점에는 로컬 사본도 옛 커밋이다. 그래서 설치본을
-# 로컬 사본이 아니라 원격 HEAD 와 비교한다. 판정 규칙은 kw-control-tower 와 같다.
+# 로컬 사본이 아니라 원격 HEAD 와 비교한다. 판정 규칙은 kw-control-tower 를 따른다.
 #
 # - 원격 HEAD 는 curl 로 git smart HTTP 의 info/refs 를 2초 제한으로 읽는다. 실측 0.2초로
 #   git ls-remote(0.6초)보다 빠르고 GitHub API 의 시간당 호출 한도가 없다.
 # - 배포처가 브랜치나 태그(ref)를 지정했거나, 원격을 못 읽으면 로컬 사본의 HEAD 와 비교한다.
 #   지정된 ref 를 원격 기본 브랜치와 비교하면 매 세션 불일치가 나서 갱신이 되풀이된다.
-# - 같은 원격 커밋으로 갱신이 한 번 실패했으면 다시 시도하지 않고 알림만 한다. 원격에 새 커밋이
-#   생기면 다시 시도한다. 기록은 update.stuck 이다.
+# - 갱신에 실패하면 그날은 다시 시도하지 않고 알림만 한다. 날짜가 바뀐 뒤 첫 세션에서 다시
+#   시도한다. 기록은 update.stuck 이고 실패한 날짜(YYYY-MM-DD)를 적는다. 예전에는 원격 커밋을 적어
+#   새 커밋이 생길 때까지 보류했는데, 편집기가 사본 폴더를 잡는 것처럼 곧 풀리는 원인으로 실패해도
+#   같은 커밋으로는 다시 시도하지 않았다(2026-10-12 kw-control-tower 의 같은 변경). 옛 기록은
+#   날짜가 아니므로 다음 세션이 다시 시도한다.
+# - VS Code 같은 프로그램이 사본 폴더를 잡고 있으면 `claude plugin marketplace update` 가 기존 폴더
+#   이름을 바꾸지 못해 "because it is in use" 로 실패한다. 폴더 안 파일 쓰기는 막히지 않으므로, 그
+#   문구가 나오면 사본 폴더 안에서 git fetch 로 받고, 받은 커밋의 marketplace.json 이 JSON 으로
+#   읽힐 때만 reset --hard 로 옮긴다. 사본은 손으로 고치는 폴더가 아니므로 사본의 수정은 보호하지
+#   않는다. 원인 확인과 임시 복제본 측정은 kw-plugins 세션(2026-10-12)이 했다.
 # - 세션 사이에 자동 갱신이 설치본을 옮겼으면 알린다. 지난 세션에 본 커밋은 update.seen 이다.
 #   이 세션이 새 버전으로 실행되는지는 실행 중인 CLAUDE_PLUGIN_ROOT 의 폴더 이름으로 판정한다.
 # - 배포처나 설정에서 autoUpdate 를 false 로 두었으면 아무것도 하지 않는다.
-# - 두 갱신 명령에는 60초 상한과 잠금을 둔다. 시간 초과도 다른 실패와 같이 update.stuck 에 적는다 —
+# - 두 갱신 명령에는 60초 상한과 잠금을 둔다. 폴더 안 git fetch 는 20초 상한이고, 셋을 더한 140초가
+#   훅 제한 150초(hooks.json) 안에 든다. 시간 초과도 다른 실패와 같이 update.stuck 에 적는다 —
 #   늘 멈추는 망에서 startup 마다 최대 120초를 기다리지 않게 한다.
 #
 # 옮긴 뒤에는 반드시 다시 켜라고 말한다. `claude plugin update` 의 도움말이 "restart required to
@@ -27,7 +36,7 @@
 # $1=설정 홈(~/.claude). 사용자에게 보일 줄을 stdout 으로 낸다. 어느 분기에서도 0 으로 끝난다 —
 # 갱신 확인이 세션 시작을 막지 않는다.
 ensure_install_current() {
-  local home="$1" inst out id sha url ref name dir head rc bin curl kdir seen stuck restart=0 notes="" root au lock tmo got
+  local home="$1" inst out id sha url ref name dir head rc bin curl kdir seen stuck restart=0 notes="" root au lock tmo got today err
   inst="$home/plugins/installed_plugins.json"
   [ -f "$inst" ] || return 0
 
@@ -96,10 +105,10 @@ sys.exit(1)
   else
     # 시험에서 실제 명령을 실행하지 않도록 주입한다.
     bin="${DISCIPLINED_CODER_CLAUDE_BIN:-claude}"
-    stuck="$(cat "$kdir/update.stuck" 2>/dev/null || true)"
-    if [ "$stuck" = "$head" ]; then
+    stuck="$(cat "$kdir/update.stuck" 2>/dev/null || true)"; today="$(date +%F)"
+    if [ "$stuck" = "$today" ]; then
       notes="${notes:+$notes
-}설치본이 원격보다 뒤처져 있다(${sha:0:7} → ${head:0:7}). 이 커밋으로는 이미 갱신에 실패해 다시 시도하지 않았다. 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
+}설치본이 원격보다 뒤처져 있다(${sha:0:7} → ${head:0:7}). 오늘 이미 갱신에 실패해 다시 시도하지 않았다. 내일 첫 세션에서 다시 시도한다. 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
     else
       # 창 둘이 동시에 열리면 한 창만 옮긴다. 잠금은 폴더 만들기로 잡는다. 10분이 지난 잠금은 끊긴 창이
       # 남긴 것으로 보고 치우되, 치운 창은 그 실행에서 물러난다. 치우고 곧바로 잡으면 그 사이에 다른 창이
@@ -116,8 +125,17 @@ sys.exit(1)
       # 명령이고 --version 을 모른다. GNU timeout 이 없으면(맥 기본) 상한 없이 실행한다.
       tmo=""; timeout --version >/dev/null 2>&1 && tmo="timeout 60"
       # 로컬 사본이 옛 커밋이면 plugin update 가 옮길 새 버전이 없으므로 사본부터 원격에 맞춘다.
-      rc=0
-      $tmo "$bin" plugin marketplace update "$name" >/dev/null 2>&1 || rc=$?
+      # 오류 문구를 보고 폴더 안 git 갱신으로 넘어가야 하므로 출력을 임시 파일에 받는다.
+      rc=0; err="$(mktemp)"
+      $tmo "$bin" plugin marketplace update "$name" >"$err" 2>&1 || rc=$?
+      if [ "$rc" -ne 0 ] && grep -qF 'because it is in use' "$err"; then
+        rc=0
+        ${tmo:+timeout 20} git -C "$dir" fetch -q origin "${ref:-HEAD}" >/dev/null 2>&1 || rc=$?
+        [ "$rc" -eq 0 ] && { git -C "$dir" show FETCH_HEAD:.claude-plugin/marketplace.json 2>/dev/null \
+          | json_valid_stdin >/dev/null 2>&1 || rc=65; }
+        [ "$rc" -eq 0 ] && { git -C "$dir" reset -q --hard FETCH_HEAD >/dev/null 2>&1 || rc=$?; }
+      fi
+      rm -f "$err"
       [ "$rc" -eq 0 ] && { $tmo "$bin" plugin update "$id" >/dev/null 2>&1 || rc=$?; }
       rmdir "$lock" 2>/dev/null || true
       if [ "$rc" -eq 0 ]; then
@@ -127,13 +145,13 @@ sys.exit(1)
         notes="${notes:+$notes
 }설치본을 원격에 맞춰 옮겼다(${sha:0:7} → ${head:0:7}). 클로드 코드는 켤 때 플러그인을 읽으므로 이 세션은 옛 버전으로 실행된다."
       else
-        printf '%s\n' "$head" > "$kdir/update.stuck"
+        printf '%s\n' "$today" > "$kdir/update.stuck"
         if [ "$rc" -eq 124 ]; then
           notes="${notes:+$notes
-}설치본이 원격보다 뒤처졌는데 갱신 명령이 60초 안에 끝나지 않아 멈췄다(${sha:0:7} → ${head:0:7}). 원격에 새 커밋이 생기기 전에는 다시 시도하지 않는다. 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
+}설치본이 원격보다 뒤처졌는데 갱신 명령이 60초 안에 끝나지 않아 멈췄다(${sha:0:7} → ${head:0:7}). 내일 첫 세션에서 다시 시도한다. 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
         else
           notes="${notes:+$notes
-}설치본이 원격보다 뒤처졌는데 옮기지 못했다(${sha:0:7} → ${head:0:7}, 종료 코드 $rc). 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
+}설치본이 원격보다 뒤처졌는데 옮기지 못했다(${sha:0:7} → ${head:0:7}, 종료 코드 $rc). 내일 첫 세션에서 다시 시도한다. 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
         fi
       fi
       fi
