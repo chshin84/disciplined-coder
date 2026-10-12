@@ -1,0 +1,54 @@
+{
+ "target": "CLAUDE.md",
+ "lens": "lens-fit",
+ "doc_type": "규범·인덱스 — 문서·훅·검사 장치의 위치를 가리키는 포인터와 작업 규칙을 포함한다",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/lens-fit/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "「변경 뒤 실행」 마지막 문단",
+   "type": "constraint",
+   "claim": "규범·인덱스 문서에 특정 CLI 버전(2.1.296)이 지금 내는 경고라는 현재 상태를 적었다. 타입 표의 규범·인덱스 행은 상태를 적지 말라고 한다.",
+   "file": "CLAUDE.md",
+   "evidence": "경고 문구는 CLI 버전마다 바뀐다(2.1.296 은 `version` 경고 대신 루트 CLAUDE.md 가 실리지 않는다는 경고를 낸다).",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "| **규범·인덱스** (CLAUDE.md·문서 맵) | 문서의 위치와 작업 방법 | 포인터와 규칙만 적고 상태는 적지 마라 |",
+   "principle": "DOC-TYPE",
+   "consequence": "CLAUDE.md 「변경 뒤 실행」이 CLI 2.1.296 의 validate 경고 내용을 적고 있고, skills/domain-plugin/SKILL.md 는 같은 명령의 version 경고를 전제로 적고 있다."
+  },
+  {
+   "where": "「변경 뒤 실행」의 결함 주입 문단",
+   "type": "style",
+   "claim": "목록 앞에 개수(넷)를 예고했다.",
+   "file": "CLAUDE.md",
+   "evidence": "테스트나 문서를 줄이는 차수에는 `domain-pruning` 「절차」의 결함 주입을 이 저장소의 핵심 계약 넷에 한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "- **`COUNT-EARNS`** — 숫자는 그 값이 달라지면 결론이나 결정이 바뀔 때만 적어라. 대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라.",
+   "principle": "COUNT-EARNS",
+   "consequence": "핵심 계약을 '넷'으로 예고한 뒤 다음 문장에서 네 계약을 나열하므로, 계약을 하나 추가하거나 빼면 개수와 목록 두 곳을 함께 고쳐야 한다."
+  },
+  {
+   "where": "「에이전트원칙을 고칠 때」의 조항 추가와 문구 변경 항목",
+   "type": "style",
+   "claim": "불릿 한 항목이 여섯 문장이다.",
+   "file": "CLAUDE.md",
+   "evidence": "- **조항 추가와 문구 변경** — 클린룸 소거 시험으로 효과를 확인한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "- **`BULLET-SCOPE`** — 불릿은 같은 종류를 늘어놓을 때만 쓰고, 한 항목이 여러 문장이 되면 산문으로 써라.",
+   "principle": "BULLET-SCOPE",
+   "consequence": "조항 추가 절차와 문구 변경 절차와 삭제 기록 위치가 한 불릿 항목 안에 여섯 문장으로 이어져 있다."
+  }
+ ],
+ "principles_applied": [
+  "DOC-TYPE",
+  "COUNT-EARNS",
+  "BULLET-SCOPE",
+  "ONE-IDEA",
+  "ANTI-LIMIT",
+  "WRITTEN-ONLY"
+ ],
+ "notes": "검토 관점: 형식·스타일·오염·호환·규율을 항목마다 보았다. 문서 타입은 규범·인덱스로 골랐다. 「문서 타입마다 무엇이 강제하나」 표는 장치 포인터라 상태로 보지 않았다. CLAUDE.md 는 남에게 전달되는 문서가 아니어서 TITLES 묶음은 적용하지 않았다. 'A가 아니라 B' 대구는 1회라 ANTI-LIMIT 안이다."
+}

@@ -1,0 +1,79 @@
+{
+ "target": "README.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — 설치·동작 확인·복구·hook 해제 방법과 hook 목록 계약을 포함하고 진행 상태는 포함하지 않는다",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/domain-readme/SKILL.md",
+  "skills/lens-fit/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "「하드 게이트와 넛지와 전역 설정 수정」 아래 세 소제목",
+   "type": "style",
+   "claim": "남에게 전달되는 문서인 README 에 ### 소제목 층을 두었다. TITLE-LAYERS 는 문서의 절 제목을 #·## 두 층으로 두고 ### 층을 두지 말라고 한다.",
+   "file": "README.md",
+   "evidence": "### 차단되었을 때 푸는 법",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "문서에는 `###` 소제목 층을 두지 마라.",
+   "principle": "TITLE-LAYERS",
+   "consequence": "README 의 「하드 게이트와 넛지와 전역 설정 수정」 절 아래에 「차단되었을 때 푸는 법」·「세션 시작에 바꾸는 전역 설정」·「끄는 법」 세 소제목이 ### 층으로 놓여 있다."
+  },
+  {
+   "where": "「하드 게이트와 넛지와 전역 설정 수정」 첫 문단과 「끄는 법」",
+   "type": "constraint",
+   "claim": "사용자용 README 에 이 저장소에서만 실행되는 개발용 hook(seal_reviews.sh)과 변수를 나눈 내부 사유 같은 개발자 근거를 섞었다.",
+   "file": "README.md",
+   "evidence": "금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.",
+   "counterpart_file": "skills/domain-readme/SKILL.md",
+   "counterpart": "사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않는다. 후자는 별도 문서나 스킬로 뺀다.",
+   "principle": "domain-readme 「독자 분리」",
+   "consequence": "플러그인 사용자가 읽는 hook 표에 이 저장소 개발 세션에서만 실행되는 seal_reviews.sh 행이 있고, 「끄는 법」에 금지 표현 목록을 고치는 개발자의 사정이 적혀 있다."
+  },
+  {
+   "where": "「끄는 법」 첫 문장, 「하드 게이트와 넛지와 전역 설정 수정」 첫 문단",
+   "type": "style",
+   "claim": "목록 앞에 개수를 예고하고 대상을 개수로 가리켰다.",
+   "file": "README.md",
+   "evidence": "hook은 환경 변수 두 개로 끈다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "- **`COUNT-EARNS`** — 숫자는 그 값이 달라지면 결론이나 결정이 바뀔 때만 적어라. 대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라.",
+   "principle": "COUNT-EARNS",
+   "consequence": "「끄는 법」은 '환경 변수 두 개'로 목록을 예고하고 뒤에서 '두 변수는'으로 가리키며, hook 절 첫 문단은 '연결 파일은 둘이다'로 목록을 예고한다."
+  },
+  {
+   "where": "「설치」 첫 문단",
+   "type": "style",
+   "claim": "한 단락에 여섯 문장을 두었다. ONE-IDEA 는 단락을 네 문장 이하로 끊으라고 한다.",
+   "file": "README.md",
+   "evidence": "스코프는 user여야 모든 프로젝트에서 hook이 실행된다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "- **`ONE-IDEA`** — 한 문장에 한 개념만 두고, 단락은 네 문장 이하로 끊어라.",
+   "principle": "ONE-IDEA",
+   "consequence": "「설치」 첫 단락이 스코프·Windows 선행 설치·bash 와 pwsh 사유·PowerShell 5.1 불가·파이썬 필요·파이썬 부재 시 동작을 여섯 문장으로 한데 적는다."
+  },
+  {
+   "where": "「세션 시작에 바꾸는 전역 설정」의 플러그인 갱신 항목",
+   "type": "style",
+   "claim": "불릿 한 항목이 일곱 문장이다. BULLET-SCOPE 는 한 항목이 여러 문장이 되면 산문으로 쓰라고 한다.",
+   "file": "README.md",
+   "evidence": "- **플러그인 갱신** — 마켓플레이스나 설정에서 `autoUpdate`를 `false`로 두었으면 확인하지 않는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "- **`BULLET-SCOPE`** — 불릿은 같은 종류를 늘어놓을 때만 쓰고, 한 항목이 여러 문장이 되면 산문으로 써라.",
+   "principle": "BULLET-SCOPE",
+   "consequence": "「차단되었을 때 푸는 법」과 「세션 시작에 바꾸는 전역 설정」의 불릿 항목이 대부분 서너 문장 이상이고, 플러그인 갱신 항목은 일곱 문장이다."
+  }
+ ],
+ "principles_applied": [
+  "TITLE-LAYERS",
+  "COUNT-EARNS",
+  "ONE-IDEA",
+  "BULLET-SCOPE",
+  "DOC-TYPE",
+  "WRITTEN-ONLY",
+  "ANTI-LIMIT",
+  "SECTION-HEAD"
+ ],
+ "notes": "검토 관점: 형식·스타일·오염·호환·규율을 항목마다 보았다. 문서 타입 표에서 절차·계약 행을 골랐고 진행 상태 서술은 찾지 못했다. TITLES 묶음은 '기존 문서를 고치면 그 형식을 우선하라'는 단서가 있어, README 의 ### 층을 기존 형식으로 볼지는 호출자가 정해야 한다. 'A가 아니라 B' 대구는 0회다. domain-readme 「권장 동선」의 순서(설치 → 사용 예시 → 주의 → 더 읽기)는 지켜졌다. 금지 낱말은 지시대로 보지 않았다."
+}

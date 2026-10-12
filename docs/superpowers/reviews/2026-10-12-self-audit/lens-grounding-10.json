@@ -1,0 +1,166 @@
+{
+ "target": "skills/audit-repo-docs/SKILL.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "scripts/audit_targets.sh",
+  "scripts/audit_evidence.sh",
+  "scripts/audit_rounds.sh",
+  "scripts/audit_prior_rounds.sh",
+  "scripts/audit_topics.sh",
+  "scripts/audit_statements.sh",
+  "scripts/audit_verify.sh",
+  "scripts/_audit_common.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/test_audit.sh",
+  "scripts/test_docs_drift.sh",
+  "hooks/_spec_marker.sh",
+  "korean-banned-words.md",
+  "commands/show-principles.md"
+ ],
+ "issues": [
+  {
+   "where": "「차수 대조」 절 첫 문단",
+   "type": "contradiction",
+   "claim": "문서는 직전 차수 diff.json 이 잔존으로 적은 항목을 대조 대상에 넣는다고 적지만, 대조를 계산하는 audit_rounds.sh diff 는 앞선 diff.json 에서 판정이 해소인 항목만 읽고 잔존 항목은 건너뛴다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "직전 차수 `diff.json`이 잔존으로 적은 항목",
+   "counterpart_file": "scripts/audit_rounds.sh",
+   "counterpart": "if fp in seen or i.get(\"verdict\") != \"해소\": continue",
+   "principle": "NO-ASSUME",
+   "consequence": "전전 차수 이전에서 잔존으로 넘어왔고 직전 차수 findings.json 에 다시 오르지 않은 발견은 지금 이번 차수 diff.json 의 items 에 들어가지 않는다."
+  },
+  {
+   "where": "「차수 대조」 절 첫 문단",
+   "type": "mismatch",
+   "claim": "문서는 해소 항목을 전전 차수 diff.json 과 비교해 거른다고 적지만, audit_rounds.sh diff 는 앞선 diff.json 을 하나만 인자로 받고 전전 차수 diff.json 을 읽는 경로가 없다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "전전 차수 `diff.json`에서는 해소가 아니었던 항목이다",
+   "counterpart_file": "scripts/audit_rounds.sh",
+   "counterpart": "[--prior-diff <앞선 diff.json>]",
+   "principle": "NO-ASSUME",
+   "consequence": "audit_prior_rounds.sh 가 고른 전전 차수 폴더는 audit_rounds.sh diff 의 어느 인자로도 들어가지 않고, 재발 판정은 직전 diff.json 의 해소 항목만으로 계산된다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "audit-repo-docs",
+   "statement": "레포 전체 점검을 요청받으면 살아 있는 문서를 모두 헤아리고 렌즈 그룹에 따라 렌즈를 병렬로 실행해 한 파일에 모은 뒤 구분한 목록을 사용자에게 넘긴다.",
+   "evidence": "사용자가 레포 전체 점검을 요청하면 살아 있는 문서를 모두 헤아리고"
+  },
+  {
+   "topic": "ASYNC-FIRST",
+   "statement": "감사의 렌즈는 병렬로 실행한다.",
+   "evidence": "렌즈 그룹에 따라 렌즈를 병렬로 실행하고"
+  },
+  {
+   "topic": "review-docs",
+   "statement": "문서 하나를 쓰거나 고친 뒤의 검진은 review-docs 가 소유한다.",
+   "evidence": "문서 하나를 쓰거나 고친 뒤의 검진은 `review-docs`가 소유한다."
+  },
+  {
+   "topic": "문서를 쓰고 관리할 때",
+   "statement": "감사 대상은 살아 있는 문서이고 스펙·계획·지난 리뷰 기록·인수인계는 대상이 아니다.",
+   "evidence": "살아 있는 문서만 본다."
+  },
+  {
+   "topic": "lens-grounding",
+   "statement": "모든 대상 문서에 lens-grounding 을 lens-fit 앞에 실행한다.",
+   "evidence": "모든 대상 문서에 문서 단위 그룹을 `lens-grounding`, `lens-fit` 차례로 실행한다."
+  },
+  {
+   "topic": "lens-consistency",
+   "statement": "lens-consistency 는 문서별로 적용하지 않고 값이 다른 짝마다 적용한다.",
+   "evidence": "`lens-consistency`는 문서별로 적용하지 않고"
+  },
+  {
+   "topic": "lens-adversarial",
+   "statement": "lens-adversarial 은 저장소 전체를 입력으로 한 번 따로 실행한다.",
+   "evidence": "`lens-adversarial`은 문서별로 배정하지 않고 저장소 전체를 입력으로 따로 한 번 실행한다."
+  },
+  {
+   "topic": "lens-readability",
+   "statement": "lens-readability 는 대상을 헤아린 뒤 감사 시작 시점에 발동 기준에 맞는 문서 목록을 보이고 실행 여부를 묻는다.",
+   "evidence": "`lens-readability`는 대상을 헤아린 뒤 감사를 시작할 때 제안한다."
+  },
+  {
+   "topic": "lens-prior-art",
+   "statement": "감사에서는 lens-prior-art 를 제안하지 않는다.",
+   "evidence": "`lens-prior-art`는 제안하지 않는다."
+  },
+  {
+   "topic": "lens-fit",
+   "statement": "lens-fit 에는 review-docs 가 정한 계약 경로를 넘긴다.",
+   "evidence": "`lens-fit`에는 `review-docs`의 「`lens-fit`에 넘기는 계약」이 정한 경로를 계약 칸으로 넘긴다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "문서 단위 그룹의 두 렌즈는 한 호출에 묶어 실행한다.",
+   "evidence": "문서 단위 그룹의 두 렌즈는 렌즈마다 따로 실행하지 말고 한 번에 실행한다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "한 단계의 에이전트는 10개를 넘지 않고, 묶음은 9개 이하로 둔다.",
+   "evidence": "한 단계의 에이전트는 `dispatching-lenses`의 상한 10개를 넘지 않는다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "반영한 뒤 다시 감사하지 않는다.",
+   "evidence": "반영한 뒤 다시 감사하지 않는다."
+  },
+  {
+   "topic": "review-docs",
+   "statement": "기록 이름 규칙은 review-docs 가 소유한다.",
+   "evidence": "이름 규칙은 review-docs 가 소유하므로 그 스킬을 따른다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "statements 항목의 계약은 aggregating-lenses 가 진다.",
+   "evidence": "항목은 `{topic, statement, evidence}` 셋이며 계약은 `aggregating-lenses`가 진다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "집계는 aggregating-lenses 의 「하는 일」 두 단계로 하고 결정은 내지 않는다.",
+   "evidence": "렌즈 결과를 한 목록으로 병합한 뒤 `aggregating-lenses`의 「하는 일」 두 단계로 커버리지 공백을 표시한다."
+  },
+  {
+   "topic": "ASK-OPTIONS",
+   "statement": "끊긴 차수가 있으면 이어받을지 버릴지 사용자에게 묻는다.",
+   "evidence": "이어받을지 버릴지 묻는다(`ASK-OPTIONS`)"
+  },
+  {
+   "topic": "미해결의 처분",
+   "statement": "넘길 발견은 메모리에 적지 않고 사용자에게 알린다.",
+   "evidence": "이번에 안 고치기로 한 발견이다. 메모리에 적지 않고 사용자에게 알린다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "근본 원인은 brainstorming 으로 spec 을 쓰고 review-specs 리뷰를 지난 뒤에 고친다.",
+   "evidence": "그 spec 이 `review-specs`의 리뷰를 지난 뒤에 고친다."
+  },
+  {
+   "topic": "검증",
+   "statement": "인용 확인을 지난 발견은 세션이 확정·기각·미판정으로 판정한다.",
+   "evidence": "인용 확인을 지난 발견을 **세션이 판정한다**."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "STATE-ASSUME",
+  "SPECIFIC-NAME",
+  "SUBJECT-OBJECT",
+  "WRITTEN-ONLY"
+ ],
+ "notes": "검토한 관점: 누락, 모순, 환각(근거 없음), 불일치(숫자·인용·식별자). 확인해서 문제가 없던 항목: 단계 수(표 12행), 일관성 대조 다섯 단계(불릿 5개), audit_rounds.sh 의 diff·metrics 인자와 metrics 출력 키(by_lens·confirmed·tokens·seconds·tokens_per_confirmed·resolved_rate·verdict_counts), auto_rejected, audit_prior_rounds.sh 의 self-audit 기본값과 --stale, audit_verify.sh 의 파일 넷과 target 검사, audit_status_set 이 「판정」 절 문장에서 status 집합을 뽑는 방식, audit_targets.sh 의 제외 규칙, path_in_own_repo 주석, 인용된 절 제목(dispatching-lenses·review-docs·review-specs) 실재, lens-consistency 의 duplication type. 더 확인할 것: run.json 에 적는다고 한 스키마 버전·실행체 이름·커밋 지문·끝난 단계 목록은 audit_verify.sh 가 검사하지 않으므로 실제 차수 폴더에서 채워졌는지는 확인하지 못했다. 「실행할 때 지킬 것」의 '묶음은 9개 이하(적대적 렌즈 하나를 남긴다)'는 「단계」 표가 적대적 렌즈를 별도 단계로 둔 것과 상한 계산이 맞는지 lens-consistency 쪽에서 볼 만하다."
+}

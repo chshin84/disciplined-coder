@@ -22,8 +22,8 @@
 
 적용된 훅의 전체 목록과 연결은 `README.md`의 「하드 게이트와 넛지와 전역 설정 수정」 절이 소유한다. 이 저장소에서 일할 때 알아 둘 동작은 아래와 같다.
 
-- **감사 기록 봉인** — 세션이 시작될 때 커밋된 감사 기록이 읽기 전용으로 봉인된다. 기록을 고치려다 Write나 Edit이 거부되면 훅 고장이 아니라 봉인이다.
-- **넛지 예외** — 리뷰 기록과 프로젝트 밖 문서에는 문서 넛지가 뜨지 않는다. 세션의 첫 도구 호출에 한 번 뜨는 규칙 넛지는 대상 경로를 보지 않으므로 이 예외가 적용되지 않는다.
+- **리뷰 기록 봉인** — 세션이 시작될 때 커밋된 리뷰 기록(`docs/superpowers/reviews/` 아래 전부)이 읽기 전용으로 봉인된다. 기록을 고치려다 Write나 Edit이 거부되면 훅 고장이 아니라 봉인이다.
+- **넛지 예외** — 리뷰 기록과 프로젝트 밖 문서에는 문서 넛지가 뜨지 않는다. 검진 넛지(`hooks/doc_review_posttooluse.sh`)는 리뷰 기록만 빼고 프로젝트 밖 문서도 본다. 세션의 첫 도구 호출에 한 번 뜨는 규칙 넛지는 대상 경로를 보지 않으므로 이 예외가 적용되지 않는다.
 
 ## 문서 타입마다 무엇이 강제하나
 
@@ -33,7 +33,7 @@
 |---|---|
 | **상태** (roadmap) | 없다. 무엇과 대조할지는 그 프로젝트의 코드와 인프라가 정한다 |
 | **절차·계약** | 문서와 코드를 대조하는 테스트 `scripts/test_docs_drift.sh` |
-| **설계** (spec·plan) | 대체된 spec의 superseded 표시와, 보존 태그 없이 지운 plan을 검사한다 `scripts/test_docs_drift.sh` |
+| **설계** (spec·plan) | 경로를 지정한 대체된 spec의 superseded 표시와, 보존 태그 없이 지운 plan을 검사한다 `scripts/test_docs_drift.sh` |
 | **기록** (reviews) | 있는 기록의 수정을 거부하는 훅 `hooks/readonly_pretooluse.sh` 와, 고친 기록과 보존 태그 없이 지운 기록을 잡는 검사 `scripts/test_docs_drift.sh` |
 | **핸드오프** | 세션 시작에 잔존을 세어 알린다 `scripts/scaffold.sh` |
 | **맥락** (Claude 메모리) | 없다. 메모리가 git 밖이라 검사가 닿지 않는다 |
@@ -45,6 +45,6 @@
 
 `d=$(mktemp -d); for t in scripts/test_*.sh; do ( bash "$t" > "$d/$(basename "$t").log" 2>&1 || echo "$t" >> "$d/bad" ) & done; wait; if [ -s "$d/bad" ]; then echo "FAILED:"; while read -r t; do echo "--- $t"; grep 'FAIL:' "$d/$(basename "$t").log"; done < "$d/bad"; else echo "ALL PASS"; fi`
 
-테스트나 문서를 줄이는 차수에는 `domain-pruning` 「절차」의 결함 주입을 이 저장소의 핵심 계약 넷에 한다. 리뷰 기록을 보존 태그 없이 지우기, 대체된 spec의 superseded 표시 지우기, settings.json 사본(.bak) 만들기 없애기, 읽기 전용 차단 훅 무력화다. 각 결함에서 검사가 실패해야 한다.
+테스트나 문서를 줄이는 차수에는 `domain-pruning` 「절차」의 결함 주입을 이 저장소의 핵심 계약에 한다. 대상 결함은 리뷰 기록을 보존 태그 없이 지우기, 대체된 spec의 superseded 표시 지우기, settings.json 사본(.bak) 만들기 없애기, 읽기 전용 차단 훅 무력화다. 각 결함에서 검사가 실패해야 한다.
 
 검사 스크립트를 동시에 실행하고 실패한 이름을 모아 마지막에 알린다. 차례로 이어 실행하면 마지막 하나의 결과만 남아 앞의 실패가 묻히고, 동시에 실행하면 전체 시간이 줄어든다(실측은 `domain-discipline.md`의 `ASYNC-FIRST` 절). `claude plugin validate ./`는 오류 없이 `Validation passed`를 내면 정상이다. 경고가 나오면 내용을 읽고, 이번 변경 때문에 생긴 경고만 고친다. 경고 문구는 CLI 버전마다 바뀐다(2.1.296 은 `version` 경고 대신 루트 CLAUDE.md 가 실리지 않는다는 경고를 낸다).

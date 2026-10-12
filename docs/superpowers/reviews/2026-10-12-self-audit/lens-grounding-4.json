@@ -1,0 +1,35 @@
+{
+ "target": "commands/show-principles.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "scripts/_resolve_home.sh",
+  "scripts/scaffold.sh",
+  "scripts/_scaffold_common.sh",
+  "skills/domain-plugin/SKILL.md"
+ ],
+ "issues": [],
+ "statements": [
+  {
+   "topic": "show-principles",
+   "statement": "설정 홈을 _resolve_home.sh 로 도출한 뒤 그 아래 disciplined-coder/agent-principles.md 를 읽어 그대로 보여 준다.",
+   "evidence": "그 값 아래의 `disciplined-coder/agent-principles.md`를 Read해서 내용을 그대로 보여줘라. 인자는 없다."
+  },
+  {
+   "topic": "NO-ASSUME",
+   "statement": "경로를 짐작하지 말고 명령을 실행해 받은 값을 쓴다.",
+   "evidence": "먼저 설정 홈을 도출하라 — 경로를 짐작하지 말고 아래를 실행해 받은 값을 쓴다. 홈 경로가 서로 다른 PC에서는"
+  },
+  {
+   "topic": "STATE-ASSUME",
+   "statement": "사본이 없는 원인을 확정해 적지 않는다.",
+   "evidence": "원인을 확정해 적지 마라. 사본이 없는 이유는 셋업 미실행 말고도 복사 실패와 설정 홈 불일치가 있다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "STATE-ASSUME",
+  "EVIDENCE-FIRST"
+ ],
+ "notes": "검토 관점: 누락·모순·환각·불일치를 항목마다 따로 보았다. stderr 안내 한 줄은 _resolve_home.sh 의 USERPROFILE 분기 note 와 일치하고, 사본이 없는 원인 셋(셋업 미실행·복사 실패·홈 불일치)은 scaffold.sh 의 ERROR 분기와 README 「동작 확인과 복구」와 일치한다. 발견 없음."
+}

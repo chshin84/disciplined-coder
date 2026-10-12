@@ -1,0 +1,18 @@
+{
+ "target": "commands/show-principles.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — 설정 홈을 도출하고 원칙 사본을 읽어 보여 주는 수행 방법만 포함한다",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/domain-plugin/SKILL.md"
+ ],
+ "issues": [],
+ "principles_applied": [
+  "DOC-TYPE",
+  "WRITTEN-ONLY",
+  "ONE-IDEA",
+  "SUBJECT-OBJECT"
+ ],
+ "notes": "검토 관점: 형식(frontmatter 는 description 하나이며 ': '·' #' 이 없다)·스타일·오염·호환·규율을 보았다. 진행 상태 서술은 없다. '보여줘라'의 붙여 쓴 형태가 WRITTEN-ONLY 의 구어 축약에 해당하는지는 domain-korean 에 판정 사례가 없어 발견으로 올리지 않았다."
+}

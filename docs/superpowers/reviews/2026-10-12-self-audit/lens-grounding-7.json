@@ -1,0 +1,138 @@
+{
+ "target": "docs/korean-banned-words-evidence.md",
+ "lens": "lens-grounding",
+ "read": [
+  "docs/korean-banned-words-evidence.md",
+  "korean-banned-words.md",
+  "docs/domain-korean.md",
+  "scripts/scaffold.sh",
+  "scripts/_scaffold_common.sh",
+  "scripts/check_banned_words.sh",
+  "scripts/test_docs_drift.sh"
+ ],
+ "issues": [
+  {
+   "where": "## `그게`",
+   "type": "contradiction",
+   "claim": "끈 사유에 적힌 빈도 0.15 가 기준선 0.15 와 같은데 '미만이라 껐다'고 적혀 있어, 표시된 수치로는 끈 조건이 성립하지 않는다.",
+   "file": "docs/korean-banned-words-evidence.md",
+   "evidence": "38건, 만자당 0.15 로 기준선 0.15 미만이라 껐다",
+   "counterpart_file": "docs/korean-banned-words-evidence.md",
+   "counterpart": "32건, 만자당 0.12 로 기준선 0.15 미만이라 껐다",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "그게 항목의 끈 근거는 기준선과 같은 값을 기준선 미만이라고 서술하고 있어, 다른 꺼 둔 항목과 달리 기록된 수치만으로 끈 판단을 재현할 수 없다."
+  },
+  {
+   "where": "## `초록불`",
+   "type": "omission",
+   "claim": "목록 파일의 초록불 항목에는 파란불·녹색 토큰이 있는데, 근거 파일의 초록불 절은 초록불·초록색으로 좁힌 경위만 적고 파란불·녹색을 넣은 근거가 없다.",
+   "file": "docs/korean-banned-words-evidence.md",
+   "evidence": "2026-09-24 에 초록불·초록색으로 좁혔다.",
+   "counterpart_file": "korean-banned-words.md",
+   "counterpart": "| `초록불` · `초록색` · `파란불` · `녹색` | 통과 · 성공 | 문서와 답변 | 영어를 직역한 것 | — |",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "금지 토큰 파란불·녹색이 근거 파일에 근거 없이 목록에서 켜져 있다."
+  },
+  {
+   "where": "## `부분`",
+   "type": "omission",
+   "claim": "목록 파일의 부분 항목에는 영역 토큰이 함께 있는데, 근거 파일의 부분 절은 부분의 빈도만 적고 영역의 근거가 없다. 근거 파일 머리는 항목마다 그 말을 왜 쓰지 않는지 적는다고 선언한다.",
+   "file": "docs/korean-banned-words-evidence.md",
+   "evidence": "이 문서는 `korean-banned-words.md` 의 항목마다 그 말을 왜 쓰지 않는지와, 꺼 둔 항목은 왜 껐는지를 적는다.",
+   "counterpart_file": "korean-banned-words.md",
+   "counterpart": "| `부분` · `영역` | 가리키는 대상의 이름을 그대로 쓴다 | 문서와 답변 | 대명사처럼 쓰는 말 |",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "금지 토큰 영역이 근거 파일 어디에도 언급되지 않은 채 목록에서 켜져 있다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "출력지시",
+   "statement": "이 문서는 korean-banned-words.md 의 항목마다 쓰지 않는 이유와 끈 이유를 적는다.",
+   "evidence": "이 문서는 `korean-banned-words.md` 의 항목마다 그 말을 왜 쓰지 않는지와, 꺼 둔 항목은 왜 껐는지를 적는다."
+  },
+  {
+   "topic": "출력지시",
+   "statement": "scaffold.sh 는 이 문서를 세션에 싣지 않으므로 항목을 다시 논의할 때 사람이 연다.",
+   "evidence": "`scaffold.sh` 는 이 문서를 세션에 싣지 않으므로 항목을 다시 논의할 때 사람이 연다."
+  },
+  {
+   "topic": "EDIT-DISCIPLINE",
+   "statement": "사용자 원문 인용은 고쳐 쓰지 않는다.",
+   "evidence": "사용자 원문 인용은 고쳐 쓰지 않는다."
+  },
+  {
+   "topic": "EVIDENCE-FIRST",
+   "statement": "빈도가 기준선 만자당 0.15 미만인 항목은 끄고 빈도가 오르면 다시 켠다.",
+   "evidence": "적용 대상 말뭉치에서 32건, 만자당 0.12 로 기준선 0.15 미만이라 껐다. 빈도가 오르면 다시 켠다."
+  },
+  {
+   "topic": "EVIDENCE-FIRST",
+   "statement": "기대를 걸 은 빈도가 아니라 걸 항목과의 중복 때문에 껐다.",
+   "evidence": "빈도 때문이 아니라 중복이라서 껐다."
+  },
+  {
+   "topic": "EVIDENCE-FIRST",
+   "statement": "값 은 잘못된 용법만 골라낼 문자열이 없어 기각했다.",
+   "evidence": "2026-09-23 기각. 가치를 뜻하는 잘못된 용법만 골라낼 문자열이 없다."
+  },
+  {
+   "topic": "EVIDENCE-FIRST",
+   "statement": "이게 는 사동·피동 어간 형태와 구별되지 않아 기각했다.",
+   "evidence": "2026-09-23 기각. 보이게·쓰이게 처럼 사동과 피동 어간에 붙는 형태와 구별되지 않는다."
+  },
+  {
+   "topic": "EVIDENCE-FIRST",
+   "statement": "거는 은 적용 뜻만 골라낼 문자열이 없어 기각했고, 같은 뜻의 건다 는 걸 항목에 넣었다.",
+   "evidence": "적용한다 는 뜻의 거는·건 만 골라낼 문자열이 없다. 같은 뜻의 건다 는 걸 항목에 넣었다"
+  },
+  {
+   "topic": "BULLET-SCOPE",
+   "statement": "불릿은 같은 종류를 늘어놓을 때만 쓴다는 규칙의 근거는 사용자 지시다.",
+   "evidence": "## 규칙: 불릿은 같은 종류를 늘어놓을 때만 쓴다."
+  },
+  {
+   "topic": "NO-ANALOGY",
+   "statement": "비유로 설명하지 않는다는 규칙의 근거는 추론이고 원문 인용이 없다.",
+   "evidence": "근거 종류는 추론이고 원문 인용은 없다."
+  },
+  {
+   "topic": "SPECIFIC-NAME",
+   "statement": "대상의 이름이 있으면 '것' 대신 그 이름을 쓴다.",
+   "evidence": "## 규칙: 대상의 이름이 있으면 '것' 대신 그 이름을 쓴다."
+  },
+  {
+   "topic": "LABEL-NOUN",
+   "statement": "제목과 표 머리는 명사구로 쓴다.",
+   "evidence": "## 규칙: 제목과 표 머리는 명사구로 쓴다."
+  },
+  {
+   "topic": "COUNT-EARNS",
+   "statement": "제목과 소제목에 개수를 붙이지 않는다.",
+   "evidence": "## 규칙: 제목과 소제목에 개수를 붙이지 않는다."
+  },
+  {
+   "topic": "COUNT-EARNS",
+   "statement": "수사를 대명사처럼 쓰지 않는다.",
+   "evidence": "## 규칙: 수사를 대명사처럼 쓰지 않는다."
+  },
+  {
+   "topic": "VOCAB-PREF",
+   "statement": "정본·배선·발화·쪽·판 같은 평소에 쓰지 않는 말을 금지한다.",
+   "evidence": "분류는 「평소에 쓰지 않는 말」이고 켜져 있다."
+  },
+  {
+   "topic": "WRITTEN-ONLY",
+   "statement": "돌리·그냥·쯤·게 아니라 같은 구어 표현을 금지한다.",
+   "evidence": "분류는 「구어에서만 쓰는 말」이고 켜져 있다."
+  }
+ ],
+ "principles_applied": [
+  "EVIDENCE-FIRST",
+  "NO-ASSUME",
+  "SPECIFIC-NAME",
+  "WRITTEN-ONLY",
+  "NO-MIRROR"
+ ],
+ "notes": "체크리스트 관점: 누락은 목록 파일의 켜진 항목·꺼 둔 항목·하단 규칙이 근거 파일에 절로 모두 있는지 대조했다. 모든 첫 토큰에 절이 있고, 토큰 단위로는 영역·파란불·녹색만 근거가 없었다. 모순은 분류 칸을 목록과 근거에서 항목마다 대조했고(불일치 없음), 끈 사유의 수치를 기준선과 비교했다. 환각은 'scaffold.sh 가 이 문서를 싣지 않는다'를 _scaffold_common.sh 의 SCAFFOLD_FILES 로 확인했고 사실이었다. 불일치는 기대를 걸 끈 사유('걸 항목 제외에도 풀리지 않는다')와 거는 끈 사유('건다 는 걸 항목에 넣었다')를 목록과 대조했고 둘 다 사실이었다. 확인하지 못한 것: 옛 저장소 KiwoomAX/korean-banned-words 커밋 5b02378 과 말뭉치 집계 수치는 저장소 밖이라 대조하지 못했다. 그게 항목의 0.15 는 257만 자 말뭉치 기준 38건이면 0.148 로 반올림 표시일 가능성이 있으나, 이 값은 가정이며 근거 파일에 분모가 적혀 있지 않다."
+}

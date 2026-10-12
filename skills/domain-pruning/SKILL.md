@@ -15,7 +15,7 @@ description: 프로젝트의 테스트·스크립트·코드·문서가 과한�
 - **중복과 항진** — 다른 검사가 같은 사실을 보면 하나만 남기고, 무엇을 고쳐도 참인 단언은 지운다. 실제로 지워진 테스트 24,431건의 대부분은 대상이 사라진 테스트와 중복 테스트였다([MSR 2025](https://2025.msrconf.org/details/msr-2025-technical-papers/24/Understanding-Test-Deletion-in-Java-Applications)).
 - **실패 이력** — 한 번도 실패하지 않았다는 사실은 실행 빈도를 낮출 근거이고 지울 근거가 아니다. Google 에서 테스트 대상의 91.3%가 실패한 적이 없었다([Memon 외 2017](https://huang.isis.vanderbilt.edu/cs8395-f23/paper/google-testing-icse-seip-17.pdf)). 일회성 재발 방지 검사를 지울지는 이 근거와 별개로 사용자가 정한다.
 - **셸 스크립트의 길이** — 100줄을 넘거나 제어 흐름이 단순하지 않은 셸 스크립트는 구조적인 언어로 옮길지 따진다. 업체 규범이며 실증 연구는 아니다([Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html)).
-- **에이전트 산출물의 비대** — 에이전트가 쓴 변경은 사람의 변경보다 컸고, 원인은 장황한 구현·범위 확장·과잉 방어 코드·과잉 문서화였다. 리뷰에서 이 네 원인을 하나씩 찾는다([arXiv 2608.12355](https://arxiv.org/pdf/2608.12355)).
+- **에이전트 산출물의 비대** — 에이전트가 쓴 변경은 사람의 변경보다 컸고, 원인은 장황한 구현·범위 확장·과잉 방어 코드·과잉 문서화였다. 리뷰에서 이 원인들을 하나씩 찾는다([arXiv 2608.12355](https://arxiv.org/pdf/2608.12355)).
 - **문서와 기록의 수명** — 결정 기록은 짧게 두고 고치지 않으며 대체되면 표시한다([Microsoft ADR](https://learn.microsoft.com/en-us/azure/well-architected/architect-role/architecture-decision-record)). 쓸모가 끝난 작업 문서는 지우거나 폐기 표시한다([Software Engineering at Google 10장](https://abseil.io/resources/swe-book/html/ch10.html)). 기록은 보존 기간을 정하고, 기간이 지나면 원래 저장소 밖으로 옮긴다([NIST SP 800-92](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-92.pdf)). 에이전트원칙의 「문서 타입과 수명」이 문서 수명을 정하는 프로젝트에서는, 그 표와 다르게 처분하려면 사용자에게 묻는다.
 
 ## 분류
@@ -57,7 +57,7 @@ description: 프로젝트의 테스트·스크립트·코드·문서가 과한�
 | 분류 | 근거를 내는 장치 |
 |---|---|
 | 설계 단계의 과잉(테스트·스크립트·문서·훅을 늘리는 spec) | `lens-adversarial`의 과설계 항목이 이 참고서와 `domain-plugin`을 근거로 지적한다 |
-| 사본 | 레포 문서 감사에서 `lens-consistency`의 `duplication` 발견 |
+| 사본 | 레포 문서 감사에서 호출자가 `lens-consistency`의 같음 판정으로 도출한 `duplication` 발견 |
 | 수명 끝 | `lens-fit`이 고른 문서 타입(`doc_type`)과 에이전트원칙 「문서 타입과 수명」의 행 |
 | 문구고정·구현고정·중복·항진·일회성 | 이 참고서의 「절차」를 따르는 판정표. 렌즈 없이 프로젝트의 테스트를 읽는 실행자가 낸다 |
 | 결함 주입의 핵심 계약 | 프로젝트가 정한다. 이 저장소는 `CLAUDE.md`의 「변경 뒤 실행」이 적는다 |

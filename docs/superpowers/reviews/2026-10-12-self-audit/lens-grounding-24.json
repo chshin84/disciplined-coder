@@ -1,0 +1,55 @@
+{
+ "target": "skills/review-llm-calls/SKILL.md",
+ "lens": "lens-grounding",
+ "read": [
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "scripts/test_docs_drift.sh"
+ ],
+ "issues": [],
+ "statements": [
+  {
+   "topic": "review-llm-calls",
+   "statement": "적용할 렌즈는 호출 종류별 고정표로 정하고 차수마다 다시 판단하지 않는다",
+   "evidence": "호출 종류로 정한다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "렌즈가 둘이면 aggregating-lenses 로 집계하고 하나면 집계 단계를 두지 않는다",
+   "evidence": "렌즈가 둘이면 `aggregating-lenses`로 집계하고 하나면 집계 단계를 두지 않는다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈 호출 횟수는 한 번씩이며 그 규율은 dispatching-lenses 가 소유한다",
+   "evidence": "렌즈를 호출하는 횟수는 `dispatching-lenses`의 「한 번만 실행하는 렌즈의 규율」을 따라 한 번씩이다."
+  },
+  {
+   "topic": "SECRETS",
+   "statement": "렌즈의 지적을 로그로 남기지 않고 개인정보를 뺀 집계값만 남긴다",
+   "evidence": "렌즈의 지적을 로그로 남기지 않는다."
+  },
+  {
+   "topic": "NO-ASSUME",
+   "statement": "요청·지연·토큰·실패율을 로깅한다",
+   "evidence": "요청과 지연과 토큰과 실패율을 로깅한다."
+  },
+  {
+   "topic": "REVERSIBLE",
+   "statement": "비가역이거나 위험이 큰 액션에는 사람 승인을 적용한다",
+   "evidence": "비가역이거나 위험이 큰 액션에는 사람 승인을 적용한다(critical)."
+  },
+  {
+   "topic": "review-llm-calls",
+   "statement": "비기능 체크리스트의 critical 누락은 머지와 배포를 차단한다",
+   "evidence": "누락 항목은 그 항목에 붙은 등급대로 처리하며, critical은 머지와 배포를 차단한다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "SECRETS",
+  "REVERSIBLE"
+ ],
+ "notes": "검토 관점: 누락, 모순, 환각, 불일치. dispatching-lenses 의 「호출자 목록」(review-llm-calls 는 서브에이전트 규율 밖이지만 그 절을 가리킬 때 소유자를 dispatching-lenses 로 적는다)과 본문의 세 절 참조가 일치한다. accept·regenerate·escalate 와 type 기반 라우팅은 aggregating-lenses 출력 스키마·「처분」과 일치한다. test_docs_drift.sh 의 '조립 절이 type 값으로 accept·escalate 를 가른다' 검사 대상 문구도 실재한다. 발견 없음."
+}

@@ -1,0 +1,155 @@
+{
+ "target": "skills/nested-orchestration/references/sub-session-protocol.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/nested-orchestration/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+  "hooks/_spec_marker.sh",
+  "C:/Users/ho381/.claude/plugins/cache/claude-plugins-official/superpowers/6.4.1/skills/subagent-driven-development/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "「멈추는 기준」 첫 문장",
+   "type": "contradiction",
+   "claim": "멈추는 때의 목록에 FAILED 가 빠져 있다. 같은 파일의 상향 메시지 표는 FAILED 를 끝낼 수 없을 때 보내는 메시지로 두고, 근거 문서의 개정 지시는 이 문장에 FAILED 를 예외로 적으라고 정했다.",
+   "file": "skills/nested-orchestration/references/sub-session-protocol.md",
+   "evidence": "서브 세션은 `AWAITING_APPROVAL`, `DONE`, `CANCELED`를 보낼 때와 「메시지 형식」의 사유 코드에 해당할 때만 멈춘다.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+   "counterpart": "'아래 사유에서만 멈춘다'에 `FAILED`를 예외로 적는다",
+   "principle": "FOCUSED",
+   "consequence": "서브 세션이 통째로 읽는 프로토콜 파일 안에서 FAILED 로 멈추는 일이 「멈추는 기준」의 허용 목록 밖에 놓여 있고, 같은 파일의 상향 메시지 표와 서로 다르게 정해져 있다."
+  },
+  {
+   "where": "「메시지 형식」 상향 메시지 표의 FAILED 행",
+   "type": "omission",
+   "claim": "'끝낼 수 없다'의 판정 기준(같은 결함에 수정 시도가 세 번 실패하면 FAILED)이 프로토콜 파일에 없다. 근거 문서는 이 기준을 정했고 「2026-10-11 개정 — 검진 반영」의 대체 목록에도 이 문장은 들지 않는다.",
+   "file": "skills/nested-orchestration/references/sub-session-protocol.md",
+   "evidence": "| `FAILED` | `원인`, `시도한 것`, `되돌릴 것` | 사유 코드 어디에도 들지 않는데 끝낼 수 없을 때 |",
+   "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+   "counterpart": "같은 결함에 수정 시도가 세 번 실패하면 서브 세션은 고치기를 멈추고 `FAILED`를 돌려주며, `시도한 것`에 그 세 시도를 적는다.",
+   "principle": "FOCUSED",
+   "consequence": "프로토콜 파일과 nested-orchestration/SKILL.md 어디에도 FAILED 를 보내는 판정 기준이 없고, 그 기준은 서브 세션이 읽지 않는 근거 문서에만 있다."
+  },
+  {
+   "where": "「메시지 형식」의 「사유 코드」 문단",
+   "type": "omission",
+   "claim": "한 번에 user-decision 사유가 둘 이상일 때 두 번째 이후 사유의 유형을 적는 방법이 없다. 근거 문서는 `요청` 필드의 줄마다 유형을 적게 정했으나, 프로토콜은 나머지 사유를 사유 코드와 함께만 적게 한다.",
+   "file": "skills/nested-orchestration/references/sub-session-protocol.md",
+   "evidence": "한 번 멈출 때 사유가 둘 이상이면 머리줄에는 표에서 먼저 나오는 코드를 적고, 나머지는 `요청`에 줄마다 사유 코드와 함께 적는다.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+   "counterpart": "한 번에 `user-decision` 사유가 둘 이상이면 서브 세션은 `요청` 필드의 줄마다 유형을 적는다.",
+   "principle": "FOCUSED",
+   "consequence": "프로토콜의 `유형` 필드는 값 하나만 받는다. user-decision 사유가 둘 이상인 BLOCKED 에서 두 번째 사유의 유형이 메시지에 실리지 않고, SKILL.md 「BLOCKED 처리」 표는 유형마다 처리가 다르다."
+  },
+  {
+   "where": "「SDD 와 함께 쓸 때」 첫 문장",
+   "type": "contradiction",
+   "claim": "절 첫 문장은 SDD 규칙을 그대로 따르고 추가만 한다고 적지만, 같은 절 둘째 문단은 SDD 가 최종 리뷰 뒤 하는 작업 공간 삭제와 finishing-a-development-branch 실행을 하지 않게 해 SDD 규칙을 대체한다.",
+   "file": "skills/nested-orchestration/references/sub-session-protocol.md",
+   "evidence": "실행 루프는 SDD가 소유하므로 서브 세션은 SDD 규칙을 그대로 따르고 아래만 추가한다.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+   "counterpart": "When the final whole-branch review is clean and its fixes are merged, delete this plan's workspace",
+   "principle": "TERM-ONE",
+   "consequence": "「SDD 와 함께 쓸 때」 절은 SDD 의 작업 공간 삭제 단계를 뒤집는 규칙을 '추가'라는 이름 아래 두고 있어, 절 첫 문장과 둘째 문단이 SDD 규칙과의 관계를 서로 다르게 적고 있다."
+  },
+  {
+   "where": "(계약 대조) nested-orchestration/SKILL.md 「이어 쓰기와 재개」의 재시작 복구 문장",
+   "type": "omission",
+   "claim": "프로토콜은 상향 메시지로 FAILED 와 CANCELED 를 두고 SKILL.md 「FAILED와 CANCELED」는 둘 다 사용자에게 묻는 처리를 정하지만, 현재 세션의 재시작 복구는 마지막 메시지가 AWAITING_APPROVAL·BLOCKED·DONE 인 것만 미답으로 본다.",
+   "file": "skills/nested-orchestration/SKILL.md",
+   "evidence": "마지막 메시지가 `AWAITING_APPROVAL`, `BLOCKED`, `DONE`이고 그 서브 세션이 실행 중이 아니면, 현재 세션은 그 메시지에 아직 답하지 않은 것으로 보고 처리한다.",
+   "counterpart_file": "skills/nested-orchestration/references/sub-session-protocol.md",
+   "counterpart": "| `FAILED` | `원인`, `시도한 것`, `되돌릴 것` | 사유 코드 어디에도 들지 않는데 끝낼 수 없을 때 |",
+   "principle": "FOCUSED",
+   "consequence": "리포트의 `메시지 기록` 마지막 메시지가 FAILED 나 CANCELED 인 워크스트림은 SKILL.md 의 재시작 복구 문장에서 미답 처리 대상에 들어 있지 않다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "nested-orchestration",
+   "statement": "서브 세션은 시작할 때와 하향 메시지를 받을 때마다 프로토콜 파일을 통째로 읽는다.",
+   "evidence": "서브 세션은 시작할 때와 하향 메시지를 받을 때마다 이 파일을 통째로 읽는다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "현재 세션과 서브 세션은 「메시지 형식」의 형식으로만 메시지를 주고받는다.",
+   "evidence": "현재 세션과 서브 세션은 이 절의 형식으로만 메시지를 주고받는다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "값이 없는 필드는 지우지 않고 `없음`으로 적는다.",
+   "evidence": "값이 없는 필드는 지우지 않고 `없음`으로 적는다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "서브 세션은 상향 메시지를 보내기 전에 리포트를 갱신하고 `메시지 기록` 절에 그 메시지를 덧붙인다.",
+   "evidence": "서브 세션은 상향 메시지를 보내기 전에 리포트를 갱신하고, 리포트의 `메시지 기록` 절에 보낼 메시지를 그대로 덧붙인다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "사유가 둘 이상이면 머리줄에는 표에서 먼저 나오는 사유 코드를 적는다.",
+   "evidence": "한 번 멈출 때 사유가 둘 이상이면 머리줄에는 표에서 먼저 나오는 코드를 적고, 나머지는 `요청`에 줄마다 사유 코드와 함께 적는다."
+  },
+  {
+   "topic": "LENS-ALLOWED",
+   "statement": "상시 허용 렌즈로 볼 수 있는 관점이면 서브 세션은 멈추지 않고 그 렌즈를 직접 실행한다.",
+   "evidence": "상시 허용 렌즈(에이전트원칙 LENS-ALLOWED)로 볼 수 있는 관점이면 서브 세션은 멈추지 않고 그 렌즈를 직접 실행한다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "필요할 때 그룹의 발동 기준에 해당했을 뿐이면 서브 세션은 멈추지 않고 리포트의 `렌즈 그룹 판정`에 적는다.",
+   "evidence": "필요할 때 그룹의 발동 기준에 해당했을 뿐 진행에 지장이 없으면 멈추지 않고 리포트의 `렌즈 그룹 판정`에 적는다(`dispatching-lenses`의 「렌즈 그룹」)."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "`CANCEL`을 받으면 서브 세션은 미커밋 변경을 커밋하지 않고 워크트리에 남긴 채 멈춘다.",
+   "evidence": "| `CANCEL` | `이유` | 미커밋 변경을 커밋하지 않고 워크트리에 남긴 채 멈춘다 | `CANCELED` |"
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "서브 세션은 범위 밖 항목에 분명히 드는 결정에서만 멈추고, 확실하지 않으면 스스로 판정해 마지막 칸에 '예'를 적는다.",
+   "evidence": "서브 세션은 위 항목에 분명히 드는 결정에서만 멈추고, 드는지 확실하지 않으면 스스로 판정해 그 줄의 마지막 칸에 '예'를 적는다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "서브 세션은 리뷰 반영 뒤 다시 리뷰를 생략하고 기능적 변화가 있었던 반영을 리포트의 `기능적 반영`에 적는다.",
+   "evidence": "서브 세션은 리뷰 반영 뒤 다시 리뷰할지 묻지 못하므로 생략하고, 기능적 변화가 있었던 반영을 리포트의 `기능적 반영`에 적는다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "SDD 최종 리뷰 뒤 서브 세션은 finishing-a-development-branch 를 실행하지 않고 DONE 을 돌려준다.",
+   "evidence": "SDD 최종 리뷰 뒤 서브 세션은 `finishing-a-development-branch`를 실행하지 않고 `DONE`을 돌려준다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "서브 세션은 워크트리와 SDD 작업 공간을 DONE 뒤에도 지우지 않는다.",
+   "evidence": "서브 세션은 워크트리와 SDD 작업 공간(`.superpowers/sdd/` 아래, gitignore 대상)을 `DONE` 뒤에도 지우지 않는다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "서브 세션은 리포트를 `리포트` 필드의 경로에 쓰고 커밋하지 않는다.",
+   "evidence": "서브 세션은 `리포트` 필드의 경로에 리포트를 쓰고 커밋하지 않는다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "리포트에는 테스트 결과를 적지 않는다.",
+   "evidence": "테스트 결과는 현재 세션이 시험 병합에서 직접 실행하므로 적지 않는다."
+  }
+ ],
+ "principles_applied": [
+  "FOCUSED",
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "STATE-ASSUME",
+  "TERM-ONE",
+  "SPECIFIC-NAME",
+  "WRITTEN-ONLY",
+  "SUBJECT-OBJECT"
+ ],
+ "notes": "검토한 관점은 누락·모순·환각·불일치 넷이다. 프로토콜과 nested-orchestration/SKILL.md 의 계약을 항목마다 대조했다. 맞는 것으로 확인한 항목: 용어 표의 머리줄·상향·하향·사유 코드·유형(SKILL.md 「용어」가 이 파일을 가리킴), START·RESTART 필드(근거 문서 「시작 형식 결정」의 공통 필드와 일치), SKILL.md 「BLOCKED 처리」 표가 사유 코드 다섯과 유형 다섯을 모두 다룸, REVISE 의 대상 '응답'이 SKILL.md 「형식 이탈」과 일치, 리포트 절 아홉이 모두 SKILL.md 어딘가에서 소비됨(확정한 결정·확정한 계약 의미는 시험 병합, 판정 세 절과 렌즈 그룹 판정은 판정 기록 확인, 기능적 반영·제안은 마무리, 메시지 기록은 재시작 복구), SDD 6.4.1 의 네 가지 정지 사유(27~31행)·수정 라운드 1~3 재개와 4라운드부터 새 구현자(75·375·381행)·`.superpowers/sdd/` gitignore 작업 공간(136~138행)·`Ruling:` 줄 수집(473행). 발견으로 올리지 않은 것: (1) `INTEGRATION-FAILED`의 `확인 위치` 값은 근거 문서 「2026-10-11 개정 — 메시지 형식」에서 try/<id> 커밋이나 dev/<개발> 커밋이었고 이 파일은 ws/<개발>/<id> @ <커밋> 이나 없음으로 적는다. SKILL.md 가 실패 시 try 브랜치를 지우므로 이 파일 쪽이 동작과 맞고, 근거 문서의 「검진 반영」 절에는 이 변경의 기록이 없다. 근거 문서 갱신 여부는 호출자가 확인할 일이다. (2) SDD 4라운드부터는 '더 상위 모델'을 쓰라는 조건이 이 파일에서 빠졌으나 SDD 규칙을 따르라고 가리키므로 결과를 구체적으로 적을 수 없어 올리지 않았다. 다섯째 발견은 file 이 SKILL.md 이지만 사용자가 계약 대조를 요구해 이 대상 아래에 두었다."
+}

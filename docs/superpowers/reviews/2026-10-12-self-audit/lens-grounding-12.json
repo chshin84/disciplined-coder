@@ -1,0 +1,93 @@
+{
+ "target": "skills/domain-plugin/SKILL.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "CLAUDE.md",
+  ".claude-plugin/plugin.json",
+  ".claude-plugin/marketplace.json",
+  "hooks/hooks.json",
+  "hooks/stop_gates.sh",
+  "scripts/_ensure_autoupdate.sh",
+  "scripts/test_docs_drift.sh",
+  "skills/domain-pruning/SKILL.md",
+  "skills/*/SKILL.md frontmatter",
+  "commands/show-principles.md",
+  "git show 67ac723",
+  "claude plugin validate ./ (2.1.296 실행 출력)"
+ ],
+ "issues": [
+  {
+   "where": "「플러그인을 만들 때 지킬 것」의 version 비우기·validate 항목",
+   "type": "contradiction",
+   "claim": "claude plugin validate 가 version 경고를 낸다고 전제하고 그 경고를 수용하라고 적지만, 이 PC 의 CLI 2.1.296 은 version 이 빈 plugin.json 에 version 경고를 내지 않는다. 저장소 CLAUDE.md 도 2.1.296 은 version 경고 대신 루트 CLAUDE.md 경고를 낸다고 적는다.",
+   "file": "skills/domain-plugin/SKILL.md",
+   "evidence": "`claude plugin validate`가 내는 version 경고는 수용한다.",
+   "counterpart_file": "CLAUDE.md",
+   "counterpart": "경고 문구는 CLI 버전마다 바뀐다(2.1.296 은 `version` 경고 대신 루트 CLAUDE.md 가 실리지 않는다는 경고를 낸다).",
+   "principle": "NO-ASSUME",
+   "consequence": "이 저장소에서 claude plugin validate ./ 를 실행하면 루트 CLAUDE.md 경고 하나만 나오고 version 경고는 나오지 않는데, domain-plugin 은 version 경고를 기준으로 수용 여부와 --strict 실패를 설명한다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "domain-plugin",
+   "statement": "활성 개발 중이면 plugin.json 의 version 을 비워 커밋 SHA 기반 자동 업데이트를 유지한다.",
+   "evidence": "- **version 비우기** — 활성 개발 중이면 plugin.json의 `version`을 비워 커밋 SHA 기반 자동 업데이트를 유지한다. version을 설정하면 업데이트가 버전 문자열 비교로 바뀌어, 값을 올리지 않는 한 새 커밋이 사용자에게 배포되지 않는다([plugins-reference의 Version management](https://code.claude.com/docs/en/plugins-reference#version-management)). `claude plugin validate`가 내는 version 경고는 수용한다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "marketplace.json 의 plugins[].description 은 plugin.json 의 description 과 글자 그대로 같게 두고 test_docs_drift.sh 가 확인한다.",
+   "evidence": "- **marketplace.json** — `.claude-plugin/marketplace.json`에 최상위 `name`·`description`·`owner`·`plugins[]`를 둔다. 레포 루트가 곧 플러그인이면 `source: \"./\"`로 가리킨다. `plugins[].description`은 `plugin.json`의 `description`과 글자 그대로 같게 둔다. 문안을 바꿀 때는 `plugin.json`을 고치고 마켓플레이스 항목을 따라 맞추며, 같은지는 `scripts/test_docs_drift.sh`가 확인한다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "스킬 SKILL.md 는 name·description, 커맨드 .md 는 description 하나를 쓰고 description 에는 언제 여는지를 넣으며 ': ' 와 ' #' 을 넣지 않는다.",
+   "evidence": "- **frontmatter** — 스킬 `SKILL.md`는 `name`(디렉터리 이름과 같게)과 `description` 두 키를 쓰고, 커맨드 `.md`는 `description` 하나를 쓴다. `description`은 언제 여는지를 포함한다. 이 요구는 스킬과 커맨드 양쪽에 적용된다. 스킬은 Claude 가 언제 열지 고르는 근거가 그 값뿐이고, 커맨드는 사용자가 목록에서 고르는 근거가 그 값뿐이다. 값은 YAML 평문 스칼라라 `: `와 ` #`을 넣지 않는다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "규칙집은 domain-, 렌즈는 lens-, 절차는 동사구로 스킬 이름을 짓는다.",
+   "evidence": "- **스킬 이름의 부류** — 이름의 모양이 그 스킬을 어떻게 쓰는지 말하게 한다. 열어서 읽는 규칙집에는 `domain-` 접두사를 붙이고(`domain-readme`·`domain-plugin`), 읽기 전용 서브에이전트로 실행하는 렌즈에는 `lens-` 접두사를 붙이며, 렌즈를 실행해 결과를 내는 절차에는 접두사 대신 동사구를 쓴다(`review-specs`·`review-docs`·`review-llm-calls`·`audit-repo-docs`·`dispatching-lenses`·`aggregating-lenses`·`nested-orchestration`). 규칙집과 절차가 같은 접두사를 쓰면 여는 쪽이 무엇을 기대할지 알 수 없다."
+  },
+  {
+   "topic": "NO-ASSUME",
+   "statement": "자주 실행되는 훅을 만들기 전에 그 비용을 먼저 측정하고, 다른 환경에서는 다시 측정한다.",
+   "evidence": "훅은 값이 든다. 자주 실행되는 훅을 만들기 전에 그 값을 먼저 측정한다. 아래는 2026-09-07에 이 PC(윈도우 11, Git Bash)에서 측정한 것이고, 다른 환경에서는 다시 측정한다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "대화 기록을 파싱하는 Stop 훅은 만들지 않고, 답에 적용하는 규칙은 에이전트원칙의 지시로 맡긴다.",
+   "evidence": "- **대화 기록을 파싱하는 Stop 훅은 만들지 않는다** — Stop 훅은 방금 쓴 답을 인자로 받지 않는다. 대화 기록 파일을 열고 JSON을 파싱해 마지막 답을 골라내야 하고, 그래서 파이썬을 실행하게 된다. 실제 대화 기록에서 답 하나에 1,021밀리초가 들어 그 훅을 걷어냈다. 답에 적용하는 규칙은 에이전트원칙에 적어 지시로 맡긴다. git 상태만 보는 가벼운 게이트는 이 금지에 들지 않되, 검사를 한 프로세스로 모으고 git status 는 한 번만 실행한다(`hooks/stop_gates.sh`)."
+  },
+  {
+   "topic": "REVERSIBLE",
+   "statement": "사용자 설정 파일을 고치기 전에 .bak 을 남기고, 새로 쓴 파일을 다시 파싱해 유효할 때만 원래 경로에 놓는다.",
+   "evidence": "- **사본과 재검증** — 고치기 전에 `.bak`을 남기고, 새로 쓴 파일을 다시 파싱해 유효할 때만 원래 경로에 놓는다."
+  },
+  {
+   "topic": "YAGNI",
+   "statement": "JSON 을 다루는 처리기를 여러 개 두지 않는다.",
+   "evidence": "- **처리기 하나** — JSON을 다루는 처리기를 여러 개 두지 않는다. 폴백을 하나 더 두면 한 번도 실행되지 않는 사본이 생기고, 실행해 보지 않은 코드에는 오류가 숨는다(에이전트원칙의 `YAGNI`)."
+  },
+  {
+   "topic": "domain-pruning",
+   "statement": "플러그인이 아닌 프로젝트에도 해당하는 과잉 기준은 domain-pruning 이 소유한다.",
+   "evidence": "플러그인을 리뷰하거나 줄일 때 훅과 상시 지시를 아래 판정 질문으로 본다. 테스트·스크립트·문서처럼 플러그인이 아닌 프로젝트에도 해당하는 기준은 `domain-pruning`이 소유한다. 판정 질문은 2026-10-05에 선행연구로 모았다."
+  },
+  {
+   "topic": "EVIDENCE-FIRST",
+   "statement": "훅으로 강제할 조건과 상시 지시 분량의 기준을 출처와 함께 적는다.",
+   "evidence": "- **상시 지시의 분량** — 지시 한 줄마다 지우면 에이전트가 실수하는지 묻고, 그렇지 않으면 지운다. CLAUDE.md 는 import 한 파일까지 쳐서 200줄 미만을 목표로 한다. 지시 수가 늘면 준수율이 떨어진다는 측정은 키워드 지시로 한 것이라 방향의 근거로만 쓴다([Claude Code memory](https://code.claude.com/docs/en/memory), [IFScale](https://arxiv.org/abs/2507.11538))."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "STATE-ASSUME",
+  "EVIDENCE-FIRST",
+  "REVERSIBLE",
+  "YAGNI",
+  "SPECIFIC-NAME"
+ ],
+ "notes": "검토 관점: 누락·모순·환각·불일치를 항목마다 따로 보았다. plugin.json 에 version 이 없는 것, 두 description 이 같은 것, 모든 스킬의 name 이 디렉터리 이름과 같은 것, description 에 ': ' 와 ' #' 이 없는 것, 절차 스킬 이름 일곱 개가 skills/ 에 실재하는 것, stop_gates.sh 의 git status 호출이 한 번인 것, _ensure_autoupdate.sh 가 settings.json 과 known_marketplaces.json 에 .bak 을 남기고 다시 파싱하는 것을 확인했다. 훅 비용 표의 밀리초 값과 IFScale 등 외부 출처는 다시 측정하거나 웹을 열지 않아 대조하지 않았다. 「사용자 설정 파일을 고칠 때 지킬 것」의 환경 변수 항목은 커밋 67ac723 이 PYTHONUTF8 예외 문장을 지운 뒤 이 저장소 안에 해당 구현이 없는 일반 규칙으로 남았다. 근거 불일치는 아니라 발견으로 올리지 않았다."
+}

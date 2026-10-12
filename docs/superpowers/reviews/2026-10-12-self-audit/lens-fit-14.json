@@ -1,0 +1,17 @@
+{
+ "target": "skills/domain-readme/SKILL.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — README 를 쓰는 규칙과 동선만 포함한다",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md"
+ ],
+ "issues": [],
+ "principles_applied": [
+  "DOC-TYPE",
+  "COUNT-EARNS",
+  "NAME-ITEMS",
+  "ONE-IDEA"
+ ],
+ "notes": "검토 관점: 형식·스타일·오염·호환·규율을 보았다. 절 제목 「독자가 빨리 답해야 하는 네 가지」는 제목에 개수를 붙인 형태이나, 이 스킬은 남에게 전달되는 문서가 아니어서 TITLES 와 금지어 목록의 제목 규칙으로 판정하지 않았다. 호출자가 스킬 문서에도 그 규칙을 적용하기로 하면 다시 보아야 한다."
+}

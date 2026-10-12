@@ -1,0 +1,266 @@
+{
+ "target": "docs/domain-discipline.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/seal_reviews.sh",
+  "hooks/_banned_words.sh",
+  "hooks/_spec_marker.sh",
+  "hooks/readonly_pretooluse.sh",
+  "hooks/doc_word_pretooluse.sh",
+  "skills/nested-orchestration/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "korean-banned-words.md",
+  "docs/domain-korean.md",
+  "docs/superpowers/specs/2026-09-28-titles-split-design.md",
+  "docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md",
+  "README.md",
+  "CLAUDE.md",
+  "git tag (archive/*)",
+  "git log -S canon-sections -- scripts/"
+ ],
+ "issues": [
+  {
+   "where": "### `NAME-ITEMS` 첫 문단",
+   "type": "mismatch",
+   "claim": "test_docs_drift.sh 에 「canon-sections」 묶음이 있다고 단정하지만 현재 스크립트에는 그 묶음도, 옛 서수 제목을 찾는 검사도 없다. git log -S 로 보면 그 묶음은 커밋 d75f319 등에서 지워졌다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "`scripts/test_docs_drift.sh` 의 「canon-sections」 묶음이 옛 서수 제목이 되살아나지 않는지 함께 본다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "# --- canon-realign: 에이전트원칙이 원칙 전부를 갖는다 ---",
+   "principle": "NO-ASSUME",
+   "consequence": "scripts/ 와 hooks/ 어디에도 canon-sections 나 서수 제목 검사가 없어, 참고서가 존재하지 않는 검사를 근거로 가리키고 있다."
+  },
+  {
+   "where": "머리말 수치 문단 마지막 문장",
+   "type": "mismatch",
+   "claim": "태스크 다섯 기준을 nested-orchestration 「나누는 기준」으로 옮겼다고 적지만, 스킬에는 그 이름의 절이나 라벨이 없고 기준은 「맡기는 기준」 라벨 아래에 있다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "「나누는 기준」으로 옮겼다.",
+   "counterpart_file": "skills/nested-orchestration/SKILL.md",
+   "counterpart": "**맡기는 기준.** 현재 세션은 계약 코드를 고정한 뒤",
+   "principle": "TERM-ONE",
+   "consequence": "참고서의 포인터 「나누는 기준」이 스킬 안의 어느 제목이나 라벨과도 일치하지 않는다."
+  },
+  {
+   "where": "### `FOCUSED` 첫 문단",
+   "type": "mismatch",
+   "claim": "_banned_words.sh 가 표 파싱과 본문 맞추기를 함수 둘로 나눴다고 적지만, 실제로는 banned_parse·banned_scan·banned_report 세 함수로 나뉘어 있다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "한 작업이 두 가지를 하면 두 가지를 따로 바꿀 수 없다. `hooks/_banned_words.sh` 가 표 파싱과 본문",
+   "counterpart_file": "hooks/_banned_words.sh",
+   "counterpart": "banned_scan() {  # $1=pairs, $2=excl, $3=scopes, $4=고를 적용 대상(빈 값이면 전부), $5=파일 목록 파일",
+   "principle": "NO-ASSUME",
+   "consequence": "예시로 든 파일의 함수 개수가 참고서의 서술(둘)과 다르다(셋)."
+  },
+  {
+   "where": "### `EDIT-DISCIPLINE` 마지막 문단",
+   "type": "unsupported",
+   "claim": "리뷰 기록이 append-only 를 선언한다고 단정하지만, 저장소의 리뷰 기록·스킬·스크립트 어디에도 append-only 선언이 없다. 훅은 선언이 아니라 seal_reviews.sh 가 붙인 읽기 전용 속성만 읽는다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "리뷰 기록은 append-only 를 선언하고 `hooks/readonly_pretooluse.sh` 가 그 선언대로 수정을 거부한다.",
+   "counterpart_file": "scripts/seal_reviews.sh",
+   "counterpart": "# 읽기 전용 속성은 만든 쪽의 의도라 어느 저장소에서든 같은 뜻이고, 훅(hooks/readonly_pretooluse.sh)은",
+   "principle": "NO-ASSUME",
+   "consequence": "append-only 라는 말은 이 참고서와 옛 spec·rewrite-map 에만 있고, 실제 차단 장치는 chmod a-w 속성과 그 속성을 읽는 훅이다."
+  },
+  {
+   "where": "### `DOC-TYPE` 둘째 문단",
+   "type": "contradiction",
+   "claim": "기록만 지우지 않는다고 적지만, 에이전트원칙의 기록 행과 같은 절 뒤 문단(2026-10-06)은 기록을 보존 태그 뒤 지우게 바뀌었다. 또 spec 도 지우지 않으므로 '기록만'이라는 한정이 현행 표와 맞지 않는다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "기록만 지우지 않는 이유는, 앞선 차수의 기록이 없으면 지적이 0건이었던 차수와 검증을 실행하지 않은 차수가",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "다룬 작업이 병합되면 git 보존 태그를 단 뒤 지우되, 차수 대조에 쓰는 최근 기록은 남겨라.",
+   "principle": "DOC-TYPE",
+   "consequence": "같은 `DOC-TYPE` 절 안에 기록을 지우지 않는다는 문장과 기록을 보존 태그 뒤 지운다는 문장이 함께 있다."
+  },
+  {
+   "where": "## 삭제한 조항",
+   "type": "omission",
+   "claim": "test_docs_drift.sh 는 되살아나면 안 되는 ID 로 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 를 검사하고 그 근거가 두 참고서의 「삭제한 조항」 절에 있다고 적지만, 이 절과 domain-korean.md 어디에도 이 다섯 ID 가 없다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "2026-09-23에 `FAIL-LOUD` `EXPLICIT` `SSOT` `NAME-UNRESOLVED` `TRACE-REQUEST` `KEEP-STYLE` `IDEMPOTENT`",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "# 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.",
+   "principle": "KEEP-FAILED",
+   "consequence": "검사가 차단하는 ID 중 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 는 삭제 근거가 어느 참고서에도 적혀 있지 않다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "원칙",
+   "statement": "사소한 작업의 경계(파일 하나, 20줄)와 NO-FLEET 의 10개, CHECKABLE 의 셋은 측정값이 아니라 2026-09-24 사용자 합의값이며 측정으로 더 나은 값이 나오면 바꾼다.",
+   "evidence": "측정값이 아니다. 2026-09-24에 모호한 기준을 없애려고 사용자와 합의한 값이다. 측정으로 더 나은 값이 나오면"
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "SUB-ORCHESTRATE 의 태스크 다섯 기준은 2026-10-10에 nested-orchestration 으로 옮겼다.",
+   "evidence": "「나누는 기준」으로 옮겼다."
+  },
+  {
+   "topic": "FOCUSED",
+   "statement": "한 단위가 두 가지를 하면 따로 바꿀 수 없다는 것이 근거이고, 2026-10-03에 '한 작업'을 '구성 단위'로 고쳤다.",
+   "evidence": "한 작업이 두 가지를 하면 두 가지를 따로 바꿀 수 없다."
+  },
+  {
+   "topic": "ASYNC-FIRST",
+   "statement": "검사를 차례로 실행하면 334초, 동시에 실행하면 219초였다는 실측이 근거다.",
+   "evidence": "이 PC에서 검사 다섯 벌을 차례로 실행하면 334초, 동시에 실행하면 219초였다."
+  },
+  {
+   "topic": "NAME-ITEMS",
+   "statement": "번호는 항목 변경 때 가리키는 대상이 조용히 바뀌고, 순서 없는 목록의 번호는 우선순위로 읽힌다.",
+   "evidence": "번호는 항목을 지우거나 끼워 넣는 순간 가리키는 대상이 달라지고, 그 변화가 조용히 일어난다."
+  },
+  {
+   "topic": "REVERSIBLE",
+   "statement": "되돌릴 수 있는 결정은 틀려도 비용이 작고, 되돌리기 어려운 결정은 근거를 남긴다.",
+   "evidence": "되돌릴 수 있는 결정은 틀려도 값이 작다."
+  },
+  {
+   "topic": "SECRETS",
+   "statement": "프롬프트와 로그는 남으므로 한 번 실은 비밀은 회수할 수 없다.",
+   "evidence": "프롬프트와 로그는 남는다."
+  },
+  {
+   "topic": "NO-ASSUME",
+   "statement": "출처는 andrej-karpathy-skills 1.0.0이고, 검사 단언 수를 잘못 센 사례가 근거다.",
+   "evidence": "출처는 `andrej-karpathy-skills` 1.0.0이다."
+  },
+  {
+   "topic": "STATE-ASSUME",
+   "statement": "가정을 적지 않으면 읽는 사람이 사실로 읽는다.",
+   "evidence": "출처는 같다. 가정을 적지 않으면 읽는 사람이 그것을 사실로 읽는다."
+  },
+  {
+   "topic": "EVIDENCE-FIRST",
+   "statement": "외부 근거 탐색 지시와 기준값 출처 지시를 한 조항으로 합쳤고 클린룸 시험에서 빈 모델 4건, 새 문안 0건이었다.",
+   "evidence": "4개 세션에서 나왔다. 두 지시가 같은 관심사라 한 조항으로 합쳤다."
+  },
+  {
+   "topic": "ASK-OPTIONS",
+   "statement": "2026-09-24에 ASK-CONTEXT 를 이 조항에 합쳤다.",
+   "evidence": "2026-09-24에 묻는 형태를 정하던 `ASK-CONTEXT` 를 이 조항에 합쳤다."
+  },
+  {
+   "topic": "RUN-IT",
+   "statement": "kw-control-tower AX 블록에서 가져왔고 나머지 항목은 기존 조항에 합쳤다.",
+   "evidence": "2026-09-24에 kw-control-tower 의 AX 블록 「답할 때 지킬 것」에서 가져왔다."
+  },
+  {
+   "topic": "NO-FLEET",
+   "statement": "ASYNC-FIRST 와 적용 조건이 겹치지 않는다.",
+   "evidence": "출처는 같다. `ASYNC-FIRST` 와 반대 방향처럼 보이지만 적용 조건이 겹치지 않는다."
+  },
+  {
+   "topic": "YAGNI",
+   "statement": "원문 다섯 줄을 '요청한 것 밖' 한 조항으로 합쳤고 2026-10-03에 50/200줄 예시를 지웠다.",
+   "evidence": "상황의 처리, 분량의 과잉을 각각 적었다."
+  },
+  {
+   "topic": "REPORT-DEAD",
+   "statement": "이번 변경이 죽인 것은 지우고 원래 죽어 있던 것은 알리기만 한다.",
+   "evidence": "출처는 같다. 두 문장이 서로 반대 방향이라 한 조항에 함께 둔다."
+  },
+  {
+   "topic": "CHECKABLE",
+   "statement": "검사 계약은 기대 개수를 숫자로 박지 않고 FAIL=0 으로 정한다.",
+   "evidence": "저장소의 검사 계약이 그 형태다 — 기대 개수를 숫자로 박지 않고 FAIL=0 하나로 정한다."
+  },
+  {
+   "topic": "KEEP-FAILED",
+   "statement": "실패한 시도를 지우면 다음 작업자가 같은 방법을 반복한다.",
+   "evidence": "실패한 시도를 지우면 다음 작업자가 같은 방법을 다시 시도한다."
+  },
+  {
+   "topic": "TITLE-LAYERS",
+   "statement": "식별자는 목차에 둘 수 있고, ### 금지는 남에게 전달되는 문서에만 적용한다.",
+   "evidence": "`###` 금지는 남에게 전달되는 문서에만 적용한다."
+  },
+  {
+   "topic": "TITLE-CLAIM",
+   "statement": "슬라이드 제목 40자 상한은 추정한 가정이며 사용자가 세 안 중 골랐다.",
+   "evidence": "40자는 16:9 슬라이드 24pt 두 줄에 들어가는 값으로 추정한 가정이며, 사용자가 세 안(40자, 두 줄,"
+  },
+  {
+   "topic": "TITLE-PROOF",
+   "statement": "결론형 제목의 알려진 실패는 뒷받침 없는 주장과 제목끼리의 반복이다.",
+   "evidence": "결론형 제목의 알려진 실패는 본문이 뒷받침하지 않는 주장과 제목끼리의 반복이다."
+  },
+  {
+   "topic": "LABEL-NOUN",
+   "statement": "2026-09-28에 제목 층을 TITLE-LAYERS 로 옮기고 이름표 규칙만 남겼다.",
+   "evidence": "이름표만 남긴 조항이다."
+  },
+  {
+   "topic": "DOC-TYPE",
+   "statement": "spec 은 결정 기록으로 남기고 plan 과 기록은 보존 태그 뒤 작업 트리에서 지운다.",
+   "evidence": "그래서 spec은 결정 기록으로 남기고, plan과 기록은 git 보존 태그를 단 뒤 작업 트리에서 지운다."
+  },
+  {
+   "topic": "MANAGED-BLOCK",
+   "statement": "마커로 감싸면 그 안만 바꾸므로 반복 실행해도 결과가 같다.",
+   "evidence": "자동 생성 구간과 사용자 콘텐츠가 섞이면 다시 만들 때 사용자 것을 지운다."
+  },
+  {
+   "topic": "DOC-PLACE",
+   "statement": "CLAUDE.md·스킬·rules 는 비용과 누락 양상이 다르다.",
+   "evidence": "셋의 값이 다르다."
+  },
+  {
+   "topic": "EDIT-DISCIPLINE",
+   "statement": "파일이 선언한 수정 방식을 어기면 되돌리기 어려운 사고가 난다.",
+   "evidence": "파일이 스스로 선언한 수정 방식을 어기면 되돌리기 어려운 사고가 난다."
+  },
+  {
+   "topic": "EXPLAIN-STRUCTURE",
+   "statement": "diff 가 보여 주지 못하는 호출·의존 관계를 설명한다.",
+   "evidence": "바뀐 줄은 diff가 이미 보여 준다."
+  },
+  {
+   "topic": "NO-RAW-OUTPUT",
+   "statement": "한 번에 낸 출력은 확증 편향을 거르지 못해 렌즈를 독립 서브에이전트로 실행한다.",
+   "evidence": "한 번에 낸 출력을 결과로 삼으면 자기 글을 자기가 검토하는 확증 편향을 지나지 않는다."
+  },
+  {
+   "topic": "LENS-ALLOWED",
+   "statement": "2026-10-04에 예외를 승인을 요구하는 렌즈 전반으로 일반화했다.",
+   "evidence": "2026-10-04에 예외를 `lens-prior-art` 한 이름에서 \"호출 절차가 사용자 승인을 요구하는 렌즈\"로 일반화했다."
+  },
+  {
+   "topic": "NO-TODO-DOC",
+   "statement": "할 일 목록 문서는 갱신 의무를 지고, 지지 않으면 낡는다.",
+   "evidence": "할 일 목록 문서는 상태를 적는 문서라 바뀔 때마다 갱신할 의무를 진다."
+  },
+  {
+   "topic": "RESOLVE-NOW",
+   "statement": "미루면 기록하고 다시 찾는 비용이 고치는 비용보다 커진다.",
+   "evidence": "지금 할 수 있는 것을 미루면 그것을 기록하고 다시 찾는 값이 고치는 값보다 커진다."
+  },
+  {
+   "topic": "TELL-NOW",
+   "statement": "모아 두면 문서를 다시 열기 전까지 결정이 요청되지 않는다.",
+   "evidence": "모아 두면 사용자가 그 문서를 다시 열기 전까지 결정이 요청되지 않는다."
+  },
+  {
+   "topic": "SUB-ORCHESTRATE",
+   "statement": "조항은 판단 시점만 가리키고 기준과 실행 방법은 nested-orchestration 이 소유한다.",
+   "evidence": "같은 판단을 하라\"이고, 기준과 실행 방법은 `nested-orchestration` 이 소유한다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "TERM-ONE",
+  "DOC-TYPE",
+  "KEEP-FAILED",
+  "SPECIFIC-NAME",
+  "WRITTEN-ONLY"
+ ],
+ "notes": "체크리스트 항목별 검토: 누락 — 에이전트원칙의 한국어 절 밖 조항 ID 가 모두 ### 절로 있는지 대조했고 빠진 ID 는 없다. 삭제한 조항 절에서 test_docs_drift.sh 가 차단하는 ID 다섯이 빠진 것을 올렸다. 모순 — DOC-TYPE 절 안의 옛 문장과 현행 기록 행을 대조해 올렸다. SUB-ORCHESTRATE 인용 문구는 에이전트원칙 현행 문구와 일치한다. 환각 — canon-sections 묶음과 append-only 선언을 저장소에서 찾지 못해 올렸다. path_in_own_repo, _spec_marker.sh 의 영구 결정 근거, korean-banned-words.md 머리의 사본 수정 금지, archive/2026-10-06-plans-and-reviews 태그, 인용된 spec 두 개와 「2026-10-10 개정」 절, lens-prior-art 가 유일한 웹 렌즈라는 서술, lens-readability 가 승인 그룹이라는 서술은 실재를 확인했다. 불일치 — 수치(파일 하나·20줄·10개·셋·40자)는 에이전트원칙과 일치한다. 확인하지 못한 것: ASYNC-FIRST 의 334초·219초·64밀리초, 각 클린룸 측정 건수, andrej-karpathy-skills 1.0.0 과 kw-control-tower AX 블록 「답할 때 지킬 것」의 원문은 저장소 밖 자료라 대조하지 못했다. 측정 기록 원본이 git 이력(보존 태그)에 있는지 확인하려면 archive 태그의 리뷰 기록을 열어야 한다."
+}

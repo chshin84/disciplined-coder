@@ -51,7 +51,7 @@ marker="$mdir/nested-judged-$sid-$key"
 [ -e "$marker" ] && exit 0
 { mkdir -p "$mdir" && : > "$marker"; } 2>/dev/null || exit 0
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유
-reason="새 spec(${match##*/})을 쓰기 전에 서브 세션에 나눠 맡길지 판단하라. 계약을 고정한 뒤 동시에 시작할 수 있는 워크스트림이 둘 이상이고 각각 태스크 다섯 이상으로 예상될 만큼 크거나, 서로 독립된 큰 작업이 둘 이상이면 disciplined-coder nested-orchestration 스킬을 열어 맡길지 판단하라. 어느 쪽에도 들지 않으면 스킬을 열지 말고 판단과 근거를 한 문장으로 사용자에게 알린 뒤 같은 Write 를 다시 실행하라. 맡기기로 하면 그 스킬이 정한 큰 명세를 지금 거부된 이 경로에 써라. 이 경로의 파일 이름에 든 주제를 개발 이름으로 삼는다. 이 경로에 대한 거부는 이 세션에서 한 번뿐이다."
+reason="새 spec(${match##*/})을 쓰기 전에 서브 세션에 나눠 맡길지 판단하라. 계약을 고정한 뒤 동시에 시작할 수 있는 워크스트림이 둘 이상이고 각각 태스크 다섯 이상으로 예상될 만큼 크거나, 서로 독립된 큰 작업이 둘 이상이거나, 사용자가 나눠 맡기라고 요구했으면 disciplined-coder nested-orchestration 스킬을 열어 맡길지 판단하라. 어느 것에도 해당하지 않으면 스킬을 열지 말고 판단과 근거를 한 문장으로 사용자에게 알린 뒤 같은 Write 를 다시 실행하라. 맡기기로 하면 그 스킬이 정한 큰 명세를 지금 거부된 이 경로에 써라. 이 경로의 파일 이름에 든 주제를 개발 이름으로 삼는다. 이 경로에 대한 거부는 이 세션에서 한 번뿐이다."
 esc="$(escape_for_json "$reason")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"%s"}}\n' "$esc"
 exit 0

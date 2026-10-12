@@ -1,0 +1,30 @@
+{
+ "target": "skills/lens-consistency/SKILL.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — 렌즈 체크리스트, 레포 감사에서의 짝 판정 방법, 출력 스키마를 포함한다",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md"
+ ],
+ "issues": [
+  {
+   "where": "「레포 문서 감사에서의 짝」 절 첫 문단 끝",
+   "type": "style",
+   "claim": "판정 목록 앞에 개수를 예고한다. 바로 아래 불릿이 불일치·좁혀 적음·같음을 이름으로 적는다",
+   "file": "skills/lens-consistency/SKILL.md",
+   "evidence": "판정은 짝마다 셋이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라.",
+   "principle": "COUNT-EARNS",
+   "consequence": "판정의 개수 '셋'과 판정 이름 목록이 두 곳에 함께 적혀 있다"
+  }
+ ],
+ "principles_applied": [
+  "COUNT-EARNS",
+  "BULLET-SCOPE",
+  "COMMA-CUT",
+  "ANTI-LIMIT",
+  "DOC-TYPE"
+ ],
+ "notes": "검토 관점: 형식, 스타일, 오염, 호환, 규율. 짝 판정 불릿(불일치·좁혀 적음·같음)은 항목마다 두 문장 안팎이라 BULLET-SCOPE 경계에 있으나 같은 종류의 정의를 늘어놓은 목록이라 올리지 않았다. 상태 기재는 없다."
+}

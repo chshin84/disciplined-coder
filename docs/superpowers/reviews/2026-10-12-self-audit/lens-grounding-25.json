@@ -1,0 +1,118 @@
+{
+ "target": "skills/review-specs/SKILL.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "skills/lens-prior-art/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/nested-orchestration/references/sub-session-protocol.md",
+  "hooks/hooks.json",
+  "hooks/_spec_marker.sh",
+  "hooks/stop_gates.sh",
+  "hooks/_stop_preamble.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "docs/superpowers/specs/2026-08-16-review-procedure-design.md",
+  "docs/superpowers/specs/2026-08-13-prior-art-reviewer-design.md"
+ ],
+ "issues": [
+  {
+   "where": "「한계」 마지막 문단",
+   "type": "omission",
+   "claim": "하드 게이트가 열리는 조건으로 커스텀 경로·git 밖·기존 커밋된 spec 수정만 적고, Stop 훅이 이 세션이 시작되기 전에 만든 미추적 spec·plan 초안을 보지 않는다는 조건을 적지 않는다.",
+   "file": "skills/review-specs/SKILL.md",
+   "evidence": "탐지 밖에서는 열어 둔다. 커스텀 경로나 git이 아닌 곳에서는 FAIL-OPEN으로 통과시킨다. 기존 커밋된 spec을 수정할 때는 하드 게이트가 적용되지 않고 넛지만 뜬다.",
+   "counterpart_file": "hooks/stop_gates.sh",
+   "counterpart": "이 세션이 시작되기 전에 만든 미추적 초안은 보지 않는다(에이전트원칙 FOCUSED)",
+   "principle": "NO-ASSUME",
+   "consequence": "stop_gates.sh 는 세션 시작 표시 파일보다 오래된 미추적 spec·plan 을 차단 대상에서 빼는데, review-specs 「훅이 적용하는 강제」와 「한계」는 이 제외를 적지 않아 그 초안이 마커 없이 남아도 차단된다고 읽힌다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "review-specs",
+   "statement": "Stop 훅은 미리뷰 문서가 남은 채 턴이 끝나는 것을 턴에 한 번 차단한다.",
+   "evidence": "- **Stop**이 미리뷰 문서가 남은 채 턴이 끝나는 것을 차단한다(하드 게이트). 차단은 턴에 한 번이다. 「한계」 절을 참고한다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "마커는 🔴가 있으면 escalated, 없으면 passed 이고 날짜와 개수를 박지 않는다.",
+   "evidence": "- 리뷰와 처분 분류가 끝나면 개선보다 먼저 문서 마지막 줄에 마커를 남겨 해제한다. `<!-- spec-review: passed -->`, `🔴`가 있으면 `<!-- spec-review: escalated -->`다. 날짜와 개수는 박지 않는다. 기존 dated 마커도 prefix 매칭으로 인식한다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "게이트는 env DISCIPLINED_CODER_REVIEW_GATE=off 로 끈다.",
+   "evidence": "- 끄려면 env `DISCIPLINED_CODER_REVIEW_GATE=off`를 설정한다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "대상 하나에 렌즈 넷을 따로 실행하고 spec 과 plan 을 함께 보면 여덟이다.",
+   "evidence": "실행하는 개수도 여기서 정해진다. 대상 하나에 넷이다. 배정된 렌즈가 넷이고 렌즈마다 따로 실행하기 때문이며, spec 과 plan 을 함께 보는 차수는 여덟이 된다. `lens-prior-art`는 이 넷에 들지 않고, 붙이기로 하면 렌즈 개수 대신 서브에이전트 상한으로 센다. 그 상한은 `lens-prior-art`의 「실행할 때 지킬 상한」이 정하며 사용자가 정한 값이다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈 실행 횟수는 dispatching-lenses 「한 번만 실행하는 렌즈의 규율」이 정하고 review-specs 는 줄인 경위를 소유한다.",
+   "evidence": "렌즈를 실행하는 횟수는 `dispatching-lenses`의 「한 번만 실행하는 렌즈의 규율」이 정한다. 이 절은 그렇게 줄인 경위와 잃은 것을 소유한다. 전에는 두 번씩 실행했고, 이 레포에서 세 차수를 확인해 보니 두 번째가 새로 잡은 것이 21%에서 55% 사이였다. 그런데도 한 번으로 줄인 것은 사용자가 값을 더 크게 봤기 때문이다. 무엇을 잃는지 알고 줄인 것이라 한 번으로 못 건진 지적이 있을 수 있다. 그래서 리뷰 기록에 \"렌즈를 한 번씩만 실행했다\"를 한 줄 적는다."
+  },
+  {
+   "topic": "lens-prior-art",
+   "statement": "선행연구 렌즈는 spec 에만 제안하고 plan 에는 제안하지 않는다.",
+   "evidence": "plan에는 제안하지 않는다."
+  },
+  {
+   "topic": "lens-prior-art",
+   "statement": "선행연구 렌즈의 발동 기준은 아직 해본 적 없는 것을 해내려 하고 되는지가 미지수인 spec 이다.",
+   "evidence": "**발동 기준** — 이 spec이 이미 하던 일을 자동화하거나 정리하는 것이면 제안하지 않는다. 아직 해본 적 없는 것을 해내려 하고 그것이 되는지 자체가 미지수이면 제안한다. 판단이 서로 다르면 제안한다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "spec 리뷰의 메타 집계는 decision 을 내지 않고 병합한 목록을 「합치기」로 넘긴다.",
+   "evidence": "`aggregating-lenses`의 「하는 일」 두 단계를 그대로 따른다. 한 목록으로 모으고 커버리지 공백을 표시하는 데서 멈춘다. **spec 리뷰에서는 결정 단계가 없으므로** `decision`을 내지 않고 병합한 목록을 「합치기」 절로 넘긴다. 이 리뷰의 작성자는 메인 세션 하나다. 렌즈는 JSON만 돌려주고 취합과 반영과 마커 기록은 메인 세션이 한다."
+  },
+  {
+   "topic": "review-docs",
+   "statement": "리뷰 기록 파일 이름 규칙은 review-docs 가 소유한다.",
+   "evidence": "차수마다 별개 파일을 만든다. 앞 차수를 덮거나 이어 붙이지 않는다. 이름 규칙은 review-docs 가 소유하므로 여기 베끼지 않는다 — 차수를 뒤에 붙이는 조건이 그 규칙에 있다. 차수마다 문서가 달랐으므로 섞으면 어느 차수가 무엇을 잡았는지 가릴 수 없다."
+  },
+  {
+   "topic": "REVERSIBLE",
+   "statement": "되돌리기 어려운 결정은 🔴로 올린다.",
+   "evidence": "- 되돌리기 어려운 결정인가(`REVERSIBLE`)."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "lens-prior-art 의 발견은 판정 내용과 무관하게 전부 🔴로 간다.",
+   "evidence": "`lens-prior-art`의 발견은 판정 내용과 무관하게 전부 `🔴`로 간다."
+  },
+  {
+   "topic": "ASK-OPTIONS",
+   "statement": "다시 리뷰는 매번 사용자에게 선택지가 있는 질문으로 묻는다.",
+   "evidence": "다시 리뷰는 매번 사용자에게 묻는다. 자동으로 실행되지 않는다. 물을 때는 `ASK-OPTIONS`대로 선택지가 있는 질문으로 묻는다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "nested-orchestration 의 서브 세션은 다시 리뷰를 생략하고 기능적 변화가 있었던 항목을 리포트에 적는다.",
+   "evidence": "사람과 대화할 수 없는 실행자(`nested-orchestration`의 서브 세션)는 묻지 않고 다시 리뷰를 생략한다. 대신 반영한 것 가운데 기능적 변화가 있었던 항목을 리포트에 적어 현재 세션에 넘긴다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "search_status 가 ok 가 아니면 선행연구 렌즈 결과를 판정으로 쓰지 않는다.",
+   "evidence": "- `search_status`가 `ok`가 아니면 이 렌즈의 결과를 판정으로 쓰지 않는다. 그 값을 보고에 적는다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "STATE-ASSUME",
+  "FOCUSED",
+  "TERM-ONE",
+  "SPECIFIC-NAME",
+  "WRITTEN-ONLY",
+  "SUBJECT-OBJECT"
+ ],
+ "notes": "검토한 관점은 누락·모순·환각·불일치 넷이다. 코드와 맞는 것으로 확인한 항목: Stop 루프가드 stop_hook_active(_stop_preamble.sh), 마커 prefix 매칭과 마지막 비공백 줄 판정(_spec_marker.sh marker_is_terminal), DISCIPLINED_CODER_REVIEW_GATE=off(spec_review_posttooluse.sh·stop_gates.sh), PostToolUse 비블로킹 additionalContext, 신규(??·A) spec 만 하드 게이트이고 기존 수정은 제외, git 저장소가 아니면 FAIL-OPEN. 소유자 문서와 맞는 것으로 확인한 항목: 배정 렌즈 넷(dispatching-lenses 「렌즈 그룹」 표), 「실행하는 방법」의 나눠 주지 않기, 「따로 실행할 때와 묶을 때」의 다섯 개 경계, lens-prior-art 상한이 「대상이 다르면 별개 호출」을 이긴다는 문장, 통상·최대한 두 이름, review-docs 「lens-fit에 넘기는 계약」과 「기록 파일 이름 규칙」, lens-adversarial 체크리스트 넷과 lens-consistency 체크리스트. 21%~55% 수치는 2026-08-16 설계 문서 표의 원자료가 있는 세 회차 범위와 일치한다. 발견으로 올리지 않은 것: (1) 94%·39~77% 수치는 2026-08-13-prior-art-reviewer-design.md 에만 있고 이 문서는 출처를 가리키지 않지만 상대편 문장이 같은 주장이라 불일치가 아니다. (2) spec_review_posttooluse.sh 는 path_in_project 로 프로젝트 밖 spec 을 빼지만 「훅이 적용하는 강제」는 이 제외를 적지 않는다. 결과가 넛지 하나라 발견 기준에 못 미쳐 올리지 않았다."
+}

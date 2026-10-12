@@ -9,7 +9,7 @@ Claude Code 플러그인과 마켓플레이스를 만들고 배포하는 방법�
 ## 플러그인을 만들 때 지킬 것
 플러그인은 남의 PC 로 배포되므로, 값을 잘못 두면 새 커밋이 그쪽에 안 실리거나 스킬이 안 열린다.
 
-- **version 비우기** — 활성 개발 중이면 plugin.json의 `version`을 비워 커밋 SHA 기반 자동 업데이트를 유지한다. version을 설정하면 업데이트가 버전 문자열 비교로 바뀌어, 값을 올리지 않는 한 새 커밋이 사용자에게 배포되지 않는다([plugins-reference의 Version management](https://code.claude.com/docs/en/plugins-reference#version-management)). `claude plugin validate`가 내는 version 경고는 수용한다.
+- **version 비우기** — 활성 개발 중이면 plugin.json의 `version`을 비워 커밋 SHA 기반 자동 업데이트를 유지한다. version을 설정하면 업데이트가 버전 문자열 비교로 바뀌어, 값을 올리지 않는 한 새 커밋이 사용자에게 배포되지 않는다([plugins-reference의 Version management](https://code.claude.com/docs/en/plugins-reference#version-management)). `claude plugin validate`가 version 경고를 내면 수용한다(CLI 버전에 따라 내지 않기도 한다).
 - **marketplace.json** — `.claude-plugin/marketplace.json`에 최상위 `name`·`description`·`owner`·`plugins[]`를 둔다. 레포 루트가 곧 플러그인이면 `source: "./"`로 가리킨다. `plugins[].description`은 `plugin.json`의 `description`과 글자 그대로 같게 둔다. 문안을 바꿀 때는 `plugin.json`을 고치고 마켓플레이스 항목을 따라 맞추며, 같은지는 `scripts/test_docs_drift.sh`가 확인한다.
 - **frontmatter** — 스킬 `SKILL.md`는 `name`(디렉터리 이름과 같게)과 `description` 두 키를 쓰고, 커맨드 `.md`는 `description` 하나를 쓴다. `description`은 언제 여는지를 포함한다. 이 요구는 스킬과 커맨드 양쪽에 적용된다. 스킬은 Claude 가 언제 열지 고르는 근거가 그 값뿐이고, 커맨드는 사용자가 목록에서 고르는 근거가 그 값뿐이다. 값은 YAML 평문 스칼라라 `: `와 ` #`을 넣지 않는다.
 - **validate** — `claude plugin validate ./`로 검증한다. `--strict`는 경고까지 실패로 취급하므로, 위 버전 정책을 쓰는 레포에서는 `--strict`가 실패하는 것이 정상이며 non-strict로 통과를 확인한다.
@@ -28,7 +28,7 @@ Claude Code 플러그인과 마켓플레이스를 만들고 배포하는 방법�
 | `python` 하나 | 71밀리초 |
 | `python3` 하나(스토어 안내판으로 풀릴 때) | 186밀리초 |
 
-셋을 지킨다.
+아래를 지킨다.
 
 - **프로세스 수를 센다** — 셸 반복이 파이썬보다 싸다고 가정하지 않는다. 표의 행마다 파이프를 실행한 훅이 13,057밀리초였고, 같은 일을 파이썬 한 번으로 하니 1,108밀리초였다. 윈도우는 프로세스를 실행하는 값이 커서 반복이 그대로 값이 된다.
 - **고정 문자열 검색은 로케일을 `C`로 둔다** — `C.UTF-8`에서 `grep`이 207밀리초, `awk`가 213밀리초 들던 것이 크게 줄었다. `grep -F`는 찾는 글자를 그대로 비교하므로 바이트로 비교해도 UTF-8 결과가 같다.
