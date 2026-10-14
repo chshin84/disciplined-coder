@@ -1,0 +1,19 @@
+{
+ "FOCUSED": "strong",
+ "EVIDENCE-FIRST": "strong",
+ "CHECKABLE": "strong",
+ "TITLE-CLAIM": "strong",
+ "TITLE-PROOF": "strong",
+ "LABEL-NOUN": "strong",
+ "EDIT-PRIORITY": "strong",
+ "SPECIFIC-NAME": "strong",
+ "NO-MID-MOD": "strong",
+ "NO-STACK-MOD": "strong",
+ "KEEP-CONNECT": "strong",
+ "BULLET-SCOPE": "strong",
+ "ONE-IDEA": "strong",
+ "TERM-EXPLAIN": "strong",
+ "COUNT-EARNS": "strong",
+ "SUBJECT-OBJECT": "strong",
+ "ASK-OPTIONS": "strong2"
+}

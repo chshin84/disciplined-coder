@@ -109,7 +109,8 @@ WK="$HERE/docs/domain-korean.md"
 # 에이전트원칙이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
 # 그 검사가 우리가 없애려던 중복을 오히려 요구했다. 이제 ID 로 잇고, 지시 문장이 스킬에 그대로
 # 있으면 실패한다.
-KO_IDS="$(awk '/^### `PLAIN-KO`/{f=1} f&&/^## /{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
+# 한국어 묶음은 「원칙」 절과 「사람이 볼 문서」 절에 나뉘어 있으므로 묶음 제목으로 뽑는다.
+KO_IDS="$(awk '/^### `(PLAIN-KO|KO-SYNTAX|PROSE-FORM|READ-FLOW|UNPACK|DOC-FORM|REVISE-ORDER)`/{f=1;next} /^##/{f=0} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
 check "에이전트원칙에서 한국어 조항 ID 를 뽑았다"    "[ -n \"\$KO_IDS\" ]"
 KO_MISS=""
 KO_DUP=""
@@ -816,7 +817,7 @@ CANON_CUT="$(mktemp)"; grep -vF '**`YAGNI`' "$CANON" > "$CANON_CUT"
 check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids '$CANON_CUT')\" = ' YAGNI' ]"
 # 한국어 절은 두 층이다. 묶는 이름은 `###` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
 # 검사해야 이름만 남고 지시가 빠지거나 그 반대인 상태를 잡는다. 원자 지시 층은 위의 도출 검사가 본다.
-for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK REVISE-ORDER; do
+for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK DOC-FORM REVISE-ORDER; do
   check "canon: korean group $g present"             "grep -qE '^### \`$g\`' '$CANON'"
 done
 # 조항을 더하려면 CLAUDE.md 가 정한 클린룸 소거 시험을 거쳐야 한다. 시험으로 지운 조항 ID 가
