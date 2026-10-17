@@ -1,0 +1,102 @@
+{ "lens": "lens-adversarial",
+"read": [
+"D:\\projects\\Structure\\disciplined-coder\\agent-principles.md",
+"D:\\projects\\Structure\\disciplined-coder\\skills\\lens-adversarial\\SKILL.md",
+"D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"D:\\projects\\Structure\\disciplined-coder\\skills\\lens-prior-art\\SKILL.md (1~40행)",
+"D:\\projects\\Structure\\disciplined-coder\\skills\\dispatching-lenses\\SKILL.md (43·92~100행, Grep 결과)",
+"D:\\projects\\Structure\\disciplined-coder\\skills\\review-specs\\SKILL.md (64~70행, Grep 결과)"
+],
+"issues": [
+{
+"where": "「기존 스킬과의 관계」 표의 `skills/lens-prior-art/SKILL.md` 행(164행) 중 \"description 에 상황(기존 도구 탐색, 결정 근거 탐색)의 발동 문구를 추가한다\"와 「목표」의 발동 경로(44행)",
+"type": "failure-mode",
+"claim": "발동 누락을 줄이는 수단은 description 문구 추가뿐이다. 그런데 이 세션에서 실패한 요청(\"선행연구해봐라\")은 현행 description 이 이미 포함하는 말이었다. 따라서 설계대로 구현해도 메인 세션이 스킬을 열지 않는 실패는 그대로 남는다. 설계는 오히려 메인 세션이 따라야 할 절차(상황 판정·프로토콜·승인·워크플로 두 개·공백 판단·기록)를 늘리므로, 스킬을 연 뒤에도 절차를 건너뛰고 손으로 짠 실행으로 대체할 여지가 커진다.",
+"file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"evidence": "28행 \"사용자가 '…선행연구해봐라'고 요청했지만, 메인 세션은 `lens-prior-art`를 열지 않고 손으로 짠 워크플로를 실행했다\"; 164행 \"description 에 상황(…)의 발동 문구를 추가한다\"",
+"counterpart_file": "D:\\projects\\Structure\\disciplined-coder\\skills\\lens-prior-art\\SKILL.md",
+"counterpart": "3행 description \"선행연구·선행 사례·prior art를 찾아 달라거나 … 사용자가 선행연구를 직접 청하면 spec이 없어도 연다\"",
+"principle": "NO-ASSUME",
+"consequence": "현행 description 이 실패한 요청 문구를 이미 포함하고 있고, 설계에는 발동 누락의 원인 분석과 그 원인에 대응하는 변경이 없다. 「시험 계획」의 측정값에도 발동 여부가 없어 이 목표의 달성 여부를 확인할 방법이 없다."
+},
+{
+"where": "「노력 산정과 상한」의 세는 대상(126행)과 「열린 위험」의 비용(211행)",
+"type": "risk",
+"claim": "상한은 연구자만 세고 검사 에이전트와 검증자와 합성 대조 에이전트는 세지 않는다. 검증자는 인용 하나마다 하나씩 실행되므로(97행) 최대 20 연구자에서 에이전트 총수에 상한이 없다. 10개 이하 규칙은 단계를 나누게 할 뿐 총수를 줄이지 않는다.",
+"file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"evidence": "126행 \"검증자와 검사 에이전트는 상한에 넣지 않는다. 대신 … 워크플로가 단계를 나눈다\"; 97행 \"검사를 거친 인용마다 검증자를 실행한다\"",
+"counterpart_file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"counterpart": "55행 반목표 '과잉 실행'; 74행 \"단순 질의에 서브에이전트 50개를 실행한 실패 … 그래서 도구 호출과 공백 라운드에 숫자 상한을 둔다\"",
+"principle": "EVIDENCE-FIRST",
+"consequence": "프로토콜 승인(92행)에서 사용자에게 보이는 수는 연구자 수뿐이고, 실제로 실행될 검증자 수와 총 에이전트 수는 승인 대상에 없다. 완화안은 기능 추가가 아니라 프로토콜에 인용 수 상한이나 총 에이전트 수 추정치를 함께 적어 승인받게 하는 문장 변경이다."
+},
+{
+"where": "「목표」의 가드의 강제(43행), 「실행 흐름」 2단계의 검사 에이전트 문장(96행), 「검증」의 기계 검사(147행)",
+"type": "over-engineering",
+"claim": "'기계 검사'라고 부르는 질의 경계 검사와 URL 응답 확인을 LLM 에이전트(검사 에이전트)가 수행한다. 금지 목록과 정규식 대조는 결정론 검사이므로 워크플로 스크립트 안의 JS 코드로 할 수 있고, URL 응답 확인은 검증자가 원문을 열 때 이미 `unverifiable`로 판정한다(143행). 검사 에이전트는 구성 요소를 하나 늘리면서 결정론을 잃는다.",
+"file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"evidence": "43행 \"질의 경계는 기계 검사로 … 강제한다\"; 147행 \"기계 검사 — 검사 에이전트가 수행한다\"; 143행 \"`unverifiable`(봇 차단, 유료 장벽, 응답 없음)\". 단순화 근거: 정규식 대조는 판단이 필요 없는 문자열 비교이며, URL 응답은 검증자의 판정 범주와 중복된다.",
+"counterpart_file": "D:\\projects\\Structure\\disciplined-coder\\skills\\lens-adversarial\\SKILL.md",
+"counterpart": "28~29행 「기계에 넘기는 것」 — 결정론 검사가 답할 수 있는 것은 기계에 넘기고 판단만 에이전트에 둔다는 구분(dispatching-lenses 설명의 '무엇을 기계에 먼저 넘기는지')",
+"principle": "YAGNI",
+"consequence": "검사 에이전트는 별도 정의도 없이 검사를 맡고 있고, 그 검사가 에이전트 판단이라 '가드의 강제'라는 목표가 프롬프트 지시 수준에 머문다. 또 147행이 인정하듯 검사는 검색어가 이미 나간 뒤에 실행되므로 위반을 막지 못하고 기록만 한다."
+},
+{
+"where": "「열린 위험」의 런타임 의존(212행)과 「실행 흐름」 끝의 사실 확인 경로 문장(107행)",
+"type": "failure-mode",
+"claim": "워크플로가 꺼졌거나(disableWorkflows) 실행 중 실패하면 무엇이 남는지를 설계가 정하지 않고 빌더에게 넘긴다. 데이터 흐름 강제(150행)와 검증 통과 목록의 분리(99행)는 워크플로에만 있으므로, 대체 경로에서는 메인 세션이 그 자리에서 절차를 짜는 상태로 돌아간다. 이 상태는 설계가 고치려던 '절차의 즉흥성'(29행)과 같다. 실행 중 끊긴 때 이미 나간 검색과 완료된 연구자 결과를 어떻게 이어 쓰는지도 없다.",
+"file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"evidence": "212행 \"대체 경로가 필요하며, 그 경로는 빌더가 정한다\"; 107행 \"이 경로에서도 2단계의 질의 경계 검사와 인용 검증은 오케스트레이터가 직접 한다\"",
+"counterpart_file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"counterpart": "29행 '절차의 즉흥성' — \"인용 검증을 메인 세션이 그 자리에서 짰다\"; 150행 \"종합 워크플로의 입력은 탐색 워크플로의 통과 목록뿐이다\"",
+"principle": "CHECKABLE",
+"consequence": "설계에는 워크플로 없는 경로가 사실 확인 상황(107행)으로 이미 존재하지만 그 경로를 대체 경로로 지정하지 않았고, 대체 경로의 확인 방법도 없다. 107행 경로를 대체 경로로 명시하면 설계 안의 문장 변경만으로 이 공백을 닫을 수 있다."
+},
+{
+"where": "「구성」 표의 종합 워크플로 행(84행)과 「실행 흐름」 4단계(102행), 「출력 계약」의 `mode` 행(137행)",
+"type": "over-engineering",
+"claim": "종합 워크플로는 근거 지도를 만드는 단계인데, `contrast` 모드(spec 대조·제안서 검진)는 근거 지도를 만들지 않는다. 그런데도 실행 흐름 4단계는 상황과 무관하게 종합 워크플로를 실행한다. 또 종합 단계의 내용은 합성 에이전트와 대조 에이전트 두 번의 순차 호출이라, 별도 워크플로 파일 없이 Agent 도구 호출 두 번이나 탐색 워크플로의 마지막 단계로 할 수 있다.",
+"file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"evidence": "84행 \"통과한 결과를 근거 지도로 합치고, 그 지도를 입력과 다시 대조한다\"; 137행 \"`contrast`(이슈만) 또는 `survey`(이슈와 근거 지도)다\"; 115~116행 spec 대조·제안서 검진의 출력은 '이슈'. 단순화 근거: 한 사용자 규모에서 두 번의 순차 호출은 병렬 이득이 없어 워크플로 런타임이 주는 이점(중간 결과를 스크립트 변수에 두기)이 작다.",
+"counterpart_file": "D:\\projects\\Structure\\disciplined-coder\\agent-principles.md",
+"counterpart": "22행 YAGNI \"한 번만 쓰는 추상화 … 를 넣지 마라. 같은 일을 더 짧게 할 수 있으면 짧게 다시 써라\"",
+"principle": "YAGNI",
+"consequence": "발동 경로가 가장 잦은 spec 대조·제안서 검진 상황에서도 4단계가 무조건 실행되도록 적혀 있고, 구성 요소는 스킬 절차·에이전트 정의 둘·워크플로 둘로 다섯이다."
+},
+{
+"where": "「이중화」 절(152~158행)과 「시험 계획」의 조건 '새 에이전트(이중화 있음)'(179행)",
+"type": "over-engineering",
+"claim": "설계가 인용한 근거가 같은 모델 이중화의 이득이 작다고 이미 말하는데도, 이중화 절차(원출처 동일성 확인, 불일치 대조)를 만들고 시험 조건 하나를 더 실행한 뒤 이득이 없으면 빼기로 했다. 근거가 이득 없음을 예측하므로 처음부터 넣지 않는 쪽이 짧다.",
+"file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"evidence": "158행 \"측정 결과가 이득을 보이지 않으면 이중화를 절차에서 뺀다\"; 156행 hyperresearch 독립성 감사는 \"메인 세션이 이 원문을 열어 확인하지 않았다\". 단순화 근거: 71행의 두 출처.",
+"counterpart_file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"counterpart": "71행 \"9개 모델 패널은 독립 표 약 2개 분량의 정보만 냈고, 최고 단일 판정자가 모든 조건에서 패널과 같거나 더 나았다\"",
+"principle": "YAGNI",
+"consequence": "이중화는 기본값이 아닌 선택으로 들어가 있고, 연구자 수 산정식(127행)과 시험 조건과 dispatching-lenses 예외(167행)에 함께 반영되어 있다."
+},
+{
+"where": "「시험 계획」의 측정값(180행)과 채택 기준(186~188행), 조건의 기준선(177행)",
+"type": "failure-mode",
+"claim": "시험 계획은 \"측정값마다 판정 규칙을 둔다\"고 적었지만 판정 규칙이 하나도 없다. 기준선 \"현행 렌즈 1개를 이 세션 방식대로\"는 이 세션의 방식이 손으로 짠 워크플로였으므로 무엇을 실행하는지 정해지지 않는다. 과제당 실행 횟수가 없어 웹 결과의 변동과 효과를 구분할 수 없고, 오인 판정자는 설계를 만든 메인 세션이다. 토큰 사용량은 측정하지만 채택 기준에 들어가지 않는다.",
+"file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"evidence": "180행 \"측정값마다 판정 규칙을 둔다\" 아래 181~185행은 측정값 이름만 있다; 177행 \"이 세션 방식대로\"; 182행 \"메인 세션이 원문으로 판정\"; 187행 채택 기준에 토큰 항목 없음",
+"counterpart_file": "D:\\projects\\Structure\\disciplined-coder\\CLAUDE.md",
+"counterpart": "「조항 추가와 문구 변경」 — 과제 3개를 조건마다 실행하고 개선이 없으면 과제 2개를 더 실행하는 추가 실행 규칙과 '현행보다 나쁘지 않을 때 채택'의 합계 기준",
+"principle": "CHECKABLE",
+"consequence": "채택 기준의 '나쁘지 않고'와 '적으면'을 판정할 규칙·반복 횟수·판정자가 없고, 열린 위험(211행)으로 적은 비용이 채택 판단에서 빠져 있다."
+},
+{
+"where": "「노력 산정과 상한」의 도구 호출 상한(128행)과 공백 라운드 상한(129행)",
+"type": "risk",
+"claim": "도구 호출 상한의 강제 수단이 없다. 에이전트 정의의 도구 제한은 도구 종류만 정하고 호출 횟수는 정하지 않으므로, 이 상한은 '가드의 약함'(31행)이 지적한 프롬프트 지시와 같은 수준이다. 두 상한의 수치도 메인 세션이 원문을 확인하지 않은 보고에 기대며, 공백 라운드 최대 2회는 근거가 없다.",
+"file": "D:\\projects\\Structure\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-18-prior-art-agent-design.md",
+"evidence": "128행 \"메인 세션은 그 파일을 열어 확인하지 않았다. 빌더가 원문을 확인한다\"; 129행 \"최대 2회는 메인 세션이 정했다\"",
+"counterpart_file": "D:\\projects\\Structure\\disciplined-coder\\agent-principles.md",
+"counterpart": "18행 EVIDENCE-FIRST \"근거를 찾지 못한 제약은 두지 마라\"",
+"principle": "EVIDENCE-FIRST",
+"consequence": "도구 호출 상한은 강제 장치 없이 수치만 있고, 공백 라운드 최대 2회는 출처 없이 설계에 들어가 있다. 74행이 이 상한의 목적으로 든 '무한 탐색' 실패를 막는 장치가 확인되지 않은 상태다."
+}
+],
+"principles_applied": [ "YAGNI", "REVERSIBLE", "EVIDENCE-FIRST", "NO-ASSUME", "STATE-ASSUME", "CHECKABLE", "FOCUSED", "SECRETS", "NO-FLEET", "WRITTEN-ONLY", "NO-MIRROR", "SUBJECT-OBJECT", "SPECIFIC-NAME", "TERM-ONE" ],
+"notes": "검토한 관점: 실패 모드(발동 누락의 재발, 워크플로 꺼짐·중간 실패, 절차 미준수), 과설계(구성 요소 다섯의 필요성, 검사 에이전트, 종합 워크플로, 이중화), 비가역(외부로 나간 검색어, 상한 정책 변경, 출력 스키마 변경), 위험(비용 상한 누락, 상한의 강제 수단, 시험 계획의 실행 가능성)을 항목마다 따로 검토했다. 비가역 축에서는 별도 발견을 올리지 않았다. 상한 2·20은 사용자가 정했고, 스키마 추가와 스킬 이름 유지는 되돌릴 수 있다. 되돌릴 수 없는 유일한 행위는 검색어의 외부 전송이며, 그 문제는 검사 에이전트 발견에 포함했다. 가정: 워크플로 스크립트가 파일 시스템과 셸에는 접근하지 못해도 반환값 배열에 대한 JS 정규식 계산은 할 수 있다고 가정했다. 이 가정이 틀리면 검사 에이전트 발견의 단순화 근거가 약해지므로 workflow-authoring 스킬이나 공식 문서로 확인해야 한다. 추가 확인 대상: (가) 워크플로가 실행 중 끊긴 뒤 이어서 실행(resume)할 수 있는지와 완료된 에이전트 결과가 보존되는지. 이것이 정해져야 중간 실패 발견의 고칠 문장을 정할 수 있다. (나) 플러그인 에이전트 정의에 턴 수나 도구 호출 수를 제한하는 frontmatter 칸이 있는지. 있으면 도구 호출 상한 발견은 그 칸을 지정하는 문장으로 닫힌다. (다) 5행이 가리키는 리뷰 기록 파일은 범위상 열지 않았다. 상황별 전략 표에서 spec 대조와 제안서 검진은 발동 경로만 다르고 분해·수·출력이 같아 합칠 여지가 있으나, 상황 목록은 사용자 확인 대상(111행)으로 남아 있어 발견으로 올리지 않았다."
+}

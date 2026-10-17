@@ -1,0 +1,92 @@
+{
+  "lens": "lens-prior-art",
+  "search_status": "ok",
+  "read": [
+    "https://arxiv.org/html/2506.07962v1",
+    "https://www.emergentmind.com/papers/2605.29800",
+    "https://arxiv.org/abs/2605.29800",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC10908130",
+    "https://elicit.com/blog/how-we-evaluated-elicit-systematic-review",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC12594113/",
+    "https://arxiv.org/pdf/2608.26885 (1~3페이지를 PDF 로 직접 읽음)",
+    "https://www.ispor.org/heor-resources/presentations-database/presentation-cti/ispor-2026/poster-session-2-4/automation-of-systematic-reviews-with-large-language-models",
+    "https://www.rti.org/publication/single-reviewer-abstract-screening-missed-13-percent-relevant-studies",
+    "https://www.medrxiv.org/content/10.64898/2026.06.02.26354724v1.full",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC12012331/",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC7839230/",
+    "https://arxiv.org/abs/2509.04499"
+  ],
+  "queries": [
+    "LLM title abstract screening systematic review sensitivity specificity evaluation",
+    "LLM as second reviewer dual independent screening systematic review replacement",
+    "ASReview stopping rule active learning screening SAFE procedure",
+    "correlated errors language models same model agreement independence \"correlated errors\"",
+    "Elicit systematic review workflow screening extraction accuracy documentation",
+    "RAISE responsible AI evidence synthesis Cochrane position statement 2025",
+    "otto-SR end-to-end agentic systematic review LLM workflow Cochrane reproduce",
+    "LLM screening systematic review repeated runs consistency reproducibility same prompt variability",
+    "deep research agents citation accuracy unsupported claims fabricated references evaluation benchmark",
+    "PRISMA-S reporting literature search checklist items search strategy documentation",
+    "two different LLMs ensemble screening systematic review union sensitivity Cochrane GPT Gemini",
+    "single reviewer screening misses 13% relevant studies Waffenschmidt dual screening",
+    "citation chasing versus database searching unique studies found supplementary search methods systematic review"
+  ],
+  "issues": [
+    {
+      "where": "메커니즘 — '결론을 바꾸는 하위 질문은 다른 검색 경로의 에이전트에 독립 이중화'와 '이중화 판정 대조(불일치는 원문 대조, 미해소는 보고)'",
+      "type": "known-failure",
+      "claim": "같은 모델 에이전트 두 개의 판정이 일치하면 확인된 결론으로 보는 구조는, LLM 사이의 오류 상관이 크다는 측정 결과에 비추어 사람 2인 독립 선별만큼의 독립성을 확보하지 못한다. 이 설계는 불일치만 원문 대조로 보내므로 두 에이전트가 같은 방향으로 틀린 판정은 검출 경로가 없다.",
+      "consequence": "지금 설계에서는 이중화한 두 에이전트가 같은 오판(예: 출처가 주장을 뒷받침한다고 함께 오판, 결말을 함께 잘못 요약)을 내면 그 판정이 '일치'로 분류되어 원문 대조를 거치지 않고 근거 지도에 올라간다. 사용자는 이중화를 거친 판정을 독립 확인을 거친 판정으로 읽게 된다.",
+      "evidence": "Kim 등(ICML 2025)은 350개 이상 LLM 에서 두 모델이 함께 틀린 문항 중 같은 오답을 고른 비율이 평균 0.6(Helm, 무작위 기준선 1/3)·0.423(HuggingFace)이었고, 같은 회사·같은 구조이면 이 비율이 더 높으며(회귀계수 +0.066, +0.076) 정확한 모델일수록 오류 상관이 크다고 측정했다. 'Nine Judges, Two Effective Votes'(arXiv 2605.29800)는 7개 계열 9개 최상위 모델 패널의 유효 독립 표가 Kish 유효표본 기준 약 2(1.94~2.48)이고, 계열을 달리해도 상관이 거의 줄지 않으며(같은 계열 쌍이 +0.047 높을 뿐), temperature 변경은 효과가 없고 chain-of-thought 는 상관을 높였다(phi 0.391→0.456)고 보고했다. 같은 조건의 사람 평가자 패널은 약 3~5.8 유효표를 냈다. 네 축 대조: 목적(판정의 독립 확인)은 같다. 메커니즘은 다르다. 선행 측정은 같은 입력에 다른 모델을 적용했고, 이 설계는 같은 모델에 다른 검색 경로를 적용한다. 검색 경로가 다르면 입력 문서가 달라져 검색 단계의 상관은 줄어들 여지가 있으나, 출처 해석·결말 판정 단계는 같은 모델이 수행하므로 위 상관이 그대로 적용된다고 렌즈가 추론했다(lens-derived). 평가(정답 대비 정확도)는 같은 종류이고, 적용 대상(벤치마크 분류·심사 대 선행연구 근거 지도)은 다르다. 같은 모델·다른 검색 경로 조건을 직접 측정한 연구는 찾지 못했다(not_found 참조).",
+      "citations": [
+        { "url": "https://arxiv.org/html/2506.07962v1", "kind": "peer-reviewed", "opened": true },
+        { "url": "https://arxiv.org/abs/2605.29800", "kind": "preprint", "opened": true },
+        { "url": "https://www.emergentmind.com/papers/2605.29800", "kind": "blog", "opened": true },
+        { "url": "https://arxiv.org/html/2506.07962v1#lens-derived-inference", "kind": "lens-derived", "opened": false }
+      ]
+    },
+    {
+      "where": "메커니즘 — 오케스트레이터(메인 세션)가 수행하는 '인용 지지 검증(출처가 주장을 실제로 뒷받침하는지 직접 열어 확인)'",
+      "type": "known-failure",
+      "claim": "인용 지지 검증을 서브에이전트와 같은 모델 계열의 메인 세션이 수행하면, 검증자가 생산자와 같은 오류를 공유할 때 그 오류를 통과시키는 LLM-as-judge 의 알려진 실패가 이 단계에도 남는다.",
+      "consequence": "지금 설계에서는 서브에이전트가 출처를 잘못 읽어 쓴 지지 주장을, 같은 방식으로 잘못 읽는 메인 세션이 '지지됨'으로 판정할 수 있다. 딥리서치 계열 시스템의 인용 정확도가 40~80% 수준이라는 측정에 비추면, 이 단계의 통과가 사람 처분 전에 오류를 거르는 장치로 기대만큼 작동하지 않는다.",
+      "evidence": "Kim 등은 LLM 판정자가 자신과 같은 오답을 낸 모델의 답을 정답으로 처리해 덜 정확한 모델의 정확도를 부풀리고, 이 부풀림이 같은 제공사·같은 계열에서 가장 크다고 보고했다. DeepTRACE(arXiv 2509.04499)는 딥리서치·검색 엔진 시스템의 인용 정확도가 40~80%이고 자기 출처가 뒷받침하지 않는 문장의 비중이 크다고 초록에서 밝혔다. 네 축 대조: 목적(인용 지지 확인)과 평가(지지 여부 판정)는 같다. 메커니즘은 이 설계가 원문을 직접 연다는 점에서 선행 판정자 실험(정답 문항 판정)과 다르며, 원문 대조가 오류를 얼마나 줄이는지는 측정을 찾지 못했다. 적용 대상은 다르다(벤치마크 판정 대 설계 근거 지도). 이 설계는 최종 처분을 사람에게 두므로 실패가 곧바로 문서에 반영되지는 않는다.",
+      "citations": [
+        { "url": "https://arxiv.org/html/2506.07962v1", "kind": "peer-reviewed", "opened": true },
+        { "url": "https://arxiv.org/abs/2509.04499", "kind": "preprint", "opened": true }
+      ]
+    },
+    {
+      "where": "평가 — 독립 이중화의 효과를 무엇과 비교해 판정하는지가 원문에 없다",
+      "type": "weak-baseline",
+      "claim": "이 설계의 독립 이중화는 '에이전트 하나 실행 뒤 사람 처분'과 '같은 에이전트를 같은 경로로 한 번 더 실행' 같은 단순 기준선과 비교되지 않았다.",
+      "consequence": "지금 설계에서는 이중화가 비용(에이전트 수, 대조 단계)을 늘리는 만큼 오류를 더 거르는지 알 수 없다. 선행 측정에서는 최고 성능 단일 판정자가 패널과 같거나 더 나았고, 앙상블의 추가 효과가 1~2%p 수준이었으므로 이 비교가 없으면 이중화의 이득을 확인할 근거가 없다.",
+      "evidence": "체계적 문헌고찰 분야는 2인 선별의 효과를 1인 선별 기준선과 비교해 측정했다(Gartlehner 등 무작위 시험: 1인 선별 민감도 86.6%, 2인 선별 97.5%, 놓친 연구 13% 대 3%). LLM 선별 앙상블 연구는 단일 모델 기준선과 비교했다(스웨덴 보건복지청 2026 medRxiv: OR 앙상블이 민감도 +1.8%p, 최고 단일 모델 대비 교차 계열 조합이 +0.7%p; 'Nine Judges': 최고 단일 판정자가 모든 조건에서 9인 패널과 같거나 더 나음). 같은 모델 반복 실행의 불일치도 기준선으로 측정되었다(Figalová 등: 같은 조건 GPT-5.4 두 실행이 1,131건 중 8.3% 불일치, 검증된 적격 기록 316건 중 29건이 한 실행에서만 유지; JAMIA 앙상블 연구: 반복 실행 kappa 0.487~1.000). 네 축 대조: 목적(독립 판정으로 누락·오판 감소)은 같고, 메커니즘(같은 모델·다른 검색 경로 대 다른 모델·같은 입력)과 적용 대상(선행연구 근거 지도 대 생의학 문헌 선별)은 다르다.",
+      "citations": [
+        { "url": "https://www.rti.org/publication/single-reviewer-abstract-screening-missed-13-percent-relevant-studies", "kind": "peer-reviewed", "opened": true },
+        { "url": "https://www.medrxiv.org/content/10.64898/2026.06.02.26354724v1.full", "kind": "preprint", "opened": true },
+        { "url": "https://arxiv.org/abs/2605.29800", "kind": "preprint", "opened": true },
+        { "url": "https://arxiv.org/pdf/2608.26885", "kind": "preprint", "opened": true },
+        { "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12012331/", "kind": "peer-reviewed", "opened": true }
+      ]
+    }
+  ],
+  "not_found": [
+    "같은 모델 에이전트 두 개를 서로 다른 검색 경로(키워드 검색·인용 추적·표준기구 문서)에 배치했을 때 판정 오류의 상관을 측정한 연구는 찾지 못했다. 선행 측정은 모두 같은 입력에 다른 모델 또는 같은 모델 반복을 적용했다. 이 공백은 독창성의 근거가 아니다.",
+    "같은 모델의 단순 반복 표본(같은 프롬프트·같은 입력 n회)의 유효 독립 표 수는 'Nine Judges' 논문 공개 페이지에 없었다. temperature 변경 결과만 확인했다.",
+    "otto-SR 의 원문(medRxiv PDF·초록 페이지)은 403 으로 열리지 않아 이중 선별을 LLM 하나로 하는지 둘로 하는지, 불일치를 어떻게 해소하는지를 확인하지 못했다. 학회 초록에서 성능 수치만 확인했다.",
+    "GPT-5 Thinking 과 Gemini 2.5 Pro 이중 모델 앙상블 medRxiv 프리프린트(2025.11.03)는 403 으로 열리지 않아 수치를 확인하지 못했다.",
+    "LLM 을 메타분석의 2번째 검토자로 시험한 Research Square 프리프린트(rs-10475119)는 페이지에 제목만 있어 수치를 확인하지 못했다.",
+    "Consensus 제품의 공식 문서와 ASReview 공식 문서는 열지 않았다. ASReview 는 SAFE 절차 논문으로만 확인했다.",
+    "인용 추적이 데이터베이스 검색에 없는 고유 문헌을 얼마나 추가하는지는 2014년 사례 연구 1건의 검색 요약만 보았고 원문을 열지 않았다. 담당 범위 밖으로 보고 더 조사하지 않았다."
+  ],
+  "disclosures": [
+    "질의 경계: 일부 검색어에 공개 제품명·공개 표준명(ASReview, Elicit, otto-SR, RAISE, Cochrane, PRISMA-S, GPT, Gemini)과 공개 논문 저자의 성(Waffenschmidt) 하나를 넣었다. 제품명·표준명은 호출자의 배경에 예시로 주어진 공개 명칭이다. 다만 저자 성을 넣은 검색어는 가드의 '사람 이름 금지'를 위반했다. 사내 식별자·경로·미공개 제품명·코드 조각은 넣지 않았다.",
+    "DeepTRACE 는 초록 페이지만 읽었다. 인용 정확도 40~80% 외의 세부 정의는 확인하지 못했다.",
+    "emergentmind 요약(blog)과 arXiv 초록을 함께 써서 'Nine Judges' 수치를 확인했다. 표의 세부 수치(n_eff 1.94~2.48, phi 0.391→0.456)는 emergentmind 요약에서 왔고 arXiv 초록은 '약 2 유효표'와 'temperature 에 무관'만 확인해 준다.",
+    "Kim 등 논문은 HTML 전문의 앞 100,000자만 읽었다.",
+    "검색 경로가 다르면 검색 단계의 상관은 줄고 판정 단계의 상관은 남는다는 해석은 렌즈의 추론(lens-derived)이며 측정으로 확인하지 않았다. 첫 이슈의 lens-derived 인용은 열 수 있는 URL 이 아니라 추론 표시다."
+  ],
+  "principles_applied": ["EVIDENCE-FIRST", "NO-ASSUME", "STATE-ASSUME", "SECRETS", "FOCUSED", "ASYNC-FIRST", "NO-FLEET", "YAGNI", "KEEP-FAILED", "WRITTEN-ONLY", "SUBJECT-OBJECT", "SPECIFIC-NAME", "TERM-ONE", "COUNT-EARNS", "FULL-SENTENCE"],
+  "notes": "검토한 관점: 기시감은 체계적 문헌고찰 자동화(Elicit, otto-SR, SAFE 절차, LLM 앙상블 선별)와 LLM 판정 상관 측정에서 찾았다. 결말은 선별 민감도·특이도·재현성 수치로 확인했다. 전이는 같은 모델 판정 상관과 같은 계열 검증자 문제로 두 이슈를 올렸다. 기준선은 단일 실행·반복 실행과의 비교 부재를 weak-baseline 으로 올렸다. 붐빔은 올리지 않았다. Elicit 와 otto-SR 은 생의학 체계적 문헌고찰(적용 대상)에 맞춘 선별·추출 도구이고, 이 설계의 목적(설계 결정의 선행 사례·결말·전이 지도)과 평가(사람 처분)가 달라 같은 사례로 보지 않았다. 표준 대조: 공동 입장문(Cochrane·Campbell·JBI·CEE 2025)은 사람 감독, 도구 검증, 판정을 내리는 AI 사용의 보고를 요구하고 AI 가 2번째 사람 검토자를 대체한다고 하지 않는다. 이 설계의 '사람이 처분, 웹 결과 자동 반영 없음'은 이 요구와 일치한다.\n\n찾은 사례 목록:\n- 오류 상관 측정(Kim 등, ICML 2025), https://arxiv.org/html/2506.07962v1 — 350개 이상 LLM 의 쌍별 '함께 틀렸을 때 같은 오답' 비율 측정. 공개 수치: Helm 평균 0.6(기준선 1/3), HuggingFace 0.423, 같은 회사 +0.066, 같은 구조 +0.076(회귀계수). 네 축: 목적 같음(독립성 판단), 메커니즘 다름(다른 모델·같은 입력), 평가 같은 종류(정확도), 적용 대상 다름. 빌릴 구조: 이중화 쌍의 '함께 틀린 비율'을 기준선 대비로 측정하는 지표.\n- 9인 판정자 패널 유효표(arXiv 2605.29800), https://arxiv.org/abs/2605.29800 — Kish 유효표본과 Condorcet 귀무모형으로 패널의 독립 정보량 측정. 공개 수치: 9인 패널 n_eff 약 2, 사람 패널 3~5.8, 최고 단일 판정자가 패널 이상. 네 축: 목적 같음, 메커니즘 다름(다른 모델 패널), 평가 같은 종류, 적용 대상 다름. 빌릴 구조: 이중화의 효과를 유효표로 환산해 보고하는 방식.\n- 반복 실행 일관성(Figalová 등, arXiv 2608.26885, 사전등록 연구), https://arxiv.org/pdf/2608.26885 — 사람 워크플로 2개와 LLM 실행 7개를 같은 1,131건에 적용. 공개 수치: 같은 조건 GPT-5.4 두 실행 일치 91.7%, 적격 기록 29건이 한 실행에서만 유지, 어떤 워크플로도 적격 316건을 전부 회수하지 못함, 운용 회수율 82.3~83.9%. 네 축: 목적 같음(누락 없는 선별), 메커니즘 다름, 평가 같음(회수율), 적용 대상 다름. 빌릴 구조: 모델이 아니라 워크플로 전체를 비교 단위로 두는 평가, 동일 조건 반복 실행을 대조군으로 두는 설계.\n- SAFE 중단 절차(ASReview 기반, 2024), https://pmc.ncbi.nlm.nih.gov/articles/PMC10908130 — 4단계 중단 규칙. 공개 기준(예시값): 핵심 문헌 전부 포함, 추정 적격 수의 2배 이상 선별, 전체의 10% 이상 선별, 마지막 50건 연속 무관. 3단계에서 다른 모델로 재정렬해 확인. 네 축: 목적 같음(포화 판단), 메커니즘 다름(능동학습 순위화), 평가 다름(회수율), 적용 대상 다름. 빌릴 구조: 이 설계의 포화 신호를 단일 기준이 아니라 여러 기준의 동시 충족으로 정의하고, 마지막 단계에 다른 모델로 확인하는 단계. 원문 구상에는 포화 신호의 판정 기준이 적혀 있지 않아 이슈로 올리지 않았다.\n- Elicit Systematic Review 평가(vendor), https://elicit.com/blog/how-we-evaluated-elicit-systematic-review — 58개 공개 문헌고찰 대비 선별 평가. 공개 수치: 회수율 93.6%, 특이도 62.8%, 기준을 바르게 정하면 약 96.4%(누락의 약 절반이 자동 생성 선별 기준 탓). 사람은 결과를 보고 판정을 뒤집을 수 있으나 공식 불일치 해소 절차는 없다. 정답 집합을 LLM 으로 만들었다는 한계를 스스로 밝힌다. 네 축: 목적 일부 같음, 메커니즘 다름, 평가 다름, 적용 대상 다름. 빌릴 구조: 누락 원인을 '기준 생성 오류'와 '판정 오류'로 나눠 측정하는 방식(이 설계의 프로토콜 사용자 승인 단계에 대응).\n- otto-SR(학회 초록, ISPOR 2026) — 검색부터 분석까지 에이전트형 LLM 워크플로. 공개 수치: 선별 민감도 96.7%·특이도 97.9%(사람 2인 워크플로 81.7%·98.1%), 추출 정확도 93.1%(사람 79.7%), Cochrane 12편 재현에서 잘못 제외한 적격 연구 중앙값 0. 원문 미열람으로 이중 선별 구조는 확인하지 못했다. 네 축: 목적 다름(문헌고찰 생산), 메커니즘 일부 같음(에이전트 파이프라인), 평가 다름, 적용 대상 다름.\n- 교차 계열 이중 모델·이중 실행 앙상블(스웨덴 보건복지청, medRxiv 2026), https://www.medrxiv.org/content/10.64898/2026.06.02.26354724v1.full — 두 계열 모델을 각 2회 실행하고 4회 모두 제외일 때만 AI 제외. 공개 수치: 419편 기준 민감도 98.0%, 외부 검증 96.7%, 계열 효과 +3.8%p, OR 앙상블 +1.8%p, 교차 계열 추가 +0.7%p, 모델 버전 교체 시 43건 새 누락·31건 회복. 네 축: 목적 같음(독립 판정으로 누락 감소), 메커니즘 다름(다른 계열·같은 입력), 평가 같음(민감도), 적용 대상 다름. 빌릴 구조: 교차 계열 모델을 이중화에 쓰는 구성, 만장일치 제외 규칙, 모델 버전을 기록해 교체 영향을 확인하는 절차.\n- LLM-LLM·LLM-사람 앙상블(JAMIA), https://pmc.ncbi.nlm.nih.gov/articles/PMC12012331/ — 병렬(하나라도 포함이면 포함)·직렬(둘 다 포함이어야 포함) 조합. 공개 수치: 개발 데이터 66개 앙상블 민감도 1.0, 실데이터(119,695건)에서 정밀도 0.0036~0.145, 반복 실행 kappa 0.487~1.000. 네 축: 목적 같음, 메커니즘 다름, 평가 같음, 적용 대상 다름. 빌릴 구조: 이중화 판정의 조합 규칙을 병렬과 직렬 중 하나로 명시하는 방식.\n- 1인 대 2인 선별 무작위 시험(Gartlehner 등), https://www.rti.org/publication/single-reviewer-abstract-screening-missed-13-percent-relevant-studies — 사람 1인 민감도 86.6%, 2인 97.5%. 네 축: 목적 같음, 메커니즘 다름(사람), 평가 같음, 적용 대상 다름. 빌릴 구조: 이중화 효과를 단일 실행 대비로 측정하는 기준선.\n- 공동 입장문(Cochrane·Campbell·JBI·CEE, 2025), https://pmc.ncbi.nlm.nih.gov/articles/PMC12594113/ — 사람 감독, 도구 검증(파일럿·보정), 도구명·버전·날짜·목적·한계 보고 요구. 네 축: 목적 다름(규범), 적용 대상 다름. 빌릴 구조: 근거 지도에 사용 모델·버전·실행 날짜를 남기는 보고 항목.\n- PRISMA-S(2021), https://pmc.ncbi.nlm.nih.gov/articles/PMC7839230/ — 검색 보고 16개 항목. 이 설계의 queries·route 기록에 대응하는 항목은 전체 검색 전략(8), 제한(9), 검색 날짜(13), 검색 전략 동료검토 PRESS(14), 인용 추적(5)이다. 원문 구상에는 검색 날짜와 제한의 근거 기록이 보이지 않는다. 재현성 요구가 이 설계의 목적인지 알 수 없어 이슈로 올리지 않았다. 빌릴 구조: 검색 날짜·제한·인용 추적의 출발 문헌 기록.\n- DeepTRACE(arXiv 2509.04499), https://arxiv.org/abs/2509.04499 — 딥리서치 시스템 감사. 공개 수치: 인용 정확도 40~80%. 네 축: 목적 같음(출처 지지 확인), 메커니즘 다름(자동 감사 지표), 적용 대상 다름. 빌릴 구조: 문장 단위로 분해해 출처 지지를 판정하는 행렬.\n\n더 확인해야 할 사항: 같은 모델·다른 검색 경로 이중화의 오류 상관은 측정 선례를 찾지 못했으므로, 호출자가 이 설계의 이중화를 유지하려면 소수 사례에서 '두 에이전트가 함께 틀린 비율'을 단일 실행·같은 경로 반복 실행과 비교해 직접 확인해야 결론이 정해진다. otto-SR 원문의 불일치 해소 방식은 403 때문에 확인하지 못해, 다른 경로(저자 저장소나 출판본)로 열어 보아야 한다."
+}
