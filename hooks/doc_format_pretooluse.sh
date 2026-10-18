@@ -25,7 +25,7 @@ done <<EOF
 $FILE_PATHS
 EOF
 [ -n "$match" ] || exit 0
-msg="📝 새 문서 작성 — 쓰기 전에 에이전트원칙의 「작업 문서·지시문」 절로 이 문서의 타입과 수명을 가리고, 결론을 앞에 두고 내용을 배치하라. 에이전트원칙은 @import 로 이미 실려 있다. README 라면 disciplined-coder domain-readme 를 함께 열어라."
+msg="📝 새 문서 작성 — 쓰기 전에 에이전트원칙의 「문서 관리」 절로 이 문서의 타입과 수명을 가리고, 결론을 앞에 두고 내용을 배치하라. 에이전트원칙은 @import 로 이미 실려 있다. README 라면 disciplined-coder domain-readme 를 함께 열어라."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0
