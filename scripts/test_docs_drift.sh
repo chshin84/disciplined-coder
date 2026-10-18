@@ -462,8 +462,11 @@ EOF
 # 전체 일치로 재면 이름은 그대로인데 설명절을 붙이는 순간 실패한다. 이름 부분만 맞대면 원래
 # 잡으려던 것(가리키는 이름이 어디에도 없다)은 그대로 잡힌다.
 echo "[「」로 가리킨 절이 레포 어딘가에 실재한다]"
-HEADINGS="$(find "$HERE" -name '*.md' -not -path '*/.git/*' -exec grep -hE '^#+ ' {} + \
-  | sed 's/^#\+ *//' | sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
+# grep 을 find -exec 로 묶어 실행하면, 제목이 하나도 없는 파일 묶음에서 grep 이 1을 내고 pipefail 이
+# 검사 전체를 멈춘다(평가 과제가 늘어난 2026-10-18 에 일어났다). 그래서 파일을 이어 붙인 뒤 한 번만 거른다.
+# 평가 과제의 프롬프트(evals/principles/cases)는 문서가 아닌 시험 입력이라 제목 집합에서 뺀다.
+HEADINGS="$(find "$HERE" -name '*.md' -not -path '*/.git/*' -not -path '*/evals/principles/cases/*' -exec cat {} + \
+  | grep -E '^#+ ' | sed 's/^#\+ *//' | sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
 BN=0
 for SRC in "$HERE/skills/lens-readability/SKILL.md" "$CALLER" "$CANON"; do
   sn="$(basename "$(dirname "$SRC")")/$(basename "$SRC")"
@@ -684,8 +687,9 @@ anti_count() {  # $1=파일 경로 → 이 문서에 남은 대구의 개수
 }
 echo "[대구 한도] 글 한 편에 한 번까지"
 # 금지 표현 목록과 근거 파일은 뺀다. 목록은 표의 분류 설명이, 근거 파일은 고쳐 쓰지 않는 사용자 원문
-# 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다.
-ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$')"
+# 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다. 평가 과제(evals/principles/cases)도
+# 뺀다. ANTI-LIMIT 의 과제는 모델이 대구를 줄이는지 보려고 대구를 일부러 넣은 시험 입력이다.
+ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$' -e '^evals/principles/cases/')"
 # 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.
 ANTI_TMP="$(mktemp -d)"
 printf 'A가 아니라 B다.

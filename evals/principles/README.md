@@ -77,7 +77,7 @@
 | 판정 | 단위 수 | 단위 |
 |---|---|---|
 | 채택 | 11 | ASK-OPTIONS, COMMA-CUT, LABEL-NOUN, NO-MID-MOD, ONE-IDEA, SECTION-HEAD, SUBJECT-OBJECT, TERM-ONE, TITLE-CLAIM, TITLE-PROOF, WRITTEN-ONLY |
-| 넣음(새 조항) | 1 | INSTRUCTION-FORM |
+| 넣음(새 조항) | 1 | INSTRUCTION-FORM(질문 4개, 조항 없음 위반 1건, 변경안 0건. 참고서의 절은 원칙에 조항을 넣을 때 함께 만든다) |
 | 채택(차이없음) | 36 | 나머지 단위. 동률 뒤 추가 질문에서도 같아, 측정이 차이를 잡지 못한 채택이다 |
 | 기각 | 8 | BOTTOM-LINE, CHECKABLE, EDIT-PRIORITY, NO-SQUEEZE, REVERSIBLE, RUN-IT, TERM-EXPLAIN, VOCAB-PREF. 모두 질문 한두 개의 차이이며, 판단 조항이라 처리를 사용자에게 묻는다 |
 
