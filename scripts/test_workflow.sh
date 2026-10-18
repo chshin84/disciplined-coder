@@ -102,6 +102,7 @@ cat > "$FX/cq_in.json" <<'EOF'
       "A/B testing",
       "HTTP/1.1 caching",
       "prior art search agent",
+      "Claude Code \"/deep-research\" skill",
       "Acme Beta /etc/x"
     ]}},
     {"id": "S2", "output": null}

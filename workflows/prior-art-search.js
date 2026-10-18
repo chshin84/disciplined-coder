@@ -97,7 +97,8 @@ function checkQueries(researchers, forbiddenTerms) {
       if (terms.some((w) => lower.includes(w))) found.push({ id: r.id, query, rule: 'forbidden-term' });
       const isPath = query.split(/\s+/).some((tok) => {
         const t = tok.replace(/^["'`()\[\],.:;]+|["'`()\[\],.:;]+$/g, '');
-        return /^(~\/|\.\.?\/|\/)/.test(t) || /^[A-Za-z]:[\\/]/.test(t) ||
+        // `/` 하나로 시작하는 토큰은 구분자가 하나 더 있어야 경로다. `/deep-research` 같은 명령 이름은 경로가 아니다.
+        return /^(~\/|\.\.?\/)/.test(t) || /^\/[^\/]+\//.test(t) || /^[A-Za-z]:[\\/]/.test(t) ||
           (/[\\/]/.test(t) && /\.[A-Za-z][^.\\/]{0,4}$/.test(t));
       });
       if (isPath) found.push({ id: r.id, query, rule: 'path-shape' });
@@ -265,7 +266,7 @@ function schemas() {
           type: 'object',
           properties: {
             prior_claim: str,
-            citations: { type: 'array', items: { type: 'object', properties: { url: str } } },
+            citations: { type: 'array', maxItems: 1, items: { type: 'object', properties: { url: str } } },
           },
           required: ['prior_claim', 'citations'],
         },
