@@ -559,10 +559,10 @@ pan() { printf '{"session_id":"s","hook_event_name":"UserPromptSubmit","prompt":
 for m in '선행연구에 쓸 만한 에이전트 플러그인이 있나 찾아봐' \
          '에이전트원칙의 목차를 어떤 기준으로 배치해야 하는지 선행연구를 조사해 줘' \
          'docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md 의 선행 사례를 찾아 줘' \
-         '선행연구렌즈로 뒤져봐' 'lens-prior-art 로 찾아봐' '\"이 방법\"의 선행연구를 찾아 줘' 'Prior Art 있나'; do
+         '선행연구렌즈로 뒤져봐' 'lens-prior-art 로 찾아봐' '\"이 방법\"의 선행연구를 찾아 줘' 'Prior Art 있나'          '에이전트원칙의 목차를 어떤 기준으로 배치해야 하는지 근거를 찾아줘'          'docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md 를 선행연구와 대조해줘'; do
   check "알린다: $m" "out=\"\$(pan '$m')\" && grep -qF 'agent-prior-art' <<<\"\$out\" && grep -qF '\"hookEventName\":\"UserPromptSubmit\"' <<<\"\$out\" && json_valid_stdin <<<\"\$out\""
 done
-for m in '선행연구 결과를 기록에 정리했다' '선행연구 단계는 끝났다' 'prior art 기록 파일 이름을 바꿨다' '이 함수를 고쳐봐'; do
+for m in '선행연구 결과를 기록에 정리했다' '선행연구 단계는 끝났다' 'prior art 기록 파일 이름을 바꿨다' '이 함수를 고쳐봐' '결정 근거를 기록에 정리했다'; do
   check "침묵한다: $m" "out=\"\$(pan '$m')\" && [ -z \"\$out\" ]"
 done
 check "끄면 침묵한다" "out=\"\$(DISCIPLINED_CODER_PRIOR_ART_NUDGE=off pan '선행연구렌즈로 뒤져봐')\" && [ -z \"\$out\" ]"

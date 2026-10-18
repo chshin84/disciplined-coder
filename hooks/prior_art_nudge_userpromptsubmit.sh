@@ -15,8 +15,8 @@ INPUT="$(cat)"
 case "$INPUT" in *'"prompt"'*) ;; *) exit 0 ;; esac
 p="${INPUT#*\"prompt\"}"
 
-TOPICS=("선행연구" "prior art" "선행 사례" "누가 해봤" "선행연구렌즈" "lens-prior-art")
-REQUESTS=("찾아" "뒤져" "조사해" "해봐" "있나" "없나")
+TOPICS=("선행연구" "prior art" "선행 사례" "누가 해봤" "근거를 찾" "선행연구렌즈" "lens-prior-art")
+REQUESTS=("찾아" "뒤져" "조사해" "대조해" "해봐" "있나" "없나")
 
 shopt -s nocasematch
 hit_topic=0; hit_request=0
