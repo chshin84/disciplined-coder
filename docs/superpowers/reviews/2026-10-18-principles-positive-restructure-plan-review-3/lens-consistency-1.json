@@ -1,0 +1,19 @@
+{
+  "lens": "lens-consistency",
+  "issues": [
+    {"where": "Task 8 Step 4 / 용어 「실행 키」", "type": "contradiction", "claim": "실행 키가 prompt.md 전체(front matter 포함) 해시라, language 과제의 clause 에 BANNED-LIST 를 덧붙이면 키가 바뀌어 none 조건을 다시 실행한다.", "principle": "NO-ASSUME"},
+    {"where": "Task 4 Step 4 (smoke)", "type": "contradiction", "claim": "smoke 가 실제 과제를 실행하고 기록을 임시 폴더에 버려 Task 6 이 같은 질문을 같은 조건으로 다시 실행한다.", "principle": "NO-ASSUME"},
+    {"where": "Task 4 Interfaces 보고 판정 / Task 6 Step 4·5", "type": "gap", "claim": "보고가 둘째 차례(추가 질문 뒤 합계 이하이면 채택)를 표현하지 못하고, 새 조항의 new≥none>0 판정 값이 없다.", "principle": "CHECKABLE"},
+    {"where": "Task 5 Files·Step 3", "type": "gap", "claim": "나눈 신설 조항(OTHER-SESSIONS·CONFIRM-IRREVERSIBLE·REVIEW-DELIVERABLE)이 새 조항인지 문구 변경인지, current.md 에 무엇을 넣는지 정하지 않았다.", "principle": "SPECIFIC-NAME"},
+    {"where": "Task 9 Step 2", "type": "gap", "claim": "grep -r 이 .superpowers 의 초안과 scripts/scaffold.sh 209행 주석을 잡아 확인이 통과하지 못한다.", "principle": "CHECKABLE"},
+    {"where": "Task 8, Task 10", "type": "gap", "claim": "사용자 판정 확인 표본이 Task 6 에만 있다.", "principle": "CHECKABLE"},
+    {"where": "Task 10 Step 2", "type": "gap", "claim": "두 라벨 비교 출력에 적재 분량이 없어 분량 기록이 빠진다.", "principle": "CHECKABLE"},
+    {"where": "Task 4 Interfaces run_case 의 error", "type": "drift", "claim": "판정 읽기 실패를 어느 필드로 알리는지 정하지 않아 위반 아님으로 기록되고 다시 실행되지 않을 수 있다.", "principle": "NO-ASSUME"},
+    {"where": "Task 4 Step 1", "type": "gap", "claim": "pair 선택 필드를 확인하는 픽스처가 없다.", "principle": "CHECKABLE"},
+    {"where": "Task 5 Step 3 ↔ Task 7 Step 1", "type": "drift", "claim": "new.md 첫 줄이 묶음 조건인지 층 조건인지 섞여, 층마다 한 문장을 고를 규칙이 없다.", "principle": "TERM-ONE"},
+    {"where": "Task 8 Step 5", "type": "gap", "claim": "되돌리기 대상 커밋·파일과 Step 1 시험의 처리가 정해지지 않았다.", "principle": "CHECKABLE"},
+    {"where": "Task 4 Interfaces 보고의 금지어 수", "type": "drift", "claim": "금지어를 대화 답에서만 세는지 정하지 않았다.", "principle": "TERM-ONE"}
+  ],
+  "principles_applied": ["NO-ASSUME", "CHECKABLE", "SPECIFIC-NAME", "TERM-ONE", "NO-FLEET", "WRITTEN-ONLY"],
+  "notes": "Task 3 Interfaces 의 result.json 배열·run 서술이 남아 있어 Task 4 가 runs 키 유지를 명시해야 한다. eval_clause.sh 의 작업 폴더가 git 이 아닌 빈 폴더이고 도구를 끄는지 명시가 없다. 새 질문 짝 추가가 기존 과제 front matter 를 건드리지 않는지 확인해야 한다. 원본의 evidence·counterpart 칸은 길이 때문에 줄였다."
+}
