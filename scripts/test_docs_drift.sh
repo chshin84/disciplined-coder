@@ -347,7 +347,7 @@ check "소유자로 불리는 절이 스스로 선언한다" "[ -z \"\$OWN_UNDEC
 check "절 이름을 담은 문서가 소유자를 가리킨다" "[ -z \"\$OWN_BAD\" ]"
 
 echo "[첫 문장] 절 제목 아래 첫 줄이 산문이다"
-# TITLE-LAYERS 가 "절의 첫 문장이 본문 제목이다"라고 정한다(본문 제목은 결론 한 문장).
+# TITLE-LAYERS 가 "절의 첫 문장이 본문 제목이다"라고 정한다(문서의 본문 제목은 결론 한 문장).
 # 빈 줄을 건너뛴 첫 줄이 불릿·표·코드블록·인용·번호목록이면 결론 문장이 아니다. 그 줄이 산문인데
 # 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
 # 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
@@ -782,15 +782,15 @@ for c in "$HERE"/commands/*.md; do
   check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
 done
 
-# 「모든 작업」 절을 뽑아 둔다. 아래 canon 검사(LENS-ALLOWED)가 쓴다.
-# 파일 전역 grep이 아니라 「모든 작업」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
+# 「원칙」 절을 뽑아 둔다. 아래 canon 검사(LENS-ALLOWED)가 쓴다.
+# 파일 전역 grep이 아니라 「원칙」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
 # vacuous 통과하지 않게 한다).
-WF_BLOCK="$(awk '/^## 모든 작업/{f=1} f&&/^## /&&!/^## 모든 작업/{exit} f' "$HERE/agent-principles.md")"
+WF_BLOCK="$(awk '/^## 원칙/{f=1} f&&/^## /&&!/^## 원칙/{exit} f' "$HERE/agent-principles.md")"
 
 # --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(에이전트원칙 계약 가드) ---
 # 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
 # (vacuous 통과 방지).
-PO_BLOCK="$(awk '/^## 모든 작업/{f=1} f&&/^## /&&!/^## 모든 작업/{exit} f' "$HERE/agent-principles.md")"
+PO_BLOCK="$(awk '/^## 원칙/{f=1} f&&/^## /&&!/^## 원칙/{exit} f' "$HERE/agent-principles.md")"
 echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
 check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
 check "그 절에 SUB-ORCHESTRATE 조항이 있다" "printf '%s' \"\$PO_BLOCK\" | grep -qF '**\`SUB-ORCHESTRATE\`'"
@@ -837,7 +837,7 @@ check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않�
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
 # 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 에이전트원칙은 @import로 실리므로 이 한
 # 문장이 있으면 검진이 돈다.
-# 파일 전역 grep이 아니라 「모든 작업」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
+# 파일 전역 grep이 아니라 「원칙」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
 # 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
 # 절을 뽑는 계산은 위 WF_BLOCK 을 그대로 쓴다.
 # 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
@@ -861,7 +861,7 @@ SR="$HERE/skills/review-specs/SKILL.md"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
 # 언제 묻는지와 어떻게 묻는지를 `ASK-OPTIONS` 하나가 정한다(2026-09-24 에 `ASK-CONTEXT` 를 합쳤다).
 # 조항 안의 세 문장(정해지지 않으면 묻는다·하나씩 묻는다·대목적을 되짚는다)을 조항 ID 하나로 합쳤다.
-check "canon: 묻는 조항이 원칙 절에 있다"    "sec_has '$CANON' '모든 작업' '**\`ASK-OPTIONS\`'"
+check "canon: 묻는 조항이 원칙 절에 있다"    "sec_has '$CANON' '원칙' '**\`ASK-OPTIONS\`'"
 # 사용 여부(「작업 순서와 다시 리뷰」 절의 ASK-OPTIONS)는 위 「합치기와 다시 리뷰」가 본다.
 check "spec-review: 규칙을 재정의 말고 인용" "! grep -qF '**\`ASK-OPTIONS\`' '$SR'"
 
