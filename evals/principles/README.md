@@ -79,6 +79,6 @@
 | 채택 | 11 | ASK-OPTIONS, COMMA-CUT, LABEL-NOUN, NO-MID-MOD, ONE-IDEA, SECTION-HEAD, SUBJECT-OBJECT, TERM-ONE, TITLE-CLAIM, TITLE-PROOF, WRITTEN-ONLY |
 | 넣음(새 조항) | 1 | INSTRUCTION-FORM(질문 4개, 조항 없음 위반 1건, 변경안 0건. 참고서의 절은 원칙에 조항을 넣을 때 함께 만든다) |
 | 채택(차이없음) | 36 | 나머지 단위. 동률 뒤 추가 질문에서도 같아, 측정이 차이를 잡지 못한 채택이다 |
-| 기각 | 8 | BOTTOM-LINE, CHECKABLE, EDIT-PRIORITY, NO-SQUEEZE, REVERSIBLE, RUN-IT, TERM-EXPLAIN, VOCAB-PREF. 모두 질문 한두 개의 차이이며, 판단 조항이라 처리를 사용자에게 묻는다 |
+| 기각 | 8 | BOTTOM-LINE, CHECKABLE, EDIT-PRIORITY, NO-SQUEEZE, REVERSIBLE, RUN-IT, TERM-EXPLAIN, VOCAB-PREF. 모두 질문 한두 개의 차이다. 사용자가 현행 문안 유지를 골랐다(2026-10-18) |
 
 사용자 확인 일치도는 10건 중 10건이다(2026-10-18). 표본은 판정이 갈린 단위와 다섯 층에서 골랐고, 통과 5건과 위반 5건이다. 메인 세션은 q-run-it-3(도구가 없는 평가라 '실행했다'는 응답이 나올 수 없다)과 q-instruction-form-1(필요한 금지까지 위반으로 본다)을 애매한 판정으로 짚었으나, 사용자는 모두 판정에 동의했다.
