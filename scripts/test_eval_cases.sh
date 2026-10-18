@@ -25,6 +25,15 @@ SECRET="$(lib secrets "$CASES")"
 [ -n "$SECRET" ] && printf '%s\n' "$SECRET" | sed 's/^/    /'
 check "비밀 패턴이 없다" "[ -z \"\$SECRET\" ]"
 
+echo "[시험 단위 — 현행 문안, 변경안, 질문 수]"
+CLAUSES="$HERE/evals/principles/clauses"
+UB="$(mktemp)"; git -C "$HERE" show 7a2d26d:agent-principles.md > "$UB"
+UNITS="$(json_run 'import runpy,sys; p=sys.argv[1]; sys.argv=[p]+sys.argv[2:]; runpy.run_path(p, run_name="__main__")' "$HERE/scripts/_eval_clause.py" check "$CASES" "$CLAUSES" "$UB" 2>&1 || true)"
+rm -f "$UB"
+[ -n "$UNITS" ] && printf '%s\n' "$UNITS" | sed 's/^/    /'
+check "시험 단위 폴더가 하나 이상 있다" "[ -n \"\$(ls -d '$CLAUSES'/*/ 2>/dev/null)\" ]"
+check "current.md 는 기준 원칙의 줄이고, new.md 가 있고, 단위마다 개발용 질문이 3개 이상이며 두 kind 가 모두 있다" "[ -z \"\$UNITS\" ]"
+
 echo "[비교 — 판정, 행별 위반 수, 금지어 횟수]"
 # 픽스처로 본다. 저장소 과제와 측정 결과에 기대지 않는다.
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT

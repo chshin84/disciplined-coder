@@ -4,7 +4,7 @@ kind: should-not
 pair: instruction-positive
 type: workdoc
 failure: [candidate:instruction-split]
-clause: [SUBJECT-OBJECT]
+clause: [SUBJECT-OBJECT, INSTRUCTION-FORM]
 judge: last-turn
 ---
 

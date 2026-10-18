@@ -189,9 +189,31 @@ def _report(cases_dir, units_dir, results, pairs, excl, names):
               f"금지어 비교={r['banned_cmp']} 새={r['banned_new']} 판정={r['verdict']}")
 
 
+def check_units(cases, units, baseline):
+    """저장소 단위 폴더의 형식 오류를 낸다. baseline 은 기준 원칙 커밋의 agent-principles.md 내용이다."""
+    errs = []
+    for n, u in units.items():
+        if not u["new"].strip():
+            errs.append(f"{n}: new.md 가 없거나 비었다")
+        if u["current"] is not None and n != "BANNED-LIST":
+            for line in u["current"].splitlines():
+                if line.strip() and line not in baseline:
+                    errs.append(f"{n}: current.md 의 줄이 기준 원칙에 없다: {line[:40]}")
+        qs = questions(cases, u)
+        kinds = {cases[q]["meta"].get("kind") for q in qs}
+        if len(qs) < 3 or kinds != {"should", "should-not"}:
+            errs.append(f"{n}: 개발용 질문 {len(qs)}개, kind {sorted(k for k in kinds if k)}")
+    return errs
+
+
 if __name__ == "__main__":
     a = sys.argv
-    if a[1] == "run":
+    if a[1] == "check":
+        # check <과제> <단위> <기준 원칙 파일>
+        lib = runpy.run_path(os.path.join(HERE, "_eval_lib.py"))
+        for e in check_units(lib["load_cases"](a[2]), load_units(a[3]), open(a[4], encoding="utf-8").read()):
+            print(e)
+    elif a[1] == "run":
         _run(a[2], a[3], a[4], a[5], a[6:])
     elif a[1] == "report":
         _report(a[2], a[3], a[4], a[5], a[6], a[7:])
