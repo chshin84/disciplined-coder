@@ -1,0 +1,28 @@
+{
+  "lens": "lens-consistency",
+  "target": "docs/superpowers/specs/2026-10-18-principles-action-output-split-design.md",
+  "issues": [
+    { "where": "ASK-OPTIONS, DELEGATED-SCORE", "type": "contradiction", "claim": "위임 중 결과를 바꾸는 결정에 ASK-OPTIONS 는 묻게 하고 DELEGATED-SCORE 는 진행하게 한다. 경계 문장이 어느 쪽에도 없다." },
+    { "where": "TOP-DOWN, NO-RAW-OUTPUT", "type": "contradiction", "claim": "위 층 결정이 바뀌는 상황에서 TOP-DOWN 은 '알려라', NO-RAW-OUTPUT 은 '반영하기 전에 물어라'를 지시하고, 위임 중 우선순위가 없다." },
+    { "where": "DELEGATED-SCORE, STATUS-FIRST", "type": "contradiction", "claim": "하위 결정마다 점수표를 결과 보고에 남기면 끝난 일을 짧게 줄이라는 STATUS-FIRST 와 상충한다." },
+    { "where": "REPORT-WHEN, TELL-NOW", "type": "drift", "claim": "'사용자가 정할 일이 생겼을 때'와 '사용자 결정이 필요한 일', '계획과 다르게 진행될 때'와 '결과가 기대와 다르면'이 같은 조건인지 구분되지 않는다." },
+    { "where": "REPORT-WHEN, STATUS-FIRST", "type": "contradiction", "claim": "정할 일은 없지만 남은 문제가 있는 대기 응답에서 '한 줄로만'과 '남은 문제를 먼저 적어라'가 함께 적용된다." },
+    { "where": "작은 변경, CHECKABLE", "type": "drift", "claim": "면제 대상 '단계표'라는 말이 새 CHECKABLE 에 없다. 면제 조항이 면제 대상보다 뒤에 나온다." },
+    { "where": "## 출력 머리, 작업 지시서·읽기 위한 문서 적용 조건", "type": "contradiction", "claim": "상위 층 적용 조건('사용자에게 글을 보낼 때')이 하위 층(서브에이전트 프롬프트, 다른 사람에게 보낼 글)보다 좁다." },
+    { "where": "출력 하위 층 (spec·plan)", "type": "gap", "claim": "spec·plan 이 출력의 어느 하위 층에도 속하지 않는다." },
+    { "where": "읽기 위한 문서, 대화 답과 작업 보고", "type": "contradiction", "claim": "마크다운 파일로 쓰는 작업 보고가 두 층에 함께 들어간다." },
+    { "where": "BOTTOM-LINE, STATUS-FIRST", "type": "contradiction", "claim": "작업 보고 첫머리 규칙이 「공통」과 「대화 답과 작업 보고」로 나뉜다." },
+    { "where": "## 행동 머리", "type": "contradiction", "claim": "행동 절 머리에 출력 기준 문장이 있다." },
+    { "where": "공통", "type": "gap", "claim": "BULLET-SCOPE·SECTION-HEAD·TERM-ONE 등은 사후 확인형 문구로 남고, 「공통」이 생성형인지 확인하는 단계가 없다." },
+    { "where": "test_docs_drift.sh, 빌더에게 맡기는 것", "type": "gap", "claim": "새 구조에서 어느 ID 가 한국어 조항인지 정하지 않아 KO_IDS 범위가 파일 끝까지 늘어난다." },
+    { "where": "유지할 계약", "type": "gap", "claim": "PO_BLOCK 의 SUB-ORCHESTRATE·nested-orchestration 검사 계약이 목록에 없다." },
+    { "where": "#### 묶음 제목 표기, #### 사후 검사", "type": "drift", "claim": "목표 구조 묶음 제목에 백틱이 없어 검사 패턴과 다르고, 「사후 검사」는 ID 가 없으며 REVISE-ORDER 가 사라진다." },
+    { "where": "NO-RAW-OUTPUT 아래 '근거:' 문단, 확인 방법", "type": "contradiction", "claim": "확인 방법대로 하면 근거 문단이 에이전트원칙에 들어가 '지시와 근거의 분리'와 상충한다. 편집 지시 항목은 대조 대상이 불분명하다." },
+    { "where": "함께 고칠 파일, 확인 방법", "type": "gap", "claim": "evals/principles/clauses/EDIT-PRIORITY/current.md 가 REVISE-ORDER 를 가리키는데 고칠지 예외로 둘지 정하지 않았다." },
+    { "where": "CLAUDE.md·README.md·hook, 문서 관리", "type": "drift", "claim": "옛 「작업 문서·지시문」은 「문서 관리」와 「작업 지시서」로 나뉘는데 모두 「문서 관리」로 바꾸라고 한다. 「문서 타입과 수명」 제목의 존속과 단계가 정해지지 않았다." },
+    { "where": "확인 방법", "type": "gap", "claim": "'같은 지시가 있었는데 실패한 행동에는 문장을 더하지 않는다' 목표, 근거 기록, 메모리 처분 질문에 확인 단계가 없다." },
+    { "where": "ASK-OPTIONS '층위와 출처'", "type": "drift", "claim": "'층위'와 TOP-DOWN 의 '층'이 같은 대상인지 연결되지 않고 '출처'가 정의되지 않았다." }
+  ],
+  "principles_applied": ["NO-ASSUME", "STATE-ASSUME", "SPECIFIC-NAME", "TERM-ONE", "NAME-ITEMS", "COUNT-EARNS", "WRITTEN-ONLY", "FULL-SENTENCE", "SUBJECT-OBJECT", "BOTTOM-LINE", "ASK-OPTIONS", "REVERSIBLE", "TELL-NOW", "STATUS-FIRST", "CHECKABLE", "NO-RAW-OUTPUT", "INSTRUCTION-FORM"],
+  "notes": "REVERSIBLE 과 DELEGATED-SCORE 는 맞는다. 스코프는 한 plan 으로 다룰 크기다. NO-RAW-OUTPUT 의 차수 규칙과 review-specs 의 대조, 커밋 메시지·PR 본문의 층 귀속, 「원칙」 검색 시 낫표 포함 여부는 확인하지 않았다. 원본 보고의 file·evidence·counterpart·consequence 칸은 이 사본에서 줄였다."
+}

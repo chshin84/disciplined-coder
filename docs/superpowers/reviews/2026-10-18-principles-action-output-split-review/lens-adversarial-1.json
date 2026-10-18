@@ -1,0 +1,24 @@
+{
+  "lens": "lens-adversarial",
+  "target": "docs/superpowers/specs/2026-10-18-principles-action-output-split-design.md",
+  "issues": [
+    { "where": "「조항 문구」 > 「출력 · 공통」 > 언어 문단 항목 (100행)", "type": "failure-mode", "claim": "언어 문단에 '도구를 호출하기 직전의 한 줄과 압축 요약 직후의 첫 답도 한국어로 써라'를 붙이는 변경은 spec 이 스스로 정한 기준(이미 같은 지시가 있었는데도 실패한 행동에는 지시 문장을 더하지 않는다)을 위반한다. 현행 언어 문단은 이미 같은 지시를 포함한다. domain-korean 도 2026-09-28 시험 뒤 '문구로 풀리지 않으면 남은 수단은 답의 한글 비율을 보는 Stop 훅 같은 기계 검사다'라고 적었다.", "counterpart": "agent-principles.md 36행 / domain-korean.md 168행", "principle": "YAGNI, EVIDENCE-FIRST" },
+    { "where": "「목표」 마지막 불릿(15행)과 「조항 문구」 전체", "type": "failure-mode", "claim": "spec 은 새 문장마다 '같은 지시가 이미 있었는지, 그 지시가 실패했는지'를 적지 않아 자체 기준의 위반을 판정할 수 없다. 예: ASK-OPTIONS 의 층위·출처·배경 지식 문장은 현행에 비슷한 지시가 있었는데도 교정된 행동에 대응한다.", "principle": "NO-ASSUME, STATE-ASSUME" },
+    { "where": "DELEGATED-SCORE(77행)와 ASK-OPTIONS(76행)", "type": "failure-mode", "claim": "DELEGATED-SCORE 는 '결과를 바꾸지 않는 하위 결정'과 '위임했거나 자리에 없을 때'를 작성자 세션이 판정하게 한다. 응답이 늦는 상황을 '자리에 없음'으로 해석할 수 있다. ASK-OPTIONS 는 DELEGATED-SCORE 예외를 가리키지 않는다. 원래 메모리는 명시 지시가 있을 때만 적용했다.", "principle": "ASK-OPTIONS, REVERSIBLE" },
+    { "where": "DELEGATED-SCORE 넷째·다섯째 문장", "type": "over-engineering", "claim": "결과를 바꾸지 않는 하위 결정에도 점수표 기록을 요구하면 사소한 결정까지 점수표가 붙는다. 점수표는 위임·부재 상황에만 요구하고 하위 결정은 '권장안으로 진행하고 결과 보고에 적어라'로 두면 된다.", "principle": "YAGNI, COUNT-EARNS" },
+    { "where": "NO-RAW-OUTPUT(89행)과 「함께 고칠 파일」", "type": "failure-mode", "claim": "차단 여부를 작성자 세션이 판정해 지적을 낮출 수 있다. review-specs 「작업 순서와 다시 리뷰」는 '다시 리뷰는 매번 사용자에게 묻는다'고 적는데 「함께 고칠 파일」에 review-specs 가 없어 두 규칙이 상충한다. '차단 지적'은 🔴 분류와 대응되지 않는 새 용어다.", "counterpart_file": "skills/review-specs/SKILL.md", "principle": "NO-RAW-OUTPUT, SUBJECT-OBJECT" },
+    { "where": "NO-RAW-OUTPUT '지난 차수 뒤 바뀐 부분만 리뷰하라'", "type": "risk", "claim": "바뀐 부분만 보면 바뀐 절과 안 바뀐 절의 충돌을 놓친다. '바뀐 부분과 그 부분이 가리키거나 그 부분을 가리키는 절'로 지정하면 된다.", "principle": "NO-RAW-OUTPUT" },
+    { "where": "NO-RAW-OUTPUT 다섯째 문장과 TOP-DOWN", "type": "failure-mode", "claim": "'확정한 층'의 기록 장소가 정해지지 않아 압축 요약 뒤 판정 근거를 잃는다.", "principle": "NO-ASSUME" },
+    { "where": "TOP-DOWN(79행)", "type": "over-engineering", "claim": "spec·plan 을 쓰는 방법은 superpowers 가 소유하고 brainstorming 도 단계별 승인 순서로 진행한다. 실패가 brainstorming 중에 일어났는지 spec 이 적지 않아 기준 위반 여부를 판정할 수 없다. '설계나 구조를 정할 때'는 작은 변경까지 포함한다.", "principle": "YAGNI, FOCUSED" },
+    { "where": "REPORT-WHEN(95행)", "type": "failure-mode", "claim": "완료 알림은 대개 결과가 나온 시점이라 첫 문장(결과 보고)과 둘째 문장(한 줄 대기)이 같은 응답에 함께 해당한다. 예시를 '다른 작업이 아직 남아 결과가 나오지 않은 중간 완료 알림'으로 좁히면 분리된다.", "principle": "TELL-NOW, STATUS-FIRST" },
+    { "where": "REPORT-SCOPE(96행)", "type": "failure-mode", "claim": "'이 세션이 맡은 일만'은 이 세션이 nested-orchestration 으로 위임한 서브 세션의 일을 빼게 할 수 있다. '사용자가 다른 세션에 맡긴 일'로 지정하면 된다.", "principle": "SPECIFIC-NAME, OTHER-SESSIONS" },
+    { "where": "CONCRETE-FORM(121행)", "type": "failure-mode", "claim": "코드 변경 제안에서 '현행·변경안을 보여라'와 EXPLAIN-STRUCTURE 의 '줄 단위 변경 목록은 되풀이하지 마라'가 상충한다. 대상을 '문구·설정'으로 좁히면 된다.", "principle": "EXPLAIN-STRUCTURE, FOCUSED" },
+    { "where": "「출력」 머리·「읽기 위한 문서」·「작업 지시서」 적용 조건", "type": "failure-mode", "claim": "현행 EDIT-PRIORITY 는 대화 답만 빼고 spec·plan·CLAUDE.md·스킬에도 적용됐는데, 새 구조는 이들을 사후 재검출에서 뺀다. 「출력」 머리가 '사용자에게 글을 보낼 때'라서 작업 지시서에 「공통」이 적용되는지 정해지지 않는다. spec·plan 은 어느 출력 층에도 속하지 않는다.", "principle": "FOCUSED, DOC-TYPE" },
+    { "where": "KO-SYNTAX 머리 문단과 NO-MID-MOD", "type": "risk", "claim": "'한 줄을 넘을 것 같으면'의 '한 줄'은 출력 환경에 따라 달라 측정할 수 없다. 글자 수나 어절 수로 지정하면 판정이 일정해진다. 생성형 문안의 효과는 가정이다.", "principle": "CHECKABLE, STATE-ASSUME" },
+    { "where": "SUB-ORCHESTRATE(80행)", "type": "failure-mode", "claim": "발동 조건에 작업 크기 하한이 없어 두 파일을 따로 고치는 작은 작업도 판단 대상이 될 수 있다. 작은 변경은 SUB-ORCHESTRATE 를 면제하지 않는다.", "principle": "NO-FLEET, YAGNI" },
+    { "where": "「함께 고칠 파일」 test_docs_drift.sh·domain-korean", "type": "failure-mode", "claim": "112행 KO_IDS 구간이 새 구조에서 파일 끝까지 늘어나 domain-discipline 에 근거가 있는 조항까지 domain-korean 근거를 요구받는다. spec 은 NAME-ITEMS·STATE-ASSUME 근거를 어디 둘지 정하지 않았다.", "principle": "NO-ASSUME, FOCUSED" },
+    { "where": "「확인 방법」", "type": "risk", "claim": "구조 검사만 있고, 시험 없이 배포되는 새 조항의 행동 효과를 관찰하거나 되돌릴 조건이 없다. 새 조항마다 '시험하지 않은 채 넣었다'와 되돌림 계기(같은 교정 재발)를 domain-discipline 에 적으면 된다.", "principle": "REVERSIBLE, KEEP-FAILED" }
+  ],
+  "principles_applied": ["작은 변경", "FOCUSED", "OTHER-SESSIONS", "REVERSIBLE", "NO-ASSUME", "STATE-ASSUME", "EVIDENCE-FIRST", "ASK-OPTIONS", "NO-FLEET", "YAGNI", "CHECKABLE", "KEEP-FAILED", "SUB-ORCHESTRATE", "SPECIFIC-NAME", "NO-MID-MOD", "COUNT-EARNS", "STATUS-FIRST", "TELL-NOW", "DOC-TYPE", "NO-RAW-OUTPUT", "EXPLAIN-STRUCTURE"],
+  "notes": "렌즈는 한 번만 실행했고 파일은 고치지 않았다. ANTI-LIMIT·COMMA-CUT·ONE-IDEA·NO-STACK-MOD 의 새 문안은 앞 문장을 참조하는 형태라 생성 중에도 따를 수 있다고 판단했다. ANTI-LIMIT 의 '아니라'는 '~뿐 아니라'까지 포함해 의도보다 넓다. evals/principles/clauses/EDIT-PRIORITY/current.md 는 시험 고정 문안이라 옛 이름 검색 대상에서 뺄지 정해야 한다. 「행동」 머리의 '출력의 전달력이 가장 중요하다'는 배치가 맞는지 볼 대상이다. 원본 보고는 각 지적에 file·evidence·consequence 칸을 더 담았으나 이 사본은 지적의 내용을 유지하고 인용 칸을 줄였다."
+}
