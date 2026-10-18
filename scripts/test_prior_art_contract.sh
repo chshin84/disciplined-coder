@@ -189,30 +189,23 @@ echo "[계약 대조]"
 check "계약 코드가 JSON 으로 읽힌다" "json_valid_stdin < \"\$CONTRACT\""
 WF="$HERE/workflows/prior-art-search.js"
 HARNESS="$HERE/scripts/workflow_harness.mjs"
-if [ ! -f "$WF" ]; then
-  echo "  SKIP: workflow — 워크플로 스크립트가 없다"
-else
-  check "node 가 있다" "command -v node >/dev/null"
-  SCHEMAS="$FX/schemas.json"
-  check "시험 도구가 스키마 상수 네 개를 낸다" \
-    "printf '[]' | node \"\$HARNESS\" fn schemas > \"\$SCHEMAS\" && json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(k in d for k in (\"RESEARCHER_SCHEMA\",\"VERIFIER_SCHEMA\",\"SYNTHESIS_SCHEMA\",\"MAP_SCHEMA\")) else 1)' \"\$SCHEMAS\""
-  for pair in researcher:RESEARCHER_SCHEMA verifier:VERIFIER_SCHEMA synthesis:SYNTHESIS_SCHEMA map:MAP_SCHEMA; do
-    name="${pair%%:*}"; const="${pair##*:}"
-    json_run 'import json,sys; json.dump(json.load(open(sys.argv[1],encoding="utf-8"))[sys.argv[2]], open(sys.argv[3],"w",encoding="utf-8"))' "$SCHEMAS" "$const" "$FX/schema_$name.json" 2>/dev/null || true
-    check "스키마 $const 가 계약 코드와 맞는다" "contract_check $name \"\$FX/schema_$name.json\" -"
-  done
-fi
+check "워크플로 스크립트가 있다" "[ -f \"\$WF\" ]"
+check "node 가 있다" "command -v node >/dev/null"
+SCHEMAS="$FX/schemas.json"
+check "시험 도구가 스키마 상수 네 개를 낸다" \
+  "printf '[]' | node \"\$HARNESS\" fn schemas > \"\$SCHEMAS\" && json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(k in d for k in (\"RESEARCHER_SCHEMA\",\"VERIFIER_SCHEMA\",\"SYNTHESIS_SCHEMA\",\"MAP_SCHEMA\")) else 1)' \"\$SCHEMAS\""
+for pair in researcher:RESEARCHER_SCHEMA verifier:VERIFIER_SCHEMA synthesis:SYNTHESIS_SCHEMA map:MAP_SCHEMA; do
+  name="${pair%%:*}"; const="${pair##*:}"
+  json_run 'import json,sys; json.dump(json.load(open(sys.argv[1],encoding="utf-8"))[sys.argv[2]], open(sys.argv[3],"w",encoding="utf-8"))' "$SCHEMAS" "$const" "$FX/schema_$name.json" 2>/dev/null || true
+  check "스키마 $const 가 계약 코드와 맞는다" "contract_check $name \"\$FX/schema_$name.json\" -"
+done
 RD="$HERE/agents/prior-art-researcher.md"
 VD="$HERE/agents/prior-art-verifier.md"
-if [ ! -f "$RD" ] && [ ! -f "$VD" ]; then
-  echo "  SKIP: agents — 에이전트 정의가 없다"
-else
-  check "에이전트 정의 두 파일이 있다" "[ -f \"\$RD\" ] && [ -f \"\$VD\" ]"
-  for pair in researcher:RD synthesis:RD verifier:VD map:VD; do
-    name="${pair%%:*}"; def="${pair##*:}"; file="${!def}"
-    check "예시 $name 이 계약 코드와 맞는다" \
-      "contract_check_example $name \"$file\""
-  done
-fi
+check "에이전트 정의 두 파일이 있다" "[ -f \"\$RD\" ] && [ -f \"\$VD\" ]"
+for pair in researcher:RD synthesis:RD verifier:VD map:VD; do
+  name="${pair%%:*}"; def="${pair##*:}"; file="${!def}"
+  check "예시 $name 이 계약 코드와 맞는다" \
+    "contract_check_example $name \"$file\""
+done
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
