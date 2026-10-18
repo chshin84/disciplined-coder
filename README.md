@@ -54,7 +54,7 @@ done
 | SessionStart | `hooks/rules_nudge_sessionstart.sh` | 이 세션의 규칙 넛지 표시를 지워 다시 알리게 한다. 대화가 압축(compact)된 뒤에도 지운다. startup 에서는 spec 게이트가 쓰는 세션 시작 표시도 남긴다 | 알림 |
 | UserPromptSubmit | `hooks/prior_art_nudge_userpromptsubmit.sh` | 사용자 메시지에 선행연구 주제어와 요청형 표현이 함께 있으면 `agent-prior-art`를 열라고 알린다. 메시지마다 본다 | 알림 |
 | PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 대한 Write와 Edit을 사유와 함께 거부한다 | 차단 |
-| PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md`를 만들면 에이전트원칙의 「작업 문서·지시문」으로 타입과 수명을 가리게 하고, README면 `domain-readme`를 함께 가리킨다 | 알림 |
+| PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md`를 만들면 에이전트원칙의 「문서 관리」로 타입과 수명을 가리게 하고, README면 `domain-readme`를 함께 가리킨다 | 알림 |
 | PreToolUse | `hooks/doc_word_pretooluse.sh` | 산출물 `.md`에 금지 표현이 들어가면 거부한다 | 차단 |
 | PreToolUse | `hooks/nested_judgment_pretooluse.sh` | 프로젝트 안에 새 spec을 처음 쓰려 하면 세션마다 경로당 한 번 거부하고, 사유에 적은 기준으로 `nested-orchestration`에 나눠 맡길지 먼저 판단하게 한다. 서브에이전트의 Write는 보지 않는다 | 차단 |
 | PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 규칙 넛지. 세션의 첫 Write·Edit·Bash 호출 전에 원칙 사본과 `domain-korean.md`와 `domain-discipline.md`의 절대경로를 한 번 알린다. 서브에이전트에는 원칙이 실리지 않기 때문이다 | 알림 |
