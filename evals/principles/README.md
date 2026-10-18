@@ -67,3 +67,18 @@
 처음 40개의 출력 종류 비율은 세션 기록(대화 답 140, 도구 실행 중 판단 84, 작업 문서 32, 산출물 27, 코드 20)을 따랐다. 추가한 150개는 시험 단위의 조항이 다루는 출력 종류를 따른다. 보류용 12개는 클린룸 시험에 쓰지 않고 전체 비교에만 쓴다.
 
 평가 세션에서는 도구를 실행할 수 없으므로, 도구 과제(`tool`)는 프롬프트 끝에 '실행할 행동과 사용자에게 보낼 말을 적어라'를 넣고 그 서술로 판정한다. 여러 턴 과제는 앞 턴을 `[이전 대화]` 로 인용하고 마지막 메시지에 대한 응답만 판정한다(`judge: last-turn`).
+
+동률 단위에 추가한 질문 84개(`q-<단위>-f1`·`f2`, `followup: true`)는 위 표의 개수에 들어 있지 않다.
+
+## 측정 기록
+
+2026-10-18 조항별 클린룸 시험의 결과다. 시험 단위 56개를 개발용 질문(단위마다 3~8개)으로 비교했고, 동률 단위 42개에는 질문 짝을 한 번 추가했다. 생성은 모두 560건이고 같은 질문을 같은 조건으로 두 번 생성하지 않았다. 판정 모델은 sonnet 이다. 단위마다의 수치는 `docs/domain-discipline.md`·`docs/domain-korean.md` 의 조항 절과 `bash scripts/eval_clause_report.sh` 의 출력이 소유한다.
+
+| 판정 | 단위 수 | 단위 |
+|---|---|---|
+| 채택 | 11 | ASK-OPTIONS, COMMA-CUT, LABEL-NOUN, NO-MID-MOD, ONE-IDEA, SECTION-HEAD, SUBJECT-OBJECT, TERM-ONE, TITLE-CLAIM, TITLE-PROOF, WRITTEN-ONLY |
+| 넣음(새 조항) | 1 | INSTRUCTION-FORM |
+| 채택(차이없음) | 36 | 나머지 단위. 동률 뒤 추가 질문에서도 같아, 측정이 차이를 잡지 못한 채택이다 |
+| 기각 | 8 | BOTTOM-LINE, CHECKABLE, EDIT-PRIORITY, NO-SQUEEZE, REVERSIBLE, RUN-IT, TERM-EXPLAIN, VOCAB-PREF. 모두 질문 한두 개의 차이이며, 판단 조항이라 처리를 사용자에게 묻는다 |
+
+사용자 확인 일치도는 아직 기록하지 않았다. 판정 표본을 사용자에게 보이는 단계가 남아 있다.
