@@ -352,7 +352,7 @@ echo "[첫 문장] 절 제목 아래 첫 줄이 산문이다"
 # 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
 # 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
 # 따라온다. 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
-# TITLE-LAYERS 는 「원칙」 절의 규칙이라 영어 제목에도 적용한다.
+# TITLE-LAYERS 는 「남에게 전달하는 산출물」 절의 규칙이라 영어 제목에도 적용한다.
 HF_WK="$HERE/docs/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
@@ -462,8 +462,11 @@ EOF
 # 전체 일치로 재면 이름은 그대로인데 설명절을 붙이는 순간 실패한다. 이름 부분만 맞대면 원래
 # 잡으려던 것(가리키는 이름이 어디에도 없다)은 그대로 잡힌다.
 echo "[「」로 가리킨 절이 레포 어딘가에 실재한다]"
-HEADINGS="$(find "$HERE" -name '*.md' -not -path '*/.git/*' -exec grep -hE '^#+ ' {} + \
-  | sed 's/^#\+ *//' | sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
+# grep 을 find -exec 로 묶어 실행하면, 제목이 하나도 없는 파일 묶음에서 grep 이 1을 내고 pipefail 이
+# 검사 전체를 멈춘다(평가 과제가 늘어난 2026-10-18 에 일어났다). 그래서 파일을 이어 붙인 뒤 한 번만 거른다.
+# 평가 과제의 프롬프트(evals/principles/cases)는 문서가 아닌 시험 입력이라 제목 집합에서 뺀다.
+HEADINGS="$(find "$HERE" -name '*.md' -not -path '*/.git/*' -not -path '*/evals/principles/cases/*' -exec cat {} + \
+  | grep -E '^#+ ' | sed 's/^#\+ *//' | sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
 BN=0
 for SRC in "$HERE/skills/lens-readability/SKILL.md" "$CALLER" "$CANON"; do
   sn="$(basename "$(dirname "$SRC")")/$(basename "$SRC")"
@@ -684,8 +687,10 @@ anti_count() {  # $1=파일 경로 → 이 문서에 남은 대구의 개수
 }
 echo "[대구 한도] 글 한 편에 한 번까지"
 # 금지 표현 목록과 근거 파일은 뺀다. 목록은 표의 분류 설명이, 근거 파일은 고쳐 쓰지 않는 사용자 원문
-# 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다.
-ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$')"
+# 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다. 평가 과제(evals/principles/cases)도
+# 뺀다. ANTI-LIMIT 의 과제는 모델이 대구를 줄이는지 보려고 대구를 일부러 넣은 시험 입력이다.
+# BANNED-LIST 의 current.md 는 기준 커밋 목록 파일의 사본이라 목록과 같은 이유로 뺀다.
+ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$' -e '^evals/principles/cases/' -e '^evals/principles/clauses/BANNED-LIST/')"
 # 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.
 ANTI_TMP="$(mktemp -d)"
 printf 'A가 아니라 B다.
@@ -777,15 +782,15 @@ for c in "$HERE"/commands/*.md; do
   check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
 done
 
-# 「검증」 절을 뽑아 둔다. 아래 canon 검사가 쓴다.
-# 파일 전역 grep이 아니라 「검증」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
+# 「모든 작업」 절을 뽑아 둔다. 아래 canon 검사(LENS-ALLOWED)가 쓴다.
+# 파일 전역 grep이 아니라 「모든 작업」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
 # vacuous 통과하지 않게 한다).
-WF_BLOCK="$(awk '/^## 검증/{f=1} f&&/^## /&&!/^## 검증/{exit} f' "$HERE/agent-principles.md")"
+WF_BLOCK="$(awk '/^## 모든 작업/{f=1} f&&/^## /&&!/^## 모든 작업/{exit} f' "$HERE/agent-principles.md")"
 
 # --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(에이전트원칙 계약 가드) ---
 # 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
 # (vacuous 통과 방지).
-PO_BLOCK="$(awk '/^## 병렬 오케스트레이션/{f=1} f&&/^## /&&!/^## 병렬 오케스트레이션/{exit} f' "$HERE/agent-principles.md")"
+PO_BLOCK="$(awk '/^## 모든 작업/{f=1} f&&/^## /&&!/^## 모든 작업/{exit} f' "$HERE/agent-principles.md")"
 echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
 check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
 check "그 절에 SUB-ORCHESTRATE 조항이 있다" "printf '%s' \"\$PO_BLOCK\" | grep -qF '**\`SUB-ORCHESTRATE\`'"
@@ -832,7 +837,7 @@ check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않�
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
 # 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 에이전트원칙은 @import로 실리므로 이 한
 # 문장이 있으면 검진이 돈다.
-# 파일 전역 grep이 아니라 「검증」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
+# 파일 전역 grep이 아니라 「모든 작업」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
 # 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
 # 절을 뽑는 계산은 위 WF_BLOCK 을 그대로 쓴다.
 # 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
@@ -856,7 +861,7 @@ SR="$HERE/skills/review-specs/SKILL.md"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
 # 언제 묻는지와 어떻게 묻는지를 `ASK-OPTIONS` 하나가 정한다(2026-09-24 에 `ASK-CONTEXT` 를 합쳤다).
 # 조항 안의 세 문장(정해지지 않으면 묻는다·하나씩 묻는다·대목적을 되짚는다)을 조항 ID 하나로 합쳤다.
-check "canon: 묻는 조항이 원칙 절에 있다"    "sec_has '$CANON' '원칙' '**\`ASK-OPTIONS\`'"
+check "canon: 묻는 조항이 원칙 절에 있다"    "sec_has '$CANON' '모든 작업' '**\`ASK-OPTIONS\`'"
 # 사용 여부(「작업 순서와 다시 리뷰」 절의 ASK-OPTIONS)는 위 「합치기와 다시 리뷰」가 본다.
 check "spec-review: 규칙을 재정의 말고 인용" "! grep -qF '**\`ASK-OPTIONS\`' '$SR'"
 

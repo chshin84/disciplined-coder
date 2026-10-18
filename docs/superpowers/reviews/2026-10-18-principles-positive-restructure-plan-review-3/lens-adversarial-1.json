@@ -1,0 +1,23 @@
+{
+  "lens": "lens-adversarial",
+  "issues": [
+    {"where": "「용어」 실행 키(19행), run_key(161행)", "type": "failure-mode", "claim": "실행 키가 prompt.md 파일 전체 해시라 front matter 만 바꿔도 같은 질문을 다시 실행한다. 생성 모델이 받는 본문 해시로 키를 만들어야 한다.", "principle": "사용자 지시(반복 금지), CHECKABLE"},
+    {"where": "Task 6 Step 3(203행)와 실행 키의 criteria.md", "type": "failure-mode", "claim": "판정 기준만 고쳐도 생성을 다시 실행한다. 생성 키와 판정을 분리하면 저장된 응답을 다시 판정하기만 하면 된다.", "principle": "사용자 지시(반복 금지), YAGNI"},
+    {"where": "eval_clause.sh 오류 규칙(162행)", "type": "failure-mode", "claim": "판정만 실패한 작업을 기록하지 않으면 다음 실행이 성공한 생성까지 반복한다. 판정 읽기 실패를 violated=False 로 기록하면 위반 없음으로 굳는다.", "principle": "사용자 지시(반복 금지), KEEP-FAILED"},
+    {"where": "run_case error(160행), smoke(173행)", "type": "risk", "claim": "JSON 으로 온 API 오류(인증, 429, 과부하)를 오류로 보지 않으면 그 문구가 응답으로 기록·판정되고 다시 실행되지 않는다. is_error 필드나 빈 result 를 오류로 세야 한다(필드 이름은 가정).", "principle": "NO-ASSUME, CHECKABLE"},
+    {"where": "Review Focus 조건 혼선(43행), smoke(173행)", "type": "risk", "claim": "작업 폴더가 사용자 홈 아래 Temp 이면 조상 폴더 탐색으로 사용자 홈의 .claude/CLAUDE.md 가 실릴 수 있다(가정). none probe 로 측정하거나 조상에 CLAUDE.md 가 없는 경로에 두어야 한다.", "principle": "NO-ASSUME, STATE-ASSUME"},
+    {"where": "Task 4 Step 4 smoke(173행)", "type": "failure-mode", "claim": "smoke 가 실제 과제를 쓰고 기록을 버려 Task 6 이 같은 질문을 다시 실행한다. 픽스처 과제를 써야 한다.", "principle": "사용자 지시(반복 금지)"},
+    {"where": "runs.jsonl 기록(162행), 동시 실행 8(172행)", "type": "risk", "claim": "기록 시점·동시 쓰기·손상 줄 처리·동시 프로세스 잠금이 없다. 지금 코드는 끝난 뒤 한 번에 쓰고 TimeoutExpired 를 잡지 않는다.", "principle": "사용자 지시(반복 금지), CHECKABLE"},
+    {"where": "판정 세션의 설정 폴더 공유(172행)", "type": "risk", "claim": "8 개 판정 세션이 한 설정 폴더를 함께 쓰면 설정 파일이 깨질 수 있다(가정). 동시 실행 수 8 은 근거가 없다(기존 4).", "principle": "EVIDENCE-FIRST, NO-ASSUME"},
+    {"where": "생성 모델 미고정(162·163행)", "type": "risk", "claim": "CLI 기본 모델이 바뀌면 함께 쓰는 결과와 새 결과가 다른 모델에서 나온다. --model 을 고정해야 한다.", "principle": "NO-ASSUME, CHECKABLE"},
+    {"where": "보고 판정 동률(163행)과 Task 6 Step 4(204행)", "type": "failure-mode", "claim": "보고가 회차를 몰라 둘째 보고에서도 동률을 내며, Step 5 확인 목록에 동률이 없다.", "principle": "CHECKABLE"},
+    {"where": "Task 6 Step 2(202행)", "type": "failure-mode", "claim": "오류 재실행에 멈출 조건이 없다. 한 번으로 한정하고 남은 오류는 사용자에게 알려야 한다.", "principle": "TELL-NOW, CHECKABLE"},
+    {"where": "Task 5 Step 4(191행)", "type": "risk", "claim": "서브에이전트가 new.md 로 질문을 만들면 new.md 에만 있는 상황을 겨눠 current 가 구조적으로 진다. 질문 출처를 current.md 와 초안 이유 칸의 실패 사례로 한정해야 한다. 층마다 기준 엄격함이 갈리고 사람이 질문을 한 번도 보지 않는다.", "principle": "CHECKABLE, FOCUSED"},
+    {"where": "Task 8 Step 3(247행)", "type": "failure-mode", "claim": "원칙 쪽과 겹치는 문장을 합치면서 시험한 원칙 문장을 다시 고친다. 목록 쪽 문장만 지워야 한다.", "principle": "CHECKABLE, REVERSIBLE"},
+    {"where": "Task 8 Step 4~5", "type": "irreversible", "claim": "되돌리기 범위가 없다. banned_guide·조항 폴더·질문을 먼저 커밋해 시험하고 scaffold·관리블록·옛 사본·README 는 채택 뒤에만 고쳐야 한다.", "principle": "REVERSIBLE, KEEP-FAILED"},
+    {"where": "Task 7 Step 5(220행)", "type": "risk", "claim": "검사를 고치는 범위에 한계가 없다. 절 선택 부분만 바꾸고 단언 문자열은 바꾸지 않아야 한다.", "principle": "CHECKABLE, REVERSIBLE"},
+    {"where": "Review Focus(42행)와 Task 10 Step 2(269행)", "type": "failure-mode", "claim": "전체 비교 경로에는 실행 키가 없어 끊기거나 다시 실행하면 모든 과제가 반복된다. 끊기면 다시 실행하지 말고 묻는다는 멈출 조건이 필요하다.", "principle": "사용자 지시(반복 금지), CHECKABLE"}
+  ],
+  "principles_applied": ["CHECKABLE", "NO-ASSUME", "STATE-ASSUME", "EVIDENCE-FIRST", "REVERSIBLE", "KEEP-FAILED", "TELL-NOW", "YAGNI", "FOCUSED", "SECRETS", "SUBJECT-OBJECT", "WRITTEN-ONLY"],
+  "notes": "조항 파일이 바뀌면 새 키가 맞으므로 올리지 않았다. 비용은 생성 약 480건, 60달러 안팎에 동률 재시험과 전체 비교가 더해진다(가정). 조상 CLAUDE.md 적재, is_error 필드, 공유 설정 폴더 손상은 측정하지 않은 가정이다. current.md 검사가 부분 문자열이면 조각 줄도 통과한다. 하네스가 이 보고에 settings-json 형태 패턴 표시를 붙였으나 보고 내용에 설정 변경 지시는 없었다. 원본의 evidence·counterpart 칸은 길이 때문에 줄였다."
+}

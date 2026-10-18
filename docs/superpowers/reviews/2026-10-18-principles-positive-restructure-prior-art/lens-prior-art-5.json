@@ -1,0 +1,72 @@
+{
+  "lens": "lens-prior-art",
+  "target": "적용 범위로 나눈 층",
+  "search_status": "ok",
+  "read": [
+    "https://cursor.com/docs/context/rules",
+    "https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions",
+    "https://code.visualstudio.com/docs/copilot/customization/custom-instructions",
+    "https://agents.md/",
+    "https://code.claude.com/docs/en/memory",
+    "https://developers.google.com/style",
+    "https://learn.microsoft.com/en-us/style-guide/chatbots-virtual-agents",
+    "https://learn.microsoft.com/en-us/style-guide/chatbots-virtual-agents/writing-bots",
+    "https://github.com/MicrosoftDocs/microsoft-style-guide/blob/master/styleguide/welcome/index.md",
+    "https://help.splunk.com/en/splunk-style-guide/ai/writing-chatbot-responses",
+    "https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/style-guides/",
+    "https://guidance.publishing.service.gov.uk/writing-to-gov-uk-standards/style-guides/a-to-z-style-guide/",
+    "https://forum.cursor.com/t/cursor-agent-not-following-rules/149542",
+    "https://forum.cursor.com/t/cursorrules-not-being-followed-or-applied/131781",
+    "https://forum.cursor.com/t/cursor-agent-not-calling-rules-during-chat-sessions/104719"
+  ],
+  "queries": [
+    "Google developer documentation style guide \"highlights\" general principles vs specific topics organization",
+    "Microsoft Writing Style Guide chatbots virtual agents conversational responses guidance",
+    "ISO 24495-1:2023 plain language principles governing principles scope all types of documents",
+    "Microsoft style guide \"bots and virtual agents\" learn.microsoft.com style-guide",
+    "ISO 24495-1 plain language four principles relevant findable understandable usable scope \"primarily in the form of text\"",
+    "Cursor \"Apply Intelligently\" OR \"Agent Requested\" rules not applied reliably forum"
+  ],
+  "issues": [
+    {
+      "where": "개편안 — 조건이 붙는 묶음은 하위 절 첫 줄에 적용 조건을 적는다(남에게 전달하는 산출물 / 작업 문서·지시문 / 코드 층)",
+      "type": "known-failure",
+      "claim": "적용 조건을 본문 문장으로 적고 해당 여부를 모델이 스스로 판정하게 하는 방식은 에이전트 규칙 도구에서 '모델이 관련 없다고 보고 규칙을 건너뛰는' 실패가 보고된 방식이며, 그 실패 원인이 이 설계에도 남아 있다.",
+      "consequence": "개편안의 층 중 산출물·작업 문서·코드 층은 모델이 지금 쓰는 출력이 어느 종류인지 스스로 분류해야 적용된다. 분류가 틀리면 조건이 명확하게 적혀 있어도 규칙이 적용되지 않는다. 세션 기록의 실패 분류는 출력 종류를 사후에 사람이 붙인 값이라, 실행 시점에 모델이 같은 분류를 하는지는 이 설계가 확인하지 않았다.",
+      "evidence": "Cursor 공식 문서는 규칙을 Always Apply / Apply Intelligently(description으로 모델이 관련성 판단) / Apply to Specific Files(globs) / Apply Manually 로 구분한다. Cursor 포럼(2026-01-24) 직원 답변은 규칙이 로드되었으나 따르지 않았다고 밝히고 \"Rules in context don't guarantee 100% adherence\", \"The agent can see them, but won't use them because they're not related to the task\"라고 적었으며, 해결책으로 '규칙이 문서 작업을 포함한 모든 작업에 적용된다는 명시 지시를 추가하라'를 제시했다. 네 축 대조: 목적은 같다. 메커니즘은 다르다(Cursor는 파일 단위 메타데이터, 이 설계는 한 파일 안 절 첫 줄 조건). 평가는 다르다. 적용 대상은 같다. 전이되는 원인은 '해당 여부 판정을 모델에 맡김' 한 가지로 한정된다.",
+      "citations": [
+        { "url": "https://cursor.com/docs/context/rules", "kind": "vendor", "opened": true },
+        { "url": "https://forum.cursor.com/t/cursor-agent-not-following-rules/149542", "kind": "vendor", "opened": true },
+        { "url": "https://code.visualstudio.com/docs/copilot/customization/custom-instructions", "kind": "vendor", "opened": true }
+      ]
+    },
+    {
+      "where": "개편안 — 목차를 출력 종류별 층으로 나누되 전체를 모든 세션에 실리는 한 문서로 유지",
+      "type": "weak-baseline",
+      "claim": "에이전트 지시 도구들이 공통으로 제공하는 기준선(항상 로드되는 규칙과 경로·작업 조건으로 따로 로드되는 규칙을 파일 단위로 분리)과 이 개편안이 비교되지 않았다.",
+      "consequence": "개편안은 조건부 층(코드, 작업 문서·지시문)도 항상 로드되는 파일 안에 남긴다. 그 조건부 층의 분량은 모든 세션의 컨텍스트를 계속 차지하고, 목차 개편은 그 분량을 줄이지 않는다.",
+      "evidence": "Claude Code 메모리 문서: \"target under 200 lines per CLAUDE.md file. Longer files consume more context and reduce adherence. Move instructions that matter for only part of the codebase into path-scoped rules\", \"Imports help you organize a long file but don't reduce its context cost\". GitHub Copilot은 저장소 전체 지시와 applyTo 경로 지시를 분리하고 둘이 함께 쓰인다고 적는다. VS Code는 applyTo(경로)와 description(작업 일치 시 온디맨드 로드)을 제공한다. AGENTS.md는 가장 가까운 파일이 이긴다는 디렉터리 범위만 제공한다. 다만 이 설계의 층 기준인 '출력 종류(대화 답 대 산출물)'는 경로로 표현되지 않으므로 기준선이 모든 층을 대신하지는 못한다.",
+      "citations": [
+        { "url": "https://code.claude.com/docs/en/memory", "kind": "vendor", "opened": true },
+        { "url": "https://docs.github.com/en/copilot/how-tos/configure-custom-instructions/add-repository-instructions", "kind": "vendor", "opened": true },
+        { "url": "https://code.visualstudio.com/docs/copilot/customization/custom-instructions", "kind": "vendor", "opened": true },
+        { "url": "https://agents.md/", "kind": "vendor", "opened": true }
+      ]
+    }
+  ],
+  "not_found": [
+    "출력 종류(대화 답 대 산출물)를 기준으로 에이전트 지시를 층으로 나누고 그 결과를 측정한 연구나 사례를 찾지 못했다. 독창성의 근거가 아니다.",
+    "ISO 24495-1 원문의 적용 범위 조항을 직접 열지 못했다.",
+    "plainlanguage.gov 는 조사 시간 안에 열지 못했다.",
+    "GOV.UK Technical A to Z 페이지는 404였다.",
+    "Cursor 포럼에서 '규칙 수가 많을수록 악화된다'는 직원 답변은 검색 요약에만 있었고 해당 스레드를 열지 못해 근거로 쓰지 않았다."
+  ],
+  "disclosures": [
+    "WebFetch는 페이지를 작은 모델이 요약해 돌려주므로 인용문은 원문 대조가 필요하다.",
+    "Cursor 포럼은 벤더가 운영하는 커뮤니티라 kind를 vendor로 적었으나 사용자 보고와 직원 답변이 섞여 있다.",
+    "Splunk 스타일가이드는 하위 질문에 명시되지 않은 출처이며, 대화 응답 층의 선례로 notes에만 사용했다.",
+    "도구 문서의 동작 설명은 2026-10-18 시점 버전이며 버전마다 바뀐다."
+  ],
+  "principles_applied": ["EVIDENCE-FIRST", "NO-ASSUME", "STATE-ASSUME", "SECRETS", "FOCUSED", "YAGNI", "ASYNC-FIRST", "SPECIFIC-NAME", "VOCAB-PREF", "WRITTEN-ONLY", "NO-MIRROR", "SUBJECT-OBJECT", "FULL-SENTENCE", "BOTTOM-LINE", "TERM-ONE", "COUNT-EARNS"],
+  "notes": "기시감: '항상 적용 규칙 + 조건부 규칙'의 층 구분은 Cursor·Copilot·VS Code·Claude Code·AGENTS.md 모두에 있다. 조건은 파일 경로, 디렉터리, 작업 설명 일치이며 출력 종류를 조건으로 삼는 공식 메커니즘은 찾지 못했다. 가장 가까운 선례는 VS Code의 출력별 설정(코드 리뷰, 커밋 메시지, PR 설명 지시)이다. 전제 반박: '목차 이름의 기준이 섞여 있다'는 진단을 반박하는 근거는 없었으나, Google 스타일가이드 탐색 구조도 원칙·형식·콘텐츠 종류를 한 목차에 섞고 있어 기준 혼재 자체가 실패 원인이라는 근거도 찾지 못했다. 찾은 기준 목록(요지): 일부에만 해당하는 규칙은 조건부 로드, 200줄 미만과 import 비용, 관련 지시를 제목과 불릿으로 묶고 상충 지시 제거, Cursor 규칙 유형 메타데이터, Copilot 추가형 층, VS Code 온디맨드 로드와 출력 종류별 지시 설정, AGENTS.md 가까운 파일 우선, Google 가이드의 프로젝트 지침→가이드→제3자 순서와 일반·콘텐츠 종류 주제 구분, Microsoft 봇 글쓰기의 일반 보이스 위 특화 층, Splunk 챗봇 응답 층, GOV.UK 일반·기술 A to Z. 선례는 대화 응답을 일반 규칙 위의 특화 층으로 두는데 개편안은 대화 답을 기본 층, 산출물을 추가 요건 층으로 두어 방향이 반대다. 더 확인할 사항: 층 사이 우선순위, 실행 시점에 모델이 출력 종류를 같게 판정하는지, ISO 24495-1 원문 범위."
+}
