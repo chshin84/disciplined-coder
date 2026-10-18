@@ -149,10 +149,12 @@
 
 | 상수 | 루트의 `required` | 원소의 `required` | 열거로 묶는 칸 |
 |---|---|---|---|
-| `RESEARCHER_SCHEMA` | `search_status`, `queries`, `issues` | 없음 | `search_status`의 `ok`·`no-results`·`failed`·`not-attempted` |
+| `RESEARCHER_SCHEMA` | `search_status`, `queries`, `issues` | `issues` 원소의 `prior_claim`, `citations`. `evidence_map` 원소의 `case`, `url`, `axes`, `outcome`. `axes`의 네 축과 축마다 `prior`, `same`, `note` | `search_status`의 `ok`·`no-results`·`failed`·`not-attempted` |
 | `VERIFIER_SCHEMA` | `url`, `judgments`, `principles_applied` | `judgments` 원소의 `ref`, `verdict`, `quote`, `reason` | `verdict`의 `supported`·`unsupported`·`unverifiable` |
-| `SYNTHESIS_SCHEMA` | `evidence_map`, `conclusions`, `principles_applied` | 없음 | 없음 |
+| `SYNTHESIS_SCHEMA` | `evidence_map`, `conclusions`, `principles_applied` | `evidence_map` 원소의 `case`, `url`, `outcome`, `axes`. `conclusions` 원소의 `text`, `refs` | 없음 |
 | `MAP_SCHEMA` | `cells`, `principles_applied` | `cells` 원소의 `row`, `column`, `grounded`, `source_ref` | 없음 |
+
+원소의 `required`는 계약 코드 `scripts/prior_art_contract.json`의 같은 자료와 같다. 계약 테스트가 `properties`와 `required`를 함께 대조하므로, 이 표와 계약 코드가 다르면 계약 코드를 따른다.
 
 `RESEARCHER_SCHEMA`는 `evidence_map`을 `properties`에 두되 루트 `required`에 넣지 않는다. `contrast` 모드의 연구자는 `evidence_map`을 채우지 않기 때문이며, 없으면 빈 배열로 본다. 원소 수준에서는 계약 표의 `researcher` 행대로 이슈 원소에 `prior_claim`·`citations`를, 근거 지도 행에 `case`·`url`·`axes`·`outcome`을, `axes`에 네 축을, 축에 `prior`·`same`·`note`를 `required`로 둔다. 그래서 하위 칸이 빠진 출력은 런타임의 스키마 검사에서 다시 요청되고, 후처리가 없는 칸을 읽다 예외로 끝나지 않는다. 네 상수는 최상위 `function schemas()`가 한 객체로 돌려주며, 계약 테스트가 그 함수로 상수를 읽는다(큰 명세 「다시 나눈 분할」의 「계약 코드와 계약 테스트」).
 
