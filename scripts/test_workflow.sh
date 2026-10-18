@@ -133,7 +133,9 @@ cat > "$FX/gu_in.json" <<'EOF'
         "purpose": {"prior": "p1", "same": true, "note": "n"},
         "mechanism": {"prior": "m1", "same": false, "note": "n"},
         "evaluation": {"prior": "e1", "same": false, "note": "n"},
-        "target": {"prior": "t1", "same": true, "note": "n"}}}
+        "target": {"prior": "t1", "same": true, "note": "n"}}},
+      {"case": "  ", "url": "https://a", "outcome": "O2", "axes": {"purpose": {"prior": "p2", "same": true, "note": "n"}, "mechanism": {"prior": "m2", "same": false, "note": "n"}, "evaluation": {"prior": "e2", "same": false, "note": "n"}, "target": {"prior": "t2", "same": true, "note": "n"}}},
+      {"case": "C3", "url": "https://a", "outcome": "O3", "axes": {"purpose": {"prior": "  ", "same": true, "note": "n"}, "mechanism": {"prior": "  ", "same": false, "note": "n"}, "evaluation": {"prior": "  ", "same": false, "note": "n"}, "target": {"prior": "  ", "same": true, "note": "n"}}}
     ]}},
   {"id": "S2", "output": {"search_status": "ok", "queries": [],
     "issues": [
@@ -162,6 +164,12 @@ cat > "$FX/gu_want.json" <<'EOF'
         "mechanism": {"prior": "m1", "same": false, "note": "n"},
         "evaluation": {"prior": "e1", "same": false, "note": "n"},
         "target": {"prior": "t1", "same": true, "note": "n"}}}},
+    {"ref": "S1#case#2", "urls": ["https://a"],
+     "text": "{\"case\":\"  \",\"outcome\":\"O2\",\"prior\":{\"purpose\":\"p2\",\"mechanism\":\"m2\",\"evaluation\":\"e2\",\"target\":\"t2\"}}",
+     "row": {"case": "  ", "url": "https://a", "outcome": "O2", "axes": {"purpose": {"prior": "p2", "same": true, "note": "n"}, "mechanism": {"prior": "m2", "same": false, "note": "n"}, "evaluation": {"prior": "e2", "same": false, "note": "n"}, "target": {"prior": "t2", "same": true, "note": "n"}}}},
+    {"ref": "S1#case#3", "urls": ["https://a"],
+     "text": "{\"case\":\"C3\",\"outcome\":\"O3\",\"prior\":{\"purpose\":\"  \",\"mechanism\":\"  \",\"evaluation\":\"  \",\"target\":\"  \"}}",
+     "row": {"case": "C3", "url": "https://a", "outcome": "O3", "axes": {"purpose": {"prior": "  ", "same": true, "note": "n"}, "mechanism": {"prior": "  ", "same": false, "note": "n"}, "evaluation": {"prior": "  ", "same": false, "note": "n"}, "target": {"prior": "  ", "same": true, "note": "n"}}}},
     {"ref": "S2#issue#0", "urls": ["https://a"], "text": "claim B"},
     {"ref": "S2#issue#1", "urls": ["https://c"], "text": "  "}
   ],
@@ -190,7 +198,8 @@ cat > "$FX/cl_in.json" <<'EOF'
     {"ref": "T#8", "urls": ["https://u4"], "text": "x"},
     {"ref": "T#9", "urls": ["https://u5"], "text": "x"},
     {"ref": "T#10", "urls": ["https://u1"], "text": ""},
-    {"ref": "T#11", "urls": ["https://u6"], "text": "x"}
+    {"ref": "T#11", "urls": ["https://u6"], "text": "x"},
+    {"ref": "T#12", "urls": ["https://u1"], "text": "x", "row": {"case": "  ", "axes": {"purpose": {"prior": "p2", "same": true, "note": "n"}, "mechanism": {"prior": "m2", "same": false, "note": "n"}, "evaluation": {"prior": "e2", "same": false, "note": "n"}, "target": {"prior": "t2", "same": true, "note": "n"}}}}
   ],
   [
     {"url": "https://u1", "subquestions": ["T"], "output": {"url": "https://u1", "principles_applied": [], "judgments": [
@@ -220,7 +229,8 @@ cat > "$FX/cl_want.json" <<'EOF'
   "rejected": [
     {"ref": "T#2", "urls": ["https://u1"]},
     {"ref": "T#4", "urls": []},
-    {"ref": "T#10", "urls": ["https://u1"]}
+    {"ref": "T#10", "urls": ["https://u1"]},
+    {"ref": "T#12", "urls": ["https://u1"]}
   ],
   "unverifiable": [{"ref": "T#3", "urls": ["https://u1"]}],
   "verify_failed": [
@@ -292,5 +302,23 @@ cat > "$FX/ms2_want.json" <<'EOF'
 }
 EOF
 check "mergeStatus 는 모두 ok 이면 overall_status 가 ok 다" "harn fn mergeStatus < \"\$FX/ms2_in.json\" > \"\$FX/ms2_got.json\" && json_same \"\$FX/ms2_got.json\" \"\$FX/ms2_want.json\""
+
+cat > "$FX/ms3_in.json" <<'EOF'
+[
+  [{"id": "S4", "output": {"search_status": "no-results", "queries": [], "issues": []}}],
+  [],
+  {"passed": [], "rejected": [], "unverifiable": [], "verify_failed": []}
+]
+EOF
+check "mergeStatus 는 no-results 만 있어도 overall_status 가 not-ok 다" "harn fn mergeStatus < \"\$FX/ms3_in.json\" > \"\$FX/ms3_got.json\" && json_true \"\$FX/ms3_got.json\" 'd[\"overall_status\"] == \"not-ok\"'"
+cat > "$FX/ms4_in.json" <<'EOF'
+[
+  [{"id": "S1", "output": {"search_status": "ok", "queries": [], "issues": []}}],
+  [{"ref": "S1#issue#0", "urls": ["https://a"], "text": "x"}],
+  {"passed": [], "rejected": [], "unverifiable": [],
+   "verify_failed": [{"url": "https://a", "refs": ["S1#issue#0"]}]}
+]
+EOF
+check "mergeStatus 는 ok 하위 질문의 검증 실패만으로도 overall_status 가 not-ok 다" "harn fn mergeStatus < \"\$FX/ms4_in.json\" > \"\$FX/ms4_got.json\" && json_true \"\$FX/ms4_got.json\" 'd[\"overall_status\"] == \"not-ok\"'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

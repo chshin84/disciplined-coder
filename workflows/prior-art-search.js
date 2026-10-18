@@ -55,10 +55,10 @@ function groupByUrl(researchers) {
       const u = String(row.url ?? '');
       const ax = row.axes ?? {};
       const prior = {
-        purpose: ax.purpose?.prior,
-        mechanism: ax.mechanism?.prior,
-        evaluation: ax.evaluation?.prior,
-        target: ax.target?.prior,
+        purpose: String(ax?.purpose?.prior ?? ''),
+        mechanism: String(ax?.mechanism?.prior ?? ''),
+        evaluation: String(ax?.evaluation?.prior ?? ''),
+        target: String(ax?.target?.prior ?? ''),
       };
       items.push({
         ref: `${r.id}#case#${j}`,
