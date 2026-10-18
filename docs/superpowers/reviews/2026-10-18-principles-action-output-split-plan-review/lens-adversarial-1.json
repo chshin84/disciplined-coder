@@ -1,0 +1,16 @@
+{
+  "lens": "lens-adversarial",
+  "target": "docs/superpowers/plans/2026-10-18-principles-action-output-split.md",
+  "issues": [
+    { "where": "Task 1 Step 2~5, Global Constraints", "type": "failure-mode", "claim": "Step 2 뒤 검사 스크립트를 더 고치지 말라는 제약이 없어, 빌더가 실패를 만나면 검사를 느슨하게 고쳐 통과시킬 수 있고 같은 커밋에 섞인다." },
+    { "where": "Task 1 Step 2 Expected", "type": "risk", "claim": "고친 검사가 새 원칙에서 결함을 잡는지 확인하는 단계가 없다. KO_IDS 목록을 기대값과 대조하고, 임시 사본에서 LENS-ALLOWED 이동·STATE-ASSUME 근거 삭제 시 FAIL 이 나는지 보는 결함 주입을 권한다." },
+    { "where": "Task 1 Step 1 묶음 루프", "type": "risk", "claim": "^#{3,4} 는 두 단계를 모두 허용해 현행보다 느슨하다. 묶음마다 정확한 단계를 검사하라." },
+    { "where": "Task 1 Step 4", "type": "failure-mode", "claim": "근거 절을 옮길 때 손실·중복을 검사가 잡지 못한다(DC 는 제목만, KO 는 문자열 언급만 본다. NAME-ITEMS 는 이미 domain-korean 331행에 언급됨). 옮긴 ID 마다 두 참고서에 ^### `ID` 가 정확히 한 번인지 확인하라." },
+    { "where": "Task 1 Step 4 domain-korean 문단", "type": "failure-mode", "claim": "EDIT-PRIORITY 를 옮기라면서 domain-korean 의 같은 절에 적으라고 하고, 비게 되는 `## REVISE-ORDER — 고칠 순서` 절의 처분이 없다." },
+    { "where": "Global Constraints, 커밋 단계", "type": "irreversible", "claim": "작업 브랜치·push·병합 시점·되돌림이 없다. 플러그인은 GitHub autoUpdate 로 퍼지고 main 은 origin 보다 앞서 있다. Task 1 커밋 뒤 push 되면 hook 이 없는 절을 가리키는 채로 퍼진다. 직전 재편처럼 worktree 브랜치에서 마치고 한 번에 병합·push 하라." },
+    { "where": "Task 1 Step 5", "type": "failure-mode", "claim": "test_docs_drift.sh 만 실행한다. test_audit.sh 도 원칙의 ## 절 제목과 ID 를 audit_topics 와 대조하므로 전체 검사를 실행하라." },
+    { "where": "Task 3 Step 3", "type": "failure-mode", "claim": "'끊어라'가 남으면 고치라고 하지만 spec 은 SECTION-HEAD 등을 현행 유지로 정했다. 비목표 침범이고 커밋 단계도 없다." }
+  ],
+  "principles_applied": ["CHECKABLE", "REVERSIBLE", "YAGNI", "REPORT-DEAD", "NO-ASSUME", "STATE-ASSUME", "KEEP-FAILED"],
+  "notes": "저장소 CLAUDE.md 의 결함 주입 규칙은 문언상 이번 차수(검사를 줄이지 않음)에 해당하지 않는다고 판단했다. 다만 고친 검사에 한정한 결함 주입을 권한다. autoUpdate 로 퍼진다는 판단은 known_marketplaces.json 근거의 가정이다. 원본 보고의 evidence·counterpart·consequence 칸은 이 사본에서 줄였다."
+}
