@@ -19,10 +19,13 @@
 
 조건 하나의 준비는 아래 순서다. 모든 명령은 `CLAUDE_HOME_DIR` 을 비우고 `CLAUDE_CONFIG_DIR=<평가 설정 폴더>` 를 붙여 실행한다.
 
-1. 빈 평가 설정 폴더를 만든다.
-2. `claude plugin marketplace add <그 커밋의 worktree>` 와 `claude plugin install disciplined-coder@chshin-tools` 를 실행한다.
-3. `plugins/known_marketplaces.json` 의 chshin-tools 항목에 `"autoUpdate": false` 를 넣는다.
-4. 예열 세션 `claude -p "확인용 예열입니다. ok 라고만 답하세요."` 를 실행한다.
+1. 빈 평가 설정 폴더를 만들고, 사용자 전역 `CLAUDE.md` 의 관리블록 밖 내용과 `kw-ax` 폴더를 복사한다. 모든 조건이 같은 사용자 지시를 받게 하기 위해서다.
+2. `disciplined-coder/plugin-notice.skip` 에 `superpowers` 를 적는다. 평가 설정 폴더에는 superpowers 가 없어, 끄지 않으면 함께 쓰는 플러그인 알림이 응답에 섞인다.
+3. `claude plugin marketplace add <그 커밋의 worktree>` 와 `claude plugin install disciplined-coder@chshin-tools` 를 실행한다.
+4. `plugins/known_marketplaces.json` 의 chshin-tools 항목에 `"autoUpdate": false` 를 넣는다.
+5. 예열 세션 `claude -p "확인용 예열입니다. ok 라고만 답하세요." --tools ""` 를 실행한다.
+
+과제 세션은 `--tools ""` 로 도구를 끄고, git 저장소가 아닌 빈 작업 폴더에서 실행한다. 처음에는 빈 git 저장소에서 실행했는데, 하네스가 그 git 상태를 맥락에 넣자 모델이 과제의 작업 기록을 저장소 상태와 대조하려 했고 도구 호출문을 글로 적었다. 그래서 작업 폴더를 바꾸고, 모든 과제 앞에 '평가용 대화이고 도구는 쓸 수 없으며 이전 대화와 기록은 확인된 사실이다'라는 머리말을 뒀다. 판정 세션은 플러그인이 없는 빈 설정 폴더에서 실행한다. 판정 세션에 원칙이 실리면 조건마다 판정자가 달라지기 때문이다.
 
 인증 키는 저장소 밖 `~/.dc-eval.env` 의 `ANTHROPIC_API_KEY` 줄에서 읽어 환경 변수로만 넘기고, 출력하거나 파일에 다시 쓰지 않는다. 사용료는 그 키의 API 계정으로 청구된다.
 
