@@ -23,9 +23,34 @@ function loadBody() {
   return source.slice('export '.length);
 }
 
+// 런타임이 막는 호출을 본문 안에서 재현하는 대체본이다. 막힌 호출은 raise 로 치명 오류를 남기므로
+// 스크립트가 예외를 삼켜도 종료 코드 1 로 드러난다.
+const GuardedDate = new Proxy(Date, {
+  construct(target, a, newTarget) {
+    if (a.length === 0) raise('금지 호출: 인자 없는 new Date()');
+    return Reflect.construct(target, a, newTarget);
+  },
+  apply(target, thisArg, a) {
+    if (a.length === 0) raise('금지 호출: 인자 없는 Date()');
+    return Reflect.apply(target, thisArg, a);
+  },
+  get(target, key) {
+    if (key === 'now') return () => raise('금지 호출: Date.now()');
+    return Reflect.get(target, key, target);
+  },
+});
+const GuardedMath = new Proxy(Math, {
+  get(target, key) {
+    if (key === 'random') return () => raise('금지 호출: Math.random()');
+    return Reflect.get(target, key, target);
+  },
+});
+
 function build(body) {
   const head = "'use strict';\nif (__fn) return eval(__fn)(...__fnArgs);\n";
-  return new AsyncFunction('agent', 'parallel', 'phase', 'log', 'args', '__fn', '__fnArgs', head + body);
+  // process·require·fetch·setTimeout·Buffer 는 undefined 로 가려 본문이 쓰면 TypeError 가 나게 한다.
+  return new AsyncFunction('agent', 'parallel', 'phase', 'log', 'args', '__fn', '__fnArgs',
+    'Date', 'Math', 'process', 'require', 'fetch', 'setTimeout', 'Buffer', head + body);
 }
 
 // 루트가 type: object 이고 모든 객체 스키마에서 required 가 properties 의 부분집합인지 본다. 어긋나면 문구를 돌려준다.
@@ -77,7 +102,7 @@ async function main() {
 
   if (command === 'fn') {
     try {
-      const out = await fn(undefined, undefined, undefined, undefined, undefined, name, input);
+      const out = await fn(undefined, undefined, undefined, undefined, undefined, name, input, GuardedDate, GuardedMath);
       process.stdout.write(JSON.stringify(out ?? null) + '\n');
     } catch (e) {
       process.stderr.write(`스크립트 예외: ${e.message}\n`);
@@ -113,7 +138,7 @@ async function main() {
 
   let result;
   try {
-    result = await fn(agent, parallel, phase, log, args, undefined, undefined);
+    result = await fn(agent, parallel, phase, log, args, undefined, undefined, GuardedDate, GuardedMath);
   } catch (e) {
     process.stderr.write(`스크립트 예외: ${e.message}\n`);
     process.exitCode = 1;
