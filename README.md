@@ -52,6 +52,7 @@ done
 | SessionStart | `hooks/update_check_sessionstart.sh` | 설치본이 원격 저장소보다 뒤처지면 새 버전으로 옮기고, 사용자 화면과 Claude의 첫 답에서 다시 켜라고 요구한다. 새로 켤 때(startup)만 확인한다. 자동 갱신을 꺼 두었으면 아무것도 하지 않는다 | 알림 |
 | SessionStart | `scripts/seal_reviews.sh` | 커밋된 리뷰 기록(`docs/superpowers/reviews/` 아래 전부)을 읽기 전용으로 봉인한다(이 저장소의 프로젝트 hook) | 알림 |
 | SessionStart | `hooks/rules_nudge_sessionstart.sh` | 이 세션의 규칙 넛지 표시를 지워 다시 알리게 한다. 대화가 압축(compact)된 뒤에도 지운다. startup 에서는 spec 게이트가 쓰는 세션 시작 표시도 남긴다 | 알림 |
+| UserPromptSubmit | `hooks/prior_art_nudge_userpromptsubmit.sh` | 사용자 메시지에 선행연구 주제어와 요청형 표현이 함께 있으면 `agent-prior-art`를 열라고 알린다. 메시지마다 본다 | 알림 |
 | PreToolUse | `hooks/readonly_pretooluse.sh` | 읽기 전용 파일에 대한 Write와 Edit을 사유와 함께 거부한다 | 차단 |
 | PreToolUse | `hooks/doc_format_pretooluse.sh` | 새 `.md`를 만들면 에이전트원칙의 「문서를 쓰고 관리할 때」로 타입과 수명을 가리게 하고, README면 `domain-readme`를 함께 가리킨다 | 알림 |
 | PreToolUse | `hooks/doc_word_pretooluse.sh` | 산출물 `.md`에 금지 표현이 들어가면 거부한다 | 차단 |
@@ -87,8 +88,9 @@ hook은 아래 환경 변수로 끈다.
 
 - **`DISCIPLINED_CODER_REVIEW_GATE=off`** — `spec_review_posttooluse.sh`, `stop_gates.sh`의 spec 검사, `doc_format_pretooluse.sh`, `doc_review_posttooluse.sh`, `rules_nudge_pretooluse.sh`, `nested_judgment_pretooluse.sh`를 끈다.
 - **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `stop_gates.sh`의 금지 표현 검사)을 끈다. 금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.
+- **`DISCIPLINED_CODER_PRIOR_ART_NUDGE=off`** — `prior_art_nudge_userpromptsubmit.sh`를 끈다.
 
-읽기 전용 차단과 세션 시작의 셋업은 끄는 변수가 없다. 두 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
+읽기 전용 차단과 세션 시작의 셋업은 끄는 변수가 없다. 세 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
 
 ## 주의
 
