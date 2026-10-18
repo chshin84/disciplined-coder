@@ -277,10 +277,11 @@
 
 ### Task 10: 전체 비교와 병합 준비
 
+- [ ] **Step 0:** 보류용 질문을 약 30개로 늘린다. 세션 기록 원자료(`~/dc-eval-raw/2026-10-18/`)의 실패 사례 중 기존 과제와 겹치지 않는 사례를 일반화해 `tags: [holdout]` 과제로 쓰고, 문안 선택(Task 6·8)에는 쓰지 않는다. `bash scripts/test_eval_cases.sh` 가 FAIL=0 이면 커밋한다. `git commit -m "평가 세트: 보류용 질문 확대"`
 - [ ] **Step 1:** `git merge main` 으로 main 을 가져와 충돌을 해소한다. 확인: 저장소 검사가 FAIL=0 이다.
 - [ ] **Step 2:** `bash scripts/eval_principles.sh 7a2d26d all baseline` 과 `bash scripts/eval_principles.sh HEAD all final` 을 실행한다. 이 경로는 생성 키로 반복을 차단하지 않으므로, 한쪽이 끊기거나 실패하면 다시 실행하지 말고 원인과 남은 과제를 사용자에게 알려 처리를 묻는다. 확인: 두 명령의 종료 코드가 0 이다.
 - [ ] **Step 3:** `eval_compare.sh baseline final` 로 비교하고, `eval_compare.sh baseline` 과 `eval_compare.sh final` 로 적재 분량을 낸다. 판정 10건 안팎을 사용자에게 보여 일치도를 받는다. 세 출력과 일치도를 측정 기록에 추가해 커밋한다.
-- [ ] **Step 4:** 측정 기록 전체와 최종 비교를 사용자에게 보고한다. 첫 줄 판정이 `개선` 이고 `tags holdout` 행의 B 가 A 이하일 때만 main 병합 승인을 묻는다. 그렇지 않으면 병합하지 않고, 과제별 위반 차이와 선택지를 보여 묻는다.
+- [ ] **Step 4:** 측정 기록 전체와 최종 비교를 사용자에게 보고한다. `tags holdout` 행의 B 가 A 보다 적을 때만 main 병합 승인을 묻는다(개발용과 첫 줄 판정은 기록만 한다). 그렇지 않으면 병합하지 않고, 과제별 위반 차이와 선택지를 보여 묻는다.
 - [ ] **Step 5:** 병합한 뒤 이 plan 에 git 보존 태그를 달고 plan 을 지운다(에이전트원칙 문서 수명 표). 원자료 폴더 `~/dc-eval-raw/2026-10-18/` 를 지울지 사용자에게 묻는다.
 
 <!-- spec-review: escalated -->
