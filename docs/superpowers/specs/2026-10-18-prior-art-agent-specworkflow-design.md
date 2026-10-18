@@ -2,7 +2,7 @@
 
 이 문서는 큰 명세 `docs/superpowers/specs/2026-10-18-prior-art-agent-design.md`(아래 '큰 명세')의 「워크스트림 분할」에서 `specworkflow` 행을 구현하는 하부 명세다. 2026-10-18에 명세 서브 세션이 썼다. 맡는 파일은 탐색 워크플로 `workflows/prior-art-search.js`, 시험 도구 `scripts/workflow_harness.mjs`, 계약 테스트 `scripts/test_workflow.sh`다.
 
-큰 명세가 고정한 값을 명세 서브 세션은 다시 정하지 않고 절 이름으로 가리켰다. 키 이름과 바깥 형식의 원본은 큰 명세 「출력 스키마」의 「키 이름과 바깥 형식」 표다. 프롬프트 형식의 원본은 같은 절의 「에이전트에게 보내는 프롬프트」이고, 단계 순서의 원본은 「오케스트레이터 절차」 2단계다. 명명과 공용 유틸리티와 주장 참조 형식의 원본은 「결정 기록」이며, 이 하부 명세에는 그 원본이 비워 둔 내부 규칙만 적었다.
+큰 명세가 고정한 값을 명세 서브 세션은 다시 정하지 않고 절 이름으로 가리켰다. 키 이름과 바깥 형식의 원본은 계약 코드 `scripts/prior_art_contract.json`이고, 큰 명세 「출력 스키마」의 「키 이름과 바깥 형식」 표는 같은 내용을 사람이 읽도록 옮겨 적었다. 결측 처리는 큰 명세 「다시 나눈 분할」의 계약 표가 원본이다. 프롬프트 형식의 원본은 같은 절의 「에이전트에게 보내는 프롬프트」이고, 단계 순서의 원본은 「오케스트레이터 절차」 2단계다. 명명과 공용 유틸리티와 주장 참조 형식의 원본은 「결정 기록」이며, 이 하부 명세에는 그 원본이 비워 둔 내부 규칙만 적었다.
 
 리뷰 기록은 `docs/superpowers/reviews/2026-10-18-prior-art-agent-specworkflow-review.md`다. 리뷰로 바뀐 판단은 각 절에 적었다.
 
@@ -95,6 +95,7 @@
 
 | 조건 | 행선지 | 이유 |
 |---|---|---|
+| 판정할 선행 사례 서술이 없다(이슈의 `prior_claim`이 비었거나 공백뿐이다. 근거 지도 행의 `case`가 비었거나 네 축의 `prior`가 모두 비었다) | 검증자에게 보내지 않고 `rejected`에 둔다 | 큰 명세 「다시 나눈 분할」 계약 표의 `researcher` 행이 정한 결측 처리다. 사유는 '판정할 선행 사례 서술이 없다'다 |
 | 판정 중 `supported`가 하나라도 있다 | `passed`에 둔다 | 큰 명세 「오케스트레이터 절차」 2단계에서 `supported` 판정에 기댄 사례만 통과한다 |
 | 실패한 URL 이 하나라도 있다 | 어느 판정 목록에도 두지 않는다 | 판정을 받지 못한 URL 이 지지했을 수 있으므로, 탈락으로 단정하면 판정의 역전이 된다 |
 | 판정이 하나 이상이고 모두 `unverifiable`이다 | `unverifiable`에 둔다 | 큰 명세 「출력 스키마」에서 `unverifiable`은 반박이 아니다 |
@@ -153,7 +154,7 @@
 | `SYNTHESIS_SCHEMA` | `evidence_map`, `conclusions`, `principles_applied` | 없음 | 없음 |
 | `MAP_SCHEMA` | `cells`, `principles_applied` | `cells` 원소의 `row`, `column`, `grounded`, `source_ref` | 없음 |
 
-`RESEARCHER_SCHEMA`는 `evidence_map`과 이슈의 `citations`를 `properties`에 두되 `required`에 넣지 않는다. `contrast` 모드의 연구자는 `evidence_map`을 채우지 않기 때문이다.
+`RESEARCHER_SCHEMA`는 `evidence_map`을 `properties`에 두되 루트 `required`에 넣지 않는다. `contrast` 모드의 연구자는 `evidence_map`을 채우지 않기 때문이며, 없으면 빈 배열로 본다. 원소 수준에서는 계약 표의 `researcher` 행대로 이슈 원소에 `prior_claim`·`citations`를, 근거 지도 행에 `case`·`url`·`axes`·`outcome`을, `axes`에 네 축을, 축에 `prior`·`same`·`note`를 `required`로 둔다. 그래서 하위 칸이 빠진 출력은 런타임의 스키마 검사에서 다시 요청되고, 후처리가 없는 칸을 읽다 예외로 끝나지 않는다. 네 상수는 최상위 `function schemas()`가 한 객체로 돌려주며, 계약 테스트가 그 함수로 상수를 읽는다(큰 명세 「다시 나눈 분할」의 「계약 코드와 계약 테스트」).
 
 ## 시험 도구
 
@@ -172,7 +173,7 @@
 | `fn <함수 이름>` | 인자 배열 | 그 함수의 반환값 |
 | `run` | `{ args, responses }` | `{ result, calls, logs }` |
 
-`fn`의 함수 이름이 판정 함수가 아니면 시험 도구는 종료 코드 2로 끝난다. `fn`은 훅 매개변수에 `undefined`를 넘긴다. 판정 함수는 훅을 쓰지 않으므로, 판정 함수가 훅을 부르면 예외가 나서 그 규칙 위반이 드러난다.
+`fn`의 함수 이름이 판정 함수나 `schemas`가 아니면 시험 도구는 종료 코드 2로 끝난다. `fn`은 훅 매개변수에 `undefined`를 넘긴다. 판정 함수는 훅을 쓰지 않으므로, 판정 함수가 훅을 부르면 예외가 나서 그 규칙 위반이 드러난다.
 
 `run`은 `args`를 런타임의 `args`로 넘기고 가짜 `agent`·`parallel`·`phase`·`log`를 준다. 스크립트가 이 밖의 훅(`pipeline`·`budget`·`workflow`)을 쓰면 정의되지 않은 이름이라 예외가 나고, 시험 도구는 종료 코드 1로 끝난다.
 

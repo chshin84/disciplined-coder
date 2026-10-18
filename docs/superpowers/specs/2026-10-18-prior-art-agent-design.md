@@ -219,7 +219,7 @@
 
 **워크플로 반환값.** 통과 목록, 탈락 목록, 판정 불가 목록, 검증 실패 목록, 하위 질문별 커버리지 표·`search_status`·`verification_status`, `overall_status`, 질의 경계 위반 목록, 실행한 검증자 수다.
 
-**키 이름과 바깥 형식.** 워크스트림 사이에서 주고받는 JSON 의 키는 아래와 같다. 이 목록이 원본이다.
+**키 이름과 바깥 형식.** 워크스트림 사이에서 주고받는 JSON 의 키는 아래와 같다. 이 표는 계약 코드 `scripts/prior_art_contract.json`을 사람이 읽도록 옮겨 적었고, 둘이 다르면 계약 코드를 따른다(「다시 나눈 분할」).
 
 | 자료 | 형식 |
 |---|---|
@@ -426,6 +426,101 @@
 | 완료 조건의 예외 파일 | `specagents` 「한 번 하는 확인」 | 같은 동작이라 「공유 결정」으로 합쳤다 | 옛 이름이 남지 않았는지 보는 확인 하나다. `specworkflow` 파일은 옛 이름을 쓰지 않으므로 예외에 넣지 않는다 |
 | `agentType` 해석 전제 | `specworkflow` 「맡는 일과 전제」, `specagents` 「가정과 남은 위험」 | 같은 전제라 「결정 기록」의 「런타임 확인」으로 처분했다 | 두 하부 명세가 같은 미확인 전제를 적었고, 현재 세션이 실측으로 확인했다 |
 
+## 다시 나눈 분할
+
+이 절이 구현 단계의 분할이며, 「워크스트림 분할」의 임시 분할을 대체한다. 임시 분할의 「공통 제약」과 「현재 세션이 맡는 일」은 아래에 새 워크스트림 id 로 다시 적었다.
+
+**하위 프로젝트와 공유 항목.** 완전체 명세의 하위 프로젝트는 탐색 워크플로와, 스킬·에이전트 정의·넛지·참조 처리 두 가지다. 현재 세션은 이 목록으로 「묶는 단위」를 다시 실행했다.
+
+| 항목 | 소유 | 사용 | 판정 | 고정한 의미 |
+|---|---|---|---|---|
+| 연구자·검증자·종합·지도 대조 출력의 형식 | `agents` | `workflow` | 떼어냄 | 계약 코드 `scripts/prior_art_contract.json`과 아래 계약 표 |
+| 에이전트에게 보내는 프롬프트의 형식 | `workflow` | `agents` | 떼어냄 | 「출력 스키마」의 「에이전트에게 보내는 프롬프트」와 「경계」 |
+| 에이전트 등록 이름 | `agents` | `workflow` | 떼어냄 | `disciplined-coder:prior-art-researcher`, `disciplined-coder:prior-art-verifier` |
+| 워크플로 등록 이름 | `workflow` | `agents` | 떼어냄 | `disciplined-coder:prior-art-search` |
+| 워크플로 `args`와 반환값, 상태 값 | `workflow` | `agents` | 떼어냄 | 계약 코드와 아래 계약 표 |
+
+**설계 의존 표.**
+
+| X \ Y | `workflow` | `agents` |
+|---|---|---|
+| `workflow` | — | 0 |
+| `agents` | 0 | — |
+
+**워크스트림 목록.**
+
+| 워크스트림 id | 맡는 일 | 예상 태스크 |
+|---|---|---|
+| `workflow` | 탐색 워크플로 `workflows/prior-art-search.js`, 시험 도구 `scripts/workflow_harness.mjs`, 그 테스트 `scripts/test_workflow.sh` | 시험 도구, 판정 함수, 실행 흐름, 테스트 |
+| `agents` | 스킬 `skills/agent-prior-art/SKILL.md`, 연구자·검증자 정의, 발동 넛지와 그 연결·README, 「기존 파일과의 관계」의 참조 처리, `skills/lens-prior-art/` 삭제 | 스킬 본문, 연구자·검증자 정의, 넛지와 연결, 렌즈 집계·호출 스킬 정리, 리뷰 스킬 정리, 원칙·근거 문서 정리, drift 검사와 삭제 |
+
+`workflow`의 예상 태스크는 다섯에 못 미쳐 「맡기는 기준」의 크기 조건에 들지 않는다. 사용자 지시로 이 분할을 쓴다(「워크스트림 분할」).
+
+**의존 순서 표.**
+
+| 워크스트림 | 선행 | 검증 의존 |
+|---|---|---|
+| `workflow` | 없음 | 없음 |
+| `agents` | 없음 | 없음 |
+
+두 워크스트림 모두 시작 워크스트림이다. 시작 의존과 검증 의존을 합친 그래프에 순환이 없고, 병합 차례는 끝나는 차례를 따른다.
+
+**통합 확인.** 현재 세션은 워크스트림마다 CLAUDE.md 「변경 뒤 실행」의 검사 스크립트 전체가 `ALL PASS`를 내는지와 `claude plugin validate ./`가 새 경고 없이 통과하는지를 본다. 검사 스크립트에는 계약 테스트 `scripts/test_prior_art_contract.sh`가 들어 있다. 두 워크스트림이 모두 통합된 뒤 현재 세션은 `specagents` 하부 명세 「한 번 하는 확인」의 완료 조건 명령을 통합 트리에서 한 번 실행한다. 이때 계약 코드 두 파일은 옛 이름을 쓰지 않으므로 예외 목록에 넣지 않는다.
+
+**공통 제약.**
+
+- 서브 세션은 자기 브랜치까지만 진행한다. main 병합과 push 는 병합 전 시험을 통과한 뒤 사용자 승인을 받아 현재 세션이 한다.
+- 질의 경계와 `SECRETS`를 지킨다. 에이전트 정의와 스킬과 테스트에 키·토큰·개인정보를 적지 않는다.
+- 변경 뒤 CLAUDE.md 「변경 뒤 실행」의 명령과 `claude plugin validate ./`를 실행한다.
+- 하부 명세 파일은 서브 세션의 허용 경로에 들지 않는다. 하부 명세를 고쳐야 하면 `BLOCKED shared-file-change`로 요청한다.
+
+**수정 허용 경로.** 아래는 git pathspec 이다. 두 목록에 함께 드는 경로는 없다. 모든 워크스트림의 허용 경로에는 자기 문서 경로(`nested-orchestration` 「경로와 브랜치 이름」)가 기본으로 들어간다.
+
+| 워크스트림 | 허용 경로 |
+|---|---|
+| `workflow` | `workflows/prior-art-search.js`, `scripts/workflow_harness.mjs`, `scripts/test_workflow.sh` |
+| `agents` | `skills/agent-prior-art/**`, `skills/lens-prior-art/**`, `skills/review-specs/SKILL.md`, `skills/review-docs/SKILL.md`, `skills/dispatching-lenses/SKILL.md`, `skills/aggregating-lenses/SKILL.md`, `skills/audit-repo-docs/SKILL.md`, `skills/lens-fit/SKILL.md`, `skills/domain-plugin/SKILL.md`, `skills/nested-orchestration/SKILL.md`, `skills/nested-orchestration/references/sub-session-protocol.md`, `agents/prior-art-researcher.md`, `agents/prior-art-verifier.md`, `hooks/prior_art_nudge_userpromptsubmit.sh`, `hooks/hooks.json`, `README.md`, `scripts/test_hooks.sh`, `scripts/test_docs_drift.sh`, `scripts/test_audit.sh`, `agent-principles.md`, `docs/domain-discipline.md` |
+
+**소유 표.**
+
+| 공용 파일 | 소유 | 비고 |
+|---|---|---|
+| `scripts/prior_art_contract.json` | 현재 세션 | 계약 코드. 키 이름과 형식의 원본이다 |
+| `scripts/test_prior_art_contract.sh` | 현재 세션 | 계약 테스트 |
+
+이 저장소에는 의존성 목록과 잠금 파일이 없다. 마지막 시험 병합 뒤 현재 세션은 계약 테스트의 생략 분기를 지우고, 계약 테스트는 두 워크스트림 사이의 형식 드리프트를 잡는 검사로 남긴다.
+
+**계약 코드와 계약 테스트.** 이 개발의 계약은 함수 계약이 아니고, 워크플로와 에이전트 정의가 실행 중에 주고받는 JSON 의 형식 계약이다. 계약 코드 `scripts/prior_art_contract.json`은 자료마다 반드시 있어야 하는 키를 중첩 구조 그대로 적는다. 키 이름과 형식은 이 파일이 원본이며, 「출력 스키마」의 「키 이름과 바깥 형식」 표는 사람이 읽도록 같은 내용을 옮겨 적었다. 둘이 다르면 계약 코드를 따른다.
+
+계약 테스트는 두 곳을 읽어 계약 코드와 대조한다.
+
+- **워크플로의 스키마** — 워크플로 스크립트는 최상위 `function schemas()`가 `{ RESEARCHER_SCHEMA, VERIFIER_SCHEMA, SYNTHESIS_SCHEMA, MAP_SCHEMA }`를 돌려주게 둔다. 계약 테스트는 `printf '[]' | node scripts/workflow_harness.mjs fn schemas`로 그 값을 얻는다. 시험 도구의 `fn`은 판정 함수와 함께 `schemas`를 받는다.
+- **에이전트 정의의 출력 형식 블록** — 연구자·검증자 정의는 출력 형식마다 `<!-- output: <자료 이름> -->` 한 줄 바로 다음에 json 코드 블록을 둔다. 자료 이름은 `researcher`·`synthesis`·`verifier`·`map`이다. 블록은 그 자료의 예시 JSON 하나이며 `JSON.parse`로 읽혀야 한다.
+
+계약 테스트는 각 자료에서 계약 코드의 키가 스키마의 `properties`와 예시 JSON 에 모두 있는지 본다. 워크플로 스크립트가 없으면 `workflow`를, 에이전트 정의가 없으면 `agents`를 생략 사유에 적고 그 대조를 생략한다.
+
+**계약 표.**
+
+| 이름 | 제공자 → 소비자 | 형식 | 단위 | 의미(시간·결측 포함) |
+|---|---|---|---|---|
+| `scripts/prior_art_contract.json`의 `args` | `agents`(오케스트레이터 스킬) → `workflow` | 「키 이름과 바깥 형식」의 프로토콜 객체 | 없음 | 실행 한 번에 하나다. `round`는 첫 실행 1, 공백 라운드 2 다. 결측은 없다(오케스트레이터가 모든 키를 채운다) |
+| `scripts/prior_art_contract.json`의 `researcher` | `agents`(연구자 정의) → `workflow` | 연구자 출력. 이슈 원소는 `prior_claim`과 `citations`를, 근거 지도 행은 `case`·`url`·`axes`·`outcome`을, `axes`는 네 축을, 축은 `prior`·`same`·`note`를 반드시 가진다. 워크플로 스키마의 `required`도 이 칸을 강제한다 | 없음 | 하위 질문 하나에 한 번 나온다. `evidence_map`이 없으면 빈 배열로 본다. 공백만 있거나 빈 `prior_claim`, 빈 `case`, 네 축의 `prior`가 모두 빈 행은 판정 근거가 없으므로 `workflow`가 검증자에게 보내지 않고 `rejected`에 둔다(사유 '판정할 선행 사례 서술이 없다'). 연구자가 실패하면 `null`이며 그 하위 질문의 `search_status`는 `failed`다 |
+| `scripts/prior_art_contract.json`의 `verifier` | `agents`(검증자 정의) → `workflow` | `{ url, judgments: [{ ref, verdict, quote, reason }], principles_applied }` | 없음 | URL 하나에 한 번 나온다. 보낸 `ref`의 판정이 하나라도 빠지면 그 검증자는 실패로 본다. 결측(`null`)은 `verify_failed`로 간다 |
+| `scripts/prior_art_contract.json`의 `synthesis`·`map` | `agents` → `workflow` | 「키 이름과 바깥 형식」의 두 행 | 없음 | `survey`에서만 최대 한 번씩 나온다. 통과 행이 없으면 종합을 실행하지 않고, 종합 결과가 `null`이면 지도 대조를 실행하지 않는다. 그래서 `synthesis`가 `null`이면 `map_check`도 `null`이며, 두 값은 `overall_status`에 영향이 없다 |
+| 에이전트에게 보내는 프롬프트 | `workflow` → `agents`(두 정의) | 첫 줄 `MODE: <모드>`, 둘째 줄 `PRINCIPLES: <경로>`, 셋째 줄부터 json 코드 울타리 안의 `JSON.stringify(입력, null, 2)` | 없음 | 호출마다 하나다. 입력 키는 「에이전트에게 보내는 프롬프트」가 정한다. 인용 판정 입력의 `claims[].text`는 이슈면 `prior_claim`, 근거 지도 행이면 `JSON.stringify({ case, outcome, prior })`다. 종합 입력 `passed_rows`와 지도 대조 입력 `passed`의 원소는 `{ ref, row }`다. 결측은 없다 |
+| `scripts/prior_art_contract.json`의 `result` | `workflow` → `agents`(오케스트레이터 스킬) | 「키 이름과 바깥 형식」의 반환값. `researchers`는 `[{ id, output }]`, `verifiers`는 `[{ url, subquestions, output }]`, `query_violations[].rule`은 `forbidden-term`·`path-shape` | 사례 수는 건수 | 실행 한 번에 하나다. 판정에 쓰는 발견은 `passed`뿐이다(「공유 결정」). 실패한 연구자와 검증자는 `output: null`이다. 탈락·판정 불가의 사유는 같은 `ref`의 `verifiers[].output.judgments[]`에, 검증 실패의 사유는 같은 `url`의 `verifiers[].output`에 있다. `synthesis: null`의 두 사정은 `passed`에 `#case#` 항목이 있는지로 구별한다 |
+| 에이전트 등록 이름 | `agents` → `workflow` | `disciplined-coder:prior-art-researcher`, `disciplined-coder:prior-art-verifier` | 없음 | 의미는 이름 그대로다. 시간과 결측은 없다 |
+| 워크플로 등록 이름 | `workflow` → `agents` | `disciplined-coder:prior-art-search` | 없음 | 의미는 이름 그대로다. 시간과 결측은 없다 |
+
+**절 배정.**
+
+| 워크스트림 id | 하부 명세 파일과 절 | 작성 기록이 있는 리포트 |
+|---|---|---|
+| `workflow` | `docs/superpowers/specs/2026-10-18-prior-art-agent-specworkflow-design.md` 전체 | `<git common dir>/nested/prior-art-agent/report-specworkflow.md` |
+| `agents` | `docs/superpowers/specs/2026-10-18-prior-art-agent-specagents-design.md` 전체 | `<git common dir>/nested/prior-art-agent/report-specagents.md` |
+
+두 워크스트림 모두 이 큰 명세의 「출력 스키마」「공유 결정」「경계」「다시 나눈 분할」「결정 기록」을 함께 따른다. 하부 명세와 이 절이 다르면 이 절의 계약 표와 계약 코드를 따른다.
+
 ## 결정 기록
 
 이 절은 현재 세션만 쓴다.
@@ -447,7 +542,9 @@
 
 **이미 겪은 함정.** 서브 세션은 `docs/superpowers/reviews/2026-10-18-prior-art-agent-plan-review/`의 렌즈 원본을 이미 겪은 함정의 목록으로 읽는다. 그 지적이 인용한 plan 초안은 실행하지 않으며 입력도 아니다. 초안은 커밋 `252155f`에 보존되어 있고, 현재 세션이 명세 디스패치 전에 사용자 확인을 받아 통합 브랜치에서 지운다.
 
-**런타임 확인(2026-10-18).** 현재 세션이 임시 플러그인 `probeplug`를 `claude -p --plugin-dir`로 적재해 워크플로 하나를 실행했다. 그 플러그인은 `workflows/probe.js`(`meta.name: 'probe'`)와 `agents/probe.md`(`tools: Read`)만 두었다. 이름 `probe`로 부르자 "Workflow \"probe\" not found. Available: deep-research, probeplug:probe"가 나왔고, `probeplug:probe`로 부르자 실행되었다. 그래서 플러그인 워크플로는 `<플러그인 이름>:<워크플로 이름>`으로 등록된다. 파일 이름과 `meta.name`이 같았으므로 워크플로 이름이 둘 중 어느 쪽에서 오는지는 확인하지 않았고, 이 저장소도 둘을 `prior-art-search`로 같게 둔다. `agent()`의 `agentType: 'probeplug:probe'`는 그 에이전트 정의로 해석되었고, 에이전트에게는 정의의 `Read`와 스키마용 `StructuredOutput`만 주어졌다. 관측한 정의는 이 하나뿐이지만, 정의의 `tools`가 워크플로 안에서 적용된다는 것은 확인되었다.
+**런타임 확인(2026-10-18).** 현재 세션이 임시 플러그인 `probeplug`를 `claude -p --plugin-dir`로 적재해 워크플로 하나를 실행했다. 그 플러그인은 `workflows/probe.js`(`meta.name: 'probe'`)와 `agents/probe.md`(`tools: Read`)만 두었다. 이름 `probe`로 부르자 "Workflow \"probe\" not found. Available: deep-research, probeplug:probe"가 나왔고, `probeplug:probe`로 부르자 실행되었다. 그래서 플러그인 워크플로는 `<플러그인 이름>:<워크플로 이름>`으로 등록된다. 파일 이름과 `meta.name`이 같았으므로 워크플로 이름이 둘 중 어느 쪽에서 오는지는 확인하지 않았고, 이 저장소도 둘을 `prior-art-search`로 같게 둔다. `agent()`의 `agentType: 'probeplug:probe'`는 그 에이전트 정의로 해석되었고, 에이전트에게는 정의의 `Read`와 스키마용 `StructuredOutput`만 주어졌다. 관측한 정의는 이 하나뿐이지만, 정의의 `tools`가 워크플로 안에서 적용된다는 것은 확인되었다. 같은 임시 플러그인에 `claude plugin validate ./`를 실행했고, `workflows/`와 `agents/`가 있는 트리에서 작성자 정보가 없다는 경고 하나와 함께 `Validation passed with warnings`가 나왔다.
 
 
-<!-- spec-review: escalated -->
+
+
+<!-- spec-review: passed -->
