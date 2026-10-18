@@ -8,7 +8,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 ## 오케스트레이터 절차
 
-워크플로는 실행 도중에 사용자 입력을 받지 못하므로, 오케스트레이터는 승인이 필요한 지점마다 워크플로 실행을 나눈다. 단계 사이에 오케스트레이터와 사용자가 대화하는 턴이 들어가며, 이 턴들이 여러 턴 진행이다.
+워크플로는 실행 도중에 사용자 입력을 받지 못하므로, 오케스트레이터는 승인이 필요한 지점마다 워크플로 실행을 나눈다. 단계 사이에 오케스트레이터와 사용자가 대화하는 턴이 들어가며, 그래서 선행연구는 여러 턴에 걸쳐 진행된다.
 
 **프로토콜 항목.** 프로토콜은 오케스트레이터가 실행 전에 쓰는 연구 계획이다. 항목은 연구 질문, 상황, 대조 대상, 모드, 하위 질문(ID, 범위 문장, 포함·제외 기준), 질의 금지 목록, 탐색 모드 연구자 수와 그 산정 근거, `principles_path`다. 오케스트레이터는 `principles_path`를 실행 시점에 도출하며, 도출 규칙은 `dispatching-lenses`의 「렌즈에게 에이전트원칙을 알리는 법」을 따른다. 워크플로가 그 경로를 연구자와 검증자의 프롬프트에 넣는다.
 
@@ -120,7 +120,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 연구자·종합·인용 판정·지도 대조 출력과 워크플로 반환값의 형식은 아래와 같으며, 키 이름의 원본은 계약 코드 `scripts/prior_art_contract.json`이다. 두 에이전트 정의는 같은 자료의 예시 블록을 글자 그대로 싣는다.
 
-**연구자 출력.** 연구자 출력의 기본 칸은 옛 선행연구 렌즈의 출력 칸이다. `agent` 칸의 값은 `agent-prior-art`다. `citations`의 `kind` 중 `standard`는 표준기구 문서이고, `derived`는 에이전트가 스스로 계산하거나 추론한 값이다. 아래 칸은 선행연구 에이전트가 추가한 칸이다.
+**연구자 출력.** 연구자 출력의 칸은 아래 `researcher` 예시 블록과 같다. `agent` 칸의 값은 `agent-prior-art`다. `citations`의 `kind` 중 `standard`는 표준기구 문서이고, `derived`는 에이전트가 스스로 계산하거나 추론한 값이다. 그중 아래 표의 칸이 선행연구 에이전트가 추가한 칸이다.
 
 | 칸 | 내용 |
 |---|---|
@@ -248,7 +248,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 | 자료 | 형식 |
 |---|---|
 | 워크플로 `args`(프로토콜) | `{ question, situation, target, mode: "contrast"\|"survey", round: 1\|2, subquestions: [{ id, scope, include, exclude }], forbidden_terms: [string], researcher_count, researcher_count_basis, principles_path }`. `round`는 첫 실행이 1, 공백 라운드가 2 다 |
-| 연구자 출력 | 옛 선행연구 렌즈의 칸(`agent`로 바꾼 칸 포함)에 위 표의 칸을 더한다. `evidence_map` 행은 `{ case, url, axes: { purpose, mechanism, evaluation, target }, outcome, kind, source_level, route, adoption? }`다 |
+| 연구자 출력 | 「연구자 출력」의 `researcher` 예시 블록의 칸이다. `evidence_map` 행은 `{ case, url, axes: { purpose, mechanism, evaluation, target }, outcome, kind, source_level, route, adoption? }`다 |
 | 종합 모드 연구자 출력 | `{ evidence_map: [행], conclusions: [{ text, refs: [string] }], principles_applied }` |
 | 검증자 인용 판정 출력 | `{ url, judgments: [{ ref, verdict, quote, reason }], principles_applied }`. `ref`의 형식은 주장 참조 형식이다 |
 | 검증자 지도 대조 출력 | `{ cells: [{ row, column, grounded, source_ref }], principles_applied }` |

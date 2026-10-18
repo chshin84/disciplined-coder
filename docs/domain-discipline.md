@@ -323,7 +323,8 @@ action title 조합과 같은 구조다.
 `docs/superpowers/reviews/2026-10-12-no-raw-output-ownership-check/`에 있다.
 
 2026-10-18에 `lens-prior-art`를 삭제하고 `agent-prior-art`로 대체했다. 위 서술의 `lens-prior-art`는
-삭제된 렌즈를 가리킨다. 이후 호출자마다 다른 발동 기준은 `agent-prior-art`의 「발동과 기록」이 정한다.
+삭제된 렌즈를 가리킨다. 발동 기준은 지금도 각 호출자(`review-specs`·`review-docs`)가 정하고,
+제안과 승인 규칙은 `agent-prior-art`의 「발동과 기록」이 정한다.
 
 ### `LENS-ALLOWED`
 
