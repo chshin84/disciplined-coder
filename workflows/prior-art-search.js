@@ -10,10 +10,79 @@ export const meta = {
   ],
 };
 
-// 본문은 후속 태스크가 채운다. 스키마 상수는 최상위 const 로 두지 않고 schemas() 가 만든다.
+// 본문. 스키마 상수는 최상위 const 로 두지 않고 schemas() 가 만든다.
 // 시험 도구가 본문보다 먼저 판정 함수를 부르므로 const 를 초기화 전에 참조하면 예외가 나기 때문이다.
-schemas();
-return null;
+// 단계 사이에는 parallel() 장벽을 둔다. thunk 는 agent() 의 반환만 돌려주고, 짝짓기는 반환 배열의 위치로 한다.
+const S = schemas();
+const RESEARCHER = 'disciplined-coder:prior-art-researcher';
+const VERIFIER = 'disciplined-coder:prior-art-verifier';
+
+phase('Research');
+const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
+  prompt('explore', args.principles_path, {
+    question: args.question,
+    situation: args.situation,
+    target: args.target,
+    mode: args.mode,
+    subquestion: sq,
+    forbidden_terms: args.forbidden_terms,
+  }),
+  { agentType: RESEARCHER, label: `research:${sq.id}`, phase: 'Research', schema: S.RESEARCHER_SCHEMA },
+)));
+const researchers = args.subquestions.map((sq, i) => ({ id: sq.id, output: researchOut[i] ?? null }));
+const query_violations = checkQueries(researchers, args.forbidden_terms);
+const { items, groups } = groupByUrl(researchers);
+
+phase('Verify');
+const verifyOut = await parallel(groups.map((g) => () => agent(
+  prompt('cite', args.principles_path, { url: g.url, claims: g.claims }),
+  { agentType: VERIFIER, label: `verify:${g.url}`, phase: 'Verify', schema: S.VERIFIER_SCHEMA },
+)));
+const verifiers = groups.map((g, i) => ({ url: g.url, subquestions: g.subquestions, output: verifyOut[i] ?? null }));
+
+const classified = classify(items, verifiers);
+const merged = mergeStatus(researchers, items, classified);
+
+const result = {
+  round: args.round,
+  passed: classified.passed,
+  rejected: classified.rejected,
+  unverifiable: classified.unverifiable,
+  verify_failed: classified.verify_failed,
+  coverage: merged.coverage,
+  subquestion_status: merged.subquestion_status,
+  overall_status: merged.overall_status,
+  query_violations,
+  verifier_count: verifiers.length,
+  researchers,
+  verifiers,
+};
+
+if (args.mode === 'survey') {
+  // 통과한 근거 지도 행만 종합의 입력이다. 이슈 항목은 row 가 없어 제외한다.
+  const passed_rows = classified.passed
+    .filter((p) => p.ref.includes('#case#'))
+    .map((p) => ({ ref: p.ref, row: items.find((it) => it.ref === p.ref).row }));
+  let synthesis = null;
+  let map_check = null;
+  if (passed_rows.length > 0) {
+    phase('Synthesize');
+    synthesis = await agent(
+      prompt('synthesize', args.principles_path, { question: args.question, target: args.target, passed_rows }),
+      { agentType: RESEARCHER, label: 'synthesize', phase: 'Synthesize', schema: S.SYNTHESIS_SCHEMA },
+    );
+  }
+  if (synthesis != null) {
+    phase('MapCheck');
+    map_check = await agent(
+      prompt('map', args.principles_path, { evidence_map: synthesis.evidence_map, passed: passed_rows }),
+      { agentType: VERIFIER, label: 'map-check', phase: 'MapCheck', schema: S.MAP_SCHEMA },
+    );
+  }
+  result.synthesis = synthesis;
+  result.map_check = map_check;
+}
+return result;
 
 // 질의 경계 검사. output 이 null 이 아닌 연구자의 검색어마다 금지어와 경로 형태를 본다.
 // 한 검색어 안에서는 forbidden-term 원소가 path-shape 원소보다 앞이다.
@@ -258,4 +327,9 @@ function schemas() {
     required: ['cells', 'principles_applied'],
   };
   return { RESEARCHER_SCHEMA, VERIFIER_SCHEMA, SYNTHESIS_SCHEMA, MAP_SCHEMA };
+}
+
+// 에이전트에게 보내는 프롬프트. 첫 줄은 모드, 둘째 줄은 원칙 문서 경로, 셋째 줄부터 JSON 블록이다.
+function prompt(mode, principlesPath, input) {
+  return `MODE: ${mode}\nPRINCIPLES: ${principlesPath}\n\`\`\`json\n${JSON.stringify(input, null, 2)}\n\`\`\``;
 }

@@ -81,6 +81,13 @@ check "MAP_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.j
 echo "[시험 도구 자체]"
 check "알 수 없는 함수 이름은 종료 코드 2 다" "printf '[]' | harn fn nosuch >/dev/null 2>&1; [ \$? -eq 2 ]"
 check "깨진 JSON 입력의 run 은 종료 코드 2 다" "printf '{broken' | harn run >/dev/null 2>&1; [ \$? -eq 2 ]"
+cat > "$FX/miss_in.json" <<'EOF'
+{"args": {"question": "Q?", "situation": "S", "target": "T", "mode": "contrast", "round": 1,
+  "subquestions": [{"id": "S1", "scope": "a", "include": [], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": []}],
+  "forbidden_terms": [], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md"},
+ "responses": {"research:S1": {"search_status": "ok", "queries": [], "issues": []}}}
+EOF
+check "응답표에 없는 label 을 부르면 종료 코드 1 이고 표준 오류에 그 label 이 있다" "harn run < \"\$FX/miss_in.json\" > /dev/null 2> \"\$FX/miss_err.txt\"; [ \$? -eq 1 ] && grep -qF 'research:S2' \"\$FX/miss_err.txt\""
 
 echo "[질의 경계 검사]"
 cat > "$FX/cq_in.json" <<'EOF'
@@ -320,5 +327,121 @@ cat > "$FX/ms4_in.json" <<'EOF'
 ]
 EOF
 check "mergeStatus 는 ok 하위 질문의 검증 실패만으로도 overall_status 가 not-ok 다" "harn fn mergeStatus < \"\$FX/ms4_in.json\" > \"\$FX/ms4_got.json\" && json_true \"\$FX/ms4_got.json\" 'd[\"overall_status\"] == \"not-ok\"'"
+
+# 실행 흐름 묶음이 공유하는 입력 조각이다. 응답표만 시험마다 다르다.
+ARGS_C='"args": {"question": "Q?", "situation": "Sit", "target": "Tgt", "mode": "contrast", "round": 1,
+  "subquestions": [{"id": "S1", "scope": "a", "include": ["i"], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": ["e"]}],
+  "forbidden_terms": ["Acme"], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md"}'
+ARGS_S="${ARGS_C/\"contrast\"/\"survey\"}"
+ROW='{"case": "C0", "url": "https://a", "outcome": "O0", "axes": {
+  "purpose": {"prior": "p0", "same": true, "note": "n"}, "mechanism": {"prior": "m0", "same": false, "note": "n"},
+  "evaluation": {"prior": "e0", "same": false, "note": "n"}, "target": {"prior": "t0", "same": true, "note": "n"}}}'
+# 프롬프트를 줄로 나눠 형식을 확인하고 JSON 블록을 읽는 파이썬 식 조각이다. json_true 가 eval 을 쓰므로 식 하나여야 한다.
+# call(라벨)은 그 라벨의 호출 목록이고, block(호출, 모드)은 줄 형식이 맞을 때만 셋째 줄 이후의 JSON 값이며 틀리면 None 이다.
+PY_CALL='lambda l: [c for c in d["calls"] if c["label"] == l]'
+PY_BLOCK='lambda c, mode: (lambda ls: json.loads("\n".join(ls[3:-1])) if (ls[0] == "MODE: " + mode and ls[1] == "PRINCIPLES: D:/x/agent-principles.md" and ls[2] == "```json" and ls[-1] == "```") else None)(c["prompt"].split("\n"))'
+PY_WRAP_HEAD='(lambda call, block: '
+PY_WRAP_TAIL=")($PY_CALL, $PY_BLOCK)"
+
+echo "[실행 흐름: contrast]"
+cat > "$FX/rc_in.json" <<EOF
+{$ARGS_C, "responses": {
+  "research:S1": {"search_status": "ok", "queries": ["Acme agent", "prior art"], "issues": [{"prior_claim": "claim A", "citations": [{"url": "https://a"}]}]},
+  "research:S2": {"search_status": "ok", "queries": ["x"], "issues": [{"prior_claim": "claim B", "citations": [{"url": "https://a"}, {"url": "https://b"}]}]},
+  "verify:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "verdict": "supported", "quote": "q", "reason": "r"}, {"ref": "S2#issue#0", "verdict": "supported", "quote": "q", "reason": "r"}]},
+  "verify:https://b": {"url": "https://b", "principles_applied": [], "judgments": [
+    {"ref": "S2#issue#0", "verdict": "unsupported", "quote": "", "reason": "r"}]}}}
+EOF
+check "contrast 실행이 끝나고 출력을 얻는다" "harn run < \"\$FX/rc_in.json\" > \"\$FX/rc_out.json\""
+E_RC_RES='len([c for c in d["calls"] if c["label"].startswith("research:")]) == 2 and all(c["agentType"] == "disciplined-coder:prior-art-researcher" and c["phase"] == "Research" for c in d["calls"] if c["label"].startswith("research:"))'
+check "연구자 호출의 agentType 과 phase 가 정해진 값이다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_RES\""
+E_RC_VER='len([c for c in d["calls"] if c["label"].startswith("verify:")]) == 2 and all(c["agentType"] == "disciplined-coder:prior-art-verifier" and c["phase"] == "Verify" for c in d["calls"] if c["label"].startswith("verify:")) and d["result"]["verifier_count"] == 2'
+check "검증자 호출의 agentType 과 phase 가 정해진 값이고 verifier_count 가 URL 수와 같다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_VER\""
+E_RC_EXP="$PY_WRAP_HEAD"'all(
+  (lambda b, sq: set(b) == {"question", "situation", "target", "mode", "subquestion", "forbidden_terms"}
+    and b["question"] == "Q?" and b["situation"] == "Sit" and b["target"] == "Tgt" and b["mode"] == "contrast"
+    and b["forbidden_terms"] == ["Acme"] and b["subquestion"] == sq)(block(call("research:" + sq["id"])[0], "explore"), sq)
+  for sq in [{"id": "S1", "scope": "a", "include": ["i"], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": ["e"]}])'"$PY_WRAP_TAIL"
+check "탐색 프롬프트의 줄 형식과 JSON 블록이 정해진 대로다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_EXP\""
+E_RC_CITE="$PY_WRAP_HEAD"'(lambda b, b2: set(b) == {"url", "claims"} and b["url"] == "https://a" and [x["ref"] for x in b["claims"]] == ["S1#issue#0", "S2#issue#0"] and set(b2) == {"url", "claims"})(block(call("verify:https://a")[0], "cite"), block(call("verify:https://b")[0], "cite"))'"$PY_WRAP_TAIL"
+check "인용 판정 프롬프트가 MODE: cite 와 { url, claims } 블록이다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_CITE\""
+E_RC_NOSYN='not any(c["label"] in ("synthesize", "map-check") for c in d["calls"])'
+check "contrast 에서 synthesize 와 map-check 호출이 없다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_NOSYN\""
+E_RC_NOOPT='all("model" not in c and "effort" not in c for c in d["calls"])'
+check "어느 호출에도 model 과 effort 가 없다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_NOOPT\""
+E_RC_KEYS='list(d["result"].keys()) == [k for k in C["result"] if not k.startswith("?")]'
+check "반환값의 키 차례가 계약 코드 result 에서 ? 키를 뺀 것과 같다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_KEYS\""
+check "round 가 args.round 와 같다" "json_true \"\$FX/rc_out.json\" 'd[\"result\"][\"round\"] == 1'"
+E_RC_VIOL='d["result"]["query_violations"] == [{"id": "S1", "query": "Acme agent", "rule": "forbidden-term"}]'
+check "금지어가 든 검색어가 query_violations 에 든다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_VIOL\""
+E_RC_PASS='d["result"]["passed"] == [{"ref": "S1#issue#0", "urls": ["https://a"]}, {"ref": "S2#issue#0", "urls": ["https://a", "https://b"]}] and d["result"]["rejected"] == [] and d["result"]["overall_status"] == "ok" and d["result"]["verify_failed"] == []'
+check "통과 판정과 overall_status 가 검증 판정을 따른다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_PASS\""
+E_RC_LISTS='[r["id"] for r in d["result"]["researchers"]] == ["S1", "S2"] and [(v["url"], v["subquestions"]) for v in d["result"]["verifiers"]] == [("https://a", ["S1", "S2"]), ("https://b", ["S2"])] and d["result"]["verifiers"][1]["output"]["url"] == "https://b"'
+check "researchers 와 verifiers 가 하위 질문 차례와 URL 묶음 차례의 원소다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_LISTS\""
+
+echo "[실행 흐름: survey]"
+cat > "$FX/rs_in.json" <<EOF
+{$ARGS_S, "responses": {
+  "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim A", "citations": [{"url": "https://a"}]}], "evidence_map": [$ROW]},
+  "research:S2": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim B", "citations": [{"url": "https://b"}]}]},
+  "verify:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "verdict": "supported", "quote": "q", "reason": "r"}, {"ref": "S1#case#0", "verdict": "supported", "quote": "q", "reason": "r"}]},
+  "verify:https://b": {"url": "https://b", "principles_applied": [], "judgments": [
+    {"ref": "S2#issue#0", "verdict": "unsupported", "quote": "", "reason": "r"}]},
+  "synthesize": {"evidence_map": [$ROW], "conclusions": [{"text": "c", "refs": ["S1#case#0"]}], "principles_applied": []},
+  "map-check": {"cells": [], "principles_applied": []}}}
+EOF
+check "survey 실행이 끝나고 출력을 얻는다" "harn run < \"\$FX/rs_in.json\" > \"\$FX/rs_out.json\""
+E_RS_SYN="$PY_WRAP_HEAD"'(lambda cs, b, rows: len(cs) == 1 and cs[0]["phase"] == "Synthesize" and cs[0]["agentType"] == "disciplined-coder:prior-art-researcher" and set(b) == {"question", "target", "passed_rows"} and b["question"] == "Q?" and b["target"] == "Tgt" and b["passed_rows"] == rows)(call("synthesize"), block(call("synthesize")[0], "synthesize"), [{"ref": "S1#case#0", "row": d["result"]["researchers"][0]["output"]["evidence_map"][0]}])'"$PY_WRAP_TAIL"
+check "종합 호출이 하나이고 프롬프트의 passed_rows 가 통과한 근거 지도 행과 같다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_SYN\""
+E_RS_MAP="$PY_WRAP_HEAD"'(lambda cm, b, syn: len(cm) == 1 and cm[0]["phase"] == "MapCheck" and cm[0]["agentType"] == "disciplined-coder:prior-art-verifier" and set(b) == {"evidence_map", "passed"} and b["evidence_map"] == d["result"]["synthesis"]["evidence_map"] and b["passed"] == syn["passed_rows"])(call("map-check"), block(call("map-check")[0], "map"), block(call("synthesize")[0], "synthesize"))'"$PY_WRAP_TAIL"
+check "지도 대조 호출이 하나이고 블록이 { evidence_map, passed } 다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_MAP\""
+E_RS_CNT='d["result"]["verifier_count"] == 2 and len(d["result"]["verifiers"]) == 2'
+check "verifier_count 가 지도 대조 검증자를 세지 않는다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_CNT\""
+E_RS_KEYS='list(d["result"].keys()) == [k.lstrip("?") for k in C["result"]] and d["result"]["synthesis"]["conclusions"][0]["refs"] == ["S1#case#0"] and d["result"]["map_check"] == {"cells": [], "principles_applied": []}'
+check "survey 반환값에 synthesis 와 map_check 가 뒤따른다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_KEYS\""
+# 통과 행이 없는 응답표다. 판정이 모두 unsupported 다.
+cat > "$FX/rn_in.json" <<EOF
+{$ARGS_S, "responses": {
+  "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [], "evidence_map": [$ROW]},
+  "research:S2": {"search_status": "ok", "queries": ["q"], "issues": []},
+  "verify:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#case#0", "verdict": "unsupported", "quote": "", "reason": "r"}]}}}
+EOF
+E_RN='not any(c["label"] in ("synthesize", "map-check") for c in d["calls"]) and d["result"]["synthesis"] is None and d["result"]["map_check"] is None'
+check "통과 행이 없으면 종합과 지도 대조를 부르지 않고 두 키가 null 이다" "harn run < \"\$FX/rn_in.json\" > \"\$FX/rn_out.json\" && json_true \"\$FX/rn_out.json\" \"\$E_RN\""
+# 종합 응답이 null 인 응답표다.
+cat > "$FX/rz_in.json" <<EOF
+{$ARGS_S, "responses": {
+  "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [], "evidence_map": [$ROW]},
+  "research:S2": {"search_status": "ok", "queries": ["q"], "issues": []},
+  "verify:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#case#0", "verdict": "supported", "quote": "q", "reason": "r"}]},
+  "synthesize": null}}
+EOF
+E_RZ='len([c for c in d["calls"] if c["label"] == "synthesize"]) == 1 and not any(c["label"] == "map-check" for c in d["calls"]) and d["result"]["synthesis"] is None and d["result"]["map_check"] is None'
+check "종합 응답이 null 이면 지도 대조를 부르지 않고 map_check 가 null 이다" "harn run < \"\$FX/rz_in.json\" > \"\$FX/rz_out.json\" && json_true \"\$FX/rz_out.json\" \"\$E_RZ\""
+
+echo "[실패 행선지]"
+cat > "$FX/rf_in.json" <<EOF
+{$ARGS_C, "responses": {
+  "research:S1": null,
+  "research:S2": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim B", "citations": [{"url": "https://a"}, {"url": "https://b"}]}], "evidence_map": [{"case": "C1", "url": "https://b", "outcome": "O", "axes": {
+    "purpose": {"prior": "p", "same": true, "note": "n"}, "mechanism": {"prior": "m", "same": true, "note": "n"},
+    "evaluation": {"prior": "e", "same": true, "note": "n"}, "target": {"prior": "t", "same": true, "note": "n"}}}]},
+  "verify:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S2#issue#0", "verdict": "supported", "quote": "q", "reason": "r"}]},
+  "verify:https://b": null}}
+EOF
+check "실패가 섞인 실행이 끝나고 출력을 얻는다" "harn run < \"\$FX/rf_in.json\" > \"\$FX/rf_out.json\""
+E_RF1='d["result"]["verify_failed"] == [{"url": "https://b", "refs": ["S2#issue#0", "S2#case#0"]}]'
+check "null 인 검증자의 URL 이 verify_failed 에 그 묶음의 참조 전부와 함께 든다" "json_true \"\$FX/rf_out.json\" \"\$E_RF1\""
+E_RF2='[s for s in d["result"]["subquestion_status"] if s["id"] == "S2"][0]["verification_status"] == "partial" and d["result"]["overall_status"] == "not-ok"'
+check "그 URL 을 인용한 하위 질문이 partial 이고 overall_status 가 not-ok 다" "json_true \"\$FX/rf_out.json\" \"\$E_RF2\""
+E_RF3='d["result"]["verifier_count"] == 2 and d["result"]["verifiers"][1]["output"] is None'
+check "verifier_count 가 null 인 검증자를 센다" "json_true \"\$FX/rf_out.json\" \"\$E_RF3\""
+E_RF4='d["result"]["researchers"][0] == {"id": "S1", "output": None} and d["result"]["subquestion_status"][0]["search_status"] == "failed"'
+check "연구자가 null 인 하위 질문은 failed 이고 researchers 에 output null 로 남는다" "json_true \"\$FX/rf_out.json\" \"\$E_RF4\""
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
