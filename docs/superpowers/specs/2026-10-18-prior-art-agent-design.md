@@ -79,7 +79,7 @@
 
 **워크플로 런타임.** [워크플로 문서](https://code.claude.com/docs/en/workflows)에 따르면 런타임은 중간 결과를 스크립트 변수에 두고, 플러그인은 `workflows/` 디렉터리로 워크플로를 배포한다. 같은 문서는 "No mid-run user input"을 제약으로 적고, 단계 사이 승인이 필요하면 단계마다 워크플로를 따로 실행하라고 적는다. 런타임은 같은 세션 안에서 중단된 실행을 이어 실행하며, 완료된 에이전트는 저장된 결과를 돌려준다.
 
-**에이전트 정의.** [플러그인 구성 문서](https://code.claude.com/docs/en/plugins/components)에 따르면 `agents/` 아래 마크다운 파일 하나가 에이전트 하나를 정의하고, 등록 이름은 `<plugin>:<name>` 형태다. [서브에이전트 문서](https://code.claude.com/docs/en/sub-agents)의 frontmatter 표에는 `tools`, `disallowedTools`, `model`, `maxTurns`("Maximum number of agentic turns")가 있다. 플러그인 에이전트는 `hooks`·`mcpServers`·`permissionMode`를 무시한다. 워크플로 `agent()`의 `agentType` 옵션은 내장 `workflow-authoring` 스킬이 "resolved from the same registry as the Agent tool"로 적으며, 공식 워크플로 문서 본문에는 없으므로 빌더가 실측으로 확인한다.
+**에이전트 정의.** [플러그인 구성 문서](https://code.claude.com/docs/en/plugins/components)에 따르면 `agents/` 아래 마크다운 파일 하나가 에이전트 하나를 정의하고, 등록 이름은 `<plugin>:<name>` 형태다. [서브에이전트 문서](https://code.claude.com/docs/en/sub-agents)의 frontmatter 표에는 `tools`, `disallowedTools`, `model`, `maxTurns`("Maximum number of agentic turns")가 있다. 플러그인 에이전트는 `hooks`·`mcpServers`·`permissionMode`를 무시한다. 워크플로 `agent()`의 `agentType` 옵션은 내장 `workflow-authoring` 스킬이 "resolved from the same registry as the Agent tool"로 적으며, 공식 워크플로 문서 본문에는 없다. 현재 세션이 2026-10-18에 실측했고 결과는 「결정 기록」의 「런타임 확인」에 있다.
 
 **시험용 플러그인 적재.** 이 PC의 Claude Code 2.1.302 `claude --help`는 `--plugin-dir <path>`를 "Load a plugin from a directory or .zip"으로 설명한다. 그래서 병합 전 시험은 브랜치 작업 트리를 이 옵션으로 적재한 세션에서 실행한다.
 
@@ -125,7 +125,7 @@
 
 1. **상황 판정과 프로토콜** — 오케스트레이터가 상황과 대조 대상을 정하고 프로토콜을 쓴다. 사용자에게 프로토콜을 보이고 승인을 받으며, 승인이 없으면 실행하지 않는다. 승인을 받으면 오케스트레이터는 곧바로 기록 파일을 만들고 프로토콜 전문과 승인 사실을 적는다.
    - **확인** — 기록 파일에 프로토콜 전문과 승인 사실이 있다.
-2. **탐색** — 오케스트레이터가 `prior-art-search`를 프로토콜과 함께 실행한다. 아래 처리는 워크플로가 한다.
+2. **탐색** — 오케스트레이터가 `disciplined-coder:prior-art-search`를 프로토콜과 함께 실행한다. 아래 처리는 워크플로가 한다.
    - 하위 질문마다 탐색 모드 연구자를 실행한다.
    - 스크립트가 연구자의 `queries`를 질의 금지 목록과 경로 형태 정규식으로 검사하고 위반을 기록한다.
    - 스크립트가 인용을 URL 로 묶고, URL 마다 검증자를 실행한다.
@@ -133,7 +133,7 @@
    - 나머지 사례는 탈락 목록, 판정 불가 목록, 검증 실패 목록에 사유와 함께 들어간다.
    - `survey` 모드에서는 종합 모드 연구자와 지도 대조 모드 검증자를 차례로 실행한다.
    - **확인** — 반환값이 「출력 스키마」의 워크플로 반환값 형식을 따른다. 오케스트레이터는 반환 직후 원본을 기록 폴더에 쓴다.
-3. **공백 판단** — 오케스트레이터가 커버리지 표와 연구자의 `saturation`·`not_found`를 사용자에게 보이고, 공백 라운드를 실행할지 묻는다. 공백 라운드는 공백 하위 질문만 대상으로 `prior-art-search`를 다시 실행하며, 한 연구 질문에 1회까지다. 오케스트레이터는 두 실행의 결과를 하위 질문 ID 로 합치고, 같은 URL 이 두 실행에 다 있으면 공백 라운드의 판정을 쓴다.
+3. **공백 판단** — 오케스트레이터가 커버리지 표와 연구자의 `saturation`·`not_found`를 사용자에게 보이고, 공백 라운드를 실행할지 묻는다. 공백 라운드는 공백 하위 질문만 대상으로 `disciplined-coder:prior-art-search`를 다시 실행하며, 한 연구 질문에 1회까지다. 오케스트레이터는 두 실행의 결과를 하위 질문 ID 로 합치고, 같은 URL 이 두 실행에 다 있으면 공백 라운드의 판정을 쓴다.
    - **확인** — 기록에 공백 라운드 실행 여부와 사유가 있고, 공백 라운드 원본이 반환 직후 기록 폴더에 있다.
 4. **인용 확인과 보고** — 오케스트레이터가 「인용 확인」의 범위에 드는 인용을 직접 열어 확인한다. 그다음 기록 파일에 처분 전 결과를 적고 사용자에게 보고한다. 문서에 반영할지는 사용자가 정한다.
    - **확인** — 기록 파일과 원본이 아래 원본 파일 규칙을 따른다.
@@ -209,10 +209,11 @@
 | `mode` | `contrast`(이슈만) 또는 `survey`(이슈와 근거 지도)다. 상황이 정한다 |
 | `subquestion_id` | 프로토콜의 하위 질문 ID 다 |
 | `queries` | 연구자가 실행한 검색어 전부다. 질의 경계 검사의 입력이다 |
-| `evidence_map` | `survey`에서만 채운다. 탐색 모드 연구자는 자기 하위 질문의 행을 채우고, 종합 모드 연구자는 통과 목록의 행만으로 다시 만든다. 행마다 사례 이름, URL, 네 축 각각의 같음·다름과 근거, 결말(성공·실패·판정 못 함), 출처 성격, 1차·2차 출처 구분, 찾은 경로(`route`)를 적는다. 기존 도구 탐색 상황에서는 `adoption`(채택·흡수·참고·해당 없음)도 채운다 |
+| `evidence_map` | `survey`에서만 채운다. 탐색 모드 연구자는 자기 하위 질문의 행을 채우고, 종합 모드 연구자는 통과 목록의 행만으로 다시 만든다. 행마다 사례 이름, URL, 네 축 각각의 `{ prior, same, note }`(`prior`는 선행 사례 쪽 서술, `same`은 대조 대상과 같은지, `note`는 그 판단의 근거), 결말(성공·실패·판정 못 함), 출처 성격, 1차·2차 출처 구분, 찾은 경로(`route`)를 적는다. 기존 도구 탐색 상황에서는 `adoption`(채택·흡수·참고·해당 없음)도 채운다 |
 | `saturation` | 마지막 세 번의 검색에서 새 사례가 몇 건 나왔는지다 |
+| `issues[].prior_claim` | 이슈마다 선행 사례와 그 결말에 관한 서술만 적은 문장이다. 검증자가 판정하는 대상이다. 대조 대상에 관한 서술(전이, 기준선과 비교되지 않음)은 `claim`에 남기고 판정하지 않는다 |
 
-**인용 판정 출력.** 검증자는 URL 마다 그 URL 에 걸린 주장별로 `verdict`(supported·unsupported·unverifiable), `quote`(원문에서 옮긴 지지 구절), `reason`을 낸다. 출력 전체에 `principles_applied`를 둔다. 빌더는 판정 기준을 "옮긴 구절이 주장의 주어와 수치와 조건을 모두 포함하면 supported"로 고정한다. `unverifiable`은 원문 쪽 사정(봇 차단, 유료 장벽, 응답 없음)만 뜻하며 반박으로 세지 않는다. 검증자 에이전트 자체가 실패하면 워크플로가 그 URL 을 검증 실패 목록에 넣는다.
+**인용 판정 출력.** 검증자는 URL 마다 그 URL 에 걸린 주장별로 `verdict`(supported·unsupported·unverifiable), `quote`(원문에서 옮긴 지지 구절), `reason`을 낸다. 출력 전체에 `principles_applied`를 둔다. 빌더는 판정 기준을 "옮긴 구절이 주장의 주어와 수치와 조건을 모두 포함하면 supported"로 고정한다. 판정 대상은 선행 사례 쪽 서술뿐이다. 이슈는 `prior_claim`, 근거 지도 행은 사례 이름과 `outcome`과 각 축의 `prior`다. 근거 지도 행은 사례가 있다는 것과 그 결말을 뒷받침하는 구절이 있으면 `supported`이고, 축마다의 판정은 `reason`에 적는다. 대조 대상 쪽 판단(`same`, `note`, 이슈의 `claim`)은 연구자가 책임지며 사용자가 보고에서 확인한다(2026-10-18 사용자 결정). `unverifiable`은 원문 쪽 사정(봇 차단, 유료 장벽, 응답 없음)만 뜻하며 반박으로 세지 않는다. 검증자 에이전트 자체가 실패하면 워크플로가 그 URL 을 검증 실패 목록에 넣는다.
 
 **지도 대조 출력.** 검증자는 근거 지도의 칸마다 `row`, `column`, `grounded`(참·거짓), `source_ref`(근거가 된 통과 목록 항목)를 내고, 출력 전체에 `principles_applied`를 둔다.
 
@@ -292,7 +293,8 @@
 
 **측정값.**
 
-- **통과 사례 수** — 검증자가 `supported`로 판정한 주장에 기댄 사례 수다.
+- **통과 사례 수** — 검증자가 `supported`로 판정한 주장에 기댄 사례 수다. 판정 목록 `passed`만 세고 `verify_failed`는 세지 않는다. 이슈 항목과 근거 지도 항목을 따로 세며, 채택 기준의 비교는 기준선에도 있는 이슈 항목으로 한다.
+- **런타임 동작** — 런타임이 스크립트를 엄격 모드로 실행하는지, 긴 URL 을 넣은 `label`이 동작하는지, `agentType`과 정의의 `model` 중 어느 쪽 모델로 실행되는지를 기록한다(`specworkflow` 리포트의 제안).
 - **오인 수** — 네 축 대조에서 다른 사례를 같은 사례로 적은 수다. 오케스트레이터가 원문으로 판정하고 사용자가 표본 세 건을 확인한다.
 - **질의 경계 위반 수** — 스크립트 검사의 결과다.
 - **토큰 사용량** — 런타임이 보고하는 값이다.
@@ -349,7 +351,7 @@
 | 에이전트에게 보내는 프롬프트의 형식 | `specworkflow` | `specagents` | 떼어냄 | 「출력 스키마」의 「에이전트에게 보내는 프롬프트」를 그대로 쓴다 |
 | 에이전트 등록 이름과 `tools`·`maxTurns` | `specagents` | `specworkflow` | 떼어냄 | `disciplined-coder:prior-art-researcher`와 `disciplined-coder:prior-art-verifier`이며, 값은 「구성」을 따른다 |
 | 워크플로 `args`와 반환값, 상태 값 | `specworkflow` | `specagents` | 떼어냄 | 「키 이름과 바깥 형식」 표와, 「출력 스키마」의 `search_status`·`verification_status`·`overall_status` 값을 그대로 쓴다 |
-| 워크플로 이름 | `specworkflow` | `specagents` | 떼어냄 | `prior-art-search`다 |
+| 워크플로 이름 | `specworkflow` | `specagents` | 떼어냄 | 파일 이름과 `meta.name`은 `prior-art-search`이고, 부르는 이름은 `disciplined-coder:prior-art-search`다 |
 
 모든 행을 떼어냄으로 판정했으므로 합칠 묶음이 없다.
 
@@ -375,7 +377,54 @@
 - 질의 경계와 `SECRETS`를 지킨다. 에이전트 정의와 스킬과 테스트에 키·토큰·개인정보를 적지 않는다.
 - 변경 뒤 CLAUDE.md 「변경 뒤 실행」의 명령과 `claude plugin validate ./`를 실행한다.
 
-**현재 세션이 맡는 일.** `agentType`이 플러그인 에이전트를 해석하는지(「리서치 근거」의 「에이전트 정의」)는 `--plugin-dir` 세션이 있어야 확인할 수 있다. 서브 세션은 새 세션을 열지 못하므로, 현재 세션이 구현 디스패치 전에 사용자와 함께 확인한다. 확인에는 빈 에이전트 정의 하나와 그 정의를 `agentType`으로 부르는 워크플로 하나만 쓴다. 해석되지 않으면 현재 세션은 구현을 디스패치하지 않고 사용자에게 보고한다. 병합 전 시험(「시험 계획」)도 사람이 메시지를 입력해야 하므로 모든 워크스트림이 통합된 뒤 현재 세션이 사용자와 함께 진행한다.
+**현재 세션이 맡는 일.** `agentType`의 플러그인 에이전트 해석은 서브 세션이 새 세션을 열지 못하므로 현재 세션이 확인했다(「결정 기록」의 「런타임 확인」). 병합 전 시험(「시험 계획」)도 사람이 메시지를 입력해야 하므로 모든 워크스트림이 통합된 뒤 현재 세션이 사용자와 함께 진행한다. 두 워크스트림이 통합된 뒤 현재 세션은 `specagents` 「한 번 하는 확인」의 완료 조건 명령을 통합 트리에서 한 번 실행한다. 각 워크스트림 브랜치에는 상대 워크스트림의 파일이 없어, 그 브랜치에서 실행한 확인으로는 통합 트리를 보지 못하기 때문이다.
+
+
+## 하부 명세
+
+두 임시 워크스트림의 내부 설계는 아래 하부 명세에 있다. 이 큰 명세는 하부 명세 원문을 옮겨 오지 않고 가리킨다.
+
+| 임시 id | 하부 명세 | 리뷰 기록 |
+|---|---|---|
+| `specworkflow` | `docs/superpowers/specs/2026-10-18-prior-art-agent-specworkflow-design.md` | `docs/superpowers/reviews/2026-10-18-prior-art-agent-specworkflow-review.md` |
+| `specagents` | `docs/superpowers/specs/2026-10-18-prior-art-agent-specagents-design.md` | `docs/superpowers/reviews/2026-10-18-prior-art-agent-specagents-review.md` |
+
+## 공유 결정
+
+두 하부 명세가 함께 따르는 결정이다. 현재 세션이 완전체 명세를 쓰며 정했다.
+
+**워크플로 등록 이름.** 오케스트레이터는 탐색 워크플로를 `disciplined-coder:prior-art-search`로 실행하고, 연구자·검증자 정의의 `description`도 그 이름을 적는다. 파일 이름과 `meta.name`은 `prior-art-search`다(「결정 기록」의 「런타임 확인」).
+
+**인용 판정 범위.** 검증자 `cite` 모드는 선행 사례 쪽 서술만 판정한다. 그래서 워크플로가 검증자에게 보내는 `claims[].text`는 이슈 항목이면 `prior_claim`이고, 근거 지도 항목이면 `JSON.stringify({ case, outcome, prior })`다. `prior`는 네 축의 `prior`만 모은 객체다. 판정 기준과 대상은 「출력 스키마」의 「인용 판정 출력」이 원본이다. 2026-10-18 사용자가 이 범위를 골랐다. 대조 대상 쪽 서술까지 판정하면 원문이 그 서술을 뒷받침할 수 없어 항목이 계통적으로 탈락하기 때문이다.
+
+**판정에 쓰는 발견.** 오케스트레이터와 `review-specs`·`review-docs`가 판정과 보고에 쓰는 발견은 `passed`의 `ref`가 가리키는 항목뿐이다. `rejected`·`unverifiable`·`verify_failed`의 항목은 사유와 함께 보고하지만 판정에 쓰지 않는다. 사례 수는 `passed`·`rejected`·`unverifiable` 세 목록으로 세며 `verify_failed`는 세지 않는다.
+
+**옛 이름이 남지 않는 파일.** `specworkflow`가 만드는 `workflows/`와 시험 도구와 계약 테스트에는 옛 이름 `lens-prior-art`를 쓰지 않는다. 그래서 `specagents`의 완료 조건 예외에 그 파일들을 넣지 않고, 현재 세션이 통합 트리에서 완료 조건을 확인한다(「현재 세션이 맡는 일」).
+
+## 경계
+
+워크스트림 경계를 넘는 자료의 원본은 아래와 같다. 한 하부 명세가 정하고 다른 하부 명세는 그 정의를 가리킨다.
+
+| 자료 | 정한 곳 | 가리키는 곳 |
+|---|---|---|
+| 프롬프트의 JSON 블록 표기(셋째 줄부터 json 코드 울타리 안의 `JSON.stringify(입력, null, 2)`) | `specworkflow` 「프롬프트와 입력」 | `specagents` 「연구자와 검증자 정의」의 공통 단락 |
+| 인용 판정 입력 `claims[].text`의 형태 | `specworkflow` 「판정 함수」의 `groupByUrl` 항목 | `specagents` 「연구자와 검증자 정의」의 `cite` 모드 단락 |
+| 종합 모드 입력 `passed_rows`와 지도 대조 입력 `passed`의 원소 `{ ref, row }` | `specworkflow` 「용어」의 '통과 행'과 「프롬프트와 입력」 | `specagents` 「연구자와 검증자 정의」의 `synthesize`·`map` 모드 단락 |
+| 반환값 `researchers`·`verifiers`의 원소 형식 | `specworkflow` 「반환값의 형식」 | `specagents` 「절차의 연결」 |
+| `verify_failed`의 원소와 탈락·판정 불가·검증 실패의 사유 위치 | `specworkflow` 「목록의 행선지」 | `specagents` 「절차의 연결」 |
+| `synthesis`가 `null`인 두 사정(통과 행이 없어 생략, 종합 실패)과 `query_violations[].rule`의 값 `forbidden-term`·`path-shape` | `specworkflow` 「반환값의 형식」·「판정 함수」 | `specagents` 「절차의 연결」 |
+| 연구자 출력의 `issues[].prior_claim`과 `axes` 축 값 `{ prior, same, note }` | `specagents` 「출력 스키마를 옮기는 규칙」 | `specworkflow` 「판정 함수」의 `groupByUrl` 항목 |
+
+## 겹침 판정
+
+| 대상 | 하부 명세 | 판정 | 이유 |
+|---|---|---|---|
+| 워크플로를 실행하는 이름 | `specagents` 「절차의 연결」·「연구자와 검증자 정의」, 큰 명세 「오케스트레이터 절차」 | 같은 동작이라 「공유 결정」으로 합쳤다 | 모두 같은 워크플로 하나를 실행하는 동작이다. 실측한 등록 이름 `disciplined-coder:prior-art-search`로 맞췄다 |
+| 인용 판정의 입력과 기준 | `specworkflow` 「판정 함수」·「열린 위험」, `specagents` 「연구자와 검증자 정의」·「출력 스키마를 옮기는 규칙」 | 같은 동작이라 「공유 결정」으로 합쳤다 | 워크플로가 보내는 `text`와 검증자가 판정하는 대상은 같은 주장 하나의 두 면이다. 두 쪽이 같은 범위를 써야 판정이 성립한다 |
+| 프롬프트 형식과 종합·지도 대조 입력 | `specworkflow` 「프롬프트와 입력」, `specagents` 「연구자와 검증자 정의」·「가정과 남은 위험」 | 경계 자료라 「경계」에 소유 쪽 정의를 적었다 | `specagents`는 `passed_rows`가 주장 참조를 싣는다고 전제했고, `specworkflow`의 `{ ref, row }`가 그 전제를 충족한다 |
+| 판정과 보고에 쓰는 목록 | `specworkflow` 「목록의 행선지」, `specagents` 「참조 처리 목록」의 `review-specs` 76행 | 같은 동작이라 「공유 결정」으로 합쳤다 | 두 쪽 모두 통과한 사례만 판정에 쓰는 동작이다. `specagents`의 문안이 그 목록을 `passed`로 한정하지 않아 맞췄다 |
+| 완료 조건의 예외 파일 | `specagents` 「한 번 하는 확인」 | 같은 동작이라 「공유 결정」으로 합쳤다 | 옛 이름이 남지 않았는지 보는 확인 하나다. `specworkflow` 파일은 옛 이름을 쓰지 않으므로 예외에 넣지 않는다 |
+| `agentType` 해석 전제 | `specworkflow` 「맡는 일과 전제」, `specagents` 「가정과 남은 위험」 | 같은 전제라 「결정 기록」의 「런타임 확인」으로 처분했다 | 두 하부 명세가 같은 미확인 전제를 적었고, 현재 세션이 실측으로 확인했다 |
 
 ## 결정 기록
 
@@ -394,8 +443,11 @@
 
 **묶음 FAIL 수 세기.** 묶음 하나의 FAIL 수는 `bash <스크립트> 2>&1 | awk -v h='<묶음 머리>' '$0==h{f=1;next} /^\[/{f=0} f' | grep -c '^  FAIL:'`로 센다. `check`의 실패 줄 머리(`  FAIL: `)만 세므로 요약 줄과 설명문의 'FAIL' 글자를 세지 않는다. 줄 수 창(`grep -A<n>`)으로 세지 않는다.
 
+**선행연구 에이전트가 발동 기준에 들 때(2026-10-18 사용자 답).** 서브 세션 리포트의 `렌즈 그룹 판정`에 선행연구 에이전트가 있으면 현재 세션이 사용자에게 제안하고, 승인받으면 `agent-prior-art` 절차로 직접 실행한다. 그 결과로 하부 명세나 구현을 고쳐야 하면 `REVISE`(명세 서브 세션이면 `RESTART`)로 보낸다. 서브 세션은 선행연구 에이전트를 실행하지 않는다. `specagents`가 `nested-orchestration` `SKILL.md`의 「판정 기록 확인」을 이 내용으로 고친다. 이 개발이 main 에 병합되기 전에는 선행연구 에이전트가 아직 없으므로, 현재 세션은 설치된 캐시의 `lens-prior-art`로 실행한다(같은 날 사용자 답).
+
 **이미 겪은 함정.** 서브 세션은 `docs/superpowers/reviews/2026-10-18-prior-art-agent-plan-review/`의 렌즈 원본을 이미 겪은 함정의 목록으로 읽는다. 그 지적이 인용한 plan 초안은 실행하지 않으며 입력도 아니다. 초안은 커밋 `252155f`에 보존되어 있고, 현재 세션이 명세 디스패치 전에 사용자 확인을 받아 통합 브랜치에서 지운다.
 
-**런타임 확인(2026-10-18).** 현재 세션이 임시 플러그인(`probeplug`)을 `claude -p --plugin-dir`로 적재해 워크플로 하나를 실행했다. 결과는 다음과 같다. 플러그인의 워크플로는 `<플러그인 이름>:<워크플로 이름>`으로 등록되므로, 이 저장소의 탐색 워크플로는 `disciplined-coder:prior-art-search`로 실행한다. `agent()`의 `agentType: 'probeplug:probe'`는 플러그인 에이전트 정의로 해석되었고, 그 에이전트에는 정의의 `tools`(`Read`)와 스키마용 `StructuredOutput`만 주어져 `WebSearch`가 없었다. 그래서 에이전트 정의의 도구 제한이 워크플로 안에서도 적용된다.
+**런타임 확인(2026-10-18).** 현재 세션이 임시 플러그인 `probeplug`를 `claude -p --plugin-dir`로 적재해 워크플로 하나를 실행했다. 그 플러그인은 `workflows/probe.js`(`meta.name: 'probe'`)와 `agents/probe.md`(`tools: Read`)만 두었다. 이름 `probe`로 부르자 "Workflow \"probe\" not found. Available: deep-research, probeplug:probe"가 나왔고, `probeplug:probe`로 부르자 실행되었다. 그래서 플러그인 워크플로는 `<플러그인 이름>:<워크플로 이름>`으로 등록된다. 파일 이름과 `meta.name`이 같았으므로 워크플로 이름이 둘 중 어느 쪽에서 오는지는 확인하지 않았고, 이 저장소도 둘을 `prior-art-search`로 같게 둔다. `agent()`의 `agentType: 'probeplug:probe'`는 그 에이전트 정의로 해석되었고, 에이전트에게는 정의의 `Read`와 스키마용 `StructuredOutput`만 주어졌다. 관측한 정의는 이 하나뿐이지만, 정의의 `tools`가 워크플로 안에서 적용된다는 것은 확인되었다.
+
 
 <!-- spec-review: escalated -->
