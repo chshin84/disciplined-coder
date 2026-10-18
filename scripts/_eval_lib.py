@@ -9,7 +9,7 @@ import os
 import re
 import sys
 
-REQUIRED = ("tags", "kind", "pair", "type", "failure", "clause")
+REQUIRED = ("tags", "kind", "type", "failure", "clause")  # pair 는 선택이다. 짝을 이루지 못하는 셋째 질문이 있다
 TAGS = ("dev", "holdout")
 KINDS = ("should", "should-not")
 TYPES = ("chat", "tool", "workdoc", "deliverable", "code")
@@ -122,7 +122,7 @@ def banned_count(texts, pairs_path, excl_path):
 
 
 def violations(result):
-    """과제 이름 → 위반 회차 수."""
+    """과제 이름 → 위반 수. 판정을 읽지 못한 건(None)은 세지 않는다."""
     out = {}
     for r in result["runs"]:
         out[r["case"]] = out.get(r["case"], 0) + (1 if r["violated"] else 0)
@@ -144,7 +144,7 @@ def compare(cases_dir, results, labels, pairs_path, excl_path):
     a, b = sum(vs[0].values()), sum(vs[1].values())
     verdict = "개선" if b < a else ("악화" if b > a else "동률")
     out = [f"A={a} B={b} 판정={verdict}"]
-    for field in ("kind", "type", "failure", "clause"):
+    for field in ("tags", "kind", "type", "failure", "clause"):
         groups = {}
         for n, c in cases.items():
             vals = c["meta"].get(field)

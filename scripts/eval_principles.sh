@@ -1,29 +1,27 @@
 #!/usr/bin/env bash
 # 한 조건(커밋)의 원칙으로 평가 과제를 실행해 evals/principles/results/<라벨>/result.json 을 쓴다.
-# 사용: eval_principles.sh <커밋> <태그(dev|holdout)> <라벨>
+# 사용: eval_principles.sh <커밋> <태그(dev|holdout|all)> <라벨>
 # 실행 도구와 준비 순서의 근거는 evals/principles/README.md 「실행 도구」 절이다.
 # 실제 설정 폴더는 쓰지 않는다. 조건마다 빈 평가 설정 폴더에 그 커밋의 플러그인을 설치하고, 끝나면 실제 설정
 # 파일의 지문을 대조한다. 지문이 다르면 되돌리지 않고 바뀐 파일을 알리며 끝난다(다른 창의 정상 변경을 덮지 않는다).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
-[ "$#" -eq 3 ] || { echo "사용: eval_principles.sh <커밋> <dev|holdout> <라벨>" >&2; exit 2; }
+[ "$#" -eq 3 ] || { echo "사용: eval_principles.sh <커밋> <dev|holdout|all> <라벨>" >&2; exit 2; }
 COMMIT="$1"; TAG="$2"; LABEL="$3"
 OUT="$HERE/evals/principles/results/$LABEL/result.json"
 [ -e "$OUT" ] && { echo "ERROR: $OUT 가 이미 있다. 측정 기록을 덮지 않으려고 멈춘다." >&2; exit 2; }
 . "$HERE/scripts/_resolve_home.sh"
 . "$HERE/scripts/_json_valid.sh"
+. "$HERE/scripts/_eval_env.sh"
 unset CLAUDE_HOME_DIR CLAUDE_CONFIG_DIR
 REAL="$(resolve_home claude)"
-KEYFILE="${EVAL_KEYFILE:-$HOME/.dc-eval.env}"
-ANTHROPIC_API_KEY="$(sed -n 's/^ANTHROPIC_API_KEY=//p' "$KEYFILE" | tr -d '\r')"
-[ -n "$ANTHROPIC_API_KEY" ] || { echo "ERROR: $KEYFILE 에 ANTHROPIC_API_KEY 가 없다." >&2; exit 2; }
-export ANTHROPIC_API_KEY
+eval_load_key || exit 2
 FULL="$(git -C "$HERE" rev-parse --verify "$COMMIT^{commit}")"
 
-fingerprint() { (cd "$REAL" && sha256sum CLAUDE.md disciplined-coder/*.md settings.json plugins/known_marketplaces.json plugins/installed_plugins.json 2>/dev/null) || true; }
+fingerprint() { eval_fingerprint "$REAL"; }
 git -C "$HERE" worktree prune
 FP0="$(fingerprint)"
-T="$(mktemp -d)"; WT="$T/wt"; CFG="$T/cfg"; JCFG="$T/judge"; CWD="$T/cwd"
+T="$(eval_tmpdir)" || exit 2; WT="$T/wt"; CFG="$T/cfg"; JCFG="$T/judge"; CWD="$T/cwd"
 cleanup() {
   local rc=$?
   git -C "$HERE" worktree remove --force "$WT" >/dev/null 2>&1 || true

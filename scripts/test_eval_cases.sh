@@ -40,31 +40,44 @@ cat > "$T/banned.md" <<'BANEOF'
 |---|---|---|---|---|
 | `판` | 버전 | 문서와 답변 | 평소에 쓰지 않는 말 | `판정` |
 BANEOF
-# 위반: fa 는 a1 2·a2 1·b1 2 = 5, fb 는 a1 1·a2 0·b1 2 = 3, fc 는 fa 와 같은 5.
-mkres() {  # $1=라벨, $2..=a1·a2·b1 의 회차별 위반(t/f) 아홉 개, 마지막 인자=a1 1회차 응답
-  local l="$1"; shift; local v=("$@")
+# 위반은 과제마다 한 건이다(같은 질문을 반복하지 않는다). fa 는 a1·a2·b1 모두 위반 = 3, fb 는 a1 만 = 1, fc 는 fa 와 같다.
+mkres() {  # $1=라벨, $2..$4=a1·a2·b1 의 위반(t/f), $5=a1 응답
   json_run 'import json,sys
-o,l,resp=sys.argv[1],sys.argv[2],sys.argv[12]
-v=[x=="t" for x in sys.argv[3:12]]
-runs=[]
-for i,c in enumerate(["a1","a2","b1"]):
-    for r in range(3):
-        runs.append({"case":c,"run":r+1,"violated":v[i*3+r],"response":resp if (c=="a1" and r==0) else "응답","judge_note":""})
-json.dump({"commit":"x","tag":"dev","model":"m","judge_model":"j","loaded_lines":10,"loaded_chars":100,"runs":runs},open(o,"w",encoding="utf-8"),ensure_ascii=False)' "$T/results/$l/result.json" "$l" "${v[@]}"
+o,resp=sys.argv[1],sys.argv[5]
+v=[x=="t" for x in sys.argv[2:5]]
+runs=[{"case":c,"violated":v[i],"response":resp if c=="a1" else "응답","judge_note":""} for i,c in enumerate(["a1","a2","b1"])]
+json.dump({"commit":"x","tag":"dev","model":"m","judge_model":"j","loaded_lines":10,"loaded_chars":100,"runs":runs},open(o,"w",encoding="utf-8"),ensure_ascii=False)' "$T/results/$1/result.json" "$2" "$3" "$4" "$5"
 }
-mkres fa t t f  t f f  t t f  "응답"
-mkres fb t f f  f f f  t t f  "새 판을 낸다. 판정은 판에 따른다."
-mkres fc t t f  t f f  t t f  "응답"
+mkres fa t t t "응답"
+mkres fb t f f "새 판을 낸다. 판정은 판에 따른다."
+mkres fc t t t "응답"
 cmp() { EVAL_CASES="$T/cases" EVAL_RESULTS="$T/results" EVAL_BANNED="$T/banned.md" bash "$HERE/scripts/eval_compare.sh" "$@" 2>&1 || true; }
 O_AB="$(cmp fa fb)"; O_BA="$(cmp fb fa)"; O_AC="$(cmp fa fc)"; O_B="$(cmp fb)"
-check "적으면 개선이다"              "[ \"\$(printf '%s\n' \"\$O_AB\" | head -1)\" = 'A=5 B=3 판정=개선' ]"
-check "많으면 악화다"                "[ \"\$(printf '%s\n' \"\$O_BA\" | head -1)\" = 'A=3 B=5 판정=악화' ]"
-check "같으면 동률이다"              "[ \"\$(printf '%s\n' \"\$O_AC\" | head -1)\" = 'A=5 B=5 판정=동률' ]"
-check "failure 행이 그 값의 위반을 센다" "printf '%s\n' \"\$O_AB\" | grep -qx 'failure confirm-loop A=2 B=1'"
-check "kind 행이 그 값의 위반을 센다"    "printf '%s\n' \"\$O_AB\" | grep -qx 'kind should A=4 B=3'"
-check "conflict:* 가 conflict 행에 합쳐진다" "printf '%s\n' \"\$O_AB\" | grep -qx 'failure conflict A=3 B=1'"
+check "적으면 개선이다"              "[ \"\$(printf '%s\n' \"\$O_AB\" | head -1)\" = 'A=3 B=1 판정=개선' ]"
+check "많으면 악화다"                "[ \"\$(printf '%s\n' \"\$O_BA\" | head -1)\" = 'A=1 B=3 판정=악화' ]"
+check "같으면 동률이다"              "[ \"\$(printf '%s\n' \"\$O_AC\" | head -1)\" = 'A=3 B=3 판정=동률' ]"
+check "failure 행이 그 값의 위반을 센다" "printf '%s\n' \"\$O_AB\" | grep -qx 'failure confirm-loop A=1 B=1'"
+check "kind 행이 그 값의 위반을 센다"    "printf '%s\n' \"\$O_AB\" | grep -qx 'kind should A=2 B=1'"
+check "conflict:* 가 conflict 행에 합쳐진다" "printf '%s\n' \"\$O_AB\" | grep -qx 'failure conflict A=2 B=1'"
+check "tags 행이 개발용과 보류용을 나눠 센다" "printf '%s\n' \"\$O_AB\" | grep -qx 'tags dev A=3 B=1'"
 check "금지어는 횟수로 세고 제외어는 뺀다" "[ \"\$(printf '%s\n' \"\$O_AB\" | tail -1)\" = '금지어 A=0 B=2' ]"
-check "라벨 하나면 요약 한 줄을 낸다"     "[ \"\$O_B\" = '라벨=fb 위반=3 금지어=2 적재줄=10 적재자=100' ]"
+check "라벨 하나면 요약 한 줄을 낸다"     "[ \"\$O_B\" = '라벨=fb 위반=1 금지어=2 적재줄=10 적재자=100' ]"
+
+echo "[클린룸 — 설정 폴더, 키, 작업 계획, 보고, pair]"
+mkdir -p "$T/clean"
+CL="$(json_run 'import runpy,sys; p=sys.argv[1]; sys.argv=[p]+sys.argv[2:]; runpy.run_path(p, run_name="__main__")' "$HERE/scripts/_test_eval_clause.py" "$HERE/scripts" "$T/clean" 2>&1 || true)"
+while IFS= read -r line; do
+  case "$line" in "OK "*) check "${line#OK }" true ;; "NG "*) check "${line#NG }" false ;; esac
+done <<< "$CL"
+check "클린룸 시험 프로그램이 끝까지 실행된다" "printf '%s\n' \"\$CL\" | tail -1 | grep -qx DONE"
+printf '%s\n' "$CL" | grep -v '^\(OK\|NG\) \|^DONE$' | sed 's/^/    /' || true
+
+echo "[상위 경로 — 평가 폴더 위에 CLAUDE.md 가 있으면 찾는다]"
+. "$HERE/scripts/_eval_env.sh" 2>/dev/null || ancestor_claude() { echo "(_eval_env.sh 없음)"; }
+mkdir -p "$T/anc/.claude" "$T/anc/x/y" "$T/plain/x/y"; echo m > "$T/anc/.claude/CLAUDE.md"
+A1="$(ancestor_claude "$T/anc/x/y" 2>&1 || true)"; A2="$(ancestor_claude "$T/plain/x/y" 2>&1 || true)"
+check "상위의 .claude/CLAUDE.md 를 가장 가까운 것부터 낸다" "[ \"\$A1\" = \"\$T/anc/.claude/CLAUDE.md\" ]"
+check "픽스처 안에 없으면 픽스처 경로를 내지 않는다" "case \"\$A2\" in \"\$T\"/*) false ;; *) true ;; esac"
 
 echo "[판정 응답 읽기 — 판정 모델의 답에서 위반 여부를 꺼낸다]"
 judge() { json_run 'import runpy,sys; p=sys.argv[1]; m=runpy.run_path(p); print(m["parse_judge"](sys.argv[2]))' "$HERE/scripts/_eval_run.py" "$1" 2>&1 || true; }
