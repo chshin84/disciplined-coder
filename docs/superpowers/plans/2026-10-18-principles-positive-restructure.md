@@ -277,6 +277,8 @@
 
 ### Task 10: 전체 비교와 병합 준비
 
+2026-10-18 사용자 지시로 전체 비교를 폐지했다(spec 「검증과 단계」). Step 2·3 은 한 차례 실행한 기록만 남기고, 병합은 조항별 시험 결과로 판단한다.
+
 - [ ] **Step 0:** 보류용 질문을 약 30개로 늘린다. 세션 기록 원자료(`~/dc-eval-raw/2026-10-18/`)의 실패 사례 중 기존 과제와 겹치지 않는 사례를 일반화해 `tags: [holdout]` 과제로 쓰고, 문안 선택(Task 6·8)에는 쓰지 않는다. `bash scripts/test_eval_cases.sh` 가 FAIL=0 이면 커밋한다. `git commit -m "평가 세트: 보류용 질문 확대"`
 - [ ] **Step 1:** `git merge main` 으로 main 을 가져와 충돌을 해소한다. 확인: 저장소 검사가 FAIL=0 이다.
 - [ ] **Step 2:** `bash scripts/eval_principles.sh 7a2d26d all baseline` 과 `bash scripts/eval_principles.sh HEAD all final` 을 실행한다. 이 경로는 생성 키로 반복을 차단하지 않으므로, 한쪽이 끊기거나 실패하면 다시 실행하지 말고 원인과 남은 과제를 사용자에게 알려 처리를 묻는다. 확인: 두 명령의 종료 코드가 0 이다.

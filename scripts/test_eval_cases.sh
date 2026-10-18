@@ -37,14 +37,9 @@ UBL="$(mktemp)"; git -C "$HERE" show 7a2d26d:korean-banned-words.md > "$UBL"
 check "BANNED-LIST 의 current.md 가 기준 커밋의 목록 파일과 같다" "cmp -s '$UBL' '$CLAUSES/BANNED-LIST/current.md'"
 rm -f "$UBL"
 
-echo "[비교 — 판정, 행별 위반 수, 금지어 횟수]"
-# 픽스처로 본다. 저장소 과제와 측정 결과에 기대지 않는다.
+echo "[금지어 횟수 — 같은 낱말은 두 번 세고 제외어는 뺀다]"
+# 픽스처로 본다. 저장소 과제와 측정 결과에 기대지 않는다. 클린룸 보고의 금지어 수가 이 함수를 쓴다.
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
-mkdir -p "$T/cases/a1" "$T/cases/a2" "$T/cases/b1" "$T/results/fa" "$T/results/fb" "$T/results/fc"
-printf -- '---\ntags: [dev]\nkind: should\npair: a2\ntype: chat\nfailure: [confirm-loop, conflict:a]\nclause: [X-ONE]\n---\n\np\n' > "$T/cases/a1/prompt.md"
-printf -- '---\ntags: [dev]\nkind: should-not\npair: a1\ntype: chat\nfailure: [conflict:b]\nclause: [X-ONE]\n---\n\np\n' > "$T/cases/a2/prompt.md"
-printf -- '---\ntags: [dev]\nkind: should\npair: b1\ntype: tool\nfailure: [language]\nclause: [Y-TWO]\n---\n\np\n' > "$T/cases/b1/prompt.md"
-for c in a1 a2 b1; do echo c > "$T/cases/$c/criteria.md"; done
 cat > "$T/banned.md" <<'BANEOF'
 ### 금지 표현
 
@@ -52,28 +47,10 @@ cat > "$T/banned.md" <<'BANEOF'
 |---|---|---|---|---|
 | `판` | 버전 | 문서와 답변 | 평소에 쓰지 않는 말 | `판정` |
 BANEOF
-# 위반은 과제마다 한 건이다(같은 질문을 반복하지 않는다). fa 는 a1·a2·b1 모두 위반 = 3, fb 는 a1 만 = 1, fc 는 fa 와 같다.
-mkres() {  # $1=라벨, $2..$4=a1·a2·b1 의 위반(t/f), $5=a1 응답
-  json_run 'import json,sys
-o,resp=sys.argv[1],sys.argv[5]
-v=[x=="t" for x in sys.argv[2:5]]
-runs=[{"case":c,"violated":v[i],"response":resp if c=="a1" else "응답","judge_note":""} for i,c in enumerate(["a1","a2","b1"])]
-json.dump({"commit":"x","tag":"dev","model":"m","judge_model":"j","loaded_lines":10,"loaded_chars":100,"runs":runs},open(o,"w",encoding="utf-8"),ensure_ascii=False)' "$T/results/$1/result.json" "$2" "$3" "$4" "$5"
-}
-mkres fa t t t "응답"
-mkres fb t f f "새 판을 낸다. 판정은 판에 따른다."
-mkres fc t t t "응답"
-cmp() { EVAL_CASES="$T/cases" EVAL_RESULTS="$T/results" EVAL_BANNED="$T/banned.md" bash "$HERE/scripts/eval_compare.sh" "$@" 2>&1 || true; }
-O_AB="$(cmp fa fb)"; O_BA="$(cmp fb fa)"; O_AC="$(cmp fa fc)"; O_B="$(cmp fb)"
-check "적으면 개선이다"              "[ \"\$(printf '%s\n' \"\$O_AB\" | head -1)\" = 'A=3 B=1 판정=개선' ]"
-check "많으면 악화다"                "[ \"\$(printf '%s\n' \"\$O_BA\" | head -1)\" = 'A=1 B=3 판정=악화' ]"
-check "같으면 동률이다"              "[ \"\$(printf '%s\n' \"\$O_AC\" | head -1)\" = 'A=3 B=3 판정=동률' ]"
-check "failure 행이 그 값의 위반을 센다" "printf '%s\n' \"\$O_AB\" | grep -qx 'failure confirm-loop A=1 B=1'"
-check "kind 행이 그 값의 위반을 센다"    "printf '%s\n' \"\$O_AB\" | grep -qx 'kind should A=2 B=1'"
-check "conflict:* 가 conflict 행에 합쳐진다" "printf '%s\n' \"\$O_AB\" | grep -qx 'failure conflict A=2 B=1'"
-check "tags 행이 개발용과 보류용을 나눠 센다" "printf '%s\n' \"\$O_AB\" | grep -qx 'tags dev A=3 B=1'"
-check "금지어는 횟수로 세고 제외어는 뺀다" "[ \"\$(printf '%s\n' \"\$O_AB\" | tail -1)\" = '금지어 A=0 B=2' ]"
-check "라벨 하나면 요약 한 줄을 낸다"     "[ \"\$O_B\" = '라벨=fb 위반=1 금지어=2 적재줄=10 적재자=100' ]"
+. "$HERE/hooks/_banned_words.sh"
+banned_parse "$T/banned.md" "$T/pairs" "$T/toks" "$T/excl"
+BC="$(json_run 'import runpy,sys; m=runpy.run_path(sys.argv[1]); print(m["banned_count"]([sys.argv[2]], sys.argv[3], sys.argv[4]))' "$HERE/scripts/_eval_lib.py" "새 판을 낸다. 판정은 판에 따른다." "$T/pairs" "$T/excl" 2>&1 || true)"
+check "금지어는 횟수로 세고 제외어는 뺀다" "[ \"\$BC\" = 2 ]"
 
 echo "[클린룸 — 설정 폴더, 키, 작업 계획, 보고, pair]"
 mkdir -p "$T/clean"

@@ -1,4 +1,4 @@
-"""에이전트원칙 실패 평가 세트의 과제 읽기와 검사. 소비자는 test_eval_cases.sh, eval_principles.sh, eval_compare.sh 다.
+"""에이전트원칙 실패 평가 세트의 과제 읽기와 검사. 소비자는 test_eval_cases.sh, _eval_clause.py 다.
 
 과제 폴더마다 prompt.md(front matter 에 과제 머리, 본문에 프롬프트)와 criteria.md(판정 기준)를 둔다.
 front matter 는 `키: 값` 과 `키: [a, b]` 만 쓴다. YAML 파서를 들이지 않으려고 이 두 형태로 한정한다.
@@ -101,11 +101,6 @@ def check_secrets(root):
     return errs
 
 
-def load_result(results, label):
-    import json
-    return json.load(open(os.path.join(results, label, "result.json"), encoding="utf-8"))
-
-
 def banned_count(texts, pairs_path, excl_path):
     """banned_parse 가 낸 pairs·excl 로 금지어 출현 횟수를 센다. 제외어 안의 글자는 세지 않는다."""
     rows = [l.rstrip("\n").split("\t")[1:] for l in open(pairs_path, encoding="utf-8")]
@@ -121,53 +116,8 @@ def banned_count(texts, pairs_path, excl_path):
     return n
 
 
-def violations(result):
-    """과제 이름 → 위반 수. 판정을 읽지 못한 건(None)은 세지 않는다."""
-    out = {}
-    for r in result["runs"]:
-        out[r["case"]] = out.get(r["case"], 0) + (1 if r["violated"] else 0)
-    return out
-
-
-def chat_texts(result, cases):
-    return [r["response"] for r in result["runs"] if cases.get(r["case"], {}).get("meta", {}).get("type") == "chat"]
-
-
-def compare(cases_dir, results, labels, pairs_path, excl_path):
-    cases = load_cases(cases_dir)
-    res = [load_result(results, l) for l in labels]
-    vs = [violations(r) for r in res]
-    bans = [banned_count(chat_texts(r, cases), pairs_path, excl_path) for r in res]
-    if len(labels) == 1:
-        r = res[0]
-        return [f"라벨={labels[0]} 위반={sum(vs[0].values())} 금지어={bans[0]} 적재줄={r.get('loaded_lines')} 적재자={r.get('loaded_chars')}"]
-    a, b = sum(vs[0].values()), sum(vs[1].values())
-    verdict = "개선" if b < a else ("악화" if b > a else "동률")
-    out = [f"A={a} B={b} 판정={verdict}"]
-    for field in ("tags", "kind", "type", "failure", "clause"):
-        groups = {}
-        for n, c in cases.items():
-            vals = c["meta"].get(field)
-            vals = vals if isinstance(vals, list) else [vals] if vals else []
-            if field == "failure" and any(v.startswith("conflict:") for v in vals):
-                vals = vals + ["conflict"]
-            for v in vals:
-                groups.setdefault(v, []).append(n)
-        for v in sorted(groups):
-            ca = sum(vs[0].get(n, 0) for n in groups[v])
-            cb = sum(vs[1].get(n, 0) for n in groups[v])
-            out.append(f"{field} {v} A={ca} B={cb}")
-    out.append(f"금지어 A={bans[0]} B={bans[1]}")
-    return out
-
-
 def main(argv):
     cmd, root = argv[1], argv[2]
-    if cmd == "compare":
-        # compare <과제 폴더> <결과 폴더> <pairs> <excl> <라벨>...
-        for line in compare(root, argv[3], argv[6:], argv[4], argv[5]):
-            print(line)
-        return
     if cmd == "secrets":
         out = check_secrets(root)
     else:

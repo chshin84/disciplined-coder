@@ -1,9 +1,8 @@
-"""평가 과제를 claude -p 로 생성하고 판정 모델로 판정한다. eval_principles.sh(전체 비교)와 _eval_clause.py(클린룸)가 쓴다.
+"""평가 과제를 claude -p 로 생성하고 판정 모델로 판정한다. _eval_clause.py(조항별 클린룸)가 쓴다.
 
 생성 세션은 호출자가 준 CLAUDE_CONFIG_DIR 로, 판정 세션은 플러그인이 없는 빈 설정 폴더로 실행한다. 판정 세션에
 원칙이 실리면 조건마다 판정자가 달라지기 때문이다. 같은 질문은 조건마다 한 번만 생성한다(2026-10-18 사용자 지시).
 
-사용(전체 비교): python _eval_run.py <과제 폴더> <태그|all> <작업 폴더> <판정 설정 폴더> <출력 JSON> <커밋> <적재 줄> <적재 글자>
 """
 import concurrent.futures
 import json
@@ -77,36 +76,3 @@ def judge(prompt, criteria, response, cwd, env):
         return {"violated": None, "judge_note": "판정 읽기 실패: " + str(j.get("error") or j.get("result", ""))[:200],
                 "judge_model": _models(j)}
     return {"violated": parsed[0], "judge_note": parsed[1], "judge_model": _models(j)}
-
-
-def main(argv):
-    cases_dir, tag, cwd, judge_cfg, out, commit, lines, chars = argv[1:9]
-    lib = runpy.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)), "_eval_lib.py"))
-    cases = {n: c for n, c in lib["load_cases"](cases_dir).items()
-             if tag == "all" or tag in (c["meta"].get("tags") or [])}
-
-    def one(name):
-        c = cases[name]
-        g = generate(c["prompt"], cwd, dict(os.environ))
-        if g["error"]:
-            j = {"violated": None, "judge_note": "생성 오류", "judge_model": ""}
-        else:
-            jd = os.path.join(judge_cfg, name)
-            os.makedirs(jd, exist_ok=True)
-            j = judge(c["prompt"], c["criteria"], g["response"], cwd, dict(os.environ, CLAUDE_CONFIG_DIR=jd))
-        return dict({"case": name, "response": g["response"], "error": g["error"], "model": g["model"]}, **j)
-
-    with concurrent.futures.ThreadPoolExecutor(JOBS) as ex:
-        runs = list(ex.map(one, sorted(cases)))
-    models = sorted({r["model"] for r in runs if r["model"]})
-    judges = sorted({r["judge_model"] for r in runs if r["judge_model"]})
-    res = {"commit": commit, "tag": tag, "model": ",".join(models), "judge_model": ",".join(judges),
-           "loaded_lines": int(lines), "loaded_chars": int(chars), "runs": runs}
-    os.makedirs(os.path.dirname(out), exist_ok=True)
-    json.dump(res, open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    bad = sum(1 for r in runs if r["violated"] is None)
-    print(f"runs={len(runs)} violated={sum(1 for r in runs if r['violated'])} errors={bad}")
-
-
-if __name__ == "__main__":
-    main(sys.argv)
