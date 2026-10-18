@@ -606,7 +606,7 @@ done
 # 조용히 사라진다. 규칙은 domain-plugin 「frontmatter」가 소유하고 여기서 기계로 붙든다.
 echo "[frontmatter 안전 — description 값에 ': ' 와 ' #' 이 없다]"
 FMN=0
-for f in "$HERE"/skills/*/SKILL.md "$HERE"/commands/*.md; do
+for f in "$HERE"/skills/*/SKILL.md "$HERE"/commands/*.md "$HERE"/agents/*.md; do
   [ -f "$f" ] || continue
   FMN=$((FMN+1))
   DESC="$(grep -m1 '^description:' "$f" | sed 's/^description:[[:space:]]*//')"
@@ -931,5 +931,20 @@ check "SKILL.md 머리가 프로토콜 파일 경로를 적는다" "grep -qF 're
 for sec in '디스패치 템플릿' '받은 메시지 처리' '이어 쓰기와 재개'; do
   check "「$sec」이 프로토콜 파일을 가리킨다" "sec_has \"\$NO_DOC\" '$sec' '프로토콜 파일'"
 done
+
+echo "[선행연구 에이전트]"
+AP="$HERE/skills/agent-prior-art/SKILL.md"
+RDEF="$HERE/agents/prior-art-researcher.md"
+VDEF="$HERE/agents/prior-art-verifier.md"
+fm() { awk 'NR==1&&/^---$/{f=1;next} f&&/^---$/{exit} f' "$1" 2>/dev/null; }
+for s in '오케스트레이터 절차' '발동과 기록' '상황별 전략' '실행할 때 지킬 상한' '판정 규약' '출력 스키마' '인용 확인' '레퍼런스 프롬프트'; do
+  check "agent-prior-art 에 절이 있다: $s" "has_sec \"\$AP\" '$s'"
+done
+check "spec 리뷰가 발동과 기록을 가리킨다" "points_to \"\$CALLER\" '\`agent-prior-art\`' '「발동과 기록」'"
+check "연구자 정의의 도구가 구성과 같다" "grep -qx 'tools: WebSearch, WebFetch, Read, Grep, Glob' <<<\"\$(fm \"\$RDEF\")\""
+check "검증자 정의의 도구가 구성과 같다" "grep -qx 'tools: WebFetch, Read' <<<\"\$(fm \"\$VDEF\")\""
+check "두 정의의 턴 상한이 20 이다" "grep -qx 'maxTurns: 20' <<<\"\$(fm \"\$RDEF\")\" && grep -qx 'maxTurns: 20' <<<\"\$(fm \"\$VDEF\")\""
+RP="$( [ -f "$AP" ] && doc_sec "$AP" '레퍼런스 프롬프트' | grep -m1 '^- system: "' | sed 's/^- system: "//; s/"$//' || true)"
+check "연구자 정의가 레퍼런스 프롬프트 본문을 그대로 싣는다" "[ -n \"\$RP\" ] && grep -qF -- \"\$RP\" \"\$RDEF\""
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
