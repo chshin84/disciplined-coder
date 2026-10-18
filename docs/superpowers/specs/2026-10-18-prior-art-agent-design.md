@@ -396,4 +396,6 @@
 
 **이미 겪은 함정.** 서브 세션은 `docs/superpowers/reviews/2026-10-18-prior-art-agent-plan-review/`의 렌즈 원본을 이미 겪은 함정의 목록으로 읽는다. 그 지적이 인용한 plan 초안은 실행하지 않으며 입력도 아니다. 초안은 커밋 `252155f`에 보존되어 있고, 현재 세션이 명세 디스패치 전에 사용자 확인을 받아 통합 브랜치에서 지운다.
 
+**런타임 확인(2026-10-18).** 현재 세션이 임시 플러그인(`probeplug`)을 `claude -p --plugin-dir`로 적재해 워크플로 하나를 실행했다. 결과는 다음과 같다. 플러그인의 워크플로는 `<플러그인 이름>:<워크플로 이름>`으로 등록되므로, 이 저장소의 탐색 워크플로는 `disciplined-coder:prior-art-search`로 실행한다. `agent()`의 `agentType: 'probeplug:probe'`는 플러그인 에이전트 정의로 해석되었고, 그 에이전트에는 정의의 `tools`(`Read`)와 스키마용 `StructuredOutput`만 주어져 `WebSearch`가 없었다. 그래서 에이전트 정의의 도구 제한이 워크플로 안에서도 적용된다.
+
 <!-- spec-review: escalated -->
