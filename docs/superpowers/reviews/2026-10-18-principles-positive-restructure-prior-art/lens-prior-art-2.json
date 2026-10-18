@@ -1,0 +1,114 @@
+{
+  "lens": "lens-prior-art",
+  "target": "긍정형·금지형 지시(벤더·실무 문서 경로, 1 의 이중화)",
+  "search_status": "ok",
+  "read": [
+    "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-4-8",
+    "https://www.anthropic.com/news/claude-new-constitution",
+    "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "https://code.claude.com/docs/en/best-practices",
+    "https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_prompting_guide",
+    "https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6.md",
+    "https://ai.google.dev/gemini-api/docs/prompting-strategies",
+    "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/start/gemini-3-prompting-guide?hl=de",
+    "https://codex.danielvaughan.com/2026/07/04/agents-md-structure-doesnt-matter-factorial-study-instruction-adherence-codex-cli/"
+  ],
+  "queries": [
+    "OpenAI GPT-5 prompting guide contradictory instructions \"be THOROUGH\" overly firm language",
+    "Gemini prompt design strategies negative constraints \"what not to do\" avoid broad negative instructions",
+    "Anthropic Claude constitution explain reasoning rather than rules generalize",
+    "OpenAI GPT-5.6 prompting guide absolute always never rules conflicting rules stopping conditions",
+    "Google Gemini 3 prompting guide avoid broad negative constraints \"do not infer\" over-index",
+    "AGENTS.md coding agent instructions file study rules ignored negative instructions practitioner report 2026"
+  ],
+  "issues": [
+    {
+      "where": "원문 마지막 문장 「현재 설계는 지시와 이유(근거)를 별도 문서로 분리해, 모델은 이유가 빠진 지시만 받는다」와 저장소 CLAUDE.md 「지시와 근거의 분리」 규칙",
+      "type": "refuted-premise",
+      "claim": "현행 설계의 전제인 '모델에게는 행동 지시만 주고 이유는 별도 문서에 둔다'는 Anthropic 공식 지침과 상충한다. Anthropic 은 지시에 이유를 붙이면 모델이 그 이유에서 일반화한다고 적고, 이유 없는 금지문(NEVER use ellipses)을 덜 효과적인 예로 든다.",
+      "consequence": "지금 세션에 실리는 조항은 이유 없이 실린다. 예를 들어 TITLE-CLAIM 의 40자 제한은 왜 40자인지가 빠져 있으므로, 모델은 제한의 목적(한눈에 읽히는 결론)과 수단(글자 수)을 구분하지 못하고 글자 수를 맞추려고 내용을 압축할 수 있다. 원문이 보고한 '제목 길이 제한을 지키려 내용을 압축했다'는 실패가 이 상태와 들어맞는다. 개편안 (1)의 '왜'는 이 전제를 뒤집으므로, 저장소 CLAUDE.md 의 「지시와 근거의 분리」 규칙도 함께 고쳐야 개편안과 저장소 규범이 상충하지 않는다.",
+      "evidence": "Anthropic Prompting best practices 「Add context to improve performance」: \"Providing context or motivation behind your instructions, such as explaining to Claude why such behavior is important, can help Claude better understand your goals\"; 덜 효과적인 예 \"NEVER use ellipses\", 더 효과적인 예 \"...so never use ellipses since the text-to-speech engine will not know how to pronounce them.\"; \"Claude is smart enough to generalize from the explanation.\" Claude 헌법 발표문: \"need to explain this to them rather than merely specify what we want them to do\", 규칙은 \"can also be applied poorly in unanticipated situations or when followed too rigidly.\" 네 축 대조: 목적(지시 준수 향상)은 같다. 메커니즘(지시에 이유를 붙임)은 개편안 (1)과 같고 현행과 다르다. 평가는 벤더 문서가 수치를 내지 않아 비교할 수 없다. 적용 대상은 벤더 문서가 API 시스템 프롬프트이고 이 설계는 세션 전역 지시 파일이라 다르다.",
+      "citations": [
+        { "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices", "kind": "vendor", "opened": true },
+        { "url": "https://www.anthropic.com/news/claude-new-constitution", "kind": "vendor", "opened": true }
+      ]
+    },
+    {
+      "where": "agent-principles.md 3행 「원칙 사이에 우열은 없으니, 상황에 해당하는 조항을 모두 적용하라」(개편안 (3)이 바꾸려는 현행 문장)",
+      "type": "refuted-premise",
+      "claim": "'조항 사이에 우열이 없고 해당하는 조항을 모두 적용한다'는 현행 전제는 벤더 지침과 상충한다. OpenAI 는 서로 부딪히는 지시가 빠진 지시보다 더 해롭다고 적고, Anthropic 헌법은 충돌 시 나열 순서대로 우선한다는 순위를 둔다.",
+      "consequence": "지금은 YAGNI(요청 범위를 넘어 만들지 마라)와 KEEP-FAILED(실패한 시도도 남겨라)가 같은 상황에 함께 해당하면, 모델이 우선순위 없이 두 조항을 동시에 만족시키려 한다. 원문이 보고한 '범위를 넘어 만들지 마라를 지키려 필요한 기록까지 지웠다'는 실패가 이 상태와 들어맞는다. OpenAI 는 이 상태에서 모델이 두 규칙을 조정하느라 추론을 낭비한다고 보고한다.",
+      "evidence": "OpenAI GPT-5 prompting guide: \"contradictory or vague instructions can be more damaging to GPT-5 than to other models\"; 의료 예약 예시에서 \"Never schedule an appointment without explicit patient consent\" 와 \"auto-assign the earliest same-day slot without contacting the patient\" 가 충돌하며, 해법은 \"By resolving the instruction hierarchy conflicts, GPT-5 elicits much more efficient and performant reasoning.\" GPT-5.6 guide: \"conflicting rules can create more instability than missing detail.\" Claude 헌법 발표문: \"In cases of apparent conflict, Claude should generally prioritize these properties in the order in which they're listed.\" 네 축 대조: 목적과 메커니즘(충돌 해소)은 개편안 (3)과 같다. 다만 OpenAI 의 해법은 충돌하는 문장 자체를 고치는 방식이고 개편안 (3)은 우선순위 메타 규칙을 두는 방식이라 메커니즘이 일부 다르다. 적용 대상(타사 모델과 API 프롬프트)도 다르다.",
+      "citations": [
+        { "url": "https://developers.openai.com/cookbook/examples/gpt-5/gpt-5_prompting_guide", "kind": "vendor", "opened": true },
+        { "url": "https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6.md", "kind": "vendor", "opened": true },
+        { "url": "https://www.anthropic.com/news/claude-new-constitution", "kind": "vendor", "opened": true }
+      ]
+    },
+    {
+      "where": "개편안 (1) 「모든 조항을 … 긍정형으로 다시 쓴다. 금지만 있는 조항은 대신 할 행동으로 바꾼다」",
+      "type": "refuted-premise",
+      "claim": "'모든 조항을 긍정형으로'라는 범위는 벤더 지침보다 넓다. 벤더 문서는 긍정형을 서식·판단 영역에 권하고, 절대 금지(NEVER, must)는 참인 불변 조건에만 남기라고 권한다. Anthropic 헌법도 고위험 행동에는 hard constraints 를 규칙으로 남긴다.",
+      "consequence": "개편안대로 하면 SECRETS 와 REVERSIBLE 같은 불변 조건도 '대신 할 행동' 형식으로 바뀐다. 금지가 대체 행동 하나로 좁혀지면 Opus 4.8 계열처럼 지시를 글자 그대로 따르는 모델은 그 대체 행동이 가리키지 않는 상황에 금지를 넓혀 적용하지 않는다. 그 결과 금지 범위가 지금보다 좁아질 위험이 있다.",
+      "evidence": "Anthropic best practices 의 「Tell Claude what to do instead of what not to do」는 「Control the format of responses」 절 안의 항목이며 예시도 마크다운 서식이다. OpenAI GPT-5.6 guide: \"Avoid unnecessary absolute rules.\" \"Use ALWAYS, NEVER, must, and only for true invariants such as safety rules, required fields, or actions that should never happen.\" \"For judgment calls, such as when to search, ask, use a tool, or keep iterating, prefer decision rules.\" Google Gemini 3 가이드(독일어판): 'do not infer'·'do not guess' 같은 넓은 금지는 과잉 적용되어 기본 추론까지 차단하므로 명시적 대체 지시를 권한다. 다만 같은 Google 의 prompting-strategies 페이지는 근거 제한 예시에 \"Do not assume or infer from the provided facts\" 를 그대로 쓴다. Claude 헌법: 규칙은 \"more predictable, transparent, and testable\" 하므로 \"especially high-stakes behaviors\" 에는 hard constraints 를 둔다. Opus 4.8 가이드: \"It does not silently generalize an instruction from one item to another.\" 네 축 대조: 목적(과잉 회피 행동 줄이기)은 같다. 메커니즘은 벤더가 '판단 영역은 긍정형·결정 규칙, 불변 조건은 절대 금지'로 나누는 반면 이 설계는 전부 긍정형이라 다르다.",
+      "citations": [
+        { "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices", "kind": "vendor", "opened": true },
+        { "url": "https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6.md", "kind": "vendor", "opened": true },
+        { "url": "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/start/gemini-3-prompting-guide?hl=de", "kind": "vendor", "opened": true },
+        { "url": "https://ai.google.dev/gemini-api/docs/prompting-strategies", "kind": "vendor", "opened": true },
+        { "url": "https://www.anthropic.com/news/claude-new-constitution", "kind": "vendor", "opened": true },
+        { "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-4-8", "kind": "vendor", "opened": true }
+      ]
+    },
+    {
+      "where": "개편안 (1)·(2)·(3)을 함께 적용하는 전면 재작성 계획",
+      "type": "known-failure",
+      "claim": "OpenAI 는 작동 중인 프롬프트 묶음을 한 번에 다시 쓰지 말라고 권한다. 한 번에 다시 쓰면 행동 변화가 어느 변경에서 왔는지 구분할 수 없다는 실패 원인을 근거로 든다. 이 설계는 형식(긍정형 4단), 목차(출력 종류별 층), 우선순위를 한 차수에 바꾸므로 같은 원인이 남아 있다.",
+      "consequence": "개편 뒤 어떤 과제에서 위반이 늘거나 줄어도, 그 변화가 긍정형 문구에서 왔는지, 층 재배치에서 왔는지, 우선순위 규칙에서 왔는지를 구분할 수 없다. 개편안 (4)의 조항별 소거 시험은 '조항이 있을 때와 없을 때'를 비교하므로, 세 가지 구조 변경을 서로 분리하지 못한다.",
+      "evidence": "OpenAI GPT-5.6 guide: \"Do not rewrite a working prompt stack all at once. Otherwise you cannot tell whether a behavior change came from the model, reasoning setting, prompt, tool set, or runtime.\" 이행 절차: \"Run representative evals before changing the prompt.\" \"Remove one group of instructions, examples, or tools at a time, then rerun the same evals.\" \"Add only the smallest targeted instruction that fixes a measured regression.\" \"Re-run evals after each prompt or reasoning change.\" 네 축 대조: 목적(프롬프트 개선)과 평가(같은 평가 세트 재실행)는 같다. 적용 대상은 OpenAI 가 모델 이행 상황을 다루고 이 설계는 같은 모델에서 원칙을 고치는 상황이라 다르다. 다만 실패 원인(동시 변경으로 귀인 불가)은 상황과 무관하게 남는다.",
+      "citations": [
+        { "url": "https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6.md", "kind": "vendor", "opened": true }
+      ]
+    },
+    {
+      "where": "개편안 (1) 「어떤 상황에서 → 무엇을 어떻게 하라 → 언제 멈춰라 → 왜」 형식을 약 55개 조항 전부에 적용",
+      "type": "known-failure",
+      "claim": "매 세션에 실리는 지시 파일이 길어지면 모델이 지시를 놓친다는 실패가 Anthropic 의 Claude Code 문서에 보고되어 있다. 조항마다 상황·행동·멈춤·이유 네 요소를 붙이면 파일이 현행보다 길어지므로, 같은 실패 원인이 이 설계에 남는다.",
+      "consequence": "개편 뒤의 원칙 파일은 모든 프로젝트의 세션에 실리므로, 길어진 분량만큼 개별 조항이 묻힐 수 있다. 원문의 실패 유형(과잉 회피)은 줄어도 '규칙을 놓치는' 다른 유형의 위반이 늘 수 있다. 다만 반대 근거도 있다. 실무자가 정리한 요인 실험(Claude Code, 사소한 코드 규칙 하나)에서는 파일 크기가 준수율에 유의한 효과를 내지 않았다. 따라서 이 실패의 크기는 이 설계의 과제로 측정해야 정해진다.",
+      "evidence": "Claude Code best practices: \"Keep it concise. For each line, ask: 'Would removing this cause Claude to make mistakes?' If not, cut it. Bloated CLAUDE.md files cause Claude to ignore your actual instructions!\"; \"If your CLAUDE.md is too long, Claude ignores half of it because important rules get lost in the noise. Fix: Ruthlessly prune.\" Anthropic context engineering: \"minimal set of information that fully outlines your expected behavior\" 이면서 \"minimal does not necessarily mean short\". 반대 근거(실무자 블로그): 파일 크기·위치·단일/분할 구조 \"None of the four structural variables... produced a statistically significant effect\", 한계로 \"deliberately trivial\" 규칙만 시험함. 네 축 대조: 적용 대상(세션마다 실리는 에이전트 지시 파일)은 같다. 평가는 Anthropic 문서가 수치를 내지 않고 실무자 연구는 사소한 규칙만 측정해 이 설계의 평가와 다르다.",
+      "citations": [
+        { "url": "https://code.claude.com/docs/en/best-practices", "kind": "vendor", "opened": true },
+        { "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents", "kind": "vendor", "opened": true },
+        { "url": "https://codex.danielvaughan.com/2026/07/04/agents-md-structure-doesnt-matter-factorial-study-instruction-adherence-codex-cli/", "kind": "blog", "opened": true }
+      ]
+    },
+    {
+      "where": "개편안 (4) 「조항을 넣고 뺀 모델에 같은 과제를 주는 소거 시험」",
+      "type": "weak-baseline",
+      "claim": "벤더 문서가 쓰는 단순한 기준선 두 가지와 비교되지 않았다. 하나는 문구를 바꾸기 전 현행 원칙 전체로 대표 과제를 실행한 결과이고, 다른 하나는 재작성 대신 해당 조항을 지우거나 줄이기만 한 조건이다. 원문 (4)에는 '새 긍정형 문구 대 현행 문구'의 비교도 적혀 있지 않다.",
+      "consequence": "소거 시험만으로는 '조항이 효과가 있는가'는 확인되지만 '긍정형 재작성이 현행 문구나 단순 삭제보다 나은가'는 확인되지 않는다. 원문이 보고한 실패 약 60건이 조항 삭제만으로 사라지는지, 재작성이 필요한지를 지금 설계로는 구분할 수 없다. 저장소 CLAUDE.md 의 「조항 추가와 문구 변경」 절은 현행 문안 조건을 함께 실행하도록 정하지만 원문 (4)의 설명은 그 조건을 포함하지 않는다.",
+      "evidence": "OpenAI GPT-5.6 guide: \"Run representative evals before changing the prompt.\" \"Remove obsolete scaffolding, repeated instructions, and irrelevant tools.\" Claude Code best practices: \"If Claude already does something correctly without the instruction, delete it or convert it to a hook.\" \"test changes by observing whether Claude's behavior actually shifts.\" 네 축 대조: 평가 방법(같은 과제로 조건 비교)은 같다. 비교 조건의 종류가 다르다.",
+      "citations": [
+        { "url": "https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6.md", "kind": "vendor", "opened": true },
+        { "url": "https://code.claude.com/docs/en/best-practices", "kind": "vendor", "opened": true }
+      ]
+    }
+  ],
+  "not_found": [
+    "긍정형 지시와 금지형 지시의 효과 차이를 수치로 보고한 벤더 공식 자료를 찾지 못했다. 찾은 벤더 문서는 모두 권고와 예시만 제시한다. 이 결과는 독창성의 근거가 아니다.",
+    "OpenAI Model Spec 원문(chain of command, 질문과 진행의 균형)은 열지 못했다. 첫 주소는 리디렉션 안내만 돌려주었고, 리디렉션된 주소는 요약 도구가 오류를 내어 읽지 못했다.",
+    "Google 공식 문서에서 강한 어조(CRITICAL, MUST)의 효과를 다룬 대목을 찾지 못했다. Google 의 prompting-strategies 페이지는 오히려 예시 안에서 MUST 를 쓴다.",
+    "OpenAI GPT-5.6 가이드에서 지시에 이유를 붙이라는 권고를 찾지 못했다. 이유 첨부 권고는 Anthropic 문서에서만 확인했다.",
+    "한국어 지시문에 한정한 벤더 지침이나 실무 보고는 찾지 못했다. 이 설계의 '~하라/~하지 마라' 어미가 영어 대문자 강조와 같은 효과를 내는지는 확인하지 못했다."
+  ],
+  "disclosures": [
+    "WebFetch 는 페이지를 요약 모델에 통과시켜 돌려주므로, 위 인용문은 요약 모델이 원문에서 뽑은 문장이다. 호출자가 원문과 대조해 확인해야 한다. Anthropic best practices 페이지만은 저장된 전체 텍스트에서 직접 문장을 확인했다.",
+    "Google Gemini 3 가이드의 영어판 주소는 404 를 돌려주어 독일어판을 읽었다. 인용문은 독일어 원문과 그 영어 예시 문장이다.",
+    "실무자 요인 실험은 블로그 요약만 읽었고 원 논문(arXiv:2605.10039)은 학술 논문 범위라 열지 않았다.",
+    "Anthropic 의 과잉 발동(overtriggering) 보고는 Opus 4.5·4.6 을 대상으로 적혀 있다. 이후 모델에서 같은 경향이 유지되는지는 문서에서 확인하지 못했다. Opus 4.8 가이드는 반대로 도구 호출을 덜 하는 경향과 글자 그대로의 지시 해석을 보고한다.",
+    "GPT-5.6 관련 언론 보도(Decrypt 등)는 2차 자료라 인용하지 않고 OpenAI 개발자 문서만 인용했다."
+  ],
+  "principles_applied": ["SECRETS", "EVIDENCE-FIRST", "NO-ASSUME", "STATE-ASSUME", "FOCUSED", "NO-FLEET", "WRITTEN-ONLY", "NO-MIRROR", "SPECIFIC-NAME", "SUBJECT-OBJECT", "TERM-ONE", "COUNT-EARNS", "FULL-SENTENCE"],
+  "notes": "기시감: 개편안의 네 요소는 모두 벤더 문서에 대응 사례가 있다(긍정형 서식 지시, 이유 첨부, 판단 영역의 결정 규칙과 멈춤 조건, 우선순위, 조항을 빼 보고 행동 변화를 관찰하는 시험). 결말: 벤더 문서는 권고만 제시하고 효과 크기를 공개하지 않는다. 실패로 끝난 보고는 강한 어조로 인한 과잉 발동과 넓은 금지의 과잉 적용이다. 원문이 보고한 '위임 뒤에도 계속 묻기'는 이 과잉 발동 보고와 같은 유형이고, 벤더 해법(어조 완화, 결정 규칙, 멈춤 조건)은 개편안의 '언제 멈춰라'와 같은 방향이다. 전이: 전면 동시 재작성과 분량 증가. 기준선: 현행 원칙 전체의 사전 측정과 삭제만 한 조건. 붐빔: 원칙 형식은 벤더 권고의 재구성이며 상용 제품을 다시 짓는 상황은 아니다. 찾은 기준 목록(요지): 하지 말 것 대신 할 것(서식 절), 지시에 이유, 강한 어조 완화, 이전 모델용 과잉 지시 제거, 긍정 예시 선호, 적용 범위 명시, 고위험에만 hard constraints, 충돌 시 나열 순서, 부딪히는 지시의 해악, 철저함 지시의 과잉 검색, 맥락 수집의 멈춤 조건, 절대어는 불변 조건에만, 판단 영역은 결정 규칙, 한 번에 다시 쓰지 않기, 넓은 금지의 과잉 적용, 지시 파일의 간결성, 강조는 한 줄에만, 반드시 지킬 규칙은 훅으로. 더 확인할 것: OpenAI Model Spec 원문의 chain of command, 한국어 명령형 어미가 과잉 발동을 낳는지."
+}

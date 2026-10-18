@@ -1,0 +1,145 @@
+{ "lens": "lens-consistency",
+  "read": [
+    "agent-principles.md",
+    "skills/lens-consistency/SKILL.md",
+    "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+    "docs/superpowers/reviews/2026-10-18-principles-positive-restructure-review.md",
+    "CLAUDE.md",
+    "korean-banned-words.md",
+    "docs/domain-korean.md (340-379행)",
+    "scripts/scaffold.sh",
+    "scripts/_scaffold_common.sh",
+    "hooks/_banned_words.sh",
+    "scripts/test_docs_drift.sh (128-152행, 775-862행)",
+    "scripts/test_hooks.sh (298-331행)",
+    "README.md (금지 표현 목록과 관리블록을 언급하는 행만 Grep)",
+    "skills/review-specs·review-docs·dispatching-lenses·lens-prior-art (승인·재실행 문장만 Grep)"
+  ],
+  "issues": [
+    {
+      "where": "「검증과 단계」 극성 짝 실험 문장",
+      "type": "contradiction",
+      "claim": "사용자 결정은 판단 조항을 모두 결정 규칙으로 쓰고 불변 조건만 금지문으로 남기게 한다. 그런데 「검증과 단계」는 극성 짝 실험에서 긍정형이 낫지 않은 조항을 금지형으로 남기게 하여, 판단 조항이 금지문으로 남을 길을 연다. 같은 문장은 '이유'와 함께 두라고 하지만, 단계 2 는 이유 한 줄을 아직 붙이지 않는다고 정한다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "110행 \"긍정형이 금지형보다 낫지 않은 조항은 금지형과 이유로 둔다.\" / 115행 \"이유 한 줄은 아직 붙이지 않는다.\"",
+      "counterpart_file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "counterpart": "54행 \"판단 조항은 결정 규칙으로 다시 쓰고, 불변 조건만 금지문으로 남긴다.\" / 126행 CLAUDE.md 명령형 항목에 \"판단 조항은 결정 규칙, 불변 조건은 금지문이라는 구분을 추가한다\"",
+      "principle": "모순(문서가 스스로 정한 원칙을 어기는 설계)",
+      "consequence": "현재 spec 은 금지형으로 남은 판단 조항을 허용하는 문장(110행)과 금지하는 문장(54·126행)을 함께 수록한다. 단계 2 안에서 '이유와 함께 둔다'는 지시와 '이유를 아직 붙이지 않는다'는 지시도 함께 적혀 있다."
+    },
+    {
+      "where": "「결정」 실행 방식과 「검증과 단계」 단계 5",
+      "type": "contradiction",
+      "claim": "실행 방식은 보류용 과제를 최종안과 기준 원칙의 비교에 한 번만 쓰게 하는데, 「검증과 단계」와 단계 5 는 후보마다 보류용 과제로 채택을 판정하게 한다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "108행 \"새 조항 후보를 만드는 데는 개발용만 쓰고, 채택 판정은 보류용으로 한다.\" / 118행 \"확인: 후보마다 보류용 과제에서 개선을 보인다.\"",
+      "counterpart_file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "counterpart": "62행 \"보류용 과제는 최종안과 기준 원칙의 비교에 한 번 쓴다.\" / 66행 \"최종안이 보류용 과제에서 기준 원칙보다 나을 때만 main 에 한 번 병합한다.\"",
+      "principle": "모순",
+      "consequence": "현재 spec 대로 실행하면 보류용 과제는 단계 5 의 후보 수만큼 쓰인 뒤 최종 비교에 다시 쓰인다. 62행의 '한 번' 조건과 맞지 않는다."
+    },
+    {
+      "where": "「결정」 시험 규칙과 단계 5",
+      "type": "contradiction",
+      "claim": "시험 규칙은 조항 하나의 추가에 클린룸 소거 시험을 쓰게 한다. 그런데 새 조항 후보는 하나씩 추가되는 조항인데도, spec 은 실패 평가 세트에서 개선을 보였는지로만 넣을지 정한다. 후보 하나의 추가에 어느 시험을 적용하는지 두 문장이 서로 다르게 정한다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "63행 \"CLAUDE.md 의 클린룸 소거 시험은 조항 하나의 추가와 변경에 그대로 쓰고, 구조 개편과 여러 조항의 동시 변경에는 실패 평가 세트를 쓴다.\"",
+      "counterpart_file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "counterpart": "74행 \"후보는 실패 평가 세트에서 개선을 보인 것만 넣는다.\" / 118행 단계 5 \"후보마다 보류용 과제에서 개선을 보인다.\" (CLAUDE.md 19행 \"5개 모두 조항 없이 지켜지면 넣지 않는다\"도 그대로 유지된다)",
+      "principle": "모순",
+      "consequence": "현재 spec 은 단계 5 후보에 클린룸 소거 시험을 실행하는지 정하지 않았다. 63행을 따르면 실행해야 하고, 74·118행을 따르면 실패 평가 세트만으로 채택한다."
+    },
+    {
+      "where": "「결정」 REVERSIBLE 의 불변 조건 범위",
+      "type": "contradiction",
+      "claim": "불변 조건 범위는 커밋·백업이 없는 파일의 삭제이고, 판단 조항 범위는 git 이 추적하는 파일의 덮어쓰기다. git 이 추적하지만 커밋하지 않은 수정이 있는 파일을 덮어쓰는 작업은 두 범위에 모두 해당한다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "64행 \"복구할 수 없는 삭제(커밋·백업이 없는 파일, ...)\"",
+      "counterpart_file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "counterpart": "64행 \"사용자 자기 저장소로의 푸시와 git 이 추적하는 파일의 덮어쓰기는 판단 조항으로 내리고\"",
+      "principle": "모순(적용 조건 분리로 충돌을 푼다는 70행의 방침을 이 조항 안에서 지키지 않음)",
+      "consequence": "현재 문안에서는 커밋하지 않은 수정이 있는 추적 파일의 덮어쓰기가 불변 조건(확인 필수)과 판단 조항(세션 안 1회 승인 뒤 다시 묻지 않음) 중 어디에 속하는지 정해져 있지 않다."
+    },
+    {
+      "where": "「결정」 개편 범위와 불변 조건 초안의 셋째 항목",
+      "type": "contradiction",
+      "claim": "개편 범위는 빌더에게 다른 세션이 고치는 review-specs·dispatching-lenses 변경과 대조하게 하는데, 불변 조건 초안은 다른 세션이 맡은 저장소를 읽거나 검사하지 않게 한다. spec 은 그 대조를 메시지로 하는지 직접 읽어서 하는지 적지 않았다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "65행 \"다른 세션이 선행연구 에이전트 개발로 `review-specs`·`dispatching-lenses` 를 고치고 있으므로, 빌더는 병합 전에 그 변경과 대조한다.\"",
+      "counterpart_file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "counterpart": "72행 \"셋째는 사용자가 다른 세션이 맡았다고 한 저장소를 읽거나 검사하거나 고치지 않는 조항이며, 메모리 규칙(`other-sessions-message-only`)과 같은 범위로 적는다.\"",
+      "principle": "모순",
+      "consequence": "현재 spec 의 지시대로 빌더가 다른 세션의 변경을 직접 열어 대조하면, 같은 spec 이 불변 조건으로 두려는 행동(다른 세션 작업물 읽기)과 같은 행동이 된다."
+    },
+    {
+      "where": "「선행연구에서 확인한 기준」 점화 항목과 「금지어 2트랙」 반대 근거 문단",
+      "type": "drift",
+      "claim": "spec 은 「지시문의 형태」의 0건 대 3건을 '금지어를 이름으로 대고 대체어를 준 조건 대 주지 않은 조건'으로 옮기고, 그 실측으로 현행 형태를 채택했다고 적는다. 원문에서 0건 대 3건은 낱말 규칙을 준 조건과 안 준 조건의 비교다. 두 형태는 0 대 0 으로 비겼고, 형태를 고른 근거는 실측 밖(검사 글자를 뽑아낼 수 있음)이라고 적혀 있다. 원문은 금지어 없이 대체어만 준 조건에서 다섯 벌 모두 '측정'을 썼다고도 기록한다. 이 기록은 지시형 트랙 쪽을 지지하는 근거다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "43행 \"금지어를 이름으로 대고 대체어를 함께 준 조건에서 금지어가 0건, 주지 않은 조건에서 3건이었다고 기록한다.\" / 102행 \"이 결정에는 저장소 안의 반대 근거가 있다. ... 실측으로 현행 형태를 채택했다.\"",
+      "counterpart_file": "docs/domain-korean.md",
+      "counterpart": "350-352행 \"낱말 규칙을 준 스무 벌에서 금지어가 0건, 안 준 열 벌에서 3건이었다 ... 목표 낱말에서 0대 0으로 비겼다.\" / 354행 \"그래서 형태를 고른 근거는 실측 밖에 있다.\" / 359-361행 \"금지어를 한 번도 안 적고 ... 다섯 벌은 다섯 모두 '측정'을 썼고, 금지어와 대체어를 함께 준 다섯 벌은 둘이었다.\"",
+      "principle": "드리프트(같은 측정을 두 문서가 다른 비교로 적음)",
+      "consequence": "현재 spec 은 domain-korean 의 측정을 '반대 근거'로만 적는다. 원문이 기록한 채택 사유(검사 글자를 뽑아낼 수 있음)는 검사기 트랙이 표에서 직접 읽으면 사라진다. 이 사유와 대체어만 준 조건의 결과(5/5)는 spec 에 없다."
+    },
+    {
+      "where": "「금지어 2트랙」 검사기 트랙 문장과 「영향을 받는 파일」 금지어 항목",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 상황 칸을 표의 어느 열에 넣는지 정하지 않은 채 '지금처럼 표를 읽는다'고 적었다. banned_parse 는 열 번호를 고정해 읽으므로 상황 칸이 제외 칸 앞에 들어가면 제외어 추출이 달라진다. 같은 파서를 쓰는 stop_gates.sh 와, 다섯 열 픽스처로 파서를 시험하는 test_hooks.sh 는 영향 파일에 없다(`hooks/doc_word_*.sh` 에 stop_gates.sh 는 들지 않는다).",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "100행 \"검사기 트랙은 표의 금지어·제외어·적용 대상이며, 금지어 훅(`hooks/_banned_words.sh` 와 `doc_word_*` 훅)과 `scripts/check_banned_words.sh` 가 지금처럼 표를 읽는다.\" / 134행 영향 파일 목록",
+      "counterpart_file": "hooks/_banned_words.sh",
+      "counterpart": "34행 \"first = c[2]; repl = c[3]\", 46·48행 \"제외 칸은 여섯째다 ... split(c[6], eparts\", 57행 \"sc = (n >= 4) ? c[4]\" / hooks/stop_gates.sh 76행 banned_parse 호출 / scripts/test_hooks.sh 306·325행 다섯 열 픽스처 표",
+      "principle": "커버리지 공백(spec 의 요구가 이어질 작업 대상이 빠짐)",
+      "consequence": "현재 파서는 둘째·셋째·넷째·여섯째 열을 위치로 읽는다. spec 에는 상황 칸의 위치도, stop_gates.sh·test_hooks.sh 의 수정도 적혀 있지 않다."
+    },
+    {
+      "where": "「금지어 2트랙」 관리블록 문장과 「영향을 받는 파일」",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 관리블록이 지시형 트랙 파일만 싣게 하려면 복사 목록과 위생 화이트리스트가 바뀌어야 한다. 그 목록과 화이트리스트를 소유하는 `scripts/_scaffold_common.sh` 는 영향 파일에 없다. 지시형 트랙 파일의 이름과 놓일 곳도 정해져 있지 않다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "100행 \"`scripts/scaffold.sh` 가 원본 표에서 뽑아 만들고 관리블록 ... 이 이 파일만 싣는다.\" / 134행 영향 파일에 `scripts/scaffold.sh`, `scripts/test_scaffold.sh` 만 있음",
+      "counterpart_file": "scripts/_scaffold_common.sh",
+      "counterpart": "5행 \"SCAFFOLD_FILES=\\\"agent-principles.md korean-banned-words.md\\\"\", 7행 \"파일 이름을 다른 곳에 다시 적지 않는다 — 여기만 고친다.\", 11행 SCAFFOLD_WHITELIST / scripts/scaffold.sh 152행 관리블록에 `@disciplined-coder/korean-banned-words.md` 를 쓰고 161-169행 첫 세션에 SCAFFOLD_FILES 를 그대로 출력",
+      "principle": "커버리지 공백",
+      "consequence": "현재 스캐폴드는 원본 korean-banned-words.md 전체(금지어 포함)를 ~/.claude/disciplined-coder 에 복사하고 @import 로 싣는다. 첫 세션에는 같은 파일을 stdout 으로 출력한다. spec 의 영향 파일 목록에는 이 동작을 정하는 _scaffold_common.sh 가 빠져 있다."
+    },
+    {
+      "where": "「영향을 받는 파일」 README 항목",
+      "type": "gap",
+      "claim": "커버리지 공백이다. README 는 금지 표현 목록 원본을 모든 세션에 싣는다고 여러 곳에 적는데, spec 은 README 를 옛 절 이름을 맞출 대상으로만 올렸다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "135행 \"`hooks/doc_format_pretooluse.sh`, `README.md`, ... 은 옛 절 이름을 가리키는 문장을 맞춘다.\"",
+      "counterpart_file": "README.md",
+      "counterpart": "3행 \"한국어 금지 표현 목록을 모든 세션에 싣는다.\" / 41행 \"금지 표현 목록 `korean-banned-words.md`도 같은 폴더에 복사하고 같은 관리블록이 `@import`로 싣는다.\" / 80행 \"원칙 사본과 금지 표현 목록 사본을 놓고, 관리블록에 두 파일의 `@import`를 쓴다.\"",
+      "principle": "커버리지 공백",
+      "consequence": "현재 spec 대로 단계 4 를 마치면 README 3·41·80행은 실제로 실리는 파일(지시형 트랙)과 다른 파일을 설명하게 된다. spec 에는 그 행을 고치는 작업이 없다."
+    },
+    {
+      "where": "「목차 구조」 첫 문단 지시와 「검증과 단계」",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 첫 문단의 '원칙 사이에 우열은 없으니'를 지우고 '해당하는 층을 모두 적용하라'로 바꾸는 결정이 단계 1~5 중 어느 단계에서 실행되는지 정해져 있지 않다. 단계 1 은 문구를 바꾸지 않는다고 정하고, 단계 2 는 결정 규칙화와 충돌 쌍 해소만 열거한다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "70행 \"현행 첫 문단의 \\\"원칙 사이에 우열은 없으니\\\"는 지우고, ... \\\"해당하는 층을 모두 적용하라\\\"로 바꿔 남긴다.\" / 78행 \"첫 문단에는 ... \\\"해당하는 층을 모두 적용하라\\\"를 둔다.\"",
+      "counterpart_file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "counterpart": "114행 단계 1 \"조항 문구와 각 묶음의 현행 적용 조건 문장을 바꾸지 않고 목차만 옮긴다.\" / 115행 단계 2 목록",
+      "principle": "커버리지 공백(결정이 단계로 이어지지 않음)",
+      "consequence": "현재 단계 목록에는 첫 문단을 고치는 단계가 없다. 그래서 첫 문단 변경의 효과를 어느 단계의 측정이 반영하는지도 정해져 있지 않다."
+    },
+    {
+      "where": "「용어」 이유 한 줄과 「저장소 규칙의 변경」 지시와 근거의 분리",
+      "type": "drift",
+      "claim": "같은 대상을 '이유 한 줄', '목적 문장', '목적 한 줄'로 부른다. 용어 표는 '~이기 때문이다' 형태(이유)도 허용하는데, CLAUDE.md 에 들어갈 문장은 그 대상을 '목적 한 줄'로 적는다. 70행의 '목적 문장'은 충돌 해소 수단을 가리키는 다른 대상이다.",
+      "file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "evidence": "14행 \"이유 한 줄 | 조항 끝에 붙이는 목적 문장이다. \\\"~하기 위해서다\\\" 또는 \\\"~이기 때문이다\\\"로 쓴다\" / 124행 \"에이전트원칙에는 행동 지시와 그 목적 한 줄을 적는다\"",
+      "counterpart_file": "docs/superpowers/specs/2026-10-18-principles-positive-restructure-design.md",
+      "counterpart": "55행 \"조항마다 이유 한 줄을 붙인다.\" / 70행 \"한쪽 조항의 수단을 목적 문장으로 바꿔\"",
+      "principle": "드리프트(TERM-ONE)",
+      "consequence": "현재 spec 에서는 '목적 문장'이 14행에서는 이유 한 줄을, 70행에서는 조항 본문의 수단 대체를 가리킨다. CLAUDE.md 에 넣을 문장(124행)은 결정(55행)과 다른 이름을 쓴다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME", "STATE-ASSUME", "NO-FLEET", "YAGNI", "SPECIFIC-NAME", "TERM-ONE", "SUBJECT-OBJECT", "WRITTEN-ONLY", "NO-MIRROR", "FULL-SENTENCE", "COUNT-EARNS", "BOTTOM-LINE"
+  ],
+  "notes": "검토한 관점: 모순(「결정」의 사용자 결정끼리, 「결정」과 「검증과 단계」 사이), 커버리지 공백(결정이 단계·저장소 규칙·영향 파일로 이어지는지, 금지어 2트랙의 생성 경로가 현행 scaffold.sh·_scaffold_common.sh·_banned_words.sh·stop_gates.sh·test_hooks.sh·README 로 이어지는지), 산출물 공백, 드리프트, 스코프. 산출물 공백은 따로 올리지 않았다. 지시형 트랙 파일의 이름과 놓일 곳이 빠진 문제는 _scaffold_common.sh 지적의 claim 에 포함했다. 스코프는 단계 1~5 가 한 브랜치에서 측정과 함께 진행되도록 정해져 있어 별도 지적으로 올리지 않았다. 앞 차수에서 처분한 지적(외부 JSON 원본, 다른 세션 범위, LENS-ALLOWED 위치, domain-pruning·CLAUDE.md 30행, 병합 방식, 개발용·보류용 구분, ID 규칙)은 처분 뒤의 문안을 확인했고, 새로 생긴 모순만 올렸다. test_docs_drift.sh 822-829행(되살아난 ID 검사)은 클린룸 시험이 유지되므로 이번 결정과 부딪치지 않는다고 판단했다. 더 확인해야 할 사항은 아래와 같다. 첫째, 「결정」 실행 방식의 CLAUDE_CONFIG_DIR 임시 설정 폴더에서 플러그인 SessionStart 훅이 실행되어 지시형 트랙이 실제 세션과 같은 경로로 실리는지는 scripts/_resolve_home.sh 와 설치 기록을 읽어야 판정할 수 있다. 이 파일은 읽기 범위 밖이라 열지 않았다. 둘째, 메모리 항목 'dc코더는 금지어 검사를 끈다'가 spec 의 '검사기 트랙은 지금처럼 표를 읽는다' 및 단계 4 의 금지어 빈도 측정과 어떤 관계인지 확인이 필요하다. 그 메모리 파일 본문은 읽지 않았다. 셋째, 「목차 구조」에서 REVISE-ORDER 를 '모든 답(대화 답 포함)' 층에 두면 현행의 대화 답 제외가 바뀐다. 이 변경을 단계 2 의 '층 적용 조건의 사건화'가 맡는지 결정에서 정해야 하는지는 메인 세션이 판단할 사항이라 지적으로 올리지 않았다."
+}
