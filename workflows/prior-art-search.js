@@ -15,29 +15,155 @@ export const meta = {
 schemas();
 return null;
 
-// 질의 경계 검사. 구현은 판정 함수 태스크가 채운다.
+// 질의 경계 검사. output 이 null 이 아닌 연구자의 검색어마다 금지어와 경로 형태를 본다.
+// 한 검색어 안에서는 forbidden-term 원소가 path-shape 원소보다 앞이다.
 function checkQueries(researchers, forbiddenTerms) {
-  throw new Error('미구현');
+  const terms = (forbiddenTerms ?? []).map((w) => String(w ?? '').toLowerCase()).filter((w) => w !== '');
+  const found = [];
+  for (const r of researchers) {
+    if (r.output == null) continue;
+    for (const q of r.output.queries ?? []) {
+      const query = String(q ?? '');
+      const lower = query.toLowerCase();
+      if (terms.some((w) => lower.includes(w))) found.push({ id: r.id, query, rule: 'forbidden-term' });
+      const isPath = query.split(/\s+/).some((tok) => {
+        const t = tok.replace(/^["'`()\[\],.:;]+|["'`()\[\],.:;]+$/g, '');
+        return /^(~\/|\.\.?\/|\/)/.test(t) || /^[A-Za-z]:[\\/]/.test(t) ||
+          (/[\\/]/.test(t) && /\.[A-Za-z][^.\\/]{0,4}$/.test(t));
+      });
+      if (isPath) found.push({ id: r.id, query, rule: 'path-shape' });
+    }
+  }
+  return found;
 }
 
-// URL 묶기.
+// URL 묶기. 항목은 하위 질문 차례, 이슈, 근거 지도 행의 차례로 만든다.
+// 선행 서술이 결측인 항목은 items 에 남기고 어느 묶음의 claims 에도 넣지 않는다.
 function groupByUrl(researchers) {
-  throw new Error('미구현');
+  const items = [];
+  for (const r of researchers) {
+    if (r.output == null) continue;
+    (r.output.issues ?? []).forEach((issue, i) => {
+      const urls = [];
+      for (const c of issue.citations ?? []) {
+        const u = String(c.url ?? '');
+        if (u !== '' && !urls.includes(u)) urls.push(u);
+      }
+      items.push({ ref: `${r.id}#issue#${i}`, urls, text: String(issue.prior_claim ?? '') });
+    });
+    (r.output.evidence_map ?? []).forEach((row, j) => {
+      const u = String(row.url ?? '');
+      const ax = row.axes ?? {};
+      const prior = {
+        purpose: ax.purpose?.prior,
+        mechanism: ax.mechanism?.prior,
+        evaluation: ax.evaluation?.prior,
+        target: ax.target?.prior,
+      };
+      items.push({
+        ref: `${r.id}#case#${j}`,
+        urls: u === '' ? [] : [u],
+        text: JSON.stringify({ case: row.case, outcome: row.outcome, prior }),
+        row,
+      });
+    });
+  }
+  const groups = [];
+  for (const item of items) {
+    if (lacksPrior(item)) continue;
+    const sub = item.ref.slice(0, item.ref.indexOf('#'));
+    for (const url of item.urls) {
+      let g = groups.find((x) => x.url === url);
+      if (!g) {
+        g = { url, subquestions: [], claims: [] };
+        groups.push(g);
+      }
+      if (!g.subquestions.includes(sub)) g.subquestions.push(sub);
+      g.claims.push({ ref: item.ref, text: item.text });
+    }
+  }
+  return { items, groups };
 }
 
-// 통과 판정.
-function classify(items, groups, verifiers) {
-  throw new Error('미구현');
+// 통과 판정. 행선지는 항목마다 위 행부터 차례로 정한다.
+// 검증자가 실패한 URL 은 응답이 없거나 null 이거나 보낸 참조의 판정을 빠뜨린 URL 이다.
+function classify(items, verifiers) {
+  const sent = new Map();
+  for (const item of items) {
+    if (lacksPrior(item)) continue;
+    for (const url of item.urls) {
+      if (!sent.has(url)) sent.set(url, []);
+      sent.get(url).push(item.ref);
+    }
+  }
+  const failed = new Set();
+  const verdicts = new Map();
+  for (const [url, refs] of sent) {
+    const v = verifiers.find((x) => x.url === url);
+    const judgments = v?.output?.judgments;
+    if (!Array.isArray(judgments) || refs.some((ref) => !judgments.some((j) => j.ref === ref))) {
+      failed.add(url);
+      continue;
+    }
+    for (const j of judgments) {
+      if (!refs.includes(j.ref)) continue;
+      if (!verdicts.has(j.ref)) verdicts.set(j.ref, []);
+      verdicts.get(j.ref).push(j.verdict);
+    }
+  }
+  const passed = [];
+  const rejected = [];
+  const unverifiable = [];
+  for (const item of items) {
+    const entry = { ref: item.ref, urls: item.urls };
+    if (lacksPrior(item)) {
+      rejected.push(entry);
+      continue;
+    }
+    const vs = verdicts.get(item.ref) ?? [];
+    if (vs.includes('supported')) passed.push(entry);
+    else if (item.urls.some((u) => failed.has(u))) continue;
+    else if (vs.length > 0 && vs.every((v) => v === 'unverifiable')) unverifiable.push(entry);
+    else rejected.push(entry);
+  }
+  const verify_failed = [];
+  for (const [url, refs] of sent) {
+    if (failed.has(url)) verify_failed.push({ url, refs });
+  }
+  return { passed, rejected, unverifiable, verify_failed };
 }
 
-// 상태 합치기.
-function mergeStatus(subquestions, researchers, classified) {
-  throw new Error('미구현');
+// 상태 합치기. 참조가 하위 질문 X 에 속하는지는 `X#` 로 시작하는지로 본다.
+function mergeStatus(researchers, items, classified) {
+  const coverage = [];
+  const subquestion_status = [];
+  for (const r of researchers) {
+    const mine = (ref) => ref.startsWith(`${r.id}#`);
+    coverage.push({
+      id: r.id,
+      cases_found: items.filter((it) => mine(it.ref)).length,
+      passed: classified.passed.filter((it) => mine(it.ref)).length,
+    });
+    subquestion_status.push({
+      id: r.id,
+      search_status: r.output == null ? 'failed' : r.output.search_status,
+      verification_status: classified.verify_failed.some((f) => f.refs.some(mine)) ? 'partial' : 'ok',
+    });
+  }
+  const overall_status = subquestion_status.every(
+    (s) => s.search_status === 'ok' && s.verification_status === 'ok',
+  ) ? 'ok' : 'not-ok';
+  return { coverage, subquestion_status, overall_status };
 }
 
-// 선행 서술 결측 판정.
+// 선행 서술 결측 판정. 이슈 항목은 text 가 공백뿐이면 참이다.
+// 근거 지도 항목은 row.case 가 공백뿐이거나 네 축의 prior 가 모두 공백뿐이면 참이다.
 function lacksPrior(item) {
-  throw new Error('미구현');
+  const blank = (v) => String(v ?? '').trim() === '';
+  if (item.row == null) return blank(item.text);
+  const ax = item.row.axes ?? {};
+  return blank(item.row.case) ||
+    ['purpose', 'mechanism', 'evaluation', 'target'].every((k) => blank(ax[k]?.prior));
 }
 
 // 네 스키마 상수를 한 객체로 돌려준다. 계약 테스트와 본문이 이 함수로 상수를 읽는다.
