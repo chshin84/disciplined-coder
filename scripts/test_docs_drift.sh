@@ -109,7 +109,7 @@ WK="$HERE/docs/domain-korean.md"
 # 에이전트원칙이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
 # 그 검사가 우리가 없애려던 중복을 오히려 요구했다. 이제 ID 로 잇고, 지시 문장이 스킬에 그대로
 # 있으면 실패한다.
-KO_IDS="$(awk '/^### `PLAIN-KO`/{f=1} f&&/^## /{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
+KO_IDS="$(awk '/^#### `PLAIN-KO`/{f=1;print;next} f&&/^##?#? /{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
 check "에이전트원칙에서 한국어 조항 ID 를 뽑았다"    "[ -n \"\$KO_IDS\" ]"
 KO_MISS=""
 KO_DUP=""
@@ -352,7 +352,7 @@ echo "[첫 문장] 절 제목 아래 첫 줄이 산문이다"
 # 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
 # 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
 # 따라온다. 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
-# TITLE-LAYERS 는 「남에게 전달하는 산출물」 절의 규칙이라 영어 제목에도 적용한다.
+# TITLE-LAYERS 는 「읽기 위한 문서」 절의 규칙이라 영어 제목에도 적용한다.
 HF_WK="$HERE/docs/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
@@ -782,15 +782,15 @@ for c in "$HERE"/commands/*.md; do
   check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
 done
 
-# 「원칙」 절을 뽑아 둔다. 아래 canon 검사(LENS-ALLOWED)가 쓴다.
-# 파일 전역 grep이 아니라 「원칙」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
+# 「행동」 절을 뽑아 둔다. 아래 canon 검사(LENS-ALLOWED)가 쓴다.
+# 파일 전역 grep이 아니라 「행동」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
 # vacuous 통과하지 않게 한다).
-WF_BLOCK="$(awk '/^## 원칙/{f=1} f&&/^## /&&!/^## 원칙/{exit} f' "$HERE/agent-principles.md")"
+WF_BLOCK="$(awk '/^## 행동/{f=1} f&&/^## /&&!/^## 행동/{exit} f' "$HERE/agent-principles.md")"
 
 # --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(에이전트원칙 계약 가드) ---
 # 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
 # (vacuous 통과 방지).
-PO_BLOCK="$(awk '/^## 원칙/{f=1} f&&/^## /&&!/^## 원칙/{exit} f' "$HERE/agent-principles.md")"
+PO_BLOCK="$(awk '/^## 행동/{f=1} f&&/^## /&&!/^## 행동/{exit} f' "$HERE/agent-principles.md")"
 echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
 check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
 check "그 절에 SUB-ORCHESTRATE 조항이 있다" "printf '%s' \"\$PO_BLOCK\" | grep -qF '**\`SUB-ORCHESTRATE\`'"
@@ -819,11 +819,12 @@ check "canon: every clause with a rationale in the references is in agent-princi
 # 도출 검사가 결손을 실제로 잡는지 임시 사본에서 본다. 조항 하나를 지운 사본이 통과하면 검사가 무의미하다.
 CANON_CUT="$(mktemp)"; grep -vF '**`YAGNI`' "$CANON" > "$CANON_CUT"
 check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids '$CANON_CUT')\" = ' YAGNI' ]"
-# 한국어 절은 두 층이다. 묶는 이름은 `###` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
+# 한국어 절은 두 층이다. 묶는 이름은 `####` 제목(사후 검사 묶음 REVISE-ORDER 는 `###`)이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
 # 검사해야 이름만 남고 지시가 빠지거나 그 반대인 상태를 잡는다. 원자 지시 층은 위의 도출 검사가 본다.
-for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK REVISE-ORDER; do
-  check "canon: korean group $g present"             "grep -qE '^### \`$g\`' '$CANON'"
+for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK; do
+  check "canon: korean group $g present"             "grep -qE '^#### \`$g\`' '$CANON'"
 done
+check "canon: korean group REVISE-ORDER present"   "grep -qE '^### \`REVISE-ORDER\`' '$CANON'"
 # 조항을 더하려면 CLAUDE.md 가 정한 클린룸 소거 시험을 거쳐야 한다. 시험으로 지운 조항 ID 가
 # 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
 # 다만 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 는 그 절이 생기기 전(2026-06~09)에 지워 근거가 git 이력에만 있다.
@@ -837,7 +838,7 @@ check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않�
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
 # 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 에이전트원칙은 @import로 실리므로 이 한
 # 문장이 있으면 검진이 돈다.
-# 파일 전역 grep이 아니라 「원칙」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
+# 파일 전역 grep이 아니라 「행동」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
 # 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
 # 절을 뽑는 계산은 위 WF_BLOCK 을 그대로 쓴다.
 # 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
@@ -861,7 +862,7 @@ SR="$HERE/skills/review-specs/SKILL.md"
 echo "[question-tool] the fork-in-the-road question rule is always loaded"
 # 언제 묻는지와 어떻게 묻는지를 `ASK-OPTIONS` 하나가 정한다(2026-09-24 에 `ASK-CONTEXT` 를 합쳤다).
 # 조항 안의 세 문장(정해지지 않으면 묻는다·하나씩 묻는다·대목적을 되짚는다)을 조항 ID 하나로 합쳤다.
-check "canon: 묻는 조항이 원칙 절에 있다"    "sec_has '$CANON' '원칙' '**\`ASK-OPTIONS\`'"
+check "canon: 묻는 조항이 행동 절에 있다"    "sec_has '$CANON' '행동' '**\`ASK-OPTIONS\`'"
 # 사용 여부(「작업 순서와 다시 리뷰」 절의 ASK-OPTIONS)는 위 「합치기와 다시 리뷰」가 본다.
 check "spec-review: 규칙을 재정의 말고 인용" "! grep -qF '**\`ASK-OPTIONS\`' '$SR'"
 
