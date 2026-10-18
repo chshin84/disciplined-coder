@@ -60,7 +60,7 @@
 | 보류용(`holdout`) | 12(짝 6개: deliv-term, runit, first, keepfailed, label, natural) |
 | 대화 답(`chat`) | 77 |
 | 도구 실행 중 판단(`tool`) | 47 |
-| 남에게 전달하는 산출물(`deliverable`) | 31 |
+| 읽기 위한 문서(`deliverable`) | 31 |
 | 작업 문서(`workdoc`) | 21 |
 | 코드(`code`) | 14 |
 
