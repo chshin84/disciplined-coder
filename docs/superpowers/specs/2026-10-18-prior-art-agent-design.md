@@ -13,7 +13,9 @@
 | 선행연구 에이전트 | 스킬 `agent-prior-art`, 연구자 정의, 검증자 정의, 탐색 워크플로, 발동 넛지를 묶은 구성 전체다 |
 | 오케스트레이터 | `agent-prior-art`를 따르는 메인 세션이다. 프로토콜을 쓰고 단계 사이에서 사용자 승인을 받으며 기록을 쓴다 |
 | 설계 세션 | 2026-10-18에 이 spec 을 쓴 세션이다 |
-| 빌더 | 이 spec 으로 plan 을 쓰고 구현하는 사람이나 세션이다 |
+| 빌더 | 이 spec 으로 plan 을 쓰고 구현하는 사람이나 세션이다. 「워크스트림 분할」 뒤로는 구현 서브 세션이 빌더다 |
+| 현재 세션 | `nested-orchestration`의 현재 세션이다. 사용자와 대화하며 큰 명세와 통합과 병합 전 시험을 맡는다. 설계 세션이 이어서 맡는다 |
+| 서브 세션 | `nested-orchestration`의 서브 세션이다. 워크스트림 하나를 맡고 사용자와 대화하지 못한다 |
 | 연구자 | 에이전트 정의 `disciplined-coder:prior-art-researcher`로 실행하는 서브에이전트다. 탐색 모드에서는 하위 질문 하나를 맡아 웹을 탐색하고, 종합 모드에서는 통과 목록으로 근거 지도를 만든다 |
 | 검증자 | 에이전트 정의 `disciplined-coder:prior-art-verifier`로 실행하는 서브에이전트다. 인용 판정 모드와 지도 대조 모드가 있다 |
 | 프로토콜 | 오케스트레이터가 실행 전에 쓰는 연구 계획이다. 항목은 「오케스트레이터 절차」의 프로토콜 항목이 정한다 |
@@ -216,6 +218,19 @@
 
 **워크플로 반환값.** 통과 목록, 탈락 목록, 판정 불가 목록, 검증 실패 목록, 하위 질문별 커버리지 표·`search_status`·`verification_status`, `overall_status`, 질의 경계 위반 목록, 실행한 검증자 수다.
 
+**키 이름과 바깥 형식.** 워크스트림 사이에서 주고받는 JSON 의 키는 아래와 같다. 이 목록이 원본이다.
+
+| 자료 | 형식 |
+|---|---|
+| 워크플로 `args`(프로토콜) | `{ question, situation, target, mode: "contrast"\|"survey", round: 1\|2, subquestions: [{ id, scope, include, exclude }], forbidden_terms: [string], researcher_count, researcher_count_basis, principles_path }`. `round`는 첫 실행이 1, 공백 라운드가 2 다 |
+| 연구자 출력 | 현행 렌즈 칸(`agent`로 바꾼 칸 포함)에 위 표의 칸을 더한다. `evidence_map` 행은 `{ case, url, axes: { purpose, mechanism, evaluation, target }, outcome, kind, source_level, route, adoption? }`다 |
+| 종합 모드 연구자 출력 | `{ evidence_map: [행], conclusions: [{ text, refs: [string] }], principles_applied }` |
+| 검증자 인용 판정 출력 | `{ url, judgments: [{ ref, verdict, quote, reason }], principles_applied }`. `ref`의 형식은 「결정 기록」의 주장 참조 형식이다 |
+| 검증자 지도 대조 출력 | `{ cells: [{ row, column, grounded, source_ref }], principles_applied }` |
+| 워크플로 반환값 | `{ round, passed, rejected, unverifiable, verify_failed: [{ url, refs }], coverage: [{ id, cases_found, passed }], subquestion_status: [{ id, search_status, verification_status }], overall_status, query_violations: [{ id, query, rule }], verifier_count, researchers, verifiers, synthesis?, map_check? }`. `passed`·`rejected`·`unverifiable`의 원소는 `{ ref, urls }`이고, `verifier_count`는 인용 판정 검증자 수다. `overall_status`는 `ok`나 `not-ok`다 |
+
+**에이전트에게 보내는 프롬프트.** 워크플로는 연구자와 검증자에게 보내는 프롬프트의 첫 줄을 `MODE: <모드>`로 쓴다. 모드 값은 연구자가 `explore`·`synthesize`, 검증자가 `cite`·`map`이다. 둘째 줄부터 `PRINCIPLES: <principles_path>`를 두고, 그 아래에 모드별 입력을 JSON 블록 하나로 둔다. 연구자 탐색 모드의 입력은 `{ question, situation, target, mode, subquestion, forbidden_terms }`, 종합 모드의 입력은 `{ question, target, passed_rows }`, 검증자 인용 판정 모드의 입력은 `{ url, claims: [{ ref, text }] }`, 지도 대조 모드의 입력은 `{ evidence_map, passed }`다. 에이전트 정의의 모드 처리 단락은 이 첫 줄로 모드를 고른다.
+
 **`principles_applied`가 빈 때.** 오케스트레이터는 그 사실을 보고에 적고 자동으로 다시 실행하지 않는다(현행 `aggregating-lenses`의 규칙을 옮긴다).
 
 **판정 모델 교체.** 빌더는 검증자의 출력 형식을 판정 모델과 무관하게 정한다. 그래서 검증자 정의의 `model`만 바꾸면 Haiku 같은 다른 모델로 판정 단계를 바꿀 수 있다. 판정 전용 모델(예: Typesafe AI 의 Jev)도 쓸 수 있게 되면 같은 방식으로 바꿀 수 있다. 다만 Kim 등은 제공사가 달라도 오류 상관이 높다고 보고했으므로, 모델을 바꿔도 상관 오류가 줄어든다고 기대하지 않는다. Jev 는 이 PC에 키가 없고 사내 문서를 외부 API 로 보내는 데 회사 승인이 필요하므로 구성에 넣지 않는다.
@@ -255,7 +270,7 @@
 
 ## 시험 계획
 
-이 시험은 병합 전 게이트다. 빌더는 plan 의 마지막 단계에서 시험을 실행하고, 채택 기준을 통과해야 main 에 병합한다. 통과하지 못하면 병합하지 않고 결과를 사용자에게 보고한다. 사용자가 2026-10-18에 이 게이트와 판정 기준을 정했다.
+이 시험은 병합 전 게이트다. 모든 워크스트림이 통합 브랜치에 들어온 뒤 현재 세션이 사용자와 함께 시험을 실행하고, 채택 기준을 통과해야 main 에 병합한다. 통과하지 못하면 병합하지 않고 결과를 사용자에게 보고한다. 사용자가 2026-10-18에 이 게이트와 판정 기준을 정했다.
 
 **실행 환경.** 빌더는 브랜치 작업 트리를 `claude --plugin-dir <작업 트리 경로>`로 적재한 새 세션에서 시험한다. 설치된 플러그인은 main 커밋의 캐시로 실행되므로, 그 캐시로는 브랜치의 구성을 시험할 수 없다.
 
@@ -310,4 +325,75 @@
 
 **발동 누락.** 발동 넛지는 사용자 메시지의 표현에 기대므로, 목록에 없는 말로 요청하면 알림이 뜨지 않는다. 빌더는 발동 시험으로 이 위험을 확인한다.
 
-<!-- spec-review: passed -->
+
+## 워크스트림 분할
+
+이 절은 `nested-orchestration`의 임시 분할이다. 개발 이름은 `prior-art-agent`, 통합 브랜치는 `dev/prior-art-agent`다. 사용자가 2026-10-18 이 개발을 `nested-orchestration`으로 진행하라고 지시했다.
+
+**하위 프로젝트와 임시 워크스트림.**
+
+| 임시 id | 맡는 일 | 예상 태스크 |
+|---|---|---|
+| `specworkflow` | `workflows/prior-art-search.js`와 그 시험 도구 `scripts/workflow_harness.mjs`, 계약 테스트 `scripts/test_workflow.sh` | 시험 도구, 계약 테스트, 순수 함수, 실행 흐름 |
+| `specagents` | 「구성」의 오케스트레이터 스킬·연구자 정의·검증자 정의·발동 넛지와, 「기존 파일과의 관계」 절 전체(표의 모든 행과 참조 처리 규칙, `lens-prior-art` 삭제) | 스킬 본문, 연구자·검증자 정의, 넛지와 그 연결·README, 렌즈 집계·호출 스킬 정리, 리뷰 스킬 정리, 원칙·근거 문서와 `domain-plugin` 정리, drift 검사와 완료 검사, `lens-prior-art` 삭제 |
+
+`specagents`는 처음에 스킬·에이전트 정의, 넛지, 참조 처리로 나눴던 세 하위 프로젝트를 합친 것이다. 스킬·에이전트 정의는 「스킬 등재」 검사(`scripts/test_docs_drift.sh`)를 통과하려면 다른 스킬이 `agent-prior-art`를 불러야 하고, 그 포인터는 참조 처리가 만든다. 참조 처리는 스킬·에이전트 정의가 만드는 절을 가리킨다. 두 하위 프로젝트가 서로에게 검증 의존하는 순환이라 4차 리뷰 뒤 사용자가 합치기로 정했다. 넛지는 다른 하위 프로젝트와 주고받는 값이 스킬 이름 하나뿐이라 같은 결정에서 함께 합쳤다. `lens-prior-art`의 내용을 옮기는 서브 세션이 원문과 대조한 뒤 직접 지운다.
+
+`specworkflow`의 예상 태스크는 다섯에 못 미쳐 「맡기는 기준」의 크기 조건에 들지 않는다. 사용자 지시로 이 분할을 쓴다.
+
+**공유 항목 표.**
+
+| 항목 | 소유 | 사용 | 판정 | 고정한 의미 |
+|---|---|---|---|---|
+| 연구자·검증자·종합·지도 대조 출력의 형식 | `specagents` | `specworkflow` | 떼어냄 | 「출력 스키마」의 칸과 「키 이름과 바깥 형식」 표를 그대로 쓴다 |
+| 에이전트에게 보내는 프롬프트의 형식 | `specworkflow` | `specagents` | 떼어냄 | 「출력 스키마」의 「에이전트에게 보내는 프롬프트」를 그대로 쓴다 |
+| 에이전트 등록 이름과 `tools`·`maxTurns` | `specagents` | `specworkflow` | 떼어냄 | `disciplined-coder:prior-art-researcher`와 `disciplined-coder:prior-art-verifier`이며, 값은 「구성」을 따른다 |
+| 워크플로 `args`와 반환값, 상태 값 | `specworkflow` | `specagents` | 떼어냄 | 「키 이름과 바깥 형식」 표와, 「출력 스키마」의 `search_status`·`verification_status`·`overall_status` 값을 그대로 쓴다 |
+| 워크플로 이름 | `specworkflow` | `specagents` | 떼어냄 | `prior-art-search`다 |
+
+모든 행을 떼어냄으로 판정했으므로 합칠 묶음이 없다.
+
+**설계 의존 표.** X 를 설계하려면 Y 의 실제 결과를 보아야 하면 1 이다.
+
+| X \ Y | `specworkflow` | `specagents` |
+|---|---|---|
+| `specworkflow` | — | 0 |
+| `specagents` | 0 | — |
+
+**의존 순서 표.**
+
+| 워크스트림 | 선행 | 검증 의존 |
+|---|---|---|
+| `specworkflow` | 없음 | 없음 |
+| `specagents` | 없음 | 없음 |
+
+`specworkflow`와 `specagents`가 모두 시작 워크스트림이라 명세 단계에서 동시에 진행한다. 두 워크스트림의 통합 확인은 저장소 전체 계약 테스트의 `ALL PASS`이며, 상대 워크스트림의 실제 구현을 쓰지 않는다. 두 워크스트림이 함께 고치는 파일은 없다.
+
+**공통 제약.**
+
+- 서브 세션은 자기 브랜치까지만 진행한다. main 병합과 push 는 병합 전 시험을 통과한 뒤 사용자 승인을 받아 현재 세션이 한다.
+- 질의 경계와 `SECRETS`를 지킨다. 에이전트 정의와 스킬과 테스트에 키·토큰·개인정보를 적지 않는다.
+- 변경 뒤 CLAUDE.md 「변경 뒤 실행」의 명령과 `claude plugin validate ./`를 실행한다.
+
+**현재 세션이 맡는 일.** `agentType`이 플러그인 에이전트를 해석하는지(「리서치 근거」의 「에이전트 정의」)는 `--plugin-dir` 세션이 있어야 확인할 수 있다. 서브 세션은 새 세션을 열지 못하므로, 현재 세션이 구현 디스패치 전에 사용자와 함께 확인한다. 확인에는 빈 에이전트 정의 하나와 그 정의를 `agentType`으로 부르는 워크플로 하나만 쓴다. 해석되지 않으면 현재 세션은 구현을 디스패치하지 않고 사용자에게 보고한다. 병합 전 시험(「시험 계획」)도 사람이 메시지를 입력해야 하므로 모든 워크스트림이 통합된 뒤 현재 세션이 사용자와 함께 진행한다.
+
+## 결정 기록
+
+이 절은 현재 세션만 쓴다.
+
+**관례 골격.**
+
+- **명명** — 계약 테스트는 `scripts/test_<대상>.sh`이고, 묶음 머리는 `echo "[<묶음 이름>]"`이며, 단언은 `scripts/_test_check.sh`의 `check "<설명>" "<명령>"`으로 쓴다. 새 훅 파일은 `hooks/<이름>_<이벤트 소문자>.sh`로 짓는다(기존 `stop_gates.sh`는 예외다). 끄는 변수는 `DISCIPLINED_CODER_<이름>=off`이고 `${변수:-on}`과 비교한다. 선행연구 에이전트의 원본 파일 이름은 「오케스트레이터 절차」의 「원본 파일 규칙」을 따른다.
+- **오류 처리** — 새 훅은 `set -euo pipefail`로 시작하고, 입력을 해석하지 못하면 아무것도 출력하지 않고 0 으로 끝난다(FAIL-OPEN). 워크플로는 `agent()`가 `null`을 돌려주면 예외를 던지지 않고 그 사실을 상태 값과 목록에 반영한다.
+- **추상화 수준** — 한 번만 쓰는 함수와 설정 가능성을 두지 않는다. 워크플로의 순수 함수는 결정론으로 검사할 판정(질의 경계 검사, URL 묶기, 통과 판정, 상태 합치기)에만 둔다.
+- **디렉터리 구조** — 워크플로는 `workflows/`, 에이전트 정의는 `agents/`, 스킬은 `skills/agent-prior-art/`, 계약 테스트와 시험 도구는 `scripts/`에 둔다.
+
+**공용 유틸리티.** 계약 테스트는 `scripts/_test_check.sh`의 `check`, `scripts/_json_valid.sh`의 `json_valid_stdin`, `scripts/_doc_keys.sh`의 `has_sec`·`sec_has`·`points_to`를 쓴다. 훅은 `hooks/_json_escape.sh`를 쓴다. 넛지 훅은 사용자 메시지 전문을 받으므로 stdin 을 `INPUT="$(cat)"`으로 읽는다(`hooks/_hook_input.sh` 머리 주석의 큰 입력 훅 방식). `hooks/_hook_input.sh`의 `json_str`은 첫 따옴표에서 끊기므로 사용자 메시지를 읽는 데 쓰지 않는다.
+
+**주장 참조 형식.** 검증자 판정의 `ref`는 `<하위 질문 ID>#<issue|case>#<배열 위치>`다. 배열은 연구자 출력의 `issues`나 `evidence_map`이다.
+
+**묶음 FAIL 수 세기.** 묶음 하나의 FAIL 수는 `bash <스크립트> 2>&1 | awk -v h='<묶음 머리>' '$0==h{f=1;next} /^\[/{f=0} f' | grep -c '^  FAIL:'`로 센다. `check`의 실패 줄 머리(`  FAIL: `)만 세므로 요약 줄과 설명문의 'FAIL' 글자를 세지 않는다. 줄 수 창(`grep -A<n>`)으로 세지 않는다.
+
+**이미 겪은 함정.** 서브 세션은 `docs/superpowers/reviews/2026-10-18-prior-art-agent-plan-review/`의 렌즈 원본을 이미 겪은 함정의 목록으로 읽는다. 그 지적이 인용한 plan 초안은 실행하지 않으며 입력도 아니다. 초안은 커밋 `252155f`에 보존되어 있고, 현재 세션이 명세 디스패치 전에 사용자 확인을 받아 통합 브랜치에서 지운다.
+
+<!-- spec-review: escalated -->
