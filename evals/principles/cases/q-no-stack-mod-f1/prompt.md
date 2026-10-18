@@ -4,7 +4,7 @@ kind: should
 pair: q-no-stack-mod-f2
 type: deliverable
 failure: [language]
-clause: [NO-STACK-MOD]
+clause: [NO-STACK-MOD, BANNED-LIST]
 followup: true
 ---
 

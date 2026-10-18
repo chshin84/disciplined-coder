@@ -4,7 +4,7 @@ kind: should
 pair: q-written-only-2
 type: chat
 failure: [language]
-clause: [WRITTEN-ONLY]
+clause: [WRITTEN-ONLY, BANNED-LIST]
 judge: last-turn
 ---
 

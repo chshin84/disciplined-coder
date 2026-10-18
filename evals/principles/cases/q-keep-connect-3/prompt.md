@@ -3,7 +3,7 @@ tags: [dev]
 kind: should
 type: chat
 failure: [language]
-clause: [KEEP-CONNECT]
+clause: [KEEP-CONNECT, BANNED-LIST]
 judge: last-turn
 ---
 

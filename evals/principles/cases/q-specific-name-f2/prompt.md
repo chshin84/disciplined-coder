@@ -4,7 +4,7 @@ kind: should-not
 pair: q-specific-name-f1
 type: workdoc
 failure: [language]
-clause: [SPECIFIC-NAME]
+clause: [SPECIFIC-NAME, BANNED-LIST]
 judge: last-turn
 followup: true
 ---

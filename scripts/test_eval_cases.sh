@@ -33,6 +33,9 @@ rm -f "$UB"
 [ -n "$UNITS" ] && printf '%s\n' "$UNITS" | sed 's/^/    /'
 check "시험 단위 폴더가 하나 이상 있다" "[ -n \"\$(ls -d '$CLAUSES'/*/ 2>/dev/null)\" ]"
 check "current.md 는 기준 원칙의 줄이고, new.md 가 있고, 단위마다 개발용 질문이 3개 이상이며 두 kind 가 모두 있다" "[ -z \"\$UNITS\" ]"
+UBL="$(mktemp)"; git -C "$HERE" show 7a2d26d:korean-banned-words.md > "$UBL"
+check "BANNED-LIST 의 current.md 가 기준 커밋의 목록 파일과 같다" "cmp -s '$UBL' '$CLAUSES/BANNED-LIST/current.md'"
+rm -f "$UBL"
 
 echo "[비교 — 판정, 행별 위반 수, 금지어 횟수]"
 # 픽스처로 본다. 저장소 과제와 측정 결과에 기대지 않는다.

@@ -4,7 +4,7 @@ kind: should
 pair: term-expert
 type: chat
 failure: [language]
-clause: [TERM-EXPLAIN, VOCAB-PREF]
+clause: [TERM-EXPLAIN, VOCAB-PREF, BANNED-LIST]
 judge: last-turn
 ---
 

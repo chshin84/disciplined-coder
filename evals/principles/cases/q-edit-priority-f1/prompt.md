@@ -4,7 +4,7 @@ kind: should
 pair: q-edit-priority-f2
 type: chat
 failure: [language]
-clause: [EDIT-PRIORITY]
+clause: [EDIT-PRIORITY, BANNED-LIST]
 followup: true
 ---
 

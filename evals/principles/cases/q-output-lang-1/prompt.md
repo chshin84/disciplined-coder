@@ -4,7 +4,7 @@ kind: should
 pair: q-output-lang-2
 type: chat
 failure: [language]
-clause: [OUTPUT-LANG]
+clause: [OUTPUT-LANG, BANNED-LIST]
 judge: last-turn
 ---
 

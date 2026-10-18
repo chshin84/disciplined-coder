@@ -4,7 +4,7 @@ kind: should-not
 pair: q-written-only-f1
 type: chat
 failure: [language]
-clause: [WRITTEN-ONLY]
+clause: [WRITTEN-ONLY, BANNED-LIST]
 followup: true
 ---
 

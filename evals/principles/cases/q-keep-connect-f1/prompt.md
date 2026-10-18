@@ -4,7 +4,7 @@ kind: should
 pair: q-keep-connect-f2
 type: chat
 failure: [language]
-clause: [KEEP-CONNECT]
+clause: [KEEP-CONNECT, BANNED-LIST]
 judge: last-turn
 followup: true
 ---

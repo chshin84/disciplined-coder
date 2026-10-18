@@ -3,7 +3,7 @@ tags: [dev]
 kind: should
 type: deliverable
 failure: [format, language]
-clause: [FULL-SENTENCE]
+clause: [FULL-SENTENCE, BANNED-LIST]
 judge: last-turn
 ---
 

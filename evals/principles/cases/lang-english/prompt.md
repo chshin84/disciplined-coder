@@ -4,7 +4,7 @@ kind: should-not
 pair: lang-korean
 type: chat
 failure: [language]
-clause: [NO-MIRROR, OUTPUT-LANG]
+clause: [NO-MIRROR, OUTPUT-LANG, BANNED-LIST]
 judge: last-turn
 ---
 

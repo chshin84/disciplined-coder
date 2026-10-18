@@ -3,7 +3,7 @@ tags: [dev]
 kind: should
 type: deliverable
 failure: [language]
-clause: [ONE-IDEA]
+clause: [ONE-IDEA, BANNED-LIST]
 judge: last-turn
 ---
 

@@ -4,7 +4,7 @@ kind: should
 pair: q-term-explain-2
 type: chat
 failure: [language]
-clause: [TERM-EXPLAIN]
+clause: [TERM-EXPLAIN, BANNED-LIST]
 judge: last-turn
 ---
 

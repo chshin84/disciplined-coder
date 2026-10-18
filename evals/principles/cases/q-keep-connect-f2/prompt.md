@@ -4,7 +4,7 @@ kind: should-not
 pair: q-keep-connect-f1
 type: chat
 failure: [language]
-clause: [KEEP-CONNECT]
+clause: [KEEP-CONNECT, BANNED-LIST]
 followup: true
 ---
 

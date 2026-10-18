@@ -4,7 +4,7 @@ kind: should
 pair: q-term-one-2
 type: chat
 failure: [language]
-clause: [TERM-ONE]
+clause: [TERM-ONE, BANNED-LIST]
 judge: last-turn
 ---
 

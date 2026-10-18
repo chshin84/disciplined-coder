@@ -4,7 +4,7 @@ kind: should-not
 pair: q-output-lang-f1
 type: code
 failure: [language]
-clause: [OUTPUT-LANG]
+clause: [OUTPUT-LANG, BANNED-LIST]
 followup: true
 ---
 

@@ -4,7 +4,7 @@ kind: should
 pair: q-no-analogy-f2
 type: chat
 failure: [language]
-clause: [NO-ANALOGY]
+clause: [NO-ANALOGY, BANNED-LIST]
 judge: last-turn
 followup: true
 ---

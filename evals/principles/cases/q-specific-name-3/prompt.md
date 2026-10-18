@@ -3,7 +3,7 @@ tags: [dev]
 kind: should
 type: chat
 failure: [language]
-clause: [SPECIFIC-NAME]
+clause: [SPECIFIC-NAME, BANNED-LIST]
 judge: last-turn
 ---
 

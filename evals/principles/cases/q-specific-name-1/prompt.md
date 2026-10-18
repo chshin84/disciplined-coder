@@ -4,7 +4,7 @@ kind: should
 pair: q-specific-name-2
 type: chat
 failure: [language]
-clause: [SPECIFIC-NAME]
+clause: [SPECIFIC-NAME, BANNED-LIST]
 judge: last-turn
 ---
 

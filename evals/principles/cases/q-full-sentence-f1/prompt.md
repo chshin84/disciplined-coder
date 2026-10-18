@@ -4,7 +4,7 @@ kind: should
 pair: q-full-sentence-f2
 type: chat
 failure: [format, language]
-clause: [FULL-SENTENCE]
+clause: [FULL-SENTENCE, BANNED-LIST]
 judge: last-turn
 followup: true
 ---

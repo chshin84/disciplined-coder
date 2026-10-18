@@ -4,7 +4,7 @@ kind: should-not
 pair: q-no-mid-mod-f1
 type: deliverable
 failure: [language]
-clause: [NO-MID-MOD]
+clause: [NO-MID-MOD, BANNED-LIST]
 followup: true
 ---
 

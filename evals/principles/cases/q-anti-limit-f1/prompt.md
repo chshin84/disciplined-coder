@@ -4,7 +4,7 @@ kind: should
 pair: q-anti-limit-f2
 type: chat
 failure: [language]
-clause: [ANTI-LIMIT]
+clause: [ANTI-LIMIT, BANNED-LIST]
 followup: true
 ---
 

@@ -4,7 +4,7 @@ kind: should-not
 pair: q-no-mirror-f1
 type: chat
 failure: [language, format]
-clause: [NO-MIRROR]
+clause: [NO-MIRROR, BANNED-LIST]
 judge: last-turn
 followup: true
 ---

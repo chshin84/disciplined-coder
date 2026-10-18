@@ -4,7 +4,7 @@ kind: should
 pair: q-no-mirror-2
 type: chat
 failure: [language, format]
-clause: [NO-MIRROR]
+clause: [NO-MIRROR, BANNED-LIST]
 judge: last-turn
 ---
 
