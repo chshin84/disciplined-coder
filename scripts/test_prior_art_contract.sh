@@ -136,6 +136,17 @@ except ValueError:
 ' "$1" "$2"
 }
 
+# contract_check_example <자료 이름> <정의 파일>
+# 정의 파일에서 예시 블록을 꺼내 대조한다. 추출이 실패하면 사유 줄(error:...)을 로그에 남기고 1 로 끝난다.
+contract_check_example() {
+  local out="$FX/ex_$1.json"
+  if extract_block "$1" "$2" > "$out"; then
+    contract_check "$1" - "$out"
+  else
+    cat "$out"; return 1
+  fi
+}
+
 # 픽스처. 파일 경로는 json_run 에 인자로만 넘긴다.
 cat > "$FX/ok_schema.json" <<'J'
 {"type":"object","required":["url","judgments","principles_applied"],"properties":{"url":{},"principles_applied":{},
@@ -200,7 +211,7 @@ else
   for pair in researcher:RD synthesis:RD verifier:VD map:VD; do
     name="${pair%%:*}"; def="${pair##*:}"; file="${!def}"
     check "예시 $name 이 계약 코드와 맞는다" \
-      "extract_block $name \"$file\" > \"\$FX/ex_$name.json\" && contract_check $name - \"\$FX/ex_$name.json\""
+      "contract_check_example $name \"$file\""
   done
 fi
 
