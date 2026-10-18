@@ -19,7 +19,7 @@ description: 렌즈를 둘 이상 실행한 뒤에 연다. 그 출력을 한 목
 이 계약은 여기가 소유한다. 렌즈는 이 스키마로 돌려준다. 렌즈 파일에는 자기 `type` 폐쇄 집합만 정의하고 나머지는 여기를 참조한다.
 
 ```
-{ "lens": "lens-grounding|lens-fit|lens-consistency|lens-adversarial|lens-prior-art|lens-readability",
+{ "lens": "lens-grounding|lens-fit|lens-consistency|lens-adversarial|lens-readability",
   "read": ["문서 밖에서 실제로 열어본 것 — 파일 경로나 URL"],
   "issues": [ { "where": "문서 내 위치", "type": "<렌즈가 정의한 폐쇄 집합>",
                 "claim": "무엇이 문제인가", "file": "지적한 곳의 레포 상대경로",
@@ -50,10 +50,9 @@ description: 렌즈를 둘 이상 실행한 뒤에 연다. 그 출력을 한 목
 렌즈는 위 칸 말고 자기 칸을 추가할 수 있고, 무엇을 추가해도 되는지는 아래 「렌즈가 추가하는 칸」이 소유한다.
 
 ## 공통 계약의 예외
-`lens-readability`와 `lens-prior-art`는 빠지는 칸이 서로 달라 예외마다 따로 적는다.
+공통 계약을 따르지 않는 렌즈는 아래와 같다.
 
 - `lens-readability` — 대조할 상대편이 없어 위 공통 계약을 따르지 않는다. 제안이라서 「집계」·「커버리지 공백」 어디에도 들어가지 않는다. 대신 들어가는 칸과 스키마는 `skills/lens-readability/SKILL.md`가 소유한다. 빠지는 칸: `type`·`claim`·`file`·`evidence`·`counterpart_file`·`counterpart`·`principle`·`consequence`.
-- `lens-prior-art` — 대조할 상대편이 레포 안에 없어 위 공통 계약을 따르지 않는다. `evidence`는 인용이나 경로나 URL 이고, 인용 검증은 호출자(`review-specs`, `review-docs`)가 자기 도구로 한다. 빠지는 칸: `file`·`counterpart_file`·`counterpart`·`principle`.
 
 ## 처분 — 호출자의 몫
 렌즈는 처분을 고르지 않는다. 처분 축이 맥락마다 다르고, 사용자를 멈추게 할지는 호출자의 책임이다. accept/regenerate/escalate 결정은 제품 런타임에서만 내고, spec·plan 리뷰와 문서 검진에서는 결정 없이 병합한 목록만 호출자에게 넘긴다.
@@ -81,10 +80,6 @@ description: 렌즈를 둘 이상 실행한 뒤에 연다. 그 출력을 한 목
 | 칸 | 추가하는 쪽 | 포함하는 것 |
 |---|---|---|
 | `statements` | 문서별 호출 | 레포 문서 감사에서 그 문서가 정한 것의 목록이다. 항목은 `{topic, statement, evidence}` 셋이고, 요구하는 주체는 `audit-repo-docs`의 「진술 받기」 단계다 |
-| `search_status` | `lens-prior-art` | 검색이 제대로 실행되었는지다. 빈 `issues`를 판정으로 써도 되는지를 이 값이 정한다 |
-| `citations` | `lens-prior-art` | 인용의 목록이다 |
-| `not_found` | `lens-prior-art` | 찾지 못한 것의 목록이다 |
-| `disclosures` | `lens-prior-art` | 렌즈가 스스로 밝히는 한계다 |
 | `purpose` | `lens-readability` | 그 문서의 목적 한 줄이다. 빈 `suggestions`를 판정으로 써도 되는지를 이 값이 정한다 |
 | `rewrite` | `lens-readability` | 고친 결과다. 문장이든 옮긴 절이든 새로 쓴 문장이든 포함하고, 손대지 않는 요소에 적용되면 비운다 |
 | `doc_type` | `lens-fit` | 그 문서를 어느 타입으로 가렸는지다 |
@@ -92,7 +87,7 @@ description: 렌즈를 둘 이상 실행한 뒤에 연다. 그 출력을 한 목
 | `pairs` | `lens-consistency` | 짝마다의 판정이다 |
 | `target` | 레포 감사의 문서별 원본 | 그 원본이 다룬 문서의 레포 상대경로다. `scripts/audit_verify.sh`가 필수로 검사하고 `scripts/audit_statements.sh`가 진술을 문서별로 모을 때 쓴다 |
 
-`search_status`와 `purpose`는 집계본만 보고 넘어가면 조용한 통과가 생긴다. 두 칸은 호출자가 원본을 열어 확인한다.
+`purpose`는 집계본만 보고 넘어가면 조용한 통과가 생긴다. 이 칸은 호출자가 원본을 열어 확인한다.
 
 ## 구현 형태 (맥락 의존)
 같은 집계라도 제품 코드가 있느냐에 따라 구현하는 곳이 달라진다.
