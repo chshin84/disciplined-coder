@@ -544,7 +544,6 @@
 
 **런타임 확인(2026-10-18).** 현재 세션이 임시 플러그인 `probeplug`를 `claude -p --plugin-dir`로 적재해 워크플로 하나를 실행했다. 그 플러그인은 `workflows/probe.js`(`meta.name: 'probe'`)와 `agents/probe.md`(`tools: Read`)만 두었다. 이름 `probe`로 부르자 "Workflow \"probe\" not found. Available: deep-research, probeplug:probe"가 나왔고, `probeplug:probe`로 부르자 실행되었다. 그래서 플러그인 워크플로는 `<플러그인 이름>:<워크플로 이름>`으로 등록된다. 파일 이름과 `meta.name`이 같았으므로 워크플로 이름이 둘 중 어느 쪽에서 오는지는 확인하지 않았고, 이 저장소도 둘을 `prior-art-search`로 같게 둔다. `agent()`의 `agentType: 'probeplug:probe'`는 그 에이전트 정의로 해석되었고, 에이전트에게는 정의의 `Read`와 스키마용 `StructuredOutput`만 주어졌다. 관측한 정의는 이 하나뿐이지만, 정의의 `tools`가 워크플로 안에서 적용된다는 것은 확인되었다. 같은 임시 플러그인에 `claude plugin validate ./`를 실행했고, `workflows/`와 `agents/`가 있는 트리에서 작성자 정보가 없다는 경고 하나와 함께 `Validation passed with warnings`가 나왔다.
 
-
-
+**워크플로 판정의 사용자 확인(2026-10-18 사용자 답).** `workflow` 리포트가 사용자 확인으로 표시한 판정 두 건을 사용자가 그대로 승인했다. 검증자 판정 없이 `rejected`에 든 원소(선행 서술 결측이나 빈 `urls`)에는 반환값에 사유 키를 두지 않고, 오케스트레이터가 사유를 도출한다. `urls`가 비었으면 사유는 '인용에 URL 이 없다'이고, 아니면 '판정할 선행 사례 서술이 없다'다. `args.subquestions`가 빈 배열이면 `overall_status`는 정의대로 `ok`다. 오케스트레이터가 하위 질문을 늘 채우므로 워크플로는 이 입력을 따로 차단하지 않는다.
 
 <!-- spec-review: passed -->
