@@ -1,0 +1,26 @@
+{
+  "lens": "lens-fit",
+  "target": "docs/superpowers/plans/2026-10-18-prior-art-agent-workflow.md",
+  "doc_type": "설계 (spec·plan) 행이다. 대상 문서는 머리말과 Global Constraints와 태스크별 Files·Interfaces·체크박스 단계로 구현 방법과 설계 근거를 포함하고, 진행 상태나 일회성 인계를 포함하지 않는다. 이 행이 금하는 것은 실행이 끝난 plan을 보존 태그 없이 남기거나 지우는 일뿐이라 포함 금지 위반은 없다. 체크박스는 writing-plans 형식이 요구하는 추적용이고 진행 상태 기록이 아니다.",
+  "read": [
+    "skills/lens-fit/SKILL.md",
+    "agent-principles.md",
+    "docs/domain-korean.md",
+    "docs/superpowers/plans/2026-10-18-prior-art-agent-workflow.md"
+  ],
+  "issues": [
+    {"where": "Task 1 Step 4 Expected(84행), Task 3 Step 4 Expected(177행), Goal(5행), Architecture(7행), Global Constraints 수정 허용 경로(15행)", "type": "style", "claim": "'계약 테스트'라는 같은 용어가 `scripts/test_workflow.sh`와 `scripts/test_prior_art_contract.sh` 두 스크립트를 함께 가리킨다. 그래서 '계약 테스트는 `SKIP: agents` 줄을 낸다'가 어느 스크립트의 기대 출력인지 두 가지로 읽힌다.", "principle": "TERM-ONE"},
+    {"where": "Task 3 Step 4(176~177행)", "type": "constraint", "claim": "Run 칸이 명령을 적지 않고 CLAUDE.md 절을 가리킨다. Expected 칸은 그 명령이 내지 않는 출력을 기대한다. 그 명령은 각 스크립트 출력을 임시 디렉터리 로그로 보내고 `ALL PASS`나 `FAILED:`와 FAIL 줄만 출력하므로 `SKIP: agents` 줄은 화면에 나오지 않는다.", "principle": "CHECKABLE"},
+    {"where": "Task 3 Step 4 Expected(177행)", "type": "constraint", "claim": "'이번 변경 전에도 있던 경고만 낸다'는 변경 전 경고 목록과 비교해야 판정되는데, 어느 단계도 변경 전 `claude plugin validate ./` 출력을 받아 두지 않는다.", "principle": "CHECKABLE"},
+    {"where": "Task 1 Interfaces(44~49행) 대 Task 2 Step 1(110행)·Task 3 Step 1(158행)", "type": "constraint", "claim": "Task 2·Task 3 은 픽스처 디렉터리 변수 `$FX`를 쓰지만 Task 1 Interfaces 의 Produces 는 `$FX`를 주지 않는다.", "principle": "FOCUSED"},
+    {"where": "Task 1 Interfaces `run` 명령(46행) 대 Task 3 Step 1(158행)·`[시험 도구 자체]`(163행)", "type": "constraint", "claim": "Task 1 Interfaces 는 `responses`의 키가 호출의 `label`인지와 응답표에 키가 없을 때 치명 오류로 종료 코드 1 이 되는지를 적지 않는다.", "principle": "FOCUSED"},
+    {"where": "Task 1 Files(40행) 대 Task 2 Files(96행)·Produces(106행)", "type": "constraint", "claim": "Task 1 은 `lacksPrior` 선언을 언급하지 않는데 Task 2 는 '`lacksPrior`의 본문'을 고친다고 적어, 새로 선언해야 하는지가 두 가지로 읽힌다.", "principle": "TERM-ONE"},
+    {"where": "Task 1 Interfaces 불릿(45~49행)", "type": "style", "claim": "같은 구실을 하는 Interfaces 불릿의 말끝이 문장과 기호 조각으로 섞여 있다.", "principle": "ONE-ENDING"},
+    {"where": "Task 1 Step 1(53행), Task 2 Step 1(108행)·Files(97행), Task 3 Files(150행)·Step 3(172행), Task 2 `[통과 판정]`(114행), Global Constraints(24행), Spec(11행)", "type": "style", "claim": "목록 개수 예고, 다른 절 목록의 개수 참조, 대명사로 쓴 수사가 여러 줄에 있다(묶음 두 개, 여덟 단계, 여덟 조건, 세 파일, 둘이 다르면).", "principle": "COUNT-EARNS"},
+    {"where": "「스스로 정한 내부 규칙」 머리(28행), Global Constraints 수정 허용 경로(15행)", "type": "style", "claim": "'리포트에 같은 내용을 적는다'와 '멈춰 보고한다'에서 누가 어느 리포트에 적는지, 누구에게 보고하는지가 빠졌다.", "principle": "SUBJECT-OBJECT"},
+    {"where": "「스스로 정한 내부 규칙」 불릿(30~32행), Task 2 `[URL 묶기]`·`[통과 판정]` 불릿(113~114행), Global Constraints 불릿(20·23행)", "type": "style", "claim": "한 불릿 항목이 다섯 문장 이상으로 이어진다. 113행의 괄호 지시가 기대값 파일에 적을 문자열인지 계산 방법인지 구분되지 않는다.", "principle": "BULLET-SCOPE"},
+    {"where": "Architecture(7행) 둘째 문장", "type": "style", "claim": "한 문장에 첫 줄 처리, AsyncFunction 감싸기, fn 분기, run 분기의 네 개념이 들어 있고 명사 앞에 수식어가 겹친다.", "principle": "ONE-IDEA"}
+  ],
+  "principles_applied": ["TERM-ONE", "CHECKABLE", "FOCUSED", "ONE-ENDING", "FULL-SENTENCE", "COUNT-EARNS", "SUBJECT-OBJECT", "TERM-EXPLAIN", "BULLET-SCOPE", "ONE-IDEA", "NO-STACK-MOD", "NO-MID-MOD", "WRITTEN-ONLY", "COMMA-CUT", "ANTI-LIMIT", "NAME-ITEMS", "DOC-TYPE"],
+  "notes": "검토한 관점은 writing-plans 형식, 태스크 사이 Interfaces 의 완결성, 확인 단계의 명령과 기대 출력, 에이전트원칙과 domain-korean 의 문체·용어 조항이다. 금지 낱말은 보지 않았다. 더 확인할 사항: Task 1 Step 2 의 Expected 는 set -euo pipefail 아래에서 워크플로 파일이 없을 때 grep -c·head·awk 가 비정상 종료하면 스크립트가 PASS/FAIL 줄에 이르기 전에 다른 종료 코드로 끝날 수 있다. (호출자 주: 원본 JSON 의 evidence·counterpart·consequence 칸은 길이 때문에 요약 저장했다.)"
+}

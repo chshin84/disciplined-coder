@@ -1,0 +1,15 @@
+{
+  "lens": "lens-grounding",
+  "target": "docs/superpowers/plans/2026-10-18-prior-art-agent-workflow.md",
+  "read": ["skills/lens-grounding/SKILL.md", "agent-principles.md", "docs/domain-korean.md (절 제목)", "docs/superpowers/plans/2026-10-18-prior-art-agent-workflow.md", "docs/superpowers/specs/2026-10-18-prior-art-agent-specworkflow-design.md", "docs/superpowers/specs/2026-10-18-prior-art-agent-design.md", "docs/superpowers/specs/2026-10-18-prior-art-agent-specagents-design.md (66행)", "scripts/prior_art_contract.json", "scripts/test_prior_art_contract.sh", "scripts/_test_check.sh", "scripts/_json_valid.sh", "scripts/test_assertions.sh", "scripts/test_docs_drift.sh (CI 대조 구간)", ".github/workflows/ci.yml", "node v24.16.0 로 plan 의 checkQueries 정규식을 실행한 결과", "node JSON.stringify 와 python json.dumps 출력 대조 결과"],
+  "issues": [
+    {"where": "「스스로 정한 내부 규칙」의 「판정 없이 탈락한 항목의 사유」", "type": "contradiction", "claim": "plan 은 classify 가 rejected 원소에 reason 키를 붙이게 한다. 하부 명세는 목록 원소가 { ref, urls }를 그대로 쓰고 사유는 다른 칸에서 읽는다고 정했고, specagents 하부 명세 66행은 그 사유 위치를 그대로 읽는다.", "principle": "EVIDENCE-FIRST"},
+    {"where": "Task 2 Step 3 의 checkQueries 정규식 설명", "type": "mismatch", "claim": "plan 은 정규식이 하부 명세 문구를 그대로 옮겼다고 단정하지만, 확장자의 둘째 글자부터를 영숫자로 한정한 조건은 명세 문구에 없다. a/b.c_d 는 명세 문구로는 경로 형태인데 정규식은 false 를 낸다.", "principle": "NO-ASSUME"},
+    {"where": "Task 2 Interfaces 의 checkQueries 항목", "type": "unsupported", "claim": "같은 검색어에서 forbidden-term 원소가 path-shape 원소보다 앞이라는 차례는 하부 명세에 없고 「스스로 정한 내부 규칙」에도 없다.", "principle": "EVIDENCE-FIRST"},
+    {"where": "Task 1 Interfaces 의 종료 코드", "type": "unsupported", "claim": "명령 이름 오류와 입력 JSON 해석 실패를 종료 코드 2 로 분류한 것은 하부 명세에 없고 「스스로 정한 내부 규칙」에도 없다.", "principle": "EVIDENCE-FIRST"},
+    {"where": "Task 3 Step 4 의 Expected", "type": "mismatch", "claim": "CLAUDE.md 「변경 뒤 실행」 명령은 ALL PASS 나 FAIL 줄만 출력하므로 SKIP: agents 줄을 그 출력에서 확인할 수 없다.", "principle": "NO-ASSUME"},
+    {"where": "Task 1 Step 2 의 Expected", "type": "unsupported", "claim": "awk 를 check 밖에서 실행하면 set -e 때문에 파일이 없을 때 스크립트가 멈춰 PASS/FAIL 집계가 관측되지 않는다.", "principle": "STATE-ASSUME"}
+  ],
+  "principles_applied": ["NO-ASSUME", "STATE-ASSUME", "EVIDENCE-FIRST", "SPECIFIC-NAME", "SUBJECT-OBJECT", "WRITTEN-ONLY", "FULL-SENTENCE", "COUNT-EARNS", "TERM-ONE"],
+  "notes": "라벨, phase 제목, agentType, meta.name, whenToUse, model·effort 금지, 모드 값, 프롬프트 도우미 형식, 루트·원소 required, 반환값 키 차례, SKIP: agents 기대(Task 1), json_run·check 의 위치는 출처와 같다. CI 에는 setup-node@v4 단계가 있으나 contracts 작업에 속하는지는 끝까지 확인하지 않았다. checkQueries 정규식은 명세 표와 plan 입력의 검색어에서 모두 기대 판정을 냈다. JSON.stringify 와 json.dumps(separators=(',', ':'), ensure_ascii=False)는 문자열·정수·삽입 차례 객체에서 같은 문자열을 냈다(실수 1.0 과 짝 없는 서로게이트만 다르다). 추가 확인사항: (a) lacksPrior 의 '공백뿐' 조건을 case·prior 에도 적용하는 것은 계약 표가 어느 쪽으로도 읽힌다. (b) groupByUrl 이 결측 항목을 claims·subquestions 에서 빼는 규칙은 행선지 표와 맞다. (c) lacksPrior 는 추상화 수준 목록에 없지만 두 판정 함수가 쓴다. (e) Task 3 Step 3 의 '각 단계 앞에서 phase' 는 제목이 없는 단계에 무엇을 할지 정하지 않는다. (f) classify 의 판정 사전이 ref 하나에 판정 하나만 두면 여러 URL 판정 중 하나만 남는다. (호출자 주: 원본의 evidence·counterpart·consequence 칸은 길이 때문에 요약 저장했다.)"
+}
