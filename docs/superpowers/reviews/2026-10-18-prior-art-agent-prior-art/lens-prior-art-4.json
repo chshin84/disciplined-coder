@@ -1,0 +1,104 @@
+{
+  "lens": "lens-prior-art",
+  "search_status": "ok",
+  "read": [
+    "https://arxiv.org/html/2509.04499",
+    "https://arxiv.org/html/2601.15808",
+    "https://arxiv.org/html/2508.15804",
+    "https://arxiv.org/html/2506.11763",
+    "https://www.anthropic.com/engineering/multi-agent-research-system",
+    "https://arxiv.org/html/2604.03173",
+    "https://arxiv.org/abs/2607.08700",
+    "https://arxiv.org/abs/2608.24306",
+    "https://arxiv.org/abs/2607.20527",
+    "https://arxiv.org/html/2607.20527",
+    "https://arxiv.org/abs/2609.14575",
+    "https://arxiv.org/html/2609.14575",
+    "https://arxiv.org/pdf/2609.14575",
+    "https://gemini.google/overview/deep-research/",
+    "https://openai.com/index/introducing-deep-research/ (403, 열지 못함)"
+  ],
+  "queries": [
+    "DeepTRACE audit deep research citation accuracy arXiv",
+    "DeepVerifier deep research agent verification arXiv",
+    "ReportBench deep research citation statement verification arXiv",
+    "Anthropic multi-agent research system CitationAgent lead researcher subagents engineering",
+    "OpenAI deep research system card hallucination citation human review limitations",
+    "deep research agent citation verification LLM judge agreement human annotators attribution evaluation 2026",
+    "citation verifiers disagree unsupported citation rate depends on verifier strictness deep research",
+    "Gemini Deep Research research plan user approval edit before research"
+  ],
+  "issues": [
+    {
+      "where": "메커니즘 — 인용 지지 검증(출처가 주장을 실제로 뒷받침하는지 직접 열어 확인)과 이중화 판정 대조",
+      "type": "known-failure",
+      "claim": "인용 지지 판정은 판정기의 엄격도에 따라 결과가 크게 바뀌고, 판정기끼리는 '지지됨'에는 일치하지만 '미지지' 지정에는 일치하지 않는다는 실패 유형이 보고되어 있다. 이 설계의 인용 지지 검증은 판정 기준의 엄격도와 오판정률 확인 방법을 정하지 않아 같은 실패가 그대로 전이된다.",
+      "consequence": "현재 설계에서는 같은 근거 지도라도 검증을 맡은 모델과 프롬프트에 따라 미지지 플래그가 달라진다. 이중화 판정 대조의 불일치도 대부분 '미지지' 쪽에서 생길 것으로 예상되므로, 원문 대조와 미해소 보고가 사람 처분 단계로 몰린다. 미지지 플래그 중 상당수는 실제로는 지지되는 인용을 잘못 기각한 결과일 수 있다.",
+      "evidence": "arXiv 2607.20527(과학 문헌 합성 에이전트의 인용 충실도): 같은 에이전트 출력에서 미지지 인용 비율이 판정기 엄격도만으로 약 3%(고재현율 판정기 AttrScore-3B)에서 약 14~18%(엄격한 DeBERTa-NLI 판정기)까지 변한다. 미지지에 대한 판정기 간 일치(negative-specific agreement)는 0.27~0.30이고, 한 판정기가 지적한 인용의 60~80%를 다른 판정기는 지지됨으로 판정한다. 저자들은 엄격도 상승분의 상당 부분이 오기각이라고 적고, 판정기와 프로토콜을 명시하지 않은 수치끼리는 비교할 수 없다고 결론짓는다. DeepTRACE(2509.04499)도 사실 지지 판정의 LLM 판정기와 사람 라벨의 상관이 Pearson r=0.62(100개 과제)로 '중간 수준'이라 한계로 적는다. arXiv 2607.08700은 판정기 8종을 사람 검토 라벨 1,248건과 대조해 사실 지지 차원에서 판정기 간 통계적 차이가 없고, F1이 같아도 오탐률·미탐률의 방향 편향이 크게 다르다고 보고한다. 네 축 대조: 목적(인용 충실도 판정)은 같고, 메커니즘(자동 판정기 대 오케스트레이터의 직접 열람 판정)은 다르며, 평가(사람 골드 라벨 대 사람 처분)와 적용 대상(과학 합성 에이전트·벤치마크 대 단일 사용자 플러그인)이 다르다. 따라서 수치 자체는 이 설계에 옮길 수 없고, 판정기 엄격도에 결과가 좌우된다는 실패 원인만 전이된다.",
+      "citations": [
+        { "url": "https://arxiv.org/html/2607.20527", "kind": "preprint", "opened": true },
+        { "url": "https://arxiv.org/html/2509.04499", "kind": "peer-reviewed", "opened": true },
+        { "url": "https://arxiv.org/abs/2607.08700", "kind": "preprint", "opened": true }
+      ]
+    },
+    {
+      "where": "메커니즘 — 기계 검사(URL 응답)",
+      "type": "known-failure",
+      "claim": "URL 응답 검사는 봇 차단·유료 장벽 때문에 실재하는 출처의 10~20%를 판정 불가로 남긴다는 실패 유형이 보고되어 있다. 이 설계는 4xx 응답과 판정 불가 응답을 어떻게 처분할지 정하지 않았다.",
+      "consequence": "현재 설계대로 URL 응답 검사를 통과·실패 둘로만 처리하면 봇 차단으로 403을 돌려주는 실재 출처(벤더 공식 글 등)가 기각되거나, 반대로 응답만 하는 출처가 지지 검증 없이 통과한 것으로 읽힐 수 있다. 이 렌즈의 이번 실행에서도 벤더 공식 글 하나가 403을 돌려주었다.",
+      "evidence": "arXiv 2604.03173(상용 LLM과 deep research 에이전트의 참조 환각 탐지·수정): HEAD 후 GET 요청과 Wayback 스냅숏 조회로 LIVE·DEAD·LIKELY_HALLUCINATED·UNKNOWN을 구분하는 도구 urlhealth를 공개했다. 10~20%의 URL은 봇 차단·유료 장벽·모호한 응답 때문에 UNKNOWN으로 남고, 헤드리스 브라우저로 다시 확인하면 그중 89%가 실재하거나 차단된 페이지였다. deep research 에이전트의 환각 URL 비율은 10.7%로 검색 보강 모델의 4.8%보다 높다. 저자들은 URL 응답 검사가 존재 여부만 보며 지지 여부는 검증하지 않는다고 명시한다. DeepTRACE도 원문 추출 단계에서 URL의 약 15%가 유료 장벽·404로 실패해 제외했다. 네 축 대조: 목적(인용 URL 실재 확인)과 메커니즘(HTTP 응답 검사)은 같고, 평가(대규모 URL 통계 대 사람 처분)와 적용 대상(벤치마크 대 플러그인)은 다르다.",
+      "citations": [
+        { "url": "https://arxiv.org/html/2604.03173", "kind": "preprint", "opened": true },
+        { "url": "https://arxiv.org/html/2509.04499", "kind": "peer-reviewed", "opened": true }
+      ]
+    },
+    {
+      "where": "메커니즘 — 결론을 바꾸는 하위 질문의 독립 이중화",
+      "type": "weak-baseline",
+      "claim": "이 설계의 독립 이중화는 같은 토큰 예산을 단일 에이전트 하나에 준 기준선과 비교되지 않았다.",
+      "consequence": "현재 설계에서는 이중화로 얻는 사례 발견과 판정 안정성이 서로 다른 검색 경로 덕분인지, 단순히 탐색량이 두 배가 된 덕분인지 구분할 수 없다. 이중화 대상 하위 질문마다 비용이 두 배로 늘지만 그 비용의 근거가 남지 않는다.",
+      "evidence": "Anthropic 공식 엔지니어링 글(다중 에이전트 리서치 시스템)은 BrowseComp에서 토큰 사용량 하나가 성능 분산의 80%를 설명했다고 적고, 다중 에이전트 시스템이 채팅의 약 15배 토큰을 쓴다고 적는다. 같은 글은 서브에이전트끼리 같은 주제를 중복 조사한 사례를 실패 유형으로 보고한다. ReportBench(2508.15804)는 인용 없는 진술을 두 모델이 세 번씩 판정한 6표 다수결로 검증하는 구조를 쓰지만, 이 구조도 단일 판정 대비 이득을 따로 측정하지 않았다. 네 축 대조: Anthropic 시스템과 목적(웹 조사 결과 산출)과 메커니즘(오케스트레이터와 병렬 서브에이전트)은 같고, 평가(LLM 판정기와 사람 테스터 대 사람 처분)와 적용 대상(claude.ai 제품 대 Claude Code 플러그인)은 다르다. 의도적 이중화와 우발적 중복을 구분해 비교한 선행 결과는 찾지 못했다.",
+      "citations": [
+        { "url": "https://www.anthropic.com/engineering/multi-agent-research-system", "kind": "vendor", "opened": true },
+        { "url": "https://arxiv.org/html/2508.15804", "kind": "preprint", "opened": true }
+      ]
+    },
+    {
+      "where": "메커니즘 — 오케스트레이터가 결과를 사례 키로 합친 뒤 검증하는 순서",
+      "type": "known-failure",
+      "claim": "오픈소스 deep research 시스템의 최종 보고서 오류는 대부분 오케스트레이터에서 생기고, 그 오류의 다수는 인용 오류라는 결과가 보고되어 있다. 이 설계는 인용 지지 검증의 대상이 서브에이전트가 돌려준 진술인지, 오케스트레이터가 합친 근거 지도인지 정하지 않았다.",
+      "consequence": "현재 설계에서 인용 지지 검증을 서브에이전트 출력에만 적용하면, 오케스트레이터가 사례 키로 합치면서 생기는 진술·출처 연결 오류가 검증 순서 밖에 남는다.",
+      "evidence": "arXiv 2608.24306(에이전트형 deep research의 충실도·인용 오류 위치 추적): 각 에이전트 호출을 자기 입력과 대조해 오류를 환각·인용 없는 입력 의존·인용 없는 출력·인용 부족으로 분류했다. AI-Q 시스템에서 최종 보고서 오류의 84.7%가 오케스트레이터에서 생겼고, 그중 약 31%가 환각, 나머지가 인용 오류였다. 단일 문서를 요약하는 에이전트만 오류가 적었다. 네 축 대조: 목적(다중 에이전트 조사의 인용 충실도)과 메커니즘(오케스트레이터와 하위 에이전트)은 같고, 평가(호출 단위 자동 판정 대 사람 처분)와 적용 대상(오픈소스 deep research 시스템 대 플러그인)은 다르다.",
+      "citations": [
+        { "url": "https://arxiv.org/abs/2608.24306", "kind": "preprint", "opened": true }
+      ]
+    },
+    {
+      "where": "메커니즘 — 인용 지지 검증의 절차 정의",
+      "type": "crowded",
+      "claim": "진술과 URL 쌍을 추출하고 원문을 가져와 지지 구절을 찾은 뒤 지지·비지지를 이진 판정하는 절차는 FACT와 ReportBench가 공개한 표준화된 절차다. 이 설계는 '직접 열어 확인'만 적고 그 절차를 참조하지 않아 같은 절차를 처음부터 다시 짓는다.",
+      "consequence": "현재 설계의 인용 지지 검증은 지지 구절을 기록하라는 요구가 없어, 사람이 처분할 때 판정을 다시 검토할 근거가 남지 않는다(이 결과는 렌즈의 추론이다). 공개 절차를 따르면 지지 구절과 판정을 쌍으로 남길 수 있다.",
+      "evidence": "DeepResearch Bench의 FACT(2506.11763): 판정 LLM이 진술·URL 쌍을 추출하고 중복을 제거한 뒤 Jina Reader로 원문을 가져와 support/not support를 이진 판정한다. 인용 정확도는 과제마다 지지 쌍의 비율을 구해 평균한 값이다. 사람 대조는 100쌍에서 지지 판정 96%, 비지지 판정 92% 일치다. ReportBench(2508.15804): 진술과 URL을 짝짓고, 원문을 가져와 가장 관련 있는 지지 구절을 찾은 뒤, 마지막에 지지 여부를 판정하는 3단계를 쓴다. 다만 ReportBench는 평가 지표에 대한 사람 일치 연구를 보고하지 않았다. 두 절차 모두 벤치마크 평가용이라 사람 처분 단계가 없고, 바로 가져다 쓸 수 있는 플러그인 모듈 형태는 아니다. 네 축 대조: 목적(인용이 진술을 받치는지 판정)과 메커니즘(원문 열람 후 판정)은 같고, 평가(벤치마크 점수 대 사람 처분)와 적용 대상(시스템 비교 대 개별 결정 근거)은 다르다.",
+      "citations": [
+        { "url": "https://arxiv.org/html/2506.11763", "kind": "preprint", "opened": true },
+        { "url": "https://arxiv.org/html/2508.15804", "kind": "preprint", "opened": true },
+        { "url": "https://arxiv.org/html/2508.15804", "kind": "lens-derived", "opened": true }
+      ]
+    }
+  ],
+  "not_found": [
+    "OpenAI Deep Research 소개 글의 한계 절 원문은 403 응답으로 열지 못해 벤더가 직접 밝힌 인용 검증·사람 확인 방식을 확인하지 못했다.",
+    "Perplexity와 Google이 제품 안에서 인용 지지 여부를 자동 검증하는지 밝힌 벤더 문서는 찾지 못했다. Gemini 공식 소개 페이지는 계획을 사용자가 조정할 수 있고 '여러 단계의 자기 비판'을 거친다고만 적으며 인용 검증은 언급하지 않는다.",
+    "서로 다른 검색 경로(키워드 검색·인용 추적·표준기구 문서)로 같은 하위 질문을 독립 이중화해 그 효과를 측정한 선행 연구는 찾지 못했다. 이 결과는 독창성의 근거가 아니다.",
+    "사람 처분을 전제로 한 연구 에이전트 검증 모듈의 공개 평가는 찾지 못했다. 확인한 벤치마크는 모두 자동 판정기 기준이다.",
+    "arXiv 2609.14575(Reddit 생성 검색 감사)의 MiniCheck와 LLM 판정기 비교 수치는 HTML 본문 앞 100,000자와 PDF에서 확인하지 못해 인용하지 않았다."
+  ],
+  "disclosures": [
+    "DeepTRACE 표 1과 본문의 Gemini 인용 정확도가 50.3%와 40.3%로 다르고, 판정 모델도 본문(GPT-5)과 부록(GPT-4)이 다르다. 이 수치는 판정 근거로 쓰지 않았다.",
+    "WebFetch는 요약 모델을 거쳐 내용을 돌려주므로 인용한 수치는 원문 문장 그대로가 아닐 수 있다. 호출자가 원문에서 수치를 다시 확인하기를 권한다.",
+    "arXiv 2607.08700, 2608.24306은 초록만 열었고 본문은 열지 않았다.",
+    "DeepVerifier의 수치(메타 평가 F1 73.17 대 LLM 판정기 기준선 25.00, 반복 3~4차 이후 성능 일부 하락)는 HTML 본문 요약에서 얻었다."
+  ],
+  "principles_applied": ["NO-ASSUME", "STATE-ASSUME", "EVIDENCE-FIRST", "SECRETS", "FOCUSED", "ASYNC-FIRST", "YAGNI", "WRITTEN-ONLY", "NO-MIRROR", "SUBJECT-OBJECT", "SPECIFIC-NAME", "TERM-ONE", "BOTTOM-LINE", "COUNT-EARNS", "FULL-SENTENCE"],
+  "notes": "검토한 관점: 체크리스트 항목마다 따로 보았다. 기시감은 Anthropic 다중 에이전트 리서치 시스템이 오케스트레이터·서브에이전트·복잡도별 노력 산정·CitationAgent 구조에서 가장 가깝다. 결말은 벤치마크마다 인용 정확도가 40~94%로 퍼져 있고 미해결이다. 전이는 판정기 엄격도 의존, URL 판정 불가, 오케스트레이터 단계 인용 오류의 세 가지를 issues에 올렸다. 기준선은 동일 토큰 예산의 단일 에이전트를 올렸다. 붐빔은 인용 지지 판정 절차를 올렸다. 오케스트레이터·서브에이전트 구조 자체는 적용 대상(claude.ai 제품 대 Claude Code 플러그인)과 평가(LLM 판정기 대 사람 처분)가 달라 붐빔으로 올리지 않았다.\n\n벤치마크마다 '정확'의 정의가 다르다. DeepTRACE의 인용 정확도는 인용 행렬과 사실 지지 행렬의 원소곱 합을 인용 행렬 합으로 나눈 값이고, 진술 단위가 아니라 인용 관계 단위다. FACT의 인용 정확도는 과제마다 지지 판정 쌍의 비율을 구해 과제 평균을 낸 값이고, 인용 가능한 진술이 없는 과제는 0점이다. ReportBench의 인용 진술 일치율은 인용이 붙은 진술 중 출처와 의미가 일치하는 비율이고, 인용 없는 진술은 별도로 6표 다수결로 사실 정확도를 판정한다. 따라서 같은 OpenAI Deep Research가 DeepTRACE 79.1%(GPT-5 DR), FACT 77.96%, ReportBench 78.87%로 비슷해 보여도 분모가 달라 직접 비교할 수 없다.\n\n설계의 충분성에 대한 판단: 인용 지지 검증을 넣은 방향은 선행 결과와 맞는다. 다만 판정 엄격도와 사람 표본 대조가 정해져 있지 않아 이중화 판정 대조가 판정기 차이를 사례 차이로 오인할 수 있다. 기존 모듈 채택에 대해서는, 바로 가져다 쓸 수 있는 플러그인용 검증 모듈은 확인하지 못했다. 빌릴 수 있는 것은 FACT·ReportBench의 절차 구조와 urlhealth의 URL 분류 규칙이다.\n\n찾은 사례 목록:\n- Anthropic 다중 에이전트 리서치 시스템(https://www.anthropic.com/engineering/multi-agent-research-system): 연구 종료 뒤 CitationAgent가 문서와 보고서를 처리해 인용 위치를 지정한다. 평가는 LLM 판정기(사실 정확도·인용 정확도·완전성·출처 품질·도구 효율, 0.0~1.0과 통과·실패)와 사람 테스터다. 공개 수치는 단일 Opus 4 대비 내부 평가 90.2% 향상, 토큰 15배, 토큰 사용량이 BrowseComp 성능 분산의 80% 설명이다. 사람 테스터가 SEO 콘텐츠 농장 선호를 찾아냈다. 네 축은 목적 일부 같음, 메커니즘 같음, 평가 다름, 적용 대상 다름이다. 빌릴 구조는 복잡도별 서브에이전트 수 규칙(단순 1개·비교 2~4개·복잡 10개 초과), 출처 품질 휴리스틱, 결과 상태 평가다.\n- DeepTRACE(https://arxiv.org/html/2509.04499, ICLR 2026): 진술 분해와 인용 행렬·사실 지지 행렬로 8개 지표를 측정한다. 인용 정확도는 deep research 구성에서 31.4~79.1%, 미지지 진술은 12.5~97.5%다. 사실 지지 판정의 사람 상관은 r=0.62다. 알려진 실패 유형은 논쟁 질문의 한쪽 치우침, 과신, 관련 없는 출처 인용, 나열만 하고 인용하지 않는 출처다. 네 축은 목적 다름(시스템 감사), 메커니즘 일부 같음, 평가 다름, 적용 대상 다름이다. 빌릴 구조는 인용 정확도와 인용 철저도(지지 출처 중 실제 인용된 비율)를 나눠 보는 지표와 '나열만 된 출처' 검사다.\n- DeepResearch Bench FACT(https://arxiv.org/html/2506.11763): 진술·URL 추출, Jina Reader 원문 수집, 이진 지지 판정을 거친다. 인용 정확도는 Gemini-2.5-Pro DR 81.44%, OpenAI DR 77.96%, Perplexity DR 90.24%, Claude-3.7-Sonnet 검색 93.68%다. 사람 일치는 100쌍에서 지지 96%, 비지지 92%다. 네 축은 목적 같음(인용 지지), 메커니즘 같음, 평가 다름, 적용 대상 다름이다. 빌릴 구조는 같은 URL에 붙은 중복 진술 제거와 이진 판정이다.\n- ReportBench(https://arxiv.org/html/2508.15804): 인용 진술은 3단계 의미 일치로, 인용 없는 진술은 웹 연결 모델 두 개의 6표 다수결로 검증한다. 인용 진술 일치율은 OpenAI DR 78.87%, Gemini DR 72.94%, o3 31.43%다. 지표에 대한 사람 일치 연구는 없다. 실패 유형은 진술 환각(인용 출처와 다른 내용), 인용 환각(존재하지 않는 URL), 과다 인용, 금지된 원 논문 인용이다. 네 축은 목적 일부 같음, 메커니즘 같음, 평가 다름, 적용 대상 다름이다. 빌릴 구조는 지지 구절을 먼저 찾고 판정하는 순서와 다수결 표 비율을 신뢰도로 남기는 방식이다.\n- DeepVerifier(https://arxiv.org/html/2601.15808): 최종 답과 궤적 요약을 실패 분류(5대분류·13소분류) 루브릭으로 검토하고, 최대 3개의 예·아니요 후속 질문을 별도 검증 에이전트가 웹에서 확인한다. 메타 평가 F1은 73.17(분해 없는 에이전트 판정기 61.54, LLM 판정기 25.00)이다. 반복 피드백으로 GAIA-Web 정확도가 약 12점까지 오르지만 3~4차 이후 맞는 답을 기각해 일부 하락한다. 네 축은 목적 다름(답의 정답성), 메커니즘 일부 같음, 평가 다름, 적용 대상 다름이다. 빌릴 구조는 전체를 다시 풀지 않고 의심 지점만 예·아니요 질문으로 검증하는 방식이다. 이 설계의 공백 라운드에도 반복 차수가 늘수록 맞는 판정을 뒤집는 하락이 전이되는지는 확인하지 못했다. 공백 라운드의 종료 조건과 함께 더 확인해야 한다.\n- urlhealth(https://arxiv.org/html/2604.03173): HEAD·GET과 Wayback 조회로 URL을 4종으로 분류한다. 비응답 URL은 5.4~18.5%, 환각 URL은 3.0~13.3%다. 도구를 에이전트에 주면 비응답 비율이 1% 미만으로 줄었다(GPT-5.1 16.0%→0.6%). 판정 불가가 10~20% 남는다. 네 축은 목적 같음(URL 실재), 메커니즘 같음, 평가 다름, 적용 대상 다름이다. 빌릴 구조는 4종 분류와 판정 불가를 실패와 분리하는 규칙이다.\n- 에이전트형 deep research 오류 위치 추적(https://arxiv.org/abs/2608.24306): 호출 단위로 충실도·검증 가능성을 검사한다. AI-Q 최종 오류의 84.7%가 오케스트레이터에서 생기고 그 다수가 인용 오류다. 네 축은 목적 같음, 메커니즘 같음, 평가 다름, 적용 대상 다름이다. 빌릴 구조는 오케스트레이터의 합성 결과를 자기 입력(서브에이전트 출력)과 대조하는 검사다.\n- 과학 합성 인용 충실도 가드(https://arxiv.org/html/2607.20527): 판정기 엄격도에 따라 미지지 비율이 약 3~18%로 변하고 미지지 일치가 0.27~0.30이다. split-conformal 층으로 통과한 미지지 인용의 상한을 보장한다(사람 골드 SciFact 208쌍, QASA 1,375건). 네 축은 목적 같음, 메커니즘 다름, 평가 다름, 적용 대상 다름이다. 빌릴 구조는 판정기와 프로토콜을 결과와 함께 기록하는 규칙이다.\n- 인용 판정기 벤치마크(https://arxiv.org/abs/2607.08700): 판정기 8종을 사람 검토 1,248건과 대조했다. 출처 관련성은 GPT-5-mini F1 0.908(κ=0.636)이고, 사실 지지는 판정기 간 차이가 없다. 같은 F1에서도 오탐·미탐 방향 편향이 다르다. 네 축은 목적 같음, 메커니즘 다름, 평가 다름, 적용 대상 다름이다. 빌릴 구조는 저가 모델로도 판정이 가능하다는 결과와 방향 편향 확인이다.\n- Gemini Deep Research(https://gemini.google/overview/deep-research/): 다중 포인트 조사 계획을 만들고 사용자가 조정할 수 있다. 인용 검증 언급은 없다. 네 축은 목적 일부 같음, 메커니즘 일부 같음(계획 사용자 조정은 이 설계의 프로토콜 승인과 대응), 평가 다름, 적용 대상 다름이다.\n\n더 확인할 사항: 이 설계의 서브에이전트 상한(통상 2, 최대 20)은 현행 렌즈 계약(lens-prior-art SKILL.md, 통상 2·최대 6)과 값이 다르다. 이 차이는 이 렌즈의 담당 범위 밖이라 조사하지 않았으며, 호출자가 확인하기를 권한다. 또 2609.14575 부록 B.2의 판정기 불일치 수치는 본문 뒷부분(offset 100000 이후)을 열어 확인해야 한다."
+}

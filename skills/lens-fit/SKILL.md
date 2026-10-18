@@ -35,7 +35,7 @@ description: LLM 출력이 소비자 계약(형식·스키마·길이·스타일
 ```
 { "lens": "lens-fit", "doc_type": "계약의 문서 타입 표에서 고른 행의 이름과 그렇게 고른 근거 — 계약에 타입 표가 없거나 타입을 못 가렸으면 null", "read": [ "..." ], "issues": [ { "where": "...", "type": "schema|format|style|constraint|compat", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "..." ], "notes": "" }
 ```
-`doc_type`은 조용한 통과를 차단한다. 이 칸이 채워져 있으면 그 타입 행에 비추어 보았고 적용될 것이 없었다는 뜻이라 판정으로 쓸 수 있다. `null`이면 타입을 못 가려 그 단계를 실행하지 않았으므로 빈 `issues`를 판정으로 쓰지 않는다. `lens-readability`의 `purpose`와 `lens-prior-art`의 `search_status`가 같은 구실을 한다.
+`doc_type`은 조용한 통과를 차단한다. 이 칸이 채워져 있으면 그 타입 행에 비추어 보았고 적용될 것이 없었다는 뜻이라 판정으로 쓸 수 있다. `null`이면 타입을 못 가려 그 단계를 실행하지 않았으므로 빈 `issues`를 판정으로 쓰지 않는다. `lens-readability`의 `purpose`가 같은 구실을 한다.
 
 `doc_type`은 이 렌즈가 추가하는 칸이라 집계 대상이 아니다. 이 값이 필요한 호출자는 집계본 대신 이 렌즈가 돌려준 원본을 본다.
 
