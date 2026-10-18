@@ -546,4 +546,16 @@
 
 **워크플로 판정의 사용자 확인(2026-10-18 사용자 답).** `workflow` 리포트가 사용자 확인으로 표시한 판정 두 건을 사용자가 그대로 승인했다. 검증자 판정 없이 `rejected`에 든 원소(선행 서술 결측이나 빈 `urls`)에는 반환값에 사유 키를 두지 않고, 오케스트레이터가 사유를 도출한다. `urls`가 비었으면 사유는 '인용에 URL 이 없다'이고, 아니면 '판정할 선행 사례 서술이 없다'다. `args.subquestions`가 빈 배열이면 `overall_status`는 정의대로 `ok`다. 오케스트레이터가 하위 질문을 늘 채우므로 워크플로는 이 입력을 따로 차단하지 않는다.
 
+**워크스트림이 확정한 결정(2026-10-18 통합 뒤 옮김).** 아래는 두 구현 서브 세션 리포트의 `확정한 결정`이다. 근거는 `<git common dir>/nested/prior-art-agent/`의 `report-workflow.md`와 `report-agents.md`에 있다.
+
+- `workflow` — 선행 서술 결측은 `lacksPrior(item)` 하나가 판정하고 `groupByUrl`과 `classify`가 함께 쓴다. 결측 항목은 `items`에 남지만 어느 묶음의 `claims`에도 들지 않으며, `classify`의 보낸 참조에서도 빠진다.
+- `workflow` — `classify`는 판정을 `ref`마다 배열로 모은다. 한 URL 의 판정이 다른 URL 의 판정을 덮어쓰지 않게 하기 위해서다.
+- `workflow` — 인용 `url`은 `String(c.url ?? '')`로 읽고, `evidence_map`이 없는 연구자 출력은 빈 배열로 본다.
+- `workflow` — 시험 도구는 런타임의 금지 호출(`Date.now()`, 인자 없는 `Date`, `Math.random()`)에서 예외를 던지고, Node 전역을 `undefined`로 둔다.
+- `workflow` — 워크플로 테스트의 입력 heredoc 은 모두 `<<'EOF'`로 쓰고, 공유 조각은 파일로 두어 `json_run`으로 합친다.
+- `agents` — 옛 렌즈 삭제를 호출자 문서 처리보다 앞 커밋에 둔다. 절 제목을 먼저 바꾸면 「소유 표」 검사가 실패하기 때문이다.
+- `agents` — 스킬 「출력 스키마」의 네 블록과 두 정의의 블록은 글자 그대로 같다.
+- `agents` — 연구자 정의 `explore` 단락에 스킬 「판정 규약」의 가드 사본, '이 설계'의 뜻, `issues[].type`과 `search_status` 값의 뜻, `subquestion_id`·`mode` 채우는 법을 둔다. 서브에이전트는 스킬을 받지 못하기 때문이다.
+- `agents` — 넛지 실행 시간은 Windows Git Bash 에서 한 번에 약 114ms 다(20회 반복 real 2.284s).
+
 <!-- spec-review: passed -->
