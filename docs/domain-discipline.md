@@ -322,6 +322,10 @@ action title 조합과 같은 구조다.
 적은 실행은 현행 2건, 새 문안 1건이었다. 새 문안이 현행보다 나쁘지 않아 채택했다. 기록은
 `docs/superpowers/reviews/2026-10-12-no-raw-output-ownership-check/`에 있다.
 
+2026-10-18에 `lens-prior-art`를 삭제하고 `agent-prior-art`로 대체했다. 위 서술의 `lens-prior-art`는
+삭제된 렌즈를 가리킨다. 발동 기준은 지금도 각 호출자(`review-specs`·`review-docs`)가 정하고,
+제안과 승인 규칙은 `agent-prior-art`의 「발동과 기록」이 정한다.
+
 ### `LENS-ALLOWED`
 
 세션 기본 지침이 "요청하지 않으면 서브에이전트를 호출하지 마라"로 들어오는 환경이 있다. 그 문구는
@@ -340,6 +344,11 @@ lens-dispatch 브랜치가 `lens-readability` 를 사용자 승인 뒤 실행하
 빈 모델, 현행 문안, 새 문안 모두 0건이었다. 다만 현행 문안 조건은 "따로 승인을 받으라고 명시한 렌즈는
 `lens-prior-art` 하나뿐이라 readability 는 이미 허용된 것으로 읽을 수도 있다"고 해석의 여지를 스스로 적었다.
 새 문안이 현행보다 나쁘지 않아 채택했다.
+
+2026-10-18에 `lens-prior-art`를 삭제하고 `agent-prior-art`로 대체하면서 조항의 예시 괄호를 지웠다.
+위 서술과 측정의 `lens-prior-art`는 삭제된 렌즈를 가리킨다. 선행연구 에이전트의 이름은 `lens-*` 형태가 아니어서
+이 조항의 허가 밖에 있고, 승인 규칙은 `agent-prior-art`의 「발동과 기록」이 정한다. 예시 괄호 밖의 규칙 문장은 바뀌지 않았고
+지시 내용도 달라지지 않아, 사용자가 같은 날 클린룸 시험을 생략하기로 정했다.
 
 ## 미해결의 처분
 

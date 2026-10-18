@@ -208,7 +208,6 @@ check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$
 check "집계 계약이 제안 채널을 가른다"       "owns_sec '$MA' '렌즈가 추가하는 칸' && sec_has_id '$MA' '렌즈가 추가하는 칸' suggestions"
 check "렌즈 그룹을 소유자가 적는다" "owns_sec '$DISP' '렌즈 그룹' && sec_has_id '$DISP' '렌즈 그룹' lens-adversarial"
 # 사본 쪽에 그 절이 없는지는 구조로 본다.
-# 한 줄에 lens-prior-art 이름과 '예외' 가 함께 있는지를 본다.
 
 PDA="$HERE/skills/audit-repo-docs/SKILL.md"
 check "인용 확인 스크립트를 부른다"       "grep -qF 'audit_evidence.sh' '$PDA'"

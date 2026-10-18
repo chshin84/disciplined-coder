@@ -552,4 +552,23 @@ EOF
 [ -n "$HOOK_MISS" ] && echo "    README 에 빠진 스크립트:$HOOK_MISS"
 check "README 가 배선된 스크립트를 모두 적는다" "[ -z \"\$HOOK_MISS\" ]"
 
+
+echo "[prior-art-nudge]"
+PAN="$HERE/hooks/prior_art_nudge_userpromptsubmit.sh"
+pan() { printf '{"session_id":"s","hook_event_name":"UserPromptSubmit","prompt":"%s"}' "$1" | bash "$PAN"; }
+for m in '선행연구에 쓸 만한 에이전트 플러그인이 있나 찾아봐' \
+         '에이전트원칙의 목차를 어떤 기준으로 배치해야 하는지 선행연구를 조사해 줘' \
+         'docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md 의 선행 사례를 찾아 줘' \
+         '선행연구렌즈로 뒤져봐' 'lens-prior-art 로 찾아봐' '\"이 방법\"의 선행연구를 찾아 줘' 'Prior Art 있나'; do
+  check "알린다: $m" "out=\"\$(pan '$m')\" && grep -qF 'agent-prior-art' <<<\"\$out\" && grep -qF '\"hookEventName\":\"UserPromptSubmit\"' <<<\"\$out\" && json_valid_stdin <<<\"\$out\""
+done
+for m in '선행연구 결과를 기록에 정리했다' '선행연구 단계는 끝났다' 'prior art 기록 파일 이름을 바꿨다' '이 함수를 고쳐봐'; do
+  check "침묵한다: $m" "out=\"\$(pan '$m')\" && [ -z \"\$out\" ]"
+done
+check "끄면 침묵한다" "out=\"\$(DISCIPLINED_CODER_PRIOR_ART_NUDGE=off pan '선행연구렌즈로 뒤져봐')\" && [ -z \"\$out\" ]"
+check "빈 객체 입력은 침묵하고 0 으로 끝난다" "out=\"\$(printf '{}' | bash \"\$PAN\")\" && [ -z \"\$out\" ]"
+check "빈 표준 입력은 침묵하고 0 으로 끝난다" "out=\"\$(printf '' | bash \"\$PAN\")\" && [ -z \"\$out\" ]"
+check "prompt 값이 빈 입력은 침묵하고 0 으로 끝난다" "out=\"\$(pan '')\" && [ -z \"\$out\" ]"
+check "UserPromptSubmit 이 넛지를 연결한다" "json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")).get(\"hooks\",{}).get(\"UserPromptSubmit\",[]); sys.exit(0 if any(\"prior_art_nudge_userpromptsubmit.sh\" in h[\"command\"] for g in d for h in g[\"hooks\"]) else 1)' \"\$HERE/hooks/hooks.json\""
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
