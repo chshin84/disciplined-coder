@@ -689,7 +689,8 @@ echo "[대구 한도] 글 한 편에 한 번까지"
 # 금지 표현 목록과 근거 파일은 뺀다. 목록은 표의 분류 설명이, 근거 파일은 고쳐 쓰지 않는 사용자 원문
 # 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다. 평가 과제(evals/principles/cases)도
 # 뺀다. ANTI-LIMIT 의 과제는 모델이 대구를 줄이는지 보려고 대구를 일부러 넣은 시험 입력이다.
-ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$' -e '^evals/principles/cases/')"
+# BANNED-LIST 의 current.md 는 기준 커밋 목록 파일의 사본이라 목록과 같은 이유로 뺀다.
+ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$' -e '^evals/principles/cases/' -e '^evals/principles/clauses/BANNED-LIST/')"
 # 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.
 ANTI_TMP="$(mktemp -d)"
 printf 'A가 아니라 B다.
