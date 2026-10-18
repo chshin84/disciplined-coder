@@ -15,6 +15,7 @@ import runpy
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+JUDGE_MODEL = runpy.run_path(os.path.join(HERE, "_eval_run.py"))["JUDGE_MODEL"]
 
 
 def _sha(s):
@@ -32,8 +33,9 @@ def gen_key(case, cond_text):
     return _sha(case["prompt"]) + "-" + _sha(cond_text)
 
 
-def judge_key(gk, criteria):
-    return gk + "-" + _sha(criteria)
+def judge_key(gk, criteria, model=None):
+    """판정 기준이나 판정 모델이 바뀌면 판정만 다시 한다. 생성 키는 그대로다."""
+    return gk + "-" + _sha(criteria + "\0" + (model or JUDGE_MODEL))
 
 
 def load_units(root, names=None):

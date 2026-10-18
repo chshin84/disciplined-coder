@@ -39,6 +39,8 @@ say("gen_key 는 본문이 다르면 다른 값을 낸다", gk(a, "t") != gk(cas
 say("gen_key 는 조건 문안이 다르면 다른 값을 낸다", gk(a, "t") != gk(a, "u"))
 say("판정 기준만 바꾸면 judge_key 만 달라진다",
     cl["judge_key"](gk(a, "t"), "c1") != cl["judge_key"](gk(a, "t"), "c2"))
+say("판정 모델을 바꾸면 judge_key 가 달라진다",
+    cl["judge_key"](gk(a, "t"), "c1", "m1") != cl["judge_key"](gk(a, "t"), "c1", "m2"))
 
 # 작업 계획
 cases = {"a1": case("본문1", clause=["X-ONE"]), "a2": case("본문2", clause=["Y-THREE"]),
