@@ -843,10 +843,10 @@ SC_LINE="$(grep -F -- "$CONSENT" "$CANON" || true)"
 echo "[standing-consent] lens calls carry the user's standing consent"
 check "canon: 상시 허가 조항"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- \"\$CONSENT\""
 check "canon: 허가 범위 한정"              "grep -qF -- '\`lens-*\`' <<<\"\$SC_LINE\""
-# 선행연구 렌즈는 이름을 대서 예외로 못 박아야 한다. 이름이 lens-*라 허가에 들면서 동시에 웹에
-# 나가는 유일한 렌즈라, 뭉뚱그린 말로 제외하면 같은 렌즈를 열고 닫는 문장이 된다. 그 상태에서는
-# 렌즈를 범위 밖으로 판단해 조용히 건너뛰게 되고, '막히면 알린다'는 안전장치도 발동하지 않는다.
-check "canon: 선행연구 렌즈를 이름으로 예외" "printf '%s' \"\$WF_BLOCK\" | grep -qF -- 'lens-prior-art'"
+# 선행연구 에이전트는 이름이 `lens-*` 형태가 아니어서 상시 허가에 들지 않고, 승인 규칙은 자기 절이 소유한다.
+# 허가 조항이 그 이름을 예외로 적을 필요가 없으므로, 소유 선언이 스킬에 있는지만 본다.
+AP="$HERE/skills/agent-prior-art/SKILL.md"
+check "선행연구 에이전트가 승인 규칙을 소유한다" "owns_sec \"\$AP\" '발동과 기록'"
 
 # --- question-tool: 갈림길은 질문 도구로 묻는다 (상시 로드 규칙) ---
 # 이 규칙이 리뷰 스킬 한 곳에만 있으면 그 스킬을 열지 않은 세션에는 닿지 않는다. 실제로 문서 검진
@@ -933,7 +933,6 @@ for sec in '디스패치 템플릿' '받은 메시지 처리' '이어 쓰기와 
 done
 
 echo "[선행연구 에이전트]"
-AP="$HERE/skills/agent-prior-art/SKILL.md"
 RDEF="$HERE/agents/prior-art-researcher.md"
 VDEF="$HERE/agents/prior-art-verifier.md"
 fm() { awk 'NR==1&&/^---$/{f=1;next} f&&/^---$/{exit} f' "$1" 2>/dev/null; }
@@ -946,5 +945,8 @@ check "검증자 정의의 도구가 구성과 같다" "grep -qx 'tools: WebFetc
 check "두 정의의 턴 상한이 20 이다" "grep -qx 'maxTurns: 20' <<<\"\$(fm \"\$RDEF\")\" && grep -qx 'maxTurns: 20' <<<\"\$(fm \"\$VDEF\")\""
 RP="$( [ -f "$AP" ] && doc_sec "$AP" '레퍼런스 프롬프트' | grep -m1 '^- system: "' | sed 's/^- system: "//; s/"$//' || true)"
 check "연구자 정의가 레퍼런스 프롬프트 본문을 그대로 싣는다" "[ -n \"\$RP\" ] && grep -qF -- \"\$RP\" \"\$RDEF\""
+DDISC="$HERE/docs/domain-discipline.md"
+check "근거 문서의 NO-RAW-OUTPUT 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`NO-RAW-OUTPUT\`' 'agent-prior-art'"
+check "근거 문서의 LENS-ALLOWED 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`LENS-ALLOWED\`' 'agent-prior-art'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
