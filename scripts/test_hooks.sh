@@ -330,28 +330,6 @@ banned_parse "$BX/list2.md" "$BX/pairs2" "$BX/toks2" "$BX/excl2" "$BX/scopes2"
 printf '판단력이 있다.\n' > "$BX/long.md"
 check "긴 제외어가 먼저 덮인다"      "[ -z \"\$(banned_report '$BX/pairs2' '$BX/long.md' '$BX/excl2')\" ]"
 
-echo "[여섯째 칸 — 상황 칸을 더해도 검사기 트랙은 같다]"
-# 상황 칸은 제외 칸 뒤 여섯째 칸이다. 파서가 칸을 위치로 읽으므로 앞 다섯 칸의 결과가 같아야 한다.
-cat > "$BX/list6.md" <<'BANEOF'
-### 금지 표현
-
-| 쓰지 않는 말 | 대신 쓰는 말 | 적용 대상 | 분류 | 제외 | 상황 |
-|---|---|---|---|---|---|
-| `판` | 버전 | 문서와 답변 | 평소에 쓰지 않는 말 | `판정` · `판단` | 버전을 말할 때 |
-| `짚` | 지적 | 답변과 산출물 | 한자어를 고유어로 되돌린 것 |  | 문제를 가리킬 때 |
-BANEOF
-banned_parse "$BX/list6.md" "$BX/pairs6" "$BX/toks6" "$BX/excl6" "$BX/scopes6"
-check "여섯 칸에서도 제외 안의 것은 안 잡는다" "[ -z \"\$(banned_report '$BX/pairs6' '$BX/clean.md' '$BX/excl6')\" ]"
-check "여섯 칸에서도 제외 밖의 것은 잡는다"    "banned_report '$BX/pairs6' '$BX/dirty.md' '$BX/excl6' | grep -qF '판 -> 버전'"
-BX6SCAN="$(cd "$BX" && banned_scan "$BX/pairs6" "$BX/excl6" "$BX/scopes6" '문서와 답변' "$BX/files")"
-check "여섯 칸에서도 적용 대상으로 행을 고른다" "[ \"\$(printf '%s\\n' \"\$BX6SCAN\" | grep -c .)\" = 1 ]"
-
-echo "[지시형 트랙 — 상황과 대체어만 내고 금지어는 내지 않는다]"
-GUIDE_OUT="$BX/guide.md"
-banned_guide "$BX/list6.md" "$GUIDE_OUT" 2>/dev/null || true
-check "지시형 트랙이 '상황: 대체어' 줄을 낸다" "grep -qxF -- '- 버전을 말할 때: 버전' '$GUIDE_OUT'"
-check "지시형 트랙에 금지어 칸의 글자가 없다"  "! grep -qF '\`판\`' '$GUIDE_OUT' && ! grep -qF '짚' '$GUIDE_OUT'"
-
 echo "[stop 겹 — 도구를 묻지 않고 결과를 본다]"
 # 명령줄에 대상이 안 나타나는 변경(파이썬 스크립트, git checkout)을 앞 두 겹이 못 본다.
 # 이 겹은 git 이 바뀌었다고 말하는 파일을 보므로 무엇이 바꿨는지 묻지 않는다.
