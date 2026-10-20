@@ -1,0 +1,174 @@
+{
+  "lens": "lens-consistency",
+  "read": [
+    "D:/projects/dc-verifier-tier/skills/lens-consistency/SKILL.md",
+    "D:/projects/dc-verifier-tier/agent-principles.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+    "D:/projects/dc-verifier-tier/skills/agent-prior-art/SKILL.md",
+    "D:/projects/dc-verifier-tier/scripts/prior_art_contract.json",
+    "D:/projects/dc-verifier-tier/agents/prior-art-verifier.md",
+    "D:/projects/dc-verifier-tier/workflows/prior-art-search.js (Verify·classify·mergeStatus·메타 부분)",
+    "D:/projects/dc-verifier-tier/scripts/test_docs_drift.sh (선행연구 에이전트 절)",
+    "D:/projects/dc-verifier-tier/scripts/test_workflow.sh (grep)",
+    "D:/projects/dc-verifier-tier/scripts/test_prior_art_contract.sh (grep)",
+    "D:/projects/dc-verifier-tier/hooks/hooks.json (matcher)",
+    "D:/projects/dc-verifier-tier/hooks/readonly_pretooluse.sh (머리)",
+    "D:/projects/dc-verifier-tier/README.md (grep)"
+  ],
+  "issues": [
+    {
+      "where": "「비목표」 대 「판정 에이전트의 구성」의 최종 verdict 순서",
+      "type": "contradiction",
+      "claim": "비목표는 인용 판정 기준을 바꾸지 않는다고 적었다. 그러나 「판정 에이전트의 구성」은 최종 verdict 를 카테고리별 불일치 여부의 조합으로 정한다. 현행의 단일 기준(옮긴 구절 하나가 주어·수치·조건을 모두 포함하는지)이 새 구조에서 어떻게 유지되는지 spec 은 적지 않았다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "판정 규약과 인용 판정 기준(\"옮긴 구절이 주장의 주어와 수치와 조건을 모두 포함하면 supported\")도 바꾸지 않는다. / 2. 구절이 원문에 없거나 존재·수치·조건·방향·범위 중 하나라도 불일치이면 `unsupported` 다. 3. 그 밖은 `supported` 다.",
+      "counterpart_file": "skills/agent-prior-art/SKILL.md",
+      "counterpart": "판정 기준은 \"옮긴 구절이 주장의 주어와 수치와 조건을 모두 포함하면 supported\"로 고정한다.",
+      "principle": "모순 — 문서가 스스로 정한 원칙을 어기는 설계",
+      "consequence": "현행 기준은 구절 하나가 모든 요소를 함께 담아야 supported 이다. 새 순서는 구절의 존재와 카테고리별 일치를 따로 판정해 합치므로, 서로 다른 구절이 각 카테고리를 뒷받침해도 supported 가 된다. 비목표의 문장과 새 판정 순서가 서로 다른 기준을 정하고 있다."
+    },
+    {
+      "where": "「원문 확보」의 다운로드 스크립트·수집 에이전트 대 「검증 카테고리」의 구절 행",
+      "type": "contradiction",
+      "claim": "구절 카테고리는 `quote` 가 원문에 있는지를 스크립트로 판정한다. 그러나 현행에서 `quote` 는 검증자가 원문을 읽고 만든다. 새 구조에서는 수집 에이전트가 판정 에이전트보다 먼저 실행되므로, 스크립트에 넘길 구절 목록을 누가 언제 만드는지 정해지지 않았다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "구절 목록을 함께 받으면 각 구절이 원문에 있는지도 출력한다. / Verify 단계는 URL 마다 수집 에이전트를 실행하고, 이어서 판정 에이전트들을 실행한다. / 구절 ... 대부분의 `quote`",
+      "counterpart_file": "skills/agent-prior-art/SKILL.md",
+      "counterpart": "검증자는 URL 마다 그 URL 에 걸린 주장별로 `verdict`(supported·unsupported·unverifiable), `quote`(원문에서 옮긴 지지 구절), `reason`을 내고",
+      "principle": "모순 — 아키텍처 설명이 기능 설명과 맞는가",
+      "consequence": "연구자 출력 스키마에는 `quote` 칸이 없고, `quote` 를 내는 판정 에이전트는 수집 단계 뒤에 실행된다. 그래서 수집 단계의 스크립트가 검사할 구절은 실행 순서상 아직 존재하지 않는다. 판정 에이전트가 `quote` 를 내는지, 그 `quote` 를 스크립트로 다시 검사하는 단계가 있는지도 spec 에 없다."
+    },
+    {
+      "where": "「바뀌는 파일」의 계약 항목 대 현행 반환값 형식",
+      "type": "gap",
+      "claim": "산출물 공백이다. spec 은 계약에 '새 출력 형식을 넣는다'고만 적었다. 판정 에이전트 출력의 형태, 수집 에이전트 출력의 형태, 반환값의 `verifiers` 원소와 `verifier_count` 의 새 뜻, 인용 판정 출력의 `quote` 필드 존폐를 정하지 않았다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "`scripts/prior_art_contract.json` 과 `scripts/test_prior_art_contract.sh` 에 새 출력 형식을 넣는다.",
+      "counterpart_file": "scripts/prior_art_contract.json",
+      "counterpart": "\"verifier\": { \"url\": true, \"judgments\": [{ \"ref\": true, \"verdict\": true, \"quote\": true, \"reason\": true }], \"principles_applied\": true } ... \"verifier_count\": true, ... \"verifiers\": [{ \"url\": true, \"subquestions\": true, \"output\": true }]",
+      "principle": "산출물 공백 — 내놓는 것의 형태가 정해져 있는가",
+      "consequence": "현행 `verifiers[].output` 은 URL 하나에 검증자 출력 하나이고, `verifier_count` 는 URL 마다 하나인 인용 판정 검증자의 수다. 새 구조에서는 URL 마다 수집 에이전트 하나와 판정 에이전트가 여럿 실행된다. 그런데 spec 은 이 원소와 수를 무엇으로 채우는지 적지 않았다. 오케스트레이터가 사유를 읽는 위치(「반환값을 읽는 규칙」의 `verifiers[].output.judgments[]`)도 어떻게 바뀌는지 정해지지 않았다."
+    },
+    {
+      "where": "「판정 에이전트의 구성」의 verdict 순서 대 현행 검증 실패 처리와 `verification_status`",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 판정 에이전트 중 일부만 실패하거나 판정을 빠뜨린 경우, 그리고 수집 에이전트가 실패한 경우를 `verify_failed` 와 `partial` 로 어떻게 처리하는지 spec 이 정하지 않았다. 최종 verdict 를 워크플로 스크립트가 합치는지 에이전트가 합치는지도 적혀 있지 않다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "최종 `verdict` 는 아래 순서로 정한다. 1. 접근 실패는 `unverifiable` 이다. 2. ... 3. 그 밖은 `supported` 다.",
+      "counterpart_file": "skills/agent-prior-art/SKILL.md",
+      "counterpart": "그 하위 질문의 URL 에 검증 실패(검증자 에이전트의 실패, 시간 초과, 속도 제한)가 하나라도 있으면 `partial`이다. / 검증자 에이전트 자체가 실패하면 워크플로가 그 URL 을 검증 실패 목록에 넣는다.",
+      "principle": "커버리지 공백 — 한쪽이 정한 것이 다른 쪽에서 어느 단계로 이어지는가",
+      "consequence": "현행 `classify` 는 URL 하나의 검증자 출력 하나에서 판정 누락을 보고 실패를 정한다. verdict 순서 세 단계에는 에이전트 실패라는 경우가 없어서, 판정 에이전트 하나가 응답하지 않은 URL 이 supported·unsupported·검증 실패 중 어디로 가는지 정해지지 않았다."
+    },
+    {
+      "where": "「검증 카테고리」의 지도 대조 행 대 「원문 확보」·「바뀌는 파일」",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 지도 대조(map 모드)는 원문을 읽지 않는 카테고리다. 그런데 spec 은 판정 에이전트를 '저장된 본문을 읽는 Read 하나'로만 정의했다. MapCheck 단계를 어느 에이전트 정의가 맡는지, 프롬프트 첫 줄의 `MODE: cite|map` 규약이 새 에이전트들에서 어떻게 되는지도 적지 않았다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "지도 대조 | 종합 결과의 칸이 통과한 행에 근거하는지. 웹을 열지 않는다 | 모델 / **판정 에이전트:** 도구는 Read 하나다. 저장된 본문을 읽고, 맡은 카테고리를 판정한다. / Verify 단계를 수집과 판정으로 바꾼다.",
+      "counterpart_file": "workflows/prior-art-search.js",
+      "counterpart": "{ agentType: VERIFIER, label: 'map-check', phase: 'MapCheck', schema: S.MAP_SCHEMA }",
+      "principle": "커버리지 공백",
+      "consequence": "`agents/prior-art-verifier.md` 는 수집 에이전트와 판정 에이전트들로 나뉜다. 그러나 MapCheck 호출이 쓰는 `VERIFIER` agentType 의 행선지는 정해지지 않았고, 바뀌는 파일 목록에도 MapCheck 단계가 없다."
+    },
+    {
+      "where": "「바뀌는 파일」 목록",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 바뀌는 파일 목록에 빠진 파일이 있다. 현행 검증자 정의의 도구·이름·agentType·`verifier_count` 를 고정해 검사하는 시험 스크립트 `scripts/test_docs_drift.sh` 와 `scripts/test_workflow.sh` 가 목록에 없다. `scripts/test_prior_art_contract.sh` 의 정의 파일 짝(verifier:VD map:VD)도 정의 파일이 나뉘면 바뀌어야 한다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "`scripts/prior_art_contract.json` 과 `scripts/test_prior_art_contract.sh` 에 새 출력 형식을 넣는다.",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "check \"검증자 정의의 도구가 구성과 같다\" \"grep -qx 'tools: WebFetch, Read' ...\" / check \"두 정의의 턴 상한이 20 이다\" ... (scripts/test_workflow.sh: c[\"agentType\"] == \"disciplined-coder:prior-art-verifier\" and c[\"phase\"] == \"Verify\" ... d[\"result\"][\"verifier_count\"] == 2)",
+      "principle": "커버리지 공백",
+      "consequence": "spec 대로 정의 파일을 나누고 도구를 Bash 와 Read 로 바꾸면, `test_docs_drift.sh` 의 도구 검사와 `test_workflow.sh` 의 agentType·verifier_count 검사는 현행 값을 기대한 채로 남는다. 두 스크립트를 고치는 일은 spec 의 어느 항목에도 들어 있지 않다."
+    },
+    {
+      "where": "「바뀌는 파일」의 `skills/agent-prior-art/SKILL.md` 항목",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 고칠 절로 「출력 스키마」·「판정 모델 교체」·「실행할 때 지킬 상한」만 꼽았다. 검증자를 이름과 agentType 으로 직접 가리키는 「오케스트레이터 절차」(워크플로가 꺼진 환경의 Agent 도구 경로, 반환값을 읽는 규칙, 상태 값)와 「인용 확인」이 빠졌다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "`skills/agent-prior-art/SKILL.md` 의 「출력 스키마」·「판정 모델 교체」·「실행할 때 지킬 상한」을 고친다.",
+      "counterpart_file": "skills/agent-prior-art/SKILL.md",
+      "counterpart": "`subagent_type`에는 `disciplined-coder:prior-art-researcher`와 `disciplined-coder:prior-art-verifier`를 넣고 / 오케스트레이터는 검증자의 `quote`가 원문에 있고 주장을 뒷받침하는지 직접 열어 확인한다.",
+      "principle": "커버리지 공백",
+      "consequence": "워크플로가 꺼진 환경에서 오케스트레이터는 정의가 나뉜 뒤에도 `disciplined-coder:prior-art-verifier` 하나를 실행하도록 지시받는다. 또 수집·판정 순서와 다운로드 스크립트 실행을 이 경로에서 누가 하는지 정해지지 않았다. 「인용 확인」은 검증자의 `quote` 를 확인 대상으로 삼는데, 새 구조에서 그 `quote` 가 어디서 나오는지 정해지지 않았다."
+    },
+    {
+      "where": "「원문 확보」의 수집 에이전트(도구 Bash) 대 hooks",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 수집 에이전트는 Bash 를 쓰는 첫 선행연구 에이전트다. 그러나 spec 은 Bash 에 걸리는 플러그인 훅이 수집 에이전트에도 적용되는지, 적용되면 어떻게 다룰지 적지 않았다. Bash 실행 권한을 어떻게 받는지와 README 의 훅·권한 설명을 바꿀지도 '있으면 고친다'로만 남겼다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "**수집 에이전트:** 도구는 Bash 하나다. 다운로드 스크립트만 실행하고 / `README.md` 의 에이전트·권한 설명이 있으면 고친다.",
+      "counterpart_file": "hooks/hooks.json",
+      "counterpart": "\"matcher\": \"Write|Edit|Bash\" ... rules_nudge_pretooluse.sh / \"matcher\": \"Write|Edit|Bash\" ... doc_review_posttooluse.sh / \"matcher\": \"Bash\" ... doc_word_posttooluse.sh",
+      "principle": "커버리지 공백",
+      "consequence": "현행 hooks.json 에는 Bash 를 matcher 로 갖는 훅이 셋 있다. 수집 에이전트가 URL 마다 실행되면 이 훅들이 그 Bash 호출에도 걸릴 수 있다. 그러나 spec 은 훅을 바뀌는 파일에도 검토 대상에도 넣지 않았다."
+    },
+    {
+      "where": "「목표」 대 「채택 규칙」의 병합 조건",
+      "type": "contradiction",
+      "claim": "목표는 방향·범위 카테고리의 정확도를 현행 기준선보다 낮추지 않는다고 정했다. 그러나 구성 전체를 다시 측정한 뒤의 병합 조건은 비용 하나뿐이다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "같은 자료로 구성 전체의 비용과 정확도를 다시 측정한다. 구성 전체의 비용이 기준선(현행 Opus 단일 검증자)보다 낮아야 병합한다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "방향·범위 카테고리의 판정 정확도는 현행 기준선보다 낮추지 않는다.",
+      "principle": "모순 — 문서가 스스로 정한 원칙을 어기는 설계",
+      "consequence": "카테고리를 묶은 판정 에이전트의 프롬프트는 시험에 쓴 단독 프롬프트와 다르다. 그런데 구성 전체의 정확도는 측정만 하고 병합 판단에 쓰지 않는다. 그래서 구성 단계에서 방향·범위의 정확도가 떨어져도 병합 조건은 충족된다."
+    },
+    {
+      "where": "「시험」의 '기준선'과 「목표」·「채택 규칙」의 '기준선'",
+      "type": "drift",
+      "claim": "'기준선'이 서로 다른 두 대상을 가리킨다. 설정 격자에서는 카테고리 단독 프롬프트로 실행한 Opus medium 이고, 병합 조건에서는 현행 Opus 단일 검증자이다. 카테고리별 채택 규칙의 '기준선 이상의 정확도'가 둘 중 어느 쪽인지 spec 이 밝히지 않았다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "Opus 5.5 | medium | medium(기준선), low / 판정 에이전트 시험은 카테고리마다 그 카테고리만 판정하는 단독 프롬프트로 한다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "구성 전체의 비용이 기준선(현행 Opus 단일 검증자)보다 낮아야 병합한다.",
+      "principle": "드리프트 — 같은 이름이 다른 대상을 가리킴",
+      "consequence": "현행 단일 검증자는 모든 카테고리를 한 프롬프트로 판정하고, 격자의 기준선은 카테고리 하나만 판정한다. 그래서 두 기준선의 정확도는 다를 수 있다. 채택 규칙이 어느 쪽과 비교하는지에 따라 채택되는 설정이 달라진다."
+    },
+    {
+      "where": "spec 전체의 '검증자'·'수집 에이전트'·'판정 에이전트'",
+      "type": "drift",
+      "claim": "spec 은 '검증자'를 현행 단일 에이전트의 이름으로만 쓰고, 새 구조는 '수집 에이전트'와 '판정 에이전트'로 부른다. 그러나 반환값 키(`verifiers`·`verifier_count`), 워크플로 메타의 description, SKILL 의 description 과 본문은 '검증자'를 계속 쓴다. 새 구조에서 '검증자'가 무엇을 가리키는지(두 에이전트의 묶음인지, 판정 에이전트인지) spec 이 정하지 않았다. 제목도 '검증자의 카테고리별 모델 배치'로 남아 있다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "# 선행연구 검증자의 카테고리별 모델 배치 설계 / **수집 에이전트:** ... / **판정 에이전트:** ... / 기준선(현행 Opus 단일 검증자)",
+      "counterpart_file": "workflows/prior-art-search.js",
+      "counterpart": "description: '하위 질문마다 연구자를 실행하고 인용을 검증자로 판정해 통과한 선행 사례만 모은다'",
+      "principle": "드리프트 — 같은 대상을 두 이름으로 가리킴",
+      "consequence": "SKILL 의 「상태 값」은 '검증자 에이전트의 실패'를 partial 의 조건으로 정한다. 새 구조에서 이 '검증자'가 수집 에이전트를 포함하는지 정해지지 않아, 같은 조건이 두 가지로 읽힌다."
+    },
+    {
+      "where": "「시험」의 자료·주입 자료·고정 원문 대 「바뀌는 파일」의 evals 항목, 「원문 확보」의 저장 경로",
+      "type": "gap",
+      "claim": "산출물 공백이다. 시험 스크립트와 결과는 `evals/prior-art-verifier/` 에 둔다고 적었다. 그러나 주입 자료, 시험 전에 고정한 원문 파일, 정답표가 놓일 곳은 정하지 않았다. 운영 중에 다운로드 스크립트가 본문을 저장하는 위치와 판정 에이전트에게 경로를 넘기는 방식도 적지 않았다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "원문은 시험 전에 다운로드 스크립트로 한 번 받아 고정하고, 모든 설정이 같은 파일을 읽는다. / 시험 스크립트와 결과는 `evals/prior-art-verifier/` 에 둔다. / URL 하나를 받아 본문 텍스트를 파일로 저장하고 HTTP 상태와 저장 경로를 출력한다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "원본은 worktree `D:\\projects\\dc-clause-candidates` 의 `docs/superpowers/reviews/2026-10-20-generation-constraints-prior-art/` 에 있다.",
+      "principle": "산출물 공백 — 내놓는 것이 놓일 곳",
+      "consequence": "시험 자료의 원본은 다른 worktree 에 있다. 이 저장소로 옮길지, 주입 자료와 고정 원문을 커밋할지 spec 에 정해져 있지 않다. 그래서 시험을 다시 실행할 수 있는지가 정해지지 않았다."
+    },
+    {
+      "where": "「남은 결정」 대 「판정 에이전트의 구성」·「채택 규칙」",
+      "type": "scope",
+      "claim": "spec 은 남은 결정이 없다고 적었다. 그러나 판정 에이전트의 수와 묶음은 시험 결과가 나와야 정해진다. 그러면 에이전트 정의 파일의 수, 워크플로 Verify 단계의 호출 구조, 계약의 출력 형식도 시험 뒤에야 정해진다. 그래서 이 spec 은 시험(설정 선택)과 통합 구현(정의·워크플로·계약·SKILL 개정)이라는 두 단계를 한 구현 계획에 담고 있다.",
+      "file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "없다. 카테고리별 모델과 노력 수준은 시험이 정한다. / 시험에서 같은 설정을 고른 카테고리끼리 한 판정 에이전트로 묶고, 설정이 다르면 판정 에이전트를 나눈다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "`agents/prior-art-verifier.md` 를 수집 에이전트 정의와 판정 에이전트 정의들로 나눈다. / `scripts/prior_art_contract.json` 과 `scripts/test_prior_art_contract.sh` 에 새 출력 형식을 넣는다.",
+      "principle": "스코프 — 한 구현 계획에 맞는 크기인가",
+      "consequence": "plan 작성자는 계약과 워크플로의 작업을 쓰기 전에 시험 결과를 알아야 한다. 그런데 spec 에는 시험이 끝난 뒤 구성 결정을 기록하고 승인받는 지점이 없다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "WRITTEN-ONLY",
+    "SUBJECT-OBJECT",
+    "SPECIFIC-NAME",
+    "TERM-ONE",
+    "STATE-ASSUME",
+    "FULL-SENTENCE"
+  ],
+  "notes": "검토 관점: 체크리스트 다섯 항목(모순, 커버리지 공백, 산출물 공백, 드리프트, 스코프)을 차례로 보았다. 현행 계약은 prior_art_contract.json, SKILL.md 「출력 스키마」·「오케스트레이터 절차」·「인용 확인」, 워크플로의 classify·mergeStatus 와 대조했다. 바뀌는 파일 목록은 grep 으로 찾은 실제 참조처(test_docs_drift.sh, test_workflow.sh, test_prior_art_contract.sh, hooks.json, README.md)와 대조했다. 더 확인할 것은 세 가지이다. 첫째, Bash 를 matcher 로 갖는 훅 셋이 서브에이전트의 Bash 호출에도 실제로 걸리는지는 런타임 동작이라 확인하지 않았다(가정). 그래서 hooks 항목은 spec 이 그 사실을 다루지 않았다는 점만 지적했다. 둘째, 에이전트 정의 frontmatter 의 `effort` 칸을 런타임이 지원하는지는 읽기 범위 밖이라 확인하지 않았다. 셋째, 이전 설계 문서 2026-10-18-prior-art-agent-*.md 는 이번 검토에서 열지 않았다. 따라서 그 문서들이 정한 검증자 구성(도구 WebFetch·Read, maxTurns 20)과의 충돌은 SKILL.md 와 test_docs_drift.sh 로만 대조했다."
+}

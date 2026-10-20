@@ -1,0 +1,216 @@
+{
+  "lens": "lens-adversarial",
+  "read": [
+    "D:/projects/dc-verifier-tier/skills/lens-adversarial/SKILL.md",
+    "D:/projects/dc-verifier-tier/agent-principles.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+    "D:/projects/dc-verifier-tier/agents/prior-art-verifier.md",
+    "D:/projects/dc-verifier-tier/agents/prior-art-researcher.md (quote 필드 유무만 grep)",
+    "D:/projects/dc-verifier-tier/workflows/prior-art-search.js (1-60행, quote 검색)",
+    "D:/projects/dc-verifier-tier/scripts/prior_art_contract.json (quote 검색)",
+    "D:/projects/dc-verifier-tier/skills/agent-prior-art/SKILL.md (49행 「워크플로가 꺼진 환경」, 79-93행 상한, 262행 판정 모델 교체)",
+    "D:/projects/dc-verifier-tier/skills/domain-plugin/SKILL.md (1-60행)",
+    "D:/projects/dc-verifier-tier/scripts/ (파일 목록)"
+  ],
+  "issues": [
+    {
+      "where": "「원문 확보」 41행(다운로드 스크립트의 구절 목록 입력)과 「판정 에이전트의 구성」 49행(수집 뒤 판정 순서)",
+      "type": "failure-mode",
+      "claim": "구절 카테고리를 수집 단계의 스크립트가 판정하도록 설계했으나, 수집 시점에는 판정할 구절이 존재하지 않는다. 현행 구조에서 quote 를 만드는 쪽은 검증자뿐이고 연구자 출력에는 quote 가 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "41행 \"구절 목록을 함께 받으면 각 구절이 원문에 있는지도 출력한다.\" 49행 \"URL 마다 수집 에이전트를 실행하고, 이어서 판정 에이전트들을 실행한다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/workflows/prior-art-search.js",
+      "counterpart": "quote 는 검증자 스키마(289행 quote: str, 292행 required)에만 있고 agents/prior-art-researcher.md 에는 quote 가 없다. 수집 에이전트에 넘길 구절 목록의 출처가 문서 어디에도 없다.",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 문서대로라면 수집 단계에서 구절 검사는 입력 없이 실행되거나 생략된다. 판정 에이전트가 quote 를 만든 뒤 스크립트를 다시 돌리는 단계는 순서에 없고, 판정 에이전트의 도구는 Read 뿐이라 스크립트를 실행할 수 없다."
+    },
+    {
+      "where": "「판정 에이전트의 구성」 51-53행의 verdict 결정 순서 1번(접근 실패의 정의)",
+      "type": "failure-mode",
+      "claim": "접근 실패를 HTTP 상태로만 판정하면, 200 으로 응답하는 봇 확인 페이지·로그인 리다이렉트·JS 렌더링 빈 껍데기 페이지가 접근 성공으로 분류된다. 그 경우 본문에 구절이 없으므로 규칙 2번에 따라 unsupported 가 된다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "25-27행 접근 카테고리의 판정 수단 \"다운로드 스크립트의 HTTP 상태\", 51-52행 \"접근 실패는 unverifiable 이다. 구절이 원문에 없거나 … unsupported 다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agents/prior-art-verifier.md",
+      "counterpart": "현행 정의는 \"원문을 열지 못하면(봇 차단, 유료 장벽, 응답 없음) 모든 주장을 unverifiable 로 두고\"라고 하여, unverifiable 을 원문 쪽 사정으로 정한다. 지난 실행의 예(OpenAI Structured Outputs 403)는 403 이었으나 OpenAI 문서처럼 JS 로 그리는 페이지는 curl 로 받으면 200 과 빈 본문이 나올 수 있다.",
+      "principle": "NO-ASSUME",
+      "consequence": "원문 쪽 사정으로 판정할 수 없던 출처가 거짓 주장으로 기각되어 rejected 로 들어간다. 이 오분류는 원래 자료의 정답과 다르게 나오므로 주입 자료 시험(접근 오류는 없는 arXiv 번호와 404 뿐)에서는 드러나지 않는다."
+    },
+    {
+      "where": "「검증 카테고리」 표의 구절 행(28행)과 「구현자에게 맡기는 것」 112행",
+      "type": "risk",
+      "claim": "구절 판정의 정규화가 공백과 따옴표뿐이어서, PDF 줄끝 하이픈 분리·합자(ﬁ)·소프트 하이픈·HTML 엔티티·유니코드 대시·줄바꿈 삽입이 있는 원문에서 실제 있는 구절을 없다고 판정한다. 이 미탐은 규칙 2번에 따라 곧바로 unsupported 가 된다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "28행 \"스크립트의 문자열 검색(공백·따옴표 정규화)\". 지난 실행의 출처 다수가 arXiv 논문(2605.10039, 2310.01798)이다. 완화안은 정규화 대상을 문서에 열거하고, 스크립트가 없다고 답한 구절을 곧바로 unsupported 로 두지 말고 판정 에이전트가 원문에서 다시 확인하게 하는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/skills/domain-plugin/SKILL.md",
+      "counterpart": "기존 관례는 \"고정 문자열 검색은 로케일을 C로 둔다 … grep -F는 찾는 글자를 그대로 비교\"다. C 로케일 바이트 비교로는 곡선 따옴표 같은 멀티바이트 문자를 정규화할 수 없다.",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 문서에는 구절 미탐이 기각으로 이어지는 경로만 있고 재확인 경로가 없다. 112행은 본문 추출을 \"기존 스크립트 관례\"에 맡기지만 scripts/ 에는 HTTP 수집·HTML 정리·PDF 추출을 하는 스크립트가 하나도 없다."
+    },
+    {
+      "where": "「원문 확보」 41행(다운로드 스크립트)과 「구현자에게 맡기는 것」 112행",
+      "type": "risk",
+      "claim": "사내망 Windows 환경의 프록시와 TLS 가로채기 인증서, PDF 텍스트 추출 도구의 부재, EUC-KR·cp949 페이지 인코딩, 거대한 페이지의 크기 상한에 대해 문서가 아무것도 정하지 않는다. 그래서 다운로드 스크립트는 설치된 모든 PC에서 같은 결과를 낸다고 보장되지 않는다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "112행 \"다운로드 스크립트의 본문 추출 방법(HTML 정리, PDF 처리)은 저장소의 기존 스크립트 관례를 따른다.\" 완화안은 실패 사유(프록시·인증서·추출 도구 없음·크기 초과)를 HTTP 상태와 구분해 출력하고 그 경우를 unverifiable 로 두는 규칙을 51행에 넣는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/skills/domain-plugin/SKILL.md",
+      "counterpart": "\"사유를 구분한 통지 — 못 고친 차수는 까닭을 구분해 알린다. 설정을 못 읽은 것과 파이썬이 없는 것과 쓰기 권한이 없는 것은 사용자가 할 일이 서로 다르다.\" 이 PC 에는 사내 인증서 등록 스킬(kw-control-tower:register-corp-certs)이 따로 있을 만큼 인증서 문제가 실제로 일어난다.",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "현행 WebFetch 는 Anthropic 쪽에서 페이지를 받으므로 사내 프록시를 거치지 않는다. 새 스크립트는 사용자 PC 에서 직접 받으므로, 사내망 PC 에서는 42개 URL 전부가 인증서 오류로 실패할 수 있고 그 사유가 보고되지 않는다."
+    },
+    {
+      "where": "「원문 확보」 42행(수집 에이전트: 도구 Bash, Haiku low)과 39행의 분리 근거",
+      "type": "risk",
+      "claim": "수집 에이전트의 Bash 는 스크립트 하나로 제한되지 않는다. URL 문자열은 연구자가 웹 페이지에서 얻은 값이라 공격자가 고를 수 있고, 에이전트가 그 URL 을 셸 명령에 끼워 넣으면 명령 치환이 실행된다. 스크립트가 stderr 로 서버 응답 일부(오류 페이지 문구, 리다이렉트 대상)를 내보내면 페이지 내용이 Bash 를 가진 에이전트에게 닿는다. \"저장된 본문은 읽지 않는다\"는 지시 준수에만 기댄다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "39행 \"웹 페이지에 끼워 넣은 지시(prompt injection)가 Bash 를 가진 에이전트에게 닿지 않게 하기 위해서다.\" 42행 \"다운로드 스크립트만 실행하고, 저장된 본문은 읽지 않는다. 모델은 가장 싼 설정(Haiku low)으로 둔다. 판단이 필요 없는 일이기 때문이다.\" 완화안은 스크립트 출력을 상태 코드·경로·불리언으로 한정한다고 41행에 적고, URL 을 인자 하나로 인용해 넘기는 형식을 정하는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/skills/agent-prior-art/SKILL.md",
+      "counterpart": "49행은 워크플로가 꺼진 경로에서 \"두 가드는 지시 준수에만 기댄다\"고 적어, 이 저장소가 지시 준수만으로 지키는 가드를 약점으로 이미 인정한다.",
+      "principle": "REVERSIBLE",
+      "consequence": "지금 문서에서 주입 차단은 에이전트 분리와 지시에만 기대며, 가장 지시 준수가 약한 설정(Haiku low)이 Bash 를 쥔다. 스크립트 출력의 범위와 URL 전달 형식은 정해져 있지 않다."
+    },
+    {
+      "where": "「원문 확보」 42행(수집 에이전트를 LLM 으로 둠)과 「판정 에이전트의 구성」 49행(URL 마다 수집 에이전트 실행)",
+      "type": "over-engineering",
+      "claim": "수집은 URL 을 받아 스크립트를 실행하는 결정론적 일인데 LLM 에이전트를 URL 마다 하나씩 둔다. 판단이 필요 없다고 문서 스스로 적었으므로 LLM 이 맡을 이유가 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "42행 \"판단이 필요 없는 일이기 때문이다.\" 지난 실행 기준 수집 에이전트 42개가 추가된다. 단순화안은 수집 에이전트를 없애고, 워크플로를 Research 뒤에서 끊어 오케스트레이터가 Bash 한 번으로 모든 URL 을 받은 뒤 Verify 를 이어 실행하게 하거나, 최소한 수집 에이전트 하나가 Bash 한 번으로 URL 전체를 받게 하는 것이다. 어느 쪽이든 Bash 를 쥔 에이전트 수와 주입 경로가 줄어든다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/workflows/prior-art-search.js",
+      "counterpart": "워크플로 스크립트가 쓰는 원시 함수는 agent()·parallel()·phase() 뿐이어서 스크립트 안에서 셸을 직접 실행하는 경로는 보이지 않는다. 그래서 대안은 워크플로 분할이나 단일 수집 에이전트가 된다.",
+      "principle": "YAGNI",
+      "consequence": "지금 설계에서는 Bash 권한을 가진 LLM 에이전트가 URL 수만큼 실행되고, 에이전트마다 시스템 프롬프트와 도구 정의의 고정 비용이 더해진다."
+    },
+    {
+      "where": "「판정 에이전트의 구성」 47행(설정마다 에이전트 하나, 에이전트마다 원문 재독)과 「목표」 14행(비용 절감)",
+      "type": "risk",
+      "claim": "현행 WebFetch 는 작은 모델이 요약한 결과만 검증자 맥락에 넣지만, 새 구조는 원문 전체를 Read 로 판정 에이전트 맥락에 넣고 그 일을 판정 에이전트 수만큼 되풀이한다. arXiv 논문 PDF 본문은 수만 토큰에 이르므로 원문 재독 비용과 에이전트별 고정 비용이 절감분을 넘을 수 있다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "5행 검증자 42개가 캐시 쓰기 약 136만 토큰, 즉 검증자 하나에 약 3만 2천 토큰을 썼다. 이 값의 상당 부분은 에이전트 하나를 띄울 때마다 드는 고정 비용이다. 47행 \"판정 에이전트가 늘면 에이전트마다 원문을 다시 읽으므로\". 완화안은 원문 길이 상한과 그 초과 시 처리(잘라 읽기 또는 unverifiable)를 41행에 정하는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "37행 \"WebFetch 는 페이지 원문 대신, 작은 모델이 페이지를 읽고 프롬프트에 답한 결과를 넘긴다.\" 문서는 원문 크기와 Read 도구의 한 번 읽기 상한(긴 파일은 일부만 읽힘)을 다루지 않는다.",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "지금 문서에는 원문 크기 상한이 없고, 원문이 Read 상한을 넘으면 판정 에이전트가 앞부분만 읽고 판정할 수 있다. 비용 목표가 깨지는지는 93행의 구성 전체 재측정 때에야 드러난다."
+    },
+    {
+      "where": "「원문 확보」 41행(본문을 파일로 저장)",
+      "type": "failure-mode",
+      "claim": "저장 파일의 위치·이름 규칙·정리 시점·동시 실행 처리가 문서에 없다. 이 플러그인은 모든 프로젝트에 설치되므로 작업 디렉터리에 저장하면 사용자 프로젝트에 파일이 쌓이고, URL 에서 파일 이름을 만들면 병렬 실행이나 두 세션의 동시 실행에서 같은 이름이 충돌한다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "41행 \"URL 하나를 받아 본문 텍스트를 파일로 저장하고 HTTP 상태와 저장 경로를 출력한다.\" 완화안은 실행마다 새 디렉터리(워크플로 실행 ID 단위)를 쓰고, 프로젝트 밖에 두며, 실행이 끝나면 지운다고 41행에 적는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/workflows/prior-art-search.js",
+      "counterpart": "Verify 단계는 parallel() 로 URL 마다 동시에 실행한다(37행). 같은 URL 이 두 세션에서 동시에 받히는 경우도 막는 장치가 없다.",
+      "principle": "REVERSIBLE",
+      "consequence": "지금 설계로는 사용자 프로젝트에 원문 파일이 남거나, 한 실행이 다른 실행의 파일을 덮어써 판정 에이전트가 다른 원문을 읽을 수 있다. 판정 에이전트의 Read 가 프로젝트 밖 경로를 읽을 때 권한 확인이 뜨는지도 정해져 있지 않다."
+    },
+    {
+      "where": "「원문 확보」 42행과 「바뀌는 파일」 97-98행(Bash 를 쥔 에이전트 정의 배포)",
+      "type": "irreversible",
+      "claim": "플러그인 에이전트에 Bash 를 주는 결정이 모든 프로젝트와 모든 PC 에 자동 갱신으로 곧바로 퍼지는데, 문서에는 Bash 호출의 권한 확인 처리와 스크립트 경로 해석이 없다. 다른 프로젝트에서 상대 경로 scripts/fetch_source.sh 는 존재하지 않으며, 플러그인 캐시 경로를 에이전트가 알 방법이 정해져 있지 않다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "97행 \"scripts/fetch_source.sh 를 새로 만든다.\" 42행 \"도구는 Bash 하나다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/skills/domain-plugin/SKILL.md",
+      "counterpart": "\"version 비우기 — … 커밋 SHA 기반 자동 업데이트를 유지한다.\" 병합 즉시 설치된 모든 PC 에 실린다. 같은 문서는 사용자 설정 파일을 플러그인이 고칠 때 묻고 덮지 말라고 정하므로, 플러그인이 Bash 허용 규칙을 사용자 설정에 넣어 확인 창을 없애는 길도 막혀 있다.",
+      "principle": "REVERSIBLE",
+      "consequence": "지금 문서대로 배포하면 사용자는 URL 수만큼(지난 실행 42회) Bash 권한 확인 창을 받거나, 거부하면 모든 출처가 unverifiable 이 된다. 사용자에게 권한 확대를 묻는 단계는 문서에 없다."
+    },
+    {
+      "where": "「원문 확보」 41행과 「판정 에이전트의 구성」 49행(URL 마다 동시 수집)",
+      "type": "risk",
+      "claim": "URL 수만큼의 다운로드가 parallel() 로 동시에 나가므로, 같은 호스트(arXiv 등)에 짧은 간격으로 요청이 몰린다. 속도 제한에 걸리면 429·403 이 접근 실패로 분류되어 unverifiable 이 늘어난다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "49행 \"URL 마다 수집 에이전트를 실행하고\". 지난 실행 출처 다수가 arXiv 이며, arXiv 는 자동 요청에 요청 간격을 두라고 안내한다(가정: 현재 정책 문구는 arXiv API 이용 약관에서 확인해야 한다). 완화안은 429 를 접근 실패와 구분해 재시도 1회 또는 별도 사유로 출력하는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/workflows/prior-art-search.js",
+      "counterpart": "37행 parallel(groups.map(...)) 로 URL 그룹 전체를 동시에 실행한다. 현행은 WebFetch 가 Anthropic 쪽에서 받으므로 사용자 IP 하나에 요청이 몰리지 않는다.",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 문서에는 호스트별 간격이나 429 처리가 없어, 사용자 IP 하나에서 나간 동시 요청이 차단되면 그 출처들이 원문 쪽 사정이 아닌 이유로 unverifiable 이 된다."
+    },
+    {
+      "where": "「판정 에이전트의 구성」 49-53행(판정 에이전트 여럿의 결과 합치기)",
+      "type": "failure-mode",
+      "claim": "한 URL 에 판정 에이전트가 여럿일 때, 그 가운데 하나만 스키마 실패·턴 상한 도달·null 을 내는 절반의 실패를 어떻게 합칠지 정하지 않았다. verdict 순서 1-3번은 모든 카테고리 판정이 있다는 전제에서만 동작한다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "52-53행 \"하나라도 불일치이면 unsupported 다. 그 밖은 supported 다.\" 이 규칙대로면 판정이 빠진 카테고리는 불일치가 아니므로 supported 로 떨어진다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agents/prior-art-verifier.md",
+      "counterpart": "\"판정이 하나라도 빠지면 워크플로가 그 출력 전체를 검증 실패로 처리한다.\" 현행은 검증자 하나라 빠짐이 곧 verify_failed 였다.",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 규칙에서는 방향 판정 에이전트가 실패하고 나머지가 일치를 내면 그 주장이 supported 로 통과한다. 방향 카테고리는 지난 실행에서 오류가 나온 곳이다."
+    },
+    {
+      "where": "「바뀌는 파일」 101행(skills/agent-prior-art/SKILL.md 수정 절 목록)",
+      "type": "failure-mode",
+      "claim": "워크플로가 꺼진 환경에서는 오케스트레이터가 Agent 도구로 같은 순서를 실행하는데, 수정할 절 목록에 「워크플로가 꺼진 환경」이 빠져 있다. 그 경로의 오케스트레이터는 수집 에이전트·판정 에이전트 여럿의 실행과 verdict 합치기를 직접 해야 한다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "101행 \"「출력 스키마」·「판정 모델 교체」·「실행할 때 지킬 상한」을 고친다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/skills/agent-prior-art/SKILL.md",
+      "counterpart": "49행 \"subagent_type 에는 disciplined-coder:prior-art-researcher 와 disciplined-coder:prior-art-verifier 를 넣고\". 이 이름은 98행에서 나뉘어 사라진다.",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 목록대로 고치면 워크플로가 꺼진 PC 의 오케스트레이터는 없어진 에이전트 이름을 부르거나, 합치기 규칙 없이 판정 결과를 손으로 합친다."
+    },
+    {
+      "where": "「시험」의 「자료와 정답」 61행·63-71행과 「채택 규칙」 91행",
+      "type": "failure-mode",
+      "claim": "채택 판단을 주입 자료로만 하면서 주입 자료에 참인 주장을 섞는지, 정확도를 무엇으로 세는지가 정해져 있지 않다. 오류만 든 자료라면 모든 주장을 unsupported 로 내는 설정이 최고 정확도를 받는다. 실제 운영의 오류 기저율은 약 60건 중 2건이라, 참인 주장을 잘못 기각하는 비율이 운영 품질을 좌우하는데 그 비율을 재는 규칙이 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "61행 \"채택 판단은 오류를 일부러 넣은 주입 자료로만 한다.\" 91행은 방향 카테고리의 오류 통과 건수만 따로 센다. 완화안은 주입 자료에 원래 자료의 참인 주장을 함께 넣고, 오류 통과와 참 기각을 나눠 세며, 참 기각도 기준선보다 많으면 채택하지 않는다고 91행에 적는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "15행 목표 \"방향·범위 카테고리의 판정 정확도는 현행 기준선보다 낮추지 않는다.\" 이 목표는 기각 쪽 오류를 포함한 정확도를 뜻하지만 채택 규칙은 통과 쪽 오류만 센다.",
+      "principle": "CHECKABLE",
+      "consequence": "지금 규칙으로는 참인 주장을 많이 기각하는 싸고 보수적인 설정이 채택될 수 있고, 그 결과 운영에서 통과하는 선행 사례가 줄어든다."
+    },
+    {
+      "where": "「시험」의 「자료와 정답」 63-71행(주입 오류의 정답)",
+      "type": "risk",
+      "claim": "주입한 주장이 정말 원문과 어긋나는지를 누가 확인하는지 정하지 않았다. 부정어를 뺀 주장이나 조건을 지운 주장은 같은 원문의 다른 구절이 뒷받침할 수 있어, 정답을 unsupported 로 둔 주입 항목이 실제로는 supported 일 수 있다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "69-70행 \"결말을 뒤집거나 부정어를 뺀 주장\", \"출처의 조건을 지워 일반화한 주장\". 완화안은 주입 항목마다 원문 전체에서 반대 근거가 없음을 사람이나 오케스트레이터가 확인했다고 기록하는 단계를 이 절에 넣는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "111행 \"주입 오류의 개수는 카테고리마다 같게 두되, 개수는 비용을 보고 정한다.\" 정답 확인 절차는 구현자에게도 맡겨지지 않았다.",
+      "principle": "CHECKABLE",
+      "consequence": "지금 문서에서는 주입 항목의 정답이 주입했다는 사실만으로 정해지므로, 원문을 더 꼼꼼히 읽는 설정이 오답으로 채점될 수 있다."
+    },
+    {
+      "where": "「채택 규칙」 91행(기준선 이상 정확도)과 「구현자에게 맡기는 것」 111행(표본 수)",
+      "type": "failure-mode",
+      "claim": "카테고리별 표본 수가 비용에 따라 정해지고 반복 실행 횟수도 없으므로, 한 건 차이가 채택을 뒤집는다. 기준선 자체도 한 번 실행한 값이라 흔들리며, 같은 점수일 때 가장 싼 설정을 고르는 규칙은 흔들림 안의 차이를 품질 차이로 다룬다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "91행 \"기준선 이상의 정확도를 내는 설정 중 total_cost_usd 가 가장 낮은 설정을 채택한다.\" 111행 \"개수는 비용을 보고 정한다.\" 완화안은 설정마다 반복 횟수를 정하고, 기준선과의 차이가 반복 사이 흔들림 안에 들면 같은 점수로 본다는 규칙을 91행에 적는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "5행 지난 실행에서 방향 카테고리의 오류는 걸러 낸 1건과 놓친 1건뿐이다. 이 규모에서는 표본 몇 건이 결론 전체를 정한다.",
+      "principle": "CHECKABLE",
+      "consequence": "지금 규칙으로는 같은 설정을 다시 시험하면 다른 설정이 채택될 수 있고, 채택 결과를 재현할 기준이 없다."
+    },
+    {
+      "where": "「설정 격자」 87행(카테고리별 단독 프롬프트 시험)과 「채택 규칙」 93행(구성 전체 재측정의 병합 조건)",
+      "type": "failure-mode",
+      "claim": "설정은 카테고리 하나만 판정하는 단독 프롬프트로 고르지만, 실제로는 같은 설정을 고른 카테고리끼리 한 에이전트로 묶는다. 묶은 에이전트에서 카테고리별 정확도가 유지되는지 확인하는 조건이 없고, 93행의 병합 조건은 비용만 요구한다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "93행 \"같은 자료로 구성 전체의 비용과 정확도를 다시 측정한다. 구성 전체의 비용이 기준선(현행 Opus 단일 검증자)보다 낮아야 병합한다.\" 완화안은 병합 조건에 카테고리별 정확도가 단독 시험 값과 기준선 이상이라는 조건을 함께 넣는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "47행 \"시험에서 같은 설정을 고른 카테고리끼리 한 판정 에이전트로 묶고\". 15행 목표는 방향·범위 정확도를 기준선보다 낮추지 않는 것이다.",
+      "principle": "CHECKABLE",
+      "consequence": "지금 병합 조건으로는 묶은 뒤 방향 카테고리의 정확도가 떨어져도 비용만 낮으면 병합된다."
+    },
+    {
+      "where": "「채택 규칙」 93행의 기준선 정의(현행 Opus 단일 검증자)와 「설정 격자」 87행의 실행 조건",
+      "type": "failure-mode",
+      "claim": "현행 기준선은 WebFetch 로 원문을 받는 워크플로 안의 검증자이고, 새 설정은 고정 파일을 Read 로 읽는 claude -p 단독 실행이다. 두 조건은 원문 접근 방식과 실행 환경이 달라, 비용과 정확도의 차이가 설정 차이인지 조건 차이인지 가를 수 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "73행 \"원문은 시험 전에 다운로드 스크립트로 한 번 받아 고정하고, 모든 설정이 같은 파일을 읽는다.\" 85행 Opus medium 을 기준선으로 격자에 넣었으나 93행의 기준선은 \"현행 Opus 단일 검증자\"다. 완화안은 93행의 기준선을 같은 고정 파일을 읽는 Opus medium 단일 판정 에이전트로 정의하는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "5행 기준선 비용은 2026-10-20 워크플로 실행(wf_8cadf2c0-63d)의 값이다. claude -p 는 그 PC 의 플러그인·훅·CLAUDE.md 를 함께 실으므로 total_cost_usd 에 그 고정 비용이 섞인다.",
+      "principle": "CHECKABLE",
+      "consequence": "지금 문서에는 기준선이 두 가지로 적혀 있어, 비교 대상에 따라 병합 여부가 달라질 수 있다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "CHECKABLE",
+    "REVERSIBLE",
+    "YAGNI",
+    "FOCUSED",
+    "STATE-ASSUME",
+    "WRITTEN-ONLY",
+    "SPECIFIC-NAME"
+  ],
+  "notes": "검토한 관점은 실패 모드(다운로드 스크립트, prompt injection 경로, 저장 파일, 원문 재독 비용, 구절 검색 오탐·미탐, 절반의 실패, 워크플로가 꺼진 경로), 시험 설계(정답 신뢰성, 단독 프롬프트와 묶은 에이전트, 표본 수와 흔들림, 같은 점수 처리, 기준선 정의), 과설계(수집 에이전트의 LLM 화, 설정마다 에이전트 하나, 격자 크기), 비가역(Bash 권한, 모든 프로젝트 배포)이다. 격자 크기는 사용자가 2026-10-21 에 승인했고 Opus low 는 조건부로만 시험하므로 과설계로 올리지 않았다. 설정마다 에이전트 하나 구조도 사용자가 정했으므로 과설계로 올리지 않고, 비용 위험만 원문 재독 비용 지적에 담았다. 구절 판정의 오탐(정규화 때문에 다른 문장과 일치)은 공백·따옴표만 정규화하는 수준에서는 드물다고 보아 미탐만 올렸다. 더 확인할 것은 다음과 같다. 에이전트 정의의 tools 칸이 Bash(경로:*) 같은 패턴 제한을 받는지 확인해야 한다. 받는다면 Bash 권한 지적의 완화안이 된다. 워크플로 런타임이 agent() 밖에서 셸이나 fetch 를 실행할 수 있는지 확인해야 한다. 가능하면 수집 에이전트를 워크플로 코드로 대신할 수 있다. 서브에이전트의 Bash 호출이 상위 세션 권한 모드를 따라 확인 창을 띄우는지 확인해야 한다. arXiv 의 자동 요청 간격 정책은 현재 문구를 확인하지 않았으므로 가정으로 적었다."
+}
