@@ -1,0 +1,152 @@
+{
+  "lens": "lens-grounding",
+  "read": [
+    "D:/projects/dc-clause-candidates/skills/lens-grounding/SKILL.md",
+    "D:/projects/dc-clause-candidates/agent-principles.md",
+    "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+    "D:/projects/dc-clause-candidates/docs/superpowers/reviews/2026-10-20-generation-constraints-prior-art.md",
+    "D:/projects/dc-clause-candidates/docs/superpowers/reviews/2026-10-20-generation-constraints-prior-art/verifier-r1.json",
+    "D:/projects/dc-clause-candidates/docs/superpowers/reviews/2026-10-20-generation-constraints-prior-art/synthesis-r1.json",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-12-clause-strengthening-check/score.md",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-12-clause-strengthening-check/results-half.tsv, results-top.tsv, results-combined.tsv, results-strong.tsv, results-strong2.tsv",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-12-clause-strengthening-check/half10.log, top10.log, combined10.log, combined.log",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-12-clause-strengthening-check/adopt.json, adopt-half.json, adopt-top.json",
+    "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-12-clause-strengthening-check/clauses/{YAGNI,VOCAB-PREF,ANTI-LIMIT,CHECKABLE,SUBJECT-OBJECT,SECRETS,BULLET-SCOPE}/strong*.txt 와 scores/*.json(조건별 합계)",
+    "git diff 8b4a05a~1 8b4a05a -- agent-principles.md (D:/projects/dc-clause-candidates)",
+    "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-18-principles-action-output-split-design.md",
+    "D:/projects/dc-clause-candidates/evals/principles/README.md",
+    "D:/projects/dc-clause-candidates/scripts/eval_clause.sh",
+    "D:/projects/dc-clause-candidates/scripts/_eval_run.py",
+    "D:/projects/dc-clause-candidates/scripts/_eval_clause.py",
+    "D:/projects/dc-clause-candidates/CLAUDE.md",
+    "D:/projects/dc-clause-candidates/hooks/hooks.json",
+    "D:/projects/dc-clause-candidates/hooks/doc_word_pretooluse.sh",
+    "D:/projects/dc-clause-candidates/hooks/doc_word_posttooluse.sh",
+    "D:/projects/dc-clause-candidates/hooks/_spec_marker.sh",
+    "D:/projects/dc-clause-candidates/hooks/stop_gates.sh",
+    "D:/projects/dc-clause-candidates/skills/domain-plugin/SKILL.md"
+  ],
+  "issues": [
+    {
+      "where": "「비목표와 반목표」 셋째 문단(23행)",
+      "type": "mismatch",
+      "claim": "spec 은 강화 시험에서 YAGNI·VOCAB-PREF·ANTI-LIMIT 의 해당 문안이 1→6·0→3·0→2 로 악화되었다고 적는다. 그러나 이 세 수치는 그 조항을 강화한 시험에서 나오지 않았다. 세 수치는 다른 15개 조항만 강화한 통합 조건(half)에서 나왔고, 그 조건에서 세 조항은 원래 문구 그대로였다. 각 조항의 강화 문구를 단독으로 실은 개별 시험에서는 YAGNI 1→0, ANTI-LIMIT 0→0, VOCAB-PREF 0→4(strong)와 0→1(strong2)였다. 또 2026-10-12 에 시험한 강화 문구(strong.txt)는 8b4a05a 의 문안과 다르다. 그래서 8b4a05a 문안이 악화되었다는 측정은 없다. spec 이 측정 원본으로 지목한 score.md 에도 이 세 수치는 없다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "강화 시험에서 악화된 문안은 옮기지 않는다. `YAGNI` 의 요청 밖 개선 제안(1→6), `VOCAB-PREF` 의 번역 직역 금지(0→3), `ANTI-LIMIT` 의 \"A 빼고 B만\"(0→2)이 그 문안이다. 측정 원본은 `docs/superpowers/reviews/2026-10-12-clause-strengthening-check/score.md` 에 있다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-12-clause-strengthening-check/half10.log, adopt-half.json",
+      "counterpart": "half10.log: \"YAGNI orig= 1(10) half= 6(10)\", \"VOCAB-PREF orig= 0(10) half= 3(10)\", \"ANTI-LIMIT orig= 0(10) half= 2(10)\". adopt-half.json 의 15개 조항에는 YAGNI·VOCAB-PREF·ANTI-LIMIT 가 없다. 개별 시험 점수 합계(clauses/<조항>/scores/strong__*.json)는 YAGNI 0, ANTI-LIMIT 0이다",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 spec 은 다른 조항의 강화가 넘쳐 난 효과를 세 조항의 8b4a05a 문안 탓으로 돌린다. 그리고 측정한 적 없는 문안을 측정 근거로 제외한다"
+    },
+    {
+      "where": "「현행 조항 대조」 표 아래 첫 문단(56행)",
+      "type": "unsupported",
+      "claim": "spec 은 8b4a05a 에서 옮길 네 건을 '악화되지 않은' 문안이라고 적는다. 그러나 2026-10-12 시험은 8b4a05a 문안을 측정하지 않았다. SUBJECT-OBJECT 강화 문구에는 '주체를 모르면 모른다고 적어라'가 없고, NO-MID-MOD 의 '감독원이 지적한' 예시와 SECRETS 의 sk-*** 문안도 측정 문구에 없다. 따라서 '악화되지 않았다'는 '측정되지 않았다'에 가깝다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "브랜치 8b4a05a 에서 옮길 대상은 2026-10-18 원칙에 없는 문안 중 악화되지 않은 네 건이다.",
+      "counterpart_file": "D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-12-clause-strengthening-check/clauses/SUBJECT-OBJECT/strong.txt",
+      "counterpart": "10-12 의 SUBJECT-OBJECT 강화 문구는 \"행동하는 주체를 문장에서 생략해도 되는 조건은 아래 목록뿐이다\" 계열이며, 8b4a05a 의 \"대화와 자료로 주체를 확인할 수 없으면 짐작해 채우지 말고 주체를 모른다고 적어라\"는 문장을 담지 않는다",
+      "principle": "STATE-ASSUME",
+      "consequence": "측정되지 않은 문안이 '악화되지 않음'이라는 측정 결론을 달고 이식 대상으로 분류되어 있다"
+    },
+    {
+      "where": "56행의 SECRETS 이식 대상과 T8 행",
+      "type": "contradiction",
+      "claim": "spec 은 56행에서 8b4a05a 의 'SECRETS 의 가린 값(sk-***) 문안'을 옮긴다고 적는다. 그러나 8b4a05a 문안은 가린 값으로 적으라고 허용하는 문장이다. 반면 T8 은 '가린 값(sk-***)도 적지 말라는 문안'을 시험한다고 적는다. 2026-10-12 에 채택된 SECRETS strong2 도 앞뒤 글자를 남긴 값까지 노출로 본다. 두 문장은 같은 문안을 반대 방향으로 가리킨다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "T8 가벼운 문안 | `SECRETS` 의 가린 값(`sk-***`)도 적지 말라는 문안과 `SUBJECT-OBJECT` 문안을 시험한다",
+      "counterpart_file": "git show 8b4a05a:agent-principles.md (D:/projects/dc-clause-candidates)",
+      "counterpart": "+- **`SECRETS` (Secrets stay server-side)** — ... 필요하면 환경변수 이름이나 가린 값(`sk-***`)으로 적어라.",
+      "principle": "NO-ASSUME",
+      "consequence": "구현자는 SECRETS 변경안을 8b4a05a 의 허용 문안으로 쓸지, 금지 문안으로 쓸지 spec 에서 정할 수 없다"
+    },
+    {
+      "where": "56행의 BULLET-SCOPE '굵은 라벨 지목'",
+      "type": "mismatch",
+      "claim": "spec 은 8b4a05a 의 BULLET-SCOPE 문안을 금지 형태를 이름으로 지목하는 문안으로 보고, 기본 습관 제약에 어긋나므로 T4 의 지목형 조건으로만 시험한다고 적는다. 그러나 8b4a05a 문안은 굵은 라벨을 금지하지 않는다. 오히려 항목마다 굵은 라벨을 붙이라고 지시한다. 2026-10-12 에 64→2 를 낸 강화 문구는 반대로 '굵은 라벨 뒤 두 문장'을 위반으로 정의했다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "그중 `BULLET-SCOPE` 의 굵은 라벨 지목은 기본 습관 제약에 어긋나므로 T4 의 지목형 조건으로만 시험한다.",
+      "counterpart_file": "git show 8b4a05a:agent-principles.md (D:/projects/dc-clause-candidates)",
+      "counterpart": "+- **`BULLET-SCOPE`** — 불릿과 번호는 같은 종류를 늘어놓을 때만 써라. 항목마다 첫머리에 짧은 굵은 라벨(예: **관례 골격.**)을 붙이고, 한 항목이 여러 문장이 되면 라벨을 붙인 문단으로 써라.",
+      "principle": "NO-ASSUME",
+      "consequence": "T4 의 '지목형 문안' 조건에 8b4a05a 문안을 넣으면, spec 이 24% 의 원인으로 지목한 굵은 라벨 형식을 권하는 문안을 시험하게 된다"
+    },
+    {
+      "where": "「현행 조항 대조」 표의 BULLET-SCOPE·SECTION-HEAD 행",
+      "type": "contradiction",
+      "claim": "spec 은 BULLET-SCOPE 와 SECTION-HEAD 의 현행 문구가 다 쓴 뒤에야 판정된다고 적는다. 그러나 2026-10-18 spec 은 같은 두 조항을 쓰는 순간에 판단할 수 있다고 보고 고치지 않기로 정했다. 이번 spec 은 그 선행 판단을 뒤집으면서도 그 판단을 언급하지 않는다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "| `BULLET-SCOPE` | 순차 생성 | \"한 항목이 여러 문장이 되면 산문으로 써라\"는 항목을 쓴 뒤에야 판정된다 |",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-18-principles-action-output-split-design.md",
+      "counterpart": "`BULLET-SCOPE`·`SECTION-HEAD`·`TERM-ONE` 은 현행 문구로도 쓰는 순간에 판단할 수 있어 고치지 않는다(이 세션의 판단).",
+      "principle": "TOP-DOWN",
+      "consequence": "선행 spec 의 판단과 이번 spec 의 판단이 서로 반대인 채 둘 다 남아 있다. 이번 spec 에는 그 판단을 바꾼 근거가 없다"
+    },
+    {
+      "where": "「생성 제약」 표의 자기 판정의 한계 행",
+      "type": "contradiction",
+      "claim": "spec 은 모델이 외부 피드백 없이 자기 출력의 오류를 잘 찾지 못한다고 일반화해 단정한다. 근거는 2023년 논문(arXiv 2310.01798) 하나다. 그러나 같은 선행연구 기록에 반대 방향의 출처가 있다. Opus 5 가이드는 Opus 5 가 지시 없이도 자기 실수를 잘 잡아 고친다고 적는다. Self-Correction Bench(arXiv 2507.02778)는 추론 모델이 자기 오류를 훨씬 잘 교정한다고 적는다. spec 은 같은 Opus 5 가이드를 재작성 가능 여부 행에서 인용하면서도 이 대목은 다루지 않는다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "| 자기 판정의 한계 | 모델은 외부 피드백 없이 자기 출력의 오류를 잘 찾지 못한다 |",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/reviews/2026-10-20-generation-constraints-prior-art/verifier-r1.json",
+      "counterpart": "sq2#issue#0 quote: \"Claude Opus 5 catches and fixes its own mistakes well without prompting.\" / sq6#issue#0 quote: \"Reasoning models exhibit a small, even negative, Self-Correction Blind Spot ... reasoning models are much better at self-correcting their own error\"",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "이 행의 '모델의 실제 동작' 칸은 현행 대상 모델(claude-opus-5-5)에 대한 반대 근거를 빼고 옛 모델 결과로 단정한다. 문체 규칙 위반의 자기 판정을 비교한 연구는 선행연구 기록에서 not_found 로 남아 있다"
+    },
+    {
+      "where": "「생성 제약」 표의 모호함의 증폭 행",
+      "type": "unsupported",
+      "claim": "spec 은 '최근 모델은 지시를 문자 그대로 따른다'를 모델 일반의 동작으로 적는다. 그러나 근거는 GPT-4.1 가이드 하나이고, 그 가이드는 GPT-4.1 이 이전 OpenAI 모델보다 문자 그대로 따른다고만 적는다. Claude 모델에 대한 근거는 선행연구 기록에 없다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "해석이 둘인 지시에서 모델은 한 해석으로 수렴하고, 최근 모델은 지시를 문자 그대로 따른다",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/reviews/2026-10-20-generation-constraints-prior-art/verifier-r1.json",
+      "counterpart": "sq5#case#2 quote: \"GPT-4.1 is trained to follow instructions more closely and more literally than its predecessors\"",
+      "principle": "STATE-ASSUME",
+      "consequence": "한 벤더 모델의 서술이 '최근 모델' 전체의 동작으로 확대되어 조항 작성 규칙의 전제가 되어 있다"
+    },
+    {
+      "where": "「기계 검사」 층 표의 파일 행과 73행",
+      "type": "omission",
+      "claim": "spec 은 파일 층 검사가 'Write·Edit 뒤 훅'에서 작동하고 Bash 편집 연결은 구현 단계에서 정한다고 적는다. 그러나 기존 금지어 훅은 그런 구조가 아니다. Write·Edit 에 걸리는 doc_word_pretooluse.sh 는 쓰기 전에 실행하는 거부 훅이다. doc_word_posttooluse.sh 는 matcher 가 Bash 이고, bash_write_targets 로 Bash 편집 대상을 이미 잡는다. 즉 spec 이 확장한다는 훅 가운데 Write·Edit 뒤에 실행하는 것은 없고, Bash 편집 검사는 이미 있다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "그래서 파일 검사는 Bash 편집도 잡도록 연결한다. 연결 방법은 구현 단계에서 정한다.",
+      "counterpart_file": "D:/projects/dc-clause-candidates/hooks/hooks.json, hooks/doc_word_posttooluse.sh",
+      "counterpart": "hooks.json: \"matcher\": \"Bash\" → doc_word_posttooluse.sh. doc_word_posttooluse.sh: TARGETS=\"$(bash_write_targets \"$CMD\" 2>/dev/null || true)\"",
+      "principle": "NO-ASSUME",
+      "consequence": "spec 은 이미 구현된 Bash 편집 검사를 미결 과제로 남기고 있다. 또 기존 훅의 실행 시점(Write·Edit 은 Pre, Bash 는 Post)과 다른 시점을 전제한다"
+    },
+    {
+      "where": "「기계 검사」 층 표와 75행의 대상 경로",
+      "type": "contradiction",
+      "claim": "spec 은 파일 층이 '읽기 위한 문서·작업 지시서'를 검사한다고 적는다. 동시에 대상 경로는 path_is_banned_target 의 제외 규칙을 그대로 따른다고 적는다. 그러나 그 함수는 docs/superpowers/ 아래(spec·plan), /.claude/projects/(메모리), 이 플러그인 저장소 자신의 문서(CLAUDE.md·스킬·agent-principles.md)를 뺀다. 원칙이 정의한 작업 지시서는 spec·plan·CLAUDE.md·스킬·메모리이므로 대부분이 검사에서 빠진다. 또 이 함수는 두 훅이 아니라 hooks/_spec_marker.sh 에 정의되어 있다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "대상 경로는 그 훅의 `path_is_banned_target` 제외 규칙을 그대로 따른다.",
+      "counterpart_file": "D:/projects/dc-clause-candidates/hooks/_spec_marker.sh",
+      "counterpart": "case \"$1\" in */.claude/projects/*|*/docs/superpowers/*|docs/superpowers/*) return 1 ;; esac\n  path_in_own_repo \"$1\" && return 1",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 spec 대로 구현하면 작업 지시서 층의 spec·plan·메모리·이 저장소 스킬은 검사되지 않는다. 층 표가 약속한 범위와 실제 검사 범위가 다르다"
+    },
+    {
+      "where": "「기계 검사」 73행",
+      "type": "unsupported",
+      "claim": "spec 은 auto mode 에서 Bash 로 파일을 고치면 Write·Edit 훅이 실행되지 않는다고 적고, 근거로 파일이 없는 세션 사례만 든다. 그런데 이 현상은 auto mode 에만 해당하지 않는다. hooks.json 의 Write|Edit matcher 는 어느 모드에서도 Bash 호출에 걸리지 않는다. 이 저장소는 그래서 Bash matcher 훅을 따로 둔다. 'auto mode' 라는 조건은 출처로 확인되지 않는다",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "evidence": "auto mode 에서 Bash 로 파일을 고치면 Write·Edit 훅이 실행되지 않는다(KW-doc-formats 세션, 2026-09-22).",
+      "counterpart_file": "D:/projects/dc-clause-candidates/hooks/hooks.json",
+      "counterpart": "\"matcher\": \"Write|Edit\" ... \"command\": \"bash \\\"${CLAUDE_PLUGIN_ROOT}/hooks/doc_word_pretooluse.sh\\\"\" / 별도 항목 \"matcher\": \"Bash\" ... doc_word_posttooluse.sh",
+      "principle": "STATE-ASSUME",
+      "consequence": "모드에 따른 현상처럼 적혀 있어, 구현자가 auto mode 에서만 쓰는 우회책을 찾게 될 수 있다"
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "STATE-ASSUME",
+    "TOP-DOWN",
+    "WRITTEN-ONLY",
+    "SPECIFIC-NAME",
+    "FULL-SENTENCE",
+    "SUBJECT-OBJECT"
+  ],
+  "notes": "체크리스트 네 항목(누락·모순·환각·불일치)을 따로 검토했다. 대조한 결과를 수치, 외부 문서, 저장소 사실 순으로 적는다.\n\n수치 대조. NO-MID-MOD 22건과 52건은 score.md 와 일치한다(원래 문구는 51건이다). CHECKABLE 15건→0건은 개별·half·top 조건과 일치하고, 40개 통합 조건에서는 3건이었다. arXiv 2601.08070 의 87.5%, arXiv 2507.11538 의 68%, arXiv 2605.10039 의 1,650 세션은 선행연구 기록과 검증자 quote 와 일치한다. 호출자가 든 '64→2' 는 spec 본문에 없다. 데이터상으로는 BULLET-SCOPE 개별 강화 결과(64→2)로 존재한다. 1→6·0→3·0→2 의 귀속 오류는 issues 에 올렸다.\n\n외부 문서 대조. Anthropic best practices(할 것을 말하라, 예시가 가장 믿을 만한 형식 조종 방법), Claude 4.6 이후 프리필 미지원, Opus 5 가이드(명시적 검증 지시가 과잉 검증을 낳으니 지우라, 이름으로 지목하는 지시가 덜 효과적), NVIDIA NeMo(스트리밍에서 이미 사용자에게 간 출력), ICLR 2025 의 첫 몇 토큰 정렬, arXiv 2408.02442 의 형식 제한, Guardrails AI regex_match, Kamoi 서베이(arXiv 2406.01297, 신뢰할 외부 피드백이 있으면 자기 교정이 잘 된다)는 모두 기록과 맞게 옮겨졌다. 다만 ICLR 2025 연구는 안전 정렬을 다룬 결과다. 그 결과를 문체 형식의 순차 생성 근거로 쓰는 것은 유추이며, spec 도 결정점 문형의 측정 연구가 없다고 밝혀 두었다. Fable 5.1 가이드의 '과잉 억제를 낳는다'는 원문을 풀어 쓴 해석이다. 원문은 새 모델이 반대로 기울므로 반형식 규칙을 지우거나 바꾸라고만 적는다. 정도가 약해 issues 에는 올리지 않았다.\n\n저장소 사실 대조. 평가 세션이 도구를 끈다는 주장은 scripts/_eval_run.py 의 cmd = [\"claude\", \"-p\", prompt, \"--tools\", \"\", ...] 로 확인했다. 조항 파일 하나만 CLAUDE.md 로 싣는다는 주장은 evals/principles/README.md 36행과 _eval_clause.py 28행으로 확인했다. 생성 모델 opus-5-5 와 판정 모델 sonnet-5-5 도 _eval_run.py 와 일치한다. domain-plugin 35행의 문구와 그 전제('Stop 훅은 방금 쓴 답을 인자로 받지 않는다')는 spec 의 인용과 일치한다. 2026-10-18 spec 15행의 반목표, 같은 질문 한 번만 생성, 묶음 비교 금지, 2건 안팎의 흔들림은 2026-10-18 spec·CLAUDE.md·evals README 와 일치한다. main 저장소의 2026-10-12 폴더가 미추적이라는 사실은 git status(??)로 확인했다. worktree 브랜치 feat/clause-candidates 와 기준 커밋 2fa22d3 도 확인했다.\n\n이슈로 올리지 않은 것. 첫째, 실사용 답 1,851개 중 약 24% 와 KW-doc-formats 세션 사례는 파일 출처가 없다. 호출자가 이 세션의 분석 결과라고 밝혔으므로 환각으로 보지 않았다. 다만 24% 는 이 설계의 동기를 받치는 수치다. 그래서 분석 기록 파일의 경로를 spec 이나 docs/domain-discipline.md 에 남길 것을 권한다(EVIDENCE-FIRST, CLAUDE.md 「지시와 근거의 분리」). 둘째, Stop 훅의 last_assistant_message 와 additionalContext·decision:block 동작은 호출자가 2026-10-20 에 공식 문서로 확인했다고 주입했다. 이 렌즈는 그 확인을 그대로 받아들였고 WebFetch 로 다시 확인하지 않았다. 셋째, T7 의 Concise 출력 스타일 문구('다른 지침과 충돌하면 이 규칙이 이긴다')는 저장소 파일에서 확인할 출처가 없다. 세션 시스템 프롬프트에서 온 사실로 보이므로 더 확인이 필요하다.\n\n더 확인할 것. 1→6·0→3·0→2 가 8b4a05a 문안을 따로 측정한 다른 기록에서 나왔는지 확인해야 한다. 이 렌즈가 찾은 범위(main 의 2026-10-12 폴더와 dc-clause-candidates 전체)에는 그런 기록이 없었다. 사용자나 spec 작성자가 그 출처를 대지 못하면 23행과 56행의 '악화됨·악화되지 않음' 분류를 다시 정해야 한다."
+}

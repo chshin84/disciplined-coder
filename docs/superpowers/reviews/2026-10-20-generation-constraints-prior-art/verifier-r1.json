@@ -1,0 +1,1118 @@
+[
+  {
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "subquestions": [
+      "sq1",
+      "sq3"
+    ],
+    "output": {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "judgments": [
+        {
+          "ref": "sq1#issue#0",
+          "verdict": "supported",
+          "quote": "There are a few particularly effective ways to steer output formatting:\n\n1. **Tell Claude what to do instead of what not to do**\n\n   * Instead of: \"Do not use markdown in your response\"\n   * Try: \"Your response should be composed of smoothly flowing prose paragraphs.\" ... Avoid using **bold**\nand *italics*.\n\nDO NOT use ordered lists (1. ...) or unordered lists (*) unless:",
+          "reason": "원문 「Control the format of responses」 절의 1번 방법이 금지 대신 할 일을 말하라는 권고이고, 그 아래에 주장이 든 두 문장이 대비 예시로 실려 있다. 같은 절의 예시 프롬프트 'Sample prompt to minimize markdown'에도 'Avoid using **bold**'와 'DO NOT use ordered lists'가 그대로 있다. 따라서 주장의 주어와 조건이 모두 원문에 있다."
+        },
+        {
+          "ref": "sq1#issue#1",
+          "verdict": "supported",
+          "quote": "The formatting style used in your prompt may influence Claude's response style. ... For example, removing markdown from your prompt can reduce the volume of markdown in the output.",
+          "reason": "원문 3번 방법 'Match your prompt style to the desired output'이 프롬프트 서식이 응답 서식에 영향을 줄 수 있다고 적는다. 같은 문단이 프롬프트에서 마크다운을 빼면 출력의 마크다운이 줄 수 있다는 예를 든다."
+        },
+        {
+          "ref": "sq1#case#2",
+          "verdict": "supported",
+          "quote": "Starting with Claude 4.6 models and [Claude Mythos Preview](https://anthropic.com/glasswing), prefilled responses (providing a partial assistant message for Claude to continue from) on the last assistant turn are no longer supported. Requests with prefilled assistant messages to these models return a 400 error.",
+          "reason": "사례의 존재와 내용은 「Migrating away from prefilled responses」 절이 뒷받침한다. 결말 '판정 못 함'은 원문이 평가 수치를 내지 않는 점과 맞는다. 축별 판정은 다음과 같다. purpose 축은 지지된다. 원문 절 'Control the format of responses'가 'ways to steer output formatting'을 안내한다. mechanism 축도 지지된다. 원문은 4.6 모델부터 프리필에 400 오류를 낸다고 적는다. 형식 강제는 'The Structured Outputs feature is designed specifically to constrain Claude's responses'와 'Try asking the model to conform to your output structure first'로 옮기라고 한다. 긍정형 지시와 XML 형식 표시, 프롬프트 서식 일치도 1~3번 방법에 있다. evaluation 축도 지지된다. 원문은 해당 권고에 수치를 붙이지 않았다. target 축은 원문이 Messages API 요청과 시스템 프롬프트를 대상으로 하므로 지지된다."
+        },
+        {
+          "ref": "sq3#issue#2",
+          "verdict": "supported",
+          "quote": "The formatting style used in your prompt may influence Claude's response style. If you are still experiencing steerability issues with output formatting, try matching your prompt style to your desired output style as closely as possible. For example, removing markdown from your prompt can reduce the volume of markdown in the output.",
+          "reason": "원문 한 문단에 주장의 세 요소가 모두 있다. 첫째는 프롬프트 서식이 응답 서식에 영향을 줄 수 있다는 서술이다. 둘째는 형식 제어가 잘 안 될 때 프롬프트 서식을 출력 서식에 맞추라는 권고이다. 셋째는 마크다운을 빼는 예시이다."
+        },
+        {
+          "ref": "sq3#case#0",
+          "verdict": "supported",
+          "quote": "### Control the format of responses\n\nThere are a few particularly effective ways to steer output formatting:",
+          "reason": "사례 「Control the format of responses」 절은 원문에 있다. 결말 '판정 못 함'은 원문에 정량 결과가 없다는 점과 맞는다. 축별 판정은 다음과 같다. purpose 축은 지지된다. 원문 예시 블록 이름이 <avoid_excessive_markdown_and_bullet_points>이다. mechanism 축도 지지된다. 원문은 네 방법을 든다. 금지 대신 원하는 형태를 말하기, 'Use XML format indicators', 'Match your prompt style to the desired output', 'Use detailed prompts for specific formatting preferences'이며, 마지막 예시 블록이 'Avoid using **bold**'와 'DO NOT use ordered lists'를 명시한다. evaluation 축도 지지된다. 원문은 'particularly effective'라고만 적고 수치를 붙이지 않는다. target 축은 'Claude 모델의 시스템 프롬프트'로 적혀 있다. 원문은 'Sample prompt'라고만 적고 시스템 프롬프트로 한정하지 않는다. 그래서 target 축은 대체로 맞지만 원문의 범위보다 좁다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://proceedings.iclr.cc/paper_files/paper/2025/hash/88be023075a5a3ff3dc3b5d26623fa22-Abstract-Conference.html",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2025/hash/88be023075a5a3ff3dc3b5d26623fa22-Abstract-Conference.html",
+      "judgments": [
+        {
+          "ref": "sq1#case#0",
+          "verdict": "supported",
+          "quote": "the alignment adapts a model's generative distribution primarily over only its very first few output tokens",
+          "reason": "사례의 존재는 원문으로 확인했다. 원문은 ICLR 2025 초록 페이지이며, 제목은 'Safety Alignment Should be Made More Than Just a Few Tokens Deep'이고 저자는 Xiangyu Qi 외다. 결말 '성공'은 초록의 두 서술이 뒷받침한다. 초록은 정렬을 처음 몇 토큰 너머로 깊게 하면 일부 공격에 대한 견고성이 개선된다고 쓰고, 'Overall, we advocate that future safety alignment should be made more than just a few tokens deep.'로 맺는다. 축별 판정은 다음과 같다. purpose 축은 supported 이다. 초록은 이 문제를 'We unifiedly refer to this issue as shallow safety alignment.'로 명명하고 원인을 밝힌 뒤 정렬을 깊게 만드는 방법을 제안한다. mechanism 축도 supported 이다. 인용 구절이 정렬이 처음 몇 출력 토큰의 분포만 바꾼다는 점을 서술하고, 초록은 프리필 공격(prefilling attacks)을 이 취약성을 이용하는 공격으로 든다. evaluation 축은 부분 지지에 그친다. 초록은 여러 공격에 대한 견고성 개선을 말하지만, 특정 '공격 벤치마크'의 이름은 초록에서 확인되지 않는다. target 축은 supported 이다. 대상은 정렬된 LLM 의 안전 정렬이다. 다만 WebFetch 도구가 125자를 넘는 인용을 거부했으므로, 이 판정은 초록 전문을 직접 확인한 결과가 아니고 발췌 구절과 요약에 근거한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "EVIDENCE-FIRST",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://huggingface.co/papers/2402.10200.md",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://huggingface.co/papers/2402.10200.md",
+      "judgments": [
+        {
+          "ref": "sq1#case#1",
+          "verdict": "supported",
+          "quote": "CoT reasoning paths can be elicited from pre-trained LLMs by simply altering the decoding process",
+          "reason": "원문 제목은 \"Chain-of-Thought Reasoning without Prompting\"이고 저자는 Xuezhi Wang 과 Denny Zhou 다. 원문에 따르면 이 사례는 실재하며, 디코딩만 바꿔 CoT 를 끌어냈다는 결말도 원문이 뒷받침한다. GSM8K 정확도가 Mistral-7B 에서 9.9% 에서 25.1% 로, PaLM-2 Large 에서 34.8% 에서 63.2% 로 올랐으므로 결말을 '성공'으로 판정했다. 축별 판정은 다음과 같다. purpose 는 지지된다. 초록이 \"by simply altering the decoding process\"라고 적는다. mechanism 도 지지된다. 3절이 첫 디코딩 위치에서 k = 10 개의 대안 토큰을 고른 뒤 \"continue greedy decoding afterwards\"라고 적고, \"later-stage branching is significantly influenced by previously generated tokens\"라고도 적는다. evaluation 은 GSM8K 정확도 결과가 있어 지지된다. target 은 사전학습 LLM(pre-trained LLMs)으로 지지된다. 다만 case 이름에 적힌 'NeurIPS 2024'라는 학회명은 이 페이지에 없어 확인하지 못했다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2408.02442",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2408.02442",
+      "judgments": [
+        {
+          "ref": "sq1#case#3",
+          "verdict": "supported",
+          "quote": "Surprisingly, we observe a significant decline in LLMs' reasoning abilities under format restrictions.",
+          "reason": "원문 제목은 'Let Me Speak Freely? A Study on the Impact of Format Restrictions on Performance of Large Language Models'이고, 저자는 Zhi Rui Tam 외로 확인되어 사례의 존재가 확인된다. 사례 결말인 '성공'은 연구 측정이 성립한 뜻으로 읽었고, 형식 제한에서 추론 성능 저하를 관측했다는 위 구절이 이를 뒷받침한다. 다만 가져온 페이지는 arXiv 프리프린트(2408.02442v3)로만 표기되어 있어서 'EMNLP 2024 Industry' 게재 사실은 이 원문에서 확인하지 못했다. 축마다의 판정은 다음과 같다. purpose 축은 지지된다. 원문은 형식 제한에서 추론 능력이 떨어지는지를 측정했고, 제약이 엄격할수록 저하가 커진다는 구절도 있다. mechanism 축도 지지된다. 원문은 JSON-mode, Format-Restricting Instructions, NL-to-Format(자연어로 먼저 답한 뒤 형식으로 변환)을 비교한다. 또한 GPT 3.5 Turbo의 JSON-mode 응답이 100% 'answer' 키를 'reason' 키보다 앞에 두어 추론 없이 바로 답했다는 서술이 있다. evaluation 축도 지지된다. 원문은 추론 과제로 GSM8K, Last Letter Concatenation, Shuffled Objects를 쓰고 분류 과제로 DDXPlus, MultiFin, Sports Understanding, NI Task 280을 쓴다. target 축(구조화 출력 요청)은 연구 대상과 일치한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/1811.05701v3",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/1811.05701v3",
+      "judgments": [
+        {
+          "ref": "sq1#case#4",
+          "verdict": "supported",
+          "quote": "We propose a plan-and-write hierarchical generation framework that first plans a storyline, ... The dynamic schema interweaves story planning and its surface realization in text, while the static schema plans out the entire storyline before generating stories. ... the generated stories are more diverse, coherent, and on topic than those generated without creating a full plan",
+          "reason": "원문 초록과 Comments 의 'Accepted by AAAI 2019'가 사례의 존재(Yao 외, AAAI 2019)와 '성공'이라는 결말을 뒷받침한다. 축별로 보면 다음과 같다. purpose 축은 지지된다. 초록이 일관된 긴 글의 생성을 과제로 들고 일관성과 주제 적합성 향상을 보고한다. 다만 '제목에서' 생성한다는 조건은 가져온 초록 발췌에서 확인하지 못했다. mechanism 축은 지지된다. 정적 스키마와 동적 스키마의 서술이 원문과 일치한다. evaluation 축도 지지된다. 원문은 다양성·일관성·주제 적합성의 향상을 적고, 자동 평가와 인간 평가에서 이 향상을 보고했다고 쓴다. target 축은 대체로 지지된다. 원문의 대상은 자동 스토리텔링의 계층적 생성 프레임워크이다. 이 판정은 WebFetch 요약 모델이 돌려준 초록 발췌에 근거하며, 인용문은 그 발췌 구절을 생략 부호로 이은 문장이다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2307.15337",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2307.15337",
+      "judgments": [
+        {
+          "ref": "sq1#case#5",
+          "verdict": "supported",
+          "quote": "This work aims at decreasing the end-to-end generation latency of large language models (LLMs). One of the major causes of the high generation latency is the sequential decoding approach ... we propose Skeleton-of-Thought (SoT), which first guides LLMs to generate the skeleton of the answer, and then conducts parallel API calls or batched decoding to complete the contents of each skeleton point in parallel. Not only does SoT provide considerable speed-ups across 12 LLMs, but it can also potentially improve the answer quality on several question categories.",
+          "reason": "원문 arXiv 초록 페이지에 사례(Skeleton-of-Thought, 저자 Xuefei Ning 외, 주석 'In ICLR'24')가 있다. 결말 '판정 못 함'은 원문 서술과 상충하지 않는다. 축별 판정은 다음과 같다. purpose는 초록이 지연 감소를 목적으로 하고 순차 디코딩을 원인으로 들므로 supported이다. mechanism은 골격을 먼저 생성한 뒤 각 항목을 병렬로 완성한다는 구절과 일치하므로 supported이다. evaluation은 '12 LLMs'에서 속도 향상이 있고 품질 향상은 'potentially'라는 단서와 함께 'several question categories'에 한정되므로 supported이다. target은 초록에 '일반 질의응답'이라는 말이 직접 나오지 않는다. 그러나 'answer'와 'question categories'라는 표현이 답변 생성을 가리키므로 부분적으로 지지된다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2408.05093",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2408.05093",
+      "judgments": [
+        {
+          "ref": "sq1#case#6",
+          "verdict": "supported",
+          "quote": "Order Matters in Hallucination: Reasoning Order as Benchmark and Reflexive Prompting for Large-Language-Models",
+          "reason": "초록 페이지가 사례의 실재를 확인한다. 결말 칸의 값은 '판정 못 함'이며, 원문의 구절과 상충하지 않는다. 축마다의 판정은 다음과 같다. purpose 축은 지지된다. 원문에 \"We discovered that the order in which LLMs generate answers and reasoning impacts their consistency.\"라는 구절이 있다. mechanism 축은 일부만 지지된다. 원문은 \"we propose a new benchmark method for assessing LLM consistency\"라고 하고 두 순서의 응답 비교를 설명하며, 제목에 Reflexive Prompting 을 적는다. 그러나 '두 순서를 모두 실행해 조정한다'는 세부 동작은 초록에 명시되어 있지 않다. evaluation 축은 지지되지 않는다. 원문은 \"this strategy improves performance across various LLMs compared to direct questioning\"이라고만 적는다. 원문이 향상을 보고한 범위는 여러 LLM이며, 여러 데이터셋에서 정확도가 향상되었다는 서술은 초록에 없다. target 축(일반 LLM 질의응답)은 초록이 LLM 일반의 일관성과 질의 응답을 다루므로 지지된다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+      "judgments": [
+        {
+          "ref": "sq2#issue#0",
+          "verdict": "supported",
+          "quote": "Claude Opus 5 catches and fixes its own mistakes well without prompting. Avoid instructing re-checks it already performs (\"double-check your answer,\" \"re-verify before responding\"); like verification instructions, these compound with the model's own behavior and add cost without improving results.",
+          "reason": "「Self-correction」 절의 인용 구절이 주장의 주어(Opus 5), 지시 없이 자기 실수를 고친다는 서술, 'double-check your answer' 예시, 기본 동작과 겹쳐 결과 개선 없이 비용만 늘린다는 서술을 모두 포함한다. 명시적 검증 지시를 지우라는 권고는 같은 페이지 「Task scope and over-verification」 절에 있다. 그 절은 \"If your prompt contains explicit verification instructions (...), remove them\"라고 적으므로 주장의 마지막 문장도 원문과 일치한다."
+        },
+        {
+          "ref": "sq2#case#6",
+          "verdict": "supported",
+          "quote": "Claude Opus 5 verifies its own work without being told to. If your prompt contains explicit verification instructions (\"include a final verification step for any non-trivial task,\" \"use a subagent to verify\"), remove them: instructions like these cause over-verification on Claude Opus 5, and removing them reduces wasted tokens with no loss in quality.",
+          "reason": "사례가 원문에 실재한다. 결말 '판정 못 함'은 원문이 채택 뒤의 결과 자료를 싣지 않은 사실과 맞는다. 축별 판정은 다음과 같다. purpose 축은 'reduces wasted tokens'와 'add cost without improving results'로 지지된다. mechanism 축은 'remove them'과 'catches and fixes its own mistakes well without prompting'으로 지지된다. evaluation 축은 원문이 'no loss in quality'라고 적을 뿐 측정 방법이나 평가 자료를 제시하지 않으므로 지지된다. target 축은 원문 전체가 Claude Opus 5 를 대상으로 하므로 지지된다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2310.01798",
+    "subquestions": [
+      "sq2",
+      "sq6"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2310.01798",
+      "judgments": [
+        {
+          "ref": "sq2#issue#1",
+          "verdict": "supported",
+          "quote": "Our research indicates that LLMs struggle to self-correct their responses without external feedback, and at times, their performance even degrades after self-correction.",
+          "reason": "원문 초록의 이 구절에 주장의 요소가 모두 들어 있다. 주어는 LLM 이고, 조건은 외부 피드백이 없는 자기 수정이며, 결과는 답을 잘 고치지 못하고 때로는 수정 뒤 성능이 떨어진다는 내용이다. 같은 페이지에 제목 'Large Language Models Cannot Self-Correct Reasoning Yet', 저자 Jie Huang 외, 학회 ICLR 2024 가 적혀 있다. 다만 WebFetch 요약 모델은 초록 전문을 옮기지 않았다. 그래서 요약 모델이 직접 옮긴 부분은 'LLMs struggle to self-correct their responses without external feedback' 까지이고, 성능 저하는 요약 모델이 'performance sometimes gets worse after self-correction'으로 요약해 전했다."
+        },
+        {
+          "ref": "sq2#case#1",
+          "verdict": "supported",
+          "quote": "Our research indicates that LLMs struggle to self-correct their responses without external feedback, and at times, their performance even degrades after self-correction.",
+          "reason": "원문 페이지에서 사례가 실제로 있음(Huang 외, ICLR 2024)을 확인했다. 결말 '실패'도 이 구절이 뒷받침한다. 축마다의 판정은 다음과 같다. purpose 는 초록이 외부 피드백 없는 자기 수정의 역할과 효능을 검토한다고 밝히므로 지지된다. mechanism 은 초록이 모델이 자기 능력만으로 처음 답을 고치는 방식이라고 서술하므로 지지된다. target 은 초록이 추론 과제에서의 결과로 한정하므로 지지된다. evaluation 의 '추론 벤치마크에서 수정 전후 정확도 비교'는 초록이 수정 뒤 성능 저하만 말하고 벤치마크 이름과 정확도 지표를 적지 않으므로 부분적으로만 지지된다."
+        },
+        {
+          "ref": "sq6#case#0",
+          "verdict": "unsupported",
+          "quote": "Our research indicates that LLMs struggle to self-correct their responses without external feedback, and at times, their performance even degrades after self-correction.",
+          "reason": "원문 페이지에서 사례가 실제로 있음(제목, Huang 외, ICLR 2024)은 확인했다. 그러나 결말 '판정 못 함'은 원문과 상충한다. 원문은 내재적 자기 교정이 추론에서 잘 작동하지 않고 때로는 성능을 떨어뜨린다는 결말을 분명히 적고 있다. 그래서 결말을 지지하는 구절은 원문에 없다. 축마다의 판정은 다음과 같다. purpose·mechanism·target 은 sq2#case#1 과 같은 근거로 지지된다. evaluation 의 '정답률 전후 비교'는 초록에 지표가 명시되지 않아 부분적으로만 지지된다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2507.02778",
+    "subquestions": [
+      "sq2",
+      "sq6"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2507.02778",
+      "judgments": [
+        {
+          "ref": "sq2#issue#2",
+          "verdict": "supported",
+          "quote": "Testing 14 open-source non-reasoning models reveals a 64.5% Self-Correction Blind Spot: ... Appending \"Wait\" requires no training yet reduces the blind spot by 89.3%",
+          "reason": "초록에 주어(오픈소스 비추론 모델 14종), 수치(평균 맹점 64.5%, 'Wait' 추가 뒤 89.3% 감소), 조건(외부 출처로 제시한 오류는 고치고, 같은 오류를 자기 출력으로 제시하면 놓친다)이 모두 들어 있다. 제출일은 2025년 7월 3일(v1)이므로 2025 프리프린트라는 서술과도 일치한다. 다만 초록에 적힌 출처 조건은 '외부에서 온' 오류이며 '사용자 글'이라고 한정하지 않았다."
+        },
+        {
+          "ref": "sq2#case#3",
+          "verdict": "supported",
+          "quote": "Testing 14 open-source non-reasoning models reveals a 64.5% Self-Correction Blind Spot:",
+          "reason": "Self-Correction Bench라는 사례가 있다는 사실은 제목과 초록으로 확인된다. outcome '판정 못 함'은 원문에서 확인할 결말 주장이 아니어서 판정에 영향을 주지 않는다. 축마다 판정하면 다음과 같다. purpose는 지지된다. 자기 오류와 외부 오류의 교정 차이를 측정한다는 내용이 초록에 있다. mechanism은 지지된다. 같은 오류의 출처를 외부와 자기로 바꿔 제시하는 방식이 초록에 있다. evaluation은 지지된다. 14종, 64.5%, 'Wait' 추가 뒤 89.3% 감소가 초록에 있다. target은 지지된다. 대상이 오픈소스 비추론 모델이라고 초록에 적혀 있다."
+        },
+        {
+          "ref": "sq6#issue#1",
+          "verdict": "supported",
+          "quote": "Appending \"Wait\" requires no training yet reduces the blind spot by 89.3%",
+          "reason": "초록에 훈련 없이 'Wait'를 덧붙이면 맹점이 89.3% 줄었다는 내용이 그대로 있다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2303.17651",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2303.17651",
+      "judgments": [
+        {
+          "ref": "sq2#case#0",
+          "verdict": "supported",
+          "quote": "The main idea is to generate an initial output using an LLMs; then, the same LLMs provides feedback for its output and uses it to refine itself, iteratively. ... Self-Refine does not require any supervised training data, additional training, or reinforcement learning ... We evaluate Self-Refine across 7 diverse tasks, ranging from dialog response generation to mathematical reasoning, using state-of-the-art (GPT-3.5, ChatGPT, and GPT-4) LLMs. Across all evaluated tasks, outputs generated with Self-Refine are preferred by humans and automatic metrics over those generated with the same LLM using conventional one-step generation, improving by ~20% absolute on average in task performance.",
+          "reason": "초록이 사례(Self-Refine)가 있다는 사실과 그 결말(전 과제에서 단일 생성 대비 개선, 곧 성공)을 뒷받침한다. 축별 판정은 다음과 같다. purpose 는 지지된다. 초록이 첫 시도의 출력이 최선이 아니라는 문제를 제기하고, 추가 학습 없이 푼다고 밝힌다. mechanism 은 지지된다. 같은 LLM 이 생성기·피드백 제공자·수정기를 겸해 반복 수정한다고 적혀 있다. evaluation 은 지지된다. 대화 응답 생성부터 수학 추론까지 7개 과제를 다루고, 사람과 자동 지표로 단일 생성과 비교했으며, 평균 약 20% absolute 개선을 보고한다. 주장의 '20%p'는 원문 '~20% absolute'와 같은 뜻이다. target 은 지지된다. 대상 모델로 GPT-3.5, ChatGPT, GPT-4 가 명시되어 있다. 인용 구절은 WebFetch 가 구간별로 돌려준 초록 문장을 이어 붙인 것이고, 생략 부호는 구간 사이를 표시한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2406.01297",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2406.01297",
+      "judgments": [
+        {
+          "ref": "sq2#case#2",
+          "verdict": "supported",
+          "quote": "In this work, we critically survey broad papers and discuss the conditions required for successful self-correction. ... Our critical survey based on the newly categorized research questions shows that (1) no prior work demonstrates successful self-correction with feedback from prompted LLMs, except for studies in tasks that are exceptionally suited for self-correction, (2) self-correction works well in tasks that can use reliable external feedback, and (3) large-scale fine-tuning enables self-correction.",
+          "reason": "원문은 Kamoi 등이 쓴 'When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of LLMs'이다. 그래서 사례가 존재한다는 점이 확인된다. 결말 '판정 못 함'은 서베이 자체에 성패 결말이 없다는 뜻으로 읽힌다. 초록의 'there is still no consensus on the question of when LLMs can correct their own mistakes' 구절과도 상충하지 않는다. 축마다의 판정은 다음과 같다. purpose 축은 'discuss the conditions required for successful self-correction' 구절이 지지한다. mechanism 축에서 서베이라는 점은 지지된다. 그러나 원문은 'we categorize research questions'라고만 적고, 프롬프트 수정·외부 피드백 수정·미세조정 수정의 세 범주 구분은 결론 (1)~(3)에서 간접적으로만 드러난다. evaluation 축은 'prior studies often do not define their research questions in detail and involve impractical frameworks or unfair evaluations' 구절과 결론 (1)·(2)가 지지한다. 다만 원문은 '일반 과제'라는 표현을 쓰지 않는다. 그 대신 'except for studies in tasks that are exceptionally suited for self-correction'이라는 예외 조건을 단다. target 축(LLM 자기 수정 연구 전반)은 'critically survey broad papers' 구절이 지지한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2305.11738",
+    "subquestions": [
+      "sq2",
+      "sq6"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2305.11738",
+      "judgments": [
+        {
+          "ref": "sq2#case#4",
+          "verdict": "supported",
+          "quote": "starting with an initial output, CRITIC interacts with appropriate tools to evaluate certain aspects of the text, and then revises the output based on the feedback obtained during this validation process. Comprehensive evaluations involving free-form question answering, mathematical program synthesis, and toxicity reduction demonstrate that CRITIC consistently enhances the performance of LLMs.",
+          "reason": "CRITIC 사례가 원문에 있고, 세 과제에서 성능이 향상되었다는 결말도 원문이 뒷받침한다. 축별 판정은 다음과 같다. purpose는 'validate and progressively amend their own outputs'로 지지된다. mechanism은 도구로 평가한 뒤 피드백으로 수정한다는 구절과 'search engine for fact-checking, or a code interpreter for debugging'으로 지지된다. evaluation은 세 과제 이름과 'consistently enhances the performance'로 지지된다. target은 'LLMs, which are essentially \"black boxes\"'로 지지된다."
+        },
+        {
+          "ref": "sq6#case#3",
+          "verdict": "supported",
+          "quote": "starting with an initial output, CRITIC interacts with appropriate tools to evaluate certain aspects of the text, and then revises the output based on the feedback obtained during this validation process. Comprehensive evaluations involving free-form question answering, mathematical program synthesis, and toxicity reduction demonstrate that CRITIC consistently enhances the performance of LLMs.",
+          "reason": "원문 페이지에 저자 Gou 외와 학회 표기 'ICLR 2024'가 있어 사례 식별 정보가 맞다. 성능이 향상되었다는 결말도 원문이 뒷받침한다. 축별 판정은 다음과 같다. purpose는 자기 출력을 검증하고 수정한다는 구절과 성능 향상 결과로 지지된다. mechanism은 원문 예시 'using a search engine for fact-checking, or a code interpreter for debugging'과 'progressively amend'로 지지된다. evaluation은 세 과제 이름으로 지지된다. target은 'hallucinating facts, generating flawed code, or creating offensive and toxic content'로 지지된다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/chain-prompts",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/chain-prompts",
+      "judgments": [
+        {
+          "ref": "sq2#case#5",
+          "verdict": "supported",
+          "quote": "The most common chaining pattern is **self-correction:** generate a draft → have Claude review it against criteria → have Claude refine based on the review. Each step is a separate API call so you can log, evaluate, or branch at any point.",
+          "reason": "입력 URL을 열자 Prompting best practices 페이지(claude-prompting-best-practices)의 본문이 돌아왔다. 그 페이지의 「Chain complex prompts」 절에 자기 수정 체인이 있으므로 사례는 실재한다. 결말 '판정 못 함'은 그 절에 효과나 결과의 서술이 없다는 사실과 맞는다. 축마다의 판정은 다음과 같다. mechanism 축은 인용 구절이 초안 생성, 기준 대비 검토, 수정을 별도 API 호출로 진행한다고 적으므로 지지된다. evaluation 축의 '평가 수치는 제시하지 않는다'도 지지된다. 그 절에는 수치가 없기 때문이다. target 축의 'Claude API 로 만드는 애플리케이션'은 일부만 지지된다. 원문은 'breaking a task into sequential API calls'라고만 적고 대상 애플리케이션을 따로 밝히지 않는다. purpose 축의 '초안 품질을 높이고 오류를 잡는다'는 지지되지 않는다. 원문이 밝힌 체이닝의 목적은 'when you need to inspect intermediate outputs or enforce a specific pipeline structure'와 'so you can log, evaluate, or branch at any point'이며, 품질 향상이나 오류 검출은 그 절에 적혀 있지 않다. 오류 검출 문구('This catches errors reliably')는 같은 페이지의 다른 기법인 단일 프롬프트 self-check 항목에 나오므로 이 사례의 목적으로 옮길 수 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://akka.io/guides/guardrail-on-a-streaming-response",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://akka.io/guides/guardrail-on-a-streaming-response",
+      "judgments": [
+        {
+          "ref": "sq2#case#7",
+          "verdict": "supported",
+          "quote": "The runtime groups tokens into a unit the guardrail can evaluate and releases that unit after the verdict returns.",
+          "reason": "원문은 Akka Verify 가 스트리밍 응답에 가드레일을 적용하는 사례를 설명한다. 그러나 가드레일의 지연·정확도·처리량을 측정한 수치는 원문에 없다. 그래서 사례가 있다는 점과 결말 '판정 못 함'은 원문으로 뒷받침된다. 축마다 판정한 결과는 다음과 같다. purpose 축은 supported 이다. 원문에 'A check that waits for the last token has nothing left to prevent, because the earlier pieces already reached the caller.'가 있다. mechanism 축은 supported 이다. 인용한 구절과 PASS 판정 뒤 내보낸다는 서술이 근거다. evaluation 축도 supported 이다. 원문에 'A guardrail that evaluates larger units returns stronger verdicts and pushes that first word later.'가 있고 정량 결과는 없다. target 축은 unsupported 이다. 원문은 이 가드레일을 외부 가드레일로 설명하지 않는다. 원문은 'Inline guardrails, sanitizers and the interaction record are capabilities of Akka Verify, running on the Akka SDK runtime.'처럼 런타임 안의 인라인 통제로 설명하므로 '외부 가드레일'이라는 서술과 상충한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://developer.nvidia.com/blog/stream-smarter-and-safer-learn-how-nvidia-nemo-guardrails-enhance-llm-output-streaming/",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://developer.nvidia.com/blog/stream-smarter-and-safer-learn-how-nvidia-nemo-guardrails-enhance-llm-output-streaming/",
+      "judgments": [
+        {
+          "ref": "sq2#case#8",
+          "verdict": "supported",
+          "quote": "synchronously by default, meaning the entire LLM response is generated and validated before being returned to the user. ... Enabling streaming mode decouples response generation from validation, allowing tokens to be sent incrementally ... The LLM response is split into chunks (configurable through chunk_size in config.yml). ... the objectionable text might have already been sent to the user ... the guardrails service returns a response in the JSON format ... larger chunks (200-256 tokens) provide better context for rails like hallucination detection ... smaller chunks (128 tokens) lower latency but risk missing cross-chunk violations",
+          "reason": "원문에는 NeMo Guardrails 의 스트리밍 출력 레일 사례가 있다. 원문은 기능 설명이고 도입 결과를 보고하지 않으므로, 결말을 '판정 못 함'으로 둔 서술과 상충하지 않는다. 축별 판정은 다음과 같다. purpose 축은 스트리밍과 검증을 함께 쓰는 설명이 있어 지지된다. mechanism 축에서 기본 동기 검증, chunk_size 에 따른 청크 단위 검사, JSON 오류 객체 전송은 원문 구절로 지지된다. 그러나 원문은 stream_first 아래에서 텍스트가 '이미 보내졌을 수 있다'고 하고 대응을 호출자 책임으로 둘 뿐이며, '회수하지 못한다'는 표현은 쓰지 않는다. 그래서 회수 불가 서술은 원문에서 추론한 내용이다. evaluation 축은 청크 크기에 따른 지연과 청크 경계 위반 누락의 절충 구절로 지지된다. target 축에 대해 원문은 지연에 민감한 엔터프라이즈 생성형 AI 앱과 LLM 스트리밍 아키텍처를 대상으로 적는다. '가드레일을 둔 LLM 서비스'라는 표현은 원문에 그대로 나오지 않지만 의미는 일치한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1",
+      "judgments": [
+        {
+          "ref": "sq3#issue#0",
+          "verdict": "supported",
+          "quote": "Earlier models overused bullets and bold in chat, and many prompts carry anti-formatting rules written to hold that down. Claude Fable 5.1 leans the other way: it uses bold less and is less likely to reach for headers, lists, or quotation marks. If your prompt contains anti-formatting language, remove it or replace it with a rule that says when specific formatting is appropriate, such as the following:",
+          "reason": "「Formatting in chat」 절의 이 구절에 주장의 요소가 모두 있다. 이전 모델이 불릿과 굵은 글씨를 과다하게 썼다는 서술, 많은 프롬프트에 반형식 규칙이 있다는 서술, Fable 5.1 이 굵은 글씨·헤더·목록을 덜 쓴다는 서술, 그 규칙을 지우거나 형식이 적절한 조건을 말하는 규칙으로 바꾸라는 권고가 그 요소다. 다만 '내용에 필요한 구조까지 억제할 수 있다'는 이 구절에 직접 적혀 있지 않다. 같은 문서 머리의 안내 목록에 'Chat replies carry less structure than the content needs: [Formatting in chat]'라는 증상 서술이 있어서 그 요소를 뒷받침한다."
+        },
+        {
+          "ref": "sq3#case#1",
+          "verdict": "supported",
+          "quote": "Earlier models overused bullets and bold in chat, and many prompts carry anti-formatting rules written to hold that down. Claude Fable 5.1 leans the other way: it uses bold less and is less likely to reach for headers, lists, or quotation marks. If your prompt contains anti-formatting language, remove it or replace it with a rule that says when specific formatting is appropriate",
+          "reason": "원문에는 「Formatting in chat」 절이 실제로 있다. 결말이 '실패'라는 판정은 두 서술로 뒷받침된다. 원문은 이전 모델에 맞춰 쓴 반형식 규칙이 새 모델에서는 지우거나 바꿔야 할 대상이 되었다고 적고, 증상을 'Chat replies carry less structure than the content needs'로 적는다. 축별 판정은 다음과 같다. purpose 축은 지지된다. 위 구절과 증상 서술이 모델 교체 뒤 생기는 과잉 억제를 다루기 때문이다. mechanism 축도 지지된다. 'remove it or replace it with a rule that says when specific formatting is appropriate'가 이 축의 서술과 일치한다. evaluation 축 역시 지지된다. 이 절은 관찰된 행동 차이만 서술하고 수치를 제시하지 않는다. target 축도 지지된다. 문서 description 이 'Behavioral differences and prompting patterns for Claude Fable 5.1 and Claude Mythos 5.1'로 적기 때문이다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2601.08070",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2601.08070",
+      "judgments": [
+        {
+          "ref": "sq3#issue#1",
+          "verdict": "supported",
+          "quote": "In priming failure (87.5% of violations), the instruction's explicit mention of the forbidden word ... the very act of naming a forbidden word primes the model to produce it. ... the instruction reduces target probability by only 5.2 percentage points in failures versus 22.8 points in successes",
+          "reason": "초록에 주장의 세 요소가 모두 있다. 첫째로 위반의 87.5%가 점화 실패라는 수치가 있다. 둘째로 금지 단어를 명시하는 행위가 모델이 그 단어를 생성하도록 점화한다는 결론이 있다. 셋째로 억제 폭이 실패 사례 5.2%p, 성공 사례 22.8%p라는 수치가 있다."
+        },
+        {
+          "ref": "sq3#case#4",
+          "verdict": "supported",
+          "quote": "Semantic Gravity Wells: Why Negative Constraints Backfire ... In priming failure (87.5% of violations) ... In override failure (12.5%) ... Activation patching confirms that layers 23--27 are causally responsible ... $n=40{,}000$ samples",
+          "reason": "초록이 사례의 존재와 결말을 뒷받침한다. 결말이 '실패'라는 점은 제목의 'Backfire'와 위반 분석으로 확인된다. 축별 판정은 다음과 같다. purpose는 부정 제약이 실패하는 기제를 분석한다는 내용이 제목과 초록에 있어 지지된다. mechanism은 금지 단어 지시와 활성화 패칭으로 점화 실패와 덮어쓰기 실패를 구분한다는 내용이 초록에 있어 지지된다. evaluation은 4만 표본(n=40,000)과 위반의 87.5%가 점화 실패라는 수치가 초록에 있어 지지된다. target은 금지 단어 지시라는 점이 'forbidden word'라는 표현으로 확인되어 지지된다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://aclanthology.org/2025.acl-long.1308/",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://aclanthology.org/2025.acl-long.1308/",
+      "judgments": [
+        {
+          "ref": "sq3#case#2",
+          "verdict": "supported",
+          "quote": "we study format biases in reinforcement learning from human feedback (RLHF).",
+          "reason": "ACL Anthology 페이지에서 제목 'From Lists to Emojis: How Format Bias Affects Model Alignment', 저자 Xuanchang Zhang 외, ACL 2025 Long Papers 게재를 확인했으므로 사례가 실재한다. 초록은 널리 쓰이는 선호 모델이 특정 형식에 편향되어 있고 1% 미만의 편향 데이터로도 보상 모델에 편향을 주입할 수 있음을 보고하므로, 결말 '성공'은 연구 결과가 산출되었다는 뜻으로 뒷받침된다. 축별 판정은 다음과 같다. purpose: 지지된다. 초록이 RLHF 의 형식 편향을 연구한다고 밝힌다. mechanism: 지지된다. 목록·링크·굵은 글씨·이모지에 대한 선호 편향 측정과 소량 편향 데이터 주입 실험이 초록에 있다. evaluation: 지지된다. RewardBench 상위 모델·GPT-4·사람 평가자가 형식 편향을 보이고, LLM 이 AlpacaEval·LMSYS Chatbot Arena 순위를 높이는 데 이 편향을 이용할 수 있다고 적혀 있다. target: 지지된다. 보상 모델과 정렬 알고리즘(best-of-n sampling, online iterative DPO)이 대상이다. 다만 WebFetch 요약 도구가 초록 전문 인용을 125자로 제한해 원문에서 그대로 옮긴 구절은 위 한 문장만 확보했다. 나머지 축의 근거는 같은 페이지 초록의 요약에서 확인한 내용이다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2502.12150",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2502.12150",
+      "judgments": [
+        {
+          "ref": "sq3#case#3",
+          "verdict": "supported",
+          "quote": "Surprisingly, we observe our classifiers achieve high accuracies of 73.1% for chat APIs and 77.7% for instruct LLMs.",
+          "reason": "원문은 이 사례가 있다는 점과 성공이라는 결말을 뒷받침한다. 축마다 판정한 결과는 다음과 같다. purpose 축은 원문의 'the objective is to predict the source LLM that generates the text'가 뒷받침한다. mechanism 축과 evaluation 축의 수치는 원문의 마크다운 요소 실험 절에 있는 위 구절이 뒷받침하며, 73.1%와 77.7%가 주장과 일치한다. evaluation 축의 서식 서술 가운데 Claude 쪽은 'Claude (yellow) has a high density at zero in the bold text and header count distributions'가 뒷받침하고, ChatGPT 쪽은 'ChatGPT tends to emphasize each key point within enumerations in bold and highlight a title with markdown headers'가 뒷받침한다. target 축은 원문이 Chat APIs·Instruct LLMs·Base LLMs 세 집단을 연구 대상으로 정의한 서술이 뒷받침한다. 다만 수치 구절이 마크다운만 남긴 조건의 결과라는 점은 WebFetch 요약이 그 절에서 옮긴 구절이라고 보고한 내용에 근거한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://community.openai.com/t/fyi-gpt-5-prompting-guide-markdown-section-includes-some-api-information/1338561",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://community.openai.com/t/fyi-gpt-5-prompting-guide-markdown-section-includes-some-api-information/1338561",
+      "judgments": [
+        {
+          "ref": "sq3#case#5",
+          "verdict": "supported",
+          "quote": "By default, GPT-5 in the API does not format its final answers in Markdown ... adherence to Markdown instructions specified in the system prompt can degrade over the course of a long conversation. ... we've seen consistent adherence from appending a Markdown instruction every 3-5 user messages.",
+          "reason": "원문에는 GPT-5 프롬프팅 가이드의 마크다운 절이 커뮤니티 글로 실려 있으므로 사례가 원문에 있다. 결말을 '판정 못 함'으로 둔 서술은 원문의 정성 서술과 상충하지 않는다. 원문은 반복 지시로 준수가 일관되었다고만 적고 수치를 제시하지 않는다. 축별 판정은 다음과 같다. purpose 는 기본으로 마크다운을 쓰지 않는 API 모델에 지시로 마크다운을 켜는 내용이며 원문 구절이 지지한다. mechanism 은 시스템 프롬프트의 마크다운 지시와 3~5 사용자 메시지마다 지시를 다시 붙이는 방법이며 원문 구절이 지지한다. evaluation 은 긴 대화에서 준수가 떨어지고 반복하면 일관된 준수를 보았다는 서술이다. 이 서술은 원문과 일치하며, 수치가 없다는 점도 원문과 같다. target 은 GPT-5 API 이며 'GPT-5 in the API' 구절이 지지한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "judgments": [
+        {
+          "ref": "sq4#issue#0",
+          "verdict": "supported",
+          "quote": "Context, therefore, must be treated as a finite resource with diminishing marginal returns. / teams will often stuff a laundry list of edge cases into a prompt ... We do not recommend this. / Providing examples, otherwise known as few-shot prompting, is a well known best practice / curate a set of diverse, canonical examples that effectively portray the expected behavior",
+          "reason": "원문 구절이 주장의 세 요소를 모두 포함한다. 첫째, 원문은 컨텍스트를 한계 수확이 체감하는 유한 자원으로 다룬다. 둘째, 예외 사례 목록을 프롬프트에 채워 넣는 방식을 권하지 않는다. 셋째, few-shot 예시를 잘 알려진 모범 사례로 보고 다양하고 대표적인 예시를 골라 넣으라고 권한다."
+        },
+        {
+          "ref": "sq4#case#6",
+          "verdict": "supported",
+          "quote": "the smallest possible set of high-signal tokens that maximize the likelihood of some desired outcome / The right altitude is the Goldilocks zone between two common failure modes. / teams will often stuff a laundry list of edge cases into a prompt ... We do not recommend this. / curate a set of diverse, canonical examples that effectively portray the expected behavior",
+          "reason": "원문에 이 사례가 있고, 원문이 실무 지침이라는 점도 확인된다. outcome 은 '판정 못 함'이며, 원문에 효과를 측정한 수치가 없으므로 이 판정과 맞는다. 축별 판정은 다음과 같다. purpose 축은 지지된다. 원문이 에이전트용 시스템 프롬프트와 컨텍스트를 어떻게 구성할지 안내하기 때문이다. mechanism 축도 지지된다. 원문에 고신호 토큰의 최소 집합, 적정 고도, 예외 목록 비권장, 대표 예시 선별을 권하는 구절이 모두 있다. evaluation 축도 지지된다. 원문은 통제 실험 수치를 제시하지 않으며, 다중 에이전트 구조의 개선도 수치 없이 'a substantial improvement'라고만 적는다. target 축도 지지된다. 원문의 대상이 LLM 에이전트의 프롬프트와 컨텍스트이기 때문이다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2605.10039",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2605.10039",
+      "judgments": [
+        {
+          "ref": "sq4#issue#1",
+          "verdict": "supported",
+          "quote": "structural choices (file size, instruction position, file architecture, contradictions in adjacent files) ... produces a detectable contrast after multiple-testing correction ... Size and conflict nulls are supported by affirmative-null Bayes factors (BF10 between 0.05 and 0.10) ... each additional function the agent generates is associated with approximately 5.6% lower odds of compliance per step",
+          "reason": "초록이 이 주장의 주어와 수치와 조건을 모두 포함한다. 주어는 1,650 Claude Code CLI 세션(primarily Sonnet 4.6)이고, 네 변수가 다중 검정 보정 뒤 검출 가능한 대비를 내지 않았다. 크기와 모순의 무효과는 BF10 0.05–0.10 으로 지지되었고, 함수 하나당 준수 오즈는 약 5.6% 낮아졌다. 16,050 관측과 두 TypeScript 코드베이스는 초록에 있고 'a trivial target annotation' 구절도 있다. 그러나 초록에는 한계를 따로 적은 절이 없으며, '저자가 한계를 밝혔다'는 서술은 이 구절들에서 읽어 낸 해석이다. 도구가 한 번에 옮길 수 있는 글자 수가 제한되어, quote 는 초록의 원문 조각들을 '...'로 이은 형태다."
+        },
+        {
+          "ref": "sq4#case#5",
+          "verdict": "supported",
+          "quote": "across 1,650 Claude Code CLI sessions ... structural choices (file size, instruction position, file architecture, contradictions in adjacent files) ... produces a detectable contrast after multiple-testing correction",
+          "reason": "사례가 있다는 사실과 결말을 초록이 뒷받침한다. 결말 '판정 못 함'은 네 변수 모두 효과를 검출하지 못한 결과와 일치한다. 축마다 판정했다. purpose 는 지지된다. 초록이 구조 선택이 준수에 주는 영향을 측정한다고 적는다. mechanism 은 지지된다. 초록이 네 변수를 조작한다고 적으며, '요인 설계'라는 표현은 변수와 2원 상호작용을 다룬 서술에서 도출된다. evaluation 은 지지된다. 1,650 세션, 16,050 관측, 혼합효과 모형과 Bayesian 보완 분석, 무효과, 함수당 오즈 약 5.6% 감소가 초록에 있다. 다만 저자는 이 관계가 단조적이지 않고 사전에 정한 분석이 아니라고 단서를 달았다. target 은 대체로 지지된다. 대상은 Claude Code CLI 의 설정 파일이며, '상시로 싣는다'는 서술은 초록에 그대로 나오지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2608.02639",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2608.02639",
+      "judgments": [
+        {
+          "ref": "sq4#issue#2",
+          "verdict": "supported",
+          "quote": "stacks 24 verifier-checked instructions, one to twenty at a time … evaluate three production-tier LLMs (Claude Sonnet 4.6, GPT-5-mini, Gemini 2.5 Flash) … Instruction-following degrades non-linearly … the follow rate falls from ~96% to as low as 20% … a structured and reproducible set of pairwise conflicts … A single \"output JSON\" constraint, for example, is jointly unsatisfiable with nine others. … an instruction compiler that rewrites the stacked prompt in a single LLM call … It recovers up to +11 points of follow rate for weaker models … leaving stronger models, which already internalise the same structure, essentially unchanged",
+          "reason": "초록이 주장의 요소를 모두 포함한다. 그 요소는 검증기가 있는 지시 24개를 1~20개씩 쌓은 설계, 시험한 모델 세 개, 약 96%에서 20%까지의 비선형 하락, 쌍별 충돌 구조로의 귀속, JSON 출력 지시와 다른 지시 아홉 개의 충돌, 단일 LLM 호출 재작성기, 약한 모델의 최대 11점 회복과 강한 모델의 무변화다. 주장이 '지시 재작성기'라고 부른 기법을 원문은 'instruction compiler'라고 부르며, 원문은 이 기법을 프롬프트를 다시 쓰는 기법으로 설명하므로 실체는 같다."
+        },
+        {
+          "ref": "sq4#case#4",
+          "verdict": "supported",
+          "quote": "stacks 24 verifier-checked instructions, one to twenty at a time … the follow rate falls from ~96% to as low as 20% … an instruction compiler that rewrites the stacked prompt in a single LLM call … It recovers up to +11 points of follow rate for weaker models",
+          "reason": "초록에서 사례의 존재와 결말을 확인했다. 결말은 붕괴를 측정했고 완화 기법이 약한 모델에서 최대 11점을 회복했다는 내용이며, 이 결말이 '성공'과 맞는다. 축별 판정은 다음과 같다. purpose 축은 지시 누적의 붕괴 측정과 완화 기법 제안을 초록이 서술하므로 supported 이다. mechanism 축은 지시 24개를 1~20개씩 쌓은 설계와 단일 LLM 호출 재작성(instruction compiler)이 원문에 있으므로 supported 이다. evaluation 축은 verifier-checked 채점, ~96%에서 20%로의 하락, +11점 회복이 원문에 있으므로 supported 이다. target 축은 원문이 Claude Sonnet 4.6, GPT-5-mini, Gemini 2.5 Flash 를 명시하므로 supported 이다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2507.11538v1",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2507.11538v1",
+      "judgments": [
+        {
+          "ref": "sq4#case#0",
+          "verdict": "supported",
+          "quote": "even the best frontier models only achieve 68% accuracy at the max density of 500 instructions",
+          "reason": "원문에는 IFScale 사례가 있고, 그 결말을 뒷받침하는 구절도 있다. 축마다 판정하면 다음과 같다. purpose 축은 원문의 'to measure how instruction-following performance degrades as instruction density increases'가 지지한다. 지시 수 범위 10~500은 Section 3과 Section 4.1이 지지한다. mechanism 축은 'The task is to generate a professional business report while including a set of keywords in the output.'과 'Each instruction is a constraint to include a specific keyword in the generated report.'가 지지한다. evaluation 축에서 모델 20개는 'We evaluated a total of 20 models spanning seven providers'가, 최고 모델 약 68%는 인용 구절이 지지한다. Claude Sonnet 4 의 수치는 Table 1 의 claude-sonnet-4 행(비추론 모드)과 같다. 그 값은 10개 100.0%, 250개 77.2%, 500개 42.9%이며 본문 문장이 아닌 표의 값이다. 같은 표의 claude-sonnet-4 (r) 행은 추론 모드의 결과이므로 이 수치와 구분해야 한다. 앞쪽 지시 편향은 'bias towards earlier instructions'가, 누락 오류 증가는 'Models overwhelmingly err toward omission errors as instruction density increases.'가 지지한다. target 축의 '단일 생성 과제의 사용자 프롬프트에 든 지시'는 보고서 생성 과제 하나에 키워드 지시를 넣는 설계와 일치한다. outcome 의 '판정 못 함'은 선행 사례 쪽 서술이 아니어서 이 판정의 대상에서 뺐다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2509.21051",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2509.21051",
+      "judgments": [
+        {
+          "ref": "sq4#case#1",
+          "verdict": "supported",
+          "quote": "Many Instruction-Following Eval (ManyIFEval) for text generation with up to ten instructions ... Style-aware Mostly Basic Programming Problems (StyleMBPP) for code generation with up to six instructions. ... Our experiments with the created benchmarks across ten LLMs reveal that performance consistently degrades as the number of instructions increases. ... a logistic regression model using instruction count as an explanatory variable can predict performance with approximately 10% error, even for unseen instruction combinations.",
+          "reason": "원문 초록에는 사례의 존재가 적혀 있다. 논문 제목은 'When Instructions Multiply: Measuring and Estimating LLM Capabilities of Multiple Instructions Following'이며 두 벤치마크를 만들었다는 서술이 있다. 결말 '판정 못 함'은 사례 쪽 결과를 적은 말이 아니고 워크플로 쪽 분류이므로, 원문과 상충하지 않는다. 축별 판정은 다음과 같다. purpose는 supported이다. 제목의 'Measuring and Estimating'과 지시 여러 개 준수가 그 근거이다. mechanism은 supported이다. 텍스트 지시 최대 10개, 코드 지시 최대 6개, 지시 수를 설명변수로 한 로지스틱 회귀가 모두 원문에 있다. evaluation은 supported이다. LLM 10개에서 지시 수가 늘수록 성능이 일관되게 떨어졌다는 서술과 약 10% 오차가 원문에 있다. target은 supported이다. 텍스트 생성과 코드 생성 지시를 다룬다는 서술이 원문에 있다. 다만 '단일 프롬프트'라는 한정은 초록 요약에 명시되어 있지 않고, 여러 지시를 한 번에 주는 설정에서 추론한 해석이다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2503.06573v1",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2503.06573v1",
+      "judgments": [
+        {
+          "ref": "sq4#case#2",
+          "verdict": "supported",
+          "quote": "all evaluated models experience performance degradation with an increasing number of constraints",
+          "reason": "WildIFEval 사례가 원문에 실재하고, 결말 '판정 못 함'은 원문 구절로 판정할 대상이 아니라고 보았다. 축마다의 판정은 다음과 같다. purpose 축은 지지된다. 원문은 실제 사용자 프롬프트에서 다중 제약 준수를 다루는 데이터셋을 소개한다. mechanism 축도 지지된다. 원문에 'a large-scale dataset of 12K real user instructions with diverse, multi-constraint conditions'와 'We categorize these constraints into eight high-level classes'가 있다. evaluation 축은 인용 구절과 'the specific type of constraint plays a critical role in model performance'로 지지된다. target 축(사용자 턴의 지시)은 'real user instructions'와 맞는다. 다만 원문 초록에서 확인한 수치는 '약 12K'가 아닌 '12K'이다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://www.alphaxiv.org/abs/2607.19257",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://www.alphaxiv.org/abs/2607.19257",
+      "judgments": [
+        {
+          "ref": "sq4#case#3",
+          "verdict": "supported",
+          "quote": "Experiment 1 (960 calls/model) measures instruction-following decay as rule count N grows from 10 to 160 ... crossed with four formats and system-prompt vs. user-turn placement. ... Perfect-response rate collapses to zero by N=80 for every model, format, and placement. Placement produces effects at least as large as format at N=160 in most models, but the direction is model-specific. No model shows a reliable markdown advantage; one 35B model favors plain text instead.",
+          "reason": "원문 초록에서 사례(Prompt Design at Scale: How Format, Instruction Count, and Context Length Shape Instruction Adherence)가 있음을 확인했다. 결말을 뒷받침하는 구절도 초록에 있다. 축별 판정은 다음과 같다. purpose 는 초록의 제목과 'three prompt-design decisions' 문장이 형식·지시 수·컨텍스트 길이를 다루므로 지지된다. 다만 '환각'에 관한 구절은 이번에 받은 초록 발췌에서 확인하지 못했다. mechanism 의 규칙 수 10~160, 형식 네 가지(markdown·plain text·prose·tabular), 시스템 프롬프트와 사용자 턴 배치, 모델 다섯 개('evaluated across five models')는 원문과 일치한다. evaluation 에서 N=80 의 완전 응답률 0 은 'Perfect-response rate collapses to zero by N=80 for every model, format, and placement' 와 일치한다. 그러나 N=160 에 관한 원문 조건은 'in most models'와 'at least as large'이고 방향이 모델마다 다르다는 단서가 붙는다. 그래서 주장의 '배치 효과가 형식 효과만큼 컸다'는 조건 한정 '대부분의 모델에서'를 생략하였다. markdown 이 일관되게 유리하지 않다는 서술은 'No model shows a reliable markdown advantage' 와 일치한다. target 은 시스템 프롬프트 또는 사용자 턴에 둔 규칙 목록으로, 원문의 placement 조건과 일치한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "NO-MIRROR"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2512.17920v1",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2512.17920v1",
+      "judgments": [
+        {
+          "ref": "sq4#case#7",
+          "verdict": "supported",
+          "quote": "We observe a universal U-curve pattern in constraint compliance across compression levels.",
+          "reason": "원문은 단독 저자 Rahul Baxi의 arXiv:2512.17920v1 논문이다. 제목은 'Separating Constraint Compliance from Semantic Accuracy: A Novel Benchmark for Evaluating Instruction-Following Under Compression'이다. 이 원문으로 사례가 있다는 점은 확인된다. 결말 '판정 못 함'은 보고 수치에 내부 불일치가 있다는 점과 부합한다. 축마다의 판정은 다음과 같다. purpose 축은 지지된다. 원문은 제목에서 제약 준수와 의미 정확도를 분리한다고 밝히고, 의미 정확도에 대해 'Semantic accuracy improves monotonically with more context'라고 적는다. mechanism 축도 지지된다. 원문에 'The constraint (word count) remains fixed at 35 words across all compression levels.'가 있고, 압축은 c=0.0부터 c=1.0까지 다섯 단계로 각각 약 2·13·27·69·135단어다. evaluation 축 역시 지지된다. 원문에 'A three-judge LLM jury'(Claude Opus 4.1, GPT-5.1, DeepSeek-v3.1)가 있다. U자형과 'violations peaking at medium compression'도 원문에 있으며, c=0.5(약 27단어)의 평균 CC는 6.54로 양 끝의 약 8보다 낮다. 원문에는 수치 불일치도 여러 곳 있다. 97.2%와 97.5%, 72개와 81개 조건, 0.381과 2.9배의 계산 불일치가 그 예다. target 축 '단일 과제 프롬프트'도 원문과 맞는다. 원문은 개념을 정확히 35단어로 설명하는 과제 하나만 쓴다. 단, WebFetch 요약 모델이 옮긴 구절에 기대어 판정했다는 한계가 있다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://platform.claude.com/en/docs/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://platform.claude.com/en/docs/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "judgments": [
+        {
+          "ref": "sq5#issue#0",
+          "verdict": "supported",
+          "quote": "1. **Tell Claude what to do instead of what not to do**\n\n   * Instead of: \"Do not use markdown in your response\"\n   * Try: \"Your response should be composed of smoothly flowing prose paragraphs.\"",
+          "reason": "원문의 「Control the format of responses」 절에 이 구절이 있다. 구절은 출력 형식 제어라는 조건과 금지 대신 할 일을 지시하라는 권고를 포함한다. 'Do not use markdown in your response' 대신 산문 문단을 지시하는 예시도 주장과 일치한다."
+        },
+        {
+          "ref": "sq5#issue#1",
+          "verdict": "supported",
+          "quote": "The formatting style used in your prompt may influence Claude's response style. If you are still experiencing steerability issues with output formatting, try matching your prompt style to your desired output style as closely as possible. For example, removing markdown from your prompt can reduce the volume of markdown in the output.",
+          "reason": "원문은 프롬프트의 서식 스타일이 응답 스타일에 영향을 줄 수 있다고 적는다. 또한 프롬프트에서 마크다운을 없애면 출력의 마크다운 양이 줄 수 있다고 적는다. 주장의 주어와 조건이 원문과 일치한다."
+        },
+        {
+          "ref": "sq5#case#3",
+          "verdict": "supported",
+          "quote": "This is the reference for prompt engineering with current Claude models",
+          "reason": "사례가 있다는 사실은 이 구절이 뒷받침한다. 이 문서는 지침 문서이고 결과를 측정한 보고가 아니므로 결말 '판정 못 함'과 상충하지 않는다. 축별 판정은 다음과 같다. purpose 축은 이 구절로 지지된다. mechanism 축은 원문의 'Be specific about the desired output format and constraints', 'Providing context or motivation behind your instructions', 'Include 3–5 examples for best results', 'Wrap examples in `<example>` tags', 'Tell Claude what to do instead of what not to do', 'Match your prompt style to the desired output'로 모두 지지된다. 원문의 'Diverse' 항목도 다양한 예시를 지지한다. evaluation 축의 '공개 수치 없음'은 부분적으로 틀린다. 원문은 'Queries at the end can improve response quality by up to 30 percent in tests'와 병렬 도구 호출을 '~100%'까지 높일 수 있다는 수치를 적는다. 그러나 이 수치는 개별 기법의 수치이고 문서 전체 지침의 효과를 평가한 수치는 원문에 없다. target 축은 'Setting a role in the system prompt'와 「Agentic systems」 절로 지지된다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2505.13360",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2505.13360",
+      "judgments": [
+        {
+          "ref": "sq5#issue#2",
+          "verdict": "supported",
+          "quote": "while LLMs can often infer unspecified requirements by default (41.1%) ... Under-specified prompts are 2x as likely to regress across model or prompt changes. ... simply specifying all requirements does not consistently help, as models have limited instruction-following ability",
+          "reason": "원문 초록에는 기본 추론 비율 41.1%, 모델이나 프롬프트가 바뀔 때의 회귀 가능성 2배, 모든 요구사항을 명시해도 일관되게 돕지 않는다는 결론과 그 이유인 지시 이행 능력의 한계가 모두 들어 있다. 같은 문장은 요구사항 간 충돌도 이유로 든다. 저자 목록에는 Chenyang Yang 이 들어 있다. 다만 arXiv 초록 페이지에는 소속이 적혀 있지 않아 주장의 'CMU' 소속은 이 페이지로 확인하지 못했다. 이 소속은 주장의 핵심 수치와 결론에 영향을 주지 않는다."
+        },
+        {
+          "ref": "sq5#case#1",
+          "verdict": "supported",
+          "quote": "we propose requirements-aware prompt optimization mechanisms that improve performance by 4.8% on average",
+          "reason": "제목 'What Prompts Don't Say: Understanding and Managing Underspecification in LLM Prompts'와 저자 목록으로 사례가 있음을 확인했다. 결말인 '성공'은 기준선 대비 평균 4.8% 개선을 적은 문장이 뒷받침한다. 축별 판정은 다음과 같다. purpose 축은 지지된다. 초록이 미명시(underspecification)를 분석하고 관리한다고 적기 때문이다. mechanism 축도 지지된다. 'requirements-aware prompt optimization' 문구가 원문에 있다. evaluation 축의 41.1%, 회귀 2배, 평균 4.8% 개선도 모두 원문에 있다. target 축의 LLM 응용 프롬프트는 제목의 'LLM Prompts'와 일치한다. 그러나 사례명의 'ACL Findings 2026' 게재처는 이 페이지에서 확인하지 못했다. 페이지에는 comments 필드나 게재처 표기가 없고, 버전 이력(v3, 2026-04-24)만 있다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2607.01953",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2607.01953",
+      "judgments": [
+        {
+          "ref": "sq5#case#0",
+          "verdict": "supported",
+          "quote": "LLMs frequently collapse onto a single incorrect interpretation of the task description ... affects over 10% of tasks in MBPP, 3% in HumanEval, and 32% of LiveCodeBench ... By deliberately injecting underspecification issues in the benchmark prompts, the rate rises to over 5 times",
+          "reason": "사례의 존재는 원문 제목 'Underspecification does not imply Incoherence: The Risks of Semantic Collapse in Coding Models'로 확인된다. 결말이 성공이라는 점은 저자들이 semantic collapse 를 실측으로 입증한 데서 뒷받침된다. 축별 판정은 다음과 같다. purpose 는 지지된다. 모델이 흩어진 출력을 내기보다 한 해석으로 수렴한다는 주장을 원문 초록이 다루기 때문이다. mechanism 은 지지된다. 원문이 반복 생성 출력의 일관성('consistently generating coherent but behaviorally misaligned code')을 관측하고 모호성을 의도적으로 주입하기 때문이다. evaluation 은 지지된다. MBPP 10% 이상, HumanEval 3%, LiveCodeBench 32%, 주입 시 5배 넘는 증가가 원문 구절과 일치한다. target 은 지지된다. 원문 대상이 코딩 모델의 task description 이다. 다만 quote 는 WebFetch 요약 도구가 초록에서 발췌해 돌려준 구절들을 '...'로 이은 것이다. 그래서 초록 전문의 문장 순서는 확인하지 못했다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://developers.openai.com/api/docs/guides/gpt-4.1",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://developers.openai.com/api/docs/guides/gpt-4.1",
+      "judgments": [
+        {
+          "ref": "sq5#case#2",
+          "verdict": "supported",
+          "quote": "GPT-4.1 is trained to follow instructions more closely and more literally than its predecessors",
+          "reason": "원문 페이지에 OpenAI 의 GPT-4.1 프롬프트 가이드가 실제로 있다. 위 구절은 이 사례가 있다는 것과 '지시를 문자 그대로 따르는 모델'이라는 전제를 뒷받침한다. 결말이 '판정 못 함'이라는 주장은 원문의 평가 서술과 상충하지 않는다. 축마다의 판정은 다음과 같다. purpose 축은 지지된다. 위 구절에 근거가 있다. mechanism 축도 지지된다. 원문에 'a single sentence firmly and unequivocally clarifying your desired behavior is almost always sufficient', 'ensure that any important behavior demonstrated in your examples are also cited in your rules.', 'If there are conflicting instructions, GPT-4.1 tends to follow the one closer to the end of the prompt.'라는 구절이 있다. evaluation 축은 지지되지 않는다. 원문은 'increased our internal SWE-bench Verified score by close to 20%'와 'inducing explicit planning increased the pass rate by 4%'처럼 내부 평가의 수치를 공개하므로 '공개 수치 없음'과 상충한다. 다만 '벤더 내부 평가'라는 서술은 맞다. target 축은 지지된다. 원문의 'we recommend including three key types of reminders in all agent prompts'가 GPT-4.1 에이전트의 시스템 프롬프트를 대상으로 한다는 근거다. 원문 109598자 중 앞쪽 100000자만 확인했다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2310.11324",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2310.11324",
+      "judgments": [
+        {
+          "ref": "sq5#case#4",
+          "verdict": "supported",
+          "quote": "several widely used open-source LLMs are extremely sensitive to subtle changes in prompt formatting",
+          "reason": "원문 초록 페이지에서 사례가 있다는 사실을 확인했다. 제목은 'Quantifying Language Models' Sensitivity to Spurious Features in Prompt Design'이고 저자는 Sclar·Choi·Tsvetkov·Suhr이며, comments 란에 'ICLR 2024 Camera Ready version'이 있다. 위 인용 구절은 결말(성공), 곧 서식 민감도를 측정해 낸 결과를 뒷받침한다. 축별 판정은 다음과 같다. purpose는 supported이다. 초록이 의미를 보존하는 서식 변경에 대한 민감도를 다룬다. mechanism은 대체로 supported이다. 초록은 FormatSpread가 모델 가중치 없이 그럴듯한 서식들에 걸친 기대 성능 구간을 추정한다고 적는다. 다만 이번 조회 결과에서 '표본화'라는 표현을 원문 그대로 확인하지는 못했다. evaluation 가운데 LLaMA-2-13B에서 최대 76점 정확도 차이가 난다는 내용은 초록에서 확인했다. 그러나 '모델 크기·예시 수·지시 튜닝으로도 사라지지 않는다'는 조건은 이번 조회 결과에 원문 구절로 나오지 않았으므로 미확인이다. target은 supported이다. 초록이 few-shot 설정을 명시한다. 초록에는 분류 과제 외에 텍스트 생성 실험도 있다고 적혀 있으므로, 대상을 '분류'로만 한정하면 원문보다 좁다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2102.09690v2",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2102.09690v2",
+      "judgments": [
+        {
+          "ref": "sq5#case#5",
+          "verdict": "supported",
+          "quote": "this contextual calibration procedure substantially improves GPT-3 and GPT-2's average accuracy (up to 30.0% absolute)",
+          "reason": "WebFetch로 원문을 열었다. 사례가 있다는 점과 결말(성공)을 위 인용 구절이 뒷받침하며, 원문 주석란에 'ICML 2021'이 적혀 있다. 축별 판정은 다음과 같다. purpose 축은 원문의 'We show that this type of few-shot learning can be unstable'과 'this instability arises from the bias of language models towards predicting certain answers'가 원인 규명을 뒷받침하므로 지지된다. mechanism 축은 'a content-free test input such as \"N/A\"', 'We then fit calibration parameters'와 편향 대상인 'those that are placed near the end of the prompt or are common in the pre-training data'(최근성·사전학습 빈도)가 뒷받침하므로 지지된다. evaluation 축은 인용 구절의 'up to 30.0% absolute'가 GPT-3·GPT-2 평균 정확도 최대 30.0%p와 일치하므로 지지된다. target 축의 'few-shot 분류'는 초록에 few-shot이 명시되지만 '분류'라는 과제 한정은 초록에서 직접 확인되지 않았다. 따라서 사례의 존재와 결말 판정에는 영향이 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2209.12711",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2209.12711",
+      "judgments": [
+        {
+          "ref": "sq5#case#6",
+          "verdict": "supported",
+          "quote": "We evaluate 9 different tasks with negated prompts on (1) pretrained LMs (OPT & GPT-3) of varying sizes (125M - 175B) ... (2) LMs further pretrained to generalize to novel prompts (InstructGPT) ... all LM types perform worse on negated prompts as they scale",
+          "reason": "원문 초록에서 사례(Jang, Ye, Seo 의 'Can Large Language Models Truly Understand Prompts? A Case Study with Negated Prompts')가 확인된다. 결말 '성공'은 연구가 부정형 프롬프트에서 역스케일링을 보이는 데 성공했다는 뜻으로 읽었고, 'this phenomenon does not hold ... but instead shows an inverse scaling law' 구절이 이를 뒷받침한다. 축마다의 판정은 다음과 같다. purpose 는 지지된다. 제목 'Can Large Language Models Truly Understand Prompts?'와 부정형 프롬프트 평가가 근거다. mechanism 은 지지된다. 원래 프롬프트와 부정형 프롬프트의 비교('comparing the average score on both original and negated prompts')와 규모별 비교('varying sizes (125M - 175B)')가 근거다. evaluation 도 지지된다. 'all LM types perform worse on negated prompts as they scale'에서 LM 유형에 InstructGPT 가 포함되기 때문이다. target 은 지지된다. OPT·GPT-3·InstructGPT 가 원문에 명시되어 있고, 과제 9개에 부정형 프롬프트를 적용했다. 인용문은 초록의 서로 다른 문장을 생략 부호로 이었다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2507.02778v2",
+    "subquestions": [
+      "sq6"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2507.02778v2",
+      "judgments": [
+        {
+          "ref": "sq6#issue#0",
+          "verdict": "supported",
+          "quote": "Testing 14 open-source non-reasoning models, we find an average 64.5% blind spot rate. ... Reasoning models exhibit a small, even negative, Self-Correction Blind Spot ... reasoning models are much better at self-correcting their own error",
+          "reason": "원문에는 이 주장의 주어인 비추론 오픈소스 모델 14종이 있다. 수치인 평균 64.5%와 추론 모델에 관한 조건(맹점이 작거나 음수이고 자기 오류를 훨씬 잘 고친다)도 원문 구절에 그대로 있다. 원문은 외부 출처와 비교하는 설정도 밝힌다. 같은 오류를 모델 응답에 넣어 내부 교정을 보고, 사용자 프롬프트에 넣어 외부 교정을 본다('for external correction, we inject the same error into the user prompt instead')."
+        },
+        {
+          "ref": "sq6#case#2",
+          "verdict": "supported",
+          "quote": "We uncover a systematic failure: LLMs cannot correct errors in their own outputs ... Testing 14 open-source non-reasoning models, we find an average 64.5% blind spot rate. ... appending a minimal “Wait” prompt activates a 89.3% reduction in blind spots",
+          "reason": "원문 구절은 사례가 있다는 사실과 측정 결과를 뒷받침한다. 결말 '판정 못 함'은 원문의 사실을 서술한 값이 아니라 판정 범주이므로 원문과 상충하지 않는다. purpose 축은 지지된다. 자기 출력의 오류를 고치지 못하는 현상을 측정하고, 'Wait'로 완화한다는 서술이 원문에 있다. mechanism 축도 지지된다. 원문은 'we systematically inject identical error into both model response'와 'inject the same error into the user prompt instead'로 출처를 바꿔 비교한다고 밝히고, 'Wait' 프롬프트를 덧붙인다고 적는다. evaluation 축의 세 수치(14종 평균 64.5%, 'Wait' 적용 시 89.3% 감소, 추론 모델의 맹점이 작거나 음수)는 원문 구절과 모두 일치한다. target 축도 지지된다. 원문은 SCLI5에 단순 답 오류(off-by-one, flip)를, GSM8K-SC에 여러 유형의 추론 오류를 주입한다고 적는다. 다만 PRM800K-SC는 주입한 오류가 아니라 실제 LLM 출력의 오류를 쓴다. 그래서 '주입한' 오류라는 한정은 데이터셋 일부에만 맞는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2404.13076",
+    "subquestions": [
+      "sq6"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2404.13076",
+      "judgments": [
+        {
+          "ref": "sq6#case#1",
+          "verdict": "supported",
+          "quote": "LLM Evaluators Recognize and Favor Their Own Generations",
+          "reason": "arXiv 초록 페이지에서 사례가 있음을 확인했다. 제목은 위 인용과 같고, 저자는 Arjun Panickssery, Samuel R. Bowman, Shi Feng 이다. outcome '판정 못 함'과 상충하는 서술은 페이지에 없다. 다만 WebFetch 가 초록을 그대로 옮기지 않고 요약해 돌려주었으므로, 원문 그대로 옮긴 구절은 제목만 확보했다. 축별 판정은 다음과 같다. purpose 는 지지된다. 초록이 LLM 평가자의 자기 선호 편향(self-preference bias)과 자기 인식의 관계를 다룬다고 적는다. mechanism 은 일부만 지지된다. 자기 인식 판별과 미세조정은 초록에 있지만, 1~5점 품질 채점은 이 페이지에서 확인되지 않는다. evaluation 도 일부만 지지된다. 미세조정 뒤 자기 인식 능력과 자기 선호 편향 강도 사이에 선형 상관이 있다는 서술은 초록에 있지만, '인간 평가 대비 점수 차이'는 확인되지 않는다. target 은 확인되지 않는다. 요약 과제와 XSUM·CNN/DailyMail 데이터셋은 이 페이지에 나오지 않는다. 사례 이름에 적힌 'NeurIPS 2024' 게재 정보도 이 페이지에 없다. 페이지는 arXiv 프리프린트(2024-04-15 제출)만 표시하고 학회 이름을 적지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2311.07911",
+    "subquestions": [
+      "sq6"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2311.07911",
+      "judgments": [
+        {
+          "ref": "sq6#case#4",
+          "verdict": "supported",
+          "quote": "IFEval is a straightforward and easy-to-reproduce evaluation benchmark.",
+          "reason": "사례가 있다는 사실은 원문 초록 페이지가 확인한다. 이 페이지에는 제목 'Instruction-Following Evaluation for Large Language Models'와 저자 Jeffrey Zhou 외가 있고, 제출일은 2023-11-14이다. 결말인 '판정 못 함'은 성과를 판정하지 않았다는 표시이며, 원문에 이와 상충하는 내용은 없다. 축별 판정은 다음과 같다. purpose 축은 지지된다. 근거는 인용 구절과, 사람 평가는 비싸고 느리며 LLM 자동평가는 편향될 수 있다는 초록 서술이다. mechanism 축도 지지된다. 원문은 'write in more than 400 words'와 'mention the keyword of AI at least 3 times' 같은 검증 가능한 지시를 예로 든다. 또 지시 유형 25종과 프롬프트 약 500개를 적고 있다. 다만 '코드로 채점한다'를 직접 말하는 구절은 초록에서 확인하지 못했다. evaluation 축은 확인하지 못했다. 지시 수준과 프롬프트 수준의 엄격·완화 정확도는 초록 페이지에 나오지 않으며, 확인하려면 본문 PDF가 필요하다. target 축은 범용 지시 이행 평가라는 초록의 취지와 부합한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://github.com/guardrails-ai/regex_match",
+    "subquestions": [
+      "sq6"
+    ],
+    "output": {
+      "url": "https://github.com/guardrails-ai/regex_match",
+      "judgments": [
+        {
+          "ref": "sq6#case#5",
+          "verdict": "supported",
+          "quote": "This validator ensures that any given output follows a pre-specified regex rule.",
+          "reason": "원문 README 의 Intended Use 절이 위 구절로 사례가 있음을 뒷받침한다. 축마다 판정한 결과는 다음과 같다. purpose 축은 위 구절이 그대로 지지한다. mechanism 축은 API 참조의 \"If `str`, must be one of `reask`, `fix`, `filter`, `refrain`, `noop`, `exception` or `fix_reask`.\" 구절이 실패 시 정책 일곱 가지를 그대로 지지한다. evaluation 축에 대해서는 원문 페이지에 평가나 벤치마크 절이 없으므로 '공개된 평가 결과를 찾지 못했다'는 서술이 원문과 일치한다. target 축은 원문이 입출력 유형을 'Output'으로 적어 LLM 출력 문자열을 대상으로 함을 뒷받침한다. 다만 '범용'이라는 한정어는 원문에 명시되어 있지 않다. 결말 '판정 못 함'은 원문에 효과 평가가 없다는 점과 일치한다. 원문 페이지는 \"This repository is archived and no longer maintained.\"라고도 적고 있으므로, 이 저장소가 보관 처리되어 더는 유지보수되지 않는다는 점을 결말 해석에 참고할 수 있다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+    "subquestions": [
+      "sq6"
+    ],
+    "output": {
+      "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+      "judgments": [
+        {
+          "ref": "sq6#case#6",
+          "verdict": "supported",
+          "quote": "Structured outputs guarantee schema-compliant responses through constrained decoding",
+          "reason": "원문 페이지가 Claude API Structured outputs 문서이므로 사례가 실재한다. 결말 '판정 못 함'은 원문이 기능 명세만 적고 도입 결과나 효과 측정을 보고하지 않는 사정과 일치한다. 네 축도 모두 원문 구절로 확인된다. purpose 축은 인용 구절이 뒷받침하며 supported 다. mechanism 축은 \"Structured outputs work by compiling your JSON schemas into a grammar that constrains Claude's output.\"이 컴파일과 디코딩 제약을 뒷받침한다. 미지원 목록의 \"Numerical constraints (such as `minimum`, `maximum`, `multipleOf`)\"와 \"String constraints (`minLength`, `maxLength`)\", 그리고 정규식 \"NOT supported:\" 항목(Backreferences, Lookahead/lookbehind)이 수치·길이 제약과 일부 정규식 미지원을 뒷받침하므로 supported 다. evaluation 축은 거절(\"the refusal message takes precedence over schema constraints\"), max_tokens(\"The output may be incomplete and not match your schema\"), enum 대소문자(\"Structured outputs don't guarantee the capitalization of string `enum` and `const` values\") 구절이 예외 명시를 뒷받침하므로 supported 다. target 축은 \"JSON outputs (`output_config.format`)\"와 \"Strict tool use (`strict: true`): Guarantee schema validation on tool names and inputs.\"가 JSON 구조와 도구 입력을 뒷받침하므로 supported 다. 원문 텍스트는 102126자이며 100000자까지 읽었다. 읽지 않은 끝의 2126자는 판정에 쓰지 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2408.02442",
+    "subquestions": [
+      "sq6"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2408.02442",
+      "judgments": [
+        {
+          "ref": "sq6#case#7",
+          "verdict": "supported",
+          "quote": "Let Me Speak Freely? A Study on the Impact of Format Restrictions on Performance of Large Language Models",
+          "reason": "원문 페이지가 사례의 존재를 확인한다. 제목과 저자(Zhi Rui Tam, Cheng-Kuang Wu, Yi-Lin Tsai, Chieh-Yen Lin, Hung-yi Lee, Yun-Nung Chen)가 사례 이름 'Tam 외, 2024'와 일치한다. WebFetch 도구는 초록을 그대로 옮기지 않고 요약해 돌려주었다. 그래서 quote 에는 도구가 그대로 돌려준 제목만 적었다. 축마다 판정한 결과는 다음과 같다. purpose 축은 지지된다. 요약된 초록에 따르면 이 논문은 JSON·XML 같은 형식 제약이 추론 능력과 도메인 지식을 해치는지 묻는다. mechanism 축도 지지된다. 저자들은 형식 제약 아래의 응답과 자유 응답을 여러 과제에서 비교한다. evaluation 축도 지지된다. 요약된 초록에는 형식 제약 아래에서 추론 성능이 크게 떨어진다는 결과와, 제약이 엄격할수록 추론 과제의 하락 폭이 대체로 커진다는 결과가 있다. 다만 원문에는 '대체로(generally)'라는 한정어가 있으므로, 주장의 '더 떨어진다'는 이 한정을 덧붙여 읽어야 한다. target 축은 일부만 지지된다. 요약된 초록은 추론 과제와 '여러 일반 과제'를 언급하지만 분류 과제를 명시하지 않는다. 따라서 '분류'는 초록 페이지로 확인하지 못했다. outcome '판정 못 함'은 사례 작성자가 내린 판단이며, 원문 페이지에서 확인할 수 있는 사실이 아니다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE"
+      ]
+    }
+  }
+]
