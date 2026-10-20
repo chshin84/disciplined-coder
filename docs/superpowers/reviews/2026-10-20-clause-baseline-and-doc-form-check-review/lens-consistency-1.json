@@ -1,0 +1,132 @@
+{
+  "lens": "lens-consistency",
+  "read": [
+    "D:/projects/dc-clause-candidates/skills/lens-consistency/SKILL.md",
+    "D:/projects/dc-clause-candidates/agent-principles.md",
+    "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+    "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+    "D:/projects/dc-clause-candidates/hooks/hooks.json",
+    "D:/projects/dc-clause-candidates/hooks/doc_word_posttooluse.sh",
+    "D:/projects/dc-clause-candidates/hooks/_spec_marker.sh (함수 목록만 Grep)",
+    "D:/projects/dc-clause-candidates/scripts/_test_check.sh",
+    "D:/projects/dc-clause-candidates/scripts/test_docs_drift.sh (278-292행, 800-836행)",
+    "D:/projects/dc-clause-candidates/scripts/test_hooks.sh (도우미 정의와 DWPOST 검사 252-278행)",
+    "D:/projects/dc-clause-candidates/skills/domain-plugin/SKILL.md (제목과 29·35행 Grep)",
+    "D:/projects/dc-clause-candidates/docs/domain-discipline.md (절 제목 Grep)",
+    "D:/projects/dc-clause-candidates/docs/domain-korean.md (NAME-ITEMS·삭제한 조항 Grep, 325-334행)",
+    "D:/projects/dc-clause-candidates/CLAUDE.md (퇴고 기준·변경 뒤 실행 Grep)",
+    "D:/projects/dc-clause-candidates/README.md (doc_word_posttooluse 언급과 라벨 불릿 Grep)"
+  ],
+  "issues": [
+    {
+      "where": "plan Architecture, Task 3 Files·Step 3 (hooks.json matcher 변경)",
+      "type": "contradiction",
+      "claim": "spec 은 Write·Edit 쪽 검사를 기존 PostToolUse 훅 중 하나에 붙여 프로세스 수를 늘리지 않는다고 정했다. 그러나 plan 은 Bash 전용이던 doc_word_posttooluse.sh 의 matcher 를 Write|Edit|Bash 로 넓힌다. 그래서 모든 Write·Edit 호출마다 bash 프로세스가 하나 더 뜬다. hooks.json 에는 이미 Write|Edit 에 걸리는 PostToolUse 훅(spec_review_posttooluse.sh, doc_review_posttooluse.sh)이 있으므로, spec 의 조건을 지키려면 그중 하나에 붙여야 한다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "evidence": "기존 PostToolUse 훅 `hooks/doc_word_posttooluse.sh` 의 matcher 를 `Write|Edit|Bash` 로 넓혀 그 안에서 호출한다.",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "Write·Edit 쪽 검사는 기존 PostToolUse 훅 중 하나에 붙여 프로세스 수를 늘리지 않는다.",
+      "principle": "spec 이 정한 제약을 plan 이 그대로 옮겨야 한다(모순)",
+      "consequence": "hooks.json 의 PostToolUse 에서 Write|Edit 에 걸리는 bash 프로세스가 지금 둘(spec_review_posttooluse.sh, doc_review_posttooluse.sh)이고, plan 대로 하면 셋이 된다. plan 의 어디에도 spec 의 이 제약이 적혀 있지 않다."
+    },
+    {
+      "where": "plan Task 1 Files·Step 1 (`REVIVED_IDS` 목록)",
+      "type": "drift",
+      "claim": "plan 은 `REVIVED_IDS` 를 지운 조항 ID 목록이라고 부르지만, 실제 코드에서 REVIVED_IDS 는 되살아난 ID 를 모으는 결과 변수다. 지운 조항 ID 목록은 그 아래 for 문의 `for id in ...` 목록이다. 구현자가 지시대로 REVIVED_IDS 의 초기값에 NAME-ITEMS 를 넣으면 검사가 항상 실패하고, Step 2 이후에도 통과하지 않는다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "evidence": "`scripts/test_docs_drift.sh` 의 `REVIVED_IDS` 목록 끝에 `NAME-ITEMS` 를 추가하라.",
+      "counterpart_file": "D:/projects/dc-clause-candidates/scripts/test_docs_drift.sh",
+      "counterpart": "REVIVED_IDS=\"\"\nfor id in ASK-FORK MEASURE-FIRST ... LOANWORD-KEEP LEXICAL-CHAIN; do\n  grep -qF \"**\\`$id\\`\" \"$CANON\" && REVIVED_IDS=\"$REVIVED_IDS $id\"",
+      "principle": "같은 대상을 같은 이름으로 가리켜야 한다(드리프트)",
+      "consequence": "plan 이 가리키는 이름(REVIVED_IDS)과 지운 ID 를 실제로 담는 곳(831-832행의 for 목록)이 다르다."
+    },
+    {
+      "where": "plan Task 3 (scripts/test_hooks.sh 기존 검사와 새 검사 대상 범위)",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 기존 test_hooks.sh 274행은 `sed -i s/x/y/ $HERE/README.md` 에 doc_word_posttooluse.sh 가 아무것도 내지 않기를 기대한다(\"이 저장소 문서는 대상 아님\"). 그런데 plan 의 새 형식 검사는 .md 전부를 대상으로 하고 이 저장소 문서를 빼지 않는다. 게다가 README.md 20-22행에는 굵은 라벨 뒤 여러 문장이 오는 불릿이 있다. plan 은 이 기존 검사를 고치거나 의미를 바꾸는 단계를 두지 않았다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "evidence": "Modify: `scripts/test_hooks.sh` (아래 검사 추가) / Step 4 Expected: `0`",
+      "counterpart_file": "D:/projects/dc-clause-candidates/scripts/test_hooks.sh",
+      "counterpart": "check \"이 저장소 문서는 대상 아님\"  \"[ -z \\\"\\$(JB 'sed -i s/x/y/ $HERE/README.md' | bash '$DWPOST')\\\" ]\"",
+      "principle": "plan 이 바꾸는 동작에 걸리는 기존 검사를 함께 다뤄야 한다(커버리지)",
+      "consequence": "plan 의 Task 3 단계는 기존 274행 검사를 언급하지 않는다. 그 검사의 기대(무출력)는 plan 이 정한 새 대상 범위(.md 전부)와 맞지 않는다."
+    },
+    {
+      "where": "plan Global Constraints 와 Task 2 Step 4·5",
+      "type": "contradiction",
+      "claim": "Global Constraints 는 과제마다 끝에 저장소 CLAUDE.md 「변경 뒤 실행」의 전체 테스트를 실행하라고 정했다. 그러나 Task 2 는 `bash scripts/test_doc_form.sh` 만 실행하고 곧바로 커밋한다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "evidence": "과제마다 끝에 「변경 뒤 실행」의 전체 테스트 명령(저장소 CLAUDE.md)을 실행해 FAIL 이 없어야 한다.",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "counterpart": "Task 2 Step 4: Run: `bash scripts/test_doc_form.sh` / Step 5: Commit",
+      "principle": "plan 안의 전역 제약과 과제 단계가 맞아야 한다(모순)",
+      "consequence": "Task 1·3·4 에는 전체 테스트 단계가 있고 Task 2 에는 없다."
+    },
+    {
+      "where": "plan Task 1 Step 2 (domain-korean.md 처리)와 spec T1 완료 조건",
+      "type": "contradiction",
+      "claim": "spec 의 T1 완료 조건은 `NAME-ITEMS` 절이 「삭제한 조항」 절로 옮겨져 있는 상태다. 그러나 plan 은 그 절 본문을 지우고, 「삭제한 조항」에는 측정 기록이 git 이력에 있다는 요약 문단만 더한다. 옮김과 요약 후 삭제 중 어느 쪽이 완료 조건인지 두 문서가 다르게 적는다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "evidence": "`### \\`NAME-ITEMS\\`` 제목과 그 절 본문(다음 `###` 또는 `##` 앞까지)을 지우고, 「삭제한 조항」 절 끝에 아래 문단을 추가하라. ... 2026-10-18 조항별 클린룸 시험 기록(현행 0건, 변경안 0건)은 git 이력의 이 절에 있다.",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "`docs/domain-korean.md` 의 `NAME-ITEMS` 절이 「삭제한 조항」 절로 옮겨져 있다.",
+      "principle": "spec 의 완료 조건이 plan 의 단계로 그대로 이어져야 한다(커버리지·모순)",
+      "consequence": "plan 대로 하면 domain-korean.md 에 NAME-ITEMS 절 본문(측정 기록 포함)이 남지 않고 요약 문단 하나만 남는다."
+    },
+    {
+      "where": "plan Task 3 Files·Step 6 (README.md 수정)과 spec 「과제」·「바뀌는 파일」",
+      "type": "scope",
+      "claim": "spec 은 README.md 「하드 게이트와 넛지와 전역 설정 수정」 절에 새 검사를 적는 일을 T10 에 배정했다. plan 은 이 일을 T6(Task 3)으로 당겨 오면서 spec 의 배정을 바꾼다는 사실을 적지 않았다. 별도 plan 으로 넘긴 T10 에는 같은 일이 그대로 남는다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "evidence": "Modify: `README.md` (「하드 게이트와 넛지와 전역 설정 수정」 절에 형식 경고 한 줄)",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "| `README.md` | 새 검사 | T10 | / T10: `README.md` 「하드 게이트와 넛지와 전역 설정 수정」 절에 새 검사를 적은 뒤",
+      "principle": "plan 의 과제 경계가 spec 의 과제 배정과 맞아야 한다(스코프)",
+      "consequence": "같은 README 수정이 이 plan 의 Task 3 과 spec 의 T10(이후 plan) 양쪽에 배정되어 있다."
+    },
+    {
+      "where": "plan Global Constraints(스위치)와 Task 3 Step 6(README 수정 범위)",
+      "type": "gap",
+      "claim": "커버리지 공백이다. plan 은 새 형식 검사도 `DISCIPLINED_CODER_REPLY_CHECK=off` 로 꺼진다고 정했다. 그러나 README.md 90행은 이 스위치를 금지 표현 hook 만 끄는 변수로 설명하고, plan 의 README 수정은 「하드 게이트…」 절의 doc_word_posttooluse.sh 설명 한 줄만 바꾼다. 스위치 설명을 고치는 단계가 없다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "evidence": "새 검사는 경고만 내고 거부하지 않는다. 스위치는 기존 `DISCIPLINED_CODER_REPLY_CHECK` 를 따른다(`off` 면 검사하지 않는다).",
+      "counterpart_file": "D:/projects/dc-clause-candidates/README.md",
+      "counterpart": "- **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `stop_gates.sh`의 금지 표현 검사)을 끈다.",
+      "principle": "plan 이 바꾼 동작을 설명하는 문서가 함께 고쳐져야 한다(커버리지)",
+      "consequence": "plan 의 변경 뒤에도 README.md 90행은 이 스위치가 금지 표현 검사만 끈다고 적는다."
+    },
+    {
+      "where": "plan Task 4 Step 1 (CLAUDE.md 에 추가할 두 항목)과 Task 2·3 이 만드는 검사",
+      "type": "contradiction",
+      "claim": "Task 4 가 CLAUDE.md 에 넣으라고 준 두 항목 중 `- **결정점:** ...` 은 굵은 라벨 뒤에 두 문장이 오는 불릿이다. 이것은 같은 plan 의 Task 2 가 `라벨 불릿` 으로 정의하고 Task 3 이 Write·Edit 로 쓴 .md 에 경고하게 만든 형태 그 자체다. 이 plan 은 경고 대상 형태를 스스로 새로 써 넣는다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "evidence": "  - **결정점:** 생성 중에 지킬 조항이면 문장이나 항목을 시작하기 전에 정할 일을 지시하는가. 다 쓴 뒤에야 판정할 수 있는 조항이면 재작성할 수 있는 층에 두거나 기계 검사로 옮겼는가.",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "counterpart": "`라벨 불릿`: `^\\s*[-*+]\\s+\\*\\*[^*]+\\*\\*` 로 시작하고, 라벨 뒤 본문의 문장 끝(`[.!?]` 뒤가 공백이나 줄 끝) 수가 2 이상인 줄. / test_label_two_sentences: `- **금액 필드:** v1은 정수다. v2는 문자열이다.` → `라벨 불릿` 1건",
+      "principle": "문서가 스스로 정한 규칙을 그 문서의 산출물이 어기지 않아야 한다(모순)",
+      "consequence": "Task 3 이 먼저 끝난 뒤 Task 4 를 Edit 로 실행하면, plan 이 지시한 문안을 쓰는 순간 새 훅이 CLAUDE.md 에 `라벨 불릿` 경고를 낸다."
+    },
+    {
+      "where": "plan Task 3 검사 표와 spec T6 완료 조건(코드 블록)",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 의 T6 완료 조건은 위반 예시를 Write 와 Bash 로 각각 썼을 때 경고가 나오고, 코드 블록 안의 같은 문자열에는 경고가 나오지 않는 것이다. plan 은 코드 블록 무시를 Task 2 의 검사기 단위 시험(test_fenced_code_ignored)으로만 고정하고, Task 3 의 훅 단위 검사 표에는 코드 블록 사례가 없다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-20-clause-baseline-and-doc-form-check.md",
+      "evidence": "Task 3 검사 표: Write 라벨 불릿 → 형식 경고 / Bash 라벨 불릿 → 형식 경고 / 위반 없음 → 무출력 / 리뷰 기록 → 형식 경고 없음 / `.txt` → 무출력 / OFF → 무출력 / Write 는 금지어를 다시 보지 않는다",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "위반 예시를 넣은 `.md` 를 Write 와 Bash 로 각각 썼을 때 경고가 나온다. 코드 블록 안의 같은 문자열에는 경고가 나오지 않는다.",
+      "principle": "spec 의 완료 조건이 plan 의 검사로 이어져야 한다(커버리지)",
+      "consequence": "훅을 거쳐 코드 블록 안 라벨 불릿이 무출력인지 확인하는 검사가 plan 에 없다. 검사기 단위 시험만 있다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "ASYNC-FIRST",
+    "NO-FLEET",
+    "SPECIFIC-NAME",
+    "TERM-ONE",
+    "WRITTEN-ONLY",
+    "FULL-SENTENCE",
+    "STATE-ASSUME"
+  ],
+  "notes": "검토 관점: 커버리지 공백(spec T1·T6·T9 완료 조건, 「기계 검사」, 「바뀌는 파일」 → plan 과제), plan 내부 모순(Global Constraints·Review Focus·과제 단계·Interfaces), spec 과의 모순, 이름·시그니처 드리프트(check, path_is_form_target, CLI 출력 형식, 종류 이름), 산출물 공백, 스코프를 항목마다 따로 보았다. 드리프트 점검 결과, check 시그니처와 CLI 출력 형식(`FILE:LINE: 종류: 발췌`)과 종류 이름(라벨 불릿·개수 예고·제목 개수)은 Task 2·3, 경고 문구, README 문구 사이에서 일관되었다. path_is_form_target 이 쓰는 path_is_review_record 도 hooks/_spec_marker.sh 101행에 실제로 있다. T9 는 spec 의 요구(질문 둘, 표와 근거, 24% 집계 방법, 「삭제한 조항」 앞 배치, `### ID` 제목 금지)가 모두 Task 4 로 이어졌다. test_docs_drift.sh 의 ref_clause_ids 가 「삭제한 조항」에서 멈추므로 그 앞에 둘 절에서 `### ID` 제목을 금지한 판단도 코드와 맞는다. 산출물 공백은 찾지 못했다. 스코프는 4과제로 한 plan 에 맞는 크기이며, README 배정 이동만 발견으로 올렸다. 발견으로 올리지 않았지만 호출자가 확인할 것이 셋 있다. 첫째, docs/domain-korean.md 332행이 본문에서 `NAME-ITEMS` 를 여전히 가리키는데 plan Task 1 은 이 문장을 다루지 않는다. spec 완료 조건에는 없으나 REPORT-DEAD 관점의 처분이 필요할 수 있다. 둘째, evals/principles/results/clauses/gen.jsonl·judge.jsonl 에 NAME-ITEMS 결과 줄이 있는데 plan 은 이것을 다루지 않는다. 셋째, Task 3 Step 3 의 사전 거르기 정규식이 `개|건|가지` 처럼 흔한 한국어 음절(개발·조건 등)을 포함하므로, 거르기가 거의 걸리지 않아 Write·Edit 마다 파이썬이 실행될 가능성이 크다. 이것은 가정이며 Step 5 측정으로 확인할 수 있다. 실패 모드 성격이라 lens-adversarial 이 보는 편이 맞다. 또 현행 doc_word_posttooluse.sh 는 금지어 목록 파일이 없거나(30행) Bash 쓰기 대상이 path_is_banned_target 에 걸리지 않으면(41·48행) 일찍 끝나는데, plan 은 형식 검사가 이 조기 종료를 우회하도록 구조를 바꾸라고 명시하지 않았다. 구현자가 Step 3 의 '두 경우 모두 형식 검사' 지시로 처리할 것으로 보이나 확인이 필요하다."
+}
