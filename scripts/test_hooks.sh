@@ -585,6 +585,10 @@ JE() { printf '{"tool_name":"Edit","tool_input":{"file_path":"%s","new_string":"
 FW_OUT="$(drev "$(J "$FM/x.md")")"
 check "Write 라벨 불릿 → 형식 경고" "grep -qF '라벨 불릿' <<<\"\$FW_OUT\" && json_valid_stdin <<<\"\$FW_OUT\""
 check "Bash 라벨 불릿 → 형식 경고" "drev \"\$(JB \"sed -i s/x/y/ $FM/x.md\")\" | grep -qF '라벨 불릿'"
+# 파일 전체를 검사한 보고는 이름표로 구분하고, 이번 호출에서 쓴 줄만 고치라고 안내한다.
+FB_OUT="$(drev "$(JB "sed -i s/x/y/ $FM/x.md")")"
+check "Bash 보고는 파일 전체 이름표" "grep -qF '(파일 전체):1:' <<<\"\$FB_OUT\""
+check "경고문은 이번 호출에서 쓴 줄만 고치라 한다" "grep -qF '이번 도구 호출에서 쓴 줄' <<<\"\$FB_OUT\" && grep -qF '이미 있던 줄은 고쳐 쓰지 말고' <<<\"\$FB_OUT\""
 # 실제 Write·Edit 입력은 tool_name 과 본문을 싣는다. 디스크의 파일은 깨끗하게 두어 검사기가 본문을 읽는지 본다.
 # 한국어와 줄바꿈을 바르게 이스케이프하려고 JSON 은 파이썬 json.dumps 로 만든다.
 JT() { json_run 'import json,sys; t,f,k,v=sys.argv[1:5]; print(json.dumps({"tool_name":t,"tool_input":{"file_path":f,k:v}},ensure_ascii=False))' "$@"; }

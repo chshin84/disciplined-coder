@@ -2,16 +2,17 @@
 
 CLI: python _doc_form_check.py --hook [FILE...]
   stdin 의 훅 입력 JSON 에서 Write 는 content, Edit 는 new_string 을 검사하고, 그 밖의 도구는 FILE 을 읽는다.
+  이름표는 Write 가 파일 경로, Edit 가 `경로(편집 문자열)`, FILE 인자가 `경로(파일 전체)` 이다.
   위반마다 `이름표:줄: 종류: 발췌` 한 줄을 내고, 다섯 줄을 넘으면 `외 N건` 을 붙인다. 종료 코드는 늘 0 이다.
 """
 import json
 import re
 import sys
 
-LABEL = re.compile(r"^\s*[-*+]\s+\*\*[^*]+\*\*(.*)$")
+LABEL = re.compile(r"^\s*(?:[-*+]|[0-9]+\.)\s+\*\*[^*]+\*\*(.*)$")
 SENT_END = re.compile(r"(?:다|요|까)\.")
 COUNT_WORD = re.compile(
-    r"(?:(?:^|\s)(?:두|세|네|다섯|여섯|일곱|여덟|아홉|열|[0-9]+)\s*(?:가지|개|건|항목)(?:다|이다|입니다)?(?![가-힣]))"
+    r"(?:(?:^|\s)(?:두|세|네|다섯|여섯|일곱|여덟|아홉|열|[0-9]+)\s*(?:가지|개|건|항목)(?:다|이다|입니다|를|을|의|가|이|는)?(?![가-힣]))"
     r"|(?:(?:^|\s)(?:둘|셋|넷|다섯)(?:이다|입니다))"
 )
 LIST_ITEM = re.compile(r"^\s*(?:[-*+]|[0-9]+\.)\s")
@@ -21,6 +22,8 @@ HEAD_COUNT = re.compile(
 )
 FENCE = re.compile(r"^\s{0,3}(?:```|~~~)")
 BACKTICK = re.compile(r"`[^`]*`")
+# 백틱 구간은 빈 문자열 대신 이 문자로 바꾼다. 지우면 `**`ID`**` 가 `****` 가 되어 라벨을 놓친다.
+CODE_MARK = "□"
 CAP = 5
 
 
@@ -34,7 +37,7 @@ def check(text):
             continue
         if in_fence or raw.lstrip().startswith(">"):
             continue
-        line = BACKTICK.sub("", raw)
+        line = BACKTICK.sub(CODE_MARK, raw)
         excerpt = raw.strip()[:40]
         m = LABEL.match(line)
         if m and len(SENT_END.findall(m.group(1))) >= 2:
@@ -85,12 +88,15 @@ def main(argv):
     if tool in ("Write", "Edit"):
         text = ti.get("content" if tool == "Write" else "new_string")
         if isinstance(text, str):
-            lines = report(ti.get("file_path", "?"), text)
+            label = ti.get("file_path", "?")
+            if tool == "Edit":
+                label += "(편집 문자열)"
+            lines = report(label, text)
     else:
         for f in files:
             text = read_file(f)
             if text is not None:
-                lines += report(f, text)
+                lines += report(f + "(파일 전체)", text)
     if lines:
         sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
 

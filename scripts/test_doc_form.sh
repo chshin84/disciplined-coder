@@ -23,6 +23,15 @@ OUT="$(run_text '- **입력:** 경로(e.g. 절대 경로)를 받는다.\n')"
 check "label_abbrev_ok" "[ -z \"\$OUT\" ]"
 OUT="$(run_text '- v1은 정수다. v2는 문자열이다.\n')"
 check "plain_bullet_two_sentences_ok" "[ -z \"\$OUT\" ]"
+OUT="$(run_text '- **`ID`** — 첫 문장이다. 둘째 문장이다.
+')"
+check "label_backtick_in_label" "[ \"\$(count_of \"\$OUT\" '라벨 불릿')\" = 1 ]"
+OUT="$(run_text '- **a:** `b다. c다.` 를 쓴다.
+')"
+check "label_backtick_sentences_ok" "[ -z \"\$OUT\" ]"
+OUT="$(run_text '1. **라벨** — 첫 문장이다. 둘째 문장이다.
+')"
+check "label_numbered_item" "[ \"\$(count_of \"\$OUT\" '라벨 불릿')\" = 1 ]"
 
 echo "[개수 예고]"
 OUT="$(run_text '확인할 사항은 세 가지다.\n- 첫째\n')"
@@ -31,6 +40,17 @@ OUT="$(run_text '2026-10-20 개정 사항:\n- 조항 삭제\n\n인터넷이 끊�
 check "count_substring_ok" "[ -z \"\$OUT\" ]"
 OUT="$(run_text '| 항목 | 세 가지 |\n- 첫째\n')"
 check "count_in_table_ok" "[ -z \"\$OUT\" ]"
+OUT="$(run_text '아래 세 가지를 고쳤다.
+- 첫째
+
+다음 3개의 파일을 바꿨다.
+- a.md
+')"
+check "count_preview_particle" "[ \"\$(count_of \"\$OUT\" '개수 예고')\" = 2 ]"
+OUT="$(run_text '열 개국이 참여했다.
+- 한국
+')"
+check "count_other_word_ok" "[ -z \"\$OUT\" ]"
 
 echo "[제목 개수]"
 OUT="$(run_text '## 금지사항 넷\n')"
@@ -60,7 +80,12 @@ for i in 1 2 3 4 5 6 7; do printf -- '- **a%s:** b다. c다.\n' "$i" >> "$T/seve
 OUT="$(run_file "$T/seven.md")"
 check "cap_five" "[ \"\$(count_of \"\$OUT\" '라벨 불릿')\" = 5 ] && printf '%s' \"\$OUT\" | grep -q '외 2건'"
 OUT="$(printf '%s' '{"tool_name":"Edit","tool_input":{"file_path":"x.md","new_string":"- **a:** b다. c다."}}' | json_run 'import runpy,sys; p=sys.argv[1]; sys.argv=[p]+sys.argv[2:]; runpy.run_path(p, run_name="__main__")' "$CHK" --hook 2>&1 || true)"
-check "hook_edit_new_string" "[ \"\$(count_of \"\$OUT\" '라벨 불릿')\" = 1 ] && printf '%s' \"\$OUT\" | grep -q '^x.md:1:'"
+check "hook_edit_new_string" "[ \"\$(count_of \"\$OUT\" '라벨 불릿')\" = 1 ] && printf '%s' \"\$OUT\" | grep -qF 'x.md(편집 문자열):1:'"
+OUT="$(printf '%s' '{"tool_name":"Write","tool_input":{"file_path":"x.md","content":"- **a:** b다. c다."}}' | json_run 'import runpy,sys; p=sys.argv[1]; sys.argv=[p]+sys.argv[2:]; runpy.run_path(p, run_name="__main__")' "$CHK" --hook 2>&1 || true)"
+check "hook_write_plain_label" "printf '%s' \"\$OUT\" | grep -q '^x.md:1:'"
+OUT="$(run_text '- **a:** b다. c다.
+')"
+check "file_arg_whole_label" "printf '%s' \"\$OUT\" | grep -qF 'in.md(파일 전체):1:'"
 
 echo "통과 $pass, 실패 $fail"
 [ "$fail" -eq 0 ]
