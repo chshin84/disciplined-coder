@@ -35,7 +35,7 @@ AGGSET="$(printf '%s' "$AGG_LINE" | sed 's/.*"lens"[[:space:]]*:[[:space:]]*"\([
 # 않고 aggregating-lenses 의 그 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
 # 예외 없이 다섯 렌즈 전부에게 강도 그대로의 대조를 요구한다.
 EXC_LENSES="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u || true)"
-is_exc() { printf '%s\n' "$EXC_LENSES" | grep -qxF "$1"; }
+is_exc() { grep -qxF "$1" <<<"$EXC_LENSES"; }  # 파이프는 pipefail 아래 SIGPIPE 로 거짓 실패를 낸다
 
 
 echo "[집계 태깅 == 실제 디렉터리]"
@@ -66,7 +66,7 @@ for d in "$HERE"/skills/lens-*/; do
     EXC_BAD=""
     while IFS= read -r k; do
       [ -n "$k" ] || continue
-      if printf '%s' "$SCHEMA_LINE" | grep -qF "\"$k\""; then EXC_BAD="$EXC_BAD $k"; fi
+      if grep -qF "\"$k\"" <<<"$SCHEMA_LINE"; then EXC_BAD="$EXC_BAD $k"; fi
     done <<EOF
 $(printf '%s' "$EXC_BULLET" | grep -oE '`[a-z_]+`' | tr -d '`')
 EOF
