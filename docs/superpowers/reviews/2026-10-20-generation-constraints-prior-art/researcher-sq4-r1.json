@@ -1,0 +1,320 @@
+{
+  "agent": "agent-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq4",
+  "search_status": "ok",
+  "queries": [
+    "how many instructions can LLMs follow at once benchmark instruction density",
+    "curse of instructions large language models cannot follow multiple instructions at once",
+    "multi-constraint instruction following benchmark accuracy decreases number of constraints",
+    "ManyIFEval curse of instructions success rate decreases exponentially with number of instructions",
+    "Anthropic context engineering system prompt right altitude long list of rules guidance",
+    "system prompt length instruction following degradation benchmark multiple system constraints",
+    "coding agent instructions file number of instructions frontier models can follow reliably",
+    "\"Curse of Instructions\" Harada openreview ICLR 2025",
+    "instruction following degrades as more rules added to system prompt preprint 2026 agent"
+  ],
+  "read": "[\"https://arxiv.org/abs/2507.11538\", \"https://arxiv.org/html/2507.11538v1\", \"https://arxiv.org/abs/2503.06573v1\", \"https://arxiv.org/abs/2509.21051\", \"https://anthropic.com/engineering/effective-context-engineering-for-ai-agents\", \"https://arxiv.org/abs/2605.10039\", \"https://www.alphaxiv.org/abs/2607.19257\", \"https://arxiv.org/abs/2608.11727\", \"https://arxiv.org/html/2512.17920v1\", \"https://openreview.net/forum?id=R6q67CDBCH\", \"https://arxiv.org/abs/2608.02639\"]",
+  "issues": [
+    {
+      "where": "작성 기준 표의 (5) 주의의 한계 — 예시를 상시 지시에서 빼 참고서로 옮기는 규칙",
+      "type": "refuted-premise",
+      "claim": "대조 대상은 예시를 상시 지시에서 빼 채점 기준과 참고서로 옮기라고 정한다. 그러나 벤더 지침은 시스템 프롬프트에 대표 예시를 넣으라고 권한다. 따라서 대조 대상의 예시 제거 규칙은 이 벤더 지침과 상충한다. 다만 같은 지침은 예외 사례 목록을 프롬프트에 채워 넣는 방식을 권하지 않으므로, 예외 목록을 빼는 규칙과는 일치한다.",
+      "prior_claim": "Anthropic 의 컨텍스트 엔지니어링 글은 컨텍스트를 수확 체감이 있는 유한 자원으로 보고, 예외 사례 목록(laundry list of edge cases)을 프롬프트에 채워 넣는 방식을 권하지 않는다. 같은 글은 few-shot 예시 제공을 잘 알려진 모범 사례로 보고, 다양하고 대표적인 예시를 골라 넣으라고 권한다.",
+      "consequence": "대조 대상이 예시를 일괄해서 상시 지시 밖으로 빼면, 벤더가 권하는 대표 예시까지 상시 지시에서 사라진다. 이 상충을 대조 대상이 근거와 함께 다루지 않았다.",
+      "evidence": "anthropic.com 글에서 확인한 문장: \"stuff a laundry list of edge cases into a prompt\" … \"We do not recommend this.\" 그리고 \"Providing examples, otherwise known as few-shot prompting, is a well known best practice\", \"curate a set of diverse, canonical examples\". 네 축 대조: 목적은 같다(에이전트용 시스템 프롬프트 작성 지침). 메커니즘은 다르다(최소 고신호 토큰·적정 고도 원칙이며, 여섯 제약 표가 아니다).",
+      "citations": [
+        {
+          "url": "https://anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+          "kind": "vendor",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "작성 기준 표의 (5) 주의의 한계 — '함께 실린 지시가 많을수록 개별 지시 효과가 준다'는 전제",
+      "type": "refuted-premise",
+      "claim": "대조 대상은 상시 지시의 분량이 늘면 개별 지시의 효과가 준다고 전제한다. 그러나 이 선행 연구는 코딩 에이전트의 설정 파일 크기를 바꿔도 단일 지시 준수율에 효과가 없다는 쪽의 근거(affirmative null)를 보고했다. 따라서 '정의·예시를 빼 분량을 줄이면 개별 지시가 더 잘 지켜진다'는 대조 대상의 추론은 이 연구의 시험 범위에서는 지지되지 않는다.",
+      "prior_claim": "코딩 에이전트 설정 파일에 관한 요인 설계 연구(1,650 세션, 16,050 관측, 주로 Sonnet 4.6)는 파일 크기·지시 위치·파일 구조·인접 파일 모순 네 변수 모두에서 다중 검정 보정 뒤 검출 가능한 효과를 찾지 못했다. 크기와 모순의 무효과는 Bayes factor(BF10 0.05–0.10)로 지지되었다. 가장 큰 효과는 세션 안에서 생성한 함수가 하나 늘 때마다 준수 오즈가 약 5.6% 줄어드는 현상이었다. 저자는 대상 지시가 사소한 주석 하나였고 코드베이스가 TypeScript 두 개였다는 한계를 밝혔다.",
+      "consequence": "대조 대상의 (5)번 규칙이 기대하는 효과(분량 축소로 준수율 상승)는 이 연구 조건에서는 관측되지 않았다. 이 연구에서 준수율을 떨어뜨린 요인은 파일 분량이 아니라 세션 진행 길이였다.",
+      "evidence": "arXiv 2605.10039 초록: \"None of the four structural variables … produces a detectable contrast\", 크기 무효과 BF10 0.05–0.10, 함수당 OR = 0.944. 네 축 대조: 적용 대상은 같다(코딩 에이전트에 상시로 싣는 지시 파일). 목적은 다르다(측정 연구이며 작성 기준이 아니다). 연구의 대상 지시가 하나뿐이므로 '지시 개수'를 늘린 실험이 아니라는 차이가 있다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/abs/2605.10039",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "작성 기준 표의 (5) 주의의 한계 — 준수율 하락의 원인을 주의 한계로 보는 설명",
+      "type": "refuted-premise",
+      "claim": "대조 대상은 지시가 많을 때 준수율이 떨어지는 원인을 주의의 한계로 설명하고, 처방을 '행동 지시만 남기기'로 둔다. 그러나 이 선행 연구는 하락의 원인을 지시 사이의 쌍별 충돌로 귀속했다. 그래서 대조 대상의 처방은 지시 사이의 충돌을 다루지 않는다.",
+      "prior_claim": "지시 누적 붕괴(Instruction Stacking Collapse) 연구는 결정적 검증기가 있는 지시 24개를 1~20개씩 쌓아 Claude Sonnet 4.6·GPT-5-mini·Gemini 2.5 Flash 를 시험했다. 준수율은 약 96%에서 최저 20%까지 비선형으로 떨어졌고, 저자는 이 하락을 재현 가능한 쌍별 충돌 구조로 귀속했다. 예로 'JSON 출력' 지시 하나가 다른 지시 아홉 개와 동시에 만족될 수 없었다. 저자가 제안한 지시 재작성기(한 번의 LLM 호출로 프롬프트를 다시 씀)는 약한 모델에서 최대 11점을 회복했고, 강한 모델에서는 변화가 거의 없었다.",
+      "consequence": "대조 대상이 지시 수를 줄이고 정의·예시를 빼도, 남은 행동 지시끼리 충돌하면 이 연구가 보고한 하락은 그대로 남는다. 대조 대상의 여섯 제약에는 지시 사이 충돌 검사가 없다.",
+      "evidence": "arXiv 2608.02639 초록: \"falls non-linearly … from about 96% to as low as 20%\", \"structured, reproducible set of pairwise conflicts\", \"output JSON … jointly unsatisfiable with nine other instructions\". 네 축 대조: 목적은 다르다(벤치마크와 완화 기법). 메커니즘은 다르다(지시 재작성기). 적용 대상은 일부만 같다(프롬프트에 쌓인 지시이며, 에이전트 하네스의 상시 지시로 한정하지 않았다).",
+      "citations": [
+        {
+          "url": "https://arxiv.org/abs/2608.02639",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "IFScale — 지시 밀도 10~500 에서의 준수율 벤치마크",
+      "url": "https://arxiv.org/html/2507.11538v1",
+      "axes": {
+        "purpose": {
+          "prior": "한 프롬프트에 지시가 늘 때 준수율이 어떻게 떨어지는지 측정한다",
+          "same": false,
+          "note": "선행 사례는 측정 연구이고, 대조 대상은 상시 지시 작성 기준이다. 대조 대상의 (5)번 제약 하나와만 주제가 같다"
+        },
+        "mechanism": {
+          "prior": "키워드 포함 지시 500개로 사업 보고서를 쓰게 하고 지시 수를 10에서 500까지 늘린다",
+          "same": false,
+          "note": "선행 사례는 지시 수를 조작하는 실험이고, 대조 대상은 작성 규칙 표다"
+        },
+        "evaluation": {
+          "prior": "키워드 포함 여부로 준수율을 자동 채점한다. 20개 모델에서 최고 모델도 500개에서 약 68%였다. Claude Sonnet 4 는 10개 100%, 250개 77.2%, 500개 42.9%였다. 앞쪽 지시 편향과 누락 오류 증가도 보고했다",
+          "same": false,
+          "note": "대조 대상의 평가 방식은 입력에 명시되지 않았다. 선행 사례는 문자열 검사로 채점하므로 대조 대상 (6)번 제약의 방식과만 닮았다"
+        },
+        "target": {
+          "prior": "단일 생성 과제의 사용자 프롬프트에 든 지시",
+          "same": false,
+          "note": "에이전트 하네스에 상시로 싣는 지시가 아니고, 지시 종류도 키워드 포함 하나뿐이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문(NeurIPS 2025 게재 목록 확인)",
+      "adoption": "참고"
+    },
+    {
+      "case": "ManyIFEval·StyleMBPP — 다중 지시 준수 측정과 추정",
+      "url": "https://arxiv.org/abs/2509.21051",
+      "axes": {
+        "purpose": {
+          "prior": "지시 여러 개를 동시에 지키는 능력을 측정하고 조합별 성능을 추정한다",
+          "same": false,
+          "note": "측정 연구이며 작성 기준이 아니다"
+        },
+        "mechanism": {
+          "prior": "텍스트 생성 지시 최대 10개(ManyIFEval), 코드 생성 지시 최대 6개(StyleMBPP)를 조합하고 지시 수를 설명변수로 한 로지스틱 회귀로 성능을 추정한다",
+          "same": false,
+          "note": "대조 대상은 회귀 추정을 쓰지 않는다"
+        },
+        "evaluation": {
+          "prior": "모델 10개에서 지시 수가 늘수록 성능이 일관되게 떨어졌다. 회귀 추정 오차는 약 10%였다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 다르다"
+        },
+        "target": {
+          "prior": "단일 프롬프트의 텍스트·코드 생성 지시",
+          "same": false,
+          "note": "상시로 싣는 하네스 지시가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "WildIFEval — 실제 사용자 지시의 다중 제약 준수",
+      "url": "https://arxiv.org/abs/2503.06573v1",
+      "axes": {
+        "purpose": {
+          "prior": "실제 사용자 프롬프트에서 다중 제약 준수를 측정한다",
+          "same": false,
+          "note": "측정 연구다"
+        },
+        "mechanism": {
+          "prior": "실제 사용자 지시 약 12K 개를 개별 제약으로 분해하고 8개 상위 범주로 묶는다",
+          "same": false,
+          "note": "대조 대상은 작성 규칙이다"
+        },
+        "evaluation": {
+          "prior": "평가한 모든 모델에서 제약 수가 늘수록 성능이 떨어졌고, 제약 종류도 성능에 크게 영향을 주었다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 다르다"
+        },
+        "target": {
+          "prior": "사용자 턴의 지시",
+          "same": false,
+          "note": "상시 시스템 지시가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Prompt Design at Scale — 규칙 수·형식·배치에 따른 준수",
+      "url": "https://www.alphaxiv.org/abs/2607.19257",
+      "axes": {
+        "purpose": {
+          "prior": "형식·지시 수·컨텍스트 길이가 지시 준수와 환각에 주는 영향을 측정한다",
+          "same": false,
+          "note": "측정 연구다"
+        },
+        "mechanism": {
+          "prior": "규칙 수 10~160, 형식 네 가지(markdown·평문·산문·표), 시스템 프롬프트와 사용자 턴 배치를 바꿔 모델 다섯 개를 시험한다",
+          "same": false,
+          "note": "선행 사례는 형식과 배치도 바꾸지만 대조 대상의 여섯 제약과 대응하지 않는다"
+        },
+        "evaluation": {
+          "prior": "모든 모델·형식·배치에서 완전 응답률이 N=80 에서 0이 되었다. N=160 에서는 배치 효과가 형식 효과만큼 컸고, markdown 이 일관되게 유리하지는 않았다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 다르다"
+        },
+        "target": {
+          "prior": "시스템 프롬프트 또는 사용자 턴에 둔 규칙 목록",
+          "same": false,
+          "note": "시스템 프롬프트 배치 조건은 대조 대상과 겹치지만, 에이전트 하네스로 한정하지 않았다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → alphaXiv 초록 페이지",
+      "adoption": "참고"
+    },
+    {
+      "case": "Instruction Stacking Collapse — 지시 누적 붕괴와 지시 재작성기",
+      "url": "https://arxiv.org/abs/2608.02639",
+      "axes": {
+        "purpose": {
+          "prior": "지시가 쌓일 때의 붕괴를 측정하고 완화 기법을 제안한다",
+          "same": false,
+          "note": "측정과 완화 연구이며 작성 기준 표가 아니다"
+        },
+        "mechanism": {
+          "prior": "검증기가 있는 지시 24개를 1~20개씩 쌓고, 한 번의 LLM 호출로 프롬프트를 다시 쓰는 재작성기를 적용한다",
+          "same": false,
+          "note": "대조 대상은 사람이 따르는 작성 규칙이고, 선행 사례는 자동 재작성이다"
+        },
+        "evaluation": {
+          "prior": "결정적 검증기로 채점했다. 준수율이 약 96%에서 최저 20%로 떨어졌고, 재작성기는 약한 모델에서 최대 11점을 회복했다",
+          "same": false,
+          "note": "선행 사례는 기계 검증기를 쓰므로 대조 대상 (6)번 제약의 방식과만 닮았다"
+        },
+        "target": {
+          "prior": "프롬프트에 누적된 지시(Claude Sonnet 4.6·GPT-5-mini·Gemini 2.5 Flash)",
+          "same": false,
+          "note": "에이전트 하네스 상시 지시로 한정하지 않았다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색(블로그 요약) → arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+      "url": "https://arxiv.org/abs/2605.10039",
+      "axes": {
+        "purpose": {
+          "prior": "설정 파일 구조가 지시 준수에 주는 영향을 측정한다",
+          "same": false,
+          "note": "측정 연구다"
+        },
+        "mechanism": {
+          "prior": "파일 크기·지시 위치·파일 구조·인접 파일 모순 네 변수를 요인 설계로 조작한다",
+          "same": false,
+          "note": "대조 대상은 작성 규칙이다"
+        },
+        "evaluation": {
+          "prior": "1,650 세션, 16,050 관측을 혼합효과 모형과 Bayes 분석으로 보았다. 네 변수 모두 효과가 검출되지 않았고, 세션 진행에 따라 함수당 준수 오즈가 약 5.6% 줄었다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 다르다"
+        },
+        "target": {
+          "prior": "코딩 에이전트 CLI 에 상시로 싣는 프로젝트 지시 파일",
+          "same": true,
+          "note": "대조 대상과 같은 종류의 상시 지시 파일을 다룬다. 다만 대상 지시가 사소한 주석 하나뿐이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Anthropic — 에이전트용 컨텍스트 엔지니어링 지침",
+      "url": "https://anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트에 줄 시스템 프롬프트와 컨텍스트를 어떻게 쓸지 안내한다",
+          "same": true,
+          "note": "에이전트 상시 지시의 작성 방법이라는 목적이 대조 대상과 같다"
+        },
+        "mechanism": {
+          "prior": "가장 작은 고신호 토큰 집합, 적정 고도(너무 구체적이지도 모호하지도 않은 수준), 예외 목록 금지, 대표 예시 선별을 권한다",
+          "same": false,
+          "note": "대조 대상은 생성 방식의 제약 여섯 가지로 규칙을 도출하고, 예시를 상시 지시에서 뺀다. 선행 사례는 대표 예시를 넣으라고 권한다"
+        },
+        "evaluation": {
+          "prior": "실험 수치를 제시하지 않은 실무 지침이다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 비교할 실험이 없다"
+        },
+        "target": {
+          "prior": "LLM 에이전트의 시스템 프롬프트와 컨텍스트",
+          "same": true,
+          "note": "대상이 같다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 → 벤더 엔지니어링 블로그",
+      "adoption": "참고"
+    },
+    {
+      "case": "CDCT — 프롬프트 압축 수준과 제약 준수",
+      "url": "https://arxiv.org/html/2512.17920v1",
+      "axes": {
+        "purpose": {
+          "prior": "프롬프트 길이(압축 수준)에 따라 제약 준수와 의미 정확도를 따로 측정한다",
+          "same": false,
+          "note": "측정 연구다"
+        },
+        "mechanism": {
+          "prior": "개념 설명을 정확히 35단어로 쓰게 하고 프롬프트를 약 2~135단어 다섯 단계로 압축한다",
+          "same": false,
+          "note": "지시 개수가 아닌 프롬프트 길이를 조작한다"
+        },
+        "evaluation": {
+          "prior": "LLM 판정자 셋이 채점했다. 준수는 중간 길이(약 27단어)에서 가장 낮은 U자형이었다. 단독 저자 연구이며 보고 수치에 내부 불일치가 있다",
+          "same": false,
+          "note": "대조 대상 (6)번 제약은 모델 자기 판정을 신뢰하지 않는데, 선행 사례는 LLM 판정자를 쓴다"
+        },
+        "target": {
+          "prior": "단일 과제 프롬프트",
+          "same": false,
+          "note": "상시 지시가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문",
+      "adoption": "참고"
+    }
+  ],
+  "saturation": "2",
+  "not_found": "[\"Curse of Instructions(ManyIFEval 원 논문, ICLR 2025 제출) 원문을 확인하지 못했다. OpenReview 가 브라우저 확인 화면을 내 열리지 않았고, 'p^n 형태의 지수적 감소'와 모델별 수치는 2차 블로그에서만 보았다. 그래서 이 사례는 근거 지도에 넣지 않았고, 같은 벤치마크를 쓴 후속 논문(arXiv 2509.21051)만 넣었다.\", \"'최전선 모델이 안정적으로 따르는 지시는 150~200개'라는 수치의 1차 출처를 찾지 못했다. 검색 결과는 실무 블로그들이 HumanLayer 를 출처로 되풀이한 것뿐이었다.\", \"벤더 문서에서 '지시 개수 상한'을 수치로 정한 내용을 찾지 못했다. 이 사실은 그런 상한이 없다는 근거가 아니다.\", \"정의·예외 목록·예시를 상시 지시에서 빼고 별도 참고서로 옮겼을 때 준수율을 직접 비교한 실험을 찾지 못했다. 이 사실은 대조 대상 방식의 독창성 근거가 아니다.\"]",
+  "disclosures": "[\"질의 일부에 공개된 고유명사(Anthropic, ManyIFEval, Harada, openreview, ICLR)를 넣었다. 사내 식별자나 forbidden_terms 는 넣지 않았지만, 가드의 '고유명사 금지' 문구를 글자 그대로 지키지는 못했다.\", \"Prompt Design at Scale(2607.19257)은 alphaXiv 초록 페이지만 열었고 본문은 확인하지 않았다.\", \"2605.10039·2608.02639·2509.21051·2503.06573 은 초록 페이지만 열었다. 파일 크기 범위 같은 세부 조건은 본문 PDF 에 있다.\", \"IFScale 의 모델별 수치표는 HTML 본문을 요약 모델이 추출한 결과다. 원 표와 한 번 더 대조하지 않았다.\", \"outcome 은 측정 연구에서는 '판정 못 함'으로 두었다. 이 연구들은 성공·실패를 판정할 설계가 아니라 측정 결과를 보고하기 때문이다. 재작성기를 제안한 2608.02639 만 완화 효과가 보고되어 '성공'으로 두었다(derived).\", \"WildIFEval 과 2509.21051 의 학회 게재 여부를 확인하지 않아 preprint 로 적었다.\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"ASYNC-FIRST\", \"FOCUSED\", \"STATE-ASSUME\", \"WRITTEN-ONLY\", \"SPECIFIC-NAME\"]",
+  "notes": "에이전트원칙은 세션 맥락에 이미 실린 사본으로 읽었다. 하위 질문 sq4(지시 개수가 늘수록 개별 지시 준수율이 떨어지는 현상)를 기시감·결말·전이·기준선·붐빔 관점으로 검토했다. 기시감과 결말의 측면에서는, 지시 수가 늘면 전체 준수율이 떨어진다는 결과를 여러 벤치마크가 일관되게 보고했다(IFScale·ManyIFEval·WildIFEval·Prompt Design at Scale·Instruction Stacking Collapse). 그래서 대조 대상 (5)번 제약의 현상 부분은 선행 결과와 일치한다. 그러나 원인과 처방에서 세 가지 불일치를 이슈로 올렸다. 첫째, 벤더 지침은 대표 예시를 프롬프트에 넣으라고 권한다. 둘째, 실제 코딩 에이전트 설정 파일 연구는 파일 크기에 효과가 없다는 쪽의 근거를 냈다. 셋째, 지시 누적 연구는 하락 원인을 쌍별 충돌로 보았다. 붐빔 관점에서는 같은 여섯 제약 표를 표준이나 상용 제품으로 만든 사례를 찾지 못했다. 기준선 관점에서는 선행 사례들이 대조 대상의 작성 기준과 비교할 단순 기준선을 쓰지 않아 weak-baseline 이슈를 올리지 않았다. 범위 밖이지만 참고할 결과도 있다. Harness-IF(arXiv 2608.11727)는 모델의 기본 습관에 반하는 규칙에서 모든 모델의 준수율이 3.6~7.4점 낮다고 보고했고, 이 결과는 대조 대상 (3)번 제약과 관련된다. IFScale 은 앞쪽 지시 편향과 누락 오류 증가를 보고했는데, 대조 대상의 여섯 제약에는 지시 배치 순서가 없다. 추가 확인이 필요한 사항은 다음과 같다. Curse of Instructions 원문은 지수 감소 형태를 1차 출처로 확인해야 하므로 열어야 한다. 2605.10039 본문은 파일 크기 범위가 대조 대상의 상시 지시 분량을 포함하는지 확인해야 하므로 열어야 한다. 마지막 세 번의 검색에서 새 사례가 두 건 나와 탐색은 포화되지 않았다."
+}

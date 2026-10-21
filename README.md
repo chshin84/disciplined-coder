@@ -17,9 +17,11 @@
 
 목록이 안 나오면 원인은 아래 중 하나다.
 
-- **스코프** — 플러그인 스코프가 user가 아니어서 hook이 실행되지 않았다. 설치할 때 스코프를 따로 주지 않았다면 기본값이 user이므로 이 원인이 아니다. 터미널에서 `claude plugin install disciplined-coder@chshin-tools --scope user`로 다시 설치한다.
-- **셋업 오류** — 세션 시작 알림에 `ERROR`가 출력되었다. 원칙 복사나 `@import` 연결이 실패한 것이고, 연결이 실패하면 그 세션에는 원칙이 실리지 않는다. 새 세션을 열어 셋업을 다시 실행하고, 또 `ERROR`가 출력되면 그 메시지를 이슈로 올린다.
-- **설정 홈 불일치** — 셋업이 쓴 설정 홈과 지금 세션이 읽는 설정 홈이 다르다. 회사 PC의 홈 리다이렉트로 bash의 `$HOME`과 Windows의 `USERPROFILE`이 다를 때 생긴다. 실제 홈을 아래로 확인하고 새 세션을 열어 셋업을 다시 실행한다.
+**스코프** — 플러그인 스코프가 user가 아니어서 hook이 실행되지 않았다. 설치할 때 스코프를 따로 주지 않았다면 기본값이 user이므로 이 원인이 아니다. 터미널에서 `claude plugin install disciplined-coder@chshin-tools --scope user`로 다시 설치한다.
+
+**셋업 오류** — 세션 시작 알림에 `ERROR`가 출력되었다. 원칙 복사나 `@import` 연결이 실패한 것이고, 연결이 실패하면 그 세션에는 원칙이 실리지 않는다. 새 세션을 열어 셋업을 다시 실행하고, 또 `ERROR`가 출력되면 그 메시지를 이슈로 올린다.
+
+**설정 홈 불일치** — 셋업이 쓴 설정 홈과 지금 세션이 읽는 설정 홈이 다르다. 회사 PC의 홈 리다이렉트로 bash의 `$HOME`과 Windows의 `USERPROFILE`이 다를 때 생긴다. 실제 홈을 아래로 확인하고 새 세션을 열어 셋업을 다시 실행한다.
 
 ```bash
 for d in "${CLAUDE_CONFIG_DIR:-}" "${USERPROFILE:+$USERPROFILE/.claude}" "$HOME/.claude"; do
@@ -59,36 +61,43 @@ done
 | PreToolUse | `hooks/nested_judgment_pretooluse.sh` | 프로젝트 안에 새 spec을 처음 쓰려 하면 세션마다 경로당 한 번 거부하고, 사유에 적은 기준으로 `nested-orchestration`에 나눠 맡길지 먼저 판단하게 한다. 서브에이전트의 Write는 보지 않는다 | 차단 |
 | PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 규칙 넛지. 세션의 첫 Write·Edit·Bash 호출 전에 원칙 사본과 `domain-korean.md`와 `domain-discipline.md`의 절대경로를 한 번 알린다. 서브에이전트에는 원칙이 실리지 않기 때문이다 | 알림 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan을 감지해 리뷰를 지시한다 | 알림 |
-| PostToolUse | `hooks/doc_review_posttooluse.sh` | `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 있는 폴더의 `.md`를 고치면 `review-docs` 검진을 권한다. `Bash`로 고친 것도 본다 | 알림 |
+| PostToolUse | `hooks/doc_review_posttooluse.sh` | `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 있는 폴더의 `.md`를 고치면 `review-docs` 검진을 권한다. Write·Edit·Bash 로 쓴 `.md` 의 형식(라벨 불릿·개수 예고·제목 개수)을 경고하며, 리뷰 기록(`docs/superpowers/reviews/`)과 Claude 메모리는 형식 경고에서 뺀다. 검진 넛지는 `Bash`로 고친 것도 본다 | 알림 |
 | PostToolUse | `hooks/doc_word_posttooluse.sh` | 셸로 고친 산출물 `.md`에 금지 표현이 남으면 알린다 | 알림 |
 | Stop | `hooks/stop_gates.sh` | 이 세션에 새로 생긴 미리뷰 spec·plan이 남은 채 턴이 끝나는 것을 차단하고, 커밋되지 않은 산출물 `.md`에 금지 표현이 남으면 사용자에게 알린다 | 차단 |
 
-검진 넛지는 저장소에 커밋되는 작업 문서와 리뷰 기록에는 뜨지 않는다. 남에게 전달될 문서인지는 경로로 알 수 없어 대화 맥락으로 판단한다.
+검진 넛지는 저장소에 커밋되는 작업 문서와 리뷰 기록에는 뜨지 않는다. 읽기 위한 문서인지는 경로로 알 수 없어 대화 맥락으로 판단한다.
 
 ### 차단되었을 때 푸는 법
 
 표에서 「차단」인 hook이 작업을 멈췄을 때 푸는 방법이다.
 
-- **Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 이 세션이 시작된 뒤 새 `.md`가 생긴 채 턴을 끝내려 하면 차단하고 `review-specs` 수행을 지시한다. 세션이 시작되기 전부터 있던 미추적 초안은 차단하지 않는다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 풀린다. 차단은 턴에 한 번이라 두 번째 종료 시도는 통과한다.
-- **산출물 차단** — 사용자가 요구한 산출물 `.md`에 「금지 표현」 목록의 말이 있으면 거부하고 무엇을 무엇으로 고칠지 보인다. 이 플러그인 저장소의 문서, Claude 메모리(`/.claude/projects/` 아래), `docs/superpowers/` 아래는 대상이 아니다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 적어야 하면 백틱으로 감싼다. 셸로 고친 파일은 쓰기 전에 알 수 없어 차단하지 못하고, 쓰인 뒤와 턴이 끝날 때 알린다.
-- **나눠 맡길지 판단 차단** — `docs/superpowers/specs/`에 새 `.md`를 처음 `Write`하면 세션마다 경로당 한 번 거부하고, 서브 세션에 맡길지 판단하라고 지시한다. 거부 사유에 맡기는 기준이 있어, 기준에 들 때만 `nested-orchestration`을 연다. 기준에 들지 않으면 판단과 근거를 한 문장으로 사용자에게 알린 뒤 같은 `Write`를 다시 실행하면 통과한다. 맡기기로 하면 큰 명세를 거부된 같은 경로에 쓰므로 다시 거부되지 않는다. 이미 있는 spec을 고치는 것과 plan과 서브에이전트의 `Write`는 거부하지 않는다.
-- **읽기 전용 차단** — 읽기 전용 속성이 붙은 파일에 대한 `Write`와 `Edit`을 거부한다. 어느 프로젝트의 어느 파일이든 속성만 본다. 속성을 풀면 풀린다.
+**Stop 하드 게이트** — `docs/superpowers/specs/`나 `docs/superpowers/plans/`에 이 세션이 시작된 뒤 새 `.md`가 생긴 채 턴을 끝내려 하면 차단하고 `review-specs` 수행을 지시한다. 세션이 시작되기 전부터 있던 미추적 초안은 차단하지 않는다. 문서 마지막 줄에 `<!-- spec-review: passed -->` 마커(🔴가 있으면 `<!-- spec-review: escalated -->`)가 남으면 풀린다. 차단은 턴에 한 번이라 두 번째 종료 시도는 통과한다.
+
+**산출물 차단** — 사용자가 요구한 산출물 `.md`에 「금지 표현」 목록의 말이 있으면 거부하고 무엇을 무엇으로 고칠지 보인다. 이 플러그인 저장소의 문서, Claude 메모리(`/.claude/projects/` 아래), `docs/superpowers/` 아래는 대상이 아니다. 코드 블록과 백틱 안은 검사하지 않으므로 그 말 자체를 적어야 하면 백틱으로 감싼다. 셸로 고친 파일은 쓰기 전에 알 수 없어 차단하지 못하고, 쓰인 뒤와 턴이 끝날 때 알린다.
+
+**나눠 맡길지 판단 차단** — `docs/superpowers/specs/`에 새 `.md`를 처음 `Write`하면 세션마다 경로당 한 번 거부하고, 서브 세션에 맡길지 판단하라고 지시한다. 거부 사유에 맡기는 기준이 있어, 기준에 들 때만 `nested-orchestration`을 연다. 기준에 들지 않으면 판단과 근거를 한 문장으로 사용자에게 알린 뒤 같은 `Write`를 다시 실행하면 통과한다. 맡기기로 하면 큰 명세를 거부된 같은 경로에 쓰므로 다시 거부되지 않는다. 이미 있는 spec을 고치는 것과 plan과 서브에이전트의 `Write`는 거부하지 않는다.
+
+**읽기 전용 차단** — 읽기 전용 속성이 붙은 파일에 대한 `Write`와 `Edit`을 거부한다. 어느 프로젝트의 어느 파일이든 속성만 본다. 속성을 풀면 풀린다.
 
 ### 세션 시작에 바꾸는 전역 설정
 
 새 세션을 열 때마다 아래를 확인한다. 관리블록 밖의 전역 설정(옛 공용 블록 삭제와 `autoUpdate` 설정)은 바꾸기 전에 사본(`.bak`)을 남기고 바꾼 것을 알린다. 관리블록 안은 매번 원본으로 다시 쓰므로 사본을 남기지 않는다.
 
-- **원칙 연결** — 원칙 사본과 금지 표현 목록 사본을 놓고, 관리블록에 두 파일의 `@import`를 쓴다. 예전 버전이 만든 공용 블록(`# BEGIN korean-banned-words`)이 남아 있으면 다음 세션에 지운다. 지우기 전에 사본을 `~/.claude/disciplined-coder/backups/`에 남긴다. 그 블록의 끝 줄이 없으면 파일을 고치지 않고 알린다.
-- **superpowers 안내** — superpowers가 이 PC에 없으면 설치 명령을 알린다. 대신 설치하지는 않는다. `~/.claude/disciplined-coder/plugin-notice.skip`에 이름을 한 줄 적으면 알림이 멈춘다. `andrej-karpathy-skills`는 함께 설치하지 않기를 권한다. 에이전트원칙의 「행동」 절이 같은 지침을 포함하고 있어, 함께 설치하면 비슷하지만 다른 지침이 두 벌 실린다.
-- **플러그인 갱신** — 마켓플레이스나 설정에서 `autoUpdate`를 `false`로 두었으면 확인하지 않는다. 설치된 이 플러그인의 커밋을 원격 HEAD와 비교한다. 원격은 `curl`로 2초 안에 읽고, 못 읽거나 마켓플레이스가 브랜치를 지정했으면 마켓플레이스 사본과 비교한다. 뒤처졌으면 `claude plugin marketplace update`와 `claude plugin update`를 차례로 실행하고(각 60초 상한, 창 여럿이 동시에 열리면 한 창만), 화면에 다시 켜라고 띄운다. VS Code 같은 프로그램이 마켓플레이스 사본 폴더를 잡고 있어 첫 명령이 실패하면, 사본 폴더 안에서 git으로 원격 커밋을 받아 옮긴다. 실패하면 그날은 다시 시도하지 않고 직접 실행할 명령만 알리며, 날짜가 바뀐 뒤 첫 세션에서 다시 시도한다. 세션 사이에 자동 갱신이 설치본을 옮겼으면 그 사실도 알린다. 기록은 `~/.claude/disciplined-coder/update.seen`과 `update.stuck`이다.
+**원칙 연결** — 원칙 사본과 금지 표현 목록 사본을 놓고, 관리블록에 두 파일의 `@import`를 쓴다. 예전 버전이 만든 공용 블록(`# BEGIN korean-banned-words`)이 남아 있으면 다음 세션에 지운다. 지우기 전에 사본을 `~/.claude/disciplined-coder/backups/`에 남긴다. 그 블록의 끝 줄이 없으면 파일을 고치지 않고 알린다.
+
+**superpowers 안내** — superpowers가 이 PC에 없으면 설치 명령을 알린다. 대신 설치하지는 않는다. `~/.claude/disciplined-coder/plugin-notice.skip`에 이름을 한 줄 적으면 알림이 멈춘다. `andrej-karpathy-skills`는 함께 설치하지 않기를 권한다. 에이전트원칙의 「행동」 절이 같은 지침을 포함하고 있어, 함께 설치하면 비슷하지만 다른 지침이 두 벌 실린다.
+
+**플러그인 갱신** — 마켓플레이스나 설정에서 `autoUpdate`를 `false`로 두었으면 확인하지 않는다. 설치된 이 플러그인의 커밋을 원격 HEAD와 비교한다. 원격은 `curl`로 2초 안에 읽고, 못 읽거나 마켓플레이스가 브랜치를 지정했으면 마켓플레이스 사본과 비교한다. 뒤처졌으면 `claude plugin marketplace update`와 `claude plugin update`를 차례로 실행하고(각 60초 상한, 창 여럿이 동시에 열리면 한 창만), 화면에 다시 켜라고 띄운다. VS Code 같은 프로그램이 마켓플레이스 사본 폴더를 잡고 있어 첫 명령이 실패하면, 사본 폴더 안에서 git으로 원격 커밋을 받아 옮긴다. 실패하면 그날은 다시 시도하지 않고 직접 실행할 명령만 알리며, 날짜가 바뀐 뒤 첫 세션에서 다시 시도한다. 세션 사이에 자동 갱신이 설치본을 옮겼으면 그 사실도 알린다. 기록은 `~/.claude/disciplined-coder/update.seen`과 `update.stuck`이다.
 
 ### 끄는 법
 
 hook은 아래 환경 변수로 끈다.
 
-- **`DISCIPLINED_CODER_REVIEW_GATE=off`** — `spec_review_posttooluse.sh`, `stop_gates.sh`의 spec 검사, `doc_format_pretooluse.sh`, `doc_review_posttooluse.sh`, `rules_nudge_pretooluse.sh`, `nested_judgment_pretooluse.sh`를 끈다.
-- **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `stop_gates.sh`의 금지 표현 검사)을 끈다. 금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.
-- **`DISCIPLINED_CODER_PRIOR_ART_NUDGE=off`** — `prior_art_nudge_userpromptsubmit.sh`를 끈다.
+**`DISCIPLINED_CODER_REVIEW_GATE=off`** — `spec_review_posttooluse.sh`, `stop_gates.sh`의 spec 검사, `doc_format_pretooluse.sh`, `doc_review_posttooluse.sh`의 검진 넛지, `rules_nudge_pretooluse.sh`, `nested_judgment_pretooluse.sh`를 끈다.
+
+**`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `stop_gates.sh`의 금지 표현 검사)을 끈다. 문서 형식 경고도 끈다. 금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.
+
+**`DISCIPLINED_CODER_PRIOR_ART_NUDGE=off`** — `prior_art_nudge_userpromptsubmit.sh`를 끈다.
 
 읽기 전용 차단과 세션 시작의 셋업은 끄는 변수가 없다. 세 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
 
@@ -96,9 +105,11 @@ hook은 아래 환경 변수로 끈다.
 
 이 플러그인을 쓸 때 오해하기 쉬운 점이다.
 
-- **CLAUDE.md의 한계** — CLAUDE.md는 안내이지 강제가 아니다. 파일 수정을 실제로 차단하려면 `PreToolUse` hook을 설정한다.
-- **서브에이전트와 원칙** — 서브에이전트에는 원칙이 실리지 않는다. 렌즈에는 원칙 파일의 경로를 넣으며, 어느 경로인지는 `skills/dispatching-lenses/SKILL.md`가 정한다.
-- **병렬 오케스트레이션의 전제** — superpowers 플러그인이 함께 필요하다. 없으면 세션 시작 알림이 설치 명령을 보인다.
+**CLAUDE.md의 한계** — CLAUDE.md는 안내이지 강제가 아니다. 파일 수정을 실제로 차단하려면 `PreToolUse` hook을 설정한다.
+
+**서브에이전트와 원칙** — 서브에이전트에는 원칙이 실리지 않는다. 렌즈에는 원칙 파일의 경로를 넣으며, 어느 경로인지는 `skills/dispatching-lenses/SKILL.md`가 정한다.
+
+**병렬 오케스트레이션의 전제** — superpowers 플러그인이 함께 필요하다. 없으면 세션 시작 알림이 설치 명령을 보인다.
 
 ## 더 읽기
 

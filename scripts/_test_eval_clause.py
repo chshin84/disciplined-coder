@@ -100,4 +100,24 @@ fc = {"n1": {"meta": {"tags": ["dev"], "kind": "should", "type": "chat", "failur
 say("pair 가 없는 과제는 필드 검사를 통과한다", lib["check_fields"](fc) == [])
 fc["n1"]["meta"]["pair"] = "없는과제"
 say("없는 과제를 가리키는 pair 는 실패한다", lib["check_pairs"](fc) != [])
+# 단위별 기준 커밋과 시스템 프롬프트
+ev = runpy.run_path(os.path.join(scripts, "_eval_run.py"))
+qs3 = {f"b{i}": case(f"본문{i}", clause=["B-ONE"], kind=("should" if i else "should-not")) for i in range(3)}
+bases = {"7a2d26d": "기본 줄\n", "abc1234": "기본 줄\n새 기준에만 있는 줄\n"}
+ub = {"B-ONE": {"ids": ["B-ONE"], "current": "새 기준에만 있는 줄", "new": "n", "base": "abc1234", "system": None}}
+say("base 가 있는 단위의 current.md 줄이 그 커밋 원칙에 있으면 오류가 없다", cl["check_units"](qs3, ub, bases) == [])
+un = {"B-ONE": dict(ub["B-ONE"], base=None)}
+e = cl["check_units"](qs3, un, bases)
+say("base 가 없는 단위의 current.md 줄이 7a2d26d 에 없으면 오류 한 줄이다", len(e) == 1 and "기준 원칙" in e[0])
+c1 = case("본문")
+say("system.md 가 없는 단위의 gen_key 는 지금 식과 같다",
+    gk(c1, "t") == cl["_sha"]("본문") + "-" + cl["_sha"]("t") and gk(c1, "t", None) == gk(c1, "t"))
+say("system.md 가 있는 단위의 gen_key 는 다르다", gk(c1, "t", "S") != gk(c1, "t") and gk(c1, "t", "S") != gk(c1, "t", "T"))
+cmd = ev["claude_cmd"]("p", "m", "시스템 문안")
+say("system.md 가 있는 단위의 생성 명령에 --append-system-prompt 와 내용이 들어 있다",
+    "--append-system-prompt" in cmd and cmd[cmd.index("--append-system-prompt") + 1] == "시스템 문안")
+say("system 이 없으면 생성 명령에 --append-system-prompt 가 없다", "--append-system-prompt" not in ev["claude_cmd"]("p", "m"))
+us = {"S-ONE": {"ids": ["S-ONE"], "current": None, "new": "n", "system": "SYS"}}
+gs, _ = cl["plan_jobs"]({"s1": case("본문", clause=["S-ONE"])}, us, set(), set())
+say("plan_jobs 는 system 을 키와 작업에 반영한다", all(x[0] == gk(case("본문"), x[3], "SYS") and x[4] == "SYS" for x in gs) and len(gs) == 2)
 print("DONE")

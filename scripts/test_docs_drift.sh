@@ -283,7 +283,7 @@ check "소유자 절이 소유를 밝히고 principles_applied 를 요구한다"
 # 가리키기만 해야 하는 문서들. 그 절을 두면 실패한다.
 for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$HERE"/skills/review-docs/SKILL.md; do
   # 스킬 문서는 파일 이름이 모두 SKILL.md라 부모 디렉터리로 부른다 — 안 그러면 어느 문서가 실패했는지
-  # 알 수 없다(`NAME-ITEMS`).
+  # 알 수 없다(`SPECIFIC-NAME`).
   dn="$(basename "$D")"; [ "$dn" = "SKILL.md" ] && dn="$(basename "$(dirname "$D")")"
   check "$dn 이 소유자를 가리킨다"        "points_to '$D' 'dispatching-lenses' \"\$OWNER_SEC\""
   check "$dn 에 그 절이 없다"             "! has_sec '$D' \"\$OWNER_SEC\""
@@ -829,7 +829,7 @@ check "canon: korean group REVISE-ORDER present"   "grep -qE '^### \`REVISE-ORDE
 # 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
 # 다만 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 는 그 절이 생기기 전(2026-06~09)에 지워 근거가 git 이력에만 있다.
 REVIVED_IDS=""
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN NAME-ITEMS; do
   grep -qF "**\`$id\`" "$CANON" && REVIVED_IDS="$REVIVED_IDS $id"
 done
 check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"

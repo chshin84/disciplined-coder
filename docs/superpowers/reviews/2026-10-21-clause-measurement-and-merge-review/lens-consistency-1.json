@@ -1,0 +1,162 @@
+{
+  "lens": "lens-consistency",
+  "read": [
+    "D:/projects/dc-clause-candidates/skills/lens-consistency/SKILL.md",
+    "D:/projects/dc-clause-candidates/agent-principles.md",
+    "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+    "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+    "D:/projects/dc-clause-candidates/scripts/_eval_clause.py (1-140행, check_units 194-208행)",
+    "D:/projects/dc-clause-candidates/scripts/_eval_lib.py (grep: TAGS·tags)",
+    "D:/projects/dc-clause-candidates/scripts/test_eval_cases.sh (25-40행)",
+    "D:/projects/dc-clause-candidates/evals/principles/README.md (40-100행)",
+    "D:/projects/dc-clause-candidates/evals/principles/cases/q-anti-limit-f1/prompt.md (머리)",
+    "D:/projects/dc-clause-candidates/hooks/doc_review_posttooluse.sh (grep: out=)",
+    "D:/projects/dc-clause-candidates/README.md (grep: 하드 게이트·형식 경고·남에게 전달될)",
+    "D:/projects/dc-clause-candidates/skills/review-docs/SKILL.md (grep: 남에게 전달될)"
+  ],
+  "issues": [
+    {
+      "where": "Task 2 단위 표 아래 문단",
+      "type": "contradiction",
+      "claim": "`c20-midmod-named` 의 `ids` 를 두 문장이 서로 다르게 정한다. 앞 문장은 조항 ID 만 두라고 하고, 뒤 문장은 `c20-midmod-*` 전체에 `TERM-EXPLAIN` 을 함께 두라고 한다. `c20-midmod-named` 는 `c20-midmod-*` 에 든다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "116행: \"`c20-bullet-named` 와 `c20-midmod-named` 의 `ids` 에는 조항 ID 만 두어라. `c20-midmod-*` 의 `ids` 에는 `NO-MID-MOD` 와 `TERM-EXPLAIN` 을 함께 두어 용어 풀이 과제도 고르게 하라.\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "147행: \"T4 의 `NO-MID-MOD` 문안과 T7 의 `NO-MID-MOD`×`TERM-EXPLAIN` 처방은 같은 문안을 다루므로 T4 에서 함께 시험한다.\"",
+      "principle": "TERM-ONE",
+      "consequence": "구현자가 어느 문장을 따르느냐에 따라 `c20-midmod-named` 의 질문 집합이 달라진다. 한쪽을 따르면 지목형 문안만 용어 풀이 과제 없이 시험된다."
+    },
+    {
+      "where": "Global Constraints 동률 규칙, Task 2 Step 2·Step 3",
+      "type": "contradiction",
+      "claim": "plan 은 `동률` 판정이 나오면 `p12-*` 과제를 승격한다고 정했다. 그러나 현행 도구는 질문 중 하나라도 `followup: true` 이면 동률을 `채택(차이없음)` 으로 바꾼다. 2026-10-18 에 추가한 `q-<단위>-f1`·`f2` 82개는 `tags: [dev]`·`followup: true` 이고 조항 ID 가 같다. 그래서 `c20-` 단위의 첫 실행에 이미 그 질문들이 섞여 `동률` 이 나오지 않는다. Step 3 의 \"`채택` 판정을 받은 단위\"가 `채택(차이없음)` 을 포함하는지도 plan 이 정하지 않았다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "21행: \"단위마다 과제 3개 이상을 먼저 실행하고, 판정이 `동률` 이면 그 단위의 추가 과제 2개를 더 실행하라\"; 126행: \"`동률` 인 단위가 있으면 그 조항의 `p12-*` 과제 2개를 `tags: [dev]` 로 승격\"; 130행: \"조항마다 `채택` 판정을 받은 단위 중 위반이 가장 적은 단위를 고르고\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/scripts/_eval_clause.py",
+      "counterpart": "56-58행 `questions` 는 `dev` 태그와 조항 교집합만 본다. 114-119행: `followup = any(... followup == \"true\" ...)`, `v = \"채택\" if n < c else \"기각\" if n > c else (\"채택(차이없음)\" if followup else \"동률\")`. `evals/principles/cases/q-anti-limit-f1/prompt.md` 머리는 `tags: [dev]`, `clause: [ANTI-LIMIT, BANNED-LIST]`, `followup: true` 다.",
+      "principle": "NO-ASSUME",
+      "consequence": "지금 코드로는 위반 수가 같은 단위가 `동률` 이 아닌 `채택(차이없음)` 으로 보고된다. 그래서 plan 의 승격 단계가 실행될 조건이 생기지 않는다. 또 Step 3 이 `채택(차이없음)` 을 `채택` 으로 읽으면 차이가 없는 문안이 원칙에 옮겨질 수 있다."
+    },
+    {
+      "where": "Task 2 Step 3 문안 선택 규칙",
+      "type": "contradiction",
+      "claim": "문안을 고를 때 단위끼리 위반 수를 비교하라고 한다. 그런데 같은 조항의 단위들이 같은 질문 집합을 쓴다는 보장이 plan 에 없다. `ids` 가 단위마다 다르고(116행), 동률 단위만 질문 2개를 더 받는다(126행). 그래서 단위 사이의 위반 수는 서로 다른 질문 수와 질문 집합에서 나온 값이다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "130행: \"`채택` 판정을 받은 단위 중 위반이 가장 적은 단위를 고르고, 같으면 문안이 짧은 단위를 골라라.\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "119행: \"채택 조건을 통과한 문안 중 위반이 가장 적은 문안을 채택하고, 위반 수가 같으면 짧은 문안을 채택하라. … 위반 1~2건 차이가 측정 흔들림 안에 들기 때문이다\"",
+      "principle": "CHECKABLE",
+      "consequence": "지금 plan 대로라면 위반 수의 차이가 문안 때문인지 질문 집합 때문인지 가릴 수 없다. 그 상태에서 고른 단위가 Task 6 에서 원칙에 옮겨진다."
+    },
+    {
+      "where": "Task 1 Step 4 실제 실행 확인",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 의 T2 완료 조건은 옮긴 과제 하나를 실행하는 것이다. 그런데 plan 은 옮긴 과제를 모두 `tags: [pool]` 로 두고, `pool` 과제는 `questions` 가 고르지 않게 만든다. 그래서 smoke 단위 `c20-smoke` 는 옮긴 과제를 실행하지 않는다. 대신 `BULLET-SCOPE` 의 기존 `dev` 질문 전부를 실행한다. \"과제 하나로 실행하라\"는 지시를 현행 도구로 지킬 방법도 plan 에 없다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "55행: \"`tags: [pool]` 과제는 `questions` 가 고르지 않는다.\"; 71행: `tags: [pool]`; 83행: \"`c20-smoke/` 에 … 임시로 만들고 과제 하나로 실행하라.\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "130행 T2 완료 조건: \"`eval_clause.sh` 가 옮긴 과제 하나를 실행해 gen.jsonl·judge.jsonl 을 남긴다\"",
+      "principle": "CHECKABLE",
+      "consequence": "plan 의 Task 1 은 옮긴 과제의 `prompt.md`·`criteria.md` 가 실제 생성·판정을 통과하는지 확인하지 않은 채 끝난다. 이 과제들은 동률 승격 뒤에야 처음 실행된다."
+    },
+    {
+      "where": "Goal, Task 2 제목, Task 3·4 제목",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 의 T3 은 대조 표와 후보 표의 조항마다 현행 위반 수를 측정하라고 한다. plan 은 T3 을 따로 과제로 두지 않고, Task 2 제목에만 T3 을 적었다. Task 3·4 의 기록에는 Task 2 Step 3 형식을 따르라고 해서 현행 위반 수가 함께 기록되므로, 대조 표의 행은 덮인다. 그러나 후보 표의 `SECRETS` 행은 어느 과제에도 단위가 없어 현행 위반 수가 측정되지 않는다. 또 T3 이 Task 2~4 에 흩어져 있다는 사실을 plan 이 명시하지 않는다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "95행: \"### Task 2: `BULLET-SCOPE`·`NO-MID-MOD` 문안 비교(T3·T4, …)\"; 139행: \"### Task 3: … 시험(T5)\"; 168행: \"### Task 4: … (T7·T8)\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "131행 T3: \"대조 표와 후보 표의 조항마다 현행 문안으로 위반 수를 측정한다 | 조항마다 현행 위반 수가 기록되어 있다\"; 84행: \"`SECRETS` | … | 시험하지 않는다.\"",
+      "principle": "CHECKABLE",
+      "consequence": "지금 plan 을 끝까지 실행해도 `SECRETS` 의 현행 위반 수는 기록되지 않는다. 그래서 T3 완료 조건 \"조항마다\"가 채워지지 않는다. spec 이 「시험하지 않는다」를 T3 측정에서도 뺀다는 뜻으로 읽는다면, 그 해석이 plan 에 적혀 있지 않다."
+    },
+    {
+      "where": "Task 3 Files·본문 (`c20-edit-priority` 변형 과제)",
+      "type": "gap",
+      "claim": "산출물 공백이다. `c20-edit-priority` 는 기존 과제에 형식 경고를 덧붙인 변형 과제를 쓴다고 한다. 그러나 Files 에 그 과제의 Create 가 없다. 과제 이름, `tags`, `clause` 도 정해지지 않았다. 변형 과제의 `clause` 가 `EDIT-PRIORITY` 이면 경고 없는 원래 과제도 같은 단위에 함께 골라진다. Task 3 세 단위와 Task 4 의 `c20-subject-object`·`c20-yagni`·`c20-vocab-pref`·`c20-anti-limit` 의 `ids` 도 정해지지 않았다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "142-143행 Files: \"Create: `evals/principles/clauses/c20-section-head/`, … (각 `current.md`·`new.md`·`ids`·`base`)\", \"Modify: `COUNT-EARNS` 과제의 `criteria.md` …\"; 157행: \"`c20-edit-priority` 의 과제는 `EDIT-PRIORITY` 의 기존 과제 각각에 … 덧붙인 변형을 만들어 쓴다.\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "121행: \"그래서 구현자는 T6 검사기의 경고 문구를 과제 프롬프트에 넣어 시험하라.\"",
+      "principle": "CHECKABLE",
+      "consequence": "지금 plan 에는 변형 과제를 어느 폴더에 어떤 머리로 둘지가 없다. 그래서 `c20-edit-priority` 단위가 경고를 받은 과제만으로 판정되는지 확인할 기준이 없다. `COUNT-EARNS` 의 `criteria.md` 도 기존 `q-count-earns-*` 와 `p12-count-earns-*` 중 어느 쪽인지 정해지지 않았다."
+    },
+    {
+      "where": "Task 4 Files와 `c20-concise-priority` 문단",
+      "type": "drift",
+      "claim": "Concise 문구가 두 이름으로 놓인다. Task 1 의 인터페이스는 단위 폴더의 `system.md` 만 정의한다. Task 4 는 그와 별도로 `evals/principles/system/concise.md` 를 만들고, 같은 문구를 다시 `system.md` 에 넣으라고 한다. 또 문구의 원본을 \"이 세션 시스템 프롬프트의 # Output Style: Concise 절\"로 지정했다. 이 원본은 실행하는 세션마다 다를 수 있고, 저장소에 원본 파일이 없다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "172행: \"Create: `evals/principles/system/concise.md` (Concise 출력 스타일 문구)\"; 189행: \"`system.md` 에는 `evals/principles/system/concise.md` 의 문구를 넣어라. … 그 원문은 이 세션 시스템 프롬프트의 \\\"# Output Style: Concise\\\" 절이다.\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "counterpart": "54행: \"단위 폴더의 `system.md` 가 있으면 그 단위의 모든 생성 호출에 `--append-system-prompt <내용>` 을 붙인다.\"; 176행 Consumes: \"Task 1 의 `system.md`\"",
+      "principle": "TERM-ONE",
+      "consequence": "같은 문구가 두 파일에 복사된다. 생성 키는 단위의 `system.md` 내용으로 만들어지므로, 두 파일이 어긋나면 기록된 결과가 어느 문구에서 나왔는지 `concise.md` 만 보고는 알 수 없다."
+    },
+    {
+      "where": "Task 1 Step 3 과제 이름과 머리, Task 2 Step 2 승격 대상",
+      "type": "drift",
+      "claim": "추가 과제의 이름과 표시가 기존 관례와 다르다. 기존 관례는 동률 단위의 추가 질문을 `q-<단위>-f1`·`f2`·`followup: true`·`tags: [dev]` 로 둔다. plan 은 `p12-<조항>-<1|2>` 라는 이름과 `pool` 이라는 태그를 새로 만든다. spec 은 파일 이름과 dev 태그를 README 대로 하라고 했다. 또 승격 지시는 \"그 조항의 `p12-*`\"인데, `p12-*` 는 열 조항에만 생기므로 `c20-concise-priority`(`BULLET-SCOPE`·`WRITTEN-ONLY`·`FULL-SENTENCE`)와 `TERM-EXPLAIN` 쪽 동률에는 승격할 과제가 정해지지 않는다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "48행: \"Create: `evals/principles/cases/p12-<조항 소문자>-<1|2>/…`\"; 71행 `tags: [pool]`; 126행: \"그 조항의 `p12-*` 과제 2개를 `tags: [dev]` 로 승격\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "181행: \"2026-10-12 과제를 cases 형식으로 옮길 때의 파일 이름과 dev 태그는 `evals/principles/README.md` 를 따르라.\" README 71행: \"동률 단위에 추가한 질문 84개(`q-<단위>-f1`·`f2`, `followup: true`)\"",
+      "principle": "TERM-ONE",
+      "consequence": "현재 plan 대로 하면 추가 질문이 두 가지 이름과 두 가지 표시 체계로 공존한다. Task 1 이 README 에 `pool` 설명을 더하지만, 기존 f1·f2 관례와의 관계는 적히지 않는다."
+    },
+    {
+      "where": "Architecture 마지막 문장, Task 5 Files·제외 표",
+      "type": "scope",
+      "claim": "Architecture 는 문서 정리가 측정과 독립이라고 한다. 그런데 Task 5 는 Task 2·3·4 가 측정 기록을 쓰는 `docs/domain-korean.md` 를 고친다. Task 5 의 파일 목록은 측정 기록이 생기기 전인 2026-10-21 집계에서 뽑혔다. 그리고 Task 3·4 가 기록을 더하는 `docs/domain-discipline.md` 는 목록에도 없고 제외 표에도 없다. Step 3 의 \"위반 0건\" 확인도 그 목록에만 실행된다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "7행: \"문서 정리는 측정과 독립이다.\"; 214행 Modify 목록에 `docs/domain-korean.md` 는 있고 `docs/domain-discipline.md` 는 없다; 216행: \"2026-10-21 집계에서 이 파일들에 라벨 불릿 121건과 제목 개수 1건이 있었다.\"; 240-241행: \"Run: Step 1 의 `check()` 실행 / Expected: 위반 0건\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "counterpart": "130행: \"결과를 `docs/domain-korean.md` 의 두 조항 절에 … 적고\"; 160행: \"`EDIT-PRIORITY` 는 `docs/domain-discipline.md` 의 조항 절에\"; 203행: \"`c20-concise-priority` 는 `docs/domain-discipline.md` 의 … 절에 적어라.\"",
+      "principle": "REPORT-DEAD",
+      "consequence": "Task 5 를 측정 과제와 나란히 실행하면 두 과제가 `docs/domain-korean.md` 를 함께 고친다. 측정 기록이 `docs/domain-discipline.md` 에 라벨 불릿을 더해도 Task 5 의 확인은 그것을 보지 않는다."
+    },
+    {
+      "where": "Task 5 와 Task 6 의 대상 파일",
+      "type": "scope",
+      "claim": "Task 5 와 Task 6 이 같은 파일 `skills/review-docs/SKILL.md` 의 같은 문단을 고친다. 19·21행 본문에 \"남에게 전달될 문서\"가 있고, 이 파일은 Task 5 목록에도 있다. Task 5 가 그 문단을 산문으로 바꾸면 Task 6 의 grep 결과와 바꿀 문장이 달라진다. 또 README.md 66행의 같은 용어는 Task 6 의 grep 범위(`skills`) 밖이라 남는다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "214행 목록의 `skills/review-docs/SKILL.md`; 257행: \"Modify: `skills/` 아래에서 \\\"남에게 전달될\\\"·\\\"사람이 볼\\\"을 쓰는 스킬\"; 268행: \"Run: `grep -rn -E '남에게 전달될|사람이 볼' skills`\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "138행 T10: \"스킬과 참고서의 \\\"남에게 전달될\\\"·\\\"사람이 볼\\\"을 \\\"읽기 위한 문서\\\"로 맞추고\"",
+      "principle": "TERM-ONE",
+      "consequence": "현재 순서대로 실행하면 같은 문단이 두 커밋에서 연달아 바뀐다. 용어 정리가 끝난 뒤에도 README.md 에는 \"남에게 전달될 문서\"가 남는다."
+    },
+    {
+      "where": "Task 7 Step 3 보존 태그와 plan 정리",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 병합 뒤 정리 대상을 plan 두 개로만 정했다. 원칙의 「문서 타입과 수명」 기록 행은 다룬 작업이 병합되면 리뷰 기록에도 보존 태그를 달고, 최근 기록을 남긴 채 지우라고 한다. 이 브랜치가 만든 `docs/superpowers/reviews/` 기록의 처분은 plan 어디에도 없다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "296행: \"병합한 뒤 이 plan 과 앞 plan 에 `archive/2026-10-21-clause-plans` 보존 태그를 달고, 두 plan 파일을 지우는 커밋을 main 에 만들어라\"",
+      "counterpart_file": "D:/projects/dc-clause-candidates/agent-principles.md",
+      "counterpart": "60행: \"**기록** (reviews) | … | 기록한 뒤 고치지 마라. 다룬 작업이 병합되면 git 보존 태그를 단 뒤 지우되, 차수 대조에 쓰는 최근 기록은 남겨라.\"",
+      "principle": "DOC-TYPE",
+      "consequence": "현재 plan 대로라면 병합 뒤에도 리뷰 기록(예: spec 40행이 가리키는 `2026-10-20-generation-constraints-prior-art.md`)이 태그 없이 main 에 남는다. 지울 기록과 남길 기록의 구분도 정해지지 않는다."
+    },
+    {
+      "where": "Task 4 기록 위치와 spec 「바뀌는 파일」 표",
+      "type": "contradiction",
+      "claim": "spec 의 바뀌는 파일 표는 `docs/domain-discipline.md` 를 T5·T9 만 바꾼다고 적는다. 그런데 plan Task 4(T7·T8)도 `CHECKABLE`·`YAGNI`·머리 문단의 측정 기록을 그 파일에 쓴다. 또 spec 은 `scripts/_eval_run.py` 를 T7 이 바꾼다고 적지만, plan 은 Task 1(T2)에서 바꾸고 `_eval_clause.py`·`_eval_lib.py`·`test_eval_cases.sh`·`evals/principles/README.md` 도 바꾼다. 이 파일들은 spec 표에 없다.",
+      "file": "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "173행: \"Modify: `docs/domain-discipline.md`·`docs/domain-korean.md` (측정 기록)\"; 43-49행 Task 1 Modify 목록",
+      "counterpart_file": "D:/projects/dc-clause-candidates/docs/superpowers/specs/2026-10-20-clause-decision-point-design.md",
+      "counterpart": "157행: \"`docs/domain-discipline.md` | 생성 제약 절, 채택 조항의 측정 기록 | T5, T9\"; 160행: \"`scripts/_eval_run.py` | 시스템 프롬프트 인자 | T7\"",
+      "principle": "TERM-ONE",
+      "consequence": "현재 spec 의 바뀌는 파일 표는 이번 plan 이 실제로 고치는 파일과 과제 배정을 다 담지 못한다. 그래서 병합 승인(Task 7 Step 1) 때 보이는 \"바뀌는 조항 목록\"을 spec 표로 대조할 수 없다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "CHECKABLE",
+    "TERM-ONE",
+    "DOC-TYPE",
+    "REPORT-DEAD",
+    "WRITTEN-ONLY",
+    "SPECIFIC-NAME",
+    "SUBJECT-OBJECT"
+  ],
+  "notes": "검토는 체크리스트의 모순, 커버리지 공백, 산출물 공백, 드리프트, 스코프를 항목마다 따로 보았다. 도구 동작에 기대는 지적(동률 판정, pool 선택, check_units)은 `scripts/_eval_clause.py` 원문으로 확인했다. check_units 는 줄 단위가 아닌 부분 문자열(`line not in baseline`)로 대조하므로, `c20-concise-priority` 의 current.md 가 머리 문단의 첫 문장만 담아도 검사를 통과한다. 그래서 그 점은 지적하지 않았다.\n\n대조한 범위는 다음과 같다. spec 의 「현행 조항 대조」 여섯 행(BULLET-SCOPE·NO-MID-MOD·SECTION-HEAD·COUNT-EARNS·EDIT-PRIORITY·CHECKABLE)은 Task 2·3·4 의 단위로 모두 옮겨졌다. 「커밋 8b4a05a 의 후보 문안」 표에서 T8 행 네 개는 Task 4 단위로 옮겨졌고, NO-MID-MOD 행은 Task 2 의 문안 재료로 쓰였다. 시험하지 않는 두 행은 측정에서도 빠졌다(SECRETS 는 T3 관점에서 따로 지적했다). T7 의 충돌 세 가지와 시스템 프롬프트 인자도 Task 1·2·4 에 있다.\n\nspec T10 의 README 「하드 게이트와 넛지와 전역 설정 수정」 절 갱신은 plan 에 없다. 다만 현재 README.md 62행에 형식 경고가 이미 적혀 있어 공백으로 올리지 않았다. 대신 plan 이나 앞 plan 에 이미 끝났다는 사실을 적어 두기를 권한다.\n\n더 확인해야 할 것이 있다. 첫째, 사용자 결정의 \"1c784ec 보존 태그(완료)\"는 `git tag --points-at 1c784ec` 결과가 비어 있어 이 worktree 에서 확인되지 않았다. 다른 커밋에 달았는지 호출자가 확인해야 한다. 둘째, 2026-10-12 원본 과제(`D:/projects/disciplined-coder/docs/superpowers/reviews/2026-10-12-clause-strengthening-check/`)는 읽기 범위 밖이라 열지 않았다. 그래서 `tasks.json` 의 첫 두 과제가 모두 `kind: should` 인지, `check_units` 의 kind 조건과 충돌하는지는 판정하지 않았다."
+}
