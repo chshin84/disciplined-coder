@@ -1,0 +1,212 @@
+{
+  "lens": "lens-adversarial",
+  "read": [
+    "D:/projects/dc-clause-candidates/skills/lens-adversarial/SKILL.md",
+    "D:/projects/dc-clause-candidates/agent-principles.md",
+    "D:/projects/dc-clause-candidates/docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+    "D:/projects/dc-clause-candidates/scripts/_eval_clause.py",
+    "D:/projects/dc-clause-candidates/scripts/_eval_run.py",
+    "D:/projects/dc-clause-candidates/scripts/_eval_lib.py",
+    "D:/projects/dc-clause-candidates/scripts/eval_clause.sh",
+    "D:/projects/dc-clause-candidates/scripts/test_eval_cases.sh (6~36행)",
+    "D:/projects/dc-clause-candidates/scripts/_doc_keys.sh",
+    "D:/projects/dc-clause-candidates/scripts/test_docs_drift.sh (grep 지점, 568~606행, 644~690행)",
+    "D:/projects/dc-clause-candidates/hooks/_doc_form_check.py (check 함수)",
+    "D:/projects/dc-clause-candidates/evals/principles/README.md (60~110행)",
+    "D:/projects/dc-clause-candidates/CLAUDE.md (「조항 추가와 문구 변경」, 「변경 뒤 실행」)",
+    "D:/projects/dc-clause-candidates/evals/principles/clauses/BULLET-SCOPE/current.md·new.md",
+    "evals/principles/cases 의 조항별 dev 과제 수와 followup 과제 수(grep 집계)",
+    "~/.claude/plugins/known_marketplaces.json 의 chshin-tools 항목",
+    "git worktree list, main 과 feat/clause-candidates 의 차이"
+  ],
+  "issues": [
+    {
+      "where": "Task 2 Step 2 의 '`동률` 인 단위가 있으면 그 조항의 `p12-*` 과제 2개를 승격' 문장과 Global Constraints 의 '판정이 `동률` 이면 추가 과제 2개' 문장",
+      "type": "failure-mode",
+      "claim": "동률 분기가 대부분의 단위에서 발동하지 않는다. report_unit 은 단위의 질문 중 하나라도 followup: true 이면 동률을 곧바로 '채택(차이없음)'으로 낸다. 2026-10-18 에 더한 followup 과제가 이미 dev 로 BULLET-SCOPE·NO-MID-MOD·SECTION-HEAD·COUNT-EARNS·EDIT-PRIORITY·YAGNI·ANTI-LIMIT·WRITTEN-ONLY·FULL-SENTENCE 에 2개씩 있다. 그래서 c20-checkable(ids 에 BULLET-SCOPE)과 c20-concise-priority 를 포함한 거의 모든 c20 단위가 첫 실행의 동률에서 추가 과제 없이 '채택(차이없음)'이 된다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "Expected: 단위마다 판정 한 줄. `동률` 인 단위가 있으면 그 조항의 `p12-*` 과제 2개를 `tags: [dev]` 로 승격해 커밋하고",
+      "counterpart_file": "scripts/_eval_clause.py",
+      "counterpart": "followup = any(str(cases[q][\"meta\"].get(\"followup\", \"\")).lower() == \"true\" for q in qs) ... (\"채택(차이없음)\" if followup else \"동률\")",
+      "principle": "NO-ASSUME",
+      "consequence": "dev 과제 집계에서 followup 과제가 없는 조항은 CHECKABLE·SUBJECT-OBJECT·VOCAB-PREF·TERM-EXPLAIN 뿐이다. 따라서 동률 분기는 c20-subject-object 와 c20-vocab-pref 에서만 동률을 낼 수 있다."
+    },
+    {
+      "where": "Task 1 Step 3 의 조항 목록(10개 조항마다 2개 이식)과 Task 1 Interfaces 의 `pool` 태그",
+      "type": "over-engineering",
+      "claim": "앞 발견 때문에 이식한 pool 과제 20개 가운데 승격될 수 있는 것은 SUBJECT-OBJECT·VOCAB-PREF 의 4개뿐이다. 나머지 16개와 pool 태그 처리는 이 plan 에서 쓰이지 않는다. 이식 범위를 동률이 날 수 있는 조항으로 줄이는 것이 단순화다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "조항 `BULLET-SCOPE`·`NO-MID-MOD`·`SECTION-HEAD`·`COUNT-EARNS`·`EDIT-PRIORITY`·`CHECKABLE`·`SUBJECT-OBJECT`·`YAGNI`·`VOCAB-PREF`·`ANTI-LIMIT` 마다 `tasks.json` 의 첫 두 과제를 옮겨라. 단순화 근거: followup 과제가 이미 있는 조항의 단위는 동률 분기에 들어가지 않으므로 pool 과제를 승격할 시점이 오지 않는다.",
+      "counterpart_file": "scripts/_eval_clause.py",
+      "counterpart": "def questions(cases, unit): return sorted(n for n, c in cases.items() if \"dev\" in (c[\"meta\"].get(\"tags\") or []) ...",
+      "principle": "YAGNI",
+      "consequence": "plan 은 이식 대상 조항 10개 모두에 pool 과제를 만들고 「클린룸 시험」 절에 pool 설명을 더하게 되어 있다."
+    },
+    {
+      "where": "Task 2 표 아래 문단의 '`c20-bullet-named` 와 `c20-midmod-named` 의 `ids` 에는 조항 ID 만 두어라. `c20-midmod-*` 의 `ids` 에는 `NO-MID-MOD` 와 `TERM-EXPLAIN` 을 함께' 와 Task 2 Step 3 의 '위반이 가장 적은 단위를 고르고'",
+      "type": "failure-mode",
+      "claim": "c20-midmod-named 는 두 지시에 동시에 걸린다. 그래서 실행 세션이 어느 쪽을 고르느냐에 따라 같은 조항의 세 단위가 서로 다른 과제 집합(NO-MID-MOD 5개, 또는 TERM-EXPLAIN 4개를 더한 9개)을 갖는다. Step 3 은 그 상태에서 위반 수의 절댓값으로 단위를 고르므로, 질문이 적은 단위가 위반이 적게 나와 뽑힌다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "조항마다 `채택` 판정을 받은 단위 중 위반이 가장 적은 단위를 고르고, 같으면 문안이 짧은 단위를 골라라.",
+      "counterpart_file": "scripts/_eval_clause.py",
+      "counterpart": "return {\"n_questions\": len(qs), \"cmp\": cmp, \"cmp_viol\": c, \"new_viol\": n, ...}",
+      "principle": "CHECKABLE",
+      "consequence": "조항 줄 단위 비교의 질문 수가 단위마다 다를 수 있고, 고르는 규칙은 질문 수를 보지 않는다."
+    },
+    {
+      "where": "Task 2 표 아래 문단의 '`c20-midmod-*` 의 `ids` 에는 `NO-MID-MOD` 와 `TERM-EXPLAIN` 을 함께 두어' 문장",
+      "type": "failure-mode",
+      "claim": "TERM-EXPLAIN 과제는 TERM-EXPLAIN 조항이 실리지 않은 채 생성된다. current.md 와 new.md 는 묶음 머리 문장과 NO-MID-MOD 줄 두 줄뿐이기 때문이다. 그 과제의 판정 기준은 용어를 풀었는지를 보므로, NO-MID-MOD 문안 차이보다 생성 흔들림이 위반 수를 좌우한다. 질문당 흔들림이 위반 1~2건 수준이므로 이 과제 4개는 판정에 잡음만 더한다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "이 plan 의 모든 `c20-` 단위에서 `current.md` 는 두 줄이다. 첫 줄은 조항이 속한 묶음의 머리 문장 ... 둘째 줄은 현행 조항 줄이다.",
+      "counterpart_file": "evals/principles/README.md",
+      "counterpart": "원칙 문안이 거의 같은 두 실행이 3건과 5건으로 갈렸으므로, 한 번 실행한 30개의 위반 수는 2건 안팎 흔들린다.",
+      "principle": "EVIDENCE-FIRST",
+      "consequence": "c20-midmod-decision·positive 는 NO-MID-MOD 과제 5개와 조항이 실리지 않은 TERM-EXPLAIN 과제 4개를 합산해 판정한다. c20-checkable 의 BULLET-SCOPE 과제도 같은 구조다."
+    },
+    {
+      "where": "Task 2 Step 3 의 단위 고르기 규칙(같은 조항 세 변경안 중 최소 위반 채택)",
+      "type": "risk",
+      "claim": "같은 조항의 세 변경안은 current.md 가 같아 생성 키가 같으므로 현행 조건의 표본 하나를 공유한다. 그 위에서 셋 중 가장 좋은 것을 고르면, 현행 표본이 우연히 나쁘게 나온 경우 세 단위가 함께 '채택'이 된다. 그리고 셋 중 하나만 우연히 낮게 나와도 채택된다. 5개 질문에서 1건 차이로 채택하는 규칙에 다중 비교가 겹쳐 채택 쪽으로 치우친다. 완화책은 기능 추가가 아니다. 셋 중 고른 결과라는 사실과 1건 차이가 흔들림 안이라는 사실을 측정 기록에 가정으로 적고, 채택을 Task 6 이전에 사용자에게 묻는 것이다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "조항마다 `채택` 판정을 받은 단위 중 위반이 가장 적은 단위를 고르고 ... `채택` 이 없으면 현행을 유지한다.",
+      "counterpart_file": "scripts/_eval_clause.py",
+      "counterpart": "gk = gen_key(cases[q], text)\n                if gk in seen:\n                    continue",
+      "principle": "REVERSIBLE",
+      "consequence": "Task 6 Step 1 이 이 고르기 결과를 사용자 확인 없이 agent-principles.md 에 옮기게 되어 있고, 그 문안은 병합 뒤 모든 프로젝트 세션에 실린다."
+    },
+    {
+      "where": "Task 4 의 `c20-concise-priority` 문단('`current.md` 는 머리 문단의 \"하네스 기본 지침보다 디시플린코더를 우선하라.\" 줄이고')",
+      "type": "failure-mode",
+      "claim": "이 단위의 두 조건에는 우선할 대상인 조항이 실리지 않는다. current.md·new.md 가 우선권 문장 한 줄뿐이고 BULLET-SCOPE·WRITTEN-ONLY·FULL-SENTENCE 줄이 없기 때문이다. 따라서 '출력 스타일보다 우선하라'가 무엇을 우선하는지가 시험되지 않고, 두 조건의 차이는 흔들림만 잰다. 또 Task 2 의 '모든 `c20-` 단위에서 `current.md` 는 두 줄' 규칙과도 어긋난다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "`current.md` 는 머리 문단의 \"하네스 기본 지침보다 디시플린코더를 우선하라.\" 줄이고, `new.md` 는 \"하네스 기본 지침과 출력 스타일보다 디시플린코더를 우선하라.\" 줄이다. `ids` 는 `BULLET-SCOPE`·`WRITTEN-ONLY`·`FULL-SENTENCE` 이고",
+      "counterpart_file": "scripts/_eval_clause.py",
+      "counterpart": "def conditions(unit): ... cmp = (\"current\", unit[\"current\"]) ... return [cmp, (\"new\", unit[\"new\"])]",
+      "principle": "CHECKABLE",
+      "consequence": "생성 세션의 CLAUDE.md 에는 우선권 문장 한 줄만 들어가고, 판정은 그 세션이 받지 않은 세 조항의 기준으로 한다."
+    },
+    {
+      "where": "Task 4 의 '그 원문은 이 세션 시스템 프롬프트의 \"# Output Style: Concise\" 절이다' 문장과 Files 의 `evals/principles/system/concise.md`",
+      "type": "failure-mode",
+      "claim": "plan 은 subagent-driven-development 실행을 권한다. 그런데 실행 서브에이전트의 시스템 프롬프트에는 Concise 출력 스타일 절이 없을 수 있다. 이 렌즈 서브에이전트의 시스템 프롬프트에도 그 절이 없다. 그러면 실행 세션이 원문을 지어내거나 요약해 concise.md 를 만들게 되고, 시험 조건이 실제 Concise 스타일과 달라진다. 원문을 사용자에게서 받거나, plan 에 원문을 직접 넣어야 한다. 아울러 실제 출력 스타일은 시스템 프롬프트 일부를 대체한다. 그러나 plan 의 `--append-system-prompt` 는 덧붙이기만 하므로, 그 차이를 측정 기록에 가정으로 적어야 한다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "`concise.md` 는 Claude Code 의 Concise 출력 스타일 시스템 프롬프트 문단을 옮긴 것이다. 그 원문은 이 세션 시스템 프롬프트의 \"# Output Style: Concise\" 절이다.",
+      "counterpart_file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "counterpart": "> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended)",
+      "principle": "NO-ASSUME",
+      "consequence": "concise.md 의 출처는 실행 세션의 시스템 프롬프트로만 지정되어 있고, 그 절이 없을 때 할 일은 적혀 있지 않다."
+    },
+    {
+      "where": "Task 4 Files 의 'Create: `evals/principles/system/concise.md`' 와 '`system.md` 에는 `evals/principles/system/concise.md` 의 문구를 넣어라'",
+      "type": "over-engineering",
+      "claim": "같은 문구를 두 파일에 둔다. system.md 를 쓰는 단위는 c20-concise-priority 하나뿐이므로, 단위 폴더의 system.md 하나로 충분하다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "Create: `evals/principles/system/concise.md` (Concise 출력 스타일 문구). 단순화 근거: 이 plan 의 단위 표에서 system.md 를 가진 단위는 c20-concise-priority 뿐이며, 두 사본은 한쪽만 고치면 갈라진다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "**`YAGNI`** — ... 한 번만 쓰는 추상화, 요청하지 않은 설정, 일어날 수 없는 상황의 처리는 요청 범위 밖으로 보고 빼라.",
+      "principle": "YAGNI",
+      "consequence": "plan 은 concise.md 와 단위의 system.md 를 함께 만들게 되어 있다."
+    },
+    {
+      "where": "Task 1 Interfaces 의 '생성 키에 `system.md` 내용을 포함해 다른 단위의 결과와 섞이지 않게 하라'",
+      "type": "risk",
+      "claim": "system.md 가 없을 때 생성 키가 지금과 같아야 한다는 조건이 없다. gen_key 에 system 해시를 무조건 붙이면(빈 문자열 해시 포함) 기존 gen.jsonl 의 키가 모두 맞지 않게 된다. 그러면 기존 단위는 report 에서 '미완'이 되고, 다시 실행하면 2026-10-18 의 생성 560건이 재생성된다. 이 재생성은 '같은 질문은 같은 조건으로 한 번만' 제약을 어기고, 생성 하나 0.13달러 기준으로 약 73달러가 든다. 완화책은 'system.md 가 없으면 키는 지금 그대로'를 Interfaces 와 Step 1 시험에 적는 것이다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "단위 폴더의 `system.md` 가 있으면 그 단위의 모든 생성 호출에 `--append-system-prompt <내용>` 을 붙인다. 생성 키에 `system.md` 내용을 포함해",
+      "counterpart_file": "scripts/_eval_clause.py",
+      "counterpart": "def gen_key(case, cond_text):\n    return _sha(case[\"prompt\"]) + \"-\" + _sha(cond_text)",
+      "principle": "REVERSIBLE",
+      "consequence": "Step 1 의 시험은 'system.md 가 있으면 생성 키가 달라진다'만 고정하고, 없을 때 키가 그대로인지는 고정하지 않는다."
+    },
+    {
+      "where": "Task 2 Step 2 의 승격 지시와 Task 3 의 `COUNT-EARNS` criteria.md 수정 지시",
+      "type": "risk",
+      "claim": "과제 선택은 단위 이름이 아니라 조항 ID 로 이루어진다. 그래서 p12 과제를 dev 로 승격하거나 COUNT-EARNS criteria.md 를 고치면, 같은 ID 를 가진 다른 단위도 함께 바뀐다. 2026-10-18 단위(SUBJECT-OBJECT·VOCAB-PREF·COUNT-EARNS)와 같은 조항의 다른 c20 변경안이 그 대상이다. 그 단위의 report 는 '미완'이 되거나 판정이 다시 계산된다. 'Step 1·2 를 그 단위로만 다시 실행하라'를 따르면, 함께 바뀐 단위들은 미완인 채 남는다. 완화책은 승격·기준 변경이 영향을 주는 단위 목록을 그 Step 에 적고, 그 단위들을 함께 다시 실행하거나 기록된 판정을 커밋 시점 값으로 고정하는 것이다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "`tags: [dev]` 로 승격해 커밋하고 Step 1·2 를 그 단위로만 다시 실행하라.",
+      "counterpart_file": "scripts/_eval_clause.py",
+      "counterpart": "def judge_key(gk, criteria, model=None): ... return gk + \"-\" + _sha(criteria + \"\\0\" + (model or JUDGE_MODEL))",
+      "principle": "NO-ASSUME",
+      "consequence": "questions() 는 dev 태그와 clause 교집합으로 과제를 고르고, judge_key 는 criteria 내용을 포함한다."
+    },
+    {
+      "where": "Task 3 의 '`c20-edit-priority` 의 과제는 `EDIT-PRIORITY` 의 기존 과제 각각에, 그 과제의 초안에 대한 형식 경고 문구와 위반 줄 보고를 덧붙인 변형을 만들어 쓴다' 문단",
+      "type": "failure-mode",
+      "claim": "이 변형 과제는 조항 문안이 아니라 프롬프트에 든 경고를 잰다. 두 조건이 모두 프롬프트에서 위반 줄을 직접 받으므로 양쪽이 그 줄을 고쳐 천장 효과로 동률이 된다. 또 변경안은 '직접 다시 찾지 마라'고 지시하지만, 기존 EDIT-PRIORITY 기준은 공통 조항 위반을 다시 검출했는지를 본다. 그래서 변경안이 지시를 따를수록 위반으로 판정되는 구조다. 그 밖에도 빈칸이 셋 있다. 초안을 누가 쓰는지가 없고, 변형 과제의 tags·폴더가 Files 에 없으며, 기존 과제가 dev 인 채로 함께 뽑히는지도 정해 있지 않다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "문자열로 잡히는 위반은 검사기가 찾으므로 직접 다시 찾지 마라.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "**`EDIT-PRIORITY`** — 글을 다 쓰면 전달하기 전에 「공통」 조항의 위반을 다시 검출해 고쳐라.",
+      "principle": "CHECKABLE",
+      "consequence": "Task 3 Files 에는 변형 과제의 생성이 없고, criteria 를 바꾸라는 지시는 COUNT-EARNS 에만 있다."
+    },
+    {
+      "where": "Task 1 Step 4 의 '과제 하나로 실행하라'와 '`c20-smoke` 폴더는 지우고 그 결과 줄은 남겨라'",
+      "type": "failure-mode",
+      "claim": "도구에는 과제를 하나로 좁히는 수단이 없다. 그래서 이 지시를 따르려면 실행 세션이 도구에 선택 인자를 더하는 범위 밖 변경을 하게 된다. 지시를 따르지 않으면 BULLET-SCOPE dev 과제 5개가 모두 생성된다. check_units 도 3개 미만을 오류로 낸다. 또 current 와 new 가 같은 문안이라, 남긴 결과 줄은 어느 단위의 비교에도 쓰이지 않는다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "`current.md`(2026-10-18 `BULLET-SCOPE` 줄), `new.md`(같은 줄), `ids`(`BULLET-SCOPE`), `base`(`6b90dd4`)를 임시로 만들고 과제 하나로 실행하라.",
+      "counterpart_file": "scripts/_eval_clause.py",
+      "counterpart": "if len(qs) < 3 or kinds != {\"should\", \"should-not\"}:",
+      "principle": "YAGNI",
+      "consequence": "eval_clause.sh 의 인자는 단위 이름뿐이고, 과제는 questions() 가 조항 ID 로 모두 고른다."
+    },
+    {
+      "where": "Task 5 Step 2 의 '그렇지 않으면 그 목록 전체를 산문 문단으로 바꿔라'와 '글자 그대로 두어라' 목록, Files 의 `skills/lens-*/SKILL.md`",
+      "type": "failure-mode",
+      "claim": "렌즈 SKILL.md 의 「체크리스트」 항목은 여러 문장짜리 라벨 불릿이라 check() 에 걸린다. 이 목록을 산문으로 바꾸면 드리프트 검사가 본문의 축 이름을 뽑지 못한다. 그 검사는 `- **축**` 줄에서 축을 뽑아 `- system:` 프롬프트가 축을 부르는지 대조하는데, 축이 비면 continue 로 건너뛴다. 그래서 검사가 ALL PASS 를 내면서 축 대조가 사라진다. 이 축 라벨 형식은 Step 2 의 보존 목록(절 제목·소유 선언·조항 ID·포인터)에 없다. 또 렌즈는 이 SKILL.md 를 직접 읽고 '체크리스트를 항목마다 따로 검토'하므로, 체크리스트의 항목 구조는 렌즈의 동작 지시다. 완화책은 렌즈의 「체크리스트」 절을 첫 번째 형태(라벨과 첫 문장을 남기는 형태)로만 고치게 한정하는 것이다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "스킬과 CLAUDE.md 의 절 제목, 소유 선언 문장(\"…은 여기가 소유한다\"), 조항 ID 와 포인터 문장은 글자 그대로 두어라.",
+      "counterpart_file": "scripts/test_docs_drift.sh",
+      "counterpart": "AXES=\"$(awk '/^## 체크리스트/{f=1;next} f&&/^## /{exit} f&&/^- \\*\\*/{print}' \"$L\" ...)\"\n  [ -z \"$AXES\" ] && continue",
+      "principle": "NO-ASSUME",
+      "consequence": "Task 5 의 Files 에 lens-consistency·lens-adversarial·lens-fit·lens-readability 의 SKILL.md 가 들어 있고, Step 3 의 확인은 check() 0건과 ALL PASS 뿐이다."
+    },
+    {
+      "where": "Task 5 Step 2 의 보존 목록",
+      "type": "risk",
+      "claim": "Task 6 Step 2 는 front matter description 의 발동 낱말을 바꾸지 말라고 적는다. 그러나 스킬 17개를 고치는 Task 5 에는 같은 보존 지시가 없다. Task 5 에는 본문의 '연다'·'실행한다' 같은 지시 문장을 바꾸지 말라는 지시도 없다. 라벨 불릿을 산문으로 옮기면서 문장을 다시 쓰면 지시의 조건과 순서가 바뀔 수 있고, ALL PASS 는 이를 잡지 않는다. 완화책은 Task 6 Step 2 의 description 보존 문장을 Task 5 Step 2 에도 두고, 문장을 옮기기만 하고 다시 쓰지 말라고 적는 것이다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "라벨 불릿은 뜻을 바꾸지 말고 두 형태 중 하나로 고쳐라.",
+      "counterpart_file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "counterpart": "스킬 설명(front matter `description`)의 발동 낱말은 바꾸지 마라. 발동 낱말을 바꾸면 스킬 선택이 달라지기 때문이다.",
+      "principle": "REVERSIBLE",
+      "consequence": "CLAUDE.md 「변경 뒤 실행」은 문서 대조 검사가 문장을 그대로 찾지 않는다고 적고 있으므로, 문장 재작성은 검사에 걸리지 않는다."
+    },
+    {
+      "where": "Task 7 Step 1 의 '병합은 이 PC 의 모든 프로젝트 세션에 원칙과 훅을 바꾸어 싣는다' 문장과 Global Constraints 의 'push 하지 마라'",
+      "type": "irreversible",
+      "claim": "세션에 실리는 원칙과 훅은 GitHub 마켓플레이스(chshin84/disciplined-coder)의 main 에서 온다. 이 마켓플레이스는 autoUpdate 이고, 설치된 캐시 해시 2fa22d3 은 지금의 main 과 같다. 그래서 로컬 main 에 병합해도 세션은 바뀌지 않는다. 세션을 바꾸는 비가역 단계는 push 인데, Global Constraints 는 push 를 금지한다. 따라서 Task 7 은 목표를 이루지 못하거나, 실행 세션이 제약을 어기고 push 하게 된다. 사용자 승인도 실제로 비가역인 push 가 아니라 로컬 병합에 대해 받게 된다. 완화책은 Step 1 문장을 사실대로 고치는 것이다. 그리고 push 를 할지는 별도 결정으로 사용자에게 물어야 한다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "병합은 이 PC 의 모든 프로젝트 세션에 원칙과 훅을 바꾸어 싣는다. 실행 전에 바뀌는 조항 목록과 훅 동작을 사용자에게 보이고 승인을 받아라.",
+      "counterpart_file": "~/.claude/plugins/known_marketplaces.json",
+      "counterpart": "\"chshin-tools\": { \"source\": { \"source\": \"github\", \"repo\": \"chshin84/disciplined-coder\" }, ... \"autoUpdate\": true }",
+      "principle": "REVERSIBLE",
+      "consequence": "plan 에는 push 단계가 없고, 승인 대상은 로컬 병합과 보존 태그·plan 삭제뿐이다."
+    },
+    {
+      "where": "Task 7 Step 2 와 Step 3",
+      "type": "irreversible",
+      "claim": "되돌리기 방법이 적혀 있지 않다. 병합 전 main 해시를 적어 두라는 지시가 없다. 병합 뒤 ALL PASS 가 실패하거나 사용자가 철회할 때의 처리도 없다. 그 처리는 push 전이면 그 해시로 되돌리고 push 뒤면 `git revert -m 1` 하는 것이다. 또 Step 3 은 plan 파일을 지우는 커밋을 main 에 쌓는다. 그 커밋은 병합 커밋 위에 놓이므로 병합만 되돌리기가 한 단계 더 복잡해진다. 완화책은 병합 전 main 해시를 기록하고, ALL PASS 실패 시 그 해시로 돌아가는 지시를 Step 2 에 두는 것이다.",
+      "file": "docs/superpowers/plans/2026-10-21-clause-measurement-and-merge.md",
+      "evidence": "Expected: 충돌 없음. 충돌이 있으면 `git merge --abort` 로 되돌리고 사용자에게 알려라. 병합 뒤 전체 테스트를 다시 실행해 `ALL PASS` 를 확인하라.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "**`REVERSIBLE`** — 되돌리기 어려운 결정은 그 근거를 남기고 사용자에게 물어라.",
+      "principle": "REVERSIBLE",
+      "consequence": "plan 은 충돌만 되돌리고, 병합 뒤 테스트 실패는 확인만 하고 처리는 정하지 않는다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "CHECKABLE",
+    "EVIDENCE-FIRST",
+    "REVERSIBLE",
+    "YAGNI",
+    "OTHER-SESSIONS",
+    "WRITTEN-ONLY",
+    "SUBJECT-OBJECT",
+    "COUNT-EARNS"
+  ],
+  "notes": "검토한 관점은 체크리스트의 다섯 항목이다. 측정 설계, 도구 변경, Task 5 문서 정리, Task 7 병합, 과설계를 차례로 보았다.\n\n같은 조항의 세 변경안이 current 를 공유하는 생성 재사용은 비용 면에서는 맞게 동작한다. plan_jobs 의 seen 집합과 gen_key 가 이를 보장한다. 이 재사용의 위험은 통계적 상관이며, 그것은 다중 비교 발견에 담았다.\n\nbase 파일과 pool 태그는 생성 키에 들어가지 않는다. base 는 check_units 에만 쓰이고 tags 는 gen_key 에서 빠지므로, 이 둘이 생성 결과를 섞지는 않는다. 섞일 위험은 system.md 에만 있다.\n\ncheck_units 의 줄 검사는 `line not in baseline`, 곧 파일 전체에 대한 부분 문자열 검사다. 그래서 c20-concise-priority 의 우선권 문장도 base 검사를 통과한다.\n\nmain 은 feat/clause-candidates 의 조상이다(feat..main 커밋 0개). 따라서 지금은 충돌이 없다. 다만 dc-nested-large-dev·dc-verifier-tier worktree 의 다른 세션이 Task 7 전에 main 을 움직일 수 있으므로, Step 2 직전에 다시 확인해야 한다. 그 세션들은 OTHER-SESSIONS 대상이라 이 렌즈는 확인하지 않았다.\n\nmain 저장소 폴더 D:/projects/disciplined-coder 는 8b4a05a 의 feat/clause-strengthening 에 있다. 그 폴더에 미추적 리뷰 원본이 있음을 git status 로 확인했다. plan 이 그 폴더에서 병합하지 않게 한 것은 맞다.\n\n더 확인할 것은 두 가지다. 하나는 TERM-EXPLAIN·BULLET-SCOPE 과제의 criteria.md 가 실제로 무엇을 위반으로 세는지다. 이를 확인해야 '잡음만 더한다'는 판단의 정도를 정할 수 있는데, 이 렌즈는 criteria 본문을 열지 않았다. 다른 하나는 2026-10-12 tasks.json 원본의 과제 수다. 이 렌즈는 첫 두 과제가 있는지 확인하지 않았다."
+}
