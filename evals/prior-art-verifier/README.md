@@ -17,6 +17,8 @@
 
 ## 실행 명령
 
+실행기는 단계와 설정마다 한 번씩 실행하고, 집계기는 결과를 모아 `results/report.md` 를 쓴다.
+
 ```bash
 python -I evals/prior-art-verifier/run.py --stage <baseline-cite|baseline-map|extract|judge|map> --model <ID> --effort <low|medium|high> [--category <코드>] [--extract-from <경로>] [--repeat <n>]
 python -I evals/prior-art-verifier/score.py report
