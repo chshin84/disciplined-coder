@@ -354,6 +354,7 @@ def report_v2(base_path, def_path, replay_path, cases_path, out_path):
          "이 파일은 `python -I evals/prior-art-verifier/score.py report-v2` 가 만든다. 용어는 "
          "`docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md` 「용어」를 따른다.", "",
          "## 병합 조건", "",
+         f"새 구성은 비용 조건을 {'충족했고' if cond1 else '채우지 못했고'}, 항목 조건을 {'충족했다' if cond2 else '채우지 못했다'}.", "",
          f"- 비용 조건(새 구성의 실행마다 비용이 기준선의 어느 실행보다 낮다): {'충족' if cond1 else '미충족'}. "
          f"새 구성 {', '.join(f'${c:.4f}' for c in new_cost)}, 기준선 {', '.join(f'${c:.4f}' for c in base_cost)}.",
          f"- 항목 조건(기준선이 두 실행 모두 맞힌 항목은 새 구성도 두 실행 모두 맞힌다): {'충족' if cond2 else '미충족'}. "
@@ -361,7 +362,8 @@ def report_v2(base_path, def_path, replay_path, cases_path, out_path):
          f"({', '.join(k for k in base_ok if k not in compared) or '없음'}).", "",
          "## 기준선이 맞힌 항목 중 새 구성이 틀린 항목", ""]
     if failing:
-        L += ["| 항목 | 정답 | 기준선 판정 | 새 구성 판정 | 판정 원본(수치·조건/방향/범위) |", "|---|---|---|---|---|"]
+        L += ["아래 표의 항목은 기준선이 두 실행 모두 맞혔고 새 구성이 한 번 이상 틀렸다.", "",
+              "| 항목 | 정답 | 기준선 판정 | 새 구성 판정 | 판정 원본(수치·조건/방향/범위) |", "|---|---|---|---|---|"]
         for k in failing:
             if k in items:
                 cells = " ; ".join("/".join(str((j or {}).get(c)) for c in run.JUDGE_CELLS) if j else "없음" for j in raw[k])
@@ -390,7 +392,8 @@ def report_v2(base_path, def_path, replay_path, cases_path, out_path):
     vf = [(i, REPEATS[k], raw[i][k]) for i in items for k in range(len(REPEATS)) if new_v[i][k] == "verify_failed"]
     L += ["## 새 구성의 검증 실패", ""]
     if vf:
-        L += ["| 항목 | 실행 | 판정 원본(수치·조건/방향/범위) | 다른 칸에 불일치 |", "|---|---|---|---|"]
+        L += ["아래 표는 최종 판정이 verify_failed 인 항목과 실행이다.", "",
+              "| 항목 | 실행 | 판정 원본(수치·조건/방향/범위) | 다른 칸에 불일치 |", "|---|---|---|---|"]
         for i, rep, j in vf:
             cells = "/".join(str((j or {}).get(c)) for c in run.JUDGE_CELLS) if j else "없음"
             L.append(f"| {i} | {rep} | {cells} | {_yn(j and '불일치' in [j.get(c) for c in run.JUDGE_CELLS])} |")
@@ -398,6 +401,7 @@ def report_v2(base_path, def_path, replay_path, cases_path, out_path):
         L.append("없다.")
 
     L += ["", "## 어려운 항목", "",
+          "칸의 값은 실행 1·2 의 결과이고, 판정 불가로 넘김과 틀리게 확신함은 상향 전 판정 원본으로 센다.", "",
           "| 항목 | 종류 | 정답 | 기준선 맞힘 | 새 구성 맞힘 | 판정 불가로 넘김 | 틀리게 확신함 |", "|---|---|---|---|---|---|---|"]
     hard = [x for x in cases["items"] if "hard_kind" in x]
     for x in hard:
@@ -405,7 +409,8 @@ def report_v2(base_path, def_path, replay_path, cases_path, out_path):
         L.append(f"| {i} | {x['hard_kind']} | {'참' if x['truth'] else '오류'} | {', '.join(map(_yn, base_ok[i]))} | "
                  f"{', '.join(map(_yn, new_ok[i]))} | {', '.join(_yn(handed_over(j)) for j in raw[i])} | "
                  f"{', '.join(_yn(confident_wrong(j, x['truth'])) for j in raw[i])} |")
-    L += ["", "### 판정 에이전트 노력 수준별 비교(실행 1, 병합 판정에 쓰지 않는다)", "",
+    L += ["", "## 판정 에이전트 노력 수준별 비교", "",
+          "이 비교는 실행 1 의 추출 출력으로 어려운 항목만 판정한 결과이며 병합 판정에 쓰지 않는다.", "",
           "| 수준 | 판정한 어려운 항목 | 판정 불가로 넘김 | 틀리게 확신함 | 비용(USD) |", "|---|---|---|---|---|"]
     for eff in ("low", "medium", "high"):
         cfg = f"claude-haiku-5-5/{eff}"
@@ -419,13 +424,14 @@ def report_v2(base_path, def_path, replay_path, cases_path, out_path):
         L.append(f"| {eff} | {len(js)} | {', '.join(x['id'] for x, j in js if handed_over(j)) or '없음'} | "
                  f"{', '.join(x['id'] for x, j in js if confident_wrong(j, x['truth'])) or '없음'} | {cost:.4f} |")
     L += ["", "high 의 비용은 어려운 항목 URL 의 판정 실행만 합한 값이다.", "",
-          "### 판정 불가 이유 유형", "", "| 단계·설정 | 이유 유형별 개수 |", "|---|---|"]
+          "## 판정 불가 이유 유형", "",
+          "판정 불가 칸마다 이유 유형을 셌다. 이유 유형이 빠진 칸은 '(이유 없음)' 으로 센다.", "", "| 단계·설정 | 이유 유형별 개수 |", "|---|---|"]
     for stage, cfg in (("judge-def", "claude-haiku-5-5/low"), ("judge-def", "claude-haiku-5-5/medium"),
                        ("judge-def", HAIKU_HIGH), ("escalate-def", SONNET_HIGH)):
         rc = _reason_counts(drows, stage, cfg)
         L.append(f"| {stage} {cfg} | {', '.join(f'{k} {v}' for k, v in sorted(rc.items())) or '없음'} |")
 
-    L += ["", "## 상향 비율", "", "| 실행 | 판정한 주장 | 판정 불가로 넘김 | 상향 판정을 받음 | 비율 |", "|---|---|---|---|---|"]
+    L += ["", "## 상향 비율", "", "비율은 판정한 주장 중 판정 불가로 넘긴 주장의 비율이다.", "", "| 실행 | 판정한 주장 | 판정 불가로 넘김 | 상향 판정을 받음 | 비율 |", "|---|---|---|---|---|"]
     for k, rep in enumerate(REPEATS):
         judged = [i for i in items if raw[i][k]]
         handed = [i for i in judged if handed_over(raw[i][k])]
@@ -433,7 +439,7 @@ def report_v2(base_path, def_path, replay_path, cases_path, out_path):
         L.append(f"| {rep} | {len(judged)} | {len(handed)} ({', '.join(handed) or '없음'}) | {len(got)} | "
                  f"{(len(handed) / len(judged) if judged else 0):.1%} |")
 
-    L += ["", "## 단계별 비용", "", "| 단계 | 설정 | 실행 1 | 실행 2 |", "|---|---|---|---|"]
+    L += ["", "## 단계별 비용", "", "비용은 단계·설정·실행마다 오류 없는 마지막 줄의 total_cost_usd 를 합한 값이다.", "", "| 단계 | 설정 | 실행 1 | 실행 2 |", "|---|---|---|---|"]
     for s, c in BASE_STAGES:
         L.append(f"| {s} | {c} | " + " | ".join(f"{_stage_cost(brows, s, c, rep):.4f}" for rep in REPEATS) + " |")
     for s, c in NEW_STAGES:
