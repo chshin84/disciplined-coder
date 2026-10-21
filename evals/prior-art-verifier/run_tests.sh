@@ -58,7 +58,7 @@ FAKE_MODE=mismatch $RUN --cases "$mini" --stage extract --model m --effort low -
 check "test_model_mismatch_flagged" "grep -q '모델 불일치' '$mm'"
 
 echo "== 집계기"
-for t in test_missing_judgment_is_failure test_no_quote_excluded test_unverifiable_counts_as_rejection test_zero_noise test_noise_tolerance test_failures_block_selection test_select_extract_single test_map_scoring test_xhigh_effort_allowed; do
+for t in test_missing_judgment_is_failure test_no_quote_excluded test_unverifiable_counts_as_rejection test_zero_noise test_noise_tolerance test_failures_block_selection test_select_extract_single test_map_scoring test_xhigh_effort_allowed test_judge_borrows_true_quote; do
   check "$t" "$PY -I '$HERE/harness_tests.py' $t 2>/dev/null"
 done
 echo "PASS=$pass FAIL=$fail"

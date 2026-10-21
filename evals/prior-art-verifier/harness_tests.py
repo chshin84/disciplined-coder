@@ -114,6 +114,23 @@ def test_xhigh_effort_allowed():
     assert score._order("claude-haiku-5-5/xhigh", 0) < score._order("claude-sonnet-5-5/low", 0)
 
 
+
+def test_judge_borrows_true_quote():
+    """오류 항목에 자기 구절이 없으면 같은 출처·같은 카테고리의 짝 참 항목(-tN ↔ -fN) 구절로 판정한다."""
+    import score
+    cases = {"items": [
+        {"id": "dir-t1", "category": "direction", "url": "u1", "claim": {"ref": "dir-t1", "text": "a"}, "truth": True, "check_note": "n"},
+        {"id": "dir-f1", "category": "direction", "url": "u1", "claim": {"ref": "dir-f1", "text": "b"}, "truth": False, "check_note": "n"}],
+        "map_cases": []}
+    frozen = {("u1", "dir-t1"): {"quote": "Q", "context": "C"}, ("u1", "dir-f1"): {"quote": "", "context": ""}}
+    us = run.units(cases, "judge", "direction", frozen)
+    refs = {c["ref"]: c for _, p in us for c in p["claims"]}
+    assert refs["dir-f1"]["quote"] == "Q" and refs["dir-f1"]["text"] == "b"
+    runs = [_run("judge", "h", "low", "u1", [{"ref": "dir-t1", "match": "일치"}, {"ref": "dir-f1", "match": "일치"}])]
+    r = score.score(cases, runs, "judge", "direction", frozen=frozen)["h/low"][0]
+    assert r["excluded"] == [] and r["missed_errors"] == 1
+
+
 if __name__ == "__main__":
     try:
         globals()[sys.argv[1]]()

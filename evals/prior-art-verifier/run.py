@@ -85,6 +85,15 @@ def load_extract(path):
     return m
 
 
+def judge_source(item, extract):
+    """판정 단계에 넘길 추출 판정을 고른다. 자기 구절이 없는 오류 항목(-fN)은 같은 출처의 짝 참 항목(-tN) 구절을 쓴다.
+    추출 단계가 오류 주장의 구절을 찾지 못하면 판정 에이전트의 오류 탐지를 잴 수 없어서다(2026-10-21 판정)."""
+    own = extract.get((item["url"], item["id"])) or {}
+    if own.get("quote") or item["truth"] or "-f" not in item["id"]:
+        return own
+    return extract.get((item["url"], item["id"].replace("-f", "-t"))) or own
+
+
 def units(cases, stage, category, extract):
     """(unit, payload) 목록을 만든다. cite 계열은 URL 마다, map 계열은 지도 대조 자료마다 하나다."""
     if stage in ("baseline-map", "map"):
@@ -94,8 +103,8 @@ def units(cases, stage, category, extract):
         if stage == "judge":
             if x["category"] != category:
                 continue
-            e = extract.get((x["url"], x["id"]))
-            if not e or not e.get("quote"):
+            e = judge_source(x, extract)
+            if not e.get("quote"):
                 continue
             by_url.setdefault(x["url"], []).append(
                 {"ref": x["id"], "text": x["claim"]["text"], "quote": e["quote"], "context": e.get("context", "")})

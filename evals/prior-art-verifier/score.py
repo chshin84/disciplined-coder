@@ -7,6 +7,9 @@ import json
 import os
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import run  # noqa: E402
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 EXTRACT_CATS = ("access", "exists", "quote")
 JUDGE_CATS = ("numbers_conditions", "direction", "scope")
@@ -65,7 +68,7 @@ def score(cases, runs, stage, category, frozen=None):
             for x in cases["items"]:
                 if x["category"] != category:
                     continue
-                if stage == "judge" and not (frozen.get((x["url"], x["id"])) or {}).get("quote"):
+                if stage == "judge" and not run.judge_source(x, frozen).get("quote"):
                     s["excluded"].append(x["id"])
                     continue
                 r = latest.get((m, e, rep, x["url"]))
