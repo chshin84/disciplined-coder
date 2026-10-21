@@ -1,0 +1,153 @@
+{
+ "target": "docs/domain-discipline.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "CLAUDE.md",
+  "scripts/test_docs_drift.sh",
+  "hooks/_banned_words.sh",
+  "hooks/_spec_marker.sh",
+  "hooks/readonly_pretooluse.sh",
+  "hooks/doc_review_posttooluse.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/_eval_lib.py",
+  "scripts/test_eval_cases.sh",
+  "skills/dispatching-lenses/SKILL.md",
+  "evals/principles/README.md"
+ ],
+ "issues": [
+  {
+   "where": "머리말 둘째 문단",
+   "type": "contradiction",
+   "claim": "`CHECKABLE` 의 셋을 사용자와 합의한 현행 수치로 적었으나 현행 원칙은 단계 둘 이상을 기준으로 삼는다. 같은 문서의 `CHECKABLE` 절도 둘 이상으로 바뀌었다고 적어 머리말만 옛 값이다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "조항에 적힌 수치 중 사소한 작업의 경계(파일 하나, 20줄), `NO-FLEET` 의 파일 10개, `CHECKABLE` 의 셋은",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "단계가 둘 이상이면 각 단계 문장 안에 확인 방법을 함께 써라",
+   "principle": "CHECKABLE",
+   "consequence": "머리말이 2026-09-24 합의 값 셋을 현행 수치로 소개하고 있고, 원칙의 현행 기준은 둘이다."
+  },
+  {
+   "where": "`SUB-ORCHESTRATE` 절 첫 문단",
+   "type": "contradiction",
+   "claim": "'지금 문구'로 brainstorming 분해 시점과 설계 승인 뒤 plan 전 두 시점의 문장을 인용하나, 현행 원칙 조항은 독립된 하위 프로젝트 둘 이상이면 설계 문서 유무와 무관하게 판단하게 하는 문구다. 같은 절 끝에서 문구를 바꿨다고 적지만 앞 문단의 '지금'은 고치지 않았다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "지금 문구는 \"superpowers brainstorming을 따르다가 개발을 하위 프로젝트로 분해하기로",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "개발 작업이 서로 독립된 하위 프로젝트 둘 이상으로 나뉘면, 설계 문서가 있든 없든 구현에 들어가기 전에 `nested-orchestration`으로 서브에이전트에 맡길지 판단하라.",
+   "principle": "SUB-ORCHESTRATE",
+   "consequence": "절의 첫 문단이 '지금 문구'라고 적은 인용은 현행 조항 문안과 다르다."
+  },
+  {
+   "where": "`LABEL-NOUN` 절",
+   "type": "mismatch",
+   "claim": "이 절은 라벨 규칙에 다이어그램 노드 포함과 이음말 금지가 있고 문구가 바뀌지 않았다고 적으나, 현행 `LABEL-NOUN` 조항에는 그 두 내용이 없다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "다이어그램 노드도 이름표에 들고, 라벨에 '오히려' 같은",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "라벨은 대상과 방향이 드러나는 명사구로 써라(예: '해당 상태' 대신 '금리 상승기').",
+   "principle": "LABEL-NOUN",
+   "consequence": "근거 절이 설명하는 규칙 내용과 원칙 조항의 내용이 일치하지 않는다."
+  },
+  {
+   "where": "`TITLE-PROOF` 절 둘째 문단",
+   "type": "mismatch",
+   "claim": "'제목과 부딪히는 근거는 같은 곳에 남겨라' 문장을 조항에 있는 것처럼 설명하나 현행 `TITLE-PROOF` 조항에는 그 문장이 없고, 분석에서 뺀 대상과 기준을 같은 절에 밝히라는 문장이 있다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "\"제목과 부딪히는 근거는 같은 곳에 남겨라\"는 리뷰에서 추가했다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "분석에서 뺀 대상이 있으면 뺀 대상과 기준을 같은 절에 밝혀라.",
+   "principle": "TITLE-PROOF",
+   "consequence": "근거 절이 설명하는 문장이 현행 조항에 없고, 바뀌었다는 표시도 이 문단에 없다."
+  },
+  {
+   "where": "`TITLE-CLAIM` 절 첫 문단",
+   "type": "mismatch",
+   "claim": "흐리는 서술어를 금지하는 문장을 불확실성 문장과 함께 둔다고 적으나, 현행 `TITLE-CLAIM` 조항에는 흐리는 서술어를 금지하는 문장이 없다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "흐리는 서술어를 금지하는 문장과 불확실성을 지우지 말라는",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "본문의 가정과 불확실성은 제목에 남겨라.",
+   "principle": "TITLE-CLAIM",
+   "consequence": "근거 절이 함께 둔다는 두 문장 가운데 하나가 현행 조항에 없다."
+  },
+  {
+   "where": "`ASYNC-FIRST` 절 첫 문단",
+   "type": "unsupported",
+   "claim": "순차 334초와 동시 219초와 프로그램 시작 64밀리초의 실측을 이 문서가 근거로 들고, 저장소 CLAUDE.md 는 그 실측이 이 문서에 있다고 되돌려 가리킨다. 두 문서 어디에도 원자료가 없다.",
+   "file": "docs/domain-discipline.md",
+   "evidence": "이 PC에서 검사 다섯 벌을 차례로 실행하면 334초, 동시에 실행하면 219초였다.",
+   "counterpart_file": "CLAUDE.md",
+   "counterpart": "동시에 실행하면 전체 시간이 줄어든다(실측은 `domain-discipline.md`의 `ASYNC-FIRST` 절).",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "수치의 출처가 두 문서 사이에서 서로를 가리킬 뿐이어서 수치를 다시 확인할 기록이 저장소에 없다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "NO-ASSUME",
+   "statement": "측정 전에 물어야 하는 기준인 10분은 사용자가 2026-10-12에 정한 값이다",
+   "evidence": "측정 전에 물어야 하는 기준인 10분은 사용자가 2026-10-12에 정한 값이다"
+  },
+  {
+   "topic": "SUB-ORCHESTRATE",
+   "statement": "기준과 실행 방법은 `nested-orchestration` 이 소유한다",
+   "evidence": "기준과 실행 방법은 `nested-orchestration` 이 소유한다"
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "기준과 실행 방법은 `nested-orchestration` 이 소유한다",
+   "evidence": "기준과 실행 방법은 `nested-orchestration` 이 소유한다"
+  },
+  {
+   "topic": "TITLE-CLAIM",
+   "statement": "40자는 16:9 슬라이드 24pt 두 줄에 들어가는 값으로 추정한 가정이며",
+   "evidence": "40자는 16:9 슬라이드 24pt 두 줄에 들어가는 값으로 추정한 가정이며"
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "어느 렌즈를 언제 실행하는지는 dispatching-lenses가 맡는다",
+   "evidence": "`dispatching-lenses`가 맡게 하라고 정했다"
+  },
+  {
+   "topic": "agent-prior-art",
+   "statement": "제안과 승인 규칙은 `agent-prior-art`의 「발동과 기록」이 정한다",
+   "evidence": "제안과 승인 규칙은 `agent-prior-art`의 「발동과 기록」이 정한다"
+  },
+  {
+   "topic": "LENS-ALLOWED",
+   "statement": "허가는 LENS-ALLOWED가 정하고 어느 렌즈가 승인을 요구하는지는 렌즈 호출 절차가 정한다",
+   "evidence": "허가는 이 조항이, 어느 렌즈가 승인을"
+  },
+  {
+   "topic": "DOC-TYPE",
+   "statement": "표의 그 칸은 저장소 `CLAUDE.md` 가 소유한다",
+   "evidence": "표의 그 칸은 저장소 `CLAUDE.md` 가 소유한다"
+  },
+  {
+   "topic": "TELL-NOW",
+   "statement": "미룬 항목은 `TELL-NOW` 한 곳에서 규정한다.",
+   "evidence": "미룬 항목은 `TELL-NOW` 한 곳에서 규정한다."
+  },
+  {
+   "topic": "TOP-DOWN",
+   "statement": "이 조항은 사용자와 결정을 확정하는 순서만 정한다.",
+   "evidence": "이 조항은 사용자와 결정을 확정하는 순서만 정한다."
+  },
+  {
+   "topic": "EDIT-PRIORITY",
+   "statement": "그래서 분량과 구조가 먼저이고 낱말이 마지막이다.",
+   "evidence": "그래서 분량과 구조가 먼저이고 낱말이 마지막이다."
+  }
+ ],
+ "principles_applied": [
+  "CHECKABLE",
+  "SUB-ORCHESTRATE",
+  "LABEL-NOUN",
+  "TITLE-PROOF",
+  "TITLE-CLAIM",
+  "EVIDENCE-FIRST"
+ ],
+ "notes": "누락·모순·환각·불일치를 따로 검토했다. 인용된 훅·스크립트·spec·review·보존 태그·시험 단위 폴더는 모두 실재했고, 원칙의 모든 조항 ID가 근거 절을 갖는다(test_docs_drift 계약). 지적은 원칙 문안이 이후 바뀌었는데 근거 절의 설명이 따라가지 않은 곳이다. 이 문서는 조항 문안 줄이 아니라서 클린룸 시험 제약은 해당하지 않는다. 이 문서 밖 실측 수치(334초·219초·64밀리초)의 원자료는 찾지 못했다. 확인 방법은 그 실측을 한 세션 기록을 찾아 경로를 적는 것이다."
+}

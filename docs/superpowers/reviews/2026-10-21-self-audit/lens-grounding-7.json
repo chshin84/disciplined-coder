@@ -1,0 +1,129 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/audit-repo-docs/SKILL.md",
+ "read": [
+  "skills/audit-repo-docs/SKILL.md",
+  "scripts/audit_targets.sh",
+  "scripts/audit_evidence.sh",
+  "scripts/audit_rounds.sh",
+  "scripts/audit_prior_rounds.sh",
+  "scripts/audit_verify.sh",
+  "scripts/_audit_common.sh",
+  "scripts/test_audit.sh",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "hooks/_spec_marker.sh",
+  "agent-principles.md"
+ ],
+ "issues": [
+  {
+   "where": "차수 대조 절 첫 문단",
+   "type": "contradiction",
+   "claim": "같은 문단이 대조 대상을 앞선 diff.json 전체로 적고, 다른 문장에서는 잔존으로 적힌 항목을 대조 대상에서 뺀다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "대조 대상은 앞선 차수 `findings.json`의 발견 전부(기각 포함)와 앞선 `diff.json`이다.",
+   "counterpart_file": "skills/audit-repo-docs/SKILL.md",
+   "counterpart": "직전 `diff.json`이 잔존으로 적었지만 직전 차수의 렌즈가 다시 올리지 않은 항목은 대조 대상이 아니다.",
+   "principle": "audit-repo-docs",
+   "consequence": "「차수 대조」 첫 문장이 앞선 diff.json 을 통째로 대조 대상이라 적고 같은 절의 뒤 문장은 diff.json 의 잔존 항목을 대상에서 뺀다. scripts/audit_rounds.sh 는 앞선 diff 항목 중 verdict 가 '해소'인 것만 가져온다.",
+   "lens": "lens-grounding"
+  },
+  {
+   "where": "기계가 하는 것 · 중복 제거",
+   "type": "unsupported",
+   "claim": "같은 지문의 발견을 기계가 합친다고 적었으나 이를 실행하는 스크립트가 없다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "같은 지문이면 같은 발견이다. 문자열 비교로 끝나므로 에이전트를 실행하지 않는다.",
+   "counterpart_file": "scripts/audit_evidence.sh",
+   "counterpart": "발견의 인용이 실제 파일에 그 글자로 있는지 확인하고 지문을 붙인다. 판단은 하지 않는다.",
+   "principle": "audit-repo-docs",
+   "consequence": "scripts/ 의 어느 스크립트도 같은 차수 안에서 같은 지문의 발견을 하나로 합치지 않는다. audit_evidence.sh 는 인용 확인과 지문 부여만 하고 audit_verify.sh 는 지문 길이만 검사한다. 그래서 같은 지문의 중복 발견이 findings.json 에 그대로 남을 수 있다.",
+   "lens": "lens-grounding"
+  },
+  {
+   "where": "렌즈 적용 절",
+   "type": "mismatch",
+   "claim": "lens-consistency 를 값이 다른 짝마다 적용한다고 적었으나 dispatching-lenses 는 값이 다른 짝 묶음을 한 호출에 준다고 정한다.",
+   "file": "skills/audit-repo-docs/SKILL.md",
+   "evidence": "`lens-consistency`는 문서별로 적용하지 않고 「일관성 대조」 절대로 값이 다른 짝마다 적용한다.",
+   "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+   "counterpart": "레포 감사에서 `lens-consistency`에는 값이 다른 짝 묶음을 한 호출에 주고, 짝마다 원문 앞뒤 다섯 줄과 어느 문서가 소유자인지를 함께 준다.",
+   "principle": "dispatching-lenses",
+   "consequence": "audit-repo-docs 의 문장은 호출 단위가 짝 하나인지 짝 묶음 한 호출인지 두 가지로 읽힌다. 짝마다 호출하면 같은 단계의 에이전트 상한 10개를 넘을 수 있다.",
+   "lens": "lens-grounding"
+  }
+ ],
+ "statements": [
+  {
+   "topic": "audit-repo-docs",
+   "statement": "감사 대상 목록은 손으로 적지 않고 audit_targets.sh 가 낸다.",
+   "evidence": "목록은 손으로 적지 말고 `bash scripts/audit_targets.sh`가 내게 한다."
+  },
+  {
+   "topic": "review-docs",
+   "statement": "문서 하나를 쓰거나 고친 뒤의 검진은 review-docs 가 소유한다.",
+   "evidence": "문서 하나를 쓰거나 고친 뒤의 검진은 `review-docs`가 소유한다."
+  },
+  {
+   "topic": "review-docs",
+   "statement": "기록 폴더와 원본 파일의 이름 규칙은 review-docs 가 소유한다.",
+   "evidence": "이름 규칙은 review-docs 가 소유하므로 그 스킬을 따른다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "한 단계의 에이전트는 dispatching-lenses 의 상한 10개를 넘지 않는다.",
+   "evidence": "한 단계의 에이전트는 `dispatching-lenses`의 상한 10개를 넘지 않는다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "어느 렌즈가 어느 그룹이고 어느 렌즈끼리 한 컨텍스트에 두는지는 dispatching-lenses 의 「렌즈 그룹」이 소유한다.",
+   "evidence": "어느 렌즈가 어느 그룹이고 어느 렌즈끼리 한 컨텍스트에 두는지는 `dispatching-lenses`의 「렌즈 그룹」이 소유한다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "statements 항목 {topic, statement, evidence} 의 계약은 aggregating-lenses 가 진다.",
+   "evidence": "항목은 `{topic, statement, evidence}` 셋이며 계약은 `aggregating-lenses`가 진다."
+  },
+  {
+   "topic": "agent-prior-art",
+   "statement": "레포 문서 감사는 선행연구 에이전트를 제안하지 않는다.",
+   "evidence": "선행연구 에이전트(`agent-prior-art`)는 제안하지 않는다."
+  },
+  {
+   "topic": "lens-readability",
+   "statement": "lens-readability 는 대상을 헤아린 뒤 감사를 시작할 때 제안한다.",
+   "evidence": "`lens-readability`는 대상을 헤아린 뒤 감사를 시작할 때 제안한다."
+  },
+  {
+   "topic": "lens-grounding",
+   "statement": "lens-grounding 을 앞에 두는 까닭은 그것만 문서 밖 코드까지 뒤지기 때문이다.",
+   "evidence": "`lens-grounding`을 앞에 두는 것은 그것만 문서 밖 코드까지 뒤지기 때문이다."
+  },
+  {
+   "topic": "lens-adversarial",
+   "statement": "lens-adversarial 은 문서별로 배정하지 않고 저장소 전체를 입력으로 한 번 실행한다.",
+   "evidence": "`lens-adversarial`은 문서별로 배정하지 않고 저장소 전체를 입력으로 따로 한 번 실행한다."
+  },
+  {
+   "topic": "lens-fit",
+   "statement": "lens-fit 에는 review-docs 의 「lens-fit에 넘기는 계약」이 정한 경로를 계약 칸으로 넘긴다.",
+   "evidence": "`lens-fit`에는 `review-docs`의 「`lens-fit`에 넘기는 계약」이 정한 경로를 계약 칸으로 넘긴다."
+  },
+  {
+   "topic": "lens-consistency",
+   "statement": "lens-consistency 는 문서별로 적용하지 않고 값이 다른 짝마다 적용한다.",
+   "evidence": "`lens-consistency`는 문서별로 적용하지 않고 「일관성 대조」 절대로 값이 다른 짝마다 적용한다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "근본 원인이 설계로 넘길 것이 되면 그 spec 의 review-specs 리뷰에서 발동 기준을 따진다.",
+   "evidence": "근본 원인이 「설계로 넘길 것」이 되면 그 spec의 `review-specs` 리뷰에서 발동 기준을 따진다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST"
+ ],
+ "notes": "관점: 누락·모순·환각·불일치를 따로 보았다. 문서가 이름으로 부른 소유자 문서와 스크립트를 열어 대조했다."
+}
