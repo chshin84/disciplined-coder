@@ -33,6 +33,15 @@ OUT="$(run_text '1. **라벨** — 첫 문장이다. 둘째 문장이다.
 ')"
 check "label_numbered_item" "[ \"\$(count_of \"\$OUT\" '라벨 불릿')\" = 1 ]"
 
+OUT="$(run_text '- **주체 호응:** 주체가 맞게 놓였는가. 문장은 판단하지 않는다.
+')"
+check "label_question_ending" "[ \"\$(count_of \"\$OUT\" '라벨 불릿')\" = 1 ]"
+OUT="$(run_text '- **과설계** — 일반화를 본다(위반). 판정 근거로 쓴다.
+')"
+check "label_paren_ending" "[ \"\$(count_of \"\$OUT\" '라벨 불릿')\" = 1 ]"
+OUT="$(run_text '- **입력:** 경로(절대 경로)와 이름(파일 이름)을 받는다.
+')"
+check "label_inner_paren_ok" "[ -z \"\$OUT\" ]"
 echo "[개수 예고]"
 OUT="$(run_text '확인할 사항은 세 가지다.\n- 첫째\n')"
 check "count_preview" "[ \"\$(count_of \"\$OUT\" '개수 예고')\" = 1 ]"
