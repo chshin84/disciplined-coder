@@ -27,9 +27,10 @@ check "비밀 패턴이 없다" "[ -z \"\$SECRET\" ]"
 
 echo "[시험 단위 — 현행 문안, 변경안, 질문 수]"
 CLAUSES="$HERE/evals/principles/clauses"
-UB="$(mktemp)"; git -C "$HERE" show 7a2d26d:agent-principles.md > "$UB"
+UB="$(mktemp -d)"
+for h in 7a2d26d $(cat "$CLAUSES"/*/base 2>/dev/null | tr -d '' | sort -u); do git -C "$HERE" show "$h":agent-principles.md > "$UB/$h.md" 2>/dev/null || rm -f "$UB/$h.md"; done
 UNITS="$(json_run 'import runpy,sys; p=sys.argv[1]; sys.argv=[p]+sys.argv[2:]; runpy.run_path(p, run_name="__main__")' "$HERE/scripts/_eval_clause.py" check "$CASES" "$CLAUSES" "$UB" 2>&1 || true)"
-rm -f "$UB"
+rm -rf "$UB"
 [ -n "$UNITS" ] && printf '%s\n' "$UNITS" | sed 's/^/    /'
 check "시험 단위 폴더가 하나 이상 있다" "[ -n \"\$(ls -d '$CLAUSES'/*/ 2>/dev/null)\" ]"
 check "current.md 는 기준 원칙의 줄이고, new.md 가 있고, 단위마다 개발용 질문이 3개 이상이며 두 kind 가 모두 있다" "[ -z \"\$UNITS\" ]"
