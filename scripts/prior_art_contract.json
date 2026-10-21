@@ -10,6 +10,8 @@
                                                 "evaluation": { "prior": true, "same": true, "note": true },
                                                 "target": { "prior": true, "same": true, "note": true } } }] },
   "verifier": { "url": true, "judgments": [{ "ref": true, "verdict": true, "quote": true, "reason": true }], "principles_applied": true },
+  "extract": { "url": true, "judgments": [{ "ref": true, "access": true, "exists": true, "quote": true, "context": true, "reason": true }], "principles_applied": true },
+  "judge": { "judgments": [{ "ref": true, "numbers_conditions": true, "direction": true, "scope": true, "unsure_reasons": true, "reason": true }], "principles_applied": true },
   "synthesis": { "evidence_map": [{ "case": true, "url": true, "outcome": true, "axes": true }],
                  "conclusions": [{ "text": true, "refs": true }], "principles_applied": true },
   "map": { "cells": [{ "row": true, "column": true, "grounded": true, "source_ref": true }], "principles_applied": true },
@@ -19,5 +21,6 @@
               "subquestion_status": [{ "id": true, "search_status": true, "verification_status": true }],
               "overall_status": true, "query_violations": [{ "id": true, "query": true, "rule": true }],
               "verifier_count": true, "researchers": [{ "id": true, "output": true }],
-              "verifiers": [{ "url": true, "subquestions": true, "output": true }], "?synthesis": true, "?map_check": true }
+              "verifiers": [{ "url": true, "subquestions": true, "output": true,
+                              "stages": { "extract": true, "judge": true, "escalation": true } }], "?synthesis": true, "?map_check": true }
 }

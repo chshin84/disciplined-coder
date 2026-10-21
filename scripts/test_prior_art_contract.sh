@@ -192,20 +192,34 @@ HARNESS="$HERE/scripts/workflow_harness.mjs"
 check "워크플로 스크립트가 있다" "[ -f \"\$WF\" ]"
 check "node 가 있다" "command -v node >/dev/null"
 SCHEMAS="$FX/schemas.json"
-check "시험 도구가 스키마 상수 네 개를 낸다" \
-  "printf '[]' | node \"\$HARNESS\" fn schemas > \"\$SCHEMAS\" && json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(k in d for k in (\"RESEARCHER_SCHEMA\",\"VERIFIER_SCHEMA\",\"SYNTHESIS_SCHEMA\",\"MAP_SCHEMA\")) else 1)' \"\$SCHEMAS\""
-for pair in researcher:RESEARCHER_SCHEMA verifier:VERIFIER_SCHEMA synthesis:SYNTHESIS_SCHEMA map:MAP_SCHEMA; do
+check "시험 도구가 짝지은 스키마 상수를 모두 낸다" \
+  "printf '[]' | node \"\$HARNESS\" fn schemas > \"\$SCHEMAS\" && json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(k in d for k in (\"RESEARCHER_SCHEMA\",\"EXTRACT_SCHEMA\",\"JUDGE_SCHEMA\",\"SYNTHESIS_SCHEMA\",\"MAP_SCHEMA\")) else 1)' \"\$SCHEMAS\""
+for pair in researcher:RESEARCHER_SCHEMA extract:EXTRACT_SCHEMA judge:JUDGE_SCHEMA synthesis:SYNTHESIS_SCHEMA map:MAP_SCHEMA; do
   name="${pair%%:*}"; const="${pair##*:}"
   json_run 'import json,sys; json.dump(json.load(open(sys.argv[1],encoding="utf-8"))[sys.argv[2]], open(sys.argv[3],"w",encoding="utf-8"))' "$SCHEMAS" "$const" "$FX/schema_$name.json" 2>/dev/null || true
   check "스키마 $const 가 계약 코드와 맞는다" "contract_check $name \"\$FX/schema_$name.json\" -"
 done
 RD="$HERE/agents/prior-art-researcher.md"
 VD="$HERE/agents/prior-art-verifier.md"
-check "에이전트 정의 두 파일이 있다" "[ -f \"\$RD\" ] && [ -f \"\$VD\" ]"
-for pair in researcher:RD synthesis:RD verifier:VD map:VD; do
+JD="$HERE/agents/prior-art-judge.md"
+ED="$HERE/agents/prior-art-judge-escalation.md"
+MD="$HERE/agents/prior-art-mapcheck.md"
+check "에이전트 정의 파일이 모두 있다" "[ -f \"\$RD\" ] && [ -f \"\$VD\" ] && [ -f \"\$JD\" ] && [ -f \"\$ED\" ] && [ -f \"\$MD\" ]"
+# 상향 판정 정의는 판정 정의와 같은 출력을 내므로 judge 자료에 함께 대조한다.
+for pair in researcher:RD synthesis:RD extract:VD judge:JD judge:ED map:MD; do
   name="${pair%%:*}"; def="${pair##*:}"; file="${!def}"
-  check "예시 $name 이 계약 코드와 맞는다" \
+  check "예시 $name 이 $(basename "$file") 에서 계약 코드와 맞는다" \
     "contract_check_example $name \"$file\""
 done
+# 인용 판정 출력은 에이전트가 내지 않고 워크플로의 mergeStages 가 단계 출력을 합쳐 만든다.
+# 그래서 계약 코드 verifier 는 정의 파일 대신 mergeStages 의 출력에 대조한다.
+cat > "$FX/mg_in.json" <<'J'
+[{"https://a": ["S1#issue#0"]},
+ {"https://a": {"url": "https://a", "principles_applied": [], "judgments": [{"ref": "S1#issue#0", "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"}]}},
+ {"https://a": {"principles_applied": [], "judgments": [{"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]}},
+ {}]
+J
+check "mergeStages 의 합친 출력이 계약 코드 verifier 와 맞는다" \
+  "node \"\$HARNESS\" fn mergeStages < \"\$FX/mg_in.json\" > \"\$FX/mg_out.json\" && json_run 'import json,sys; json.dump(json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"outputs\"][\"https://a\"], open(sys.argv[2],\"w\",encoding=\"utf-8\"))' \"\$FX/mg_out.json\" \"\$FX/mg_a.json\" && contract_check verifier - \"\$FX/mg_a.json\""
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

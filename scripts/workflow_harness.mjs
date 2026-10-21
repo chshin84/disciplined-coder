@@ -5,7 +5,7 @@
 // 입력을 인자로 받지 않는 이유는 MSYS2 가 POSIX 경로처럼 보이는 인자를 Windows 경로로 바꾸기 때문이다.
 import { readFileSync } from 'node:fs';
 
-const FN_NAMES = ['checkQueries', 'groupByUrl', 'classify', 'mergeStatus', 'schemas'];
+const FN_NAMES = ['checkQueries', 'groupByUrl', 'classify', 'mergeStages', 'mergeStatus', 'schemas'];
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 
 // 치명 오류의 문구다. 스크립트가 예외를 삼켜도 실행이 끝난 뒤 이 값을 보고 종료 코드 1 로 끝난다.
