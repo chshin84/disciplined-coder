@@ -144,8 +144,8 @@ V3_NEW = [
      OPUS5_NOTE + " 'Claude Opus 5 delegates to subagents more readily than prior models.' 한 문장에 모델·행동·비교 대상이 모두 있고 완화 표현이 없다.", None),
     ("quo-t5", "quote", OPUS5, "v3#quo#1", "Prompting Claude Opus 5 가이드는 Opus 5 의 컨텍스트 윈도가 1M 토큰이고 이 크기가 기본값이자 최대값이라고 적는다.", True,
      OPUS5_NOTE + " 'Claude Opus 5 has a 1M token context window as both the default and the maximum' 한 문장에 크기·기본·최대가 모두 있다.", None),
-    ("quo-t6", "quote", OPUS5, "v3#quo#2", "Prompting Claude Opus 5 가이드는 Opus 5 에서 사고 비활성화는 effort 가 high 이하일 때만 가능하고, xhigh 나 max 와 함께 요청하면 400 오류를 낸다고 적는다.", True,
-     OPUS5_NOTE + " 'thinking can be disabled only at effort `high` or below. A request that combines `thinking: {\"type\": \"disabled\"}` with effort `xhigh` or `max` returns a 400 error.' 한 문단 안의 연속한 두 문장에 두 조건이 모두 있고 완화 표현이 없다.", None),
+    ("quo-t6", "quote", OPUS5, "v3#quo#2", "Prompting Claude Opus 5 가이드는 Opus 5 에서 사고가 기본으로 켜져 있고 effort 가 high 이하일 때만 끌 수 있다고 적는다.", True,
+     OPUS5_NOTE + " 'Claude Opus 5 runs with thinking on by default, and thinking can be disabled only at effort `high` or below.' 한 문장에 기본값과 끌 수 있는 조건이 모두 있고 완화 표현이 없다.", None),
     ("quo-t7", "quote", OPUS5, "v3#quo#3", "Prompting Claude Opus 5 가이드는 Opus 5 가 사고를 끈 상태에서 도구 호출을 구조화된 tool_use 블록 대신 사용자에게 보이는 텍스트로 가끔 쓴다고 적는다.", True,
      OPUS5_NOTE + " 'With thinking disabled, the model occasionally writes a tool call into its user-facing text instead of emitting a structured `tool_use` block.' 한 문장에 조건·행동·빈도('occasionally')가 모두 있고 주장도 '가끔'으로 빈도를 보존했다.", None),
     ("acc-t4", "access", OPUS5, "v3#acc#0", "Prompting Claude Opus 5 가이드는 Opus 5 에서 low 와 medium effort 가 높은 설정보다 적은 토큰과 지연으로 강한 품질을 낸다고 적는다.", True,
@@ -165,6 +165,8 @@ def v3_items():
             x["truth"] = False
             x["check_note"] = f"{detail}. 주장이 원문의 완화 표현({hedge})을 빼 범위를 넓혔다. 인용 판정 기준에서 기각이 맞다(2026-10-21 사용자 결정). {SEEN3}."
             x.pop("hard_kind", None)
+            if x["id"] == "hard-f200-t1":
+                x["check_note"] += " 열리는 실제 문서이며 범위 오류로 기각되어야 한다. 카테고리는 참·오류 균형 때문에 access 로 둔다."
         out.append(x)
     for i, c, u, r, t, tr, n, k in V3_NEW:
         d = {"id": i, "category": c, "url": u, "claim": {"ref": r, "text": t}, "truth": tr, "check_note": n}

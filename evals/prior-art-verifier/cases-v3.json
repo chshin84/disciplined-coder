@@ -523,7 +523,7 @@
         "text": "AWS 의 Amazon Bedrock 프롬프트 엔지니어링 문서는 몇 개의 예시를 주는 few-shot 프롬프팅이 모델 출력을 기대에 맞추는 데 유용하다고 적는다."
       },
       "truth": false,
-      "check_note": "원문은 'It is sometimes useful to provide a few examples to help LLMs better calibrate their output' 다. 주장은 'sometimes' 를 빼 '유용하다'고 단정했다. 주장이 원문의 완화 표현('sometimes useful')을 빼 범위를 넓혔다. 인용 판정 기준에서 기각이 맞다(2026-10-21 사용자 결정). 2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다."
+      "check_note": "원문은 'It is sometimes useful to provide a few examples to help LLMs better calibrate their output' 다. 주장은 'sometimes' 를 빼 '유용하다'고 단정했다. 주장이 원문의 완화 표현('sometimes useful')을 빼 범위를 넓혔다. 인용 판정 기준에서 기각이 맞다(2026-10-21 사용자 결정). 2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 열리는 실제 문서이며 범위 오류로 기각되어야 한다. 카테고리는 참·오류 균형 때문에 access 로 둔다."
     },
     {
       "id": "hard-f200-f1",
@@ -565,10 +565,10 @@
       "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
       "claim": {
         "ref": "v3#quo#2",
-        "text": "Prompting Claude Opus 5 가이드는 Opus 5 에서 사고 비활성화는 effort 가 high 이하일 때만 가능하고, xhigh 나 max 와 함께 요청하면 400 오류를 낸다고 적는다."
+        "text": "Prompting Claude Opus 5 가이드는 Opus 5 에서 사고가 기본으로 켜져 있고 effort 가 high 이하일 때만 끌 수 있다고 적는다."
       },
       "truth": true,
-      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. Opus 5 가이드 원문에서 아래 구절을 찾았고, 한 구절이 주장의 모든 요소를 포함한다. 'thinking can be disabled only at effort `high` or below. A request that combines `thinking: {\"type\": \"disabled\"}` with effort `xhigh` or `max` returns a 400 error.' 한 문단 안의 연속한 두 문장에 두 조건이 모두 있고 완화 표현이 없다."
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. Opus 5 가이드 원문에서 아래 구절을 찾았고, 한 구절이 주장의 모든 요소를 포함한다. 'Claude Opus 5 runs with thinking on by default, and thinking can be disabled only at effort `high` or below.' 한 문장에 기본값과 끌 수 있는 조건이 모두 있고 완화 표현이 없다."
     },
     {
       "id": "quo-t7",
