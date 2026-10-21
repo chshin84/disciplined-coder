@@ -59,7 +59,7 @@ done
 | PreToolUse | `hooks/nested_judgment_pretooluse.sh` | 프로젝트 안에 새 spec을 처음 쓰려 하면 세션마다 경로당 한 번 거부하고, 사유에 적은 기준으로 `nested-orchestration`에 나눠 맡길지 먼저 판단하게 한다. 서브에이전트의 Write는 보지 않는다 | 차단 |
 | PreToolUse | `hooks/rules_nudge_pretooluse.sh` | 규칙 넛지. 세션의 첫 Write·Edit·Bash 호출 전에 원칙 사본과 `domain-korean.md`와 `domain-discipline.md`의 절대경로를 한 번 알린다. 서브에이전트에는 원칙이 실리지 않기 때문이다 | 알림 |
 | PostToolUse | `hooks/spec_review_posttooluse.sh` | 새 spec·plan을 감지해 리뷰를 지시한다 | 알림 |
-| PostToolUse | `hooks/doc_review_posttooluse.sh` | `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 있는 폴더의 `.md`를 고치면 `review-docs` 검진을 권한다. `Bash`로 고친 것도 본다 | 알림 |
+| PostToolUse | `hooks/doc_review_posttooluse.sh` | `.pptx`·`.xlsx`·`.docx`·`.pdf` 산출물이나 그런 파일이 있는 폴더의 `.md`를 고치면 `review-docs` 검진을 권한다. Write·Edit·Bash 로 쓴 `.md` 의 형식(라벨 불릿·개수 예고·제목 개수)을 경고한다. `Bash`로 고친 것도 본다 | 알림 |
 | PostToolUse | `hooks/doc_word_posttooluse.sh` | 셸로 고친 산출물 `.md`에 금지 표현이 남으면 알린다 | 알림 |
 | Stop | `hooks/stop_gates.sh` | 이 세션에 새로 생긴 미리뷰 spec·plan이 남은 채 턴이 끝나는 것을 차단하고, 커밋되지 않은 산출물 `.md`에 금지 표현이 남으면 사용자에게 알린다 | 차단 |
 
@@ -86,8 +86,8 @@ done
 
 hook은 아래 환경 변수로 끈다.
 
-- **`DISCIPLINED_CODER_REVIEW_GATE=off`** — `spec_review_posttooluse.sh`, `stop_gates.sh`의 spec 검사, `doc_format_pretooluse.sh`, `doc_review_posttooluse.sh`, `rules_nudge_pretooluse.sh`, `nested_judgment_pretooluse.sh`를 끈다.
-- **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `stop_gates.sh`의 금지 표현 검사)을 끈다. 금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.
+- **`DISCIPLINED_CODER_REVIEW_GATE=off`** — `spec_review_posttooluse.sh`, `stop_gates.sh`의 spec 검사, `doc_format_pretooluse.sh`, `doc_review_posttooluse.sh`의 검진 넛지, `rules_nudge_pretooluse.sh`, `nested_judgment_pretooluse.sh`를 끈다.
+- **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 hook(`doc_word_pretooluse.sh`, `doc_word_posttooluse.sh`, `stop_gates.sh`의 금지 표현 검사)을 끈다. 문서 형식 경고도 끈다. 금지 표현 목록을 고칠 때 그 목록이 검사에 검출되지 않게 하려고 변수를 나눠 두었다.
 - **`DISCIPLINED_CODER_PRIOR_ART_NUDGE=off`** — `prior_art_nudge_userpromptsubmit.sh`를 끈다.
 
 읽기 전용 차단과 세션 시작의 셋업은 끄는 변수가 없다. 세 변수는 hook이 프로세스 환경에서 읽으므로 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
