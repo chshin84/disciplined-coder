@@ -100,24 +100,25 @@ sys.exit(1 if miss else 0)
 ' "$1" "$2" "$3" "$CONTRACT"
 }
 
-# extract_block <자료 이름> <정의 파일>
-# `<!-- output: <자료 이름> -->` 다음의 json 코드 울타리 블록을 꺼내 JSON 으로 출력한다.
+# extract_block <자료 이름> <정의 파일> [표지 종류]
+# `<!-- <표지 종류>: <자료 이름> -->` 다음의 json 코드 울타리 블록을 꺼내 JSON 으로 출력한다.
+# 표지 종류는 출력 예시가 output(기본값), 입력 예시가 input 이다.
 extract_block() {
   json_run '
 import json, sys
-name, path = sys.argv[1:3]
+name, path, kind = sys.argv[1:4]
 try:
     with open(path, encoding="utf-8") as f:
         lines = f.read().splitlines()
 except OSError:
     print("error:no-marker"); sys.exit(1)
-marker = "<!-- output: " + name + " -->"
+marker = "<!-- " + kind + ": " + name + " -->"
 idx = [i for i, l in enumerate(lines) if l.strip() == marker]
 if not idx:
     print("error:no-marker"); sys.exit(1)
 i = idx[0] + 1
 while i < len(lines) and not lines[i].startswith("```json"):
-    if lines[i].startswith("<!-- output:"):
+    if lines[i].startswith("<!-- output:") or lines[i].startswith("<!-- input:"):
         i = len(lines)
     else:
         i += 1
@@ -133,14 +134,14 @@ try:
     print(json.dumps(json.loads("\n".join(body)), ensure_ascii=False))
 except ValueError:
     print("error:parse"); sys.exit(1)
-' "$1" "$2"
+' "$1" "$2" "${3:-output}"
 }
 
-# contract_check_example <자료 이름> <정의 파일>
+# contract_check_example <자료 이름> <정의 파일> [표지 종류]
 # 정의 파일에서 예시 블록을 꺼내 대조한다. 추출이 실패하면 사유 줄(error:...)을 로그에 남기고 1 로 끝난다.
 contract_check_example() {
   local out="$FX/ex_$1.json"
-  if extract_block "$1" "$2" > "$out"; then
+  if extract_block "$1" "$2" "${3:-output}" > "$out"; then
     contract_check "$1" - "$out"
   else
     cat "$out"; return 1
@@ -184,6 +185,9 @@ check "없는 자료 이름은 오류다"          "contract_check nosuch - \"\$
 check "깨진 블록을 알린다"              "extract_block researcher \"\$FX/broken_def.md\" | grep -qx 'error:parse'"
 check "표지 뒤 블록 없음을 알린다"       "extract_block researcher \"\$FX/marker_only_def.md\" | grep -qx 'error:no-block'"
 check "표지 없음을 알린다"              "extract_block researcher \"\$FX/no_marker_def.md\" | grep -qx 'error:no-marker'"
+printf '<!-- input: refetch -->\n```json\n{"url": "u"}\n```\n' > "$FX/input_def.md"
+check "입력 표지는 output 표지로 찾지 않는다" "extract_block refetch \"\$FX/input_def.md\" | grep -qx 'error:no-marker'"
+check "입력 표지의 블록을 꺼낸다"        "extract_block refetch \"\$FX/input_def.md\" input | grep -qx '{\"url\": \"u\"}'"
 
 echo "[계약 대조]"
 check "계약 코드가 JSON 으로 읽힌다" "json_valid_stdin < \"\$CONTRACT\""
@@ -211,13 +215,24 @@ for pair in researcher:RD synthesis:RD extract:VD judge:JD judge:ED map:MD; do
   check "예시 $name 이 $(basename "$file") 에서 계약 코드와 맞는다" \
     "contract_check_example $name \"$file\""
 done
+# 보충 입력은 추출 검증자 정의의 입력 예시와 대조한다.
+check "입력 예시 refetch 가 $(basename "$VD") 에서 계약 코드와 맞는다" "contract_check_example refetch \"\$VD\" input"
+# 판정 칸의 네 값과 판정 불가 이유 유형은 계약 코드 enums 가 원본이다. 판정·상향 판정 정의의 예시는 그 값을 | 로 이어 적는다.
+for def in JD ED; do
+  file="${!def}"
+  check "예시 judge 가 $(basename "$file") 에서 계약 코드 enums 의 값을 적는다" \
+    "extract_block judge \"$file\" > \"\$FX/enum_$def.json\" && json_run 'import json,sys; j=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"judgments\"][0]; e=json.load(open(sys.argv[2],encoding=\"utf-8\"))[\"enums\"]; m=\"|\".join(e[\"match\"]); u=\"|\".join(e[\"unsure\"]); sys.exit(0 if all(j[k] == m for k in (\"numbers_conditions\",\"direction\",\"scope\")) and list(j[\"unsure_reasons\"].values()) == [u] else 1)' \"\$FX/enum_$def.json\" \"\$CONTRACT\""
+done
+# 지도 대조 정의의 예시는 행마다 판정할 칸(case, outcome, 축마다 prior)을 모두 포함한다.
+check "예시 map 이 행마다 판정할 칸을 모두 포함한다" \
+  "extract_block map \"\$MD\" > \"\$FX/map_cells.json\" && json_run 'import json,sys; c=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"cells\"]; want={\"case\",\"outcome\"} | {\"axes.\"+a+\".prior\" for a in (\"purpose\",\"mechanism\",\"evaluation\",\"target\")}; sys.exit(0 if c and all({x[\"column\"] for x in c if x[\"row\"] == r} == want for r in {x[\"row\"] for x in c}) else 1)' \"\$FX/map_cells.json\""
 # 인용 판정 출력은 에이전트가 내지 않고 워크플로의 mergeStages 가 단계 출력을 합쳐 만든다.
 # 그래서 계약 코드 verifier 는 정의 파일 대신 mergeStages 의 출력에 대조한다.
 cat > "$FX/mg_in.json" <<'J'
 [{"https://a": ["S1#issue#0"]},
  {"https://a": {"url": "https://a", "principles_applied": [], "judgments": [{"ref": "S1#issue#0", "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"}]}},
- {"https://a": {"principles_applied": [], "judgments": [{"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]}},
- {}]
+ {"https://a": {"principles_applied": [], "judgments": [{"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]}},
+ {}, {}, {}]
 J
 check "mergeStages 의 합친 출력이 계약 코드 verifier 와 맞는다" \
   "node \"\$HARNESS\" fn mergeStages < \"\$FX/mg_in.json\" > \"\$FX/mg_out.json\" && json_run 'import json,sys; json.dump(json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"outputs\"][\"https://a\"], open(sys.argv[2],\"w\",encoding=\"utf-8\"))' \"\$FX/mg_out.json\" \"\$FX/mg_a.json\" && contract_check verifier - \"\$FX/mg_a.json\""

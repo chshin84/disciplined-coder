@@ -18,6 +18,12 @@ maxTurns: 20
 
 `evidence_map` 의 칸마다 `passed` 에 근거가 있는지 `grounded` 로 표시하라. `passed` 의 원소는 `{ ref, row }` 이며, 근거가 된 항목의 `ref` 를 `source_ref` 에 적어라. `row` 에는 그 행의 `case` 를, `column` 에는 칸의 키 경로(`outcome`, `axes.mechanism.prior` 같은 것)를 적고, 근거가 없으면 `source_ref` 를 빈 문자열로 둬라. `grounded` 는 참이나 거짓이다.
 
+판정할 칸은 `evidence_map` 의 행마다 아래와 같다. 한 행에서 칸을 하나라도 빠뜨리지 마라.
+
+- `case`: 사례 이름이다.
+- `outcome`: 사례의 결말이다.
+- `axes.purpose.prior`·`axes.mechanism.prior`·`axes.evaluation.prior`·`axes.target.prior`: 축마다 선행 사례 쪽 서술이다.
+
 ## 출력 형식
 
 출력은 아래 지도 대조 JSON 하나로만 내고, 앞뒤에 다른 글을 두지 마라.
@@ -26,7 +32,12 @@ maxTurns: 20
 ```json
 {
   "cells": [
-    { "row": "사례 이름", "column": "axes.mechanism.prior", "grounded": true, "source_ref": "sq1#case#0" }
+    { "row": "사례 이름", "column": "case", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "outcome", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "axes.purpose.prior", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "axes.mechanism.prior", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "axes.evaluation.prior", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "axes.target.prior", "grounded": false, "source_ref": "" }
   ],
   "principles_applied": [ "읽고 적용한 원칙 ID" ]
 }

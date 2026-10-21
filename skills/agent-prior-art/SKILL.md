@@ -21,7 +21,9 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 2. **탐색** — 오케스트레이터가 `disciplined-coder:prior-art-search`를 프로토콜과 함께 실행한다. 아래 처리는 워크플로가 한다.
    - 하위 질문마다 탐색 모드 연구자를 실행한다.
    - 스크립트가 연구자의 `queries`를 질의 금지 목록과 경로 형태 정규식으로 검사하고 위반을 기록한다.
-   - 스크립트가 인용을 URL 로 묶고, URL 마다 추출 검증자를 실행한다. 추출을 통과한 주장만 판정 에이전트가 판정하고, 판정 불가가 나온 주장만 상향 판정 에이전트가 다시 판정한다.
+   - 스크립트가 인용을 URL 로 묶고, URL 마다 추출 검증자를 실행한다. 추출을 통과한 주장만 판정 에이전트가 판정한다.
+   - 처음 판정에 `정보 부족`이 있고 `불일치`가 없는 주장은 추출 검증자가 원문을 다시 열어 보충하고, 판정 에이전트가 보충 구절로 다시 판정한다.
+   - 그 뒤에도 `판정 불가`가 남은 주장만 상향 판정 에이전트가 다시 판정한다.
    - 스크립트는 `supported` 판정을 받은 주장에 기댄 사례만 통과 목록에 넣는다.
    - 나머지 사례는 탈락 목록, 판정 불가 목록, 검증 실패 목록에 사유와 함께 들어간다.
    - `survey` 모드에서는 종합 모드 연구자와 지도 대조 에이전트를 차례로 실행한다.
@@ -35,19 +37,19 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 **반환값을 읽는 규칙.** 판정과 보고에는 `passed`의 `ref`가 가리키는 항목만 쓴다. `rejected`·`unverifiable`·`verify_failed`의 항목은 사유와 함께 보고하되 판정에 쓰지 않는다. 사례 수는 `passed`·`rejected`·`unverifiable`로 세고 `verify_failed`는 세지 않는다. 오케스트레이터는 반환값의 원소와 사유를 아래 위치에서 읽는다.
 
-- **연구자와 검증자의 원본** — `researchers`는 하위 질문 차례의 `[{ id, output }]`이고, `verifiers`는 URL 묶음 차례의 `[{ url, subquestions, output, stages }]`이다. `output`은 워크플로가 세 단계의 출력을 합친 인용 판정 출력이고, 실패한 연구자와 URL 은 `output: null`이다. `stages`는 `{ extract, judge, escalation }`이며 단계마다 에이전트의 원본 출력을 포함한다.
+- **연구자와 검증자의 원본** — `researchers`는 하위 질문 차례의 `[{ id, output }]`이고, `verifiers`는 URL 묶음 차례의 `[{ url, subquestions, output, stages }]`이다. `output`은 워크플로가 검증 단계의 출력을 합친 인용 판정 출력이고, 실패한 연구자와 URL 은 `output: null`이다. `stages`는 `{ extract, judge, refetch, rejudge, escalation }`이며 단계마다 에이전트의 원본 출력을 포함한다. `refetch`는 보충, `rejudge`는 재판정의 출력이다.
 - **탈락과 판정 불가의 사유** — 같은 `ref`의 `verifiers[].output.judgments[]`에 있는 `verdict`와 `reason`이다. 판정할 선행 사례 서술이 없는 항목은 검증자에게 보내지 않고 `rejected`에 든다. 그래서 `rejected` 원소에 그 `ref`의 판정이 없으면, 오케스트레이터는 `urls`가 비었을 때 사유를 '인용에 URL 이 없다'로, 그 밖에는 '판정할 선행 사례 서술이 없다'로 적는다.
-- **`stages`의 `null`** — `verifiers[].stages`의 단계가 `null`이면 그 단계를 실행하지 않았거나 응답이 없었다는 뜻이며, 둘을 값으로는 구별하지 못한다. 오케스트레이터는 호출 label(`extract:<url>`, `judge:<url>`, `escalate:<url>`)이 있는지로 구별한다. 추출을 통과한 주장이 없으면 판정을 실행하지 않고, 판정 불가가 없으면 상향 판정을 실행하지 않는다.
-- **검증 실패의 사유** — URL 전체의 실패는 같은 `url`의 `verifiers[].output`이 `null`인 때이며, 그 URL 의 어느 단계가 응답하지 않았거나 판정이 빠졌다는 뜻이다. 어느 단계인지는 `stages`와 호출 label 로 찾는다. 주장 하나의 실패는 `verifiers[].output.judgments[]`에서 `verdict`가 `verify_failed`인 판정이며, 상향 판정 뒤에도 판정 불가가 남았다는 뜻이다. 그 주장은 같은 URL 의 다른 칸이 `불일치`여도 `rejected`에 들지 않고 `verify_failed`에 든다. 한 URL 의 실패한 주장이 여럿이면 `verify_failed`에는 그 URL 의 `{ url, refs }` 한 원소로 모인다.
+- **`stages`의 `null`** — `verifiers[].stages`의 단계가 `null`이면 그 단계를 실행하지 않았거나 응답이 없었다는 뜻이며, 둘을 값으로는 구별하지 못한다. 오케스트레이터는 호출 label(`extract:<url>`, `judge:<url>`, `refetch:<url>`, `rejudge:<url>`, `escalate:<url>`)이 있는지로 구별한다. 추출을 통과한 주장이 없으면 판정을 실행하지 않는다. 불일치 없이 정보 부족이 있는 주장이 없으면 보충을 실행하지 않고, 보충을 통과한 주장이 없으면 재판정을 실행하지 않는다. 판정 불가가 남은 주장이 없으면 상향 판정을 실행하지 않는다.
+- **검증 실패의 사유** — URL 전체의 실패는 같은 `url`의 `verifiers[].output`이 `null`인 때이며, 그 URL 의 어느 단계가 응답하지 않았거나 판정이 빠졌다는 뜻이다. 어느 단계인지는 `stages`와 호출 label 로 찾는다. 주장 하나의 실패는 `verifiers[].output.judgments[]`에서 `verdict`가 `verify_failed`인 판정이다. 보충이나 재판정이 그 주장에서 실패했거나, 재판정에도 정보 부족이 남았거나, 상향 판정 뒤에도 판정 불가나 정보 부족이 남았다는 뜻이다. 어느 사정인지는 `stages`의 `refetch`·`rejudge`·`escalation`에서 그 `ref`의 판정으로 찾는다. 상향 뒤 실패한 주장은 상향이 다른 칸에 `불일치`를 내도 `rejected`에 들지 않고 `verify_failed`에 든다. 한 URL 의 실패한 주장이 여럿이면 `verify_failed`에는 그 URL 의 `{ url, refs }` 한 원소로 모인다.
 - **종합 결론의 사용** — 종합은 하위 질문의 상태와 무관하게 통과한 근거 지도 행 전부를 받는다. 그래서 `conclusions[].refs`에 `ok`가 아닌 하위 질문의 참조가 하나라도 있으면, 오케스트레이터는 그 결론을 판정에 쓰지 않고 보고에만 적는다.
 - **`synthesis: null`의 두 사정** — 통과 행이 없어 종합을 실행하지 않은 사정과 종합이 실패한 사정은 `passed`에 `#case#` 항목이 있는지로 구별한다. `synthesis`가 `null`이면 `map_check`도 `null`이다.
 - **질의 경계 위반** — `query_violations[].rule`의 값은 `forbidden-term`과 `path-shape`다.
 
-**상태 값.** `search_status`는 연구자마다 `ok`·`no-results`·`failed`·`not-attempted` 중 하나이며 뜻은 「출력 스키마」의 표가 정한다. `verification_status`는 하위 질문마다 `ok`·`partial` 중 하나다. 그 하위 질문의 URL 에 검증 실패(검증 단계 에이전트의 실패, 시간 초과, 속도 제한, 상향 판정 실패, 상향 판정 불가)가 하나라도 있으면 `partial`이다. 상향 판정 실패는 상향 판정 에이전트가 응답하지 않았거나 판정을 빠뜨린 때이고, 상향 판정 불가는 상향 판정 에이전트도 `판정 불가`를 낸 때다. 연구 질문 전체의 `overall_status`는 모든 하위 질문의 두 값이 `ok`일 때만 `ok`다. `overall_status`가 `ok`가 아니면 오케스트레이터는 `ok`가 아닌 하위 질문의 결과를 판정으로 쓰지 않고 하위 질문별 값을 보고에 적는다.
+**상태 값.** `search_status`는 연구자마다 `ok`·`no-results`·`failed`·`not-attempted` 중 하나이며 뜻은 「출력 스키마」의 표가 정한다. `verification_status`는 하위 질문마다 `ok`·`partial` 중 하나다. 그 하위 질문의 URL 에 검증 실패(검증 단계 에이전트의 실패, 시간 초과, 속도 제한, 보충 실패, 재판정 실패, 재판정 정보 부족, 상향 판정 실패, 상향 판정 불가)가 하나라도 있으면 `partial`이다. 보충 실패는 보충이 응답하지 않았거나 그 주장을 빠뜨렸거나, 보충 출력의 `access`가 `실패`이거나 `exists`가 `불일치`이거나 `quote`가 없는 때다. 재판정 실패는 재판정이 응답하지 않았거나 그 주장이나 칸을 빠뜨린 때이고, 재판정 정보 부족은 재판정에도 `정보 부족`이 남은 때다. 상향 판정 실패는 상향 판정 에이전트가 응답하지 않았거나 판정을 빠뜨린 때이고, 상향 판정 불가는 상향 판정 에이전트도 `판정 불가`나 `정보 부족`을 낸 때다. 연구 질문 전체의 `overall_status`는 모든 하위 질문의 두 값이 `ok`일 때만 `ok`다. `overall_status`가 `ok`가 아니면 오케스트레이터는 `ok`가 아닌 하위 질문의 결과를 판정으로 쓰지 않고 하위 질문별 값을 보고에 적는다.
 
 **세션이 끊긴 때.** 워크플로가 실행 중에 중단되면 오케스트레이터는 같은 세션 안에서 런타임의 이어 실행 기능으로 다시 시작한다. 반환 전에 세션 자체가 끝나면 기록에는 프로토콜과 승인 사실만 남는다. 다음 세션의 오케스트레이터는 검색어가 이미 나갔을 수 있다고 기록에 적은 뒤, 같은 프로토콜로 사용자 승인을 다시 받아 처음부터 실행한다.
 
-**워크플로가 꺼진 환경.** `disableWorkflows`가 켜져 있으면 오케스트레이터는 같은 순서로 연구자와 검증자를 Agent 도구로 실행한다. `subagent_type`에는 `disciplined-coder:prior-art-researcher`, `disciplined-coder:prior-art-verifier`(추출), `disciplined-coder:prior-art-judge`, `disciplined-coder:prior-art-judge-escalation`, `disciplined-coder:prior-art-mapcheck`를 단계에 맞게 넣고, 프롬프트는 「출력 스키마」의 「에이전트에게 보내는 프롬프트」 형식으로 쓴다. 이 경로에서는 질의 경계 검사와 통과 목록 분리를 오케스트레이터가 직접 하고, 단계 출력의 합치기도 오케스트레이터가 한다. 합치기는 「출력 스키마」의 「최종 판정과 실패 처리」 순서를 직접 적용하는 일이며, 접근 실패, 존재 불일치와 구절 없음, 판정 누락, 상향 판정, 칸별 불일치를 그 순서로 가른다. 그래서 이 경로의 검사와 분리와 합치기는 지시 준수에만 기댄다. 오케스트레이터는 이 사실을 보고와 기록에 적는다.
+**워크플로가 꺼진 환경.** `disableWorkflows`가 켜져 있으면 오케스트레이터는 같은 순서로 연구자와 검증자를 Agent 도구로 실행한다. `subagent_type`에는 `disciplined-coder:prior-art-researcher`, `disciplined-coder:prior-art-verifier`(추출과 보충), `disciplined-coder:prior-art-judge`(판정과 재판정), `disciplined-coder:prior-art-judge-escalation`, `disciplined-coder:prior-art-mapcheck`를 단계에 맞게 넣고, 프롬프트는 「출력 스키마」의 「에이전트에게 보내는 프롬프트」 형식으로 쓴다. 이 경로에서는 질의 경계 검사와 통과 목록 분리를 오케스트레이터가 직접 하고, 단계 출력의 합치기도 오케스트레이터가 한다. 검증 단계는 추출, 판정, 보충, 재판정, 상향 차례로 실행한다. 합치기는 「출력 스키마」의 「최종 판정과 실패 처리」 순서를 직접 적용하는 일이며, 접근 실패, 존재 불일치와 구절 없음, 판정 누락, 처음 판정의 불일치, 보충과 재판정, 상향 판정, 칸별 불일치를 그 순서로 구분한다. 그래서 이 경로의 검사와 분리와 합치기는 지시 준수에만 기댄다. 오케스트레이터는 이 사실을 보고와 기록에 적는다.
 
 ## 발동과 기록
 
@@ -85,7 +87,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 **통상을 넘을 때.** 통상은 오케스트레이터가 이유를 적지 않고 고를 수 있는 값이다. 통상을 넘는 수는 프로토콜에 이유를 적어 승인받는다. 하위 질문이 통상보다 많으면 오케스트레이터는 하위 질문을 묶지 않고, 연구자 수를 올리는 근거를 적는다.
 
-**세는 대상.** 상한은 탐색 모드 연구자만 센다. 검증자와 종합 모드 연구자는 URL 수와 모드에 따라 정해지므로 상한에 넣지 않는다. 검증자 수는 URL 마다 추출 1, 판정 1, 상향 0~1이다. 판정은 추출을 통과한 주장이 있는 URL 에서만 실행되므로 이 수는 상한이다. 검증자 수는 탐색이 끝나야 정해지므로, 오케스트레이터는 승인 때 연구자 수만 보이고 실제 검증자 수는 보고에 적는다. 연구자 하나가 인용할 출처는 약 100개 이하로 둔다. 이 값은 Anthropic cookbook 의 research subagent 프롬프트가 적은 "under about 100 sources"를 따른다.
+**세는 대상.** 상한은 탐색 모드 연구자만 센다. 검증자와 종합 모드 연구자는 URL 수와 모드에 따라 정해지므로 상한에 넣지 않는다. 검증자 수는 URL 마다 추출 1, 보충 0~1, 판정 1, 재판정 0~1, 상향 0~1이다. 판정은 추출을 통과한 주장이 있는 URL 에서만 실행되므로 이 수는 상한이다. 보충은 주장마다 한 번만 한다. 검증자 수는 탐색이 끝나야 정해지므로, 오케스트레이터는 승인 때 연구자 수만 보이고 실제 검증자 수는 보고에 적는다. 연구자 하나가 인용할 출처는 약 100개 이하로 둔다. 이 값은 Anthropic cookbook 의 research subagent 프롬프트가 적은 "under about 100 sources"를 따른다.
 
 **단계당 상한의 예외.** 선행연구 에이전트에는 `dispatching-lenses`의 "한 단계가 실행하는 에이전트는 10개 이하"를 적용하지 않는다. 사용자가 2026-10-18에 이 예외를 정했다. 한 단계의 규모는 연구자 상한 20과 런타임의 동시 실행 한도(기본 16)가 정한다.
 
@@ -218,16 +220,16 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 }
 ```
 
-**검증 단계와 출력.** 검증은 URL 마다 세 단계로 진행한다. 추출 검증자(`prior-art-verifier`, `MODE: extract`)가 URL 하나를 열어 주장마다 접근·존재·구절을 판정한다. 판정 에이전트(`prior-art-judge`, `MODE: judge`)는 웹을 열지 않고 추출 검증자가 옮긴 `quote`와 `context`만 보고 수치·조건, 방향, 범위를 판정한다. 상향 판정 에이전트(`prior-art-judge-escalation`, `MODE: judge`)는 판정 에이전트가 `판정 불가`를 낸 주장의 세 칸을 같은 입력으로 다시 판정한다. 판정 기준은 "옮긴 구절이 주장의 주어와 수치와 조건을 모두 포함하면 supported"로 고정한다. 판정 대상은 선행 사례 쪽 서술뿐이다. 이슈는 `prior_claim`, 근거 지도 행은 사례 이름과 `outcome`과 각 축의 `prior`다. 근거 지도 행은 사례가 있다는 것과 그 결말을 뒷받침하는 구절이 있으면 `supported`이고, 축마다의 판정은 `reason`에 적는다. 대조 대상 쪽 판단(`same`, `note`, 이슈의 `claim`)은 연구자가 책임지며 사용자가 보고에서 확인한다(2026-10-18 사용자 결정). `unverifiable`은 원문 쪽 사정(봇 차단, 유료 장벽, 응답 없음)만 뜻하며 반박으로 세지 않는다.
+**검증 단계와 출력.** 검증은 URL 마다 추출, 판정, 보충, 재판정, 상향 차례로 진행한다. 추출 검증자(`prior-art-verifier`, `MODE: extract`)가 URL 하나를 열어 주장마다 접근·존재·구절을 판정한다. 판정 에이전트(`prior-art-judge`, `MODE: judge`)는 웹을 열지 않고 추출 검증자가 옮긴 `quote`와 `context`, 존재 확인 사유 `source_note`만 보고 수치·조건, 방향, 범위를 판정한다. 판정 에이전트는 칸마다 먼저 판정에 필요한 정보가 있는지 판단하고, 없으면 그 칸을 `정보 부족`으로 둔다. 처음 판정에 `정보 부족`이 있고 `불일치`가 없는 주장은 추출 검증자가 원문을 다시 열어 보충하고(`MODE: refetch`), 판정 에이전트가 보충 구절로 그 주장의 모든 칸을 다시 판정한다(재판정). 상향 판정 에이전트(`prior-art-judge-escalation`, `MODE: judge`)는 그 뒤에도 `판정 불가`가 남은 주장의 세 칸을 다시 판정한다. 상향 입력은 재판정을 거친 주장이면 재판정 입력이고, 아니면 처음 판정 입력이다. 판정 기준은 "옮긴 구절이 주장의 주어와 수치와 조건을 모두 포함하면 supported"로 고정한다. 판정 대상은 선행 사례 쪽 서술뿐이다. 이슈는 `prior_claim`, 근거 지도 행은 사례 이름과 `outcome`과 각 축의 `prior`다. 근거 지도 행은 사례가 있다는 것과 그 결말을 뒷받침하는 구절이 있으면 `supported`이고, 축마다의 판정은 `reason`에 적는다. 대조 대상 쪽 판단(`same`, `note`, 이슈의 `claim`)은 연구자가 책임지며 사용자가 보고에서 확인한다(2026-10-18 사용자 결정). `unverifiable`은 원문 쪽 사정(봇 차단, 유료 장벽, 응답 없음)만 뜻하며 반박으로 세지 않는다.
 
-추출 출력은 주장마다 `access`(성공·실패), `exists`(일치·불일치), `quote`, `context`(그 구절 앞뒤의 부정·조건·비교 문장), `reason`을 포함한다. 판정 출력은 주장마다 `numbers_conditions`·`direction`·`scope` 세 칸에 `일치`·`불일치`·`판정 불가`를 포함하고, `판정 불가`인 칸에는 `unsure_reasons`에 이유 유형(`맥락 부족`·`조건 얽힘`·`표·그림 값`·`언어 해석`)을 적는다. 상향 판정 출력의 형식은 판정 출력과 같다.
+추출 출력은 주장마다 `access`(성공·실패), `exists`(일치·불일치), `exists_note`(확인한 제목·저자·학회), `quote`, `context`(그 구절 앞뒤의 부정·조건·비교 문장), `reason`을 포함한다. 보충 출력의 형식은 추출 출력과 같다. 판정 출력은 주장마다 `numbers_conditions`·`direction`·`scope` 세 칸에 `일치`·`불일치`·`판정 불가`·`정보 부족`을 포함한다. `정보 부족`인 칸에는 `missing`에 없는 요소를 적고, `판정 불가`인 칸에는 `unsure_reasons`에 이유 유형(`조건 얽힘`·`표·그림 값`·`언어 해석`)을 적는다. 재판정과 상향 판정 출력의 형식은 판정 출력과 같다.
 
 <!-- output: extract -->
 ```json
 {
   "url": "판정한 URL",
   "judgments": [
-    { "ref": "sq1#issue#0", "access": "성공|실패", "exists": "일치|불일치", "quote": "원문에서 고치지 않고 옮긴 지지 구절", "context": "그 구절 앞뒤의 부정·조건·비교 문장", "reason": "판정 이유" }
+    { "ref": "sq1#issue#0", "access": "성공|실패", "exists": "일치|불일치", "exists_note": "확인한 제목·저자·학회", "quote": "원문에서 고치지 않고 옮긴 지지 구절", "context": "그 구절 앞뒤의 부정·조건·비교 문장", "reason": "판정 이유" }
   ],
   "principles_applied": [ "읽고 적용한 원칙 ID" ]
 }
@@ -237,7 +239,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 ```json
 {
   "judgments": [
-    { "ref": "sq1#issue#0", "numbers_conditions": "일치|불일치|판정 불가", "direction": "일치|불일치|판정 불가", "scope": "일치|불일치|판정 불가", "unsure_reasons": { "판정 불가인 칸 이름": "맥락 부족|조건 얽힘|표·그림 값|언어 해석" }, "reason": "판정 이유" }
+    { "ref": "sq1#issue#0", "numbers_conditions": "일치|불일치|판정 불가|정보 부족", "direction": "일치|불일치|판정 불가|정보 부족", "scope": "일치|불일치|판정 불가|정보 부족", "missing": { "정보 부족인 칸 이름": "없는 요소" }, "unsure_reasons": { "판정 불가인 칸 이름": "조건 얽힘|표·그림 값|언어 해석" }, "reason": "판정 이유" }
   ],
   "principles_applied": [ "읽고 적용한 원칙 ID" ]
 }
@@ -248,11 +250,14 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 1. 추출 검증자가 응답하지 않았거나 판정이 빠졌으면 그 URL 은 검증 실패다.
 2. `access`가 `실패`이면 `unverifiable`이다.
 3. `exists`가 `불일치`이거나 `quote`가 없으면 `unsupported`다.
-4. 판정 에이전트가 응답하지 않았거나 세 칸 중 하나가 빠졌으면 그 URL 은 검증 실패다. 빠진 칸을 `일치`로 보지 않는다. 판정 에이전트가 `판정 불가`를 낸 칸은 상향 판정 에이전트의 값으로 바꾸고, 상향 판정 에이전트가 응답하지 않았거나 그 칸을 빠뜨렸으면 그 URL 은 검증 실패다. 상향 판정 뒤에도 `판정 불가`인 칸이 남으면 그 주장만 `verify_failed`다.
-5. 세 칸 중 하나라도 `불일치`이면 `unsupported`다.
-6. 그 밖은 `supported`다.
+4. 판정 에이전트가 응답하지 않았거나 세 칸 중 하나가 빠졌으면 그 URL 은 검증 실패다. 빠진 칸을 `일치`로 보지 않는다.
+5. 처음 판정에 `불일치`인 칸이 있으면 `unsupported`다. 이 주장은 보충과 상향을 하지 않는다.
+6. `정보 부족`인 칸이 있으면 보충하고 재판정한다. 보충이나 재판정이 응답하지 않았거나 그 주장을 빠뜨렸거나, 보충 출력의 `access`가 `실패`이거나 `exists`가 `불일치`이거나 `quote`가 없으면, 그 주장만 `verify_failed`다. 재판정은 그 주장의 세 칸을 모두 대체한다. 재판정에 `불일치`가 있으면 `unsupported`이고, 재판정에도 `정보 부족`이 있으면 그 주장만 `verify_failed`다.
+7. 남은 `판정 불가` 칸은 상향 판정 에이전트의 값으로 바꾼다. 상향 판정 에이전트가 응답하지 않았거나 그 칸을 빠뜨렸으면 그 URL 은 검증 실패다. 상향 판정 뒤에도 `판정 불가`나 `정보 부족`인 칸이 남으면 그 주장만 `verify_failed`다.
+8. 세 칸 중 하나라도 `불일치`이면 `unsupported`다.
+9. 그 밖은 `supported`다.
 
-4번이 5번보다 앞서므로, 상향 뒤에도 `판정 불가`인 칸이 있는 주장은 다른 칸이 `불일치`여도 `verify_failed`다. 합친 출력은 아래 형식이며 `verifiers[].output`에 들어간다. `quote`는 추출 검증자의 값이고 `reason`은 단계별 이유를 이어 붙인 값이다.
+7번이 8번보다 앞서므로, 상향 뒤에도 `판정 불가`나 `정보 부족`인 칸이 있는 주장은 상향이 다른 칸에 `불일치`를 내도 `verify_failed`다. 합친 출력은 아래 형식이며 `verifiers[].output`에 들어간다. `quote`는 보충 출력이 추출 기준을 통과했으면 보충 구절이고, 아니면 추출 검증자의 값이다. `reason`은 단계별 이유를 이어 붙인 값이다.
 
 <!-- output: verifier -->
 ```json
@@ -271,7 +276,12 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 ```json
 {
   "cells": [
-    { "row": "사례 이름", "column": "axes.mechanism.prior", "grounded": true, "source_ref": "sq1#case#0" }
+    { "row": "사례 이름", "column": "case", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "outcome", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "axes.purpose.prior", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "axes.mechanism.prior", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "axes.evaluation.prior", "grounded": true, "source_ref": "sq1#case#0" },
+    { "row": "사례 이름", "column": "axes.target.prior", "grounded": false, "source_ref": "" }
   ],
   "principles_applied": [ "읽고 적용한 원칙 ID" ]
 }
@@ -286,23 +296,23 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 | 워크플로 `args`(프로토콜) | `{ question, situation, target, mode: "contrast"\|"survey", round: 1\|2, subquestions: [{ id, scope, include, exclude }], forbidden_terms: [string], researcher_count, researcher_count_basis, principles_path }`. `round`는 첫 실행이 1, 공백 라운드가 2 다 |
 | 연구자 출력 | 「연구자 출력」의 `researcher` 예시 블록의 칸이다. `evidence_map` 행은 `{ case, url, axes: { purpose, mechanism, evaluation, target }, outcome, kind, source_level, route, adoption? }`다 |
 | 종합 모드 연구자 출력 | `{ evidence_map: [행], conclusions: [{ text, refs: [string] }], principles_applied }` |
-| 추출 검증자 출력 | `{ url, judgments: [{ ref, access, exists, quote, context, reason }], principles_applied }`. `ref`의 형식은 주장 참조 형식이다 |
-| 판정·상향 판정 출력 | `{ judgments: [{ ref, numbers_conditions, direction, scope, unsure_reasons, reason }], principles_applied }` |
+| 추출 검증자 출력 | `{ url, judgments: [{ ref, access, exists, exists_note, quote, context, reason }], principles_applied }`. `ref`의 형식은 주장 참조 형식이다. 보충 출력도 같은 형식이다 |
+| 판정·재판정·상향 판정 출력 | `{ judgments: [{ ref, numbers_conditions, direction, scope, missing, unsure_reasons, reason }], principles_applied }` |
 | 합친 인용 판정 출력 | `{ url, judgments: [{ ref, verdict, quote, reason }], principles_applied }`. `verdict`는 `supported`·`unsupported`·`unverifiable`·`verify_failed`다 |
 | 지도 대조 출력 | `{ cells: [{ row, column, grounded, source_ref }], principles_applied }` |
-| 워크플로 반환값 | `{ round, passed, rejected, unverifiable, verify_failed: [{ url, refs }], coverage: [{ id, cases_found, passed }], subquestion_status: [{ id, search_status, verification_status }], overall_status, query_violations: [{ id, query, rule }], verifier_count, researchers, verifiers, synthesis?, map_check? }`. `passed`·`rejected`·`unverifiable`의 원소는 `{ ref, urls }`이고, `verifiers`의 원소는 `{ url, subquestions, output, stages }`다. `verifier_count`는 판정에 보낸 URL 묶음 수(`verifiers`의 길이)다. 추출이 실패한 URL 도 세고, 에이전트 호출 수는 아니며 상향 판정 실행 수도 세지 않는다. `overall_status`는 `ok`나 `not-ok`다 |
+| 워크플로 반환값 | `{ round, passed, rejected, unverifiable, verify_failed: [{ url, refs }], coverage: [{ id, cases_found, passed }], subquestion_status: [{ id, search_status, verification_status }], overall_status, query_violations: [{ id, query, rule }], verifier_count, researchers, verifiers, synthesis?, map_check? }`. `passed`·`rejected`·`unverifiable`의 원소는 `{ ref, urls }`이고, `verifiers`의 원소는 `{ url, subquestions, output, stages }`다. `verifier_count`는 판정에 보낸 URL 묶음 수(`verifiers`의 길이)다. 추출이 실패한 URL 도 세고, 에이전트 호출 수는 아니며 보충·재판정·상향 판정 실행 수도 세지 않는다. `overall_status`는 `ok`나 `not-ok`다 |
 
-**에이전트에게 보내는 프롬프트.** 워크플로는 연구자와 검증자에게 보내는 프롬프트의 첫 줄을 `MODE: <모드>`로 쓴다. 모드 값은 연구자가 `explore`·`synthesize`, 검증 단계가 `extract`·`judge`·`map`이다. 추출 검증자는 `extract`, 판정 에이전트와 상향 판정 에이전트는 `judge`, 지도 대조 에이전트는 `map`을 받는다. 둘째 줄에는 `PRINCIPLES: <principles_path>`를 두고, 셋째 줄부터 모드별 입력을 json 코드 울타리 안의 `JSON.stringify(입력, null, 2)` 블록 하나로 둔다. 연구자 탐색 모드의 입력은 `{ question, situation, target, mode, subquestion, forbidden_terms }`, 종합 모드의 입력은 `{ question, target, passed_rows }`, 추출 모드의 입력은 `{ url, claims: [{ ref, text }] }`, 판정 모드의 입력은 `{ url, claims: [{ ref, text, quote, context }] }`, 지도 대조 모드의 입력은 `{ evidence_map, passed }`다. `passed_rows`와 `passed`의 원소는 `{ ref, row }`다. 에이전트 정의의 모드 처리 단락은 이 첫 줄로 모드를 고른다.
+**에이전트에게 보내는 프롬프트.** 워크플로는 연구자와 검증자에게 보내는 프롬프트의 첫 줄을 `MODE: <모드>`로 쓴다. 모드 값은 연구자가 `explore`·`synthesize`, 검증 단계가 `extract`·`refetch`·`judge`·`map`이다. 추출 검증자는 추출에서 `extract`, 보충에서 `refetch`를 받는다. 판정 에이전트(판정과 재판정)와 상향 판정 에이전트는 `judge`, 지도 대조 에이전트는 `map`을 받는다. 둘째 줄에는 `PRINCIPLES: <principles_path>`를 두고, 셋째 줄부터 모드별 입력을 json 코드 울타리 안의 `JSON.stringify(입력, null, 2)` 블록 하나로 둔다. 연구자 탐색 모드의 입력은 `{ question, situation, target, mode, subquestion, forbidden_terms }`, 종합 모드의 입력은 `{ question, target, passed_rows }`, 추출 모드의 입력은 `{ url, claims: [{ ref, text }] }`, 보충 모드의 입력은 `{ url, claims: [{ ref, text, missing }] }`, 판정 모드의 입력은 `{ url, claims: [{ ref, text, quote, context, source_note }] }`, 지도 대조 모드의 입력은 `{ evidence_map, passed }`다. 보충 입력의 `missing`은 처음 판정의 값이다. 판정 입력의 `quote`·`context`는 추출 출력(재판정이면 보충 출력)의 값이고, `source_note`는 같은 출력의 `exists_note`이며 없으면 빈 문자열이다. 추출 출력의 `reason`은 판정 입력에 넣지 않는다. 재판정과 상향 판정의 입력도 판정 모드의 입력과 같은 형식이다. `passed_rows`와 `passed`의 원소는 `{ ref, row }`다. 에이전트 정의의 모드 처리 단락은 이 첫 줄로 모드를 고른다.
 
 **`principles_applied`가 빈 때.** 오케스트레이터는 그 사실을 보고에 적고 자동으로 다시 실행하지 않는다.
 
-**판정 모델 교체.** 단계별 출력 형식은 판정 모델과 무관하다. 그래서 추출 검증자, 판정 에이전트, 상향 판정 에이전트, 지도 대조 에이전트 정의의 `model`만 바꾸면 단계마다 다른 모델로 바꿀 수 있다. 현재 구성은 상향 판정 에이전트만 Sonnet 5.5 이고 나머지 셋은 Haiku 5.5 이며, 모두 노력 수준은 high 다. 판정 전용 모델(예: Typesafe AI 의 Jev)도 쓸 수 있게 되면 같은 방식으로 바꿀 수 있다. 다만 Kim 등(ICML 2025)은 제공사가 달라도 오류 상관이 높다고 보고했으므로, 모델을 바꿔도 상관 오류가 줄어든다고 기대하지 않는다. Jev 는 이 PC에 키가 없고 사내 문서를 외부 API 로 보내는 데 회사 승인이 필요하므로 구성에 넣지 않는다.
+**판정 모델 교체.** 단계별 출력 형식은 판정 모델과 무관하다. 그래서 추출 검증자, 판정 에이전트, 상향 판정 에이전트, 지도 대조 에이전트 정의의 `model`만 바꾸면 단계마다 다른 모델로 바꿀 수 있다. 현재 구성은 상향 판정 에이전트만 Opus 5.5 에 노력 수준 medium 이고, 나머지 셋은 Haiku 5.5 에 노력 수준 high 다. 판정 전용 모델(예: Typesafe AI 의 Jev)도 쓸 수 있게 되면 같은 방식으로 바꿀 수 있다. 다만 Kim 등(ICML 2025)은 제공사가 달라도 오류 상관이 높다고 보고했으므로, 모델을 바꿔도 상관 오류가 줄어든다고 기대하지 않는다. Jev 는 이 PC에 키가 없고 사내 문서를 외부 API 로 보내는 데 회사 승인이 필요하므로 구성에 넣지 않는다.
 
 ## 인용 확인
 
 인용 확인은 검증자와 오케스트레이터가 나눠 맡으며, 사용자가 2026-10-18에 이 분담을 정했다. 연구자가 늘어나면 오케스트레이터 혼자 인용 수십 건을 직접 열어야 하기 때문이다.
 
-오케스트레이터는 추출 검증자가 옮긴 `quote`(합친 출력의 `quote`가 이 값이다)가 원문에 있고 주장을 뒷받침하는지 직접 열어 확인한다. 확인할 인용의 범위는 상황마다 다르다. spec 대조와 제안서 검진에서는 문서를 실제로 고치게 만들었거나 `🔴`로 올릴 발견, 그리고 사용자에게 전달할 발견이 근거로 삼은 인용 전부를 확인한다. 기존 도구 탐색, 결정 근거 탐색, 사실 확인에서는 보고의 결론 문장에 직접 쓰는 인용만 확인하고, 근거 지도의 나머지 행은 검증자 판정을 그대로 둔다.
+오케스트레이터는 추출 검증자가 옮긴 `quote`가 원문에 있고 주장을 뒷받침하는지 직접 열어 확인한다. 합친 출력의 `quote`가 이 값이며, 보충을 거친 주장이면 보충 구절이다. 확인할 인용의 범위는 상황마다 다르다. spec 대조와 제안서 검진에서는 문서를 실제로 고치게 만들었거나 `🔴`로 올릴 발견, 그리고 사용자에게 전달할 발견이 근거로 삼은 인용 전부를 확인한다. 기존 도구 탐색, 결정 근거 탐색, 사실 확인에서는 보고의 결론 문장에 직접 쓰는 인용만 확인하고, 근거 지도의 나머지 행은 검증자 판정을 그대로 둔다.
 
 이 절이 인용 확인 범위의 원본이다.
 
