@@ -16,6 +16,7 @@ def test_build_cmd_tools():
         return c[c.index("--tools") + 1] == v and c[c.index("--allowedTools") + 1] == v
     assert tools(cmds["baseline-cite"], "WebFetch,Read") and tools(cmds["extract"], "WebFetch,Read")
     assert tools(cmds["judge"], "Read") and tools(cmds["map"], "Read") and tools(cmds["baseline-map"], "Read")
+    assert tools(run.build_cmd("refetch-def", "m", "low", "p"), "WebFetch,Read") and tools(run.build_cmd("rejudge-def", "m", "low", "p"), "Read")
 
 
 def test_parse_output_fenced():
@@ -180,7 +181,7 @@ def test_map_missing_cells_fail():
     assert r["failures"] == 2
 
 
-# --- 구성 전체 재측정(-def 단계, replay.py, report-v2) 검사.
+# --- 구성 전체 재측정(-def 단계, replay.py, report-v2·report-v3) 검사.
 def _harn_run(inp):
     import subprocess
     import json
@@ -199,60 +200,224 @@ def _def_case():
 
 
 def _def_row(stage, model, effort, unit, output, repeat=1):
-    return {"key": f"{stage}{unit}{repeat}{effort}", "stage": stage, "model": model, "effort": effort, "category": "",
+    return {"key": "", "stage": stage, "model": model, "effort": effort, "category": "",
             "repeat": repeat, "unit": unit, "output": output, "cost_usd": 0.01, "error": ""}
 
 
-H, SN = "claude-haiku-5-5", "claude-sonnet-5-5"
+def _keyed(cases, rows):
+    """가짜 -def 줄에 run.py 가 그 차례에 계산했을 key 를 앞 줄부터 차례로 넣는다."""
+    done = []
+    for r in rows:
+        r["key"] = run.def_key(cases, done, r["stage"], f"{r['model']}/{r['effort']}", r["repeat"], r["unit"])
+        done.append(r)
+    return rows
+
+
+H, OP = "claude-haiku-5-5", "claude-opus-5-5"
 EXTRACT_OUT = {"url": "https://a", "principles_applied": [], "judgments": [
-    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "quote": "q0", "context": "c0", "reason": "r"},
+    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "exists_note": "n0", "quote": "q0", "context": "c0", "reason": "r"},
     {"ref": "S1#issue#1", "access": "성공", "exists": "일치", "quote": "q1", "reason": "r"}]}
+# 주장 0 은 정보 부족이라 보충·재판정을 거쳐 판정 불가로 상향되고, 주장 1 은 처음 판정에서 바로 상향된다.
 JUDGE_OUT = {"principles_applied": [], "judgments": [
-    {"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"},
-    {"ref": "S1#issue#1", "numbers_conditions": "일치", "direction": "판정 불가", "scope": "일치", "unsure_reasons": {"direction": "맥락 부족"}, "reason": "r"}]}
+    {"ref": "S1#issue#0", "numbers_conditions": "정보 부족", "direction": "일치", "scope": "일치",
+     "missing": {"numbers_conditions": "세션 수"}, "unsure_reasons": {}, "reason": "r"},
+    {"ref": "S1#issue#1", "numbers_conditions": "일치", "direction": "판정 불가", "scope": "일치", "missing": {},
+     "unsure_reasons": {"direction": "언어 해석"}, "reason": "r"}]}
+REFETCH_OUT = {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "exists_note": "n0b", "quote": "q0b", "context": "c0b", "reason": "r"}]}
+REJUDGE_OUT = {"principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "판정 불가", "scope": "일치", "missing": {},
+     "unsure_reasons": {"direction": "조건 얽힘"}, "reason": "r"}]}
 ESC_OUT = {"principles_applied": [], "judgments": [
-    {"ref": "S1#issue#1", "numbers_conditions": "일치", "direction": "불일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]}
+    {"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"},
+    {"ref": "S1#issue#1", "numbers_conditions": "일치", "direction": "불일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]}
+
+
+def _pipeline_rows():
+    import copy
+    return copy.deepcopy([
+        _def_row("extract-def", H, "high", "https://a", EXTRACT_OUT), _def_row("judge-def", H, "high", "https://a", JUDGE_OUT),
+        _def_row("refetch-def", H, "high", "https://a", REFETCH_OUT), _def_row("rejudge-def", H, "high", "https://a", REJUDGE_OUT),
+        _def_row("escalate-def", OP, "medium", "https://a", ESC_OUT)])
+
+
+def _agent_body(agent_type):
+    """agentType 이 가리키는 정의 파일에서 frontmatter 를 뗀 본문이다. 운영의 system 프롬프트에 들어가는 지시문이다."""
+    with open(os.path.join(run.ROOT, "agents", agent_type.split(":")[1] + ".md"), encoding="utf-8") as f:
+        text = f.read()
+    return text[text.index("\n---", 3) + 4:].lstrip("\n")
 
 
 def test_def_prompt_matches_workflow():
-    """harn run 이 기록한 extract:·judge:·escalate: 호출의 프롬프트가 run.py -def 단계의 사용자 메시지와 같다."""
-    args = {"question": "Q?", "situation": "S", "target": "T", "mode": "contrast", "round": 1,
+    """harn run 이 기록한 extract:·judge:·refetch:·rejudge:·escalate:·map-check 호출이 run.py -def 단계와 같다.
+    사용자 메시지는 프롬프트로, system 프롬프트는 agentType 의 정의 본문으로 대조한다."""
+    row = {"case": "사례 B", "url": "https://b", "outcome": "실패",
+           "axes": {k: {"prior": f"{k} 서술", "same": True, "note": ""} for k in ("purpose", "mechanism", "evaluation", "target")}}
+    args = {"question": "Q?", "situation": "S", "target": "T", "mode": "survey", "round": 1,
             "subquestions": [{"id": "S1", "scope": "a", "include": [], "exclude": []}], "forbidden_terms": [],
             "researcher_count": 1, "researcher_count_basis": "x", "principles_path": run.PRINCIPLES}
+    b_ok = {"url": "https://b", "principles_applied": [], "judgments": [
+        {"ref": "S1#case#0", "access": "성공", "exists": "일치", "exists_note": "nb", "quote": "qb", "context": "", "reason": "r"}]}
+    b_judge = {"principles_applied": [], "judgments": [
+        {"ref": "S1#case#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]}
+    synthesis = {"evidence_map": [row], "conclusions": [], "principles_applied": []}
+    map_out = {"cells": [], "principles_applied": []}
     responses = {"research:S1": {"search_status": "ok", "queries": ["q"], "issues": [
         {"prior_claim": "주장 A", "citations": [{"url": "https://a"}]},
-        {"prior_claim": "주장 \"B\"", "citations": [{"url": "https://a"}]}]},
-        "extract:https://a": EXTRACT_OUT, "judge:https://a": JUDGE_OUT, "escalate:https://a": ESC_OUT}
-    calls = {c["label"]: c["prompt"] for c in _harn_run({"args": args, "responses": responses})["calls"]}
+        {"prior_claim": "주장 \"B\"", "citations": [{"url": "https://a"}]}], "evidence_map": [row]},
+        "extract:https://a": EXTRACT_OUT, "judge:https://a": JUDGE_OUT, "refetch:https://a": REFETCH_OUT,
+        "rejudge:https://a": REJUDGE_OUT, "escalate:https://a": ESC_OUT,
+        "extract:https://b": b_ok, "judge:https://b": b_judge, "synthesize": synthesis, "map-check": map_out}
+    calls = {c["label"]: c for c in _harn_run({"args": args, "responses": responses})["calls"]}
     cases = _def_case()
-    runs = [_def_row("extract-def", H, "high", "https://a", EXTRACT_OUT), _def_row("judge-def", H, "high", "https://a", JUDGE_OUT)]
-
-    def mine(stage):
+    cases["map_cases"] = [{"id": "map-1", "input": {"evidence_map": [row], "passed": [{"ref": "S1#case#0", "row": row}]}, "truth": []}]
+    runs = _keyed(cases, _pipeline_rows())
+    pairs = {"extract-def": "extract:https://a", "judge-def": "judge:https://a", "refetch-def": "refetch:https://a",
+             "rejudge-def": "rejudge:https://a", "escalate-def": "escalate:https://a", "map-def": "map-check"}
+    for stage, label in pairs.items():
+        unit = "map-1" if stage == "map-def" else "https://a"
         us = dict(run.def_units(cases, stage, runs, 1, H + "/high", False))
-        return run.def_prompt(stage, us["https://a"])
-    assert mine("extract-def") == calls["extract:https://a"]
-    assert mine("judge-def") == calls["judge:https://a"]
-    assert mine("escalate-def") == calls["escalate:https://a"]
+        user, system = run.def_prompt(stage, us[unit]), run.def_system(stage)
+        assert user == calls[label]["prompt"], stage
+        assert system == _agent_body(calls[label]["agentType"]), stage
+        cmd = run.build_cmd(stage, "m", "high", user, system)
+        assert cmd[cmd.index("-p") + 1] == user and cmd[cmd.index("--system-prompt") + 1] == system, stage
+
+
+def test_escalate_input_uses_rejudge():
+    """재판정을 거친 주장의 상향 입력은 재판정 입력과 같고, 거치지 않은 주장은 처음 판정 입력과 같다."""
+    cases = _def_case()
+    runs = _keyed(cases, _pipeline_rows())
+
+    def claims(stage):
+        return {c["ref"]: c for c in dict(run.def_units(cases, stage, runs, 1, H + "/high", False))["https://a"]["claims"]}
+    esc, rj, ju = claims("escalate-def"), claims("rejudge-def"), claims("judge-def")
+    assert esc["S1#issue#0"] == rj["S1#issue#0"] and esc["S1#issue#0"]["quote"] == "q0b" and esc["S1#issue#0"]["source_note"] == "n0b"
+    assert esc["S1#issue#1"] == ju["S1#issue#1"] and ju["S1#issue#1"]["source_note"] == ""
+    assert ju["S1#issue#0"]["source_note"] == "n0"
 
 
 def test_replay_uses_workflow_merge():
     """가짜 단계 출력으로 replay 가 mergeStages·classify 의 판정을 그대로 옮긴다."""
     import replay
     cases = _def_case()
-    runs = [_def_row("extract-def", H, "high", "https://a", EXTRACT_OUT), _def_row("judge-def", H, "high", "https://a", JUDGE_OUT),
-            _def_row("escalate-def", SN, "high", "https://a", ESC_OUT)]
-    rows = {r["id"]: r for r in replay.replay(cases, runs, 1)}
-    assert rows["S1#issue#0"]["verdict"] == "supported" and rows["S1#issue#0"]["escalated"] is False
+    rows = {r["id"]: r for r in replay.replay(cases, _keyed(cases, _pipeline_rows()), 1)}
+    assert rows["S1#issue#0"]["verdict"] == "supported" and rows["S1#issue#0"]["escalated"] is True
     assert rows["S1#issue#1"]["verdict"] == "unsupported" and rows["S1#issue#1"]["escalated"] is True
     assert rows["S1#issue#1"]["judge_raw"]["direction"] == "판정 불가"
     # 상향 판정도 판정 불가면 그 주장만 verify_failed 이고 다른 주장은 남는다.
-    unsure = {"principles_applied": [], "judgments": [dict(ESC_OUT["judgments"][0], direction="판정 불가")]}
-    runs[2] = _def_row("escalate-def", SN, "high", "https://a", unsure)
-    rows = {r["id"]: r for r in replay.replay(cases, runs, 1)}
+    rs = _pipeline_rows()
+    rs[4]["output"] = {"principles_applied": [], "judgments": [ESC_OUT["judgments"][0], dict(ESC_OUT["judgments"][1], direction="판정 불가")]}
+    rows = {r["id"]: r for r in replay.replay(cases, _keyed(cases, rs), 1)}
     assert rows["S1#issue#1"]["verdict"] == "verify_failed" and rows["S1#issue#0"]["verdict"] == "supported"
     # 상향 판정 실행이 없으면 그 URL 전체가 검증 실패다.
-    rows = {r["id"]: r for r in replay.replay(cases, runs[:2], 1)}
+    rows = {r["id"]: r for r in replay.replay(cases, _keyed(cases, _pipeline_rows()[:4]), 1)}
     assert rows["S1#issue#0"]["verdict"] == "verify_failed" and rows["S1#issue#1"]["verdict"] == "verify_failed"
+
+
+def test_replay_passes_refetch_and_rejudge():
+    """replay 가 보충·재판정 출력을 mergeStages 의 새 인자로 넘긴다. 빠지면 보충에 보낸 주장만 검증 실패다."""
+    import replay
+    cases = _def_case()
+    rows = {r["id"]: r for r in replay.replay(cases, _keyed(cases, _pipeline_rows()), 1)}
+    r0 = rows["S1#issue#0"]
+    assert r0["refetch_sent"] is True and r0["refetch_raw"]["quote"] == "q0b" and r0["rejudge_raw"]["direction"] == "판정 불가"
+    assert r0["escalate_raw"]["direction"] == "일치"
+    assert rows["S1#issue#1"]["refetch_sent"] is False and rows["S1#issue#1"]["rejudge_raw"] is None
+    # 보충 출력이 없으면 주장 0 만 verify_failed 이고, 주장 1 은 상향 판정대로 unsupported 다.
+    rs = [r for r in _pipeline_rows() if r["stage"] not in ("refetch-def", "rejudge-def")]
+    rs[-1]["output"] = {"principles_applied": [], "judgments": [ESC_OUT["judgments"][1]]}
+    rows = {r["id"]: r for r in replay.replay(cases, _keyed(cases, rs), 1)}
+    assert rows["S1#issue#0"]["verdict"] == "verify_failed" and rows["S1#issue#1"]["verdict"] == "unsupported"
+
+
+def test_def_output_ignores_other_keys():
+    """앞 단계 출력은 그 차례에 계산한 key 가 같은 줄만 쓴다. 정의나 입력이 다른 옛 줄은 섞이지 않는다."""
+    cases = _def_case()
+    rs = _keyed(cases, _pipeline_rows()[:2])
+    rs[1]["key"] = "stale0000000000"
+    assert run.def_output(cases, rs, "judge-def", H + "/high", 1, "https://a") is None
+    assert run.def_output(cases, rs, "extract-def", H + "/high", 1, "https://a") == EXTRACT_OUT
+
+
+def _write(path, obj, lines=False):
+    import json
+    with open(path, "w", encoding="utf-8") as f:
+        if lines:
+            f.write("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in obj))
+        else:
+            json.dump(obj, f, ensure_ascii=False)
+
+
+def _v3_files(d, truth_d1=True, replay_rows=None):
+    """report-v3 의 입력 파일을 만든다. 기준선은 두 실행 모두 d1 supported·d2 unsupported 다."""
+    import copy
+    import score
+    cases = {"items": [
+        {"id": "d1", "category": "direction", "url": "u1", "claim": {"ref": "d1", "text": "t1"}, "truth": True, "check_note": "n"},
+        {"id": "d2", "category": "direction", "url": "u1", "claim": {"ref": "d2", "text": "t2"}, "truth": False, "check_note": "n"}],
+        "map_cases": []}
+    base = []
+    for rep in (1, 2):
+        r = _run("baseline-cite", "claude-opus-5-5", "medium", "u1",
+                 [{"ref": "d1", "verdict": "supported"}, {"ref": "d2", "verdict": "unsupported"}], repeat=rep, cost=1.0)
+        r["key"] = score.expected_key(cases, r, {})
+        base.append(r)
+    scored = copy.deepcopy(cases)
+    scored["items"][0]["truth"] = truth_d1
+    p = {k: os.path.join(d, k) for k in ("cases.json", "base-cases.json", "base.jsonl", "def.jsonl", "replay.json", "report.md")}
+    _write(p["cases.json"], scored)
+    _write(p["base-cases.json"], cases)
+    _write(p["base.jsonl"], base, lines=True)
+    _write(p["def.jsonl"], [_def_row("judge-def", H, "high", "u1", {"judgments": []}, repeat=rep) for rep in (1, 2)], lines=True)
+    _write(p["replay.json"], replay_rows or [
+        {"id": "d1", "repeat": 1, "verdict": "supported"}, {"id": "d1", "repeat": 2, "verdict": "unsupported"},
+        {"id": "d2", "repeat": 1, "verdict": "unsupported"}, {"id": "d2", "repeat": 2, "verdict": "unsupported"}])
+    return p
+
+
+def _report_v3(p):
+    import score
+    score.report_v3(p["base.jsonl"], p["def.jsonl"], p["replay.json"], p["cases.json"], p["report.md"], p["base-cases.json"], None)
+    with open(p["report.md"], encoding="utf-8") as f:
+        return f.read()
+
+
+def test_report_v3_uses_given_cases_and_baseline():
+    """병합 조건을 인자로 준 자료와 기준선 파일로 계산한다."""
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        text = _report_v3(_v3_files(d))
+        assert "비용 조건을 충족했고, 항목 조건을 채우지 못했다" in text and "| d1 |" in text
+    # 채점 자료에서 d1 이 오류 항목이면 기준선이 두 실행 모두 틀려 비교에서 빠지고 항목 조건을 채운다.
+    with tempfile.TemporaryDirectory() as d:
+        text = _report_v3(_v3_files(d, truth_d1=False))
+        assert "항목 조건을 충족했다" in text and "빠진 항목·칸 1개(d1)" in text
+
+
+def test_report_v3_lists_remaining_unsure():
+    """재판정 뒤 남은 정보 부족과 상향 뒤 남은 판정 불가가 missing·이유 유형·사유 문장과 함께 보고에 있다."""
+    import tempfile
+    sure = {"numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}}
+    rows = [
+        {"id": "d1", "repeat": 1, "verdict": "verify_failed", "refetch_sent": True, "escalate_sent": False,
+         "judge_raw": dict(sure, numbers_conditions="정보 부족", missing={"numbers_conditions": "세션 수"}, reason="처음 사유"),
+         "refetch_raw": {"access": "성공", "exists": "일치", "quote": "q"},
+         "rejudge_raw": dict(sure, numbers_conditions="정보 부족", missing={"numbers_conditions": "세션 수"}, reason="세션 수가 구절에 없다"),
+         "escalate_raw": None, "escalated": False},
+        {"id": "d1", "repeat": 2, "verdict": "supported"},
+        {"id": "d2", "repeat": 1, "verdict": "verify_failed", "refetch_sent": False, "escalate_sent": True,
+         "judge_raw": dict(sure, direction="판정 불가", unsure_reasons={"direction": "조건 얽힘"}, reason="r"),
+         "refetch_raw": None, "rejudge_raw": None,
+         "escalate_raw": dict(sure, direction="판정 불가", unsure_reasons={"direction": "언어 해석"}, reason="구절이 두 뜻으로 읽힌다"),
+         "escalated": True},
+        {"id": "d2", "repeat": 2, "verdict": "unsupported"}]
+    with tempfile.TemporaryDirectory() as d:
+        text = _report_v3(_v3_files(d, replay_rows=rows))
+    remain = text[text.index("## 남은 정보 부족과 판정 불가"):]
+    remain = remain[:remain.index("\n## ", 1)]
+    assert "| d1 | 1 | 재판정 | numbers_conditions | 정보 부족 | 세션 수 | 세션 수가 구절에 없다 |" in remain
+    assert "| d2 | 1 | 상향 | direction | 판정 불가 | 언어 해석 | 구절이 두 뜻으로 읽힌다 |" in remain
 
 
 def test_confident_wrong_counted():

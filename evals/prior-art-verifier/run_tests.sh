@@ -105,7 +105,7 @@ for t in test_missing_judgment_is_failure test_no_quote_excluded test_unverifiab
   check "$t" "$PY -I '$HERE/harness_tests.py' $t 2>/dev/null"
 done
 echo "== 구성 전체 재측정"
-for t in test_def_prompt_matches_workflow test_replay_uses_workflow_merge test_confident_wrong_counted test_merge_condition_item_level; do
+for t in test_def_prompt_matches_workflow test_escalate_input_uses_rejudge test_replay_uses_workflow_merge test_replay_passes_refetch_and_rejudge test_def_output_ignores_other_keys test_report_v3_uses_given_cases_and_baseline test_report_v3_lists_remaining_unsure test_confident_wrong_counted test_merge_condition_item_level; do
   check "$t" "$PY -I '$HERE/harness_tests.py' $t 2>/dev/null"
 done
 echo "PASS=$pass FAIL=$fail"

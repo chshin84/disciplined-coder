@@ -45,3 +45,18 @@ python -I evals/prior-art-verifier/score.py report-v2
 ```
 
 `replay.py` 는 단계 출력을 `scripts/workflow_harness.mjs` 의 `fn mergeStages` 와 `fn classify` 에 넣어 최종 판정을 얻는다. 그래서 재측정과 운영이 같은 합치기 코드를 쓴다. `score.py report-v2` 는 `results-v2/report.md` 에 병합 조건 판정과 어려운 항목 결과를 쓴다.
+
+## 충분성 판단 구성의 재측정
+
+절차는 `docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md` 의 Task 3 에 있고, 자료는 라벨을 정정한 `cases-v3.json` 이다. 새 구성의 단계 실행은 `results-v3/runs-def.jsonl` 에 쓰고, 기준선은 `results-v2/runs.jsonl` 의 두 실행을 `cases-v3.json` 으로 다시 채점한다.
+
+`refetch-def`(보충, 추출 검증자 정의, `WebFetch,Read`)와 `rejudge-def`(재판정, 판정 정의)가 추가되었다. 각 `-def` 단계는 같은 차례의 앞 단계 출력을 `run.def_output` 으로 고른다. 이 함수는 앞 단계의 입력과 정의로 다시 계산한 key 가 같은 줄만 쓰므로, 정의나 입력이 다른 옛 줄은 섞이지 않는다. `escalate-def` 는 재판정을 거친 주장이면 재판정 입력을, 아니면 처음 판정 입력을 쓴다. 보충·상향 대상이 없는 차례에는 그 단계의 줄이 없다.
+
+```bash
+python -I evals/prior-art-verifier/run.py --cases evals/prior-art-verifier/cases-v3.json --out evals/prior-art-verifier/results-v3/runs-def.jsonl --repeat 2 --stage <extract-def|judge-def|refetch-def|rejudge-def|map-def> --model claude-haiku-5-5 --effort high
+python -I evals/prior-art-verifier/run.py --cases evals/prior-art-verifier/cases-v3.json --out evals/prior-art-verifier/results-v3/runs-def.jsonl --repeat 2 --stage escalate-def --model claude-opus-5-5 --effort medium
+python -I evals/prior-art-verifier/replay.py --cases evals/prior-art-verifier/cases-v3.json --runs evals/prior-art-verifier/results-v3/runs-def.jsonl --repeat 2 --out evals/prior-art-verifier/results-v3/replay.json
+python -I evals/prior-art-verifier/score.py report-v3 --cases evals/prior-art-verifier/cases-v3.json --baseline evals/prior-art-verifier/results-v2/runs.jsonl --runs evals/prior-art-verifier/results-v3/runs-def.jsonl --replay evals/prior-art-verifier/results-v3/replay.json --out evals/prior-art-verifier/results-v3/report.md
+```
+
+`report-v3` 는 기준선 줄을 `--baseline-cases`(기본 `cases-v2.json`, 기준선을 실행한 자료)로 만든 key 와 대조해 고르고, 정답은 `--cases` 로 채점한다. 앞 재측정의 새 구성과 비교하는 열은 `--prev-replay`(기본 `results-v2/replay.json`)로 만든다.
