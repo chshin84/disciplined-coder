@@ -585,6 +585,11 @@ JE() { printf '{"tool_name":"Edit","tool_input":{"file_path":"%s","new_string":"
 FW_OUT="$(drev "$(J "$FM/x.md")")"
 check "Write 라벨 불릿 → 형식 경고" "grep -qF '라벨 불릿' <<<\"\$FW_OUT\" && json_valid_stdin <<<\"\$FW_OUT\""
 check "Bash 라벨 불릿 → 형식 경고" "drev \"\$(JB \"sed -i s/x/y/ $FM/x.md\")\" | grep -qF '라벨 불릿'"
+# 실제 Write·Edit 입력은 tool_name 과 본문을 싣는다. 디스크의 파일은 깨끗하게 두어 검사기가 본문을 읽는지 본다.
+# 한국어와 줄바꿈을 바르게 이스케이프하려고 JSON 은 파이썬 json.dumps 로 만든다.
+JT() { json_run 'import json,sys; t,f,k,v=sys.argv[1:5]; print(json.dumps({"tool_name":t,"tool_input":{"file_path":f,k:v}},ensure_ascii=False))' "$@"; }
+check "Write 본문 라벨 불릿 → 형식 경고" "drev \"\$(JT Write \"$FM/clean.md\" content \"\$LB\")\" | grep -qF '라벨 불릿'"
+check "Edit new_string 라벨 불릿 → 형식 경고" "drev \"\$(JT Edit \"$FM/clean.md\" new_string \"\$LB\")\" | grep -qF '라벨 불릿'"
 check "Edit 는 new_string 만" "! drev \"\$(JE \"$FM/x.md\" '- 한 문장 불릿이다.')\" | grep -qF '라벨 불릿'"
 # 보고 줄이 줄바꿈으로 나뉘어 나가는지도 본다. JSON 안에서 줄바꿈은 역슬래시와 n 으로 보인다.
 check "보고 상한" "drev \"\$(J \"$FM/seven.md\")\" | grep -qF '\n외 2건'"
