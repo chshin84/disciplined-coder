@@ -87,9 +87,9 @@ V2_NUM = [
 # 어려운 항목: hard_kind 마다 참 1건, 오류 1건. 마지막 칸이 hard_kind
 V2_HARD = [
     ("hard-ctx-t1", "direction", INSTR, "v2#hard#0", "Munjal 등의 연구는 지시 튜닝의 이점이 모델 파라미터 수와 평가 설정에 크게 좌우되며 소형 모델에서는 큰 이득을 준다고 결론지었다.", True,
-     SEEN2 + ". 이 논문의 초록은 기본 모델이 일관되게 앞선다는 쪽으로 읽힌다(base models consistently outperform instruction-tuned variants). 그러나 §5 결론에 'instruction tuning provides substantial gains for SLMs, while its impact on LLMs is mixed and often marginal' 와 'depend strongly on number of parameters and evaluation setting' 이 있다.", "context"),
+     SEEN2 + "(arxiv.org/abs 와 /html 두 번 조회해 같은 구절을 얻었다). 저자는 Prateek Munjal, Clement Christophe, Ronnie Rajan, Praveenkumar Kanithi 이며 첫 저자가 Munjal 이다. 이 논문의 초록은 기본 모델이 일관되게 앞선다는 쪽으로 읽힌다(base models consistently outperform instruction-tuned variants). 그러나 §5 결론에 'instruction tuning provides substantial gains for SLMs, while its impact on LLMs is mixed and often marginal' 와 'depend strongly on number of parameters and evaluation setting' 이 있다.", "context"),
     ("hard-ctx-f1", "direction", INSTR, "v2#hard#1", "Munjal 등의 연구는 모든 규모의 모델에서 기본 모델이 지시 튜닝 모델보다 수학 벤치마크 성적이 일관되게 높다고 보고했다.", False,
-     SEEN2 + ". 초록만 보면 맞아 보인다(base models consistently outperform instruction-tuned variants). 본문은 이를 뒷받침하지 않는다. §4.1 에 'LLaMA3-3B improves from 29.0% to 67.2%' 처럼 소형 모델의 큰 지시 튜닝 이득이 있고, §5 결론은 'substantial gains for SLMs' 라고 적는다. 어느 구절도 모든 규모에서 기본 모델이 높다고 적지 않는다.", "context"),
+     SEEN2 + "(arxiv.org/abs 와 /html 두 번 조회해 같은 구절을 얻었다). 초록만 보면 맞아 보인다(base models consistently outperform instruction-tuned variants). 본문은 이를 뒷받침하지 않는다. §4.1 에 'LLaMA3-3B improves from 29.0% to 67.2%' 처럼 소형 모델의 큰 지시 튜닝 이득과 'At >70B scale, base models perform competitively (Math-500) and superior (GSM8K)' 가 있고, §5 결론은 'substantial gains for SLMs' 라고 적는다. 어느 구절도 모든 규모에서 기본 모델이 높다고 적지 않는다.", "context"),
     ("hard-cnd-t1", "numbers_conditions", INSTR, "v2#hard#2", "Math-500 벤치마크에서 LLaMA3-3B 의 정확도는 기본 모델 29.0% 에서 지시 튜닝 모델 67.2% 로 올랐다.", True,
      SEEN2 + ". §4.1 에 'LLaMA3-3B improves from 29.0% to 67.2%' 가 있고, 29.0% 가 기본 모델, 67.2% 가 지시 튜닝 모델, 벤치마크는 Math-500 이다(Table S2). 모델·벤치마크·방향 세 조건이 한 대목에 있다.", "conditions"),
     ("hard-cnd-f1", "numbers_conditions", INSTR, "v2#hard#3", "Math-500 벤치마크에서 지시 튜닝은 모델 규모와 무관하게 정확도를 29.0% 에서 67.2% 로 올렸다.", False,
