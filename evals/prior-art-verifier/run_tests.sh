@@ -45,6 +45,26 @@ d=json.load(open(sys.argv[1],encoding=\"utf-8\"))
 x=[i for i in d[\"items\"] if i[\"id\"]==\"num-t3\"][0]
 n=x[\"check_note\"]
 sys.exit(0 if x[\"truth\"] is False and \"다중 비교 보정 뒤\" in n and \"결정 기록 2\" in n else 1)' '$V2'"
+V3="$HERE/cases-v3.json"
+check "cases-v3.json 이 check_cases.py 를 통과한다" "[ -f '$V3' ] && $PY -I '$HERE/check_cases.py' '$V3' >/dev/null"
+check "quo-t1·quo-t3·hard-f200-t1 이 오류 항목이고 check_note 에 정정 이유와 완화 표현이 있다" "[ -f '$V3' ] && $PY -I -c '
+import json,sys
+d=json.load(open(sys.argv[1],encoding=\"utf-8\"))
+m={i[\"id\"]:i for i in d[\"items\"]}
+want={\"quo-t1\":\"one of the most reliable\",\"quo-t3\":\"tend to be more effective\",\"hard-f200-t1\":\"sometimes useful\"}
+ok=all(m[k][\"truth\"] is False and \"완화 표현\" in m[k][\"check_note\"] and \"2026-10-21 사용자 결정\" in m[k][\"check_note\"] and w in m[k][\"check_note\"] for k,w in want.items())
+sys.exit(0 if ok else 1)' '$V3'"
+check "v3 에서 hard_kind 마다 참 항목과 오류 항목이 1건씩 있다" "[ -f '$V3' ] && $PY -I -c '
+import json,sys,collections
+d=json.load(open(sys.argv[1],encoding=\"utf-8\"))
+c=collections.Counter((x[\"hard_kind\"],x[\"truth\"]) for x in d[\"items\"] if \"hard_kind\" in x)
+ks=[\"context\",\"conditions\",\"table\",\"korean\",\"fake-200\"]
+sys.exit(0 if all(c[(k,t)]==1 for k in ks for t in (True,False)) and len(c)==10 else 1)' '$V3'"
+check "v3 의 id 가 v2 의 id 를 모두 유지한다" "[ -f '$V3' ] && $PY -I -c '
+import json,sys
+a={x[\"id\"] for x in json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"items\"]}
+b={x[\"id\"] for x in json.load(open(sys.argv[2],encoding=\"utf-8\"))[\"items\"]}
+sys.exit(0 if a<=b else 1)' '$V2' '$V3'"
 hk="$FX/hk.json"
 $PY -I -c "
 import json,sys

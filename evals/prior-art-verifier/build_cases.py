@@ -1,11 +1,17 @@
 """cases.json 을 만든다. 참 항목은 2026-10-20 실행에서 오케스트레이터가 원문을 직접 연 출처에서 골랐고,
 오류 항목은 그 참 항목을 고쳐 만들었다. 확인 내용은 항목마다 check_note 에 있다.
 
-실행: python -I evals/prior-art-verifier/build_cases.py <search-r1.json 경로> <출력 cases.json 경로> [--v2 <출력 cases-v2.json 경로>]
+실행: python -I evals/prior-art-verifier/build_cases.py <search-r1.json 경로> <출력 cases.json 경로> [--v2 <출력 cases-v2.json 경로>] [--v3 <출력 cases-v3.json 경로>]
 
 --v2 는 재측정 자료 cases-v2.json 을 함께 만든다. cases.json 의 항목에서 num-t3 를 오류 항목으로 바꾸고,
 수치·조건 참 항목 둘과 어려운 항목(hard_kind 마다 참 1건, 오류 1건)을 더한다. 어려운 항목의 출처는
 2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했고, 확인 내용은 항목마다 check_note 에 있다.
+
+--v3 는 cases-v2.json 에서 파생한 재측정 자료 cases-v3.json 을 만든다(--v2 와 함께 쓴다). id 는 바꾸지 않는다.
+quo-t1·quo-t3·hard-f200-t1 은 원문의 완화 표현을 빼 범위를 넓힌 주장이라 인용 판정 기준에서 기각이 맞으므로
+오류 항목으로 바꾼다(2026-10-21 사용자 결정, num-t3 와 같은 처리). 이어서 카테고리마다 참·오류 수를 맞추려고
+quote 참 4건과 access 참 2건(fake-200 참 1건 포함)을 더한다. hard-f200-t1 은 실제 문서의 완화 표현 문제이므로
+fake-200 이 아니게 되어 hard_kind 를 뗀다.
 """
 import json
 import sys
@@ -123,6 +129,51 @@ def v2_items():
     return out
 
 
+SEEN3 = "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다"
+V3_RELABEL = {
+    "quo-t1": ("'one of the most reliable ways to steer'",
+               "원문은 'Examples are one of the most reliable ways to steer Claude's output format, tone, and structure' 이고 '3–5 examples' 는 'for best results' 라는 조건이 붙는다. 주장은 'one of' 를 빼 '가장 믿을 만한 방법'으로 바꿨다"),
+    "quo-t3": ("'tend to be more effective'",
+               "원문은 'Positive examples of the communication style you want tend to be more effective than instructions about what not to do' 다. 주장은 'tend to' 를 빼 '더 효과적'이라고 단정했다"),
+    "hard-f200-t1": ("'sometimes useful'",
+                     "원문은 'It is sometimes useful to provide a few examples to help LLMs better calibrate their output' 다. 주장은 'sometimes' 를 빼 '유용하다'고 단정했다"),
+}
+OPUS5_NOTE = SEEN3 + ". Opus 5 가이드 원문에서 아래 구절을 찾았고, 한 구절이 주장의 모든 요소를 포함한다."
+V3_NEW = [
+    ("quo-t4", "quote", OPUS5, "v3#quo#0", "Prompting Claude Opus 5 가이드는 Opus 5 가 이전 모델보다 서브에이전트에 더 쉽게 위임한다고 적는다.", True,
+     OPUS5_NOTE + " 'Claude Opus 5 delegates to subagents more readily than prior models.' 한 문장에 모델·행동·비교 대상이 모두 있고 완화 표현이 없다.", None),
+    ("quo-t5", "quote", OPUS5, "v3#quo#1", "Prompting Claude Opus 5 가이드는 Opus 5 의 컨텍스트 윈도가 1M 토큰이고 이 크기가 기본값이자 최대값이라고 적는다.", True,
+     OPUS5_NOTE + " 'Claude Opus 5 has a 1M token context window as both the default and the maximum' 한 문장에 크기·기본·최대가 모두 있다.", None),
+    ("quo-t6", "quote", OPUS5, "v3#quo#2", "Prompting Claude Opus 5 가이드는 Opus 5 에서 사고 비활성화는 effort 가 high 이하일 때만 가능하고, xhigh 나 max 와 함께 요청하면 400 오류를 낸다고 적는다.", True,
+     OPUS5_NOTE + " 'thinking can be disabled only at effort `high` or below. A request that combines `thinking: {\"type\": \"disabled\"}` with effort `xhigh` or `max` returns a 400 error.' 한 문단 안의 연속한 두 문장에 두 조건이 모두 있고 완화 표현이 없다.", None),
+    ("quo-t7", "quote", OPUS5, "v3#quo#3", "Prompting Claude Opus 5 가이드는 Opus 5 가 사고를 끈 상태에서 도구 호출을 구조화된 tool_use 블록 대신 사용자에게 보이는 텍스트로 가끔 쓴다고 적는다.", True,
+     OPUS5_NOTE + " 'With thinking disabled, the model occasionally writes a tool call into its user-facing text instead of emitting a structured `tool_use` block.' 한 문장에 조건·행동·빈도('occasionally')가 모두 있고 주장도 '가끔'으로 빈도를 보존했다.", None),
+    ("acc-t4", "access", OPUS5, "v3#acc#0", "Prompting Claude Opus 5 가이드는 Opus 5 에서 low 와 medium effort 가 높은 설정보다 적은 토큰과 지연으로 강한 품질을 낸다고 적는다.", True,
+     OPUS5_NOTE + " '`low` and `medium` effort produce strong quality at a fraction of the tokens and latency of higher settings.' 한 문장에 모든 요소가 있다. 열리는 출처의 참 항목이며 hard_kind 는 없다.", None),
+    ("hard-f200-t2", "access", "https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html", "v3#hard#0", "AWS 의 Amazon Bedrock 개요 문서는 Bedrock 을 주요 AI 기업의 파운데이션 모델에 안전한 엔터프라이즈급 접근을 제공하는 완전 관리형 서비스로 소개한다.", True,
+     SEEN3 + ". hard-f200-f1 과 같은 사이트(docs.aws.amazon.com)의 실제 문서다. 제목 'Overview', 첫 문장 'Amazon Bedrock is a fully managed service that provides secure, enterprise-grade access to high-performing foundation models from leading AI companies' 한 문장에 주장의 모든 요소가 있고 완화 표현이 없다.", "fake-200"),
+]
+
+
+def v3_items():
+    """v2 항목에서 완화 표현을 뺀 참 항목 셋을 오류로 바꾸고, 균형용 참 항목을 더한다."""
+    out = []
+    for x in v2_items():
+        x = dict(x)
+        if x["id"] in V3_RELABEL:
+            hedge, detail = V3_RELABEL[x["id"]]
+            x["truth"] = False
+            x["check_note"] = f"{detail}. 주장이 원문의 완화 표현({hedge})을 빼 범위를 넓혔다. 인용 판정 기준에서 기각이 맞다(2026-10-21 사용자 결정). {SEEN3}."
+            x.pop("hard_kind", None)
+        out.append(x)
+    for i, c, u, r, t, tr, n, k in V3_NEW:
+        d = {"id": i, "category": c, "url": u, "claim": {"ref": r, "text": t}, "truth": tr, "check_note": n}
+        if k:
+            d["hard_kind"] = k
+        out.append(d)
+    return out
+
+
 def map_case(search):
     """지난 실행의 종합 근거 지도에서 두 행을 골라 지도 대조 입력을 만들고, 두 칸을 고쳐 근거 없는 칸으로 둔다."""
     em = search["synthesis"]["evidence_map"]
@@ -161,3 +212,6 @@ if __name__ == "__main__":
     if "--v2" in sys.argv:
         v2 = {"items": v2_items(), "map_cases": out["map_cases"]}
         json.dump(v2, open(sys.argv[sys.argv.index("--v2") + 1], "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    if "--v3" in sys.argv:
+        v3 = {"items": v3_items(), "map_cases": out["map_cases"]}
+        json.dump(v3, open(sys.argv[sys.argv.index("--v3") + 1], "w", encoding="utf-8"), ensure_ascii=False, indent=2)
