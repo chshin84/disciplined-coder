@@ -31,3 +31,17 @@ python -I evals/prior-art-verifier/score.py report
 - 같은 플래그와 `D:/dc-eval-tmp` 아래 폴더에서 Haiku 5.5 low 에 "CLAUDE.md 나 메모리 파일에서 온 내용이 있는가"를 물었더니 "없음"이라고 답했다.
 - 그 실행의 캐시 쓰기 토큰은 3,129 였다. 전역 CLAUDE.md(디시플린코더 원칙과 금지어 목록)가 실렸다면 이보다 훨씬 크다.
 - arXiv 2605.10039 하나로 추출 단계를 Haiku 5.5 low 로 실행했다(`fixtures/extract-sample.jsonl`). `error` 는 비었고, `total_cost_usd` 는 0.00741839, `modelUsage` 키는 `claude-haiku-5-5` 였다. `access` 는 `성공` 이었고, `quote` 에 원문의 부정어("None of ...")가 그대로 담겼다.
+
+## 구성 전체 재측정
+
+재측정 절차는 `docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md` 의 Task 4 에 있고, 자료는 `cases-v2.json` 이다. 결과는 `results-v2/` 에 둔다. 기준선 실행은 `runs.jsonl` 에, 새 구성의 단계 실행은 `runs-def.jsonl` 에 쓴다. 두 파일을 나눈 이유는 잠금 파일 때문에 한 결과 파일에 두 실행이 동시에 쓸 수 없어서다.
+
+`-def` 단계(`extract-def`·`judge-def`·`escalate-def`·`map-def`)는 `agents/` 의 정의 본문을 `--system-prompt` 로 넣고, 사용자 메시지는 워크플로의 `prompt()` 와 같은 `MODE`·`PRINCIPLES`·입력 블록으로 만든다. 판정과 상향 판정의 입력은 같은 결과 파일에서 같은 차례의 앞 단계 출력(`--upstream`, 기본 `claude-haiku-5-5/high`)으로 만든다. `--hard-only` 는 어려운 항목만 있는 URL 로 실행을 한정한다.
+
+```bash
+python -I evals/prior-art-verifier/run.py --cases evals/prior-art-verifier/cases-v2.json --out evals/prior-art-verifier/results-v2/runs-def.jsonl --stage <extract-def|judge-def|escalate-def|map-def> --model <ID> --effort <수준> [--repeat <n>] [--hard-only]
+python -I evals/prior-art-verifier/replay.py --cases evals/prior-art-verifier/cases-v2.json --runs evals/prior-art-verifier/results-v2/runs-def.jsonl --repeat 2 --out evals/prior-art-verifier/results-v2/replay.json
+python -I evals/prior-art-verifier/score.py report-v2
+```
+
+`replay.py` 는 단계 출력을 `scripts/workflow_harness.mjs` 의 `fn mergeStages` 와 `fn classify` 에 넣어 최종 판정을 얻는다. 그래서 재측정과 운영이 같은 합치기 코드를 쓴다. `score.py report-v2` 는 `results-v2/report.md` 에 병합 조건 판정과 어려운 항목 결과를 쓴다.

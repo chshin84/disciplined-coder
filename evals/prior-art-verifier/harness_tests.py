@@ -180,6 +180,100 @@ def test_map_missing_cells_fail():
     assert r["failures"] == 2
 
 
+# --- 구성 전체 재측정(-def 단계, replay.py, report-v2) 검사.
+def _harn_run(inp):
+    import subprocess
+    import json
+    p = subprocess.run(["node", os.path.join(run.ROOT, "scripts", "workflow_harness.mjs"), "run"],
+                       input=json.dumps(inp, ensure_ascii=False), capture_output=True, text=True, encoding="utf-8")
+    assert p.returncode == 0, p.stderr
+    return json.loads(p.stdout)
+
+
+def _def_case():
+    """주장 둘이 한 URL 에 걸린 재측정 자료다. ref 는 워크플로가 만드는 이름과 같게 둔다."""
+    return {"items": [
+        {"id": "S1#issue#0", "category": "direction", "url": "https://a", "claim": {"ref": "x", "text": "주장 A"}, "truth": True, "check_note": "n"},
+        {"id": "S1#issue#1", "category": "scope", "url": "https://a", "claim": {"ref": "y", "text": "주장 \"B\""}, "truth": False, "check_note": "n"}],
+        "map_cases": []}
+
+
+def _def_row(stage, model, effort, unit, output, repeat=1):
+    return {"key": f"{stage}{unit}{repeat}{effort}", "stage": stage, "model": model, "effort": effort, "category": "",
+            "repeat": repeat, "unit": unit, "output": output, "cost_usd": 0.01, "error": ""}
+
+
+H, SN = "claude-haiku-5-5", "claude-sonnet-5-5"
+EXTRACT_OUT = {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "quote": "q0", "context": "c0", "reason": "r"},
+    {"ref": "S1#issue#1", "access": "성공", "exists": "일치", "quote": "q1", "reason": "r"}]}
+JUDGE_OUT = {"principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"},
+    {"ref": "S1#issue#1", "numbers_conditions": "일치", "direction": "판정 불가", "scope": "일치", "unsure_reasons": {"direction": "맥락 부족"}, "reason": "r"}]}
+ESC_OUT = {"principles_applied": [], "judgments": [
+    {"ref": "S1#issue#1", "numbers_conditions": "일치", "direction": "불일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]}
+
+
+def test_def_prompt_matches_workflow():
+    """harn run 이 기록한 extract:·judge:·escalate: 호출의 프롬프트가 run.py -def 단계의 사용자 메시지와 같다."""
+    args = {"question": "Q?", "situation": "S", "target": "T", "mode": "contrast", "round": 1,
+            "subquestions": [{"id": "S1", "scope": "a", "include": [], "exclude": []}], "forbidden_terms": [],
+            "researcher_count": 1, "researcher_count_basis": "x", "principles_path": run.PRINCIPLES}
+    responses = {"research:S1": {"search_status": "ok", "queries": ["q"], "issues": [
+        {"prior_claim": "주장 A", "citations": [{"url": "https://a"}]},
+        {"prior_claim": "주장 \"B\"", "citations": [{"url": "https://a"}]}]},
+        "extract:https://a": EXTRACT_OUT, "judge:https://a": JUDGE_OUT, "escalate:https://a": ESC_OUT}
+    calls = {c["label"]: c["prompt"] for c in _harn_run({"args": args, "responses": responses})["calls"]}
+    cases = _def_case()
+    runs = [_def_row("extract-def", H, "high", "https://a", EXTRACT_OUT), _def_row("judge-def", H, "high", "https://a", JUDGE_OUT)]
+
+    def mine(stage):
+        us = dict(run.def_units(cases, stage, runs, 1, H + "/high", False))
+        return run.def_prompt(stage, us["https://a"])
+    assert mine("extract-def") == calls["extract:https://a"]
+    assert mine("judge-def") == calls["judge:https://a"]
+    assert mine("escalate-def") == calls["escalate:https://a"]
+
+
+def test_replay_uses_workflow_merge():
+    """가짜 단계 출력으로 replay 가 mergeStages·classify 의 판정을 그대로 옮긴다."""
+    import replay
+    cases = _def_case()
+    runs = [_def_row("extract-def", H, "high", "https://a", EXTRACT_OUT), _def_row("judge-def", H, "high", "https://a", JUDGE_OUT),
+            _def_row("escalate-def", SN, "high", "https://a", ESC_OUT)]
+    rows = {r["id"]: r for r in replay.replay(cases, runs, 1)}
+    assert rows["S1#issue#0"]["verdict"] == "supported" and rows["S1#issue#0"]["escalated"] is False
+    assert rows["S1#issue#1"]["verdict"] == "unsupported" and rows["S1#issue#1"]["escalated"] is True
+    assert rows["S1#issue#1"]["judge_raw"]["direction"] == "판정 불가"
+    # 상향 판정도 판정 불가면 그 주장만 verify_failed 이고 다른 주장은 남는다.
+    unsure = {"principles_applied": [], "judgments": [dict(ESC_OUT["judgments"][0], direction="판정 불가")]}
+    runs[2] = _def_row("escalate-def", SN, "high", "https://a", unsure)
+    rows = {r["id"]: r for r in replay.replay(cases, runs, 1)}
+    assert rows["S1#issue#1"]["verdict"] == "verify_failed" and rows["S1#issue#0"]["verdict"] == "supported"
+    # 상향 판정 실행이 없으면 그 URL 전체가 검증 실패다.
+    rows = {r["id"]: r for r in replay.replay(cases, runs[:2], 1)}
+    assert rows["S1#issue#0"]["verdict"] == "verify_failed" and rows["S1#issue#1"]["verdict"] == "verify_failed"
+
+
+def test_confident_wrong_counted():
+    import score
+    sure = {"numbers_conditions": "일치", "direction": "일치", "scope": "일치"}
+    assert score.confident_wrong(sure, False) is True
+    assert score.confident_wrong(sure, True) is False
+    assert score.confident_wrong(dict(sure, scope="불일치"), True) is True
+    assert score.confident_wrong(dict(sure, scope="판정 불가"), False) is False
+    assert score.confident_wrong(None, False) is False
+
+
+def test_merge_condition_item_level():
+    import score
+    base = {"a": [True, True], "b": [True, False], "c": [True, True]}
+    ok, failing = score.merge_item_condition(base, {"a": [True, False], "b": [False, False], "c": [True, True]})
+    assert ok is False and failing == ["a"]
+    ok, failing = score.merge_item_condition(base, {"a": [True, True], "b": [False, False], "c": [True, True]})
+    assert ok is True and failing == []
+
+
 if __name__ == "__main__":
     try:
         globals()[sys.argv[1]]()

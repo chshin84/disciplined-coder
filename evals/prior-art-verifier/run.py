@@ -23,15 +23,110 @@ MAX_ATTEMPTS = 2
 EFFORTS = ("low", "medium", "high", "xhigh")
 CITE_TOOLS = "WebFetch,Read"
 LOCAL_TOOLS = "Read"
-MODES = {"baseline-cite": "cite", "baseline-map": "map", "extract": "extract", "judge": "judge", "map": "map"}
+MODES = {"baseline-cite": "cite", "baseline-map": "map", "extract": "extract", "judge": "judge", "map": "map",
+         "extract-def": "extract", "judge-def": "judge", "escalate-def": "judge", "map-def": "map"}
+# -def 단계는 에이전트 정의 본문을 system 프롬프트로 넣고, 사용자 메시지는 워크플로의 prompt() 와 같게 만든다.
+DEF_AGENTS = {"extract-def": "prior-art-verifier.md", "judge-def": "prior-art-judge.md",
+              "escalate-def": "prior-art-judge-escalation.md", "map-def": "prior-art-mapcheck.md"}
+JUDGE_CELLS = ("numbers_conditions", "direction", "scope")
+MATCHES = ("일치", "불일치", "판정 불가")
+# -def 단계가 앞 단계 출력을 고를 때 쓰는 설정이다. 확정 구성의 추출·판정 설정과 같다.
+UPSTREAM = "claude-haiku-5-5/high"
 
 
-def build_cmd(stage, model, effort, prompt):
-    tools = CITE_TOOLS if stage in ("baseline-cite", "extract") else LOCAL_TOOLS
+def build_cmd(stage, model, effort, prompt, system=None):
+    tools = CITE_TOOLS if stage in ("baseline-cite", "extract", "extract-def") else LOCAL_TOOLS
     exe = shlex.split(os.environ.get("DC_EVAL_CLAUDE", "claude"), posix=False)
-    return exe + ["-p", prompt, "--output-format", "json", "--model", model, "--effort", effort,
-                  "--tools", tools, "--allowedTools", tools, "--setting-sources", "", "--strict-mcp-config",
-                  "--disable-slash-commands", "--no-session-persistence"]
+    cmd = exe + ["-p", prompt, "--output-format", "json", "--model", model, "--effort", effort,
+                 "--tools", tools, "--allowedTools", tools, "--setting-sources", "", "--strict-mcp-config",
+                 "--disable-slash-commands", "--no-session-persistence"]
+    return cmd + (["--system-prompt", system] if system else [])
+
+
+def def_system(stage):
+    """에이전트 정의 파일에서 frontmatter 를 뗀 본문이다."""
+    with open(os.path.join(ROOT, "agents", DEF_AGENTS[stage]), encoding="utf-8") as f:
+        text = f.read()
+    if text.startswith("---"):
+        text = text[text.index("\n---", 3) + 4:]
+    return text.lstrip("\n")
+
+
+def def_prompt(stage, payload):
+    """워크플로 prompt() 와 같은 사용자 메시지다. JSON.stringify(input, null, 2) 와 같은 들여쓰기를 쓴다."""
+    body = json.dumps(payload, ensure_ascii=False, indent=2)
+    return f"MODE: {MODES[stage]}\nPRINCIPLES: {PRINCIPLES}\n```json\n{body}\n```"
+
+
+def latest_output(runs, stage, config, repeat, unit):
+    """그 단계·설정(모델/수준)·차례·unit 의 오류 없는 마지막 줄의 출력이다. 없으면 None."""
+    out = None
+    for r in runs:
+        here = (r.get("stage"), f"{r.get('model')}/{r.get('effort')}", r.get("repeat"), r.get("unit"))
+        if here == (stage, config, repeat, unit) and not r.get("error") and r.get("output") is not None:
+            out = r["output"]
+    return out
+
+
+def _by_ref(refs, output, ok=lambda j: True):
+    """워크플로 judgmentsByRef 와 같다. 판정이 배열이 아니거나 한 ref 라도 없거나 ok 를 못 넘으면 None."""
+    js = output.get("judgments") if isinstance(output, dict) else None
+    if not isinstance(js, list):
+        return None
+    found = {}
+    for ref in refs:
+        j = next((x for x in js if isinstance(x, dict) and x.get("ref") == ref), None)
+        if j is None or not ok(j):
+            return None
+        found[ref] = j
+    return found
+
+
+def _passes_extract(e):
+    return e.get("access") == "성공" and e.get("exists") == "일치" and str(e.get("quote") or "").strip() != ""
+
+
+def _judge_claims(claims, ex_out):
+    """워크플로 judgeClaims 와 같다."""
+    ex = _by_ref([c["ref"] for c in claims], ex_out)
+    if ex is None:
+        return []
+    return [{"ref": c["ref"], "text": c["text"], "quote": ex[c["ref"]].get("quote"),
+             "context": "" if ex[c["ref"]].get("context") is None else ex[c["ref"]]["context"]}
+            for c in claims if _passes_extract(ex[c["ref"]])]
+
+
+def _unsure_claims(claims, ju_out):
+    """워크플로 unsureClaims 와 같다."""
+    ju = _by_ref([c["ref"] for c in claims], ju_out, lambda j: all(j.get(k) in MATCHES for k in JUDGE_CELLS))
+    if ju is None:
+        return []
+    return [c for c in claims if any(ju[c["ref"]].get(k) == "판정 불가" for k in JUDGE_CELLS)]
+
+
+def def_units(cases, stage, runs, repeat, upstream, hard_only):
+    """-def 단계의 (unit, payload) 목록이다. 판정·상향 판정 입력은 같은 차례의 앞 단계 출력에서 워크플로 규칙으로 만든다.
+    hard_only 이면 항목이 모두 어려운 항목인 URL 만 남긴다."""
+    if stage == "map-def":
+        return [(m["id"], {"evidence_map": m["input"]["evidence_map"], "passed": m["input"]["passed"]})
+                for m in cases["map_cases"]]
+    by_url, hard = {}, {}
+    for x in cases["items"]:
+        by_url.setdefault(x["url"], []).append({"ref": x["id"], "text": x["claim"]["text"]})
+        hard[x["url"]] = hard.get(x["url"], True) and "hard_kind" in x
+    out = []
+    for u, claims in by_url.items():
+        if hard_only and not hard[u]:
+            continue
+        if stage == "extract-def":
+            out.append((u, {"url": u, "claims": claims}))
+            continue
+        jc = _judge_claims(claims, latest_output(runs, "extract-def", upstream, repeat, u))
+        if stage == "escalate-def":
+            jc = _unsure_claims(jc, latest_output(runs, "judge-def", upstream, repeat, u))
+        if jc:
+            out.append((u, {"url": u, "claims": jc}))
+    return out
 
 
 def parse_output(text):
@@ -145,7 +240,8 @@ def run_one(job, cwd):
     rec = {k: job[k] for k in ("key", "stage", "model", "effort", "category", "repeat", "unit", "attempt")}
     rec.update({"output": None, "cost_usd": None, "usage": None, "models_used": "", "error": ""})
     try:
-        p = subprocess.run(build_cmd(job["stage"], job["model"], job["effort"], job["prompt"]), cwd=cwd, env=env,
+        p = subprocess.run(build_cmd(job["stage"], job["model"], job["effort"], job["prompt"], job.get("system")),
+                           cwd=cwd, env=env,
                            capture_output=True, text=True, encoding="utf-8", timeout=TIMEOUT)
     except subprocess.TimeoutExpired:
         rec["error"] = f"시간 초과({TIMEOUT}초)"
@@ -180,6 +276,8 @@ def main(argv=None):
     ap.add_argument("--repeat", type=int, default=1)
     ap.add_argument("--cases", default=os.path.join(HERE, "cases.json"))
     ap.add_argument("--out", default=os.path.join(HERE, "results", "runs.jsonl"))
+    ap.add_argument("--upstream", default=UPSTREAM, help="-def 단계가 앞 단계 출력을 고를 설정(모델/수준)")
+    ap.add_argument("--hard-only", action="store_true", help="-def 단계에서 어려운 항목만 있는 URL 만 실행한다")
     a = ap.parse_args(argv)
     if a.stage == "judge" and not (a.category and a.extract_from):
         sys.exit("judge 단계에는 --category 와 --extract-from 이 필요하다")
@@ -207,14 +305,22 @@ def _run(a):
         if r.get("error"):
             attempts[r["key"]] = max(attempts.get(r["key"], 0), r.get("attempt", 1))
     jobs = []
+    is_def = a.stage in DEF_AGENTS
+    system = def_system(a.stage) if is_def else None
     for rep in range(1, a.repeat + 1):
-        for unit, payload in units(cases, a.stage, a.category, extract):
-            prompt = build_prompt(a.stage, a.category, payload)
-            key = make_key(a.stage, a.model, a.effort, a.category, rep, unit, prompt)
+        if is_def:
+            us = def_units(cases, a.stage, past, rep, a.upstream, a.hard_only)
+        else:
+            us = units(cases, a.stage, a.category, extract)
+        for unit, payload in us:
+            prompt = def_prompt(a.stage, payload) if is_def else build_prompt(a.stage, a.category, payload)
+            # -def 단계는 정의 본문이 바뀌면 다른 실행이므로 key 에 system 프롬프트도 넣는다.
+            key = make_key(a.stage, a.model, a.effort, a.category, rep, unit, prompt + (system or ""))
             if key in done:
                 continue
             jobs.append({"key": key, "stage": a.stage, "model": a.model, "effort": a.effort, "category": a.category,
-                         "repeat": rep, "unit": unit, "prompt": prompt, "attempt": attempts.get(key, 0) + 1})
+                         "repeat": rep, "unit": unit, "prompt": prompt, "system": system,
+                         "attempt": attempts.get(key, 0) + 1})
     if not jobs:
         print("실행할 것이 없다(모두 결과가 있다).")
         return 0

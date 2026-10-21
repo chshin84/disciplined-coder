@@ -84,5 +84,9 @@ echo "== 집계기"
 for t in test_missing_judgment_is_failure test_no_quote_excluded test_unverifiable_counts_as_rejection test_zero_noise test_noise_tolerance test_failures_block_selection test_select_extract_single test_map_scoring test_xhigh_effort_allowed test_judge_borrows_true_quote test_stale_prompt_ignored test_true_without_quote_counts_as_rejection test_judge_respects_frozen_exists test_map_missing_cells_fail; do
   check "$t" "$PY -I '$HERE/harness_tests.py' $t 2>/dev/null"
 done
+echo "== 구성 전체 재측정"
+for t in test_def_prompt_matches_workflow test_replay_uses_workflow_merge test_confident_wrong_counted test_merge_condition_item_level; do
+  check "$t" "$PY -I '$HERE/harness_tests.py' $t 2>/dev/null"
+done
 echo "PASS=$pass FAIL=$fail"
 [ "$fail" -eq 0 ]

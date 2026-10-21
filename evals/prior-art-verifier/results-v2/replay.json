@@ -1,0 +1,1093 @@
+[
+ {
+  "id": "acc-t1",
+  "repeat": 1,
+  "verdict": "verify_failed",
+  "judge_raw": {
+   "ref": "acc-t1",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "'외부 피드백 없이'라는 조건은 구절과 같다. 그러나 구절 중간의 '…'으로 생략된 부분에 어떤 조건이 있는지 알 수 없고, 'ICLR 2024'라는 게재 학회와 연도는 구절과 context 어디에도 없어 수치·조건 칸을 정할 수 없다. 방향은 '어렵다'가 'struggle to self-correct'의 부정 방향과 같아 일치한다. 범위는 구절이 'In the context of reasoning'으로 추론 과제에 한정했으나 주장은 '자기 응답'을 일반적으로 말해 그 한정을 빠뜨렸으므로 불일치다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "acc-t2",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "acc-t2",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "구절의 68%와 'max density of 500 instructions'는 주장의 68%와 500개 밀도와 같다. 그러나 구절과 context에 벤치마크 이름 IFScale이 없어, 이 수치가 IFScale의 결과인지 구절만으로 확인할 수 없다. 원문 대조는 웹을 열지 않는 이 판정 범위 밖이므로 하지 않았다. 방향은 구절의 'even the best frontier models only achieve 68%'가 최상위 모델의 낮은 성능을 뜻해 주장의 '최상위 모델도 68%였다'와 같다. 주장은 구절의 'best frontier models'를 넘어 일반화하지 않았다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "acc-t3",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "acc-t3",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "수치·조건은 구절의 'priming failure (87.5% of violations)'와 'the instruction's explicit mention of the forbidden word'가 주장의 '위반의 87.5%'와 '지시가 금지 단어를 언급하면'에 그대로 대응한다. 방향은 구절의 'activates rather than suppresses'가 주장의 '오히려 활성화되는'과 같고, 범위는 주장이 '87.5%'라는 부분집합에 머물러 구절보다 넓게 일반화하지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "acc-f1",
+  "repeat": 1,
+  "verdict": "unverifiable",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "acc-f2",
+  "repeat": 1,
+  "verdict": "unverifiable",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "acc-f3",
+  "repeat": 1,
+  "verdict": "unverifiable",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "exi-t1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "exi-t1",
+   "numbers_conditions": "불일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "구절의 'without external feedback'이라는 조건이 주장에서 빠져 수치·조건이 다르다. 'ICLR 2024'도 구절에 없어 이 칸의 판단 근거로 쓰지 않았다. 방향은 '교정하지 못한다'가 'struggle to self-correct'의 부정 방향과 같아 일치한다. '아직'은 context의 제목 'Yet'으로 뒷받침된다. 범위는 외부 피드백 조건을 빼고 추론 교정을 단정했으므로 구절보다 넓게 일반화했다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "exi-t2",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "exi-t2",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "주장의 대상인 '명시적 검증 지시'는 구절의 조건절 'If your prompt contains explicit verification instructions'와 같은 대상이므로 조건이 일치한다. '지우라고 권한다'는 구절의 'remove them'과 방향이 같고, 구절 밖으로 일반화하지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "exi-t3",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "exi-t3",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "주장과 구절 모두 수치·날짜·모델 조건을 담지 않는다. 구절은 'than its predecessors' 비교로 'more closely and more literally' 따른다고 말하며 부정 표현이 없고, 주장의 '이전 모델보다 문자 그대로 따른다'와 방향이 같다. context 의 'if model behavior is different…' 조건은 뒤 문장에 붙은 것이라 이 구절에는 적용되지 않는다. 주장은 가이드가 그렇게 적는다고만 말해 구절을 넘어 일반화하지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "exi-f1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "exi-f2",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "exi-f3",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "quo-t1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "quo-t1",
+   "numbers_conditions": "불일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "수치·조건: 주장의 '3~5개'는 구절과 context 어디에도 없다. 구절은 'a few well-crafted examples'라고만 쓰고 수를 밝히지 않는다. 방향: 예시가 신뢰할 만한 방법이라는 긍정 방향이 구절과 같다. 범위: 구절은 'one of the most reliable ways'로 여러 방법 중 하나라고 한정했으나, 주장은 '가장 믿을 만한 방법'으로 넓혀 일반화했다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "quo-t2",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "quo-t2",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "수치는 없고 조건도 같다. 구절의 'If your prompt contains anti-formatting language'가 주장의 '프롬프트에 반형식 규칙이 있으면'에 해당한다. 방향은 구절이 반형식 표현을 지우거나 형식이 적절한 때를 정하는 규칙으로 바꾸라고 권하므로 주장과 같다. 범위는 주장이 구절의 권고를 그대로 옮겼고 더 넓히지 않았으므로 일치다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "quo-t3",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "quo-t3",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "수치나 조건이 없으므로 일치한다. 긍정 예시가 하지 말 것에 관한 지시보다 효과적이라는 비교 방향은 구절과 같다. 구절의 'tend to'(경향)라는 한정이 주장에서 빠져 '더 효과적이라고 적는다'로 단정되었으므로, 구절보다 넓게 일반화되어 불일치한다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "quo-f1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "quo-f2",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "quo-f3",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "num-t1",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "num-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "수치·조건: 'Claude 4.6 모델부터'와 '마지막 assistant 턴의 프리필'이 구절과 같다. 구절은 Claude Mythos Preview를 함께 적었으나, 주장이 이를 빼도 주장된 조건이 어긋나지 않는다. 방향: 'no longer supported'와 '지원하지 않는다'가 같은 방향이다. context가 4.6 이전 모델은 프리필을 계속 지원한다고 밝혀 시점 조건도 맞다. 범위: 주장은 마지막 assistant 턴의 프리필로 한정해 말하므로 일반화하지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "num-t2",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "num-t2",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "구절의 68%와 'max density of 500 instructions'는 주장의 68%와 500개 밀도와 같다. 그러나 구절과 context에 벤치마크 이름 IFScale이 없어, 이 수치가 IFScale의 결과인지 구절만으로 확인할 수 없다. 원문 대조는 웹을 열지 않는 이 판정 범위 밖이므로 하지 않았다. 방향은 acc-t2와 같은 근거로 일치한다. 주장은 구절보다 넓게 일반화하지 않았다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "num-t3",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "num-t3",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "구절과 context 어디에도 1,650 세션이라는 수가 없어 수치는 판정할 수 없다. 방향은 'None of … produces a detectable contrast'의 부정과 'nulls supported'가 모두 효과 미검출을 가리켜 일치한다. 범위는 context가 검출 없음을 시험한 세션 길이 범위 안으로 한정하는데, 주장은 그 한정을 빼고 일반화했으므로 불일치다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "num-f1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "num-f2",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "num-f3",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "num-f3",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "구절과 context에는 16,500 세션이라는 수가 없어 수치는 판정할 수 없다. 같은 논문의 sco-t3 구절이 1,650 세션이라고 적고 있어 16,500은 원문과 어긋날 가능성이 크므로 추출 단계에서 재확인이 필요하다. 방향은 일치하고, 범위는 context의 시험 세션 길이 범위 한정을 주장이 빼고 일반화했으므로 불일치다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "dir-t1",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "dir-t1",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "다중 비교 보정 조건은 'after multiple-testing correction'과 같다. 다만 구절과 context가 'four structural variables'의 이름을 밝히지 않아 크기와 지시 위치가 그 네 변수에 드는지는 확인할 수 없다. 방향은 'None of'의 부정으로 차이 없음이 일치한다. 범위는 주장이 두 변수로 좁혀 있어 일반화하지 않았다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "dir-t2",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "dir-t2",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "'외부 피드백 없는'이라는 조건과 'at times'를 옮긴 '때로'가 구절과 같다. 'degrades'를 '떨어진다', 'even'을 '오히려'로 옮겨 방향이 같고, context에는 부정이나 비교의 반전이 없다. 'at times'의 경우에 따른 한정을 '때로'로 그대로 옮겨 일반화가 없다. 저자 귀속인 'Huang 등'은 구절에 나오지 않으므로 이 판정의 대상에서 뺐다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "dir-t3",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "dir-t3",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "수치는 없고 모델 이름 Claude Fable 5.1이 구절의 context와 같다. 구절의 'uses bold less'는 context의 'Earlier models overused ... bold'와 'leans the other way'를 함께 보면 이전 모델보다 굵은 글씨를 덜 쓴다는 뜻이므로 주장과 방향이 같다. 범위는 주장이 구절보다 넓지 않으므로 일치다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "dir-f1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "dir-f2",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "dir-f3",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "sco-t1",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "sco-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "수치·조건은 주장과 구절 모두에 없다. 구절은 'more literally than its predecessors'로 말하며 부정이 없고, 주장의 '이전 OpenAI 모델보다 문자 그대로 따른다'와 방향이 같다. 구절은 'OpenAI'를 명시하지 않지만, GPT-4.1 의 predecessors 는 같은 계열의 이전 GPT 모델을 가리키므로 주장의 'OpenAI 모델'은 구절의 대상을 좁혀 적은 것이다. 주장이 구절보다 넓게 일반화한 곳은 없다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "sco-t2",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "sco-t2",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "'Claude Opus 5 에서'라는 적용 대상과 '명시적 검증 지시'라는 조건 대상이 구절과 같다. 지우라는 권고와 과잉 검증을 낳는다는 인과 방향도 구절과 같다. '명시적 검증 지시'의 범위를 구절보다 넓히지 않았으므로 일치한다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "sco-t3",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "sco-t3",
+   "numbers_conditions": "일치",
+   "direction": "판정 불가",
+   "scope": "일치",
+   "unsure_reasons": {
+    "direction": "맥락 부족"
+   },
+   "reason": "'a trivial target annotation'의 준수율 측정은 주장의 '사소한 주석 지시 하나의 준수율'과 같다. 주장의 '효과를 검출하지 못했다'는 결말은 구절과 context 어디에도 없어 방향을 정할 수 없다. 측정 방식만 옮겼고 그 이상으로 일반화하지 않았으므로 범위는 일치다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "sco-f1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "sco-f2",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "sco-f3",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "sco-f3",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "주장에는 구절과 충돌하는 수치가 없다. '영향을 주지 않는다'는 'nulls supported'의 영향 없음과 같은 방향이다. 범위는 주장이 '어떤 지시'로 넓혔으나, context가 결과를 시험한 세션 길이 범위 안으로 한정하고 sco-t3 구절상 측정 지시도 사소한 주석 하나였으므로 불일치다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "num-t4",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "num-t4",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "1,650 Claude Code CLI 세션과 사소한 대상 주석의 준수 측정이 구절과 같다. 주장은 결과를 말하지 않고 측정 사실만 말하므로 방향 충돌이 없다. 한 연구에 대한 진술이라 일반화도 없다. context의 Opus 4.6 교차 검증은 주장이 다루지 않은 부분이며 주장과 충돌하지 않는다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "num-t5",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "num-t5",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "구절의 20개 모델과 seven major providers는 주장의 7개 제공사와 모델 20개와 같다. 그러나 구절과 context에 벤치마크 이름 IFScale이 없어, 이 평가가 IFScale에 대한 것인지 구절만으로 확인할 수 없다. 주장에는 결말이나 부정, 비교 방향이 없으므로 방향은 일치로 본다. 주장은 구절의 평가 사실을 넘어 일반화하지 않았다. context의 'even·only·best' 부분은 이 주장과 무관하여 판정에 쓰지 않았다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "hard-ctx-t1",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "hard-ctx-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "판정 불가",
+   "unsure_reasons": {
+    "scope": "맥락 부족"
+   },
+   "reason": "파라미터 수와 평가 설정에 따라 달라진다는 조건, SLM 에서 큰 이득이라는 내용과 방향(크게 좌우·큰 이득)은 구절과 같다. 구절은 'this work'라고만 쓰고 Munjal 등을 밝히지 않아, 주장의 주체가 구절과 context 만으로는 확인되지 않으므로 scope 를 판정 불가로 둔다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "hard-ctx-f1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "hard-cnd-t1",
+  "repeat": 1,
+  "verdict": "verify_failed",
+  "judge_raw": {
+   "ref": "hard-cnd-t1",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {
+    "numbers_conditions": "표·그림 값"
+   },
+   "reason": "수치 29.0%·67.2%와 모델명 LLaMA3-3B 는 구절과 같으나, 그림 1 캡션이 지표를 Pass@20 으로 적고 있어 이 수치가 그림 값인지, 그 지표가 '정확도'인지를 구절만으로 가릴 수 없다. 29.0%에서 67.2%로 오른 방향은 구절과 같고, LLaMA3-3B·Math-500 한 사례로 한정한 범위도 구절과 같다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "hard-cnd-f1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "hard-cnd-f1",
+   "numbers_conditions": "불일치",
+   "direction": "불일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "'모델 규모와 무관하게'라는 적용 조건은 구절의 LLaMA3-3B 한 사례 및 context 의 규모별 차이와 달라 numbers_conditions 가 불일치다. context 는 SLM 에서 효과가 크고 LLM 에서 약해진다고 비교하므로 '무관'이라는 방향도 어긋나 direction 이 불일치다. 한 사례를 모든 규모로 일반화했으므로 scope 도 불일치다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "hard-tbl-t1",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "hard-tbl-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "구절의 표에서 claude-3.5-haiku 행의 100 열 값은 43.4%이며, 열 순서(10, 50, 100, 250, 500)와 대조해도 주장과 같다. 주장은 방향이나 비교를 말하지 않고 context 에도 부정·조건·비교 문장이 없어 방향은 일치다. 주장은 특정 표의 값을 가리키므로 일반화가 없어 범위도 일치다. 다만 '부록 Table 1'이라는 위치 표지는 구절과 context 에 나타나지 않아, 이 표를 부록 Table 1 로 본다는 점은 가정이다. 원문에서 표 번호와 부록 위치를 확인하면 이 가정을 검증할 수 있다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "hard-tbl-f1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "hard-kor-t1",
+  "repeat": 1,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "hard-kor-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "수치·조건은 구절의 '4승 1패'와 '알파고' 주체가 주장과 같고, 주장에 날짜나 추가 조건이 없어 일치한다. 방향은 구절이 알파고의 승리로 서술하며, context의 부정 표현 '못한'은 뒤 문장에 있어 대상 문장의 결말을 바꾸지 않으므로 일치한다. 범위는 주장이 위키백과의 서술 내용만 말하고 구절을 넘어 일반화하지 않으므로 일치한다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "hard-kor-f1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "hard-f200-t1",
+  "repeat": 1,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "hard-f200-t1",
+   "numbers_conditions": "불일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "수치·조건 칸에서 구절의 'sometimes'는 few-shot 프롬프팅이 유용한 경우를 한정하는 조건 단서인데, 주장은 이 단서를 빼고 유용하다고만 적었다. 방향 칸에서는 구절과 context 모두 few-shot이 유용하다는 긍정 방향이며 주장도 같은 방향이다. 범위 칸에서는 때때로 유용하다는 구절을 항상 유용하다는 일반 명제로 넓혀 써서 구절보다 일반화했다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "hard-f200-f1",
+  "repeat": 1,
+  "verdict": "unverifiable",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "acc-t1",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "acc-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "구절의 'without external feedback'이 주장의 '외부 피드백 없이'와 같은 조건이다. 주장에는 수치나 날짜가 없다. 'struggle'은 '어렵다'와 같은 방향이고 구절에 부정이 없다. 구절과 주장 모두 'LLMs'를 일반 주어로 쓰므로 주장이 구절보다 넓어지지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "acc-t2",
+  "repeat": 2,
+  "verdict": "verify_failed",
+  "judge_raw": {
+   "ref": "acc-t2",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "수치 68%와 최대 밀도 500개 지시는 구절의 'achieve 68% accuracy at the max density of 500 instructions'와 같다. 그러나 주장의 주어인 'IFScale 벤치마크'는 구절과 context 어디에도 없어, 이 결과가 그 벤치마크의 것인지 구절만으로는 정할 수 없다. 방향은 구절의 'even ... only achieve'(최상위 모델조차 낮은 정확도)를 주장의 '최상위 모델도'가 그대로 옮겨 일치한다. 범위는 구절의 최상위 모델과 최대 밀도 조건을 넘어 일반화하지 않았다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "acc-t3",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "acc-t3",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "수치 87.5%(위반 중 priming 실패 비율)와 조건(지시가 금지 단어를 명시적으로 언급)이 구절과 같다. 방향은 구절의 'paradoxically activates … rather than suppresses'와 같이 활성화가 실패 결말이며, 구절의 말줄임(…)이 가린 부분은 확인할 수 없으나 주어와 결말 방향은 주장과 맞는다. 주장은 구절이 말한 범위를 넘어 일반화하지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "acc-f1",
+  "repeat": 2,
+  "verdict": "unverifiable",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "acc-f2",
+  "repeat": 2,
+  "verdict": "unverifiable",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "acc-f3",
+  "repeat": 2,
+  "verdict": "unverifiable",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "exi-t1",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "exi-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "구절의 'In the context of reasoning'이 주장의 '추론'과 같은 범위다. 주장의 '스스로 교정'은 구절의 'without external feedback' 조건, 즉 외부 피드백 없는 자기 교정을 옮긴 말이다. 'struggle to self-correct'는 '교정하지 못한다'와 같은 결말이다. 주장의 '아직'은 구절에 없는 시점 표현이지만 현재까지 못 한다는 한정이라 구절보다 강한 일반화는 아니므로 일치로 본다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "exi-t2",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "exi-t2",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "명시적 검증 지시가 있는 경우라는 조건과 지우라는 권고 방향이 구절과 같다. 주장은 가이드의 권고 범위를 넘어 일반화하지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "exi-t3",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "exi-t3",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "주장에는 수치나 날짜가 없고 모델 이름 GPT-4.1 과 이전 모델과의 비교가 구절과 같다. 구절은 이전 모델보다 더 밀접하고 더 문자 그대로 따르도록 학습되었다는 긍정 방향이며, context 의 조건 표현(기대와 다를 때, 대부분 충분하다)은 조종 가능성과 기대 행동에 관한 것이어서 지시 준수 방향의 판정을 바꾸지 않는다. 주장은 구절의 진술을 넘지 않고, 가이드가 그렇게 적는다는 귀속만 더한다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "exi-f1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "exi-f2",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "exi-f3",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "quo-t1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "quo-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "수치 칸은 구절의 '3–5 examples'와 주장의 '3~5개'가 같아 일치다. 방향 칸은 구절이 예시를 권장하고 주장도 권한다고 적어 일치다. 범위 칸은 구절이 예시를 '가장 믿을 만한 방법 중 하나(one of the most reliable ways)'로 적었는데 주장은 '가장 믿을 만한 방법'으로 적어 일반화했으므로 불일치다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "quo-t2",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "quo-t2",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "구절의 조건 'If your prompt contains anti-formatting language'는 주장의 '반형식 규칙이 있으면'과 같다. 구절은 'remove it or replace it'로 지우거나 바꾸라고 권하며, 주장도 '지우거나 ... 바꾸라고 권한다'로 같은 방향이다. 구절은 가이드의 권고이고 주장도 이를 일반화하지 않았으므로 범위는 일치한다. 뒤따르는 예시 목록은 주장에 없지만 주장이 그것을 넓히지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "quo-t3",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "quo-t3",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "긍정 예시가 하지 말 것에 대한 지시보다 효과적이라는 비교 방향은 구절과 같다. 구절은 'tend to'로 경향을 말했으나 주장은 이를 빼고 단정으로 옮겨 일반화했다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "quo-f1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "quo-f2",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "quo-f3",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "num-t1",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "num-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "수치·조건 칸은 구절의 'Starting with Claude 4.6 models'와 'on the last assistant turn'이 주장의 'Claude 4.6 모델부터'와 '마지막 assistant 턴의 프리필'과 같아 일치다. 구절은 Claude Mythos Preview도 함께 적지만 주장은 이를 제외하거나 포함한다고 말하지 않아 주장이 구절보다 넓지 않다. 방향 칸은 구절의 'no longer supported'와 주장의 '지원하지 않는다'가 같고, context가 이전 모델의 프리필 지원과 다른 위치의 assistant 메시지가 영향을 받지 않는다고 적어 주장의 범위를 좁혀 준다. 범위 칸은 주장이 구절보다 넓게 일반화하지 않아 일치다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "num-t2",
+  "repeat": 2,
+  "verdict": "verify_failed",
+  "judge_raw": {
+   "ref": "num-t2",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "수치 68%와 밀도 500개 지시는 구절과 같다. 그러나 주장의 주어인 'IFScale'은 구절과 context에 나오지 않아, 이 수치가 그 벤치마크의 결과인지 구절만으로는 정할 수 없다. 방향은 구절이 말한 낮은 정확도를 주장도 그대로 따르므로 일치한다. 범위는 구절의 최상위 모델과 최대 밀도 조건을 넘지 않는다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "num-t3",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "num-t3",
+   "numbers_conditions": "불일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "구절은 네 구조 변수의 검출 부재를 '다중 비교 보정 후'라는 조건 아래에서 말하는데 주장은 이 조건을 빼고 있어 조건이 다르다(1,650개 세션이라는 수치도 구절과 context에 없다). 방향은 'detectable contrast가 없다'와 '검출하지 못했다'가 같고, 범위는 네 변수 중 크기 하나로 좁혔으므로 일반화가 없다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "num-f1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "num-f2",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "num-f3",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "dir-t1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "dir-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "보정 조건은 구절과 주장에 모두 있어 일치한다. 구절은 'detectable contrast'가 없다고만 말하고 context는 위치 효과를 Bayes factor 근거 없이 기각하지 못한 것으로 한정하는데, 주장은 크기와 위치 모두 '차이를 내지 않았다'고 단정해 범위를 넓혔다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "dir-t2",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "dir-t2",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "구절이 속한 문장의 'without external feedback'이 주장의 '외부 피드백 없는' 조건과 같고, 'at times'가 '때로'와 같다. 'even degrades'는 '오히려 떨어진다'와 같은 방향이다. 주장의 'LLM의 성능'은 구절의 'their performance'와 같은 범위이고 '때로'로 한정돼 있어 넓어지지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "dir-t3",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "dir-t3",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "구절에는 수치가 없고 모델 이름 'Claude Fable 5.1'은 주장의 'Fable 5.1'과 같은 모델을 가리킨다. 직전 문장의 'Earlier models overused bold'와 구절의 'leans the other way: it uses bold less'를 함께 보면 Fable 5.1이 이전 모델보다 굵은 글씨를 덜 쓴다는 방향이 주장과 같다. 주장은 굵은 글씨 사용만 말하고 구절 밖으로 넓히지 않았으므로 범위는 일치한다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "dir-f1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "dir-f2",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "dir-f3",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "sco-t1",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "sco-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "주장에는 수치나 조건이 없고 모델 이름 GPT-4.1 이 구절과 같다. 구절의 'its predecessors' 는 GPT-4.1 이 대체한 이전 모델을 가리키며, OpenAI 가 쓴 이 가이드의 맥락에서는 OpenAI 모델을 뜻하므로 '이전 OpenAI 모델'로 옮긴 것은 구절의 범위와 같다. 주장이 구절보다 넓게 일반화하지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "sco-t2",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "sco-t2",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "모델 이름(Claude Opus 5)과 조건(명시적 검증 지시)과 지우라는 방향이 구절과 같다. 주장이 Opus 5 에 한정되어 있어 일반화가 없다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "sco-t3",
+  "repeat": 2,
+  "verdict": "verify_failed",
+  "judge_raw": {
+   "ref": "sco-t3",
+   "numbers_conditions": "판정 불가",
+   "direction": "판정 불가",
+   "scope": "판정 불가",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족",
+    "direction": "맥락 부족",
+    "scope": "맥락 부족"
+   },
+   "reason": "구절은 사소한 주석 지시 하나의 준수율 측정이라는 조건만 담고, 크기 변수가 조작 변수에 들어갔다는 문장은 구절과 context에 없다. 검출 부재는 구절이 아니라 다른 문장에서 나오므로 결말과 그 범위를 이 구절로는 정할 수 없다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "sco-f1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "sco-f2",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "sco-f2",
+   "numbers_conditions": "불일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "지우라는 권고 방향은 구절과 같다. 그러나 구절의 모델은 Claude Opus 5 뿐인데 주장은 모든 Claude 모델로 옮겨 모델 조건과 적용 범위가 모두 넓어졌다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "sco-f3",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "sco-f3",
+   "numbers_conditions": "불일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "구절은 'Within the conditions tested'라는 조건 한정을 달지만 주장은 이 한정을 빼고 있어 조건이 다르다. 방향은 크기 변수가 검출 가능한 차이를 만들지 않았다는 부정 결말로 같지만, 주장은 '어떤 지시의 준수율에도'라고 일반화해 context가 준수율이 과제와 함수 순서에 따라 달라진다고 보고한 범위를 넘었다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "num-t4",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "num-t4",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "1,650개 세션과 Claude Code CLI라는 수치와 주어는 구절과 context 어디에도 없어 대조할 수 없다. 주장과 구절 모두 결말이나 부정, 비교를 담지 않아 방향은 같고, 주장은 구절이 말한 사소한 대상 주석 하나의 측정을 넘지 않는다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "num-t5",
+  "repeat": 2,
+  "verdict": "verify_failed",
+  "judge_raw": {
+   "ref": "num-t5",
+   "numbers_conditions": "판정 불가",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {
+    "numbers_conditions": "맥락 부족"
+   },
+   "reason": "모델 20개와 제공사 7곳은 구절의 '20 state-of-the-art models across seven major providers'와 같다. 그러나 주장의 주어인 'IFScale 벤치마크'가 구절과 context에 없어, 이 평가가 그 벤치마크의 것인지 구절만으로는 정할 수 없다. 평가 사실을 말하는 문장이라 결말·부정·비교 방향이 없고, context의 'have not yet been characterized'는 연구 공백을 말하는 문장이어서 주장과 충돌하지 않는다. 범위는 'state-of-the-art'라는 한정을 빼 축약했을 뿐 평가 범위를 넓히지 않았다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "hard-ctx-t1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "hard-ctx-t1",
+   "numbers_conditions": "불일치",
+   "direction": "판정 불가",
+   "scope": "일치",
+   "unsure_reasons": {
+    "direction": "맥락 부족"
+   },
+   "reason": "주장은 이점이 파라미터 수와 평가 설정에 좌우되고 소형 모델에서 큰 이득이 난다고 적었다. 구절은 평가 설정에 따라 이점이 불안정하다는 내용만 담고 있어 파라미터 수와 소형 모델 조건이 빠졌다. 구절의 '불안정하다'는 평가 설정 의존 주장과 방향이 맞지만, 소형 모델에서 이득이 크다는 방향은 구절과 context 어디에도 없어 정할 수 없다. 주장은 구절이 말한 범위를 넘어 일반화하지 않았다."
+  },
+  "escalated": true
+ },
+ {
+  "id": "hard-ctx-f1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "hard-ctx-f1",
+   "numbers_conditions": "불일치",
+   "direction": "불일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "구절은 GSM8K의 zero-shot CoT 설정에서만 기본 모델이 우세하다고 말하는데, 주장은 이 조건을 빼고 모든 규모의 모델과 수학 벤치마크 전반으로 적었다. context는 few-shot 예시를 주면 지시 튜닝 모델이 같거나 앞선다고 말하므로, 기본 모델이 일관되게 높다는 주장은 방향이 어긋난다. 주장은 한 데이터셋과 한 설정의 결과를 전체 결론으로 넓혔다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "hard-cnd-t1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "hard-cnd-f1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "hard-tbl-t1",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "hard-tbl-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "수치·조건: 인용문의 열 머리는 10, 50, 100, 250, 500 이고 claude-3.5-haiku 행의 값은 98.0%, 78.0%, 43.4%, 16.6%, 8.5% 이므로 세 번째 값 43.4%가 100 열에 대응한다. 주장의 모델, 지시 개수 100, 정확도 43.4%가 모두 이 행과 일치한다. 다만 'IFScale 부록 Table 1'이라는 표 번호와 부록 위치는 인용문과 context 어디에도 나오지 않는다(캡션 본문이 옮겨지지 않았다). 이 표시는 수치 판정에 쓰이지 않으므로 수치·조건 칸은 일치로 두었고, 표 번호·부록 위치는 확인되지 않은 가정으로 남는다. 방향: 주장과 인용문 모두 성공·실패, 부정, 비교를 담지 않아 방향이 어긋나지 않는다. 범위: 주장은 이 표의 한 값을 그대로 옮겼고 일반화하지 않았다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "hard-tbl-f1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "hard-kor-t1",
+  "repeat": 2,
+  "verdict": "supported",
+  "judge_raw": {
+   "ref": "hard-kor-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "일치",
+   "unsure_reasons": {},
+   "reason": "구절은 최종 결과가 알파고의 4승 1패 승리라고 적고 있어, 주장의 주어(알파고), 상대(이세돌), 수치(4승 1패), 결말(알파고 승리)과 모두 같다. context의 '못'은 다음 절의 바둑 전개에 관한 문장이라 결과 문장을 부정하지 않는다. 주장도 구절이 말한 범위를 넘지 않는다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "hard-kor-f1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": null,
+  "escalated": false
+ },
+ {
+  "id": "hard-f200-t1",
+  "repeat": 2,
+  "verdict": "unsupported",
+  "judge_raw": {
+   "ref": "hard-f200-t1",
+   "numbers_conditions": "일치",
+   "direction": "일치",
+   "scope": "불일치",
+   "unsure_reasons": {},
+   "reason": "수치·조건은 구절의 'a few examples'가 주장의 '몇 개의 예시'와 같고, 'meet your expectations'가 '기대에 맞추는'과 같으며, 'few-shot prompting'이라는 명칭도 같아 일치한다. 방향은 구절과 주장이 모두 유용하다는 긍정이고 context에도 부정이나 비교가 없어 일치한다. 범위는 구절이 'It is sometimes useful'로 '때때로 유용하다'며 한정했는데, 주장은 '유용하다'고 한정어 'sometimes'를 빼 일반화했으므로 불일치한다."
+  },
+  "escalated": false
+ },
+ {
+  "id": "hard-f200-f1",
+  "repeat": 2,
+  "verdict": "unverifiable",
+  "judge_raw": null,
+  "escalated": false
+ }
+]
