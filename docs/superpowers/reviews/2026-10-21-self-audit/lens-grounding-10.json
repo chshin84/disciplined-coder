@@ -1,0 +1,66 @@
+{
+ "target": "skills/lens-readability/SKILL.md",
+ "lens": "lens-grounding",
+ "read": [
+  "skills/lens-readability/SKILL.md",
+  "agent-principles.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "scripts/audit_verify.sh",
+  "hooks/doc_word_pretooluse.sh",
+  "hooks/_spec_marker.sh",
+  "docs/domain-discipline.md"
+ ],
+ "issues": [
+  {
+   "where": "고정 규칙을 나열한 문단(「기계에 넘기는 것」 절)과 레퍼런스 프롬프트",
+   "type": "contradiction",
+   "claim": "슬라이드 제목을 포함한 본문 제목 전체를 결론 한 문장으로 쓰라고 정하는데, 에이전트원칙 TITLE-CLAIM 은 슬라이드 제목을 수치 없는 명사구로 40자 안에 쓰고 문서의 본문 제목만 한 문장으로 쓰라고 정한다. 같은 문서의 「반드시 읽히는 곳의 필수 내용」 절은 슬라이드 제목을 명사구로 적어 앞의 문장과도 어긋난다. 레퍼런스 프롬프트의 '본문 제목이 결론 한 문장이 아니면 결론 한 문장으로 고쳐 줘라'도 같다.",
+   "file": "skills/lens-readability/SKILL.md",
+   "evidence": "본문 제목(슬라이드 제목, 절의 첫 문장)은 결론 한 문장으로 쓰는 것",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "슬라이드 제목은 결론을 수치 없는 명사구로 40자 안에 쓰고",
+   "principle": "TITLE-CLAIM",
+   "consequence": "고정 규칙 문단과 프롬프트를 따르는 렌즈는 슬라이드 제목을 문장으로 고쳐 주는 제안을 낼 수 있고, 그 제안은 에이전트원칙의 슬라이드 제목 규칙과 반대가 되어 있다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "lens-readability",
+   "statement": "목적에 읽는 사람과 그 사람이 할 수 있어야 하는 일이 없으면 판정하지 않고 purpose 를 null 로 둔다.",
+   "evidence": "목적을 못 받으면 판정하지 않는다."
+  },
+  {
+   "topic": "EDIT-PRIORITY",
+   "statement": "고칠 순서는 에이전트원칙의 EDIT-PRIORITY 가 정하고 이 문서는 다시 적지 않는다.",
+   "evidence": "순서는 에이전트원칙(`agent-principles.md`)의 `EDIT-PRIORITY` 가 정한다."
+  },
+  {
+   "topic": "aggregating-lenses",
+   "statement": "lens·read·principles_applied·notes 의 뜻과 공통 규칙은 aggregating-lenses 의 리뷰 산출물 계약이, purpose 의 뜻은 같은 스킬의 렌즈가 추가하는 칸이 소유한다.",
+   "evidence": "`lens`·`read`·`principles_applied`·`notes`의 뜻과 공통 규칙은 `aggregating-lenses`의 리뷰 산출물 계약이 소유하고, `purpose`의 뜻은 같은 스킬의 「렌즈가 추가하는 칸」이 소유한다."
+  },
+  {
+   "topic": "WRITTEN-ONLY",
+   "statement": "구어 종결어미와 구어 축약과 반말의 교정을 포함한 고정 규칙은 목적을 따지지 않고 판정한다.",
+   "evidence": "이 고정 규칙은 목적을 따지지 않고 판정한다."
+  },
+  {
+   "topic": "TERM-EXPLAIN",
+   "statement": "전문 용어는 없애지 않고 처음 나올 때 한 줄로 풀어 준다.",
+   "evidence": "처음 나올 때 한 줄 풀어 준다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "TITLE-LAYERS",
+  "TITLE-CLAIM",
+  "EDIT-PRIORITY",
+  "WRITTEN-ONLY",
+  "ONE-ENDING",
+  "TERM-EXPLAIN",
+  "LENS-ALLOWED"
+ ],
+ "notes": "검토한 관점: 누락·모순·환각·불일치를 항목마다 따로 보았다. 확인한 대상: aggregating-lenses 의 제외 칸 목록과 rewrite·purpose 소유 선언(일치), audit-repo-docs 의 suggestions.json 소개와 scripts/audit_verify.sh 의 검사(일치), hooks/doc_word_pretooluse.sh 가 .md 만 거부하고 이 저장소 문서를 제외하는 동작(일치), dispatching-lenses 렌즈 그룹 표의 lens-readability 행(일치), 에이전트원칙의 EDIT-PRIORITY·UNPACK 구성(일치). 확인하지 못한 것: 레퍼런스 프롬프트 뒤에 인용한 arXiv 2507.11538(IFScale)과 2307.03172(Lost in the Middle)의 제목과 내용은 오프라인이라 열지 못했다. 가정으로 두며 WebFetch 로 열어 확인할 수 있다. 20,000자 경계는 근거 문서가 이 저장소에 없어 값을 확인하지 못했다."
+}

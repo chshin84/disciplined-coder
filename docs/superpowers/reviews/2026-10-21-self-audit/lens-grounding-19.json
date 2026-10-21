@@ -1,0 +1,51 @@
+{
+ "target": "skills/review-docs/SKILL.md",
+ "lens": "lens-grounding",
+ "read": [
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/doc_word_pretooluse.sh",
+  "hooks/_spec_marker.sh",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/agent-prior-art/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "scripts/audit_verify.sh",
+  "workflows/prior-art-search.js",
+  "docs/superpowers/reviews/"
+ ],
+ "issues": [],
+ "statements": [
+  {
+   "topic": "review-docs",
+   "statement": "기록 파일 이름 규칙은 이 문서가 소유하고 문서 검진과 spec·plan 리뷰와 레포 감사와 워크플로 검증이 따른다.",
+   "evidence": "이 규칙은 여기가 소유한다. 문서 검진과 spec·plan 리뷰와 레포 감사와 워크플로 검증이 모두 이 규칙을 따른다."
+  },
+  {
+   "topic": "lens-fit",
+   "statement": "lens-fit 에 넘기는 계약은 이 문서가 소유하고 경로는 agent-principles.md 와 docs/domain-korean.md 다.",
+   "evidence": "이 계약은 여기가 소유한다. 계약은 둘의 경로다. 에이전트원칙 `agent-principles.md`와 `docs/domain-korean.md`다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "필요할 때 그룹의 공통 규칙과 lens-readability 발동 기준은 dispatching-lenses 의 렌즈 그룹이 소유한다.",
+   "evidence": "필요할 때 그룹의 공통 규칙(제안과 승인, 직접 요청, 판정 기록)과 `lens-readability`의 발동 기준은 `dispatching-lenses`의 「렌즈 그룹」이 소유한다."
+  },
+  {
+   "topic": "agent-prior-art",
+   "statement": "선행연구 에이전트의 제안과 승인, 직접 요청, 판정 기록은 agent-prior-art 의 발동과 기록이 소유한다.",
+   "evidence": "선행연구 에이전트의 제안과 승인, 직접 요청, 판정 기록은 `agent-prior-art`의 「발동과 기록」이 소유한다."
+  },
+  {
+   "topic": "ASK-OPTIONS",
+   "statement": "검진 전 질문은 ASK-OPTIONS 대로 선택지가 있는 질문으로 묻는다.",
+   "evidence": "물을 때는 `ASK-OPTIONS`대로 선택지가 있는 질문으로 묻고, 렌즈를 몇 개 실행하는지도 함께 보인다."
+  },
+  {
+   "topic": "review-docs",
+   "statement": "반영한 뒤 다시 검진하지 않는다.",
+   "evidence": "반영한 뒤 다시 검진하지는 않는다."
+  }
+ ],
+ "principles_applied": [],
+ "notes": "확인한 것: hooks/doc_review_posttooluse.sh 의 대상 선별(.pptx·.xlsx·.docx·.pdf, .html 제외, 같은 폴더 산출물 조건), hooks/doc_word_pretooluse.sh 와 hooks/_spec_marker.sh 의 path_in_own_repo(이 저장소 문서 제외, .md 만), dispatching-lenses 의 「렌즈 그룹」·「한 번만 실행하는 렌즈의 규율」·「렌즈에게 에이전트원칙을 알리는 법」, agent-prior-art 의 「발동과 기록」·「판정 규약」·「인용 확인」, lens-readability 의 「목적 주입」, review-specs 가 이 문서의 계약을 가리키는 줄, scripts/audit_verify.sh 의 파일 이름 정규식(lens-<이름>-<순번>.json)과 target 검사, 실제 기록 폴더 이름(self-audit, -review-2). 불일치는 찾지 못했다. prior-art 원본 이름 다섯 개(search-r<n> 등)는 이 문서 밖 코드에서 이름을 박은 곳을 찾지 못해 대조하지 못했다."
+}

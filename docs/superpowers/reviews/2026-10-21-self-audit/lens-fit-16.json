@@ -1,0 +1,67 @@
+{
+  "target": "agents/prior-art-researcher.md",
+  "lens": "lens-fit",
+  "doc_type": "작업 지시서 — 서브에이전트 프롬프트(에이전트 정의)이므로 문서 타입 표의 행이 아니라 「작업 지시서」 절의 INSTRUCTION-FORM을 적용 대상으로 삼았다. 타입 표로는 절차·계약에 가장 가깝다.",
+  "read": [
+    "agent-principles.md",
+    "docs/domain-korean.md",
+    "skills/agent-prior-art/SKILL.md"
+  ],
+  "issues": [
+    {
+      "where": "explore 모드 > 가드 목록",
+      "type": "constraint",
+      "claim": "에이전트가 따를 가드를 평서형 부정문('~않는다')으로 적었다. 같은 파일의 앞 단락은 '~하지 마라' 명령형을 쓴다.",
+      "file": "agents/prior-art-researcher.md",
+      "evidence": "참신함을 채점하지 않는다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "평서형 부정문은 금지로 읽히기 때문이다.",
+      "principle": "INSTRUCTION-FORM",
+      "consequence": "지금 가드 불릿 여섯 줄이 평서형이다. 이 불릿은 skill 「판정 규약」의 가드를 글자 그대로 옮긴 것이라고 선언하므로, 고치려면 skill 쪽과 이 파일을 함께 고치고 문서 대조 검사(scripts/test_docs_drift.sh 등)를 맞춰야 한다.",
+      "lens": "lens-fit"
+    },
+    {
+      "where": "explore 모드 > issues[].type",
+      "type": "style",
+      "claim": "목록을 시작하는 문장에 개수를 적었다.",
+      "file": "agents/prior-art-researcher.md",
+      "evidence": "`issues[].type`은 아래 네 값 중 하나이며, 각 값은 다음 조건에서 쓴다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "목록을 시작하는 문장에 목록의 개수를 쓰지 말고, 앞에 나온 대상은 개수 대신 이름으로 가리켜라.",
+      "principle": "COUNT-EARNS",
+      "consequence": "지금 목록 앞에 '네 값'이 예고되어 있다.",
+      "lens": "lens-fit"
+    },
+    {
+      "where": "서두와 explore 모드",
+      "type": "style",
+      "claim": "같은 행위자를 '연구자'와 '검수자'와 '이 렌즈'로 달리 부른다. 모드 단락은 '너는 선행연구 대조 검수자다'로 시작한다.",
+      "file": "agents/prior-art-researcher.md",
+      "evidence": "너는 선행연구 대조 검수자다.",
+      "counterpart_file": "agents/prior-art-researcher.md",
+      "counterpart": "너는 선행연구 에이전트의 연구자다.",
+      "principle": "TERM-ONE",
+      "consequence": "지금 받는 에이전트가 자기 역할을 연구자·검수자 둘로 읽을 수 있다. 출력 예시의 '이 렌즈'(evidence 설명, disclosures)도 같은 행위자를 가리킨다.",
+      "lens": "lens-fit"
+    },
+    {
+      "where": "explore 모드(첫 단락)",
+      "type": "style",
+      "claim": "한 단락에 지시 문장이 스무 개 넘게 이어져 있다. 한 단락은 네 문장에서 끊는다.",
+      "file": "agents/prior-art-researcher.md",
+      "evidence": "출력은 연구자 출력 JSON 하나로만 내고 앞뒤에 다른 글을 두지 마라.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "한 문장에 한 개념만 쓰고, 단락이 네 문장에 이르면 새 단락을 시작하라.",
+      "principle": "ONE-IDEA",
+      "consequence": "지금 explore 지시 전체가 한 단락이라 에이전트가 항목을 놓치기 쉽다. 이 단락은 skill 레퍼런스 프롬프트와 글자 그대로 같으므로 skill과 함께 고쳐야 한다.",
+      "lens": "lens-fit"
+    }
+  ],
+  "principles_applied": [
+    "INSTRUCTION-FORM",
+    "COUNT-EARNS",
+    "TERM-ONE",
+    "ONE-IDEA"
+  ],
+  "notes": "검토한 관점: 형식(JSON 예시의 유효성과 필수 키), 스타일, 오염(출력은 JSON 하나만이라는 지시와 예시 블록의 충돌 없음), 호환(scripts/prior_art_contract.json의 키와 일치), 규율. 금지 낱말은 세지 않았다. 이 파일이 skill의 가드 불릿과 레퍼런스 프롬프트를 글자 그대로 옮긴다고 선언하므로 INSTRUCTION-FORM·ONE-IDEA 지적은 skill까지 함께 바꿔야 하며, 클린룸 시험이 필요한 조항 문안이 아니라 에이전트 정의 문안이다."
+}

@@ -1,0 +1,59 @@
+{
+ "target": "skills/aggregating-lenses/SKILL.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — 렌즈 출력의 스키마 계약과 집계 방법을 포함하므로 수행 방법과 스키마 계약 행으로 가렸다.",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "판단 재귀 회피 (핵심 제약)",
+   "type": "style",
+   "claim": "평서형 부정문으로 적었다. 금지로 읽히기 때문에 긍정 명령으로 써야 한다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "내용 재판단이나 가중치 부여는 하지 않는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "평서형 부정문은 금지로 읽히기 때문이다.",
+   "principle": "INSTRUCTION-FORM",
+   "consequence": "지금 집계 단계가 하지 말아야 할 일이 평서형 부정문으로 적혀 있다."
+  },
+  {
+   "where": "처분 — 호출자의 몫 / spec 리뷰",
+   "type": "style",
+   "claim": "앞에 나온 두 단계를 이름 대신 개수로 가리킨다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "「하는 일」의 두 단계까지만 한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "앞에 나온 대상은 개수 대신 이름으로 가리켜라.",
+   "principle": "COUNT-EARNS",
+   "consequence": "지금 '두 단계'가 집계와 커버리지 공백 중 무엇인지 읽는 쪽이 앞 절을 다시 세어야 한다."
+  },
+  {
+   "where": "리뷰 산출물 계약",
+   "type": "style",
+   "claim": "'상대편' 앞에 수식어가 겹쳐 무엇이 무엇을 꾸미는지 헷갈린다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "상대편(불일치하는 실제 코드나 파일이나 다른 문서의 문장)",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "명사 앞에는 수식어를 하나만 두고, 더 꾸밀 내용은 서술어나 다음 문장에 써라.",
+   "principle": "NO-STACK-MOD",
+   "consequence": "지금 '불일치하는 실제 코드나 파일이나 다른 문서의 문장'에서 '불일치하는'이 코드와 파일과 문서 중 어디까지 꾸미는지 두 가지로 읽힌다."
+  },
+  {
+   "where": "리뷰 산출물 계약",
+   "type": "style",
+   "claim": "'채우는 것'의 '것'이 이름 없이 대상을 가리킨다.",
+   "file": "skills/aggregating-lenses/SKILL.md",
+   "evidence": "읽지 않고 채우는 것을 차단할 수 없어 재시도는 \"비어 있지 않은 배열\"로만 수렴한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "대상을 가리키는 '것'도 그 이름으로 바꿔라.",
+   "principle": "SPECIFIC-NAME",
+   "consequence": "지금 무엇을 채우는지(read 칸인지 principles_applied 칸인지)가 이 문장에 없다."
+  }
+ ],
+ "principles_applied": [],
+ "notes": "관점: 렌즈 출력 스키마 문서이므로 JSON 예시의 키가 렌즈 문서들의 스키마와 맞는지 보았고 맞았다. INSTRUCTION-FORM(평서형 지시)은 이 문서 전체에 퍼져 있어 부정문 한 줄만 대표로 올렸다. 금지 낱말은 세지 않았다."
+}
