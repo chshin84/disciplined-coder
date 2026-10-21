@@ -340,7 +340,7 @@ check "절차의 표 대조가 이 스크립트를 부른다" "grep -qF 'audit_t
 echo "[안내 문서 — 훅 목록]"
 # 「에이전트원칙」은 agent-principles.md 그 파일 하나를 가리키는 말로 두고, 어떤 사실의 소유자를 가리킬
 # 때는 「소유한다」를 쓴다. 한 낱말에 뜻이 둘이면 소유 표 도출이 포인터를 소유자로 센다.
-check "CLAUDE.md 가 훅 목록의 소유자를 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -F 'README.md' '$HERE/CLAUDE.md' | grep -qF '소유한다'"
+check "CLAUDE.md 가 훅 연결의 소유자를 배선 파일로 가리킨다" "grep -F 'hooks/hooks.json' '$HERE/CLAUDE.md' | grep -qF '소유한다'"
 
 echo "[seal_reviews.sh — 봉인할 기록이 없어도 끝난다]"
 SE="$(mktemp -d)"; git -C "$SE" init -q
