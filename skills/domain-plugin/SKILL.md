@@ -9,12 +9,17 @@ Claude Code 플러그인과 마켓플레이스를 만들고 배포하는 방법�
 ## 플러그인을 만들 때 지킬 것
 플러그인은 남의 PC 로 배포되므로, 값을 잘못 두면 새 커밋이 그쪽에 안 실리거나 스킬이 안 열린다.
 
-- **version 비우기** — 활성 개발 중이면 plugin.json의 `version`을 비워 커밋 SHA 기반 자동 업데이트를 유지한다. version을 설정하면 업데이트가 버전 문자열 비교로 바뀌어, 값을 올리지 않는 한 새 커밋이 사용자에게 배포되지 않는다([plugins-reference의 Version management](https://code.claude.com/docs/en/plugins-reference#version-management)). `claude plugin validate`가 version 경고를 내면 수용한다(CLI 버전에 따라 내지 않기도 한다).
-- **marketplace.json** — `.claude-plugin/marketplace.json`에 최상위 `name`·`description`·`owner`·`plugins[]`를 둔다. 레포 루트가 곧 플러그인이면 `source: "./"`로 가리킨다. `plugins[].description`은 `plugin.json`의 `description`과 글자 그대로 같게 둔다. 문안을 바꿀 때는 `plugin.json`을 고치고 마켓플레이스 항목을 따라 맞추며, 같은지는 `scripts/test_docs_drift.sh`가 확인한다.
-- **frontmatter** — 스킬 `SKILL.md`는 `name`(디렉터리 이름과 같게)과 `description` 두 키를 쓰고, 커맨드 `.md`는 `description` 하나를 쓴다. `description`은 언제 여는지를 포함한다. 이 요구는 스킬과 커맨드 양쪽에 적용된다. 스킬은 Claude 가 언제 열지 고르는 근거가 그 값뿐이고, 커맨드는 사용자가 목록에서 고르는 근거가 그 값뿐이다. 에이전트 정의 `agents/*.md`는 `name`과 `description`을 쓰고 도구와 턴 상한을 `tools`·`maxTurns`로 둔다. 값은 YAML 평문 스칼라라 `: `와 ` #`을 넣지 않으며, 이 규칙은 에이전트 정의의 `description`에도 적용된다.
-- **validate** — `claude plugin validate ./`로 검증한다. `--strict`는 경고까지 실패로 취급하므로, 위 버전 정책을 쓰는 레포에서는 `--strict`가 실패하는 것이 정상이며 non-strict로 통과를 확인한다.
-- **스킬 이름의 부류** — 이름의 모양이 그 스킬을 어떻게 쓰는지 말하게 한다. 열어서 읽는 규칙집에는 `domain-` 접두사를 붙이고(`domain-readme`·`domain-plugin`), 읽기 전용 서브에이전트로 실행하는 렌즈에는 `lens-` 접두사를 붙이며, 렌즈를 실행해 결과를 내는 절차에는 접두사 대신 동사구를 쓴다(`review-specs`·`review-docs`·`review-llm-calls`·`audit-repo-docs`·`dispatching-lenses`·`aggregating-lenses`·`nested-orchestration`). 사용자와 여러 턴을 주고받는 절차와 서브에이전트 정의와 워크플로를 묶은 구성은 `agent-` 접두사를 쓴다(`agent-prior-art`). 규칙집과 절차가 같은 접두사를 쓰면 여는 쪽이 무엇을 기대할지 알 수 없다.
-- **컴포넌트 위치** — `agents/`·`skills/`·`commands/`·`workflows/`·`hooks/hooks.json`에 둔다. 플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다.
+**version 비우기** — 활성 개발 중이면 plugin.json의 `version`을 비워 커밋 SHA 기반 자동 업데이트를 유지한다. version을 설정하면 업데이트가 버전 문자열 비교로 바뀌어, 값을 올리지 않는 한 새 커밋이 사용자에게 배포되지 않는다([plugins-reference의 Version management](https://code.claude.com/docs/en/plugins-reference#version-management)). `claude plugin validate`가 version 경고를 내면 수용한다(CLI 버전에 따라 내지 않기도 한다).
+
+**marketplace.json** — `.claude-plugin/marketplace.json`에 최상위 `name`·`description`·`owner`·`plugins[]`를 둔다. 레포 루트가 곧 플러그인이면 `source: "./"`로 가리킨다. `plugins[].description`은 `plugin.json`의 `description`과 글자 그대로 같게 둔다. 문안을 바꿀 때는 `plugin.json`을 고치고 마켓플레이스 항목을 따라 맞추며, 같은지는 `scripts/test_docs_drift.sh`가 확인한다.
+
+**frontmatter** — 스킬 `SKILL.md`는 `name`(디렉터리 이름과 같게)과 `description` 두 키를 쓰고, 커맨드 `.md`는 `description` 하나를 쓴다. `description`은 언제 여는지를 포함한다. 이 요구는 스킬과 커맨드 양쪽에 적용된다. 스킬은 Claude 가 언제 열지 고르는 근거가 그 값뿐이고, 커맨드는 사용자가 목록에서 고르는 근거가 그 값뿐이다. 에이전트 정의 `agents/*.md`는 `name`과 `description`을 쓰고 도구와 턴 상한을 `tools`·`maxTurns`로 둔다. 값은 YAML 평문 스칼라라 `: `와 ` #`을 넣지 않으며, 이 규칙은 에이전트 정의의 `description`에도 적용된다.
+
+**validate** — `claude plugin validate ./`로 검증한다. `--strict`는 경고까지 실패로 취급하므로, 위 버전 정책을 쓰는 레포에서는 `--strict`가 실패하는 것이 정상이며 non-strict로 통과를 확인한다.
+
+**스킬 이름의 부류** — 이름의 모양이 그 스킬을 어떻게 쓰는지 말하게 한다. 열어서 읽는 규칙집에는 `domain-` 접두사를 붙이고(`domain-readme`·`domain-plugin`), 읽기 전용 서브에이전트로 실행하는 렌즈에는 `lens-` 접두사를 붙이며, 렌즈를 실행해 결과를 내는 절차에는 접두사 대신 동사구를 쓴다(`review-specs`·`review-docs`·`review-llm-calls`·`audit-repo-docs`·`dispatching-lenses`·`aggregating-lenses`·`nested-orchestration`). 사용자와 여러 턴을 주고받는 절차와 서브에이전트 정의와 워크플로를 묶은 구성은 `agent-` 접두사를 쓴다(`agent-prior-art`). 규칙집과 절차가 같은 접두사를 쓰면 여는 쪽이 무엇을 기대할지 알 수 없다.
+
+**컴포넌트 위치** — `agents/`·`skills/`·`commands/`·`workflows/`·`hooks/hooks.json`에 둔다. 플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다.
 
 ## 훅을 만들 때의 값
 
@@ -32,26 +37,34 @@ Claude Code 플러그인과 마켓플레이스를 만들고 배포하는 방법�
 
 아래를 지킨다.
 
-- **프로세스 수를 센다** — 셸 반복이 파이썬보다 싸다고 가정하지 않는다. 표의 행마다 파이프를 실행한 훅이 13,057밀리초였고, 같은 일을 파이썬 한 번으로 하니 1,108밀리초였다. 윈도우는 프로세스를 실행하는 값이 커서 반복이 그대로 값이 된다.
-- **고정 문자열 검색은 로케일을 `C`로 둔다** — `C.UTF-8`에서 `grep`이 207밀리초, `awk`가 213밀리초 들던 것이 크게 줄었다. `grep -F`는 찾는 글자를 그대로 비교하므로 바이트로 비교해도 UTF-8 결과가 같다.
-- **대화 기록을 파싱하는 Stop 훅은 만들지 않는다** — Stop 훅은 `last_assistant_message` 로 마지막 답을 받는다(2026-10-20 공식 문서 확인). 그러나 이미 나간 답은 고칠 수 없고 도구 호출 사이의 중간 답은 받지 못한다. 예전 구현은 대화 기록 파일을 열고 JSON을 파싱해 마지막 답을 골라냈고, 그래서 파이썬을 실행했다. 실제 대화 기록에서 답 하나에 1,021밀리초가 들어 그 훅을 걷어냈다. 답에 적용하는 규칙은 에이전트원칙에 적어 지시로 맡긴다. git 상태만 보는 가벼운 게이트는 이 금지에 들지 않되, 검사를 한 프로세스로 모으고 git status 는 한 번만 실행한다(`hooks/stop_gates.sh`).
+**프로세스 수를 센다** — 셸 반복이 파이썬보다 싸다고 가정하지 않는다. 표의 행마다 파이프를 실행한 훅이 13,057밀리초였고, 같은 일을 파이썬 한 번으로 하니 1,108밀리초였다. 윈도우는 프로세스를 실행하는 값이 커서 반복이 그대로 값이 된다.
+
+**고정 문자열 검색은 로케일을 `C`로 둔다** — `C.UTF-8`에서 `grep`이 207밀리초, `awk`가 213밀리초 들던 것이 크게 줄었다. `grep -F`는 찾는 글자를 그대로 비교하므로 바이트로 비교해도 UTF-8 결과가 같다.
+
+**대화 기록을 파싱하는 Stop 훅은 만들지 않는다** — Stop 훅은 `last_assistant_message` 로 마지막 답을 받는다(2026-10-20 공식 문서 확인). 그러나 이미 나간 답은 고칠 수 없고 도구 호출 사이의 중간 답은 받지 못한다. 예전 구현은 대화 기록 파일을 열고 JSON을 파싱해 마지막 답을 골라냈고, 그래서 파이썬을 실행했다. 실제 대화 기록에서 답 하나에 1,021밀리초가 들어 그 훅을 걷어냈다. 답에 적용하는 규칙은 에이전트원칙에 적어 지시로 맡긴다. git 상태만 보는 가벼운 게이트는 이 금지에 들지 않되, 검사를 한 프로세스로 모으고 git status 는 한 번만 실행한다(`hooks/stop_gates.sh`).
 
 ## 사용자 설정 파일을 고칠 때 지킬 것
 
 플러그인이 `~/.claude/settings.json`처럼 사용자가 손으로 관리하는 파일을 고쳐야 할 때가 있다. 이 레포는 마켓플레이스 자동 갱신을 켜느라 그 파일을 만진다(`scripts/_ensure_autoupdate.sh`). 아래를 지킨다.
 
-- **환경 변수** — OS 환경 변수는 물어서 넣는다. 이미 값이 있으면 건드리지 않는다. 넣은 값은 이미 열려 있는 창에 실리지 않고 다음에 여는 창부터 실린다는 것을 함께 알린다.
+**환경 변수** — OS 환경 변수는 물어서 넣는다. 이미 값이 있으면 건드리지 않는다. 넣은 값은 이미 열려 있는 창에 실리지 않고 다음에 여는 창부터 실린다는 것을 함께 알린다.
 
-- **대상 좁히기** — 우리 것으로 식별되는 항목만 고친다. 남의 항목은 값이 같아도 손대지 않는다.
-- **사용자 결정 존중** — 사용자가 값을 넣어 둔 키는 덮지 않는다. 키가 아예 없을 때만 채운다.
-- **사본과 재검증** — 고치기 전에 `.bak`을 남기고, 새로 쓴 파일을 다시 파싱해 유효할 때만 원래 경로에 놓는다.
-- **사유를 구분한 통지** — 못 고친 차수는 까닭을 구분해 알린다. 설정을 못 읽은 것과 파이썬이 없는 것과 쓰기 권한이 없는 것은 사용자가 할 일이 서로 다르다.
-- **처리기 하나** — JSON을 다루는 처리기를 여러 개 두지 않는다. 폴백을 하나 더 두면 한 번도 실행되지 않는 사본이 생기고, 실행해 보지 않은 코드에는 오류가 숨는다(에이전트원칙의 `YAGNI`).
-- **서식 변경 고지** — 값을 채우면 파일 전체가 다시 기록되어 서식이 바뀔 수 있다. 바뀐 경로를 알리고 사본 위치를 함께 보인다.
+**대상 좁히기** — 우리 것으로 식별되는 항목만 고친다. 남의 항목은 값이 같아도 손대지 않는다.
+
+**사용자 결정 존중** — 사용자가 값을 넣어 둔 키는 덮지 않는다. 키가 아예 없을 때만 채운다.
+
+**사본과 재검증** — 고치기 전에 `.bak`을 남기고, 새로 쓴 파일을 다시 파싱해 유효할 때만 원래 경로에 놓는다.
+
+**사유를 구분한 통지** — 못 고친 차수는 까닭을 구분해 알린다. 설정을 못 읽은 것과 파이썬이 없는 것과 쓰기 권한이 없는 것은 사용자가 할 일이 서로 다르다.
+
+**처리기 하나** — JSON을 다루는 처리기를 여러 개 두지 않는다. 폴백을 하나 더 두면 한 번도 실행되지 않는 사본이 생기고, 실행해 보지 않은 코드에는 오류가 숨는다(에이전트원칙의 `YAGNI`).
+
+**서식 변경 고지** — 값을 채우면 파일 전체가 다시 기록되어 서식이 바뀔 수 있다. 바뀐 경로를 알리고 사본 위치를 함께 보인다.
 
 ## 훅과 상시 지시의 과잉을 판정할 때
 
 플러그인을 리뷰하거나 줄일 때 훅과 상시 지시를 아래 판정 질문으로 본다. 테스트·스크립트·문서처럼 플러그인이 아닌 프로젝트에도 해당하는 기준은 `domain-pruning`이 소유한다. 판정 질문은 2026-10-05에 선행연구로 모았다.
 
-- **훅을 쓸 조건** — 준수가 비타협적이고, 판정이 예·아니오로 떨어지며, 지시만으로는 지켜지지 않는 행동일 때 훅으로 강제한다. 판단이 필요하거나 과잉 차단의 값이 가끔의 불이행보다 크면 지시로 맡긴다. 넛지 훅이 내는 글도 컨텍스트를 쓴다([hooks vs prompts](https://agentpatterns.ai/instructions/hooks-vs-prompts/), [Claude Code best practices](https://code.claude.com/docs/en/best-practices)).
-- **상시 지시의 분량** — 지시 한 줄마다 지우면 에이전트가 실수하는지 묻고, 그렇지 않으면 지운다. CLAUDE.md 는 import 한 파일까지 쳐서 200줄 미만을 목표로 한다. 지시 수가 늘면 준수율이 떨어진다는 측정은 키워드 지시로 한 것이라 방향의 근거로만 쓴다([Claude Code memory](https://code.claude.com/docs/en/memory), [IFScale](https://arxiv.org/abs/2507.11538)).
+**훅을 쓸 조건** — 준수가 비타협적이고, 판정이 예·아니오로 떨어지며, 지시만으로는 지켜지지 않는 행동일 때 훅으로 강제한다. 판단이 필요하거나 과잉 차단의 값이 가끔의 불이행보다 크면 지시로 맡긴다. 넛지 훅이 내는 글도 컨텍스트를 쓴다([hooks vs prompts](https://agentpatterns.ai/instructions/hooks-vs-prompts/), [Claude Code best practices](https://code.claude.com/docs/en/best-practices)).
+
+**상시 지시의 분량** — 지시 한 줄마다 지우면 에이전트가 실수하는지 묻고, 그렇지 않으면 지운다. CLAUDE.md 는 import 한 파일까지 쳐서 200줄 미만을 목표로 한다. 지시 수가 늘면 준수율이 떨어진다는 측정은 키워드 지시로 한 것이라 방향의 근거로만 쓴다([Claude Code memory](https://code.claude.com/docs/en/memory), [IFScale](https://arxiv.org/abs/2507.11538)).
