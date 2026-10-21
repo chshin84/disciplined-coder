@@ -106,6 +106,14 @@ def test_map_scoring():
     assert r["missed_errors"] == 1 and r["rejected_truths"] == 0
 
 
+
+def test_xhigh_effort_allowed():
+    import score
+    assert "xhigh" in run.EFFORTS
+    assert score._order("claude-haiku-5-5/xhigh", 0) > score._order("claude-haiku-5-5/high", 0)
+    assert score._order("claude-haiku-5-5/xhigh", 0) < score._order("claude-sonnet-5-5/low", 0)
+
+
 if __name__ == "__main__":
     try:
         globals()[sys.argv[1]]()

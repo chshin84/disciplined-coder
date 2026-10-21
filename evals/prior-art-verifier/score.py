@@ -11,7 +11,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 EXTRACT_CATS = ("access", "exists", "quote")
 JUDGE_CATS = ("numbers_conditions", "direction", "scope")
 MODEL_ORDER = ("claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5")
-EFFORT_ORDER = ("low", "medium", "high")
+EFFORT_ORDER = ("low", "medium", "high", "xhigh")
 
 
 def _empty():

@@ -19,6 +19,8 @@ PRINCIPLES = os.path.join(ROOT, "agent-principles.md")
 JOBS = 4
 TIMEOUT = 900
 MAX_ATTEMPTS = 2
+# xhigh 는 Haiku high 가 기준선에 못 미칠 때 Sonnet 보다 먼저 시험한다(2026-10-21 사용자 결정).
+EFFORTS = ("low", "medium", "high", "xhigh")
 CITE_TOOLS = "WebFetch,Read"
 LOCAL_TOOLS = "Read"
 MODES = {"baseline-cite": "cite", "baseline-map": "map", "extract": "extract", "judge": "judge", "map": "map"}
@@ -163,7 +165,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage", required=True, choices=sorted(MODES))
     ap.add_argument("--model", required=True)
-    ap.add_argument("--effort", required=True, choices=["low", "medium", "high"])
+    ap.add_argument("--effort", required=True, choices=EFFORTS)
     ap.add_argument("--category", default="")
     ap.add_argument("--extract-from", default="")
     ap.add_argument("--repeat", type=int, default=1)
