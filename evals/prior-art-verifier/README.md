@@ -24,7 +24,7 @@ python -I evals/prior-art-verifier/score.py report
 
 ## 실행 조건
 
-이 PC 에는 API 키 파일이 없어 `--bare` 를 쓸 수 없다. 모든 실행에 `--setting-sources "" --strict-mcp-config --disable-slash-commands --no-session-persistence` 를 붙이고, 실행 폴더는 `scripts/_eval_env.sh` 의 `eval_tmpdir` 로 만든다. 실제로 실린 지시는 2026-10-21 첫 실제 실행에서 확인했다.
+이 PC 에는 API 키 파일이 없어 `--bare` 를 쓸 수 없다. 모든 실행에 `--setting-sources "" --strict-mcp-config --disable-slash-commands --no-session-persistence` 를 붙이고, 실행 폴더는 `scripts/_eval_env.sh` 의 `eval_tmpdir` 과 같은 규칙(기본 `D:/dc-eval-tmp`, 상위 경로에 CLAUDE.md 가 있으면 실패)으로 `run.py` 가 만든다. 실제로 실린 지시는 2026-10-21 첫 실제 실행에서 확인했다.
 
 - 같은 플래그와 `D:/dc-eval-tmp` 아래 폴더에서 Haiku 5.5 low 에 "CLAUDE.md 나 메모리 파일에서 온 내용이 있는가"를 물었더니 "없음"이라고 답했다.
 - 그 실행의 캐시 쓰기 토큰은 3,129 였다. 전역 CLAUDE.md(디시플린코더 원칙과 금지어 목록)가 실렸다면 이보다 훨씬 크다.
