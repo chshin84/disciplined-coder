@@ -46,6 +46,7 @@ $TARGETS
 EOF
   if [ "$#" -gt 0 ]; then
     . "$DIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기
+    _json_python || true   # 치환 밖에서 먼저 골라 _JSON_PY 를 남긴다(_json_valid.sh 주석)
     form="$(printf '%s' "$INPUT" | json_run 'import runpy,sys; p=sys.argv[1]; sys.argv=[p]+sys.argv[2:]; runpy.run_path(p, run_name="__main__")' "$DIR/_doc_form_check.py" --hook "$@" 2>/dev/null || true)"
   fi
 fi
