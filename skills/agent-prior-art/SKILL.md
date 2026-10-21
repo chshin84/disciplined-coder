@@ -120,7 +120,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 ## 출력 스키마
 
-연구자·종합·추출·판정·합친 인용 판정·지도 대조 출력과 워크플로 반환값의 형식은 아래와 같으며, 키 이름의 원본은 계약 코드 `scripts/prior_art_contract.json`이다. 두 에이전트 정의는 같은 자료의 예시 블록을 글자 그대로 싣는다.
+연구자·종합·추출·판정·합친 인용 판정·지도 대조 출력과 워크플로 반환값의 형식은 아래와 같으며, 키 이름의 원본은 계약 코드 `scripts/prior_art_contract.json`이다. 연구자 정의는 `researcher`·`synthesis`, 추출 검증자 정의는 `extract`, 판정 정의와 상향 판정 정의는 `judge`, 지도 대조 정의는 `map`의 예시 블록을 글자 그대로 싣는다. 합친 `verifier` 블록은 어느 정의에도 없고 워크플로가 단계 출력을 합쳐 만든다.
 
 **연구자 출력.** 연구자 출력의 칸은 아래 `researcher` 예시 블록과 같다. `agent` 칸의 값은 `agent-prior-art`다. `citations`의 `kind` 중 `standard`는 표준기구 문서이고, `derived`는 에이전트가 스스로 계산하거나 추론한 값이다. 그중 아래 표의 칸이 선행연구 에이전트가 추가한 칸이다. 이슈 하나의 `citations`는 출처 하나뿐이며, 워크플로 스키마가 `maxItems: 1`로 강제한다. 검증자가 URL 하나에 주장 전체를 대조하므로, 여러 출처에 기대는 주장은 연구자가 출처마다 이슈로 나눠 적는다.
 
@@ -290,7 +290,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 | 판정·상향 판정 출력 | `{ judgments: [{ ref, numbers_conditions, direction, scope, unsure_reasons, reason }], principles_applied }` |
 | 합친 인용 판정 출력 | `{ url, judgments: [{ ref, verdict, quote, reason }], principles_applied }`. `verdict`는 `supported`·`unsupported`·`unverifiable`·`verify_failed`다 |
 | 지도 대조 출력 | `{ cells: [{ row, column, grounded, source_ref }], principles_applied }` |
-| 워크플로 반환값 | `{ round, passed, rejected, unverifiable, verify_failed: [{ url, refs }], coverage: [{ id, cases_found, passed }], subquestion_status: [{ id, search_status, verification_status }], overall_status, query_violations: [{ id, query, rule }], verifier_count, researchers, verifiers, synthesis?, map_check? }`. `passed`·`rejected`·`unverifiable`의 원소는 `{ ref, urls }`이고, `verifiers`의 원소는 `{ url, subquestions, output, stages }`다. `verifier_count`는 인용 판정을 받은 URL 수이며 상향 판정 실행 수를 세지 않는다. `overall_status`는 `ok`나 `not-ok`다 |
+| 워크플로 반환값 | `{ round, passed, rejected, unverifiable, verify_failed: [{ url, refs }], coverage: [{ id, cases_found, passed }], subquestion_status: [{ id, search_status, verification_status }], overall_status, query_violations: [{ id, query, rule }], verifier_count, researchers, verifiers, synthesis?, map_check? }`. `passed`·`rejected`·`unverifiable`의 원소는 `{ ref, urls }`이고, `verifiers`의 원소는 `{ url, subquestions, output, stages }`다. `verifier_count`는 판정에 보낸 URL 묶음 수(`verifiers`의 길이)다. 추출이 실패한 URL 도 세고, 에이전트 호출 수는 아니며 상향 판정 실행 수도 세지 않는다. `overall_status`는 `ok`나 `not-ok`다 |
 
 **에이전트에게 보내는 프롬프트.** 워크플로는 연구자와 검증자에게 보내는 프롬프트의 첫 줄을 `MODE: <모드>`로 쓴다. 모드 값은 연구자가 `explore`·`synthesize`, 검증 단계가 `extract`·`judge`·`map`이다. 추출 검증자는 `extract`, 판정 에이전트와 상향 판정 에이전트는 `judge`, 지도 대조 에이전트는 `map`을 받는다. 둘째 줄에는 `PRINCIPLES: <principles_path>`를 두고, 셋째 줄부터 모드별 입력을 json 코드 울타리 안의 `JSON.stringify(입력, null, 2)` 블록 하나로 둔다. 연구자 탐색 모드의 입력은 `{ question, situation, target, mode, subquestion, forbidden_terms }`, 종합 모드의 입력은 `{ question, target, passed_rows }`, 추출 모드의 입력은 `{ url, claims: [{ ref, text }] }`, 판정 모드의 입력은 `{ url, claims: [{ ref, text, quote, context }] }`, 지도 대조 모드의 입력은 `{ evidence_map, passed }`다. `passed_rows`와 `passed`의 원소는 `{ ref, row }`다. 에이전트 정의의 모드 처리 단락은 이 첫 줄로 모드를 고른다.
 
