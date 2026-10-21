@@ -1,0 +1,117 @@
+{
+  "lens": "lens-fit",
+  "doc_type": "설계 (spec·plan) — 「문서 타입과 수명」 표의 행이다. 검토 대상은 spec 의 설계 근거를 받아 구현 단계·인터페이스·병합 조건을 적은 plan 이므로 이 행을 골랐다. 체크박스 단계는 superpowers plan 의 추적 관례라서, 상태 타입의 진행 상태와 다음 단계를 포함한 것으로 보지 않았다. 설계 행에는 포함하지 말라고 정한 내용이 없어 행 대조로 올린 지적은 없다.",
+  "read": [
+    "D:/projects/dc-verifier-tier/skills/lens-fit/SKILL.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+    "D:/projects/dc-verifier-tier/agent-principles.md",
+    "D:/projects/dc-verifier-tier/docs/domain-korean.md"
+  ],
+  "issues": [
+    {
+      "where": "용어 「오류 통과·참 기각」, Task 1 Interfaces, Task 1 Step 1·Step 3",
+      "type": "constraint",
+      "claim": "plan 이 다른 문서를 '첫 plan'과 '결정 기록 2'라는 순서 이름으로만 가리키고 경로를 적지 않았다. 구현자는 이 이름만으로 cases.json 형식의 출처와 num-t3 정정 이유의 출처를 찾을 수 없다. 첫 plan 은 docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md 이고, 결정 기록 2 는 docs/superpowers/decisions/2026-10-21-prior-art-verifier-composition-2.md 로 보인다. 결정 기록 3 에는 Task 4 Step 6 이 경로를 적었다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "18행 \"오류 통과·참 기각: 첫 plan 과 같다.\" / 51행 \"Consumes: 첫 plan 의 `cases.json` 형식.\" / 60행 \"`check_note` 에 결정 기록 2 의 정정 이유가 있다.\" / 70행 \"(결정 기록 2)\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「작업 지시서」 INSTRUCTION-FORM: \"받는 쪽이 모르는 맥락은 지시문 안에 직접 넣어라.\" / 「공통」 PLAIN-KO SPECIFIC-NAME: \"가리키는 대상의 이름을 그대로 써라.\"",
+      "principle": "INSTRUCTION-FORM, SPECIFIC-NAME",
+      "consequence": "Task 1 의 입력 형식과 검사 기대값이 근거로 삼는 두 문서를 plan 안에서 찾아갈 경로가 없다. spec 76행만 결정 기록 경로를 `-2.md` 라는 접미사로 적었다."
+    },
+    {
+      "where": "Task 3 Step 2 「출력 스키마」 불릿",
+      "type": "style",
+      "claim": "'Jev 문장'은 저장소 안에서만 통하는 이름인데 풀이가 없다. skills/agent-prior-art/SKILL.md 의 「판정 모델 교체」 문단에는 Jev 가 든 문장이 둘 있다. 그래서 같은 불릿이 고치라고 한 문단 안에서 어느 문장을 남기라는지 정해지지 않는다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "170행 \"추출·판정 출력과 「판정 모델 교체」 문단을 새 구성으로 고친다. Jev 문장은 그대로 둔다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「공통」 UNPACK TERM-EXPLAIN: \"저장소 안에서만 통하는 이름과 그 분야의 용어는 답마다 처음 나올 때 한 줄로 풀어라.\"",
+      "principle": "TERM-EXPLAIN",
+      "consequence": "SKILL.md 262행의 「판정 모델 교체」 문단 안에 \"판정 전용 모델(예: Typesafe AI 의 Jev)도…\" 문장과 \"Jev 는 이 PC에 키가 없고…\" 문장이 있다. plan 은 보존할 범위를 지정하지 않았다."
+    },
+    {
+      "where": "Global Constraints 병합 조건, Task 4 Step 3",
+      "type": "constraint",
+      "claim": "병합 조건이 '기준선의 틀린 판정 수'를 비교 기준으로 쓴다. 그러나 「용어」 절은 이 말을 정의하지 않는다. 「용어」의 '틀리게 확신함'은 판정 에이전트의 상향 전 출력으로 세는 값인데, 기준선에는 판정 단계가 없다. 게다가 28행은 어려운 항목끼리 비교하고, 209행은 '어려운 항목 포함'으로 기록하라고 해서 기준선의 집계 범위가 두 가지로 읽힌다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "28행 \"어려운 항목의 「틀리게 확신함」 이 기준선의 틀린 판정 수 이하다.\" / 209행 \"기준선의 틀린 판정 수(어려운 항목 포함)를 기록한다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「공통」 UNPACK TERM-EXPLAIN 과 TERM-ONE: \"한 개념에는 한 용어만 쓰고…\"",
+      "principle": "TERM-EXPLAIN, TERM-ONE",
+      "consequence": "병합 조건의 셋째 항은 비교 기준값을 정의하지 않은 상태다. 기준선의 틀린 판정을 어려운 항목에서만 셀지 전체 항목에서 셀지 plan 이 정하지 않았다."
+    },
+    {
+      "where": "Task 2 Step 1·Step 3·Step 4, Task 3 Step 2, Task 4 Step 5",
+      "type": "style",
+      "claim": "plan 이 다른 절의 목록을 개수로 가리킨다. 그 예는 '네 정의 파일', '세 판정 프롬프트', '세 결과', '네 `subagent_type`', 'Global Constraints 의 병합 조건 세 가지'다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "121행 \"네 정의 파일의 `tools`·`model`·`effort`·`maxTurns: 20` 을 본다.\" / 131행 \"세 판정 프롬프트(`judge-*.md`)\" / 138행 \"세 결과를 `mergeStages` 로 합친다.\" / 168행 \"네 `subagent_type`\" / 222행 \"Global Constraints 의 병합 조건 세 가지의 충족 여부\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「공통」 UNPACK COUNT-EARNS: \"대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라.\"",
+      "principle": "COUNT-EARNS",
+      "consequence": "222행은 score.py report-v2 의 기대 출력을 '세 가지'라는 개수로 고정했다. 28행 병합 조건의 목록이 바뀌면 이 기대값이 조용히 틀린다. 121행과 168행도 같은 방식으로 Task 2 Files 목록에 묶여 있다."
+    },
+    {
+      "where": "Task 3 Step 1",
+      "type": "constraint",
+      "claim": "Run/Expected 형식의 Expected 칸에 '고친다'와 'Step 2 로 간다'라는 행동이 들어 있다. 구현자는 그 칸을 기대 결과라는 사실로 읽는다. 그래서 SKILL.md 를 Step 1 에서 고치라는 지시인지, 결과가 그렇게 나올 것이라는 서술인지 구별되지 않는다. Step 2 도 SKILL.md 를 고치는 단계라 어느 Step 이 수정을 맡는지도 겹친다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "164행 \"Expected: 정의 이름이나 스키마 대조에서 SKILL.md 가 낡았다는 FAIL 이 있으면 그것을 고친다. 없으면 Step 2 로 간다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「작업 지시서」 INSTRUCTION-FORM: \"다른 에이전트에게 주는 지시문은 사실과 행동을 나눠 써라. 사실은 평서문으로, 할 일은 '~하라' 긍정 명령으로 쓰고…\"",
+      "principle": "INSTRUCTION-FORM",
+      "consequence": "Task 3 Step 1 의 Expected 칸에는 기대 출력이 없다. 그 칸은 조건부 수정 행동과 분기 지시만 담고 있다."
+    },
+    {
+      "where": "Review Focus 다섯째 불릿",
+      "type": "style",
+      "claim": "이 문장은 대조하는 주체를 plan 의 단계 이름 'Task 4 Step 5'로 적었다. 실제로 대조하는 주체는 score.py report-v2 나 구현자다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "38행 \"재측정 기록의 `models_used` 가 정의의 모델과 달라야 드러난다. Task 4 Step 5 가 대조한다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「공통」 KO-SYNTAX SUBJECT-OBJECT: \"판단하고 행동하는 주체를 사람이나 도구로 적고, 문장이나 문서를 판단의 주체로 쓰지 마라.\"",
+      "principle": "SUBJECT-OBJECT",
+      "consequence": "Review Focus 의 다른 불릿은 각 검사(도구)를 주체로 적었다. 이 불릿만 문서의 단계를 대조 주체로 적었다."
+    },
+    {
+      "where": "Task 3 Step 2 「오케스트레이터 절차」 불릿",
+      "type": "style",
+      "claim": "'~는 사실'을 꾸미는 관형절이 길고 둘이 '그리고'로 이어져 있다. 그래서 목적어 '사실'과 서술어 '적는다'가 문장 끝에서야 나온다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "168행 \"「워크플로가 꺼진 환경」에 네 `subagent_type` 과 「최종 판정과 실패 처리」 순서를 오케스트레이터가 직접 적용한다는 사실, 그리고 이 경로의 합치기는 지시 준수에만 기댄다는 사실을 적는다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「공통」 KO-SYNTAX NO-MID-MOD: \"관형절이 길어질 것 같으면 그 내용을 앞 문장으로 먼저 쓰고, 주어와 서술어를 가깝게 둬라.\"",
+      "principle": "NO-MID-MOD",
+      "consequence": "한 문장 안에 「워크플로가 꺼진 환경」에 적을 내용 둘이 긴 관형절로 들어 있다. 구현자는 문장 끝까지 읽어야 적을 대상을 알 수 있다."
+    }
+  ],
+  "principles_applied": [
+    "INSTRUCTION-FORM",
+    "DOC-TYPE",
+    "SPECIFIC-NAME",
+    "VOCAB-PREF",
+    "WRITTEN-ONLY",
+    "NO-MID-MOD",
+    "NO-STACK-MOD",
+    "KEEP-CONNECT",
+    "ANTI-LIMIT",
+    "COMMA-CUT",
+    "SUBJECT-OBJECT",
+    "FULL-SENTENCE",
+    "ONE-ENDING",
+    "BOTTOM-LINE",
+    "SECTION-HEAD",
+    "BULLET-SCOPE",
+    "ONE-IDEA",
+    "TERM-EXPLAIN",
+    "TERM-ONE",
+    "NO-ANALOGY",
+    "COUNT-EARNS",
+    "NO-SQUEEZE",
+    "NAME-ITEMS",
+    "STATE-ASSUME"
+  ],
+  "notes": "검토한 관점은 체크리스트의 형식·스타일·오염·호환·규율이다. 형식·오염·호환은 plan 이 파싱 대상 산출물이 아니어서 해당하지 않았다. 규율은 「출력」의 「공통」 조항 전부와 「작업 지시서」 INSTRUCTION-FORM 으로 보았다. 호출자 지시에 따라 TITLES 와 금지 낱말 목록은 적용하지 않았다. 체크박스 단계의 '~한다' 평서형과 Architecture·spec 추가 절의 평서형 설계 서술은 관례로 보고 지적하지 않았다. 예를 들어 Architecture 7행의 \"반환값의 바깥 형식은 바꾸지 않는다\"는 Global Constraints 27행이 \"바꾸지 마라\"로 다시 적어 금지가 구별되므로 올리지 않았다. spec 「확정 구성과 판정 불가 상향」 절(74~83행)은 사용자 결정의 사실 서술과 4·5번 해석 규칙이라 INSTRUCTION-FORM 위반을 찾지 못했다. Global Constraints 22·24·25행의 '키: 값' 조각은 설정값 열거로 보고 FULL-SENTENCE 지적에서 뺐다. 내용 정확성은 lens-grounding 이 보아야 할 것으로 남긴다. Task 4 Step 4(216행)가 spec 의 가정이라며 인용한 \"high 면 스스로 판단 가능 여부를 안다\"는 spec 에서 같은 문구를 찾지 못했다. Task 2 Step 4(138행)의 \"그 주장들로 상향을 실행한다\"가 URL 의 전체 주장인지 판정 불가가 있는 주장만인지도 spec 80행과 대조해야 한다. 이 둘은 lens-grounding·lens-consistency 가 확인해야 한다."
+}

@@ -1,0 +1,165 @@
+{
+  "lens": "lens-adversarial",
+  "read": [
+    "D:/projects/dc-verifier-tier/skills/lens-adversarial/SKILL.md",
+    "D:/projects/dc-verifier-tier/agent-principles.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/decisions/2026-10-21-prior-art-verifier-composition.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/decisions/2026-10-21-prior-art-verifier-composition-2.md",
+    "D:/projects/dc-verifier-tier/scripts/workflow_harness.mjs (FN_NAMES 와 agent() 대체 구현 부분, 8·114-123행)",
+    "D:/projects/dc-verifier-tier/workflows/prior-art-search.js (agentType·label 부분, 15-79행)",
+    "D:/projects/dc-verifier-tier/agents/prior-art-verifier.md (frontmatter 와 앞부분)",
+    "저장소 안 prior-art-verifier 참조 grep 결과(agents, scripts/test_*.sh, skills/agent-prior-art/SKILL.md, workflows)"
+  ],
+  "issues": [
+    {
+      "where": "Review Focus 다섯째 항목과 Task 4 Step 5 의 Expected(\"models_used 와 정의 frontmatter 의 대조\")",
+      "type": "failure-mode",
+      "claim": "frontmatter 의 model·effort 가 실제 런타임에서 무시되어도 이 plan 의 검사는 그것을 잡지 못한다. 재측정은 run.py 가 claude -p 에 --model·--effort 를 직접 넘겨 실행하므로, models_used 는 정의 frontmatter 가 아니라 run.py 가 넘긴 플래그를 반영한다. 그래서 두 값의 대조는 항상 같게 나온다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "\"정의 파일의 frontmatter 값이 실행에 적용되지 않을 때: 재측정 기록의 `models_used` 가 정의의 모델과 달라야 드러난다. Task 4 Step 5 가 대조한다.\" 그리고 Task 4 Step 3·4 는 `run.py ... --model ... --effort ...` 로 모델을 지정한다. 완화안은 병합 전에 워크플로(agentType 으로 부르는 실제 경로)를 한 번 실행해 하위 에이전트 기록의 model·effort 를 frontmatter 와 대조하는 단계로 이 항목을 바꾸는 것이다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "「에이전트와 단계」: \"frontmatter 의 `effort` 를 `CLAUDE_CODE_EFFORT_LEVEL` 환경 변수가 덮고, `model` 은 호출 매개변수가 덮는다고 적는다. 그래서 구현자는 병합 전에 실행 기록의 `model`·`effort` 값이 frontmatter 와 같은지 대조하라.\"",
+      "principle": "NO-ASSUME, CHECKABLE",
+      "consequence": "지금 plan 에서 frontmatter 적용 여부를 확인하는 단계는 run.py 의 플래그와 정의를 대조하는 단계 하나뿐이다. 워크플로가 agentType 으로 정의를 부르는 운영 경로는 어떤 단계에서도 실제 모델로 실행되지 않는다."
+    },
+    {
+      "where": "Global Constraints 의 모델 항목(`model: claude-haiku-5-5`, `model: claude-sonnet-5-5`)",
+      "type": "risk",
+      "claim": "모든 PC 에 배포되는 정의에 전체 모델 ID 를 고정하면, 그 ID 를 쓸 수 없는 환경에서 모든 검증 단계가 실패한다. Bedrock·Vertex 처럼 모델 ID 형식이 다른 공급자를 쓰거나 조직 정책이 Haiku 를 막은 PC 가 그런 환경이다. 그러면 모든 URL 이 검증 실패가 되고 모든 하위 질문이 partial 이 된다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "\"추출 검증자·판정 에이전트·지도 대조 에이전트는 `model: claude-haiku-5-5`, `effort: high`. 상향 판정 에이전트는 `model: claude-sonnet-5-5`\". 현행 정의는 model 칸이 없어 상위 세션 모델을 물려받으므로 어떤 PC 에서도 실행된다. 완화안은 frontmatter 에 별칭(haiku·sonnet)을 쓰거나, 모델을 쓸 수 없을 때 무엇이 되는지를 재측정 전에 한 번 확인해 결정 기록에 적는 것이다. 별칭은 버전이 바뀔 수 있다는 대가가 있다(가정이며, 서브에이전트 문서의 model 칸 설명으로 확인할 수 있다).",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "「원문 확보」: \"스크립트는 사용자 PC 에서 직접 받으므로 사내망 프록시·인증서에서 실패할 수 있다\" — spec 은 PC 마다 환경이 다르다는 점을 이미 근거로 쓴다.",
+      "principle": "REVERSIBLE, EVIDENCE-FIRST",
+      "consequence": "지금 plan 은 모델 ID 를 쓸 수 없는 PC 에서 무엇이 되는지를 어느 Task 에서도 확인하지 않는다. 재측정은 개발자 PC 한 대의 로그인된 CLI 에서만 실행된다."
+    },
+    {
+      "where": "Global Constraints 의 병합 조건 문장",
+      "type": "failure-mode",
+      "claim": "병합 조건은 판정 불가 상향이 폭주해도 통과한다. 비용 조건은 기준선(Opus medium, 지난 측정 $2.35)보다 낮기만 하면 되는데, 고른 구성은 기준선의 약 5.7% 였고 Sonnet 판정도 Opus 단일 검증자보다 싸다. 그래서 Haiku 가 거의 모든 주장에 판정 불가를 내도 비용 조건을 채운다. 반대로 Haiku 가 판정 불가를 거의 내지 않아 상향이 무의미해져도 조건에는 드러나지 않는다. 상향 비율은 Step 5 보고에 적기만 하고 판정 기준이 없다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "\"병합 조건: 재측정에서 구성 전체의 `total_cost_usd` 가 기준선보다 낮고, ...\" 그리고 Task 4 Step 5 \"단계별 비용, 상향 비율\". 결정 기록 1 의 비용표는 고른 구성 $0.1332, 기준선 $2.3526 이다. 완화안은 상향 비율이 얼마를 넘거나 0 이면 병합 전에 사용자에게 알린다는 판단 기준을 Step 7 에 적는 것이다. 그 값에 근거가 없으면 값을 지어내지 말고 비율을 그대로 보이고 묻는다고 적는다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "「목표」: \"검증 단계의 비용을 현행보다 줄인다.\" 그리고 「확정 구성과 판정 불가 상향」: \"판정 불가 상향은 Haiku 가 스스로 어렵다고 알아챈 경우만 잡는다.\"",
+      "principle": "CHECKABLE",
+      "consequence": "지금 병합 조건 세 가지는 어느 것도 상향 비율에 반응하지 않는다. 재측정 자료는 어려운 항목을 일부러 넣은 자료라, 운영의 상향 비율도 대표하지 않는다."
+    },
+    {
+      "where": "Global Constraints 병합 조건의 셋째 절(\"어려운 항목의 「틀리게 확신함」 이 기준선의 틀린 판정 수 이하다\")과 용어 절의 「틀리게 확신함」 정의",
+      "type": "failure-mode",
+      "claim": "셋째 조건은 단위가 다른 두 수를 비교한다. 「틀리게 확신함」은 상향 전 Haiku 판정 단계의 출력으로 세고, 기준선의 틀린 판정은 단일 검증자의 최종 verdict 로 센다. 또 건수만 비교하므로, 기준선이 틀린 어려운 항목과 Haiku 가 틀린 항목이 서로 달라도 수가 같으면 통과한다. 기준선도 틀리는 항목이 있으면 그 수만큼 Haiku 가 다른 항목에서 틀리게 확신해도 된다는 뜻이 된다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "\"**틀리게 확신함:** 판정 에이전트가 `일치`·`불일치` 를 냈는데 정답과 반대인 항목이다. 상향 전 Haiku 출력으로 센다.\" 그리고 Task 4 Step 3 \"기준선의 틀린 판정 수(어려운 항목 포함)를 기록한다.\" 단순화안은 셋째 조건을 최종 verdict 기준 항목 단위 비교로 바꾸는 것이다. 즉 기준선이 맞힌 어려운 항목을 새 구성이 틀리지 않아야 한다고 적는다. 「틀리게 확신함」은 보고용 관찰로만 남긴다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "「확정 구성과 판정 불가 상향」: \"그래서 어려운 항목을 넣은 재측정에서 「틀리게 확신함」을 따로 센다.\" — spec 은 따로 세라고만 하고 기준선과 비교하는 병합 조건으로 정하지 않았다.",
+      "principle": "CHECKABLE, NO-ASSUME",
+      "consequence": "지금 셋째 조건은 판정 단계 하나의 출력 수와 기준선 최종 판정 수를 나란히 놓는다. 어느 항목이 틀렸는지는 조건에 들지 않는다."
+    },
+    {
+      "where": "Global Constraints 병합 조건과 Task 1 Step 3 의 `hard_kind` 목록(`표·그림`·`조건 얽힘`·`가짜 성공 페이지`)",
+      "type": "failure-mode",
+      "claim": "새로 넣는 어려운 항목 가운데 일부는 병합 조건이 보지 않는 카테고리에 속한다. `가짜 성공 페이지` 는 접근 카테고리이고 추출 단계에서 판정되므로 판정 에이전트의 「틀리게 확신함」에 잡히지 않는다. `표·그림`·`조건 얽힘` 은 수치·조건 카테고리인데, 둘째 조건은 방향·범위만 본다. 그래서 이 항목들의 최종 verdict 가 오류 통과여도 병합 조건은 채워질 수 있다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "\"방향·범위의 오류 통과·참 기각이 기준선 이하이며\" 그리고 Task 1 Step 3 의 \"`가짜 성공 페이지`: WebFetch 가 HTTP 200 으로 받지만 실제 문서가 없는 주소\". 단순화안은 둘째 조건을 \"모든 카테고리와 모든 어려운 항목의 최종 verdict 기준 오류 통과·참 기각이 기준선 이하\" 로 바꾸는 것이다. 이렇게 하면 셋째 조건이 따로 필요 없어진다.",
+      "counterpart_file": "docs/superpowers/decisions/2026-10-21-prior-art-verifier-composition-2.md",
+      "counterpart": "「acc-f2 관찰 정정」: \"200 으로 오는 가짜 성공 페이지(봇 확인 페이지, 빈 페이지)를 걸러 내는지는 시험되지 않았다.\"",
+      "principle": "CHECKABLE",
+      "consequence": "지금 병합 조건은 접근·수치·조건 카테고리의 최종 verdict 를 보지 않는다. 결정 기록 2 가 시험되지 않았다고 적은 가짜 성공 페이지가 바로 그 밖에 놓인다."
+    },
+    {
+      "where": "Task 1 Step 3 의 \"어려운 항목은 `hard_kind` 마다 참 1건과 오류 1건을 만든다\"와 Task 4 Step 4(새 구성 실행 횟수가 적혀 있지 않음)",
+      "type": "risk",
+      "claim": "어려운 항목은 종류마다 1건씩이고, 새 구성은 반복 횟수 없이 한 번 실행된다. 그래서 병합 판정이 항목 하나와 실행 한 번의 흔들림에 좌우된다. 정답 라벨도 구현자가 혼자 정하는데, 지난 시험에서 `num-t3` 라벨이 틀렸던 전례가 있다. 라벨 하나가 틀리면 병합 판정이 뒤집힌다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "Task 4 Step 3 은 기준선에 `--repeat 2` 를 주지만, Step 4 의 새 구성 실행에는 반복 지정이 없다. 완화안은 Step 4 에도 기준선과 같은 `--repeat 2` 를 적는 것이다. 또 어려운 항목의 결과는 병합 조건이 아니라 결정 기록 3 의 관찰로 다루고, 그 사실을 Step 7 에서 사용자에게 함께 보인다고 적는 것이다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "「기준선」: \"두 실행의 차이를 측정 흔들림으로 보고, 다른 설정과 기준선의 차이가 그 흔들림 안에 들면 같은 성적으로 본다.\" 결정 기록 2 「num-t3 원인 정정」: \"참으로 둔 정답 라벨이 느슨했다.\"",
+      "principle": "EVIDENCE-FIRST, STATE-ASSUME",
+      "consequence": "지금 plan 에서 새 구성의 흔들림은 측정되지 않는다. 어려운 항목의 정답 라벨은 구현자 한 명이 확인한 check_note 에만 기댄다."
+    },
+    {
+      "where": "Architecture 절의 \"그래서 측정과 운영이 같은 합치기 코드를 쓴다\"와 Task 4 Interfaces 의 replay.py 설명",
+      "type": "risk",
+      "claim": "재생 방식은 합치기 코드만 운영과 같고, 단계 사이 입력은 운영과 다르다. 판정 에이전트와 상향 판정 에이전트가 받는 프롬프트는 운영에서는 워크플로가 만들지만, 재측정에서는 run.py 가 따로 만든다. 운영의 프롬프트는 quote·access·exists 로 걸러 모은 주장과 MODE 줄로 이뤄진다. 실행 방식도 다르다. 운영은 agentType 정의와 스키마와 maxTurns 로 실행되고, 재측정은 claude -p 에 정의 본문을 프롬프트로 넣어 실행된다. 그래서 재측정이 통과해도 운영 경로의 입력 구성 오류는 드러나지 않는다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "\"`run.py`(프롬프트를 에이전트 정의 본문에서 읽는 단계 `extract-def`·`judge-def`·`escalate-def`·`map-def` 를 더한다)\" 그리고 replay 는 \"단계 출력을 ... 응답표의 label 로 넣고\" 최종 판정만 얻는다. 시험 도구는 워크플로가 보낸 prompt 를 calls 에 기록한다(workflow_harness.mjs 121행). 완화안은 replay.py 가 harn 의 calls 에 기록된 judge:·escalate: 프롬프트의 주장 목록을 run.py 가 실제로 판정시킨 주장 목록과 대조하는 검사를 Task 4 Step 1 에 넣는 것이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/scripts/workflow_harness.mjs",
+      "counterpart": "120-122행: `const { label, agentType, phase, model, effort } = opts; calls.push({ label, agentType, phase, model, effort, prompt }); if (!Object.hasOwn(responses, label)) raise(...)` — 시험 도구는 응답표의 출력을 label 로만 돌려주고, 그 출력이 어떤 입력에서 나왔는지는 보지 않는다.",
+      "principle": "NO-ASSUME, STATE-ASSUME",
+      "consequence": "지금 plan 에서 \"측정과 운영이 같다\"는 말은 mergeStages 에만 맞는다. 단계 입력을 만드는 워크플로 코드는 재측정에서 모델 출력과 이어지지 않는다."
+    },
+    {
+      "where": "Task 2 Interfaces 의 `mergeStages` 반환형(`outputs` 값이 null 이면 URL 검증 실패)과 Step 1 의 `상향도 판정 불가면 검증 실패다`",
+      "type": "failure-mode",
+      "claim": "판정 불가 주장 하나의 상향이 실패하거나 다시 판정 불가가 나오면 그 URL 전체가 검증 실패가 된다. 그러면 같은 URL 에서 이미 일치·불일치로 정해진 다른 주장의 판정도 버려진다. spec 은 상향도 판정 불가면 \"그 주장\"을 검증 실패로 센다고 적는다. 그런데 outputs 형식에는 주장 단위의 검증 실패를 담을 자리가 없어서 URL 단위로 넓어진다. 판정 불가가 잦으면 검증 실패와 partial 이 그 비율 이상으로 늘어난다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "\"`outputs` 의 값이 `null` 이면 그 URL 은 검증 실패다.\" 그리고 Step 1 의 \"`상향 판정 실패는 검증 실패다`: 상향 출력이 `null` 이면 그 URL 의 `outputs` 값이 `null`.\" 단순화안은 \"상향도 판정 불가면\" 검사가 URL 단위인지 주장 단위인지를 Step 1 에 적고, URL 단위라면 spec 「확정 구성과 판정 불가 상향」의 \"그 주장은\"을 \"그 URL 은\"으로 맞추는 것이다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "「확정 구성과 판정 불가 상향」: \"상향 판정 에이전트도 `판정 불가` 면 그 주장은 검증 실패다.\"",
+      "principle": "CHECKABLE",
+      "consequence": "지금 plan 의 반환형은 URL 단위 null 하나로만 검증 실패를 표현한다. 주장 하나의 판정 불가가 URL 의 모든 주장을 검증 실패로 만든다."
+    },
+    {
+      "where": "Task 2 Step 3 의 `prior-art-judge-escalation.md` 항목(\"판정 정의와 같은 본문에 ... 한 문단을 더한다\")",
+      "type": "over-engineering",
+      "claim": "상향 판정 에이전트 정의는 판정 정의와 본문이 같고 모델과 문단 하나만 다르다. 두 파일에 같은 본문을 두면 한쪽만 고쳐지는 드리프트가 생긴다. 그래서 test_docs_drift.sh 와 test_prior_art_contract.sh 에 대조할 짝이 하나 더 늘어난다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "단순화 근거: 워크플로의 agent() 는 opts 에 model·effort 를 받는다(시험 도구가 `const { label, agentType, phase, model, effort } = opts` 로 기록한다). 그래서 escalate: 호출은 같은 `prior-art-judge` 정의에 model 을 sonnet 으로 넘기고, \"판정 에이전트가 판정 불가로 넘긴 주장이다\"는 프롬프트 한 줄로 넣을 수 있다. 다만 agent() 의 model 옵션이 실제 런타임에서 적용되는지는 확인하지 않았다(가정). 이 가정은 위 frontmatter 지적과 같은 실제 경로 실행 한 번으로 확인할 수 있다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/scripts/workflow_harness.mjs",
+      "counterpart": "120행 `const { label, agentType, phase, model, effort } = opts;`",
+      "principle": "YAGNI, FOCUSED",
+      "consequence": "지금 plan 은 같은 판정 본문을 두 정의 파일에 두고, 두 파일을 따로 drift 검사한다."
+    },
+    {
+      "where": "Global Constraints 의 에이전트 이름 항목(\"이름을 바꾸면 사용자 설정·기록의 참조가 끊긴다\")",
+      "type": "risk",
+      "claim": "이름을 유지하는 근거는 확인되지 않았고, 같은 이름의 의미가 바뀌는 데 따른 위험은 다뤄지지 않는다. 저장소 안의 prior-art-verifier 참조는 이 plan 이 고치는 파일들뿐이다. 반대로 이름을 그대로 두면 지난 리뷰 기록과 결정 기록의 \"prior-art-verifier\"(cite·map 을 맡던 Opus 검증자)를 새 의미(추출만 맡는 Haiku)로 잘못 읽게 된다. 또 자동 갱신 중에 옛 SKILL.md 를 이미 실은 세션이 워크플로가 꺼진 경로에서 `MODE: cite` 나 `MODE: map` 을 보내면, 새 정의는 그 모드를 모르므로 계약에 맞지 않는 출력을 낸다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "\"추출 검증자는 기존 `prior-art-verifier` 를 그대로 쓴다(이름을 바꾸면 사용자 설정·기록의 참조가 끊긴다).\" 저장소 grep 결과 참조는 agents/prior-art-verifier.md, scripts/test_docs_drift.sh, scripts/test_prior_art_contract.sh, scripts/test_workflow.sh, skills/agent-prior-art/SKILL.md, workflows/prior-art-search.js 뿐이다. 완화안은 이 괄호의 근거를 확인된 참조로 바꾸는 것이다. 확인하지 못했으면 가정이라고 적는다. 또 Task 2 Step 3 의 추출 정의에 `extract` 가 아닌 MODE 를 받으면 모든 주장을 판정하지 말고 빈 judgments 를 내라고 적어, 옛 지시가 검증 실패로 드러나게 한다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agents/prior-art-verifier.md",
+      "counterpart": "\"프롬프트 첫 줄 `MODE: <모드>`의 값으로 모드를 골라라. 값은 `cite`나 `map`이다.\"",
+      "principle": "NO-ASSUME, STATE-ASSUME, REVERSIBLE",
+      "consequence": "지금 plan 은 이름 유지의 근거를 사용자 설정이라고만 적고 어느 설정인지 가리키지 않는다. 옛 MODE 값이 새 정의에 들어올 때의 처리는 어느 Task 에도 없다."
+    },
+    {
+      "where": "Task 4 Step 4 의 넷째 항목(\"어려운 항목에 한해 판정을 Haiku low·medium 으로도 실행해 ...\")",
+      "type": "over-engineering",
+      "claim": "이 비교는 어떤 결정도 바꾸지 않는다. 노력 수준은 결정 기록 2 에서 이미 high 로 확정되었고, 병합 조건과 Step 7 은 low·medium 결과를 쓰지 않는다. 표본도 판정 단계에 닿는 어려운 항목 몇 건뿐이라, spec 의 가정을 확인했다고 말할 수 없다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "단순화 근거: 결정 기록 2 「확정한 구성」의 \"노력 수준을 low 대신 high 로 둔다\". 그리고 Step 6 은 이 비교를 결정 기록 3 에 적기만 한다. 이 항목과 Step 6 의 \"수준별 판정 불가 비교\"를 빼면 실행 비용과 score.py 의 보고 항목이 줄어든다.",
+      "counterpart_file": "docs/superpowers/decisions/2026-10-21-prior-art-verifier-composition-2.md",
+      "counterpart": "\"추출 검증자, 판정 에이전트 하나, 지도 대조 에이전트를 모두 Haiku 5.5 high 로 둔다.\"",
+      "principle": "YAGNI, COUNT-EARNS",
+      "consequence": "지금 plan 은 확정된 설정과 무관한 수준 두 개를 추가로 실행하고, 그 결과를 보고와 결정 기록에만 남긴다."
+    },
+    {
+      "where": "Task 4 Step 7 의 둘째 문장(\"하나라도 못 채웠으면 ... Sonnet 으로 올릴 카테고리를 사용자에게 물어라\")",
+      "type": "failure-mode",
+      "claim": "병합 조건을 못 채웠을 때의 경로는 Task 2 에서 만든 구조와 맞지 않는다. 판정 에이전트는 네 카테고리를 함께 맡는 정의 하나라, 카테고리 하나만 Sonnet 으로 올리려면 판정 정의를 나누고 워크플로·계약·검사를 다시 고쳐야 한다. 이미 커밋된 Task 2·3 을 되돌릴지 고칠지도 정해져 있지 않다. 그래서 이 경로로 가면 실행 세션은 plan 밖에서 구조를 바꾸게 된다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-implement.md",
+      "evidence": "\"하나라도 못 채웠으면 못 채운 조건과 그 카테고리를 보이고, Sonnet 으로 올릴 카테고리를 사용자에게 물어라.\" 완화안은 이 문장을 \"재측정 결과와 실패 원인을 결정 기록 3 에 남기고, 브랜치를 병합하지 않은 채 다음 설계를 사용자에게 물어라\"로 바꾸는 것이다. 카테고리를 나누는 일은 판정 에이전트의 수를 바꾸는 위 층 결정이기 때문이다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "「채택 규칙」: \"승인 전에는 에이전트 정의와 워크플로를 고치지 마라. 판정 에이전트의 수에 따라 바뀌는 파일이 달라지기 때문이다.\"",
+      "principle": "TOP-DOWN, KEEP-FAILED",
+      "consequence": "지금 Step 7 의 실패 경로는 카테고리 선택만 묻고, 그 선택이 요구하는 정의 분리와 Task 2 재작업은 어디에도 적혀 있지 않다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "CHECKABLE",
+    "REVERSIBLE",
+    "TOP-DOWN",
+    "YAGNI",
+    "FOCUSED",
+    "KEEP-FAILED",
+    "STATE-ASSUME",
+    "COUNT-EARNS",
+    "WRITTEN-ONLY",
+    "SPECIFIC-NAME",
+    "SUBJECT-OBJECT"
+  ],
+  "notes": "검토한 관점은 렌즈 체크리스트의 실패 모드·과설계·비가역·위험이다. 호출자가 지정한 항목도 하나씩 검토했다. 그 항목은 판정 불가 남발과 과소 발생, 상향 에이전트 실패, frontmatter 무시, 이름 유지의 의미 변화, 어려운 항목 1건씩의 통계적 의미, 기준선도 틀리는 항목에서 병합 조건의 해석, 재생과 실제 런타임의 차이, 모든 PC 배포다.\n\n상향 에이전트 실패 자체는 plan 의 Review Focus 첫 항목과 Task 2 검사가 이미 검증 실패로 고정한다. 그래서 그 항목은 따로 올리지 않았다. 다만 URL 단위로 넓어지는 영향은 위 mergeStages 지적에 담았다.\n\n비가역에 대해서는 Step 7 이 병합 전에 사용자 승인을 받게 한다. 또 병합 뒤에도 git 되돌리기로 돌아갈 수 있으므로 결정 자체를 비가역 지적으로 올리지 않았다. 남는 위험은 배포된 뒤 PC 마다 다른 모델 접근 조건이며, 모델 ID 지적에 담았다.\n\n더 확인할 것은 두 가지다. 첫째, Workflow 런타임의 agent() 가 agentType 정의의 frontmatter model·effort 를 적용하는지와 opts 의 model 이 그것을 덮는지는 공식 문서나 실제 실행 한 번으로 확인해야 한다. frontmatter 지적과 상향 정의 단순화 지적이 모두 이 사실에 기대기 때문이다. 둘째, 사용자 PC 의 settings 나 권한 목록에 prior-art-verifier 를 가리키는 항목이 있는지는 저장소 밖이라 확인하지 못했다. 이름 유지 지적의 근거가 여기에 걸려 있다.\n\nworkflow 가 꺼진 경로의 수동 합치기에 상향 단계가 더해져 지시 준수 부담이 커지는 점도 보았다. 그러나 spec 「바뀌는 파일」이 이미 \"지시 준수에만 기댄다\"고 적게 하므로 새 지적으로 올리지 않았다."
+}
