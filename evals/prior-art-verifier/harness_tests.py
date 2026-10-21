@@ -37,6 +37,14 @@ def _cases():
             {"row": "A", "column": "outcome", "grounded": False}, {"row": "A", "column": "x", "grounded": True}]}]}
 
 
+def _fix(cases, runs, frozen=None):
+    """가짜 실행 줄에 현재 프롬프트로 계산한 key 를 넣는다."""
+    import score
+    for r in runs:
+        r["key"] = score.expected_key(cases, r, frozen or {})
+    return runs
+
+
 def _run(stage, model, effort, unit, judgments, repeat=1, category="direction", cost=0.01, cells=None):
     out = {"cells": cells} if cells is not None else {"judgments": judgments}
     return {"key": f"{stage}{model}{effort}{unit}{repeat}", "stage": stage, "model": model, "effort": effort,
@@ -46,7 +54,8 @@ def _run(stage, model, effort, unit, judgments, repeat=1, category="direction", 
 def test_missing_judgment_is_failure():
     import score
     runs = [_run("judge", "h", "low", "u1", [{"ref": "d1", "match": "일치"}])]
-    s = score.score(_cases(), runs, "judge", "direction", frozen={("u1", "d1"): {"quote": "q"}, ("u1", "d2"): {"quote": "q"}})
+    fz = {("u1", "d1"): {"quote": "q"}, ("u1", "d2"): {"quote": "q"}}
+    s = score.score(_cases(), _fix(_cases(), runs, fz), "judge", "direction", frozen=fz)
     r = s["h/low"][0]
     assert r["failures"] == 1 and r["missed_errors"] == 0 and r["rejected_truths"] == 0
 
@@ -54,7 +63,8 @@ def test_missing_judgment_is_failure():
 def test_no_quote_excluded():
     import score
     runs = [_run("judge", "h", "low", "u1", [{"ref": "d1", "match": "일치"}])]
-    s = score.score(_cases(), runs, "judge", "direction", frozen={("u1", "d1"): {"quote": "q"}, ("u1", "d2"): {"quote": ""}})
+    fz = {("u1", "d1"): {"quote": "q"}, ("u1", "d2"): {"quote": ""}}
+    s = score.score(_cases(), _fix(_cases(), runs, fz), "judge", "direction", frozen=fz)
     r = s["h/low"][0]
     assert r["failures"] == 0 and r["excluded"] == ["d2"]
 
@@ -62,7 +72,7 @@ def test_no_quote_excluded():
 def test_unverifiable_counts_as_rejection():
     import score
     runs = [_run("baseline-cite", "o", "medium", "u1", [{"ref": "d1", "verdict": "unverifiable"}, {"ref": "d2", "verdict": "unsupported"}])]
-    r = score.score(_cases(), runs, "baseline-cite", "direction")["o/medium"][0]
+    r = score.score(_cases(), _fix(_cases(), runs), "baseline-cite", "direction")["o/medium"][0]
     assert r["rejected_truths"] == 1 and r["missed_errors"] == 0
 
 
@@ -102,7 +112,7 @@ def test_select_extract_single():
 def test_map_scoring():
     import score
     cells = [{"row": "A", "column": "outcome", "grounded": True}, {"row": "A", "column": "x", "grounded": True}]
-    r = score.score(_cases(), [_run("map", "h", "low", "map-1", None, category="", cells=cells)], "map", "map")["h/low"][0]
+    r = score.score(_cases(), _fix(_cases(), [_run("map", "h", "low", "map-1", None, category="", cells=cells)]), "map", "map")["h/low"][0]
     assert r["missed_errors"] == 1 and r["rejected_truths"] == 0
 
 
@@ -127,8 +137,47 @@ def test_judge_borrows_true_quote():
     refs = {c["ref"]: c for _, p in us for c in p["claims"]}
     assert refs["dir-f1"]["quote"] == "Q" and refs["dir-f1"]["text"] == "b"
     runs = [_run("judge", "h", "low", "u1", [{"ref": "dir-t1", "match": "일치"}, {"ref": "dir-f1", "match": "일치"}])]
-    r = score.score(cases, runs, "judge", "direction", frozen=frozen)["h/low"][0]
+    r = score.score(cases, _fix(cases, runs, frozen), "judge", "direction", frozen=frozen)["h/low"][0]
     assert r["excluded"] == [] and r["missed_errors"] == 1
+
+
+
+def test_stale_prompt_ignored():
+    """현재 프롬프트로 계산한 key 와 다른 줄(옛 프롬프트의 결과)은 집계에 쓰지 않는다."""
+    import score
+    runs = [_run("baseline-cite", "o", "medium", "u1", [{"ref": "d1", "verdict": "supported"}, {"ref": "d2", "verdict": "unsupported"}])]
+    runs[0]["key"] = "stale0000000000"
+    assert score.score(_cases(), runs, "baseline-cite", "direction") == {}
+
+
+def test_true_without_quote_counts_as_rejection():
+    """구절이 없는 참 항목은 실제 파이프라인에서 unsupported 이므로 판정 단계에서도 참 기각으로 센다."""
+    import score
+    fz = {("u1", "d1"): {"quote": ""}, ("u1", "d2"): {"quote": "q"}}
+    runs = _fix(_cases(), [_run("judge", "h", "low", "u1", [{"ref": "d2", "match": "불일치"}])], fz)
+    r = score.score(_cases(), runs, "judge", "direction", frozen=fz)["h/low"][0]
+    assert r["rejected_truths"] == 1 and r["failures"] == 0 and r["excluded"] == []
+
+
+def test_judge_respects_frozen_exists():
+    """추출에서 존재 불일치나 접근 실패인 참 항목은 판정이 일치여도 참 기각이다."""
+    import score
+    fz = {("u1", "d1"): {"quote": "q", "exists": "불일치", "access": "성공"}, ("u1", "d2"): {"quote": "q"}}
+    runs = _fix(_cases(), [_run("judge", "h", "low", "u1", [{"ref": "d1", "match": "일치"}, {"ref": "d2", "match": "불일치"}])], fz)
+    r = score.score(_cases(), runs, "judge", "direction", frozen=fz)["h/low"][0]
+    assert r["rejected_truths"] == 1
+
+
+def test_map_missing_cells_fail():
+    """입력 근거 지도의 판정 대상 칸(case, outcome, 각 축의 prior)을 출력이 빠뜨리면 실패로 센다."""
+    import score
+    cases = {"items": [], "map_cases": [{"id": "map-1", "input": {"evidence_map": [
+        {"case": "A", "outcome": "실패", "axes": {"purpose": {"prior": "p"}}}], "passed": []},
+        "truth": [{"row": "A", "column": "outcome", "grounded": True}]}]}
+    cells = [{"row": "A", "column": "outcome", "grounded": True}]
+    runs = _fix(cases, [_run("map", "h", "low", "map-1", None, category="", cells=cells)])
+    r = score.score(cases, runs, "map", "map")["h/low"][0]
+    assert r["failures"] == 2
 
 
 if __name__ == "__main__":

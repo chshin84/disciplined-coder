@@ -35,14 +35,35 @@ def _rejected(stage, j):
     return None
 
 
+def expected_key(cases, r, frozen):
+    """그 실행 줄을 지금의 프롬프트·자료로 다시 만들었을 때의 key. 그 unit 이 지금 자료에 없으면 None."""
+    payload = dict(run.units(cases, r["stage"], r.get("category", ""), frozen)).get(r["unit"])
+    if payload is None:
+        return None
+    prompt = run.build_prompt(r["stage"], r.get("category", ""), payload)
+    return run.make_key(r["stage"], r["model"], r["effort"], r.get("category", ""), r["repeat"], r["unit"], prompt)
+
+
+def _map_required(mc):
+    """지도 대조에서 출력이 반드시 표시해야 하는 칸: 행마다 case, outcome, 각 축의 prior."""
+    req = set()
+    for row in mc["input"].get("evidence_map", []):
+        req |= {(row["case"], "case"), (row["case"], "outcome")}
+        req |= {(row["case"], f"axes.{k}.prior") for k in (row.get("axes") or {})}
+    return req
+
+
 def score(cases, runs, stage, category, frozen=None):
-    """설정(model/effort)마다 repeat 순서의 Score 목록을 낸다. frozen 은 판정 단계의 (unit, ref) -> 추출 판정이다."""
+    """설정(model/effort)마다 repeat 순서의 Score 목록을 낸다. frozen 은 판정 단계의 (unit, ref) -> 추출 판정이다.
+    지금의 프롬프트·자료로 계산한 key 와 같은 줄만 쓴다. 옛 프롬프트의 결과가 섞이지 않게 하기 위해서다."""
     frozen = frozen or {}
     latest = {}
     for r in runs:
         if r.get("stage") != stage or r.get("error"):
             continue
         if stage == "judge" and r.get("category") != category:
+            continue
+        if r.get("key") != expected_key(cases, r, frozen):
             continue
         latest[(r["model"], r["effort"], r["repeat"], r["unit"])] = r
     configs = sorted({(m, e, rep) for m, e, rep, _ in latest})
@@ -56,21 +77,29 @@ def score(cases, runs, stage, category, frozen=None):
             for mc in cases["map_cases"]:
                 r = latest.get((m, e, rep, mc["id"]))
                 cells = {(c.get("row"), c.get("column")): c.get("grounded") for c in ((r or {}).get("output") or {}).get("cells", [])}
-                for t in mc["truth"]:
-                    g = cells.get((t["row"], t["column"]))
-                    if g is None:
+                truth = {(t["row"], t["column"]): t["grounded"] for t in mc["truth"]}
+                for cell in _map_required(mc) | set(truth):
+                    g = cells.get(cell)
+                    if g not in (True, False):
                         s["failures"] += 1
-                    elif g and not t["grounded"]:
+                    elif cell in truth and g and truth[cell] is False:
                         s["missed_errors"] += 1
-                    elif not g and t["grounded"]:
+                    elif cell in truth and not g and truth[cell] is True:
                         s["rejected_truths"] += 1
         else:
             for x in cases["items"]:
                 if x["category"] != category:
                     continue
-                if stage == "judge" and not run.judge_source(x, frozen).get("quote"):
-                    s["excluded"].append(x["id"])
-                    continue
+                if stage == "judge":
+                    src = run.judge_source(x, frozen)
+                    upstream = not src.get("quote") or src.get("access") == "실패" or src.get("exists") == "불일치"
+                    if upstream:
+                        # 추출에서 이미 기각된 항목이다. 참 항목이면 참 기각이고, 오류 항목이면 맞게 걸러진 것이다.
+                        if x["truth"]:
+                            s["rejected_truths"] += 1
+                        else:
+                            s["excluded"].append(x["id"])
+                        continue
                 r = latest.get((m, e, rep, x["url"]))
                 js = {j.get("ref"): j for j in ((r or {}).get("output") or {}).get("judgments", [])}
                 rej = _rejected(stage, js.get(x["id"]))
