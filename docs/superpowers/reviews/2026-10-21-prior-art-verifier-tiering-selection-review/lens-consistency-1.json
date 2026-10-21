@@ -1,0 +1,133 @@
+{
+  "lens": "lens-consistency",
+  "read": [
+    "D:/projects/dc-verifier-tier/skills/lens-consistency/SKILL.md",
+    "D:/projects/dc-verifier-tier/agent-principles.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md"
+  ],
+  "issues": [
+    {
+      "where": "Task 3 Interfaces의 score·noise·select",
+      "type": "drift",
+      "claim": "score 는 키를 \"<model>/<effort>\" 로 정하고 Score 에 repeats 칸을 둔다. 그래서 기준선의 두 실행은 같은 키 하나로 합쳐진다. 그런데 noise 는 Score 두 개가 든 목록(list[Score])을 받는다. 반복 실행을 따로 떼어 Score 둘을 만드는 경로는 Interfaces 어디에도 없다. 또 select 는 기준선 Score 하나(baseline: Score)만 받는데, 두 기준선 실행 가운데 어느 쪽을 쓰는지(첫 실행, 나쁜 쪽, 평균)도 정해져 있지 않다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "score(items: list[dict], runs: list[dict], stage: str, category: str | None) -> dict[str, Score]. 키는 \"<model>/<effort>\" 다. Score = { missed_errors: int, rejected_truths: int, failures: int, cost_usd: float, repeats: int } / noise(baseline_scores: list[Score]) / select(scores: dict[str, Score], baseline: Score, noise: dict[str, int])",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "구현자는 이 정의를 시험 자료로 `claude -p` 에서 두 번 실행하라. ... 두 실행의 차이를 측정 흔들림으로 보고, 다른 설정과 기준선의 차이가 그 흔들림 안에 들면 같은 성적으로 본다.",
+      "principle": "FOCUSED",
+      "consequence": "현재 Interfaces 의 score 출력은 noise 의 입력 형식을 만들지 못한다. 그리고 select 가 비교하는 기준선 값은 정의되어 있지 않다."
+    },
+    {
+      "where": "Task 3 score 의 단계별 세는 법과 Task 4 Step 5",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 은 지도 대조를 검증 카테고리 하나로 두고, 채택 규칙을 카테고리마다 기준선과 비교해 적용한다. 그러나 plan 의 score 는 baseline·extract·judge 단계의 세는 법만 정하고 map 단계(MapCase.truth 의 grounded 칸)를 어떻게 세는지 정하지 않는다. 또 기준선 실행(Task 4 Step 1)은 cite 모드 입력만 넣는 baseline 단계라서, 현행 정의의 map 모드 기준선은 실행되지 않는다. 그 결과 지도 대조 설정을 고를 기준선 Score 가 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "기준선은 최종 `verdict` 로 센다. ... 추출 단계는 ... 판정 단계는 그 카테고리의 `match` 로 센다. / `baseline.md` 는 ... 그 아래에 cite 모드 입력을 넣을 자리를 둔다. / Step 5: 지도 대조 격자를 실행한다",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "6. 지도 대조는 지난 실행의 `map` 모드 입력 하나에 오류 칸을 넣어 시험한다. / 카테고리마다 오류 통과 건수와 참 기각 건수가 모두 기준선 이하인 설정 중 `total_cost_usd` 가 가장 낮은 설정을 고른다.",
+      "principle": "CHECKABLE",
+      "consequence": "현재 plan 에는 지도 대조 결과를 Score 로 바꾸는 규칙도, 비교할 기준선 실행도 없다. 따라서 Task 4 Step 6 이 결정 기록에 적을 지도 대조 설정은 채택 규칙으로 도출되지 않는다."
+    },
+    {
+      "where": "Task 1 Step 3 의 _verifier_eval_check.py 검사 항목",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 은 카테고리마다 참과 오류를 같은 수로 두라고 하고, 그 카테고리에 지도 대조도 들어간다. 그러나 plan 의 형식 검사는 items 의 카테고리(access·exists·quote·numbers·direction·scope)만 센다. map_cases 의 truth 에서 grounded 참 칸과 거짓 칸이 같은 수인지는 검사하지 않는다. Step 4 도 근거 없는 칸 두 개를 넣으라고만 적는다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "검사 항목은 셋이다. 카테고리마다 `truth: true` 와 `truth: false` 의 개수가 같다. ... / `map_cases` 는 ... 하나를 만들고, 근거 없는 칸 두 개를 넣는다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "**개수:** 카테고리마다 참 주장과 오류 주장을 같은 수로 둔다.",
+      "principle": "CHECKABLE",
+      "consequence": "현재 plan 에서 지도 대조 자료의 참·오류 수는 정해지지 않았고, 검사기도 그 수가 같은지 확인하지 않는다."
+    },
+    {
+      "where": "Task 4 Step 2·Step 5 와 Global Constraints 의 Opus low 조건",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 의 격자 순서 5는 'Sonnet high 도 기준선에 못 미친 카테고리'라고만 적어 카테고리를 판정 카테고리로 한정하지 않는다. 그런데 plan 은 Opus low 를 판정 카테고리(numbers·direction·scope)에서만 실행한다. 추출 카테고리(access·exists·quote)와 지도 대조에서 Sonnet high 까지 기준선에 못 미치면 다음에 무엇을 실행하는지 plan 에 없다. 이 한정이 의도라면 plan 이 그 근거를 적어야 한다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "Opus 5.5 low 는 Sonnet high 도 기준선에 못 미친 판정 카테고리에서만 실행한다. / Haiku high 가 `access`·`exists`·`quote` 중 하나라도 기준선에 못 미치면 Sonnet low·medium·high 를 실행한다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "5. Opus low 는 Sonnet high 도 기준선에 못 미친 카테고리에서만 시험한다.",
+      "principle": "NO-ASSUME",
+      "consequence": "현재 plan 에서 추출과 지도 대조의 격자는 Sonnet 에서 끝난다. 두 단계 모두 기준선을 넘지 못하면 그 카테고리는 '고르지 못한 카테고리'로만 남는다."
+    },
+    {
+      "where": "Task 4 Step 3 의 추출 설정 선택",
+      "type": "gap",
+      "claim": "커버리지 공백이다. select 는 카테고리 하나에 대해 설정 하나를 고른다. 그러나 추출 검증자는 access·exists·quote 를 한 에이전트가 함께 맡으므로 설정도 하나여야 한다. 세 카테고리에서 고른 설정이 서로 다를 때 하나로 정하는 규칙(예: 세 카테고리 모두 기준선 이하인 설정 중 최저 비용)이 plan 에 없다. Task 4 Step 3 은 'report.md 에 추출 단계의 고른 설정이 있다'고만 기대한다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "Expected: `report.md` 에 추출 단계의 고른 설정이 있다. 그 설정의 줄만 `evals/prior-art-verifier/results/extract-frozen.jsonl` 로 옮긴다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "| 추출 검증자 | 접근, 존재, 구절 | WebFetch, Read | ... / 2. 고른 추출 설정의 출력을 저장한다.",
+      "principle": "CHECKABLE",
+      "consequence": "현재 Interfaces 에서는 select 를 카테고리마다 따로 부르므로 추출 설정이 셋으로 나올 수 있다. 고정할 추출 출력이 어느 설정의 것인지는 정해지지 않았다."
+    },
+    {
+      "where": "Task 1 Step 4 의 자료 구성과 Task 4 Step 3 의 가정 확인",
+      "type": "gap",
+      "claim": "커버리지 공백이다. Task 4 Step 3 은 arXiv 2605.10039 항목의 context 에 부정어가 담겼는지 확인하라고 한다. 그러나 Task 1 은 그 URL 을 cases.json 에 넣으라고 요구하지 않고, 검사기도 그것을 확인하지 않는다. 자료가 '오케스트레이터 인용 확인' 10건에서 시작하므로 이 URL 이 들어 있을 수 있지만, plan 은 그 사실을 확인하지 않았다(가정).",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "이때 arXiv 2605.10039 항목의 `context` 에 부정어(\"no\", \"not\" 등)가 담겼는지 확인해 `report.md` 에 적는다(spec 의 가정 확인).",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "이 가정은 시험에서 그 URL 의 추출 출력에 부정어가 담기는지로 확인한다.",
+      "principle": "NO-ASSUME",
+      "consequence": "현재 Task 1 의 산출물에는 2605.10039 항목이 있다는 보장이 없다. 그래서 Task 4 Step 3 의 확인은 대상 없이 남을 수 있다."
+    },
+    {
+      "where": "Task 1~3 의 Files 와 Task 2 의 스크립트 위치",
+      "type": "contradiction",
+      "claim": "spec 의 「바뀌는 파일」은 시험 스크립트를 evals/prior-art-verifier/ 에 두라고 정한다. 그러나 plan 은 실행기와 집계기와 검사기를 scripts/ 아래(_eval_verifier.py·_eval_verifier_score.py·_verifier_eval_check.py·test_verifier_eval.sh)에 만든다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "Create: `scripts/_eval_verifier.py` / Create: `scripts/_eval_verifier_score.py` / Create: `scripts/_verifier_eval_check.py`",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "- 시험 스크립트와 자료와 결과를 `evals/prior-art-verifier/` 에 둔다.",
+      "principle": "DOC-PLACE",
+      "consequence": "현재 plan 대로 실행하면 시험 스크립트는 spec 이 정한 위치와 다른 scripts/ 에 놓인다."
+    },
+    {
+      "where": "Task 2 Step 6 의 fixtures/extract-sample.jsonl 과 --extract-from 형식",
+      "type": "drift",
+      "claim": "--extract-from 은 Interfaces 에서 'results.jsonl 경로'로 적혀 있어 Run 줄 형식을 가리킨다. 그런데 Step 6 의 fixture 는 '손으로 만든 추출 출력 한 줄'이라고만 적혀 있어, Run 형식(key·stage·output 등)인지 output 칸만의 형식인지 알 수 없다. 이 fixture 는 Task 2 의 Files 목록에도 없고 커밋 명령에만 나온다. Task 4 Step 3 이 만드는 extract-frozen.jsonl 도 Task 4 Files 목록에 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "[--extract-from <results.jsonl 경로>] / `fixtures/extract-sample.jsonl` 은 `cases.json` 의 `numbers` 참 항목 하나로 손으로 만든 추출 출력 한 줄이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "counterpart": "`judge` 단계 입력은 `--extract-from` 파일에서 같은 `url`·`ref` 의 추출 출력을 읽어 만든다. / 그 설정의 줄만 `evals/prior-art-verifier/results/extract-frozen.jsonl` 로 옮긴다.",
+      "principle": "FOCUSED",
+      "consequence": "현재 plan 에서 --extract-from 이 받는 파일 형식은 fixture 와 extract-frozen.jsonl 사이에서 하나로 정해져 있지 않다."
+    },
+    {
+      "where": "Task 1 Item.category 와 Task 2 judge-<카테고리>.md",
+      "type": "drift",
+      "claim": "plan 은 영어 카테고리 코드를 쓰지만, 코드와 spec 의 한국어 카테고리를 대응시키는 표가 없다. 대응은 순서로만 짐작된다(접근=access, 존재=exists, 구절=quote, 수치·조건=numbers, 방향=direction, 범위=scope, 지도 대조=map 단계). 그중 numbers 는 spec 의 '수치·조건'(수치·날짜·모델 이름·적용 조건)보다 좁은 이름이다. 그래서 judge-numbers.md 가 적용 조건까지 판정하는지가 이름만으로는 드러나지 않는다. 또 quote·access·exists 는 카테고리 이름이면서 추출 출력의 칸 이름이기도 하다. Task 3 의 'quote 카테고리 항목에 대해 ... quote 없음' 같은 문장에서 두 뜻이 함께 쓰인다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "`category` 는 `access`·`exists`·`quote`·`numbers`·`direction`·`scope` 중 하나다. / `judge-<카테고리>.md` 는 ... 그 카테고리 하나의 `match`(`일치`·`불일치`)와 `reason` 을 내게 한다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "| 수치·조건 | 수치·날짜·모델 이름·적용 조건이 구절과 같은지 | 필요 없다 |",
+      "principle": "TERM-ONE",
+      "consequence": "현재 plan 에는 numbers 판정 프롬프트의 범위를 spec 의 수치·조건 정의와 묶는 문장이 없다."
+    },
+    {
+      "where": "Task 2 Step 4 의 models_used 대조",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 은 CLAUDE_CODE_EFFORT_LEVEL 환경 변수가 effort 를 덮는다는 근거로 실행 기록의 model·effort 를 대조하라고 한다. 이 대조 자체는 병합 전 절차라 승인 뒤의 plan 몫이다. 그러나 같은 덮어쓰기 위험은 시험 실행의 --effort 에도 해당한다. 그런데 plan 은 model 만 modelUsage 로 대조하고, 적용된 effort 를 기록하거나 대조하지 않는다. 실행 환경에서 CLAUDE_CODE_EFFORT_LEVEL 을 비우라는 조건도 plan 에 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "`models_used` 는 출력의 `modelUsage` 키를 정렬해 쉼표로 이은 값이다. 요청한 모델이 그 안에 없으면 `error` 에 `모델 불일치` 를 적는다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "서브에이전트 문서(...)는 frontmatter 의 `effort` 를 `CLAUDE_CODE_EFFORT_LEVEL` 환경 변수가 덮고, `model` 은 호출 매개변수가 덮는다고 적는다. 그래서 구현자는 병합 전에 실행 기록의 `model`·`effort` 값이 frontmatter 와 같은지 대조하라.",
+      "principle": "NO-ASSUME",
+      "consequence": "현재 Run 의 effort 칸에는 요청한 값만 남는다. 그래서 격자의 노력 수준이 실제로 적용되었는지는 기록으로 확인되지 않는다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "CHECKABLE",
+    "FOCUSED",
+    "DOC-PLACE",
+    "TERM-ONE",
+    "STATE-ASSUME",
+    "WRITTEN-ONLY",
+    "SPECIFIC-NAME",
+    "SUBJECT-OBJECT"
+  ],
+  "notes": "검토는 모순, 커버리지 공백, 산출물 공백, 드리프트, 스코프 순서로 했다. 호출자의 지시에 따라 승인 지점에서 plan 을 나눈 분할 자체는 지적하지 않았다. spec 시험 절의 요구가 plan 의 어느 task 로 이어지는지는 다음과 같다. 참·오류 같은 수는 Task 1 Step 3 이 맡지만 지도 대조는 빠졌다(issues 참조). 오류 항목 확인 기록은 Task 1 의 check_note 와 Step 3·4 가 맡는다. 기준선 2회는 Task 4 Step 1 이, 흔들림은 Task 3 의 noise 가 맡는다(형식 드리프트는 issues 참조). 격자 순서 1~4 와 6 은 Task 4 Step 2~5 가 맡고, 5 는 판정 카테고리로만 한정되어 있다. 추출 출력 고정은 Task 4 Step 3 이 맡는다. 2605.10039 가정 확인은 Task 4 Step 3 이 맡는다. total_cost_usd 기록은 Run.cost_usd·usage 와 Task 2 Step 6 이 맡는다. 다만 plan 은 cost_usd 가 total_cost_usd 를 옮긴 값이라고 Step 6 의 맥락으로만 드러낸다. 채택 규칙은 Task 3 의 select 가 맡는다. 결정 기록과 승인은 Task 4 Step 6·8 이 맡는다. model·effort 대조는 model 만 시험 단계에서 다룬다. build_cmd·parse_output·record 의 이름과 서명은 Task 2 의 Interfaces 와 Step 1 검사 이름 사이에서 일관되었다. match 값(일치·불일치)도 spec 과 일치했다. 스코프는 task 넷으로 한 plan 에 맞는 크기라 지적하지 않았다. 더 확인할 것이 셋 남았다. 첫째, 2605.10039 가 「오케스트레이터 인용 확인」 10건에 실제로 들어 있는지는 D:\\projects\\dc-clause-candidates\\docs\\superpowers\\reviews\\2026-10-20-generation-constraints-prior-art.md 를 열어야 알 수 있으나, 읽기 범위 밖이라 열지 않았다. 둘째, 추출 출력의 access·exists 값 형식(성공·실패, 일치·불일치 표기)은 plan 에 정의되어 있지 않다. Task 3 의 세는 법이 이 값 형식에 기대므로 확인이 필요하다. 셋째, spec 의 격자 순서 4('Haiku high 가 기준선에 못 미친 카테고리는 Sonnet 결과로 정한다')와 plan 의 select(기준선 이하 전체 중 최저 비용)가 같은 결과를 내는지 확인해야 한다. Haiku low 는 통과하고 Haiku high 는 못 미친 경우에 두 규칙의 결과가 달라질 수 있다."
+}

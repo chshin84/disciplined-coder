@@ -1,0 +1,89 @@
+{
+  "lens": "lens-grounding",
+  "read": [
+    "D:/projects/dc-verifier-tier/skills/lens-grounding/SKILL.md",
+    "D:/projects/dc-verifier-tier/agent-principles.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+    "D:/projects/dc-verifier-tier/scripts/_eval_run.py (1-75행)",
+    "D:/projects/dc-verifier-tier/scripts/_eval_clause.py (grep: key·error·plan_jobs)",
+    "D:/projects/dc-verifier-tier/scripts/_eval_env.sh (1-40행)",
+    "D:/projects/dc-verifier-tier/scripts/_test_check.sh",
+    "D:/projects/dc-verifier-tier/scripts/ (목록: test_*.sh)",
+    "D:/projects/dc-verifier-tier/agents/prior-art-verifier.md",
+    "D:/projects/dc-verifier-tier/CLAUDE.md 「변경 뒤 실행」",
+    "D:/projects/dc-verifier-tier/workflows/prior-art-search.js (55-80행, 115-135행, prior_claim grep)",
+    "D:/projects/dc-verifier-tier/scripts/prior_art_contract.json (prior_claim grep)",
+    "D:/projects/dc-clause-candidates/docs/superpowers/reviews/2026-10-20-generation-constraints-prior-art.md 「오케스트레이터 인용 확인」",
+    "D:/projects/dc-clause-candidates/docs/superpowers/reviews/2026-10-20-generation-constraints-prior-art/ (목록, search-r1.json 구조, map-check-r1.json 최상위 키)",
+    "claude --version (2.1.305), claude --help (--tools, --effort, --setting-sources, --strict-mcp-config, --disable-slash-commands, --no-session-persistence, --bare, --output-format, --model)",
+    "~/.dc-eval.env 존재 여부(없음)"
+  ],
+  "issues": [
+    {
+      "where": "Task 1 Step 4 map_cases 문장",
+      "type": "mismatch",
+      "claim": "plan 은 search-r1.json 의 `synthesis.evidence_map` 과 `passed` 행으로 map_cases 하나를 만든다고 적는다. 그러나 search-r1.json 의 `passed` 원소에는 `row` 가 없고 `{ ref, urls }` 만 있다. map 모드 입력의 `passed` 는 `{ ref, row }` 이며, 워크플로가 통과한 `#case#` ref 를 연구자 `evidence_map` 의 행과 이어 붙여 만든다. 그 입력 자체는 search-r1.json 에 저장되어 있지 않다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "`map_cases` 는 같은 폴더 `search-r1.json` 의 `synthesis.evidence_map` 과 `passed` 행으로 하나를 만들고, 근거 없는 칸 두 개를 넣는다.",
+      "counterpart_file": "workflows/prior-art-search.js",
+      "counterpart": "const passed_rows = classified.passed .filter((p) => p.ref.includes('#case#')) .map((p) => ({ ref: p.ref, row: items.find((it) => it.ref === p.ref).row }));",
+      "principle": "NO-ASSUME",
+      "consequence": "search-r1.json 의 `passed[0]` 은 `{\"ref\": \"sq1#issue#0\", \"urls\": [...]}` 이고, `passed` 의 어느 원소에도 `row` 키가 없다. `passed` 에는 `#issue#` ref 도 섞여 있다. plan 은 `researchers[].output.evidence_map[j]` 와 이어 붙여 `#case#` 만 남기는 재구성 절차를 적지 않았다."
+    },
+    {
+      "where": "Global Constraints 「판정 에이전트 단계는 웹을 열지 않는다(`--tools \"\"`)」와 Task 2 test_build_cmd_tools",
+      "type": "contradiction",
+      "claim": "spec 의 「에이전트와 단계」 표는 판정 에이전트와 지도 대조 에이전트의 도구를 Read 로 정한다. 그런데 plan 은 판정 단계를 도구 없이(`--tools \"\"`) 실행하도록 고정한다. map 단계의 `--tools` 값은 plan 어디에도 적혀 있지 않다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "판정 에이전트 단계는 웹을 열지 않는다(`--tools \"\"`). 추출 단계와 기준선은 `--tools WebFetch,Read` 로 실행한다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "| 판정 에이전트 | 수치·조건, 방향, 범위 | Read | 주장과, 추출 검증자가 낸 `quote`·`context` | ... | 지도 대조 에이전트 | 지도 대조 | Read |",
+      "principle": "NO-ASSUME",
+      "consequence": "시험에서 판정 설정은 Read 없이 측정되지만, 승인 뒤 만들 에이전트 정의는 spec 대로 Read 를 갖는다. agents/prior-art-verifier.md 의 공통 절은 `PRINCIPLES:` 경로의 파일을 읽으라고 지시한다. 그런데 `--tools \"\"` 세션은 그 파일을 읽을 수 없다."
+    },
+    {
+      "where": "Task 3 score() 의 기준선·추출 단계 계수 규칙",
+      "type": "mismatch",
+      "claim": "기준선은 참 항목이 `unsupported` 일 때만 참 기각으로 세고, 추출 단계는 `access` 실패를 기각으로 센다. spec 의 최종 판정 순서에서 `access` 실패는 `unsupported` 가 아니라 `unverifiable` 이다. 그래서 접근 카테고리의 참 항목에서 같은 사건이 기준선에서는 기각으로 안 세이고 추출 단계에서는 기각으로 세인다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "기준선은 최종 `verdict` 로 센다. 오류 항목이 `supported` 이면 오류 통과, 참 항목이 `unsupported` 이면 참 기각이다. / 추출 단계는 `access`·`exists`·`quote` 카테고리 항목에 대해 `access` 실패·`exists` 불일치·`quote` 없음을 기각으로 보고 같은 방식으로 센다.",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "2. `access` 가 실패면 `unverifiable` 이다. 3. `exists` 가 불일치이거나 `quote` 가 없으면 `unsupported` 다.",
+      "principle": "NO-ASSUME",
+      "consequence": "plan 의 계수 규칙에서 기준선의 `unverifiable` 은 참 기각에 들어가지 않는다. 반면 추출 설정의 `access` 실패는 참 기각에 들어간다. 그래서 접근 카테고리에서 기준선과 추출 설정은 서로 다른 잣대로 세인다."
+    },
+    {
+      "where": "Task 3 score()·select() 와 Task 4 Step 1·Step 5",
+      "type": "omission",
+      "claim": "spec 의 채택 규칙은 카테고리마다 기준선 이하인 설정을 고르라고 정한다. 그런데 plan 의 기준선 실행(Task 4 Step 1)은 cite 모드 URL 만 대상으로 한다. 지도 대조의 기준선 실행과 map 단계의 계수 규칙(`grounded` 와 정답표의 대조)은 score() 설명에 없다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "Run: `python -I scripts/_eval_verifier.py run --stage baseline --model claude-opus-5-5 --effort medium --repeat 2` Expected: 모든 URL 에 대해 두 줄씩",
+      "counterpart_file": "docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "카테고리마다 오류 통과 건수와 참 기각 건수가 모두 기준선 이하인 설정 중 `total_cost_usd` 가 가장 낮은 설정을 고른다.",
+      "principle": "CHECKABLE",
+      "consequence": "score() 의 하위 항목은 기준선·추출·판정 세 단계의 계수만 정한다. `select(scores, baseline, noise)` 는 기준선 Score 를 요구한다. 그러나 map 단계에 넘길 기준선 Score 와 흔들림을 만드는 실행과 계수 규칙은 plan 에 없다."
+    },
+    {
+      "where": "Task 2 Step 4 재실행 판단 문장",
+      "type": "mismatch",
+      "claim": "plan 은 재실행 판단(오류 줄을 기록하고 `error` 가 빈 줄의 key 만 건너뛰는 방식)이 `_eval_run.py` 의 `claude_json` 오류 처리와 같다고 적는다. 그러나 `claude_json` 은 `is_error` 를 `error` 칸으로 옮기기만 한다. 건너뛰기 판단은 `_eval_clause.py` 가 맡는다. 이 파일은 생성 오류가 난 실행을 기록하지 않고 errors 목록으로만 돌려준다.",
+      "file": "docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-selection.md",
+      "evidence": "재실행 판단은 `error` 가 빈 줄의 `key` 만 건너뛰는 방식이다(`scripts/_eval_run.py` 의 `claude_json` 오류 처리와 같은 방식).",
+      "counterpart_file": "scripts/_eval_clause.py",
+      "counterpart": "if g[\"error\"]: return None, None, [f\"{q} {cond}: 생성 오류 {g['error'][:120]}\"]",
+      "principle": "NO-ASSUME",
+      "consequence": "기존 관례에서는 오류가 난 실행이 기록 파일에 남지 않는다. plan 의 방식은 오류 줄을 `runs.jsonl` 에 남기고 건너뛰기 판단에서 거른다. 그래서 plan 이 가리키는 기존 함수는 이 동작의 선례가 아니다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "CHECKABLE",
+    "STATE-ASSUME",
+    "WRITTEN-ONLY",
+    "FULL-SENTENCE",
+    "SPECIFIC-NAME"
+  ],
+  "notes": "체크리스트의 네 관점(누락·모순·환각·불일치)을 항목마다 따로 검토하였다. 다음 항목은 실제로 있는 것으로 확인하였다. 첫째, `_eval_run.py` 의 `JOBS = 4`, 600초 시간 초과, `modelUsage` 키를 정렬해 잇는 `_models` 가 있다. 둘째, `_test_check.sh` 의 `check` 함수가 있고, `claude_json` 의 `is_error` 처리가 있다. 셋째, CLAUDE.md 「변경 뒤 실행」의 `ALL PASS`·`Validation passed` 문구가 있다. 넷째, CLI 2.1.305 와 `--tools`(\"\" 와 쉼표 목록), `--effort`(low~max), `--setting-sources`, `--strict-mcp-config`, `--disable-slash-commands`, `--no-session-persistence` 가 있다. `--bare` 는 ANTHROPIC_API_KEY 또는 apiKeyHelper 로만 인증한다. 다섯째, `~/.dc-eval.env` 는 없다. 여섯째, `claude-sonnet-5-5` 는 저장소 코드에 이미 쓰이고 있다. 일곱째, search-r1.json 에 `synthesis.evidence_map`(44행)과 `passed`(60건)와 `prior_claim`(16회)이 있다. spec 의 모델·수준 격자, 기준선(Opus 5.5 medium, WebFetch·Read, 두 번 실행), 채택 규칙과 흔들림 규칙은 plan 에 정확히 옮겨졌다. 다음 사항은 확인 범위 밖이라 발견으로 올리지 않았다. 「오케스트레이터 인용 확인」의 10건은 모두 `#case#` ref 이다. 그래서 참 주장의 `claim.text` 는 워크플로가 만드는 `{ case, outcome, prior }` JSON 문자열 형식을 따라야 하는데, plan 은 이를 명시하지 않았다. 구현자가 참·오류를 카테고리당 3건으로 줄이면 arXiv 2605.10039 항목이 추출 시험 자료에서 빠질 수 있다. 그러면 Task 4 Step 3 의 가정 확인을 할 수 없다. 같은 성적·같은 비용일 때의 동점 처리(모델 순서·노력 순서)는 spec 에 없는 plan 의 추가 결정이다. 다만 결과를 바꾸는 경우가 드물어 발견으로 올리지 않았다. `claude-haiku-5-5` ID 와 `total_cost_usd` 필드가 실제로 있는지는 claude -p 를 실행하지 않아 확인하지 못하였다. plan 은 Task 2 Step 6 에서 이를 확인하도록 이미 정해 두었다."
+}
