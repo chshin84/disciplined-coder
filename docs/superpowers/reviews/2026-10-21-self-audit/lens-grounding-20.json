@@ -1,0 +1,61 @@
+{
+ "target": "skills/domain-plugin/SKILL.md",
+ "lens": "lens-grounding",
+ "read": [
+  ".claude-plugin/plugin.json",
+  ".claude-plugin/marketplace.json",
+  "agents/prior-art-researcher.md",
+  "agents/prior-art-verifier.md",
+  "commands/show-principles.md",
+  "skills/*/SKILL.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/_ensure_autoupdate.sh",
+  "scripts/_json_valid.sh",
+  "hooks/stop_gates.sh",
+  "hooks/hooks.json",
+  "hooks/doc_review_posttooluse.sh",
+  "docs/domain-discipline.md"
+ ],
+ "issues": [
+  {
+   "where": "플러그인을 만들 때 지킬 것 / frontmatter",
+   "type": "mismatch",
+   "claim": "description 이 언제 여는지를 포함해야 한다는 요구가 커맨드에도 적용된다고 적었으나, 이 저장소의 커맨드 파일 description 에는 언제 여는지가 없다.",
+   "file": "skills/domain-plugin/SKILL.md",
+   "evidence": "`description`은 언제 여는지를 포함한다. 이 요구는 스킬과 커맨드 양쪽에 적용된다.",
+   "counterpart_file": "commands/show-principles.md",
+   "counterpart": "지금 이 PC에 적용되어 있는 디시플린 원칙 전문을 그대로 보여준다",
+   "principle": "lens-grounding",
+   "consequence": "지금 commands/show-principles.md 의 description 은 무엇을 보여주는지만 적고 언제 여는지는 적지 않았다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "domain-plugin",
+   "statement": "활성 개발 중이면 plugin.json 의 version 을 비워 둔다.",
+   "evidence": "**version 비우기** — 활성 개발 중이면 plugin.json의 `version`을 비워 커밋 SHA 기반 자동 업데이트를 유지한다."
+  },
+  {
+   "topic": "domain-pruning",
+   "statement": "테스트·스크립트·문서처럼 플러그인이 아닌 프로젝트에도 해당하는 기준은 domain-pruning 이 소유한다.",
+   "evidence": "테스트·스크립트·문서처럼 플러그인이 아닌 프로젝트에도 해당하는 기준은 `domain-pruning`이 소유한다."
+  },
+  {
+   "topic": "YAGNI",
+   "statement": "설정 파일 처리기는 하나만 두고 폴백을 더 두지 않는다.",
+   "evidence": "폴백을 하나 더 두면 한 번도 실행되지 않는 사본이 생기고, 실행해 보지 않은 코드에는 오류가 숨는다(에이전트원칙의 `YAGNI`)."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "마켓플레이스 항목의 description 은 plugin.json 의 description 과 글자 그대로 같게 둔다.",
+   "evidence": "`plugins[].description`은 `plugin.json`의 `description`과 글자 그대로 같게 둔다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "렌즈를 실행해 결과를 내는 절차의 이름에는 접두사 대신 동사구를 쓴다.",
+   "evidence": "렌즈를 실행해 결과를 내는 절차에는 접두사 대신 동사구를 쓴다(`review-specs`·`review-docs`·`review-llm-calls`·`audit-repo-docs`·`dispatching-lenses`·`aggregating-lenses`·`nested-orchestration`)."
+  }
+ ],
+ "principles_applied": [],
+ "notes": "확인한 것: .claude-plugin/plugin.json 에 version 이 없음, marketplace.json 의 owner·source 와 description 일치, 에이전트 정의 두 파일의 name·description·tools·maxTurns, 모든 SKILL.md 의 name 이 디렉터리 이름과 같음, scripts/test_docs_drift.sh 의 frontmatter 안전 검사가 스킬·커맨드·에이전트를 모두 본다는 점, scripts/_ensure_autoupdate.sh 의 .bak 사본과 재파싱과 종료코드 구분, hooks/stop_gates.sh 의 git status 한 번과 transcript 파싱 없음, hooks/hooks.json 의 Stop 훅 존재, 스킬 이름 부류 규칙과 실제 스킬 이름. 저장소 안에서 원본 기록을 찾지 못해 대조하지 못한 수치: 13,057·1,108밀리초(표 행마다 파이프), 207·213밀리초(C.UTF-8), 1,021밀리초(대화 기록 파싱), 2026-10-21 평균 실행 시간 세 쌍. 상대편을 댈 수 없어 발견으로 올리지 않았다. 'OS 환경 변수는 물어서 넣는다'는 규칙을 구현한 코드는 scripts·hooks 에서 찾지 못했다(규칙만 있고 구현은 없을 수 있음). 'nested-orchestration' 은 동사구가 아닌 명사구이며 '렌즈를 실행해 결과를 내는 절차' 열거에 들어 있다(이름 부류 설명과 이름 모양이 다를 수 있음)."
+}

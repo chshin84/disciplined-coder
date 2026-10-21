@@ -1,0 +1,93 @@
+{
+ "lens": "lens-fit",
+ "target": "skills/domain-readme/SKILL.md",
+ "doc_type": "절차·계약 (operations·setup·contract) — 이 문서가 포함하는 것은 README 를 쓰는 방법과 절 동선이고 진행 상태가 없다. 수행 방법을 포함했으므로 절차·계약 행으로 가렸다.",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/domain-readme/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "독자 분리 절",
+   "type": "style",
+   "claim": "평서형 부정문으로 지시를 적어 금지로 읽히게 했다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "평서형 부정문은 금지로 읽히기 때문이다.",
+   "principle": "INSTRUCTION-FORM",
+   "consequence": "README 에 섞어 쓰지 말라는 행동 지시가 '섞지 않는다'라는 평서형 부정문이다.",
+   "lens": "lens-fit"
+  },
+  {
+   "where": "권장 동선 절",
+   "type": "style",
+   "claim": "평서형 부정문으로 지시를 적어 금지로 읽히게 했다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "절에 번호를 매기지 않는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "평서형 부정문은 금지로 읽히기 때문이다.",
+   "principle": "INSTRUCTION-FORM",
+   "consequence": "번호 매기기 금지가 평서형 부정문이다.",
+   "lens": "lens-fit"
+  },
+  {
+   "where": "머리말",
+   "type": "style",
+   "claim": "평서형 부정문으로 지시를 적어 금지로 읽히게 했다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "보편 원칙은 에이전트원칙(`agent-principles.md`)이 소유하므로 여기서 다시 적지 않고 이름으로 참조한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "평서형 부정문은 금지로 읽히기 때문이다.",
+   "principle": "INSTRUCTION-FORM",
+   "consequence": "원칙을 다시 적지 말라는 행동 지시가 '적지 않고 참조한다'라는 평서형이다.",
+   "lens": "lens-fit"
+  },
+  {
+   "where": "독자가 빨리 답해야 하는 질문 절 제목",
+   "type": "style",
+   "claim": "절 제목이 주어를 따로 가진 관형절로 명사를 꾸민다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "## 독자가 빨리 답해야 하는 질문",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "주어를 따로 가진 관형절(예: '감독원이 지적한')은 앞 문장으로 먼저 써라.",
+   "principle": "NO-MID-MOD",
+   "consequence": "제목의 '독자가 빨리 답해야 하는'이 주어를 가진 관형절로 '질문'을 꾸민다. 같은 구절이 description 에도 있다.",
+   "lens": "lens-fit"
+  },
+  {
+   "where": "description",
+   "type": "style",
+   "claim": "앞에 나온 대상을 이름 대신 개수로 가리켰다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "독자가 빨리 답해야 하는 네 가지와 절의 권장 동선과 무엇을 넣지 말아야 하는지를 포함한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목록을 시작하는 문장에 목록의 개수를 쓰지 말고, 앞에 나온 대상은 개수 대신 이름으로 가리켜라.",
+   "principle": "COUNT-EARNS",
+   "consequence": "description 이 질문을 '네 가지'라고 개수로 가리킨다.",
+   "lens": "lens-fit"
+  },
+  {
+   "where": "필요한 것만 절 제목",
+   "type": "style",
+   "claim": "절 제목에 '것'을 이름 대신 썼다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "## 필요한 것만",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "대상을 가리키는 '것'도 그 이름으로 바꿔라.",
+   "principle": "SPECIFIC-NAME",
+   "consequence": "절 제목 '필요한 것만'이 무엇이 필요한지 이름을 말하지 않는다.",
+   "lens": "lens-fit"
+  }
+ ],
+ "notes": "이 문서는 조항 문안 줄이 없어 클린룸 시험 제약이 적용되지 않는다. 관점: 형식·스타일·오염·호환·규율을 따로 보았고 규율에서만 발견이 나왔다. 외부 출처 URL 은 열어 확인하지 않았다. 근본 원인 후보는 스킬 문서가 평서형 '~한다'로 지시를 쓰는 관례와 INSTRUCTION-FORM 의 불일치이다(audit-repo-docs 와 같은 모양).",
+ "principles_applied": [
+  "INSTRUCTION-FORM",
+  "COUNT-EARNS",
+  "SPECIFIC-NAME",
+  "NO-MID-MOD",
+  "DOC-TYPE",
+  "WRITTEN-ONLY"
+ ]
+}

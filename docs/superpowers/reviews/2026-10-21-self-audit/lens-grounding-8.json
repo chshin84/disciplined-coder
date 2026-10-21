@@ -1,0 +1,72 @@
+{
+ "lens": "lens-grounding",
+ "target": "skills/domain-readme/SKILL.md",
+ "read": [
+  "skills/domain-readme/SKILL.md",
+  "agent-principles.md",
+  "README.md",
+  "skills/review-docs/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "머리말",
+   "type": "mismatch",
+   "claim": "결론 우선 규칙의 소유 조항을 상위 묶음 이름 READ-FLOW 로 가리킨다. 그 규칙을 정한 조항은 BOTTOM-LINE 이다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "분량은 에이전트원칙 「행동」의 `YAGNI`, 한 파일이 한 일만 하는 것은 같은 절의 `FOCUSED`, 결론을 먼저 두는 것은 에이전트원칙 「출력」의 `READ-FLOW` 다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "결론을 먼저 말하고 근거는 뒤에 둬라.",
+   "principle": "BOTTOM-LINE",
+   "consequence": "domain-readme 가 가리키는 READ-FLOW 는 SECTION-HEAD·BULLET-SCOPE·ONE-IDEA 까지 묶은 소절 이름이어서 결론 우선 규칙 하나를 가리키지 못한다. YAGNI·FOCUSED 는 조항 ID 로 가리키는데 이것만 묶음 이름이다.",
+   "lens": "lens-grounding"
+  },
+  {
+   "where": "독자가 빨리 답해야 하는 질문 절",
+   "type": "omission",
+   "claim": "독자 질문 넷 중 '누가 만들었는가'에 답하는 자리가 권장 동선에 없다.",
+   "file": "skills/domain-readme/SKILL.md",
+   "evidence": "이 도구가 내 문제를 푸는가, 내가 쓸 수 있는가, 누가 만들었는가, 더 배우려면 어디로 가는가다.",
+   "counterpart_file": "skills/domain-readme/SKILL.md",
+   "counterpart": "제목과 한 줄 설명 다음 핵심 셀링포인트, 무엇을 왜 하는지, 설치, 사용 예시, 주의와 한계, 더 읽기와 기여 순이다.",
+   "principle": "domain-readme",
+   "consequence": "권장 동선의 절 목록에 만든 사람이나 소속을 밝히는 자리가 없어서, 문서가 스스로 정한 질문 중 하나가 동선에서 비어 있다.",
+   "lens": "lens-grounding"
+  }
+ ],
+ "statements": [
+  {
+   "topic": "domain-readme",
+   "statement": "사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않는다.",
+   "evidence": "사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않는다."
+  },
+  {
+   "topic": "domain-readme",
+   "statement": "배지·목차·스크린샷·변경 이력은 프로젝트가 실제로 필요로 할 때만 넣는다.",
+   "evidence": "배지·목차·스크린샷·변경 이력은 프로젝트가 실제로 필요로 할 때만 넣는다."
+  },
+  {
+   "topic": "YAGNI",
+   "statement": "README 의 분량 기준은 에이전트원칙 행동 절의 YAGNI 이다.",
+   "evidence": "분량은 에이전트원칙 「행동」의 `YAGNI`, 한 파일이 한 일만 하는 것은 같은 절의 `FOCUSED`, 결론을 먼저 두는 것은 에이전트원칙 「출력」의 `READ-FLOW` 다."
+  },
+  {
+   "topic": "FOCUSED",
+   "statement": "한 파일이 한 일만 하는 것은 에이전트원칙 행동 절의 FOCUSED 이다.",
+   "evidence": "분량은 에이전트원칙 「행동」의 `YAGNI`, 한 파일이 한 일만 하는 것은 같은 절의 `FOCUSED`, 결론을 먼저 두는 것은 에이전트원칙 「출력」의 `READ-FLOW` 다."
+  },
+  {
+   "topic": "READ-FLOW",
+   "statement": "결론을 먼저 두는 규칙은 에이전트원칙 출력 절의 READ-FLOW 이다.",
+   "evidence": "분량은 에이전트원칙 「행동」의 `YAGNI`, 한 파일이 한 일만 하는 것은 같은 절의 `FOCUSED`, 결론을 먼저 두는 것은 에이전트원칙 「출력」의 `READ-FLOW` 다."
+  },
+  {
+   "topic": "domain-readme",
+   "statement": "보편 원칙은 에이전트원칙이 소유하고 domain-readme 는 다시 적지 않는다.",
+   "evidence": "보편 원칙은 에이전트원칙(`agent-principles.md`)이 소유하므로 여기서 다시 적지 않고 이름으로 참조한다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME"
+ ],
+ "notes": "관점: 누락·모순·환각·불일치를 따로 보았다. 문서가 이름으로 부른 소유자 문서와 스크립트를 열어 대조했다."
+}

@@ -1,0 +1,107 @@
+{
+ "lens": "lens-grounding",
+ "target": "agent-principles.md",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-discipline.md",
+  "docs/domain-korean.md",
+  "skills/review-docs/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md",
+  "CLAUDE.md",
+  "hooks/doc_review_posttooluse.sh"
+ ],
+ "issues": [
+  {
+   "where": "EDIT-PRIORITY",
+   "type": "contradiction",
+   "claim": "docs/domain-discipline.md 는 EDIT-PRIORITY 의 쉼표를 하나 이하가 되게 고쳤다고 적는다. 그러나 2026-10-21 에 원칙으로 옮긴 EDIT-PRIORITY 줄은 연결어미 뒤 쉼표를 둘 쓴다.",
+   "file": "agent-principles.md",
+   "evidence": "고칠 때는 중복 문장과 군더더기 문장을 먼저 덜어 내고, 그다음 문장 구조를 손보고, 낱말은 마지막에 바꿔라.",
+   "counterpart_file": "docs/domain-discipline.md",
+   "counterpart": "사용자는 클린룸 시험 없이 문장을 고치라고 했고, 같은 날 `EDIT-PRIORITY`와 함께 쉼표가 하나 이하가 되게 고쳤다.",
+   "principle": "EDIT-PRIORITY",
+   "consequence": "에이전트원칙의 EDIT-PRIORITY 줄에는 '내고,'와 '손보고,' 두 쉼표가 있고, domain-discipline.md 의 근거 절은 하나 이하로 고쳤다고만 적을 뿐 10-21 채택 문안의 쉼표 둘을 다루지 않는다.",
+   "lens": "lens-grounding"
+  }
+ ],
+ "statements": [
+  {
+   "topic": "review-docs",
+   "statement": "기록 파일의 이름과 차수 표기는 review-docs 가 소유한다.",
+   "evidence": "기록 파일의 이름과 차수 표기는 `review-docs`가 소유한다."
+  },
+  {
+   "topic": "review-docs",
+   "statement": "문서를 쓰거나 고친 뒤의 검진 절차는 review-docs 가 소유한다.",
+   "evidence": "플러그인과 마켓플레이스를 만들 때의 규칙은 `domain-plugin`이, 문서를 쓰거나 고친 뒤의 검진 절차는 `review-docs`가, README의 동선과 배지 판단은 `domain-readme`가 소유한다."
+  },
+  {
+   "topic": "domain-plugin",
+   "statement": "플러그인과 마켓플레이스를 만들 때의 규칙은 domain-plugin 이 소유한다.",
+   "evidence": "플러그인과 마켓플레이스를 만들 때의 규칙은 `domain-plugin`이, 문서를 쓰거나 고친 뒤의 검진 절차는 `review-docs`가, README의 동선과 배지 판단은 `domain-readme`가 소유한다."
+  },
+  {
+   "topic": "domain-readme",
+   "statement": "README의 동선과 배지 판단은 domain-readme 가 소유한다.",
+   "evidence": "플러그인과 마켓플레이스를 만들 때의 규칙은 `domain-plugin`이, 문서를 쓰거나 고친 뒤의 검진 절차는 `review-docs`가, README의 동선과 배지 판단은 `domain-readme`가 소유한다."
+  },
+  {
+   "topic": "nested-orchestration",
+   "statement": "하위 프로젝트를 서브에이전트에 맡길지의 기준과 방법은 nested-orchestration 이 소유한다.",
+   "evidence": "기준과 방법은 `nested-orchestration`이 소유한다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "렌즈의 종류와 실행 방법은 dispatching-lenses 를 따른다.",
+   "evidence": "렌즈의 종류와 실행 방법은 `dispatching-lenses` 를 따르고, 한 산출물에 렌즈를 페이지마다 따로 실행하지 마라."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "spec·plan 을 쓰거나 기능을 바꿔 고치면 review-specs 로 렌즈 리뷰를 거친다.",
+   "evidence": "spec·plan 을 쓰거나 기능을 바꿔 고치면 `review-specs` 로 렌즈 리뷰를 거친 뒤 다음 단계로 넘어가라."
+  },
+  {
+   "topic": "NO-FLEET",
+   "statement": "읽을 파일이 10개 이하이면 서브에이전트 없이 직접 한다.",
+   "evidence": "읽을 파일이 10개 이하이거나 Grep·Read 몇 번으로 끝나는 일은 직접 하라."
+  },
+  {
+   "topic": "행동",
+   "statement": "파일 하나를 20줄 이하로 고치고 되돌리기 쉬운 작업은 CHECKABLE 단계별 확인·렌즈 검증·SUB-ORCHESTRATE 판단을 생략한다.",
+   "evidence": "파일 하나를 20줄 이하로 고치고 되돌리기 쉬운 작업이면 `CHECKABLE` 의 단계별 확인 방법과 `NO-RAW-OUTPUT`·`REVIEW-DELIVERABLE` 의 렌즈 검증과 `SUB-ORCHESTRATE` 판단을 생략하라."
+  },
+  {
+   "topic": "TITLE-CLAIM",
+   "statement": "슬라이드 제목은 결론을 수치 없는 명사구로 40자 안에 쓴다.",
+   "evidence": "슬라이드 제목은 결론을 수치 없는 명사구로 40자 안에 쓰고(예: '업무 생산효율이 16% 개선되었습니다' 대신 '업무 생산성의 개선'), 수치·기간·비교는 본문에 둬라."
+  },
+  {
+   "topic": "ANTI-LIMIT",
+   "statement": "A가 아니라 B 대구는 글 한 편에 한 번까지만 쓴다.",
+   "evidence": "`A가 아니라 B` 대구는 글 한 편에 한 번까지만 써라."
+  },
+  {
+   "topic": "COMMA-CUT",
+   "statement": "연결어미 뒤 쉼표를 한 번 썼으면 다시 쉼표가 필요해지는 곳에서 문장을 끝낸다.",
+   "evidence": "한 문장에서 연결어미 뒤 쉼표를 한 번 썼으면, 그 문장에서 다시 쉼표가 필요해지는 곳에서 문장을 끝내고 새 문장으로 써라."
+  },
+  {
+   "topic": "출력",
+   "statement": "출력 언어와 문체 지시는 에이전트원칙의 출력 절이 소유한다.",
+   "evidence": "출력 언어와 문체 지시는 여기가 소유한다."
+  },
+  {
+   "topic": "LENS-ALLOWED",
+   "statement": "렌즈 호출 허가는 lens-* 호출에만 미친다.",
+   "evidence": "허가는 `lens-*` 호출에만 미친다."
+  }
+ ],
+ "principles_applied": [
+  "EVIDENCE-FIRST",
+  "NO-ASSUME",
+  "DOC-TYPE"
+ ],
+ "notes": "관점: 누락·모순·환각·불일치를 따로 보았다. 문서가 이름으로 부른 소유자 문서와 스크립트를 열어 대조했다."
+}

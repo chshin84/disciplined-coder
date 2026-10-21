@@ -1,0 +1,50 @@
+{
+  "target": "skills/lens-consistency/SKILL.md",
+  "lens": "lens-grounding",
+  "read": [
+    "agent-principles.md",
+    "skills/dispatching-lenses/SKILL.md",
+    "skills/audit-repo-docs/SKILL.md",
+    "skills/aggregating-lenses/SKILL.md"
+  ],
+  "issues": [
+    {
+      "where": "frontmatter description",
+      "type": "omission",
+      "claim": "description 은 커버리지 공백을 spec·plan 에만 붙여 쓰지만 체크리스트는 레포 문서 감사에서도 커버리지 공백을 적용한다. description 만 읽는 호출자에게는 레포 감사의 커버리지 공백이 빠진 렌즈로 읽힌다.",
+      "file": "skills/lens-consistency/SKILL.md",
+      "evidence": "문서의 내부 모순과 이름·타입 드리프트를 보고, spec·plan 에는 커버리지 공백과 산출물 공백과 스코프까지 보는 렌즈.",
+      "counterpart_file": "skills/lens-consistency/SKILL.md",
+      "counterpart": "**커버리지 공백** — 한쪽이 정한 것이 다른 쪽에서 어느 단계로 이어지는지 지목할 수 있는가(설계 문서 리뷰에서는 spec의 요구가 plan의 작업으로, 레포 문서 감사에서는 소유자 문서의 규칙이 그것을 따르는 문서로).",
+      "principle": "STATE-ASSUME",
+      "consequence": "지금 description 의 적용 범위 문장은 커버리지 공백을 spec·plan 에만 있는 항목으로 읽히게 하고, 본문은 레포 문서 감사에도 적용한다.",
+      "lens": "lens-grounding"
+    }
+  ],
+  "statements": [
+    {
+      "topic": "lens-consistency",
+      "statement": "산출물 공백은 spec·plan 을 보는 항목이라 레포 문서 감사에서는 적용하지 않는다.",
+      "evidence": "**산출물 공백** — 내놓는 것의 형태와 놓일 곳까지 정해져 있는가. spec·plan을 보는 항목이라 레포 문서 감사에서는 적용하지 않는다."
+    },
+    {
+      "topic": "lens-consistency",
+      "statement": "복제는 렌즈가 판정하지 않고 호출자가 도출한다.",
+      "evidence": "복제는 이 렌즈가 판정하지 않고 호출자가 도출한다."
+    },
+    {
+      "topic": "dispatching-lenses",
+      "statement": "레포 문서 감사에서 호출자가 무엇을 어떻게 주는지는 dispatching-lenses의 렌즈 그룹이 정한다.",
+      "evidence": "호출자가 무엇을 어떻게 주는지는 `dispatching-lenses`의 「렌즈 그룹」이 정한다."
+    },
+    {
+      "topic": "aggregating-lenses",
+      "statement": "narrowed 와 pairs 는 레포 문서 감사에서 이 렌즈가 더 돌려주는 칸이며 집계 대상이 아니다.",
+      "evidence": "`narrowed`(좁혀 적음 개수)와 `pairs`(짝마다의 판정)는 레포 문서 감사에서 이 렌즈가 더 돌려주는 칸이며 집계 대상이 아니다."
+    }
+  ],
+  "principles_applied": [
+    "STATE-ASSUME"
+  ],
+  "notes": "dispatching-lenses 렌즈 그룹 표(소유 선언 문서마다 한 호출, 값이 다른 짝 묶음 한 호출)와 audit-repo-docs 일관성 대조 절, aggregating-lenses 칸 표의 narrowed·pairs 항목은 이 문서의 서술과 맞았다. 발견은 description 한 건이다."
+}

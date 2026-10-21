@@ -1,0 +1,54 @@
+{
+  "target": "korean-banned-words.md",
+  "lens": "lens-fit",
+  "doc_type": "규범·인덱스 — 금지 표현의 위치(표)와 작업 방법(쓰지 않는 말)을 포함한 규칙 목록이고 진행 상태가 없다. 훅이 파싱하는 표가 있어 스키마 계약의 성격도 있지만 수행 절차는 없으므로 규범으로 가렸다.",
+  "read": [
+    "agent-principles.md",
+    "docs/domain-korean.md",
+    "hooks/_banned_words.sh"
+  ],
+  "issues": [
+    {
+      "where": "금지 표현 표 > 제외 칸(담 행)",
+      "type": "format",
+      "claim": "제외 칸의 `담合`에 한자(合)가 섞여 있다. 파서는 제외어를 글자 그대로 비교하므로 한글 '담합'은 이 제외에 걸리지 않는다. 의도가 '담합'을 제외하는 것이라면 표기가 틀렸다.",
+      "file": "korean-banned-words.md",
+      "evidence": "`담대` · `담合`",
+      "counterpart_file": "korean-banned-words.md",
+      "counterpart": "다섯째 칸은 제외로, 첫 칸의 글자가 그 말의 일부이면 검출하지 않는다.",
+      "principle": "제외 칸 계약(korean-banned-words.md 서두)",
+      "consequence": "지금 '담합'이라는 낱말은 `담` 행에서 제외되지 않고 검출된다. 한자 표기 제외어는 어떤 한글 문서에도 일치하지 않는다.",
+      "lens": "lens-fit"
+    },
+    {
+      "where": "서두",
+      "type": "constraint",
+      "claim": "모든 세션에 실리는 지시문인데 금지를 평서형 부정문과 평서형 명령('쓴다')으로 적는다.",
+      "file": "korean-banned-words.md",
+      "evidence": "답변과 산출물에 아래 왼쪽 단어를 쓰지 않는다. 오른쪽을 쓴다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "다른 에이전트에게 주는 지시문은 사실과 행동을 나눠 써라.",
+      "principle": "INSTRUCTION-FORM",
+      "consequence": "지금 모든 세션에 @import로 실리는 파일의 핵심 지시가 '~않는다'·'~쓴다' 평서형이다. 서두 문장은 훅이 파싱하지 않으므로 고쳐도 표 검사에는 영향이 없다.",
+      "lens": "lens-fit"
+    },
+    {
+      "where": "금지 표현 표 > 대신 쓰는 말 열",
+      "type": "style",
+      "claim": "같은 열에 대체 낱말 목록('측정 · 확인')과 행동 지시 문장('가리키는 대상의 이름을 그대로 쓴다', '서술어로 문장을 끝낸다', '에두르지 않고 단정한다')이 섞여 있다. 훅은 이 열을 대체어로 보여 준다.",
+      "file": "korean-banned-words.md",
+      "evidence": "| `자리` | 가리키는 대상의 이름을 그대로 쓴다 |",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "한 표와 한 목록과 한 다이어그램과 한 차트 안에서 같은 구실을 하는 요소끼리 말끝을 하나로 맞춰라.",
+      "principle": "ONE-ENDING",
+      "consequence": "지금 같은 열의 셀이 낱말 나열과 문장으로 갈려 있다. 훅의 거부 메시지가 '대신 쓰는 말'로 문장을 그대로 인용한다.",
+      "lens": "lens-fit"
+    }
+  ],
+  "principles_applied": [
+    "ONE-ENDING",
+    "INSTRUCTION-FORM",
+    "DOC-TYPE"
+  ],
+  "notes": "검토한 관점: 형식(표 열 수와 백틱 규칙), 스타일, 오염, 호환(hooks/_banned_words.sh 파서와의 호환: 열 순서·제외 칸·### 금지 표현 제목 유지), 규율. 금지 낱말은 세지 않았다. ### 금지 표현 제목은 파서의 BANNED_TABLE_HEAD라 TITLE-LAYERS(### 금지)를 적용하지 않았다. ANTI-LIMIT은 인용 예시('가 아니라') 때문에 올리지 않았다. 대신 쓰는 말 열의 ONE-ENDING 지적은 열 의미를 바꾸면 파서 호환이 필요하다."
+}

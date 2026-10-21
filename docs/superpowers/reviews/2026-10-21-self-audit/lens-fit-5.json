@@ -1,0 +1,35 @@
+{
+ "target": "docs/korean-banned-words-evidence.md",
+ "lens": "lens-fit",
+ "doc_type": "기록 (측정과 사용자 지시를 근거로 남긴 기록) — 타입 표에서 가장 가까운 행이 기록이며, 설계 근거를 남기는 설계 행과도 걸치므로 타입 판정은 낮은 확신이다",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md(계약 경로로 지정되어 열람 대상)",
+  "skills/lens-fit/SKILL.md",
+  "korean-banned-words.md"
+ ],
+ "issues": [
+  {
+   "where": "「규칙: …」 절 제목",
+   "type": "style",
+   "claim": "절 제목이 명사구가 아니라 쓴다·않는다로 끝나는 서술문이다. 목차는 개념만 가리키는 명사구여야 하고, korean-banned-words.md 도 절 제목은 명사구로 쓰라고 정한다.",
+   "file": "docs/korean-banned-words-evidence.md",
+   "evidence": "## 규칙: 제목과 표 머리는 명사구로 쓴다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "목차는 개념만 가리키는 명사구로 쓰고 결론·수치를 넣지 마라.",
+   "principle": "TITLE-LAYERS",
+   "consequence": "근거 문서의 규칙 제목이 규칙 문안을 그대로 복사한 문장이어서, 목차와 표 머리는 명사구로 쓴다는 규칙이 자기 제목에서 지켜지지 않고 있다."
+  }
+ ],
+ "principles_applied": [
+  "TITLE-LAYERS",
+  "LABEL-NOUN",
+  "WRITTEN-ONLY",
+  "FULL-SENTENCE",
+  "ONE-ENDING",
+  "SUBJECT-OBJECT",
+  "COMMA-CUT",
+  "DOC-TYPE"
+ ],
+ "notes": "검토한 관점: 형식(절 구조는 항목마다 분류, 근거 종류, 날짜, 인용으로 반복되어 균일함), 스타일(문어체 종결 준수, 인용 블록은 대상에서 제외), 호환(korean-banned-words.md 가 가리키는 항목마다의 근거 구조와 맞음), 규율(위 한 건). 규칙 절의 인용 블록과 기준선 적용 문장의 주어 없는 서술은 사용자 원문 또는 기록 인용이라 대상에서 뺐다. 다시 켤 때의 표 칸 나열 줄은 FULL-SENTENCE 지적 후보였으나 고정 서식이어서 올리지 않았다. 타입 표의 기록 행은 렌즈 차수 기록(reviews)을 가리켜 이 문서와 맞지 않을 수 있어 doc_type 확신이 낮다."
+}
