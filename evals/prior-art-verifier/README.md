@@ -24,4 +24,8 @@ python -I evals/prior-art-verifier/score.py report
 
 ## 실행 조건
 
-이 PC 에는 API 키 파일이 없어 `--bare` 를 쓸 수 없다. 모든 실행에 `--setting-sources "" --strict-mcp-config --disable-slash-commands --no-session-persistence` 를 붙이고, 실행 폴더는 `scripts/_eval_env.sh` 의 `eval_tmpdir` 로 만든다. 실제로 실린 지시는 첫 실제 실행에서 확인해 아래에 적는다.
+이 PC 에는 API 키 파일이 없어 `--bare` 를 쓸 수 없다. 모든 실행에 `--setting-sources "" --strict-mcp-config --disable-slash-commands --no-session-persistence` 를 붙이고, 실행 폴더는 `scripts/_eval_env.sh` 의 `eval_tmpdir` 로 만든다. 실제로 실린 지시는 2026-10-21 첫 실제 실행에서 확인했다.
+
+- 같은 플래그와 `D:/dc-eval-tmp` 아래 폴더에서 Haiku 5.5 low 에 "CLAUDE.md 나 메모리 파일에서 온 내용이 있는가"를 물었더니 "없음"이라고 답했다.
+- 그 실행의 캐시 쓰기 토큰은 3,129 였다. 전역 CLAUDE.md(디시플린코더 원칙과 금지어 목록)가 실렸다면 이보다 훨씬 크다.
+- arXiv 2605.10039 하나로 추출 단계를 Haiku 5.5 low 로 실행했다(`fixtures/extract-sample.jsonl`). `error` 는 비었고, `total_cost_usd` 는 0.00741839, `modelUsage` 키는 `claude-haiku-5-5` 였다. `access` 는 `성공` 이었고, `quote` 에 원문의 부정어("None of ...")가 그대로 담겼다.
