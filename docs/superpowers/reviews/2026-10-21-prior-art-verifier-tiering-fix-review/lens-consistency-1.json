@@ -1,0 +1,175 @@
+{
+  "lens": "lens-consistency",
+  "read": [
+    "D:/projects/dc-verifier-tier/skills/lens-consistency/SKILL.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+    "D:/projects/dc-verifier-tier/workflows/prior-art-search.js",
+    "D:/projects/dc-verifier-tier/agents/prior-art-verifier.md",
+    "D:/projects/dc-verifier-tier/agents/prior-art-judge.md",
+    "D:/projects/dc-verifier-tier/agents/prior-art-judge-escalation.md",
+    "D:/projects/dc-verifier-tier/agents/prior-art-mapcheck.md",
+    "D:/projects/dc-verifier-tier/skills/agent-prior-art/SKILL.md",
+    "D:/projects/dc-verifier-tier/scripts/test_docs_drift.sh",
+    "D:/projects/dc-verifier-tier/scripts/test_workflow.sh",
+    "D:/projects/dc-verifier-tier/scripts/prior_art_contract.json",
+    "D:/projects/dc-verifier-tier/evals/prior-art-verifier/run.py",
+    "D:/projects/dc-verifier-tier/evals/prior-art-verifier/replay.py",
+    "D:/projects/dc-verifier-tier/evals/prior-art-verifier/score.py",
+    "D:/projects/dc-verifier-tier/evals/prior-art-verifier/README.md",
+    "D:/projects/dc-verifier-tier/evals/prior-art-verifier/results-v2/report.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/decisions/2026-10-21-prior-art-verifier-composition-3.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/decisions/2026-10-21-prior-art-verifier-composition-4.md"
+  ],
+  "issues": [
+    {
+      "where": "plan Global Constraints 판정 칸 값 / spec 「충분성 판단과 두 갈래 상향」 1·2번",
+      "type": "drift",
+      "claim": "spec 은 칸마다 충분성을 따로 묻고 그 값을 `충분`·`부족` 으로 정한 뒤, `충분` 인 칸만 `일치`·`불일치`·`판정 불가` 를 내게 한다. plan 은 충분성 값을 따로 두지 않고 `정보 부족` 을 match 의 넷째 값으로 합쳤다. 같은 대상이 spec 에서는 `부족`, plan 에서는 `정보 부족` 이라는 다른 이름과 다른 형태로 적혀 있다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "판정 칸의 값은 `일치`·`불일치`·`판정 불가`·`정보 부족` 이다. `정보 부족` 인 칸마다 `missing` 에 없는 요소를 적는다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "값은 `충분`·`부족` 이고, `부족` 이면 없는 요소(예: \"세션 수\", \"결론 문장\")를 `missing` 에 적는다. ... `충분` 인 칸만 `일치`·`불일치`·`판정 불가` 를 낸다.",
+      "principle": "같은 대상은 한 이름과 한 형태로 적는다",
+      "consequence": "spec 은 충분성 칸과 match 칸을 따로 두는 출력 형태를 적고, plan 의 계약·스키마·검사는 네 값짜리 match 칸 하나를 기준으로 적혀 있다. 어느 쪽이 계약의 원본인지 문서에 적혀 있지 않다."
+    },
+    {
+      "where": "spec 「확정 구성과 판정 불가 상향」 이유 유형 / 「충분성 판단과 두 갈래 상향」 2번",
+      "type": "contradiction",
+      "claim": "새 절은 `판정 불가` 를 '정보는 있으나 판단이 어렵다' 는 뜻으로 좁혔다. 그런데 spec 과 plan 모두 판정 불가의 이유 유형에 `맥락 부족` 을 그대로 남겼다. `맥락 부족` 은 정보가 없다는 뜻이라 새 절의 `부족`(plan 의 `정보 부족`)과 겹친다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "`판정 불가` 인 칸마다 `unsure_reasons` 에 이유 유형(`맥락 부족`·`조건 얽힘`·`표·그림 값`·`언어 해석`)을 적는다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "`충분` 인 칸만 `일치`·`불일치`·`판정 불가` 를 낸다. 이때의 `판정 불가` 는 정보는 있으나 판단이 어렵다는 뜻이다.",
+      "principle": "한 절이 다른 절과 부딪치지 않는다",
+      "consequence": "정보가 모자란 칸에 판정 에이전트가 `정보 부족` 대신 `판정 불가`+`맥락 부족` 을 낼 수 있는 길이 정의에 남는다. 그 칸은 보충이 아니라 Opus 상향으로 간다. 결정 기록 4 의 맥락 부족 5건이 바로 이 경로였다."
+    },
+    {
+      "where": "spec 「에이전트와 단계」 표와 MODE 규약 문단",
+      "type": "contradiction",
+      "claim": "옛 절의 표와 MODE 규약이 새 절과 맞지 않는다. 표는 추출 검증자의 입력을 '그 URL 에 걸린 주장들' 로만 적어 보충 입력을 빠뜨렸다. 판정 에이전트의 입력에 `source_note` 가 없고, 출력 match 는 세 값이다. 상향 판정 에이전트는 '판정 불가로 넘긴 카테고리' 로만 적혀 있다. MODE 규약은 `extract`·`judge`·`map` 셋뿐이고 `refetch` 가 없다. 새 절은 옛 절 중 「확정 구성과 판정 불가 상향」 의 상향 판정 에이전트만 대체한다고 적었으므로, 이 표와 규약은 아직 유효한 문장으로 남아 있다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "| 판정 에이전트 | 수치·조건, 방향, 범위 | Read | 주장과, 추출 검증자가 낸 `quote`·`context` | 주장마다 맡은 카테고리별 `match`(일치·불일치·판정 불가)와 `reason` | ... 프롬프트 첫 줄의 `MODE:` 규약은 에이전트마다 `extract`·`judge`·`map` 으로 둔다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "counterpart": "보충 입력은 `{ url, claims: [{ ref, text, missing }] }`(MODE `refetch`)이고 ... 판정 입력은 `{ url, claims: [{ ref, text, quote, context, source_note }] }` 다.",
+      "principle": "아키텍처 설명이 기능 설명과 맞아야 한다",
+      "consequence": "spec 의 단계 표와 MODE 규약은 단계 넷과 모드 셋을 적고, plan 과 새 절은 단계 여섯(보충·재판정 포함)과 모드 넷을 적는다."
+    },
+    {
+      "where": "plan Task 1 Interfaces 판정 차례 / spec 「비목표」·「반환값과 계약」",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 보충 뒤 재판정에 넘기는 `quote` 를 어떻게 정하는지 plan 에 적혀 있지 않다. 보충 구절이 처음 구절을 대체하는지, 처음 구절 뒤에 이어 붙는지 정하지 않았다. 합친 출력의 `quote` 와 오케스트레이터 「인용 확인」 이 읽을 값도 정하지 않았다. spec 「비목표」 는 모든 판정 에이전트가 같은 지지 구절 하나를 본다는 전제로 인용 판정 기준을 유지한다. 보충은 둘째 구절을 들여오므로 이 전제와 부딪친다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "처음 판정에 `정보 부족` 이 있으면 보충 출력의 구절로 재판정하고, 재판정 결과가 그 주장의 판정을 모두 대체한다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "새 구조에서 모든 판정 에이전트는 같은 지지 구절 하나를 보고 판정하므로, 구절 하나가 모든 요소를 함께 담아야 supported 가 된다는 뜻이 그대로 남는다. / `quote` 는 추출 검증자의 값이고",
+      "principle": "spec 의 요구가 plan 의 어느 작업으로 이어지는지 지목할 수 있어야 한다",
+      "consequence": "plan 의 refetch 지시는 `missing` 요소가 든 문장만 `quote` 에 옮기게 한다. 그 구절이 처음 구절을 대체하면, 재판정 입력에는 처음 구절이 담았던 요소가 빠진다. 합친 출력의 `quote` 가 어느 단계의 값인지도 정해져 있지 않다."
+    },
+    {
+      "where": "plan Review Focus·Task 1 Step 1 / spec 「최종 판정과 실패 처리」 1·4번",
+      "type": "gap",
+      "claim": "커버리지 공백이다. spec 「최종 판정과 실패 처리」 에는 보충·재판정 단계의 실패 규칙이 없다. plan 은 보충 무응답만 URL 검증 실패로 정했다. 재판정 무응답과 재판정 칸 누락을 고정하는 검사가 Step 1 목록에 없다. 보충 출력이 `access` 실패나 `exists` 불일치를 낼 때의 처리도 정하지 않았다. 보충 출력은 추출 출력과 같은 형식이라 이 두 값을 낼 수 있다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "- `보충 실패는 URL 검증 실패다` ... 보충 입력은 ... 출력은 추출 출력과 같은 형식이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "4. 판정 에이전트 중 하나라도 응답하지 않았거나, 맡은 카테고리의 `match` 가 빠졌으면 그 URL 은 검증 실패다.",
+      "principle": "새 단계의 실패 규칙은 최종 판정 순서와 검사로 고정되어야 한다",
+      "consequence": "재판정 무응답과, 보충 출력의 access·exists 가 처음 추출과 다를 때 mergeUrl 이 무엇을 할지는 구현자 재량으로 남는다. 둘 다 검사로 고정되어 있지 않다."
+    },
+    {
+      "where": "plan Task 1 Step 3 상향 판정 정의 / Global Constraints 보충 규칙",
+      "type": "gap",
+      "claim": "커버리지 공백이다. plan 은 판정 정의와 상향 판정 정의에 같은 세 문단을 넣는다. 그래서 상향 판정 에이전트도 `정보 부족` 을 낼 수 있다. 그런데 상향 출력의 `정보 부족` 을 어떻게 처리하는지는 plan 과 spec 어디에도 없다. 보충은 주장마다 한 번이고, 상향 뒤 처리는 `판정 불가` 만 정해져 있다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "`prior-art-judge.md` 와 `prior-art-judge-escalation.md` 에 같은 문단 세 개를 추가하거나 고친다. ... 상향 판정에서도 `판정 불가` 면 그 주장은 검증 실패다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "4. `충분` 인데 `판정 불가` 인 칸이 있는 주장은 상향 판정 에이전트(Opus 5.5 medium, 도구 Read)가 같은 입력으로 판정한다. ... 상향 판정 에이전트도 `판정 불가` 면 그 주장은 검증 실패다.",
+      "principle": "출력 값마다 최종 판정에서의 처리가 정해져 있어야 한다",
+      "consequence": "현재 mergeUrl 의 esOk 는 상향 칸이 isMatch 를 통과해야 한다고 본다. 이 술어를 넓히는 방식에 따라 상향의 `정보 부족` 은 URL 검증 실패가 되거나 일치·불일치가 아닌 값으로 새어 나간다. plan 은 어느 쪽인지 정하지 않았다."
+    },
+    {
+      "where": "plan Task 1 Step 3 추출 정의 refetch 문단",
+      "type": "contradiction",
+      "claim": "plan 은 추출 정의에 `MODE: refetch` 처리 문단을 추가한다. 그런데 현재 정의에는 첫 줄이 `MODE: extract` 가 아니면 빈 judgments 를 돌려주라는 문장이 있고, plan 은 이 문장을 고치라고 하지 않는다. 고친 정의 안에서 두 지시가 부딪친다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "첫 줄이 `MODE: refetch` 이면 주장마다 `missing` 의 요소가 든 문장을 원문에서 찾아 `quote` 에 옮겨라.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agents/prior-art-verifier.md",
+      "counterpart": "첫 줄이 `MODE: extract` 가 아니면 판정하지 말고 웹도 열지 말고 `{ \"url\": \"<입력 url>\", \"judgments\": [], \"principles_applied\": [] }` 를 돌려주라.",
+      "principle": "문서가 스스로 정한 지시끼리 부딪치지 않는다",
+      "consequence": "가드 문장이 그대로 남으면 보충 호출이 빈 judgments 를 돌려줄 수 있다. 그러면 `보충 실패는 URL 검증 실패다` 규칙에 따라 정보 부족이 있는 URL 이 모두 검증 실패가 된다."
+    },
+    {
+      "where": "plan Task 1 Files 의 workflows/prior-art-search.js 항목",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 판정 출력에 `정보 부족` 과 `missing` 을 받으려면 `schemas()` 의 JUDGE_SCHEMA match enum 과 `missing` 속성을 고쳐야 한다. `isMatch` 와 `unsureClaims`·`mergeUrl` 의 칸 검사 술어도 고쳐야 한다. plan 의 수정 대상에는 `judgeClaims`, 보충·재판정 단계, `mergeStages`·`mergeUrl` 만 적혀 있다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "Modify: `workflows/prior-art-search.js`(`judgeClaims`, 보충·재판정 단계, `mergeStages`·`mergeUrl`)",
+      "counterpart_file": "D:/projects/dc-verifier-tier/workflows/prior-art-search.js",
+      "counterpart": "const match = { type: 'string', enum: ['일치', '불일치', '판정 불가'] }; ... function isMatch(v) { return ['일치', '불일치', '판정 불가'].includes(v); }",
+      "principle": "spec 의 요구가 plan 의 작업으로 이어져야 한다",
+      "consequence": "현재 스키마는 `정보 부족` 을 enum 밖의 값으로 거부한다. `isMatch` 를 통과하지 못한 판정은 judgmentsByRef 가 null 로 만들어 URL 전체가 검증 실패가 된다."
+    },
+    {
+      "where": "plan Task 1 Step 1 test_docs_drift.sh 지시",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 상향 판정 정의의 effort 를 medium 으로 바꾸면 현재 검사 두 곳이 실패한다. 하나는 네 정의 모두에 `effort: high` 를 요구하는 반복문이고, 다른 하나는 이름·설명·모델 줄만 빼고 판정 정의와 frontmatter 가 같아야 한다는 검사다. plan 은 상향 판정 정의의 model·effort 를 본다고만 적었고, frontmatter 동일 검사에서 effort 를 빼라는 지시가 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "`scripts/test_docs_drift.sh` 의 정의 검사는 상향 판정 정의의 `model: claude-opus-5-5`, `effort: medium` 을 본다. 판정 정의와 상향 판정 정의의 본문 동일 검사는 유지한다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/scripts/test_docs_drift.sh",
+      "counterpart": "check \"상향 판정 정의의 frontmatter 가 모델 외에 판정 정의와 같다\" \"... grep -vE '^(name|description|model):' ...\"",
+      "principle": "값을 바꾸는 작업은 그 값을 고정한 검사를 함께 고쳐야 한다",
+      "consequence": "Step 5 의 기대값은 `ALL PASS` 다. 그런데 plan 대로 고치면 frontmatter 동일 검사가 FAIL 로 남는다."
+    },
+    {
+      "where": "plan Task 1 Step 4 SKILL.md 절 목록",
+      "type": "gap",
+      "claim": "산출물 공백이다. plan 이 고칠 SKILL.md 절 목록에 「오케스트레이터 절차」 2단계 탐색 목록과 「인용 확인」 이 없다. 탐색 목록은 '판정 불가가 나온 주장만 상향 판정 에이전트가 다시 판정한다' 고 차례를 적는다. 「인용 확인」 은 합친 출력의 `quote` 가 추출 검증자의 값이라고 적는다. spec 「바뀌는 파일」 은 「인용 확인」 을 고칠 절로 적었다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "SKILL.md 는 「워크플로가 꺼진 환경」·「반환값을 읽는 규칙」·「상태 값」·「실행할 때 지킬 상한」·「에이전트에게 보내는 프롬프트」·「출력 스키마」를 새 차례에 맞게 고친다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/skills/agent-prior-art/SKILL.md",
+      "counterpart": "스크립트가 인용을 URL 로 묶고, URL 마다 추출 검증자를 실행한다. 추출을 통과한 주장만 판정 에이전트가 판정하고, 판정 불가가 나온 주장만 상향 판정 에이전트가 다시 판정한다. / 오케스트레이터는 추출 검증자가 옮긴 `quote`(합친 출력의 `quote`가 이 값이다)가",
+      "principle": "산출물이 놓일 곳까지 정해져 있어야 한다",
+      "consequence": "plan 대로 실행하면 SKILL.md 의 탐색 단계 서술은 보충·재판정 없는 옛 차례로 남는다. 「인용 확인」 이 읽을 `quote` 의 출처도 갱신되지 않는다."
+    },
+    {
+      "where": "plan Task 1 Step 1 계약·stages 검사",
+      "type": "gap",
+      "claim": "커버리지 공백이다. Global Constraints 는 `verifiers[].stages` 에 `refetch`·`rejudge` 를 추가한다고 적는다. 그런데 Step 1 의 계약 검사 지시는 `judge` 자료와 `refetch` 입력 예시만 다룬다. 계약의 `stages` 키 목록과 test_workflow.sh 의 stages 집합 검사도 고쳐야 하는데, plan 이 지목한 것은 '상향 관련 기대식' 뿐이다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "`scripts/test_prior_art_contract.sh` 는 계약의 `judge` 자료(네 값과 `missing`)와 `refetch` 입력 예시를 정의 파일의 출력 예시와 대조한다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/scripts/prior_art_contract.json",
+      "counterpart": "\"stages\": { \"extract\": true, \"judge\": true, \"escalation\": true }",
+      "principle": "계약의 원본과 그것을 고정하는 검사를 함께 갱신해야 한다",
+      "consequence": "계약 json 의 stages 는 세 키이고, test_workflow.sh 의 E_MG_STAGES 는 `{\"extract\", \"judge\", \"escalation\"}` 와 같은지를 본다. plan 은 이 두 곳의 갱신을 지목하지 않는다."
+    },
+    {
+      "where": "plan Task 2 Step 3 실행 순서 / Files 의 run.py·replay.py",
+      "type": "gap",
+      "claim": "커버리지 공백이다. 현재 하네스의 `escalate-def` 는 `judge-def` 출력에서 판정 불가 주장을 고른다. plan 은 보충을 거친 주장의 상향 입력을 `rejudge-def` 출력에서 고르라는 지시가 없다. `refetch-def`·`rejudge-def` 를 반복 차례마다 짝지을지(`--repeat`)와 어느 단계 출력을 `--upstream` 으로 쓸지도 적혀 있지 않다. replay.py 의 `ESCALATION` 기본값과 score.py 의 상향 설정 상수(`SONNET_HIGH`)를 Opus medium 으로 바꾸라는 지시도 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "- `정보 부족` 이 있는 주장만 `refetch-def`(Haiku high)와 `rejudge-def`(Haiku high)로 실행한다.\n- `판정 불가` 가 남은 주장만 `escalate-def`(Opus medium)로 실행한다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/evals/prior-art-verifier/run.py",
+      "counterpart": "if stage == \"escalate-def\":\n            jc = _unsure_claims(jc, latest_output(runs, \"judge-def\", upstream, repeat, u))",
+      "principle": "운영 워크플로와 하네스가 같은 입력을 만들어야 재측정이 운영을 대표한다",
+      "consequence": "현재 하네스대로 두면 상향 입력은 재판정 결과가 아니라 처음 판정 결과에서 골라진다. 그 상태는 plan Review Focus 가 고정하려는 '재판정에 남은 판정 불가만 상향한다' 와 다르다."
+    },
+    {
+      "where": "plan Task 2 Step 5 결정 기록 5 내용",
+      "type": "drift",
+      "claim": "plan 은 '결정 기록 4 의 실패 13건' 이라고 적었다. 13 이라는 수는 결정 기록 3 에 있다(비교한 항목·칸 48개 중 13개). 결정 기록 4 는 같은 실패를 항목과 실행의 짝으로 다시 나눴을 뿐 13건이라는 단위를 적지 않았다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "결정 기록 4 의 실패 13건 각각이 이번에 맞았는지",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/decisions/2026-10-21-prior-art-verifier-composition-3.md",
+      "counterpart": "비교한 항목·칸 48개 중 13개를 새 구성이 한 번 이상 틀렸다",
+      "principle": "같은 대상은 한 출처와 한 단위로 가리킨다",
+      "consequence": "결정 기록 4 의 표는 항목과 실행의 짝 단위이고, 13건은 항목·칸 단위다. 결정 기록 5 를 쓸 사람이 대조할 목록의 단위가 정해져 있지 않다."
+    }
+  ],
+  "principles_applied": [
+    "읽기 전용으로 지적만 하고 고치지 않았다",
+    "상대편을 댈 수 있는 발견만 올렸다",
+    "결과에는 지금 그렇게 되어 있는 사실만 적었다"
+  ],
+  "notes": "검토 관점: 모순(spec 새 절과 옛 절, plan 안 지시끼리, plan 과 현재 정의 파일), 커버리지 공백(새 절의 충분성 판단, 보충→재판정, Opus medium 상향, source_note, 추출 구절 지시, 지도 대조 칸 목록, 병합 조건, 기준선 재사용이 plan 의 task 와 검사로 이어지는지), 산출물 공백(SKILL.md 절, 계약 json, evals README), 드리프트(이름·label·서명·값), 스코프를 차례로 보았다. 덮인 것: source_note(Step 1 검사 두 개와 Step 3 문단), 추출 구절 지시, 지도 대조 칸 목록, Opus medium frontmatter, 병합 조건과 기준선 `results-v2/runs.jsonl` 재사용은 plan 에 이어져 있다. 기준선 파일은 score.py report-v2 의 기본 runs 경로와 같다. label 규약(`refetch:`·`rejudge:`·`escalate:`)과 agentType 은 현재 워크플로·검사와 맞는다. evals README 는 Task 2 Files 에 있다. 최상위 README 에는 상향 판정 모델 언급이 없어 산출물 공백으로 올리지 않았다. 스코프는 task 둘로 한 계획에 맞는 크기다. 더 확인할 것: (1) 지도 대조 칸 목록을 고치면 현재 mapcheck 정의의 `column` 키 경로 규약(`outcome`, `axes.mechanism.prior`)과 새 칸 이름(`case`, `prior`)을 어떻게 대응시킬지 확인해야 한다. 이 확인은 test_prior_art_contract.sh 의 map 대조 부분을 읽어야 끝나는데 이번에 읽지 않았다. (2) plan Step 4 의 상한 '추출 1~2, 판정 1~2' 와 SKILL.md 「세는 대상」 의 `verifier_count` 서술이 보충 호출을 어떻게 세는지 구현 때 맞춰 보아야 한다."
+}

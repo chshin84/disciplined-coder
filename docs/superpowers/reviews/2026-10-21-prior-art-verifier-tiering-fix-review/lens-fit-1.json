@@ -1,0 +1,124 @@
+{
+  "lens": "lens-fit",
+  "doc_type": "설계 (spec·plan) — 대상 plan과 spec 두 절은 설계 근거와 구현 단계를 포함하고, 진행 상태 보고나 1회성 인계를 포함하지 않는다. 에이전트가 읽고 따를 글이므로 에이전트원칙 「작업 지시서」 절도 함께 적용했다. 설계 행은 포함하지 말라고 정한 항목이 없어 2단계에서 올린 지적은 없다.",
+  "read": [
+    "D:/projects/dc-verifier-tier/skills/lens-fit/SKILL.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md (56~165행)",
+    "D:/projects/dc-verifier-tier/agent-principles.md",
+    "D:/projects/dc-verifier-tier/docs/domain-korean.md",
+    "D:/projects/dc-verifier-tier/korean-banned-words.md"
+  ],
+  "issues": [
+    {
+      "where": "plan Task 1 Step 1·Step 3·Step 4, Task 2 Step 1·Step 3·Step 5, Global Constraints",
+      "type": "style",
+      "claim": "구현자가 할 일을 평서문으로 적었다. 같은 plan의 다른 지시는 '~하라' 명령형이어서 지시와 사실의 구분이 문장 끝으로 드러나지 않는다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "59행 '아래 검사를 추가한다.', 69행 '새 판정 차례에 맞게 고친다.', 80행 '같은 문단 세 개를 추가하거나 고친다.', 84행 '`effort: medium` 으로 바꾼다.', 85행 '아래 두 문단을 추가한다.', 92행 'SKILL.md 는 … 새 차례에 맞게 고친다.', 120행 '아래 테스트를 추가한다.', 133~136행 '… 실행한다.', 148행 '결정 기록 5 에 아래를 적는다.', 28행 '`refetch`·`rejudge` 를 추가한다.'",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「작업 지시서」 INSTRUCTION-FORM: '사실은 평서문으로, 할 일은 '~하라' 긍정 명령으로 쓰고' 및 호출자 계약 '지시는 ~하라 명령형, 사실은 평서문'. 같은 plan 27·30·31·139·154·163행은 명령형이다.",
+      "principle": "INSTRUCTION-FORM",
+      "consequence": "지금 plan의 지시 문장은 '~한다'와 '~하라' 두 종결로 섞여 있다. 28행 '추가한다'는 앞뒤의 사실 문장(26행 '보충은 주장마다 한 번만 한다')과 같은 종결이라 지시인지 시스템 동작 서술인지 문장만으로는 구분되지 않는다."
+    },
+    {
+      "where": "plan Task 2 Step 3",
+      "type": "format",
+      "claim": "실행 단계에 Run 칸과 Expected 칸이 없다. 실행할 정확한 명령도 단계 이름(`extract-def` 등)만 있고 명령 줄이 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "131~139행 '- [ ] **Step 3: 새 구성을 두 번 실행하고 재생한다**' 아래에 '`extract-def`·`judge-def`(Haiku high)를 `--repeat 2` 로 `results-v3/runs-def.jsonl` 에 실행한다.' 같은 불릿만 있고 'Run:'·'Expected:' 줄이 없다.",
+      "counterpart_file": "호출자 계약 (superpowers writing-plans plan 형식)",
+      "counterpart": "Task 의 Files·Interfaces·Step·Run·Expected 형식",
+      "principle": "소비자 계약: writing-plans plan 형식",
+      "consequence": "지금 이 단계는 비용이 드는 유일한 실측 단계인데, 실행 결과가 맞는지 구현자가 대조할 기대 출력(파일 생성, 행 수, 비용 기록 등)이 적혀 있지 않다. `run.py` 의 호출 형식도 적혀 있지 않다."
+    },
+    {
+      "where": "plan Task 1 Step 5",
+      "type": "format",
+      "claim": "Run 칸에 실행할 명령을 적지 않고 다른 문서의 절을 가리켰다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "96행 'Run: 저장소 CLAUDE.md 「변경 뒤 실행」의 명령, `claude plugin validate ./`'",
+      "counterpart_file": "호출자 계약 (superpowers writing-plans plan 형식)",
+      "counterpart": "Task 의 Step·Run·Expected 형식(Run 칸은 실행할 명령)",
+      "principle": "소비자 계약: writing-plans plan 형식, INSTRUCTION-FORM('받는 쪽이 모르는 맥락은 지시문 안에 직접 넣어라')",
+      "consequence": "지금 구현자는 Expected 의 `ALL PASS` 를 내는 명령이 무엇인지 알려면 CLAUDE.md 를 따로 열어야 한다. 같은 plan 75행의 Run 칸은 명령을 직접 적었다."
+    },
+    {
+      "where": "plan Global Constraints 23행과 spec 「충분성 판단과 두 갈래 상향」 1·2·3번",
+      "type": "schema",
+      "claim": "판정 칸의 값 집합이 spec과 plan에서 다르다. spec은 충분성 값 `충분`·`부족` 과 판정 값 세 가지를 두 질문으로 나누었고, plan은 한 칸에 `정보 부족` 을 넣은 네 값으로 정했다. 같은 상태를 spec은 `부족`, plan은 `정보 부족` 으로 부른다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "23행 '판정 칸의 값은 `일치`·`불일치`·`판정 불가`·`정보 부족` 이다.'",
+      "counterpart_file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "counterpart": "100행 '값은 `충분`·`부족` 이고, `부족` 이면 없는 요소 … 를 `missing` 에 적는다.' 101행 '`충분` 인 칸만 `일치`·`불일치`·`판정 불가` 를 낸다.' 102행 '그래도 `부족` 이면 그 주장은 검증 실패다.'",
+      "principle": "TERM-ONE, 형식(스키마 계약의 일치)",
+      "consequence": "지금 spec을 따르는 구현자는 칸마다 충분성 필드와 match 필드를 따로 두게 되고, plan을 따르는 구현자는 match 하나에 네 값을 둔다. `scripts/prior_art_contract.json` 의 `judge` 자료가 어느 쪽인지 두 문서가 다르게 읽힌다."
+    },
+    {
+      "where": "spec 「재측정 뒤 수정」 둘째 불릿",
+      "type": "constraint",
+      "claim": "금지어 `담` 이 쓰였다. 제외 칸(`부담`·`분담`·`담당`·`담보`·`담화`·`담다가`·`농담`·`상담`·`담임`·`담배`·`담기`·`담대`)에 해당하지 않는다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "91행 '인용 판정 기준(구절 하나가 모든 요소를 담아야 supported)은 바꾸지 않는다.'",
+      "counterpart_file": "D:/projects/dc-verifier-tier/korean-banned-words.md",
+      "counterpart": "「금지 표현」 표의 `담` 행: 대신 쓰는 말 '포함 · 수록', 적용 대상 '문서와 답변'",
+      "principle": "한국어 금지어 목록 「금지 표현」 `담` 행",
+      "consequence": "지금 같은 기준을 plan 27행은 '모두 포함하면 supported' 로, spec 91행은 '모든 요소를 담아야 supported' 로 적어 같은 기준이 두 낱말로 나뉘어 있다."
+    },
+    {
+      "where": "spec 절 제목 「충분성 판단과 두 갈래 상향」",
+      "type": "constraint",
+      "claim": "절 제목에 금지어 `갈래` 가 쓰였고, 제목에 개수 '두'가 붙었다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "96행 '### 충분성 판단과 두 갈래 상향(2026-10-21 추가)'",
+      "counterpart_file": "D:/projects/dc-verifier-tier/korean-banned-words.md",
+      "counterpart": "「금지 표현」 표의 `갈래` 행(대신 쓰는 말 '종류 · 분기', 적용 대상 '답변과 산출물')과 표 아래 지시 '제목과 소제목에 개수를 붙이지 않는다.'",
+      "principle": "한국어 금지어 목록 「금지 표현」 `갈래` 행, 표 아래 제목 개수 지시",
+      "consequence": "지금 plan 11행이 이 제목을 그대로 인용하고 있어, 제목을 고치면 plan의 인용도 함께 고쳐야 하는 상태다. 제목만으로는 두 분기가 보충과 Opus 상향이라는 사실이 드러나지 않는다."
+    },
+    {
+      "where": "plan Task 1 Step 3, spec 「재측정 뒤 수정」 첫 문단",
+      "type": "style",
+      "claim": "목록 앞에 개수를 예고했다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "80행 '같은 문단 세 개를 추가하거나 고친다.', 85행 '아래 두 문단을 추가한다.', 144행 Expected '병합 조건 두 가지의 충족 여부'; spec 88행 '아래 세 수정 뒤 새 구성만 다시 측정하기로 정했다.'",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「맥락 전달」 COUNT-EARNS: '대상을 개수로 가리키지 말고 이름으로 가리키며, 목록 앞에 개수를 예고하지 마라.'",
+      "principle": "COUNT-EARNS",
+      "consequence": "지금 문단 수가 목록과 개수 예고 두 곳에 적혀 있다. 80행의 '세 개' 중 셋째 문단(출처 정체)은 판정 정의에만 해당하는데, 개수 예고는 그 구분을 보여 주지 않는다."
+    },
+    {
+      "where": "plan Task 1 Step 1 검사 목록",
+      "type": "style",
+      "claim": "검사 이름을 늘어놓은 불릿 목록 끝에 종류가 다른 작업 지시 항목이 섞였다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md",
+      "evidence": "60~68행은 '`판정 입력에 source_note 가 있다`' 같은 검사 이름이고, 69행은 '- 기존 검사 중 상향 관련 기대식은 새 판정 차례에 맞게 고친다.' 이다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「글의 흐름」 BULLET-SCOPE: '불릿은 같은 종류를 늘어놓을 때만 쓰고'",
+      "principle": "BULLET-SCOPE",
+      "consequence": "지금 69행은 추가할 검사 이름처럼 보이는 위치에 있어, 구현자가 이 항목을 새 검사 이름으로 읽을 수 있다."
+    },
+    {
+      "where": "spec 「충분성 판단과 두 갈래 상향」 첫 문단",
+      "type": "style",
+      "claim": "상향 대상을 이름으로 적지 않고 넓은 말로 가리켰다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md",
+      "evidence": "98행 '판정 불가의 종류마다 다른 곳으로 올리기로 정했다.'",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「단어선택」 SPECIFIC-NAME: '무엇이든 가리킬 수 있는 넓은 의미의 말 대신 가리키는 대상의 이름을 그대로 써라.'",
+      "principle": "SPECIFIC-NAME",
+      "consequence": "지금 이 문장만으로는 '다른 곳'이 원문 보충(추출 검증자)과 Opus 상향 판정 에이전트라는 사실을 알 수 없고, 아래 3·4번까지 읽어야 대상이 드러난다."
+    }
+  ],
+  "principles_applied": [
+    "INSTRUCTION-FORM",
+    "TERM-ONE",
+    "SPECIFIC-NAME",
+    "COUNT-EARNS",
+    "BULLET-SCOPE",
+    "DOC-TYPE",
+    "한국어 금지어 목록 「금지 표현」",
+    "소비자 계약: writing-plans plan 형식"
+  ],
+  "notes": "검토한 관점은 형식(plan 헤더·Global Constraints·Review Focus·Task 칸), 스타일(명령형과 평서문, 에이전트원칙 「공통」 조항), 금지어 문자열 검색, 오염, 호환, 규율이다. 금지어는 korean-banned-words.md 첫 칸의 글자를 grep으로 plan 전체와 spec 86~105행에서 검색했다. `판`은 모두 `판정`·`판단`·`재판`(재판정) 제외에 해당했다. plan 63행 '`정보 부족이 없으면 보충을 부르지 않는다`'의 `부르`는 백틱 안 검사 이름(코드)이고, plan 11행의 `갈래`는 spec 절 제목 인용이므로 둘 다 올리지 않았다. spec 제목의 `갈래` 행은 적용 대상 칸이 '답변과 산출물'이다. 호출자가 첫 칸과 제외 칸만 적용하라고 지시했고 다른 프로젝트 훅은 모든 행을 적용하므로 올렸다. 다만 셋째 칸을 적용하면 저장소 spec은 대상 밖이 되므로 처분은 호출자가 정하라. Expected 칸에 행동이 들어간 곳은 없었다(76·97·129·144행). Step 제목('실패하는 검사를 쓴다' 등)이 문장 형태인 점은 금지어 목록의 '목차와 표 머리는 명사구' 지시와 충돌하지만, writing-plans 형식이 Step 제목을 동작 문장으로 정하므로 올리지 않았다. 체크박스(`- [ ]`)는 진행 상태 표기로 볼 수 있으나 설계 행이 상태를 금지하지 않고 writing-plans 형식이 요구하므로 올리지 않았다. plan 92행의 '`정보 부족` 이 있는 URL 만'과 spec 102행의 주장 단위 보충이 같은 범위인지는 내용 정합 문제라 lens-consistency가 확인할 사항이다."
+}
