@@ -4,6 +4,7 @@ import json
 import sys
 
 CATEGORIES = ("access", "exists", "quote", "numbers_conditions", "direction", "scope")
+HARD_KINDS = {"context": "direction", "conditions": "numbers_conditions", "table": "numbers_conditions", "korean": "direction", "fake-200": "access"}
 PROBE_URL = "https://arxiv.org/abs/2605.10039"
 
 
@@ -15,6 +16,8 @@ def violations(d):
         if x.get("category") not in CATEGORIES:
             out.append(f"{x.get('id')}: 알 수 없는 카테고리 {x.get('category')}")
         counts[(x.get("category"), x.get("truth"))] += 1
+        if "hard_kind" in x and HARD_KINDS.get(x["hard_kind"]) != x.get("category"):
+            out.append(f"{x.get('id')}: hard_kind {x['hard_kind']} 가 표에 없거나 카테고리 {x.get('category')} 와 맞지 않는다")
         if not str(x.get("check_note", "")).strip():
             out.append(f"{x.get('id')}: check_note 가 비었다")
     for c in CATEGORIES:

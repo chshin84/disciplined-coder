@@ -1,7 +1,11 @@
 """cases.json 을 만든다. 참 항목은 2026-10-20 실행에서 오케스트레이터가 원문을 직접 연 출처에서 골랐고,
 오류 항목은 그 참 항목을 고쳐 만들었다. 확인 내용은 항목마다 check_note 에 있다.
 
-실행: python -I evals/prior-art-verifier/build_cases.py <search-r1.json 경로> <출력 cases.json 경로>
+실행: python -I evals/prior-art-verifier/build_cases.py <search-r1.json 경로> <출력 cases.json 경로> [--v2 <출력 cases-v2.json 경로>]
+
+--v2 는 재측정 자료 cases-v2.json 을 함께 만든다. cases.json 의 항목에서 num-t3 를 오류 항목으로 바꾸고,
+수치·조건 참 항목 둘과 어려운 항목(hard_kind 마다 참 1건, 오류 1건)을 더한다. 어려운 항목의 출처는
+2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했고, 확인 내용은 항목마다 check_note 에 있다.
 """
 import json
 import sys
@@ -64,6 +68,61 @@ ITEMS = [
 ]
 
 
+SEEN2 = "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다"
+IFSCALE_HTML = "https://arxiv.org/html/2507.11538"
+INSTR = "https://arxiv.org/abs/2601.13244"
+WIKI = "https://ko.wikipedia.org/wiki/구글_딥마인드_챌린지_매치"
+AWS_REAL = "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html"
+AWS_FAKE = "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-instruction-limit-guidelines.html"
+
+NUM_T3_NOTE = ("주장이 원문의 '다중 비교 보정 뒤' 조건을 빠뜨렸고, 1,650 과 결과가 서로 다른 문장에 있다(결정 기록 2). "
+               "그래서 구절 하나가 주어·수치·조건을 모두 포함해야 하는 인용 판정 기준에서 기각이 맞다. 지난 시험에서 참으로 둔 라벨이 느슨했다.")
+
+# v2 에서 추가하는 수치·조건 참 항목: num-t3 를 오류로 바꾼 만큼 참 두 건으로 4건씩 맞춘다
+V2_NUM = [
+    ("num-t4", "numbers_conditions", AGENT, "v2#num#0", "한 연구는 Claude Code CLI 세션 1,650개에서 사소한 대상 주석(trivial target annotation)의 준수 여부를 측정했다.", True, SEEN2 + ". 초록의 한 문장에 'measuring compliance with a trivial target annotation across 1,650 Claude Code CLI sessions' 가 있어 세션 수와 측정 대상이 한 문장으로 뒷받침된다."),
+    ("num-t5", "numbers_conditions", SCALE, "v2#num#1", "IFScale 벤치마크는 7개 제공사의 모델 20개를 평가했다.", True, SEEN2 + ". 초록에 20 leading models, seven providers 가 있다(모델 20개, 제공사 7곳)."),
+]
+
+# 어려운 항목: hard_kind 마다 참 1건, 오류 1건. 마지막 칸이 hard_kind
+V2_HARD = [
+    ("hard-ctx-t1", "direction", INSTR, "v2#hard#0", "Munjal 등의 연구는 지시 튜닝의 이점이 모델 파라미터 수와 평가 설정에 크게 좌우되며 소형 모델에서는 큰 이득을 준다고 결론지었다.", True,
+     SEEN2 + ". 이 논문의 초록은 기본 모델이 일관되게 앞선다는 쪽으로 읽힌다(base models consistently outperform instruction-tuned variants). 그러나 §5 결론에 'instruction tuning provides substantial gains for SLMs, while its impact on LLMs is mixed and often marginal' 와 'depend strongly on number of parameters and evaluation setting' 이 있다.", "context"),
+    ("hard-ctx-f1", "direction", INSTR, "v2#hard#1", "Munjal 등의 연구는 모든 규모의 모델에서 기본 모델이 지시 튜닝 모델보다 수학 벤치마크 성적이 일관되게 높다고 보고했다.", False,
+     SEEN2 + ". 초록만 보면 맞아 보인다(base models consistently outperform instruction-tuned variants). 본문은 이를 뒷받침하지 않는다. §4.1 에 'LLaMA3-3B improves from 29.0% to 67.2%' 처럼 소형 모델의 큰 지시 튜닝 이득이 있고, §5 결론은 'substantial gains for SLMs' 라고 적는다. 어느 구절도 모든 규모에서 기본 모델이 높다고 적지 않는다.", "context"),
+    ("hard-cnd-t1", "numbers_conditions", INSTR, "v2#hard#2", "Math-500 벤치마크에서 LLaMA3-3B 의 정확도는 기본 모델 29.0% 에서 지시 튜닝 모델 67.2% 로 올랐다.", True,
+     SEEN2 + ". §4.1 에 'LLaMA3-3B improves from 29.0% to 67.2%' 가 있고, 29.0% 가 기본 모델, 67.2% 가 지시 튜닝 모델, 벤치마크는 Math-500 이다(Table S2). 모델·벤치마크·방향 세 조건이 한 대목에 있다.", "conditions"),
+    ("hard-cnd-f1", "numbers_conditions", INSTR, "v2#hard#3", "Math-500 벤치마크에서 지시 튜닝은 모델 규모와 무관하게 정확도를 29.0% 에서 67.2% 로 올렸다.", False,
+     SEEN2 + ". 29.0% 에서 67.2% 는 LLaMA3-3B 한 모델의 값이다. 조건 하나(모델 규모)만 일반화했다. 같은 §4.1 의 'At >70B scale, base models perform competitively (Math-500)' 와 결론의 'impact on LLMs is mixed and often marginal' 이 규모와 무관한 상승을 뒷받침하지 않는다.", "conditions"),
+    ("hard-tbl-t1", "numbers_conditions", IFSCALE_HTML, "v2#hard#4", "IFScale 부록 Table 1 에서 claude-3.5-haiku 의 지시 100개 밀도 정확도는 43.4% 다.", True,
+     SEEN2 + ". 부록 Table 1(Full Results)의 claude-3.5-haiku 행, 열 100 의 Accuracy 가 43.4% 다. 두 번 조회해 같은 값을 얻었다. 이 값은 본문 문장에 없고 표에만 있다(본문은 같은 모델을 'steep performance drops' 로만 서술한다).", "table"),
+    ("hard-tbl-f1", "numbers_conditions", IFSCALE_HTML, "v2#hard#5", "IFScale 부록 Table 1 에서 claude-3.5-haiku 의 지시 100개 밀도 정확도는 94.8% 다.", False,
+     SEEN2 + ". 94.8% 는 같은 표의 claude-3.7-sonnet 행, 열 100 의 값이다(두 번 조회해 확인). claude-3.5-haiku 의 열 100 값은 43.4% 이고, 본문 어디에도 claude-3.5-haiku 의 100개 정확도로 94.8% 를 적지 않는다.", "table"),
+    ("hard-kor-t1", "direction", WIKI, "v2#hard#6", "한국어 위키백과는 구글 딥마인드 챌린지 매치의 최종 결과를 알파고가 이세돌에게 4승 1패로 이긴 것으로 서술한다.", True,
+     SEEN2 + ". 한국어 원문에 '최종 결과는 알파고가 4승 1패로 이세돌에게 승리하였다.' 가 있고, 대국표는 이세돌의 승리를 제4국(백, 180수 불계승)으로 적는다.", "korean"),
+    ("hard-kor-f1", "direction", WIKI, "v2#hard#7", "한국어 위키백과는 구글 딥마인드 챌린지 매치의 최종 결과를 이세돌이 알파고에게 4승 1패로 이긴 것으로 서술한다.", False,
+     SEEN2 + ". 결말을 뒤집은 주장이다. 원문의 최종 결과는 알파고의 4승 1패 승리이고, 이세돌의 승리는 제4국 한 판이다. 원문의 다른 구절에도 이세돌이 4승을 거뒀다는 서술이 없다.", "korean"),
+    ("hard-f200-t1", "access", AWS_REAL, "v2#hard#8", "AWS 의 Amazon Bedrock 프롬프트 엔지니어링 문서는 몇 개의 예시를 주는 few-shot 프롬프팅이 모델 출력을 기대에 맞추는 데 유용하다고 적는다.", True,
+     SEEN2 + ". 같은 사이트(docs.aws.amazon.com)의 실제 문서다. 제목 'Prompt engineering concepts', 본문에 'It is sometimes useful to provide a few examples to help LLMs better calibrate their output' 가 있다.", "fake-200"),
+    ("hard-f200-f1", "access", AWS_FAKE, "v2#hard#9", "AWS 의 Amazon Bedrock 문서는 프롬프트에 지시가 20개를 넘으면 정확도가 급격히 떨어진다고 적는다.", False,
+     SEEN2 + ". 지어낸 경로다. curl 은 302 로 /bedrock/latest/userguide/ 로 보낸 뒤 최종 HTTP 200(2,257바이트)을 돌려준다. WebFetch 는 본문 없이 'Amazon Bedrock' 한 줄만 반환하고, 오류·리디렉션 안내도 없다. 지시 한도에 관한 문서 내용이 전혀 없다. 200 으로 오지만 실제 문서가 없는 주소다.", "fake-200"),
+]
+
+
+def v2_items():
+    """cases.json 항목에서 num-t3 를 오류로 바꾸고 재측정용 항목을 더한다."""
+    out = []
+    for i, c, u, r, t, tr, n in ITEMS:
+        if i == "num-t3":
+            tr, n = False, NUM_T3_NOTE
+        out.append({"id": i, "category": c, "url": u, "claim": {"ref": r, "text": t}, "truth": tr, "check_note": n})
+    for i, c, u, r, t, tr, n in V2_NUM:
+        out.append({"id": i, "category": c, "url": u, "claim": {"ref": r, "text": t}, "truth": tr, "check_note": n})
+    for i, c, u, r, t, tr, n, k in V2_HARD:
+        out.append({"id": i, "category": c, "url": u, "claim": {"ref": r, "text": t}, "truth": tr, "check_note": n, "hard_kind": k})
+    return out
+
+
 def map_case(search):
     """지난 실행의 종합 근거 지도에서 두 행을 골라 지도 대조 입력을 만들고, 두 칸을 고쳐 근거 없는 칸으로 둔다."""
     em = search["synthesis"]["evidence_map"]
@@ -99,3 +158,6 @@ if __name__ == "__main__":
              for i, c, u, r, t, tr, n in ITEMS]
     out = {"items": items, "map_cases": [map_case(search)]}
     json.dump(out, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    if "--v2" in sys.argv:
+        v2 = {"items": v2_items(), "map_cases": out["map_cases"]}
+        json.dump(v2, open(sys.argv[sys.argv.index("--v2") + 1], "w", encoding="utf-8"), ensure_ascii=False, indent=2)

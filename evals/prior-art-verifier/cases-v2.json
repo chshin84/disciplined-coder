@@ -1,0 +1,705 @@
+{
+  "items": [
+    {
+      "id": "acc-t1",
+      "category": "access",
+      "url": "https://arxiv.org/abs/2310.01798",
+      "claim": {
+        "ref": "sq2#case#1",
+        "text": "Huang 등의 ICLR 2024 논문은 LLM 이 외부 피드백 없이 자기 응답을 교정하기 어렵다고 보고했다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 초록에 'LLMs struggle to self-correct their responses without external feedback' 가 있다."
+    },
+    {
+      "id": "acc-t2",
+      "category": "access",
+      "url": "https://arxiv.org/abs/2507.11538",
+      "claim": {
+        "ref": "sq4#case#0",
+        "text": "IFScale 벤치마크에서 지시 500개 밀도일 때 최상위 모델도 정확도가 68% 였다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 초록에 'only achieve 68% accuracy at the max density of 500 instructions' 가 있다."
+    },
+    {
+      "id": "acc-t3",
+      "category": "access",
+      "url": "https://arxiv.org/abs/2601.08070",
+      "claim": {
+        "ref": "sq3#case#4",
+        "text": "지시가 금지 단어를 언급하면 그 단어가 오히려 활성화되는 priming 실패가 위반의 87.5% 였다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 초록에 'priming failure (87.5% of violations)' 가 있다."
+    },
+    {
+      "id": "acc-f1",
+      "category": "access",
+      "url": "https://arxiv.org/abs/2699.99999",
+      "claim": {
+        "ref": "inj#access#0",
+        "text": "arXiv 2699.99999 논문은 지시 수가 늘어도 준수율이 유지된다고 보고했다."
+      },
+      "truth": false,
+      "check_note": "2699 는 존재하지 않는 arXiv 연월(99월)이다. 2026-10-21 curl 로 열어 HTTP 404 를 확인했다."
+    },
+    {
+      "id": "acc-f2",
+      "category": "access",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/no-such-page-2026",
+      "claim": {
+        "ref": "inj#access#1",
+        "text": "Anthropic 문서는 상시 지시를 200줄 이하로 두라고 권한다."
+      },
+      "truth": false,
+      "check_note": "지어낸 경로다. 2026-10-21 curl 은 HTTP 200 을 돌려주지만(문서 사이트의 없는 페이지 응답) 이 제목의 문서는 없다. 봇 확인·빈 페이지처럼 200 으로 오는 실패를 시험한다."
+    },
+    {
+      "id": "acc-f3",
+      "category": "access",
+      "url": "https://arxiv.org/abs/2610.99999",
+      "claim": {
+        "ref": "inj#access#2",
+        "text": "arXiv 2610.99999 논문은 Haiku 가 한국어 문체 채점에서 Sonnet 과 같은 정확도를 낸다고 보고했다."
+      },
+      "truth": false,
+      "check_note": "2026-10-21 curl 로 열어 HTTP 404 를 확인했다."
+    },
+    {
+      "id": "exi-t1",
+      "category": "exists",
+      "url": "https://arxiv.org/abs/2310.01798",
+      "claim": {
+        "ref": "sq2#case#1",
+        "text": "Huang 등(ICLR 2024)은 대규모 언어 모델이 아직 스스로 추론을 교정하지 못한다고 보고했다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 제목 'Large Language Models Cannot Self-Correct Reasoning Yet', 저자 Huang 등, ICLR 2024."
+    },
+    {
+      "id": "exi-t2",
+      "category": "exists",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+      "claim": {
+        "ref": "sq2#case#6",
+        "text": "Anthropic 의 Prompting Claude Opus 5 가이드는 명시적 검증 지시를 지우라고 권한다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 'Task scope and over-verification' 절에 'remove them' 이 있다."
+    },
+    {
+      "id": "exi-t3",
+      "category": "exists",
+      "url": "https://developers.openai.com/api/docs/guides/gpt-4.1",
+      "claim": {
+        "ref": "sq5#case#2",
+        "text": "OpenAI 의 GPT-4.1 프롬프팅 가이드는 GPT-4.1 이 지시를 이전 모델보다 문자 그대로 따른다고 적는다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 'more closely and more literally than its predecessors' 가 있다."
+    },
+    {
+      "id": "exi-f1",
+      "category": "exists",
+      "url": "https://arxiv.org/abs/2310.01798",
+      "claim": {
+        "ref": "sq2#case#1",
+        "text": "Smith 등(NeurIPS 2021)은 대규모 언어 모델이 아직 스스로 추론을 교정하지 못한다고 보고했다."
+      },
+      "truth": false,
+      "check_note": "이 URL 의 논문 저자는 Huang 등이고 학회는 ICLR 2024 다. 원문 어디에도 Smith 나 NeurIPS 2021 이 저자·학회로 나오지 않는다."
+    },
+    {
+      "id": "exi-f2",
+      "category": "exists",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+      "claim": {
+        "ref": "sq2#case#6",
+        "text": "Anthropic 의 Prompting Claude Haiku 3 가이드는 명시적 검증 지시를 지우라고 권한다."
+      },
+      "truth": false,
+      "check_note": "이 URL 은 Opus 5 가이드다. 원문은 Haiku 3 를 다루지 않는다."
+    },
+    {
+      "id": "exi-f3",
+      "category": "exists",
+      "url": "https://developers.openai.com/api/docs/guides/gpt-4.1",
+      "claim": {
+        "ref": "sq5#case#2",
+        "text": "Google 의 Gemini 2 프롬프팅 가이드는 Gemini 2 가 지시를 이전 모델보다 문자 그대로 따른다고 적는다."
+      },
+      "truth": false,
+      "check_note": "이 URL 은 OpenAI 의 GPT-4.1 가이드다. Gemini 에 관한 서술은 없다."
+    },
+    {
+      "id": "quo-t1",
+      "category": "quote",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "claim": {
+        "ref": "sq5#case#3",
+        "text": "Anthropic 의 프롬프트 모범 사례 문서는 예시를 출력 형식·어조·구조를 조종하는 가장 믿을 만한 방법으로 보고 3~5개를 권한다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 'Examples are one of the most reliable ways to steer' 와 'Include 3–5 examples' 가 있다."
+    },
+    {
+      "id": "quo-t2",
+      "category": "quote",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1",
+      "claim": {
+        "ref": "sq3#case#1",
+        "text": "Prompting Claude Fable 5.1 가이드는 프롬프트에 반형식 규칙이 있으면 지우거나 언제 형식을 쓸지 정하는 규칙으로 바꾸라고 권한다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 'remove it or replace it with a rule that says when specific formatting is appropriate' 가 있다."
+    },
+    {
+      "id": "quo-t3",
+      "category": "quote",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+      "claim": {
+        "ref": "sq2#case#6",
+        "text": "Prompting Claude Opus 5 가이드는 하지 말 것보다 원하는 의사소통 형태의 긍정 예시가 더 효과적이라고 적는다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 'Positive examples of the communication style you want tend to be more effective than instructions about what not to do' 가 있다."
+    },
+    {
+      "id": "quo-f1",
+      "category": "quote",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "claim": {
+        "ref": "sq5#case#3",
+        "text": "Anthropic 의 프롬프트 모범 사례 문서는 시스템 프롬프트를 영어로만 쓰라고 권한다."
+      },
+      "truth": false,
+      "check_note": "2026-10-21 저장한 원문 전체에서 English 를 찾았으나 프롬프트 언어를 영어로 제한하라는 권고가 없었다."
+    },
+    {
+      "id": "quo-f2",
+      "category": "quote",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1",
+      "claim": {
+        "ref": "sq3#case#1",
+        "text": "Prompting Claude Fable 5.1 가이드는 모든 답을 표로 쓰라고 권한다."
+      },
+      "truth": false,
+      "check_note": "원문의 형식 절은 반형식 규칙을 줄이라고 할 뿐 표를 강제하지 않는다."
+    },
+    {
+      "id": "quo-f3",
+      "category": "quote",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+      "claim": {
+        "ref": "sq2#case#6",
+        "text": "Prompting Claude Opus 5 가이드는 서브에이전트를 항상 다섯 개 이상 띄우라고 권한다."
+      },
+      "truth": false,
+      "check_note": "원문의 서브에이전트 절은 오히려 위임을 큰 독립 작업으로 제한하고 수를 낮게 두라고 한다."
+    },
+    {
+      "id": "num-t1",
+      "category": "numbers_conditions",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "claim": {
+        "ref": "sq1#case#2",
+        "text": "Anthropic 문서에 따르면 Claude 4.6 모델부터 마지막 assistant 턴의 프리필을 지원하지 않는다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 'Starting with Claude 4.6 models ... prefilled responses ... on the last assistant turn are no longer supported' 가 있다."
+    },
+    {
+      "id": "num-t2",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/abs/2507.11538",
+      "claim": {
+        "ref": "sq4#case#0",
+        "text": "IFScale 에서 지시 500개 밀도일 때 최상위 모델의 정확도는 68% 였다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다."
+    },
+    {
+      "id": "num-t3",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/abs/2605.10039",
+      "claim": {
+        "ref": "sq4#case#5",
+        "text": "Claude Code CLI 세션 1,650개를 분석한 연구는 상시 지시 파일의 크기 효과를 검출하지 못했다."
+      },
+      "truth": false,
+      "check_note": "주장이 원문의 '다중 비교 보정 뒤' 조건을 빠뜨렸고, 1,650 과 결과가 서로 다른 문장에 있다(결정 기록 2). 그래서 구절 하나가 주어·수치·조건을 모두 포함해야 하는 인용 판정 기준에서 기각이 맞다. 지난 시험에서 참으로 둔 라벨이 느슨했다."
+    },
+    {
+      "id": "num-f1",
+      "category": "numbers_conditions",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "claim": {
+        "ref": "sq1#case#2",
+        "text": "Anthropic 문서에 따르면 Claude 3 모델부터 마지막 assistant 턴의 프리필을 지원하지 않는다."
+      },
+      "truth": false,
+      "check_note": "원문은 Claude 4.6 모델부터라고 적고, 이전 모델은 프리필을 계속 지원한다고 적는다."
+    },
+    {
+      "id": "num-f2",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/abs/2507.11538",
+      "claim": {
+        "ref": "sq4#case#0",
+        "text": "IFScale 에서 지시 500개 밀도일 때 최상위 모델의 정확도는 86% 였다."
+      },
+      "truth": false,
+      "check_note": "원문의 값은 68% 다. 86% 는 원문에 없다."
+    },
+    {
+      "id": "num-f3",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/abs/2605.10039",
+      "claim": {
+        "ref": "sq4#case#5",
+        "text": "Claude Code CLI 세션 16,500개를 분석한 연구는 상시 지시 파일의 크기 효과를 검출하지 못했다."
+      },
+      "truth": false,
+      "check_note": "원문의 세션 수는 1,650 이다."
+    },
+    {
+      "id": "dir-t1",
+      "category": "direction",
+      "url": "https://arxiv.org/abs/2605.10039",
+      "claim": {
+        "ref": "sq4#case#5",
+        "text": "Claude Code 세션 연구에서 상시 지시 파일의 크기와 지시 위치는 다중 비교 보정 뒤 준수율 차이를 내지 않았다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 초록은 크기·위치 모두 보정 뒤 검출 가능한 대비가 없다고 적는다. 지난 실행의 검증자 quote 는 이 문장의 부정어를 잘랐다."
+    },
+    {
+      "id": "dir-t2",
+      "category": "direction",
+      "url": "https://arxiv.org/abs/2310.01798",
+      "claim": {
+        "ref": "sq2#case#1",
+        "text": "Huang 등은 외부 피드백 없는 자기 교정 뒤 LLM 의 성능이 때로 오히려 떨어진다고 보고했다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 초록에 'at times, their performance even degrades after self-correction' 이 있다."
+    },
+    {
+      "id": "dir-t3",
+      "category": "direction",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1",
+      "claim": {
+        "ref": "sq3#case#1",
+        "text": "Prompting Claude Fable 5.1 가이드에 따르면 Fable 5.1 은 이전 모델보다 굵은 글씨를 덜 쓴다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 'it uses bold less' 가 있다."
+    },
+    {
+      "id": "dir-f1",
+      "category": "direction",
+      "url": "https://arxiv.org/abs/2605.10039",
+      "claim": {
+        "ref": "sq4#case#5",
+        "text": "Claude Code 세션 연구에서 상시 지시 파일의 크기와 지시 위치는 다중 비교 보정 뒤에도 준수율에 뚜렷한 차이를 냈다."
+      },
+      "truth": false,
+      "check_note": "원문은 반대로 차이가 검출되지 않았다고 적는다. 지난 실행의 잘린 quote 가 이 오류를 통과시켰다."
+    },
+    {
+      "id": "dir-f2",
+      "category": "direction",
+      "url": "https://arxiv.org/abs/2310.01798",
+      "claim": {
+        "ref": "sq2#case#1",
+        "text": "Huang 등은 외부 피드백 없는 자기 교정이 LLM 의 추론 성능을 꾸준히 높인다고 보고했다."
+      },
+      "truth": false,
+      "check_note": "원문은 자기 교정이 어렵고 때로 성능이 떨어진다고 적는다."
+    },
+    {
+      "id": "dir-f3",
+      "category": "direction",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1",
+      "claim": {
+        "ref": "sq3#case#1",
+        "text": "Prompting Claude Fable 5.1 가이드에 따르면 Fable 5.1 은 이전 모델보다 굵은 글씨를 더 많이 쓴다."
+      },
+      "truth": false,
+      "check_note": "원문은 'uses bold less' 라고 적는다."
+    },
+    {
+      "id": "sco-t1",
+      "category": "scope",
+      "url": "https://developers.openai.com/api/docs/guides/gpt-4.1",
+      "claim": {
+        "ref": "sq5#case#2",
+        "text": "OpenAI 는 GPT-4.1 이 이전 OpenAI 모델보다 지시를 문자 그대로 따른다고 적는다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다."
+    },
+    {
+      "id": "sco-t2",
+      "category": "scope",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+      "claim": {
+        "ref": "sq2#case#6",
+        "text": "Anthropic 은 Claude Opus 5 에서 명시적 검증 지시가 과잉 검증을 낳으므로 지우라고 권한다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다."
+    },
+    {
+      "id": "sco-t3",
+      "category": "scope",
+      "url": "https://arxiv.org/abs/2605.10039",
+      "claim": {
+        "ref": "sq4#case#5",
+        "text": "Claude Code 세션 연구는 사소한 주석 지시 하나의 준수율로 상시 지시 파일의 크기 효과를 측정했고 효과를 검출하지 못했다."
+      },
+      "truth": true,
+      "check_note": "2026-10-20~21 오케스트레이터가 원문을 WebFetch 로 열어 확인했다. 초록은 대상 지시를 'compliance with a trivial target annotation' 으로 적는다."
+    },
+    {
+      "id": "sco-f1",
+      "category": "scope",
+      "url": "https://developers.openai.com/api/docs/guides/gpt-4.1",
+      "claim": {
+        "ref": "sq5#case#2",
+        "text": "OpenAI 는 최신 LLM 이라면 모두 지시를 문자 그대로 따른다고 적는다."
+      },
+      "truth": false,
+      "check_note": "원문은 GPT-4.1 에 한정해 적는다. 다른 모델 일반에 대한 서술은 없다."
+    },
+    {
+      "id": "sco-f2",
+      "category": "scope",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+      "claim": {
+        "ref": "sq2#case#6",
+        "text": "Anthropic 은 모든 Claude 모델에서 명시적 검증 지시가 과잉 검증을 낳으므로 지우라고 권한다."
+      },
+      "truth": false,
+      "check_note": "원문은 Claude Opus 5 에 한정해 적는다."
+    },
+    {
+      "id": "sco-f3",
+      "category": "scope",
+      "url": "https://arxiv.org/abs/2605.10039",
+      "claim": {
+        "ref": "sq4#case#5",
+        "text": "Claude Code 세션 연구는 상시 지시 파일의 크기가 어떤 지시의 준수율에도 영향을 주지 않는다는 것을 보였다."
+      },
+      "truth": false,
+      "check_note": "원문의 대상 지시는 사소한 주석 하나뿐이고, 위치 효과는 Bayes factor 근거가 없다고 적는다. 모든 지시로 일반화한 서술은 없다."
+    },
+    {
+      "id": "num-t4",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/abs/2605.10039",
+      "claim": {
+        "ref": "v2#num#0",
+        "text": "한 연구는 Claude Code CLI 세션 1,650개에서 사소한 대상 주석(trivial target annotation)의 준수 여부를 측정했다."
+      },
+      "truth": true,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 초록의 한 문장에 'measuring compliance with a trivial target annotation across 1,650 Claude Code CLI sessions' 가 있어 세션 수와 측정 대상이 한 문장으로 뒷받침된다."
+    },
+    {
+      "id": "num-t5",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/abs/2507.11538",
+      "claim": {
+        "ref": "v2#num#1",
+        "text": "IFScale 벤치마크는 7개 제공사의 모델 20개를 평가했다."
+      },
+      "truth": true,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 초록에 20 leading models, seven providers 가 있다(모델 20개, 제공사 7곳)."
+    },
+    {
+      "id": "hard-ctx-t1",
+      "category": "direction",
+      "url": "https://arxiv.org/abs/2601.13244",
+      "claim": {
+        "ref": "v2#hard#0",
+        "text": "Munjal 등의 연구는 지시 튜닝의 이점이 모델 파라미터 수와 평가 설정에 크게 좌우되며 소형 모델에서는 큰 이득을 준다고 결론지었다."
+      },
+      "truth": true,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 이 논문의 초록은 기본 모델이 일관되게 앞선다는 쪽으로 읽힌다(base models consistently outperform instruction-tuned variants). 그러나 §5 결론에 'instruction tuning provides substantial gains for SLMs, while its impact on LLMs is mixed and often marginal' 와 'depend strongly on number of parameters and evaluation setting' 이 있다.",
+      "hard_kind": "context"
+    },
+    {
+      "id": "hard-ctx-f1",
+      "category": "direction",
+      "url": "https://arxiv.org/abs/2601.13244",
+      "claim": {
+        "ref": "v2#hard#1",
+        "text": "Munjal 등의 연구는 모든 규모의 모델에서 기본 모델이 지시 튜닝 모델보다 수학 벤치마크 성적이 일관되게 높다고 보고했다."
+      },
+      "truth": false,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 초록만 보면 맞아 보인다(base models consistently outperform instruction-tuned variants). 본문은 이를 뒷받침하지 않는다. §4.1 에 'LLaMA3-3B improves from 29.0% to 67.2%' 처럼 소형 모델의 큰 지시 튜닝 이득이 있고, §5 결론은 'substantial gains for SLMs' 라고 적는다. 어느 구절도 모든 규모에서 기본 모델이 높다고 적지 않는다.",
+      "hard_kind": "context"
+    },
+    {
+      "id": "hard-cnd-t1",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/abs/2601.13244",
+      "claim": {
+        "ref": "v2#hard#2",
+        "text": "Math-500 벤치마크에서 LLaMA3-3B 의 정확도는 기본 모델 29.0% 에서 지시 튜닝 모델 67.2% 로 올랐다."
+      },
+      "truth": true,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. §4.1 에 'LLaMA3-3B improves from 29.0% to 67.2%' 가 있고, 29.0% 가 기본 모델, 67.2% 가 지시 튜닝 모델, 벤치마크는 Math-500 이다(Table S2). 모델·벤치마크·방향 세 조건이 한 대목에 있다.",
+      "hard_kind": "conditions"
+    },
+    {
+      "id": "hard-cnd-f1",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/abs/2601.13244",
+      "claim": {
+        "ref": "v2#hard#3",
+        "text": "Math-500 벤치마크에서 지시 튜닝은 모델 규모와 무관하게 정확도를 29.0% 에서 67.2% 로 올렸다."
+      },
+      "truth": false,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 29.0% 에서 67.2% 는 LLaMA3-3B 한 모델의 값이다. 조건 하나(모델 규모)만 일반화했다. 같은 §4.1 의 'At >70B scale, base models perform competitively (Math-500)' 와 결론의 'impact on LLMs is mixed and often marginal' 이 규모와 무관한 상승을 뒷받침하지 않는다.",
+      "hard_kind": "conditions"
+    },
+    {
+      "id": "hard-tbl-t1",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/html/2507.11538",
+      "claim": {
+        "ref": "v2#hard#4",
+        "text": "IFScale 부록 Table 1 에서 claude-3.5-haiku 의 지시 100개 밀도 정확도는 43.4% 다."
+      },
+      "truth": true,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 부록 Table 1(Full Results)의 claude-3.5-haiku 행, 열 100 의 Accuracy 가 43.4% 다. 두 번 조회해 같은 값을 얻었다. 이 값은 본문 문장에 없고 표에만 있다(본문은 같은 모델을 'steep performance drops' 로만 서술한다).",
+      "hard_kind": "table"
+    },
+    {
+      "id": "hard-tbl-f1",
+      "category": "numbers_conditions",
+      "url": "https://arxiv.org/html/2507.11538",
+      "claim": {
+        "ref": "v2#hard#5",
+        "text": "IFScale 부록 Table 1 에서 claude-3.5-haiku 의 지시 100개 밀도 정확도는 94.8% 다."
+      },
+      "truth": false,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 94.8% 는 같은 표의 claude-3.7-sonnet 행, 열 100 의 값이다(두 번 조회해 확인). claude-3.5-haiku 의 열 100 값은 43.4% 이고, 본문 어디에도 claude-3.5-haiku 의 100개 정확도로 94.8% 를 적지 않는다.",
+      "hard_kind": "table"
+    },
+    {
+      "id": "hard-kor-t1",
+      "category": "direction",
+      "url": "https://ko.wikipedia.org/wiki/구글_딥마인드_챌린지_매치",
+      "claim": {
+        "ref": "v2#hard#6",
+        "text": "한국어 위키백과는 구글 딥마인드 챌린지 매치의 최종 결과를 알파고가 이세돌에게 4승 1패로 이긴 것으로 서술한다."
+      },
+      "truth": true,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 한국어 원문에 '최종 결과는 알파고가 4승 1패로 이세돌에게 승리하였다.' 가 있고, 대국표는 이세돌의 승리를 제4국(백, 180수 불계승)으로 적는다.",
+      "hard_kind": "korean"
+    },
+    {
+      "id": "hard-kor-f1",
+      "category": "direction",
+      "url": "https://ko.wikipedia.org/wiki/구글_딥마인드_챌린지_매치",
+      "claim": {
+        "ref": "v2#hard#7",
+        "text": "한국어 위키백과는 구글 딥마인드 챌린지 매치의 최종 결과를 이세돌이 알파고에게 4승 1패로 이긴 것으로 서술한다."
+      },
+      "truth": false,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 결말을 뒤집은 주장이다. 원문의 최종 결과는 알파고의 4승 1패 승리이고, 이세돌의 승리는 제4국 한 판이다. 원문의 다른 구절에도 이세돌이 4승을 거뒀다는 서술이 없다.",
+      "hard_kind": "korean"
+    },
+    {
+      "id": "hard-f200-t1",
+      "category": "access",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html",
+      "claim": {
+        "ref": "v2#hard#8",
+        "text": "AWS 의 Amazon Bedrock 프롬프트 엔지니어링 문서는 몇 개의 예시를 주는 few-shot 프롬프팅이 모델 출력을 기대에 맞추는 데 유용하다고 적는다."
+      },
+      "truth": true,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 같은 사이트(docs.aws.amazon.com)의 실제 문서다. 제목 'Prompt engineering concepts', 본문에 'It is sometimes useful to provide a few examples to help LLMs better calibrate their output' 가 있다.",
+      "hard_kind": "fake-200"
+    },
+    {
+      "id": "hard-f200-f1",
+      "category": "access",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-instruction-limit-guidelines.html",
+      "claim": {
+        "ref": "v2#hard#9",
+        "text": "AWS 의 Amazon Bedrock 문서는 프롬프트에 지시가 20개를 넘으면 정확도가 급격히 떨어진다고 적는다."
+      },
+      "truth": false,
+      "check_note": "2026-10-21 구현자가 원문을 WebFetch 로 직접 열어 확인했다. 지어낸 경로다. curl 은 302 로 /bedrock/latest/userguide/ 로 보낸 뒤 최종 HTTP 200(2,257바이트)을 돌려준다. WebFetch 는 본문 없이 'Amazon Bedrock' 한 줄만 반환하고, 오류·리디렉션 안내도 없다. 지시 한도에 관한 문서 내용이 전혀 없다. 200 으로 오지만 실제 문서가 없는 주소다.",
+      "hard_kind": "fake-200"
+    }
+  ],
+  "map_cases": [
+    {
+      "id": "map-1",
+      "input": {
+        "evidence_map": [
+          {
+            "case": "내재적 자기 수정의 한계(Huang 등)",
+            "url": "https://arxiv.org/abs/2310.01798",
+            "axes": {
+              "purpose": {
+                "prior": "외부 피드백 없는 자기 수정이 실제로 추론 성능을 높이는지 검증한다",
+                "same": false,
+                "note": "대상의 제약 (6) 전제와만 관련된다"
+              },
+              "mechanism": {
+                "prior": "모델이 자기 답을 외부 신호 없이 다시 검토하게 한다",
+                "same": false,
+                "note": "대상의 재작성 층 사후 수정과만 같다"
+              },
+              "evaluation": {
+                "prior": "추론 벤치마크에서 수정 전후 정확도를 비교했다",
+                "same": false,
+                "note": "대상은 문체 규칙 준수를 평가한다"
+              },
+              "target": {
+                "prior": "추론 과제의 LLM",
+                "same": false,
+                "note": "글쓰기 규칙 준수와 과제가 다르다"
+              }
+            },
+            "outcome": "성공",
+            "kind": "peer-reviewed",
+            "source_level": "1차",
+            "route": "논문(arXiv, ICLR 2024)",
+            "adoption": "참고"
+          },
+          {
+            "case": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+            "url": "https://arxiv.org/abs/2605.10039",
+            "axes": {
+              "purpose": {
+                "prior": "설정 파일 구조가 지시 준수에 주는 영향을 측정한다",
+                "same": false,
+                "note": "측정 연구다"
+              },
+              "mechanism": {
+                "prior": "모델이 상시 지시 파일을 매 턴 다시 읽게 하는 재주입 장치를 시험했다",
+                "same": false,
+                "note": "대조 대상은 작성 규칙이다"
+              },
+              "evaluation": {
+                "prior": "1,650 세션, 16,050 관측을 혼합효과 모형과 Bayes 분석으로 보았다. 네 변수 모두 효과가 검출되지 않았고, 세션 진행에 따라 함수당 준수 오즈가 약 5.6% 줄었다",
+                "same": false,
+                "note": "대조 대상의 평가 방식과 다르다"
+              },
+              "target": {
+                "prior": "코딩 에이전트 CLI 에 상시로 싣는 프로젝트 지시 파일",
+                "same": true,
+                "note": "대조 대상과 같은 종류의 상시 지시 파일을 다룬다. 다만 대상 지시가 사소한 주석 하나뿐이다"
+              }
+            },
+            "outcome": "판정 못 함",
+            "kind": "preprint",
+            "source_level": "1차",
+            "route": "웹 검색 → arXiv 논문",
+            "adoption": "참고"
+          }
+        ],
+        "passed": [
+          {
+            "ref": "sq2#case#1",
+            "row": {
+              "case": "내재적 자기 수정의 한계(Huang 등)",
+              "url": "https://arxiv.org/abs/2310.01798",
+              "axes": {
+                "purpose": {
+                  "prior": "외부 피드백 없는 자기 수정이 실제로 추론 성능을 높이는지 검증한다",
+                  "same": false,
+                  "note": "대상의 제약 (6) 전제와만 관련된다"
+                },
+                "mechanism": {
+                  "prior": "모델이 자기 답을 외부 신호 없이 다시 검토하게 한다",
+                  "same": false,
+                  "note": "대상의 재작성 층 사후 수정과만 같다"
+                },
+                "evaluation": {
+                  "prior": "추론 벤치마크에서 수정 전후 정확도를 비교했다",
+                  "same": false,
+                  "note": "대상은 문체 규칙 준수를 평가한다"
+                },
+                "target": {
+                  "prior": "추론 과제의 LLM",
+                  "same": false,
+                  "note": "글쓰기 규칙 준수와 과제가 다르다"
+                }
+              },
+              "outcome": "실패",
+              "kind": "peer-reviewed",
+              "source_level": "1차",
+              "route": "논문(arXiv, ICLR 2024)",
+              "adoption": "참고"
+            }
+          },
+          {
+            "ref": "sq4#case#5",
+            "row": {
+              "case": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+              "url": "https://arxiv.org/abs/2605.10039",
+              "axes": {
+                "purpose": {
+                  "prior": "설정 파일 구조가 지시 준수에 주는 영향을 측정한다",
+                  "same": false,
+                  "note": "측정 연구다"
+                },
+                "mechanism": {
+                  "prior": "파일 크기·지시 위치·파일 구조·인접 파일 모순 네 변수를 요인 설계로 조작한다",
+                  "same": false,
+                  "note": "대조 대상은 작성 규칙이다"
+                },
+                "evaluation": {
+                  "prior": "1,650 세션, 16,050 관측을 혼합효과 모형과 Bayes 분석으로 보았다. 네 변수 모두 효과가 검출되지 않았고, 세션 진행에 따라 함수당 준수 오즈가 약 5.6% 줄었다",
+                  "same": false,
+                  "note": "대조 대상의 평가 방식과 다르다"
+                },
+                "target": {
+                  "prior": "코딩 에이전트 CLI 에 상시로 싣는 프로젝트 지시 파일",
+                  "same": true,
+                  "note": "대조 대상과 같은 종류의 상시 지시 파일을 다룬다. 다만 대상 지시가 사소한 주석 하나뿐이다"
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "preprint",
+              "source_level": "1차",
+              "route": "웹 검색 → arXiv 논문",
+              "adoption": "참고"
+            }
+          }
+        ]
+      },
+      "truth": [
+        {
+          "row": "내재적 자기 수정의 한계(Huang 등)",
+          "column": "outcome",
+          "grounded": false
+        },
+        {
+          "row": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+          "column": "axes.mechanism.prior",
+          "grounded": false
+        },
+        {
+          "row": "내재적 자기 수정의 한계(Huang 등)",
+          "column": "axes.mechanism.prior",
+          "grounded": true
+        },
+        {
+          "row": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+          "column": "outcome",
+          "grounded": true
+        }
+      ]
+    }
+  ]
+}

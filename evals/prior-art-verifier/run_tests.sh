@@ -30,6 +30,29 @@ for b in drop_error empty_note no_2605; do
   check "고장 낸 사본($b)을 check_cases.py 가 거부한다" "[ -f '$FX/$b.json' ] && ! $PY -I '$HERE/check_cases.py' '$FX/$b.json' >/dev/null"
 done
 
+echo "== 재측정 자료"
+V2="$HERE/cases-v2.json"
+check "cases-v2.json 이 check_cases.py 를 통과한다" "[ -f '$V2' ] && $PY -I '$HERE/check_cases.py' '$V2' >/dev/null"
+check "hard_kind 마다 참 항목과 오류 항목이 1건씩 있다" "[ -f '$V2' ] && $PY -I -c '
+import json,sys,collections
+d=json.load(open(sys.argv[1],encoding=\"utf-8\"))
+c=collections.Counter((x[\"hard_kind\"],x[\"truth\"]) for x in d[\"items\"] if \"hard_kind\" in x)
+ks=[\"context\",\"conditions\",\"table\",\"korean\",\"fake-200\"]
+sys.exit(0 if all(c[(k,t)]==1 for k in ks for t in (True,False)) and len(c)==10 else 1)' '$V2'"
+check "num-t3 가 오류 항목이고 check_note 에 정정 이유가 있다" "[ -f '$V2' ] && $PY -I -c '
+import json,sys
+d=json.load(open(sys.argv[1],encoding=\"utf-8\"))
+x=[i for i in d[\"items\"] if i[\"id\"]==\"num-t3\"][0]
+n=x[\"check_note\"]
+sys.exit(0 if x[\"truth\"] is False and \"다중 비교 보정 뒤\" in n and \"결정 기록 2\" in n else 1)' '$V2'"
+hk="$FX/hk.json"
+$PY -I -c "
+import json,sys
+d=json.load(open(sys.argv[1],encoding='utf-8'))
+d['items'][0]['hard_kind']='context'
+json.dump(d,open(sys.argv[2],'w',encoding='utf-8'),ensure_ascii=False)" "$CASES" "$hk"
+check "카테고리와 맞지 않는 hard_kind 를 check_cases.py 가 거부한다" "! $PY -I '$HERE/check_cases.py' '$hk' >/dev/null"
+
 echo "== 실행기"
 export DC_EVAL_CLAUDE="$PY -I $HERE/fake_claude.py"
 export EVAL_TMP="$FX/evaltmp"
