@@ -25,10 +25,12 @@ SECRET="$(lib secrets "$CASES")"
 [ -n "$SECRET" ] && printf '%s\n' "$SECRET" | sed 's/^/    /'
 check "비밀 패턴이 없다" "[ -z \"\$SECRET\" ]"
 
+# 단위 폴더마다 base 파일의 커밋 해시를 한 줄씩 낸다. 끝 줄바꿈이 없는 파일끼리 붙지 않게 파일마다 읽는다.
+unit_bases() { for f in "$1"/*/base; do [ -f "$f" ] && { tr -d '\r\n ' < "$f"; echo; }; done | sort -u; }
 echo "[시험 단위 — 현행 문안, 변경안, 질문 수]"
 CLAUSES="$HERE/evals/principles/clauses"
 UB="$(mktemp -d)"
-for h in 7a2d26d $(cat "$CLAUSES"/*/base 2>/dev/null | tr -d '' | sort -u); do git -C "$HERE" show "$h":agent-principles.md > "$UB/$h.md" 2>/dev/null || rm -f "$UB/$h.md"; done
+for h in 7a2d26d $(unit_bases "$CLAUSES"); do git -C "$HERE" show "$h":agent-principles.md > "$UB/$h.md" 2>/dev/null || rm -f "$UB/$h.md"; done
 UNITS="$(json_run 'import runpy,sys; p=sys.argv[1]; sys.argv=[p]+sys.argv[2:]; runpy.run_path(p, run_name="__main__")' "$HERE/scripts/_eval_clause.py" check "$CASES" "$CLAUSES" "$UB" 2>&1 || true)"
 rm -rf "$UB"
 [ -n "$UNITS" ] && printf '%s\n' "$UNITS" | sed 's/^/    /'
@@ -41,6 +43,9 @@ rm -f "$UBL"
 echo "[금지어 횟수 — 같은 낱말은 두 번 세고 제외어는 뺀다]"
 # 픽스처로 본다. 저장소 과제와 측정 결과에 기대지 않는다. 클린룸 보고의 금지어 수가 이 함수를 쓴다.
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
+mkdir -p "$T/ub/a" "$T/ub/b"; printf abc1234 > "$T/ub/a/base"; printf def5678 > "$T/ub/b/base"
+UBS="$(unit_bases "$T/ub" | tr '\n' ' ')"
+check "끝 줄바꿈이 없는 base 파일 둘의 커밋을 따로 읽는다" "[ \"\$UBS\" = 'abc1234 def5678 ' ]"
 cat > "$T/banned.md" <<'BANEOF'
 ### 금지 표현
 

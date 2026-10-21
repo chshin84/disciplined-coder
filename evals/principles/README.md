@@ -33,7 +33,7 @@
 
 ## 클린룸 시험
 
-조항별 시험은 `scripts/eval_clause.sh [<단위 이름>...]` 로 실행하고 `scripts/eval_clause_report.sh` 로 판정을 낸다. 시험 단위는 `clauses/<단위 이름>/` 폴더이고, `current.md`(현행 문안), `new.md`(변경안), 나눈 조항 쌍이면 `ids`(단위의 조항 ID)를 둔다. `base` 파일(기준 커밋 해시 한 줄, 없으면 7a2d26d)은 `current.md` 의 줄을 대조할 `agent-principles.md` 의 커밋을 정한다. `system.md` 가 있으면 그 단위의 모든 생성 호출(`current`·`new` 양쪽)에 `--append-system-prompt <내용>` 을 붙이고, 생성 키에 그 내용의 해시를 덧붙인다. `system.md` 가 없으면 생성 키는 이전과 같아 기록된 생성이 그대로 쓰인다. 조건마다 빈 설정 폴더에 그 파일 하나만 `CLAUDE.md` 로 넣고, 플러그인과 사용자 전역 지시는 넣지 않는다. 문구 변경은 `current`·`new`, 새 조항(`current.md` 없음)은 `none`·`new` 를 실행한다.
+조항별 시험은 `scripts/eval_clause.sh [<단위 이름>...]` 로 실행하고 `scripts/eval_clause_report.sh` 로 판정을 낸다. 시험 단위는 `clauses/<단위 이름>/` 폴더이고, `current.md`(현행 문안), `new.md`(변경안), 나눈 조항 쌍이면 `ids`(단위의 조항 ID)를 둔다. `base` 파일(기준 커밋 해시 한 줄, 없으면 7a2d26d)은 `current.md` 의 줄을 대조할 `agent-principles.md` 의 커밋을 정한다. `system.md` 가 있으면 그 단위의 모든 생성 호출(`current`·`new` 양쪽)에 `--append-system-prompt <내용>` 을 붙이고, 생성 키에 그 내용의 해시를 덧붙인다. 내용이 빈 `system.md` 는 없는 것으로 본다. `system.md` 가 없으면 생성 키는 이전과 같아 기록된 생성이 그대로 쓰인다. 조건마다 빈 설정 폴더에 그 파일 하나만 `CLAUDE.md` 로 넣고, 플러그인과 사용자 전역 지시는 넣지 않는다. 문구 변경은 `current`·`new`, 새 조항(`current.md` 없음)은 `none`·`new` 를 실행한다.
 
 같은 질문은 같은 조건으로 한 번만 생성한다(2026-10-18 사용자 지시). 생성 키는 과제 본문과 조건 문안의 해시이고, 판정 키는 생성 키와 판정 기준의 해시다. 기록은 `results/clauses/gen.jsonl`(생성)과 `judge.jsonl`(판정)에 한 줄씩 덧붙인다. 생성 키가 기록에 있으면 생성하지 않고, 판정 키만 없으면 판정만 한다. 그래서 과제 머리를 바꾸거나 판정 기준을 고쳐도 생성은 반복되지 않는다. 생성 오류(`is_error` 응답, 빈 응답, 시간 초과)와 읽지 못한 판정은 기록하지 않고 `errors=` 로 센다.
 
