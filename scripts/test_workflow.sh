@@ -849,6 +849,24 @@ check "입력에 없던 판정은 쓰지 않는다(실행 흐름)" "json_true \"
 mkbig "$FX/rb0_resp.json" null
 E_RB_NULL='d["result"]["verify_failed"] == [{"url": "https://a", "refs": ["S1#issue#%d" % i for i in range(15)]}] and d["result"]["passed"] == [{"ref": "S2#issue#%d" % i, "urls": ["https://b"]} for i in range(10)] and d["result"]["verifiers"][0]["output"] is None and d["result"]["verifiers"][0]["stages"]["judge"] is None'
 check "실패한 판정 묶음의 URL 만 검증 실패다" "mkin \"\$FX/rb0_resp.json\" \"\$FX/rb0_in.json\" && harn run < \"\$FX/rb0_in.json\" > \"\$FX/rb0_out.json\" && json_true \"\$FX/rb0_out.json\" \"\$E_RB_NULL\""
+# 같은 주장의 판정이 둘인 응답표다. 판정 묶음 하나에 a(A1, A2)와 b(B1)가 든다. A1 의 판정은 일치와 불일치 둘이다.
+cat > "$FX/rd_resp.json" <<'EOF'
+{"@mode": "contrast", "responses": {
+  "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim A1", "citations": [{"url": "https://a"}]}, {"prior_claim": "claim A2", "citations": [{"url": "https://a"}]}]},
+  "research:S2": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim B1", "citations": [{"url": "https://b"}]}]},
+  "extract:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "exists_note": "N", "quote": "q1", "context": "", "reason": "r"},
+    {"ref": "S1#issue#1", "access": "성공", "exists": "일치", "exists_note": "N", "quote": "q2", "context": "", "reason": "r"}]},
+  "extract:https://b": {"url": "https://b", "principles_applied": [], "judgments": [
+    {"ref": "S2#issue#0", "access": "성공", "exists": "일치", "exists_note": "N", "quote": "q3", "context": "", "reason": "r"}]},
+  "judge:1": {"principles_applied": [], "judgments": [
+    {"url": "https://a", "ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://a", "ref": "S1#issue#1", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://b", "ref": "S2#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://a", "ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "불일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]}}}
+EOF
+E_RD='[c["label"] for c in d["calls"] if c["label"].startswith("judge:")] == ["judge:1"] and d["result"]["verify_failed"] == [{"url": "https://a", "refs": ["S1#issue#0"]}] and d["result"]["passed"] == [{"ref": "S1#issue#1", "urls": ["https://a"]}, {"ref": "S2#issue#0", "urls": ["https://b"]}] and [j["ref"] for j in d["result"]["verifiers"][0]["stages"]["judge"]["judgments"]] == ["S1#issue#1"]'
+check "같은 주장의 판정이 둘이면 그 주장만 검증 실패다" "mkin \"\$FX/rd_resp.json\" \"\$FX/rd_in.json\" && harn run < \"\$FX/rd_in.json\" > \"\$FX/rd_out.json\" && json_true \"\$FX/rd_out.json\" \"\$E_RD\""
 
 echo "[실패 행선지]"
 cat > "$FX/rf_resp.json" <<'EOF'

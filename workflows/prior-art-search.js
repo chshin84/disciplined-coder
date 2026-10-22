@@ -385,7 +385,8 @@ function batchClaims(claimsByUrl, size) {
 
 // 묶음 출력 나누기. batchOutputs[i] 는 batches[i] 의 출력이다. 반환값은 URL 을 키로 둔 { judgments, principles_applied } 다.
 // 응답이 없거나 judgments 가 배열이 아닌 묶음의 URL 은 null 이다. 판정은 url 과 ref 가 그 URL 의 입력 주장과 맞는 것만 남기고,
-// 입력에 없던 URL 이나 ref 의 판정은 버린다.
+// 입력에 없던 URL 이나 ref 의 판정은 버린다. 같은 (url, ref) 의 판정이 둘 이상이면 어느 판정을 믿을지 정할 수 없으므로
+// 그 ref 의 판정을 모두 버린다. 버린 주장은 빠진 주장과 같이 그 주장만 검증 실패가 된다.
 function splitByUrl(batchOutputs, batches) {
   const out = {};
   batches.forEach((b, i) => {
@@ -397,8 +398,9 @@ function splitByUrl(batchOutputs, batches) {
         continue;
       }
       const refs = it.claims.map((c) => c.ref);
+      const mine = o.judgments.filter((j) => j != null && j.url === it.url && refs.includes(j.ref));
       out[it.url] = {
-        judgments: o.judgments.filter((j) => j != null && j.url === it.url && refs.includes(j.ref)),
+        judgments: mine.filter((j) => mine.filter((x) => x.ref === j.ref).length === 1),
         principles_applied: o.principles_applied ?? [],
       };
     }
