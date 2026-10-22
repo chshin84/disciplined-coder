@@ -530,6 +530,15 @@ def test_report_v4_items():
     assert "| 1 | 1 | 0 | d2 |" in _section(text, "판정 누락")
     assert "| 1 | 1 | 0 | d1 |" in _section(text, "판정 불가로 기각한 주장")
     assert "| judge-def | 1 | batch:1 | 1 | 2 | 1234 | 1 | 0 |" in _section(text, "묶음별 주장 수와 출력 토큰")
+    # 틀린 항목 표는 실행마다 처음 판정 입력의 구절이 같은지 적는다. d1 은 실행 2 에 판정 입력이 없다.
+    assert "| 실행 2 에 없음 |" in _section(text, "기준선이 맞힌 항목 중 새 구성이 틀린 항목")
+
+
+def test_judge_quote_diff():
+    """처음 판정 입력의 구절이 실행마다 같은지를 같음·다름·실행 k 에 없음으로 낸다."""
+    import score
+    assert score.quote_diff(["a", "a"]) == "같음" and score.quote_diff(["a", "b"]) == "다름"
+    assert score.quote_diff(["a", None]) == "실행 2 에 없음"
 
 
 def test_confident_wrong_counted():

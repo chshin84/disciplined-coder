@@ -557,6 +557,25 @@ def batch_stats(cases, def_runs):
     return out
 
 
+def judge_quotes(cases, def_runs):
+    """(항목 id, 실행) -> 처음 판정 묶음 입력에 넣은 quote 다. 판정에 보내지 않은 항목은 없다."""
+    out = {}
+    for rep in REPEATS:
+        for b in run.pipeline(cases, def_runs, rep)["batches"]["judge-def"]:
+            for it in b["items"]:
+                for c in it["claims"]:
+                    out[(c["ref"], rep)] = c["quote"]
+    return out
+
+
+def quote_diff(quotes):
+    """실행마다의 quote 목록이 같은지다. 없는 실행이 있으면 그 실행 번호를 적는다."""
+    gone = [str(REPEATS[k]) for k, q in enumerate(quotes) if q is None]
+    if gone:
+        return f"실행 {'·'.join(gone)} 에 없음"
+    return "같음" if len(set(quotes)) == 1 else "다름"
+
+
 def report_v4(base_path, def_path, replay_path, cases_path, out_path, base_cases_path, prev_replay_path):
     cases = json.load(open(cases_path, encoding="utf-8"))
     base_cases = json.load(open(base_cases_path, encoding="utf-8"))
@@ -604,16 +623,19 @@ def report_v4(base_path, def_path, replay_path, cases_path, out_path, base_cases
          "## 기준선이 맞힌 항목 중 새 구성이 틀린 항목", ""]
     if failing:
         L += ["아래 표의 항목은 기준선이 두 실행 모두 맞혔고 새 구성이 한 번 이상 틀렸다. 판정 칸은 실행마다 수치·조건/방향/범위이고, 사유는 처음 판정의 reason 이다.", "",
-              "| 항목 | 정답 | 기준선 판정 | 새 구성 판정 | 처음 판정 | 재판정 | 처음 판정 사유 |", "|---|---|---|---|---|---|---|"]
+              "판정 입력 구절 칸은 처음 판정 입력의 quote 가 실행마다 같은지다. 원인의 판단은 이 표에 적지 않는다.", "",
+              "| 항목 | 정답 | 기준선 판정 | 새 구성 판정 | 처음 판정 | 재판정 | 처음 판정 사유 | 판정 입력 구절 |", "|---|---|---|---|---|---|---|---|"]
+        quotes = judge_quotes(cases, def_runs)
         for k in failing:
             if k in items:
                 rs = idx[k]
                 col = lambda f: " ; ".join(_cells_str((r or {}).get(f)) for r in rs)
                 why = " ; ".join(_cell(((r or {}).get("judge_raw") or {}).get("reason") or "없음") for r in rs)
                 L.append(f"| {k} | {'참' if items[k]['truth'] else '오류'} | {', '.join(map(str, base_v[k]))} | "
-                         f"{', '.join(map(str, new_v[k]))} | {col('judge_raw')} | {col('rejudge_raw')} | {why} |")
+                         f"{', '.join(map(str, new_v[k]))} | {col('judge_raw')} | {col('rejudge_raw')} | {why} | "
+                         f"{quote_diff([quotes.get((k, rep)) for rep in REPEATS])} |")
             else:
-                L.append(f"| {_cell(k)} | 지도 대조 칸 | 맞힘 | {new_ok.get(k)} | 해당 없음 | 해당 없음 | 해당 없음 |")
+                L.append(f"| {_cell(k)} | 지도 대조 칸 | 맞힘 | {new_ok.get(k)} | 해당 없음 | 해당 없음 | 해당 없음 | 해당 없음 |")
     else:
         L.append("없다.")
 
