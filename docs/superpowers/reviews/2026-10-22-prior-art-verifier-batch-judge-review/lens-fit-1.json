@@ -1,0 +1,103 @@
+{
+  "lens": "lens-fit",
+  "doc_type": "설계 (spec·plan) 행. 에이전트원칙의 「문서 타입과 수명」 표가 이 행에 plan 을 직접 적었고, 이 plan 은 Goal·Architecture·Global Constraints 로 설계 근거를 포함한다. Task 의 Step 이 수행 방법도 포함하므로 절차·계약 행의 '상태를 적지 말고 방법만 적어라'도 함께 대조했다. 체크박스가 모두 비어 있고 진행 상태와 다음 단계를 적은 문장이 없어, 두 행 모두 포함하지 말라고 한 내용은 들어 있지 않다. spec 「Opus 일괄 판정」 절도 같은 설계 행으로 보았다.",
+  "read": [
+    "D:/projects/dc-verifier-tier/skills/lens-fit/SKILL.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md",
+    "D:/projects/dc-verifier-tier/docs/superpowers/specs/2026-10-20-prior-art-verifier-tiering-design.md (100~179행, 「Opus 일괄 판정」 절과 그 앞뒤)",
+    "D:/projects/dc-verifier-tier/agent-principles.md",
+    "D:/projects/dc-verifier-tier/docs/domain-korean.md",
+    "D:/projects/dc-verifier-tier/korean-banned-words.md"
+  ],
+  "issues": [
+    {
+      "where": "Task 1 Step 3(88·89·91·92행)",
+      "type": "style",
+      "claim": "한 Step 안에서 할 일 대부분은 평서문으로 적혀 있고 90행 하나만 '~하라' 명령형으로 적혀 있다. 구현자는 평서문 항목을 할 일로 읽어야 할지, 판정 정의가 이미 그렇다는 사실로 읽어야 할지 구분할 수 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md",
+      "evidence": "- frontmatter 를 `model: claude-opus-5-5`, `effort: medium` 으로 바꾼다. / - 입력이 URL 여러 개의 `items` 라는 사실과 출력 형식을 적고, 예시 블록을 일괄 형식으로 바꾼다. / - 아래 지시를 추가하라. … / - … 기존 지시는 그대로 둔다. / - `agents/prior-art-judge-escalation.md` 를 지운다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「작업 지시서」 INSTRUCTION-FORM: 사실은 평서문으로, 할 일은 '~하라' 긍정 명령으로 쓰고 … (호출자 계약: 지시는 '~하라' 명령형, 사실은 평서문)",
+      "principle": "INSTRUCTION-FORM",
+      "consequence": "Step 3 의 할 일 다섯 항목 중 한 항목만 명령형이고, 나머지 네 항목은 평서문으로 적혀 있다."
+    },
+    {
+      "where": "Task 1 Step 1 의 기존 검사 수정 목록(76~79행)",
+      "type": "style",
+      "claim": "머리 문장은 '고쳐라'로 명령하고 있으나, 그 아래 항목은 할 일(바꾼다·추가하고·지운다·대조한다)을 평서문으로 적었다. 이 때문에 할 일과 사실을 형태로 구분할 수 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md",
+      "evidence": "아래 기존 검사와 자료도 고쳐라. / - … `E_MG_STAGES` 의 stages 집합은 새 구조에 맞게 바꾼다. / - `prior_art_contract.json` 의 `judge` 자료는 일괄 출력 형식으로 바꾸고, 일괄 입력 예시를 추가하고, `stages` 에서 `escalation` 을 지운다. / - … 상향 판정 정의와 관련된 검사(…)는 지운다.",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「작업 지시서」 INSTRUCTION-FORM: 할 일은 '~하라' 긍정 명령으로 쓰고",
+      "principle": "INSTRUCTION-FORM",
+      "consequence": "기존 검사 수정 목록의 네 항목이 모두 할 일을 평서문 종결로 적었다."
+    },
+    {
+      "where": "Global Constraints(21행·28행)와 Task 2 Step 3(154행)",
+      "type": "style",
+      "claim": "Global Constraints 와 Task 2 Step 3 에서도 할 일을 평서문으로 적었다. 같은 목록과 문단의 다른 문장은 '지켜라'·'실행하라' 명령형이다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md",
+      "evidence": "21행 \"상향 판정 에이전트 정의(`agents/prior-art-judge-escalation.md`)는 지운다.\" / 28행 \"반환값의 바깥 키는 그대로 지켜라. … `escalation` 은 지운다.\" / 154행 \"차례대로 실행하라. 모든 명령에 `--cases … --repeat 2` 를 붙인다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「작업 지시서」 INSTRUCTION-FORM",
+      "principle": "INSTRUCTION-FORM",
+      "consequence": "28행과 154행은 각각 한 문단 안에 명령형 문장과 평서형 할 일 문장을 함께 두었다."
+    },
+    {
+      "where": "Task 2 Step 3 Run(156행), Step 5 Run(168행)",
+      "type": "format",
+      "claim": "Run 칸에 그대로 실행할 수 있는 명령이 없다. 156행은 첫 명령을 '…'로 줄였고, 나머지 단계는 '이어서'와 플래그 조각으로만 적었다. 168행은 명령을 적지 않고 다른 칸을 가리켰다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md",
+      "evidence": "156행 \"Run: `python -I evals/prior-art-verifier/run.py --stage extract-def --model claude-haiku-5-5 --effort high …`, 이어서 `--stage judge-def --model claude-opus-5-5 --effort medium`, …\" / 168행 \"Run: Interfaces 의 `report-v4` 명령\"",
+      "counterpart_file": "호출자가 넘긴 소비자 계약(superpowers writing-plans 의 plan 형식)",
+      "counterpart": "Task 의 Step·Run·Expected 형식에서 Run 칸은 실행할 명령이다.",
+      "principle": "소비자 계약: writing-plans plan 형식(Run)",
+      "consequence": "156행의 Run 칸에는 완결된 명령이 하나도 없다. 구현자는 154행의 공통 인자와 조각들을 직접 이어 붙여 명령 다섯 개를 만들어야 한다. 168행의 Run 칸에는 명령 문자열이 없다."
+    },
+    {
+      "where": "Task 2 Step 2(147~150행)",
+      "type": "format",
+      "claim": "Step 하나에 '실패 확인'과 '구현'과 '통과 확인'을 합쳤다. 그래서 Expected 칸에 구현 행동을 사이에 둔 두 시점의 결과가 들어갔다. 구현 내용을 지시하는 Step 은 따로 없다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md",
+      "evidence": "- [ ] **Step 2: 실행해 실패를 확인하고 구현해 통과시킨다** / Run: `bash evals/prior-art-verifier/run_tests.sh` / Expected: 처음 FAIL, 구현 뒤 `FAIL=0`.",
+      "counterpart_file": "호출자가 넘긴 소비자 계약(superpowers writing-plans 의 plan 형식)",
+      "counterpart": "Expected 칸에는 행동을 넣지 않는다. Task 는 Step·Run·Expected 단위로 나눈다.",
+      "principle": "소비자 계약: writing-plans plan 형식(Expected 에 행동 금지)",
+      "consequence": "Expected 칸의 '구현 뒤'가 구현 행동을 가리킨다. run.py·replay.py·score.py 를 고치는 일은 이 Step 의 제목에만 있다."
+    },
+    {
+      "where": "Global Constraints(21·22·25행)",
+      "type": "style",
+      "claim": "제약 항목 일부가 서술어 없는 명사 조각이다. 쉼표로 이은 조각으로 끝난다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md",
+      "evidence": "21행 \"추출 검증자·지도 대조 에이전트는 `model: claude-haiku-5-5`, `effort: high`. 판정 에이전트는 `model: claude-opus-5-5`, `effort: medium`.\" / 22행 \"도구: 추출 검증자는 `WebFetch, Read`, 판정·지도 대조 에이전트는 `Read`.\" / 25행 \"판정 차례: 처음 판정에 `불일치` 가 있으면 `unsupported`, 보충은 주장마다 한 번, 보충·재판정 실패와 … 그 주장만 검증 실패다.\"",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「PROSE-FORM」 FULL-SENTENCE: 본문은 주어와 서술어를 갖춘 문장으로 끝까지 써라.",
+      "principle": "FULL-SENTENCE",
+      "consequence": "21·22행은 서술어 없이 끝난다. 25행은 '…있으면 `unsupported`,'와 '보충은 주장마다 한 번,' 두 조각을 쉼표로 이은 뒤 마지막 절에만 서술어를 두었다."
+    },
+    {
+      "where": "Task 2 Step 5 Expected(169행)",
+      "type": "style",
+      "claim": "병합 조건을 이름 대신 개수로 가리켰다.",
+      "file": "D:/projects/dc-verifier-tier/docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md",
+      "evidence": "Expected: `results-v4/report.md` 에 병합 조건 둘의 충족 여부, …",
+      "counterpart_file": "D:/projects/dc-verifier-tier/agent-principles.md",
+      "counterpart": "「UNPACK」 COUNT-EARNS: 대상을 개수로 가리키지 말고 이름으로 가리키며 (korean-banned-words.md 표 밖 지시 '수사를 대명사처럼 쓰지 않는다'와 겹친다)",
+      "principle": "COUNT-EARNS",
+      "consequence": "Expected 칸은 비용 조건과 맞힘 유지 조건을 이름으로 적지 않았다. 검사자가 확인할 조건을 알려면 29행으로 돌아가야 한다."
+    }
+  ],
+  "principles_applied": [
+    "INSTRUCTION-FORM",
+    "FULL-SENTENCE",
+    "COUNT-EARNS",
+    "DOC-TYPE",
+    "WRITTEN-ONLY",
+    "SUBJECT-OBJECT",
+    "ANTI-LIMIT",
+    "소비자 계약: writing-plans plan 형식(헤더·Global Constraints·Review Focus·Files·Interfaces·Step·Run·Expected)",
+    "korean-banned-words.md 금지 표현 표"
+  ],
+  "notes": "검토한 관점은 형식(writing-plans 의 헤더·Global Constraints·Review Focus·Task 칸), 스타일(명령형과 평서문의 구분, 문어체, 문장 끝맺음, 개수 표기), 오염, 호환, 규율이다. 규율 관점은 문서 타입 판정을 먼저 하고 나머지 조항을 보았다. 헤더(Goal·Architecture·Tech Stack)와 Global Constraints·Review Focus·Files·Interfaces 칸은 모두 있다. Run 이 있는 Step 에는 Expected 도 있고, Expected 칸 중 행동이 들어간 칸은 Task 2 Step 2 뿐이다. Task 1 Step 6·Task 2 Step 6 의 커밋 Step 과 Task 2 Step 7 의 사용자 질문 Step 에는 Run·Expected 가 없다. 이 Step 들의 성격상 위반으로 올리지 않았다. 금지어는 계약대로 첫 칸 글자를 문자열로 검색했다. '판'은 모두 '판정'·'판단'이라 제외 칸에 해당한다. '부르'·'부른'은 64·69·70·40행의 백틱 안 검사 이름에만 있었다. 이 검사 이름은 test_workflow.sh 에 들어갈 코드 문자열이므로 대상에서 뺐다. 다만 이 검사 이름은 Review Focus 본문(40행)에도 인용되어 있다. 금지어 훅이 백틱 안 문자열을 거르는지는 이 렌즈가 확인하지 않았다. 확인하려면 hooks/doc_word_pretooluse.sh 의 백틱 처리를 보아야 한다. spec 「Opus 일괄 판정」 절(109~119행)에서는 금지어가 검출되지 않았고, 계약 위반으로 올릴 사항도 찾지 못했다. 119행의 '시험 자료 한 번은 주장 40개 안팎이고'는 '한 번'이 실행 한 번을 뜻하는지 자료 한 묶음을 뜻하는지 이름으로 밝히지 않았다. 규칙집의 어느 조항에도 직접 해당하지 않아 올리지 않았다. 96~101행의 'Verify 단계는 아래 순서로 실행한다'는 바꾼 뒤 워크플로가 할 동작을 사실로 적은 문장으로 읽힌다. 구현자에게 내리는 지시로도 읽힐 수 있지만 올리지 않았다. 내용의 정확성과 spec·plan 사이의 일치는 이 렌즈가 보지 않았다."
+}
