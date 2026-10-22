@@ -67,7 +67,7 @@ WebFetch 는 작은 모델이 페이지를 읽고 프롬프트에 답한 결과�
 
 ### 반환값과 계약
 
-반환값의 바깥 형식은 바꾸지 않는다. 워크플로는 URL 마다 단계 출력을 합쳐 현행 인용 판정 출력 형식(`{ url, judgments: [{ ref, verdict, quote, reason }], principles_applied }`)을 만들고 `verifiers[].output` 에 넣는다. `quote` 는 추출 검증자의 값이고, `reason` 은 단계별 이유를 이어 붙인 값이다. 단계별 원본은 `verifiers[].stages` 에 새로 둔다. `verifier_count` 는 지금처럼 인용 판정을 받은 URL 수다. 그래서 오케스트레이터의 「반환값을 읽는 규칙」과 「인용 확인」은 지금 위치에서 사유와 `quote` 를 읽는다.
+반환값의 바깥 형식은 바꾸지 않는다. 워크플로는 URL 마다 단계 출력을 합쳐 현행 인용 판정 출력 형식(`{ url, judgments: [{ ref, verdict, quote, reason }], principles_applied }`)을 만들고 `verifiers[].output` 에 넣는다. `quote` 는 추출 검증자의 값이고, `reason` 은 단계별 이유를 이어 붙인 값이다. 단계별 원본은 `verifiers[].stages` 에 새로 둔다. `verifier_count` 는 지금처럼 인용 판정을 받은 URL 수다. 보충이 실행됐으면 `quote` 는 보충 구절이다(「충분성 판단과 보충·Opus 상향」 4번). `verifier_count` 는 검증에 보낸 URL 수이기도 하다. 그래서 오케스트레이터의 「반환값을 읽는 규칙」과 「인용 확인」은 지금 위치에서 사유와 `quote` 를 읽는다.
 
 "검증자"라는 이름은 이제 추출 검증자·판정 에이전트·지도 대조 에이전트를 함께 가리킨다(상향 판정 에이전트는 「Opus 일괄 판정」 에서 없앴다).
 

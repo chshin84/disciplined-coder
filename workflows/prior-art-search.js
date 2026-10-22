@@ -428,7 +428,7 @@ function mergeStages(refsByUrl, extract, judge, refetch, rejudge) {
   return { outputs, stages };
 }
 
-// URL 하나의 합치기다. spec 「최종 판정과 실패 처리」와 「충분성 판단과 보충·Opus 상향」, 「Opus 일괄 판정」의 차례로 verdict 를 정하고,
+// URL 하나의 합치기다. spec 「최종 판정과 실패 처리」와 「충분성 판단과 보충·Opus 상향」(이 절의 상향 부분은 「Opus 일괄 판정」이 대체했다), 「Opus 일괄 판정」의 차례로 verdict 를 정하고,
 // URL 검증 실패이면 null 이다. 처음 판정의 무응답과 칸 누락은 URL 검증 실패이고, 처음 판정에서 빠진 주장과 보충·재판정의 실패는
 // 그 주장만 verify_failed 다. 끝까지 판정 불가가 남은 주장은 unsupported 이고, 판정 불가 칸의 이유 유형을 reason 에 남긴다.
 // quote 는 보충 출력이 추출 기준을 통과했으면 보충 구절이고, 아니면 추출 구절이다. reason 은 단계 이름을 붙인 이유를 ' / ' 로 이어 붙인다.

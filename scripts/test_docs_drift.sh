@@ -948,7 +948,7 @@ done
 check "spec 리뷰가 발동과 기록을 가리킨다" "points_to \"\$CALLER\" '\`agent-prior-art\`' '「발동과 기록」'"
 check "연구자 정의의 도구가 구성과 같다" "grep -qx 'tools: WebSearch, WebFetch, Read, Grep, Glob' <<<\"\$(fm \"\$RDEF\")\""
 check "연구자 정의의 턴 상한이 20 이다" "grep -qx 'maxTurns: 20' <<<\"\$(fm \"\$RDEF\")\""
-# 검증자 정의는 추출·판정·지도 대조의 세 파일이다. 구성 값은 spec 「확정 구성과 판정 불가 상향」이 정했고,
+# 검증자 정의는 추출·판정·지도 대조의 세 파일이다. 구성 값은 spec 「Opus 일괄 판정」이 정했고,
 # 판정 정의의 모델과 노력 수준은 「Opus 일괄 판정」이 바꿨다.
 JDEF="$HERE/agents/prior-art-judge.md"
 MDEF="$HERE/agents/prior-art-mapcheck.md"
