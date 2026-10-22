@@ -1,0 +1,48 @@
+{
+ "target": "skills/nested-orchestration/references/sub-session-protocol.md",
+ "lens": "lens-grounding",
+ "read": [
+  "skills/nested-orchestration/references/sub-session-protocol.md",
+  "agent-principles.md",
+  "skills/nested-orchestration/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/agent-prior-art/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "C:/Users/CHSHIN/.claude/plugins/cache/claude-plugins-official/superpowers/7.0.0/skills/subagent-driven-development/SKILL.md"
+ ],
+ "issues": [],
+ "statements": [
+  {
+   "topic": "nested-orchestration",
+   "statement": "현재 세션과 서브 세션은 메시지 형식 절의 형식으로만 메시지를 주고받는다.",
+   "evidence": "현재 세션과 서브 세션은 이 절의 형식으로만 메시지를 주고받는다."
+  },
+  {
+   "topic": "LENS-ALLOWED",
+   "statement": "상시 허용 렌즈로 볼 수 있는 관점이면 서브 세션은 멈추지 않고 그 렌즈를 직접 실행한다.",
+   "evidence": "상시 허용 렌즈(에이전트원칙 LENS-ALLOWED)로 볼 수 있는 관점이면 서브 세션은 멈추지 않고 그 렌즈를 직접 실행한다."
+  },
+  {
+   "topic": "dispatching-lenses",
+   "statement": "필요할 때 그룹의 발동 기준에 해당했을 뿐 진행에 지장이 없으면 서브 세션은 멈추지 않고 리포트의 렌즈 그룹 판정에 적는다.",
+   "evidence": "필요할 때 그룹의 발동 기준에 해당했을 뿐 진행에 지장이 없으면 멈추지 않고 리포트의 `렌즈 그룹 판정`에 적는다(`dispatching-lenses`의 「렌즈 그룹」)."
+  },
+  {
+   "topic": "agent-prior-art",
+   "statement": "선행연구 에이전트의 발동 기준에 해당했을 때의 규칙은 agent-prior-art 의 발동과 기록이 정한다.",
+   "evidence": "선행연구 에이전트의 발동 기준에 해당했을 때도 같으며, 그 규칙은 `agent-prior-art`의 「발동과 기록」이 정한다."
+  },
+  {
+   "topic": "review-specs",
+   "statement": "서브 세션은 리뷰 반영 뒤 다시 리뷰할지 묻지 못하므로 생략하고 기능적 변화가 있었던 반영을 리포트의 기능적 반영에 적는다.",
+   "evidence": "서브 세션은 리뷰 반영 뒤 다시 리뷰할지 묻지 못하므로 생략하고, 기능적 변화가 있었던 반영을 리포트의 `기능적 반영`에 적는다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "LENS-ALLOWED",
+  "REVERSIBLE",
+  "SUB-ORCHESTRATE"
+ ],
+ "notes": "검토한 관점: 누락·모순·환각·불일치를 항목마다 따로 보았다. 발견은 없었다. 일치를 확인한 것: 사유 코드 다섯과 유형 다섯이 nested-orchestration/SKILL.md 의 BLOCKED 처리 표와 같음, 하향 메시지 머리줄(START·RESTART·APPROVE·REVISE·ANSWER·BASE-UPDATED·CONTRACT-CHANGED·INTEGRATION-FAILED·CANCEL)이 SKILL.md 의 처리 서술과 같음, 리포트 절 이름(명세 이탈·스스로 판정한 모호함·SDD 판정과 남은 지적·렌즈 그룹 판정·기능적 반영·제안·메시지 기록)이 SKILL.md 의 참조와 같음, 정리 단계가 SKILL.md 흐름 10단계에 있음, 디스패치 템플릿 역할 선언의 '프로토콜 필드의 파일을 통째로 읽고' 문장과 이 파일 첫 문단이 같음, SDD 수정 라운드(1~3 재개·4 이후 새 구현자)와 Ruling 줄과 멈춤 네 조건과 작업 공간 삭제 규칙이 설치된 superpowers 7.0.0 의 subagent-driven-development 와 같음, REVISE·CONTRACT-CHANGED 의 다시 리뷰가 review-specs 의 서브 세션 서술과 같음. superpowers 는 플러그인 버전에 따라 달라질 수 있어 7.0.0 기준이다."
+}

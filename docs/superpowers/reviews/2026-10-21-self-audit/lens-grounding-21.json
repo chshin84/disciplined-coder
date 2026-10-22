@@ -1,0 +1,99 @@
+{
+ "target": "CLAUDE.md",
+ "lens": "lens-grounding",
+ "read": [
+  "README.md",
+  "hooks/doc_review_posttooluse.sh",
+  "hooks/_spec_marker.sh",
+  "hooks/rules_nudge_pretooluse.sh",
+  "hooks/readonly_pretooluse.sh",
+  "hooks/stop_gates.sh",
+  "hooks/spec_review_posttooluse.sh",
+  "hooks/doc_format_pretooluse.sh",
+  "scripts/seal_reviews.sh",
+  "scripts/scaffold.sh",
+  "scripts/test_docs_drift.sh",
+  "scripts/_test_check.sh",
+  ".claude/settings.json",
+  "docs/domain-discipline.md",
+  "evals/principles/",
+  "scripts/eval_clause.sh",
+  "scripts/eval_clause_report.sh",
+  "agent-principles.md"
+ ],
+ "issues": [
+  {
+   "where": "훅과 봉인 / 넛지 예외",
+   "type": "contradiction",
+   "claim": "CLAUDE.md 는 검진 넛지가 리뷰 기록만 빼고 본다고 적었으나, README 는 저장소에 커밋되는 작업 문서에도 뜨지 않는다고 적었고 훅 코드는 spec·plan 도 뺀다.",
+   "file": "CLAUDE.md",
+   "evidence": "검진 넛지(`hooks/doc_review_posttooluse.sh`)는 리뷰 기록만 빼고 프로젝트 밖 문서도 본다.",
+   "counterpart_file": "README.md",
+   "counterpart": "검진 넛지는 저장소에 커밋되는 작업 문서와 리뷰 기록에는 뜨지 않는다.",
+   "principle": "lens-grounding",
+   "consequence": "지금 검진 넛지의 제외 대상이 CLAUDE.md 에는 리뷰 기록 하나로, README 에는 작업 문서와 리뷰 기록으로 적혀 있다."
+  },
+  {
+   "where": "훅과 봉인 / 넛지 예외",
+   "type": "mismatch",
+   "claim": "규칙 넛지가 세션의 첫 도구 호출에 뜬다고 적었으나, 훅은 첫 Write·Edit·Bash 호출에만 뜬다.",
+   "file": "CLAUDE.md",
+   "evidence": "세션의 첫 도구 호출에 한 번 뜨는 규칙 넛지는 대상 경로를 보지 않으므로 이 예외가 적용되지 않는다.",
+   "counterpart_file": "hooks/rules_nudge_pretooluse.sh",
+   "counterpart": "이 세션의 첫 Write·Edit·Bash 호출에 규칙이 어디 있는지 한 번 알린다",
+   "principle": "lens-grounding",
+   "consequence": "지금 Read·Grep 같은 읽기 도구로 시작한 세션에서는 첫 도구 호출에 이 넛지가 뜨지 않는다."
+  },
+  {
+   "where": "에이전트원칙을 고칠 때 / 명령형",
+   "type": "contradiction",
+   "claim": "CLAUDE.md 는 금지문을 불변 조건에만 쓴다고 정했으나, 에이전트원칙의 여러 조항은 불변 조건이 아닌 일에 금지문('~마라')을 쓴다.",
+   "file": "CLAUDE.md",
+   "evidence": "금지문은 불변 조건(비밀, 되돌릴 수 없는 삭제와 외부 전송, 다른 세션의 저장소)에만 쓴다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "한 번만 쓰는 추상화, 요청하지 않은 설정 가능성, 일어날 수 없는 상황의 처리를 넣지 마라.",
+   "principle": "lens-grounding",
+   "consequence": "지금 YAGNI·NO-ANALOGY·KEEP-FAILED 등 조항이 불변 조건 밖의 일에 금지문을 쓰고 있어 CLAUDE.md 가 정한 퇴고 규칙과 에이전트원칙이 다르다."
+  },
+  {
+   "where": "에이전트원칙을 고칠 때 / 지시와 근거의 분리",
+   "type": "omission",
+   "claim": "에이전트원칙에는 행동 지시와 그 이유 한 줄을 적는다고 정했으나, 이유 문장이 없는 조항이 있다.",
+   "file": "CLAUDE.md",
+   "evidence": "에이전트원칙에는 행동 지시와 그 이유 한 줄을 적는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "저장소 안에서만 통하는 이름과 그 분야의 용어는 답마다 처음 나올 때 한 줄로 풀어라.",
+   "principle": "lens-grounding",
+   "consequence": "지금 TERM-EXPLAIN 조항 줄에는 '~하기 위해서다' 형태의 이유 문장이 없다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "DOC-TYPE",
+   "statement": "에이전트원칙의 문서 관리가 타입과 수명을 정하고, 이 저장소에서 무엇이 강제하는지는 CLAUDE.md 가 적는다.",
+   "evidence": "에이전트원칙의 「문서 관리」가 타입과 수명을 정하고, 그것을 이 저장소에서 무엇이 강제하는지는 여기가 적는다."
+  },
+  {
+   "topic": "domain-pruning",
+   "statement": "테스트나 문서를 줄이는 차수에는 domain-pruning 절차의 결함 주입을 이 저장소의 핵심 계약에 한다.",
+   "evidence": "테스트나 문서를 줄이는 차수에는 `domain-pruning` 「절차」의 결함 주입을 이 저장소의 핵심 계약에 한다."
+  },
+  {
+   "topic": "ASYNC-FIRST",
+   "statement": "검사 스크립트는 동시에 실행하고 실패한 이름을 모아 마지막에 알린다.",
+   "evidence": "검사 스크립트를 동시에 실행하고 실패한 이름을 모아 마지막에 알린다."
+  },
+  {
+   "topic": "EDIT-DISCIPLINE",
+   "statement": "에이전트원칙의 PC 전역 사본은 세션마다 덮어쓰이므로 사본을 고치지 않는다.",
+   "evidence": "사본은 세션마다 이 파일에서 다시 덮어쓰므로 사본을 고치지 않는다."
+  },
+  {
+   "topic": "review-docs",
+   "statement": "리뷰 기록은 세션이 시작될 때 읽기 전용으로 봉인된다.",
+   "evidence": "**리뷰 기록 봉인** — 세션이 시작될 때 커밋된 리뷰 기록(`docs/superpowers/reviews/` 아래 전부)이 읽기 전용으로 봉인된다."
+  }
+ ],
+ "principles_applied": [],
+ "notes": "확인한 것: README 의 「하드 게이트와 넛지와 전역 설정 수정」 절 존재와 검진 넛지 설명(68행), hooks/doc_review_posttooluse.sh·_spec_marker.sh 의 제외 규칙(리뷰 기록, spec·plan, 같은 폴더 산출물 조건), hooks/rules_nudge_pretooluse.sh 의 대상 도구, scripts/seal_reviews.sh 와 .claude/settings.json 의 SessionStart 봉인과 scripts/test_docs_drift.sh 의 봉인 검사, hooks/readonly_pretooluse.sh, scripts/scaffold.sh 의 HANDOFF 처리, 문서 타입 표 일곱 행과 agent-principles.md 표의 일치, docs/domain-discipline.md 의 「생성 제약」·「삭제한 조항」·`ASYNC-FIRST` 실측(334초/219초), evals/principles/clauses·cases 와 scripts/eval_clause.sh·eval_clause_report.sh 실재, test_*.sh 의 FAIL 계수기와 종료 규약. '프로젝트 밖 문서에는 문서 넛지가 뜨지 않는다'는 spec_review_posttooluse.sh 와 doc_format_pretooluse.sh 의 path_in_project 로 확인했다."
+}

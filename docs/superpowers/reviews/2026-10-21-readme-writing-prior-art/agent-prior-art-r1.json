@@ -1,0 +1,2445 @@
+{
+  "summary": "하위 질문마다 연구자를 실행하고 인용을 검증자로 판정해 통과한 선행 사례만 모은다",
+  "agentCount": 17,
+  "logs": [],
+  "result": {
+    "round": 1,
+    "passed": [
+      {
+        "ref": "sq1#issue#0",
+        "urls": [
+          "https://arxiv.org/abs/2206.10772"
+        ]
+      },
+      {
+        "ref": "sq1#issue#1",
+        "urls": [
+          "https://arxiv.org/abs/2010.02472"
+        ]
+      },
+      {
+        "ref": "sq1#issue#2",
+        "urls": [
+          "https://par.nsf.gov/servlets/purl/10063054"
+        ]
+      },
+      {
+        "ref": "sq1#issue#3",
+        "urls": [
+          "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes"
+        ]
+      },
+      {
+        "ref": "sq1#case#0",
+        "urls": [
+          "https://arxiv.org/abs/1802.06997"
+        ]
+      },
+      {
+        "ref": "sq1#case#1",
+        "urls": [
+          "https://arxiv.org/abs/2206.10772"
+        ]
+      },
+      {
+        "ref": "sq1#case#2",
+        "urls": [
+          "https://arxiv.org/abs/2010.02472"
+        ]
+      },
+      {
+        "ref": "sq1#case#3",
+        "urls": [
+          "https://par.nsf.gov/servlets/purl/10063054"
+        ]
+      },
+      {
+        "ref": "sq1#case#4",
+        "urls": [
+          "https://arxiv.org/abs/1802.08391"
+        ]
+      },
+      {
+        "ref": "sq1#case#5",
+        "urls": [
+          "https://arxiv.org/abs/2502.18440"
+        ]
+      },
+      {
+        "ref": "sq1#case#6",
+        "urls": [
+          "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes"
+        ]
+      },
+      {
+        "ref": "sq2#issue#0",
+        "urls": [
+          "https://arxiv.org/abs/1802.06997"
+        ]
+      },
+      {
+        "ref": "sq2#issue#1",
+        "urls": [
+          "https://google.github.io/styleguide/docguide/READMEs.html"
+        ]
+      },
+      {
+        "ref": "sq2#issue#2",
+        "urls": [
+          "https://opensource.guide/starting-a-project/"
+        ]
+      },
+      {
+        "ref": "sq2#issue#3",
+        "urls": [
+          "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes"
+        ]
+      },
+      {
+        "ref": "sq2#case#0",
+        "urls": [
+          "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes"
+        ]
+      },
+      {
+        "ref": "sq2#case#1",
+        "urls": [
+          "https://github.com/RichardLitt/standard-readme/blob/main/spec.md"
+        ]
+      },
+      {
+        "ref": "sq2#case#2",
+        "urls": [
+          "https://google.github.io/styleguide/docguide/READMEs.html"
+        ]
+      },
+      {
+        "ref": "sq2#case#3",
+        "urls": [
+          "https://www.makeareadme.com/"
+        ]
+      },
+      {
+        "ref": "sq2#case#4",
+        "urls": [
+          "https://opensource.guide/starting-a-project/"
+        ]
+      },
+      {
+        "ref": "sq2#case#5",
+        "urls": [
+          "https://arxiv.org/abs/1802.06997"
+        ]
+      },
+      {
+        "ref": "sq2#case#6",
+        "urls": [
+          "https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf"
+        ]
+      }
+    ],
+    "rejected": [
+      {
+        "ref": "sq2#case#7",
+        "urls": [
+          "https://diataxis.fr/"
+        ]
+      }
+    ],
+    "unverifiable": [],
+    "verify_failed": [],
+    "coverage": [
+      {
+        "id": "sq1",
+        "cases_found": 11,
+        "passed": 11
+      },
+      {
+        "id": "sq2",
+        "cases_found": 12,
+        "passed": 11
+      }
+    ],
+    "subquestion_status": [
+      {
+        "id": "sq1",
+        "search_status": "ok",
+        "verification_status": "ok"
+      },
+      {
+        "id": "sq2",
+        "search_status": "ok",
+        "verification_status": "ok"
+      }
+    ],
+    "overall_status": "ok",
+    "query_violations": [],
+    "verifier_count": 13,
+    "researchers": [
+      {
+        "id": "sq1",
+        "output": {
+          "agent": "agent-prior-art",
+          "mode": "survey",
+          "subquestion_id": "sq1",
+          "search_status": "ok",
+          "queries": [
+            "README content categories GitHub repositories empirical study popularity",
+            "README file quality open source project adoption contributors empirical analysis",
+            "GitHub README structure clusters Java repositories stars guidelines Liu",
+            "README documentation newcomers onboarding barriers open source empirical study",
+            "README features popular vs non-popular repositories GitHub machine learning study",
+            "Noei Lyons \"ReadMe\" file structure stars Java repositories",
+            "\"ReadMe files\" GitHub guidelines 14,901 Java repositories 32 clusters",
+            "README badges repository signals popularity empirical study npm",
+            "Noei Lyons empirical study ReadMe files GitHub stars 2019"
+          ],
+          "read": "[\"https://arxiv.org/abs/1802.06997\", \"https://arxiv.org/abs/2206.10772\", \"https://katalog.hcu-hamburg.de/vufind/Search2Record/ELV007903707\", \"https://arxiv.org/abs/2010.02472\", \"https://arxiv.org/abs/2502.18440\", \"https://par.nsf.gov/servlets/purl/10063054\", \"https://arxiv.org/abs/1802.08391\", \"https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes\"]",
+          "issues": [
+            {
+              "where": "target 규칙 (4) 배지·목차·스크린샷·변경 이력은 실제로 필요할 때만 넣는다",
+              "type": "refuted-premise",
+              "claim": "대조 대상은 이미지(스크린샷)를 기본으로 빼는 쪽에 둔다. 그러나 아래 선행 연구는 인기 저장소의 README 가 목록과 이미지로 구성된 경향을 보고한다. 이 결과는 상관 관계이므로 '필요할 때만'이라는 규칙을 반박하지는 못한다. 다만 이미지가 기본으로 불필요하다는 전제와는 방향이 다르다.",
+              "prior_claim": "Venigalla 와 Chimalakonda 는 10개 언어의 GitHub README 1,950개를 분석했다. 그 결과 인기 프로젝트 README 의 대부분이 목록과 이미지로 잘 정리되어 있고 외부 링크를 포함하며, 기여 지침과 참고문헌을 담은 README 가 높은 인기와 연관되었다고 보고했다.",
+              "consequence": "대조 대상의 규칙 (4)는 이미지를 넣지 않는 쪽을 기본값으로 둔다. 그래서 이미지와 인기의 상관을 보고한 실증 결과와 비교하지 않은 채 기본값이 정해져 있다.",
+              "evidence": "arXiv 2206.10772 초록: 'well organised using lists and images', 'contribution guidelines and references ... associated with higher popularity'. 네 축 중 목적(작성 규칙 대 실증 분석)과 메커니즘이 다르다.",
+              "citations": [
+                {
+                  "url": "https://arxiv.org/abs/2206.10772",
+                  "kind": "preprint",
+                  "opened": true
+                }
+              ]
+            },
+            {
+              "where": "target 규칙 (4) 스크린샷·이미지의 기본 제외",
+              "type": "refuted-premise",
+              "claim": "대조 대상은 이미지를 기본으로 빼는 쪽에 둔다. 아래 선행 연구는 README 의 이미지 수를 인기 저장소와 비인기 저장소를 가르는 주요 특징으로 보고한다. 표본이 학술 AI 저장소에 한정되고 결과가 상관 관계라는 차이가 있다.",
+              "prior_claim": "Fan 등은 학술 AI 저장소 1,149개를 별 수 상위 20%와 하위 70%로 나눠 21개 특징을 비교했다. 그 결과 11개 특징이 유의하게 달랐고, README 안의 다른 GitHub 저장소 링크 수와 README 이미지 수와 라이선스 포함 여부가 두 집단을 가르는 가장 중요한 특징이었다.",
+              "consequence": "대조 대상의 규칙 (4)는 이 결과와 비교하지 않은 채 이미지를 선택 항목으로 둔다. 그래서 이미지가 채택 판단에 주는 효과를 검토한 기록이 대조 대상에 없다.",
+              "evidence": "arXiv 2010.02472 초록. 적용 대상(학술 AI 저장소)이 대조 대상의 범위(일반 도구 README)와 다르다.",
+              "citations": [
+                {
+                  "url": "https://arxiv.org/abs/2010.02472",
+                  "kind": "peer-reviewed",
+                  "opened": true
+                }
+              ]
+            },
+            {
+              "where": "target 규칙 (4) 배지의 기본 제외",
+              "type": "refuted-premise",
+              "claim": "대조 대상은 배지를 필요할 때만 넣는다고 정한다. 아래 선행 연구는 빌드 상태·테스트 커버리지·의존성 최신성 배지가 대체로 신뢰할 만한 품질 신호라고 보고한다. 그래서 배지가 장식이라는 전제가 깔려 있다면 그 전제와 상충한다. 다만 효과가 늘 지속되지는 않는다는 단서가 붙어 있다.",
+              "prior_claim": "Trockman 등은 npm 저장소 294,941개를 채굴하고 개발자 설문과 통계 모형과 시계열 분석을 했다. 빌드 상태·테스트 커버리지·의존성 최신성을 보이는 비자명한 배지는 대체로 신뢰할 만한 신호로서 더 많은 테스트, 더 나은 풀 리퀘스트, 더 최신의 의존성과 상관되었다. 배지 표시는 모범 관행과 상관되지만 그 효과가 항상 지속되지는 않았다.",
+              "consequence": "대조 대상의 규칙 (4)는 배지 종류를 구분하지 않는다. 그래서 신뢰할 만한 신호 배지와 장식 배지가 같은 기준으로 다뤄진다.",
+              "evidence": "par.nsf.gov 사본 1페이지 초록(ICSE 2018, DOI 10.1145/3180155.3180209): 'non-trivial badges ... are mostly reliable signals'.",
+              "citations": [
+                {
+                  "url": "https://par.nsf.gov/servlets/purl/10063054",
+                  "kind": "peer-reviewed",
+                  "opened": true
+                }
+              ]
+            },
+            {
+              "where": "target 규칙 (1)·(3) 네 질문과 권장 동선",
+              "type": "weak-baseline",
+              "claim": "대조 대상의 네 질문과 권장 동선은 아래 GitHub 공식 README 안내 목록과 비교되지 않았다.",
+              "prior_claim": "GitHub 공식 문서는 README 가 보통 프로젝트가 하는 일, 프로젝트가 유용한 이유, 시작하는 방법, 도움을 얻을 곳, 유지·기여하는 사람을 담는다고 안내한다. 또한 GitHub 는 절 제목으로 목차를 자동 생성한다.",
+              "consequence": "대조 대상에는 이 기준선과의 대조 기록이 없다. 그래서 '도움을 얻을 곳' 항목이 네 질문의 '더 배우려면 어디로' 와 같은지, 목차 자동 생성이 규칙 (4)의 목차 판단에 반영되었는지가 확인되지 않은 채 남아 있다.",
+              "evidence": "docs.github.com about-readmes 문서의 목록과 'GitHub will automatically generate a table of contents based on section headings' 문장.",
+              "citations": [
+                {
+                  "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes",
+                  "kind": "vendor",
+                  "opened": true
+                }
+              ]
+            }
+          ],
+          "evidence_map": [
+            {
+              "case": "Prana 등, Categorizing the Content of GitHub README Files",
+              "url": "https://arxiv.org/abs/1802.06997",
+              "axes": {
+                "purpose": {
+                  "prior": "README 절의 내용 범주를 분류하고 자동 분류기를 만든다",
+                  "same": false,
+                  "note": "대조 대상은 작성 규칙이고 선행 사례는 내용 분류다"
+                },
+                "mechanism": {
+                  "prior": "393개 저장소의 4,226개 절을 수작업 주석하고 8범주 다중 라벨 분류기(F1 0.746)를 학습했다",
+                  "same": false,
+                  "note": "범주 체계는 대조 대상의 절 구성과 겹치나 메커니즘은 분류다"
+                },
+                "evaluation": {
+                  "prior": "전문가 20명이 자동 범주 라벨이 정보 찾기를 쉽게 한다고 답했다",
+                  "same": false,
+                  "note": "인기·채택 지표가 아닌 정보 탐색 용이성 평가다"
+                },
+                "target": {
+                  "prior": "무작위 GitHub 저장소 README",
+                  "same": false,
+                  "note": "대조 대상은 사용자용 도구 README 로 범위가 더 좁다"
+                }
+              },
+              "outcome": "성공",
+              "kind": "peer-reviewed",
+              "source_level": "1차",
+              "route": "웹 검색 후 arXiv 초록",
+              "adoption": "참고"
+            },
+            {
+              "case": "Venigalla·Chimalakonda, README 내용과 프로젝트 인기의 상관",
+              "url": "https://arxiv.org/abs/2206.10772",
+              "axes": {
+                "purpose": {
+                  "prior": "README 내용 특징과 인기의 상관을 밝힌다",
+                  "same": false,
+                  "note": "실증 분석이며 작성 규칙이 아니다"
+                },
+                "mechanism": {
+                  "prior": "10개 언어 README 1,950개의 구조·내용 특징을 분석했다",
+                  "same": false,
+                  "note": "상관 분석이다"
+                },
+                "evaluation": {
+                  "prior": "프로젝트 인기",
+                  "same": false,
+                  "note": "대조 대상은 독자의 판단 속도와 채택을 목표로 하나 평가 지표를 정하지 않았다"
+                },
+                "target": {
+                  "prior": "공개 GitHub 프로젝트 README",
+                  "same": false,
+                  "note": "대조 대상보다 넓다"
+                }
+              },
+              "outcome": "성공",
+              "kind": "preprint",
+              "source_level": "1차",
+              "route": "웹 검색 후 arXiv 초록",
+              "adoption": "참고"
+            },
+            {
+              "case": "Fan 등, What Makes a Popular Academic AI Repository?",
+              "url": "https://arxiv.org/abs/2010.02472",
+              "axes": {
+                "purpose": {
+                  "prior": "인기 학술 AI 저장소의 특징을 밝힌다",
+                  "same": false,
+                  "note": "실증 분석이다"
+                },
+                "mechanism": {
+                  "prior": "1,149개 저장소의 21개 특징(코드·재현성·문서)을 상위 20%와 하위 70%로 비교했다",
+                  "same": false,
+                  "note": "README 특징은 일부다"
+                },
+                "evaluation": {
+                  "prior": "별 수 기준 인기",
+                  "same": false,
+                  "note": "대조 대상에는 평가 지표가 없다"
+                },
+                "target": {
+                  "prior": "논문에 딸린 학술 AI 저장소",
+                  "same": false,
+                  "note": "대조 대상의 일반 도구 README 와 다르다"
+                }
+              },
+              "outcome": "성공",
+              "kind": "peer-reviewed",
+              "source_level": "1차",
+              "route": "웹 검색 후 arXiv 초록(ICSE 2021 Journal-First)",
+              "adoption": "참고"
+            },
+            {
+              "case": "Trockman 등, npm 저장소 배지 실증 연구",
+              "url": "https://par.nsf.gov/servlets/purl/10063054",
+              "axes": {
+                "purpose": {
+                  "prior": "README 배지가 품질 신호로 작동하는지 밝힌다",
+                  "same": false,
+                  "note": "대조 대상 규칙 (4)의 배지 판단과만 관련된다"
+                },
+                "mechanism": {
+                  "prior": "294,941개 저장소 채굴, 개발자 설문, 회귀와 시계열 분석",
+                  "same": false,
+                  "note": "실증 분석이다"
+                },
+                "evaluation": {
+                  "prior": "배지와 테스트·풀 리퀘스트·의존성 최신성의 상관",
+                  "same": false,
+                  "note": "채택 판단 속도를 평가하지 않는다"
+                },
+                "target": {
+                  "prior": "npm 패키지 저장소",
+                  "same": false,
+                  "note": "생태계 하나에 한정된다"
+                }
+              },
+              "outcome": "성공",
+              "kind": "peer-reviewed",
+              "source_level": "1차",
+              "route": "웹 검색 후 NSF 공개 사본 PDF 1페이지",
+              "adoption": "참고"
+            },
+            {
+              "case": "Ikeda 등, JavaScript 패키지 README 내용 실증 연구",
+              "url": "https://arxiv.org/abs/1802.08391",
+              "axes": {
+                "purpose": {
+                  "prior": "README 에 무엇이 들어가는지 밝힌다",
+                  "same": false,
+                  "note": "실증 분석이다"
+                },
+                "mechanism": {
+                  "prior": "43,900개 패키지 README 의 주제를 분석했다",
+                  "same": false,
+                  "note": "내용 빈도 분석이다"
+                },
+                "evaluation": {
+                  "prior": "주제 빈도와 패키지 유형별 차이(사용법·설치·라이선스가 가장 흔함)",
+                  "same": false,
+                  "note": "초록에는 인기와의 관계가 없다"
+                },
+                "target": {
+                  "prior": "npm JavaScript 패키지",
+                  "same": false,
+                  "note": "생태계 하나에 한정된다"
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "preprint",
+              "source_level": "1차",
+              "route": "웹 검색 후 arXiv 초록",
+              "adoption": "참고"
+            },
+            {
+              "case": "Gaughan 등, README 와 CONTRIBUTING 파일의 도입",
+              "url": "https://arxiv.org/abs/2502.18440",
+              "axes": {
+                "purpose": {
+                  "prior": "첫 README·CONTRIBUTING 의 시점과 내용을 밝힌다",
+                  "same": false,
+                  "note": "실증 분석이다"
+                },
+                "mechanism": {
+                  "prior": "Debian 패키지 FLOSS 프로젝트의 README 4,226개와 CONTRIBUTING 714개 첫 버전을 분석했다",
+                  "same": false,
+                  "note": "도입 시점 분석이다"
+                },
+                "evaluation": {
+                  "prior": "첫 README 는 최소한이고 공동체 형성보다 사용법·절차를 다룬다",
+                  "same": false,
+                  "note": "채택이나 인기를 평가하지 않는다"
+                },
+                "target": {
+                  "prior": "Debian 에 패키징된 FLOSS 프로젝트",
+                  "same": false,
+                  "note": "대조 대상과 범위가 다르다"
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "preprint",
+              "source_level": "1차",
+              "route": "웹 검색 후 arXiv 초록(CHASE 2025)",
+              "adoption": "참고"
+            },
+            {
+              "case": "GitHub 공식 README 안내",
+              "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes",
+              "axes": {
+                "purpose": {
+                  "prior": "README 에 보통 들어갈 내용을 안내한다",
+                  "same": true,
+                  "note": "독자가 프로젝트를 이해하고 시작하게 한다는 목적이 같다"
+                },
+                "mechanism": {
+                  "prior": "하는 일·유용한 이유·시작 방법·도움 얻을 곳·유지자 목록 제시와 목차 자동 생성",
+                  "same": false,
+                  "note": "대조 대상의 사용자·개발자 분리 규칙과 절 삭제 규칙이 없다"
+                },
+                "evaluation": {
+                  "prior": "평가 없음",
+                  "same": false,
+                  "note": "대조 대상도 평가 지표가 없으나 같은 평가로 볼 근거가 없다"
+                },
+                "target": {
+                  "prior": "GitHub 의 모든 저장소 README",
+                  "same": false,
+                  "note": "대조 대상보다 넓다"
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "vendor",
+              "source_level": "1차",
+              "route": "웹 검색 후 GitHub Docs",
+              "adoption": "참고"
+            }
+          ],
+          "saturation": "1",
+          "not_found": "[\"Liu·Noei·Lyons(Information and Software Technology, 2022) 'How ReadMe files are structured in open source Java projects' 는 검색 요약에서 14,901개 Java 저장소, 32개 구조 군집, GitHub 지침을 따른 README 가 별을 더 받는 경향을 보고한다고 나왔다. 그러나 목록 페이지가 HTTP 403 을 내어 열지 못해 근거로 쓰지 않았다.\", \"README 절 순서(동선)가 채택이나 판단 속도에 주는 효과를 실험한 연구는 찾지 못했다. 찾은 연구는 모두 내용 유무와 인기의 상관 분석이다. 독창성의 근거가 아니다.\", \"사용자용 내용과 개발자 내부 근거를 분리한 README 가 더 채택되는지 다룬 실증 연구는 찾지 못했다. 독창성의 근거가 아니다.\", \"절 번호, 변경 이력 수록 여부의 효과를 다룬 실증 연구는 찾지 못했다.\"]",
+          "disclosures": "[\"대부분 초록만 열어 확인했고 효과 크기와 통제 변수는 확인하지 못했다.\", \"Trockman 등은 NSF 공개 사본 PDF 1페이지 초록만 읽었다.\", \"찾은 결과는 모두 상관 관계이며 README 내용이 인기를 일으킨다는 인과를 보이지 않는다. 그래서 refuted-premise 이슈는 방향의 상충을 적은 수준이다.\", \"katalog.hcu-hamburg.de 레코드는 열지 못했다(opened false).\"]",
+          "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"STATE-ASSUME\", \"COUNT-EARNS\", \"WRITTEN-ONLY\", \"INSTRUCTION-FORM\"]",
+          "notes": "검토한 관점은 기시감, 결말, 전이, 기준선, 붐빔이다. 기시감 관점에서는 README 작성 규칙과 같은 목적·메커니즘을 가진 실증 사례를 찾지 못했다. 그래서 모든 근거 지도 행의 축 대부분이 same false 다. 붐빔 관점에서는 GitHub 공식 안내가 사실상 기준선 구실을 하므로 weak-baseline 으로만 올렸고 crowded 로 올리지 않았다. 전이 관점에서 알려진 실패 사례는 찾지 못했다. 추가로 Liu·Noei·Lyons 2022 논문 본문을 다른 경로(출판사 DOI 페이지나 저자 사본)로 열어 GitHub 지침 준수와 별 수의 관계를 확인하라. 이 논문이 대조 대상의 권장 동선과 비교할 가장 직접적인 기준선이기 때문이다."
+        }
+      },
+      {
+        "id": "sq2",
+        "output": {
+          "agent": "agent-prior-art",
+          "mode": "survey",
+          "subquestion_id": "sq2",
+          "search_status": "ok",
+          "queries": [
+            "GitHub docs about READMEs what a README should contain",
+            "Standard Readme specification section order badges table of contents",
+            "Diataxis documentation framework tutorials how-to reference explanation separate",
+            "Art of README cognitive funneling order of sections",
+            "empirical study repository badges npm signals quality",
+            "categorizing the content of GitHub README files empirical study"
+          ],
+          "read": "[\"https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes\", \"https://github.com/RichardLitt/standard-readme/blob/main/spec.md\", \"https://google.github.io/styleguide/docguide/READMEs.html\", \"https://arxiv.org/abs/1802.06997\", \"https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf\", \"https://github.com/hackergrrl/art-of-readme (404)\", \"https://www.makeareadme.com/\", \"https://github.com/hackergrrl/art-of-readme/blob/master/README.md (404)\", \"https://opensource.guide/starting-a-project/\", \"https://diataxis.fr/\", \"https://raw.githubusercontent.com/hackergrrl/art-of-readme/master/README.md (404)\", \"https://raw.githubusercontent.com/hackergrrl/art-of-readme/main/README.md (404)\", \"https://diataxis.fr/foundations/\"]",
+          "issues": [
+            {
+              "where": "target (1) 독자가 빨리 답해야 하는 네 질문",
+              "type": "known-failure",
+              "claim": "대조 대상의 네 질문(내 문제를 푸는가, 내가 쓸 수 있는가, 누가 만들었는가, 더 배우려면 어디로 가는가)에는 프로젝트 상태(유지 중인지, 폐기 예정인지, 정식 공개 전인지)를 묻는 질문이 없다. 선행 연구가 README 에서 흔히 빠진다고 보고한 내용이 상태이므로, 이 누락 원인이 대조 대상의 규칙에도 남아 있다.",
+              "prior_claim": "Prana 등의 연구는 393개 GitHub 저장소의 README 절 4,226개를 수작업으로 분류했고, 무엇(What)과 어떻게(How) 내용은 흔하지만 목적(purpose)과 상태(status) 내용은 드물다고 보고했다.",
+              "consequence": "규칙대로 쓴 README 는 네 질문에 모두 답하더라도 상태 정보를 빠뜨릴 수 있다. 또한 '어느 질문에도 답하지 않는 절은 지운다'는 규칙 때문에 상태 절이 삭제 대상으로 판정될 수 있다.",
+              "evidence": "arXiv 1802.06997 초록: 'many README files lack information regarding the purpose and status of a repository'. 대조 대상 입력 target (1)의 네 질문 목록에 상태 항목이 없다. 네 축 중 목적(README 내용 구성)은 겹치지만 메커니즘(분류기 기반 자동 분류)과 평가(분류 F1, 사용자 20명 설문)는 대조 대상과 다르다.",
+              "citations": [
+                {
+                  "url": "https://arxiv.org/abs/1802.06997",
+                  "kind": "preprint",
+                  "opened": true
+                }
+              ]
+            },
+            {
+              "where": "target (1) 네 질문",
+              "type": "weak-baseline",
+              "claim": "대조 대상의 네 질문은 Google 문서 지침이 패키지 README 에 요구하는 다섯 항목과 비교되지 않았다.",
+              "prior_claim": "Google 문서 스타일 가이드는 패키지 수준 README 가 내용물과 용도, 연락처, 상태(폐기 여부, 일반 공개 여부), 사용 예시, 관련 문서 링크를 포함하거나 가리켜야 한다고 적는다. 최소 요건은 사용자용 문서로 가는 링크다.",
+              "consequence": "Google 지침의 '상태' 항목과 '연락처' 항목이 대조 대상의 '누가 만들었는가'와 어떻게 대응하는지 확인되지 않은 채 규칙이 정해져 있다.",
+              "evidence": "https://google.github.io/styleguide/docguide/READMEs.html 의 'Every package-level README.md should include or point to the following information' 목록. 대조 대상 입력에는 이 목록과 비교한 흔적이 없다.",
+              "citations": [
+                {
+                  "url": "https://google.github.io/styleguide/docguide/READMEs.html",
+                  "kind": "vendor",
+                  "opened": true
+                }
+              ]
+            },
+            {
+              "where": "target (1) 네 질문",
+              "type": "weak-baseline",
+              "claim": "대조 대상의 네 질문은 Open Source Guides 의 README 네 질문과 비교되지 않았다.",
+              "prior_claim": "Open Source Guides 는 README 가 '이 프로젝트는 무엇을 하는가, 왜 유용한가, 어떻게 시작하는가, 도움이 더 필요하면 어디로 가는가' 네 질문에 답해야 한다고 적고, 기여 방법은 별도 CONTRIBUTING 파일에 두고 README 에서 링크하라고 권한다.",
+              "consequence": "대조 대상의 질문 목록에는 '어떻게 시작하는가'가 질문으로 들어 있지 않다. 그래서 설치 절이 어느 질문에 답하는지는 '내가 쓸 수 있는가'의 해석에 맡겨져 있다.",
+              "evidence": "https://opensource.guide/starting-a-project/ 의 README 절. 대조 대상의 네 질문과 두 질문(무엇·도움)은 대응하나 '왜 유용한가'와 '어떻게 시작하는가'는 대조 대상의 '내 문제를 푸는가'와 '내가 쓸 수 있는가'에 그대로 대응하지 않는다.",
+              "citations": [
+                {
+                  "url": "https://opensource.guide/starting-a-project/",
+                  "kind": "vendor",
+                  "opened": true
+                }
+              ]
+            },
+            {
+              "where": "target (1) 네 질문",
+              "type": "weak-baseline",
+              "claim": "대조 대상의 네 질문은 GitHub 공식 문서의 README 다섯 주제와 비교되지 않았다.",
+              "prior_claim": "GitHub 공식 문서는 README 가 프로젝트가 하는 일, 유용한 이유, 시작 방법, 도움을 얻을 곳, 유지·기여하는 사람을 다룬다고 적고, 사용과 기여를 시작하는 데 필요한 정보만 담고 긴 문서는 위키로 옮기라고 적는다.",
+              "consequence": "GitHub 의 다섯 주제 중 '시작 방법'과 '도움을 얻을 곳'이 대조 대상의 질문 목록에 명시되지 않아, 이 두 주제를 다루는 절이 '어느 질문에도 답하지 않는 절'로 판정될 여지가 있다.",
+              "evidence": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes 본문. 대조 대상 입력에는 이 주제 목록과 비교한 흔적이 없다.",
+              "citations": [
+                {
+                  "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes",
+                  "kind": "vendor",
+                  "opened": true
+                }
+              ]
+            }
+          ],
+          "evidence_map": [
+            {
+              "case": "GitHub 공식 문서 About READMEs",
+              "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes",
+              "axes": {
+                "purpose": {
+                  "prior": "새로 온 사람이 프로젝트를 쓰고 기여하기 시작하는 데 필요한 정보를 README 에 두게 한다.",
+                  "same": true,
+                  "note": "독자가 도구를 판단하고 쓰기 시작하게 한다는 목적이 대조 대상과 같다."
+                },
+                "mechanism": {
+                  "prior": "다룰 주제 다섯 가지(하는 일, 유용한 이유, 시작 방법, 도움, 유지·기여자)를 나열하고 긴 문서는 위키로 옮기게 한다. 절 순서는 정하지 않는다. 렌더링된 마크다운에는 제목에서 목차(Outline)를 자동 생성한다.",
+                  "same": false,
+                  "note": "주제 목록과 '긴 문서는 밖으로' 원칙은 대조 대상 (1)과 비슷하나, 순서 규칙과 사용자·개발자 분리 규칙이 없다. 목차 자동 생성은 대조 대상 (4)의 '목차는 필요할 때만'과 충돌하지 않는다."
+                },
+                "evaluation": {
+                  "prior": "효과 평가가 없는 공식 안내문이다.",
+                  "same": false,
+                  "note": "대조 대상도 평가 근거를 밝히지 않았으나, 두 쪽 모두 평가가 없다는 사실만으로 같은 평가라고 볼 수 없다."
+                },
+                "target": {
+                  "prior": "GitHub 에 올린 모든 저장소의 README.",
+                  "same": false,
+                  "note": "대조 대상은 사용자용 README 로 대상을 좁히고, 개발자 근거를 따로 두게 한다."
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "vendor",
+              "source_level": "1차",
+              "route": "코드 호스팅 플랫폼 공식 문서",
+              "adoption": "참고"
+            },
+            {
+              "case": "Standard Readme 명세",
+              "url": "https://github.com/RichardLitt/standard-readme/blob/main/spec.md",
+              "axes": {
+                "purpose": {
+                  "prior": "README 절의 이름과 순서를 표준화해 독자가 정보를 같은 위치에서 찾게 한다.",
+                  "same": false,
+                  "note": "대조 대상은 독자의 판단 속도를 목적으로 두고, 형식 표준화 자체를 목적으로 두지 않는다."
+                },
+                "mechanism": {
+                  "prior": "제목, 배너, 배지, 짧은 설명, 긴 설명, 목차, 보안, 배경, 설치, 사용, 추가 절, API, 유지자, 감사, 기여, 라이선스 순서를 강제한다. 배지는 선택이며 자체 제목 없이 줄로 구분한다. 목차는 필수이나 100줄 미만 README 에서는 선택이다. 라이선스는 마지막 절이어야 한다.",
+                  "same": false,
+                  "note": "설명에서 설치·사용으로, 다시 기여·라이선스로 내려가는 큰 순서는 대조 대상 (3)과 같다. 그러나 목차를 원칙적으로 필수로 두는 점, 셀링포인트와 주의·한계 절이 없는 점, 절 제목을 고정하는 점이 다르다."
+                },
+                "evaluation": {
+                  "prior": "린터와 생성기로 형식 준수를 확인한다. 독자 효과에 대한 평가는 없다.",
+                  "same": false,
+                  "note": "대조 대상은 형식 준수 검사를 평가로 두지 않는다."
+                },
+                "target": {
+                  "prior": "오픈소스 저장소의 README 전반.",
+                  "same": false,
+                  "note": "대조 대상은 사용자용 README 로 좁힌다."
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "blog",
+              "source_level": "1차",
+              "route": "저장소(검색 결과의 미러에서 원 저장소로 이동)",
+              "adoption": "참고"
+            },
+            {
+              "case": "Google 문서 스타일 가이드 README 지침",
+              "url": "https://google.github.io/styleguide/docguide/READMEs.html",
+              "axes": {
+                "purpose": {
+                  "prior": "코드 패키지를 처음 보는 사람이 내용물과 사용법과 연락처를 찾게 한다.",
+                  "same": true,
+                  "note": "독자가 도구를 판단하고 쓰기 시작하게 한다는 목적이 같다."
+                },
+                "mechanism": {
+                  "prior": "README 가 포함하거나 가리켜야 할 다섯 항목(내용물과 용도, 연락처, 상태, 사용 예시, 관련 문서 링크)을 정한다. 최소 요건은 사용자용 문서 링크이며 순서는 정하지 않는다.",
+                  "same": false,
+                  "note": "'포함하거나 가리킨다'는 방식은 대조 대상의 '지우거나 링크로 옮긴다'와 같으나, 상태 항목이 있고 순서·배지 규칙이 없다."
+                },
+                "evaluation": {
+                  "prior": "효과 평가가 없는 사내 스타일 지침이다.",
+                  "same": false,
+                  "note": "평가 근거가 제시되지 않았다."
+                },
+                "target": {
+                  "prior": "코드베이스의 패키지 수준 README(모든 최상위 디렉터리).",
+                  "same": false,
+                  "note": "대조 대상은 공개 도구의 사용자용 README 이고, Google 지침은 사내 코드 패키지 README 를 주 대상으로 한다."
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "vendor",
+              "source_level": "1차",
+              "route": "공개 스타일 가이드",
+              "adoption": "참고"
+            },
+            {
+              "case": "Make a README",
+              "url": "https://www.makeareadme.com/",
+              "axes": {
+                "purpose": {
+                  "prior": "README 를 처음 쓰는 사람에게 넣을 만한 절을 안내한다.",
+                  "same": false,
+                  "note": "작성자 안내가 목적이고, 독자의 채택 판단 속도를 목적으로 명시하지 않는다."
+                },
+                "mechanism": {
+                  "prior": "이름, 설명, 배지, 시각 자료, 설치, 사용, 지원, 로드맵, 기여, 저자와 감사, 라이선스, 프로젝트 상태 순서를 제안하고, 프로젝트마다 해당하는 절만 고르라고 적는다. 스크린샷이나 영상을 넣는 것을 권한다. 목차는 언급하지 않고 변경 이력은 별도 파일로 둔다.",
+                  "same": false,
+                  "note": "'해당하는 절만 고른다'는 원칙과 변경 이력을 README 밖에 두는 점은 대조 대상 (4)와 같다. 그러나 배지와 시각 자료를 기본 절로 두고 주의·한계 절이 없다."
+                },
+                "evaluation": {
+                  "prior": "효과 평가가 없는 안내 페이지다.",
+                  "same": false,
+                  "note": "평가 근거가 없다."
+                },
+                "target": {
+                  "prior": "일반 소프트웨어 프로젝트의 README.",
+                  "same": false,
+                  "note": "사용자용과 개발자용을 구분하지 않는다."
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "blog",
+              "source_level": "1차",
+              "route": "널리 인용되는 README 가이드 사이트",
+              "adoption": "참고"
+            },
+            {
+              "case": "Open Source Guides 프로젝트 시작하기의 README 절",
+              "url": "https://opensource.guide/starting-a-project/",
+              "axes": {
+                "purpose": {
+                  "prior": "README 가 독자의 네 질문(무엇을 하는가, 왜 유용한가, 어떻게 시작하는가, 도움은 어디서 얻는가)에 답하게 한다.",
+                  "same": true,
+                  "note": "독자 질문으로 README 내용을 정한다는 목적이 대조 대상 (1)과 같다."
+                },
+                "mechanism": {
+                  "prior": "질문 네 개를 제시하고 기여 방법은 별도 CONTRIBUTING 파일로 두어 README 에서 링크하게 한다. 절 순서와 배지 규칙은 없다.",
+                  "same": false,
+                  "note": "질문 기반 구성과 기여 문서 분리는 대조 대상 (1)·(2)와 비슷하나, 질문 구성이 다르고(누가 만들었는가 대신 왜 유용한가, 어떻게 시작하는가) 순서 규칙이 없다."
+                },
+                "evaluation": {
+                  "prior": "효과 평가가 없는 안내문이다.",
+                  "same": false,
+                  "note": "평가 근거가 없다."
+                },
+                "target": {
+                  "prior": "새로 공개하는 오픈소스 프로젝트.",
+                  "same": false,
+                  "note": "대조 대상은 사용자용 README 로 좁힌다."
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "vendor",
+              "source_level": "1차",
+              "route": "오픈소스 재단·플랫폼이 운영하는 가이드",
+              "adoption": "참고"
+            },
+            {
+              "case": "Prana 등, Categorizing the Content of GitHub README Files",
+              "url": "https://arxiv.org/abs/1802.06997",
+              "axes": {
+                "purpose": {
+                  "prior": "README 절의 내용 종류를 분류해 독자의 정보 탐색을 돕는다.",
+                  "same": false,
+                  "note": "README 작성 규칙을 정하는 목적이 아니라 기존 README 를 분류하는 목적이다."
+                },
+                "mechanism": {
+                  "prior": "절 4,226개를 What·Why·How·When·Who·References·Contribution·Other 여덟 종류로 수작업 분류하고 다중 레이블 분류기를 만들어 절에 자동 배지를 붙인다.",
+                  "same": false,
+                  "note": "분류 범주(What, Why, How, Who, References)는 대조 대상의 네 질문과 대응하나, 작성 규칙이 아니라 사후 분류 장치다."
+                },
+                "evaluation": {
+                  "prior": "분류기 F1 0.746, 소프트웨어 전문가 20명이 자동 레이블이 정보 찾기를 쉽게 한다고 응답했다. 목적과 상태 내용이 README 에서 드물다고 보고했다.",
+                  "same": false,
+                  "note": "대조 대상은 이런 실증 평가를 갖추지 않았다."
+                },
+                "target": {
+                  "prior": "무작위로 뽑은 GitHub 저장소 393개의 README.",
+                  "same": false,
+                  "note": "대조 대상은 사용자용 README 작성 규칙이다."
+                }
+              },
+              "outcome": "성공",
+              "kind": "preprint",
+              "source_level": "1차",
+              "route": "논문(arXiv, Empirical Software Engineering 2018 게재본의 프리프린트)",
+              "adoption": "참고"
+            },
+            {
+              "case": "Trockman, Adding Sparkle to Social Coding: npm 저장소 배지 실증 연구",
+              "url": "https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf",
+              "axes": {
+                "purpose": {
+                  "prior": "README 배지가 유지자가 알리려는 품질의 믿을 만한 신호인지 확인한다.",
+                  "same": false,
+                  "note": "배지의 신호 가치만 다루며, README 전체 구성은 다루지 않는다. 대조 대상의 배지 규칙 (4)와만 관련된다."
+                },
+                "mechanism": {
+                  "prior": "npm 패키지 294,941개의 README 이력에서 배지 88종을 추출해 상관 분석, 통제 회귀, 단절 시계열 분석을 했다.",
+                  "same": false,
+                  "note": "실증 분석 방법이며 작성 규칙이 아니다."
+                },
+                "evaluation": {
+                  "prior": "패키지의 46%가 배지를 하나 이상 달았다. 품질 보증·의존성 관리처럼 실제 품질을 검사하는 배지는 그 품질과 상관이 강하고, 최신 버전 표시 같은 정보 배지는 품질과 연관이 약하다. 저자는 유지자가 검사 신호 배지를 고르라고 권한다.",
+                  "same": false,
+                  "note": "대조 대상의 '필요할 때만 배지를 넣는다'와 상충하지 않으며, '필요'의 판단 기준으로 검사 신호 여부를 제시한다."
+                },
+                "target": {
+                  "prior": "npm 생태계 저장소의 README 배지.",
+                  "same": false,
+                  "note": "특정 생태계에 한정된 결과이므로 대조 대상 전체로 일반화하지 않는다."
+                }
+              },
+              "outcome": "성공",
+              "kind": "peer-reviewed",
+              "source_level": "1차",
+              "route": "논문(ICSE 2018 Companion, 학생 연구 경연 요약)",
+              "adoption": "참고"
+            },
+            {
+              "case": "Diátaxis 문서화 프레임워크",
+              "url": "https://diataxis.fr/",
+              "axes": {
+                "purpose": {
+                  "prior": "사용자 필요에 따라 기술 문서를 튜토리얼, 방법 안내, 레퍼런스, 설명 네 종류로 나누어 쓰고 배치하게 한다.",
+                  "same": false,
+                  "note": "문서 체계 전체를 다루며 README 한 문서의 구성은 다루지 않는다. 대조 대상의 (2) 분리 규칙과만 관련된다."
+                },
+                "mechanism": {
+                  "prior": "행동·인지 축과 습득·적용 축으로 네 종류를 정의한다.",
+                  "same": false,
+                  "note": "대조 대상은 사용자 경로와 개발자 내부 근거를 나누며, Diátaxis 의 네 종류 분류와 구분 기준이 다르다. 열어 본 페이지에서는 종류를 섞을 때의 문제를 명시한 문장을 확인하지 못했다."
+                },
+                "evaluation": {
+                  "prior": "열어 본 페이지에는 효과 평가가 없다.",
+                  "same": false,
+                  "note": "평가 근거를 확인하지 못했다."
+                },
+                "target": {
+                  "prior": "제품과 프로젝트의 기술 문서 전체.",
+                  "same": false,
+                  "note": "대조 대상은 README 한 문서다."
+                }
+              },
+              "outcome": "판정 못 함",
+              "kind": "blog",
+              "source_level": "1차",
+              "route": "문서화 프레임워크 공식 사이트",
+              "adoption": "참고"
+            }
+          ],
+          "saturation": "2",
+          "not_found": "[\"Art of README(인지 깔때기, 넓은 내용에서 좁은 내용으로 가는 순서)의 원문을 열지 못했다. 저장소 주소와 raw 주소 모두 404 를 반환했다. 그래서 이 가이드의 절 순서와 배지·목차 견해는 근거 지도에 넣지 않았다.\", \"README 절 순서나 셀링포인트 배치가 독자의 채택 판단 속도에 미치는 효과를 측정한 실증 연구를 이번 검색에서 찾지 못했다. 검색 횟수 제한 때문이며, 이 결과를 대조 대상의 독창성 근거로 삼지 않는다.\", \"Diátaxis 가 문서 종류를 섞을 때 생기는 문제를 명시한 원문 문장을 확인하지 못했다. 검색 요약에는 그런 서술이 있었으나 열어 본 diataxis.fr 첫 페이지와 foundations 페이지에는 없었다.\", \"README 에 '주의와 한계' 절을 두라고 권하는 공식 지침을 이번에 열어 본 자료에서 찾지 못했다. Google 지침의 상태 항목과 Make a README 의 프로젝트 상태 절이 가장 가까운 항목이다.\", \"Trockman 연구의 전체 논문(관련 출판물 [10])은 열지 않았다. 열어 본 문서는 두 쪽짜리 요약이다.\"]",
+          "disclosures": "[\"Standard Readme 명세는 검색 결과에서 미러 사본만 나왔다. 원 저장소 주소는 내가 추론해 열었으며 내용은 열린 원 저장소의 spec.md 기준이다.\", \"GitHub 공식 문서는 검색 결과에서 Enterprise Server 버전 페이지만 나왔다. 현행 github.com 문서 주소는 내가 추론해 열었다.\", \"Make a README, Standard Readme, Diátaxis 의 kind 를 blog 로 둔 판단은 표준기구 문서도 업체 공식 문서도 아닌 개인·커뮤니티 운영 자료라는 내 분류다. GitHub 문서와 Open Source Guides 와 Google 가이드는 vendor 로 두었다.\", \"Trockman PDF 는 WebFetch 가 본문을 해석하지 못해 저장된 PDF 를 직접 읽어 확인했다.\"]",
+          "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"STATE-ASSUME\", \"SPECIFIC-NAME\", \"WRITTEN-ONLY\", \"TERM-ONE\", \"FOCUSED\"]",
+          "notes": "검토한 관점은 다음과 같다. 기시감 관점에서는 질문 기반 README 구성이 GitHub 공식 문서, Open Source Guides, Google 지침에 이미 있으나 질문 구성이 서로 다르다는 점을 확인했다. 결말 관점에서는 효과를 실증한 자료로 Prana 등(상태·목적 누락이 흔함)과 Trockman(검사 신호 배지만 품질과 강하게 상관)을 찾았다. 전이 관점에서는 대조 대상의 네 질문에 상태 항목이 없어 Prana 등이 보고한 누락이 그대로 옮겨 올 수 있다고 보았다. 기준선 관점에서는 공개된 질문·주제 목록 세 가지와 비교한 흔적이 대조 대상에 없다는 점을 적었다. 붐빔 관점에서는 Standard Readme 가 순서 강제 명세와 린터를 이미 제공하지만, 대조 대상은 사용자용 README 한정 규칙이고 순서 강제·목차 필수가 달라 crowded 로 올리지 않았다. 순서(설명, 설치, 사용, 기여)는 Standard Readme 와 Make a README 와 일치하고, 배지·목차·변경 이력을 필요할 때만 넣는다는 규칙은 열어 본 자료 어디에서도 반박되지 않았다. 추가로 확인해야 할 사항은 Art of README 원문(현재 주소가 404)과 Diátaxis 의 종류 혼합 관련 원문 페이지이며, 둘 다 대조 대상 (2)·(3)의 근거를 보강하거나 반박할 수 있기 때문이다."
+        }
+      }
+    ],
+    "verifiers": [
+      {
+        "url": "https://arxiv.org/abs/2206.10772",
+        "subquestions": [
+          "sq1"
+        ],
+        "output": {
+          "url": "https://arxiv.org/abs/2206.10772",
+          "judgments": [
+            {
+              "ref": "sq1#issue#0",
+              "verdict": "supported",
+              "quote": "We perform the study on 1950 readme files of public GitHub projects, spanning across ten programming languages ... readme files in majority of the popular projects are well organised using lists and images ... comprise links to external sources ... repositories with readme files containing contribution guidelines and references ... were observed to be associated with higher popularity.",
+              "reason": "초록이 주장의 주어(Venigalla·Chimalakonda 의 연구)와 수치(README 1,950개, 10개 언어)를 모두 포함한다. 결과 조건(목록·이미지로 정리, 외부 링크 포함, 기여 지침·참고문헌과 높은 인기의 연관)도 초록에 모두 있다. 저자는 Akhila Sri Manasa Venigalla 와 Sridhar Chimalakonda 이다."
+            },
+            {
+              "ref": "sq1#case#1",
+              "verdict": "supported",
+              "quote": "Hence, we present an empirical study to understand correlation between readme file content and project popularity. We perform the study on 1950 readme files of public GitHub projects, spanning across ten programming languages",
+              "reason": "사례의 존재(README 내용과 인기의 상관에 관한 실증 연구)와 결말(인기와 연관된 README 특징을 보고함)을 초록이 뒷받침한다. 축별 판정은 다음과 같다. purpose 축은 'understand correlation between readme file content and project popularity' 구절이 뒷받침한다. mechanism 축은 '1950 readme files ... spanning across ten programming languages' 구절이 뒷받침한다. evaluation 축의 프로젝트 인기는 'associated with higher popularity' 구절이 뒷받침한다. target 축은 'public GitHub projects' 구절이 뒷받침한다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "EVIDENCE-FIRST",
+            "STATE-ASSUME",
+            "WRITTEN-ONLY",
+            "SUBJECT-OBJECT",
+            "TERM-ONE"
+          ]
+        }
+      },
+      {
+        "url": "https://arxiv.org/abs/2010.02472",
+        "subquestions": [
+          "sq1"
+        ],
+        "output": {
+          "url": "https://arxiv.org/abs/2010.02472",
+          "judgments": [
+            {
+              "ref": "sq1#issue#1",
+              "verdict": "supported",
+              "quote": "collect 1,149 academic AI repositories ... the top 20% repositories that have the most number of stars as popular ... the bottom 70% repositories as unpopular ... propose 21 features to characterize the software engineering practices of academic AI repositories ... 11 of the studied features ... the number of links to other GitHub repositories in the README file ... the number of images in the README file ... the inclusion of a license are the most important features",
+              "reason": "초록에 주어(Fan 등의 연구, 학술 AI 저장소), 수치(1,149개, 상위 20%와 하위 70%, 21개 특징, 11개 특징), 조건(별 수 기준 구분)과 가장 중요한 특징 세 가지(README 안의 GitHub 저장소 링크 수, README 이미지 수, 라이선스 포함 여부)가 모두 있다. 인용은 WebFetch 가 돌려준 초록 구절을 생략 부호로 이은 것이다."
+            },
+            {
+              "ref": "sq1#case#2",
+              "verdict": "supported",
+              "quote": "collect 1,149 academic AI repositories ... propose 21 features to characterize the software engineering practices of academic AI repositories ... 11 of the studied features ... the inclusion of a license are the most important features",
+              "reason": "사례(Fan 등, What Makes a Popular Academic AI Repository?)가 실재하고, 인기 저장소와 비인기 저장소를 구분하는 특징을 찾았다는 결말이 초록에 있다. 축별 판정은 다음과 같다. purpose 는 초록이 인기 학술 AI 저장소의 특징을 다루므로 지지된다. mechanism 은 1,149개, 21개 특징, 상위 20%와 하위 70% 비교가 지지된다. 다만 괄호 안의 '코드·재현성·문서' 분류는 초록에 없고 초록은 'software engineering practices'라고만 적으므로 확인되지 않는다. evaluation 은 별 수 기준 인기 구분이 지지된다. target 은 논문에 딸린 학술 AI 저장소로 지지된다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "STATE-ASSUME",
+            "SPECIFIC-NAME",
+            "WRITTEN-ONLY",
+            "FULL-SENTENCE"
+          ]
+        }
+      },
+      {
+        "url": "https://par.nsf.gov/servlets/purl/10063054",
+        "subquestions": [
+          "sq1"
+        ],
+        "output": {
+          "url": "https://par.nsf.gov/servlets/purl/10063054",
+          "judgments": [
+            {
+              "ref": "sq1#issue#2",
+              "verdict": "supported",
+              "quote": "After surveying developers, mining 294,941 repositories, and applying statistical modeling and time-series analyses, we find that non-trivial badges, which display the build status, test coverage, and up-to-dateness of dependencies, are mostly reliable signals, correlating with more tests, better pull requests, and fresher dependencies. Displaying such badges correlates with best practices, but the effects do not always persist.",
+              "reason": "WebFetch 요약 모델은 압축된 PDF 본문을 읽지 못했다. 그래서 검증자는 같은 호출이 저장한 PDF 파일의 1페이지 초록을 직접 읽었다. 초록의 이 구절은 주장의 주어(Trockman 등의 npm 연구)를 포함한다. 수치(294,941개 저장소)와 방법(개발자 설문, 통계 모형, 시계열 분석)도 포함한다. 결과(빌드 상태·테스트 커버리지·의존성 최신성 배지가 대체로 신뢰할 만한 신호이고 더 많은 테스트·더 나은 풀 리퀘스트·더 최신의 의존성과 상관됨)와 조건(효과가 항상 지속되지는 않음)도 모두 이 구절에 들어 있다. 저자 이름 Asher Trockman 은 논문 제목 아래 저자 줄에서 확인했다."
+            },
+            {
+              "ref": "sq1#case#3",
+              "verdict": "supported",
+              "quote": "We report on a large-scale, mixed-methods empirical study of npm packages that explores the emerging phenomenon of repository badges, with which maintainers signal underlying qualities about their projects to contributors and users. ... After surveying developers, mining 294,941 repositories, and applying statistical modeling and time-series analyses, we find that non-trivial badges ... are mostly reliable signals, correlating with more tests, better pull requests, and fresher dependencies.",
+              "reason": "원문 초록에서 사례(npm 저장소 배지 실증 연구)가 있다는 것을 확인했다. 결말(배지가 대체로 신뢰할 만한 신호라는 결과를 얻음)도 같은 초록에 있으므로 이 항목은 supported 다. 축마다의 판정은 아래와 같다. purpose 축은 지지된다. 원문이 RQ2 'To what degree do badges correlate with qualities that developers expect?' 를 제시하고, 초록에 'which maintainers signal underlying qualities' 라는 구절이 있다. mechanism 축도 지지된다. 저장소 채굴(294,941개)과 개발자 설문과 시계열 분석이 초록에 있다. 2페이지는 이 분석을 'multiple regression models and time-series regression discontinuity designs' 로 명시하므로 회귀 분석도 확인된다. evaluation 축은 지지된다. 원문 구절 'correlating with more tests, better pull requests, and fresher dependencies' 가 이 축과 대응한다. target 축도 지지된다. 원문이 연구 대상을 'npm packages' 라고 적는다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "EVIDENCE-FIRST",
+            "ASYNC-FIRST",
+            "STATE-ASSUME",
+            "WRITTEN-ONLY",
+            "SUBJECT-OBJECT"
+          ]
+        }
+      },
+      {
+        "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes",
+        "subquestions": [
+          "sq1",
+          "sq2"
+        ],
+        "output": {
+          "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes",
+          "judgments": [
+            {
+              "ref": "sq1#issue#3",
+              "verdict": "supported",
+              "quote": "README files typically include information on: What the project does / Why the project is useful / How users can get started with the project / Where users can get help with your project / Who maintains and contributes to the project ... GitHub will automatically generate a table of contents based on section headings.",
+              "reason": "원문은 README 에 보통 들어가는 다섯 항목을 주장과 같은 내용으로 나열한다. 또한 원문은 GitHub 가 절 제목으로 목차를 자동 생성한다고 적는다. 그래서 주어와 내용과 조건이 모두 원문에 있다."
+            },
+            {
+              "ref": "sq1#case#6",
+              "verdict": "supported",
+              "quote": "README files typically include information on: What the project does / Why the project is useful / How users can get started with the project / Where users can get help with your project / Who maintains and contributes to the project ... GitHub will automatically generate a table of contents based on section headings.",
+              "reason": "사례(GitHub 공식 README 안내)가 원문으로 존재한다. 결말 '판정 못 함'은 원문이 효과를 평가하지 않는 안내문이라는 사실과 맞는다. 축마다의 판정은 다음과 같다. purpose 는 'typically include' 구절이 뒷받침한다. mechanism 의 다섯 항목과 목차 자동 생성은 인용 구절이 뒷받침한다. evaluation '평가 없음'은 원문에 효과 평가 서술이 없는 사실과 맞는다. target '모든 저장소 README'는 원문이 GitHub 저장소 README 일반을 다루는 문서라는 점과 맞지만, '모든'을 명시한 구절은 원문에서 확인하지 못했다."
+            },
+            {
+              "ref": "sq2#issue#3",
+              "verdict": "supported",
+              "quote": "A README should only contain information necessary for developers to get started using and contributing to your project. Longer documentation is best suited for wikis.",
+              "reason": "원문은 다섯 항목 목록('README files typically include information on: ...')을 적는다. 이어서 원문은 README 에 사용과 기여를 시작하는 데 필요한 정보만 두고 긴 문서는 위키가 알맞다고 적는다. 그래서 주장의 내용과 조건이 모두 원문에 있다. 다만 원문은 '위키로 옮기라'는 명령 대신 'best suited for wikis'라고 권고한다."
+            },
+            {
+              "ref": "sq2#case#0",
+              "verdict": "supported",
+              "quote": "A README should only contain information necessary for developers to get started using and contributing to your project. Longer documentation is best suited for wikis. ... GitHub will automatically generate a table of contents based on section headings.",
+              "reason": "사례(GitHub 공식 문서 About READMEs)가 원문으로 존재한다. 결말 '판정 못 함'은 원문이 효과를 평가하지 않는 안내문이라는 사실과 맞는다. 축마다의 판정은 다음과 같다. purpose 는 'only contain information necessary ... to get started using and contributing' 구절이 뒷받침한다. mechanism 에서 다섯 주제 나열, 위키 권고, 목차 자동 생성은 원문 구절이 뒷받침한다. 그러나 '절 순서는 정하지 않는다'는 부재에 관한 서술이어서 지지 구절이 없다. 또한 'Outline'이라는 명칭은 가져온 원문 구절에서 확인하지 못했다. evaluation '효과 평가가 없는 공식 안내문'은 원문과 맞는다. target 은 원문이 GitHub 저장소 README 일반을 다루는 점과 맞는다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "STATE-ASSUME",
+            "WRITTEN-ONLY",
+            "SPECIFIC-NAME",
+            "SUBJECT-OBJECT",
+            "ONE-IDEA"
+          ]
+        }
+      },
+      {
+        "url": "https://arxiv.org/abs/1802.06997",
+        "subquestions": [
+          "sq1",
+          "sq2"
+        ],
+        "output": {
+          "url": "https://arxiv.org/abs/1802.06997",
+          "judgments": [
+            {
+              "ref": "sq1#case#0",
+              "verdict": "supported",
+              "quote": "manual annotation of 4,226 README file sections from 393 randomly sampled GitHub repositories ... Our multi-label classifier which can predict eight different categories achieves an F1 score of 0.746",
+              "reason": "초록에 Prana 등의 연구가 실재하고 분류기 구축과 사용자 평가가 긍정적으로 끝났다는 서술이 있어 사례와 성공 결말을 확인했다. 축마다의 판정은 다음과 같다. purpose 축은 README 절을 범주로 분류하고 자동 분류기를 만든다는 초록 서술과 일치한다. mechanism 축은 393개 저장소, 4,226개 절, 8범주 다중 라벨 분류기, F1 0.746이 모두 초록에 있다. evaluation 축은 초록에서 'showed files with and without these badges to twenty software professionals'로 확인했고, 대부분이 정보 찾기가 쉬워졌다고 답했다는 서술도 초록에 있다. target 축은 'randomly sampled GitHub repositories'와 일치한다."
+            },
+            {
+              "ref": "sq2#issue#0",
+              "verdict": "supported",
+              "quote": "manual annotation of 4,226 README file sections from 393 randomly sampled GitHub repositories ... information discussing the `What' and `How' of a repository is very common",
+              "reason": "초록에서 저장소 393개와 절 4,226개의 수작업 주석, 그리고 What과 How 내용이 흔하다는 구절을 확인했다. 목적과 상태 내용이 드물다는 주장은 초록의 '많은 README 에 저장소의 목적(purpose)과 상태(status) 정보가 없다'는 서술과 일치한다. 다만 WebFetch 도구가 이 문장을 원문 그대로 옮기지 않고 풀어서 전달했으므로, 해당 문장은 quote 에 넣지 않았다."
+            },
+            {
+              "ref": "sq2#case#5",
+              "verdict": "supported",
+              "quote": "Our multi-label classifier which can predict eight different categories achieves an F1 score of 0.746",
+              "reason": "초록에서 사례가 실재하고 성공 결말로 끝났음을 확인했다. 축마다의 판정은 다음과 같다. purpose 축은 정보 탐색을 돕는다는 서술이 초록의 자동 라벨 평가 내용과 일치한다. mechanism 축에서 절 4,226개, 여덟 범주, 다중 레이블 분류기, 배지 부착은 초록에서 확인했다. 그러나 What·Why·How·When·Who·References·Contribution·Other 라는 범주 이름 목록은 초록에 없어 이 페이지만으로는 확인하지 못했다. evaluation 축의 F1 0.746, 전문가 20명의 응답, 목적과 상태 내용의 부족은 초록에서 확인했다. target 축은 'randomly sampled GitHub repositories'와 일치한다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "EVIDENCE-FIRST",
+            "STATE-ASSUME",
+            "ASYNC-FIRST",
+            "WRITTEN-ONLY"
+          ]
+        }
+      },
+      {
+        "url": "https://arxiv.org/abs/1802.08391",
+        "subquestions": [
+          "sq1"
+        ],
+        "output": {
+          "url": "https://arxiv.org/abs/1802.08391",
+          "judgments": [
+            {
+              "ref": "sq1#case#4",
+              "verdict": "supported",
+              "quote": "To understand the contents of a README, we investigate the contents of 43,900 JavaScript packages.",
+              "reason": "원문 제목은 'An Empirical Study on README contents for JavaScript Packages'이고 저자는 Shohei Ikeda 등이다. 그래서 사례가 있다는 사실이 확인된다. 결말 '판정 못 함'은 실증 연구라서 채택·폐기 같은 결말이 없다는 서술과 상충하지 않는다. 축별 판정은 다음과 같다. purpose 축은 지지된다. 인용 구절이 README 내용을 이해하려는 목적을 밝힌다. mechanism 축도 지지된다. 같은 구절에 43,900개 JavaScript 패키지라는 수치가 있고, 초록은 공통 content themes 를 식별했다고 적는다. evaluation 축은 일부만 지지된다. 원문은 'Results show that these packages contain common content themes (i.e., usage, install and license).'라고 적는다. 따라서 사용법·설치·라이선스가 '흔하다'는 서술은 지지되지만, '가장 흔하다'는 순위 서술은 초록에 없다. 초록은 패키지 유형별 차이도 적는다(application 유형은 options, library 유형은 install·license 를 더 자주 포함한다). target 축도 일부만 지지된다. 초록은 JavaScript packages 라고만 적고 npm 을 명시하지 않는다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "EVIDENCE-FIRST",
+            "STATE-ASSUME",
+            "WRITTEN-ONLY",
+            "SPECIFIC-NAME"
+          ]
+        }
+      },
+      {
+        "url": "https://arxiv.org/abs/2502.18440",
+        "subquestions": [
+          "sq1"
+        ],
+        "output": {
+          "url": "https://arxiv.org/abs/2502.18440",
+          "judgments": [
+            {
+              "ref": "sq1#case#5",
+              "verdict": "supported",
+              "quote": "examine README (n=4226) and CONTRIBUTING (n=714) files when they are first published",
+              "reason": "원문은 Gaughan, Champion, Hwang, Shaw 의 논문 \"The Introduction of README and CONTRIBUTING Files in Open Source Software Development\" 이다. 그래서 사례의 존재가 확인된다. 결말 '판정 못 함'은 README 가 성과를 냈는지를 이 논문이 판정하지 않는다는 뜻으로 읽힌다. 원문은 첫 버전의 시점과 내용을 기술할 뿐 효과를 측정하지 않으므로 이 결말과 상충하지 않는다. 축별 판정은 다음과 같다. purpose 는 지지된다. 초록이 README·CONTRIBUTING 이 처음 게시될 때의 시점과 내용을 연구한다고 밝힌다. mechanism 은 지지된다. 인용 구절에 README 4,226개와 CONTRIBUTING 714개가 있고, 초록이 Debian 패키지 FLOSS 프로젝트를 표본으로 밝힌다. evaluation 은 지지된다. 초록에 \"We find that projects create minimal READMEs proactively\"와 \"containing descriptions of project procedure for library usage or code contribution\"가 있다. 초록은 이어서 이 내용이 공동체 형성보다 절차를 다룬다고 결론짓는다. target 은 지지된다. 표본이 Debian GNU/Linux 에 패키징된 FLOSS 프로젝트이다. 다만 WebFetch 의 인용 길이 제한 때문에 초록 문장 전체를 옮기지 못하고 구절 단위로만 옮겼다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "EVIDENCE-FIRST",
+            "STATE-ASSUME",
+            "WRITTEN-ONLY",
+            "SUBJECT-OBJECT",
+            "FULL-SENTENCE"
+          ]
+        }
+      },
+      {
+        "url": "https://google.github.io/styleguide/docguide/READMEs.html",
+        "subquestions": [
+          "sq2"
+        ],
+        "output": {
+          "url": "https://google.github.io/styleguide/docguide/READMEs.html",
+          "judgments": [
+            {
+              "ref": "sq2#issue#1",
+              "verdict": "supported",
+              "quote": "At a minimum, the README should link to user-facing and/or team-facing documentation. ... A package-level README should include or link to: 1. What the package or library contains and what it's used for 2. Points of contact 3. Status, such as whether it's deprecated or not intended for general release 4. Usage instructions, such as sample code or copyable `bazel run` or `bazel test` commands 5. Links to related documentation",
+              "reason": "원문은 주장의 주어인 패키지 수준 README 를 다룬다. 내용물과 용도, 연락처, 상태(폐기 여부와 일반 공개 대상이 아님), 사용 예시, 관련 문서 링크를 '포함하거나 가리키라'고 적으며, 이 다섯 항목은 주장과 일치한다. 최소 요건이 사용자용·팀용 문서로 가는 링크라는 조건도 원문에 있다. 주의할 점이 있다. WebFetch 도구는 원문을 그대로 옮기지 않고 요약해 돌려주었으므로, 위 구절은 도구가 돌려준 문장을 고치지 않고 옮긴 것이다. 따라서 원문 문장과 낱말 단위로 같다고 보장할 수 없다. 큰따옴표로 직접 인용된 원문 문장은 \"All top-level directories for a code package should have an up-to-date `README.md` file.\" 하나다."
+            },
+            {
+              "ref": "sq2#case#2",
+              "verdict": "supported",
+              "quote": "All top-level directories for a code package should have an up-to-date `README.md` file. ... A package-level README should include or link to: 1. What the package or library contains and what it's used for 2. Points of contact 3. Status, such as whether it's deprecated or not intended for general release 4. Usage instructions, such as sample code or copyable `bazel run` or `bazel test` commands 5. Links to related documentation",
+              "reason": "사례(Google 문서 스타일 가이드의 README 지침)는 원문에 있다. 결말 '판정 못 함'도 원문과 상충하지 않는다. 원문은 지침만 적고 효과 측정을 적지 않기 때문이다. 축마다 판정한 결과는 다음과 같다. purpose 축은 지지된다. 원문의 다섯 항목이 내용물, 사용법, 연락처를 다루기 때문이다. 다만 '처음 보는 사람'이라는 독자 규정은 원문에 명시되지 않았다. mechanism 축의 다섯 항목과 최소 요건(사용자용 문서 링크)은 지지된다. '순서는 정하지 않는다'는 서술은 원문에 순서 규정이 없다는 사실에서 나온 추론이다. 이 추론은 원문 구절로 확인되지 않는다. evaluation 축의 '효과 평가가 없다'는 서술은 원문에 평가 내용이 없는 사실과 일치한다. 그러나 이 서술은 부재에 근거한 진술이다. '사내' 스타일 지침이라는 규정도 원문 구절로 확인하지 못했다. target 축은 지지된다. 원문이 모든 최상위 디렉터리의 패키지 수준 README 를 대상으로 하기 때문이다. WebFetch 도구는 원문을 요약해 돌려주었다. 그래서 위 구절 중 큰따옴표로 인용된 첫 문장 외에는 원문과 낱말 단위로 같다고 보장할 수 없다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "STATE-ASSUME",
+            "EVIDENCE-FIRST",
+            "ASYNC-FIRST",
+            "WRITTEN-ONLY"
+          ]
+        }
+      },
+      {
+        "url": "https://opensource.guide/starting-a-project/",
+        "subquestions": [
+          "sq2"
+        ],
+        "output": {
+          "url": "https://opensource.guide/starting-a-project/",
+          "judgments": [
+            {
+              "ref": "sq2#issue#2",
+              "verdict": "supported",
+              "quote": "What does this project do? / Why is this project useful? / How do I get started? / Where can I get more help, if I need it? ... Link to your CONTRIBUTING file from your README, so more people see it.",
+              "reason": "원문의 README 절은 네 질문을 그대로 나열한다. 원문은 또한 CONTRIBUTING 파일을 README 에서 링크하라고 적는다. 그래서 주어(Open Source Guides), 네 질문, CONTRIBUTING 링크 권고라는 주장의 요소가 모두 원문 구절에 있다."
+            },
+            {
+              "ref": "sq2#case#4",
+              "verdict": "supported",
+              "quote": "What does this project do? / Why is this project useful? / How do I get started? / Where can I get more help, if I need it? ... Link to your CONTRIBUTING file from your README, so more people see it.",
+              "reason": "원문에 사례(프로젝트 시작하기 안내의 README 절)가 있다. 결말 '판정 못 함'은 원문에 효과 평가가 없다는 서술과 맞는다. 축별 판정은 다음과 같다. purpose 축의 네 질문은 원문에 있다. mechanism 축의 네 질문 제시와 CONTRIBUTING 링크도 원문에 있다. 다만 '절 순서와 배지 규칙은 없다'는 부재 주장이며, 이번 조회에서 해당 규칙을 찾지 못했다는 수준까지만 확인했다. evaluation 축에 대해서는 원문이 효과 측정 없는 안내문이라는 점과 상충하는 구절이 없다. target 축(새로 공개하는 오픈소스 프로젝트)은 페이지 주제인 프로젝트 시작하기와 일치한다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "STATE-ASSUME",
+            "EVIDENCE-FIRST",
+            "WRITTEN-ONLY",
+            "SPECIFIC-NAME"
+          ]
+        }
+      },
+      {
+        "url": "https://github.com/RichardLitt/standard-readme/blob/main/spec.md",
+        "subquestions": [
+          "sq2"
+        ],
+        "output": {
+          "url": "https://github.com/RichardLitt/standard-readme/blob/main/spec.md",
+          "judgments": [
+            {
+              "ref": "sq2#case#1",
+              "verdict": "supported",
+              "quote": "Sections must appear in order given below. Optional sections may be omitted.",
+              "reason": "원문에 명세가 실재하므로 사례의 존재가 확인된다. 원문은 효과 측정을 적지 않으므로, 결말을 '판정 못 함'으로 둔 서술은 원문과 상충하지 않는다. 축별 판정은 다음과 같다. mechanism 축은 원문으로 지지된다. 원문이 Title, Banner, Badges, Short Description, Long Description, Table of Contents, Security, Background, Install, Usage, Extra Sections, API, Maintainers, Thanks, Contributing, License 순서를 제시하기 때문이다. 같은 축의 배지 서술도 'Status: Optional.', 'Must not have its own title.', 'Must be newline delimited.'로 지지된다. 목차 서술은 'Status: Required; optional for READMEs shorter than 100 lines.'로, 라이선스 서술은 'Must be last section.'으로 지지된다. target 축은 'Standard Readme is designed for open source libraries.'로 지지되지만, 원문의 대상은 오픈소스 라이브러리이고 '저장소의 README 전반'보다 좁다. purpose 축에서 '독자가 정보를 같은 위치에서 찾게 한다'는 의도를 진술한 구절은 이 페이지에서 확인하지 못했다. 그래서 purpose 축은 이 페이지만으로는 뒷받침되지 않는다. evaluation 축에서 '린터와 생성기로 형식 준수를 확인한다'는 서술도 이 페이지로 지지되지 않는다. 원문의 린터 언급은 코드 예시를 프로젝트 코드와 같은 방식으로 lint 하라는 내용이고, 생성기 언급은 외부 API 생성기를 쓰면 API.md 를 가리키라는 내용이다. 따라서 두 언급 모두 README 형식 준수 검사 도구를 가리키지 않는다. 형식 검사용 린터와 생성기는 저장소의 다른 페이지(README 등)에 있을 수 있으나, 이 내용은 가정이며 그 페이지를 열어 확인해야 한다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "STATE-ASSUME",
+            "SPECIFIC-NAME",
+            "WRITTEN-ONLY",
+            "FULL-SENTENCE"
+          ]
+        }
+      },
+      {
+        "url": "https://www.makeareadme.com/",
+        "subquestions": [
+          "sq2"
+        ],
+        "output": {
+          "url": "https://www.makeareadme.com/",
+          "judgments": [
+            {
+              "ref": "sq2#case#3",
+              "verdict": "supported",
+              "quote": "Every project is different, so consider which of these sections apply to yours.",
+              "reason": "원문 https://www.makeareadme.com/ 에 Make a README 라는 사례가 실제로 있다. 결말은 '판정 못 함'이고, 원문이 효과 평가가 없는 안내 페이지이므로 이 결말과 상충하지 않는다. 축별 판정은 다음과 같다. purpose 축은 지지된다. 원문의 'A README is a text file that introduces and explains a project.'와 'Anyone who is working on a programming project, especially if you want others to use it or contribute.'가 근거다. 다만 '처음 쓰는 사람'이라는 대상 한정은 원문에 명시되어 있지 않다. mechanism 축도 지지된다. 원문의 「Suggestions for a good README」 절은 Name, Description, Badges, Visuals, Installation, Usage, Support, Roadmap, Contributing, Authors and acknowledgment, License, Project status 순서로 절을 제시한다. 원문은 해당하는 절만 고르라고 적고(인용 구절), 'it can be a good idea to include screenshots or even a video'라고 적는다. 원문에는 목차 언급이 없다. 또한 원문은 'A changelog is another file that is very useful for programming projects.'라고 적는다. evaluation 축은 지지된다. 원문에서 효과 평가를 찾지 못했다. target 축은 지지된다. 원문은 프로그래밍 프로젝트 일반을 대상으로 한다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "EVIDENCE-FIRST",
+            "STATE-ASSUME",
+            "WRITTEN-ONLY",
+            "SPECIFIC-NAME"
+          ]
+        }
+      },
+      {
+        "url": "https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf",
+        "subquestions": [
+          "sq2"
+        ],
+        "output": {
+          "url": "https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf",
+          "judgments": [
+            {
+              "ref": "sq2#case#6",
+              "verdict": "supported",
+              "quote": "We found that packages with badges tend to have more of the quality they intend to signal, a small effect remaining even when controlling for other visible signals. Correlations are particularly strong for assessment signals, or badges that test an underlying non-trivial quality, e.g., quality assurance and dependency management badges, rather than just stating intentions, e.g., information badges.",
+              "reason": "WebFetch 요약 모델은 PDF 본문을 추출하지 못했다. 그래서 같은 호출이 저장한 PDF 파일을 Read 도구로 읽어 판정했다. 사례와 결말: 이 원문은 Trockman 의 ICSE 2018 Companion 논문 'Adding Sparkle to Social Coding: An Empirical Study of Repository Badges in the npm Ecosystem' 이다. 배지가 의도한 품질의 신호가 된다는 결론('Overall: signals mostly reliable')이 있으므로 결말 '성공'이 지지된다. purpose 축은 지지된다. 원문에 'We investigate which qualities maintainers intend to signal with badges and how well badges correlate with those qualities.'가 있다. mechanism 축도 지지된다. 원문에 'we mined a longitudinal data set of 294,941 npm packages', 'Badges and their adoption dates were extracted from the git history of each repository's README file', 'We found 88 distinct types of badges'가 있다. 분석 방법으로는 Correlation, Additional information(통제 회귀, hurdle regression), Longitudinal analysis('time-series regression discontinuity design')가 적혀 있다. 원문은 이 밖에 maintainer와 contributor 설문도 수행했다. evaluation 축은 대체로 지지된다. 원문에 'We found that 46% of packages have adopted at least one badge'가 있고, 위 인용 구절은 검사 신호 배지의 상관이 강하고 정보 배지는 그렇지 않다는 대비를 보여 준다. 권고 대목은 'package maintainers can make more deliberate choices about badges, e.g., by favoring assessment signals'로 지지된다. 단서가 하나 있다. 결과 절에는 'Surprisingly, information badges are correlated with a similar increase of 17%'라는 문장도 있다. 따라서 정보 배지의 연관이 약하다는 서술은 결론 절의 일반화와 종단 분석의 결과('additional effect of information badges on the decay is negligible')에 기댄 것이다. 횡단 분석에서는 정보 배지도 유사한 상관을 보였다. target 축은 지지된다. 원문의 대상은 npm 생태계 저장소의 README 배지다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "EVIDENCE-FIRST",
+            "STATE-ASSUME",
+            "SUBJECT-OBJECT",
+            "WRITTEN-ONLY"
+          ]
+        }
+      },
+      {
+        "url": "https://diataxis.fr/",
+        "subquestions": [
+          "sq2"
+        ],
+        "output": {
+          "url": "https://diataxis.fr/",
+          "judgments": [
+            {
+              "ref": "sq2#case#7",
+              "verdict": "unsupported",
+              "quote": "Diátaxis identifies four distinct needs, and four corresponding forms of documentation",
+              "reason": "원문은 사례가 있다는 점을 뒷받침한다. 그러나 결말 '판정 못 함'을 뒷받침하는 구절은 없다. 오히려 원문은 'Diátaxis is proven in practice.'와 'Its principles have been adopted successfully in hundreds of documentation projects.'처럼 성과를 주장하고, Vonage·Gatsby·Cloudflare 담당자의 추천 문구를 싣는다. 그래서 결말 서술은 원문과 상충한다. 축마다의 판정은 다음과 같다. purpose 축은 지지된다. 원문에 'tutorials, how-to guides, technical reference and explanation'과 'documentation should itself be organised around the structures of those needs'가 있다. mechanism 축은 이 페이지에서 확인되지 않는다. 행동·인지 축과 습득·적용 축은 첫 페이지에 나오지 않는다. evaluation 축의 '효과 평가가 없다'는 일부만 맞다. 원문에 측정된 평가는 없다. 그러나 채택 실적 주장과 사용자 추천 문구는 있다. target 축은 'a systematic approach to understanding the needs of documentation users'로 대체로 지지된다. 다만 '제품과 프로젝트의 기술 문서 전체'라는 범위를 그대로 적은 구절은 없다."
+            }
+          ],
+          "principles_applied": [
+            "NO-ASSUME",
+            "EVIDENCE-FIRST",
+            "STATE-ASSUME",
+            "SUBJECT-OBJECT",
+            "WRITTEN-ONLY"
+          ]
+        }
+      }
+    ],
+    "synthesis": {
+      "evidence_map": [
+        {
+          "case": "GitHub 공식 문서 About READMEs",
+          "url": "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes",
+          "axes": {
+            "purpose": {
+              "prior": "새로 온 사람이 프로젝트를 쓰고 기여하기 시작하는 데 필요한 정보를 README 에 두게 한다.",
+              "same": true,
+              "note": "독자가 도구를 판단하고 쓰기 시작하게 한다는 목적이 대조 대상과 같다."
+            },
+            "mechanism": {
+              "prior": "다룰 주제(하는 일, 유용한 이유, 시작 방법, 도움, 유지·기여자)를 나열하고 긴 문서는 위키로 옮기게 한다. 절 순서는 정하지 않는다. 렌더링된 마크다운에는 제목에서 목차를 자동 생성한다.",
+              "same": false,
+              "note": "주제 목록과 긴 문서를 밖으로 옮기는 원칙은 대조 대상 (1)과 비슷하다. 그러나 순서 규칙과 사용자·개발자 분리 규칙이 없다."
+            },
+            "evaluation": {
+              "prior": "효과 평가가 없는 공식 안내문이다.",
+              "same": false,
+              "note": "두 쪽 모두 평가가 없다는 사실만으로 같은 평가라고 볼 수 없다."
+            },
+            "target": {
+              "prior": "GitHub 에 올린 모든 저장소의 README.",
+              "same": false,
+              "note": "대조 대상은 사용자용 README 로 대상을 좁히고 개발자 근거를 따로 두게 한다."
+            }
+          },
+          "outcome": "판정 못 함",
+          "kind": "vendor",
+          "source_level": "1차",
+          "route": "코드 호스팅 플랫폼 공식 문서(sq1#case#6 과 sq2#case#0 이 같은 URL 이므로 한 행으로 합쳤다)",
+          "adoption": "참고"
+        },
+        {
+          "case": "Standard Readme 명세",
+          "url": "https://github.com/RichardLitt/standard-readme/blob/main/spec.md",
+          "axes": {
+            "purpose": {
+              "prior": "README 절의 이름과 순서를 표준화해 독자가 정보를 같은 위치에서 찾게 한다.",
+              "same": false,
+              "note": "대조 대상은 독자의 판단 속도를 목적으로 두고, 형식 표준화 자체를 목적으로 두지 않는다."
+            },
+            "mechanism": {
+              "prior": "제목, 배너, 배지, 짧은 설명, 긴 설명, 목차, 보안, 배경, 설치, 사용, 추가 절, API, 유지자, 감사, 기여, 라이선스 순서를 강제한다. 배지는 선택이다. 목차는 필수이나 100줄 미만 README 에서는 선택이다. 라이선스는 마지막 절이어야 한다.",
+              "same": false,
+              "note": "설명에서 설치·사용으로, 다시 기여·라이선스로 내려가는 큰 순서는 대조 대상 (3)과 같다. 그러나 목차를 원칙적으로 필수로 두고, 셀링포인트와 주의·한계 절이 없으며, 절 제목을 고정한다."
+            },
+            "evaluation": {
+              "prior": "린터와 생성기로 형식 준수를 확인한다. 독자 효과에 대한 평가는 없다.",
+              "same": false,
+              "note": "대조 대상은 형식 준수 검사를 평가로 두지 않는다."
+            },
+            "target": {
+              "prior": "오픈소스 저장소의 README 전반.",
+              "same": false,
+              "note": "대조 대상은 사용자용 README 로 좁힌다."
+            }
+          },
+          "outcome": "판정 못 함",
+          "kind": "blog",
+          "source_level": "1차",
+          "route": "저장소(검색 결과의 미러에서 원 저장소로 이동)",
+          "adoption": "참고"
+        },
+        {
+          "case": "Google 문서 스타일 가이드 README 지침",
+          "url": "https://google.github.io/styleguide/docguide/READMEs.html",
+          "axes": {
+            "purpose": {
+              "prior": "코드 패키지를 처음 보는 사람이 내용물과 사용법과 연락처를 찾게 한다.",
+              "same": true,
+              "note": "독자가 도구를 판단하고 쓰기 시작하게 한다는 목적이 같다."
+            },
+            "mechanism": {
+              "prior": "README 가 포함하거나 가리켜야 할 항목(내용물과 용도, 연락처, 상태, 사용 예시, 관련 문서 링크)을 정한다. 최소 요건은 사용자용 문서 링크이며 순서는 정하지 않는다.",
+              "same": false,
+              "note": "포함하거나 가리킨다는 방식은 대조 대상의 '지우거나 링크로 옮긴다'와 같으나, 상태 항목이 있고 순서·배지 규칙이 없다."
+            },
+            "evaluation": {
+              "prior": "효과 평가가 없는 사내 스타일 지침이다.",
+              "same": false,
+              "note": "평가 근거가 제시되지 않았다."
+            },
+            "target": {
+              "prior": "코드베이스의 패키지 수준 README(모든 최상위 디렉터리).",
+              "same": false,
+              "note": "대조 대상은 공개 도구의 사용자용 README 이고, Google 지침은 사내 코드 패키지 README 를 주 대상으로 한다."
+            }
+          },
+          "outcome": "판정 못 함",
+          "kind": "vendor",
+          "source_level": "1차",
+          "route": "공개 스타일 가이드",
+          "adoption": "참고"
+        },
+        {
+          "case": "Make a README",
+          "url": "https://www.makeareadme.com/",
+          "axes": {
+            "purpose": {
+              "prior": "README 를 처음 쓰는 사람에게 넣을 만한 절을 안내한다.",
+              "same": false,
+              "note": "작성자 안내가 목적이고, 독자의 채택 판단 속도를 목적으로 명시하지 않는다."
+            },
+            "mechanism": {
+              "prior": "이름, 설명, 배지, 시각 자료, 설치, 사용, 지원, 로드맵, 기여, 저자와 감사, 라이선스, 프로젝트 상태 순서를 제안하고, 프로젝트마다 해당하는 절만 고르라고 적는다. 스크린샷이나 영상을 권한다. 목차는 언급하지 않고 변경 이력은 별도 파일로 둔다.",
+              "same": false,
+              "note": "해당하는 절만 고른다는 원칙과 변경 이력을 README 밖에 두는 점은 대조 대상 (4)와 같다. 그러나 배지와 시각 자료를 기본 절로 두고 주의·한계 절이 없다."
+            },
+            "evaluation": {
+              "prior": "효과 평가가 없는 안내 페이지다.",
+              "same": false,
+              "note": "평가 근거가 없다."
+            },
+            "target": {
+              "prior": "일반 소프트웨어 프로젝트의 README.",
+              "same": false,
+              "note": "사용자용과 개발자용을 구분하지 않는다."
+            }
+          },
+          "outcome": "판정 못 함",
+          "kind": "blog",
+          "source_level": "1차",
+          "route": "널리 인용되는 README 가이드 사이트",
+          "adoption": "참고"
+        },
+        {
+          "case": "Open Source Guides 프로젝트 시작하기의 README 절",
+          "url": "https://opensource.guide/starting-a-project/",
+          "axes": {
+            "purpose": {
+              "prior": "README 가 독자의 질문(무엇을 하는가, 왜 유용한가, 어떻게 시작하는가, 도움은 어디서 얻는가)에 답하게 한다.",
+              "same": true,
+              "note": "독자 질문으로 README 내용을 정한다는 목적이 대조 대상 (1)과 같다."
+            },
+            "mechanism": {
+              "prior": "질문 목록을 제시하고 기여 방법은 별도 CONTRIBUTING 파일로 두어 README 에서 링크하게 한다. 절 순서와 배지 규칙은 없다.",
+              "same": false,
+              "note": "질문 기반 구성과 기여 문서 분리는 대조 대상 (1)·(2)와 비슷하나, 질문 구성이 다르고 순서 규칙이 없다."
+            },
+            "evaluation": {
+              "prior": "효과 평가가 없는 안내문이다.",
+              "same": false,
+              "note": "평가 근거가 없다."
+            },
+            "target": {
+              "prior": "새로 공개하는 오픈소스 프로젝트.",
+              "same": false,
+              "note": "대조 대상은 사용자용 README 로 좁힌다."
+            }
+          },
+          "outcome": "판정 못 함",
+          "kind": "vendor",
+          "source_level": "1차",
+          "route": "오픈소스 재단·플랫폼이 운영하는 가이드",
+          "adoption": "참고"
+        },
+        {
+          "case": "Prana 등, Categorizing the Content of GitHub README Files",
+          "url": "https://arxiv.org/abs/1802.06997",
+          "axes": {
+            "purpose": {
+              "prior": "README 절의 내용 종류를 분류해 독자의 정보 탐색을 돕는다.",
+              "same": false,
+              "note": "기존 README 를 분류하는 목적이며 작성 규칙을 정하는 목적과 다르다."
+            },
+            "mechanism": {
+              "prior": "무작위 저장소 393개의 절 4,226개를 What·Why·How·When·Who·References·Contribution·Other 범주로 수작업 분류하고 다중 레이블 분류기를 만들어 절에 자동 레이블을 붙인다.",
+              "same": false,
+              "note": "분류 범주(What, Why, How, Who, References)는 대조 대상의 네 질문과 대응하나, 사후 분류 장치다."
+            },
+            "evaluation": {
+              "prior": "분류기 F1 0.746, 소프트웨어 전문가 20명이 자동 레이블이 정보 찾기를 쉽게 한다고 응답했다. 목적과 상태 내용이 README 에서 드물다고 보고했다.",
+              "same": false,
+              "note": "대조 대상은 이런 실증 평가를 갖추지 않았다."
+            },
+            "target": {
+              "prior": "무작위로 뽑은 GitHub 저장소의 README.",
+              "same": false,
+              "note": "대조 대상은 사용자용 도구 README 로 범위가 더 좁다."
+            }
+          },
+          "outcome": "성공",
+          "kind": "preprint",
+          "source_level": "1차",
+          "route": "arXiv 초록(sq1#case#0 과 sq2#case#5 가 같은 URL 이므로 한 행으로 합쳤다. 탐색 행 하나는 peer-reviewed 로 적었으나 인용 URL 은 Empirical Software Engineering 게재본의 arXiv 프리프린트다)",
+          "adoption": "참고"
+        },
+        {
+          "case": "Venigalla·Chimalakonda, README 내용과 프로젝트 인기의 상관",
+          "url": "https://arxiv.org/abs/2206.10772",
+          "axes": {
+            "purpose": {
+              "prior": "README 내용 특징과 인기의 상관을 밝힌다.",
+              "same": false,
+              "note": "실증 분석이며 작성 규칙이 아니다."
+            },
+            "mechanism": {
+              "prior": "10개 언어 README 1,950개의 구조·내용 특징을 분석했다.",
+              "same": false,
+              "note": "상관 분석이다."
+            },
+            "evaluation": {
+              "prior": "프로젝트 인기",
+              "same": false,
+              "note": "대조 대상은 독자의 판단 속도와 채택을 목표로 하나 평가 지표를 정하지 않았다."
+            },
+            "target": {
+              "prior": "공개 GitHub 프로젝트 README",
+              "same": false,
+              "note": "대조 대상보다 넓다."
+            }
+          },
+          "outcome": "성공",
+          "kind": "preprint",
+          "source_level": "1차",
+          "route": "웹 검색 후 arXiv 초록",
+          "adoption": "참고"
+        },
+        {
+          "case": "Fan 등, What Makes a Popular Academic AI Repository?",
+          "url": "https://arxiv.org/abs/2010.02472",
+          "axes": {
+            "purpose": {
+              "prior": "인기 학술 AI 저장소의 특징을 밝힌다.",
+              "same": false,
+              "note": "실증 분석이다."
+            },
+            "mechanism": {
+              "prior": "1,149개 저장소의 21개 특징(코드·재현성·문서)을 상위 20%와 하위 70%로 비교했다.",
+              "same": false,
+              "note": "README 특징은 분석 특징 중 일부다."
+            },
+            "evaluation": {
+              "prior": "별 수 기준 인기",
+              "same": false,
+              "note": "대조 대상에는 평가 지표가 없다."
+            },
+            "target": {
+              "prior": "논문에 딸린 학술 AI 저장소",
+              "same": false,
+              "note": "대조 대상의 일반 도구 README 와 다르다."
+            }
+          },
+          "outcome": "성공",
+          "kind": "peer-reviewed",
+          "source_level": "1차",
+          "route": "웹 검색 후 arXiv 초록(ICSE 2021 Journal-First)",
+          "adoption": "참고"
+        },
+        {
+          "case": "Trockman 등, npm 저장소 배지 실증 연구(NSF 공개 사본)",
+          "url": "https://par.nsf.gov/servlets/purl/10063054",
+          "axes": {
+            "purpose": {
+              "prior": "README 배지가 품질 신호로 작동하는지 밝힌다.",
+              "same": false,
+              "note": "대조 대상 규칙 (4)의 배지 판단과만 관련된다."
+            },
+            "mechanism": {
+              "prior": "294,941개 저장소 채굴, 개발자 설문, 회귀와 시계열 분석",
+              "same": false,
+              "note": "실증 분석이다."
+            },
+            "evaluation": {
+              "prior": "배지와 테스트·풀 리퀘스트·의존성 최신성의 상관",
+              "same": false,
+              "note": "채택 판단 속도를 평가하지 않는다."
+            },
+            "target": {
+              "prior": "npm 패키지 저장소",
+              "same": false,
+              "note": "생태계 하나에 한정된다."
+            }
+          },
+          "outcome": "성공",
+          "kind": "peer-reviewed",
+          "source_level": "1차",
+          "route": "웹 검색 후 NSF 공개 사본 PDF 1페이지",
+          "adoption": "참고"
+        },
+        {
+          "case": "Trockman, Adding Sparkle to Social Coding: npm 저장소 배지 실증 연구(ICSE 2018 Companion 요약)",
+          "url": "https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf",
+          "axes": {
+            "purpose": {
+              "prior": "README 배지가 유지자가 알리려는 품질의 믿을 만한 신호인지 확인한다.",
+              "same": false,
+              "note": "배지의 신호 가치만 다루며 README 전체 구성은 다루지 않는다. 대조 대상의 배지 규칙 (4)와만 관련된다."
+            },
+            "mechanism": {
+              "prior": "npm 패키지 294,941개의 README 이력에서 배지 88종을 추출해 상관 분석, 통제 회귀, 단절 시계열 분석을 했다.",
+              "same": false,
+              "note": "실증 분석 방법이며 작성 규칙이 아니다."
+            },
+            "evaluation": {
+              "prior": "패키지의 46%가 배지를 하나 이상 달았다. 실제 품질을 검사하는 배지는 그 품질과 상관이 강하고, 최신 버전 표시 같은 정보 배지는 품질과 연관이 약하다. 저자는 유지자가 검사 신호 배지를 고르라고 권한다.",
+              "same": false,
+              "note": "대조 대상의 '필요할 때만 배지를 넣는다'와 상충하지 않으며, '필요'의 판단 기준으로 검사 신호 여부를 제시한다."
+            },
+            "target": {
+              "prior": "npm 생태계 저장소의 README 배지.",
+              "same": false,
+              "note": "특정 생태계에 한정된 결과이므로 대조 대상 전체로 일반화하지 않는다."
+            }
+          },
+          "outcome": "성공",
+          "kind": "peer-reviewed",
+          "source_level": "1차",
+          "route": "논문(ICSE 2018 Companion, 학생 연구 경연 요약)",
+          "adoption": "참고"
+        },
+        {
+          "case": "Ikeda 등, JavaScript 패키지 README 내용 실증 연구",
+          "url": "https://arxiv.org/abs/1802.08391",
+          "axes": {
+            "purpose": {
+              "prior": "README 에 무엇이 들어가는지 밝힌다.",
+              "same": false,
+              "note": "실증 분석이다."
+            },
+            "mechanism": {
+              "prior": "43,900개 패키지 README 의 주제를 분석했다.",
+              "same": false,
+              "note": "내용 빈도 분석이다."
+            },
+            "evaluation": {
+              "prior": "주제 빈도와 패키지 유형별 차이(사용법·설치·라이선스가 가장 흔함)",
+              "same": false,
+              "note": "초록에는 인기와의 관계가 없다."
+            },
+            "target": {
+              "prior": "npm JavaScript 패키지",
+              "same": false,
+              "note": "생태계 하나에 한정된다."
+            }
+          },
+          "outcome": "판정 못 함",
+          "kind": "preprint",
+          "source_level": "1차",
+          "route": "웹 검색 후 arXiv 초록",
+          "adoption": "참고"
+        },
+        {
+          "case": "Gaughan 등, README 와 CONTRIBUTING 파일의 도입",
+          "url": "https://arxiv.org/abs/2502.18440",
+          "axes": {
+            "purpose": {
+              "prior": "첫 README·CONTRIBUTING 의 시점과 내용을 밝힌다.",
+              "same": false,
+              "note": "실증 분석이다."
+            },
+            "mechanism": {
+              "prior": "Debian 패키지 FLOSS 프로젝트의 README 4,226개와 CONTRIBUTING 714개 첫 버전을 분석했다.",
+              "same": false,
+              "note": "도입 시점 분석이다."
+            },
+            "evaluation": {
+              "prior": "첫 README 는 최소한이고 공동체 형성보다 사용법·절차를 다룬다.",
+              "same": false,
+              "note": "채택이나 인기를 평가하지 않는다."
+            },
+            "target": {
+              "prior": "Debian 에 패키징된 FLOSS 프로젝트",
+              "same": false,
+              "note": "대조 대상과 범위가 다르다."
+            }
+          },
+          "outcome": "판정 못 함",
+          "kind": "preprint",
+          "source_level": "1차",
+          "route": "웹 검색 후 arXiv 초록(CHASE 2025)",
+          "adoption": "참고"
+        }
+      ],
+      "conclusions": [
+        {
+          "text": "통과한 행 가운데 대조 대상과 네 축이 모두 같은 선행 사례는 없다. 모든 행이 메커니즘 축과 적용 대상 축에서 대조 대상과 다르므로, 어느 행도 대조 대상과 같은 사례로 볼 수 없다. 이 결과는 통과 행 안에서의 판단이며 독창성의 근거가 아니다.",
+          "refs": [
+            "sq1#case#0",
+            "sq1#case#1",
+            "sq1#case#2",
+            "sq1#case#3",
+            "sq1#case#4",
+            "sq1#case#5",
+            "sq1#case#6",
+            "sq2#case#0",
+            "sq2#case#1",
+            "sq2#case#2",
+            "sq2#case#3",
+            "sq2#case#4",
+            "sq2#case#5",
+            "sq2#case#6"
+          ]
+        },
+        {
+          "text": "독자 질문으로 README 내용을 정한다는 대조 대상 규칙 (1)의 발상은 GitHub 공식 문서, Google 스타일 가이드, Open Source Guides 가 이미 공유한다. 그러나 Open Source Guides 의 질문은 무엇을 하는가·왜 유용한가·어떻게 시작하는가·도움은 어디서 얻는가이다. 그래서 대조 대상의 '누가 만들었는가'와 '내가 쓸 수 있는가'는 이 안내문과 구성이 다르다.",
+          "refs": [
+            "sq2#case#0",
+            "sq1#case#6",
+            "sq2#case#2",
+            "sq2#case#4"
+          ]
+        },
+        {
+          "text": "설명에서 설치·사용으로, 이어서 기여·라이선스로 내려가는 대조 대상 규칙 (3)의 큰 순서는 Standard Readme 명세와 Make a README 의 제안 순서와 같다. 그러나 두 안내 모두 주의·한계 절을 두지 않는다. 또한 Standard Readme 는 100줄 이상 README 에 목차를 필수로 요구하므로, 목차를 필요할 때만 넣는다는 규칙 (4)와 상충한다.",
+          "refs": [
+            "sq2#case#1",
+            "sq2#case#3"
+          ]
+        },
+        {
+          "text": "필요 없는 내용을 README 밖으로 옮긴다는 대조 대상 규칙 (1)·(4)의 방향은 선행 안내와 일치한다. Google 지침은 항목을 포함하거나 가리키게 하고, GitHub 문서는 긴 문서를 위키로 옮기게 하며, Make a README 는 해당하는 절만 고르고 변경 이력을 별도 파일로 둔다.",
+          "refs": [
+            "sq2#case#2",
+            "sq2#case#0",
+            "sq2#case#3"
+          ]
+        },
+        {
+          "text": "배지를 필요할 때만 넣는다는 대조 대상 규칙 (4)에 대해, npm 배지 연구는 '필요'의 판단 기준을 제시한다. 실제 품질을 검사하는 배지는 품질과 상관이 강하고 정보 배지는 연관이 약하다. 다만 이 결과는 npm 생태계에 한정된다.",
+          "refs": [
+            "sq2#case#6",
+            "sq1#case#3"
+          ]
+        },
+        {
+          "text": "대조 대상 규칙 (2)의 사용자 경로와 개발자 근거의 분리는 통과 행에서 기여 방법을 CONTRIBUTING 파일로 분리하라는 Open Source Guides 의 권고 정도로만 대응한다. 사용자·개발자 문서 분리를 규칙으로 둔 선행 사례는 통과 행에서 찾지 못했으며, 이 결과가 그런 사례가 없다는 뜻은 아니다.",
+          "refs": [
+            "sq2#case#4",
+            "sq2#case#0"
+          ]
+        },
+        {
+          "text": "실증 연구는 README 내용 분포와 인기의 상관을 보고한다. Prana 등은 목적·상태 내용이 README 에서 드물다고 보고했고, Ikeda 등은 사용법·설치·라이선스가 가장 흔하다고 보고했으며, Venigalla·Chimalakonda 와 Fan 등은 README 특징과 인기의 관계를 분석했다. 그러나 절 순서나 독자의 판단 속도를 평가한 행은 통과 행에 없다. 대조 대상도 평가 지표를 정하지 않았으므로, 규칙 (3)의 순서가 채택을 빠르게 한다는 주장은 통과 행으로 뒷받침되지 않는다.",
+          "refs": [
+            "sq1#case#0",
+            "sq2#case#5",
+            "sq1#case#4",
+            "sq1#case#1",
+            "sq1#case#2",
+            "sq1#case#5"
+          ]
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "TERM-ONE",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "ONE-IDEA",
+        "KEEP-CONNECT",
+        "COUNT-EARNS",
+        "BOTTOM-LINE"
+      ]
+    },
+    "map_check": {
+      "cells": [
+        {
+          "row": "GitHub 공식 문서 About READMEs",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq2#case#0"
+        },
+        {
+          "row": "GitHub 공식 문서 About READMEs",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#0"
+        },
+        {
+          "row": "GitHub 공식 문서 About READMEs",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#0"
+        },
+        {
+          "row": "GitHub 공식 문서 About READMEs",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#0"
+        },
+        {
+          "row": "GitHub 공식 문서 About READMEs",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#0"
+        },
+        {
+          "row": "Standard Readme 명세",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq2#case#1"
+        },
+        {
+          "row": "Standard Readme 명세",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#1"
+        },
+        {
+          "row": "Standard Readme 명세",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#1"
+        },
+        {
+          "row": "Standard Readme 명세",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#1"
+        },
+        {
+          "row": "Standard Readme 명세",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#1"
+        },
+        {
+          "row": "Google 문서 스타일 가이드 README 지침",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq2#case#2"
+        },
+        {
+          "row": "Google 문서 스타일 가이드 README 지침",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#2"
+        },
+        {
+          "row": "Google 문서 스타일 가이드 README 지침",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#2"
+        },
+        {
+          "row": "Google 문서 스타일 가이드 README 지침",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#2"
+        },
+        {
+          "row": "Google 문서 스타일 가이드 README 지침",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#2"
+        },
+        {
+          "row": "Make a README",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq2#case#3"
+        },
+        {
+          "row": "Make a README",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#3"
+        },
+        {
+          "row": "Make a README",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#3"
+        },
+        {
+          "row": "Make a README",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#3"
+        },
+        {
+          "row": "Make a README",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#3"
+        },
+        {
+          "row": "Open Source Guides 프로젝트 시작하기의 README 절",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq2#case#4"
+        },
+        {
+          "row": "Open Source Guides 프로젝트 시작하기의 README 절",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#4"
+        },
+        {
+          "row": "Open Source Guides 프로젝트 시작하기의 README 절",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#4"
+        },
+        {
+          "row": "Open Source Guides 프로젝트 시작하기의 README 절",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#4"
+        },
+        {
+          "row": "Open Source Guides 프로젝트 시작하기의 README 절",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#4"
+        },
+        {
+          "row": "Prana 등, Categorizing the Content of GitHub README Files",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq2#case#5"
+        },
+        {
+          "row": "Prana 등, Categorizing the Content of GitHub README Files",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#5"
+        },
+        {
+          "row": "Prana 등, Categorizing the Content of GitHub README Files",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#0"
+        },
+        {
+          "row": "Prana 등, Categorizing the Content of GitHub README Files",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#5"
+        },
+        {
+          "row": "Prana 등, Categorizing the Content of GitHub README Files",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#5"
+        },
+        {
+          "row": "Venigalla·Chimalakonda, README 내용과 프로젝트 인기의 상관",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq1#case#1"
+        },
+        {
+          "row": "Venigalla·Chimalakonda, README 내용과 프로젝트 인기의 상관",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#1"
+        },
+        {
+          "row": "Venigalla·Chimalakonda, README 내용과 프로젝트 인기의 상관",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#1"
+        },
+        {
+          "row": "Venigalla·Chimalakonda, README 내용과 프로젝트 인기의 상관",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#1"
+        },
+        {
+          "row": "Venigalla·Chimalakonda, README 내용과 프로젝트 인기의 상관",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#1"
+        },
+        {
+          "row": "Fan 등, What Makes a Popular Academic AI Repository?",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq1#case#2"
+        },
+        {
+          "row": "Fan 등, What Makes a Popular Academic AI Repository?",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#2"
+        },
+        {
+          "row": "Fan 등, What Makes a Popular Academic AI Repository?",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#2"
+        },
+        {
+          "row": "Fan 등, What Makes a Popular Academic AI Repository?",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#2"
+        },
+        {
+          "row": "Fan 등, What Makes a Popular Academic AI Repository?",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#2"
+        },
+        {
+          "row": "Trockman 등, npm 저장소 배지 실증 연구(NSF 공개 사본)",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq1#case#3"
+        },
+        {
+          "row": "Trockman 등, npm 저장소 배지 실증 연구(NSF 공개 사본)",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#3"
+        },
+        {
+          "row": "Trockman 등, npm 저장소 배지 실증 연구(NSF 공개 사본)",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#3"
+        },
+        {
+          "row": "Trockman 등, npm 저장소 배지 실증 연구(NSF 공개 사본)",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#3"
+        },
+        {
+          "row": "Trockman 등, npm 저장소 배지 실증 연구(NSF 공개 사본)",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#3"
+        },
+        {
+          "row": "Trockman, Adding Sparkle to Social Coding: npm 저장소 배지 실증 연구(ICSE 2018 Companion 요약)",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq2#case#6"
+        },
+        {
+          "row": "Trockman, Adding Sparkle to Social Coding: npm 저장소 배지 실증 연구(ICSE 2018 Companion 요약)",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#6"
+        },
+        {
+          "row": "Trockman, Adding Sparkle to Social Coding: npm 저장소 배지 실증 연구(ICSE 2018 Companion 요약)",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#6"
+        },
+        {
+          "row": "Trockman, Adding Sparkle to Social Coding: npm 저장소 배지 실증 연구(ICSE 2018 Companion 요약)",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#6"
+        },
+        {
+          "row": "Trockman, Adding Sparkle to Social Coding: npm 저장소 배지 실증 연구(ICSE 2018 Companion 요약)",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq2#case#6"
+        },
+        {
+          "row": "Ikeda 등, JavaScript 패키지 README 내용 실증 연구",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq1#case#4"
+        },
+        {
+          "row": "Ikeda 등, JavaScript 패키지 README 내용 실증 연구",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#4"
+        },
+        {
+          "row": "Ikeda 등, JavaScript 패키지 README 내용 실증 연구",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#4"
+        },
+        {
+          "row": "Ikeda 등, JavaScript 패키지 README 내용 실증 연구",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#4"
+        },
+        {
+          "row": "Ikeda 등, JavaScript 패키지 README 내용 실증 연구",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#4"
+        },
+        {
+          "row": "Gaughan 등, README 와 CONTRIBUTING 파일의 도입",
+          "column": "outcome",
+          "grounded": true,
+          "source_ref": "sq1#case#5"
+        },
+        {
+          "row": "Gaughan 등, README 와 CONTRIBUTING 파일의 도입",
+          "column": "axes.purpose.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#5"
+        },
+        {
+          "row": "Gaughan 등, README 와 CONTRIBUTING 파일의 도입",
+          "column": "axes.mechanism.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#5"
+        },
+        {
+          "row": "Gaughan 등, README 와 CONTRIBUTING 파일의 도입",
+          "column": "axes.evaluation.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#5"
+        },
+        {
+          "row": "Gaughan 등, README 와 CONTRIBUTING 파일의 도입",
+          "column": "axes.target.prior",
+          "grounded": true,
+          "source_ref": "sq1#case#5"
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "SPECIFIC-NAME",
+        "STATE-ASSUME"
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Research"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Verify"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Synthesize"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 4,
+      "title": "MapCheck"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "research:sq1",
+      "phaseIndex": 1,
+      "phaseTitle": "Research",
+      "agentId": "a76b1ea0764a21023",
+      "agentType": "disciplined-coder:prior-art-researcher",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792567832297,
+      "queuedAt": 1792567832267,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "agent-prior-art",
+      "promptPreview": "MODE: explore\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"question\": \"사용자용 README 를 어떤 구성과 순서로 써야 독자가 도구를 빨리 판단하고 채택하는가\",\n  \"situation\": \"결정 근거 탐색\",\n  \"target\": \"사용자용 README 작성 규칙: (1) 독자가 빨리 답해야 하는 네 질문 — 이 도구가 내 문제를 푸는가, 내가 쓸 수 있는가, 누가 만들었는가, 더 배우려면 어디로 가는가. 어느 질문에도 답하지 않는 절은 지우거나 링크로 옮긴다. (2) 사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않는다. (3) 권장 동선: 제목과 한 줄 설명…",
+      "promptFramed": true,
+      "lastProgressAt": 1792567990427,
+      "tokens": 53863,
+      "toolCalls": 19,
+      "durationMs": 158129,
+      "resultPreview": "{\"agent\":\"agent-prior-art\",\"mode\":\"survey\",\"subquestion_id\":\"sq1\",\"search_status\":\"ok\",\"queries\":[\"README content categories GitHub repositories empirical study popularity\",\"README file quality open source project adoption contributors empirical analysis\",\"GitHub README structure clusters Java repositories stars guidelines Liu\",\"README documentation newcomers onboarding barriers open source empiri…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "research:sq2",
+      "phaseIndex": 1,
+      "phaseTitle": "Research",
+      "agentId": "ae9206d503c490020",
+      "agentType": "disciplined-coder:prior-art-researcher",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792567832297,
+      "queuedAt": 1792567832267,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "agent-prior-art",
+      "promptPreview": "MODE: explore\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"question\": \"사용자용 README 를 어떤 구성과 순서로 써야 독자가 도구를 빨리 판단하고 채택하는가\",\n  \"situation\": \"결정 근거 탐색\",\n  \"target\": \"사용자용 README 작성 규칙: (1) 독자가 빨리 답해야 하는 네 질문 — 이 도구가 내 문제를 푸는가, 내가 쓸 수 있는가, 누가 만들었는가, 더 배우려면 어디로 가는가. 어느 질문에도 답하지 않는 절은 지우거나 링크로 옮긴다. (2) 사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않는다. (3) 권장 동선: 제목과 한 줄 설명…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568001153,
+      "tokens": 53543,
+      "toolCalls": 21,
+      "durationMs": 167193,
+      "resultPreview": "{\"agent\":\"agent-prior-art\",\"mode\":\"survey\",\"subquestion_id\":\"sq2\",\"search_status\":\"ok\",\"queries\":[\"GitHub docs about READMEs what a README should contain\",\"Standard Readme specification section order badges table of contents\",\"Diataxis documentation framework tutorials how-to reference explanation separate\",\"Art of README cognitive funneling order of sections\",\"empirical study repository badges np…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "verify:https://arxiv.org/abs/2206.10772",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ab07b1b52ec9cf2ba",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004321,
+      "queuedAt": 1792568004284,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://arxiv.org/abs/2206.10772",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://arxiv.org/abs/2206.10772\",\n  \"claims\": [\n    {\n      \"ref\": \"sq1#issue#0\",\n      \"text\": \"Venigalla 와 Chimalakonda 는 10개 언어의 GitHub README 1,950개를 분석했다. 그 결과 인기 프로젝트 README 의 대부분이 목록과 이미지로 잘 정리되어 있고 외부 링크를 포함하며, 기여 지침과 참고문헌을 담은 README 가 높은 인기와 연관되었다고 보고했다.\"\n    },\n    {\n      \"ref\": \"sq…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568024737,
+      "tokens": 32255,
+      "toolCalls": 2,
+      "durationMs": 20414,
+      "resultPreview": "{\"url\":\"https://arxiv.org/abs/2206.10772\",\"judgments\":[{\"ref\":\"sq1#issue#0\",\"verdict\":\"supported\",\"quote\":\"We perform the study on 1950 readme files of public GitHub projects, spanning across ten programming languages ... readme files in majority of the popular projects are well organised using lists and images ... comprise links to external sources ... repositories with readme files containing co…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "verify:https://arxiv.org/abs/2010.02472",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "acc16492862d731c5",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004321,
+      "queuedAt": 1792568004284,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://arxiv.org/abs/2010.02472",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://arxiv.org/abs/2010.02472\",\n  \"claims\": [\n    {\n      \"ref\": \"sq1#issue#1\",\n      \"text\": \"Fan 등은 학술 AI 저장소 1,149개를 별 수 상위 20%와 하위 70%로 나눠 21개 특징을 비교했다. 그 결과 11개 특징이 유의하게 달랐고, README 안의 다른 GitHub 저장소 링크 수와 README 이미지 수와 라이선스 포함 여부가 두 집단을 가르는 가장 중요한 특징이었다.\"\n    },\n    {\n      \"ref\": \"sq1#…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568036878,
+      "tokens": 32933,
+      "toolCalls": 3,
+      "durationMs": 30794,
+      "resultPreview": "{\"url\":\"https://arxiv.org/abs/2010.02472\",\"judgments\":[{\"ref\":\"sq1#issue#1\",\"verdict\":\"supported\",\"quote\":\"collect 1,149 academic AI repositories ... the top 20% repositories that have the most number of stars as popular ... the bottom 70% repositories as unpopular ... propose 21 features to characterize the software engineering practices of academic AI repositories ... 11 of the studied features …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "verify:https://par.nsf.gov/servlets/purl/10063054",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a0d54403a218ec6df",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004321,
+      "queuedAt": 1792568004284,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://par.nsf.gov/servlets/purl/10063054",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://par.nsf.gov/servlets/purl/10063054\",\n  \"claims\": [\n    {\n      \"ref\": \"sq1#issue#2\",\n      \"text\": \"Trockman 등은 npm 저장소 294,941개를 채굴하고 개발자 설문과 통계 모형과 시계열 분석을 했다. 빌드 상태·테스트 커버리지·의존성 최신성을 보이는 비자명한 배지는 대체로 신뢰할 만한 신호로서 더 많은 테스트, 더 나은 풀 리퀘스트, 더 최신의 의존성과 상관되었다. 배지 표시는 모범 관행과 상관되지만 그 효과가 항상 지속…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568035525,
+      "tokens": 35494,
+      "toolCalls": 3,
+      "durationMs": 29441,
+      "resultPreview": "{\"url\":\"https://par.nsf.gov/servlets/purl/10063054\",\"judgments\":[{\"ref\":\"sq1#issue#2\",\"verdict\":\"supported\",\"quote\":\"After surveying developers, mining 294,941 repositories, and applying statistical modeling and time-series analyses, we find that non-trivial badges, which display the build status, test coverage, and up-to-dateness of dependencies, are mostly reliable signals, correlating with more…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "verify:https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a1aeefca3058fd8e0",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004322,
+      "queuedAt": 1792568004284,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://docs.github.com/en/repositories/managing-your-repos…",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes\",\n  \"claims\": [\n    {\n      \"ref\": \"sq1#issue#3\",\n      \"text\": \"GitHub 공식 문서는 README 가 보통 프로젝트가 하는 일, 프로젝트가 유용한 이유, 시작하는 방법, 도움을 얻을 곳, 유지·기여하는 사람을 담는다고 안내한다. 또한 Git…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568033037,
+      "tokens": 32663,
+      "toolCalls": 2,
+      "durationMs": 26953,
+      "resultPreview": "{\"url\":\"https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes\",\"judgments\":[{\"ref\":\"sq1#issue#3\",\"verdict\":\"supported\",\"quote\":\"README files typically include information on: What the project does / Why the project is useful / How users can get started with the project / Where users can get help with your project / Who mai…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "verify:https://arxiv.org/abs/1802.06997",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "aad552b1be716e2a7",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004322,
+      "queuedAt": 1792568004284,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://arxiv.org/abs/1802.06997",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://arxiv.org/abs/1802.06997\",\n  \"claims\": [\n    {\n      \"ref\": \"sq1#case#0\",\n      \"text\": \"{\\\"case\\\":\\\"Prana 등, Categorizing the Content of GitHub README Files\\\",\\\"outcome\\\":\\\"성공\\\",\\\"prior\\\":{\\\"purpose\\\":\\\"README 절의 내용 범주를 분류하고 자동 분류기를 만든다\\\",\\\"mechanism\\\":\\\"393개 저장소의 4,226개 절을 수작업 주석하고 8범…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568037064,
+      "tokens": 36416,
+      "toolCalls": 3,
+      "durationMs": 30980,
+      "resultPreview": "{\"url\":\"https://arxiv.org/abs/1802.06997\",\"judgments\":[{\"ref\":\"sq1#case#0\",\"verdict\":\"supported\",\"quote\":\"manual annotation of 4,226 README file sections from 393 randomly sampled GitHub repositories ... Our multi-label classifier which can predict eight different categories achieves an F1 score of 0.746\",\"reason\":\"초록에 Prana 등의 연구가 실재하고 분류기 구축과 사용자 평가가 긍정적으로 끝났다는 서술이 있어 사례와 성공 결말을 확인했다. 축마다의 판정은 다…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "verify:https://arxiv.org/abs/1802.08391",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a8a1e76b926544ec0",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004322,
+      "queuedAt": 1792568004284,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://arxiv.org/abs/1802.08391",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://arxiv.org/abs/1802.08391\",\n  \"claims\": [\n    {\n      \"ref\": \"sq1#case#4\",\n      \"text\": \"{\\\"case\\\":\\\"Ikeda 등, JavaScript 패키지 README 내용 실증 연구\\\",\\\"outcome\\\":\\\"판정 못 함\\\",\\\"prior\\\":{\\\"purpose\\\":\\\"README 에 무엇이 들어가는지 밝힌다\\\",\\\"mechanism\\\":\\\"43,900개 패키지 README 의 주제를 분석했다\\\",\\\"evaluation\\\":\\\"주제 빈도와…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568032018,
+      "tokens": 32401,
+      "toolCalls": 3,
+      "durationMs": 25933,
+      "resultPreview": "{\"url\":\"https://arxiv.org/abs/1802.08391\",\"judgments\":[{\"ref\":\"sq1#case#4\",\"verdict\":\"supported\",\"quote\":\"To understand the contents of a README, we investigate the contents of 43,900 JavaScript packages.\",\"reason\":\"원문 제목은 'An Empirical Study on README contents for JavaScript Packages'이고 저자는 Shohei Ikeda 등이다. 그래서 사례가 있다는 사실이 확인된다. 결말 '판정 못 함'은 실증 연구라서 채택·폐기 같은 결말이 없다는 서술과 상충하지 않는다. 축별 판정은 다음과 같다. …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "verify:https://arxiv.org/abs/2502.18440",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ac452a9cef6b29d24",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004322,
+      "queuedAt": 1792568004284,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://arxiv.org/abs/2502.18440",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://arxiv.org/abs/2502.18440\",\n  \"claims\": [\n    {\n      \"ref\": \"sq1#case#5\",\n      \"text\": \"{\\\"case\\\":\\\"Gaughan 등, README 와 CONTRIBUTING 파일의 도입\\\",\\\"outcome\\\":\\\"판정 못 함\\\",\\\"prior\\\":{\\\"purpose\\\":\\\"첫 README·CONTRIBUTING 의 시점과 내용을 밝힌다\\\",\\\"mechanism\\\":\\\"Debian 패키지 FLOSS 프로젝트의 README 4,226개와 CONT…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568037639,
+      "tokens": 32637,
+      "toolCalls": 3,
+      "durationMs": 31554,
+      "resultPreview": "{\"url\":\"https://arxiv.org/abs/2502.18440\",\"judgments\":[{\"ref\":\"sq1#case#5\",\"verdict\":\"supported\",\"quote\":\"examine README (n=4226) and CONTRIBUTING (n=714) files when they are first published\",\"reason\":\"원문은 Gaughan, Champion, Hwang, Shaw 의 논문 \\\"The Introduction of README and CONTRIBUTING Files in Open Source Software Development\\\" 이다. 그래서 사례의 존재가 확인된다. 결말 '판정 못 함'은 README 가 성과를 냈는지를 이 논문이 판정하지 않는다는…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "verify:https://google.github.io/styleguide/docguide/READMEs.html",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "aebb5d4d7bc253c17",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004322,
+      "queuedAt": 1792568004285,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://google.github.io/styleguide/docguide/READMEs.html",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://google.github.io/styleguide/docguide/READMEs.html\",\n  \"claims\": [\n    {\n      \"ref\": \"sq2#issue#1\",\n      \"text\": \"Google 문서 스타일 가이드는 패키지 수준 README 가 내용물과 용도, 연락처, 상태(폐기 여부, 일반 공개 여부), 사용 예시, 관련 문서 링크를 포함하거나 가리켜야 한다고 적는다. 최소 요건은 사용자용 문서로 가는 링크다.\"\n    },\n    {\n      \"ref\": \"sq2#case#2\",\n…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568039776,
+      "tokens": 36195,
+      "toolCalls": 3,
+      "durationMs": 33690,
+      "resultPreview": "{\"url\":\"https://google.github.io/styleguide/docguide/READMEs.html\",\"judgments\":[{\"ref\":\"sq2#issue#1\",\"verdict\":\"supported\",\"quote\":\"At a minimum, the README should link to user-facing and/or team-facing documentation. ... A package-level README should include or link to: 1. What the package or library contains and what it's used for 2. Points of contact 3. Status, such as whether it's deprecated o…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "verify:https://opensource.guide/starting-a-project/",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a8612a674e58efc38",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004322,
+      "queuedAt": 1792568004285,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://opensource.guide/starting-a-project/",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://opensource.guide/starting-a-project/\",\n  \"claims\": [\n    {\n      \"ref\": \"sq2#issue#2\",\n      \"text\": \"Open Source Guides 는 README 가 '이 프로젝트는 무엇을 하는가, 왜 유용한가, 어떻게 시작하는가, 도움이 더 필요하면 어디로 가는가' 네 질문에 답해야 한다고 적고, 기여 방법은 별도 CONTRIBUTING 파일에 두고 README 에서 링크하라고 권한다.\"\n    },\n    {\n      \"ref\": \"s…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568025739,
+      "tokens": 32300,
+      "toolCalls": 2,
+      "durationMs": 19653,
+      "resultPreview": "{\"url\":\"https://opensource.guide/starting-a-project/\",\"judgments\":[{\"ref\":\"sq2#issue#2\",\"verdict\":\"supported\",\"quote\":\"What does this project do? / Why is this project useful? / How do I get started? / Where can I get more help, if I need it? ... Link to your CONTRIBUTING file from your README, so more people see it.\",\"reason\":\"원문의 README 절은 네 질문을 그대로 나열한다. 원문은 또한 CONTRIBUTING 파일을 README 에서 링크하라고 …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 12,
+      "label": "verify:https://github.com/RichardLitt/standard-readme/blob/main/spec.md",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a837ae872420bec25",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004322,
+      "queuedAt": 1792568004285,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://github.com/RichardLitt/standard-readme/blob/main/sp…",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://github.com/RichardLitt/standard-readme/blob/main/spec.md\",\n  \"claims\": [\n    {\n      \"ref\": \"sq2#case#1\",\n      \"text\": \"{\\\"case\\\":\\\"Standard Readme 명세\\\",\\\"outcome\\\":\\\"판정 못 함\\\",\\\"prior\\\":{\\\"purpose\\\":\\\"README 절의 이름과 순서를 표준화해 독자가 정보를 같은 위치에서 찾게 한다.\\\",\\\"mechanism\\\":\\\"제목, 배너, 배지, 짧은 설명, 긴 …",
+      "promptFramed": true,
+      "lastProgressAt": 1792568029150,
+      "tokens": 32289,
+      "toolCalls": 2,
+      "durationMs": 23064,
+      "resultPreview": "{\"url\":\"https://github.com/RichardLitt/standard-readme/blob/main/spec.md\",\"judgments\":[{\"ref\":\"sq2#case#1\",\"verdict\":\"supported\",\"quote\":\"Sections must appear in order given below. Optional sections may be omitted.\",\"reason\":\"원문에 명세가 실재하므로 사례의 존재가 확인된다. 원문은 효과 측정을 적지 않으므로, 결말을 '판정 못 함'으로 둔 서술은 원문과 상충하지 않는다. 축별 판정은 다음과 같다. mechanism 축은 원문으로 지지된다. 원문이 Title, Banner, Badges, Short Description, Long D…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 13,
+      "label": "verify:https://www.makeareadme.com/",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a226ed0ceb24d08df",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004322,
+      "queuedAt": 1792568004285,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://www.makeareadme.com/",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://www.makeareadme.com/\",\n  \"claims\": [\n    {\n      \"ref\": \"sq2#case#3\",\n      \"text\": \"{\\\"case\\\":\\\"Make a README\\\",\\\"outcome\\\":\\\"판정 못 함\\\",\\\"prior\\\":{\\\"purpose\\\":\\\"README 를 처음 쓰는 사람에게 넣을 만한 절을 안내한다.\\\",\\\"mechanism\\\":\\\"이름, 설명, 배지, 시각 자료, 설치, 사용, 지원, 로드맵, 기여, 저자와 감사, 라이선스, 프로젝트 상태 순서를 제안하고, 프…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568030879,
+      "tokens": 32393,
+      "toolCalls": 2,
+      "durationMs": 24794,
+      "resultPreview": "{\"url\":\"https://www.makeareadme.com/\",\"judgments\":[{\"ref\":\"sq2#case#3\",\"verdict\":\"supported\",\"quote\":\"Every project is different, so consider which of these sections apply to yours.\",\"reason\":\"원문 https://www.makeareadme.com/ 에 Make a README 라는 사례가 실제로 있다. 결말은 '판정 못 함'이고, 원문이 효과 평가가 없는 안내 페이지이므로 이 결말과 상충하지 않는다. 축별 판정은 다음과 같다. purpose 축은 지지된다. 원문의 'A README is a text file that introduces and explain…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 14,
+      "label": "verify:https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "ae7b58bcb6925211e",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004323,
+      "queuedAt": 1792568004285,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf\",\n  \"claims\": [\n    {\n      \"ref\": \"sq2#case#6\",\n      \"text\": \"{\\\"case\\\":\\\"Trockman, Adding Sparkle to Social Coding: npm 저장소 배지 실증 연구\\\",\\\"outcome\\\":\\\"성공\\\",\\\"prior\\\":{\\\"purpose\\\":\\\"README 배지가 유지자가 알리려는 품질의 믿을 만한 신호인지 확인한다.\\\",\\\"mechanism\\\":\\\"np…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568036012,
+      "tokens": 35613,
+      "toolCalls": 4,
+      "durationMs": 29927,
+      "resultPreview": "{\"url\":\"https://www.cs.cmu.edu/~ckaestne/pdf/srcicse18.pdf\",\"judgments\":[{\"ref\":\"sq2#case#6\",\"verdict\":\"supported\",\"quote\":\"We found that packages with badges tend to have more of the quality they intend to signal, a small effect remaining even when controlling for other visible signals. Correlations are particularly strong for assessment signals, or badges that test an underlying non-trivial qual…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 15,
+      "label": "verify:https://diataxis.fr/",
+      "phaseIndex": 2,
+      "phaseTitle": "Verify",
+      "agentId": "a75e41796113a36b9",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568004323,
+      "queuedAt": 1792568004285,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "https://diataxis.fr/",
+      "promptPreview": "MODE: cite\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"url\": \"https://diataxis.fr/\",\n  \"claims\": [\n    {\n      \"ref\": \"sq2#case#7\",\n      \"text\": \"{\\\"case\\\":\\\"Diátaxis 문서화 프레임워크\\\",\\\"outcome\\\":\\\"판정 못 함\\\",\\\"prior\\\":{\\\"purpose\\\":\\\"사용자 필요에 따라 기술 문서를 튜토리얼, 방법 안내, 레퍼런스, 설명 네 종류로 나누어 쓰고 배치하게 한다.\\\",\\\"mechanism\\\":\\\"행동·인지 축과 습득·적용 축으로 네 종류를 정의한다.\\\",\\\"evaluation\\\":\\…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568032657,
+      "tokens": 36152,
+      "toolCalls": 3,
+      "durationMs": 26572,
+      "resultPreview": "{\"url\":\"https://diataxis.fr/\",\"judgments\":[{\"ref\":\"sq2#case#7\",\"verdict\":\"unsupported\",\"quote\":\"Diátaxis identifies four distinct needs, and four corresponding forms of documentation\",\"reason\":\"원문은 사례가 있다는 점을 뒷받침한다. 그러나 결말 '판정 못 함'을 뒷받침하는 구절은 없다. 오히려 원문은 'Diátaxis is proven in practice.'와 'Its principles have been adopted successfully in hundreds of documentation projects.'처럼 성과를 주장하고, Vonage·Gats…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 16,
+      "label": "synthesize",
+      "phaseIndex": 3,
+      "phaseTitle": "Synthesize",
+      "agentId": "a96f00d81d6448458",
+      "agentType": "disciplined-coder:prior-art-researcher",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568041988,
+      "queuedAt": 1792568041973,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "MODE: synthesize\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"question\": \"사용자용 README 를 어떤 구성과 순서로 써야 독자가 도구를 빨리 판단하고 채택하는가\",\n  \"target\": \"사용자용 README 작성 규칙: (1) 독자가 빨리 답해야 하는 네 질문 — 이 도구가 내 문제를 푸는가, 내가 쓸 수 있는가, 누가 만들었는가, 더 배우려면 어디로 가는가. 어느 질문에도 답하지 않는 절은 지우거나 링크로 옮긴다. (2) 사용자 설치·사용 경로와 개발자 내부 근거를 한 문서에 섞지 않는다. (3) 권장 동선: 제목과 한 줄 설명, 핵심 셀링포인트, 무엇을 왜 하는지, 설…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568111755,
+      "tokens": 50466,
+      "toolCalls": 2,
+      "durationMs": 69766,
+      "resultPreview": "{\"evidence_map\":[{\"case\":\"GitHub 공식 문서 About READMEs\",\"url\":\"https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes\",\"axes\":{\"purpose\":{\"prior\":\"새로 온 사람이 프로젝트를 쓰고 기여하기 시작하는 데 필요한 정보를 README 에 두게 한다.\",\"same\":true,\"note\":\"독자가 도구를 판단하고 쓰기 시작하게 한다는 목적이 대조 대상과 같다.\"},\"mechanism\":{\"prior\":\"다룰 주제(하는 일, 유용한 이유, 시작 방법, 도움, 유지·기여자)를 나…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 17,
+      "label": "map-check",
+      "phaseIndex": 4,
+      "phaseTitle": "MapCheck",
+      "agentId": "aecc19fbbc94190c5",
+      "agentType": "disciplined-coder:prior-art-verifier",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792568114667,
+      "queuedAt": 1792568114649,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "MODE: map\nPRINCIPLES: C:/Users/CHSHIN/.claude/disciplined-coder/agent-principles.md\n```json\n{\n  \"evidence_map\": [\n    {\n      \"case\": \"GitHub 공식 문서 About READMEs\",\n      \"url\": \"https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes\",\n      \"axes\": {\n        \"purpose\": {\n          \"prior\": \"새로 온 사람이 프로젝트를 쓰고 기여하기 시작하는 데 필요한…",
+      "promptFramed": true,
+      "lastProgressAt": 1792568150370,
+      "tokens": 44463,
+      "toolCalls": 1,
+      "durationMs": 35703,
+      "resultPreview": "{\"cells\":[{\"row\":\"GitHub 공식 문서 About READMEs\",\"column\":\"outcome\",\"grounded\":true,\"source_ref\":\"sq2#case#0\"},{\"row\":\"GitHub 공식 문서 About READMEs\",\"column\":\"axes.purpose.prior\",\"grounded\":true,\"source_ref\":\"sq2#case#0\"},{\"row\":\"GitHub 공식 문서 About READMEs\",\"column\":\"axes.mechanism.prior\",\"grounded\":true,\"source_ref\":\"sq2#case#0\"},{\"row\":\"GitHub 공식 문서 About READMEs\",\"column\":\"axes.evaluation.prior\",\"gr…"
+    }
+  ],
+  "totalTokens": 642076,
+  "totalToolCalls": 78
+}

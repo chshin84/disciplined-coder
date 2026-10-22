@@ -1,0 +1,63 @@
+{
+  "target": "skills/review-llm-calls/SKILL.md",
+  "lens": "lens-fit",
+  "doc_type": "절차·계약 (런타임 검증 호출자 절차. 수행 방법과 고정표를 포함하고 진행 상태가 없다)",
+  "read": [
+    "agent-principles.md",
+    "docs/domain-korean.md",
+    "skills/aggregating-lenses/SKILL.md"
+  ],
+  "issues": [
+    {
+      "where": "비기능 체크리스트",
+      "type": "style",
+      "claim": "불릿 항목이 두 문장으로 쓰였다. 설명이 두 문장 이상이면 문단으로 쓰라는 조항과 어긋난다.",
+      "file": "skills/review-llm-calls/SKILL.md",
+      "evidence": "외부 호출에는 timeout을 적용한다. 적용하지 않으면 무한히 대기한다(critical).",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "같은 종류를 늘어놓을 때만 불릿을 쓰고, 항목마다 한 문장으로 써라.",
+      "principle": "BULLET-SCOPE",
+      "consequence": "지금 비기능 체크리스트의 여러 불릿이 한 항목에 두 문장 이상을 담고 있다.",
+      "lens": "lens-fit"
+    },
+    {
+      "where": "비기능 체크리스트와 조립 절",
+      "type": "style",
+      "claim": "'등급'이 두 뜻으로 쓰였다. 체크리스트 도입은 등급이 문서가 미리 정한 고정값이고 렌즈가 매기는 값이 아니라고 하는데, 조립 절 로그 문장은 값을 '등급을 매겨 가리고'라고 마스킹 동작으로 쓴다.",
+      "file": "skills/review-llm-calls/SKILL.md",
+      "evidence": "비밀과 개인정보가 섞일 수 있는 값은 등급을 매겨 가리고 원문을 남기지 않는다.",
+      "counterpart_file": "skills/review-llm-calls/SKILL.md",
+      "counterpart": "각 항목의 등급은 이 문서가 미리 정한 고정값이지 렌즈가 매기는 값이 아니다.",
+      "principle": "TERM-ONE",
+      "consequence": "지금 같은 문서에서 '등급을 매긴다'가 마스킹 처리와 critical·major 지정 두 뜻으로 읽힌다.",
+      "lens": "lens-fit"
+    },
+    {
+      "where": "서두",
+      "type": "style",
+      "claim": "'A가 아니라 B' 대구를 한 문서에서 서두에 쓰고 체크리스트 도입에서 '이지 ~가 아니다' 꼴로 한 번 더 썼다. 두 번째는 A를 빼고 B만 단정문으로 써야 한다.",
+      "file": "skills/review-llm-calls/SKILL.md",
+      "evidence": "렌즈는 Claude Code 에이전트가 아니라 제품 코드가 구현할 청사진이다.",
+      "counterpart_file": "agent-principles.md",
+      "counterpart": "`A가 아니라 B` 대구는 글 한 편에 한 번까지만 써라.",
+      "principle": "ANTI-LIMIT",
+      "consequence": "지금 이 문서에는 대구가 서두 말고 체크리스트 도입('고정값이지 렌즈가 매기는 값이 아니다')에도 있다.",
+      "lens": "lens-fit"
+    }
+  ],
+  "principles_applied": [
+    "COUNT-EARNS",
+    "NO-MID-MOD",
+    "SPECIFIC-NAME",
+    "INSTRUCTION-FORM",
+    "BULLET-SCOPE",
+    "TERM-ONE",
+    "ANTI-LIMIT",
+    "SUBJECT-OBJECT",
+    "WRITTEN-ONLY",
+    "DOC-TYPE",
+    "FULL-SENTENCE",
+    "ONE-IDEA"
+  ],
+  "notes": "금지 낱말은 세지 않았다. 검토한 관점은 형식, 스타일, 오염, 호환, 규율이다. 규율은 COUNT-EARNS, NO-MID-MOD, SPECIFIC-NAME, INSTRUCTION-FORM, BULLET-SCOPE, TERM-ONE, ANTI-LIMIT 위주로 대조했다. agent-principles.md 의 조항 줄을 고치는 발견은 없다. 세 번째 발견의 두 번째 대구는 '이지 ~가 아니다' 꼴이라 'A가 아니라 B' 와 같은 대구로 볼지 해석이 갈린다. 판단은 호출자에게 맡긴다."
+}

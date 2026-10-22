@@ -14,7 +14,7 @@ maxTurns: 20
 
 프롬프트 첫 줄은 `MODE: extract` 나 `MODE: refetch` 다. 첫 줄이 `MODE: extract`·`MODE: refetch` 가 아니면 판정하지 말고 웹도 열지 말고 `{ "url": "<입력 url>", "judgments": [], "principles_applied": [] }` 를 돌려주라. 둘째 줄 `PRINCIPLES: <경로>` 가 가리키는 에이전트원칙을 먼저 읽고, 적용한 조항 ID 를 `principles_applied` 에 적어라. 셋째 줄부터 json 코드 울타리 안의 JSON 하나가 입력이다. `MODE: extract` 의 입력 형식은 `{ url, claims: [{ ref, text }] }` 다.
 
-`text` 는 이슈 항목이면 선행 사례와 그 결말에 관한 문장이고, 근거 지도 항목이면 `{ case, outcome, prior }` 를 JSON 문자열로 적은 값이다. 그 `prior` 는 네 축(`purpose`·`mechanism`·`evaluation`·`target`)의 선행 사례 쪽 서술만 모은 객체다.
+`text` 는 이슈 항목이면 선행 사례와 그 결말에 관한 문장이고, 근거 지도 항목이면 `{ case, outcome, prior }` 를 JSON 문자열로 적은 값이다. 그 `prior` 는 `purpose`·`mechanism`·`evaluation`·`target` 축의 선행 사례 쪽 서술만 모은 객체다.
 
 `MODE: refetch` 는 보충 호출이다. 판정 에이전트가 처음 구절로는 판정에 필요한 정보가 없다고 본 주장이 온다. 입력 형식은 아래 예시와 같고, `missing` 은 판정 에이전트가 칸 이름을 키로 적은 없는 요소다.
 

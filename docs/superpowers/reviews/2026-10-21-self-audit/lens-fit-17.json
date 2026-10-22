@@ -1,0 +1,81 @@
+{
+ "target": "skills/domain-pruning/SKILL.md",
+ "lens": "lens-fit",
+ "doc_type": "절차·계약 — 감축 차수의 수행 방법(목록, 판정표, 범위, 적용, 결함 주입)과 판정 질문을 포함하는 참고서이므로 수행 방법 행으로 가렸다.",
+ "read": [
+  "agent-principles.md",
+  "docs/domain-korean.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md"
+ ],
+ "issues": [
+  {
+   "where": "재현성 확인",
+   "type": "constraint",
+   "claim": "절차·계약 문서에 일자가 붙은 측정 결과(검사 건수, 일치율, 카파)가 적혀 있어 상태를 적지 말라는 행의 노후 방지 방법에 어긋난다.",
+   "file": "skills/domain-pruning/SKILL.md",
+   "evidence": "2026-10-06 첫 측정(`test_audit.sh` 검사 115건)은 일치 78%, 카파 0.43이었고",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "상태를 적지 말고 방법만 적어라",
+   "principle": "DOC-TYPE",
+   "consequence": "지금 이 참고서는 판정 방법과 함께 2026-10-06 측정값을 싣고 있어, 검사가 바뀌면 이 값이 낡은 상태로 남는다."
+  },
+  {
+   "where": "절차 4단계",
+   "type": "style",
+   "claim": "수행 절차를 '~한다' 평서문으로 적었다. 할 일은 '~하라' 긍정 명령으로 쓰는 규칙에 어긋난다.",
+   "file": "skills/domain-pruning/SKILL.md",
+   "evidence": "**4. 적용** — 정한 범위만 고친다. 쓰이지 않게 된 변수·헬퍼·주석도 함께 지운다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "사실은 평서문으로, 할 일은 '~하라' 긍정 명령으로 쓰고",
+   "principle": "INSTRUCTION-FORM",
+   "consequence": "지금 에이전트가 따를 절차 단계가 현재 상태를 적은 말로도 읽히는 평서형으로 적혀 있다."
+  },
+  {
+   "where": "판정 질문",
+   "type": "style",
+   "claim": "평서형 부정문으로 적었다. 금지로 읽히기 때문에 긍정 명령으로 써야 한다.",
+   "file": "skills/domain-pruning/SKILL.md",
+   "evidence": "근거가 밝혀지지 않은 기준값(테스트를 지우는 경과 일수 등)은 두지 않는다(`EVIDENCE-FIRST`).",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "평서형 부정문은 금지로 읽히기 때문이다.",
+   "principle": "INSTRUCTION-FORM",
+   "consequence": "지금 이 문장은 지시인지 현재 상태 서술인지 읽는 쪽이 추정해야 하는 평서형 부정문이다."
+  },
+  {
+   "where": "절차 5단계",
+   "type": "style",
+   "claim": "'것'이 앞에 나온 '공백'을 다시 가리킨다. 대상의 이름으로 바꿔야 한다.",
+   "file": "skills/domain-pruning/SKILL.md",
+   "evidence": "감축 전 버전도 같은 결함에 실패하지 않으면 그 공백은 감축 전부터 있던 것으로 적는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "대상을 가리키는 '것'도 그 이름으로 바꿔라.",
+   "principle": "SPECIFIC-NAME",
+   "consequence": "지금 '있던 것'이 무엇을 가리키는지 읽는 쪽이 앞 문장에서 찾아야 한다."
+  },
+  {
+   "where": "판정 질문 첫 문단",
+   "type": "style",
+   "claim": "'모았고'의 행위 주체가 적혀 있지 않다.",
+   "file": "skills/domain-pruning/SKILL.md",
+   "evidence": "판정 질문은 2026-10-05에 선행연구로 모았고, 출처마다 성격이 달라 수치를 그대로 옮기지 않는다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "대화와 자료로 주체를 확인할 수 없으면 짐작해 채우지 말고 주체를 모른다고 적어라.",
+   "principle": "SUBJECT-OBJECT",
+   "consequence": "지금 판정 질문을 모은 사람이나 도구가 문장에 없다."
+  },
+  {
+   "where": "재현성 확인 문단",
+   "type": "style",
+   "claim": "한 단락이 네 문장을 넘어 여덟 문장 가까이 이어진다.",
+   "file": "skills/domain-pruning/SKILL.md",
+   "evidence": "정의만 받은 다른 실행자가 감축 전 버전을 다시 판정해, 실제 처분과 지움·남김이 얼마나 일치하는지 센다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "한 문장에 한 개념만 쓰고, 단락이 네 문장에 이르면 새 단락을 시작하라.",
+   "principle": "ONE-IDEA",
+   "consequence": "지금 측정 방법과 첫 측정 결과와 재측정 결과와 해석이 한 단락에 이어져 있다."
+  }
+ ],
+ "principles_applied": [],
+ "notes": "관점: INSTRUCTION-FORM 평서형 지시는 이 문서 전체에 퍼져 있어(분류 표 처분 칸, 절차 1~6단계) 대표 두 줄만 올렸다. 조항 문안 자체의 문체 지적은 없다. 금지 낱말은 세지 않았다."
+}

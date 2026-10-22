@@ -1,0 +1,140 @@
+{
+ "target": "docs/domain-korean.md",
+ "lens": "lens-grounding",
+ "read": [
+  "agent-principles.md",
+  "skills/lens-grounding/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "korean-banned-words.md",
+  "docs/korean-banned-words-evidence.md",
+  "skills/review-docs/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "hooks/_spec_marker.sh",
+  "scripts/scaffold.sh",
+  "scripts/test_docs_drift.sh",
+  "evals/principles/clauses/ (c20-* 단위 폴더, BANNED-LIST, OUTPUT-LANG)",
+  "evals/principles/cases/ (q-vocab-pref-1·2, term-expert, term-gloss, q-anti-limit-*, q-subject-object-1·2)",
+  "evals/principles/README.md",
+  "docs/domain-discipline.md (ASK-OPTIONS, 삭제한 조항 절 존재)",
+  "git: 8b4a05a:docs/domain-discipline.md 403행 근방, a0ab399 커밋 날짜"
+ ],
+ "issues": [
+  {
+   "where": "VOCAB-PREF 절, 2026-10-18 재편 문단",
+   "type": "contradiction",
+   "claim": "2026-10-18 재편 문단은 영어 원어 문장을 에이전트원칙 「출력」 머리의 언어 문단이 같은 지시를 하므로 지웠다고 적는다. 같은 절의 2026-10-21 문단은 그 문장을 다시 넣은 후보를 원칙에 옮겼다고 적고, 지금 agent-principles.md 의 VOCAB-PREF 줄에 그 문장이 있다. 지운 이유로 든 중복이 지금 존재한다. 같은 문단이 새 이름을 밝히게 했다고 적은 문장도 지금 VOCAB-PREF 줄에 없다.",
+   "file": "docs/domain-korean.md",
+   "evidence": "2026-10-18 재편에서 영어 원어 문장을 지웠다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "표준 용어가 영어 원어이면 원어로 써라.",
+   "principle": "VOCAB-PREF",
+   "consequence": "이 절만 읽으면 VOCAB-PREF 에 영어 원어 문장이 없고 새 이름을 밝히는 문장이 있는 것으로 읽히지만, 지금 agent-principles.md 는 반대로 되어 있다."
+  },
+  {
+   "where": "금지 표현의 근거 절, 무리 설명",
+   "type": "mismatch",
+   "claim": "이 절은 무리의 소속을 목록 파일의 분류 칸이 소유한다고 하면서 무리 이름을 「무엇이든 가리킬 수 있는 넓은 말」과 「영어를 그대로 옮긴 것」으로 적는다. 목록과 근거 파일의 분류 값은 「대명사처럼 쓰는 말」과 「영어를 직역한 것」이다. 두 이름이 분류 칸 어디에도 없다.",
+   "file": "docs/domain-korean.md",
+   "evidence": "어느 말이 어느 무리에 드는지는 목록 파일의 분류 칸이 소유한다.",
+   "counterpart_file": "docs/korean-banned-words-evidence.md",
+   "counterpart": "분류는 「영어를 직역한 것」이고 켜져 있다.",
+   "principle": "TERM-ONE",
+   "consequence": "독자가 이 절의 무리 이름으로 분류 칸을 찾으면 같은 이름이 없어서 어느 항목이 어느 무리인지 이을 수 없다."
+  },
+  {
+   "where": "지시문의 형태 절, 2026-10-18 목록 단위 측정",
+   "type": "unsupported",
+   "claim": "측정 문단은 지시형 트랙을 금지어 목록의 표 상황 칸과 대체어 칸으로 만들었다고 적는다. 목록 파일의 표 머리는 쓰지 않는 말·대신 쓰는 말·적용 대상·분류·제외 다섯이고 상황 칸이 없다.",
+   "file": "docs/domain-korean.md",
+   "evidence": "표의 상황 칸과 대체어 칸만으로 만든 지시형 트랙",
+   "counterpart_file": "korean-banned-words.md",
+   "counterpart": "| 쓰지 않는 말 | 대신 쓰는 말 | 적용 대상 | 분류 | 제외 |",
+   "principle": "NO-ASSUME",
+   "consequence": "지시형 트랙이 표의 어느 칸에서 나왔는지를 목록 파일로 확인할 수 없고, 상황 문구를 누가 지었는지는 이 문서에 없다."
+  },
+  {
+   "where": "NAME-ITEMS 절",
+   "type": "mismatch",
+   "claim": "삭제한 NAME-ITEMS 의 근거 문단은 CHECKABLE 이 단계에 번호를 붙이라고 한다고 적는다. 지금 CHECKABLE 줄은 각 단계 문장 안에 확인 방법을 함께 쓰라고만 하고, 번호는 예시 문장에 있을 뿐 지시가 아니다.",
+   "file": "docs/domain-korean.md",
+   "evidence": "순서가 있는 계획은 이 조항 밖이다 — `CHECKABLE` 이 단계에 번호를 붙이라고 한다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "단계가 둘 이상이면 각 단계 문장 안에 확인 방법을 함께 써라",
+   "principle": "CHECKABLE",
+   "consequence": "CHECKABLE 이 번호를 지시한다는 전제가 지금의 CHECKABLE 문안에 없는데도, 조항을 다시 넣으려는 세션이 읽을 근거 문단에 그 전제가 남아 있다."
+  }
+ ],
+ "statements": [
+  {
+   "topic": "review-docs",
+   "statement": "`review-docs` 는 이 파일을 `lens-fit` 에 계약으로 넘긴다.",
+   "evidence": "`review-docs` 는 이 파일을 `lens-fit` 에 계약으로 넘긴다."
+  },
+  {
+   "topic": "lens-readability",
+   "statement": "`lens-readability` 는 고정 규칙을 에이전트원칙에서 받고, 왜 그런지는 이 파일에서 본다.",
+   "evidence": "`lens-readability` 는 고정 규칙을 에이전트원칙에서 받고, 왜 그런지는 이 파일에서 본다."
+  },
+  {
+   "topic": "TITLE-LAYERS",
+   "statement": "이 목록은 여기가 소유한다.",
+   "evidence": "이 목록은 여기가 소유한다."
+  },
+  {
+   "topic": "TITLE-LAYERS",
+   "statement": "예외는 렌즈 파일(`skills/lens-*/SKILL.md`) 안에서만 적용된다.",
+   "evidence": "예외는 렌즈 파일(`skills/lens-*/SKILL.md`) 안에서만 적용된다."
+  },
+  {
+   "topic": "SECTION-HEAD",
+   "statement": "이 조항은 끊는 기준만 맡는다.",
+   "evidence": "이 조항은 끊는 기준만 맡는다."
+  },
+  {
+   "topic": "VOCAB-PREF",
+   "statement": "풀어 쓸 대상은 새로 지어 붙인 조어로 한정한다.",
+   "evidence": "풀어 쓸 대상은 새로 지어 붙인 조어로 한정한다."
+  },
+  {
+   "topic": "VOCAB-PREF",
+   "statement": "2026-10-18 재편에서 영어 원어 문장을 지웠다.",
+   "evidence": "2026-10-18 재편에서 영어 원어 문장을 지웠다."
+  },
+  {
+   "topic": "VOCAB-PREF",
+   "statement": "그리고 새 이름을 붙여야 할 때는 처음 쓸 때 새로 붙인 이름임을 밝히게 했다.",
+   "evidence": "그리고 새 이름을 붙여야 할 때는 처음 쓸 때 새로 붙인 이름임을 밝히게 했다."
+  },
+  {
+   "topic": "SPECIFIC-NAME",
+   "statement": "앞 절을 받는 '것'('고치는 것이 낫다')은 대상을 가리키지 않으므로 이 조항 밖이다.",
+   "evidence": "앞 절을 받는 '것'('고치는 것이 낫다')은 대상을 가리키지 않으므로 이 조항 밖이다."
+  },
+  {
+   "topic": "ANTI-LIMIT",
+   "statement": "글 한 편은 답 하나 또는 문서 하나다.",
+   "evidence": "글 한 편은 답 하나 또는 문서 하나다."
+  },
+  {
+   "topic": "ONE-ENDING",
+   "statement": "맞추는 단위는 같은 구실을 하는 요소끼리다.",
+   "evidence": "맞추는 단위는 같은 구실을 하는 요소끼리다."
+  },
+  {
+   "topic": "NO-MIRROR",
+   "statement": "사용자가 구어나 반말로 물어도 답은 `WRITTEN-ONLY` 를 따른다.",
+   "evidence": "사용자가 구어나 반말로 물어도 답은 `WRITTEN-ONLY` 를 따른다."
+  },
+  {
+   "topic": "ASK-OPTIONS",
+   "statement": "2026-09-24에 `ASK-CONTEXT` 를 `ASK-OPTIONS` 에 합쳤다.",
+   "evidence": "2026-09-24에 `ASK-CONTEXT` 를 `ASK-OPTIONS` 에 합쳤다."
+  }
+ ],
+ "principles_applied": [
+  "PLAIN-KO",
+  "KO-SYNTAX",
+  "UNPACK"
+ ],
+ "notes": "점검 관점: 누락(조항 ID 근거 절 누락 없음, 드리프트 검사 PASS=305 FAIL=0), 모순, 환각, 불일치를 항목별로 검토했다. 확인된 일치: 소유 선언과 파일 경로(c20-* 단위, 질문 이름, hooks/_spec_marker.sh 의 path_in_own_repo, scaffold.sh 의 @import 줄), 후보 문안(VOCAB-PREF·ANTI-LIMIT·SUBJECT-OBJECT·NO-MID-MOD 지목형·COUNT-EARNS·BULLET-SCOPE 긍정형·SECTION-HEAD)이 현재 agent-principles.md 와 일치함, 목록 단위 측정 수치가 evals/principles/README.md 와 일치함. 확인하지 못한 것: 최근 30개 세션의 어휘 빈도, 안구운동·읽기 시간·정답률 같은 외부 연구 수치, 2026-09 측정의 서른 벌 표본은 저장소 안에 원자료가 없어 출처 대조를 못 했다. NAME-ITEMS 절은 삭제 날짜를 2026-10-20 로 적지만 에이전트원칙에서 지운 커밋 a0ab399 의 날짜는 2026-10-21 이고, 근거로 가리킨 8b4a05a 의 domain-discipline.md 403행은 main 에 없는 커밋 안에 있다(그 줄은 실재하고 날짜를 2026-10-14 로 적는다). 문서 파일 안에서 상대편 문장을 댈 수 없어 발견으로 올리지 않았다. 이 문서의 ANTI-LIMIT 계수는 작은따옴표 예시를 빼는 드리프트 검사 기준을 따랐다."
+}

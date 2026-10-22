@@ -256,7 +256,7 @@ while IFS= read -r f; do
   # 그래서 파이프 대신 here-string 으로 넘긴다(CI 에서 무작위 파일이 '빠진 문서'로 나왔다).
   grep -qxF "$f" <<<"$AT_OUT" || AT_MISS="$AT_MISS $f"
 done <<EOF
-$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -vE '(^|/)HANDOFF-[^/]*$')
+$(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -v '^evals/' | grep -vE '(^|/)HANDOFF-[^/]*$')
 EOF
 [ -n "$AT_MISS" ] && echo "    빠진 문서:$AT_MISS"
 check "살아 있는 .md 가 모두 있다"     "[ -z \"\$AT_MISS\" ]"
@@ -309,11 +309,12 @@ check "audit-repo-docs 가 판정 개수를 담는다고 적는다"             
 echo "[audit_targets.sh — 배제 규칙이 실제로 걸린다]"
 EXT="$(mktemp -d)"
 ( cd "$EXT" && git init -q && printf 'a\n' > kept.md && printf 'b\n' > "HANDOFF-x.md" \
-  && printf 'superseded\n표시\n' > old.md \
-  && git add kept.md "HANDOFF-x.md" old.md && git -c user.email=t@t -c user.name=t commit -qm seed )
+  && printf 'superseded\n표시\n' > old.md && mkdir -p evals/c && printf 'c\n' > evals/c/prompt.md \
+  && git add kept.md "HANDOFF-x.md" old.md evals/c/prompt.md && git -c user.email=t@t -c user.name=t commit -qm seed )
 EXT_OUT="$(bash "$AT" --root "$EXT" 2>/dev/null || true)"
 check "HANDOFF- 로 시작하는 파일이 빠진다"     "! printf '%s' \"\$EXT_OUT\" | grep -q 'HANDOFF-x.md'"
 check "머리에 superseded 가 있는 문서가 빠진다" "! printf '%s' \"\$EXT_OUT\" | grep -q 'old.md'"
+check "evals/ 아래 평가 과제가 빠진다"       "! printf '%s' \"\$EXT_OUT\" | grep -q 'evals/c/prompt.md'"
 check "빠지지 않을 문서는 남는다"              "printf '%s' \"\$EXT_OUT\" | grep -q 'kept.md'"
 rm -rf "$EXT"
 
@@ -340,7 +341,7 @@ check "절차의 표 대조가 이 스크립트를 부른다" "grep -qF 'audit_t
 echo "[안내 문서 — 훅 목록]"
 # 「에이전트원칙」은 agent-principles.md 그 파일 하나를 가리키는 말로 두고, 어떤 사실의 소유자를 가리킬
 # 때는 「소유한다」를 쓴다. 한 낱말에 뜻이 둘이면 소유 표 도출이 포인터를 소유자로 센다.
-check "CLAUDE.md 가 훅 목록의 소유자를 README 로 가리킨다" "grep -qF 'README.md' '$HERE/CLAUDE.md' && grep -F 'README.md' '$HERE/CLAUDE.md' | grep -qF '소유한다'"
+check "CLAUDE.md 가 훅 연결의 소유자를 배선 파일로 가리킨다" "grep -F 'hooks/hooks.json' '$HERE/CLAUDE.md' | grep -qF '소유한다'"
 
 echo "[seal_reviews.sh — 봉인할 기록이 없어도 끝난다]"
 SE="$(mktemp -d)"; git -C "$SE" init -q

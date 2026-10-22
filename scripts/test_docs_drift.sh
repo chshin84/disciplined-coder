@@ -417,18 +417,14 @@ for RW in "$RWDIR"/*.md; do
 done
 check "대응표를 하나 이상 훑었다"           "[ '$RWN' -gt 0 ]"
 
-# --- 프로젝트 파일에 손대는 예외: README 한 곳만 조건을 적는다 ---
-# 전에는 README가 스스로 원본이라고 선언해 놓고 스캐폴드 둘이 조건을 각각 다시
-# 적었다. 예외가 늘거나 조건이 바뀌면 사람이 네 곳을 손으로 맞춰야 하고, 그러면 반드시 갈라진다.
-# 가리키는 절 이름도 함께 확인한다 — 전에 README 절 이름이 바뀌었는데 가리키는 쪽만 옛 이름으로 남았다.
-echo "[프로젝트 파일 예외 — README 한 곳만 조건을 적는다]"
-EXC_OWN_SEC='프로젝트 폴더에 생기는 파일'
-check "README가 예외 절을 두고 그 조건을 스스로 정한다" "has_sec \"\$README\" \"\$EXC_OWN_SEC\" && sec_has \"\$README\" \"\$EXC_OWN_SEC\" '여기가 정한다'"
-# 이 뽑아내기는 반드시 UTF-8 로케일에서 돈다. 바이트로 보면 [^」] 가 한글 음절의 이음 바이트까지
-# 걸러 내 「프로젝트 폴더에 생기는 파일」 같은 이름이 통째로 안 잡힌다(실제로 그 함정을 밟았다).
-# 괄호를 떼는 것도 tr 로 하지 않는다 — tr 은 바이트를 지워 같은 이음 바이트를 가진 한글을 망가뜨린다.
-EXC_SEC="$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$HERE/scripts/scaffold.sh" | sed 's/^「//; s/」$//' | grep -F '프로젝트 폴더' | head -1 || true)"
-check "그 절이 README에 실재한다"            "[ -n \"\$EXC_SEC\" ] && grep -qF \"## \$EXC_SEC\" \"\$README\""
+# --- 프로젝트 파일에 손대는 예외: 코드 주석 한 곳만 조건을 적는다 ---
+# 전에는 README가 조건의 원본이었고 스캐폴드가 그 절을 가리켰다. 조건은 코드가 실제로 하는 일이라
+# 코드 옆 주석을 원본으로 두고, 머리 주석이 그 태그를 가리킨다. 가리키는 태그가 실재하는지도 본다.
+echo "[프로젝트 파일 예외 — 스캐폴드 주석 한 곳만 조건을 적는다]"
+SCAF="$HERE/scripts/scaffold.sh"
+EXC_TAG="$(sed -n '1,6p' "$SCAF" | grep -oE '\[[a-z-]+\]' | head -1 || true)"
+check "스캐폴드 머리 주석이 예외 태그를 가리킨다" "[ -n \"\$EXC_TAG\" ]"
+check "그 태그의 주석이 본문에 실재한다"        "sed -n '7,\$p' \"\$SCAF\" | grep -qF -- \"# \$EXC_TAG\""
 # CLAUDE.md는 이제 조건을 되풀이하지 않고 README를 가리키기만 한다. 가리키는 문장이 살아 있는지 본다.
 check "CLAUDE.md가 README를 가리킨다"          "sec_has \"$HERE/CLAUDE.md\" '에이전트원칙을 고칠 때' 'README'"
 

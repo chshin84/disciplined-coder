@@ -233,6 +233,9 @@ echo "[doc-review-post]"
 DLV="$T/deliv-out"; mkdir -p "$DLV"; : > "$DLV/deck.pptx"; printf 'x\n' > "$DLV/draft.md"
 check "산출물 없는 폴더의 .md → 무출력"  "[ -z \"\$(drev '$(J "$T/existing.md")')\" ]"
 check "산출물(.pptx) → 검진 넛지"        "drev '$(J "$DLV/deck.pptx")' | grep -q additionalContext"
+: > "$DLV/memo.hwpx"
+check "한글 문서(.hwpx) → 검진 넛지"     "drev '$(J "$DLV/memo.hwpx")' | grep -q additionalContext"
+check "넛지가 초안 단계를 안내한다"      "drev '$(J "$DLV/deck.pptx")' | grep -q '마크다운 초안'"
 check "산출물 옆의 .md → 검진 넛지"      "drev '$(J "$DLV/draft.md")' | grep -q additionalContext"
 check "spec 경로 → 무출력"               "[ -z \"\$(drev '$(J "$SP/nomark.md")')\" ]"
 check "plan 경로 → 무출력"               "[ -z \"\$(drev '$(J "$PL/nomark.md")')\" ]"
@@ -537,20 +540,22 @@ check "session_id 없음 → 무출력(재시도를 셀 수 없어 거부하지 
 ptm() { json_run 'import json,sys; d=json.load(sys.stdin)["hooks"]["PreToolUse"]; print([g.get("matcher","") for g in d for h in g["hooks"] if sys.argv[1] in h["command"]][0])' "$1" < "$HJ"; }
 check "PreToolUse 의 Write 매처로 배선되어 있다" "[ \"\$(ptm nested_judgment_pretooluse.sh)\" = 'Write' ]"
 
-echo "[README — 배선된 스크립트를 모두 적는다]"
-# 훅이 일곱인데 안내 문서가 넷만 적고 있었다. 목록을 README 에 손으로 적지 않고 배선 파일 둘에서
-# 도출해 맞댄다. 훅을 더하거나 빼면 여기서 함께 갈린다.
+echo "[배선된 스크립트 — 머리 주석이 하는 일을 적는다]"
+# 훅 목록과 하는 일의 원본은 README 가 아니라 배선 파일과 각 스크립트의 머리 주석이다.
+# 그래서 배선된 스크립트마다 둘째 줄이 주석인지 본다. 설명 없는 훅이 들어오면 여기서 실패한다.
 HOOK_WIRED="$(grep -ohE '[a-z_]+\.sh' "$HERE/hooks/hooks.json" "$HERE/.claude/settings.json" | sort -u)"
 check "배선 파일에서 스크립트 이름을 뽑았다" "[ -n \"\$HOOK_WIRED\" ]"
-HOOK_MISS=""
+HOOK_NOHEAD=""
 while IFS= read -r sname; do
   [ -n "$sname" ] || continue
-  if ! grep -qF "$sname" "$HERE/README.md"; then HOOK_MISS="$HOOK_MISS $sname"; fi
+  f="$HERE/hooks/$sname"; [ -f "$f" ] || f="$HERE/scripts/$sname"
+  sed -n '2p' "$f" 2>/dev/null | grep -qE '^# .+' || HOOK_NOHEAD="$HOOK_NOHEAD $sname"
 done <<EOF
 $HOOK_WIRED
 EOF
-[ -n "$HOOK_MISS" ] && echo "    README 에 빠진 스크립트:$HOOK_MISS"
-check "README 가 배선된 스크립트를 모두 적는다" "[ -z \"\$HOOK_MISS\" ]"
+[ -n "$HOOK_NOHEAD" ] && echo "    머리 주석이 없는 스크립트:$HOOK_NOHEAD"
+check "배선된 스크립트가 모두 머리 주석을 둔다" "[ -z \"\$HOOK_NOHEAD\" ]"
+
 
 
 echo "[prior-art-nudge]"

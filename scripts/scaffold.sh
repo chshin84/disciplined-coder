@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Idempotent. SessionStart마다 실행. 지식을 PC(~/.claude/disciplined-coder)에 두고
 # ~/.claude/CLAUDE.md 관리블록이 @import. 프로젝트 폴더에 파일을 새로 만들지는 않는다 —
-# 무엇에 어떤 조건으로 손대는지는 README의 「프로젝트 폴더에 생기는 파일」이 원본이다.
+# 프로젝트 파일에 손대는 예외는 아래 [project-old-block] 하나이고, 그 조건은 그 주석이 정한다.
 set -euo pipefail
 
 # 이 스크립트의 폴더. dirname 프로세스를 띄우지 않고 확장으로 구한다. 슬래시 없이 불렸으면 현재 폴더다.
