@@ -296,14 +296,15 @@ EOF
 check "주장 단위 verify_failed 는 그 주장만 뺀다" "harn fn classify < \"\$FX/cl2_in.json\" > \"\$FX/cl2_got.json\" && json_same \"\$FX/cl2_got.json\" \"\$FX/cl2_want.json\""
 
 echo "[단계 합치기]"
-# URL 마다 한 상황을 둔다. 인자는 refsByUrl, extract, judge, refetch, rejudge, escalation 차례다.
+# URL 마다 한 상황을 둔다. 인자는 refsByUrl, extract, judge, refetch, rejudge 차례다. judge 는 판정 묶음 출력을 splitByUrl 로 나눈 값이다.
 # 이 묶음에는 정보 부족이 없으므로 보충과 재판정은 빈 객체다. 보충·재판정 상황은 아래 mg2 묶음이 다룬다.
-# u5 는 quote 가 없어 판정에 가지 않으므로 judge 에 키가 없다. 상향 키가 없는 URL 은 상향을 실행하지 않은 URL 이다.
+# u5 는 quote 가 없어 판정에 가지 않으므로 judge 에 키가 없다. u9 는 판정 묶음이 실패해 judge 값이 null 이다.
+# u11 은 판정 출력에서 주장 하나(M#14)가 빠졌다.
 cat > "$FX/mg_in.json" <<'EOF'
 [
   {"https://u1": ["M#1"], "https://u2": ["M#2", "M#3"], "https://u3": ["M#4"], "https://u4": ["M#5"],
    "https://u5": ["M#6"], "https://u6": ["M#7"], "https://u7": ["M#8"], "https://u8": ["M#9"],
-   "https://u9": ["M#10"], "https://u10": ["M#11", "M#12"]},
+   "https://u9": ["M#10"], "https://u10": ["M#11", "M#12"], "https://u11": ["M#13", "M#14"]},
   {
     "https://u1": null,
     "https://u2": {"url": "https://u2", "principles_applied": [], "judgments": [
@@ -324,7 +325,10 @@ cat > "$FX/mg_in.json" <<'EOF'
       {"ref": "M#10", "access": "성공", "exists": "일치", "quote": "q10", "context": "", "reason": "e10"}]},
     "https://u10": {"url": "https://u10", "principles_applied": [], "judgments": [
       {"ref": "M#11", "access": "성공", "exists": "일치", "quote": "q11", "context": "", "reason": "e11"},
-      {"ref": "M#12", "access": "성공", "exists": "일치", "quote": "q12", "context": "", "reason": "e12"}]}
+      {"ref": "M#12", "access": "성공", "exists": "일치", "quote": "q12", "context": "", "reason": "e12"}]},
+    "https://u11": {"url": "https://u11", "principles_applied": [], "judgments": [
+      {"ref": "M#13", "access": "성공", "exists": "일치", "quote": "q13", "context": "", "reason": "e13"},
+      {"ref": "M#14", "access": "성공", "exists": "일치", "quote": "q14", "context": "", "reason": "e14"}]}
   },
   {
     "https://u6": {"principles_applied": [], "judgments": [
@@ -333,21 +337,15 @@ cat > "$FX/mg_in.json" <<'EOF'
       {"ref": "M#8", "numbers_conditions": "일치", "direction": "불일치", "scope": "일치", "unsure_reasons": {}, "reason": "j8"}]},
     "https://u8": {"principles_applied": ["NO-ASSUME", "EVIDENCE-FIRST"], "judgments": [
       {"ref": "M#9", "numbers_conditions": "일치", "direction": "판정 불가", "scope": "일치", "unsure_reasons": {"direction": "조건 얽힘"}, "reason": "j9"}]},
-    "https://u9": {"principles_applied": [], "judgments": [
-      {"ref": "M#10", "numbers_conditions": "판정 불가", "direction": "일치", "scope": "일치", "unsure_reasons": {"numbers_conditions": "표·그림 값"}, "reason": "j10"}]},
-    "https://u10": {"principles_applied": [], "judgments": [
-      {"ref": "M#11", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "j11"},
-      {"ref": "M#12", "numbers_conditions": "일치", "direction": "일치", "scope": "판정 불가", "unsure_reasons": {"scope": "언어 해석"}, "reason": "j12"}]}
-  },
-  {},
-  {},
-  {
-    "https://u8": {"principles_applied": [], "judgments": [
-      {"ref": "M#9", "numbers_conditions": "일치", "direction": "일치", "scope": "불일치", "unsure_reasons": {}, "reason": "s9"}]},
     "https://u9": null,
     "https://u10": {"principles_applied": [], "judgments": [
-      {"ref": "M#12", "numbers_conditions": "일치", "direction": "일치", "scope": "판정 불가", "unsure_reasons": {"scope": "언어 해석"}, "reason": "s12"}]}
-  }
+      {"ref": "M#11", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "j11"},
+      {"ref": "M#12", "numbers_conditions": "일치", "direction": "일치", "scope": "판정 불가", "unsure_reasons": {"scope": "언어 해석"}, "reason": "j12"}]},
+    "https://u11": {"principles_applied": [], "judgments": [
+      {"ref": "M#13", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "j13"}]}
+  },
+  {},
+  {}
 ]
 EOF
 check "mergeStages 출력을 얻는다" "harn fn mergeStages < \"\$FX/mg_in.json\" > \"\$FX/mg_got.json\""
@@ -360,18 +358,19 @@ check "exists 불일치는 unsupported 다" "json_true \"\$FX/mg_got.json\" '${P
 check "quote 없는 주장은 판정에 보내지 않는다: 합친 판정이 unsupported 다" "json_true \"\$FX/mg_got.json\" '${PY_V}v(\"u5\", \"M#6\") == \"unsupported\"${PY_V_TAIL}'"
 check "카테고리 칸 누락은 URL 검증 실패다" "json_true \"\$FX/mg_got.json\" 'd[\"outputs\"][\"https://u6\"] is None'"
 check "불일치가 하나라도 있으면 unsupported 다" "json_true \"\$FX/mg_got.json\" '${PY_V}v(\"u7\", \"M#8\") == \"unsupported\"${PY_V_TAIL}'"
-check "상향은 판정 불가 칸만 바꾼다" "json_true \"\$FX/mg_got.json\" '${PY_V}v(\"u8\", \"M#9\") == \"supported\"${PY_V_TAIL}'"
-check "상향 판정 실패는 URL 검증 실패다" "json_true \"\$FX/mg_got.json\" 'd[\"outputs\"][\"https://u9\"] is None'"
-check "상향 판정 불가는 그 주장만 검증 실패다" "json_true \"\$FX/mg_got.json\" '${PY_V}v(\"u10\", \"M#11\") == \"supported\" and v(\"u10\", \"M#12\") == \"verify_failed\"${PY_V_TAIL}'"
+check "판정 불가는 기각이고 이유가 남는다(합치기)" "json_true \"\$FX/mg_got.json\" '${PY_V}v(\"u8\", \"M#9\") == \"unsupported\" and \"조건 얽힘\" in d[\"outputs\"][\"https://u8\"][\"judgments\"][0][\"reason\"]${PY_V_TAIL}'"
+check "실패한 판정 묶음의 URL 은 검증 실패다(합치기)" "json_true \"\$FX/mg_got.json\" 'd[\"outputs\"][\"https://u9\"] is None'"
+check "판정 불가 주장은 기각이고 같은 URL 의 다른 주장은 남는다" "json_true \"\$FX/mg_got.json\" '${PY_V}v(\"u10\", \"M#11\") == \"supported\" and v(\"u10\", \"M#12\") == \"unsupported\"${PY_V_TAIL}'"
+check "판정 출력에서 빠진 주장만 검증 실패다(합치기)" "json_true \"\$FX/mg_got.json\" '${PY_V}v(\"u11\", \"M#13\") == \"supported\" and v(\"u11\", \"M#14\") == \"verify_failed\"${PY_V_TAIL}'"
 E_MG_SHAPE='(lambda o: set(o) == {"url", "judgments", "principles_applied"} and o["url"] == "https://u8" and o["judgments"][0]["quote"] == "q9" and set(o["judgments"][0]) == {"ref", "verdict", "quote", "reason"} and o["principles_applied"] == ["NO-ASSUME", "EVIDENCE-FIRST"])(d["outputs"]["https://u8"])'
 check "합친 출력이 인용 판정 형식이고 quote 는 추출 값이며 principles_applied 는 단계의 합집합이다" "json_true \"\$FX/mg_got.json\" '$E_MG_SHAPE'"
-E_MG_REASON='all(s in d["outputs"]["https://u8"]["judgments"][0]["reason"] for s in ("e9", "j9", "s9"))'
+E_MG_REASON='all(s in d["outputs"]["https://u8"]["judgments"][0]["reason"] for s in ("e9", "j9", "조건 얽힘"))'
 check "합친 reason 이 단계별 이유를 모두 포함한다" "json_true \"\$FX/mg_got.json\" '$E_MG_REASON'"
-E_MG_STAGES='list(d["stages"]) == list(d["outputs"]) and all(set(s) == {"extract", "judge", "refetch", "rejudge", "escalation"} for s in d["stages"].values()) and all(s["refetch"] is None and s["rejudge"] is None for s in d["stages"].values()) and d["stages"]["https://u8"]["escalation"]["judgments"][0]["reason"] == "s9" and d["stages"]["https://u7"]["escalation"] is None and d["stages"]["https://u5"]["judge"] is None and d["stages"]["https://u1"]["extract"] is None'
-check "stages 가 URL 마다 다섯 단계 원본을 보존하고 실행하지 않은 단계는 null 이다" "json_true \"\$FX/mg_got.json\" '$E_MG_STAGES'"
-# 보충·재판정·상향 차례의 묶음이다. URL 마다 한 상황을 둔다. 보충 구절은 r<번호>, 처음 구절은 q<번호> 다.
+E_MG_STAGES='list(d["stages"]) == list(d["outputs"]) and all(set(s) == {"extract", "judge", "refetch", "rejudge"} for s in d["stages"].values()) and all(s["refetch"] is None and s["rejudge"] is None for s in d["stages"].values()) and d["stages"]["https://u8"]["judge"]["judgments"][0]["reason"] == "j9" and d["stages"]["https://u9"]["judge"] is None and d["stages"]["https://u5"]["judge"] is None and d["stages"]["https://u1"]["extract"] is None'
+check "stages 가 URL 마다 네 단계 원본을 보존하고 실행하지 않은 단계는 null 이다" "json_true \"\$FX/mg_got.json\" '$E_MG_STAGES'"
+# 보충·재판정 차례의 묶음이다. URL 마다 한 상황을 둔다. 보충 구절은 r<번호>, 처음 구절은 q<번호> 다.
 # n1 보충 뒤 재판정 일치, n2 재판정의 불일치, n3 처음 판정의 불일치와 정보 부족, n4 보충 무응답, n5 보충 access 실패,
-# n6 재판정 무응답, n7 재판정 정보 부족, n8 재판정 판정 불가의 상향, n9 상향 정보 부족, n10 보충 exists 불일치다.
+# n6 재판정 묶음 실패, n7 재판정 정보 부족, n8 재판정 판정 불가, n9 처음 판정의 판정 불가, n10 보충 exists 불일치다.
 cat > "$FX/mg2_in.json" <<'EOF'
 [
   {
@@ -428,10 +427,6 @@ cat > "$FX/mg2_in.json" <<'EOF'
    "https://n6": null,
    "https://n7": {"principles_applied": [], "judgments": [{"ref": "N#10", "numbers_conditions": "정보 부족", "direction": "일치", "scope": "일치", "missing": {"numbers_conditions": "세션 수"}, "unsure_reasons": {}, "reason": "j"}]},
    "https://n8": {"principles_applied": [], "judgments": [{"ref": "N#12", "numbers_conditions": "일치", "direction": "일치", "scope": "판정 불가", "missing": {}, "unsure_reasons": {"scope": "언어 해석"}, "reason": "j"}]}
-  },
-  {
-   "https://n8": {"principles_applied": [], "judgments": [{"ref": "N#12", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "j"}]},
-   "https://n9": {"principles_applied": [], "judgments": [{"ref": "N#13", "numbers_conditions": "일치", "direction": "정보 부족", "scope": "일치", "missing": {"direction": "결론 문장"}, "unsure_reasons": {}, "reason": "j"}]}
   }
 ]
 EOF
@@ -447,11 +442,61 @@ check "보충 실패는 그 주장만 검증 실패다" "v2 'v(\"n4\", \"N#4\")[
 check "보충 출력의 access 실패는 그 주장만 검증 실패다" "v2 'v(\"n5\", \"N#6\")[\"verdict\"] == \"verify_failed\" and v(\"n5\", \"N#7\")[\"verdict\"] == \"supported\"'"
 check "보충 출력의 exists 불일치는 그 주장만 검증 실패다" "v2 'v(\"n10\", \"N#15\")[\"verdict\"] == \"verify_failed\" and v(\"n10\", \"N#16\")[\"verdict\"] == \"supported\"'"
 check "재판정 실패는 그 주장만 검증 실패다" "v2 'v(\"n6\", \"N#8\")[\"verdict\"] == \"verify_failed\" and v(\"n6\", \"N#9\")[\"verdict\"] == \"supported\"'"
-check "재판정도 정보 부족이면 그 주장만 검증 실패다" "v2 'v(\"n7\", \"N#10\")[\"verdict\"] == \"verify_failed\" and v(\"n7\", \"N#11\")[\"verdict\"] == \"supported\"'"
-check "재판정의 판정 불가는 상향 판정으로 바꾼다" "v2 'v(\"n8\", \"N#12\")[\"verdict\"] == \"supported\" and v(\"n8\", \"N#12\")[\"quote\"] == \"r12\"'"
-check "상향의 정보 부족은 그 주장만 검증 실패다" "v2 'v(\"n9\", \"N#13\")[\"verdict\"] == \"verify_failed\" and v(\"n9\", \"N#14\")[\"verdict\"] == \"supported\"'"
+check "재판정도 정보 부족이면 그 주장만 검증 실패다(합치기)" "v2 'v(\"n7\", \"N#10\")[\"verdict\"] == \"verify_failed\" and v(\"n7\", \"N#11\")[\"verdict\"] == \"supported\"'"
+check "재판정의 판정 불가도 기각이고 이유가 남는다" "v2 'v(\"n8\", \"N#12\")[\"verdict\"] == \"unsupported\" and v(\"n8\", \"N#12\")[\"quote\"] == \"r12\" and \"언어 해석\" in v(\"n8\", \"N#12\")[\"reason\"]'"
+check "처음 판정의 판정 불가는 보충 없이 기각이다" "v2 'v(\"n9\", \"N#13\")[\"verdict\"] == \"unsupported\" and \"조건 얽힘\" in v(\"n9\", \"N#13\")[\"reason\"] and v(\"n9\", \"N#14\")[\"verdict\"] == \"supported\"'"
 E_MG2_STG='d["stages"]["https://n1"]["refetch"]["judgments"][0]["quote"] == "r1" and d["stages"]["https://n1"]["rejudge"]["judgments"][0]["reason"] == "rj1" and d["stages"]["https://n4"]["refetch"] is None and d["stages"]["https://n9"]["rejudge"] is None'
 check "stages 가 보충과 재판정 원본을 보존한다" "json_true \"\$FX/mg2_got.json\" '$E_MG2_STG'"
+
+echo "[판정 묶음]"
+# mkclaims <파일> <URL=개수 ...> — URL 마다 주장 n 개를 둔 claimsByUrl 과 묶음 크기 20 을 batchClaims 인자로 쓴다.
+mkclaims() {
+  local out="$1"; shift
+  json_run '
+import json, sys
+by = {}
+for spec in sys.argv[2:]:
+    url, n = spec.rsplit("=", 1)
+    by[url] = [{"ref": url + "#" + str(i), "text": "t"} for i in range(int(n))]
+with open(sys.argv[1], "w", encoding="utf-8") as f:
+    json.dump([by, 20], f)
+' "$out" "$@"
+}
+# 묶음마다 (URL, 주장 수) 목록으로 줄여 본다. 주장은 입력 차례 그대로여야 한다.
+E_BC_KEEP='all(it["claims"] == [{"ref": it["url"] + "#" + str(i), "text": "t"} for i in range(len(it["claims"]))] for b in d for it in b["items"]) and all(set(b) == {"items"} and set(it) == {"url", "claims"} for b in d for it in b["items"])'
+bc_shape() { json_true "$1" "[[(it[\"url\"], len(it[\"claims\"])) for it in b[\"items\"]] for b in d] == $2 and $E_BC_KEEP"; }
+mkclaims "$FX/bc1_in.json" https://u1=10 https://u2=8 https://u3=7
+check "묶음은 주장 20개 이하이고 URL 을 나누지 않는다" "harn fn batchClaims < \"\$FX/bc1_in.json\" > \"\$FX/bc1_got.json\" && bc_shape \"\$FX/bc1_got.json\" '[[(\"https://u1\", 10), (\"https://u2\", 8)], [(\"https://u3\", 7)]]'"
+mkclaims "$FX/bc2_in.json" https://u1=3 https://u2=22 https://u3=2
+check "20개를 넘는 URL 은 홀로 묶음이 된다" "harn fn batchClaims < \"\$FX/bc2_in.json\" > \"\$FX/bc2_got.json\" && bc_shape \"\$FX/bc2_got.json\" '[[(\"https://u1\", 3)], [(\"https://u2\", 22)], [(\"https://u3\", 2)]]'"
+mkclaims "$FX/bc3_in.json" https://u1=0 https://u2=2 https://u3=0
+mkclaims "$FX/bc4_in.json"
+check "주장 없는 URL 은 묶음에 넣지 않는다" "harn fn batchClaims < \"\$FX/bc3_in.json\" > \"\$FX/bc3_got.json\" && bc_shape \"\$FX/bc3_got.json\" '[[(\"https://u2\", 2)]]' && harn fn batchClaims < \"\$FX/bc4_in.json\" > \"\$FX/bc4_got.json\" && json_true \"\$FX/bc4_got.json\" 'd == []'"
+# 묶음 출력 나누기. 첫 묶음 출력에는 입력에 없던 ref(rX), 입력에 없던 URL(z), 다른 URL 의 ref(b 의 r1)가 섞여 있다.
+# 둘째 묶음은 응답이 없고, 셋째 묶음은 judgments 가 배열이 아니다.
+cat > "$FX/sp_in.json" <<'EOF'
+[
+  [{"principles_applied": ["P"], "judgments": [
+     {"url": "https://a", "ref": "r1", "reason": "a1"},
+     {"url": "https://a", "ref": "rX", "reason": "x"},
+     {"url": "https://z", "ref": "r1", "reason": "x"},
+     {"url": "https://b", "ref": "r1", "reason": "x"},
+     {"ref": "r2", "reason": "x"},
+     {"url": "https://b", "ref": "r2", "reason": "b2"}]},
+   null,
+   {"principles_applied": [], "judgments": "x"}],
+  [{"items": [{"url": "https://a", "claims": [{"ref": "r1"}]}, {"url": "https://b", "claims": [{"ref": "r2"}]}]},
+   {"items": [{"url": "https://c", "claims": [{"ref": "r3"}]}]},
+   {"items": [{"url": "https://e", "claims": [{"ref": "r4"}]}]}]
+]
+EOF
+cat > "$FX/sp_want.json" <<'EOF'
+{"https://a": {"judgments": [{"url": "https://a", "ref": "r1", "reason": "a1"}], "principles_applied": ["P"]},
+ "https://b": {"judgments": [{"url": "https://b", "ref": "r2", "reason": "b2"}], "principles_applied": ["P"]},
+ "https://c": null,
+ "https://e": null}
+EOF
+check "입력에 없던 판정은 쓰지 않는다" "harn fn splitByUrl < \"\$FX/sp_in.json\" > \"\$FX/sp_got.json\" && json_same \"\$FX/sp_got.json\" \"\$FX/sp_want.json\""
 
 echo "[상태 합치기]"
 cat > "$FX/ms_in.json" <<'EOF'
@@ -582,11 +627,9 @@ cat > "$FX/rc_resp.json" <<'EOF'
   "extract:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
     {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"},
     {"ref": "S2#issue#0", "access": "성공", "exists": "일치", "quote": "q", "context": "c", "reason": "r"}]},
-  "judge:https://a": {"principles_applied": [], "judgments": [
-    {"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"},
-    {"ref": "S2#issue#0", "numbers_conditions": "일치", "direction": "판정 불가", "scope": "일치", "unsure_reasons": {"direction": "조건 얽힘"}, "reason": "r"}]},
-  "escalate:https://a": {"principles_applied": [], "judgments": [
-    {"ref": "S2#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]},
+  "judge:1": {"principles_applied": [], "judgments": [
+    {"url": "https://a", "ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://a", "ref": "S2#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]},
   "extract:https://b": {"url": "https://b", "principles_applied": [], "judgments": [
     {"ref": "S2#issue#0", "access": "성공", "exists": "일치", "quote": "", "context": "", "reason": "r"}]}}}
 EOF
@@ -594,7 +637,7 @@ check "contrast 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rc_resp.js
 E_RC_RES='len([c for c in d["calls"] if c["label"].startswith("research:")]) == 2 and all(c["agentType"] == "disciplined-coder:prior-art-researcher" and c["phase"] == "Research" for c in d["calls"] if c["label"].startswith("research:"))'
 check "연구자 호출의 agentType 과 phase 가 정해진 값이다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_RES\""
 # 검증 단계의 label 접두사마다 호출 label 목록과 agentType 을 본다.
-E_RC_VER='(lambda by: by("extract:") == (["extract:https://a", "extract:https://b"], {"disciplined-coder:prior-art-verifier"}) and by("judge:") == (["judge:https://a"], {"disciplined-coder:prior-art-judge"}) and by("escalate:") == (["escalate:https://a"], {"disciplined-coder:prior-art-judge-escalation"}))(lambda p: ([c["label"] for c in d["calls"] if c["label"].startswith(p)], {c["agentType"] for c in d["calls"] if c["label"].startswith(p)})) and all(c["phase"] == "Verify" for c in d["calls"] if c["label"].split(":")[0] in ("extract", "judge", "escalate")) and d["result"]["verifier_count"] == 2'
+E_RC_VER='(lambda by: by("extract:") == (["extract:https://a", "extract:https://b"], {"disciplined-coder:prior-art-verifier"}) and by("judge:") == (["judge:1"], {"disciplined-coder:prior-art-judge"}))(lambda p: ([c["label"] for c in d["calls"] if c["label"].startswith(p)], {c["agentType"] for c in d["calls"] if c["label"].startswith(p)})) and all(c["phase"] == "Verify" for c in d["calls"] if c["label"].split(":")[0] in ("extract", "judge")) and d["result"]["verifier_count"] == 2'
 check "검증 단계 호출의 agentType 과 phase 가 정해진 값이고 verifier_count 가 URL 수와 같다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_VER\""
 E_RC_EXP="$PY_WRAP_HEAD"'all(
   (lambda b, sq: set(b) == {"question", "situation", "target", "mode", "subquestion", "forbidden_terms"}
@@ -604,14 +647,12 @@ E_RC_EXP="$PY_WRAP_HEAD"'all(
 check "탐색 프롬프트의 줄 형식과 JSON 블록이 정해진 대로다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_EXP\""
 E_RC_EXT="$PY_WRAP_HEAD"'(lambda b, b2: set(b) == {"url", "claims"} and b["url"] == "https://a" and [x["ref"] for x in b["claims"]] == ["S1#issue#0", "S2#issue#0"] and all(set(x) == {"ref", "text"} for x in b["claims"]) and set(b2) == {"url", "claims"})(block(call("extract:https://a")[0], "extract"), block(call("extract:https://b")[0], "extract"))'"$PY_WRAP_TAIL"
 check "추출 프롬프트가 MODE: extract 와 { url, claims } 블록이다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_EXT\""
-E_RC_JUD="$PY_WRAP_HEAD"'(lambda b: set(b) == {"url", "claims"} and b["url"] == "https://a" and [x["ref"] for x in b["claims"]] == ["S1#issue#0", "S2#issue#0"] and all(set(x) == {"ref", "text", "quote", "context", "source_note"} for x in b["claims"]) and b["claims"][1]["quote"] == "q" and b["claims"][1]["context"] == "c" and b["claims"][1]["text"] == "claim B")(block(call("judge:https://a")[0], "judge"))'"$PY_WRAP_TAIL"
-check "판정 프롬프트가 MODE: judge 와 추출 quote·context·source_note 를 붙인 { url, claims } 블록이다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_JUD\""
-E_RC_ESC="$PY_WRAP_HEAD"'(lambda b, j: set(b) == {"url", "claims"} and b["url"] == "https://a" and b["claims"] == [x for x in j["claims"] if x["ref"] == "S2#issue#0"])(block(call("escalate:https://a")[0], "judge"), block(call("judge:https://a")[0], "judge"))'"$PY_WRAP_TAIL"
-check "상향 판정 프롬프트가 MODE: judge 이고 판정 불가가 있는 주장만 포함한다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_ESC\""
-E_RC_NOQ='not any(c["label"] == "judge:https://b" for c in d["calls"]) and d["result"]["verifiers"][1]["output"]["judgments"][0]["verdict"] == "unsupported"'
+E_RC_JUD="$PY_WRAP_HEAD"'(lambda b: set(b) == set(C["judge_input"]) and [it["url"] for it in b["items"]] == ["https://a"] and set(b["items"][0]) == set(C["judge_input"]["items"][0]) and [x["ref"] for x in b["items"][0]["claims"]] == ["S1#issue#0", "S2#issue#0"] and all(set(x) == set(C["judge_input"]["items"][0]["claims"][0]) for x in b["items"][0]["claims"]) and b["items"][0]["claims"][1]["quote"] == "q" and b["items"][0]["claims"][1]["context"] == "c" and b["items"][0]["claims"][1]["text"] == "claim B")(block(call("judge:1")[0], "judge"))'"$PY_WRAP_TAIL"
+check "판정 프롬프트가 MODE: judge 와 추출 quote·context·source_note 를 붙인 { items: [{ url, claims }] } 블록이다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_JUD\""
+E_RC_NOQ="$PY_WRAP_HEAD"'all(it["url"] != "https://b" for c in d["calls"] if c["label"].startswith("judge:") for it in block(c, "judge")["items"]) and d["result"]["verifiers"][1]["output"]["judgments"][0]["verdict"] == "unsupported"'"$PY_WRAP_TAIL"
 check "quote 없는 주장은 판정에 보내지 않는다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_NOQ\""
-E_RC_STG='all(set(v) == set(C["result"]["verifiers"][0]) and set(v["stages"]) == set(C["result"]["verifiers"][0]["stages"]) for v in d["result"]["verifiers"]) and d["result"]["verifiers"][0]["stages"]["escalation"]["judgments"][0]["ref"] == "S2#issue#0"'
-check "verifiers 원소가 계약 코드의 키와 stages 를 보유한다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_STG\""
+E_RC_STG='all(set(v) == set(C["result"]["verifiers"][0]) and set(v["stages"]) == set(C["result"]["verifiers"][0]["stages"]) for v in d["result"]["verifiers"]) and [j["ref"] for j in d["result"]["verifiers"][0]["stages"]["judge"]["judgments"]] == ["S1#issue#0", "S2#issue#0"] and d["result"]["verifiers"][1]["stages"]["judge"] is None'
+check "verifiers 원소가 계약 코드의 키와 stages 를 보유하고 stages 의 judge 는 그 URL 의 판정만 포함한다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_STG\""
 E_RC_NOSYN='not any(c["label"] in ("synthesize", "map-check") for c in d["calls"])'
 check "contrast 에서 synthesize 와 map-check 호출이 없다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_NOSYN\""
 E_RC_NOOPT='all("model" not in c and "effort" not in c for c in d["calls"])'
@@ -633,8 +674,8 @@ cat > "$FX/rs_resp.json" <<'EOF'
   "research:S2": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim B", "citations": [{"url": "https://b"}]}]},
   "extract:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
     {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"}, {"ref": "S1#case#0", "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"}]},
-  "judge:https://a": {"principles_applied": [], "judgments": [
-    {"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}, {"ref": "S1#case#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]},
+  "judge:1": {"principles_applied": [], "judgments": [
+    {"url": "https://a", "ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}, {"url": "https://a", "ref": "S1#case#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]},
   "extract:https://b": {"url": "https://b", "principles_applied": [], "judgments": [
     {"ref": "S2#issue#0", "access": "성공", "exists": "불일치", "quote": "q", "context": "", "reason": "r"}]},
   "synthesize": {"evidence_map": ["@ROW@"], "conclusions": [{"text": "c", "refs": ["S1#case#0"]}], "principles_applied": []},
@@ -647,8 +688,8 @@ E_RS_MAP="$PY_WRAP_HEAD"'(lambda cm, b, syn: len(cm) == 1 and cm[0]["phase"] == 
 check "지도 대조 호출이 하나이고 블록이 { evidence_map, passed } 다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_MAP\""
 E_RS_CNT='d["result"]["verifier_count"] == 2 and len(d["result"]["verifiers"]) == 2'
 check "verifier_count 가 지도 대조 검증자를 세지 않는다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_CNT\""
-E_RS_NOESC='not any(c["label"].startswith("escalate:") for c in d["calls"]) and [c["label"] for c in d["calls"] if c["label"].startswith("judge:")] == ["judge:https://a"]'
-check "판정 불가가 없으면 상향을 부르지 않는다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_NOESC\""
+E_RS_JUD='[c["label"] for c in d["calls"] if c["label"].startswith("judge:")] == ["judge:1"]'
+check "판정 묶음이 하나면 판정을 한 번 부른다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_JUD\""
 E_RS_NORF='not any(c["label"].split(":")[0] in ("refetch", "rejudge") for c in d["calls"]) and all(v["stages"]["refetch"] is None and v["stages"]["rejudge"] is None for v in d["result"]["verifiers"])'
 check "정보 부족이 없으면 보충을 부르지 않는다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_NORF\""
 E_RS_KEYS='list(d["result"].keys()) == [k.lstrip("?") for k in C["result"]] and d["result"]["synthesis"]["conclusions"][0]["refs"] == ["S1#case#0"] and d["result"]["map_check"] == {"cells": [], "principles_applied": []}'
@@ -670,63 +711,144 @@ cat > "$FX/rz_resp.json" <<'EOF'
   "research:S2": {"search_status": "ok", "queries": ["q"], "issues": []},
   "extract:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
     {"ref": "S1#case#0", "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"}]},
-  "judge:https://a": {"principles_applied": [], "judgments": [
-    {"ref": "S1#case#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]},
+  "judge:1": {"principles_applied": [], "judgments": [
+    {"url": "https://a", "ref": "S1#case#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]},
   "synthesize": null}}
 EOF
 E_RZ='len([c for c in d["calls"] if c["label"] == "synthesize"]) == 1 and not any(c["label"] == "map-check" for c in d["calls"]) and d["result"]["synthesis"] is None and d["result"]["map_check"] is None'
 check "종합 응답이 null 이면 지도 대조를 부르지 않고 map_check 가 null 이다" "mkin \"\$FX/rz_resp.json\" \"\$FX/rz_in.json\" && harn run < \"\$FX/rz_in.json\" > \"\$FX/rz_out.json\" && json_true \"\$FX/rz_out.json\" \"\$E_RZ\""
 
-echo "[실행 흐름: 보충과 상향]"
-# 주장은 A(S1#issue#0, a), C(S1#issue#1, c), B(S2#issue#0, a), D(S2#issue#1, d), E(S2#issue#2, d) 다.
-# A 는 정보 부족으로 보충·재판정을 거쳐 판정 불가로 상향한다. C 는 불일치와 정보 부족이 함께 있다. D 는 보충이 응답하지 않는다.
+echo "[실행 흐름: 보충과 재판정]"
+# 주장은 A(S1#issue#0, a), C(S1#issue#1, c), F(S1#issue#2, e), G(S1#issue#3, e), B(S2#issue#0, a), D(S2#issue#1, d), E(S2#issue#2, d) 다.
+# A 는 정보 부족으로 보충·재판정을 거쳐 판정 불가가 남는다. C 는 불일치와 정보 부족이 함께 있다. D 는 보충이 응답하지 않는다.
+# F 는 재판정에도 정보 부족이다. 주장이 일곱이므로 판정과 재판정은 묶음 하나다.
 cat > "$FX/rr_resp.json" <<'EOF'
 {"@mode": "contrast", "responses": {
-  "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim A", "citations": [{"url": "https://a"}]}, {"prior_claim": "claim C", "citations": [{"url": "https://c"}]}]},
+  "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim A", "citations": [{"url": "https://a"}]}, {"prior_claim": "claim C", "citations": [{"url": "https://c"}]}, {"prior_claim": "claim F", "citations": [{"url": "https://e"}]}, {"prior_claim": "claim G", "citations": [{"url": "https://e"}]}]},
   "research:S2": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim B", "citations": [{"url": "https://a"}]}, {"prior_claim": "claim D", "citations": [{"url": "https://d"}]}, {"prior_claim": "claim E", "citations": [{"url": "https://d"}]}]},
   "extract:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
     {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "exists_note": "N-A", "quote": "qa", "context": "ca", "reason": "RSECRET"},
     {"ref": "S2#issue#0", "access": "성공", "exists": "일치", "quote": "qb", "context": "", "reason": "RSECRET"}]},
-  "judge:https://a": {"principles_applied": [], "judgments": [
-    {"ref": "S1#issue#0", "numbers_conditions": "정보 부족", "direction": "일치", "scope": "일치", "missing": {"numbers_conditions": "세션 수"}, "unsure_reasons": {}, "reason": "r"},
-    {"ref": "S2#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]},
-  "refetch:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
-    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "exists_note": "N2", "quote": "q2", "context": "c2", "reason": "RSECRET2"}]},
-  "rejudge:https://a": {"principles_applied": [], "judgments": [
-    {"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "판정 불가", "missing": {}, "unsure_reasons": {"scope": "언어 해석"}, "reason": "r"}]},
-  "escalate:https://a": {"principles_applied": [], "judgments": [
-    {"ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]},
   "extract:https://c": {"url": "https://c", "principles_applied": [], "judgments": [
     {"ref": "S1#issue#1", "access": "성공", "exists": "일치", "exists_note": "N-C", "quote": "qc", "context": "", "reason": "r"}]},
-  "judge:https://c": {"principles_applied": [], "judgments": [
-    {"ref": "S1#issue#1", "numbers_conditions": "정보 부족", "direction": "불일치", "scope": "일치", "missing": {"numbers_conditions": "세션 수"}, "unsure_reasons": {}, "reason": "r"}]},
+  "extract:https://e": {"url": "https://e", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#2", "access": "성공", "exists": "일치", "exists_note": "N-F", "quote": "qf", "context": "", "reason": "r"},
+    {"ref": "S1#issue#3", "access": "성공", "exists": "일치", "exists_note": "N-G", "quote": "qg", "context": "", "reason": "r"}]},
   "extract:https://d": {"url": "https://d", "principles_applied": [], "judgments": [
     {"ref": "S2#issue#1", "access": "성공", "exists": "일치", "exists_note": "N-D", "quote": "qd", "context": "", "reason": "r"},
     {"ref": "S2#issue#2", "access": "성공", "exists": "일치", "exists_note": "N-E", "quote": "qe", "context": "", "reason": "r"}]},
-  "judge:https://d": {"principles_applied": [], "judgments": [
-    {"ref": "S2#issue#1", "numbers_conditions": "일치", "direction": "정보 부족", "scope": "일치", "missing": {"direction": "결론 문장"}, "unsure_reasons": {}, "reason": "r"},
-    {"ref": "S2#issue#2", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]},
-  "refetch:https://d": null}}
+  "judge:1": {"principles_applied": [], "judgments": [
+    {"url": "https://a", "ref": "S1#issue#0", "numbers_conditions": "정보 부족", "direction": "일치", "scope": "일치", "missing": {"numbers_conditions": "세션 수"}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://a", "ref": "S2#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://c", "ref": "S1#issue#1", "numbers_conditions": "정보 부족", "direction": "불일치", "scope": "일치", "missing": {"numbers_conditions": "세션 수"}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://e", "ref": "S1#issue#2", "numbers_conditions": "일치", "direction": "정보 부족", "scope": "일치", "missing": {"direction": "결론 문장"}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://e", "ref": "S1#issue#3", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://d", "ref": "S2#issue#1", "numbers_conditions": "일치", "direction": "정보 부족", "scope": "일치", "missing": {"direction": "결론 문장"}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://d", "ref": "S2#issue#2", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]},
+  "refetch:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "exists_note": "N2", "quote": "q2", "context": "c2", "reason": "RSECRET2"}]},
+  "refetch:https://e": {"url": "https://e", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#2", "access": "성공", "exists": "일치", "exists_note": "N-F2", "quote": "qf2", "context": "", "reason": "r"}]},
+  "refetch:https://d": null,
+  "rejudge:1": {"principles_applied": [], "judgments": [
+    {"url": "https://a", "ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "판정 불가", "missing": {}, "unsure_reasons": {"scope": "언어 해석"}, "reason": "r"},
+    {"url": "https://e", "ref": "S1#issue#2", "numbers_conditions": "일치", "direction": "정보 부족", "scope": "일치", "missing": {"direction": "결론 문장"}, "unsure_reasons": {}, "reason": "r"}]}}}
 EOF
 check "보충이 섞인 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rr_resp.json\" \"\$FX/rr_in.json\" && harn run < \"\$FX/rr_in.json\" > \"\$FX/rr_out.json\""
-E_RR_SRC="$PY_WRAP_HEAD"'(lambda b: [x["source_note"] for x in b["claims"]] == ["N-A", ""] and all("reason" not in x for x in b["claims"]) and "RSECRET" not in json.dumps(b, ensure_ascii=False))(block(call("judge:https://a")[0], "judge"))'"$PY_WRAP_TAIL"
+# item(호출, url) 은 그 호출 블록의 items 에서 그 URL 의 원소다.
+PY_ITEM='lambda b, u: [it for it in b["items"] if it["url"] == u][0]'
+E_RR_SRC="$PY_WRAP_HEAD"'(lambda item: (lambda b: [x["source_note"] for x in item(b, "https://a")["claims"]] == ["N-A", ""] and all("reason" not in x for it in b["items"] for x in it["claims"]) and "RSECRET" not in json.dumps(b, ensure_ascii=False))(block(call("judge:1")[0], "judge")))('"$PY_ITEM"')'"$PY_WRAP_TAIL"
 check "판정 입력에 source_note 가 있다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_SRC\""
-E_RR_NONOTE="$PY_WRAP_HEAD"'block(call("judge:https://a")[0], "judge")["claims"][1]["source_note"] == ""'"$PY_WRAP_TAIL"
+E_RR_NONOTE="$PY_WRAP_HEAD"'[it for it in block(call("judge:1")[0], "judge")["items"] if it["url"] == "https://a"][0]["claims"][1]["source_note"] == ""'"$PY_WRAP_TAIL"
 check "exists_note 없는 추출은 빈 source_note 다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NONOTE\""
-E_RR_RF="$PY_WRAP_HEAD"'(lambda rf, rj: call("refetch:https://a")[0]["agentType"] == "disciplined-coder:prior-art-verifier" and call("rejudge:https://a")[0]["agentType"] == "disciplined-coder:prior-art-judge" and all(c["phase"] == "Verify" for c in d["calls"] if c["label"].split(":")[0] in ("refetch", "rejudge")) and rf == {"url": "https://a", "claims": [{"ref": "S1#issue#0", "text": "claim A", "missing": {"numbers_conditions": "세션 수"}}]} and set(rf) == set(C["refetch"]) and set(rf["claims"][0]) == set(C["refetch"]["claims"][0]) and rj == {"url": "https://a", "claims": [{"ref": "S1#issue#0", "text": "claim A", "quote": "q2", "context": "c2", "source_note": "N2"}]})(block(call("refetch:https://a")[0], "refetch"), block(call("rejudge:https://a")[0], "judge"))'"$PY_WRAP_TAIL"
+E_RR_RF="$PY_WRAP_HEAD"'(lambda rf: call("refetch:https://a")[0]["agentType"] == "disciplined-coder:prior-art-verifier" and all(c["phase"] == "Verify" for c in d["calls"] if c["label"].split(":")[0] in ("refetch", "rejudge")) and rf == {"url": "https://a", "claims": [{"ref": "S1#issue#0", "text": "claim A", "missing": {"numbers_conditions": "세션 수"}}]} and set(rf) == set(C["refetch"]) and set(rf["claims"][0]) == set(C["refetch"]["claims"][0]))(block(call("refetch:https://a")[0], "refetch"))'"$PY_WRAP_TAIL"
 check "정보 부족은 보충으로 보낸다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_RF\""
-E_RR_MIS='not any(c["label"] in ("refetch:https://c", "rejudge:https://c", "escalate:https://c") for c in d["calls"]) and {"ref": "S1#issue#1", "urls": ["https://c"]} in d["result"]["rejected"] and [j["verdict"] for j in d["result"]["verifiers"][1]["output"]["judgments"]] == ["unsupported"]'
+E_RR_RJ="$PY_WRAP_HEAD"'[c["label"] for c in d["calls"] if c["label"].startswith("rejudge:")] == ["rejudge:1"] and [c["agentType"] for c in call("rejudge:1")] == ["disciplined-coder:prior-art-judge"] and block(call("rejudge:1")[0], "judge") == {"items": [{"url": "https://a", "claims": [{"ref": "S1#issue#0", "text": "claim A", "quote": "q2", "context": "c2", "source_note": "N2"}]}, {"url": "https://e", "claims": [{"ref": "S1#issue#2", "text": "claim F", "quote": "qf2", "context": "", "source_note": "N-F2"}]}]}'"$PY_WRAP_TAIL"
+check "재판정은 보충한 주장만 묶어 부른다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_RJ\""
+E_RR_MIS='not any(c["label"] == "refetch:https://c" for c in d["calls"]) and {"ref": "S1#issue#1", "urls": ["https://c"]} in d["result"]["rejected"] and [j["verdict"] for j in d["result"]["verifiers"][1]["output"]["judgments"]] == ["unsupported"]'
 check "불일치가 있으면 보충하지 않는다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_MIS\""
-E_RR_FAIL='d["result"]["verify_failed"] == [{"url": "https://d", "refs": ["S2#issue#1"]}] and {"ref": "S2#issue#2", "urls": ["https://d"]} in d["result"]["passed"] and not any(c["label"] == "rejudge:https://d" for c in d["calls"])'
-check "보충이 응답하지 않으면 그 주장만 검증 실패이고 재판정을 부르지 않는다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_FAIL\""
-E_RR_ESC="$PY_WRAP_HEAD"'[c["agentType"] for c in call("escalate:https://a")] == ["disciplined-coder:prior-art-judge-escalation"] and block(call("escalate:https://a")[0], "judge") is not None'"$PY_WRAP_TAIL"
-check "판정 불가는 Opus 상향으로 보낸다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_ESC\""
-E_RR_ESCIN="$PY_WRAP_HEAD"'block(call("escalate:https://a")[0], "judge") == block(call("rejudge:https://a")[0], "judge")'"$PY_WRAP_TAIL"
-check "상향 입력은 재판정을 거친 주장이면 재판정 입력이다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_ESCIN\""
-E_RR_Q='(lambda o: [(j["ref"], j["verdict"], j["quote"]) for j in o["judgments"]] == [("S1#issue#0", "supported", "q2"), ("S2#issue#0", "supported", "qb")])(d["result"]["verifiers"][0]["output"])'
+E_RR_FAIL='{"url": "https://d", "refs": ["S2#issue#1"]} in d["result"]["verify_failed"] and {"ref": "S2#issue#2", "urls": ["https://d"]} in d["result"]["passed"]'
+check "보충이 응답하지 않으면 그 주장만 검증 실패다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_FAIL\""
+E_RR_UNS='(lambda j: j["verdict"] == "unsupported" and "언어 해석" in j["reason"])([j for j in d["result"]["verifiers"][0]["output"]["judgments"] if j["ref"] == "S1#issue#0"][0]) and {"ref": "S1#issue#0", "urls": ["https://a"]} in d["result"]["rejected"]'
+check "판정 불가는 기각이고 이유가 남는다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_UNS\""
+E_RR_NI='{"url": "https://e", "refs": ["S1#issue#2"]} in d["result"]["verify_failed"] and {"ref": "S1#issue#3", "urls": ["https://e"]} in d["result"]["passed"]'
+check "재판정도 정보 부족이면 그 주장만 검증 실패다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NI\""
+E_RR_NOESC='not any(c["label"].startswith("escalate:") for c in d["calls"]) and all(c["agentType"] != "disciplined-coder:prior-art-judge-escalation" for c in d["calls"])'
+check "상향 호출이 없다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NOESC\""
+E_RR_Q='(lambda o: [(j["ref"], j["verdict"], j["quote"]) for j in o["judgments"]] == [("S1#issue#0", "unsupported", "q2"), ("S2#issue#0", "supported", "qb")])(d["result"]["verifiers"][0]["output"])'
 check "합친 출력의 quote 는 보충 구절이다(실행 흐름)" "json_true \"\$FX/rr_out.json\" \"\$E_RR_Q\""
-E_RR_ORDER='(lambda ls: ls == sorted(ls, key=["research", "extract", "judge", "refetch", "rejudge", "escalate"].index))([c["label"].split(":")[0] for c in d["calls"]])'
-check "검증 단계가 추출, 판정, 보충, 재판정, 상향 차례로 실행된다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_ORDER\""
+E_RR_ORDER='(lambda ls: ls == sorted(ls, key=["research", "extract", "judge", "refetch", "rejudge"].index))([c["label"].split(":")[0] for c in d["calls"]])'
+check "검증 단계가 추출, 판정, 보충, 재판정 차례로 실행된다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_ORDER\""
+# 보충이 모두 실패한 응답표다. 재판정할 주장이 없다.
+cat > "$FX/rq_resp.json" <<'EOF'
+{"@mode": "contrast", "responses": {
+  "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim D", "citations": [{"url": "https://d"}]}]},
+  "research:S2": {"search_status": "ok", "queries": ["q"], "issues": []},
+  "extract:https://d": {"url": "https://d", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "exists_note": "N-D", "quote": "qd", "context": "", "reason": "r"}]},
+  "judge:1": {"principles_applied": [], "judgments": [
+    {"url": "https://d", "ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "정보 부족", "scope": "일치", "missing": {"direction": "결론 문장"}, "unsure_reasons": {}, "reason": "r"}]},
+  "refetch:https://d": null}}
+EOF
+E_RQ='not any(c["label"].startswith("rejudge:") for c in d["calls"]) and d["result"]["verify_failed"] == [{"url": "https://d", "refs": ["S1#issue#0"]}] and d["result"]["verifiers"][0]["stages"]["rejudge"] is None'
+check "보충이 없으면 재판정을 부르지 않는다" "mkin \"\$FX/rq_resp.json\" \"\$FX/rq_in.json\" && harn run < \"\$FX/rq_in.json\" > \"\$FX/rq_out.json\" && json_true \"\$FX/rq_out.json\" \"\$E_RQ\""
+# 재판정 묶음이 응답하지 않는 응답표다. A1 만 보충했다.
+cat > "$FX/rj_resp.json" <<'EOF'
+{"@mode": "contrast", "responses": {
+  "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim A1", "citations": [{"url": "https://a"}]}, {"prior_claim": "claim A2", "citations": [{"url": "https://a"}]}]},
+  "research:S2": {"search_status": "ok", "queries": ["q"], "issues": []},
+  "extract:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "exists_note": "N", "quote": "q1", "context": "", "reason": "r"},
+    {"ref": "S1#issue#1", "access": "성공", "exists": "일치", "exists_note": "N", "quote": "q2", "context": "", "reason": "r"}]},
+  "judge:1": {"principles_applied": [], "judgments": [
+    {"url": "https://a", "ref": "S1#issue#0", "numbers_conditions": "정보 부족", "direction": "일치", "scope": "일치", "missing": {"numbers_conditions": "세션 수"}, "unsure_reasons": {}, "reason": "r"},
+    {"url": "https://a", "ref": "S1#issue#1", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]},
+  "refetch:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
+    {"ref": "S1#issue#0", "access": "성공", "exists": "일치", "exists_note": "N", "quote": "r1", "context": "", "reason": "r"}]},
+  "rejudge:1": null}}
+EOF
+E_RJ='d["result"]["verify_failed"] == [{"url": "https://a", "refs": ["S1#issue#0"]}] and d["result"]["passed"] == [{"ref": "S1#issue#1", "urls": ["https://a"]}]'
+check "실패한 재판정 묶음은 보충 주장만 검증 실패다" "mkin \"\$FX/rj_resp.json\" \"\$FX/rj_in.json\" && harn run < \"\$FX/rj_in.json\" > \"\$FX/rj_out.json\" && json_true \"\$FX/rj_out.json\" \"\$E_RJ\""
+
+echo "[실행 흐름: 판정 묶음]"
+# mkbig <응답표 파일> <판정 묶음 1 처리> — S1 이 https://a 에 주장 15개, S2 가 https://b 에 주장 10개를 인용한다.
+# 합이 20을 넘으므로 판정 묶음은 a 와 b 의 둘이다. 처리가 null 이면 judge:1 이 응답하지 않는다.
+# 처리가 gap 이면 judge:1 출력에서 S1#issue#3 이 빠지고, 입력에 없던 URL 과 다른 URL 의 ref 판정이 섞인다.
+mkbig() {
+  json_run '
+import json, sys
+out, mode = sys.argv[1], sys.argv[2]
+ok = lambda u, r: {"url": u, "ref": r, "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}
+bad = lambda u, r: dict(ok(u, r), direction="불일치")
+ex = lambda u, refs: {"url": u, "principles_applied": [], "judgments": [{"ref": r, "access": "성공", "exists": "일치", "exists_note": "N", "quote": "q", "context": "", "reason": "r"} for r in refs]}
+ra = ["S1#issue#%d" % i for i in range(15)]
+rb = ["S2#issue#%d" % i for i in range(10)]
+j1 = {"principles_applied": [], "judgments": [ok("https://a", r) for r in ra]}
+if mode == "gap":
+    j1["judgments"] = [j for j in j1["judgments"] if j["ref"] != "S1#issue#3"] + [bad("https://a", "S2#issue#0"), bad("https://zz", "S1#issue#3"), bad("https://a", "S9#issue#0")]
+resp = {
+  "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "a%d" % i, "citations": [{"url": "https://a"}]} for i in range(15)]},
+  "research:S2": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "b%d" % i, "citations": [{"url": "https://b"}]} for i in range(10)]},
+  "extract:https://a": ex("https://a", ra),
+  "extract:https://b": ex("https://b", rb),
+  "judge:1": None if mode == "null" else j1,
+  "judge:2": {"principles_applied": [], "judgments": [ok("https://b", r) for r in rb]},
+}
+with open(out, "w", encoding="utf-8") as f:
+    json.dump({"@mode": "contrast", "responses": resp}, f, ensure_ascii=False)
+' "$1" "$2"
+}
+mkbig "$FX/rb_resp.json" gap
+check "묶음 둘인 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rb_resp.json\" \"\$FX/rb_in.json\" && harn run < \"\$FX/rb_in.json\" > \"\$FX/rb_out.json\""
+E_RB_CALLS="$PY_WRAP_HEAD"'[c["label"] for c in d["calls"] if c["label"].startswith("judge:")] == ["judge:1", "judge:2"] and [[it["url"] for it in block(call(l)[0], "judge")["items"]] for l in ("judge:1", "judge:2")] == [["https://a"], ["https://b"]] and all(c["agentType"] == "disciplined-coder:prior-art-judge" and c["phase"] == "Verify" for c in d["calls"] if c["label"].startswith("judge:"))'"$PY_WRAP_TAIL"
+check "판정은 묶음마다 한 번 부른다" "json_true \"\$FX/rb_out.json\" \"\$E_RB_CALLS\""
+E_RB_GAP='d["result"]["verify_failed"] == [{"url": "https://a", "refs": ["S1#issue#3"]}] and len(d["result"]["passed"]) == 24 and {"ref": "S1#issue#3", "urls": ["https://a"]} not in d["result"]["passed"]'
+check "빠진 주장만 검증 실패다" "json_true \"\$FX/rb_out.json\" \"\$E_RB_GAP\""
+E_RB_FOREIGN='{"ref": "S2#issue#0", "urls": ["https://b"]} in d["result"]["passed"] and [j["ref"] for j in d["result"]["verifiers"][0]["stages"]["judge"]["judgments"]] == ["S1#issue#%d" % i for i in range(15) if i != 3] and all(j["url"] == "https://a" for j in d["result"]["verifiers"][0]["stages"]["judge"]["judgments"])'
+check "입력에 없던 판정은 쓰지 않는다(실행 흐름)" "json_true \"\$FX/rb_out.json\" \"\$E_RB_FOREIGN\""
+mkbig "$FX/rb0_resp.json" null
+E_RB_NULL='d["result"]["verify_failed"] == [{"url": "https://a", "refs": ["S1#issue#%d" % i for i in range(15)]}] and d["result"]["passed"] == [{"ref": "S2#issue#%d" % i, "urls": ["https://b"]} for i in range(10)] and d["result"]["verifiers"][0]["output"] is None and d["result"]["verifiers"][0]["stages"]["judge"] is None'
+check "실패한 판정 묶음의 URL 만 검증 실패다" "mkin \"\$FX/rb0_resp.json\" \"\$FX/rb0_in.json\" && harn run < \"\$FX/rb0_in.json\" > \"\$FX/rb0_out.json\" && json_true \"\$FX/rb0_out.json\" \"\$E_RB_NULL\""
 
 echo "[실패 행선지]"
 cat > "$FX/rf_resp.json" <<'EOF'
@@ -737,8 +859,8 @@ cat > "$FX/rf_resp.json" <<'EOF'
     "evaluation": {"prior": "e", "same": true, "note": "n"}, "target": {"prior": "t", "same": true, "note": "n"}}}]},
   "extract:https://a": {"url": "https://a", "principles_applied": [], "judgments": [
     {"ref": "S2#issue#0", "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"}]},
-  "judge:https://a": {"principles_applied": [], "judgments": [
-    {"ref": "S2#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]},
+  "judge:1": {"principles_applied": [], "judgments": [
+    {"url": "https://a", "ref": "S2#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"}]},
   "extract:https://b": null}}
 EOF
 check "실패가 섞인 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rf_resp.json\" \"\$FX/rf_in.json\" && harn run < \"\$FX/rf_in.json\" > \"\$FX/rf_out.json\""

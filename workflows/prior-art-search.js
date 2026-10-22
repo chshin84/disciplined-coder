@@ -17,8 +17,9 @@ const S = schemas();
 const RESEARCHER = 'disciplined-coder:prior-art-researcher';
 const EXTRACTOR = 'disciplined-coder:prior-art-verifier';
 const JUDGE = 'disciplined-coder:prior-art-judge';
-const ESCALATION = 'disciplined-coder:prior-art-judge-escalation';
 const MAPCHECK = 'disciplined-coder:prior-art-mapcheck';
+// 판정 묶음 하나에 넣는 주장 수의 상한이다. 값의 근거는 spec 「Opus 일괄 판정」의 묶음 크기다.
+const BATCH_SIZE = 20;
 
 phase('Research');
 const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
@@ -36,16 +37,13 @@ const researchers = args.subquestions.map((sq, i) => ({ id: sq.id, output: resea
 const query_violations = checkQueries(researchers, args.forbidden_terms);
 const { items, groups } = groupByUrl(researchers);
 
-// 검증은 다섯 단계다. URL 마다 추출하고, 추출을 통과한 주장만 판정한다. 정보 부족이 있고 불일치가 없는 주장은
-// 추출 검증자가 원문을 다시 열어 보충하고(refetch), 보충 구절로 다시 판정한다(rejudge). 판정 불가가 남은 주장만 상향 판정한다.
-// 단계 출력은 URL 을 키로 둔 객체에 모으고 mergeStages 가 인용 판정 출력 형식으로 합친다.
+// 검증은 네 단계다. URL 마다 추출하고, 추출을 통과한 주장만 묶음으로 모아 판정한다. 정보 부족이 있고 불일치가 없는 주장은
+// 추출 검증자가 URL 마다 원문을 다시 열어 보충하고(refetch), 보충 구절을 다시 묶음으로 모아 판정한다(rejudge).
+// 판정 묶음 출력은 splitByUrl 로 URL 마다 나누고, 단계 출력은 URL 을 키로 둔 객체에 모아 mergeStages 가 인용 판정 출력 형식으로 합친다.
 phase('Verify');
 const refsByUrl = {};
 const extract = {};
-const judge = {};
 const refetch = {};
-const rejudge = {};
-const escalation = {};
 const extractOut = await parallel(groups.map((g) => () => agent(
   prompt('extract', args.principles_path, { url: g.url, claims: g.claims }),
   { agentType: EXTRACTOR, label: `extract:${g.url}`, phase: 'Verify', schema: S.EXTRACT_SCHEMA },
@@ -54,15 +52,15 @@ groups.forEach((g, i) => {
   refsByUrl[g.url] = g.claims.map((c) => c.ref);
   extract[g.url] = extractOut[i] ?? null;
 });
-const judgeJobs = groups
-  .map((g) => ({ url: g.url, claims: judgeClaims(g.claims, extract[g.url]) }))
-  .filter((x) => x.claims.length > 0);
-const judgeOut = await parallel(judgeJobs.map((x) => () => agent(
-  prompt('judge', args.principles_path, { url: x.url, claims: x.claims }),
-  { agentType: JUDGE, label: `judge:${x.url}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
+const judgeIn = {};
+groups.forEach((g) => { judgeIn[g.url] = judgeClaims(g.claims, extract[g.url]); });
+const judgeBatches = batchClaims(judgeIn, BATCH_SIZE);
+const judgeOut = await parallel(judgeBatches.map((b, i) => () => agent(
+  prompt('judge', args.principles_path, b),
+  { agentType: JUDGE, label: `judge:${i + 1}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
 )));
-judgeJobs.forEach((x, i) => { judge[x.url] = judgeOut[i] ?? null; });
-const refetchJobs = judgeJobs
+const judge = splitByUrl(judgeOut, judgeBatches);
+const refetchJobs = judgeBatches.flatMap((b) => b.items)
   .map((x) => ({ url: x.url, claims: refetchClaims(x.claims, judge[x.url]) }))
   .filter((x) => x.claims.length > 0);
 const refetchOut = await parallel(refetchJobs.map((x) => () => agent(
@@ -70,28 +68,15 @@ const refetchOut = await parallel(refetchJobs.map((x) => () => agent(
   { agentType: EXTRACTOR, label: `refetch:${x.url}`, phase: 'Verify', schema: S.EXTRACT_SCHEMA },
 )));
 refetchJobs.forEach((x, i) => { refetch[x.url] = refetchOut[i] ?? null; });
-const rejudgeJobs = refetchJobs
-  .map((x) => ({ url: x.url, claims: rejudgeClaims(x.claims, refetch[x.url]) }))
-  .filter((x) => x.claims.length > 0);
-const rejudgeOut = await parallel(rejudgeJobs.map((x) => () => agent(
-  prompt('judge', args.principles_path, { url: x.url, claims: x.claims }),
-  { agentType: JUDGE, label: `rejudge:${x.url}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
+const rejudgeIn = {};
+refetchJobs.forEach((x) => { rejudgeIn[x.url] = rejudgeClaims(x.claims, refetch[x.url]); });
+const rejudgeBatches = batchClaims(rejudgeIn, BATCH_SIZE);
+const rejudgeOut = await parallel(rejudgeBatches.map((b, i) => () => agent(
+  prompt('judge', args.principles_path, b),
+  { agentType: JUDGE, label: `rejudge:${i + 1}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
 )));
-rejudgeJobs.forEach((x, i) => { rejudge[x.url] = rejudgeOut[i] ?? null; });
-const rejudgeInput = {};
-rejudgeJobs.forEach((x) => { rejudgeInput[x.url] = x.claims; });
-const escJobs = judgeJobs
-  .map((x) => ({
-    url: x.url,
-    claims: escalateClaims(x.claims, judge[x.url], refetch[x.url] ?? null, rejudgeInput[x.url] ?? [], rejudge[x.url] ?? null),
-  }))
-  .filter((x) => x.claims.length > 0);
-const escOut = await parallel(escJobs.map((x) => () => agent(
-  prompt('judge', args.principles_path, { url: x.url, claims: x.claims }),
-  { agentType: ESCALATION, label: `escalate:${x.url}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
-)));
-escJobs.forEach((x, i) => { escalation[x.url] = escOut[i] ?? null; });
-const { outputs, stages } = mergeStages(refsByUrl, extract, judge, refetch, rejudge, escalation);
+const rejudge = splitByUrl(rejudgeOut, rejudgeBatches);
+const { outputs, stages } = mergeStages(refsByUrl, extract, judge, refetch, rejudge);
 const verifiers = groups.map((g) => ({
   url: g.url, subquestions: g.subquestions, output: outputs[g.url], stages: stages[g.url],
 }));
@@ -282,22 +267,22 @@ function cellsOk(j) {
   return judgeCells().every((k) => isMatch(j[k]));
 }
 
-// 단계 출력에서 refs 의 판정을 ref 마다 하나씩 찾아 Map 으로 돌려준다. 판정이 배열이 아니거나,
-// 한 ref 라도 판정이 없거나 ok 를 통과하지 못하면 null 이다. null 은 그 단계가 그 URL 에서 실패했다는 뜻이다.
-function judgmentsByRef(refs, output, ok = () => true) {
+// 추출 출력에서 refs 의 판정을 ref 마다 하나씩 찾아 Map 으로 돌려준다. 판정이 배열이 아니거나,
+// 한 ref 라도 판정이 없으면 null 이다. null 은 추출이 그 URL 에서 실패했다는 뜻이다.
+function judgmentsByRef(refs, output) {
   const judgments = output?.judgments;
   if (!Array.isArray(judgments)) return null;
   const found = new Map();
   for (const ref of refs) {
     const j = judgments.find((x) => x.ref === ref);
-    if (j == null || !ok(j)) return null;
+    if (j == null) return null;
     found.set(ref, j);
   }
   return found;
 }
 
 // 단계 출력에서 ref 하나의 판정을 찾는다. 출력이 없거나 그 ref 의 판정이 없으면 null 이다.
-// 보충과 재판정은 주장 하나만 실패로 두므로 URL 단위의 judgmentsByRef 대신 이 함수로 찾는다.
+// 보충과 재판정은 주장 하나만 실패로 두므로 URL 단위의 judgmentsByRef·judgedRefs 대신 이 함수로 찾는다.
 function judgmentOf(output, ref) {
   const judgments = output?.judgments;
   if (!Array.isArray(judgments)) return null;
@@ -323,35 +308,51 @@ function judgeClaims(claims, extractOutput) {
   return claims.filter((c) => passesExtract(ex.get(c.ref))).map((c) => toJudgeClaim(c, ex.get(c.ref)));
 }
 
-// 판정 하나의 다음 차례다. 불일치가 있으면 unsupported, 정보 부족이 있으면 refetch, 판정 불가가 있으면 escalate,
-// 셋 다 없으면 supported 다. 불일치를 먼저 보므로 불일치가 있는 주장은 보충과 상향을 하지 않는다.
+// 판정 하나의 다음 차례다. 불일치가 있으면 unsupported, 정보 부족이 있으면 refetch, 판정 불가가 있으면 unsupported,
+// 셋 다 없으면 supported 다. 불일치를 먼저 보므로 불일치가 있는 주장은 보충을 하지 않는다.
+// 판정 불가는 구절이 주장을 뒷받침한다는 확인이 없으므로 기각한다. 이유 유형은 mergeUrl 이 reason 에 남긴다.
 function nextStep(j) {
   const cells = judgeCells().map((k) => j[k]);
   if (cells.includes('불일치')) return 'unsupported';
   if (cells.includes('정보 부족')) return 'refetch';
-  if (cells.includes('판정 불가')) return 'escalate';
+  if (cells.includes('판정 불가')) return 'unsupported';
   return 'supported';
 }
 
 // 주장 하나의 판정 차례다. j 는 세 칸이 정해진 처음 판정, rf 와 rj 는 그 주장의 보충·재판정 판정(없으면 null)이다.
-// step 은 supported·unsupported·escalate·verify_failed 중 하나이고, j 는 상향이 바꿀 칸을 고를 판정이다.
+// step 은 supported·unsupported·verify_failed 중 하나이고, j 는 step 을 정한 판정(검증 실패면 null)이다.
 // 보충이 없거나 보충 출력이 추출 기준을 통과하지 못하거나, 재판정이 없거나 칸이 빠지거나, 재판정도 정보 부족이면 verify_failed 다.
 function routeClaim(j, rf, rj) {
   const first = nextStep(j);
-  if (first !== 'refetch') return { step: first, from: 'judge', j };
-  if (rf == null || !passesExtract(rf)) return { step: 'verify_failed', from: 'refetch', j: null };
-  if (rj == null || !cellsOk(rj)) return { step: 'verify_failed', from: 'rejudge', j: null };
+  if (first !== 'refetch') return { step: first, j };
+  if (rf == null || !passesExtract(rf)) return { step: 'verify_failed', j: null };
+  if (rj == null || !cellsOk(rj)) return { step: 'verify_failed', j: null };
   const second = nextStep(rj);
-  return { step: second === 'refetch' ? 'verify_failed' : second, from: 'rejudge', j: rj };
+  return { step: second === 'refetch' ? 'verify_failed' : second, j: rj };
+}
+
+// 판정 출력에서 refs 중 판정이 있는 ref 의 판정을 Map 으로 돌려준다. 판정이 빠진 ref 는 Map 에 없고, 그 주장만 검증 실패가 된다.
+// 판정이 배열이 아니거나, 있는 판정 중 하나라도 칸이 빠지면 null 이다. null 은 판정이 그 URL 에서 실패했다는 뜻이다.
+function judgedRefs(refs, output) {
+  const judgments = output?.judgments;
+  if (!Array.isArray(judgments)) return null;
+  const found = new Map();
+  for (const ref of refs) {
+    const j = judgments.find((x) => x.ref === ref);
+    if (j == null) continue;
+    if (!cellsOk(j)) return null;
+    found.set(ref, j);
+  }
+  return found;
 }
 
 // 보충 입력의 claims 다. 처음 판정에 정보 부족이 있고 불일치가 없는 주장만 고르고, 판정의 missing 을 붙인다.
 // 판정이 실패한 URL 은 빈 배열이다.
 function refetchClaims(claims, judgeOutput) {
-  const ju = judgmentsByRef(claims.map((c) => c.ref), judgeOutput, cellsOk);
+  const ju = judgedRefs(claims.map((c) => c.ref), judgeOutput);
   if (ju == null) return [];
   return claims
-    .filter((c) => nextStep(ju.get(c.ref)) === 'refetch')
+    .filter((c) => ju.has(c.ref) && nextStep(ju.get(c.ref)) === 'refetch')
     .map((c) => ({ ref: c.ref, text: c.text, missing: ju.get(c.ref).missing ?? {} }));
 }
 
@@ -362,24 +363,54 @@ function rejudgeClaims(claims, refetchOutput) {
     .map((c) => toJudgeClaim(c, judgmentOf(refetchOutput, c.ref)));
 }
 
-// 상향 판정 입력의 claims 다. 판정 불가가 남은 주장만 고른다. 재판정을 거친 주장은 재판정 입력을,
-// 아니면 처음 판정 입력을 쓴다. 판정이 실패한 URL 은 빈 배열이다.
-function escalateClaims(claims, judgeOutput, refetchOutput, rejudgeInput, rejudgeOutput) {
-  const ju = judgmentsByRef(claims.map((c) => c.ref), judgeOutput, cellsOk);
-  if (ju == null) return [];
-  const out = [];
-  for (const c of claims) {
-    const route = routeClaim(ju.get(c.ref), judgmentOf(refetchOutput, c.ref), judgmentOf(rejudgeOutput, c.ref));
-    if (route.step !== 'escalate') continue;
-    out.push(route.from === 'rejudge' ? rejudgeInput.find((x) => x.ref === c.ref) : c);
+// 판정 묶음 만들기. claimsByUrl 은 URL 을 키로 둔 판정 입력 claims 이고, 키 차례대로 앞 묶음부터 채운다.
+// 묶음 하나의 주장은 size 개 이하이고 한 URL 의 주장은 한 묶음에 둔다. 한 URL 의 주장이 size 개를 넘으면 그 URL 만으로 묶음 하나다.
+// 주장이 없는 URL 은 넣지 않는다. 반환값의 원소는 판정 입력 { items: [{ url, claims }] } 그대로다.
+function batchClaims(claimsByUrl, size) {
+  const batches = [];
+  let cur = null;
+  let count = 0;
+  for (const [url, claims] of Object.entries(claimsByUrl)) {
+    if (claims.length === 0) continue;
+    if (cur == null || count + claims.length > size) {
+      cur = { items: [] };
+      batches.push(cur);
+      count = 0;
+    }
+    cur.items.push({ url, claims });
+    count += claims.length;
   }
+  return batches;
+}
+
+// 묶음 출력 나누기. batchOutputs[i] 는 batches[i] 의 출력이다. 반환값은 URL 을 키로 둔 { judgments, principles_applied } 다.
+// 응답이 없거나 judgments 가 배열이 아닌 묶음의 URL 은 null 이다. 판정은 url 과 ref 가 그 URL 의 입력 주장과 맞는 것만 남기고,
+// 입력에 없던 URL 이나 ref 의 판정은 버린다.
+function splitByUrl(batchOutputs, batches) {
+  const out = {};
+  batches.forEach((b, i) => {
+    const o = batchOutputs[i] ?? null;
+    const ok = o != null && Array.isArray(o.judgments);
+    for (const it of b.items) {
+      if (!ok) {
+        out[it.url] = null;
+        continue;
+      }
+      const refs = it.claims.map((c) => c.ref);
+      out[it.url] = {
+        judgments: o.judgments.filter((j) => j != null && j.url === it.url && refs.includes(j.ref)),
+        principles_applied: o.principles_applied ?? [],
+      };
+    }
+  });
   return out;
 }
 
 // 단계 합치기. 인자와 반환값은 모두 URL 을 키로 둔 일반 객체다. 단계 객체에 키가 없는 URL 은 그 단계를 실행하지 않은 URL 이다.
+// judge 와 rejudge 는 묶음 출력을 splitByUrl 로 나눈 값이고, 묶음이 실패한 URL 의 값은 null 이다.
 // outputs[url] 이 null 이면 그 URL 은 검증 실패이고, 주장 하나만 실패하면 그 판정의 verdict 가 verify_failed 다.
-// stages[url] 은 다섯 단계의 원본이며, 실행하지 않은 단계는 null 이다.
-function mergeStages(refsByUrl, extract, judge, refetch, rejudge, escalation) {
+// stages[url] 은 네 단계의 원본이며, 실행하지 않은 단계는 null 이다.
+function mergeStages(refsByUrl, extract, judge, refetch, rejudge) {
   const outputs = {};
   const stages = {};
   for (const [url, refs] of Object.entries(refsByUrl)) {
@@ -388,7 +419,6 @@ function mergeStages(refsByUrl, extract, judge, refetch, rejudge, escalation) {
       judge: judge[url] ?? null,
       refetch: refetch[url] ?? null,
       rejudge: rejudge[url] ?? null,
-      escalation: escalation[url] ?? null,
     };
     stages[url] = st;
     outputs[url] = mergeUrl(url, refs, st);
@@ -396,22 +426,16 @@ function mergeStages(refsByUrl, extract, judge, refetch, rejudge, escalation) {
   return { outputs, stages };
 }
 
-// URL 하나의 합치기다. spec 「최종 판정과 실패 처리」와 「충분성 판단과 보충·Opus 상향」의 차례로 verdict 를 정하고,
-// URL 검증 실패이면 null 이다. 처음 판정과 상향 판정의 무응답·누락은 URL 검증 실패이고, 보충과 재판정의 실패는 그 주장만 verify_failed 다.
-// 상향 판정은 판정 불가 칸만 바꾸고, 상향 뒤에도 판정 불가나 정보 부족이 남으면 그 주장만 verify_failed 다.
+// URL 하나의 합치기다. spec 「최종 판정과 실패 처리」와 「충분성 판단과 보충·Opus 상향」, 「Opus 일괄 판정」의 차례로 verdict 를 정하고,
+// URL 검증 실패이면 null 이다. 처음 판정의 무응답과 칸 누락은 URL 검증 실패이고, 처음 판정에서 빠진 주장과 보충·재판정의 실패는
+// 그 주장만 verify_failed 다. 끝까지 판정 불가가 남은 주장은 unsupported 이고, 판정 불가 칸의 이유 유형을 reason 에 남긴다.
 // quote 는 보충 출력이 추출 기준을 통과했으면 보충 구절이고, 아니면 추출 구절이다. reason 은 단계 이름을 붙인 이유를 ' / ' 로 이어 붙인다.
 function mergeUrl(url, refs, st) {
   const exBy = judgmentsByRef(refs, st.extract);
   if (exBy == null) return null;
   const toJudge = refs.filter((r) => passesExtract(exBy.get(r)));
-  const juBy = toJudge.length > 0 ? judgmentsByRef(toJudge, st.judge, cellsOk) : new Map();
+  const juBy = toJudge.length > 0 ? judgedRefs(toJudge, st.judge) : new Map();
   if (juBy == null) return null;
-  const routes = new Map(toJudge.map((r) => [r, routeClaim(juBy.get(r), judgmentOf(st.refetch, r), judgmentOf(st.rejudge, r))]));
-  const unsure = toJudge.filter((r) => routes.get(r).step === 'escalate');
-  // 상향 판정 출력은 판정 불가였던 칸만 정해진 값이면 된다.
-  const esOk = (j) => judgeCells().every((k) => routes.get(j.ref).j[k] !== '판정 불가' || isMatch(j[k]));
-  const esBy = unsure.length > 0 ? judgmentsByRef(unsure, st.escalation, esOk) : new Map();
-  if (esBy == null) return null;
   const judgments = refs.map((ref) => {
     const e = exBy.get(ref);
     const reasons = [`추출: ${e.reason ?? ''}`];
@@ -419,6 +443,10 @@ function mergeUrl(url, refs, st) {
     const out = (verdict) => ({ ref, verdict, quote, reason: reasons.join(' / ') });
     if (e.access === '실패') return out('unverifiable');
     if (!passesExtract(e)) return out('unsupported');
+    if (!juBy.has(ref)) {
+      reasons.push('판정: 판정 출력에 이 주장이 없다');
+      return out('verify_failed');
+    }
     const j = juBy.get(ref);
     reasons.push(`판정: ${j.reason ?? ''}`);
     if (nextStep(j) === 'refetch') {
@@ -428,17 +456,15 @@ function mergeUrl(url, refs, st) {
       if (f != null && passesExtract(f)) quote = String(f.quote ?? '');
       if (g != null) reasons.push(`재판정: ${g.reason ?? ''}`);
     }
-    const route = routes.get(ref);
-    if (route.step !== 'escalate') return out(route.step);
-    const s = esBy.get(ref);
-    reasons.push(`상향: ${s.reason ?? ''}`);
-    const cells = judgeCells().map((k) => (route.j[k] === '판정 불가' ? s[k] : route.j[k]));
-    if (cells.includes('판정 불가') || cells.includes('정보 부족')) return out('verify_failed');
-    if (cells.includes('불일치')) return out('unsupported');
-    return out('supported');
+    const route = routeClaim(j, judgmentOf(st.refetch, ref), judgmentOf(st.rejudge, ref));
+    const unsure = route.j == null ? [] : judgeCells().filter((k) => route.j[k] === '판정 불가');
+    if (unsure.length > 0) {
+      reasons.push(`판정 불가: ${unsure.map((k) => `${k}=${route.j.unsure_reasons?.[k] ?? ''}`).join(', ')}`);
+    }
+    return out(route.step);
   });
   const principles = [];
-  for (const o of [st.extract, st.judge, st.refetch, st.rejudge, st.escalation]) {
+  for (const o of [st.extract, st.judge, st.refetch, st.rejudge]) {
     for (const p of o?.principles_applied ?? []) if (!principles.includes(p)) principles.push(p);
   }
   return { url, judgments, principles_applied: principles };
@@ -540,7 +566,7 @@ function schemas() {
     },
     required: ['url', 'judgments', 'principles_applied'],
   };
-  // 판정·재판정·상향 판정이 같은 스키마를 쓴다. 보충은 추출 스키마를 쓴다.
+  // 판정과 재판정이 같은 스키마를 쓴다. 판정마다 url 은 그 주장이 든 묶음 입력 원소의 URL 이다. 보충은 추출 스키마를 쓴다.
   const match = { type: 'string', enum: ['일치', '불일치', '판정 불가', '정보 부족'] };
   const unsure = { type: 'string', enum: ['조건 얽힘', '표·그림 값', '언어 해석'] };
   const perCell = (v) => ({
@@ -556,6 +582,7 @@ function schemas() {
         items: {
           type: 'object',
           properties: {
+            url: str,
             ref: str,
             numbers_conditions: match,
             direction: match,
@@ -564,7 +591,7 @@ function schemas() {
             unsure_reasons: perCell(unsure),
             reason: str,
           },
-          required: ['ref', 'numbers_conditions', 'direction', 'scope', 'missing', 'unsure_reasons', 'reason'],
+          required: ['url', 'ref', 'numbers_conditions', 'direction', 'scope', 'missing', 'unsure_reasons', 'reason'],
         },
       },
       principles_applied: principles,

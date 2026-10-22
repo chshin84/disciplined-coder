@@ -12,7 +12,8 @@
   "verifier": { "url": true, "judgments": [{ "ref": true, "verdict": true, "quote": true, "reason": true }], "principles_applied": true },
   "extract": { "url": true, "judgments": [{ "ref": true, "access": true, "exists": true, "exists_note": true, "quote": true, "context": true, "reason": true }], "principles_applied": true },
   "refetch": { "url": true, "claims": [{ "ref": true, "text": true, "missing": true }] },
-  "judge": { "judgments": [{ "ref": true, "numbers_conditions": true, "direction": true, "scope": true, "missing": true, "unsure_reasons": true, "reason": true }], "principles_applied": true },
+  "judge_input": { "items": [{ "url": true, "claims": [{ "ref": true, "text": true, "quote": true, "context": true, "source_note": true }] }] },
+  "judge": { "judgments": [{ "url": true, "ref": true, "numbers_conditions": true, "direction": true, "scope": true, "missing": true, "unsure_reasons": true, "reason": true }], "principles_applied": true },
   "enums": { "match": ["일치", "불일치", "판정 불가", "정보 부족"], "unsure": ["조건 얽힘", "표·그림 값", "언어 해석"] },
   "synthesis": { "evidence_map": [{ "case": true, "url": true, "outcome": true, "axes": true }],
                  "conclusions": [{ "text": true, "refs": true }], "principles_applied": true },
@@ -24,5 +25,5 @@
               "overall_status": true, "query_violations": [{ "id": true, "query": true, "rule": true }],
               "verifier_count": true, "researchers": [{ "id": true, "output": true }],
               "verifiers": [{ "url": true, "subquestions": true, "output": true,
-                              "stages": { "extract": true, "judge": true, "refetch": true, "rejudge": true, "escalation": true } }], "?synthesis": true, "?map_check": true }
+                              "stages": { "extract": true, "judge": true, "refetch": true, "rejudge": true } }], "?synthesis": true, "?map_check": true }
 }

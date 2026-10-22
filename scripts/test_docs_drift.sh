@@ -948,12 +948,11 @@ done
 check "spec 리뷰가 발동과 기록을 가리킨다" "points_to \"\$CALLER\" '\`agent-prior-art\`' '「발동과 기록」'"
 check "연구자 정의의 도구가 구성과 같다" "grep -qx 'tools: WebSearch, WebFetch, Read, Grep, Glob' <<<\"\$(fm \"\$RDEF\")\""
 check "연구자 정의의 턴 상한이 20 이다" "grep -qx 'maxTurns: 20' <<<\"\$(fm \"\$RDEF\")\""
-# 검증자 정의는 추출·판정·상향 판정·지도 대조의 네 파일이다. 구성 값은 spec 「확정 구성과 판정 불가 상향」이 정했고,
-# 상향 판정 정의의 모델과 노력 수준은 「충분성 판단과 보충·Opus 상향」이 바꿨다.
+# 검증자 정의는 추출·판정·지도 대조의 세 파일이다. 구성 값은 spec 「확정 구성과 판정 불가 상향」이 정했고,
+# 판정 정의의 모델과 노력 수준은 「Opus 일괄 판정」이 바꿨다.
 JDEF="$HERE/agents/prior-art-judge.md"
-EDEF="$HERE/agents/prior-art-judge-escalation.md"
 MDEF="$HERE/agents/prior-art-mapcheck.md"
-for row in "VDEF|WebFetch, Read|claude-haiku-5-5|high" "JDEF|Read|claude-haiku-5-5|high" "EDEF|Read|claude-opus-5-5|medium" "MDEF|Read|claude-haiku-5-5|high"; do
+for row in "VDEF|WebFetch, Read|claude-haiku-5-5|high" "JDEF|Read|claude-opus-5-5|medium" "MDEF|Read|claude-haiku-5-5|high"; do
   IFS='|' read -r def tools model effort <<<"$row"
   file="${!def}"; FMV="$(fm "$file" || true)"; base="$(basename "$file")"
   check "$base 의 도구가 구성과 같다" "grep -qx 'tools: $tools' <<<\"\$FMV\""
@@ -962,14 +961,6 @@ for row in "VDEF|WebFetch, Read|claude-haiku-5-5|high" "JDEF|Read|claude-haiku-5
   check "$base 의 턴 상한이 20 이다" "grep -qx 'maxTurns: 20' <<<\"\$FMV\""
   check "$base 의 description 이 실행 경로를 한정한다" "grep -m1 '^description:' <<<\"\$FMV\" | grep -qF 'agent-prior-art 절차와 워크플로 disciplined-coder:prior-art-search 에서만 실행한다'"
 done
-# 상향 판정 정의는 판정 정의의 본문에 상향 문단 하나만 추가한다. 본문을 문단으로 나눠 상향 문단을 빼면 두 본문이 같아야 한다.
-# frontmatter 도 이름·설명·모델·노력 수준 줄을 빼면 같아야 한다. 한쪽만 고친 상태를 잡는다.
-ESC_MARK='판정 에이전트가 판정 불가로 넘긴 주장이다'
-body() { awk 'NR==1&&/^---$/{f=1;next} f==1&&/^---$/{f=2;next} f==2' "$1" 2>/dev/null; }
-esc_paras() { body "$1" | awk -v m="$ESC_MARK" 'BEGIN{RS="";ORS="\n\n"} index($0, m)==0'; }
-esc_count() { body "$1" | awk -v m="$ESC_MARK" 'BEGIN{RS=""} index($0, m)>0{n++} END{print n+0}'; }
-check "상향 판정 정의는 판정 정의와 본문이 같다" "[ -s \"\$JDEF\" ] && [ \"\$(esc_count \"\$EDEF\")\" -eq 1 ] && [ \"\$(esc_count \"\$JDEF\")\" -eq 0 ] && [ \"\$(esc_paras \"\$JDEF\")\" = \"\$(esc_paras \"\$EDEF\")\" ]"
-check "상향 판정 정의의 frontmatter 가 모델과 노력 수준 외에 판정 정의와 같다" "[ -s \"\$JDEF\" ] && [ \"\$(fm \"\$JDEF\" | grep -vE '^(name|description|model|effort):')\" = \"\$(fm \"\$EDEF\" | grep -vE '^(name|description|model|effort):')\" ]"
 RP="$( [ -f "$AP" ] && doc_sec "$AP" '레퍼런스 프롬프트' | grep -m1 '^- system: "' | sed 's/^- system: "//; s/"$//' || true)"
 check "연구자 정의가 레퍼런스 프롬프트 본문을 그대로 싣는다" "[ -n \"\$RP\" ] && grep -qF -- \"\$RP\" \"\$RDEF\""
 DDISC="$HERE/docs/domain-discipline.md"
