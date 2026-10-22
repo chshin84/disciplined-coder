@@ -2,7 +2,7 @@
 # PostToolUse(Write|Edit|Bash): 두 가지를 알린다. 둘 다 비블로킹 경고이고 쓰기를 거부하지 않는다.
 #   문서 형식 경고 — 쓴 .md 의 라벨 불릿·개수 예고·제목 개수(판정은 _doc_form_check.py).
 #     스위치는 DISCIPLINED_CODER_REPLY_CHECK 다.
-#   검진 넛지 — 산출물(.pptx·.xlsx·.docx·.pdf)과 그 폴더의 마크다운 작성/수정. spec/plan 은 자체
+#   검진 넛지 — 산출물(.pptx·.xlsx·.docx·.pdf·.hwp·.hwpx)과 그 폴더의 마크다운 작성/수정. spec/plan 은 자체
 #     하드 게이트가 맡아 뺀다. 스위치는 DISCIPLINED_CODER_REVIEW_GATE 다.
 # 한 훅에 둔 까닭은 대상 뽑기를 한 번만 하려는 것이다. 이 PC 는 프로세스 하나 띄우는 값이 크다.
 # 경로는 도구에 따라 한 곳에서 뽑는다. Write·Edit 은 훅 입력의 file_path 이고, Bash 는
@@ -61,7 +61,8 @@ match=""
   # 폴더에 아직 산출물이 없을 때 처음 쓰는 마크다운은 기계로 못 가린다. 그것이 산출물 재료인지는
   # 대화 맥락에만 있으므로 review-docs 가 그 판단을 사람과 모델에게 맡긴다. 여기서 추측하지 않는다.
   case "$FILE" in
-    *.pptx|*.xlsx|*.docx|*.pdf) match="$FILE"; break ;;
+    # .html 은 보고서와 웹 화면을 확장자로 가릴 수 없어 넣지 않는다. 고칠 때마다 뜨면 아무도 안 본다.
+    *.pptx|*.xlsx|*.docx|*.pdf|*.hwp|*.hwpx) match="$FILE"; break ;;
     *.md) ;;
     *) continue ;;
   esac
@@ -77,7 +78,7 @@ match=""
   # 메모리와 계획 파일에 넛지가 뜨던 문제는 이 조건이 대신 막는다. 그 폴더에는 산출물이 없다.
   case "$FILE" in */*) FDIR="${FILE%/*}" ;; *) FDIR=. ;; esac
   has_deliverable=0
-  for cand in "$FDIR"/*.pptx "$FDIR"/*.xlsx "$FDIR"/*.docx "$FDIR"/*.pdf; do
+  for cand in "$FDIR"/*.pptx "$FDIR"/*.xlsx "$FDIR"/*.docx "$FDIR"/*.pdf "$FDIR"/*.hwp "$FDIR"/*.hwpx; do
     if [ -e "$cand" ]; then has_deliverable=1; break; fi
   done
   [ "$has_deliverable" -eq 1 ] || continue
@@ -97,7 +98,7 @@ fi
 # 먼저 낡아 훅이 안내하는 렌즈와 문서가 정하는 렌즈가 조용히 갈라진다(spec 훅도 같은 이유로 위임한다).
 if [ -n "$match" ]; then
   base="${match##*/}"
-  msg="🔎 문서(${base}) 작성/수정됨 — 완료로 보고하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 에이전트원칙을 따른다. 넛지일 뿐 차단은 아니다."
+  msg="🔎 문서(${base}) 작성/수정됨 — 완료로 보고하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 자기 검토만으로 끝내지 말 것. 퇴고는 변환 전 마크다운 초안에서 하는 것이 순서이니, 초안 단계를 건너뛰었으면 그 사실을 사용자에게 알려라. 고칠 범위는 에이전트원칙을 따른다. 넛지일 뿐 차단은 아니다."
   out="${out:+$out
 }$msg"
 fi
