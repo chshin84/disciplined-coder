@@ -44,8 +44,15 @@ def parse_judge(text):
     return None
 
 
-def claude_json(prompt, cwd, env, model):
+def claude_cmd(prompt, model, system=None):
     cmd = ["claude", "-p", prompt, "--tools", "", "--output-format", "json", "--model", model]
+    if system:
+        cmd += ["--append-system-prompt", system]
+    return cmd
+
+
+def claude_json(prompt, cwd, env, model, system=None):
+    cmd = claude_cmd(prompt, model, system)
     try:
         p = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, text=True, encoding="utf-8", timeout=600)
     except subprocess.TimeoutExpired:
@@ -64,8 +71,8 @@ def _models(j):
     return ",".join(sorted((j.get("modelUsage") or {}).keys()))
 
 
-def generate(prompt, cwd, env):
-    g = claude_json(prompt, cwd, env, GEN_MODEL)
+def generate(prompt, cwd, env, system=None):
+    g = claude_json(prompt, cwd, env, GEN_MODEL, system)
     return {"response": g.get("result", "") if not g.get("error") else "", "model": _models(g), "error": g.get("error", "")}
 
 

@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
-# PostToolUse(Write|Edit|Bash): 산출물(.pptx·.xlsx·.docx·.pdf)과 그 폴더의 마크다운 작성/수정
-# 감지 → 비자가 검진 넛지(비블로킹, 게이트 아님). spec/plan 은 자체 하드 게이트가 맡아 뺀다.
+# PostToolUse(Write|Edit|Bash): 두 가지를 알린다. 둘 다 비블로킹 경고이고 쓰기를 거부하지 않는다.
+#   문서 형식 경고 — 쓴 .md 의 라벨 불릿·개수 예고·제목 개수(판정은 _doc_form_check.py).
+#     스위치는 DISCIPLINED_CODER_REPLY_CHECK 다.
+#   검진 넛지 — 산출물(.pptx·.xlsx·.docx·.pdf)과 그 폴더의 마크다운 작성/수정. spec/plan 은 자체
+#     하드 게이트가 맡아 뺀다. 스위치는 DISCIPLINED_CODER_REVIEW_GATE 다.
+# 한 훅에 둔 까닭은 대상 뽑기를 한 번만 하려는 것이다. 이 PC 는 프로세스 하나 띄우는 값이 크다.
 # 경로는 도구에 따라 한 곳에서 뽑는다. Write·Edit 은 훅 입력의 file_path 이고, Bash 는
 # _extract_bash_targets.sh 가 명령줄에서 뽑은 쓰기 대상이다. Bash 를 넣는 이유는 셸로 고치면 이
 # 훅이 안 돌기 때문이다. jq 비의존.
 set -euo pipefail
-[ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
 INPUT="$(cat)"
 DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
 . "$DIR/_hook_input.sh"    # 훅 입력 읽기와 쓰기 구문 판정 공유
@@ -27,8 +30,29 @@ fi
 
 . "$DIR/_spec_marker.sh"   # 경로 술어(path_is_specplan·path_is_review_record) 공유
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유
+
+# 문서 형식 경고. 대상 파일을 모아 검사기를 한 번만 실행한다. 파이썬이 없거나 검사기가 실패하면
+# 알림 없이 넘어간다 — 경고가 빠질 뿐 쓰기에는 영향이 없다.
+form=""
+if [ "${DISCIPLINED_CODER_REPLY_CHECK:-on}" != "off" ]; then
+  set --
+  while IFS= read -r FILE; do
+    [ -n "$FILE" ] || continue
+    path_is_form_target "$FILE" || continue
+    [ -f "$FILE" ] || continue
+    set -- "$@" "$FILE"
+  done <<EOF
+$TARGETS
+EOF
+  if [ "$#" -gt 0 ]; then
+    . "$DIR/../scripts/_json_valid.sh"   # 파이썬 인터프리터 고르기
+    _json_python || true   # 치환 밖에서 먼저 골라 _JSON_PY 를 남긴다(_json_valid.sh 주석)
+    form="$(printf '%s' "$INPUT" | json_run 'import runpy,sys; p=sys.argv[1]; sys.argv=[p]+sys.argv[2:]; runpy.run_path(p, run_name="__main__")' "$DIR/_doc_form_check.py" --hook "$@" 2>/dev/null || true)"
+  fi
+fi
+
 match=""
-while IFS= read -r FILE; do
+[ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] || while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
   # 거는 대상은 남에게 나가는 산출물과 그 재료다. 사람이 읽을 파일 형식이거나, 그런 파일이
   # 이미 있는 폴더의 마크다운이다. 저장소에 커밋되는 작업 문서에는 걸지 않는다 — 한 줄만 고쳐도
@@ -61,12 +85,22 @@ while IFS= read -r FILE; do
 done <<EOF
 $TARGETS
 EOF
-[ -n "$match" ] || exit 0
-base="${match##*/}"
+[ -n "$match" ] || [ -n "$form" ] || exit 0
+
+out=""
+if [ -n "$form" ]; then
+  out="disciplined-coder 문서 형식 경고다. 쓰기는 막지 않았다. 이번 도구 호출에서 쓴 줄은 전달 전에 고쳐라. 파일에 이미 있던 줄은 고쳐 쓰지 말고 사용자에게 알리기만 하라. 이름표가 (파일 전체)이면 파일 전체를 검사한 결과이고, (편집 문자열)이면 줄 번호는 편집한 문자열 안의 번호다. 라벨 불릿은 굵은 라벨 뒤에 문장이 둘 이상인 불릿이며, 산문 문단으로 바꿔라. 개수 예고는 목록 바로 앞 문장이 목록의 개수를 말하는 것이며, 그 개수를 지워라. 제목 개수는 제목에 붙은 개수이며, 제목에서 지우고 필요하면 본문 문장에 적어라. 코드 블록·백틱·인용 줄은 검사하지 않았다.
+$form"
+fi
 
 # 렌즈 이름을 여기 박지 않는다 — 구성은 review-docs 가 소유하고, 여기 적으면 그 사본이
 # 먼저 낡아 훅이 안내하는 렌즈와 문서가 정하는 렌즈가 조용히 갈라진다(spec 훅도 같은 이유로 위임한다).
-msg="🔎 문서(${base}) 작성/수정됨 — 완료로 보고하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 에이전트원칙을 따른다. 넛지일 뿐 차단은 아니다."
-esc="$(escape_for_json "$msg")"
+if [ -n "$match" ]; then
+  base="${match##*/}"
+  msg="🔎 문서(${base}) 작성/수정됨 — 완료로 보고하기 전에 disciplined-coder review-docs 가 정하는 렌즈로 비자가 검진을 거쳐라. 셀프 퇴고만으로 끝내지 말 것. 고칠 범위는 에이전트원칙을 따른다. 넛지일 뿐 차단은 아니다."
+  out="${out:+$out
+}$msg"
+fi
+esc="$(escape_for_json "$out")"
 printf '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

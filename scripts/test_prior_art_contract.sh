@@ -186,8 +186,8 @@ check "깨진 블록을 알린다"              "extract_block researcher \"\$FX
 check "표지 뒤 블록 없음을 알린다"       "extract_block researcher \"\$FX/marker_only_def.md\" | grep -qx 'error:no-block'"
 check "표지 없음을 알린다"              "extract_block researcher \"\$FX/no_marker_def.md\" | grep -qx 'error:no-marker'"
 printf '<!-- input: refetch -->\n```json\n{"url": "u"}\n```\n' > "$FX/input_def.md"
-check "입력 표지는 output 표지로 찾지 않는다" "extract_block refetch \"\$FX/input_def.md\" | grep -qx 'error:no-marker'"
-check "입력 표지의 블록을 꺼낸다"        "extract_block refetch \"\$FX/input_def.md\" input | grep -qx '{\"url\": \"u\"}'"
+check "입력 표지는 output 표지로 찾지 않는다" "grep -qx 'error:no-marker' <<<\"\$(extract_block refetch \"\$FX/input_def.md\")\""
+check "입력 표지의 블록을 꺼낸다"        "grep -qx '{\"url\": \"u\"}' <<<\"\$(extract_block refetch \"\$FX/input_def.md\" input)\""
 
 echo "[계약 대조]"
 check "계약 코드가 JSON 으로 읽힌다" "json_valid_stdin < \"\$CONTRACT\""

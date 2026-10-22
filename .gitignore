@@ -8,5 +8,5 @@
 .superpowers/
 docs/html-reports/
 
-# 파이썬 바이트코드
+# 파이썬 바이트코드 캐시 (플러그인 내용이 아니다)
 __pycache__/

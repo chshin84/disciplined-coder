@@ -1,0 +1,1502 @@
+{
+  "evidence_map": [
+    {
+      "case": "Safety Alignment Should be Made More Than Just a Few Tokens Deep (Qi 외, ICLR 2025)",
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2025/hash/88be023075a5a3ff3dc3b5d26623fa22-Abstract-Conference.html",
+      "axes": {
+        "purpose": {
+          "prior": "안전 정렬이 얕은 원인을 밝히고 정렬을 깊게 만든다",
+          "same": false,
+          "note": "대조 대상은 상시 지시 작성 기준이고 선행 사례는 안전 정렬 훈련이다"
+        },
+        "mechanism": {
+          "prior": "정렬이 주로 처음 몇 출력 토큰의 분포만 바꾸며, 프리필 공격이 그 점을 이용한다",
+          "same": false,
+          "note": "첫 토큰이 이후 생성을 끌고 간다는 관찰은 제약 (1) 순차 생성과 겹치지만, 대응책은 훈련 목적함수 변경이다"
+        },
+        "evaluation": {
+          "prior": "공격 벤치마크에서 견고성 측정",
+          "same": false,
+          "note": "대조 대상은 형식 규칙 준수를 평가한다"
+        },
+        "target": {
+          "prior": "정렬된 LLM 의 안전 거부 행동",
+          "same": false,
+          "note": "출력 형식이 아닌 안전 행동이 대상이다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "학회 논문집",
+      "adoption": "참고"
+    },
+    {
+      "case": "Chain-of-Thought Reasoning Without Prompting (Wang·Zhou, NeurIPS 2024)",
+      "url": "https://huggingface.co/papers/2402.10200.md",
+      "axes": {
+        "purpose": {
+          "prior": "프롬프트 없이 디코딩만 바꿔 추론 경로를 끌어낸다",
+          "same": false,
+          "note": "목적이 추론 정확도이고 지시문 작성이 아니다"
+        },
+        "mechanism": {
+          "prior": "첫 디코딩 위치의 top-k 대안 토큰에서 분기해 탐욕 디코딩을 이어간다. 뒤에서 분기할수록 앞 토큰에 더 묶인다고 본문이 적는다",
+          "same": false,
+          "note": "첫 토큰 선택이 이후 경로를 결정한다는 관찰만 제약 (1)과 같다"
+        },
+        "evaluation": {
+          "prior": "GSM8K 등 추론 벤치마크 정확도",
+          "same": false,
+          "note": "형식 준수 평가가 아니다"
+        },
+        "target": {
+          "prior": "사전학습 LLM 의 디코딩",
+          "same": false,
+          "note": "상시 지시가 아니라 디코딩 절차가 대상이다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "논문(Hugging Face 논문 페이지)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Claude 프롬프트 모범 사례 — 프리필 이전 안내와 출력 형식 조종",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "axes": {
+        "purpose": {
+          "prior": "현행 Claude 모델에서 출력 형식을 조종하는 방법 안내",
+          "same": false,
+          "note": "출력 형식 조종이라는 목적은 겹치나 상시 지시 작성 기준 전체를 다루지 않는다"
+        },
+        "mechanism": {
+          "prior": "Claude 4.6 모델부터 마지막 assistant 턴 프리필이 지원되지 않아 400 오류를 낸다. 형식 강제는 Structured Outputs 나 지시로 옮기라고 하며, 긍정형 지시·XML 표시·프롬프트 서식 일치를 권한다",
+          "same": false,
+          "note": "첫 토큰을 API 로 고정하는 수단이 현행 모델에서 없어졌으므로 제약 (1)의 '시작 전 결정'은 지시문으로만 유도할 수 있다는 점이 대조 대상과 맞물린다. 메커니즘 목록은 대조 대상과 다르다"
+        },
+        "evaluation": {
+          "prior": "평가 수치 없이 권고로 제시",
+          "same": false,
+          "note": "대조 대상은 소거 시험 같은 측정을 쓴다"
+        },
+        "target": {
+          "prior": "Claude API 사용자 프롬프트",
+          "same": false,
+          "note": "상시 실리는 하네스 규칙과 겹치나 일반 프롬프트 전반이 대상이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "벤더 공식 문서",
+      "adoption": "참고"
+    },
+    {
+      "case": "Let Me Speak Freely? 형식 제한이 LLM 성능에 미치는 영향 (Tam 외, EMNLP 2024 Industry)",
+      "url": "https://arxiv.org/html/2408.02442",
+      "axes": {
+        "purpose": {
+          "prior": "JSON·XML 같은 형식 제한이 추론 성능을 떨어뜨리는지 측정",
+          "same": false,
+          "note": "형식과 생성 순서의 관계를 다루지만 지시 작성 기준이 목적이 아니다"
+        },
+        "mechanism": {
+          "prior": "JSON 모드·형식 제한 지시·NL-to-Format(자연어로 답한 뒤 형식 변환) 비교. JSON 모드에서 GPT-3.5 Turbo 가 answer 키를 reason 키보다 먼저 써 추론 없이 답했다",
+          "same": false,
+          "note": "키 순서가 생성 순서를 정한다는 관찰은 제약 (1)과, 내용 생성과 형식 준수를 나누는 두 단계 방식은 제약 (2)와 겹친다. 대조 대상 전체와는 다르다"
+        },
+        "evaluation": {
+          "prior": "GSM8K·Last Letter 등 추론 과제와 분류 과제 정확도",
+          "same": false,
+          "note": "형식 규칙 위반 수가 아니라 과제 정확도를 측정한다"
+        },
+        "target": {
+          "prior": "구조화 출력 요청",
+          "same": false,
+          "note": "산문 문체 규칙이 아닌 JSON·XML 형식이 대상이다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Plan-And-Write: Towards Better Automatic Storytelling (Yao 외, AAAI 2019)",
+      "url": "https://arxiv.org/abs/1811.05701v3",
+      "axes": {
+        "purpose": {
+          "prior": "제목에서 이야기를 생성할 때 일관성과 주제 적합성을 높인다",
+          "same": false,
+          "note": "생성 전 계획이라는 착상만 제약 (1)과 겹친다"
+        },
+        "mechanism": {
+          "prior": "줄거리를 먼저 계획하고(정적 스키마) 또는 계획과 서술을 번갈아(동적 스키마) 생성",
+          "same": false,
+          "note": "모델 구조로 계획 단계를 둔다. 대조 대상은 지시문으로 결정 시점을 앞당긴다"
+        },
+        "evaluation": {
+          "prior": "자동·인간 평가에서 다양성·일관성·주제 적합성 향상",
+          "same": false,
+          "note": "형식 규칙 준수를 평가하지 않는다"
+        },
+        "target": {
+          "prior": "신경망 이야기 생성 모델",
+          "same": false,
+          "note": "LLM 상시 지시가 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Skeleton-of-Thought (Ning 외, ICLR 2024)",
+      "url": "https://arxiv.org/abs/2307.15337",
+      "axes": {
+        "purpose": {
+          "prior": "순차 디코딩으로 생기는 지연을 줄인다",
+          "same": false,
+          "note": "목적이 속도다"
+        },
+        "mechanism": {
+          "prior": "답의 골격을 먼저 쓰게 한 뒤 각 항목을 병렬로 확장",
+          "same": false,
+          "note": "개요 우선 생성은 제약 (1)과 겹치나 병렬 확장이 핵심이다"
+        },
+        "evaluation": {
+          "prior": "12개 LLM 에서 속도 향상, 일부 질문 범주에서 품질 향상 가능성(초록이 단서를 단다)",
+          "same": false,
+          "note": "형식 규칙 준수가 아니라 지연과 답 품질을 측정한다"
+        },
+        "target": {
+          "prior": "일반 질의응답 생성",
+          "same": false,
+          "note": "상시 지시가 대상이 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Order Matters in Hallucination (arXiv 2408.05093)",
+      "url": "https://arxiv.org/abs/2408.05093",
+      "axes": {
+        "purpose": {
+          "prior": "답 먼저와 추론 먼저의 순서가 결과 일관성에 미치는 영향을 측정",
+          "same": false,
+          "note": "먼저 낸 결정이 뒤 생성을 끌고 간다는 관찰은 제약 (1)과 겹친다"
+        },
+        "mechanism": {
+          "prior": "두 순서의 응답을 비교하는 벤치마크와 두 순서를 모두 실행해 조정하는 Reflexive Prompting",
+          "same": false,
+          "note": "대조 대상은 지시문 작성 규칙이고 선행 사례는 프롬프트 기법이다"
+        },
+        "evaluation": {
+          "prior": "여러 데이터셋에서 정확도 향상 보고",
+          "same": false,
+          "note": "형식 준수 평가가 아니다"
+        },
+        "target": {
+          "prior": "일반 LLM 질의응답",
+          "same": false,
+          "note": "상시 지시가 대상이 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "arXiv 프리프린트",
+      "adoption": "참고"
+    },
+    {
+      "case": "Self-Refine(생성-자기 피드백-수정 반복)",
+      "url": "https://arxiv.org/abs/2303.17651",
+      "axes": {
+        "purpose": {
+          "prior": "한 번 생성한 출력의 품질을 추가 학습 없이 높인다",
+          "same": false,
+          "note": "대상은 생성 방식 제약에 맞춘 상시 지시 작성 기준이다. Self-Refine 은 그중 재작성 단계 하나와만 목적이 겹친다"
+        },
+        "mechanism": {
+          "prior": "같은 LLM 이 초안을 쓰고 비평한 뒤 반복해 고친다",
+          "same": false,
+          "note": "대상의 재작성 층 규칙과만 같고, 스트리밍 층 구분과 기계 검사는 없다"
+        },
+        "evaluation": {
+          "prior": "대화 응답부터 수학 추론까지 7개 과제에서 사람과 자동 지표로 단일 생성과 비교했다. 평균 약 20%p 개선을 보고했다",
+          "same": false,
+          "note": "대상은 문체 규칙 위반 수로 평가하므로 지표가 다르다"
+        },
+        "target": {
+          "prior": "GPT-3.5, ChatGPT, GPT-4",
+          "same": false,
+          "note": "적용 모델 세대와 과제 범위가 다르다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "논문(arXiv, NeurIPS 2023)",
+      "adoption": "참고"
+    },
+    {
+      "case": "내재적 자기 수정의 한계(Huang 등)",
+      "url": "https://arxiv.org/abs/2310.01798",
+      "axes": {
+        "purpose": {
+          "prior": "외부 피드백 없는 자기 수정이 실제로 추론 성능을 높이는지 검증한다",
+          "same": false,
+          "note": "대상의 제약 (6) 전제와만 관련된다"
+        },
+        "mechanism": {
+          "prior": "모델이 자기 답을 외부 신호 없이 다시 검토하게 한다",
+          "same": false,
+          "note": "대상의 재작성 층 사후 수정과만 같다"
+        },
+        "evaluation": {
+          "prior": "추론 벤치마크에서 수정 전후 정확도를 비교했다",
+          "same": false,
+          "note": "대상은 문체 규칙 준수를 평가한다"
+        },
+        "target": {
+          "prior": "추론 과제의 LLM",
+          "same": false,
+          "note": "글쓰기 규칙 준수와 과제가 다르다"
+        }
+      },
+      "outcome": "실패",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "논문(arXiv, ICLR 2024)",
+      "adoption": "참고"
+    },
+    {
+      "case": "자기 수정 비판적 서베이(Kamoi 등)",
+      "url": "https://arxiv.org/abs/2406.01297",
+      "axes": {
+        "purpose": {
+          "prior": "자기 수정이 언제 작동하는지 선행 연구를 재평가한다",
+          "same": false,
+          "note": "대상의 제약 (2)·(6)과만 관련된다"
+        },
+        "mechanism": {
+          "prior": "서베이로, 프롬프트만으로의 수정과 외부 피드백 수정과 미세조정 수정을 구분한다",
+          "same": false,
+          "note": "대상은 문자열 위반을 기계 검사로 넘기는데, 서베이의 '신뢰할 외부 피드백' 범주와만 겹친다"
+        },
+        "evaluation": {
+          "prior": "선행 연구의 실험 설계를 검토했다. 프롬프트만으로의 자기 수정이 일반 과제에서 성공한 선행 연구는 없고, 신뢰할 외부 피드백이 있으면 잘 작동한다고 결론지었다",
+          "same": false,
+          "note": "실험 아닌 문헌 검토다"
+        },
+        "target": {
+          "prior": "LLM 자기 수정 연구 전반",
+          "same": false,
+          "note": "상시 지시 작성 기준과 대상이 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "2차",
+      "route": "논문(arXiv, TACL 2024)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Self-Correction Bench(자기 수정 맹점)",
+      "url": "https://arxiv.org/abs/2507.02778",
+      "axes": {
+        "purpose": {
+          "prior": "모델이 자기 출력의 오류를 남의 오류보다 덜 고치는 현상을 측정한다",
+          "same": false,
+          "note": "대상의 제약 (6) 전제와만 관련된다"
+        },
+        "mechanism": {
+          "prior": "통제된 오류를 주입하고 출처를 사용자와 모델로 바꿔 제시한다",
+          "same": false,
+          "note": "대상은 기계 검사로 우회하며 출처 바꾸기는 쓰지 않는다"
+        },
+        "evaluation": {
+          "prior": "오픈소스 비추론 모델 14종에서 평균 맹점 64.5%를 측정했다. 'Wait' 추가 뒤 89.3% 감소를 보고했다",
+          "same": false,
+          "note": "문체 위반 측정과 다르다"
+        },
+        "target": {
+          "prior": "오픈소스 비추론 모델",
+          "same": false,
+          "note": "대상이 쓰는 상용 프런티어 모델과 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "논문(arXiv, NeurIPS 2025 목록)",
+      "adoption": "참고"
+    },
+    {
+      "case": "CRITIC(도구로 검증한 뒤 수정)",
+      "url": "https://arxiv.org/abs/2305.11738",
+      "axes": {
+        "purpose": {
+          "prior": "외부 도구 피드백으로 LLM 출력을 검증하고 고친다",
+          "same": false,
+          "note": "대상의 제약 (6) 기계 검사와만 목적이 겹친다"
+        },
+        "mechanism": {
+          "prior": "검색·코드 실행기 같은 도구로 검증하고 수정하는 반복",
+          "same": false,
+          "note": "대상은 정규식 검사로 거르며 모델 수정 반복은 정하지 않았다"
+        },
+        "evaluation": {
+          "prior": "자유 질의응답, 수학 프로그램 합성, 유해성 감소 과제에서 성능 향상을 보고했다",
+          "same": false,
+          "note": "문체 규칙 평가가 없다"
+        },
+        "target": {
+          "prior": "블랙박스 LLM",
+          "same": false,
+          "note": "과제 범위가 다르다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "논문(arXiv, ICLR 2024)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Anthropic 프롬프트 체이닝의 자기 수정 체인",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/chain-prompts",
+      "axes": {
+        "purpose": {
+          "prior": "초안 품질을 높이고 오류를 잡는다",
+          "same": false,
+          "note": "대상의 재작성 층 규칙과만 목적이 겹친다"
+        },
+        "mechanism": {
+          "prior": "초안 생성, 기준 대비 검토, 수정을 각각 별도 API 호출로 진행한다",
+          "same": false,
+          "note": "대상은 한 응답 안의 지시로 재작성을 맡기고, 별도 호출 분리는 정하지 않았다"
+        },
+        "evaluation": {
+          "prior": "평가 수치는 제시하지 않는다",
+          "same": false,
+          "note": "대조할 평가가 없다"
+        },
+        "target": {
+          "prior": "Claude API 로 만드는 애플리케이션",
+          "same": false,
+          "note": "상시 지시(하네스 규칙)와 층이 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "벤더 문서(prompting best practices 페이지로 이동됨)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Anthropic Opus 5 프롬프트 가이드의 재확인 지시 비권장",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+      "axes": {
+        "purpose": {
+          "prior": "과잉 검증으로 늘어나는 비용을 줄인다",
+          "same": false,
+          "note": "대상의 재작성 층 규칙과 반대 방향의 권고다"
+        },
+        "mechanism": {
+          "prior": "명시적 검증·재확인 지시를 지우고 모델의 기본 자기 수정에 맡긴다",
+          "same": false,
+          "note": "대상은 재작성 지시를 두는 쪽이다"
+        },
+        "evaluation": {
+          "prior": "지시를 지워도 품질 손실이 없다고 적지만 측정 방법은 공개하지 않았다",
+          "same": false,
+          "note": "근거 측정을 확인할 수 없다"
+        },
+        "target": {
+          "prior": "Claude Opus 5",
+          "same": false,
+          "note": "대상이 실리는 모델과 세대가 같을 수 있으나 확인하지 않았다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "벤더 문서",
+      "adoption": "참고"
+    },
+    {
+      "case": "Akka 스트리밍 응답 가드레일",
+      "url": "https://akka.io/guides/guardrail-on-a-streaming-response",
+      "axes": {
+        "purpose": {
+          "prior": "스트리밍 응답에서 위반 내용이 사용자에게 가기 전에 거른다",
+          "same": false,
+          "note": "대상의 제약 (2) 스트리밍 층 구분과만 관련된다"
+        },
+        "mechanism": {
+          "prior": "가드레일이 판정할 수 있는 크기까지 토큰을 모았다가 통과한 단위만 내보낸다",
+          "same": false,
+          "note": "대상은 스트리밍 층에서 재작성 규칙을 빼고 생성 전 결정 규칙만 둔다. 버퍼링은 쓰지 않는다"
+        },
+        "evaluation": {
+          "prior": "정량 평가 없이, 단위가 클수록 판정이 강해지고 첫 글자가 늦어진다는 절충만 적는다",
+          "same": false,
+          "note": "평가 수치가 없다"
+        },
+        "target": {
+          "prior": "외부 가드레일을 둔 스트리밍 서비스",
+          "same": false,
+          "note": "모델에게 주는 지시가 아닌 런타임 장치다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "벤더 가이드",
+      "adoption": "참고"
+    },
+    {
+      "case": "NVIDIA NeMo Guardrails 스트리밍 출력 레일",
+      "url": "https://developer.nvidia.com/blog/stream-smarter-and-safer-learn-how-nvidia-nemo-guardrails-enhance-llm-output-streaming/",
+      "axes": {
+        "purpose": {
+          "prior": "스트리밍 중에도 출력 레일 검사를 유지한다",
+          "same": false,
+          "note": "대상의 스트리밍 층 구분과만 관련된다"
+        },
+        "mechanism": {
+          "prior": "기본은 동기 검증이다. 스트리밍 모드는 청크 단위로 검사하고, stream_first 를 켜면 이미 보낸 토큰은 회수하지 못하고 오류 객체만 보낸다",
+          "same": false,
+          "note": "보낸 출력은 고칠 수 없다는 사실은 대상 제약 (2)와 같으나, 해법이 런타임 청크 검사라 다르다"
+        },
+        "evaluation": {
+          "prior": "청크 크기에 따른 지연과 검출 범위의 절충을 설명한다",
+          "same": false,
+          "note": "문체 규칙 평가와 다르다"
+        },
+        "target": {
+          "prior": "가드레일을 둔 LLM 서비스",
+          "same": false,
+          "note": "상시 지시가 아닌 외부 검사 장치다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "벤더 블로그",
+      "adoption": "참고"
+    },
+    {
+      "case": "Anthropic 프롬프트 가이드 「Control the format of responses」",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "axes": {
+        "purpose": {
+          "prior": "Claude 응답의 마크다운·불릿 과다를 줄이는 프롬프트 작성법",
+          "same": false,
+          "note": "대조 대상의 제약 (3)·(4)와만 겹친다. 순차 생성·재작성 층·기계 검사는 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "금지 대신 원하는 형태를 말하기, XML 형식 표시, 프롬프트 서식을 출력 서식에 맞추기, 습관 형태(굵은 글씨·목록)를 명시한 상세 블록",
+          "same": false,
+          "note": "상세 블록은 bold·목록을 지목하므로 제약 (3)과 같다. 반면 '하지 말 것 대신 할 것'과 '프롬프트 서식 일치'는 대조 대상 표에 없다."
+        },
+        "evaluation": {
+          "prior": "정량 평가 없이 효과적이라고 권고한다",
+          "same": false,
+          "note": "대조 대상은 클린룸 소거 시험으로 효과를 측정하지만 이 가이드는 수치를 내지 않는다."
+        },
+        "target": {
+          "prior": "Claude 모델의 시스템 프롬프트",
+          "same": false,
+          "note": "대조 대상은 상시 지시 전체의 작성 기준이고, 이 가이드는 출력 형식 절 하나다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "벤더 문서",
+      "adoption": "참고"
+    },
+    {
+      "case": "Anthropic Claude Fable 5.1 가이드 「Formatting in chat」",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-1",
+      "axes": {
+        "purpose": {
+          "prior": "모델이 바뀐 뒤 반형식 규칙이 과잉 억제를 일으키는 문제를 바로잡기",
+          "same": false,
+          "note": "대조 대상의 제약 (3)에 대한 반례 성격이다. 대조 대상 전체 목적과는 다르다."
+        },
+        "mechanism": {
+          "prior": "반형식 규칙을 지우거나 형식이 적절한 조건을 말하는 규칙으로 교체",
+          "same": false,
+          "note": "대조 대상은 습관 형태를 지목하라고 하고, 이 가이드는 형식을 쓸 조건을 적으라고 한다."
+        },
+        "evaluation": {
+          "prior": "관찰된 모델 행동 차이를 서술한다. 수치는 없다",
+          "same": false,
+          "note": "정량 평가가 없다."
+        },
+        "target": {
+          "prior": "Claude Fable 5.1 과 Mythos 5.1 모델",
+          "same": false,
+          "note": "특정 모델 버전에 한정된다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "벤더 문서",
+      "adoption": "참고"
+    },
+    {
+      "case": "From Lists to Emojis: How Format Bias Affects Model Alignment (Zhang et al., ACL 2025)",
+      "url": "https://aclanthology.org/2025.acl-long.1308/",
+      "axes": {
+        "purpose": {
+          "prior": "선호 모델과 보상 모델의 형식 편향을 측정한다",
+          "same": false,
+          "note": "모델이 형식을 선호하게 된 원인을 설명할 뿐, 지시 작성 기준을 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "목록·링크·굵은 글씨·이모지에 대한 평가자 선호 측정과 편향 주입 실험",
+          "same": false,
+          "note": "대조 대상 제약 (3)의 '기본 습관'이 정렬 단계에서 생긴다는 배경 근거다."
+        },
+        "evaluation": {
+          "prior": "RewardBench 상위 모델·GPT-4·사람 평가자의 선호 비교, AlpacaEval·Chatbot Arena 순위 조작 실험",
+          "same": false,
+          "note": "출력 형식을 바꾸는 지시의 효과는 측정하지 않는다."
+        },
+        "target": {
+          "prior": "보상 모델과 정렬 학습 파이프라인",
+          "same": false,
+          "note": "상시 지시가 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Idiosyncrasies in Large Language Models (arXiv 2502.12150)",
+      "url": "https://arxiv.org/html/2502.12150",
+      "axes": {
+        "purpose": {
+          "prior": "출력 특징으로 어느 LLM이 썼는지 분류한다",
+          "same": false,
+          "note": "형식 습관이 모델마다 다르다는 근거만 겹친다."
+        },
+        "mechanism": {
+          "prior": "마크다운 요소만 남긴 텍스트로 분류기를 학습한다",
+          "same": false,
+          "note": "지시 방식 실험이 아니다."
+        },
+        "evaluation": {
+          "prior": "마크다운만으로 채팅 API 73.1%, 인스트럭트 모델 77.7% 분류 정확도. Claude 는 굵은 글씨·헤더가 0인 응답이 많고 ChatGPT 는 열거 항목마다 굵은 글씨를 쓴다",
+          "same": false,
+          "note": "제약 (3)의 습관 형태가 모델별로 다르다는 근거다. 그래서 한 형태를 지목하는 규칙은 모델마다 효과가 다를 수 있다(derived)."
+        },
+        "target": {
+          "prior": "채팅 API·인스트럭트·베이스 모델의 출력",
+          "same": false,
+          "note": "상시 지시가 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Semantic Gravity Wells: Why Negative Constraints Backfire (arXiv 2601.08070)",
+      "url": "https://arxiv.org/abs/2601.08070",
+      "axes": {
+        "purpose": {
+          "prior": "부정 제약이 실패하는 기제를 밝힌다",
+          "same": false,
+          "note": "제약 (3)의 '지목' 방식과 관련되지만 형식이 아닌 금지 단어를 다룬다."
+        },
+        "mechanism": {
+          "prior": "금지 단어 지시와 활성화 패칭으로 점화 실패와 덮어쓰기 실패를 구분한다",
+          "same": false,
+          "note": "토큰 수준 실험이다."
+        },
+        "evaluation": {
+          "prior": "4만 표본, 위반의 87.5%가 점화 실패",
+          "same": false,
+          "note": "형식 준수율은 측정하지 않았다."
+        },
+        "target": {
+          "prior": "단어 금지 지시",
+          "same": false,
+          "note": "형식 습관 규칙으로의 전이는 추정이다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "OpenAI GPT-5 프롬프팅 가이드의 마크다운 절(커뮤니티 재수록)",
+      "url": "https://community.openai.com/t/fyi-gpt-5-prompting-guide-markdown-section-includes-some-api-information/1338561",
+      "axes": {
+        "purpose": {
+          "prior": "API 모델의 마크다운 사용을 지시로 켜고 유지하기",
+          "same": false,
+          "note": "방향이 반대(형식을 늘리는 쪽)다. 형식 습관이 지시로 바뀐다는 점만 겹친다."
+        },
+        "mechanism": {
+          "prior": "시스템 프롬프트의 마크다운 지시, 3~5 사용자 메시지마다 지시 반복",
+          "same": false,
+          "note": "대조 대상 제약 (5)는 지시 수를 줄이는 쪽이고 이 가이드는 반복으로 준수를 유지한다."
+        },
+        "evaluation": {
+          "prior": "긴 대화에서 준수가 떨어지고 반복하면 일관된 준수를 보았다는 서술. 수치는 없다",
+          "same": false,
+          "note": "정량 근거가 없다."
+        },
+        "target": {
+          "prior": "GPT-5 API",
+          "same": false,
+          "note": "특정 벤더 모델이다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "벤더 포럼",
+      "adoption": "참고"
+    },
+    {
+      "case": "IFScale — 지시 밀도 10~500 에서의 준수율 벤치마크",
+      "url": "https://arxiv.org/html/2507.11538v1",
+      "axes": {
+        "purpose": {
+          "prior": "한 프롬프트에 지시가 늘 때 준수율이 어떻게 떨어지는지 측정한다",
+          "same": false,
+          "note": "선행 사례는 측정 연구이고, 대조 대상은 상시 지시 작성 기준이다. 대조 대상의 (5)번 제약 하나와만 주제가 같다"
+        },
+        "mechanism": {
+          "prior": "키워드 포함 지시 500개로 사업 보고서를 쓰게 하고 지시 수를 10에서 500까지 늘린다",
+          "same": false,
+          "note": "선행 사례는 지시 수를 조작하는 실험이고, 대조 대상은 작성 규칙 표다"
+        },
+        "evaluation": {
+          "prior": "키워드 포함 여부로 준수율을 자동 채점한다. 20개 모델에서 최고 모델도 500개에서 약 68%였다. Claude Sonnet 4 는 10개 100%, 250개 77.2%, 500개 42.9%였다. 앞쪽 지시 편향과 누락 오류 증가도 보고했다",
+          "same": false,
+          "note": "대조 대상의 평가 방식은 입력에 명시되지 않았다. 선행 사례는 문자열 검사로 채점하므로 대조 대상 (6)번 제약의 방식과만 닮았다"
+        },
+        "target": {
+          "prior": "단일 생성 과제의 사용자 프롬프트에 든 지시",
+          "same": false,
+          "note": "에이전트 하네스에 상시로 싣는 지시가 아니고, 지시 종류도 키워드 포함 하나뿐이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문(NeurIPS 2025 게재 목록 확인)",
+      "adoption": "참고"
+    },
+    {
+      "case": "ManyIFEval·StyleMBPP — 다중 지시 준수 측정과 추정",
+      "url": "https://arxiv.org/abs/2509.21051",
+      "axes": {
+        "purpose": {
+          "prior": "지시 여러 개를 동시에 지키는 능력을 측정하고 조합별 성능을 추정한다",
+          "same": false,
+          "note": "측정 연구이며 작성 기준이 아니다"
+        },
+        "mechanism": {
+          "prior": "텍스트 생성 지시 최대 10개(ManyIFEval), 코드 생성 지시 최대 6개(StyleMBPP)를 조합하고 지시 수를 설명변수로 한 로지스틱 회귀로 성능을 추정한다",
+          "same": false,
+          "note": "대조 대상은 회귀 추정을 쓰지 않는다"
+        },
+        "evaluation": {
+          "prior": "모델 10개에서 지시 수가 늘수록 성능이 일관되게 떨어졌다. 회귀 추정 오차는 약 10%였다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 다르다"
+        },
+        "target": {
+          "prior": "단일 프롬프트의 텍스트·코드 생성 지시",
+          "same": false,
+          "note": "상시로 싣는 하네스 지시가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "WildIFEval — 실제 사용자 지시의 다중 제약 준수",
+      "url": "https://arxiv.org/abs/2503.06573v1",
+      "axes": {
+        "purpose": {
+          "prior": "실제 사용자 프롬프트에서 다중 제약 준수를 측정한다",
+          "same": false,
+          "note": "측정 연구다"
+        },
+        "mechanism": {
+          "prior": "실제 사용자 지시 약 12K 개를 개별 제약으로 분해하고 8개 상위 범주로 묶는다",
+          "same": false,
+          "note": "대조 대상은 작성 규칙이다"
+        },
+        "evaluation": {
+          "prior": "평가한 모든 모델에서 제약 수가 늘수록 성능이 떨어졌고, 제약 종류도 성능에 크게 영향을 주었다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 다르다"
+        },
+        "target": {
+          "prior": "사용자 턴의 지시",
+          "same": false,
+          "note": "상시 시스템 지시가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Prompt Design at Scale — 규칙 수·형식·배치에 따른 준수",
+      "url": "https://www.alphaxiv.org/abs/2607.19257",
+      "axes": {
+        "purpose": {
+          "prior": "형식·지시 수·컨텍스트 길이가 지시 준수와 환각에 주는 영향을 측정한다",
+          "same": false,
+          "note": "측정 연구다"
+        },
+        "mechanism": {
+          "prior": "규칙 수 10~160, 형식 네 가지(markdown·평문·산문·표), 시스템 프롬프트와 사용자 턴 배치를 바꿔 모델 다섯 개를 시험한다",
+          "same": false,
+          "note": "선행 사례는 형식과 배치도 바꾸지만 대조 대상의 여섯 제약과 대응하지 않는다"
+        },
+        "evaluation": {
+          "prior": "모든 모델·형식·배치에서 완전 응답률이 N=80 에서 0이 되었다. N=160 에서는 배치 효과가 형식 효과만큼 컸고, markdown 이 일관되게 유리하지는 않았다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 다르다"
+        },
+        "target": {
+          "prior": "시스템 프롬프트 또는 사용자 턴에 둔 규칙 목록",
+          "same": false,
+          "note": "시스템 프롬프트 배치 조건은 대조 대상과 겹치지만, 에이전트 하네스로 한정하지 않았다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → alphaXiv 초록 페이지",
+      "adoption": "참고"
+    },
+    {
+      "case": "Instruction Stacking Collapse — 지시 누적 붕괴와 지시 재작성기",
+      "url": "https://arxiv.org/abs/2608.02639",
+      "axes": {
+        "purpose": {
+          "prior": "지시가 쌓일 때의 붕괴를 측정하고 완화 기법을 제안한다",
+          "same": false,
+          "note": "측정과 완화 연구이며 작성 기준 표가 아니다"
+        },
+        "mechanism": {
+          "prior": "검증기가 있는 지시 24개를 1~20개씩 쌓고, 한 번의 LLM 호출로 프롬프트를 다시 쓰는 재작성기를 적용한다",
+          "same": false,
+          "note": "대조 대상은 사람이 따르는 작성 규칙이고, 선행 사례는 자동 재작성이다"
+        },
+        "evaluation": {
+          "prior": "결정적 검증기로 채점했다. 준수율이 약 96%에서 최저 20%로 떨어졌고, 재작성기는 약한 모델에서 최대 11점을 회복했다",
+          "same": false,
+          "note": "선행 사례는 기계 검증기를 쓰므로 대조 대상 (6)번 제약의 방식과만 닮았다"
+        },
+        "target": {
+          "prior": "프롬프트에 누적된 지시(Claude Sonnet 4.6·GPT-5-mini·Gemini 2.5 Flash)",
+          "same": false,
+          "note": "에이전트 하네스 상시 지시로 한정하지 않았다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색(블로그 요약) → arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+      "url": "https://arxiv.org/abs/2605.10039",
+      "axes": {
+        "purpose": {
+          "prior": "설정 파일 구조가 지시 준수에 주는 영향을 측정한다",
+          "same": false,
+          "note": "측정 연구다"
+        },
+        "mechanism": {
+          "prior": "파일 크기·지시 위치·파일 구조·인접 파일 모순 네 변수를 요인 설계로 조작한다",
+          "same": false,
+          "note": "대조 대상은 작성 규칙이다"
+        },
+        "evaluation": {
+          "prior": "1,650 세션, 16,050 관측을 혼합효과 모형과 Bayes 분석으로 보았다. 네 변수 모두 효과가 검출되지 않았고, 세션 진행에 따라 함수당 준수 오즈가 약 5.6% 줄었다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 다르다"
+        },
+        "target": {
+          "prior": "코딩 에이전트 CLI 에 상시로 싣는 프로젝트 지시 파일",
+          "same": true,
+          "note": "대조 대상과 같은 종류의 상시 지시 파일을 다룬다. 다만 대상 지시가 사소한 주석 하나뿐이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Anthropic — 에이전트용 컨텍스트 엔지니어링 지침",
+      "url": "https://anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트에 줄 시스템 프롬프트와 컨텍스트를 어떻게 쓸지 안내한다",
+          "same": true,
+          "note": "에이전트 상시 지시의 작성 방법이라는 목적이 대조 대상과 같다"
+        },
+        "mechanism": {
+          "prior": "가장 작은 고신호 토큰 집합, 적정 고도(너무 구체적이지도 모호하지도 않은 수준), 예외 목록 금지, 대표 예시 선별을 권한다",
+          "same": false,
+          "note": "대조 대상은 생성 방식의 제약 여섯 가지로 규칙을 도출하고, 예시를 상시 지시에서 뺀다. 선행 사례는 대표 예시를 넣으라고 권한다"
+        },
+        "evaluation": {
+          "prior": "실험 수치를 제시하지 않은 실무 지침이다",
+          "same": false,
+          "note": "대조 대상의 평가 방식과 비교할 실험이 없다"
+        },
+        "target": {
+          "prior": "LLM 에이전트의 시스템 프롬프트와 컨텍스트",
+          "same": true,
+          "note": "대상이 같다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 → 벤더 엔지니어링 블로그",
+      "adoption": "참고"
+    },
+    {
+      "case": "CDCT — 프롬프트 압축 수준과 제약 준수",
+      "url": "https://arxiv.org/html/2512.17920v1",
+      "axes": {
+        "purpose": {
+          "prior": "프롬프트 길이(압축 수준)에 따라 제약 준수와 의미 정확도를 따로 측정한다",
+          "same": false,
+          "note": "측정 연구다"
+        },
+        "mechanism": {
+          "prior": "개념 설명을 정확히 35단어로 쓰게 하고 프롬프트를 약 2~135단어 다섯 단계로 압축한다",
+          "same": false,
+          "note": "지시 개수가 아닌 프롬프트 길이를 조작한다"
+        },
+        "evaluation": {
+          "prior": "LLM 판정자 셋이 채점했다. 준수는 중간 길이(약 27단어)에서 가장 낮은 U자형이었다. 단독 저자 연구이며 보고 수치에 내부 불일치가 있다",
+          "same": false,
+          "note": "대조 대상 (6)번 제약은 모델 자기 판정을 신뢰하지 않는데, 선행 사례는 LLM 판정자를 쓴다"
+        },
+        "target": {
+          "prior": "단일 과제 프롬프트",
+          "same": false,
+          "note": "상시 지시가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문",
+      "adoption": "참고"
+    },
+    {
+      "case": "Underspecification does not imply Incoherence (semantic collapse)",
+      "url": "https://arxiv.org/abs/2607.01953",
+      "axes": {
+        "purpose": {
+          "prior": "모호한 과제에서 모델이 출력을 흩뜨리는지, 한 해석으로 수렴하는지를 확인한다",
+          "same": false,
+          "note": "target 은 지시 작성 규칙이고, 이 연구는 모호성 탐지 기법의 맹점을 다룬다. 제약 (4)의 전제와만 겹친다"
+        },
+        "mechanism": {
+          "prior": "반복 생성 출력의 의미 일관성을 측정하고 모호성을 주입한다",
+          "same": false,
+          "note": "작성 규칙이 아닌 측정 방법이다"
+        },
+        "evaluation": {
+          "prior": "MBPP 10% 이상, HumanEval 3%, LiveCodeBench 32% 과제에서 잘못된 한 해석으로 수렴하며, 모호성 주입 시 5배 넘게 증가한다",
+          "same": false,
+          "note": "코드 생성 벤치마크 정확도이고 target 은 평가 설계를 제시하지 않았다"
+        },
+        "target": {
+          "prior": "코딩 모델의 과제 설명",
+          "same": false,
+          "note": "상시 지시가 아닌 과제 입력이다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "arXiv",
+      "adoption": "참고"
+    },
+    {
+      "case": "What Prompts Don't Say (Yang 외, ACL Findings 2026)",
+      "url": "https://arxiv.org/abs/2505.13360",
+      "axes": {
+        "purpose": {
+          "prior": "프롬프트의 미명시 요구사항이 성능과 안정성에 미치는 영향을 분석하고 관리한다",
+          "same": false,
+          "note": "제약 (4)·(5)의 관심사와 겹치나 target 전체(여섯 제약 표)와는 다르다"
+        },
+        "mechanism": {
+          "prior": "요구사항 인지형 프롬프트 최적화",
+          "same": false,
+          "note": "target 은 작성 규칙이고 자동 최적화를 쓰지 않는다"
+        },
+        "evaluation": {
+          "prior": "기본 추론 41.1%, 회귀 2배, 최적화로 평균 4.8% 개선",
+          "same": false,
+          "note": "target 에는 정량 평가가 없다"
+        },
+        "target": {
+          "prior": "LLM 응용 프롬프트",
+          "same": false,
+          "note": "에이전트 상시 지시와 유사하나 같지 않다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "arXiv, ACL Anthology(미리보기 페이지는 404)",
+      "adoption": "참고"
+    },
+    {
+      "case": "OpenAI GPT-4.1 프롬프트 가이드",
+      "url": "https://developers.openai.com/api/docs/guides/gpt-4.1",
+      "axes": {
+        "purpose": {
+          "prior": "지시를 문자 그대로 따르는 모델에 맞춘 프롬프트 작성 지침",
+          "same": true,
+          "note": "상시 지시(시스템 프롬프트) 작성 기준이라는 목적이 같다"
+        },
+        "mechanism": {
+          "prior": "원하는 동작을 단호한 한 문장으로 명시하고, 예시가 보여 준 동작을 규칙에도 적으며, 충돌 시 뒤쪽 지시를 따르는 경향을 점검한다",
+          "same": false,
+          "note": "제약 (4)의 단일 해석 작성과 (5)의 예시 분리 중 일부와만 겹친다. 예시 문구를 그대로 복사한다는 경고는 (5)를 지지한다"
+        },
+        "evaluation": {
+          "prior": "벤더 내부 평가, 공개 수치 없음",
+          "same": false,
+          "note": "target 도 평가를 제시하지 않아 비교할 수 없다"
+        },
+        "target": {
+          "prior": "GPT-4.1 계열 에이전트·응용의 시스템 프롬프트",
+          "same": true,
+          "note": "LLM 에이전트 상시 지시라는 대상이 같다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "벤더 문서",
+      "adoption": "참고"
+    },
+    {
+      "case": "Anthropic 프롬프트 모범 사례",
+      "url": "https://platform.claude.com/en/docs/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+      "axes": {
+        "purpose": {
+          "prior": "Claude 프롬프트 작성 지침",
+          "same": true,
+          "note": "상시 지시 작성 기준이라는 목적이 같다"
+        },
+        "mechanism": {
+          "prior": "명확하고 구체적으로 쓰기, 이유 제시, 다양한 예시 3-5개를 태그로 분리, 금지 대신 할 것 지시, 프롬프트 형식을 출력 형식에 맞추기",
+          "same": false,
+          "note": "예시를 지시문 안에 태그로 넣으라고 권하므로 예시를 참고서로 빼라는 제약 (5)와 다르고, 금지형 대신 긍정형을 권하는 점은 제약 (3)의 지목 방식과 다를 수 있다"
+        },
+        "evaluation": {
+          "prior": "공개 수치 없음",
+          "same": false,
+          "note": "비교 불가"
+        },
+        "target": {
+          "prior": "Claude 모델의 시스템 프롬프트와 에이전트",
+          "same": true,
+          "note": "같은 대상이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "벤더 문서",
+      "adoption": "참고"
+    },
+    {
+      "case": "Quantifying Sensitivity to Spurious Features in Prompt Design (Sclar 외, ICLR 2024)",
+      "url": "https://arxiv.org/abs/2310.11324",
+      "axes": {
+        "purpose": {
+          "prior": "의미를 보존하는 서식 변경이 성능에 미치는 영향을 측정한다",
+          "same": false,
+          "note": "작성 규칙이 아닌 민감도 측정이다"
+        },
+        "mechanism": {
+          "prior": "FormatSpread로 서식 공간을 표본화해 성능 구간을 보고한다",
+          "same": false,
+          "note": "target 에 없는 방법이다"
+        },
+        "evaluation": {
+          "prior": "LLaMA-2-13B에서 최대 76점 차이, 모델 크기·예시 수·지시 튜닝으로도 사라지지 않는다",
+          "same": false,
+          "note": "분류 과제 정확도"
+        },
+        "target": {
+          "prior": "few-shot 분류 프롬프트",
+          "same": false,
+          "note": "상시 지시가 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "arXiv",
+      "adoption": "참고"
+    },
+    {
+      "case": "Calibrate Before Use (Zhao 외, ICML 2021)",
+      "url": "https://arxiv.org/abs/2102.09690v2",
+      "axes": {
+        "purpose": {
+          "prior": "few-shot 성능 불안정의 원인을 밝히고 보정한다",
+          "same": false,
+          "note": "제약 (3) 기본 습관과 관심사가 겹칠 뿐이다"
+        },
+        "mechanism": {
+          "prior": "내용 없는 입력으로 모델의 답 편향(최근성·사전학습 빈도)을 추정해 보정한다",
+          "same": false,
+          "note": "출력 확률 보정이며 작성 규칙이 아니다"
+        },
+        "evaluation": {
+          "prior": "GPT-3·GPT-2 평균 정확도 최대 30.0%p 개선",
+          "same": false,
+          "note": "분류 정확도"
+        },
+        "target": {
+          "prior": "few-shot 분류",
+          "same": false,
+          "note": "상시 지시가 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "arXiv",
+      "adoption": "참고"
+    },
+    {
+      "case": "Can LLMs Truly Understand Prompts? Negated Prompts (Jang 외, 2022)",
+      "url": "https://arxiv.org/abs/2209.12711",
+      "axes": {
+        "purpose": {
+          "prior": "부정형 지시를 모델이 이해하는지 확인한다",
+          "same": false,
+          "note": "제약 (3)의 지목을 금지형으로 쓸 때의 위험과만 관련된다"
+        },
+        "mechanism": {
+          "prior": "원래 프롬프트와 부정형 프롬프트의 성능을 모델 규모별로 비교한다",
+          "same": false,
+          "note": "측정 방법이다"
+        },
+        "evaluation": {
+          "prior": "InstructGPT를 포함한 모든 모델 유형에서 규모가 커질수록 부정형 프롬프트 성능이 떨어진다",
+          "same": false,
+          "note": "2022년 모델 기준이며 현행 모델에 대한 결과가 아니다"
+        },
+        "target": {
+          "prior": "OPT·GPT-3·InstructGPT의 과제 프롬프트",
+          "same": false,
+          "note": "상시 지시가 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "arXiv",
+      "adoption": "참고"
+    },
+    {
+      "case": "LLM Evaluators Recognize and Favor Their Own Generations (Panickssery 외, NeurIPS 2024)",
+      "url": "https://arxiv.org/abs/2404.13076",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 평가자가 자기 출력을 높게 채점하는 편향과 자기 인식의 관계를 밝힌다",
+          "same": false,
+          "note": "대조 대상의 제약 (6) 하나와만 관련된다"
+        },
+        "mechanism": {
+          "prior": "자기 인식 판별 과제와 1~5점 품질 채점, 미세조정으로 자기 인식 강도를 조절한다",
+          "same": false,
+          "note": "대조 대상은 검사 수단을 바꾸는 규칙이고 선행 사례는 편향의 원인 분석이다"
+        },
+        "evaluation": {
+          "prior": "인간 평가 대비 자기 출력 점수 차이와 자기 인식 정확도의 선형 상관",
+          "same": false,
+          "note": "대조 대상에는 정량 평가가 없다"
+        },
+        "target": {
+          "prior": "요약 과제(XSUM, CNN/DailyMail) 출력의 품질 채점",
+          "same": false,
+          "note": "대조 대상은 규칙 위반 검출을 다룬다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "논문(arXiv, NeurIPS 2024)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Self-Correction Bench (Tsui, 2025)",
+      "url": "https://arxiv.org/html/2507.02778v2",
+      "axes": {
+        "purpose": {
+          "prior": "모델이 자기 출력의 오류를 외부 출처의 같은 오류보다 덜 고치는 현상을 측정하고 완화한다",
+          "same": false,
+          "note": "대조 대상의 제약 (6) 하나와만 주제가 같다"
+        },
+        "mechanism": {
+          "prior": "오류를 주입한 뒤 출처를 자기 또는 사용자로 바꿔 교정률을 비교하고 'Wait' 단서를 덧붙인다",
+          "same": false,
+          "note": "대조 대상은 기계 검사로 대체하는 방식을 택한다"
+        },
+        "evaluation": {
+          "prior": "비추론 모델 14종에서 평균 맹점률 64.5%, 'Wait' 로 89.3% 감소, 추론 모델은 맹점이 작거나 음수",
+          "same": false,
+          "note": "대조 대상에는 정량 평가가 없다"
+        },
+        "target": {
+          "prior": "주입한 추론·계산 오류",
+          "same": false,
+          "note": "대조 대상은 문자열로 잡히는 문체 위반을 다룬다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "논문(arXiv, NeurIPS 2025 목록)",
+      "adoption": "참고"
+    },
+    {
+      "case": "CRITIC: tool-interactive critiquing (Gou 외, ICLR 2024)",
+      "url": "https://arxiv.org/abs/2305.11738",
+      "axes": {
+        "purpose": {
+          "prior": "외부 도구로 자기 출력을 검증하고 수정하게 해 성능을 높인다",
+          "same": false,
+          "note": "외부 검사 수단으로 자기 판정을 보완한다는 방향은 제약 (6)과 같지만 목적은 과제 성능 향상이다"
+        },
+        "mechanism": {
+          "prior": "검색 엔진·코드 인터프리터 호출 결과로 비평을 만들고 수정을 반복한다",
+          "same": false,
+          "note": "대조 대상은 정규식 검사로 거르는 방식을 택하고, 선행 사례는 도구 결과를 모델에 다시 넣는다"
+        },
+        "evaluation": {
+          "prior": "질의응답, 수학 프로그램 합성, 유해성 감소 과제의 성능 향상",
+          "same": false,
+          "note": "대조 대상에는 정량 평가가 없다"
+        },
+        "target": {
+          "prior": "사실·코드·유해성 오류",
+          "same": false,
+          "note": "대조 대상은 문체 규칙 위반을 다룬다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "논문(arXiv, ICLR 2024)",
+      "adoption": "참고"
+    },
+    {
+      "case": "IFEval: Instruction-Following Evaluation (Zhou 외, 2023)",
+      "url": "https://arxiv.org/abs/2311.07911",
+      "axes": {
+        "purpose": {
+          "prior": "지시 이행을 객관적이고 재현 가능하게 평가한다",
+          "same": false,
+          "note": "선행 사례는 벤치마크이고 대조 대상은 작성 기준이다"
+        },
+        "mechanism": {
+          "prior": "단어 수·키워드 횟수처럼 프로그램으로 검증 가능한 지시를 코드로 채점한다",
+          "same": false,
+          "note": "문자열로 잡히는 규칙을 기계로 판정한다는 점은 제약 (6)의 작성 규칙과 같다. 그러나 선행 사례는 평가에 쓰고 대조 대상은 출력 거르기에 쓴다"
+        },
+        "evaluation": {
+          "prior": "지시 수준과 프롬프트 수준의 정확도(엄격·완화)",
+          "same": false,
+          "note": "대조 대상에는 정량 평가가 없다"
+        },
+        "target": {
+          "prior": "범용 지시 이행",
+          "same": false,
+          "note": "대조 대상은 상시 지시와 문체 규칙을 다룬다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "논문(arXiv)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Guardrails AI RegexMatch 검증기",
+      "url": "https://github.com/guardrails-ai/regex_match",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 출력이 정해 둔 정규식을 따르는지 검사한다",
+          "same": false,
+          "note": "대조 대상의 제약 (6) 작성 규칙과만 같다"
+        },
+        "mechanism": {
+          "prior": "정규식 검사 뒤 실패 시 reask·fix·filter·refrain·noop·exception·fix_reask 중 하나를 수행한다",
+          "same": false,
+          "note": "정규식 검사는 같지만 재요청까지 자동화한 도구이며 대조 대상은 작성 기준이다"
+        },
+        "evaluation": {
+          "prior": "공개된 평가 결과를 찾지 못했다",
+          "same": false,
+          "note": "대조 대상에도 정량 평가가 없으나 비교할 결과가 없다"
+        },
+        "target": {
+          "prior": "범용 LLM 출력 문자열",
+          "same": false,
+          "note": "대조 대상은 상시 지시 아래에서 생성된 글을 다룬다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "저장소(GitHub, 보관 처리되어 Guardrails Hub 로 이전)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Claude API Structured outputs 문서",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs",
+      "axes": {
+        "purpose": {
+          "prior": "constrained decoding 으로 JSON 스키마를 지키는 출력을 보장한다",
+          "same": false,
+          "note": "생성 중 기계 제약으로 형식 위반을 없앤다는 방향만 제약 (6)과 같다"
+        },
+        "mechanism": {
+          "prior": "JSON 스키마를 컴파일해 디코딩을 제약한다. 수치·길이 제약과 일부 정규식 기능은 지원하지 않는다",
+          "same": false,
+          "note": "대조 대상은 생성 뒤 정규식 검사를 택한다. 문서는 지원하지 않는 값 규칙을 코드에서 검증하라고 안내한다"
+        },
+        "evaluation": {
+          "prior": "스키마 준수를 보장하되 거절·max_tokens 중단·enum 대소문자 같은 예외를 명시한다",
+          "same": false,
+          "note": "대조 대상에는 정량 평가가 없다"
+        },
+        "target": {
+          "prior": "JSON 구조와 도구 입력",
+          "same": false,
+          "note": "대조 대상은 자연어 문체 규칙을 다룬다. 문체 규칙은 JSON 스키마로 표현되지 않는다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "공급사 문서",
+      "adoption": "참고"
+    },
+    {
+      "case": "Let Me Speak Freely? 형식 제약의 성능 영향 (Tam 외, 2024)",
+      "url": "https://arxiv.org/abs/2408.02442",
+      "axes": {
+        "purpose": {
+          "prior": "출력 형식 제약이 LLM 성능에 주는 영향을 측정한다",
+          "same": false,
+          "note": "대조 대상과 목적이 다르다"
+        },
+        "mechanism": {
+          "prior": "JSON·XML 등 형식을 강제한 조건과 자유 생성을 비교한다",
+          "same": false,
+          "note": "대조 대상은 생성 뒤 검사를 택하므로 생성 중 형식 강제와 다르다"
+        },
+        "evaluation": {
+          "prior": "형식 제약 아래 추론 성능이 크게 떨어지고, 제약이 엄격할수록 더 떨어진다",
+          "same": false,
+          "note": "대조 대상에는 정량 평가가 없다"
+        },
+        "target": {
+          "prior": "추론·분류 과제",
+          "same": false,
+          "note": "대조 대상은 문체 규칙을 다룬다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "논문(arXiv)",
+      "adoption": "참고"
+    }
+  ],
+  "conclusions": [
+    {
+      "text": "검증을 통과한 행 중 네 축이 모두 대조 대상과 같은 사례는 없다. 목적과 적용 대상이 같은 사례는 벤더의 작성 지침 세 건이며, 세 지침 모두 메커니즘이 다르고 정량 평가를 공개하지 않았다. 같은 사례를 찾지 못했다는 사실은 독창성의 근거가 아니다.",
+      "refs": [
+        "sq4#case#6",
+        "sq5#case#2",
+        "sq5#case#3"
+      ]
+    },
+    {
+      "text": "제약 (1) 순차 생성의 전제인 '앞 토큰이 뒤 생성을 끌고 간다'는 관찰은 안전 정렬, 디코딩, 형식 제한, 답과 추론의 순서 연구에서 각각 보고되었다. 다만 이 연구들은 대응책을 훈련이나 디코딩이나 프롬프트 기법으로 두며, 지시문 작성 규칙으로 다루지 않는다.",
+      "refs": [
+        "sq1#case#0",
+        "sq1#case#1",
+        "sq1#case#3",
+        "sq1#case#6"
+      ]
+    },
+    {
+      "text": "생성 전에 계획이나 골격을 먼저 쓰게 하는 방식은 이야기 생성과 지연 단축 연구에 선례가 있다. 두 연구는 모델 구조나 병렬 확장으로 구현하므로 대조 대상의 '시작 전 결정을 지시한다'는 규칙과 메커니즘이 다르다.",
+      "refs": [
+        "sq1#case#4",
+        "sq1#case#5"
+      ]
+    },
+    {
+      "text": "Anthropic 문서에 따르면 Claude 4.6 이후 모델은 마지막 assistant 턴 프리필을 지원하지 않는다. 그래서 첫 토큰을 API 로 고정하는 수단이 없어졌고, 제약 (1)의 시작 전 결정은 지시문이나 Structured Outputs 로만 유도할 수 있다.",
+      "refs": [
+        "sq1#case#2"
+      ]
+    },
+    {
+      "text": "제약 (2)의 전제인 '이미 보낸 스트리밍 출력은 고칠 수 없다'는 사실은 스트리밍 가드레일 벤더 문서 두 건이 확인한다. 두 문서는 버퍼링이나 청크 검사 같은 런타임 장치로 대응하고, 대조 대상은 재작성 규칙을 스트리밍 층에서 빼는 방식으로 대응한다.",
+      "refs": [
+        "sq2#case#7",
+        "sq2#case#8"
+      ]
+    },
+    {
+      "text": "재작성 층에서 초안을 고치는 방식은 Self-Refine 과 Anthropic 프롬프트 체이닝에 선례가 있다. 그러나 Anthropic Opus 5 가이드는 명시적 재확인 지시를 지우라고 권하므로, 대조 대상의 재작성 지시가 같은 세대 모델에서 비용 대비 효과가 있는지는 측정으로 확인해야 한다. 이 가이드는 측정 방법을 공개하지 않았다.",
+      "refs": [
+        "sq2#case#0",
+        "sq2#case#5",
+        "sq2#case#6"
+      ]
+    },
+    {
+      "text": "제약 (3)의 기본 습관은 보상 모델의 형식 편향과 모델별 마크다운 습관 연구가 뒷받침한다. 모델마다 습관 형태가 다르므로 한 형태를 지목하는 규칙은 모델이 바뀌면 효과가 달라질 수 있다(derived).",
+      "refs": [
+        "sq3#case#2",
+        "sq3#case#3"
+      ]
+    },
+    {
+      "text": "습관 형태를 지목하는 방식에는 상충하는 선행 근거가 있다. Anthropic 형식 가이드는 굵은 글씨와 목록을 지목한 블록을 제시하지만, 같은 벤더의 다른 가이드는 금지 대신 원하는 형태를 말하라고 권한다. 또 Fable 5.1 가이드는 반형식 규칙이 과잉 억제를 일으킨다고 적는다. 금지형 지시는 금지 단어를 오히려 점화하거나 규모가 커질수록 이해가 떨어진다는 연구도 있다.",
+      "refs": [
+        "sq3#case#0",
+        "sq5#case#3",
+        "sq3#case#1",
+        "sq3#case#4",
+        "sq5#case#6"
+      ]
+    },
+    {
+      "text": "제약 (4)의 모호함에 관해서는 모호한 과제에서 모델이 한 해석으로 수렴한다는 결과와, 미명시 요구사항과 서식 변경이 성능을 크게 흔든다는 결과가 있다. 다만 수렴하는 해석이 '습관 쪽'이라는 대조 대상의 구체적 전제를 직접 측정한 행은 없다.",
+      "refs": [
+        "sq5#case#0",
+        "sq5#case#1",
+        "sq5#case#4",
+        "sq5#case#5",
+        "sq5#case#2"
+      ]
+    },
+    {
+      "text": "제약 (5)의 전제인 '지시 수가 늘면 개별 준수가 떨어진다'는 단일 프롬프트 벤치마크 여러 건이 일관되게 보고한다. 그러나 코딩 에이전트 상시 지시 파일을 직접 다룬 요인 설계 연구는 파일 크기와 지시 위치의 효과를 검출하지 못했다. 그 연구의 대상 지시는 사소한 주석 하나뿐이었다.",
+      "refs": [
+        "sq4#case#0",
+        "sq4#case#1",
+        "sq4#case#2",
+        "sq4#case#3",
+        "sq4#case#4",
+        "sq4#case#5"
+      ]
+    },
+    {
+      "text": "제약 (5)가 예시를 상시 지시에서 빼라고 정한 점은 벤더 지침과 상충한다. Anthropic 의 두 지침은 대표 예시를 지시 안에 넣으라고 권하고, OpenAI GPT-4.1 가이드는 모델이 예시 문구를 그대로 복사한다고 경고한다. 긴 대화에서 지시를 반복해 준수를 유지하라는 OpenAI 측 서술도 지시 수를 줄이는 방향과 반대다.",
+      "refs": [
+        "sq4#case#6",
+        "sq5#case#3",
+        "sq5#case#2",
+        "sq3#case#5"
+      ]
+    },
+    {
+      "text": "제약 (6)의 전제인 자기 판정의 한계는 외부 피드백 없는 자기 수정의 실패, 자기 출력 선호 편향, 자기 수정 맹점 측정이 뒷받침한다. 서베이는 신뢰할 외부 피드백이 있을 때 자기 수정이 잘 작동한다고 결론지었다.",
+      "refs": [
+        "sq2#case#1",
+        "sq2#case#2",
+        "sq2#case#3",
+        "sq6#case#1",
+        "sq6#case#2"
+      ]
+    },
+    {
+      "text": "문자열로 잡히는 위반을 기계로 판정하는 방식은 IFEval 채점, Guardrails AI 정규식 검증기, CRITIC 의 도구 검증에 선례가 있다. 정규식 출력 검사는 이미 공개 도구로 존재하므로 대조 대상이 검사기를 새로 만든다면 기존 도구와 비교할 수 있다(derived).",
+      "refs": [
+        "sq6#case#4",
+        "sq6#case#5",
+        "sq6#case#3",
+        "sq2#case#4"
+      ]
+    },
+    {
+      "text": "생성 중에 형식을 강제하는 constrained decoding 은 문체 규칙을 표현하지 못하고, 형식 제약이 추론 성능을 떨어뜨린다는 결과도 있다. 이 두 결과는 대조 대상이 생성 뒤 검사를 택한 근거와 맞물린다.",
+      "refs": [
+        "sq6#case#6",
+        "sq6#case#7",
+        "sq1#case#3"
+      ]
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "STATE-ASSUME",
+    "SPECIFIC-NAME",
+    "TERM-ONE",
+    "WRITTEN-ONLY",
+    "FULL-SENTENCE",
+    "ONE-IDEA",
+    "KEEP-CONNECT",
+    "SUBJECT-OBJECT",
+    "COUNT-EARNS"
+  ]
+}

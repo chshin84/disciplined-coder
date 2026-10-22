@@ -1,0 +1,1332 @@
+{
+  "cells": [
+    {
+      "row": "Safety Alignment Should be Made More Than Just a Few Tokens Deep (Qi 외, ICLR 2025)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Safety Alignment Should be Made More Than Just a Few Tokens Deep (Qi 외, ICLR 2025)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Safety Alignment Should be Made More Than Just a Few Tokens Deep (Qi 외, ICLR 2025)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Safety Alignment Should be Made More Than Just a Few Tokens Deep (Qi 외, ICLR 2025)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Safety Alignment Should be Made More Than Just a Few Tokens Deep (Qi 외, ICLR 2025)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Chain-of-Thought Reasoning Without Prompting (Wang·Zhou, NeurIPS 2024)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Chain-of-Thought Reasoning Without Prompting (Wang·Zhou, NeurIPS 2024)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Chain-of-Thought Reasoning Without Prompting (Wang·Zhou, NeurIPS 2024)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Chain-of-Thought Reasoning Without Prompting (Wang·Zhou, NeurIPS 2024)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Chain-of-Thought Reasoning Without Prompting (Wang·Zhou, NeurIPS 2024)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Claude 프롬프트 모범 사례 — 프리필 이전 안내와 출력 형식 조종",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "Claude 프롬프트 모범 사례 — 프리필 이전 안내와 출력 형식 조종",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "Claude 프롬프트 모범 사례 — 프리필 이전 안내와 출력 형식 조종",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "Claude 프롬프트 모범 사례 — 프리필 이전 안내와 출력 형식 조종",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "Claude 프롬프트 모범 사례 — 프리필 이전 안내와 출력 형식 조종",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제한이 LLM 성능에 미치는 영향 (Tam 외, EMNLP 2024 Industry)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#3"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제한이 LLM 성능에 미치는 영향 (Tam 외, EMNLP 2024 Industry)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#3"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제한이 LLM 성능에 미치는 영향 (Tam 외, EMNLP 2024 Industry)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#3"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제한이 LLM 성능에 미치는 영향 (Tam 외, EMNLP 2024 Industry)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#3"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제한이 LLM 성능에 미치는 영향 (Tam 외, EMNLP 2024 Industry)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#3"
+    },
+    {
+      "row": "Plan-And-Write: Towards Better Automatic Storytelling (Yao 외, AAAI 2019)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Plan-And-Write: Towards Better Automatic Storytelling (Yao 외, AAAI 2019)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Plan-And-Write: Towards Better Automatic Storytelling (Yao 외, AAAI 2019)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Plan-And-Write: Towards Better Automatic Storytelling (Yao 외, AAAI 2019)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Plan-And-Write: Towards Better Automatic Storytelling (Yao 외, AAAI 2019)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Skeleton-of-Thought (Ning 외, ICLR 2024)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#5"
+    },
+    {
+      "row": "Skeleton-of-Thought (Ning 외, ICLR 2024)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#5"
+    },
+    {
+      "row": "Skeleton-of-Thought (Ning 외, ICLR 2024)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#5"
+    },
+    {
+      "row": "Skeleton-of-Thought (Ning 외, ICLR 2024)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#5"
+    },
+    {
+      "row": "Skeleton-of-Thought (Ning 외, ICLR 2024)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#5"
+    },
+    {
+      "row": "Order Matters in Hallucination (arXiv 2408.05093)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "Order Matters in Hallucination (arXiv 2408.05093)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "Order Matters in Hallucination (arXiv 2408.05093)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "Order Matters in Hallucination (arXiv 2408.05093)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "Order Matters in Hallucination (arXiv 2408.05093)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "Self-Refine(생성-자기 피드백-수정 반복)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#0"
+    },
+    {
+      "row": "Self-Refine(생성-자기 피드백-수정 반복)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#0"
+    },
+    {
+      "row": "Self-Refine(생성-자기 피드백-수정 반복)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#0"
+    },
+    {
+      "row": "Self-Refine(생성-자기 피드백-수정 반복)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#0"
+    },
+    {
+      "row": "Self-Refine(생성-자기 피드백-수정 반복)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#0"
+    },
+    {
+      "row": "내재적 자기 수정의 한계(Huang 등)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "내재적 자기 수정의 한계(Huang 등)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "내재적 자기 수정의 한계(Huang 등)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "내재적 자기 수정의 한계(Huang 등)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "내재적 자기 수정의 한계(Huang 등)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "자기 수정 비판적 서베이(Kamoi 등)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "자기 수정 비판적 서베이(Kamoi 등)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "자기 수정 비판적 서베이(Kamoi 등)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "자기 수정 비판적 서베이(Kamoi 등)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "자기 수정 비판적 서베이(Kamoi 등)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "Self-Correction Bench(자기 수정 맹점)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#3"
+    },
+    {
+      "row": "Self-Correction Bench(자기 수정 맹점)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#3"
+    },
+    {
+      "row": "Self-Correction Bench(자기 수정 맹점)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#3"
+    },
+    {
+      "row": "Self-Correction Bench(자기 수정 맹점)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#3"
+    },
+    {
+      "row": "Self-Correction Bench(자기 수정 맹점)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#3"
+    },
+    {
+      "row": "CRITIC(도구로 검증한 뒤 수정)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "CRITIC(도구로 검증한 뒤 수정)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "CRITIC(도구로 검증한 뒤 수정)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "CRITIC(도구로 검증한 뒤 수정)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "CRITIC(도구로 검증한 뒤 수정)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "Anthropic 프롬프트 체이닝의 자기 수정 체인",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#5"
+    },
+    {
+      "row": "Anthropic 프롬프트 체이닝의 자기 수정 체인",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#5"
+    },
+    {
+      "row": "Anthropic 프롬프트 체이닝의 자기 수정 체인",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#5"
+    },
+    {
+      "row": "Anthropic 프롬프트 체이닝의 자기 수정 체인",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#5"
+    },
+    {
+      "row": "Anthropic 프롬프트 체이닝의 자기 수정 체인",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#5"
+    },
+    {
+      "row": "Anthropic Opus 5 프롬프트 가이드의 재확인 지시 비권장",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "Anthropic Opus 5 프롬프트 가이드의 재확인 지시 비권장",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "Anthropic Opus 5 프롬프트 가이드의 재확인 지시 비권장",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "Anthropic Opus 5 프롬프트 가이드의 재확인 지시 비권장",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "Anthropic Opus 5 프롬프트 가이드의 재확인 지시 비권장",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "Akka 스트리밍 응답 가드레일",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "Akka 스트리밍 응답 가드레일",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "Akka 스트리밍 응답 가드레일",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "Akka 스트리밍 응답 가드레일",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "Akka 스트리밍 응답 가드레일",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "NVIDIA NeMo Guardrails 스트리밍 출력 레일",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#8"
+    },
+    {
+      "row": "NVIDIA NeMo Guardrails 스트리밍 출력 레일",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#8"
+    },
+    {
+      "row": "NVIDIA NeMo Guardrails 스트리밍 출력 레일",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#8"
+    },
+    {
+      "row": "NVIDIA NeMo Guardrails 스트리밍 출력 레일",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#8"
+    },
+    {
+      "row": "NVIDIA NeMo Guardrails 스트리밍 출력 레일",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#8"
+    },
+    {
+      "row": "Anthropic 프롬프트 가이드 「Control the format of responses」",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "Anthropic 프롬프트 가이드 「Control the format of responses」",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "Anthropic 프롬프트 가이드 「Control the format of responses」",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "Anthropic 프롬프트 가이드 「Control the format of responses」",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "Anthropic 프롬프트 가이드 「Control the format of responses」",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "Anthropic Claude Fable 5.1 가이드 「Formatting in chat」",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "Anthropic Claude Fable 5.1 가이드 「Formatting in chat」",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "Anthropic Claude Fable 5.1 가이드 「Formatting in chat」",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "Anthropic Claude Fable 5.1 가이드 「Formatting in chat」",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "Anthropic Claude Fable 5.1 가이드 「Formatting in chat」",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "From Lists to Emojis: How Format Bias Affects Model Alignment (Zhang et al., ACL 2025)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "From Lists to Emojis: How Format Bias Affects Model Alignment (Zhang et al., ACL 2025)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "From Lists to Emojis: How Format Bias Affects Model Alignment (Zhang et al., ACL 2025)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "From Lists to Emojis: How Format Bias Affects Model Alignment (Zhang et al., ACL 2025)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "From Lists to Emojis: How Format Bias Affects Model Alignment (Zhang et al., ACL 2025)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "Idiosyncrasies in Large Language Models (arXiv 2502.12150)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "Idiosyncrasies in Large Language Models (arXiv 2502.12150)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "Idiosyncrasies in Large Language Models (arXiv 2502.12150)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "Idiosyncrasies in Large Language Models (arXiv 2502.12150)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "Idiosyncrasies in Large Language Models (arXiv 2502.12150)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "Semantic Gravity Wells: Why Negative Constraints Backfire (arXiv 2601.08070)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "Semantic Gravity Wells: Why Negative Constraints Backfire (arXiv 2601.08070)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "Semantic Gravity Wells: Why Negative Constraints Backfire (arXiv 2601.08070)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "Semantic Gravity Wells: Why Negative Constraints Backfire (arXiv 2601.08070)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "Semantic Gravity Wells: Why Negative Constraints Backfire (arXiv 2601.08070)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "OpenAI GPT-5 프롬프팅 가이드의 마크다운 절(커뮤니티 재수록)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#5"
+    },
+    {
+      "row": "OpenAI GPT-5 프롬프팅 가이드의 마크다운 절(커뮤니티 재수록)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#5"
+    },
+    {
+      "row": "OpenAI GPT-5 프롬프팅 가이드의 마크다운 절(커뮤니티 재수록)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#5"
+    },
+    {
+      "row": "OpenAI GPT-5 프롬프팅 가이드의 마크다운 절(커뮤니티 재수록)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#5"
+    },
+    {
+      "row": "OpenAI GPT-5 프롬프팅 가이드의 마크다운 절(커뮤니티 재수록)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#5"
+    },
+    {
+      "row": "IFScale — 지시 밀도 10~500 에서의 준수율 벤치마크",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#0"
+    },
+    {
+      "row": "IFScale — 지시 밀도 10~500 에서의 준수율 벤치마크",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#0"
+    },
+    {
+      "row": "IFScale — 지시 밀도 10~500 에서의 준수율 벤치마크",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#0"
+    },
+    {
+      "row": "IFScale — 지시 밀도 10~500 에서의 준수율 벤치마크",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#0"
+    },
+    {
+      "row": "IFScale — 지시 밀도 10~500 에서의 준수율 벤치마크",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#0"
+    },
+    {
+      "row": "ManyIFEval·StyleMBPP — 다중 지시 준수 측정과 추정",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "ManyIFEval·StyleMBPP — 다중 지시 준수 측정과 추정",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "ManyIFEval·StyleMBPP — 다중 지시 준수 측정과 추정",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "ManyIFEval·StyleMBPP — 다중 지시 준수 측정과 추정",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "ManyIFEval·StyleMBPP — 다중 지시 준수 측정과 추정",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "WildIFEval — 실제 사용자 지시의 다중 제약 준수",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "WildIFEval — 실제 사용자 지시의 다중 제약 준수",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "WildIFEval — 실제 사용자 지시의 다중 제약 준수",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "WildIFEval — 실제 사용자 지시의 다중 제약 준수",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "WildIFEval — 실제 사용자 지시의 다중 제약 준수",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "Prompt Design at Scale — 규칙 수·형식·배치에 따른 준수",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#3"
+    },
+    {
+      "row": "Prompt Design at Scale — 규칙 수·형식·배치에 따른 준수",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#3"
+    },
+    {
+      "row": "Prompt Design at Scale — 규칙 수·형식·배치에 따른 준수",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#3"
+    },
+    {
+      "row": "Prompt Design at Scale — 규칙 수·형식·배치에 따른 준수",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#3"
+    },
+    {
+      "row": "Prompt Design at Scale — 규칙 수·형식·배치에 따른 준수",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#3"
+    },
+    {
+      "row": "Instruction Stacking Collapse — 지시 누적 붕괴와 지시 재작성기",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "Instruction Stacking Collapse — 지시 누적 붕괴와 지시 재작성기",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "Instruction Stacking Collapse — 지시 누적 붕괴와 지시 재작성기",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "Instruction Stacking Collapse — 지시 누적 붕괴와 지시 재작성기",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "Instruction Stacking Collapse — 지시 누적 붕괴와 지시 재작성기",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "코딩 에이전트 설정 파일 구조의 요인 설계 연구",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "Anthropic — 에이전트용 컨텍스트 엔지니어링 지침",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "Anthropic — 에이전트용 컨텍스트 엔지니어링 지침",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "Anthropic — 에이전트용 컨텍스트 엔지니어링 지침",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "Anthropic — 에이전트용 컨텍스트 엔지니어링 지침",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "Anthropic — 에이전트용 컨텍스트 엔지니어링 지침",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "CDCT — 프롬프트 압축 수준과 제약 준수",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "CDCT — 프롬프트 압축 수준과 제약 준수",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "CDCT — 프롬프트 압축 수준과 제약 준수",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "CDCT — 프롬프트 압축 수준과 제약 준수",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "CDCT — 프롬프트 압축 수준과 제약 준수",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "Underspecification does not imply Incoherence (semantic collapse)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "Underspecification does not imply Incoherence (semantic collapse)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "Underspecification does not imply Incoherence (semantic collapse)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "Underspecification does not imply Incoherence (semantic collapse)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "Underspecification does not imply Incoherence (semantic collapse)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "What Prompts Don't Say (Yang 외, ACL Findings 2026)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "What Prompts Don't Say (Yang 외, ACL Findings 2026)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "What Prompts Don't Say (Yang 외, ACL Findings 2026)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "What Prompts Don't Say (Yang 외, ACL Findings 2026)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "What Prompts Don't Say (Yang 외, ACL Findings 2026)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "OpenAI GPT-4.1 프롬프트 가이드",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "OpenAI GPT-4.1 프롬프트 가이드",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "OpenAI GPT-4.1 프롬프트 가이드",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "OpenAI GPT-4.1 프롬프트 가이드",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "OpenAI GPT-4.1 프롬프트 가이드",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "Anthropic 프롬프트 모범 사례",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#3"
+    },
+    {
+      "row": "Anthropic 프롬프트 모범 사례",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#3"
+    },
+    {
+      "row": "Anthropic 프롬프트 모범 사례",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#3"
+    },
+    {
+      "row": "Anthropic 프롬프트 모범 사례",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#3"
+    },
+    {
+      "row": "Anthropic 프롬프트 모범 사례",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#3"
+    },
+    {
+      "row": "Quantifying Sensitivity to Spurious Features in Prompt Design (Sclar 외, ICLR 2024)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "Quantifying Sensitivity to Spurious Features in Prompt Design (Sclar 외, ICLR 2024)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "Quantifying Sensitivity to Spurious Features in Prompt Design (Sclar 외, ICLR 2024)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "Quantifying Sensitivity to Spurious Features in Prompt Design (Sclar 외, ICLR 2024)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "Quantifying Sensitivity to Spurious Features in Prompt Design (Sclar 외, ICLR 2024)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "Calibrate Before Use (Zhao 외, ICML 2021)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "Calibrate Before Use (Zhao 외, ICML 2021)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "Calibrate Before Use (Zhao 외, ICML 2021)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "Calibrate Before Use (Zhao 외, ICML 2021)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "Calibrate Before Use (Zhao 외, ICML 2021)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "Can LLMs Truly Understand Prompts? Negated Prompts (Jang 외, 2022)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "Can LLMs Truly Understand Prompts? Negated Prompts (Jang 외, 2022)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "Can LLMs Truly Understand Prompts? Negated Prompts (Jang 외, 2022)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "Can LLMs Truly Understand Prompts? Negated Prompts (Jang 외, 2022)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "Can LLMs Truly Understand Prompts? Negated Prompts (Jang 외, 2022)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "LLM Evaluators Recognize and Favor Their Own Generations (Panickssery 외, NeurIPS 2024)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq6#case#1"
+    },
+    {
+      "row": "LLM Evaluators Recognize and Favor Their Own Generations (Panickssery 외, NeurIPS 2024)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#1"
+    },
+    {
+      "row": "LLM Evaluators Recognize and Favor Their Own Generations (Panickssery 외, NeurIPS 2024)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#1"
+    },
+    {
+      "row": "LLM Evaluators Recognize and Favor Their Own Generations (Panickssery 외, NeurIPS 2024)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#1"
+    },
+    {
+      "row": "LLM Evaluators Recognize and Favor Their Own Generations (Panickssery 외, NeurIPS 2024)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#1"
+    },
+    {
+      "row": "Self-Correction Bench (Tsui, 2025)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq6#case#2"
+    },
+    {
+      "row": "Self-Correction Bench (Tsui, 2025)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#2"
+    },
+    {
+      "row": "Self-Correction Bench (Tsui, 2025)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#2"
+    },
+    {
+      "row": "Self-Correction Bench (Tsui, 2025)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#2"
+    },
+    {
+      "row": "Self-Correction Bench (Tsui, 2025)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#2"
+    },
+    {
+      "row": "CRITIC: tool-interactive critiquing (Gou 외, ICLR 2024)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq6#case#3"
+    },
+    {
+      "row": "CRITIC: tool-interactive critiquing (Gou 외, ICLR 2024)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#3"
+    },
+    {
+      "row": "CRITIC: tool-interactive critiquing (Gou 외, ICLR 2024)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#3"
+    },
+    {
+      "row": "CRITIC: tool-interactive critiquing (Gou 외, ICLR 2024)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#3"
+    },
+    {
+      "row": "CRITIC: tool-interactive critiquing (Gou 외, ICLR 2024)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#3"
+    },
+    {
+      "row": "IFEval: Instruction-Following Evaluation (Zhou 외, 2023)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq6#case#4"
+    },
+    {
+      "row": "IFEval: Instruction-Following Evaluation (Zhou 외, 2023)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#4"
+    },
+    {
+      "row": "IFEval: Instruction-Following Evaluation (Zhou 외, 2023)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#4"
+    },
+    {
+      "row": "IFEval: Instruction-Following Evaluation (Zhou 외, 2023)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#4"
+    },
+    {
+      "row": "IFEval: Instruction-Following Evaluation (Zhou 외, 2023)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#4"
+    },
+    {
+      "row": "Guardrails AI RegexMatch 검증기",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq6#case#5"
+    },
+    {
+      "row": "Guardrails AI RegexMatch 검증기",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#5"
+    },
+    {
+      "row": "Guardrails AI RegexMatch 검증기",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#5"
+    },
+    {
+      "row": "Guardrails AI RegexMatch 검증기",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#5"
+    },
+    {
+      "row": "Guardrails AI RegexMatch 검증기",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#5"
+    },
+    {
+      "row": "Claude API Structured outputs 문서",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq6#case#6"
+    },
+    {
+      "row": "Claude API Structured outputs 문서",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#6"
+    },
+    {
+      "row": "Claude API Structured outputs 문서",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#6"
+    },
+    {
+      "row": "Claude API Structured outputs 문서",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#6"
+    },
+    {
+      "row": "Claude API Structured outputs 문서",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#6"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제약의 성능 영향 (Tam 외, 2024)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq6#case#7"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제약의 성능 영향 (Tam 외, 2024)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#7"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제약의 성능 영향 (Tam 외, 2024)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#7"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제약의 성능 영향 (Tam 외, 2024)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#7"
+    },
+    {
+      "row": "Let Me Speak Freely? 형식 제약의 성능 영향 (Tam 외, 2024)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq6#case#7"
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "FOCUSED",
+    "YAGNI",
+    "SPECIFIC-NAME",
+    "TERM-ONE"
+  ]
+}

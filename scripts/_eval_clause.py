@@ -15,6 +15,7 @@ import runpy
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_BASE = "7a2d26d"
 JUDGE_MODEL = runpy.run_path(os.path.join(HERE, "_eval_run.py"))["JUDGE_MODEL"]
 
 
@@ -28,9 +29,11 @@ def make_cfg(path, text):
         open(os.path.join(path, "CLAUDE.md"), "w", encoding="utf-8", newline="\n").write(text)
 
 
-def gen_key(case, cond_text):
-    """생성 모델이 받는 것(과제 본문과 조건 문안)만으로 키를 만든다. 과제 머리를 바꿔도 키는 같다."""
-    return _sha(case["prompt"]) + "-" + _sha(cond_text)
+def gen_key(case, cond_text, system=None):
+    """생성 모델이 받는 것(과제 본문과 조건 문안, 있으면 시스템 프롬프트)만으로 키를 만든다. 과제 머리를 바꿔도 키는 같다.
+    system 이 없으면 시스템 프롬프트를 도입하기 전의 키와 같아, 이미 기록된 생성이 그대로 쓰인다."""
+    k = _sha(case["prompt"]) + "-" + _sha(cond_text)
+    return k + "-" + _sha(system) if system else k
 
 
 def judge_key(gk, criteria, model=None):
@@ -46,7 +49,9 @@ def load_units(root, names=None):
             continue
         rd = lambda f: open(os.path.join(d, f), encoding="utf-8").read() if os.path.isfile(os.path.join(d, f)) else None
         ids = [x.strip() for x in (rd("ids") or n).splitlines() if x.strip()]
-        units[n] = {"ids": ids, "current": rd("current.md"), "new": rd("new.md") or ""}
+        base = (rd("base") or "").strip() or None
+        units[n] = {"ids": ids, "current": rd("current.md"), "new": rd("new.md") or "", "base": base,
+                    "system": rd("system.md") or None}
     missing = set(names or []) - set(units)
     if missing:
         raise SystemExit("없는 단위: " + " ".join(sorted(missing)))
@@ -69,12 +74,12 @@ def plan_jobs(cases, units, done_gen, done_judge):
     for u in units.values():
         for q in questions(cases, u):
             for cond, text in conditions(u):
-                gk = gen_key(cases[q], text)
+                gk = gen_key(cases[q], text, u.get("system"))
                 if gk in seen:
                     continue
                 seen.add(gk)
                 if gk not in done_gen:
-                    gen_jobs.append((gk, q, cond, text))
+                    gen_jobs.append((gk, q, cond, text, u.get("system")))
                 elif judge_key(gk, cases[q]["criteria"]) not in done_judge:
                     judge_jobs.append((judge_key(gk, cases[q]["criteria"]), gk, q))
     return gen_jobs, judge_jobs
@@ -103,7 +108,7 @@ def report_unit(cases, unit, gens, judges, count):
     complete = True
     for q in qs:
         for side, text in (("c", ctext), ("n", ntext)):
-            gk = gen_key(cases[q], text)
+            gk = gen_key(cases[q], text, unit.get("system"))
             j = judges.get(judge_key(gk, cases[q]["criteria"]))
             if gk not in gens or j is None:
                 complete = False
@@ -146,10 +151,10 @@ def _run(cases_dir, units_dir, results, tmp, names):
                 "judge_note": r["judge_note"], "judge_model": r["judge_model"]}, None
 
     def gen_task(job):
-        gk, q, cond, text = job
+        gk, q, cond, text, system = job
         gd = os.path.join(tmp, "g-" + gk)
         make_cfg(gd, text)
-        g = ev["generate"](cases[q]["prompt"], cwd, dict(os.environ, CLAUDE_CONFIG_DIR=gd))
+        g = ev["generate"](cases[q]["prompt"], cwd, dict(os.environ, CLAUDE_CONFIG_DIR=gd), system)
         if g["error"]:
             return None, None, [f"{q} {cond}: 생성 오류 {g['error'][:120]}"]
         grec = {"key": gk, "case": q, "cond": cond, "response": g["response"], "model": g["model"]}
@@ -191,10 +196,16 @@ def _report(cases_dir, units_dir, results, pairs, excl, names):
               f"금지어 비교={r['banned_cmp']} 새={r['banned_new']} 판정={r['verdict']}")
 
 
-def check_units(cases, units, baseline):
-    """저장소 단위 폴더의 형식 오류를 낸다. baseline 은 기준 원칙 커밋의 agent-principles.md 내용이다."""
+def check_units(cases, units, baselines):
+    """저장소 단위 폴더의 형식 오류를 낸다. baselines 는 {커밋: 그 커밋의 agent-principles.md 내용}이고,
+    단위는 base 파일의 커밋(없으면 DEFAULT_BASE)의 내용과 대조한다."""
     errs = []
     for n, u in units.items():
+        base = u.get("base") or DEFAULT_BASE
+        baseline = baselines.get(base)
+        if baseline is None:
+            errs.append(f"{n}: 기준 커밋 {base} 의 원칙을 읽을 수 없다")
+            continue
         if not u["new"].strip():
             errs.append(f"{n}: new.md 가 없거나 비었다")
         if u["current"] is not None and n != "BANNED-LIST":
@@ -211,9 +222,10 @@ def check_units(cases, units, baseline):
 if __name__ == "__main__":
     a = sys.argv
     if a[1] == "check":
-        # check <과제> <단위> <기준 원칙 파일>
+        # check <과제> <단위> <기준 원칙 폴더: <커밋>.md 파일들>
         lib = runpy.run_path(os.path.join(HERE, "_eval_lib.py"))
-        for e in check_units(lib["load_cases"](a[2]), load_units(a[3]), open(a[4], encoding="utf-8").read()):
+        bl = {f[:-3]: open(os.path.join(a[4], f), encoding="utf-8").read() for f in os.listdir(a[4]) if f.endswith(".md")}
+        for e in check_units(lib["load_cases"](a[2]), load_units(a[3]), bl):
             print(e)
     elif a[1] == "run":
         _run(a[2], a[3], a[4], a[5], a[6:])

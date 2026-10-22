@@ -571,4 +571,42 @@ check "빈 표준 입력은 침묵하고 0 으로 끝난다" "out=\"\$(printf ''
 check "prompt 값이 빈 입력은 침묵하고 0 으로 끝난다" "out=\"\$(pan '')\" && [ -z \"\$out\" ]"
 check "UserPromptSubmit 이 넛지를 연결한다" "json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")).get(\"hooks\",{}).get(\"UserPromptSubmit\",[]); sys.exit(0 if any(\"prior_art_nudge_userpromptsubmit.sh\" in h[\"command\"] for g in d for h in g[\"hooks\"]) else 1)' \"\$HERE/hooks/hooks.json\""
 
+echo "[문서 형식 경고 — 검진 훅이 .md 의 형식을 알린다]"
+# 경고만 내고 쓰기는 막지 않는다. 대상은 .md 이고 리뷰 기록과 Claude 메모리는 뺀다.
+FM="$T/form"; mkdir -p "$FM" "$T/docs/superpowers/reviews"
+LB='- **금액 필드:** v1은 정수다. v2는 문자열이다.'
+printf '%s\n' "$LB" > "$FM/x.md"
+printf '%s\n' "$LB" > "$FM/x.txt"
+printf '%s\n' "$LB" > "$T/docs/superpowers/reviews/x.md"
+for i in 1 2 3 4 5 6 7; do printf '%s\n\n' "$LB"; done > "$FM/seven.md"
+printf -- '- 한 문장 불릿이다.\n- 또 한 문장이다.\n' > "$FM/clean.md"
+printf -- '```\n%s\n```\n' "$LB" > "$FM/fence.md"
+JE() { printf '{"tool_name":"Edit","tool_input":{"file_path":"%s","new_string":"%s"}}' "$1" "$2"; }
+FW_OUT="$(drev "$(J "$FM/x.md")")"
+check "Write 라벨 불릿 → 형식 경고" "grep -qF '라벨 불릿' <<<\"\$FW_OUT\" && json_valid_stdin <<<\"\$FW_OUT\""
+check "Bash 라벨 불릿 → 형식 경고" "drev \"\$(JB \"sed -i s/x/y/ $FM/x.md\")\" | grep -qF '라벨 불릿'"
+# 파일 전체를 검사한 보고는 이름표로 구분하고, 이번 호출에서 쓴 줄만 고치라고 안내한다.
+FB_OUT="$(drev "$(JB "sed -i s/x/y/ $FM/x.md")")"
+check "Bash 보고는 파일 전체 이름표" "grep -qF '(파일 전체):1:' <<<\"\$FB_OUT\""
+check "경고문은 이번 호출에서 쓴 줄만 고치라 한다" "grep -qF '이번 도구 호출에서 쓴 줄' <<<\"\$FB_OUT\" && grep -qF '이미 있던 줄은 고쳐 쓰지 말고' <<<\"\$FB_OUT\""
+# 실제 Write·Edit 입력은 tool_name 과 본문을 싣는다. 디스크의 파일은 깨끗하게 두어 검사기가 본문을 읽는지 본다.
+# 한국어와 줄바꿈을 바르게 이스케이프하려고 JSON 은 파이썬 json.dumps 로 만든다.
+JT() { json_run 'import json,sys; t,f,k,v=sys.argv[1:5]; print(json.dumps({"tool_name":t,"tool_input":{"file_path":f,k:v}},ensure_ascii=False))' "$@"; }
+check "Write 본문 라벨 불릿 → 형식 경고" "drev \"\$(JT Write \"$FM/clean.md\" content \"\$LB\")\" | grep -qF '라벨 불릿'"
+check "Edit new_string 라벨 불릿 → 형식 경고" "drev \"\$(JT Edit \"$FM/clean.md\" new_string \"\$LB\")\" | grep -qF '라벨 불릿'"
+check "Edit 는 new_string 만" "! drev \"\$(JE \"$FM/x.md\" '- 한 문장 불릿이다.')\" | grep -qF '라벨 불릿'"
+# 보고 줄이 줄바꿈으로 나뉘어 나가는지도 본다. JSON 안에서 줄바꿈은 역슬래시와 n 으로 보인다.
+check "보고 상한" "drev \"\$(J \"$FM/seven.md\")\" | grep -qF '\n외 2건'"
+FC_OUT="$(drev "$(J "$FM/clean.md")")"
+check "위반 없음 → 형식 경고 없음" "! grep -qE '라벨 불릿|개수 예고|제목 개수' <<<\"\$FC_OUT\""
+check "코드 블록 → 형식 경고 없음" "! drev \"\$(J \"$FM/fence.md\")\" | grep -qF '라벨 불릿'"
+check "리뷰 기록 → 형식 경고 없음" "! drev \"\$(J \"$T/docs/superpowers/reviews/x.md\")\" | grep -qF '라벨 불릿'"
+check ".txt → 형식 경고 없음" "! drev \"\$(J \"$FM/x.txt\")\" | grep -qF '라벨 불릿'"
+check "스위치 OFF → 형식 경고 없음" "! J \"$FM/x.md\" | DISCIPLINED_CODER_REPLY_CHECK=off bash \"\$DREV\" | grep -qF '라벨 불릿'"
+check "검진 게이트 OFF 에도 형식 경고" "J \"$FM/x.md\" | DISCIPLINED_CODER_REVIEW_GATE=off bash \"\$DREV\" | grep -qF '라벨 불릿'"
+# 파이썬이 없는 PC 를 흉내 낸다. 실패하는 python·python3 를 PATH 앞에 둔다.
+NOPY="$T/nopy"; mkdir -p "$NOPY"
+for n in python python3; do printf '#!/bin/sh\nexit 1\n' > "$NOPY/$n"; chmod +x "$NOPY/$n"; done
+check "파이썬 없음 → 오류 없음" "J \"$FM/x.md\" | PATH=\"$NOPY:\$PATH\" bash \"\$DREV\" >/dev/null 2>&1"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

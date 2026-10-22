@@ -35,7 +35,7 @@ AGGSET="$(printf '%s' "$AGG_LINE" | sed 's/.*"lens"[[:space:]]*:[[:space:]]*"\([
 # 않고 aggregating-lenses 의 그 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
 # 예외 없이 다섯 렌즈 전부에게 강도 그대로의 대조를 요구한다.
 EXC_LENSES="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u || true)"
-is_exc() { printf '%s\n' "$EXC_LENSES" | grep -qxF "$1"; }
+is_exc() { grep -qxF "$1" <<<"$EXC_LENSES"; }  # 파이프는 pipefail 아래 SIGPIPE 로 거짓 실패를 낸다
 
 
 echo "[집계 태깅 == 실제 디렉터리]"
@@ -66,7 +66,7 @@ for d in "$HERE"/skills/lens-*/; do
     EXC_BAD=""
     while IFS= read -r k; do
       [ -n "$k" ] || continue
-      if printf '%s' "$SCHEMA_LINE" | grep -qF "\"$k\""; then EXC_BAD="$EXC_BAD $k"; fi
+      if grep -qF "\"$k\"" <<<"$SCHEMA_LINE"; then EXC_BAD="$EXC_BAD $k"; fi
     done <<EOF
 $(printf '%s' "$EXC_BULLET" | grep -oE '`[a-z_]+`' | tr -d '`')
 EOF
@@ -283,7 +283,7 @@ check "소유자 절이 소유를 밝히고 principles_applied 를 요구한다"
 # 가리키기만 해야 하는 문서들. 그 절을 두면 실패한다.
 for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$HERE"/skills/review-docs/SKILL.md; do
   # 스킬 문서는 파일 이름이 모두 SKILL.md라 부모 디렉터리로 부른다 — 안 그러면 어느 문서가 실패했는지
-  # 알 수 없다(`NAME-ITEMS`).
+  # 알 수 없다(`SPECIFIC-NAME`).
   dn="$(basename "$D")"; [ "$dn" = "SKILL.md" ] && dn="$(basename "$(dirname "$D")")"
   check "$dn 이 소유자를 가리킨다"        "points_to '$D' 'dispatching-lenses' \"\$OWNER_SEC\""
   check "$dn 에 그 절이 없다"             "! has_sec '$D' \"\$OWNER_SEC\""
@@ -829,7 +829,7 @@ check "canon: korean group REVISE-ORDER present"   "grep -qE '^### \`REVISE-ORDE
 # 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
 # 다만 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 는 그 절이 생기기 전(2026-06~09)에 지워 근거가 git 이력에만 있다.
 REVIVED_IDS=""
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN; do
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN NAME-ITEMS; do
   grep -qF "**\`$id\`" "$CANON" && REVIVED_IDS="$REVIVED_IDS $id"
 done
 check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
@@ -959,7 +959,7 @@ for row in "VDEF|WebFetch, Read|claude-haiku-5-5|high" "JDEF|Read|claude-opus-5-
   check "$base 의 모델이 구성과 같다" "grep -qx 'model: $model' <<<\"\$FMV\""
   check "$base 의 노력 수준이 $effort 다" "grep -qx 'effort: $effort' <<<\"\$FMV\""
   check "$base 의 턴 상한이 20 이다" "grep -qx 'maxTurns: 20' <<<\"\$FMV\""
-  check "$base 의 description 이 실행 경로를 한정한다" "grep -m1 '^description:' <<<\"\$FMV\" | grep -qF 'agent-prior-art 절차와 워크플로 disciplined-coder:prior-art-search 에서만 실행한다'"
+  check "$base 의 description 이 실행 경로를 한정한다" "grep -qF 'agent-prior-art 절차와 워크플로 disciplined-coder:prior-art-search 에서만 실행한다' <<<\"\$(grep -m1 '^description:' <<<\"\$FMV\")\""
 done
 RP="$( [ -f "$AP" ] && doc_sec "$AP" '레퍼런스 프롬프트' | grep -m1 '^- system: "' | sed 's/^- system: "//; s/"$//' || true)"
 check "연구자 정의가 레퍼런스 프롬프트 본문을 그대로 싣는다" "[ -n \"\$RP\" ] && grep -qF -- \"\$RP\" \"\$RDEF\""

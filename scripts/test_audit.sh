@@ -244,7 +244,7 @@ rm -rf "$APR_T"
 echo "[audit_targets.sh — 대상 목록만 낸다]"
 AT="$HERE/scripts/audit_targets.sh"
 AT_OUT="$(bash "$AT" 2>/dev/null || true)"
-check "지난 기록은 대상이 아니다"      "! printf '%s' \"\$AT_OUT\" | grep -q '^docs/superpowers/'"
+check "지난 기록은 대상이 아니다"      "! grep -q '^docs/superpowers/' <<<\"\$AT_OUT\""
 check "모르는 인자를 주면 실패 종료한다" "! bash '$AT' --limit >/dev/null 2>&1"
 # 그 밖의 살아 있는 .md 전부가 있다 — 기대 목록을 스크립트와 같은 규칙(대상 아님·HANDOFF-·
 # superseded)으로 git 에서 도출해 실제 출력과 견준다. 조각 출력이 사라졌으므로 경로만 견준다.
@@ -252,7 +252,9 @@ AT_MISS=""
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   head -12 "$HERE/$f" | grep -qi superseded && continue
-  printf '%s\n' "$AT_OUT" | grep -qxF "$f" || AT_MISS="$AT_MISS $f"
+  # grep -q 가 일찍 끝나면 printf 가 SIGPIPE 를 받고 pipefail 이 파이프 전체를 실패로 만든다.
+  # 그래서 파이프 대신 here-string 으로 넘긴다(CI 에서 무작위 파일이 '빠진 문서'로 나왔다).
+  grep -qxF "$f" <<<"$AT_OUT" || AT_MISS="$AT_MISS $f"
 done <<EOF
 $(cd "$HERE" && git ls-files '*.md' | grep -v '^docs/superpowers/' | grep -vE '(^|/)HANDOFF-[^/]*$')
 EOF
@@ -323,7 +325,7 @@ ATP_OUT="$(bash "$ATP" 2>/dev/null || true)"
 ATP_MISS=""
 while IFS= read -r want; do
   [ -n "$want" ] || continue
-  printf '%s\n' "$ATP_OUT" | grep -qxF "$want" || ATP_MISS="$ATP_MISS [$want]"
+  grep -qxF "$want" <<<"$ATP_OUT" || ATP_MISS="$ATP_MISS [$want]"
 done <<TOPICEOF
 $(grep -oE '^- \*\*`[A-Z-]+`' "$HERE/agent-principles.md" | sed 's/^- \*\*`//; s/`$//')
 $(grep '^## ' "$HERE/agent-principles.md" | sed 's/^## //')
