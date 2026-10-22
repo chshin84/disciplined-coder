@@ -454,10 +454,11 @@ def report_v2(base_path, def_path, replay_path, cases_path, out_path):
 
 
 
-# --- 충분성 판단 구성의 재측정(report-v3). 용어는 docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md 「용어」를 따른다.
-V3 = os.path.join(HERE, "results-v3")
-NEW_STAGES_V3 = (("extract-def", HAIKU_HIGH), ("judge-def", HAIKU_HIGH), ("refetch-def", HAIKU_HIGH),
-                 ("rejudge-def", HAIKU_HIGH), ("escalate-def", OPUS), ("map-def", HAIKU_HIGH))
+# --- Opus 묶음 판정 구성의 재측정(report-v4). 용어는 docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md 「용어」를 따른다.
+V3, V4 = os.path.join(HERE, "results-v3"), os.path.join(HERE, "results-v4")
+# 새 구성 한 번의 비용을 이루는 단계와 설정이다(spec 「Opus 일괄 판정」).
+NEW_STAGES_V4 = (("extract-def", HAIKU_HIGH), ("judge-def", OPUS), ("refetch-def", HAIKU_HIGH),
+                 ("rejudge-def", OPUS), ("map-def", HAIKU_HIGH))
 
 
 def _cell(v):
@@ -497,22 +498,29 @@ def _tally(items, cat, vs, k):
             sum(1 for i in ids if items[i]["truth"] and vs[i][k] != "supported"))
 
 
+def _final_judgment(row):
+    """최종 판정을 정한 판정 원본이다. 워크플로 routeClaim 의 j 와 같고, 검증 실패나 판정이 없으면 None 이다."""
+    j = row.get("judge_raw")
+    if not j:
+        return None
+    return run.route_claim(j, row.get("refetch_raw"), row.get("rejudge_raw"))[1]
+
+
+def unsure_rejected(row):
+    """판정 불가로 기각: 최종 판정이 unsupported 이고, 그 판정을 정한 판정에 불일치가 없고 판정 불가가 있다."""
+    j = _final_judgment(row)
+    cells = [j.get(k) for k in run.JUDGE_CELLS] if j else []
+    return row.get("verdict") == "unsupported" and "판정 불가" in cells and "불일치" not in cells
+
+
 def _remaining(row):
-    """검증 실패한 주장에 남은 정보 부족·판정 불가 칸이다. (단계, 칸, 값, missing 이나 이유 유형, 사유 문장) 목록."""
+    """검증 실패한 주장에 남은 정보 부족 칸이다. (단계, 칸, missing, 사유 문장) 목록."""
     j = row.get("judge_raw")
     if not j:
         return []
-    base, bstage = (row["rejudge_raw"], "재판정") if row.get("rejudge_raw") else (j, "처음 판정")
-    esc = row.get("escalate_raw")
-    out = []
-    for k in run.JUDGE_CELLS:
-        src, stage = (esc, "상향") if esc and base.get(k) == "판정 불가" else (base, bstage)
-        v = src.get(k)
-        if v == "정보 부족":
-            out.append((stage, k, v, (src.get("missing") or {}).get(k) or "(missing 없음)", src.get("reason") or ""))
-        elif v == "판정 불가":
-            out.append((stage, k, v, (src.get("unsure_reasons") or {}).get(k) or "(이유 없음)", src.get("reason") or ""))
-    return out
+    src, stage = (row["rejudge_raw"], "재판정") if row.get("rejudge_raw") else (j, "처음 판정")
+    return [(stage, k, (src.get("missing") or {}).get(k) or "(missing 없음)", src.get("reason") or "")
+            for k in run.JUDGE_CELLS if src.get(k) == "정보 부족"]
 
 
 def _refetch_note(row):
@@ -526,7 +534,30 @@ def _refetch_note(row):
     return f"access {f.get('access')}, exists {f.get('exists')}, 구절 {'있음' if str(f.get('quote') or '').strip() else '없음'}"
 
 
-def report_v3(base_path, def_path, replay_path, cases_path, out_path, base_cases_path, prev_replay_path):
+def batch_stats(cases, def_runs):
+    """판정·재판정 묶음마다의 크기·출력 토큰·판정 누락·버린 판정·비용이다. 줄은 run.pipeline 이 고른 줄(단계별 설정)이다.
+    판정 누락은 묶음 입력에 있는데 split_by_url 뒤에 판정이 없는 주장이고, 버린 판정은 출력의 판정 중 split_by_url 이 버린 판정이다."""
+    out = []
+    for rep in REPEATS:
+        p = run.pipeline(cases, def_runs, rep)
+        for stage in run.BATCH_STAGES:
+            for i, b in enumerate(p["batches"][stage]):
+                unit = f"batch:{i + 1}"
+                r = p["rows"][stage].get(unit)
+                refs = [c["ref"] for it in b["items"] for c in it["claims"]]
+                s = {"stage": stage, "repeat": rep, "unit": unit, "urls": len(b["items"]), "claims": len(refs), "row": r is not None,
+                     "output_tokens": None, "missing": [], "dropped": 0, "cost": None}
+                if r is not None:
+                    kept = [j["ref"] for it in b["items"] for j in ((p["outputs"][stage].get(it["url"]) or {}).get("judgments") or [])]
+                    js = (r["output"] or {}).get("judgments")
+                    s.update(output_tokens=(r.get("usage") or {}).get("output_tokens"), cost=r.get("cost_usd"),
+                             missing=[x for x in refs if x not in kept],
+                             dropped=(len(js) if isinstance(js, list) else 0) - len(kept))
+                out.append(s)
+    return out
+
+
+def report_v4(base_path, def_path, replay_path, cases_path, out_path, base_cases_path, prev_replay_path):
     cases = json.load(open(cases_path, encoding="utf-8"))
     base_cases = json.load(open(base_cases_path, encoding="utf-8"))
     base_runs, def_runs = read_runs(base_path), read_runs(def_path)
@@ -534,6 +565,7 @@ def report_v3(base_path, def_path, replay_path, cases_path, out_path, base_cases
     brows, drows = _baseline_rows(base_cases, base_runs), _latest_rows(def_runs)
     items = {x["id"]: x for x in cases["items"]}
     idx = _replay_index(cases, replayed)
+    stats = batch_stats(cases, def_runs)
 
     base_v = _base_verdicts(cases, brows)
     new_v = {i: [(r or {}).get("verdict") for r in rs] for i, rs in idx.items()}
@@ -551,14 +583,14 @@ def report_v3(base_path, def_path, replay_path, cases_path, out_path, base_cases
     new_ok.update(nmap)
 
     base_cost = [sum(_stage_cost(brows, s, c, rep) for s, c in BASE_STAGES) for rep in REPEATS]
-    new_cost = [sum(_stage_cost(drows, s, c, rep) for s, c in NEW_STAGES_V3) for rep in REPEATS]
+    new_cost = [sum(_stage_cost(drows, s, c, rep) for s, c in NEW_STAGES_V4) for rep in REPEATS]
     cond1 = max(new_cost) < min(base_cost)
     cond2, failing = merge_item_condition(base_ok, new_ok)
     compared = [k for k, v in base_ok.items() if v and all(v)]
 
-    L = ["# 선행연구 검증자 충분성 판단 구성 재측정 결과", "",
-         "이 파일은 `python -I evals/prior-art-verifier/score.py report-v3` 가 만든다. 용어는 "
-         "`docs/superpowers/plans/2026-10-21-prior-art-verifier-tiering-fix.md` 「용어」를 따른다.", "",
+    L = ["# 선행연구 검증자 Opus 묶음 판정 구성 재측정 결과", "",
+         "이 파일은 `python -I evals/prior-art-verifier/score.py report-v4` 가 만든다. 용어는 "
+         "`docs/superpowers/plans/2026-10-22-prior-art-verifier-batch-judge.md` 「용어」를 따른다.", "",
          "## 병합 조건", "",
          f"새 구성은 비용 조건을 {'충족했고' if cond1 else '채우지 못했고'}, 항목 조건을 {'충족했다' if cond2 else '채우지 못했다'}.", "",
          f"- 비용 조건(새 구성의 실행마다 비용이 기준선의 어느 실행보다 낮다): {'충족' if cond1 else '미충족'}. "
@@ -567,17 +599,19 @@ def report_v3(base_path, def_path, replay_path, cases_path, out_path, base_cases
          f"비교한 항목·칸 {len(compared)}개, 기준선이 한 번 이상 틀려 빠진 항목·칸 {len(base_ok) - len(compared)}개"
          f"({', '.join(k for k in base_ok if k not in compared) or '없음'}).",
          f"- 기준선 실행은 `{os.path.basename(base_cases_path)}` 의 주장으로 만든 줄만 쓰고, 정답은 `{os.path.basename(cases_path)}` 로 채점했다. "
-         f"기준선 판정이 없는 항목: {', '.join(no_base) or '없음'}.", "",
+         f"기준선 판정이 없는 항목: {', '.join(no_base) or '없음'}.",
+         "- 새 구성의 판정·재판정 입력은 ref 를 중립 번호(c1, c2 …)로 바꿨다. 기준선과 앞 재측정은 항목 id 를 ref 로 실행했다.", "",
          "## 기준선이 맞힌 항목 중 새 구성이 틀린 항목", ""]
     if failing:
-        L += ["아래 표의 항목은 기준선이 두 실행 모두 맞혔고 새 구성이 한 번 이상 틀렸다. 판정 원본은 실행마다 처음 판정·재판정·상향 판정의 칸(수치·조건/방향/범위)이다.", "",
-              "| 항목 | 정답 | 기준선 판정 | 새 구성 판정 | 처음 판정 | 재판정 | 상향 판정 |", "|---|---|---|---|---|---|---|"]
+        L += ["아래 표의 항목은 기준선이 두 실행 모두 맞혔고 새 구성이 한 번 이상 틀렸다. 판정 칸은 실행마다 수치·조건/방향/범위이고, 사유는 처음 판정의 reason 이다.", "",
+              "| 항목 | 정답 | 기준선 판정 | 새 구성 판정 | 처음 판정 | 재판정 | 처음 판정 사유 |", "|---|---|---|---|---|---|---|"]
         for k in failing:
             if k in items:
                 rs = idx[k]
                 col = lambda f: " ; ".join(_cells_str((r or {}).get(f)) for r in rs)
+                why = " ; ".join(_cell(((r or {}).get("judge_raw") or {}).get("reason") or "없음") for r in rs)
                 L.append(f"| {k} | {'참' if items[k]['truth'] else '오류'} | {', '.join(map(str, base_v[k]))} | "
-                         f"{', '.join(map(str, new_v[k]))} | {col('judge_raw')} | {col('rejudge_raw')} | {col('escalate_raw')} |")
+                         f"{', '.join(map(str, new_v[k]))} | {col('judge_raw')} | {col('rejudge_raw')} | {why} |")
             else:
                 L.append(f"| {_cell(k)} | 지도 대조 칸 | 맞힘 | {new_ok.get(k)} | 해당 없음 | 해당 없음 | 해당 없음 |")
     else:
@@ -590,7 +624,7 @@ def report_v3(base_path, def_path, replay_path, cases_path, out_path, base_cases
     has_prev = bool(prev_v)
     L += ["", "## 카테고리별 오류 통과와 참 기각", "",
           "칸의 값은 실행 1·2 의 \"오류 통과 / 참 기각\" 이고, 모든 열을 같은 정답 자료로 채점했다. 기준선 열은 기준선 판정이 없는 항목을 세지 않는다."
-          + (" 앞 재측정 열은 그 재측정의 새 구성(Sonnet 상향)이며, 그때 자료에 없던 항목은 세지 않는다." if has_prev else ""), "",
+          + (" 앞 재측정 열은 results-v3 의 새 구성(Haiku 판정과 Opus 상향)이다." if has_prev else ""), "",
           "| 카테고리 | 기준선 |" + (" 앞 재측정 새 구성 |" if has_prev else "") + " 새 구성 |",
           "|---|---|" + ("---|" if has_prev else "") + "---|"]
     for c in cats:
@@ -608,43 +642,65 @@ def report_v3(base_path, def_path, replay_path, cases_path, out_path, base_cases
     vf = [(i, REPEATS[k], idx[i][k]) for i in items for k in range(len(REPEATS)) if new_v[i][k] == "verify_failed"]
     L += ["## 새 구성의 검증 실패", ""]
     if vf:
-        L += ["아래 표는 최종 판정이 verify_failed 인 항목과 실행이다.", "",
-              "| 항목 | 실행 | 처음 판정 | 보충 | 재판정 | 상향 판정 |", "|---|---|---|---|---|---|"]
+        L += ["아래 표는 최종 판정이 verify_failed 인 항목과 실행이다. 남은 정보 부족은 마지막 판정에 남은 정보 부족 칸과 missing 이다.", "",
+              "| 항목 | 실행 | 처음 판정 | 보충 | 재판정 | 남은 정보 부족 |", "|---|---|---|---|---|---|"]
         for i, rep, r in vf:
             r = r or {}
-            L.append(f"| {i} | {rep} | {_cells_str(r.get('judge_raw'))} | {_refetch_note(r)} | {_cells_str(r.get('rejudge_raw'))} | "
-                     f"{_cells_str(r.get('escalate_raw')) if r.get('escalate_sent') else '보내지 않음'} |")
+            rem = "; ".join(f"{st} {k}={_cell(m)}" for st, k, m, _ in _remaining(r)) or "없음"
+            first = _cells_str(r.get("judge_raw")) if r.get("judge_raw") else ("판정 누락" if r.get("judge_sent") else "판정에 보내지 않음")
+            L.append(f"| {i} | {rep} | {first} | {_refetch_note(r)} | {_cells_str(r.get('rejudge_raw')) if r.get('rejudge_sent') else '보내지 않음'} | {rem} |")
     else:
         L.append("없다.")
 
-    L += ["", "## 보충과 상향을 거친 항목", ""]
-    went = [(i, REPEATS[k], idx[i][k]) for i in items for k in range(len(REPEATS))
-            if idx[i][k] and (idx[i][k].get("refetch_sent") or idx[i][k].get("escalate_sent"))]
+    L += ["", "## 판정 누락", "",
+          "판정 누락은 묶음 입력에 있는데 출력에서 판정을 찾지 못한 주장이다. 묶음 줄이 없는 묶음(호출 실패)은 세지 않는다.", "",
+          "| 실행 | 처음 판정 누락 | 재판정 누락 | 누락 항목 |", "|---|---|---|---|"]
+    for rep in REPEATS:
+        miss = {st: [x for s in stats if s["stage"] == st and s["repeat"] == rep for x in s["missing"]] for st in run.BATCH_STAGES}
+        L.append(f"| {rep} | {len(miss['judge-def'])} | {len(miss['rejudge-def'])} | "
+                 f"{', '.join(miss['judge-def'] + miss['rejudge-def']) or '없음'} |")
+
+    L += ["", "## 판정 불가로 기각한 주장", "",
+          "최종 판정이 unsupported 이고, 그 판정을 정한 판정에 불일치가 없고 판정 불가가 있는 주장을 정답으로 나눠 셌다.", "",
+          "| 실행 | 참 항목 | 오류 항목 | 항목 |", "|---|---|---|---|"]
+    for k, rep in enumerate(REPEATS):
+        ur = [i for i in items if idx[i][k] and unsure_rejected(idx[i][k])]
+        L.append(f"| {rep} | {sum(1 for i in ur if items[i]['truth'])} | {sum(1 for i in ur if not items[i]['truth'])} | {', '.join(ur) or '없음'} |")
+    L += ["", "판정 불가 칸마다 이유 유형을 셌다. 이유 유형이 빠진 칸은 '(이유 없음)' 으로 센다.", "",
+          "| 단계·설정 | 이유 유형별 개수 |", "|---|---|"]
+    for stage, cfg in (("judge-def", OPUS), ("rejudge-def", OPUS)):
+        rc = _reason_counts(drows, stage, cfg)
+        L.append(f"| {stage} {cfg} | {', '.join(f'{k} {v}' for k, v in sorted(rc.items())) or '없음'} |")
+
+    L += ["", "## 틀리게 확신함", "",
+          "틀리게 확신함은 판정 원본이 모든 칸에 일치·불일치를 냈는데 그 칸들로 정한 판정이 정답과 반대인 판정이다. 처음 판정과, 최종 판정을 정한 판정을 따로 셌다.", "",
+          "| 실행 | 처음 판정 | 최종 판정을 정한 판정 |", "|---|---|---|"]
+    for k, rep in enumerate(REPEATS):
+        a = [i for i in items if idx[i][k] and confident_wrong(idx[i][k].get("judge_raw"), items[i]["truth"])]
+        b = [i for i in items if idx[i][k] and confident_wrong(_final_judgment(idx[i][k]), items[i]["truth"])]
+        L.append(f"| {rep} | {len(a)} ({', '.join(a) or '없음'}) | {len(b)} ({', '.join(b) or '없음'}) |")
+
+    L += ["", "## 보충 비율과 결과", "", "보충 비율은 처음 판정을 받은 주장 중 보충에 보낸 주장의 비율이다.", "",
+          "| 실행 | 판정한 주장 | 보충에 보냄 | 보충 비율 |", "|---|---|---|---|"]
+    for k, rep in enumerate(REPEATS):
+        judged = [i for i in items if (idx[i][k] or {}).get("judge_raw")]
+        rf = [i for i in items if (idx[i][k] or {}).get("refetch_sent")]
+        L.append(f"| {rep} | {len(judged)} | {len(rf)} ({', '.join(rf) or '없음'}) | {len(rf) / (len(judged) or 1):.1%} |")
+    went = [(i, REPEATS[k], idx[i][k]) for i in items for k in range(len(REPEATS)) if (idx[i][k] or {}).get("refetch_sent")]
+    L.append("")
     if went:
-        L += ["아래 표는 보충이나 상향 판정에 보낸 주장의 단계별 결과다. 칸 값은 수치·조건/방향/범위 순서다.", "",
-              "| 항목 | 실행 | 정답 | 처음 판정 | 보충 | 재판정 | 상향 판정 | 최종 판정 | 맞힘 |", "|---|---|---|---|---|---|---|---|---|"]
+        L += ["아래 표는 보충에 보낸 주장의 단계별 결과다. 칸 값은 수치·조건/방향/범위 순서다.", "",
+              "| 항목 | 실행 | 정답 | 처음 판정 | 보충 | 재판정 | 최종 판정 | 맞힘 |", "|---|---|---|---|---|---|---|---|"]
         for i, rep, r in went:
             L.append(f"| {i} | {rep} | {'참' if items[i]['truth'] else '오류'} | {_cells_str(r.get('judge_raw'))} | {_refetch_note(r)} | "
-                     f"{_cells_str(r.get('rejudge_raw')) if r.get('refetch_sent') else '보내지 않음'} | "
-                     f"{_cells_str(r.get('escalate_raw')) if r.get('escalate_sent') else '보내지 않음'} | {r.get('verdict')} | "
+                     f"{_cells_str(r.get('rejudge_raw')) if r.get('rejudge_sent') else '보내지 않음'} | {r.get('verdict')} | "
                      f"{_yn(correct(items[i]['truth'], r.get('verdict')))} |")
     else:
-        L.append("없다.")
-
-    L += ["", "## 남은 정보 부족과 판정 불가", ""]
-    rem = [(i, REPEATS[k], x) for i in items for k in range(len(REPEATS))
-           if new_v[i][k] == "verify_failed" for x in _remaining(idx[i][k] or {})]
-    if rem:
-        L += ["아래 표는 검증 실패한 주장에 마지막 단계 뒤에도 남은 칸이다. 값이 정보 부족이면 missing 을, 판정 불가면 이유 유형을 적었다.", "",
-              "| 항목 | 실행 | 남은 단계 | 칸 | 값 | missing 또는 이유 유형 | 사유 문장 |", "|---|---|---|---|---|---|---|"]
-        for i, rep, (stage, k, v, why, reason) in rem:
-            L.append(f"| {i} | {rep} | {stage} | {k} | {v} | {_cell(why)} | {_cell(reason)} |")
-    else:
-        L.append("없다.")
+        L.append("보충에 보낸 주장이 없다.")
 
     L += ["", "## 어려운 항목", "",
-          "칸의 값은 실행 1·2 의 결과이고, 판정 불가로 넘김·정보 부족으로 보충·틀리게 확신함은 처음 판정 원본으로 센다.", "",
-          "| 항목 | 종류 | 정답 | 기준선 맞힘 | 새 구성 맞힘 | 판정 불가로 넘김 | 정보 부족으로 보충 | 틀리게 확신함 |",
+          "칸의 값은 실행 1·2 의 결과이고, 판정 불가·정보 부족으로 보충·틀리게 확신함은 처음 판정 원본으로 센다.", "",
+          "| 항목 | 종류 | 정답 | 기준선 맞힘 | 새 구성 맞힘 | 판정 불가 | 정보 부족으로 보충 | 틀리게 확신함 |",
           "|---|---|---|---|---|---|---|---|"]
     for x in [x for x in cases["items"] if "hard_kind" in x]:
         i = x["id"]
@@ -654,56 +710,60 @@ def report_v3(base_path, def_path, replay_path, cases_path, out_path, base_cases
                  f"{', '.join(_yn(bool((r or {}).get('refetch_sent'))) for r in idx[i])} | "
                  f"{', '.join(_yn(confident_wrong(j, x['truth'])) for j in raws)} |")
 
-    L += ["", "## 판정 불가 이유 유형", "",
-          "판정 불가 칸마다 이유 유형을 셌다. 이유 유형이 빠진 칸은 '(이유 없음)' 으로 센다.", "", "| 단계·설정 | 이유 유형별 개수 |", "|---|---|"]
-    for stage, cfg in (("judge-def", HAIKU_HIGH), ("rejudge-def", HAIKU_HIGH), ("escalate-def", OPUS)):
-        rc = _reason_counts(drows, stage, cfg)
-        L.append(f"| {stage} {cfg} | {', '.join(f'{k} {v}' for k, v in sorted(rc.items())) or '없음'} |")
+    L += ["", "## 묶음별 주장 수와 출력 토큰", "",
+          "묶음마다 한 줄이다. 출력 토큰은 total_cost_usd 와 함께 기록한 usage.output_tokens(생각 포함)이고, 버린 판정은 입력에 없던 URL·ref 이거나 같은 주장의 판정이 둘 이상이라 쓰지 않은 판정이다.", "",
+          "| 단계 | 실행 | 묶음 | URL 수 | 주장 수 | 출력 토큰 | 판정 누락 | 버린 판정 | 비용(USD) |", "|---|---|---|---|---|---|---|---|---|"]
+    for s in stats:
+        if s["row"]:
+            L.append(f"| {s['stage']} | {s['repeat']} | {s['unit']} | {s['urls']} | {s['claims']} | {s['output_tokens']} | "
+                     f"{len(s['missing'])} | {s['dropped']} | {(s['cost'] or 0):.4f} |")
+        else:
+            L.append(f"| {s['stage']} | {s['repeat']} | {s['unit']} | {s['urls']} | {s['claims']} | 줄 없음 | 줄 없음 | 줄 없음 | 줄 없음 |")
+    measured = [s for s in stats if s["row"]]
+    if measured:
+        L += ["", f"측정한 묶음의 주장 수는 최대 {max(s['claims'] for s in measured)}개이고, 출력 토큰은 최대 "
+              f"{max(s['output_tokens'] or 0 for s in measured)} 이다. 이보다 큰 묶음은 이 측정의 범위 밖이다."]
 
-    L += ["", "## 보충과 상향 비율", "", "비율은 처음 판정을 받은 주장 중 그 단계에 보낸 주장의 비율이다.", "",
-          "| 실행 | 판정한 주장 | 보충에 보냄 | 보충 비율 | 상향에 보냄 | 상향 비율 |", "|---|---|---|---|---|---|"]
-    for k, rep in enumerate(REPEATS):
-        judged = [i for i in items if (idx[i][k] or {}).get("judge_raw")]
-        rf = [i for i in items if (idx[i][k] or {}).get("refetch_sent")]
-        es = [i for i in items if (idx[i][k] or {}).get("escalate_sent")]
-        n = len(judged) or 1
-        L.append(f"| {rep} | {len(judged)} | {len(rf)} ({', '.join(rf) or '없음'}) | {len(rf) / n:.1%} | "
-                 f"{len(es)} ({', '.join(es) or '없음'}) | {len(es) / n:.1%} |")
-
-    L += ["", "## 단계별 비용", "", "비용은 단계·설정·실행마다 오류 없는 마지막 줄의 total_cost_usd 를 합한 값이다.", "",
+    L += ["", "## 단계별 비용", "", "비용은 단계·설정·실행마다 오류 없는 마지막 줄의 total_cost_usd 를 합한 값이다. 판정·재판정은 묶음 비용의 합이다.", "",
           "| 단계 | 설정 | 실행 1 | 실행 2 |", "|---|---|---|---|"]
     for s, c in BASE_STAGES:
         L.append(f"| {s} | {c} | " + " | ".join(f"{_stage_cost(brows, s, c, rep):.4f}" for rep in REPEATS) + " |")
-    for s, c in NEW_STAGES_V3:
+    for s, c in NEW_STAGES_V4:
         L.append(f"| {s} | {c} | " + " | ".join(f"{_stage_cost(drows, s, c, rep):.4f}" for rep in REPEATS) + " |")
     errs = [r for r in def_runs if r.get("error")]
     L += ["", f"새 구성 결과 파일의 전체 비용(오류 줄과 다시 실행한 줄 포함): ${sum(r.get('cost_usd') or 0 for r in def_runs):.4f}. "
           "기준선 비용은 앞 재측정의 실행이며 이번에 새로 쓰지 않았다.", "",
           "## 실행 기록", "",
           f"기준선 {len(base_runs)}줄(앞 재측정), 새 구성 {len(def_runs)}줄, 새 구성의 오류 줄 {len(errs)}개, "
-          f"시간 초과 {sum('시간 초과' in r['error'] for r in errs)}개, 모델 불일치 {sum('모델 불일치' in r['error'] for r in errs)}개.", "",
-          "실행 조건은 README.md 「실행 조건」에 있다."]
+          f"시간 초과 {sum('시간 초과' in r['error'] for r in errs)}개, 모델 불일치 {sum('모델 불일치' in r['error'] for r in errs)}개.", ""]
+    if errs:
+        L += ["아래 표는 새 구성의 오류 줄이다.", "", "| 단계 | 실행 | unit | 시도 | 오류 |", "|---|---|---|---|---|"]
+        for r in errs:
+            L.append(f"| {r['stage']} | {r['repeat']} | {_cell(r['unit'])} | {r.get('attempt')} | {_cell(r['error'][:200])} |")
+        L.append("")
+    L.append("실행 조건은 README.md 「실행 조건」에 있다.")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(L) + "\n")
+
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("cmd", choices=["report", "report-v2", "report-v3"])
-    ap.add_argument("--runs", help="report·report-v2 는 기준선 결과 파일, report-v3 는 새 구성 결과 파일")
-    ap.add_argument("--baseline", default=os.path.join(V2, "runs.jsonl"), help="report-v3 의 기준선 결과 파일")
+    ap.add_argument("cmd", choices=["report", "report-v2", "report-v4"])
+    ap.add_argument("--runs", help="report·report-v2 는 기준선 결과 파일, report-v4 는 새 구성 결과 파일")
+    ap.add_argument("--baseline", default=os.path.join(V2, "runs.jsonl"), help="report-v4 의 기준선 결과 파일")
     ap.add_argument("--baseline-cases", default=os.path.join(HERE, "cases-v2.json"),
-                    help="report-v3 에서 기준선 줄의 key 를 대조할 자료(기준선을 실행한 자료)")
-    ap.add_argument("--prev-replay", default=os.path.join(V2, "replay.json"), help="report-v3 에서 비교할 앞 재측정의 replay")
+                    help="report-v4 에서 기준선 줄의 key 를 대조할 자료(기준선을 실행한 자료)")
+    ap.add_argument("--prev-replay", default=os.path.join(V3, "replay.json"), help="report-v4 에서 비교할 앞 재측정의 replay")
     ap.add_argument("--def-runs", default=os.path.join(V2, "runs-def.jsonl"))
     ap.add_argument("--replay")
     ap.add_argument("--cases")
     ap.add_argument("--frozen", default=os.path.join(HERE, "results", "extract-frozen.jsonl"))
     ap.add_argument("--out")
     a = ap.parse_args()
-    if a.cmd == "report-v3":
-        out = a.out or os.path.join(V3, "report.md")
-        report_v3(a.baseline, a.runs or os.path.join(V3, "runs-def.jsonl"), a.replay or os.path.join(V3, "replay.json"),
+    if a.cmd == "report-v4":
+        out = a.out or os.path.join(V4, "report.md")
+        report_v4(a.baseline, a.runs or os.path.join(V4, "runs-def.jsonl"), a.replay or os.path.join(V4, "replay.json"),
                   a.cases or os.path.join(HERE, "cases-v3.json"), out, a.baseline_cases, a.prev_replay)
         print(out)
         sys.exit(0)

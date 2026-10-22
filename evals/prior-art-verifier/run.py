@@ -25,16 +25,18 @@ EFFORTS = ("low", "medium", "high", "xhigh")
 CITE_TOOLS = "WebFetch,Read"
 LOCAL_TOOLS = "Read"
 MODES = {"baseline-cite": "cite", "baseline-map": "map", "extract": "extract", "judge": "judge", "map": "map",
-         "extract-def": "extract", "judge-def": "judge", "refetch-def": "refetch", "rejudge-def": "judge",
-         "escalate-def": "judge", "map-def": "map"}
+         "extract-def": "extract", "judge-def": "judge", "refetch-def": "refetch", "rejudge-def": "judge", "map-def": "map"}
 # -def 단계는 에이전트 정의 본문을 system 프롬프트로 넣고, 사용자 메시지는 워크플로의 prompt() 와 같게 만든다.
 DEF_AGENTS = {"extract-def": "prior-art-verifier.md", "judge-def": "prior-art-judge.md",
-              "refetch-def": "prior-art-verifier.md", "rejudge-def": "prior-art-judge.md",
-              "escalate-def": "prior-art-judge-escalation.md", "map-def": "prior-art-mapcheck.md"}
+              "refetch-def": "prior-art-verifier.md", "rejudge-def": "prior-art-judge.md", "map-def": "prior-art-mapcheck.md"}
 JUDGE_CELLS = ("numbers_conditions", "direction", "scope")
 MATCHES = ("일치", "불일치", "판정 불가", "정보 부족")
-# -def 단계가 앞 단계 출력을 고를 때 쓰는 설정이다. 확정 구성의 추출·판정 설정과 같다.
-UPSTREAM = "claude-haiku-5-5/high"
+# -def 단계가 앞 단계 출력을 고를 때 쓰는 단계마다의 설정이다. 확정 구성(spec 「Opus 일괄 판정」)과 같다.
+UPSTREAM = {"extract-def": "claude-haiku-5-5/high", "judge-def": "claude-opus-5-5/medium",
+            "refetch-def": "claude-haiku-5-5/high", "rejudge-def": "claude-opus-5-5/medium"}
+# 판정·재판정은 묶음마다 한 줄이다(unit batch:<n>). 묶음 크기는 워크플로 BATCH_SIZE 와 같다.
+BATCH_STAGES = ("judge-def", "rejudge-def")
+BATCH_SIZE = 20
 
 
 def build_cmd(stage, model, effort, prompt, system=None):
@@ -108,57 +110,114 @@ def _judge_claims(claims, ex_out):
 
 
 def next_step(j):
-    """워크플로 nextStep 과 같다."""
+    """워크플로 nextStep 과 같다. 판정 불가는 기각이다."""
     cells = [j.get(k) for k in JUDGE_CELLS]
     if "불일치" in cells:
         return "unsupported"
     if "정보 부족" in cells:
         return "refetch"
     if "판정 불가" in cells:
-        return "escalate"
+        return "unsupported"
     return "supported"
 
 
 def route_claim(j, rf, rj):
-    """워크플로 routeClaim 과 같다. (차례, 그 차례를 정한 단계) 를 낸다."""
+    """워크플로 routeClaim 과 같다. (차례, 그 차례를 정한 판정) 을 낸다. 검증 실패면 판정은 None 이다."""
     first = next_step(j)
     if first != "refetch":
-        return first, "judge"
+        return first, j
     if rf is None or not _passes_extract(rf):
-        return "verify_failed", "refetch"
+        return "verify_failed", None
     if rj is None or not _cells_ok(rj):
-        return "verify_failed", "rejudge"
+        return "verify_failed", None
     second = next_step(rj)
-    return ("verify_failed" if second == "refetch" else second), "rejudge"
+    return ("verify_failed" if second == "refetch" else second), rj
+
+
+def _judged_refs(refs, output):
+    """워크플로 judgedRefs 와 같다. 판정이 빠진 ref 는 결과에 없고, 있는 판정 중 하나라도 칸이 빠지면 None."""
+    js = output.get("judgments") if isinstance(output, dict) else None
+    if not isinstance(js, list):
+        return None
+    found = {}
+    for ref in refs:
+        j = next((x for x in js if isinstance(x, dict) and x.get("ref") == ref), None)
+        if j is None:
+            continue
+        if not _cells_ok(j):
+            return None
+        found[ref] = j
+    return found
 
 
 def _refetch_claims(claims, ju_out):
     """워크플로 refetchClaims 와 같다."""
-    ju = _by_ref([c["ref"] for c in claims], ju_out, _cells_ok)
+    ju = _judged_refs([c["ref"] for c in claims], ju_out)
     if ju is None:
         return []
     return [{"ref": c["ref"], "text": c["text"],
              "missing": {} if ju[c["ref"]].get("missing") is None else ju[c["ref"]]["missing"]}
-            for c in claims if next_step(ju[c["ref"]]) == "refetch"]
+            for c in claims if c["ref"] in ju and next_step(ju[c["ref"]]) == "refetch"]
 
 
 def _rejudge_claims(claims, rf_out):
     """워크플로 rejudgeClaims 와 같다."""
     return [_to_judge_claim(c, _judgment_of(rf_out, c["ref"])) for c in claims
-            if _passes_extract(_judgment_of(rf_out, c["ref"]))]
+            if _judgment_of(rf_out, c["ref"]) is not None and _passes_extract(_judgment_of(rf_out, c["ref"]))]
 
 
-def _escalate_claims(claims, ju_out, rf_out, rj_input, rj_out):
-    """워크플로 escalateClaims 와 같다. 재판정을 거친 주장은 재판정 입력을 쓴다."""
-    ju = _by_ref([c["ref"] for c in claims], ju_out, _cells_ok)
-    if ju is None:
-        return []
-    out = []
-    for c in claims:
-        step, frm = route_claim(ju[c["ref"]], _judgment_of(rf_out, c["ref"]), _judgment_of(rj_out, c["ref"]))
-        if step == "escalate":
-            out.append(next(x for x in rj_input if x["ref"] == c["ref"]) if frm == "rejudge" else c)
+def batch_claims(claims_by_url, size=BATCH_SIZE):
+    """워크플로 batchClaims 와 같다. 키 차례대로 앞 묶음부터 채우고 앞 묶음으로 되돌아가지 않는다(next-fit)."""
+    batches, cur, count = [], None, 0
+    for url, claims in claims_by_url.items():
+        if not claims:
+            continue
+        if cur is None or count + len(claims) > size:
+            cur, count = {"items": []}, 0
+            batches.append(cur)
+        cur["items"].append({"url": url, "claims": claims})
+        count += len(claims)
+    return batches
+
+
+def split_by_url(outputs, batches):
+    """워크플로 splitByUrl 과 같다. outputs[i] 는 batches[i] 의 출력(ref 를 되돌린 것)이고, 없으면 None 이다.
+    입력에 없던 URL 이나 ref 의 판정은 버리고, 같은 (url, ref) 의 판정이 둘 이상이면 그 ref 의 판정을 모두 버린다."""
+    out = {}
+    for b, o in zip(batches, outputs):
+        ok = isinstance(o, dict) and isinstance(o.get("judgments"), list)
+        for it in b["items"]:
+            if not ok:
+                out[it["url"]] = None
+                continue
+            refs = [c["ref"] for c in it["claims"]]
+            mine = [j for j in o["judgments"] if isinstance(j, dict) and j.get("url") == it["url"] and j.get("ref") in refs]
+            out[it["url"]] = {"judgments": [j for j in mine if sum(1 for x in mine if x.get("ref") == j.get("ref")) == 1],
+                              "principles_applied": [] if o.get("principles_applied") is None else o["principles_applied"]}
     return out
+
+
+def neutral_payload(batch):
+    """묶음의 ref 를 정답이 드러나지 않는 번호(c1, c2 …)로 바꾼 판정 입력과, 번호 -> 원래 ref 표다.
+    시험 자료의 항목 id(acc-t1, quo-f1 같은 것)는 -t·-f 로 참·오류를 드러내기 때문이다(결정 기록 5 「ref 이름이 정답을 드러내는 한계」)."""
+    back, items = {}, []
+    for it in batch["items"]:
+        claims = []
+        for c in it["claims"]:
+            n = f"c{len(back) + 1}"
+            back[n] = c["ref"]
+            claims.append(dict(c, ref=n))
+        items.append({"url": it["url"], "claims": claims})
+    return {"items": items}, back
+
+
+def restore_refs(output, back):
+    """판정 출력의 ref 를 원래 ref 로 되돌린 사본이다. 표에 없는 ref 는 None 이 되어 split_by_url 이 버린다."""
+    if not isinstance(output, dict) or not isinstance(output.get("judgments"), list):
+        return output
+    js = [dict(j, ref=back.get(j.get("ref")) if isinstance(j.get("ref"), str) else None) if isinstance(j, dict) else j
+          for j in output["judgments"]]
+    return dict(output, judgments=js)
 
 
 def _url_claims(cases):
@@ -168,67 +227,77 @@ def _url_claims(cases):
     return by_url
 
 
-def def_payload(cases, stage, runs, repeat, upstream, unit):
-    """-def 단계의 unit 하나의 입력이다. 앞 단계 출력은 같은 차례의 upstream 설정 출력을 def_output 으로 고르고,
-    워크플로의 단계 차례(추출, 판정, 보충, 재판정, 상향 판정)로 입력을 만든다. 보낼 주장이 없으면 None."""
-    if stage == "map-def":
-        m = next((m for m in cases["map_cases"] if m["id"] == unit), None)
-        return None if m is None else {"evidence_map": m["input"]["evidence_map"], "passed": m["input"]["passed"]}
-    claims = _url_claims(cases).get(unit)
-    if not claims:
-        return None
-    if stage == "extract-def":
-        return {"url": unit, "claims": claims}
-
-    def up(s):
-        return def_output(cases, runs, s, upstream, repeat, unit, upstream)
-    out = _judge_claims(claims, up("extract-def"))
-    if stage != "judge-def":
-        jc, ju = out, up("judge-def")
-        out = rc = _refetch_claims(jc, ju)
-        if stage != "refetch-def":
-            rf = up("refetch-def") if rc else None
-            out = rj_in = _rejudge_claims(rc, rf)
-            if stage != "rejudge-def":
-                rj = up("rejudge-def") if rj_in else None
-                out = _escalate_claims(jc, ju, rf, rj_in, rj)
-    return {"url": unit, "claims": out} if out else None
-
-
-def def_key(cases, runs, stage, config, repeat, unit, upstream=UPSTREAM):
-    """그 단계·설정·차례·unit 을 지금 실행하면 run.py 가 줄에 적을 key 다. 보낼 입력이 없으면 None."""
-    payload = def_payload(cases, stage, runs, repeat, upstream, unit)
-    if payload is None:
-        return None
+def def_key(stage, config, repeat, unit, payload):
+    """그 단계·설정·차례·unit 을 그 입력으로 실행하면 run.py 가 줄에 적을 key 다."""
     model, effort = config.split("/")
     return make_key(stage, model, effort, "", repeat, unit, def_prompt(stage, payload) + def_system(stage))
 
 
-def def_output(cases, runs, stage, config, repeat, unit, upstream=UPSTREAM):
-    """def_key 와 key 가 같은 줄 중 오류 없는 마지막 줄의 출력이다. 정의나 입력이 다른 옛 줄은 고르지 않는다."""
-    key = def_key(cases, runs, stage, config, repeat, unit, upstream)
-    out = None
+def def_row(runs, stage, config, repeat, unit, payload):
+    """def_key 와 key 가 같은 줄 중 오류 없는 마지막 줄이다. 정의나 입력이 다른 옛 줄은 고르지 않는다. 없으면 None."""
+    key = def_key(stage, config, repeat, unit, payload)
+    row = None
     for r in runs:
-        if key is not None and r.get("key") == key and not r.get("error") and r.get("output") is not None:
-            out = r["output"]
-    return out
+        if r.get("key") == key and not r.get("error") and r.get("output") is not None:
+            row = r
+    return row
 
 
-def def_units(cases, stage, runs, repeat, upstream, hard_only):
-    """-def 단계의 (unit, payload) 목록이다. hard_only 이면 항목이 모두 어려운 항목인 URL 만 남긴다."""
+def pipeline(cases, runs, repeat):
+    """한 차례의 -def 단계를 워크플로의 차례(추출, 판정 묶음, 보충, 재판정 묶음)로 따라간다.
+    앞 단계 출력은 UPSTREAM 의 단계별 설정 줄에서 고른다. 반환값의 키는 아래와 같다.
+    units[stage]: 그 단계에 보낼 (unit, payload) 목록이다. 판정·재판정의 payload 는 중립 번호로 바꾼 입력이다.
+    batches[stage]: 판정·재판정 묶음(원래 ref)이다. rows[stage][unit]: 고른 줄이다(없으면 키가 없다).
+    outputs[stage]: URL 을 키로 둔 단계 출력이다. 판정·재판정은 split_by_url 의 값이고 ref 는 항목 id 로 되돌렸다."""
+    p = {"units": {}, "batches": {}, "rows": {}, "outputs": {}}
+
+    def per_url(stage, jobs):
+        p["units"][stage] = [(u, {"url": u, "claims": c}) for u, c in jobs]
+        p["rows"][stage], p["outputs"][stage] = {}, {}
+        for u, payload in p["units"][stage]:
+            r = def_row(runs, stage, UPSTREAM[stage], repeat, u, payload)
+            if r is not None:
+                p["rows"][stage][u] = r
+                p["outputs"][stage][u] = r["output"]
+        return p["outputs"][stage]
+
+    def batched(stage, claims_by_url):
+        batches = batch_claims(claims_by_url)
+        p["batches"][stage], p["units"][stage], p["rows"][stage] = batches, [], {}
+        outs = []
+        for i, b in enumerate(batches):
+            unit = f"batch:{i + 1}"
+            payload, back = neutral_payload(b)
+            p["units"][stage].append((unit, payload))
+            r = def_row(runs, stage, UPSTREAM[stage], repeat, unit, payload)
+            if r is not None:
+                p["rows"][stage][unit] = r
+            outs.append(None if r is None else restore_refs(r["output"], back))
+        p["outputs"][stage] = split_by_url(outs, batches)
+        return p["outputs"][stage]
+
+    claims = _url_claims(cases)
+    extract = per_url("extract-def", list(claims.items()))
+    judge = batched("judge-def", {u: _judge_claims(c, extract.get(u)) for u, c in claims.items()})
+    jobs = [(it["url"], _refetch_claims(it["claims"], judge.get(it["url"]))) for b in p["batches"]["judge-def"] for it in b["items"]]
+    jobs = [(u, c) for u, c in jobs if c]
+    refetch = per_url("refetch-def", jobs)
+    batched("rejudge-def", {u: _rejudge_claims(c, refetch.get(u)) for u, c in jobs})
+    return p
+
+
+def def_units(cases, stage, runs, repeat):
+    """-def 단계의 (unit, payload) 목록이다. 보낼 주장이 없는 unit 은 없다."""
     if stage == "map-def":
-        names = [m["id"] for m in cases["map_cases"]]
-    else:
-        hard = {}
-        for x in cases["items"]:
-            hard[x["url"]] = hard.get(x["url"], True) and "hard_kind" in x
-        names = [u for u in _url_claims(cases) if not hard_only or hard[u]]
-    out = []
-    for u in names:
-        p = def_payload(cases, stage, runs, repeat, upstream, u)
-        if p is not None:
-            out.append((u, p))
-    return out
+        return [(m["id"], {"evidence_map": m["input"]["evidence_map"], "passed": m["input"]["passed"]}) for m in cases["map_cases"]]
+    return pipeline(cases, runs, repeat)["units"][stage]
+
+
+def def_output(cases, runs, stage, config, repeat, unit):
+    """그 차례·unit 의 입력으로 계산한 key 가 같은 줄의 출력이다. 판정·재판정은 중립 번호 그대로다. 없으면 None."""
+    payload = dict(def_units(cases, stage, runs, repeat)).get(unit)
+    r = None if payload is None else def_row(runs, stage, config, repeat, unit, payload)
+    return None if r is None else r["output"]
 
 
 def parse_output(text):
@@ -378,8 +447,6 @@ def main(argv=None):
     ap.add_argument("--repeat", type=int, default=1)
     ap.add_argument("--cases", default=os.path.join(HERE, "cases.json"))
     ap.add_argument("--out", default=os.path.join(HERE, "results", "runs.jsonl"))
-    ap.add_argument("--upstream", default=UPSTREAM, help="-def 단계가 앞 단계 출력을 고를 설정(모델/수준)")
-    ap.add_argument("--hard-only", action="store_true", help="-def 단계에서 어려운 항목만 있는 URL 만 실행한다")
     a = ap.parse_args(argv)
     if a.stage == "judge" and not (a.category and a.extract_from):
         sys.exit("judge 단계에는 --category 와 --extract-from 이 필요하다")
@@ -411,7 +478,7 @@ def _run(a):
     system = def_system(a.stage) if is_def else None
     for rep in range(1, a.repeat + 1):
         if is_def:
-            us = def_units(cases, a.stage, past, rep, a.upstream, a.hard_only)
+            us = def_units(cases, a.stage, past, rep)
         else:
             us = units(cases, a.stage, a.category, extract)
         for unit, payload in us:
