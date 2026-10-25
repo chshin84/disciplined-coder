@@ -163,7 +163,8 @@ check "managing-docs 가 기록 이름의 소유자를 가리킨다" "sec_has_id
 
 echo "[합치기와 다시 리뷰]"
 check "합치기 절이 있다"                      "has_sec \"\$CALLER\" '합치기'"
-check "다시 리뷰를 물을 때 ASK-OPTIONS 를 따른다" "sec_has_id \"\$CALLER\" '작업 순서와 다시 리뷰' ASK-OPTIONS"
+# 다시 리뷰할지는 묻지 않고 NO-RAW-OUTPUT 대로 정한다(2026-10-25 클린룸 시험, domain-discipline 「NO-RAW-OUTPUT」).
+check "다시 리뷰 판단을 NO-RAW-OUTPUT 으로 넘긴다" "sec_has_id \"\$CALLER\" '작업 순서와 다시 리뷰' NO-RAW-OUTPUT"
 check "🔴 반영도 다시 리뷰 절이 다룬다"      "sec_has_id \"\$CALLER\" '작업 순서와 다시 리뷰' '🔴'"
 check "문서 검진이 재검진 금지를 소유자로 넘긴다" "points_to \"\$DOCS\" '\`dispatching-lenses\`' '「한 번만 실행하는 렌즈의 규율」'"
 check "그 절이 공통 규칙을 렌즈 그룹으로 넘긴다"               "sec_has \"\$DOCS\" '필요할 때 렌즈' '「렌즈 그룹」'"
