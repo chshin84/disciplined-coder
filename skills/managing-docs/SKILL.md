@@ -36,6 +36,8 @@ description: 문서를 새로 만들거나 고치기 전에 연다. 마크다운
 
 ## 상황별로 더 읽을 파일
 
+쓰는 문서의 종류에 따라 아래 파일을 더 읽어라.
+
 - 사용자가 읽거나 남에게 전달할 문서(보고서·제안서·발표자료·README·.html·.pptx·.docx·.hwp(x), 파일로 쓰는 작업 보고)를 쓰거나 고치면 같은 폴더의 `references/reading-docs.md` 를 읽고 따르라.
 - README 를 쓰거나 고치면 `domain-readme` 도 열어라.
 - 플러그인·훅·사용자 설정 파일을 고치면 `domain-plugin` 을 열어라.
