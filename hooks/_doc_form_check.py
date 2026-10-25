@@ -42,26 +42,49 @@ def _own_sentences(text):
 
 
 def check_paragraphs(lines):
-    """단락(빈 줄로 끊긴 산문 줄 묶음)마다 문장 수를 세어 ONE-IDEA 를 본다. 목록·표·제목·인용·펜스는 단락이 아니다."""
+    """단락(빈 줄로 끊긴 산문 줄 묶음)마다 문장 수를 세어 ONE-IDEA 를 본다. 목록(들여쓴 연속 줄 포함)·표·제목·
+    인용·펜스·네 칸 들여쓴 코드·HTML 주석·맨 앞 front-matter 는 단락이 아니다."""
     found = []
-    in_fence = False
+    in_fence = in_list = in_comment = False
     para, para_start = [], 0
+    start = 0
+    if lines and lines[0].strip() == "---":
+        end = next((j for j in range(1, len(lines)) if lines[j].strip() == "---"), None)
+        if end is not None:
+            start = end + 1
 
     def flush():
         if para and _own_sentences(" ".join(para)) > PARA_MAX:
             found.append((para_start, "ONE-IDEA 단락 길이", para[0][:40]))
         para.clear()
 
-    for i, raw in enumerate(lines):
+    for i in range(start, len(lines)):
+        raw = lines[i]
         if FENCE.match(raw):
             flush()
             in_fence = not in_fence
             continue
         if in_fence:
             continue
+        if in_comment or raw.lstrip().startswith("<!--"):
+            flush()
+            in_comment = "-->" not in raw
+            continue
         line = BACKTICK.sub(CODE_MARK, raw)
-        if (not line.strip() or HEADING.match(line) or TABLE.match(line) or LIST_ITEM.match(line)
-                or line.lstrip().startswith(">")):
+        if not line.strip():
+            flush()
+            in_list = False
+            continue
+        if LIST_ITEM.match(line):
+            flush()
+            in_list = True
+            continue
+        indented = line[:1] in (" ", "\t")
+        if (in_list and indented) or line.startswith("    ") or line.startswith("\t"):
+            flush()
+            continue
+        in_list = False
+        if HEADING.match(line) or TABLE.match(line) or line.lstrip().startswith(">"):
             flush()
             continue
         if not para:

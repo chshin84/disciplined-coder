@@ -63,13 +63,13 @@
 | 에이전트 | 대상과 모드 | tools | 그룹 | 실행하는 호출자 |
 |---|---|---|---|---|
 | `lens-adversarial` | `design`(spec·plan), `artifact`(코드·실험 결과·테스트 출력) | Read, Grep, Glob | 묶음 전체 | `design` 은 review-specs, `artifact` 는 사용자 직접 요청 |
-| `lens-adversarial-claim` | 주장·제안서·보고서의 논증 | Read, WebSearch, WebFetch | 필요할 때 | 사용자 직접 요청, review-docs 가 제안서·보고서를 검진할 때 제안하고 승인받는다 |
+| `lens-adversarial-claim` | 주장·제안서·보고서의 논증 | Read, Grep, Glob, WebSearch, WebFetch | 필요할 때 | 사용자 직접 요청, review-docs 가 제안서·보고서를 검진할 때 제안하고 승인받는다 |
 | `lens-consistency` | spec·plan(감사 모드는 감사 삭제와 함께 지운다) | Read, Grep, Glob | 묶음 전체 | review-specs |
 | `lens-grounding` | `runtime`, `spec`, `doc` | Read, Grep, Glob | 문서 단위 | 모든 호출자 |
 | `lens-fit` | 대상 타입을 렌즈 안에서 판정한다(현행 `lens-fit:18-20`) | Read, Grep, Glob | 문서 단위 | 모든 호출자 |
 | `lens-readability` | 렌더링된 HTML·HTML 슬라이드 화면 | Read 와 브라우저 도구(런타임 시험 결과에 따른다) | 필요할 때 | review-docs 가 HTML 산출물을 검진할 때 제안하고 승인받는다 |
 
-정의마다 frontmatter 에 `name`, `description`, `tools`, `model` 을 적어라. `model` 은 `opus` 로 적어라(내 판단). 공식 문서(code.claude.com/docs/en/sub-agents 「Model selection」)는 패밀리 별칭이 메인 대화와 같은 패밀리이면 그 정확한 모델로 해석된다고 적는다. tools 에는 Agent 도구와 쓰기 도구를 빼고 표의 도구만 적어라.
+정의마다 frontmatter 에 `name`, `description`, `tools`, `model` 을 적어라. `model` 은 `opus` 로 적어라(내 판단). 공식 문서(code.claude.com/docs/en/sub-agents 「Model selection」)는 패밀리 별칭이 메인 대화와 같은 패밀리이면 그 정확한 모델로 해석된다고 적는다. tools 에는 Agent 도구와 쓰기 도구를 빼고 표의 도구만 적어라. 도구는 에이전트의 목적에 필요한 것만 계획해 허가한다. `lens-adversarial-claim` 은 처음에 Read·WebSearch·WebFetch 였으나, 반박 후보의 출처를 대상 문서와 그 폴더의 자료로 넓힌 뒤(「새 체크리스트」) 폴더를 볼 Grep·Glob 이 빠졌다는 지적이 최종 리뷰에서 나와 더했다(사용자 결정 2026-10-25). 같은 날 Agent 와 쓰기 도구만 막고 나머지를 물려받는 안도 검토했으나, 계획에 없는 Bash 와 외부로 보내는 MCP 도구까지 허용되어 기각했다.
 
 에이전트 호출 정책은 "사전 정의 호출만 허용"이다. 에이전트 호출은 스킬 절차나 워크플로 스크립트에 이름으로 적힌 호출만 허용하고, 실행 중인 에이전트가 임의로 다른 에이전트를 실행하는 호출은 금지한다. 서브에이전트 안에서는 실행할 종류를 제한할 수 없으므로, 그 장치로 플러그인의 모든 에이전트 정의는 Agent 없는 tools 를 둔다. 판단 근거와 기각한 안은 결정 기록 `docs/superpowers/decisions/2026-10-25-agent-call-policy.md` 에 있다. 구현자는 다음을 하라.
 
@@ -112,7 +112,7 @@ description 에는 렌즈가 하는 일과 "실행하는 쪽은 먼저 `dispatch
 
 `principles_path` 는 `dispatching-lenses` 「렌즈에게 에이전트원칙을 알리는 법」대로 도출하라. 선행연구 개선 세션이 이 절 제목을 참조하므로 제목을 유지하라.
 
-사용자는 `@agent-disciplined-coder:<에이전트 이름>` 이나 자연어 요청으로 렌즈를 직접 실행한다. 이때 메인 세션은 description 의 지시대로 `dispatching-lenses` 를 읽고 MODE·PRINCIPLES 줄을 채운다. 정의 본문에는 그 두 줄이 없을 때의 동작도 적어라. MODE 가 없으면 에이전트가 대상에서 모드를 정해 `notes` 에 적는다. PRINCIPLES 가 없으면 `principles_applied` 를 비우고 그 사실을 `notes` 에 적는다. 스킬 슬래시 명령(`/disciplined-coder:lens-*`)은 사라진다.
+사용자는 `@agent-disciplined-coder:<에이전트 이름>` 이나 자연어 요청으로 렌즈를 직접 실행한다. 이때 메인 세션은 description 의 지시대로 `dispatching-lenses` 를 읽고 MODE·PRINCIPLES 줄을 채운다. 정의 본문에는 그 두 줄이 없을 때의 동작도 적어라. MODE 가 없으면 에이전트가 대상에서 모드를 정해 `notes` 에 적는다. PRINCIPLES 가 없으면 세션에 실린 원칙을 적용해 `principles_applied` 에 적고, 줄이 없었다는 사실을 `notes` 에 적는다(사용자 결정 2026-10-25, 런타임 시험 6 뒤. 처음 문안은 `principles_applied` 를 비우게 했다). 스킬 슬래시 명령(`/disciplined-coder:lens-*`)은 사라진다.
 
 ## 출력 계약
 

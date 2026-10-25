@@ -32,6 +32,9 @@ check "그 절이 소유를 밝히고 빈 issues 를 다룬다"  "owns_sec \"\$D
 check "그 절이 principles_applied 를 언제 요구하는지 정한다" "sec_has_id \"\$DISP\" '결과를 모으는 법' principles_applied"
 check "그 절이 spec 리뷰의 처분을 따로 넘긴다"  "sec_has_id \"\$DISP\" '결과를 모으는 법' review-specs"
 check "그 절이 계약 파일을 가리킨다"            "sec_has \"\$DISP\" '결과를 모으는 법' 'scripts/lens_contract.json'"
+# 렌즈 지적도 틀릴 수 있어 메인 세션이 반영 전에 거른다. 거르기는 이 절이 소유하고 호출자는 가리킨다.
+check "그 절이 틀린 지적 거르기를 정한다"       "sec_has \"\$DISP\" '결과를 모으는 법' '**틀린 지적 거르기**'"
+check "spec 리뷰와 문서 검진이 그 절로 거른다"  "sec_has \"\$CALLER\" '합치기' '「결과를 모으는 법」' && sec_has \"\$HERE/skills/review-docs/SKILL.md\" '기록' '「결과를 모으는 법」'"
 
 
 echo "[spec 리뷰 — 처분은 호출자가 정한다]"

@@ -1,6 +1,6 @@
 # 렌즈 에이전트 런타임 시험 기록
 
-이 기록은 렌즈 에이전트 전환 spec(`docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md`) 「먼저 할 런타임 시험」의 결과다. 시험은 모두 통과했고, 실패 처리로 넘어간 시험은 없다. 시험 6의 결과로 PRINCIPLES 줄을 어떻게 할지와 `maxTurns`·`effort` 값은 사용자 결정으로 남았다.
+이 기록은 렌즈 에이전트 전환 spec(`docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md`) 「먼저 할 런타임 시험」의 결과다. 시험은 모두 통과했고, 실패 처리로 넘어간 시험은 없다. 시험 6의 결과로 PRINCIPLES 줄을 어떻게 할지와 `maxTurns`·`effort` 값을 사용자가 정했다. PRINCIPLES 줄은 이 저장소 안에서만 넘기고, `maxTurns`·`effort` 는 적지 않는다. 근거는 아래 「남은 결정」에 있다.
 
 ## 시험 환경
 

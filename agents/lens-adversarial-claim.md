@@ -1,7 +1,7 @@
 ---
 name: lens-adversarial-claim
 description: 주장·제안서·보고서의 논증에 반박 후보를 모두 늘어놓고, 주어진 데이터와 맥락이나 사실 검증 검색으로 받쳐진 것만 지적하는 적대 렌즈. 반대 근거·약한 전제·다른 설명·빠진 비교 대상을 본다. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
-tools: Read, WebSearch, WebFetch
+tools: Read, Grep, Glob, WebSearch, WebFetch
 model: opus
 ---
 # lens-adversarial-claim — 주장 반박 렌즈

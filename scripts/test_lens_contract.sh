@@ -14,7 +14,7 @@ KNOWN="lens-adversarial lens-adversarial-claim lens-consistency lens-fit lens-gr
 
 # policy_violations <agents_dir> <workflows_dir>
 # 위반마다 `agents:<파일>:<사유>` 나 `workflows:<파일>:<줄>` 한 줄을 낸다. 0=위반 없음, 1=있음.
-# 사유는 no-tools(tools 줄 없음), not-one-line(`tools:` 뒤 값이 비어 있음), agent-tool(Agent·Task 가 있음)이다.
+# 사유는 no-tools(tools 줄 없음), not-one-line(값이 비었거나 `[`·따옴표로 시작함), agent-tool(Agent·Task 가 있음)이다.
 policy_violations() {
   json_run '
 import os, re, sys
@@ -31,14 +31,22 @@ for name in sorted(os.listdir(agents_dir)) if os.path.isdir(agents_dir) else []:
             if l == "---":
                 break
             fm.append(l)
-    tl = [l for l in fm if re.match(r"tools:", l)]
-    if not tl:
+    def field(key):
+        # 한 줄 쉼표 목록 필드의 이름 목록. 줄이 없으면 None, 블록·흐름 목록이나 따옴표 값이면 "bad".
+        hit = [l for l in fm if re.match(key + r":", l)]
+        if not hit:
+            return None
+        val = hit[0][len(key) + 1:].strip()
+        if not val or val[0] in "[\"\x27":
+            return "bad"
+        return [x.strip().split("(")[0].strip() for x in val.split(",")]
+    tools = field("tools")
+    if tools is None:
+        # tools 를 생략하면 Agent 와 MCP 를 포함한 세션 도구를 모두 물려받는다. 도구는 목적에 맞게 계획해 허가한다.
         bad.append("agents:%s:no-tools" % name); continue
-    val = tl[0][len("tools:"):].strip()
-    if not val:
+    if tools == "bad":
         bad.append("agents:%s:not-one-line" % name); continue
-    items = [x.strip().split("(")[0].strip() for x in val.split(",")]
-    if any(x in ("Agent", "Task") for x in items):
+    if any(x in ("Agent", "Task") for x in tools):
         bad.append("agents:%s:agent-tool" % name)
 
 def blank(src):
@@ -108,8 +116,10 @@ mk_tools_fx t_task      's/^\(tools: .*\)$/\1, Task/'
 mk_tools_fx t_agentsub  's/^\(tools: .*\)$/\1, Agent(lens-fit)/'
 mk_tools_fx t_yaml      's/^tools: .*$/tools:\n  - Read/'
 mk_tools_fx t_none      '/^tools: /d'
+mk_tools_fx t_flow      's/^tools: .*$/tools: [Read, Agent]/'
+mk_tools_fx t_quoted    's/^tools: .*$/tools: "Read, Task"/'
 TOOLS_MISS=""
-for row in t_agent:agent-tool t_task:agent-tool t_agentsub:agent-tool t_yaml:not-one-line t_none:no-tools; do
+for row in t_agent:agent-tool t_task:agent-tool t_agentsub:agent-tool t_yaml:not-one-line t_none:no-tools t_flow:not-one-line t_quoted:not-one-line; do
   f="${row%%:*}"; why="${row##*:}"
   # 위반이 있으면 함수가 1 을 돌려주므로 pipefail 에 걸리지 않게 출력을 먼저 받아 둔다.
   out="$(policy_violations "$FX/$f/agents" "$FX/$f/workflows" 2>/dev/null || true)"
@@ -134,7 +144,7 @@ echo "[정의]"
 # docs/superpowers/decisions/2026-10-25-lens-agent-runtime.md 시험 4 가 확인한 이름이다.
 declare -A TOOLS=(
   [lens-adversarial]="Read, Grep, Glob"
-  [lens-adversarial-claim]="Read, WebSearch, WebFetch"
+  [lens-adversarial-claim]="Read, Grep, Glob, WebSearch, WebFetch"
   [lens-consistency]="Read, Grep, Glob"
   [lens-fit]="Read, Grep, Glob"
   [lens-grounding]="Read, Grep, Glob"

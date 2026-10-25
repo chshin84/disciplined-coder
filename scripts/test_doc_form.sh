@@ -78,6 +78,14 @@ check "ONE-IDEA: 목록 항목은 단락으로 세지 않는다" "[ \"\$(count_o
 OUT="$(run_text '그는 이렇게 말했다. "첫째다. 둘째다. 셋째다." 그래서 고쳤다.
 ')"
 check "ONE-IDEA: 인용 안 문장은 세지 않는다" "[ \"\$(count_of \"\$OUT\" 'ONE-IDEA')\" = 0 ]"
+OUT="$(run_text '---\nname: x\ndescription: 첫째다. 둘째다. 셋째다. 넷째다. 다섯째다.\n---\n본문이다.\n')"
+check "ONE-IDEA: front-matter 는 단락이 아니다" "[ \"\$(count_of \"\$OUT\" 'ONE-IDEA')\" = 0 ]"
+OUT="$(run_text '- 항목이다.\n  첫째다. 둘째다. 셋째다. 넷째다. 다섯째다.\n')"
+check "ONE-IDEA: 목록의 들여쓴 연속 줄은 단락이 아니다" "[ \"\$(count_of \"\$OUT\" 'ONE-IDEA')\" = 0 ]"
+OUT="$(run_text '본문이다.\n\n    첫째다. 둘째다. 셋째다. 넷째다. 다섯째다.\n')"
+check "ONE-IDEA: 네 칸 들여쓴 코드는 단락이 아니다" "[ \"\$(count_of \"\$OUT\" 'ONE-IDEA')\" = 0 ]"
+OUT="$(run_text '<!-- 첫째다. 둘째다. 셋째다. 넷째다. 다섯째다. -->\n')"
+check "ONE-IDEA: HTML 주석은 단락이 아니다" "[ \"\$(count_of \"\$OUT\" 'ONE-IDEA')\" = 0 ]"
 
 echo "[건너뛰는 구간]"
 OUT="$(run_text '```\n- **a:** b다. c다.\n```\n')"
