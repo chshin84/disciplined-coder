@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# 렌즈 출력 계약(scripts/lens_contract.json)을 계약 원문과 렌즈 에이전트 정의에 대조하고, 플러그인의
+# 렌즈 출력 계약(scripts/lens_contract.json)을 렌즈 에이전트 정의에 대조하고, 플러그인의
 # 에이전트 호출 정책을 검사한다. 계약: FAIL=0 (매직넘버 금지 — 개수는 테스트가 센다).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 CONTRACT="$HERE/scripts/lens_contract.json"
-AGG="$HERE/skills/aggregating-lenses/SKILL.md"
 FX="$(mktemp -d)"; trap 'rm -rf "$FX"' EXIT
 . "$HERE/scripts/_test_check.sh"
 . "$HERE/scripts/_json_valid.sh"
@@ -12,44 +11,6 @@ _json_python || true
 
 # 계약에 아는 렌즈 이름. spec 「에이전트 구성」 표가 원본이다.
 KNOWN="lens-adversarial lens-adversarial-claim lens-consistency lens-fit lens-grounding lens-readability"
-
-# keyset <JSON 파일> — 객체의 키를 경로로 늘어놓는다. 배열은 첫 원소의 키를 `칸[].키` 로 적는다.
-# `?` 접두 키는 선택 키라 `?` 를 떼고 끝에 `?` 표시를 붙인다.
-keyset() {
-  json_run '
-import json, sys
-def walk(o, p, out, req_only):
-    for k, v in o.items():
-        opt = k.startswith("?")
-        key = k[1:] if opt else k
-        if req_only and opt:
-            continue
-        out.append(p + key)
-        if isinstance(v, dict):
-            walk(v, p + key + ".", out, req_only)
-        elif isinstance(v, list) and v and isinstance(v[0], dict):
-            walk(v[0], p + key + "[].", out, req_only)
-d = json.load(open(sys.argv[1], encoding="utf-8"))
-if len(sys.argv) > 2:
-    d = d[sys.argv[2]]
-out = []
-walk(d, "", out, len(sys.argv) > 3)
-print("\n".join(sorted(set(out))))
-' "$@"
-}
-
-# agg_block — aggregating-lenses 「리뷰 산출물 계약」 절의 첫 코드 블록을 JSON 으로 꺼낸다.
-agg_block() {
-  json_run '
-import json, sys
-lines = open(sys.argv[1], encoding="utf-8").read().splitlines()
-i = next(n for n, l in enumerate(lines) if l.startswith("## 리뷰 산출물 계약"))
-while not lines[i].startswith("```"): i += 1
-j = i + 1
-while not lines[j].startswith("```"): j += 1
-print(json.dumps(json.loads("\n".join(lines[i+1:j])), ensure_ascii=False))
-' "$AGG"
-}
 
 # policy_violations <agents_dir> <workflows_dir>
 # 위반마다 `agents:<파일>:<사유>` 나 `workflows:<파일>:<줄>` 한 줄을 낸다. 0=위반 없음, 1=있음.
@@ -125,9 +86,6 @@ sys.exit(1 if bad else 0)
 
 echo "[계약]"
 check "계약 파일이 JSON 으로 읽힌다" "json_valid_stdin < \"\$CONTRACT\""
-agg_block > "$FX/agg.json" 2>/dev/null || true
-check "계약의 공통 칸이 aggregating-lenses 리뷰 산출물 계약과 같다" \
-  "[ \"\$(keyset \"\$FX/agg.json\")\" = \"\$(keyset \"\$CONTRACT\" common req)\" ]"
 check "계약의 렌즈 이름이 아는 이름이다" \
   "[ \"\$(json_run 'import json,sys; print(\" \".join(sorted(json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"])))' \"\$CONTRACT\" 2>/dev/null)\" = \"\$KNOWN\" ]"
 check "빼는 칸이 공통 최상위 칸이다" \
@@ -223,6 +181,11 @@ for name in $KNOWN; do
   check "$name: 입력 절이 두 줄의 부재를 다룬다" \
     "has_sec \"$d\" '입력' && sec_has \"$d\" '입력' MODE && sec_has \"$d\" '입력' PRINCIPLES"
   check "$name: 출력 예시가 계약과 같다" "example_ok \"$d\" $name 2>/dev/null"
+  check "$name: 읽기 범위 절이 있다" "has_sec \"$d\" '읽기 범위'"
+  check "$name: description 이 입력 안내로 dispatching-lenses 를 가리킨다" \
+    "grep -E '^description: ' \"$d\" | grep -qF '\`dispatching-lenses\`'"
+  check "$name: 출력 예시가 계약 소유자를 가리킨다" \
+    "sec_has \"$d\" '출력 예시' '「결과를 모으는 법」' && sec_has \"$d\" '출력 예시' 'scripts/lens_contract.json'"
 done
 check "lens-readability: 도구 부재 처리를 적는다" "grep -qF '브라우저 도구 없음' \"\$HERE/agents/lens-readability.md\""
 

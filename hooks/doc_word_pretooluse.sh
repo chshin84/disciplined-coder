@@ -9,8 +9,8 @@
 #       사용자 결정은 _spec_marker.sh 의 path_in_own_repo 가 소유한다.
 #   (2) Claude 메모리 — 경로에 `/.claude/projects/` 가 있으면 뺀다. 나에게 남기는 쪽지이지
 #       사람이 요구한 산출물이 아니고, 금지어를 목록으로 적어 둘 곳이다.
-#   (3) `docs/superpowers/` 아래 — spec·plan·리뷰 기록이다. 문서 검사(test_docs_drift.sh)와
-#       audit-repo-docs 의 「대상 아님」이 이미 같은 규정으로 빼는 곳이라 그것을 따른다.
+#   (3) `docs/superpowers/` 아래 — spec·plan·리뷰 기록이다. 문서 검사(test_docs_drift.sh)가
+#       이미 같은 규정으로 빼는 곳이라 그것을 따른다.
 # 예외는 파이썬이 없을 때다. 본문을 추리는 단계가 파이썬이라 그때는 알림 없이 통과한다(2026-09-30 사용자 결정, README 「설치」에 적었다).
 #
 # 코드 블록과 백틱 안은 검사하지 않는다. 파일 내용과 식별자를 인용한 것까지 잡으면 거짓 거부가

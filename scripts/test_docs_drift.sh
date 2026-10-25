@@ -2,8 +2,9 @@
 # 문서의 렌즈 열거가 진실과 어긋나지 않는지 검증. 계약: FAIL=0 (매직넘버 금지 — 개수는 테스트가 센다).
 #
 # 아래 불변식을 단언한다. 개수를 박지 않고 두 집합의 일치를 본다.
-#   집계 태깅   — aggregating-lenses가 source 값으로 적은 렌즈 == 같은 디렉터리 집합
-# 권위 있는 출처는 디렉터리이고 산문의 열거는 그 캐시다.
+#   렌즈 그룹   — dispatching-lenses 「렌즈 그룹」 표의 에이전트 == agents/lens-*.md 집합
+# 권위 있는 출처는 에이전트 정의 디렉터리이고 산문의 열거는 그 캐시다. 렌즈 출력 칸은
+# scripts/test_lens_contract.sh 가 계약 파일과 정의의 출력 예시로 본다.
 #
 # 앵커는 산문 문장이 아니라 안정된 열쇠다. 규칙이 있는지는 조항 ID(`ASK-OPTIONS` 같은 것)와 절 제목으로,
 # 소유는 그 절 안의 소유 선언으로, 포인터는 소유자 이름과 절 이름이 한 줄에 함께 있는지로 본다.
@@ -19,64 +20,19 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TMP"
 README="$HERE/README.md"
 CALLER="$HERE/skills/review-specs/SKILL.md"
-AGG="$HERE/skills/aggregating-lenses/SKILL.md"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
 . "$HERE/scripts/_test_check.sh"
 
-# 진실 — 실제 렌즈 디렉터리에서 짧은 이름을 도출한다.
-ALL="$(for d in "$HERE"/skills/lens-*/; do [ -d "$d" ] || continue; basename "$d" | sed 's/^lens-//'; done | sort)"
+# 진실 — 렌즈 에이전트 정의에서 짧은 이름을 도출한다.
+ALL="$(for f in "$HERE"/agents/lens-*.md; do [ -f "$f" ] || continue; basename "$f" .md | sed 's/^lens-//'; done | sort)"
 
-# 캐시 — aggregating-lenses 리뷰 산출물 계약의 렌즈 이름 열거. 출력 스키마의 `source`는 이 값을
-# 그대로 옮기는 자리라 열거를 두지 않는다. 이름 열거가 한 문서에 하나만 남게 여기서 뽑는다.
-AGG_LINE="$(grep -F '"lens": "lens-' "$AGG" | head -1 || true)"
-AGGSET="$(printf '%s' "$AGG_LINE" | sed 's/.*"lens"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | tr '|' '\n' | sed 's/^ *//; s/ *$//; s/^lens-//' | grep -v '^$' | sort || true)"
+echo "[결과를 모으는 법 — dispatching-lenses 가 소유한다]"
+# 렌즈 출력의 칸은 scripts/lens_contract.json 이, 칸에 딸린 산문 규칙은 이 절이 소유한다.
+check "그 절이 소유를 밝히고 빈 issues 를 다룬다"  "owns_sec \"\$DISP\" '결과를 모으는 법' && sec_has_id \"\$DISP\" '결과를 모으는 법' issues"
+check "그 절이 principles_applied 를 언제 요구하는지 정한다" "sec_has_id \"\$DISP\" '결과를 모으는 법' principles_applied"
+check "그 절이 spec 리뷰의 처분을 따로 넘긴다"  "sec_has_id \"\$DISP\" '결과를 모으는 법' review-specs"
+check "그 절이 계약 파일을 가리킨다"            "sec_has \"\$DISP\" '결과를 모으는 법' 'scripts/lens_contract.json'"
 
-# 캐시 — aggregating-lenses가 「공통 계약의 예외」로 적은 렌즈 이름 열거. 손으로 목록을 베끼지
-# 않고 aggregating-lenses 의 그 절에서 뽑는다. 그 절이 없어지거나 이름이 바뀌면 EXC_LENSES가 비어 아래 단언이
-# 예외 없이 다섯 렌즈 전부에게 강도 그대로의 대조를 요구한다.
-EXC_LENSES="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u || true)"
-is_exc() { grep -qxF "$1" <<<"$EXC_LENSES"; }  # 파이프는 pipefail 아래 SIGPIPE 로 거짓 실패를 낸다
-
-
-echo "[집계 태깅 == 실제 디렉터리]"
-# aggregating-lenses의 출력 스키마가 이슈의 출처를 렌즈 이름으로 태깅한다. 그 열거도 렌즈가 늘면 낡는다.
-check "aggregating-lenses가 렌즈 전부를 태깅한다"    "[ \"\$AGGSET\" = \"\$ALL\" ]"
-if [ "$AGGSET" != "$ALL" ]; then
-  echo "    디렉터리      : $(printf '%s' "$ALL" | tr '\n' ' ')"
-  echo "    aggregating-lenses: $(printf '%s' "$AGGSET" | tr '\n' ' ')"
-fi
-
-
-echo "[산출물 계약 — aggregating-lenses가 소유한다]"
-check "계약이 read 필드를 정의한다"             "grep -qF '\"read\"' \"\$AGG\""
-check "계약 절이 소유를 밝히고 빈 issues 를 다룬다" "owns_sec \"\$AGG\" '리뷰 산출물 계약' && sec_has_id \"\$AGG\" '리뷰 산출물 계약' issues"
-check "처분 절이 spec 리뷰를 따로 다룬다"       "sec_has_id \"\$AGG\" '처분' review-specs"
-
-
-echo "[렌즈 계약 — 등급 없음, 근거 필수]"
-for d in "$HERE"/skills/lens-*/; do
-  n="$(basename "$d")"; f="$d/SKILL.md"
-  if is_exc "$n"; then
-    # 예외 렌즈가 계약에서 빼는 칸은 aggregating-lenses 의 예외 항목이 "빠지는 칸: `x`·`y`" 로 적는다. 목록을 여기
-    # 손으로 베끼지 않고 거기서 뽑아 그 렌즈의 출력 스키마 줄에 없는지 본다. 예외마다 빠지는 칸이
-    # 다르므로 "consequence 가 없다" 하나로 뭉뚱그리면 그 칸을 담는 예외에서 거짓이 된다.
-    EXC_BULLET="$(awk '/^## 공통 계약의 예외/{f=1; next} /^## /{f=0} f' "$AGG" | grep -F "\`$n\`" | grep -oE '빠지는 칸: .*$' || true)"
-    check "$n 예외가 빠지는 칸을 적는다" "[ -n \"\$EXC_BULLET\" ]"
-    SCHEMA_LINE="$(grep -F '"lens": "' "$f" | head -1 || true)"
-    EXC_BAD=""
-    while IFS= read -r k; do
-      [ -n "$k" ] || continue
-      if grep -qF "\"$k\"" <<<"$SCHEMA_LINE"; then EXC_BAD="$EXC_BAD $k"; fi
-    done <<EOF
-$(printf '%s' "$EXC_BULLET" | grep -oE '`[a-z_]+`' | tr -d '`')
-EOF
-    check "$n 스키마에 빠지는 칸이 없다" "[ -z \"\$EXC_BAD\" ]"
-  else
-    check "$n 이 consequence 를 요구한다"   "grep -qF 'consequence' \"$f\""
-  fi
-  check "$n 이 read 를 요구한다"          "grep -qF '\"read\"' \"$f\""
-  check "$n 에 읽기 범위 절이 있다"       "has_sec \"$f\" '읽기 범위'"
-done
 
 echo "[spec 리뷰 — 처분은 호출자가 정한다]"
 # 처분 절이 🔴 진입 기준을 조항 ID 로 걸고, 🔴 을 예외로 두는 기본값(고치기)을 적는다.
@@ -194,21 +150,6 @@ for d in "$HERE"/agents/lens-*.md; do
   awk '/^## 렌즈 그룹/{f=1;next} /^## /{f=0} f && /^\| `lens-/' "$DISP" | grep -q "^| \`$n\` |" || GROUP_MISS="$GROUP_MISS $n"
 done
 check "실재하는 렌즈가 모두 렌즈 그룹 표에 있다" "[ -z \"\$GROUP_MISS\" ]"
-LCON="$HERE/skills/lens-consistency/SKILL.md"
-check "lens-consistency 가 짝 주는 법을 렌즈 그룹으로 넘긴다" "points_to \"\$LCON\" '\`dispatching-lenses\`' '「렌즈 그룹」'"
-
-echo "[따르는 문서 — 렌즈 이름]"
-# 렌즈 스키마의 lens 값은 디렉터리 이름과 같은 한 문자열이다. 짧은 이름이 남으면 기록 파일 이름과
-# findings 의 lens 칸이 갈린다.
-LENS_BAD=""
-while IFS= read -r d; do
-  [ -n "$d" ] || continue
-  ln="$(basename "$d")"
-  if ! grep -qF "\"lens\": \"$ln\"" "$d/SKILL.md"; then LENS_BAD="$LENS_BAD $ln"; fi
-done <<EOF
-$(ls -d "$HERE"/skills/lens-*)
-EOF
-check "렌즈 스키마의 lens 값이 디렉터리 이름과 같다" "[ -z \"\$LENS_BAD\" ]"
 
 echo "[기록 — 자리와 담을 것]"
 # 기록에 무엇을 담고 빼는지는 review-docs 「기록」과 review-specs 「리뷰 기록」 절이 정한다. 절 안의
@@ -229,53 +170,6 @@ check "그 절이 공통 규칙을 렌즈 그룹으로 넘긴다"               
 check "그 절이 선행연구 인용 확인을 researching-prior-art 로 넘긴다" "points_to \"\$DOCS\" '\`researching-prior-art\`' '「인용 확인」'"
 check "런타임이 재리뷰 금지를 소유자로 넘긴다" "points_to \"\$RUNTIME2\" '\`dispatching-lenses\`' '「한 번만 실행하는 렌즈의 규율」'"
 check "재검진 금지는 dispatching-lenses 가 소유하고 spec 리뷰의 반복 절을 가리킨다" "points_to \"\$DISP\" '\`review-specs\`' '「작업 순서와 다시 리뷰」'"
-
-# --- 렌즈 스키마 사본이 공통 계약과 어긋나지 않는다 ---
-# 여섯 렌즈의 「출력 스키마」 블록은 공통 계약을 그 렌즈의 값으로 채워 보인 사본이다. 사본이므로
-# 손으로 맞추면 갈라진다 — 실제로 `evidence`의 뜻풀이에서 근거 형태 둘이 사라진 채 오래 남았다.
-# 그래서 앵커를 테스트에 박지 않고 aggregating-lenses 에서 뽑아 온다. 그 문안이 바뀌면 이 검사가 함께 따라간다.
-MA="$HERE/skills/aggregating-lenses/SKILL.md"
-CONTRACT_EV="$(grep -o '"evidence": "[^"]*"' "$MA" | head -1 | sed 's/^"evidence": "//; s/"$//')"
-CONTRACT_CONSEQ="$(grep -o '"consequence": "[^"]*"' "$MA" | head -1 | sed 's/^"consequence": "//; s/"$//')"
-echo "[렌즈 스키마 사본]"
-for L in "$HERE"/skills/lens-*/SKILL.md; do
-  n="$(basename "$(dirname "$L")")"
-  # 공통 계약 예외 렌즈는 스키마 사본 대조에서 빠진다.
-  if ! is_exc "$n"; then
-    # 계약이 "렌즈 파일에는 자기 type 폐쇄 집합만 정의하고 나머지는 여기를 참조한다"고 정하므로
-    # 뜻풀이를 담고 있으면 실패한다. 전에는 반대로 담고 있어야 통과해서 검사가 베끼기를 강제했다.
-    # 「레퍼런스 프롬프트」 절은 예외다 — 그 문장은 에이전트원칙이 안 실리는 서브에이전트에 그대로 실어
-    # 보내는 페이로드라 복제가 아니다. 그래서 그 절을 떼어 낸 나머지에서만 본다.
-    NOPROMPT="$(awk '/^## 레퍼런스 프롬프트/{f=1;next} f&&/^## /{f=0} !f' "$L")"
-    check "$n: consequence 뜻풀이를 베끼지 않는다" "! printf '%s' \"\$NOPROMPT\" | grep -qF -- \"\$CONTRACT_CONSEQ\""
-    check "$n: evidence 뜻풀이를 베끼지 않는다"    "! printf '%s' \"\$NOPROMPT\" | grep -qF -- \"\$CONTRACT_EV\""
-    check "$n: 출력 스키마가 계약 소유자를 가리킨다" "points_to '$L' '\`aggregating-lenses\`' '리뷰 산출물 계약'"
-    if grep -qF -- '"counterpart_file"' "$L"; then
-      check "$n: file 칸을 이름으로 적는다"      "grep -qF -- '\"file\":' '$L'"
-      check "$n: principle 칸을 이름으로 적는다" "grep -qF -- '\"principle\":' '$L'"
-    fi
-  fi
-done
-# 렌즈가 계약에 없는 칸을 더할 수 있고, 그 목록은 aggregating-lenses 의 「렌즈가 추가하는 칸」 절이 소유한다.
-# 목록을 여기 손으로 적지 않고 그 절에서 뽑아, 렌즈가 쓰는 덧붙임 칸이 다 올라 있는지 본다.
-EXTRA_LISTED="$(awk '/^## 렌즈가 추가하는 칸/{f=1;next} f&&/^## /{exit} f' "$MA" | grep -oE '`[a-z_]+`' | tr -d '`' | sort -u)"
-# 뽑아 놓고 대조를 안 하면 목록이 낡아도 초록이다. 실제로 그랬고 lens-fit 의 doc_type 이 빠져
-# 있었다. 렌즈 파일이 자기 덧붙임 칸이라 밝힌 이름을 뽑아 위 목록에 다 있는지 본다.
-EXTRA_BAD=""
-for xf in "$HERE"/skills/lens-*/SKILL.md; do
-  xn="$(basename "$(dirname "$xf")")"
-  while IFS= read -r xk; do
-    [ -n "$xk" ] || continue
-    printf '%s
-' "$EXTRA_LISTED" | grep -qx -- "$xk" || EXTRA_BAD="$EXTRA_BAD [$xn:$xk]"
-  done <<INNER
-$(LC_ALL=C.UTF-8 grep -oE '`[a-z_]+`[^`]{0,14}이 렌즈가 추가하는 칸' "$xf" | grep -oE '^`[a-z_]+`' | tr -d '`' | sort -u)
-INNER
-done
-[ -n "$EXTRA_BAD" ] && printf '    aggregating-lenses 목록에 안 오른 덧붙임 칸:%s
-' "$EXTRA_BAD"
-check "렌즈가 추가하는 칸이 모두 aggregating-lenses 목록에 있다" "[ -z \"\$EXTRA_BAD\" ]"
-check "aggregating-lenses 가 principles_applied 규칙을 소유한다" "owns_sec \"\$MA\" '리뷰 산출물 계약' && sec_has_id \"\$MA\" '리뷰 산출물 계약' principles_applied"
 
 echo "[렌즈에게 에이전트원칙을 알리는 법 — dispatching-lenses 한 곳만 규율을 적는다]"
 # 전에 여러 문서가 각자 적었다가 하나에서 둘이 빠져 갈라졌다. 소유자를 하나로 두고
@@ -298,8 +192,18 @@ echo "[소유 표] 소유는 하나뿐이고 나머지는 가리킨다"
 # 가리키는 문장은 이 꼴을 쓰지 않으므로 포인터가 소유자로 잡히지 않는다.
 # 전에는 「렌즈에게 에이전트원칙을 알리는 법」 하나에만 이 검사가 걸렸고 가리킬 문서 셋도 손으로 적혀
 # 있었다. 넷째 문서가 복제하면 검사가 지나쳤다. 이제 소유자도 대상도 도출한다.
-# 감사 대상 목록은 아래 세 구획(소유 표·첫 문장·대구 한도)이 함께 쓴다. 한 번만 뽑는다.
-AUDIT_DOCS="$(cd "$HERE" && bash scripts/audit_targets.sh)"
+# 살아 있는 문서 목록은 아래 세 구획(소유 표·첫 문장·대구 한도)이 함께 쓴다. 한 번만 뽑는다.
+# 앞으로도 읽히고 고쳐질 문서만이다. 스펙과 계획과 지난 기록과 인수인계는 그때의 판단을 남긴 것이라 뺀다.
+# evals/ 아래 평가 과제는 일부러 위반을 담은 시험 자료라 뺀다. 머리 12줄에 superseded 가 있으면 대체된
+# 설계 문서라 뺀다. 목록을 손으로 적지 않고 git 색인에서 도출한다.
+AUDIT_DOCS="$(cd "$HERE" && git ls-files '*.md' | LC_ALL=C awk '
+  /^docs\/superpowers\// || /^evals\// || /(^|\/)HANDOFF-[^\/]*$/ { next }
+  {
+    f = $0; hit = 0
+    for (i = 0; i < 12 && (getline line < f) > 0; i++) if (tolower(line) ~ /superseded/) { hit = 1; break }
+    close(f)
+    if (!hit) print f
+  }')"
 OWN_DOCS="$AUDIT_DOCS"
 # 문서마다 awk·grep 을 따로 띄우지 않고 awk 한 번으로 모든 문서를 읽는다. 문서 경로는 레포 상대다.
 OWN_TSV="$(cd "$HERE" && awk '
@@ -353,24 +257,16 @@ echo "[첫 문장] 절 제목 아래 첫 줄이 산문이다"
 # TITLE-LAYERS 가 "절의 첫 문장이 본문 제목이다"라고 정한다(문서의 본문 제목은 결론 한 문장).
 # 빈 줄을 건너뛴 첫 줄이 불릿·표·코드블록·인용·번호목록이면 결론 문장이 아니다. 그 줄이 산문인데
 # 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
-# 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
-# 따라온다. 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
 # TITLE-LAYERS 는 managing-docs 의 reading-docs.md(읽기 위한 문서) 규칙이라 영어 제목에도 적용한다.
-HF_WK="$HERE/docs/domain-korean.md"
-# 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
-HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
 HF_DOCS="$AUDIT_DOCS"
 HF_BAD=""
 for hf in $HF_DOCS; do
-  hf_lens=0; case "$hf" in skills/lens-*/SKILL.md) hf_lens=1 ;; esac
-  hit="$(awk -v isLens="$hf_lens" -v exc="$HF_EXC" '
-    BEGIN { n=split(exc, E, "\n") }
+  hit="$(awk '
     /^#{2,3} / {
       title=$0; sub(/^#+ /, "", title)
       first=""
       while ((getline line) > 0) { if (line ~ /^[ \t]*$/) continue; first=line; break }
       if (first == "") next
-      if (isLens) { for (i=1;i<=n;i++) if (E[i] != "" && index(title, E[i]) == 1) next }
       if (first ~ /^[-*+] / || first ~ /^\|/ || first ~ /^```/ || first ~ /^> / || first ~ /^[0-9]+\. /) print title
     }' "$HERE/$hf")"
   [ -n "$hit" ] && HF_BAD="$HF_BAD [$hf: $(printf '%s' "$hit" | tr '\n' ',')]"
@@ -467,7 +363,7 @@ echo "[「」로 가리킨 절이 레포 어딘가에 실재한다]"
 HEADINGS="$(find "$HERE" -name '*.md' -not -path '*/.git/*' -not -path '*/evals/principles/cases/*' -exec cat {} + \
   | grep -E '^#+ ' | sed 's/^#\+ *//' | sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
 BN=0
-for SRC in "$HERE/skills/lens-readability/SKILL.md" "$CALLER" "$CANON"; do
+for SRC in "$HERE/agents/lens-readability.md" "$CALLER" "$CANON"; do
   sn="$(basename "$(dirname "$SRC")")/$(basename "$SRC")"
   while IFS= read -r sec; do
     [ -n "$sec" ] || continue
@@ -526,9 +422,9 @@ echo "[이름 없는 렌즈 개수를 산문에 박지 않는다]"
 # 어차피 '한 렌즈'는 렌즈가 늘어도 안 낡는 표현이라 금지할 값이 없다.
 NUM='(두|세|네|다섯|여섯|일곱|여덟|아홉|열)'
 NUMB='(둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)'
-# 렌즈 이름은 디렉터리에서 도출한다 — 여기 손으로 적으면 그 목록이 먼저 낡는다.
+# 렌즈 이름은 에이전트 정의에서 도출한다 — 여기 손으로 적으면 그 목록이 먼저 낡는다.
 LENS_RE="$(printf '%s' "$ALL" | tr '\n' '|' | sed 's/|$//')"
-COUNT_SCAN="$AGG $HERE/skills/lens-*/SKILL.md $HERE/skills/review-docs/SKILL.md $HERE/skills/domain-readme/SKILL.md $DISP $CALLER $CANON $HERE/README.md"
+COUNT_SCAN="$HERE/agents/lens-*.md $HERE/skills/review-docs/SKILL.md $HERE/skills/domain-readme/SKILL.md $DISP $CALLER $CANON $HERE/README.md"
 # shellcheck disable=SC2086
 NUMHIT="$(LC_ALL=C.UTF-8 grep -nE "$NUM[ ]?렌즈|렌즈[ ]?$NUMB|다른 $NUMB[ ]?(렌즈|은|는)|$NUMB[ ]?곳에" $COUNT_SCAN 2>/dev/null \
   | grep -v '개수를 산문에\|이름을 같은 줄에' \
@@ -564,28 +460,9 @@ CI="$HERE/.github/workflows/ci.yml"
 check "CI가 계약 테스트를 돈다"               "grep -qF -- 'for t in scripts/test_*.sh' \"\$CI\""
 
 
-# --- 렌즈: 본문 체크리스트의 축이 복사용 프롬프트에도 다 실린다 ---
-# 실제로 도는 것은 프롬프트다. 본문에만 적힌 축은 그대로 복사한 세션에 닿지 않아 그 축이 통째로
-# 안 돌고, 출력 스키마의 해당 `type` 값이 한 번도 안 쓰인 채 남는다.
-# 전에는 그때 눈에 띈 문구 셋을 grep 으로 붙들었는데, 그 모양은 새로 갈라지는 축을 못 잡았다(실제로
-# 세 렌즈가 갈린 채 검사를 통과했다). 그래서 본문에서 축 이름을 뽑아 프롬프트와 대조한다.
-echo "[렌즈 — 본문 축이 프롬프트에도 실린다]"
-for L in "$HERE"/skills/lens-*/SKILL.md; do
-  LN="$(basename "$(dirname "$L")")"
-  AXES="$(awk '/^## 체크리스트/{f=1;next} f&&/^## /{exit} f&&/^- \*\*/{print}' "$L" \
-          | sed 's/^- \*\*//; s/\*\*.*$//')"
-  [ -z "$AXES" ] && continue
-  while IFS= read -r ax; do
-    [ -z "$ax" ] && continue
-    check "$LN: 프롬프트가 축을 부른다: $ax" "grep -m1 '^- system:' '$L' | grep -qF -- '$ax'"
-  done <<AXEOF
-$AXES
-AXEOF
-done
-
 # --- 새로 만든 스킬이 진입로에 등재된다 ---
 # 스킬을 만들면서 그것을 가리키는 자리를 함께 만들지 않으면, 상황에서 출발한 세션이 그 스킬에 닿지
-# 못한다(실제로 audit-repo-docs 이 에이전트원칙의 두 표 어디에도 없었다). 그래서 스킬 디렉터리에서 이름을
+# 못한다(실제로 레포 문서 감사 스킬이 에이전트원칙의 두 표 어디에도 없었다). 그래서 스킬 디렉터리에서 이름을
 # 도출해 에이전트원칙이나 도메인 목차가 그 이름을 한 번은 부르는지 본다.
 echo "[스킬 등재 — 진입로에서 이름이 불린다]"
 for d in "$HERE"/skills/*/; do
@@ -618,14 +495,13 @@ check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
 # 호출 정책의 규칙은 domain-plugin 이 소유하고, 검사는 test_lens_contract.sh 「호출 정책」 묶음이 한다.
 check "domain-plugin 이 에이전트 호출 정책을 둔다" "has_sec \"\$HERE/skills/domain-plugin/SKILL.md\" '에이전트 호출 정책'"
 
-# --- 이독성 규칙의 출처가 세 문서에 걸쳐 이어져 있다 ---
-# 에이전트원칙은 조항만 담고, domain-korean 이 상세를 담으며, lens-readability 가 그것을 열어 대조한다.
-# 전에 에이전트원칙을 줄이면서 조항을 스킬로 통째로 내렸더니 렌즈가 가리키는 근거가 에이전트원칙에서 사라졌는데,
-# 검사가 새 자리를 따라가 버려 끊긴 것을 못 잡았다. 그래서 셋을 한 줄로 함께 붙든다.
-echo "[규칙 출처] 에이전트원칙 → domain-korean → lens-readability 가 이어져 있다"
-RDB_L="$HERE/skills/lens-readability/SKILL.md"
-check "렌즈 프롬프트도 그 파일을 읽힌다" "grep -m1 '^- system:' \"$RDB_L\" | grep -qF 'domain-korean'"
-check "기준 문서가 자기 구실을 밝힌다"   "grep -qF 'lens-readability' \"$WK\""
+# --- 화면 리뷰 렌즈가 제목 규칙의 기준 문서를 연다 ---
+# lens-readability 는 렌더링된 화면의 제목을 TITLE-LAYERS·TITLE-CLAIM 으로 본다. 그 조항은 managing-docs 의
+# reading-docs.md 로 옮겨졌으므로, 정의가 그 파일을 기준 문서로 가리키는지 붙든다.
+echo "[규칙 출처] lens-readability 가 reading-docs.md 를 기준 문서로 연다"
+RDB_L="$HERE/agents/lens-readability.md"
+check "정의의 읽기 범위가 그 파일을 가리킨다" "sec_has \"\$RDB_L\" '읽기 범위' 'reading-docs.md'"
+check "그 파일이 실재한다"                    "[ -f \"\$HERE/skills/managing-docs/references/reading-docs.md\" ]"
 
 # --- 마켓플레이스 문안이 매니페스트에서 갈라지지 않는다 ---
 # 마켓플레이스 카드는 설치 전 사용자가 보는 첫 문안이다. 같은 사실을 두 파일이 각자 적으면 반드시
@@ -883,17 +759,6 @@ done
 NO_REF="$HERE/skills/nested-orchestration/references/sub-session-protocol.md"
 check "nested-orchestration 프로토콜: Claude 전용 종류 이름 없음"  "! grep -qF 'Explore' '$NO_REF'"
 check "nested-orchestration 프로토콜: 관리 디렉터리 절대경로 없음" "! grep -qF '~/.claude/disciplined-coder/' '$NO_REF'"
-# 렌즈 목록은 손으로 적지 않고 디렉터리에서 도출한다 — 렌즈를 더해도 사람이 목록을 맞출 필요가 없다.
-for D in "$HERE"/skills/lens-*/; do
-  l="$(basename "$D" | sed 's/^lens-//')"
-  F="$D/SKILL.md"
-  # 렌즈는 이 필드가 언제 필요한지를 스스로 규정하지 않고 aggregating-lenses 로 넘긴다. 예전에는 일곱 파일이
-  # 같은 문단을 복제해 지켰는데, 그 사이 aggregating-lenses 의 스키마 블록이 이 필드를 무조건 필수로 보이게 적어
-  # 필수 여부가 두 곳에서 갈렸다. 지금은 aggregating-lenses 한 곳만 규정하고 렌즈는 가리키기만 한다.
-  # principles_applied 를 부르는 줄이 소유자 이름과 계약 절 이름을 함께 가리키는지 본다.
-  check "lens-$l: 규칙을 aggregating-lenses 로 넘긴다" "grep -qF -- '\`aggregating-lenses\`' <<<\"\$(grep -F -- '\`principles_applied\`' '$F' | grep -F -- '리뷰 산출물 계약')\""
-done
-check "aggregating-lenses: 출력 스키마 절이 principles_applied 를 따로 다룬다" "sec_has_id '$HERE/skills/aggregating-lenses/SKILL.md' '출력 스키마' principles_applied"
 
 # --- 매니페스트 version 계약 ---
 # Claude 매니페스트는 version을 비워 커밋 SHA 기반 자동 업데이트를 유지한다(domain-plugin).
