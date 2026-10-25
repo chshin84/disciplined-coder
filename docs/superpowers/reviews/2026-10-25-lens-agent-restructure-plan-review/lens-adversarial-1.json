@@ -1,0 +1,185 @@
+{
+ "lens": "lens-adversarial",
+ "read": [
+  "skills/lens-adversarial/SKILL.md",
+  "agent-principles.md",
+  "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+  "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+  "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+  "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md (56-64행, 151행 일부)",
+  "skills/aggregating-lenses/SKILL.md (「리뷰 산출물 계약」, 「렌즈가 추가하는 칸」, 「구현 형태」)",
+  "scripts/test_docs_drift.sh (190-280행, 600-625행)",
+  "workflows/prior-art-search.js (15-125행)",
+  "agents/ 와 workflows/ 목록",
+  "~/.claude/settings.json (disciplined-coder 활성 줄)",
+  "~/.claude/plugins/cache/chshin-tools/disciplined-coder/*/skills 목록",
+  "scripts/scaffold.sh:231, scripts/_test_check.sh:3 (grep 결과)"
+ ],
+ "issues": [
+  {
+   "where": "Task 1 Step 2 (시험 명령 형식)",
+   "type": "failure-mode",
+   "claim": "Step 2 는 여섯 시험을 모두 권한 플래그 없이 `claude -p` 로 실행한다. 헤드리스 실행에서는 Playwright MCP 도구 호출이 권한 확인 단계에서 거부될 수 있다. 그 결과가 '플러그인 에이전트의 tools 에 MCP 도구를 적을 수 없다'로 잘못 판정되면, 사용자가 정한 대체안(readability 를 글 검토 에이전트로 남김)이 근거 없이 발동한다. 완화안은 Step 2 에 시험별 `--allowedTools`(또는 권한 모드)를 적는 일이다. 이어서 도구 거부와 도구 부재를 stream-json 의 tool_result 오류 문구로 구분해 판정하라고 적는다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "명령 형식은 `claude -p --plugin-dir \"$PWD\" --output-format stream-json --verbose \"<요청>\"` 이다.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "`lens-readability` 를 글 검토 에이전트로 남긴다(사용자 결정 2026-10-25)",
+   "principle": "NO-ASSUME",
+   "consequence": "현재 plan 의 시험 명령에는 권한 플래그가 없다. 거부와 부재를 구분하는 판정 기준도 Step 2·3 에 없다."
+  },
+  {
+   "where": "Task 1 Step 2 (`@agent-` 직접 실행 시험)",
+   "type": "failure-mode",
+   "claim": "`@agent-disciplined-coder:lens-adversarial` 언급은 대화형 입력창의 기능이다. 그래서 `claude -p` 의 프롬프트 문자열 안에서는 같은 경로로 처리된다고 확인한 근거가 없다. 이 시험이 -p 에서만 실패하면 spec 의 대체안('description 에 자연어 요청 문구만 둔다')이 잘못 발동한다. 완화안은 이 시험 하나만 대화형 세션에서 하거나, -p 결과가 실패이면 대화형으로 한 번 확인한 뒤 판정하라고 Step 2 에 적는 일이다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "시험마다 요청과 판정은 spec 표를 따른다.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "description 에 자연어 요청 문구만 둔다",
+   "principle": "NO-ASSUME",
+   "consequence": "현재 plan 은 이 시험도 다른 시험과 같은 -p 명령 하나로만 실행하게 되어 있다."
+  },
+  {
+   "where": "Task 1 Step 3 (같은 이름 동시 적재 기록)",
+   "type": "failure-mode",
+   "claim": "이 PC 에는 설치된 `disciplined-coder@chshin-tools` 가 활성이고, 그 캐시에도 `lens-*` 스킬이 있다. 그래서 `--plugin-dir` 로 같은 이름의 플러그인을 함께 적재하면 '같은 이름의 스킬과 에이전트' 시험(시험 3)에서 옛 스킬이 설치본에서 왔는지 이 브랜치에서 왔는지 구분되지 않는다. Step 3 은 동시 적재 여부를 '적는다'고만 하고, 동시 적재가 확인됐을 때의 판정과 처리를 정하지 않는다. 완화안은 시험 세션에서 설치본을 끈 채(예: 별도 설정 디렉터리나 비활성 설정) 실행하라는 조건을 Step 2 에 적는 일이다. 또는 동시 적재가 확인되면 시험 1·3 을 무효로 보고 다시 설계하라고 Step 4 에 적어도 된다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "설치된 플러그인과 `--plugin-dir` 의 같은 이름이 함께 적재되었는지도 적는다.",
+   "counterpart_file": "~/.claude/settings.json",
+   "counterpart": "\"disciplined-coder@chshin-tools\": true,",
+   "principle": "CHECKABLE",
+   "consequence": "현재 Step 3·4 에는 동시 적재가 확인된 상황에서 시험 결과를 어떻게 판정할지가 없다."
+  },
+  {
+   "where": "Task 1 Step 2·4 (CLAUDE.md 상속 시험)",
+   "type": "failure-mode",
+   "claim": "이 저장소의 세션 넛지 훅은 메인 세션에 '서브에이전트에는 에이전트원칙이 안 실리므로 그 경로를 프롬프트에 직접 넣어라'고 지시한다. 그래서 메인 세션이 Agent 프롬프트에 원칙 경로나 조항을 넣으면 에이전트가 조항 ID 를 맞힌다. 그 결과는 상속으로 잘못 판정된다. 상속으로 판정되면 Step 4 가 PRINCIPLES 줄 삭제를 사용자에게 묻는다. 완화안은 이 시험의 판정 조건에 'stream-json 의 Agent tool_use 입력 prompt 에 원칙 경로·조항 문구가 없음'을 넣는 일이다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "에이전트에게 원칙의 조항 ID 하나를 묻는다",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "받으면 PRINCIPLES 줄과 원칙이 두 번 실리므로 PRINCIPLES 줄을 뺄지 사용자에게 묻는다.",
+   "principle": "NO-ASSUME",
+   "consequence": "현재 plan Step 2 는 tool_use 이벤트에서 subagent_type·도구·턴 수만 읽게 하고, 넘긴 prompt 내용은 확인하지 않는다."
+  },
+  {
+   "where": "Task 1 Step 2 (시험 1 과 시험 5 의 실행)",
+   "type": "over-engineering",
+   "claim": "시험 1(subagent_type 으로 lens-grounding 실행, tools 확인)과 시험 5(같은 spec 에 lens-grounding 을 실행해 턴 수·도구 호출 수·effort 측정)는 같은 에이전트를 같은 대상에 실행한다. 이 두 시험을 따로 실행하면 렌즈 1회(조사 기록 grounding 중앙값 132k 토큰, 191초)가 중복된다. 단순화안은 시험 5 의 대상으로 시험 1 을 실행하고, 그 한 번의 stream-json 에서 두 시험의 값을 함께 읽게 하는 일이다. 근거는 사용자의 작업당 비용 최소화 목표와 '같은 질문을 같은 조건으로 다시 실행하지 않는다' 제약이다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "effort 시험 대상은 이 plan 의 spec 하나다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "| grounding | 132k | 191초 | 178 | 88% | 94% | 약 48k | 약 10% |",
+   "principle": "YAGNI",
+   "consequence": "현재 plan 은 시험마다 따로 실행하라고만 적고, 두 시험을 한 실행으로 합치는 지시가 없다."
+  },
+  {
+   "where": "Task 1~10 의 마지막 Step (커밋한다), 전역 제약의 Task 5 시작 조건",
+   "type": "risk",
+   "claim": "모든 작업이 마지막 단계에서 바로 커밋하게 되어 있다. 이 구성은 '커밋은 사용자 요청 시에만 한다'는 사용자 지시와 상충한다. 반대로 커밋을 하지 않으면 Task 5 의 main 병합을 커밋되지 않은 변경 위에서 해야 한다. 그러면 병합이 거부되거나 Task 1~4 변경과 병합 충돌이 섞인다. 또 Task 7 수정과 Task 8 삭제가 한 작업 트리에 섞이면 Task 8 만 되돌리기 어렵다. 완화안은 각 커밋 단계를 '사용자에게 커밋 승인을 묻는다'로 바꾸는 일이다. 특히 Task 4 끝(병합 전)과 Task 7 끝(삭제 전)에는 승인 질문을 반드시 넣는다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "- [ ] **Step 6: 커밋한다.** `git commit -m \"렌즈 스킬과 레포 문서 감사를 지운다\"`",
+   "counterpart_file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "counterpart": "Task 5 이후는 원칙 경량화 세션(`worktree-principles-slimming`)이 main 에 병합된 뒤 그 커밋 위에서 시작한다.",
+   "principle": "REVERSIBLE",
+   "consequence": "현재 plan 에는 사용자에게 커밋 승인을 묻는 단계가 없고, 열 작업 모두 커밋 명령이 그대로 적혀 있다."
+  },
+  {
+   "where": "Task 3 Step 1 셋째 검사와 Step 3 (agent() 괄호 짝 파서)",
+   "type": "failure-mode",
+   "claim": "현행 `workflows/prior-art-search.js` 15행의 주석에 `agent()` 가 있다. 그 앞 문자는 공백이므로 Step 3 의 규칙('식별자 문자가 앞에 붙지 않은 `agent(`')에 해당한다. 짝 괄호까지 읽은 내용은 빈 문자열이고 `agentType` 이 없다. 그래서 첫 검사('현행 정의와 워크플로가 호출 정책을 지킨다')가 현행 파일에서 오탐으로 실패한다. 또 Step 1 의 픽스처는 '첫 `agent(` 호출'을 고치게 한다. 그런데 문자열상 첫 `agent(` 는 이 주석이므로, 픽스처가 실제 호출을 바꾸지 않고도 주석 오탐 때문에 1 을 돌려준다. 그러면 결함 주입이 잘못된 이유로 통과한다. 완화안은 Step 3 에 `//`·`/* */` 주석과 문자열·템플릿 리터럴을 먼저 지운 뒤 괄호 짝을 읽으라고 적는 일이다. 이어서 픽스처는 'agentType 키가 있는 첫 호출'에서 키를 지우라고 적는다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "식별자 문자가 앞에 붙지 않은 `agent(` 마다 짝이 맞는 닫는 괄호까지 읽고, 그 안에 `agentType` 이 없으면 위반이다.",
+   "counterpart_file": "workflows/prior-art-search.js",
+   "counterpart": "// 단계 사이에는 parallel() 장벽을 둔다. thunk 는 agent() 의 반환만 돌려주고, 짝짓기는 반환 배열의 위치로 한다.",
+   "principle": "CHECKABLE",
+   "consequence": "현재 plan 의 파서 규칙대로 구현하면 현행 워크플로 15행 주석이 위반 한 줄로 출력된다. 픽스처 지시도 그 주석을 첫 호출로 가리킨다."
+  },
+  {
+   "where": "Task 3 Step 3 (agentType 존재 판정)",
+   "type": "failure-mode",
+   "claim": "Step 3 은 호출 괄호 안에 문자열 `agentType` 이 '있는지'만 본다. 그래서 호출 안의 주석('// agentType 생략')이나 프롬프트 문자열에 그 낱말이 있으면 실제 옵션 키가 없어도 통과하므로 위반을 놓친다. 반대로 `{ ...opts }` 처럼 펼친 객체로 agentType 을 넘기는 호출은 오탐이 된다. 완화안은 주석과 문자열을 지운 뒤 `agentType\\s*:` 형태의 키를 찾게 하는 일이다. 펼친 객체는 위반으로 보고 정의 쪽에 명시하라는 규칙을 domain-plugin 절에 함께 적는다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "그 안에 `agentType` 이 없으면 위반이다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "counterpart": "`workflows/` 아래 스크립트의 `agent()` 호출이 모두 `agentType` 을 준다.",
+   "principle": "CHECKABLE",
+   "consequence": "현재 plan 의 판정은 낱말 포함 여부이고, 키 형태나 주석·문자열 제외 조건이 없다."
+  },
+  {
+   "where": "Task 4 Step 3 (원칙 경량화 반영 시점)과 Task 5 Steps",
+   "type": "failure-mode",
+   "claim": "Task 4 Step 3 은 원칙 경량화 세션이 병합되기 전이면 'Task 5 시작 때 다시 맞춘다'고 미룬다. 그러나 Task 5 의 Step 1~4 에는 그 재조정 단계도 확인 단계도 없다. 그래서 실행 세션이 Task 5 를 단계대로 따르면 `lens-readability` 81·110행과 `lens-adversarial` 포인터 변경이 반영되지 않은 정의로 채택 비교를 한다. 그 경우 측정값이 최종 정의와 다르다. 완화안은 Task 5 에 Step 0 을 두는 일이다. Step 0 은 '병합된 원칙 경량화 커밋의 diff 를 정의 여섯 개에 반영하고 `test_lens_contract.sh` FAIL=0 을 확인한다'이다. 또는 Task 4 자체를 병합 뒤로 옮겨 한 번에 쓰게 해도 된다. 두 번째 안이 재작성 비용이 없다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "병합 전이면 Task 5 시작 때 다시 맞춘다.",
+   "counterpart_file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "counterpart": "원칙 경량화 세션의 병합 뒤에 시작한다. 시작 전에 고칠 줄 범위(Task 7·8 의 Files)를 원칙 경량화 세션과 선행연구 개선 세션에 메시지로 보낸다.",
+   "principle": "CHECKABLE",
+   "consequence": "현재 Task 5 의 시작 조건과 단계에는 메시지 전송만 있고, 정의 재조정 단계는 없다."
+  },
+  {
+   "where": "Task 2 Interfaces(계약 파일 구조), Task 7 Step 1, Task 8 Delete 목록",
+   "type": "failure-mode",
+   "claim": "`aggregating-lenses` 「리뷰 산출물 계약」에는 키 목록 말고 산문 규칙도 있다. '상대편을 못 대면 발견이 아니다', consequence 에 현재 상태만 적기, 등급 라벨 금지, principles_applied 를 언제 요구하는지, 줄 번호 금지, `where` 의 뜻이 그 규칙이다. `lens_contract.json` 은 키에 `true` 만 두는 구조라 이 규칙을 담지 못한다. Task 7 Step 1 이 옮기는 절도 「하는 일」·「판단 재귀 회피」·「처분」·집계 방법뿐이다. 그래서 Task 8 이 스킬을 지우면 이 규칙의 출처가 사라진다. 게다가 Task 4 Step 3 은 현행 SKILL.md 의 모든 절을 옮기게 하므로, 정의 여섯 개에 '`aggregating-lenses`의 리뷰 산출물 계약이 정한다' 포인터도 복사된다. 그 포인터는 Task 8 Step 3 grep 에 잡힌다. 그러나 고칠 대상 위치가 plan 에 없다. 완화안은 Task 7 Step 1 의 이전 목록에 「리뷰 산출물 계약」의 산문 규칙(34-49행)과 그 이전 위치(예: dispatching-lenses 「결과를 모으는 법」)를 적는 일이다. 이어서 Task 4 Step 3 에 정의의 포인터를 그 위치로 적으라고 적는다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "aggregating-lenses 의 「하는 일」, 「판단 재귀 회피」, 「처분」, 메인 세션 집계 방법을 「결과를 모으는 법」으로 옮긴다.",
+   "counterpart_file": "skills/aggregating-lenses/SKILL.md",
+   "counterpart": "발견 하나는 지적한 곳(파일과 그 파일의 문장), 상대편(실제 코드, 파일, 다른 문서의 문장 중 지적한 곳과 불일치하는 쪽), 원칙(어느 규칙에 적용되는지), 결과다. **상대편을 못 대면 발견이 아니다.** 지적만 하고 대조할 상대가 없으면 올리지 않는다.",
+   "principle": "REPORT-DEAD",
+   "consequence": "현재 plan 의 어느 작업도 「리뷰 산출물 계약」의 산문 규칙을 옮길 위치로 지정하지 않는다. 현행 렌즈 다섯 개는 그 규칙을 이 절로 가리키고 있다."
+  },
+  {
+   "where": "Task 8 Step 1·Step 4 (옮긴 검사의 대조와 결함 주입)",
+   "type": "risk",
+   "claim": "Task 8 이 지우는 235-274행 중에는 '뜻풀이를 베끼지 않는다', '출력 스키마가 계약 소유자를 가리킨다', '덧붙임 칸이 목록에 있다' 검사가 있다. 이 성질은 Task 4 [정의] 묶음(키 집합·lens 값·type 집합 대조)에 대응 검사가 없다. Step 1 은 '빠진 성질이 있으면 먼저 추가한다'고만 하고, 추가한 검사가 실제로 실패하는지 확인하는 주입은 정하지 않는다. Step 4 의 결함 주입 네 가지는 저장소 핵심 계약(리뷰 기록·superseded·.bak·읽기 전용 훅)이라 이번에 옮긴 렌즈 검사와 무관하다. 그래서 옮긴 성질의 검출력은 Task 4 의 `severity` 주입 하나로만 확인된다. 완화안은 Step 1 대조표의 행마다 결함 하나씩을 주입하라고 적는 일이다. 예를 들어 lens 값을 다른 이름으로 바꾸기, readability 예시에 omit 칸 넣기, 계약 소유자 포인터 지우기를 주입하고 `test_lens_contract.sh` 가 실패하는지 확인한다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "리뷰 기록을 보존 태그 없이 지우기, 대체된 spec 의 superseded 표시 지우기, settings.json 사본(.bak) 만들기 없애기, 읽기 전용 차단 훅 무력화를 한 번에 하나씩 넣는다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "check \"$n: 출력 스키마가 계약 소유자를 가리킨다\" \"points_to '$L' '\\`aggregating-lenses\\`' '리뷰 산출물 계약'\"",
+   "principle": "CHECKABLE",
+   "consequence": "현재 plan 의 결함 주입은 지워지는 렌즈 스키마 검사의 성질을 하나도 겨누지 않는다."
+  },
+  {
+   "where": "Task 8 Files (Modify 목록)",
+   "type": "failure-mode",
+   "claim": "Step 3 의 grep 은 `scripts/scaffold.sh:231` 의 `audit_targets.sh` 언급과 `scripts/_test_check.sh:3` 의 `_audit_common.sh` 언급에도 해당한다. 그러나 두 파일은 Files 목록에도 spec 「1:1 전제 목록」·「감사를 가리키는 파일」 행에도 없다. 그래서 실행 세션은 Step 3 에서 목록 밖 파일을 고칠지 멈춰 판단해야 하므로 절반만 완료된 상태로 끝날 수 있다. 완화안은 두 파일을 Task 8 Modify 목록에 넣는 일이다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "- Modify: spec 「1:1 전제 목록」의 모든 위치, spec 처분 표 「감사를 가리키는 파일」 행의 파일들",
+   "counterpart_file": "scripts/_test_check.sh",
+   "counterpart": "# 베껴 두면 한쪽만 고쳐져 갈라진다(_audit_common.sh 와 같은 이유).",
+   "principle": "CHECKABLE",
+   "consequence": "현재 Task 8 의 Files 와 spec 의 두 목록에는 scaffold.sh 와 _test_check.sh 가 없다."
+  },
+  {
+   "where": "Task 9 Step 6 (렌즈 리뷰 한 차수)",
+   "type": "over-engineering",
+   "claim": "Step 6 은 fit 지적 중 `style` 비율 하나를 측정하려고 렌즈 리뷰 한 차수 전체를 실행한다. 조사 기록 기준으로 한 차수는 약 49만 토큰이고, fit 1회는 109k 토큰이다. 측정 대상은 fit 출력뿐이므로 lens-fit 한 번이면 같은 값을 얻는다. 또 비율이 줄지 않았을 때 무엇을 할지(되돌리기, 사용자 질문)가 정해져 있지 않다. 그래서 그 측정은 결정에 쓰이지 않는다. 단순화안은 대상 하나에 lens-fit 만 한 번 실행하는 일이다. 대상 문서를 지정하고, 줄지 않으면 수치를 적어 사용자에게 묻는다고 적는다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "이어서 렌즈 리뷰 한 차수를 실행해 fit 지적 중 `style` 비율이 약 85% 보다 줄었는지 결정 기록에 적는다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "| fit | 109k | 131초 | 302 | 63% | 60% | 약 21k(설계 지적만 세면 약 120k) | 약 85% |",
+   "principle": "YAGNI",
+   "consequence": "현재 Step 6 은 렌즈 네 개 차수를 요구하고, 대상 문서와 미달 시 처리를 적지 않는다."
+  },
+  {
+   "where": "Task 6 Step 5 (검증자 재사용 재검토 조건)",
+   "type": "failure-mode",
+   "claim": "Step 5 는 '실패가 많으면' 검증자 재사용을 다시 묻게 한다. 그러나 몇 건이나 몇 퍼센트부터 많은지 기준이 없다. 그래서 실행 세션이 기준을 지어내거나 묻지 않고 넘어간다. 완화안은 기준 없이 인용 확인 실패 건수와 전체 건수를 사용자에게 보이고 재검토 여부를 묻는다고 적는 일이다. 이 방식은 근거 없는 임계값을 두지 않는 조사 기록의 원칙과도 맞는다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "실패가 많으면 spec 「새 체크리스트」대로 검증자 재사용을 사용자에게 다시 묻는다.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "5단계 측정에서 인용 확인 실패가 많으면 그때 다시 검토한다.",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "현재 plan 과 spec 모두 '많으면'의 기준을 정하지 않았다."
+  }
+ ],
+ "principles_applied": [
+  "YAGNI",
+  "REVERSIBLE",
+  "CHECKABLE",
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "REPORT-DEAD",
+  "OTHER-SESSIONS",
+  "ASK-OPTIONS"
+ ],
+ "notes": "검토한 관점은 실패 모드, 과설계, 비가역, 위험이다. 타깃 체크리스트 1~5를 항목마다 따로 보았다. (3) 비용: Task 5 는 대상 2개 × 렌즈 4개로 약 98만 토큰(조사 기록 중앙값 115k+132k+132k+109k=488k ×2)이 든다. 이 실행은 되돌리기 어려운 Task 8 삭제 앞의 채택 관문이고, 기준선(현행 비율 1.0)은 다시 실행하지 않으므로 목적 대비 과하다고 판단하지 않았다. Task 6 은 1회 실행이라 같다. 과한 쪽은 Task 1 의 시험 1·5 중복과 Task 9 Step 6 의 차수 전체 실행이고, 둘 다 issues 에 올렸다. (1) effort 측정: Task 1 Step 2 는 '토큰과 시간은 usage 에서 읽는다'고 하지만, 서브에이전트의 실제 effort 를 stream-json 의 어느 필드에서 읽는지는 적지 않았다. 그 필드가 있는지 확인하지 못했으므로 지적으로 올리지 않았다. 실행 전에 stream-json 출력에 effort 가 노출되는지 한 번 확인할 필요가 있다. 노출되지 않으면 spec 표의 effort 행은 측정할 수 없다. (1) Task 1 의 시험용 정의 커밋: Task 4 가 덮어쓰고 test_docs_drift.sh 608행의 description 안전 검사만 agents/*.md 를 보므로 커밋 자체가 시험을 깨지는 않는다. 다만 커밋 승인 문제는 커밋 단계 지적에 포함했다. (5) 순서: 스킬 삭제(Task 8)가 채택 비교(Task 5)·주장 반박 시험(Task 6)·호출 스킬 수정(Task 7) 뒤에 있어 순서 자체는 되돌리기 쉬운 쪽이다. 남은 위험은 커밋 없이 진행할 때 Task 7·8 변경이 한 작업 트리에 섞이는 점이고, 커밋 단계 지적에 포함했다. 다른 세션의 브랜치는 읽지 않았다(OTHER-SESSIONS). 그래서 원칙 경량화 세션이 실제로 고친 줄과 Task 4 정의의 겹침 정도는 확인하지 않았다."
+}

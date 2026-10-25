@@ -1,0 +1,118 @@
+{
+ "lens": "lens-adversarial",
+ "read": [
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\skills\\lens-adversarial\\SKILL.md",
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\agent-principles.md",
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\docs\\superpowers\\decisions\\2026-10-25-agent-call-policy.md",
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\skills\\domain-pruning\\SKILL.md (「분류」)",
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\skills\\domain-plugin\\SKILL.md (「훅과 상시 지시의 과잉을 판정할 때」)",
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\docs\\superpowers\\specs\\2026-10-25-lens-agent-restructure-design.md (grep: agent·tools 관련 행)",
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\workflows\\prior-art-search.js (agent() 호출과 agentType)",
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\agents\\prior-art-*.md (frontmatter)",
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\scripts\\test_docs_drift.sh (945·954행)",
+  "D:\\projects\\Structure\\disciplined-coder\\.claude\\worktrees\\lens-agent-restructure\\skills\\dispatching-lenses\\SKILL.md (41·47행)"
+ ],
+ "issues": [
+  {
+   "where": "「판단」 34행과 「유의사항」 40행",
+   "type": "failure-mode",
+   "claim": "시나리오 C 가 막는 경로는 이미 Agent 가 없는 정의뿐이다. 그래서 사용자가 위험하다고 한 중첩은 정책을 따른 뒤에도 그대로 남는다. 실제 중첩은 메인 세션이 tools 를 정하지 않은 general-purpose 를 실행할 때 생긴다. 이 렌즈 호출도 general-purpose 로 실행되어 Agent 도구를 받았다. 판단 절은 이 잔여 경로를 '규칙 밖'으로만 적고, 사용자의 질문(에이전트가 에이전트를 부르는 구조의 위험)에 대한 답에서 그 경로가 남는다는 사실과 남기는 근거를 밝히지 않는다. 판단 절에 잔여 경로를 명시하고, 그 경로를 받아들이는 근거나 완화(예: 플러그인 스킬이 서브에이전트를 열 때 Agent 없는 종류를 쓰라는 지시)를 적는 수정이 필요하다.",
+   "file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "evidence": "이 규칙은 플러그인이 정의한 에이전트에만 적용된다. 메인 세션이 general-purpose 나 Explore 같은 내장 에이전트를 직접 실행하는 호출(조사용 서브에이전트 등)은 이 규칙 밖에 남는다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "counterpart": "플러그인의 에이전트 정의는 `agents/prior-art-*.md` 네 개뿐이고, 네 개 모두 tools 에 Agent 가 없다",
+   "principle": "NO-ASSUME",
+   "consequence": "정책 적용 전후로 Agent 를 가진 플러그인 정의 수는 0 으로 같다. 중첩이 생길 수 있는 경로는 메인 세션의 general-purpose 실행(렌즈 전환 전 단계와 플러그인 밖 호출)으로 남아 있다. Explore 는 공식 목록에서 Agent 가 빠져 있어 이 공백에 들지 않는데도 문서는 general-purpose 와 같은 줄에 묶었다."
+  },
+  {
+   "where": "「판단」 36행(검사 범위)과 「확인한 사실」 16행·「유의사항」 44행",
+   "type": "risk",
+   "claim": "정책은 워크플로 스크립트를 에이전트를 부르는 정당한 주체로 정하면서 검사는 `agents/` 아래 정의만 본다. 워크플로의 agent() 호출에 agentType 을 주지 않으면 기본 에이전트가 실행된다. 그 기본 에이전트가 Agent 도구를 물려받는다면(가정이다. 공식 문서의 Workflow agent() 기본 종류로 확인할 수 있다) 정의 검사를 통과한 채 중첩이 생긴다. 현행 `workflows/prior-art-search.js` 의 agent() 호출은 모두 agentType 을 주므로 지금은 문제가 없다. 그러나 검사 범위 문장에 워크플로 agent() 호출의 agentType 지정을 함께 넣어야 정책이 스스로 정한 주체를 덮는다.",
+   "file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "evidence": "검사는 `agents/` 아래 모든 정의에 대해 tools 가 있고 그 안에 Agent 가 없는지 확인한다.",
+   "counterpart_file": "workflows/prior-art-search.js",
+   "counterpart": "{ agentType: RESEARCHER, label: `research:${sq.id}`, phase: 'Research', schema: S.RESEARCHER_SCHEMA }",
+   "principle": "CHECKABLE",
+   "consequence": "워크플로 스크립트는 검사 대상 밖에 있다. agentType 을 뺀 agent() 호출을 추가해도 정책의 검사는 실패하지 않는다."
+  },
+  {
+   "where": "「판단」 36행(검사 판정 방법)",
+   "type": "failure-mode",
+   "claim": "검사 문장이 tools 를 어떤 형식으로 읽을지 정하지 않는다. 기존 검사는 `grep -qx 'tools: ...'` 처럼 한 줄 쉼표 목록만 읽는다. 같은 방식으로 새 검사를 쓰면 다음 형식에서 판정이 틀린다. YAML 배열(`tools:` 다음 줄에 `- Agent`)은 tools 줄이 비어 보여 생략 위반으로 오판하거나, 그 줄에서 Agent 를 찾지 못해 통과시킨다. `Agent(lens-x)` 구문은 단어 일치 방식에 따라 놓친다. 옛 이름 `Task` 는 Agent 문자열이 없어 통과한다(Task 가 지금도 Agent 의 별칭으로 받아들여진다는 점은 가정이다. 공식 문서의 도구 이름 변경 기록으로 확인할 수 있다). `disallowedTools: Agent` 만 두고 tools 를 생략한 정의는 사실 12행에 따르면 안전한데 36행은 위반으로 본다. 36행에 허용 형식(한 줄 쉼표 목록만)과 Task·Agent(...) 를 모두 Agent 로 보는 규칙과 disallowedTools 처리 방식을 적어야 한다.",
+   "file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "evidence": "tools 생략은 Agent 를 물려받으므로 위반으로 본다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "counterpart": "`tools` 허용 목록이나 `disallowedTools` 로 막을 수 있다",
+   "principle": "CHECKABLE",
+   "consequence": "36행은 tools 의 기록 형식과 Agent 의 다른 표기를 정의하지 않는다. scripts/test_docs_drift.sh 945·954행의 기존 도구 검사는 한 줄 정확 일치 방식이다."
+  },
+  {
+   "where": "「시나리오」 표 D 행과 「판단」 34행",
+   "type": "risk",
+   "claim": "판단 절은 B 의 기각 이유만 적고 D 의 기각 이유를 적지 않는다. D 는 표에서 C 가 덮지 못하는 general-purpose 중첩까지 하네스가 막는 유일한 안이다. 그래서 D 를 버리면 잔여 위험(첫 지적)을 받아들이는 셈인데 그 교환이 판단에 드러나지 않는다. D 의 단점 '사용자가 다른 작업에서 쓰는 중첩까지 막는다'도 비개발 사무직 사용자가 실제로 중첩을 쓰는지에 대한 근거가 없다. 판단 절에 D 를 기각한 근거(사용자 설정 수정 비용, domain-plugin 의 설정 파일 수정 규칙)를 적고, D 를 사용자 선택 안내로 둘지를 사용자에게 물을 결정으로 남겨야 한다.",
+   "file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "evidence": "B 는 기본이 허용이라 tools 를 생략한 정의가 Agent 를 물려받으므로 기각한다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "counterpart": "general-purpose 를 포함한 모든 서브에이전트의 중첩을 하네스가 막는다 | 플러그인이 사용자 설정을 바꿔야 하고, 사용자가 다른 작업에서 쓰는 중첩까지 막는다",
+   "principle": "ASK-OPTIONS",
+   "consequence": "판단 절에는 D 에 대한 판정 문장이 없다. D 의 단점 칸에는 사용자 중첩 사용 빈도의 출처가 없다."
+  },
+  {
+   "where": "「시나리오」 표 B 행 단점 칸과 「판단」 34행의 B 기각 문장",
+   "type": "failure-mode",
+   "claim": "B 의 기각 이유는 'tools 를 생략한 정의가 Agent 를 물려받는다'인데, 36행의 검사(tools 생략을 위반으로 본다)를 B 에 똑같이 붙이면 그 단점이 사라진다. 그래서 문서가 든 이유로는 A·C 와 B 가 구분되지 않는다. 남는 실제 차이는 B 가 선언하지 않은 정의의 tools 에 Agent 를 적는 일을 허용한다는 점이다. 기각 문장을 그 차이로 고쳐야 사용자가 요청한 하위 지정·상위 지정 판단의 근거가 맞게 선다. 하위 지정이 나은 조건(대부분의 정의가 다른 에이전트를 불러야 하는 구성)이 지금은 없다는 점도 같은 문장에 적을 수 있다.",
+   "file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "evidence": "기본이 허용이라서 선언을 잊은 새 정의와 tools 를 생략한 정의가 Agent 를 물려받는다. 실패가 위험한 쪽으로 난다",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "counterpart": "tools 생략은 Agent 를 물려받으므로 위반으로 본다.",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "B 의 기각 근거와 C 에 붙인 검사가 같은 결함(tools 생략)을 다룬다. 문서에는 검사를 붙인 B 와 C 의 차이가 적혀 있지 않다."
+  },
+  {
+   "where": "「판단」 36행(검사 대상)",
+   "type": "over-engineering",
+   "claim": "domain-pruning 「분류」의 중복 질문으로 보면, 선행연구 정의 네 개에 대해 새 검사는 기존 검사와 같은 결함을 잡는다. test_docs_drift.sh 954행은 각 정의의 tools 줄을 구성과 정확히 대조하므로 Agent 를 추가하면 이미 실패한다. 새 검사의 고유한 보호는 정확 대조가 없는 정의(새 렌즈 정의와 앞으로의 정의)에만 있다. 36행에 새 검사가 기존 정확 대조를 대체하는지 함께 두는지를 적어야 같은 결함에 검사가 두 개 생기지 않는다.",
+   "file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "evidence": "검사는 `agents/` 아래 모든 정의에 대해 tools 가 있고 그 안에 Agent 가 없는지 확인한다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "check \"$base 의 도구가 구성과 같다\" \"grep -qx 'tools: $tools' <<<\\\"\\$FMV\\\"\"",
+   "principle": "YAGNI",
+   "consequence": "선행연구 정의 네 개는 이미 tools 줄 정확 일치 검사를 받는다. 정책은 새 검사와 그 검사의 관계를 적지 않는다."
+  },
+  {
+   "where": "「판단」 34행('오케스트레이터 에이전트가 처음 필요해질 때 A 의 선언 방식을 추가')",
+   "type": "risk",
+   "claim": "규칙을 고칠 시점의 결정 주체와 절차가 없다. 이 정책은 다른 세션(c6)이 상위 지정을 제안한 데서 나왔으므로, 오케스트레이터가 필요해지는 첫 세션은 이 세션이 아닐 가능성이 크다. 그 세션은 검사 실패를 만나면 선언 방식을 정하지 않고 검사에 예외 한 줄을 넣거나 Agent 를 tools 에 적는 쪽으로 갈 수 있다. 34행에 '선언 방식 추가는 사용자에게 묻는 설계 결정이며 검사 예외로 대신하지 않는다'는 멈춤 조건을 적으면 고치는 비용이 작게 유지된다.",
+   "file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "evidence": "권장안은 C 로 시작하고, 오케스트레이터 에이전트가 처음 필요해질 때 A 의 선언 방식을 추가하는 안이다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "counterpart": "선행연구 개선 세션(c6)이 2026-10-25 그쪽 사용자 지시로 \"상위 에이전트로 규정된 것만 에이전트를 호출할 수 있다\"는 정책을 제안했다.",
+   "principle": "TOP-DOWN",
+   "consequence": "34행에는 전환 시점을 누가 판단하는지와 그때 멈추고 물을 조건이 없다."
+  },
+  {
+   "where": "「유의사항」 46행(규칙을 둘 곳)",
+   "type": "risk",
+   "claim": "규칙을 domain-plugin 에 두면 효과는 이 플러그인을 개발하는 세션에만 미친다. domain-plugin 은 플러그인·훅을 만들 때 여는 스킬이므로 비개발 사무직 사용자의 세션은 이 스킬을 열지 않는다. 그 사용자에게 닿는 보호는 배포된 정의 파일의 tools 뿐이고, 그들의 프로젝트 `.claude/agents` 나 다른 플러그인의 에이전트에는 아무 효과가 없다. 46행은 배치 근거를 원칙 비용으로만 적으므로, 이 배치가 누구에게 효과가 있고 누구에게 없는지를 같은 문장에 밝혀야 사용자가 정책의 범위를 과대평가하지 않는다.",
+   "file": "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+   "evidence": "규칙을 둘 곳은 `domain-plugin` 스킬과 검사 스크립트다. 에이전트원칙에 두면 모든 프로젝트 세션에 실리고 조항별 클린룸 시험이 필요하다.",
+   "counterpart_file": "skills/domain-plugin/SKILL.md",
+   "counterpart": "Claude Code 플러그인·마켓플레이스를 만들 때, 훅을 만들 때 ... 참조하는 도메인 참고서다. 설계와 개발과 리뷰 단계에서 연다.",
+   "principle": "STATE-ASSUME",
+   "consequence": "46행은 다른 프로젝트 사용자에게 미치는 효과를 적지 않는다. domain-plugin 의 발동 조건은 플러그인 제작·리뷰다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "CHECKABLE",
+  "EVIDENCE-FIRST",
+  "ASK-OPTIONS",
+  "TOP-DOWN",
+  "REVERSIBLE",
+  "YAGNI",
+  "STATE-ASSUME",
+  "WRITTEN-ONLY",
+  "SUBJECT-OBJECT"
+ ],
+ "notes": "검토한 관점은 실패 모드, 과설계, 비가역, 위험이다. 비가역 관점에서는 발견이 없다. C 는 정의 파일의 tools 와 검사 하나라 되돌리기 쉽고, A 의 선언 방식을 미루는 판단은 YAGNI 에 맞다. A 와 C 가 같은 규칙이라는 30행의 분석도 타당하다. 더 확인해야 할 사항은 다음과 같다. 첫째, 선행연구 개선 세션 브랜치(worktree-prior-art-agent-review)에 Agent 를 가진 정의나 오케스트레이터 에이전트 계획이 있는지 확인하지 못했다. git 명령이 워크트리 격리로 거부되었기 때문이다. 그 브랜치에 그런 정의가 있으면 34행의 '지금 플러그인에는 다른 에이전트를 불러야 하는 정의가 없다'는 전제가 병합 뒤 틀린다. 둘째, 워크플로 agent() 의 기본 에이전트 종류와 Task 별칭이 지금도 받아들여지는지는 공식 문서로 확인해야 한다. 셋째, 렌즈 전환 spec 의 1~6단계 동안에는 렌즈가 여전히 general-purpose 로 실행되므로 40행의 '렌즈는 이 공백에서 빠진다'는 7단계 이후에만 참이다. 이 점은 고칠 줄을 40행으로 지목할 수 있으나 첫 지적과 원인이 같아 따로 올리지 않았다."
+}

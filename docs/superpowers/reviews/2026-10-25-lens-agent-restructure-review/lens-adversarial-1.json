@@ -1,0 +1,201 @@
+{
+ "lens": "lens-adversarial",
+ "read": [
+  "skills/lens-adversarial/SKILL.md",
+  "agent-principles.md",
+  "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+  "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+  "skills/domain-pruning/SKILL.md 「판정 질문」「분류」",
+  "skills/domain-plugin/SKILL.md 「훅과 상시 지시의 과잉을 판정할 때」",
+  "skills/dispatching-lenses/SKILL.md 전문",
+  "skills/review-docs/SKILL.md 85-100행",
+  "skills/review-llm-calls/SKILL.md 1-12행",
+  "scripts/audit_verify.sh 1-12, 40-66행",
+  "scripts/test_docs_drift.sh 195-210행",
+  "agents/ 와 scripts/ 목록, docs/superpowers/specs 와 reviews 의 10-11·10-25 목록",
+  "hooks/rules_nudge_pretooluse.sh 52행",
+  "skills/lens-*/SKILL.md 와 aggregating-lenses 의 행 수와 절 제목",
+  "lens-* 를 가리키는 파일 목록(grep)"
+ ],
+ "issues": [
+  {
+   "where": "「순서와 확인」 5단계와 6단계의 차례",
+   "type": "irreversible",
+   "claim": "렌즈 스킬과 aggregating-lenses 를 지우는 5단계가 채택을 판정하는 6단계보다 앞에 있다. 6단계를 5단계 앞으로 옮기면 판정이 실패했을 때 스킬 경로가 그대로 남아 되돌릴 일이 없어진다. 3단계 뒤에는 에이전트 정의와 스킬이 함께 있으므로 6단계를 그 시점에 실행할 수 있다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "5. `skills/lens-*/` 와 `skills/aggregating-lenses/` 를 지우고 … 6. 과거 spec 두 개 … 에 새 에이전트 네 개를 한 번씩 실행하고 「채택 조건」으로 판정한다.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "「채택 조건」 \"둘 중 하나라도 나빠지면 그 수치를 적어 사용자에게 묻는다\" 와 원칙 `REVERSIBLE` \"파일을 지우거나 … 실행 전에 확인받아라\"",
+   "principle": "REVERSIBLE",
+   "consequence": "채택 판정은 스킬 다섯 개와 aggregating-lenses 를 지우고 다섯 호출자 스킬을 고친 뒤에 실행된다. 판정이 나빠져 사용자가 기각하면 4·5단계 전체를 되돌려야 한다."
+  },
+  {
+   "where": "「순서와 확인」 6단계의 대상 spec 과 「채택 조건」 첫 두 문장",
+   "type": "failure-mode",
+   "claim": "비교 기준의 원본이 이 워크트리에 없고, 있는 원본도 지금의 spec 본문과 짝이 맞지 않는다. 비교 대상 spec 의 커밋과 기준 리뷰 기록의 차수를 6단계에 지정해야 대칭 비교가 된다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "과거 spec 두 개(`2026-10-25-principles-slimming-design.md` 와 `2026-10-11` 메시지 형식 spec) … 비교 기준은 조사 기록과 같은 날 실행한 리뷰 기록의 렌즈 원본이다.",
+   "counterpart_file": "docs/superpowers/specs/, docs/superpowers/reviews/ (이 워크트리)",
+   "counterpart": "specs 폴더에 2026-10-25 원칙 경량화 spec 이 없고, reviews 폴더에 그 리뷰 기록도 없다. 메시지 형식 spec 은 `2026-10-11-message-schema-review` 와 `-review-2` 두 차수가 있다",
+   "principle": "CHECKABLE",
+   "consequence": "원칙 경량화 spec 과 그 리뷰 원본은 다른 세션의 워크트리에만 있어 이 브랜치에서 읽을 수 없다. 메시지 형식 spec 은 1차 리뷰를 반영해 고쳐진 본문이 지금 저장소에 있으므로, 새 에이전트를 지금 본문에 실행하면 1차 기준 원본보다 지적이 적게 나오는 방향으로 기운다."
+  },
+  {
+   "where": "「채택 조건」 셋째 문장의 측정값(설계 지적 수, 토큰 합)",
+   "type": "risk",
+   "claim": "채택 지표가 한 번씩 실행한 지적 수의 단순 비교이고, 토큰 합의 출처가 없다. 반목표는 '반영되는 설계 지적'을 기준으로 삼는데 지표는 반영 여부를 보지 않는다. 기준 원본의 지적과 새 지적을 대조해 기준이 잡은 설계 지적을 몇 건 잡았는지로 세고, 토큰은 세션 기록의 서브에이전트 사용량에서 가져온다고 적으면 흔들림과 측정 불가를 줄일 수 있다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "같은 spec 에 대해 새 에이전트의 설계 지적(fit 의 style 유형을 뺀 지적) 수가 현행 원본보다 적지 않고, 차수의 토큰 합이 현행보다 크지 않으면 채택한다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "「선행연구 에이전트에서 옮길 교훈」 \"실행 사이 변동 때문에 도달할 수 없었다. 병합 조건은 오류 총량을 기준선과 비교하는 대칭 지표로 처음부터 정한다\" 와 spec 「목표와 비목표」 \"반영되는 설계 지적이 현행보다 줄어도 실패다\"",
+   "principle": "CHECKABLE",
+   "consequence": "지적 수는 실행마다 흔들리므로, 같은 원인을 둘로 나눠 쓴 실행은 통과하고 우연히 적게 낸 실행은 질문으로 올라간다. 리뷰 기록 원본에는 토큰 칸이 없어(감사의 run.json 만 tokens_method 를 보유) 기준 차수의 토큰 합을 어디서 읽는지 정해지지 않았다."
+  },
+  {
+   "where": "「실행 경로」 셋째 문단과 「먼저 할 런타임 시험」 첫 행의 판정 열",
+   "type": "failure-mode",
+   "claim": "사용자가 이름으로 직접 실행하면 호출자가 dispatching-lenses 를 거치지 않으므로 프롬프트에 MODE 줄과 PRINCIPLES 줄이 없다. 첫 시험의 판정 열에 'MODE·PRINCIPLES 줄 없는 입력에서 출력이 계약을 지키는가'를 넣으면 이 실패를 구현 전에 볼 수 있다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "| `@agent-disciplined-coder:lens-adversarial` 로 사용자가 직접 실행할 수 있는가 | 에이전트가 실행되고 정의의 tools 만 주어진다 | description 에 자연어 요청 문구만 둔다 |",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "「실행 경로」 둘째 문단 \"프롬프트의 첫 줄은 `MODE: <모드>`, 둘째 줄은 `PRINCIPLES: <principles_path>` … 모드가 하나인 에이전트도 첫 줄을 쓴다\" 와 「제약」 \"사용자는 렌즈를 이름으로 직접 실행할 수 있어야 한다\"",
+   "principle": "CHECKABLE",
+   "consequence": "시험 판정은 실행 여부와 tools 만 본다. 직접 실행한 렌즈가 모드를 모른 채 실행되고 principles_applied 를 비워 내도 시험은 통과로 기록된다. 실패하면 대안이 자연어 요청뿐이라, 지금의 슬래시 명령보다 이름 지정이 약해진다."
+  },
+  {
+   "where": "「스킬과 구조의 처분」 첫 행(`skills/lens-*/` 삭제)과 「순서와 확인」 5단계",
+   "type": "risk",
+   "claim": "설치본이 갱신되는 시점의 전환 처리가 spec 에 없다. 다른 프로젝트 사용자는 main 커밋의 설치 캐시로 실행하고, 갱신은 세션 시작 뒤에 도착하므로 한 세션 안에 옛 스킬 목록과 새 문서가 섞일 수 있다. 같은 이름의 얇은 스킬을 한 버전 동안 남겨 에이전트를 가리키게 하거나, 최소한 전환 기간의 동작을 시험 목록에 넣으면 이 공백이 줄어든다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "| `skills/lens-*/` 다섯 개 | 내용을 `agents/lens-*.md` 로 옮긴 뒤 지운다 |",
+   "counterpart_file": "C:/Users/ho381/.claude/projects/D--projects-Structure-disciplined-coder/memory/MEMORY.md",
+   "counterpart": "\"갱신이 세션 도중 도착한다 — SessionStart 뒤에 오므로 그 세션은 옛 판으로 돈다\" 와 관련 배경 \"시험은 --plugin-dir 로 브랜치를 적재해야 한다(설치 캐시는 main 커밋)\"",
+   "principle": "REVERSIBLE",
+   "consequence": "런타임 시험은 --plugin-dir 로 이 PC 한 곳에서만 한다. 다른 프로젝트 사용자의 설치본이 갱신되는 세션에서 `/disciplined-coder:lens-*` 슬래시 명령과 새 에이전트 중 무엇이 보이는지는 어느 단계도 확인하지 않는다."
+  },
+  {
+   "where": "「다른 세션과의 경계」 첫 문단(158행)과 표의 원칙 경량화 행(162행), 「순서와 확인」 9단계",
+   "type": "failure-mode",
+   "claim": "158행은 두 세션 중 먼저 병합되는 세션 위에서 4·5단계를 시작하게 하지만, 162행은 원칙 경량화 세션 병합 뒤의 내용을 옮긴다고 적는다. 선행연구 개선 세션이 먼저 병합되면 162행을 지킬 수 없다. 또한 원칙 경량화 세션이 고친 `lens-readability:81` 을 이 브랜치가 지우면 나중에 병합하는 쪽에서 수정·삭제 충돌이 난다. 4·5단계의 시작 조건을 '원칙 경량화 세션 병합 뒤'로 하나로 정해야 한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "4·5단계는 두 세션 중 먼저 병합되는 세션의 커밋 위에서 시작하고 … 이 spec 은 그 줄을 그 세션 병합 뒤의 내용으로 옮긴다",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "「권장 차례」 2단계 \"원칙 경량화 세션이 main 에 병합한 뒤 그 커밋을 기준으로 시작하고\" 와 「다른 세션과의 경계」 \"이 세션은 `lens-readability` 81·110행 … 을 바꿔 달라고 요청했다\"",
+   "principle": "OTHER-SESSIONS",
+   "consequence": "시작 조건이 두 가지로 읽혀 실행 세션이 선행연구 개선 세션 병합만 보고 4·5단계를 시작할 수 있다. 9단계와 fit 기계화 후보(지운 조항 제외)도 원칙 경량화 병합에 묶여 있어, 그 병합이 늦어지면 이 spec 은 8단계까지 끝나고 9단계만 남은 상태로 멈춘다."
+  },
+  {
+   "where": "「에이전트 구성」 `lens-adversarial-claim` 행과 「구현자에게 맡기는 것」의 claim 체크리스트 항목",
+   "type": "risk",
+   "claim": "주장 반박 에이전트는 사내 제안서·보고서의 주장을 WebSearch 검색어와 WebFetch 요청으로 밖에 보낸다. 정의 본문 가드에 접속 금지 도메인(kofia.or.kr 와 그 아래 주소)과 검색어에 원문 문장·수치를 그대로 넣지 않는 규칙을 적어야 한다. 이 PC 사용자는 금융업 종사자이고 7단계 시험 대상이 국고채 커브 주장이라, 금융투자협회 채권 자료 페이지로 향할 가능성이 높다(가정이며, 시험 전 검색어 기록으로 확인할 수 있다).",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "| `lens-adversarial-claim` | 주장·제안서·보고서의 논증 | Read, WebSearch, WebFetch | 필요할 때 |",
+   "counterpart_file": "C:/Users/ho381/.claude/kw-ax/claude-md-ko.md",
+   "counterpart": "\"금융투자협회 홈페이지(`kofia.or.kr` 와 그 아래 주소 전체)에는 접속하지 않는다 … 접속이 반복되면 사내 접속이 차단되어\" 와 원칙 `REVERSIBLE` \"밖으로 보내는 작업은 실행 전에 확인받아라\"",
+   "principle": "REVERSIBLE",
+   "consequence": "spec 의 가드 지시는 출처 없는 반박을 올리지 않는다는 한 가지뿐이다. 서브에이전트에는 사용자 CLAUDE.md 가 실린다고 보장되지 않으므로(런타임 시험 4행), 사용자 지침의 접속 금지가 claim 에이전트에 전해지지 않는다."
+  },
+  {
+   "where": "「출력 계약」 넷째 문단(83행)의 출처 URL 규칙",
+   "type": "risk",
+   "claim": "claim 에이전트의 지적은 URL 이 있으면 올라가고, 그 URL 이 반박을 실제로 받치는지 확인하는 단계가 없다. 선행연구 에이전트는 바로 이 문제 때문에 검증자를 두었다. 7단계 사용자 판정에서 URL 마다 원문 대조를 하게 적거나, 외부 근거 탐색은 이미 있는 agent-prior-art 로 넘기면 검증 없는 인용이 줄어든다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "이 에이전트의 지적은 `evidence` 칸에 외부 출처 URL 을 적는다. 출처가 없는 반박은 지적으로 올리지 않고 `notes` 에 적는다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "「선행연구 에이전트에서 옮길 교훈」 \"효과가 확인된 장치는 에이전트의 연구 능력보다 후단의 강제 장치였다\" 와 dispatching-lenses:104 \"선행연구 대조는 렌즈 대신 `agent-prior-art`가 맡는다\"",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "claim 에이전트가 낸 URL 은 검증자 없이 사용자에게 전달된다. 외부 근거를 찾는 경로가 agent-prior-art 와 claim 에이전트 두 곳이 되고, 둘의 인용 품질 기준이 서로 다르다."
+  },
+  {
+   "where": "「에이전트 구성」 `lens-readability` 행과 「스킬과 구조의 처분」 표(readability 글 검토의 이전 행이 없음)",
+   "type": "failure-mode",
+   "claim": "렌더링 시험이 이 PC 에서 통과하면 글 검토 렌즈는 없어지는데, 조사 기록이 정한 '글 검토는 review-docs 퇴고 단계로 흡수'가 처분 표와 순서 어디에도 없다. 또한 Playwright 는 이 PC 에 설치된 플러그인 MCP 라 다른 사용자 PC 에는 없을 수 있다. 처분 표에 글 검토의 이전 행을 넣고, 브라우저 도구가 없는 환경의 동작을 시험 2행의 판정에 포함해야 한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "| `lens-readability` | 렌더링된 HTML·슬라이드 화면 | Read 와 브라우저 도구(런타임 시험 결과에 따른다) | 필요할 때 |",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "「사용자가 정할 사항」 \"글 검토는 review-docs 의 퇴고 단계로 흡수하고, readability 는 렌더링 화면을 보는 에이전트로 다시 만든다\" 와 dispatching-lenses:102 \"목적 한 줄의 요건은 `lens-readability`의 「목적 주입」이 정한다\"",
+   "principle": "CHECKABLE",
+   "consequence": "시험이 통과하면 lens-readability 의 「관찰 목록」「목적 주입」이 옮겨 갈 곳 없이 스킬과 함께 지워진다. Playwright 가 없는 PC 에서는 tools 의 MCP 도구 이름이 해석되지 않아 에이전트가 Read 만으로 HTML 원문을 읽게 된다(가정이며, Playwright 를 끈 세션에서 시험 2행을 다시 실행해 확인할 수 있다)."
+  },
+  {
+   "where": "「목표와 비목표」 비목표 '체크리스트 개선' 행과 「구현자에게 맡기는 것」 '정의 본문의 문안' 항목",
+   "type": "failure-mode",
+   "claim": "비목표는 체크리스트와 판정 축을 옮기기만 한다고 정하지만, 같은 spec 이 adversarial 의 `artifact` 모드, readability 재정의, claim 신설을 요구한다. 이 세 가지의 체크리스트와 읽기 범위를 누가 어디에 새로 쓰는지 정해야 한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "**체크리스트 개선:** 렌즈의 체크리스트와 판정 축은 문구를 고치지 않고 옮기기만 한다.",
+   "counterpart_file": "skills/lens-adversarial/SKILL.md",
+   "counterpart": "「읽기 범위」 \"문서 안에서 추론한다\" 와 체크리스트 \"이 설계대로 해서 완전히 실패했다고 놓고\", 「지적은 고칠 줄과 절을 가리킨다」 \"문서의 어느 줄이나 어느 절\"",
+   "principle": "TOP-DOWN",
+   "consequence": "구현자가 비목표를 따르면 `artifact` 모드는 설계 문서용 지시(고칠 줄과 절, 문서 안의 추론)로 코드와 실험 결과를 보게 된다. 반대로 구현자가 새 체크리스트를 쓰면 비목표를 어기고, 그 문안은 6단계 채택 비교 대상(네 개)에도 들지 않는다."
+  },
+  {
+   "where": "「스킬과 구조의 처분」 '묶기 예외' 행",
+   "type": "risk",
+   "claim": "감사 경로만 general-purpose 에 정의 본문을 주는 방식으로 남아 실행 경로가 두 개가 된다. 근거로 든 '3 대 1.2 측정'은 dispatching-lenses 가 정책값이라고 적은 값이다. 감사는 드물게 실행되므로 묶기를 없애고 감사도 에이전트를 렌즈마다 실행하면 경로가 하나로 준다. 이 배수는 사용자 정책값이라 바꾸려면 사용자에게 물어야 한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "묶은 호출은 general-purpose 에이전트에 각 에이전트 정의 본문을 차례로 주는 방식으로 남긴다(내 판단: 감사에서만 쓰이고 읽기 비용 차이가 3 대 1.2 로 측정되어 있다)",
+   "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+   "counterpart": "58행 \"이 배수는 사용자가 정한 정책값이라 바꾸려면 사용자에게 물어야 한다\"",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "감사 경로에서는 spec 이 목적으로 든 도구 제한과 model 고정이 적용되지 않고 읽기 전용이 다시 프롬프트 지시로만 지켜진다. 실행 시점에 플러그인의 agents/ 경로를 어떻게 도출하는지도 spec 에 없고, test_lens_contract.sh 는 이 경로의 출력을 대조하지 않는다."
+  },
+  {
+   "where": "「출력 계약」 첫 두 문단(계약 파일과 `test_lens_contract.sh` 신설)",
+   "type": "over-engineering",
+   "claim": "domain-pruning 「분류」로 보면 렌즈 SKILL.md 다섯 개의 스키마는 '사본'이고 처분은 '소유자를 가리키는 문장으로 바꾼다'이다. 지금 계약의 원본은 이미 aggregating-lenses 한 곳이다. 계약 JSON 과 대조 테스트를 새로 만들면 기존 검사와 겹치는데, spec 은 test_docs_drift.sh 의 렌즈 이름 검사를 지우거나 옮기는지 적지 않았다. 원본을 계약 파일 하나로 옮기려면 그 검사의 처분을 같은 절에 적고, 테스트는 기존 test_prior_art_contract.sh 를 넓히는 안과 비교해야 한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "새 테스트 `scripts/test_lens_contract.sh` 가 그 예시 블록과 계약 파일을 대조한다. 선행연구 에이전트의 `test_prior_art_contract.sh` 와 같은 방식이다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "199-207행 \"렌즈 스키마의 lens 값이 디렉터리 이름과 같다\" 검사(skills/lens-* 에서 도출) 와 domain-pruning 「분류」 '중복'·'사본' 행, 「판정 질문」 \"100줄을 넘거나 … 셸 스크립트는 구조적인 언어로 옮길지 따진다\"",
+   "principle": "YAGNI",
+   "consequence": "같은 형식의 대조 테스트인 test_prior_art_contract.sh 가 237줄이다. 새 테스트가 같은 크기로 추가되면 계약 대조 셸 스크립트가 두 개가 되고, test_docs_drift.sh 의 lens 값 검사는 skills/lens-* 가 사라지면 대상 없이 남는다."
+  },
+  {
+   "where": "「fit 문체 기계화」 첫 문단과 「순서와 확인」 8단계",
+   "type": "over-engineering",
+   "claim": "옮길 곳이 모든 프로젝트의 Write 에 실행되는 PreToolUse 훅이다. domain-plugin 은 준수가 비타협적이고 지시로 지켜지지 않을 때만 훅을 쓰라고 정하는데, ONE-IDEA 같은 문체 항목은 비타협적 준수 대상이 아니다. 8단계 확인이 test_hooks.sh 통과뿐이라 오탐률과 fit 문체 비율 감소를 보지 않는다. 조사 기록 「권장 차례」 5단계의 '문체 비율이 줄었는지 확인'을 8단계 확인에 되살리고, 후보를 오탐 0건이 시험된 항목으로 한정해야 한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "8. fit 문체 항목을 기계 검사로 옮기고, `test_hooks.sh` 가 통과하는지 확인한다.",
+   "counterpart_file": "skills/domain-plugin/SKILL.md",
+   "counterpart": "「훅과 상시 지시의 과잉을 판정할 때」 \"준수가 비타협적이고, 판정이 예·아니오로 떨어지며, 지시만으로는 지켜지지 않는 행동일 때 훅으로 강제한다 … 넛지 훅이 내는 글도 컨텍스트를 쓴다\"",
+   "principle": "YAGNI",
+   "consequence": "훅 경고는 다른 프로젝트의 모든 문서 쓰기에 컨텍스트를 쓴다. 이 비용이 fit 토큰 절감보다 작은지 측정하는 단계가 없어, 반목표 '토큰이 현행보다 늘면 실패'를 이 변경에 대해서는 판정할 수 없다."
+  },
+  {
+   "where": "「에이전트 구성」 63행(`maxTurns` 와 `effort` 미기재)과 「먼저 할 런타임 시험」 셋째 행",
+   "type": "risk",
+   "claim": "effort 를 적지 않으면 호출 세션의 값을 물려받는지 시험 목록에 없다. 선행연구 개발에서 model 미기재로 Opus 를 물려받아 비용이 폭증했고, 조사 기록은 effort 와 maxTurns 를 정의마다 적으라고 했다. 런타임 시험 셋째 행의 판정에 effort 상속 여부를 함께 기록하게 하면 같은 실패를 미리 볼 수 있다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "`maxTurns` 와 `effort` 는 근거가 없어 적지 않는다. … 이 값은 「먼저 할 런타임 시험」에서 측정한 뒤 정한다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "「선행연구 에이전트에서 옮길 교훈」 \"정의마다 `tools`(쓰기 도구와 Agent 제외), `model`, `effort`, `maxTurns` 를 적는다. 검증자 정의에 model 이 없어 Opus 를 물려받았고 … 캐시 쓰기 토큰 약 136만을 썼다\"",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "시험 셋째 행은 lens-grounding 한 개의 턴 수와 도구 호출 수만 기록한다. effort 를 어떻게 정할지는 어느 시험의 판정에도 없어, 측정 뒤 정한다는 문장이 실행될 단계가 없다."
+  },
+  {
+   "where": "「순서와 확인」 4단계의 grep 범위와 「1:1 전제 목록」 표",
+   "type": "failure-mode",
+   "claim": "4단계 grep 은 '고친 파일'만 보고, 5단계는 조사 때의 구조 지도에서 온 목록만 고친다. 삭제 대상을 가리키는 파일 중 이 두 목록 밖의 파일이 남는다. 4단계 확인을 저장소 전체 grep(봉인된 리뷰 기록과 과거 spec 제외)으로 넓히면 잔존 포인터를 잡는다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "고친 파일에 `skills/lens-*` 와 `aggregating-lenses` 를 가리키는 줄이 남지 않았는지 grep 으로 확인한다.",
+   "counterpart_file": "hooks/rules_nudge_pretooluse.sh, skills/review-llm-calls/SKILL.md",
+   "counterpart": "rules_nudge_pretooluse.sh:52 \"한국어 상세는 lens-readability 폴더에 놓인 참고서다\", review-llm-calls description \"렌즈와 aggregating-lenses는 별도 스킬에서 본다\", 그리고 lens-* 를 가리키는 docs/domain-discipline.md·docs/domain-korean.md",
+   "principle": "REPORT-DEAD",
+   "consequence": "이 파일들은 처분 표와 1:1 전제 목록 어디에도 없다. 5단계 테스트가 FAIL=0 이어도 훅 주석과 스킬 description 이 지워진 스킬을 가리킨 채 남는다."
+  }
+ ],
+ "principles_applied": [
+  "YAGNI",
+  "REVERSIBLE",
+  "EVIDENCE-FIRST",
+  "CHECKABLE",
+  "OTHER-SESSIONS",
+  "TOP-DOWN",
+  "REPORT-DEAD",
+  "STATE-ASSUME",
+  "WRITTEN-ONLY",
+  "SUBJECT-OBJECT",
+  "SPECIFIC-NAME"
+ ],
+ "notes": "검토한 관점은 실패 모드, 과설계, 비가역, 위험 네 가지이며 항목마다 따로 검토했다. 타깃 체크리스트의 항목(직접 실행·설치 캐시 공백, 묶기 이중 경로, 채택 조건의 측정 가능성, claim 의 출처 품질과 외부 전송, 렌더링 리뷰의 브라우저 전제, 병합 순서, 되돌리기 어려운 단계, 과설계)은 모두 위 지적으로 다루었다. 기록 이름 규칙 변경은 지적으로 올리지 않았다. audit_verify.sh 의 정규식 `^lens-[a-z-]+-[0-9]+\\.json$` 이 `lens-adversarial-claim-1.json` 도 받아들이고 기존 이름과 새 이름이 claim 밖에서 같으므로, 지금 확인한 범위에서는 되돌리기 어렵지 않다. 다만 audit_verify.sh:6-8 주석이 '스킬 이름'을 적고 있어 함께 고칠 대상이다(1:1 전제 목록에 이미 있다). 여섯 개 에이전트가 지금 필요한지는 claim(직접 요청 2건, agent-prior-art 와 겹침)과 adversarial artifact 모드(실사용 1건)를 각각 위 지적에서 다루었다. 더 확인할 사항은 세 가지다. 첫째, 3~5단계 사이 스킬과 에이전트가 같은 이름(`disciplined-coder:lens-adversarial`)으로 동시에 있을 때 메인 세션이 Skill 과 Agent 중 무엇을 고르는지는 확인하지 않았다(런타임 시험 1행에서 함께 볼 수 있다). 둘째, 설치본 갱신 때 옛 커밋 해시 캐시 폴더가 지워지는지는 이 렌즈의 읽기 범위 밖이라 확인하지 않았다. 셋째, 플러그인 에이전트가 사용자 CLAUDE.md 를 받는 것으로 시험 4행이 판정되면 원칙이 import 와 PRINCIPLES 줄로 두 번 실려 토큰이 늘 수 있는데, spec 의 실패 열은 '받지 않는다'만 다룬다."
+}

@@ -1,0 +1,179 @@
+{
+ "lens": "lens-consistency",
+ "read": [
+  "skills/lens-consistency/SKILL.md",
+  "agent-principles.md",
+  "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/review-docs/SKILL.md (86-106행, 절 제목, readability 언급 줄)",
+  "skills/review-specs/SKILL.md (절 제목, 98-107행)",
+  "skills/audit-repo-docs/SKILL.md (절 제목, readability 언급 줄)",
+  "skills/lens-*/SKILL.md (절 제목과 description, lens-fit 39행)",
+  "scripts/test_docs_drift.sh (skills/lens- 를 가리키는 줄 grep)",
+  "hooks/rules_nudge_pretooluse.sh:45-60",
+  "docs/domain-korean.md:258-268",
+  "skills/domain-plugin/SKILL.md:24",
+  "skills/domain-pruning/SKILL.md:76,88",
+  "scripts/audit_statements.sh:5",
+  "skills/nested-orchestration/SKILL.md 와 references/sub-session-protocol.md (렌즈 언급 줄 grep)",
+  "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md (채택·비교 기준 grep)",
+  "docs/superpowers/specs 목록, docs/superpowers/reviews/2026-10-11-message-schema-review/lens-consistency-1.json 의 target"
+ ],
+ "issues": [
+  {
+   "where": "「목표와 비목표」 반목표 문단과 「채택 조건」",
+   "type": "contradiction",
+   "claim": "반목표는 토큰과 대기 시간, 그리고 '반영되는' 설계 지적으로 실패를 정의한다. 그러나 채택 조건은 설계 지적 수와 토큰 합만 측정하고 대기 시간과 반영 여부는 측정하지 않는다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "30행: \"리뷰 한 차수의 토큰이나 대기 시간이 현행보다 늘면 이 개편은 실패다. 반영되는 설계 지적이 현행보다 줄어도 실패다.\"",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "138행: \"새 에이전트의 설계 지적(fit 의 style 유형을 뺀 지적) 수가 현행 원본보다 적지 않고, 차수의 토큰 합이 현행보다 크지 않으면 채택한다.\"",
+   "principle": "CHECKABLE",
+   "consequence": "6단계 판정이 통과해도 대기 시간 증가나 반영되지 않는 지적의 증가가 반목표를 어기는지 확인할 단계가 spec 에 없다."
+  },
+  {
+   "where": "「목표와 비목표」 비목표 '체크리스트 개선'과 「fit 문체 기계화」·목표 'readability 재정의'",
+   "type": "scope",
+   "claim": "비목표는 체크리스트와 판정 축의 문구를 고치지 않고 옮기기만 한다고 정한다. 그러나 같은 spec 이 lens-fit 정의에 지적 제외 규칙을 넣고 lens-readability 의 대상을 렌더링 화면으로 바꾼다. 비목표와 목표가 서로 침범한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "28행: \"렌즈의 체크리스트와 판정 축은 문구를 고치지 않고 옮기기만 한다.\"",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "18행: \"readability 를 렌더링 화면 리뷰 에이전트로 다시 만든다.\" / 105행: \"옮긴 항목은 `lens-fit` 정의에서 \\\"기계 검사가 이미 본 항목은 다시 지적하지 마라\\\"로 뺀다.\"",
+   "principle": "TOP-DOWN",
+   "consequence": "구현자가 lens-fit·lens-readability 의 판정 축을 바꿀 수 있는 범위가 비목표 문장과 목표 문장 중 어느 쪽을 따르는지 spec 에 정해져 있지 않다."
+  },
+  {
+   "where": "「스킬과 구조의 처분」 묶기 예외 행",
+   "type": "contradiction",
+   "claim": "묶기 예외는 general-purpose 에이전트에 정의 본문을 주는 방식으로 남는다. 이 호출은 목표인 '도구·모델을 정의 파일로 강제'를 받지 못하고, 제약표가 근거로 든 LENS-ALLOWED 의 `lens-*` 호출 이름에도 해당하지 않는다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "97행: \"묶은 호출은 general-purpose 에이전트에 각 에이전트 정의 본문을 차례로 주는 방식으로 남긴다\"",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "15행: \"렌즈를 `agents/lens-*.md` 로 옮겨 도구·모델을 정의 파일로 강제한다.\" / 44행: \"렌즈 에이전트 이름은 `lens-` 로 시작한다 | 원칙 `LENS-ALLOWED` 가 `lens-*` 호출만 상시 허용한다\"",
+   "principle": "LENS-ALLOWED",
+   "consequence": "레포 문서 감사의 묶은 호출은 읽기 전용이 다시 프롬프트 지시로만 지켜지고, 상시 허용 범위에 드는지가 spec 에 적혀 있지 않다."
+  },
+  {
+   "where": "「에이전트 구성」 lens-adversarial-claim 행",
+   "type": "gap",
+   "claim": "커버리지 공백이다. lens-adversarial-claim 을 필요할 때 그룹에 넣었지만 그 그룹의 제안 조건인 발동 기준과 실행하는 호출자를 spec 이 정하지 않는다. dispatching-lenses 는 필요할 때 그룹 렌즈마다 발동 기준을 두고 그에 따라 제안하게 한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "55행: \"| `lens-adversarial-claim` | 주장·제안서·보고서의 논증 | Read, WebSearch, WebFetch | 필요할 때 |\"",
+   "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+   "counterpart": "92행: \"**제안과 승인** — 발동 기준에 해당하면 실행할지 묻고, 승인받으면 실행한다.\" / 102행: \"`lens-readability`의 발동 기준은 호출자와 무관하게 하나다.\"",
+   "principle": "CHECKABLE",
+   "consequence": "review-docs 등 호출자가 lens-adversarial-claim 을 언제 제안하는지와 대상별 에이전트 표의 실행하는 호출자 칸에 무엇을 적는지가 spec 과 「순서와 확인」 어디에도 없다."
+  },
+  {
+   "where": "「에이전트 구성」 정의 본문 문단",
+   "type": "gap",
+   "claim": "산출물 공백이다. 정의 본문에 옮길 절 목록이 현행 렌즈 SKILL.md 의 일부 절만 적는다. lens-readability 의 「목적 주입」「관찰 목록」「고칠 순서」「고치는 범위」「손대지 않는 요소」, lens-consistency 의 「레포 문서 감사에서의 짝」, lens-adversarial 의 「지적은 고칠 줄과 절을 가리킨다」가 어디로 가는지 정해져 있지 않다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "67행: \"정의 본문은 현행 렌즈 SKILL.md 의 「체크리스트」, 체크리스트 설명, 「가드」, 「읽기 범위」, system 프롬프트, user 틀, 출력 예시를 옮긴 내용이다.\"",
+   "counterpart_file": "skills/lens-readability/SKILL.md",
+   "counterpart": "21행 「목적 주입」, 35행 「관찰 목록」, 80·83·93행 절 제목 (lens-consistency/SKILL.md:33 「레포 문서 감사에서의 짝」, lens-adversarial/SKILL.md:21)",
+   "principle": "SPECIFIC-NAME",
+   "consequence": "5단계에서 skills/lens-*/ 를 지우면 이 절들의 내용이 옮겨질 곳이 spec 에 없다. dispatching-lenses:102, review-docs:64, audit-repo-docs:61 은 「목적 주입」을 이름으로 가리킨다."
+  },
+  {
+   "where": "목표 'readability 재정의'와 「1:1 전제 목록」",
+   "type": "gap",
+   "claim": "커버리지 공백이다. lens-readability 를 렌더링된 HTML·슬라이드 화면 리뷰로 바꾸지만, 이 렌즈를 마크다운 초안의 퇴고 문장 생성과 레포 문서 감사에 쓰는 호출자 문장을 고치는 단계가 없다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "59행: \"| `lens-readability` | 렌더링된 HTML·슬라이드 화면 | Read 와 브라우저 도구(런타임 시험 결과에 따른다) | 필요할 때 |\"",
+   "counterpart_file": "skills/review-docs/SKILL.md",
+   "counterpart": "39행: \"`lens-fit` 이 위반을 찾고 `lens-readability` 가 고쳐 쓴 문장을 내며, 메인 세션은 그 결과를 반영한다.\" (audit-repo-docs/SKILL.md:48,61 도 레포 문서에 이 렌즈를 실행한다)",
+   "principle": "CHECKABLE",
+   "consequence": "4단계의 grep 확인은 `skills/lens-*` 와 `aggregating-lenses` 문자열만 찾으므로 review-docs:39 와 audit-repo-docs:48,61 의 마크다운 대상 문장이 그대로 남는다."
+  },
+  {
+   "where": "「1:1 전제 목록」 scripts/test_docs_drift.sh 행",
+   "type": "gap",
+   "claim": "커버리지 공백이다. test_docs_drift.sh 에서 `skills/lens-*` 경로로 진실을 도출하는 줄 중 목록에 빠진 줄이 있다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "152행: \"`scripts/test_docs_drift.sh:27,57,188,199-207,238,262,528,570,588,646-651,883`\"",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "193행 LCON=\"$HERE/skills/lens-consistency/SKILL.md\", 362행 case \"$hf\" in skills/lens-*/SKILL.md, 467행 for SRC in \"$HERE/skills/lens-readability/SKILL.md\", 600행 case \"$sk\" in lens-*, 621행 RDB_L=\"$HERE/skills/lens-readability/SKILL.md\"",
+   "principle": "NO-ASSUME",
+   "consequence": "5단계의 '「1:1 전제 목록」의 위치를 모두 고친 뒤'를 마쳐도 193·362·467·600·621행은 지운 경로를 가리킨다."
+  },
+  {
+   "where": "「스킬과 구조의 처분」과 「순서와 확인」 4단계",
+   "type": "gap",
+   "claim": "커버리지 공백이다. 지우는 스킬(`skills/lens-*`, `aggregating-lenses`)을 가리키는 파일 중 spec 이 다루지 않는 파일이 있다. 4단계 grep 은 '고친 파일'만 보므로 이 파일들을 잡지 못한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "129행: \"고친 파일에 `skills/lens-*` 와 `aggregating-lenses` 를 가리키는 줄이 남지 않았는지 grep 으로 확인한다.\"",
+   "counterpart_file": "docs/domain-korean.md",
+   "counterpart": "264행: \"예외는 렌즈 파일(`skills/lens-*/SKILL.md`) 안에서만 적용된다.\" / skills/domain-plugin/SKILL.md:24 (\"`aggregating-lenses`\" 와 lens- 접두사를 서브에이전트로 실행하는 스킬 이름으로 정의) / scripts/audit_statements.sh:5 (\"aggregating-lenses 계약\") / hooks/rules_nudge_pretooluse.sh:52 (\"lens-readability 폴더에 놓인 참고서\")",
+   "principle": "REPORT-DEAD",
+   "consequence": "domain-korean 의 렌즈 파일 예외 범위, domain-plugin 의 이름 부류 규칙, audit_statements.sh 와 훅 주석이 지운 스킬을 가리킨 채 남는다."
+  },
+  {
+   "where": "「스킬과 구조의 처분」 dispatching-lenses 행과 「다른 세션과의 경계」",
+   "type": "gap",
+   "claim": "커버리지 공백이다. 「렌즈 그룹」 표를 대상별 에이전트 표로 바꾼다고 하지만 「렌즈 그룹」 절 제목을 유지하는지 정하지 않는다. 이 절 제목은 다른 스킬 여러 곳이 이름으로 가리키고, spec 은 절 제목 유지를 두 곳에만 약속한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "95행: \"「렌즈 그룹」 표를 대상별 에이전트 표로 바꾸고 이 표를 호출자×렌즈 정의의 원본으로 삼는다.\"",
+   "counterpart_file": "skills/nested-orchestration/references/sub-session-protocol.md",
+   "counterpart": "63행: \"리포트의 `렌즈 그룹 판정`에 적는다(`dispatching-lenses`의 「렌즈 그룹」)\" (nested-orchestration/SKILL.md:246, review-docs/SKILL.md:62,64, audit-repo-docs/SKILL.md:48 도 같은 절을 가리킨다)",
+   "principle": "TERM-ONE",
+   "consequence": "nested-orchestration 은 spec 의 처분 표와 1:1 전제 목록 어디에도 없어, 절 이름이나 표 이름이 바뀌면 이 참조를 고칠 단계가 없다."
+  },
+  {
+   "where": "「fit 문체 기계화」와 「순서와 확인」 8단계",
+   "type": "gap",
+   "claim": "커버리지 공백이다. 「fit 문체 기계화」는 lens-fit 정의에 제외 규칙을 넣고 원칙 경량화 세션이 지운 조항을 후보에서 빼라고 요구한다. 8단계는 훅 이전과 test_hooks.sh 통과만 확인하고, 정의 수정과 경량화 세션 병합 선행 조건이 없다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "133행: \"8. fit 문체 항목을 기계 검사로 옮기고, `test_hooks.sh` 가 통과하는지 확인한다.\"",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "105행: \"옮긴 항목은 `lens-fit` 정의에서 ... 뺀다. ... 원칙 경량화 세션이 지운 조항(TERM-ONE 등)은 후보에서 뺀다.\"",
+   "principle": "CHECKABLE",
+   "consequence": "agents/lens-fit.md 수정과 test_lens_contract.sh 재확인이 어느 단계에도 없고, 8단계가 경량화 세션 병합 전에 실행될 수 있다."
+  },
+  {
+   "where": "「다시 리뷰 정책」과 「순서와 확인」 9단계",
+   "type": "gap",
+   "claim": "커버리지 공백이다. 변경안이 채택되면 `NO-RAW-OUTPUT` 문구와 review-specs 「작업 순서와 다시 리뷰」를 고쳐야 하지만, 9단계는 판정을 domain-discipline.md 에 적었는지만 확인한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "134행: \"9. 원칙 경량화 세션이 병합되면 「다시 리뷰 정책」의 클린룸 시험을 하고, 판정을 `docs/domain-discipline.md` 에 적었는지 확인한다.\"",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "111행: \"변경안이 채택되면 `review-specs` 「작업 순서와 다시 리뷰」도 같은 뜻으로 고친다. 기각되면 현행 문구를 유지하고 시험 결과를 `docs/domain-discipline.md` 의 `NO-RAW-OUTPUT` 절에 적는다.\"",
+   "principle": "CHECKABLE",
+   "consequence": "채택 분기에서 agent-principles.md 와 review-specs/SKILL.md 를 고치는 일과 그 확인 방법이 단계에 없다. 111행은 domain-discipline 기록을 기각 분기에만 둬 9단계의 확인과도 다르다."
+  },
+  {
+   "where": "「출력 계약」과 「순서와 확인」 2단계",
+   "type": "contradiction",
+   "claim": "test_lens_contract.sh 의 대조 대상이 두 곳에서 다르다. 「출력 계약」은 에이전트 정의의 출력 예시 블록과 대조한다고 하고, 2단계는 현행 렌즈 SKILL.md 의 스키마와 대조해 통과를 확인한다. lens-adversarial-claim 은 SKILL.md 가 없어 2단계에서 type 값을 대조할 대상이 없다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "127행: \"`scripts/lens_contract.json` 과 `scripts/test_lens_contract.sh` 를 만들고, 현행 렌즈 SKILL.md 의 스키마와 대조해 테스트가 통과하는지 확인한다.\"",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "81행: \"새 테스트 `scripts/test_lens_contract.sh` 가 그 예시 블록과 계약 파일을 대조한다.\"",
+   "principle": "CHECKABLE",
+   "consequence": "2단계 테스트가 SKILL.md 를 읽게 만들어지면 5단계에서 SKILL.md 를 지운 뒤 테스트의 입력이 사라진다."
+  },
+  {
+   "where": "「순서와 확인」 6단계와 「채택 조건」",
+   "type": "drift",
+   "claim": "6단계의 '새 에이전트 네 개'가 여섯 개 중 어느 넷인지 이름이 없다. 또 '2026-10-11 메시지 형식 spec'은 별도 spec 파일이 아니고 2026-10-09 spec 의 개정 절이며, 그 리뷰 기록은 10-11 것이라 '조사 기록과 같은 날 실행한 리뷰 기록'이라는 비교 기준과 맞지 않는다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "131행: \"과거 spec 두 개(`2026-10-25-principles-slimming-design.md` 와 `2026-10-11` 메시지 형식 spec)에 새 에이전트 네 개를 한 번씩 실행\" / 138행: \"비교 기준은 조사 기록과 같은 날 실행한 리뷰 기록의 렌즈 원본이다.\"",
+   "counterpart_file": "docs/superpowers/reviews/2026-10-11-message-schema-review/lens-consistency-1.json",
+   "counterpart": "\"target\":\"docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md 「2026-10-11 개정 — 메시지 형식」 절\"",
+   "principle": "SPECIFIC-NAME",
+   "consequence": "6단계 실행자가 대상 파일 경로와 실행할 에이전트 이름과 비교할 기록 폴더를 spec 에서 특정할 수 없다. 2026-10-25-principles-slimming-design.md 도 이 브랜치와 main 에 없고 다른 워크트리에만 있다."
+  }
+ ],
+ "principles_applied": [
+  "CHECKABLE",
+  "NO-ASSUME",
+  "SPECIFIC-NAME",
+  "TERM-ONE",
+  "REPORT-DEAD",
+  "TOP-DOWN",
+  "LENS-ALLOWED",
+  "SUBJECT-OBJECT",
+  "WRITTEN-ONLY"
+ ],
+ "notes": "검토한 관점: 모순(에이전트 수·이름, 모드, 그룹 배정, 기록 파일 이름, 채택 조건과 반목표, 단계와 앞 절 요구의 대응), 커버리지 공백(처분 표와 1:1 전제 목록이 저장소의 참조를 모두 덮는지), 산출물 공백(agents 여섯 개, lens_contract.json, test_lens_contract.sh, 결정 기록, 스킬·테스트 수정이 단계에 있는지), 드리프트(대상별 에이전트 표/렌즈 그룹 표, 에이전트/렌즈), 스코프(목표와 비목표의 침범). 에이전트 여섯 개의 이름과 수, 모드 이름, 그룹 배정, 기록 파일 이름 규칙은 spec 안에서 서로 맞았다. '대상별 에이전트 표'는 67·71·95행에서 같은 이름으로 쓰여 spec 안의 드리프트는 없었다. agents 여섯 개, 계약 파일, 대조 테스트, 런타임 결정 기록은 1~3단계에 있다. README 와 hooks/hooks.json, .claude-plugin 은 렌즈 스킬 경로를 가리키지 않았다. 더 확인할 사항: (1) docs/domain-discipline.md 가 skills/lens-* 나 aggregating-lenses 를 가리키는 줄은 grep 으로 찾지 못했지만, 처음 파일 목록 grep 에는 이 파일이 나왔다. 렌즈 이름(lens-fit 등)만 언급하는지 호출자가 확인해야 한다. (2) review-specs:57-60, review-docs:7, audit-repo-docs:44-46 등 처분 표의 행 번호는 읽기 범위 밖이라 대조하지 않았다. (3) scripts/test_audit.sh, audit_verify.sh, audit_rounds.sh 의 행 번호는 열지 않았다."
+}

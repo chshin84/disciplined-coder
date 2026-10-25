@@ -1,0 +1,133 @@
+{
+ "lens": "lens-grounding",
+ "read": [
+  "skills/lens-grounding/SKILL.md",
+  "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+  "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+  "docs/superpowers/decisions/2026-10-25-agent-call-policy.md",
+  "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/lens-adversarial/SKILL.md",
+  "skills/lens-consistency/SKILL.md",
+  "skills/lens-fit/SKILL.md",
+  "skills/lens-readability/SKILL.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/nested-orchestration/SKILL.md",
+  "skills/nested-orchestration/references/sub-session-protocol.md",
+  "scripts/test_docs_drift.sh",
+  "scripts/test_prior_art_contract.sh",
+  "scripts/prior_art_contract.json",
+  "scripts/_test_check.sh",
+  "scripts/_json_valid.sh",
+  "scripts/_doc_keys.sh",
+  "scripts/eval_clause.sh",
+  "scripts/_eval_clause.py",
+  "evals/principles/clauses/",
+  "workflows/prior-art-search.js",
+  "agents/prior-art-*.md",
+  "docs/superpowers/reviews/2026-10-11-message-schema-review/",
+  "C:/Users/ho381/.claude/projects/D--projects-Structure-disciplined-coder/48843762-6779-48dd-94da-653cdc70a608/subagents/agent-a00f7ad9d6c17aea0.meta.json"
+ ],
+ "issues": [
+  {
+   "where": "Task 3 Step 3 (agent() 호출 검사 알고리즘)와 Step 1 셋째 검사(첫 agent( 호출 픽스처)",
+   "type": "contradiction",
+   "claim": "plan 의 검사 규칙은 식별자 문자가 앞에 붙지 않은 모든 `agent(` 를 호출로 읽는다. 그러나 현행 워크플로 15행의 주석에 `agent()` 가 있다. 그래서 첫째 검사 '현행 정의와 워크플로가 호출 정책을 지킨다'가 이 주석을 agentType 없는 호출로 잡아 실패한다. 또한 '첫 agent( 호출의 옵션 객체'를 글자 순서로 찾으면 옵션 객체가 없는 이 주석이 첫 대상이 된다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "식별자 문자가 앞에 붙지 않은 `agent(` 마다 짝이 맞는 닫는 괄호까지 읽고, 그 안에 `agentType` 이 없으면 위반이다.",
+   "counterpart_file": "workflows/prior-art-search.js",
+   "counterpart": "// 단계 사이에는 parallel() 장벽을 둔다. thunk 는 agent() 의 반환만 돌려주고, 짝짓기는 반환 배열의 위치로 한다.",
+   "principle": "NO-ASSUME",
+   "consequence": "현행 워크플로 파일은 주석 한 줄 때문에 plan 이 정한 검사 규칙에서 위반 한 건을 가진 상태다. 실제 agent() 호출 일곱 곳은 모두 두 번째 인자 옵션 객체에 agentType 을 주므로 주석과 문자열을 빼면 규칙이 의도대로 동작한다."
+  },
+  {
+   "where": "Task 2 계약 표의 lens-consistency 행",
+   "type": "contradiction",
+   "claim": "plan 은 lens-consistency 의 types 에 duplication 을, extra 에 narrowed·pairs 를 둔다. 현행 SKILL.md 는 이 세 값을 모두 레포 문서 감사 전용으로 정의한다. 그런데 spec 과 Task 4 Step 3 은 감사 모드와 감사 문장을 지운다. 그 결과 [정의] 검사가 감사 없는 정의의 출력 예시에 감사 전용 칸 narrowed·pairs 를 요구하게 된다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "| `lens-consistency` | `spec`, `plan` | contradiction, gap, drift, scope, duplication | `narrowed`, `pairs` | — |",
+   "counterpart_file": "skills/lens-consistency/SKILL.md",
+   "counterpart": "`duplication`은 레포 문서 감사에서 호출자가 도출해 붙이는 값이다. `narrowed`(좁혀 적음 개수)와 `pairs`(짝마다의 판정)는 레포 문서 감사에서 이 렌즈가 더 돌려주는 칸이며 집계 대상이 아니다.",
+   "principle": "NO-ASSUME",
+   "consequence": "plan 안에서 Task 2 의 계약은 감사 전용 값을 유지하고, Task 4 Step 3 은 lens-consistency 의 감사 모드를 지운다. 두 지시가 같은 에이전트에 대해 서로 다른 범위를 정한 상태다."
+  },
+  {
+   "where": "Task 2 계약 표의 lens-readability 행과 Task 4 Step 1 '출력 예시가 계약과 같다' 검사",
+   "type": "contradiction",
+   "claim": "plan 의 키 집합 계산은 'common 에서 omit 을 빼고 extra 를 넣은 집합'이다. omit 은 issues 하위 칸만 나열하므로 계산 결과에는 issues 와 그 아래 where 가 남는다. 그러나 현행 readability 스키마와 spec 은 issues 없이 suggestions 만 낸다. 그리고 suggestions 하위 칸(where·why·screen)은 계약 어디에도 없어 검사하지 못한다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "그 블록의 키 집합이 `common` 에서 `omit` 을 빼고 `extra` 를 넣은 집합과 같은지, `lens` 값이 이름과 같은지, `issues[].type` 값이 `types` 안에 있는지 본다.",
+   "counterpart_file": "skills/lens-readability/SKILL.md",
+   "counterpart": "`suggestions`는 다른 렌즈의 `issues`와 다른 이 렌즈 전용 스키마다. 상대편이 없어 등급도 판정도 없고, `where`·`why`·`rewrite`만 포함한다.",
+   "principle": "NO-ASSUME",
+   "consequence": "plan 이 정한 계약 값과 대조 규칙으로는 issues 를 가진 readability 예시만 통과한다. 현행 스키마와 같은 형태의 예시는 실패한다."
+  },
+  {
+   "where": "Task 8 Files 와 Step 5",
+   "type": "omission",
+   "claim": "Task 2 의 [계약] 첫 검사는 skills/aggregating-lenses/SKILL.md 의 코드 블록을 읽는다. 그런데 Task 8 은 그 스킬을 지우면서도 test_lens_contract.sh 를 Modify 목록에 넣지 않는다. 그 상태에서 Step 5 는 전체 테스트 FAIL=0 을 요구한다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "첫 검사 \"계약의 공통 칸이 aggregating-lenses 리뷰 산출물 계약과 같다\" 는 `skills/aggregating-lenses/SKILL.md` 「리뷰 산출물 계약」 코드 블록의 키 집합과 `common` 의 키 집합(issues 하위 포함)이 같은지 본다.",
+   "counterpart_file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "counterpart": "- Delete: `skills/lens-*/`, `skills/aggregating-lenses/`, `skills/audit-repo-docs/`, `scripts/_audit_common.sh`, `scripts/audit_*.sh`, `scripts/test_audit.sh`",
+   "principle": "REPORT-DEAD",
+   "consequence": "plan 의 Task 8 Files 에는 대조 원본이 사라진 뒤 [계약] 첫 검사를 지우거나 고치는 단계가 없다. 그래서 Step 5 의 FAIL=0 조건과 Task 2 의 검사가 함께 성립할 수 없다."
+  },
+  {
+   "where": "Task 7 Step 3",
+   "type": "mismatch",
+   "claim": "plan 은 test_docs_drift.sh 284·872행을 '렌즈 손 목록'이라 부른다. 실제 두 행은 호출자 스킬 목록(review-specs, nested-orchestration, review-docs)이다. 그리고 「렌즈 그룹」 표의 실행하는 호출자 열에는 nested-orchestration 이 없다. 따라서 표에서 그대로 도출하면 nested-orchestration 이 검사 대상에서 빠진다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "`test_docs_drift.sh:284,872` 의 렌즈 손 목록은 「렌즈 그룹」 표에서 도출하게 바꾼다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "for s in review-specs review-docs nested-orchestration; do",
+   "principle": "SPECIFIC-NAME",
+   "consequence": "plan 의 지시문은 무엇을 도출할지 렌즈 목록으로 적고 있다. 그러나 대상 행은 호출자 목록이며, spec 의 표 열에는 그중 nested-orchestration 이 없다."
+  },
+  {
+   "where": "Task 10 Files 와 Step 1",
+   "type": "omission",
+   "claim": "시험 단위 이름 NO-RAW-OUTPUT-rereview 는 조항 ID 가 아니다. _eval_clause.py 는 ids 파일이 없으면 폴더 이름을 조항 ID 로 쓴다. 그런데 plan 의 Files 에는 ids 파일이 없다. 그래서 dev 태그 질문을 조항 ID 로 고를 때 NO-RAW-OUTPUT 과제가 선택되지 않는다. 같은 이름의 기존 단위 evals/principles/clauses/NO-RAW-OUTPUT/ 는 ids 파일을 둔다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "- Create: `evals/principles/clauses/NO-RAW-OUTPUT-rereview/` (현행·변경안 조건)",
+   "counterpart_file": "scripts/_eval_clause.py",
+   "counterpart": "시험 단위는 evals/principles/clauses/<단위 이름>/ 폴더 하나다. ids 파일이 있으면 그 줄들이, 없으면 폴더 이름이",
+   "principle": "NO-ASSUME",
+   "consequence": "plan 이 적은 파일 구성(current·new 두 조건)만으로는 그 단위의 조항 ID 가 'NO-RAW-OUTPUT-rereview' 가 된다. 이 값은 어떤 질문의 clause 메타와도 같지 않다."
+  },
+  {
+   "where": "Task 1 Step 2",
+   "type": "unsupported",
+   "claim": "plan 은 stream-json 의 tool_use 이벤트에서 서브에이전트가 받은 도구와 턴 수와 도구 호출 수를 읽는다고 단정한다. 그러나 저장소의 근거 문서들은 이 사실을 확인한 적이 없다. 조사 기록의 도구 호출 수는 세션 기록에서 센 값이다. 세션 기록의 subagents/*.meta.json 에는 agentType 만 있고 받은 도구 목록이 없다. spec 이 요구한 '적지 않았을 때의 실제 effort'를 어디서 읽는지도 plan 은 적지 않았다. 가정이며, 확인 방법은 시험 1회의 stream-json 출력에 해당 필드가 있는지 보는 것이다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "stream-json 의 tool_use 이벤트에서 `subagent_type`, 서브에이전트가 받은 도구, 턴 수, 도구 호출 수를 읽는다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "렌즈 1회의 도구 호출 수는 세션 기록 기준으로 adversarial 중앙값 10·최댓값 33, consistency 11·26, fit 8·14, grounding 18·48 이었다.",
+   "principle": "STATE-ASSUME",
+   "consequence": "plan 은 확인하지 않은 출력 형식을 측정 출처로 지정했다. 그 결과 spec 의 첫 시험 판정('정의의 tools 만 주어진다')과 effort 시험에서 어떤 필드를 읽을지가 정해지지 않았다."
+  },
+  {
+   "where": "Task 2·Task 4 의 키 집합 일치 검사와 Task 8 Step 2 의 1:1 전제 정리",
+   "type": "omission",
+   "claim": "review-docs 의 기록 파일 규칙은 대상이 둘일 때 원본의 target 칸으로 어느 대상인지 구분한다. 그러나 plan 의 계약에는 target 이 없다. 게다가 [정의] 검사가 예시의 키 집합을 계약과 정확히 같게 강제한다. plan 은 이 규칙을 고치는 단계도 두지 않았다.",
+   "file": "docs/superpowers/plans/2026-10-25-lens-agent-restructure.md",
+   "evidence": "그 블록의 키 집합이 `common` 에서 `omit` 을 빼고 `extra` 를 넣은 집합과 같은지",
+   "counterpart_file": "skills/review-docs/SKILL.md",
+   "counterpart": "렌즈는 한 대상에 한 번만 실행하므로 대상이 하나면 늘 1이고, spec 과 plan 을 함께 보면 1과 2다. 어느 대상인지는 원본의 `target` 칸이 진다.",
+   "principle": "NO-ASSUME",
+   "consequence": "plan 이 정한 계약에서 렌즈 출력 예시는 target 을 가질 수 없다. 한편 review-docs 94행은 순번 1·2 의 대상 구분을 그 칸에 맡기고 있다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "STATE-ASSUME",
+  "SPECIFIC-NAME",
+  "SUBJECT-OBJECT",
+  "REPORT-DEAD",
+  "WRITTEN-ONLY"
+ ],
+ "notes": "체크리스트 항목별 검토 결과다. (1) 경로·행 번호: test_docs_drift.sh 199-207(lens 값 대조)과 235-274(사본·추가 칸 대조)는 현행과 맞는다. 다만 234행 MA= 와 275행 aggregating-lenses 소유 검사도 같은 구간에 의존하며, spec 1:1 전제 목록의 233-275 가 이를 덮는다. review-docs 94-96, nested-orchestration/SKILL.md 246, sub-session-protocol.md 63, review-docs 62·64 의 「렌즈 그룹」 참조는 현행과 맞는다. 메시지 형식 리뷰 폴더의 렌즈 결과 파일 넷도 실재한다. eval_clause.sh·eval_clause_report.sh 사용법, --plugin-dir, 세션 기록 경로 subagents/agent-<id>.jsonl 도 실재를 확인했다. stream-json 의 필드는 확인하지 못했다(지적 7). (2) types 값 다섯 행은 현행 SKILL.md 의 폐쇄 집합과 글자 그대로 같다. fit 의 doc_type 과 readability 의 purpose 유지, rewrite 삭제는 spec 99행과 맞는다. 지적은 consistency 의 감사 전용 값(지적 2)과 readability 의 omit 계산 구조(지적 3)다. (3) 옵션 객체는 모든 실제 호출에서 agent() 의 두 번째 인자다. 그래서 '짝 괄호 안 agentType' 규칙은 동작하지만 주석 오탐이 있다(지적 1). (4) 모드 이름 claim·auto·render 와 칸 이름 screen 은 spec 에 없는 값이다. spec 은 단일 모드 에이전트에도 MODE 줄을 요구하고 화면 위치 칸의 이름은 주지 않는다. 그리고 「구현자에게 맡기는 것」의 '계약 파일의 칸 배치'가 키 이름을 맡기므로 screen 은 위임 범위로 판단해 지적하지 않았다. 모드 이름은 위임 목록에 명시되지 않았으나 spec 이 이름 없이 첫 줄을 요구하므로 구현자 결정으로 보고 지적하지 않았다. 시험 단위 이름 NO-RAW-OUTPUT-rereview 는 CLAUDE.md 가 이름을 정하지 않아 위임 범위이지만 ids 파일 누락이 있다(지적 6). (5) 지적 7 로 올렸다. 그 밖에 결정 기록은 '워크플로 agent() 호출 여덟 곳'이라 적지만 이 워크트리의 현행 파일에는 일곱 곳이 있다. 이 문장은 다른 브랜치(4c9ef93) 기준이라 plan 의 지적으로 올리지 않았다. 선행연구 개선 세션의 이름 변경(aa9e6d2)은 이 워크트리에 없으므로, Task 3 이 workflows/prior-art-search.js 와 agents/prior-art-*.md 를 기준으로 검사하는 것은 현행과 맞다. 에이전트원칙은 세션 맥락에 실린 ~/.claude/disciplined-coder/agent-principles.md 사본으로 적용했다. 저장소 agent-principles.md 를 따로 Read 하지는 않았다."
+}

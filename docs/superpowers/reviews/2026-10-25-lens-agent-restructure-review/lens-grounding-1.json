@@ -1,0 +1,171 @@
+{
+ "lens": "lens-grounding",
+ "read": [
+  "skills/lens-grounding/SKILL.md",
+  "agent-principles.md",
+  "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+  "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "skills/review-specs/SKILL.md",
+  "skills/aggregating-lenses/SKILL.md",
+  "skills/audit-repo-docs/SKILL.md (44-46, 59, 63, 65)",
+  "skills/review-llm-calls/SKILL.md (7)",
+  "skills/lens-fit/SKILL.md (16-21)",
+  "scripts/test_docs_drift.sh (지정 줄과 lens-·aggregating 참조 전체 grep)",
+  "scripts/test_audit.sh (180)",
+  "scripts/audit_verify.sh (6-8, 44-46, 60-64)",
+  "scripts/audit_rounds.sh (85-94)",
+  "hooks/doc_format_pretooluse.sh",
+  "hooks/_doc_form_check.py",
+  "hooks/doc_review_posttooluse.sh",
+  "docs/superpowers/specs/2026-10-18-prior-art-agent-design.md (545)",
+  "docs/superpowers/specs/2026-10-03-lens-groups-design.md",
+  "docs/superpowers/reviews/ 목록(2026-10-11·2026-10-25)",
+  "docs/superpowers/specs/ 목록(2026-10-11·2026-10-25)"
+ ],
+ "issues": [
+  {
+   "where": "「fit 문체 기계화」 첫 문단",
+   "type": "contradiction",
+   "claim": "spec 은 라벨 불릿·개수 예고·제목 개수 검사가 hooks/doc_format_pretooluse.sh 에 있다고 적는다. 그러나 그 훅은 새 문서 생성 때 타입·수명 판단을 제안하는 넛지만 낸다. 실제 검사기는 hooks/_doc_form_check.py 이고, hooks/doc_review_posttooluse.sh 가 그 검사기를 호출한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "fit 지적 중 결정론으로 답할 수 있는 문체 항목을 `hooks/doc_format_pretooluse.sh` 의 형식 경고로 옮긴다. 이 훅은 이미 라벨 불릿, 개수 예고, 제목 개수를 검사한다.",
+   "counterpart_file": "hooks/_doc_form_check.py",
+   "counterpart": "\"\"\"문서 형식 정규식 검사기. 라벨 불릿·개수 예고·제목 개수를 줄 단위로 잡는다.",
+   "principle": "NO-ASSUME",
+   "consequence": "spec 이 기계화 항목을 넣을 대상 파일로 실제 검사기와 다른 훅을 지정하고 있다."
+  },
+  {
+   "where": "「스킬과 구조의 처분」 묶기 예외 행",
+   "type": "contradiction",
+   "claim": "spec 은 읽기 비용 3 대 1.2 를 측정값이라고 적는다. 그러나 원본인 dispatching-lenses 는 이 배수를 사용자가 정한 정책값으로 적는다. 2026-10-12 감사 grounding 원본도 이 값을 문서 안 산술로만 확인했다고 적었다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "감사에서만 쓰이고 읽기 비용 차이가 3 대 1.2 로 측정되어 있다",
+   "counterpart_file": "skills/dispatching-lenses/SKILL.md",
+   "counterpart": "한 대상에 렌즈가 셋 적용되면 따로 실행할 때 3이고 묶을 때 1.2다. 이 배수는 사용자가 정한 정책값이라 바꾸려면 사용자에게 물어야 한다.",
+   "principle": "STATE-ASSUME",
+   "consequence": "묶은 호출을 남기는 판단의 근거가 측정되지 않은 정책값인데, spec 에는 측정 근거로 적혀 있다."
+  },
+  {
+   "where": "「fit 문체 기계화」 첫 문단의 조항별 건수",
+   "type": "unsupported",
+   "claim": "조항별 fit 지적 건수(COUNT-EARNS 98건, ONE-IDEA 67건, SUBJECT-OBJECT 60건, TERM-ONE 55건, INSTRUCTION-FORM 51건)가 조사 기록에 없다. 저장소 어디에서도 이 수치가 검출되지 않는다. 조사 기록에는 fit 문체·표기 비율 약 85% 만 있다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "후보는 fit 지적에 가장 많이 붙은 조항(COUNT-EARNS 98건, ONE-IDEA 67건, SUBJECT-OBJECT 60건, TERM-ONE 55건, INSTRUCTION-FORM 51건) 중",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "반면 fit 지적의 약 85% 는 문체·표기 지적이고, fit 의 반영률은 63% 로 가장 낮다(추정 포함).",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "spec 이 기계화 후보를 고르는 수치를 들고 있으나, 그 수치의 출처와 집계 방식이 spec 과 조사 기록 어디에도 적혀 있지 않다."
+  },
+  {
+   "where": "「에이전트 구성」 maxTurns·effort 문단",
+   "type": "unsupported",
+   "claim": "렌즈 1회 도구 호출 수 중앙값 8~18, 최댓값 14~48 이 조사 기록에 없다. 조사 기록의 「실측」 표에는 토큰과 시간만 있다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "세션 기록의 렌즈 1회 도구 호출 수는 중앙값 8~18, 최댓값 14~48 이었지만, 도구 호출 수와 턴 수의 관계는 측정한 적이 없다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "| 렌즈 | 1회 토큰(중앙값) | 1회 시간(중앙값) | 단독 발견 | 반영률 | 단독 반영률 | 반영된 단독 발견 1건당 토큰(추정) | 문체·표기 비율(추정) |",
+   "principle": "EVIDENCE-FIRST",
+   "consequence": "spec 이 인용한 도구 호출 수가 지정된 출처에 없어 독자가 수치를 검증할 수 없다."
+  },
+  {
+   "where": "「다른 세션과의 경계」 원칙 경량화 행",
+   "type": "contradiction",
+   "claim": "조사 기록은 원칙 경량화 세션이 lens-readability 81·110행을 바꿔 달라고 이 세션에 요청했다고 적는다. 그러나 spec 은 그 세션이 lens-readability:81 을 이미 고쳤다고 적는다. review-llm-calls:30,46 과 test_docs_drift.sh:218,286 수정도 조사 기록에 없다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "그 세션은 `lens-readability:81`, `review-docs:39`, `review-llm-calls:30,46`, `test_docs_drift.sh:218,286` 을 고쳤다(미커밋).",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "이 세션은 `lens-readability` 81·110행과 `lens-adversarial` 의 참고 문서 포인터를 바꿔 달라고 요청했다",
+   "principle": "NO-ASSUME",
+   "consequence": "lens-readability 81·110행과 lens-adversarial 포인터를 누가 고치는지에 대해 spec 과 조사 기록이 서로 다르게 적고 있다. spec 에는 110행과 lens-adversarial 포인터 요청이 빠져 있다."
+  },
+  {
+   "where": "「1:1 전제 목록」 test_docs_drift.sh 행",
+   "type": "omission",
+   "claim": "test_docs_drift.sh 에서 skills/lens-* 나 aggregating-lenses 를 직접 가리키는 줄이 목록 밖에도 있다. 184-190(렌즈 그룹 표), 193(LCON 경로), 362, 467, 600, 621-623(lens-readability 경로), 22·31-46·97·178·233-275·886-892(AGG/MA 경로와 aggregating-lenses 절)가 그 줄이다. 5단계는 이 두 스킬 디렉터리를 지운다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "| `scripts/test_docs_drift.sh:27,57,188,199-207,238,262,528,570,588,646-651,883` | 진실을 `skills/lens-*/` 에서 도출한다 |",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "AGG=\"$HERE/skills/aggregating-lenses/SKILL.md\"",
+   "principle": "NO-ASSUME",
+   "consequence": "spec 의 수정 대상 목록이 aggregating-lenses 경로와 lens-consistency·lens-readability 고정 경로에 의존하는 검사를 빠뜨리고 있다. 5단계의 'FAIL=0 확인'이 목록만으로는 달성되지 않는다."
+  },
+  {
+   "where": "「스킬과 구조의 처분」 aggregating-lenses 행",
+   "type": "mismatch",
+   "claim": "spec 은 99-101행을 런타임 전용 결정과 재시도로 묶는다. 그러나 100행은 spec/plan 리뷰·문서 검진·감사의 집계 방법이며 런타임 전용이 아니다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "런타임 전용 결정과 재시도(현행 63·69-73·99-101행)는 `review-llm-calls` 로 옮긴 뒤 지운다",
+   "counterpart_file": "skills/aggregating-lenses/SKILL.md",
+   "counterpart": "- **spec/plan 리뷰와 문서 검진과 레포 문서 감사와 워크플로 검증** — 제품 코드가 없으므로 메인 세션이 위 「하는 일」의 두 단계를 직접 따라 집계한다.",
+   "principle": "SPECIFIC-NAME",
+   "consequence": "런타임 밖 호출자의 집계 방법을 정한 줄이 review-llm-calls 로 옮길 범위에 들어가 있다."
+  },
+  {
+   "where": "「스킬과 구조의 처분」 aggregating-lenses 행",
+   "type": "omission",
+   "claim": "aggregating-lenses 의 「판단 재귀 회피」, 「공통 계약의 예외」(lens-readability), 「처분」의 멀티에이전트 워크플로 문단(67행)을 어디로 옮기는지 spec 에 없다. 또한 '남는 내용이 다섯 줄뿐'이라는 근거는 조사 기록과 다르다. 조사 기록은 「하는 일」이 다섯 줄이고 나머지가 계약과 처분이라고 적는다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "(내 판단: 남는 내용이 다른 스킬이 이미 가리키는 다섯 줄뿐이다)",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "- **aggregating-lenses:** 「하는 일」은 dispatching-lenses 가 이미 가리키는 다섯 줄이고, 나머지는 계약과 처분이다.",
+   "principle": "NO-ASSUME",
+   "consequence": "spec 은 스킬 삭제를 지시하지만, 판단 재귀 회피 제약과 워크플로 처분 규칙의 옮길 곳이 정해져 있지 않다."
+  },
+  {
+   "where": "「실행 경로」 첫 문단",
+   "type": "unsupported",
+   "claim": "spec 은 Agent 도구의 subagent_type 으로 플러그인 에이전트 이름이 해석되는 것을 2026-10-18 에 확인했다고 적는다. 그러나 prior-art spec 545행이 확인한 사실은 워크플로 agent() 의 agentType 해석뿐이다. 조사 기록도 같은 545행을 'Agent 도구와 워크플로'의 근거로 든다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "`subagent_type` 은 `disciplined-coder:<에이전트 이름>` 이다. 플러그인 에이전트 이름의 해석은 2026-10-18 선행연구 개발에서 확인했다.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-18-prior-art-agent-design.md",
+   "counterpart": "`agent()`의 `agentType: 'probeplug:probe'`는 그 에이전트 정의로 해석되었고, 에이전트에게는 정의의 `Read`와 스키마용 `StructuredOutput`만 주어졌다.",
+   "principle": "STATE-ASSUME",
+   "consequence": "spec 이 Agent 도구 경로의 확인 근거로 워크플로 경로만 확인한 기록을 가리키고 있다."
+  },
+  {
+   "where": "「에이전트 구성」 model 문단",
+   "type": "unsupported",
+   "claim": "공식 문서 사실은 별칭이 같은 패밀리의 정확한 모델로 해석된다는 데까지다. '확장 맥락을 보존한다'는 내용은 주입된 공식 문서 사실에 없다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "별칭은 메인 대화가 Opus 이면 같은 모델로 해석되어 확장 맥락을 보존한다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-restructure-research.md",
+   "counterpart": "| Agent 도구로 실행할 때 frontmatter model 적용 | 10-21 확인했다(검증자 구성 기록 -3) |",
+   "principle": "STATE-ASSUME",
+   "consequence": "spec 이 출처에 없는 맥락 보존 효과를 공식 문서 출처와 함께 단정하고 있다."
+  },
+  {
+   "where": "「채택 조건」과 「순서와 확인」 6단계",
+   "type": "mismatch",
+   "claim": "비교 기준을 '조사 기록과 같은 날 실행한 리뷰 기록'으로 정했다. 그러나 6단계 대상인 2026-10-11 메시지 형식 spec 의 리뷰 기록은 10-11 에 실행되었고 -review 와 -review-2 두 차수가 있다. 2026-10-25-principles-slimming-design.md 와 그 리뷰 기록은 이 워크트리(main 34a04c5)에 없다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "비교 기준은 조사 기록과 같은 날 실행한 리뷰 기록의 렌즈 원본이다.",
+   "counterpart_file": "docs/superpowers/reviews/2026-10-11-message-schema-review-2.md",
+   "counterpart": "(파일 이름) 2026-10-11-message-schema-review.md, 2026-10-11-message-schema-review-2.md",
+   "principle": "SPECIFIC-NAME",
+   "consequence": "한 대상에서는 기준 날짜가 맞지 않고, 비교할 차수도 정해져 있지 않다. 다른 대상의 기준 원본은 main 에 없다."
+  },
+  {
+   "where": "「목적」 둘째 문단",
+   "type": "contradiction",
+   "claim": "spec 은 현행에서 읽기 전용이 프롬프트 지시로만 지켜진다고 단정한다. 그러나 review-specs 는 쓰기 도구가 없는 에이전트 종류가 있으면 그것으로 실행해 구조로 차단하라고 정한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "그래서 같은 글이 메인 맥락에 두 번 들어가고, 읽기 전용은 프롬프트 지시로만 지켜진다.",
+   "counterpart_file": "skills/review-specs/SKILL.md",
+   "counterpart": "쓰기 도구가 없는 에이전트 종류가 있으면 그것으로 실행하고, 없으면 프롬프트로 읽기 전용을 지시한다. 앞은 구조로 차단하고 뒤는 지시로만 차단한다는 사실을 알고 쓴다.",
+   "principle": "NO-ASSUME",
+   "consequence": "현행 절차에 이미 있는 구조적 차단 경로가 spec 의 문제 진술에서 빠져 있다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "STATE-ASSUME",
+  "SPECIFIC-NAME",
+  "SUBJECT-OBJECT",
+  "WRITTEN-ONLY",
+  "FULL-SENTENCE"
+ ],
+ "notes": "검토 관점: 누락, 모순, 환각, 불일치를 항목마다 따로 보았다. 일치를 확인한 항목: dispatching-lenses:35,40,54,62,67-73,107,110-112. review-docs:7,94-96. review-specs:37,51,57-60,100-106. audit-repo-docs:44-46,59,63,65. aggregating-lenses:23,56,63,76,84-92. review-llm-calls:7. lens-fit:18-20. test_docs_drift.sh:27,57,188,199-207,238,262,284,528,570,646-651,872,883. test_audit.sh:180. audit_verify.sh:6-8,44-46,60-64. audit_rounds.sh:85-94. 반영률 89%, LENS-ALLOWED 의 `lens-*`, @agent-<plugin>:<name> 형식, 사용자 결정 2026-10-25(S3+주장 반박, 청사진 겸함, readability 재정의, 다시 리뷰 시점), 2026-10-05 grounding·fit 분리, 2026-10-17 Opus, 2026-10-24 최우선 목표, 렌즈 그룹 spec 의 adversarial 단독 실행도 출처와 일치했다. 확인하지 못한 항목: 제약 표의 2026-09-25(렌즈 실행 조건), 2026-10-12(렌즈 선택 소유), 2026-10-24·25(스킬이 스킬을 실행하지 않음) 사용자 지시는 주입된 출처에 없다. 메모리나 세션 기록과 대조해야 한다. 원칙 경량화 세션의 미커밋 수정 줄(review-docs:39, review-llm-calls:30,46, test_docs_drift.sh:218,286)은 그 워크트리를 열어야 확인된다. test_docs_drift.sh:588 은 skills/*/ 전체 순회이며 렌즈 전제와 직접 관련된 줄은 600 이다."
+}
