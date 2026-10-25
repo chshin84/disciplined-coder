@@ -208,7 +208,7 @@ VD="$HERE/agents/prior-art-verifier.md"
 JD="$HERE/agents/prior-art-judge.md"
 MD="$HERE/agents/prior-art-mapcheck.md"
 check "에이전트 정의 파일이 모두 있다" "[ -f \"\$RD\" ] && [ -f \"\$VD\" ] && [ -f \"\$JD\" ] && [ -f \"\$MD\" ]"
-for pair in researcher:RD synthesis:RD extract:VD judge:JD map:MD; do
+for pair in researcher:RD synthesis:RD scout:RD extract:VD judge:JD map:MD; do
   name="${pair%%:*}"; def="${pair##*:}"; file="${!def}"
   check "예시 $name 이 $(basename "$file") 에서 계약 코드와 맞는다" \
     "contract_check_example $name \"$file\""

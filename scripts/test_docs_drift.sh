@@ -959,6 +959,11 @@ for row in "VDEF|WebFetch, Read|claude-haiku-5-5|high" "JDEF|Read|claude-opus-5-
 done
 RP="$( [ -f "$AP" ] && doc_sec "$AP" '레퍼런스 프롬프트' | grep -m1 '^- system: "' | sed 's/^- system: "//; s/"$//' || true)"
 check "연구자 정의가 레퍼런스 프롬프트 본문을 그대로 싣는다" "[ -n \"\$RP\" ] && grep -qF -- \"\$RP\" \"\$RDEF\""
+# survey 와 scout 지시문도 레퍼런스 프롬프트 절의 줄과 연구자 정의가 같은 글자다.
+for M in survey scout; do
+  RPM="$( [ -f "$AP" ] && doc_sec "$AP" '레퍼런스 프롬프트' | grep -m1 "^- system ($M): \"" | sed "s/^- system ($M): \"//; s/\"\$//" || true)"
+  check "연구자 정의가 레퍼런스 프롬프트의 $M 본문을 그대로 싣는다" "[ -n \"\$RPM\" ] && grep -qF -- \"\$RPM\" \"\$RDEF\""
+done
 DDISC="$HERE/docs/domain-discipline.md"
 check "근거 문서의 NO-RAW-OUTPUT 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`NO-RAW-OUTPUT\`' 'agent-prior-art'"
 check "근거 문서의 LENS-ALLOWED 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`LENS-ALLOWED\`' 'agent-prior-art'"
