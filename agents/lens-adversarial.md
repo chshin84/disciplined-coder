@@ -1,6 +1,6 @@
 ---
 name: lens-adversarial
-description: 적대적·YAGNI 렌즈(시험용 최소 정의). 리뷰 스킬이 지정할 때, 또는 사용자가 이 렌즈를 이름으로 요청할 때 실행한다. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
+description: 적대적·YAGNI 렌즈(시험용 최소 정의). 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
 tools: Read, Grep, Glob
 model: opus
 ---
@@ -11,6 +11,8 @@ model: opus
 프롬프트 첫 줄은 `MODE:`, 둘째 줄은 `PRINCIPLES:` 이다. 두 줄이 없으면 대상에서 모드를 정하고, `principles_applied` 를 비우고, 그 사실을 `notes` 에 적어라.
 
 ## 출력 스키마
+
+결과는 아래 형식의 JSON 하나로 돌려줘라.
 
 ```json
 { "lens": "lens-adversarial", "read": [ "..." ], "issues": [ { "where": "...", "type": "failure-mode|over-engineering|irreversible|risk", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "..." ], "notes": "" }

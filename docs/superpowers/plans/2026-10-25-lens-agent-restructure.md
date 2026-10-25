@@ -17,7 +17,7 @@
 - 렌즈 에이전트 이름은 `lens-` 로 시작하게 하라. 렌즈가 아닌 정의의 이름은 다른 앞말로 지어라(원칙 `LENS-ALLOWED`).
 - frontmatter 에는 `name`, `description`, `tools`, `model` 을 적어라. `model` 값은 `opus` 다. `maxTurns` 와 `effort` 는 Task 1 측정값으로 정하라.
 - `tools` 는 한 줄 쉼표 목록으로 적어라. 목록에는 spec 「에이전트 구성」 표의 도구만 둬라. `Agent`·`Agent(...)`·`Task` 와 쓰기 도구(Write, Edit, NotebookEdit)는 금지다.
-- description 의 실행 조건 문구는 "리뷰 스킬이 지정할 때, 또는 사용자가 이 렌즈를 이름으로 요청할 때 실행한다. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다"로 적어라. Task 1 의 직접 실행 시험이 실패하면 spec 표의 처리를 따르라.
+- description 에는 렌즈가 하는 일과 입력 안내 "실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다"만 적어라. 사용 제한 문장은 두지 마라(사용자 결정 2026-10-25, spec 「에이전트 구성」).
 - 프롬프트 첫 줄은 `MODE: <모드>`, 둘째 줄은 `PRINCIPLES: <principles_path>` 다.
 - 렌즈 결과 기록 파일 이름은 `<에이전트 이름>-<순번>.json` 이다.
 - `kofia.or.kr` 와 그 아래 주소는 접속 금지다.
