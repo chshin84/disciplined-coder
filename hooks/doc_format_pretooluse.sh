@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse(Write|Edit): 새 문서(.md, spec/plan 제외) 생성 감지 → 에이전트원칙의 타입·수명 판단 제안(비블로킹).
+# PreToolUse(Write|Edit): 새 문서(.md, spec/plan 제외) 생성 감지 → managing-docs 의 타입·수명 판단 제안(비블로킹).
 # 경로는 _hook_input.sh 의 hook_file_paths 가 추출(다중 경로 순회). jq 비의존.
 set -euo pipefail
 [ "${DISCIPLINED_CODER_REVIEW_GATE:-on}" = "off" ] && exit 0
@@ -14,7 +14,7 @@ while IFS= read -r FILE; do
   [ -n "$FILE" ] || continue
   case "$FILE" in *.md) ;; *) continue ;; esac          # 문서(.md)만
   if path_is_specplan "$FILE"; then continue; fi          # spec/plan은 자체 흐름(하드 게이트)
-  # 리뷰 기록은 양식을 검진 절이 정해 에이전트원칙의 양식을 고르라는 제안이 틀린 조언이 된다. 검진
+  # 리뷰 기록은 양식을 검진 절이 정해 managing-docs 의 양식을 고르라는 제안이 틀린 조언이 된다. 검진
   # 넛지도 같은 이유로 같은 경로를 뺀다 — 한쪽만 빼면 같은 파일을 만들 때 한 훅은 조용하고 다른 훅은
   # 떠들어 어느 쪽이 맞는지 알 수 없다.
   if path_is_review_record "$FILE"; then continue; fi
@@ -25,7 +25,7 @@ done <<EOF
 $FILE_PATHS
 EOF
 [ -n "$match" ] || exit 0
-msg="📝 새 문서 작성 — 쓰기 전에 에이전트원칙의 「문서 관리」 절로 이 문서의 타입과 수명을 가리고, 결론을 앞에 두고 내용을 배치하라. 에이전트원칙은 @import 로 이미 실려 있다. README 라면 disciplined-coder domain-readme 를 함께 열어라."
+msg="📝 새 문서 작성 — 쓰기 전에 disciplined-coder managing-docs 를 열어 이 문서의 타입과 수명을 가리고, 결론을 앞에 두고 내용을 배치하라. README 라면 disciplined-coder domain-readme 를 함께 열어라."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

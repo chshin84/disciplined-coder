@@ -328,7 +328,7 @@ while IFS= read -r want; do
   [ -n "$want" ] || continue
   grep -qxF "$want" <<<"$ATP_OUT" || ATP_MISS="$ATP_MISS [$want]"
 done <<TOPICEOF
-$(grep -oE '^- \*\*`[A-Z-]+`' "$HERE/agent-principles.md" | sed 's/^- \*\*`//; s/`$//')
+$(grep -ohE '^- \*\*`[A-Z-]+`' "$HERE/agent-principles.md" "$HERE"/skills/managing-docs/SKILL.md "$HERE"/skills/managing-docs/references/reading-docs.md | sed 's/^- \*\*`//; s/`$//')
 $(grep '^## ' "$HERE/agent-principles.md" | sed 's/^## //')
 $(ls "$HERE/skills")
 $(ls "$HERE/commands" | sed 's/\.md$//')

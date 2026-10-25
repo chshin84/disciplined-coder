@@ -8,7 +8,7 @@ description: 남에게 전달될 문서와 .html·.pptx·.xlsx·.docx·.pdf 산�
 
 ## `lens-fit`에 넘기는 계약
 
-이 계약은 여기가 소유한다. 계약은 둘의 경로다. 에이전트원칙 `agent-principles.md`와 `docs/domain-korean.md`다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 둘을 넘긴다.
+이 계약은 여기가 소유한다. 계약은 에이전트원칙 `agent-principles.md`, `docs/domain-korean.md`, 제목·목차 규칙이 있는 `skills/managing-docs/references/reading-docs.md` 의 경로다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 계약을 넘긴다.
 
 넘기지 않으면 그 렌즈는 계약을 모른 채 실행되어 형식만 본다. `lens-readability`를 실행하지 않은 문서도 이 경로로 에이전트원칙의 한국어 조항을 검사받는다.
 
@@ -36,7 +36,7 @@ description: 남에게 전달될 문서와 .html·.pptx·.xlsx·.docx·.pdf 산�
 
 `MD-FIRST` 의 절차와, 문서를 쓰고 고칠 때 거치는 단계는 여기가 소유한다.
 
-단계는 기계 검사와 렌즈 두 가지다. 기계 검사는 훅이 Write·Edit 마다 자동으로 실행하며, 경고가 오면 메인 세션은 `EDIT-PRIORITY` 대로 경고가 가리킨 줄만 고친다. 이 일의 이름은 '경고 수정'이고, '퇴고'는 렌즈 결과를 반영하는 일에만 쓴다. 문장 구조를 다시 짜는 퇴고는 렌즈가 맡는다. `lens-fit` 이 위반을 찾고 `lens-readability` 가 고쳐 쓴 문장을 내며, 메인 세션은 그 결과를 반영한다. 쓴 모델이 같은 맥락에서 다시 보면 쓸 때 놓친 위반을 대부분 그대로 놓치기 때문이다. 두 렌즈는 「언제 여는지」의 검진 질문에서 함께 물어라.
+단계는 기계 검사와 렌즈 두 가지다. 기계 검사는 훅이 Write·Edit 마다 자동으로 실행하며, 경고가 오면 메인 세션은 경고가 가리킨 줄만 고친다. 이 일의 이름은 '경고 수정'이고, '퇴고'는 렌즈 결과를 반영하는 일에만 쓴다. 문장 구조를 다시 짜는 퇴고는 렌즈가 맡는다. `lens-fit` 이 위반을 찾고 `lens-readability` 가 고쳐 쓴 문장을 내며, 메인 세션은 그 결과를 반영한다. 쓴 모델이 같은 맥락에서 다시 보면 쓸 때 놓친 위반을 대부분 그대로 놓치기 때문이다. 두 렌즈는 「언제 여는지」의 검진 질문에서 함께 물어라.
 
 | 상황 | 기계 검사 | 렌즈(퇴고와 검진) |
 |---|---|---|

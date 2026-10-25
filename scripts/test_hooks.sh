@@ -209,6 +209,8 @@ check "resume 에서는 표시를 새로 만들지 않는다" "[ ! -e \"\$TMPDIR
 echo "[doc-format-pre]"
 printf 'x\n' > "$T/existing.md"
 check "새 문서(.md) → 양식 제안"         "fpre '$(J "$T/newdoc.md")' | grep -q additionalContext"
+# 문서 규칙은 에이전트원칙에서 managing-docs 로 옮겼다. 안내가 옛 위치를 가리키면 규칙 없는 절을 찾게 된다.
+check "양식 제안은 managing-docs 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'managing-docs' && ! grep -qF '에이전트원칙' '$FPRE'"
 check "기존 문서(.md) → 무출력"          "[ -z \"\$(fpre '$(J "$T/existing.md")')\" ]"
 check "spec 경로 새 .md → 무출력"        "[ -z \"\$(fpre '$(J "$SP/brandnew.md")')\" ]"
 check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/new.py")')\" ]"
@@ -216,13 +218,10 @@ check "OFF → 무출력"                     "[ -z \"\$(DISCIPLINED_CODER_REVIE
 check "프로젝트 밖 새 문서 → 무출력"     "[ -z \"\$(fpre '$(J "$OUTSIDE/new.md")')\" ]"
 check "새 리뷰 기록 → 무출력"            "[ -z \"\$(fpre '$(J "$T/docs/superpowers/reviews/new-check.md")')\" ]"
 # 넛지가 가리킨 곳이 실재하는지 본다. 문자열 일치만 보던 시절 에이전트원칙 영문화로 가리키던 절 이름이
-# 바뀌자 넛지가 없는 곳을 가리킨 채 스위트가 초록으로 통과했다. 타입과 수명이 스킬에서
-# 에이전트원칙으로 돌아가 가리키는 대상이 스킬에서 절로 바뀌었고, 이 검사도 따라 바뀐다.
-# 부정 대괄호(`[^」]`)를 안 쓴다. 로케일이 UTF-8 이 아니면 sed 가 그것을 바이트로 읽어, 한글의
-# 이어지는 바이트가 」 의 바이트와 겹쳐 매치가 엉뚱한 데서 끊긴다. 메시지에 「…」 절 이 하나뿐이라
-# 탐욕적 `.*` 가 안전하다. 같은 함정을 test_docs_drift.sh 의 대구 검사도 주석으로 적어 두었다.
-NUDGE_SEC="$(fpre "$(J "$T/newdoc.md")" | sed -n 's/.*에이전트원칙의 「\(.*\)」 절.*/\1/p')"
-check "넛지가 가리킨 절이 에이전트원칙에 실재"   "[ -n \"\$NUDGE_SEC\" ] && grep -qF \"## \$NUDGE_SEC\" '$HERE/agent-principles.md'"
+# 바뀌자 넛지가 없는 곳을 가리킨 채 스위트가 초록으로 통과했다. 타입과 수명은 2026-10-25 열림 시험 뒤
+# 에이전트원칙에서 스킬 managing-docs 로 옮겼으므로, 넛지가 가리킨 스킬이 실재하는지 본다.
+NUDGE_SKILL="$(fpre "$(J "$T/newdoc.md")" | sed -n 's/.*disciplined-coder \([a-z-]*\) 를 열어.*/\1/p')"
+check "넛지가 가리킨 스킬이 실재"   "[ -n \"\$NUDGE_SKILL\" ] && [ -f '$HERE/skills/'\"\$NUDGE_SKILL\"'/SKILL.md' ]"
 NUDGE_SK="$(fpre "$(J "$T/newdoc.md")" | sed -n "s/.*disciplined-coder \([a-z][a-z-]*\) 를 함께.*/\1/p")"
 check "넛지가 가리킨 스킬이 실재"               "[ -n \"\$NUDGE_SK\" ] && [ -f \"$HERE/skills/\$NUDGE_SK/SKILL.md\" ]"
 

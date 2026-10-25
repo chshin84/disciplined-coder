@@ -22,7 +22,7 @@ description: 프로젝트의 테스트·스크립트·코드·문서가 과한�
 
 **에이전트 산출물의 비대** — 에이전트가 쓴 변경은 사람의 변경보다 컸고, 원인은 장황한 구현·범위 확장·과잉 방어 코드·과잉 문서화였다. 리뷰에서 이 원인들을 하나씩 찾는다([arXiv 2608.12355](https://arxiv.org/pdf/2608.12355)).
 
-**문서와 기록의 수명** — 결정 기록은 짧게 두고 고치지 않으며 대체되면 표시한다([Microsoft ADR](https://learn.microsoft.com/en-us/azure/well-architected/architect-role/architecture-decision-record)). 쓸모가 끝난 작업 문서는 지우거나 폐기 표시한다([Software Engineering at Google 10장](https://abseil.io/resources/swe-book/html/ch10.html)). 기록은 보존 기간을 정하고, 기간이 지나면 원래 저장소 밖으로 옮긴다([NIST SP 800-92](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-92.pdf)). 에이전트원칙의 「문서 타입과 수명」이 문서 수명을 정하는 프로젝트에서는, 그 표와 다르게 처분하려면 사용자에게 묻는다.
+**문서와 기록의 수명** — 결정 기록은 짧게 두고 고치지 않으며 대체되면 표시한다([Microsoft ADR](https://learn.microsoft.com/en-us/azure/well-architected/architect-role/architecture-decision-record)). 쓸모가 끝난 작업 문서는 지우거나 폐기 표시한다([Software Engineering at Google 10장](https://abseil.io/resources/swe-book/html/ch10.html)). 기록은 보존 기간을 정하고, 기간이 지나면 원래 저장소 밖으로 옮긴다([NIST SP 800-92](https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-92.pdf)). `managing-docs` 의 「문서 타입과 수명」이 문서 수명을 정하는 프로젝트에서는, 그 표와 다르게 처분하려면 사용자에게 묻는다.
 
 ## 분류
 
@@ -73,7 +73,7 @@ description: 프로젝트의 테스트·스크립트·코드·문서가 과한�
 |---|---|
 | 설계 단계의 과잉(테스트·스크립트·문서·훅을 늘리는 spec) | `lens-adversarial`의 과설계 항목이 이 참고서와 `domain-plugin`을 근거로 지적한다 |
 | 사본 | 레포 문서 감사에서 호출자가 `lens-consistency`의 같음 판정으로 도출한 `duplication` 발견 |
-| 수명 끝 | `lens-fit`이 고른 문서 타입(`doc_type`)과 에이전트원칙 「문서 타입과 수명」의 행 |
+| 수명 끝 | `lens-fit`이 고른 문서 타입(`doc_type`)과 `managing-docs` 「문서 타입과 수명」의 행 |
 | 문구고정·구현고정·중복·항진·일회성 | 이 참고서의 「절차」를 따르는 판정표. 렌즈 없이 프로젝트의 테스트를 읽는 실행자가 낸다 |
 | 결함 주입의 핵심 계약 | 프로젝트가 정한다. 이 저장소는 `CLAUDE.md`의 「변경 뒤 실행」이 적는다 |
 

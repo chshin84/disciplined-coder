@@ -1,0 +1,372 @@
+{
+  "cells": [
+    {
+      "row": "Perry & Stieg 1992, 대규모 실시간 시스템의 결함 사례 연구",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Perry & Stieg 1992, 대규모 실시간 시스템의 결함 사례 연구",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Perry & Stieg 1992, 대규모 실시간 시스템의 결함 사례 연구",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Perry & Stieg 1992, 대규모 실시간 시스템의 결함 사례 연구",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Perry & Stieg 1992, 대규모 실시간 시스템의 결함 사례 연구",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Perry & Stieg 1992, 대규모 실시간 시스템의 결함 사례 연구",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "Goseva-Popstojanova & Hamill, 대규모 NASA 임무의 결함·실패·수정 교훈",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Goseva-Popstojanova & Hamill, 대규모 NASA 임무의 결함·실패·수정 교훈",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Goseva-Popstojanova & Hamill, 대규모 NASA 임무의 결함·실패·수정 교훈",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Goseva-Popstojanova & Hamill, 대규모 NASA 임무의 결함·실패·수정 교훈",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Goseva-Popstojanova & Hamill, 대규모 NASA 임무의 결함·실패·수정 교훈",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Goseva-Popstojanova & Hamill, 대규모 NASA 임무의 결함·실패·수정 교훈",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "Waseem 외 2021, 오픈소스 마이크로서비스 시스템 5개의 이슈 성격 연구",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Waseem 외 2021, 오픈소스 마이크로서비스 시스템 5개의 이슈 성격 연구",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Waseem 외 2021, 오픈소스 마이크로서비스 시스템 5개의 이슈 성격 연구",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Waseem 외 2021, 오픈소스 마이크로서비스 시스템 5개의 이슈 성격 연구",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Waseem 외 2021, 오픈소스 마이크로서비스 시스템 5개의 이슈 성격 연구",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "Waseem 외 2021, 오픈소스 마이크로서비스 시스템 5개의 이슈 성격 연구",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "FTA·FMEA·STPA 안전 분석 기법 통제 실험",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "FTA·FMEA·STPA 안전 분석 기법 통제 실험",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "FTA·FMEA·STPA 안전 분석 기법 통제 실험",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "FTA·FMEA·STPA 안전 분석 기법 통제 실험",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "FTA·FMEA·STPA 안전 분석 기법 통제 실험",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "FTA·FMEA·STPA 안전 분석 기법 통제 실험",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "다중 에이전트 시스템 프롬프트 명세의 반복 감사 수렴",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "다중 에이전트 시스템 프롬프트 명세의 반복 감사 수렴",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "다중 에이전트 시스템 프롬프트 명세의 반복 감사 수렴",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "다중 에이전트 시스템 프롬프트 명세의 반복 감사 수렴",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "다중 에이전트 시스템 프롬프트 명세의 반복 감사 수렴",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "다중 에이전트 시스템 프롬프트 명세의 반복 감사 수렴",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#3"
+    },
+    {
+      "row": "LLM 과 사람 요구사항 리뷰어 비교 재현 연구",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "LLM 과 사람 요구사항 리뷰어 비교 재현 연구",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "LLM 과 사람 요구사항 리뷰어 비교 재현 연구",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "LLM 과 사람 요구사항 리뷰어 비교 재현 연구",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "LLM 과 사람 요구사항 리뷰어 비교 재현 연구",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "LLM 과 사람 요구사항 리뷰어 비교 재현 연구",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "GPU 프로그램 수치 버그 실증 연구와 GPU-NBDetect",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "GPU 프로그램 수치 버그 실증 연구와 GPU-NBDetect",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "GPU 프로그램 수치 버그 실증 연구와 GPU-NBDetect",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "GPU 프로그램 수치 버그 실증 연구와 GPU-NBDetect",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "GPU 프로그램 수치 버그 실증 연구와 GPU-NBDetect",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "GPU 프로그램 수치 버그 실증 연구와 GPU-NBDetect",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#2"
+    },
+    {
+      "row": "PyTorch 재현성 공식 문서",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "PyTorch 재현성 공식 문서",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "PyTorch 재현성 공식 문서",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "PyTorch 재현성 공식 문서",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "PyTorch 재현성 공식 문서",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "PyTorch 재현성 공식 문서",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "과학 소프트웨어 테스트 체계적 문헌 리뷰",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "과학 소프트웨어 테스트 체계적 문헌 리뷰",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "과학 소프트웨어 테스트 체계적 문헌 리뷰",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "과학 소프트웨어 테스트 체계적 문헌 리뷰",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "과학 소프트웨어 테스트 체계적 문헌 리뷰",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "과학 소프트웨어 테스트 체계적 문헌 리뷰",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#5"
+    },
+    {
+      "row": "경험 수준별 바이브 코딩 실천 설문(Fawzy·Tahir·Blincoe 2026)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "경험 수준별 바이브 코딩 실천 설문(Fawzy·Tahir·Blincoe 2026)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "경험 수준별 바이브 코딩 실천 설문(Fawzy·Tahir·Blincoe 2026)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "경험 수준별 바이브 코딩 실천 설문(Fawzy·Tahir·Blincoe 2026)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "경험 수준별 바이브 코딩 실천 설문(Fawzy·Tahir·Blincoe 2026)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    },
+    {
+      "row": "경험 수준별 바이브 코딩 실천 설문(Fawzy·Tahir·Blincoe 2026)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#2"
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "NO-FLEET",
+    "CHECKABLE",
+    "YAGNI",
+    "FOCUSED",
+    "KO-SYNTAX"
+  ]
+}

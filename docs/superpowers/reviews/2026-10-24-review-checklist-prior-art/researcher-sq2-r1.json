@@ -1,0 +1,272 @@
+{
+  "agent": "agent-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq2",
+  "search_status": "ok",
+  "queries": [
+    "perspective-based reading vs checklist-based reading controlled experiment defect detection requirements inspection",
+    "checklist length effectiveness software inspection number of items empirical study",
+    "Hatton testing the value of checklists in code inspections IEEE Software",
+    "Basili perspective-based reading empirical evaluation requirements NASA experiment results",
+    "software FMEA design review effectiveness empirical study failure mode analysis software architecture",
+    "LLM code review checklist prompt empirical evaluation defect detection design document",
+    "Porter Votta Basili scenario-based reading vs checklist ad hoc requirements inspection 1995 results",
+    "large language model requirements specification inspection checklist perspective-based reading experiment",
+    "interface control document review checklist data exchange between subsystems verification guidance"
+  ],
+  "read": "[\"https://pureportal.coventry.ac.uk/en/publications/an-experimental-comparison-of-checklist-based-reading-and-perspec/\", \"https://leshatton.org/checklists_in_code_inspections.html (503, 열지 못함)\", \"https://core.ac.uk/works/31885195 (403, 열지 못함)\", \"https://strathprints.strath.ac.uk/2663/\", \"https://eprints.kingston.ac.uk/id/eprint/8431/ (DNS 오류, 열지 못함)\", \"https://arxiv.org/abs/1612.00330\", \"https://conf.researchr.org/details/profes-2024/profes-2024-Research-Papers-1/2/Can-Large-Language-Models-LLMs-compete-with-Human-Requirement-Reviewers-Replicat\", \"https://arxiv.org/abs/2601.16009\", \"https://sites.umiacs.umd.edu/node/16314 (503, 열지 못함)\", \"https://www.cs.umd.edu/~aporter/html/scenarios.html\"]",
+  "issues": [
+    {
+      "where": "후보안 A(분야별 체크리스트 수백 개를 미리 적어 두고 골라 넘기는 방식)",
+      "type": "refuted-premise",
+      "claim": "후보안 A는 체크리스트를 쓰면 결함 발견이 늘어난다는 전제에 기대지만, 요구사항 검사 실험에서 체크리스트 검토자는 비체계적 검토(ad hoc)보다 낫지 않았다. 결함 유형마다 절차를 나눠 맡긴 시나리오 방식이 더 많이 찾았다.",
+      "prior_claim": "Porter·Votta·Basili 의 요구사항 검사 통제 실험(대학원생 48명과 Lucent 개발자 21명, 3인 팀 23개)에서 시나리오 방식은 ad hoc 와 체크리스트보다 결함 발견률이 높았다. 시나리오 검토자는 자기 시나리오 밖의 결함도 덜 찾지 않았고, 체크리스트 검토자는 ad hoc 검토자보다 낫지 않았으며, 여러 연구진의 재현 결과도 원 결과와 같았다.",
+      "consequence": "후보안 A를 채택하면 체크리스트 항목을 수백 개로 늘리는 비용을 들여도 결함 발견이 늘어난다는 실험 근거가 없는 상태가 된다. 그 실험이 지지하는 쪽은 결함 유형별로 절차를 나눠 맡기는 구성이다.",
+      "evidence": "cs.umd.edu 의 Porter 연구 소개 페이지가 'Checklist reviewers performed no better than Ad Hoc reviewers'와 시나리오 방식의 우위를 적는다. 네 축 대조: 목적(결함 발견)은 비슷하지만 비개발자 활용은 다루지 않는다. 메커니즘은 사람 검토자와 요구사항 문서이고 대조 대상은 LLM 리뷰어와 설계 문서다. 평가는 결함을 심어 둔 통제 실험이며, 적용 대상은 단일 요구사항 문서다. 그래서 같은 사례로 단정하지 않는다.",
+      "citations": [
+        {
+          "url": "https://www.cs.umd.edu/~aporter/html/scenarios.html",
+          "kind": "blog",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "후보안 A",
+      "type": "refuted-premise",
+      "claim": "독립 재현 실험도 시나리오 방식이 체크리스트 방식보다 낫다는 결과를 지지하므로, 후보안 A의 전제는 한 실험에만 반박된 상태가 아니다.",
+      "prior_claim": "Miller·Roper·Wood 의 재현 실험(Empirical Software Engineering, 1998)은 시나리오 방식이 체크리스트 방식보다 우수하다는 원 실험 결과를 대체로 지지했다. 그 실험은 검사 회의 단계가 결함을 효과적으로 찾지 못한다는 결과도 보고했다.",
+      "consequence": "후보안 A를 고르면 반복 재현된 결과와 반대 방향으로 설계하게 된다. 그리고 리뷰 결과를 모아 합의하는 회의형 단계를 두면 그 단계가 결함 발견을 늘리지 않을 수 있다.",
+      "evidence": "strathprints.strath.ac.uk/2663 초록이 'broadly supports ... the Scenario approach is superior to the Checklist approach'와 회의 단계의 비효과를 적는다. 축 차이: 사람 학생 피험자와 코드 또는 명세 문서이며 LLM 리뷰어는 다루지 않는다.",
+      "citations": [
+        {
+          "url": "https://strathprints.strath.ac.uk/2663/",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "후보안 B(대상 종류별 질문 세트)와 후보안 C(실패 유형별 LLM 리뷰어)",
+      "type": "weak-baseline",
+      "claim": "후보안 B와 C는 체크리스트 기반 읽기라는 단순한 기준선과 비교되지 않았다.",
+      "prior_claim": "Sabaliauskaite 등의 UML 설계 문서 검사 통제 실험(학생 59명)에서 관점 기반 읽기(PBR)와 체크리스트 기반 읽기(CBR)의 결함 발견 비율은 69%와 70%로 비슷했다. PBR 검토자가 시간을 덜 썼지만, 3인 가상 팀 분석에서는 CBR 이 더 효과적이었고 개인 분석에서 결함당 비용도 CBR 이 낮았다.",
+      "consequence": "설계 문서 검사에서는 관점이나 대상별로 나누는 방식이 체크리스트보다 낫다는 결과가 뒤집힌 실험이 있다. 그래서 B나 C가 A보다 낫다는 판단은 지금 비교 근거 없이 서 있다.",
+      "evidence": "pureportal.coventry.ac.uk 초록. 축 차이: 사람 학생 검토자, UML 설계 문서, 결함을 심은 실험이다. 대조 대상은 LLM 리뷰어와 다단계 시스템 설계 문서이므로 같은 사례가 아니다.",
+      "citations": [
+        {
+          "url": "https://pureportal.coventry.ac.uk/en/publications/an-experimental-comparison-of-checklist-based-reading-and-perspec/",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "후보안 C(실패 유형별 LLM 리뷰어 유지)와 후보안 A·B를 LLM에 넘기는 단계",
+      "type": "known-failure",
+      "claim": "LLM에 읽기 기법(ad hoc·관점 기반·체크리스트)을 지시해 요구사항을 검사시킨 재현 실험에서 LLM은 결함을 적게 보고했고 지시문을 바꿔도 결과가 거의 달라지지 않았다. 대조 대상의 LLM 리뷰어에도 같은 원인(단일 지시문, 보고 결함 수의 한계)이 남아 있는지 확인되지 않았다.",
+      "prior_claim": "PROFES 2024 발표 연구는 학생 대상 요구사항 검사 실험을 GPT-4-Turbo 등 LLM으로 바꿔 재현했다. 그 연구에서 LLM은 토큰 여유가 충분해도 제한된 수의 결함만 보고했고, 지시문에 따른 결과 차이가 작았으며, 정답 목록과 거의 일치하지 않았고, 쓸모 있는 통찰도 적었다.",
+      "consequence": "점검 항목을 어떻게 구성하든 LLM 리뷰어가 보고하는 결함 수에 상한이 생길 수 있다. 그러면 A·B·C 사이의 차이가 지시문 구성보다 LLM 의 보고 한계에 묻힐 수 있다.",
+      "evidence": "conf.researchr.org 의 PROFES 2024 초록. 축 차이: 단일 지시문만 시험했고 대상은 요구사항 문서다. 대조 대상은 여러 리뷰어를 나누어 실행하고 설계 문서를 다루므로 전이는 가정이다. 리뷰어를 여럿으로 나누면 이 한계가 줄어드는지를 대조 대상에서 정답 결함 목록과 비교해 확인해야 한다.",
+      "citations": [
+        {
+          "url": "https://conf.researchr.org/details/profes-2024/profes-2024-Research-Papers-1/2/Can-Large-Language-Models-LLMs-compete-with-Human-Requirement-Reviewers-Replicat",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "후보안 C의 실패 모드 공격 리뷰어",
+      "type": "weak-baseline",
+      "claim": "후보안 C의 실패 모드 공격 리뷰어는 FMEA 와 시스템 이론 기반 분석(STPA) 같은 알려진 안전 분석 기법과 비교되지 않았다.",
+      "prior_claim": "학생 21명이 FTA·FMEA·STPA 를 열차 문 제어, ABS, 충돌 회피 시스템에 적용한 통제 실험에서 STPA 는 FTA·FMEA 보다 더 다양한 소프트웨어 안전 요구사항을 찾았다. 그러나 STPA 는 시간이 더 들었고 적용성·이해도·사용 편의에서는 유의한 차이가 없었다.",
+      "consequence": "실패 모드를 부품 단위로 열거하는 방식은 시스템 수준 상호작용에서 생기는 결함을 덜 찾는다는 결과가 있다. 그런데도 대조 대상은 어느 방식에 가까운지와 그 차이를 확인하지 않은 상태다.",
+      "evidence": "arxiv.org/abs/1612.00330 초록. 축 차이: 사람이 수행한 안전 분석이고 적용 대상은 임베디드 안전 시스템이다. 대조 대상은 LLM 리뷰와 대시보드형 시스템이다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/abs/1612.00330",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "후보안 A",
+      "type": "refuted-premise",
+      "claim": "산업 현장의 코드 검사 자료에서도 체크리스트의 유의한 효과가 나오지 않았다는 보고가 있어 후보안 A의 전제와 반대 방향이다. 다만 이 출처는 열지 못했다.",
+      "prior_claim": "Hatton 의 2008년 IEEE Software 논문은 산업 엔지니어가 3년간 수행한 코드 검사 308건을 통계로 분석했고, 체크리스트가 결함 발견 품질에 유의한 효과를 내지 않았다고 보고했다. 같은 논문은 개인이 평균 약 53%를 찾고 2인 팀이 약 76%를 찾았다고 보고했다.",
+      "consequence": "후보안 A를 채택하면 현장 자료에서도 효과가 확인되지 않은 수단에 항목 작성 비용을 들이게 된다. 그 대신 검토자 수(2인 팀)가 발견률을 올렸다는 결과가 있다.",
+      "evidence": "검색 결과 요약에서만 확인했다. leshatton.org(503)와 eprints.kingston.ac.uk(DNS 오류)를 열지 못했다. 축 차이: 코드 검사이며 설계 문서 검사가 아니다.",
+      "citations": [
+        {
+          "url": "https://leshatton.org/checklists_in_code_inspections.html",
+          "kind": "peer-reviewed",
+          "opened": false
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "Porter·Votta·Basili 요구사항 검사 탐지 방법 비교(시나리오 대 체크리스트 대 ad hoc)",
+      "url": "https://www.cs.umd.edu/~aporter/html/scenarios.html",
+      "axes": {
+        "purpose": {
+          "prior": "요구사항 문서 검사에서 결함 발견률을 높인다.",
+          "same": false,
+          "note": "결함 발견 목적은 같지만 재현성과 비개발자의 결과 활용은 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "사람 검토자마다 결함 유형 하나를 겨냥한 절차(시나리오)를 나눠 맡긴다.",
+          "same": false,
+          "note": "후보안 C의 실패 유형별 분담과 비슷하지만 수행자는 사람이고 LLM 리뷰어가 아니다."
+        },
+        "evaluation": {
+          "prior": "결함을 심어 둔 문서로 통제 실험을 하고 팀별 발견률을 비교했다.",
+          "same": false,
+          "note": "대조 대상에는 아직 이런 평가가 없다."
+        },
+        "target": {
+          "prior": "대학원생과 Lucent 개발자가 검사한 요구사항 명세.",
+          "same": false,
+          "note": "대조 대상은 백엔드·프론트엔드·DB·일괄 계산이 함께 있는 다단계 시스템의 설계 문서다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "저자 소개 페이지(원 논문은 IEEE TSE 21(6), 1995)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Miller·Roper·Wood 시나리오 대 체크리스트 재현 실험",
+      "url": "https://strathprints.strath.ac.uk/2663/",
+      "axes": {
+        "purpose": {
+          "prior": "검사 탐지 보조 수단의 효과를 재현으로 확인한다.",
+          "same": false,
+          "note": "재현성을 다루지만 리뷰 방법 비교의 재현이며 리뷰 결과의 재현성은 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "사람 검토자가 시나리오 방식과 체크리스트 방식으로 검사하고 회의 단계를 거친다.",
+          "same": false,
+          "note": "LLM 리뷰어를 쓰지 않는다."
+        },
+        "evaluation": {
+          "prior": "피험자 기반 통제 실험.",
+          "same": false,
+          "note": "대조 대상에는 통제 실험이 없다."
+        },
+        "target": {
+          "prior": "대학 피험자가 검사한 소프트웨어 문서.",
+          "same": false,
+          "note": "다단계 시스템 설계 문서가 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "기관 저장소 초록",
+      "adoption": "참고"
+    },
+    {
+      "case": "Sabaliauskaite 등 UML 설계 문서의 CBR 대 PBR 비교",
+      "url": "https://pureportal.coventry.ac.uk/en/publications/an-experimental-comparison-of-checklist-based-reading-and-perspec/",
+      "axes": {
+        "purpose": {
+          "prior": "UML 설계 문서 검사에서 두 읽기 기법의 효과를 비교한다.",
+          "same": false,
+          "note": "설계 문서라는 점은 가깝지만 비개발자 활용과 재현성은 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "사람 검토자가 체크리스트 또는 관점(역할) 기반 읽기를 쓴다.",
+          "same": false,
+          "note": "후보안 A(체크리스트)와 B(대상별 질문)에 대응하는 대조이지만 수행자가 사람이다."
+        },
+        "evaluation": {
+          "prior": "학생 59명 통제 실험, 개인 발견률과 3인 가상 팀 발견률, 결함당 비용.",
+          "same": false,
+          "note": "대조 대상에는 이런 비교가 없다."
+        },
+        "target": {
+          "prior": "객체지향 UML 설계 문서.",
+          "same": false,
+          "note": "백엔드·DB·일괄 계산을 포함한 다단계 시스템 설계 문서와 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "기관 저장소 초록",
+      "adoption": "참고"
+    },
+    {
+      "case": "LLM이 사람 요구사항 검토자를 대신할 수 있는가(PROFES 2024 재현)",
+      "url": "https://conf.researchr.org/details/profes-2024/profes-2024-Research-Papers-1/2/Can-Large-Language-Models-LLMs-compete-with-Human-Requirement-Reviewers-Replicat",
+      "axes": {
+        "purpose": {
+          "prior": "LLM이 읽기 기법을 따라 요구사항 결함을 찾는지 확인한다.",
+          "same": false,
+          "note": "LLM 리뷰라는 점은 같지만 비개발자의 결과 활용은 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "단일 지시문에 ad hoc·관점 기반·체크리스트 읽기를 넣어 여러 LLM에 실행했다.",
+          "same": false,
+          "note": "대조 대상은 실패 유형별로 리뷰어를 나누어 실행한다."
+        },
+        "evaluation": {
+          "prior": "정답 결함 목록과 사람 검토자 결과에 비교했다.",
+          "same": false,
+          "note": "대조 대상은 정답 목록 비교를 하지 않았다."
+        },
+        "target": {
+          "prior": "요구사항 문서 두 건.",
+          "same": false,
+          "note": "설계 문서와 다단계 시스템이 아니다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "학회 프로그램 페이지 초록",
+      "adoption": "참고"
+    },
+    {
+      "case": "FTA·FMEA·STPA 안전 분석 기법 통제 실험",
+      "url": "https://arxiv.org/abs/1612.00330",
+      "axes": {
+        "purpose": {
+          "prior": "안전 중요 소프트웨어의 안전 요구사항을 찾는다.",
+          "same": false,
+          "note": "실패 모드 탐색이라는 점은 후보안 C의 실패 모드 공격 리뷰어 하나와만 같다."
+        },
+        "mechanism": {
+          "prior": "사람 분석가가 FTA·FMEA·STPA 를 적용한다.",
+          "same": false,
+          "note": "LLM 리뷰가 아니다."
+        },
+        "evaluation": {
+          "prior": "학생 21명, 효과·효율·적용성 비교.",
+          "same": false,
+          "note": "대조 대상에는 이런 비교가 없다."
+        },
+        "target": {
+          "prior": "열차 문 제어, ABS, 충돌 회피 시스템.",
+          "same": false,
+          "note": "대시보드형 데이터 시스템이 아니다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "arXiv",
+      "adoption": "참고"
+    }
+  ],
+  "saturation": "2",
+  "not_found": "[\"체크리스트 항목 수(길이)를 바꿔 가며 소프트웨어 설계 문서 검사의 결함 발견을 비교한 통제 실험을 찾지 못했다. GUI 사용성 체크리스트 25~300개 항목을 비교한 산업 발표 자료(gsaw.org)는 검색 결과로만 보았고 열지 않았다.\", \"LLM 리뷰어에 대상 종류(단계 사이 자료, 계산, 저장 상태, 화면)별 질문 세트를 주어 결함 발견을 비교한 연구를 찾지 못했다.\", \"인터페이스 통제 문서(ICD)의 리뷰 효과를 측정한 실험 연구를 찾지 못했다. 검색에서 나온 자료는 실무 지침(HHS, Aerospace Corporation)뿐이며 열지 않았다.\", \"비개발자가 리뷰 결과를 활용하는 정도를 측정한 연구는 이 하위 질문 범위의 검색에서 찾지 못했다.\", \"Basili 등 NASA PBR 실험과 Ciolkowski 재현은 core.ac.uk(403)를 열지 못해 근거 지도에 넣지 않았다.\"]",
+  "disclosures": "[\"Hatton 2008 논문은 leshatton.org(503)와 eprints.kingston.ac.uk(DNS 오류)를 열지 못해 opened 를 false 로 두었고 검색 요약에만 기댔다.\", \"Porter 1995 결과는 저자의 소개 페이지(2차)에서 확인했고 원 논문 본문은 열지 않았다. umiacs 페이지는 503 으로 열지 못했다.\", \"PROFES 2024 연구의 사람 검토자 수치는 초록에 없어 확인하지 못했다.\", \"선행 실험은 모두 사람 검토자 대상이 대부분이므로 LLM 리뷰어로의 전이는 가정이다.\", \"arXiv 2601.16009 를 열었으나 LLM 지원 실험이 아니라 UML 표현 실험이어서 근거로 쓰지 않았다. 검색 요약의 'LLM 지원이 정확도를 낮췄다'는 2차 기사 내용은 확인하지 못했다.\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"STATE-ASSUME\", \"SPECIFIC-NAME\", \"SUBJECT-OBJECT\", \"FULL-SENTENCE\", \"WRITTEN-ONLY\"]",
+  "notes": "체크리스트 항목별로 검토한 관점은 기시감, 결말, 전이, 기준선, 붐빔이다. 기시감 관점에서는 결함 유형별 시나리오 분담(Porter)이 후보안 C의 실패 유형별 분담과 가깝고, 관점 기반 읽기가 후보안 B와 가깝다. 결말 관점에서 사람 대상 실험은 대체로 체크리스트가 ad hoc 보다 낫지 않다고 보고했다. 그러나 UML 설계 문서 실험 하나는 팀 단위에서 체크리스트가 낫다고 보고해 결과가 엇갈린다. 전이 관점에서는 LLM 단일 지시문 리뷰의 낮은 보고량이 후보안 C에 남는지가 미확인이다. 기준선 관점에서 B와 C는 체크리스트 기준선과도, 정답 결함 목록과도 비교되지 않았다. 붐빔 관점에서 ICD 와 FMEA 는 표준 실무로 이미 있으나 이 하위 질문에서는 재구축 여부를 판단할 자료가 부족해 이슈로 올리지 않았다. 더 확인할 사항은 세 가지다. Hatton 원문의 체크리스트 효과 수치를 다시 열어 확인해야 한다. 그리고 리뷰어를 여럿으로 나누면 LLM 보고량 한계가 줄어드는지 확인하는 LLM 다중 리뷰어 연구를 찾아야 한다. 끝으로 설계 문서 대상 PBR 대 CBR 메타분석이 있는지 확인해야 한다."
+}

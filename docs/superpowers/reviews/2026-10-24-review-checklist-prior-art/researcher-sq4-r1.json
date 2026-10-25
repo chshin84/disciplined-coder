@@ -1,0 +1,286 @@
+{
+  "agent": "agent-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq4",
+  "search_status": "ok",
+  "queries": [
+    "floating-point non-determinism parallel reduction reproducibility study",
+    "differential testing numerical libraries bugs found empirical study",
+    "empirical study of numerical bugs scientific software code review vs testing",
+    "comprehensive study of real-world numerical bug characteristics ASE 2017",
+    "metamorphic testing scientific software oracle problem survey",
+    "LLM code review detect floating-point numerical bugs evaluation",
+    "numerical reproducibility parallel sum order Intel MKL conditional numerical reproducibility"
+  ],
+  "read": "[\"https://conf.researchr.org/details/issta-2020/issta-2020-papers/30/Discovering-Discrepancies-in-Numerical-Libraries\", \"https://conf.researchr.org/details/issta-2025/issta-2025-papers/72/An-Investigation-on-Numerical-Bugs-in-GPU-Programs-Towards-Automated-Bug-Detection\", \"https://arxiv.org/abs/2606.31308\", \"https://arxiv.org/abs/1804.01954\", \"https://docs.pytorch.org/docs/2.14/notes/randomness.html\", \"https://udspace.udel.edu/items/b593a5b5-e41c-45a1-9352-ae233d2599f3\", \"https://hal-lirmm.ccsd.cnrs.fr/lirmm-01206348 (열지 못함: 봇 차단)\", \"https://hal.archives-ouvertes.fr/hal-00949355 (열지 못함: 봇 차단)\", \"https://www.osti.gov/biblio/976992 (열지 못함: 연결 거부)\", \"https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-dpcpp/2025-1/numerical-reproducibility.html (본문 미확인: 목차만 읽힘)\"]",
+  "issues": [
+    {
+      "where": "후보안 C(실패 유형별 LLM 리뷰어 유지)와 후보안 B의 '계산' 질문 세트",
+      "type": "known-failure",
+      "claim": "후보안 C는 수치 계산 결함을 LLM 이 글을 읽고 찾는 방식에 맡긴다. 그래서 선행 사례가 보고한 약점이 전이될 수 있다. 그 약점은 미묘한 부동소수점 결함(상쇄, 언더플로)에서 정적 탐지 성능이 떨어진다는 점이다. 다만 선행 사례는 C 소스 코드를 읽는 과제였고, 대조 대상은 설계 문서를 읽는 리뷰이므로 축이 다르다.",
+      "prior_claim": "InterFLOPBench 연구는 C 커널 90개와 시험 표본 1,130개로 LLM 14종의 정적 부동소수점 오류 분류를 평가했다. 상위 모델은 전체 F1 0.88을 넘겼다. 그러나 평균 F1은 0으로 나누기에서 0.85, 언더플로에서 0.61, 상쇄에서 0.62로 낮아졌다.",
+      "consequence": "벡터화·병렬 리덕션 계산의 결함 중 상쇄와 언더플로처럼 명시적 연산으로 드러나지 않는 유형은 LLM 리뷰를 통과한 뒤에도 남을 수 있다. 그래서 리뷰 통과가 계산 정확성의 근거로 쓰이고 있다.",
+      "evidence": "arXiv 2606.31308 초록이 범주별 평균 F1(division by zero 0.8479, underflow 0.6059, cancellation 0.6164)과 '소스 코드에서 정적으로' 탐지한다는 범위를 밝힌다. 목적(결함 탐지)은 비슷하다. 그러나 메커니즘(코드 정적 분류와 설계 문서 리뷰), 평가(F1 벤치마크), 대상(C 커널)이 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/abs/2606.31308",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "후보안 A·B·C 전체의 수치 계산 점검 방식",
+      "type": "weak-baseline",
+      "claim": "후보안 A·B·C는 수치 계산 결함을 찾는 수단으로 리뷰만 비교한다. 그래서 선행 사례가 쓴 기준 구현 대조(differential testing)와 비교되지 않았다.",
+      "prior_claim": "FPDiff는 여러 수치 라이브러리(GSL, SciPy, mpmath, jmat)에서 같은 뜻의 함수를 자동으로 찾아 시험 드라이버를 만들고 출력을 대조했다. 그 결과 출력이 엇갈린 입력 150건, 고유 버그 125건을 찾았고, 그중 30건이 수정되었고 25건을 개발자가 인정했다.",
+      "consequence": "후보안 사이의 우열이 리뷰 방식끼리의 비교로만 정해지고 있다. 그래서 계산 결함을 실행으로 잡는 기준선 대비 리뷰가 얼마나 더 찾는지 알 수 없다.",
+      "evidence": "ISSTA 2020 논문 페이지의 초록을 열어 확인했다. 목적(수치 결함 발견)은 겹친다. 그러나 메커니즘(실행 출력 대조), 평가(발견 버그 수), 대상(성숙한 수치 라이브러리)이 대조 대상(설계 문서 리뷰, 비개발자가 만드는 대시보드)과 다르다.",
+      "citations": [
+        {
+          "url": "https://conf.researchr.org/details/issta-2020/issta-2020-papers/30/Discovering-Discrepancies-in-Numerical-Libraries",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "후보안 B의 '계산' 대상 질문 세트",
+      "type": "known-failure",
+      "claim": "후보안 B는 계산 대상에 고정 질문을 적용하지만, 대조 대상 서술에는 병렬 리덕션 순서와 실행 사이 결과 변동을 다루는 질문이 보이지 않는다. 그래서 선행 연구가 보고한 원인이 남아 있을 수 있다. 이 판단은 대상 서술만 보고 한 추론이며 실제 질문 세트를 확인하지 않았다.",
+      "prior_claim": "Chapp(델라웨어대, 2017) 학위논문은 고성능 과학 계산의 비결정성이 수치 재현성과 디버깅을 해치고, 병렬 합산을 리덕션 트리로 보면 트리 구조 변화에 대한 민감도가 결과 오차를 좌우한다고 보고했다. 저자는 재현 정확도를 보장하려면 실행 시점에 리덕션 연산자를 골라야 한다고 결론지었다.",
+      "consequence": "병렬 계산 결과가 실행마다 달라지는 결함은 설계 문서에 드러나지 않고 실행에서만 나타난다. 그래서 질문 세트가 이 결함을 묻지 않으면 리뷰를 통과한 대시보드 수치가 실행마다 달라질 수 있다.",
+      "evidence": "udspace 저장소의 학위논문 초록을 열어 확인했다. 목적(재현성 확보)은 겹치지만, 메커니즘(리덕션 연산자 선택 알고리즘), 평가(오차 모델링), 대상(엑사스케일 HPC)은 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://udspace.udel.edu/items/b593a5b5-e41c-45a1-9352-ae233d2599f3",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "후보안 B의 '계산' 대상 질문 세트와 결정성 테스트 설계",
+      "type": "known-failure",
+      "claim": "대조 대상이 벡터화 계산의 결과를 비트 단위로 같게 보는 결정성 테스트를 채택하면, 선행 문서가 밝힌 한계가 전이된다. 이 전이는 대조 대상이 그런 테스트를 쓸 때에만 성립하며, 대상 서술에서 그 사용 여부를 확인하지 못했다.",
+      "prior_claim": "PyTorch 공식 문서는 완전히 재현되는 결과가 릴리스, 개별 커밋, 플랫폼 사이에서 보장되지 않으며 같은 시드에서도 CPU와 GPU 결과가 다를 수 있다고 밝힌다. 이 문서는 결정적 알고리즘 강제 설정이 결정적 구현이 없는 연산에서 오류를 내고, 일부 연산은 경고만 내며, 결정적 연산은 대체로 느리다고 적는다.",
+      "consequence": "결정성 테스트의 범위(같은 환경의 반복 실행인지, 환경 사이 비교인지)를 정하지 않으면 테스트가 정상 코드를 실패로 판정하거나 비결정성을 놓친다.",
+      "evidence": "docs.pytorch.org 2.14 randomness 문서를 열어 확인했다. 이 출처는 벤더 문서이고 결함 연구가 아니다. 목적(재현성 안내)만 일부 겹치고 메커니즘·평가·대상은 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://docs.pytorch.org/docs/2.14/notes/randomness.html",
+          "kind": "vendor",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "후보안 A·B·C의 수치 계산 점검이 정답값을 전제하는 지점",
+      "type": "known-failure",
+      "claim": "대조 대상이 계산 결과의 정답을 리뷰어가 판정할 수 있다고 전제하면, 선행 연구가 보고한 오라클 문제가 전이된다. 이 전이는 추론이며 대조 대상의 질문 문구를 확인하지 못했다.",
+      "prior_claim": "과학 소프트웨어 테스트 체계적 문헌 리뷰(Kanewala·Bieman 계열, arXiv 1804.01954)는 오라클 문제를 과학 소프트웨어 자체의 특성에서 오는 핵심 난제로 꼽았다. 그 리뷰는 과학자가 코드와 그 코드가 구현한 모델을 분리하지 않는 문화 차이도 난제로 들었고, 일부 난제는 풀리지 않았다고 결론지었다.",
+      "consequence": "계산 결과를 사람이나 LLM 이 읽어서 맞는지 판정하게 하면 판정 기준이 없어 결함 발견과 재현성이 낮아진다.",
+      "evidence": "arXiv 초록 페이지를 열어 확인했다. 메타모픽 테스트 언급은 초록에서 확인하지 못했다. 대상(과학 소프트웨어)과 메커니즘(테스트 기법 문헌 리뷰)이 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/abs/1804.01954",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "FPDiff: 수치 라이브러리 사이 기준 구현 대조 테스트",
+      "url": "https://conf.researchr.org/details/issta-2020/issta-2020-papers/30/Discovering-Discrepancies-in-Numerical-Libraries",
+      "axes": {
+        "purpose": {
+          "prior": "수치 라이브러리의 결함을 자동으로 찾는다",
+          "same": false,
+          "note": "수치 결함 발견만 겹치고, 대조 대상은 설계 문서 리뷰 전체의 결함 발견과 비개발자의 결과 활용까지 목적으로 한다"
+        },
+        "mechanism": {
+          "prior": "같은 뜻의 함수를 짝지어 실행 출력을 대조한다",
+          "same": false,
+          "note": "실행 기반 대조이며 대조 대상의 문서 리뷰와 다르다"
+        },
+        "evaluation": {
+          "prior": "엇갈린 입력 150건, 고유 버그 125건, 수정 30건으로 평가했다",
+          "same": false,
+          "note": "대조 대상의 평가 방식은 결함 발견과 재현성이며 측정 단위가 다르다"
+        },
+        "target": {
+          "prior": "GSL, SciPy, mpmath, jmat",
+          "same": false,
+          "note": "성숙한 수치 라이브러리이며 비개발자가 만드는 대시보드가 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "학회 논문 페이지(ISSTA 2020)",
+      "adoption": "참고"
+    },
+    {
+      "case": "InterFLOPBench: LLM 의 정적 부동소수점 오류 분류 벤치마크",
+      "url": "https://arxiv.org/abs/2606.31308",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 이 소스 코드에서 부동소수점 오류를 탐지·분류하는지 평가한다",
+          "same": false,
+          "note": "LLM 리뷰의 수치 결함 탐지력만 겹친다"
+        },
+        "mechanism": {
+          "prior": "C 커널을 LLM 에 주고 여섯 범주로 다중 라벨 분류하게 한다",
+          "same": false,
+          "note": "대조 대상은 설계 문서를 읽으며 코드 분류가 아니다"
+        },
+        "evaluation": {
+          "prior": "표본 1,130개에 대한 F1, 범주별 평균 F1(상쇄 0.62, 언더플로 0.61)",
+          "same": false,
+          "note": "벤치마크 F1이며 대조 대상의 평가와 다르다"
+        },
+        "target": {
+          "prior": "C 언어 수치 커널 90개",
+          "same": false,
+          "note": "대시보드 시스템의 설계 문서와 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "arXiv 초록",
+      "adoption": "참고"
+    },
+    {
+      "case": "GPU 프로그램 수치 버그 실증 연구와 GPU-NBDetect",
+      "url": "https://conf.researchr.org/details/issta-2025/issta-2025-papers/72/An-Investigation-on-Numerical-Bugs-in-GPU-Programs-Towards-Automated-Bug-Detection",
+      "axes": {
+        "purpose": {
+          "prior": "GPU 수치 버그의 원인·증상·오라클·수정 방식을 분석하고 자동 탐지한다",
+          "same": false,
+          "note": "수치 결함 이해와 탐지만 겹친다"
+        },
+        "mechanism": {
+          "prior": "실제 버그 397건 분석과 여섯 범주 탐지 도구",
+          "same": false,
+          "note": "실행 기반 탐지 도구이며 문서 리뷰가 아니다"
+        },
+        "evaluation": {
+          "prior": "라이브러리 네 개, 함수 186개에서 버그 226건 발견, 60건 개발자 확인",
+          "same": false,
+          "note": "발견 버그 수로 평가해 대조 대상과 단위가 다르다"
+        },
+        "target": {
+          "prior": "GPU 수학 함수 라이브러리",
+          "same": false,
+          "note": "병렬 계산이라는 점만 겹치고 시스템 종류가 다르다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "학회 논문 페이지(ISSTA 2025)",
+      "adoption": "참고"
+    },
+    {
+      "case": "엑사스케일 비결정성과 리덕션 재현성 학위논문",
+      "url": "https://udspace.udel.edu/items/b593a5b5-e41c-45a1-9352-ae233d2599f3",
+      "axes": {
+        "purpose": {
+          "prior": "병렬 합산의 비결정성이 재현성과 디버깅에 주는 영향을 줄인다",
+          "same": false,
+          "note": "재현성 목적만 겹친다"
+        },
+        "mechanism": {
+          "prior": "리덕션 트리 모델링과 리덕션 연산자 선택",
+          "same": false,
+          "note": "알고리즘 선택이며 리뷰 점검 항목이 아니다"
+        },
+        "evaluation": {
+          "prior": "트리 구조 민감도 매개변수로 오차 완화를 평가했다",
+          "same": false,
+          "note": "수치 오차 분석이며 대조 대상의 평가와 다르다"
+        },
+        "target": {
+          "prior": "고성능 과학 계산 응용",
+          "same": false,
+          "note": "HPC 이며 대시보드 일괄 계산과 규모가 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "대학 저장소(udspace)",
+      "adoption": "참고"
+    },
+    {
+      "case": "PyTorch 재현성 공식 문서",
+      "url": "https://docs.pytorch.org/docs/2.14/notes/randomness.html",
+      "axes": {
+        "purpose": {
+          "prior": "사용자에게 재현성의 한계와 결정적 설정을 안내한다",
+          "same": false,
+          "note": "재현성 안내이며 결함 리뷰가 아니다"
+        },
+        "mechanism": {
+          "prior": "결정적 알고리즘 강제 설정과 시드 고정",
+          "same": false,
+          "note": "실행 설정이며 문서 리뷰와 다르다"
+        },
+        "evaluation": {
+          "prior": "평가 없음(벤더 안내)",
+          "same": false,
+          "note": "평가 자료가 없다"
+        },
+        "target": {
+          "prior": "PyTorch 연산 사용자",
+          "same": false,
+          "note": "벡터 계산 사용자라는 점만 겹친다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "공식 문서",
+      "adoption": "참고"
+    },
+    {
+      "case": "과학 소프트웨어 테스트 체계적 문헌 리뷰",
+      "url": "https://arxiv.org/abs/1804.01954",
+      "axes": {
+        "purpose": {
+          "prior": "과학 소프트웨어 테스트의 난제와 기법을 정리한다",
+          "same": false,
+          "note": "계산 결함을 어떻게 잡을지라는 질문만 겹친다"
+        },
+        "mechanism": {
+          "prior": "문헌 리뷰",
+          "same": false,
+          "note": "점검 항목 설계가 아니다"
+        },
+        "evaluation": {
+          "prior": "문헌 분류로 난제(오라클 문제, 문화 차이)를 도출했다",
+          "same": false,
+          "note": "대조 대상의 평가와 다르다"
+        },
+        "target": {
+          "prior": "과학자가 만드는 과학 소프트웨어",
+          "same": false,
+          "note": "비전문 개발자라는 점은 비슷하나 시스템 종류가 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "2차",
+      "route": "arXiv 초록",
+      "adoption": "참고"
+    }
+  ],
+  "saturation": "3",
+  "not_found": "[\"설계 문서 리뷰와 테스트의 수치 결함 발견률을 직접 비교한 연구는 찾지 못했다. 검색 결과에 비교 연구가 나오지 않았으며, 이 사실은 그런 연구가 없다는 근거가 아니다.\", \"Di Franco 등(ASE 2017)의 실제 수치 버그 특성 연구는 서지 정보만 확인했고 본문과 결론은 비공개 접근이라 확인하지 못했다.\", \"병렬 리덕션 재현성 논문(HAL, Parallel Computing 2015)과 PNNL 비결합성 논문(OSTI)은 봇 차단과 연결 거부로 열지 못했다.\", \"Intel oneMKL 조건부 수치 재현성(CNR) 문서는 본문을 읽지 못해 조건과 한계를 확인하지 못했다.\", \"메타모픽 테스트 조사 논문(Segura 등 TSE 2016)은 검색 요약만 보았고 열지 않았다.\"]",
+  "disclosures": "[\"HAL 두 건과 OSTI 한 건은 열지 못했으므로 인용하지 않았다.\", \"InterFLOPBench 는 2026년 프리프린트이며 초록 판본마다 모델 수(14종과 17종)와 상위 F1(0.88과 0.90)이 다르게 보고된다. 인용 수치는 열어 본 arXiv 초록 판본 기준이다.\", \"이슈 중 후보안 B 의 질문 세트에 리덕션 순서 질문이 없다는 판단과 오라클 전제 판단은 대상 서술만 보고 한 추론(derived)이다.\", \"모든 선행 사례가 네 축 중 하나 이상에서 대조 대상과 달라 같은 사례로 단정하지 않았다.\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"STATE-ASSUME\", \"FOCUSED\", \"ASYNC-FIRST\"]",
+  "notes": "체크리스트 관점별 결과는 다음과 같다. 기시감 관점에서 리뷰와 테스트를 직접 비교한 선행 사례는 찾지 못했고, 실행 기반 수치 결함 탐지 사례(FPDiff, GPU-NBDetect)만 찾았다. 결말 관점에서 기준 구현 대조와 실행 기반 탐지는 성숙한 라이브러리에서도 다수의 버그를 찾아 성공으로 보고되었다. 그러나 LLM 정적 탐지는 미묘한 범주에서 F1이 0.6 수준으로 떨어졌다. 전이 관점에서 리덕션 비결합성과 오라클 문제가 후보안 B·C에 남을 수 있다. 기준선 관점에서 기준 구현 대조와 비교되지 않았다. 붐빔 관점에서 결정성 설정(PyTorch)과 재현 리덕션(Intel CNR, ReprodSum)이 이미 상용·표준 수단으로 있으나 대조 대상이 그것을 새로 지으려는 증거가 없어 crowded 이슈는 올리지 않았다. 추가 확인이 필요한 사항은 Di Franco 등 ASE 2017 본문(수치 버그의 탐지 경로와 테스트 오라클 분포 확인용)과 Intel CNR 문서 본문(재현성 보장 조건 확인용)이다."
+}
