@@ -47,7 +47,7 @@ mkdir -p "$T/ub/a" "$T/ub/b"; printf abc1234 > "$T/ub/a/base"; printf def5678 > 
 UBS="$(unit_bases "$T/ub" | tr '\n' ' ')"
 check "끝 줄바꿈이 없는 base 파일 둘의 커밋을 따로 읽는다" "[ \"\$UBS\" = 'abc1234 def5678 ' ]"
 cat > "$T/banned.md" <<'BANEOF'
-### 금지 표현
+## 금지 표현
 
 | 쓰지 않는 말 | 대신 쓰는 말 | 제외 |
 |---|---|---|
