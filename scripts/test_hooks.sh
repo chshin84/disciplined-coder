@@ -305,7 +305,7 @@ BX="$T/banx"; mkdir -p "$BX"
 cat > "$BX/list.md" <<'BANEOF'
 ### 금지 표현
 
-#### 문서와 답변
+#### 답변·산출물·저장소 문서
 
 ##### 평소에 쓰지 않는 말
 
@@ -331,11 +331,11 @@ printf '새 판을 낸다.\n' > "$BX/dirty.md"
 check "제외 안의 것은 안 잡는다"    "[ -z \"\$(banned_report '$BX/pairs' '$BX/clean.md' '$BX/excl')\" ]"
 check "제외 밖의 것은 잡는다"       "banned_report '$BX/pairs' '$BX/dirty.md' '$BX/excl' | grep -qF '판 -> 버전'"
 printf 'clean.md\ndirty.md\n' > "$BX/files"
-BXSCAN="$(cd "$BX" && banned_scan "$BX/pairs" "$BX/excl" "$BX/scopes" '문서와 답변' "$BX/files")"
+BXSCAN="$(cd "$BX" && banned_scan "$BX/pairs" "$BX/excl" "$BX/scopes" '답변·산출물·저장소 문서' "$BX/files")"
 check "한 번에 훑어 걸린 파일을 낸다" "printf '%s' \"\$BXSCAN\" | grep -qF 'dirty.md'"
 check "제외에 걸린 파일은 안 든다"   "! printf '%s' \"\$BXSCAN\" | grep -qF 'clean.md'"
 check "적용 대상으로 행을 고른다"    "[ \"\$(printf '%s\\n' \"\$BXSCAN\" | grep -c .)\" = 1 ]"
-check "적용 대상을 제목에서 읽는다"  "[ \"\$(tr '\\n' '/' < '$BX/scopes')\" = '문서와 답변/답변과 산출물/' ]"
+check "적용 대상을 제목에서 읽는다"  "[ \"\$(tr '\\n' '/' < '$BX/scopes')\" = '답변·산출물·저장소 문서/답변과 산출물/' ]"
 check "같은 단계의 다음 제목에서 표를 끝낸다" "! grep -qx '새' '$BX/toks'"
 # 긴 제외어가 짧은 것에 먹히면 안 된다. `판단` 을 먼저 덮으면 `판단력` 이 더는 안 맞는다.
 cat > "$BX/list2.md" <<'BANEOF'
