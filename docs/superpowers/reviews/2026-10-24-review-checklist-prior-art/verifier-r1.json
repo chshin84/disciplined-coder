@@ -1,0 +1,920 @@
+[
+  {
+    "url": "https://users.ece.utexas.edu/~perry/work/papers/9208-DP-faults.pdf",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://users.ece.utexas.edu/~perry/work/papers/9208-DP-faults.pdf",
+      "judgments": [
+        {
+          "ref": "sq1#issue#0",
+          "verdict": "supported",
+          "quote": "Interface faults occur with slightly less frequency than implementation faults, but require about the same effort to find them and more effort to fix them.",
+          "reason": "추출: 저자·AT&T Bell Labs·1992 가 주장과 일치하고, 빈도는 약간 적으나 찾기 노력은 같고 고치기 노력은 더 든다는 서술이 원문 문장에 있다. WebFetch 는 PDF 바이너리만 반환해 저장된 사본을 직접 읽어 확인했다. 수치는 표에 있으며, 원문은 저자가 '대략(roughly)'이라는 한정을 붙였다. / 판정: context 에 Table 17 의 빈도 49%/51% 와 수정 가중 56%/44% 가 있다. 100만 줄 이상과 비초기 릴리스는 같은 URL 의 다른 주장 context 에 있다. 구절의 '빈도는 약간 적고 찾는 노력은 비슷하며 고치는 노력은 더 든다'는 주장의 방향과 같고, 주장은 일반화하지 않았다."
+        },
+        {
+          "ref": "sq1#case#0",
+          "verdict": "supported",
+          "quote": "We report the results of a survey about the software faults encountered during the testing phases in evolving a large real-time system.",
+          "reason": "추출: 제목·저자·소속·개정 연도가 case 의 이름과 일치한다. 구절은 사례 전체를 소개하는 초록 문장이라 가장 가깝지만, 대상 규모·설문 대상·22개 유형·평가 비율은 본문의 다른 절에 있어 이 구절만으로는 전부 뒷받침되지 않는다. / 판정: 설문 대상(MR 담당자), 22개 유형, 100만 줄 이상의 C 분산 실시간 시스템, 비초기 릴리스, 49/51·56/44 비율이 모두 구절과 context 에 있다. outcome 이 '판정 못 함'이므로 방향 충돌은 없고, 범위도 구절과 같다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://www.nasa.gov/wp-content/uploads/2016/10/585637main_swfaultsfailuresfixes.pdf",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://www.nasa.gov/wp-content/uploads/2016/10/585637main_swfaultsfailuresfixes.pdf",
+      "judgments": [
+        {
+          "ref": "sq1#issue#1",
+          "verdict": "supported",
+          "quote": "Specifically, we considered 2,500 non-conformance SCRs collected over 10 years",
+          "reason": "추출: 문서 제목·저자·소속이 주장과 일치하고, 표본 2,500건과 10년 조건이 11쪽에 있으며, 결함 유형 비율과 발견 활동 비율, 코딩 결함을 뺀 분석 우위 문장도 원문에 있다. 한 구절에 모든 요소가 들어가지 않아 quote 는 표본 조건 문장이고 나머지 요소는 context 에 옮겼다. / 판정: SCR 2,500건(10년)은 구절에 있다. 유형 비율 36.00·34.71·14.89·6.14·2.38%와 발견 활동 비율 49.45·38.27%는 context 의 그림 레이블과 같다. '코딩 결함을 뺀 모든 유형에서 분석이 테스트보다 우수'라는 문장도 context 에 있어 방향과 범위가 같다."
+        },
+        {
+          "ref": "sq1#case#1",
+          "verdict": "supported",
+          "quote": "Our goal: Based on systematic and thorough analysis of the available empirical data, build quantitative and qualitative knowledge that contributes towards improving IV&V efficiency and software quality",
+          "reason": "추출: 문서 제목·저자·소속이 주장과 일치하고, 5쪽의 목표 문장이 목적 서술 'IV&V 효율과 품질 개선 지식'을 뒷받침한다. 방법과 대상 요소는 다른 쪽에 있어 context 에 옮겼다. / 판정: 목적(IV&V 효율과 품질 개선 지식)은 구절과 같다. SCR 2,500건·CN 4,700건, 안전 필수 임무, CSCI 21개, 수백만 줄, 각 비율은 context 와 같다. outcome 이 '판정 못 함'이므로 방향 충돌은 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "KEEP-FAILED",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://www.es.mdu.se/publications/1023-Component_Testing_is_not_Enough___A_Study_of_Software_Faults_in_Telecom_Middleware",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://www.es.mdu.se/publications/1023-Component_Testing_is_not_Enough___A_Study_of_Software_Faults_in_Telecom_Middleware",
+      "judgments": [
+        {
+          "ref": "sq1#case#2",
+          "verdict": "unsupported",
+          "quote": "faults that manifest themselves for the first time at integration/system level; not at component level",
+          "reason": "추출: 원문 초록에서 결론(다수 결함이 통합·시스템 수준에서 처음 드러나고 컴포넌트 수준에서는 아님)을 뒷받침하는 구절을 확인했다. 다만 WebFetch 요약 결과의 인용이라 원문 문장 전체의 글자 일치는 검증하지 못했고, 전체 문장이 길어 두 부분으로 나뉘어 옮겨졌다. 주장의 '단순 결함 10% 미만' 수치는 별도 문장에 있어 이 구절에 함께 없고, 목적과 2003~2006년 분류 방법도 각각 다른 문장에 있다. / 판정: 2003~2006년 기간과 'less than 10%' 수치는 context 에 있다. 그러나 'they' 가 무엇을 가리키는지 적혀 있지 않아, 그 값이 '단순 결함'의 비율인지 정할 수 없다. 'not at component level' 의 대비 방향은 주장과 같다. 다만 '다수 결함'과 '통합·시스템 수준에서 처음 드러난다'가 같은 결함 집합을 가리키는지는 조각난 구절만으로 정할 수 없다. / 판정 불가: numbers_conditions=언어 해석, scope=언어 해석"
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2309.07067v1",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2309.07067v1",
+      "judgments": [
+        {
+          "ref": "sq1#case#3",
+          "verdict": "verify_failed",
+          "quote": "mainly occurring in the data cleaning stage of pipelines (35%)",
+          "reason": "추출: 원문 arXiv 초록이 열리고 제1저자 Foidl와 2023년 발표, 제목 일부가 주장의 사례와 일치하며, 33% 구절은 도구가 발췌한 문장 앞부분이라 전문 그대로인지는 확인되지 않는다. / 판정: 잘못된 자료형 33%는 구절에 있고, 통합·적재 47%는 context 에 있다. 그러나 정제 단계 35%와 인터뷰 8건은 구절과 context 어디에도 없다. 방향과 범위는 구절과 충돌하지 않는다. / 보충: 제목·저자가 주장의 사례와 일치하고 정제 단계 35% 수치 구절이 원문 초록에 있으나, 전문가 인터뷰 8건은 별도 문장(\"validated by eight interviews with experts from the data engineering domain\")에 있어 같은 구절에 함께 있지 않으며, 접근한 것은 초록뿐이라 본문 확인은 되지 않았다. / 재판정: 구절은 정제 단계 35%만 확인하고 33%·47%·인터뷰 8건은 구절과 맥락에 없다. 방향과 범위는 구절과 같다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "YAGNI",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2104.12192v2",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2104.12192v2",
+      "judgments": [
+        {
+          "ref": "sq1#case#4",
+          "verdict": "supported",
+          "quote": "To that end, we conducted an empirical study on 1,345 issue discussions extracted from five open source microservices systems hosted on GitHub. Our analysis led to the first of its kind taxonomy of the types of issues in open source microservices systems, informing that the problems originating from Technical debt (321, 23.86%), Build (145, 10.78%), Security (137, 10.18%), and Service execution and communication (119, 8.84%) are most prominent.",
+          "reason": "추출: 제목·저자·EASE 2021 이 주장의 사례와 일치하고, 초록의 두 연속 문장에 1,345건, 다섯 개 시스템, 네 비율(23.86%, 10.78%, 10.18%, 8.84%)이 원문 그대로 나온다. 수작업 분류는 초록에 없고 서론의 'we extracted and manually analyzed 1,345 issues from these five open source microservices systems'에 나온다. 초록은 'issue discussions', 서론은 'issues'라고 적어 단위 표현이 다르다. / 판정: 이슈 토론 1,345건, 오픈소스 시스템 5개, 기술 부채 23.86%·빌드 10.78%·보안 10.18%·서비스 실행·통신 8.84%가 구절과 같다. 방향과 범위도 구절과 같다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "NO-SQUEEZE",
+        "COUNT-EARNS",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://www.cs.umd.edu/~aporter/html/scenarios.html",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://www.cs.umd.edu/~aporter/html/scenarios.html",
+      "judgments": [
+        {
+          "ref": "sq2#issue#0",
+          "verdict": "supported",
+          "quote": "the Scenario method had a higher defect detection rate than either the Ad Hoc or Checklist methods",
+          "reason": "추출: 시나리오 방식의 발견률이 ad hoc과 체크리스트보다 높았다는 방향은 한 문장으로 확인되며, 주장의 나머지 요소(표본 수, 다른 결함 탐지, 체크리스트 대 ad hoc, 재현)는 각각 다른 문장에 있어 한 문장에 모두 든 구절은 없다. 인용문은 WebFetch 요약 응답이 옮긴 것이고 원문 HTML을 직접 대조하지 않았다. / 판정: 대학원생 48명, Lucent 개발자 21명, 3인 팀 23개가 context 에 있다. 시나리오 방식의 발견률 우위, 다른 결함도 덜 찾지 않음, 체크리스트가 ad hoc 보다 낫지 않음, 재현 결과가 원 결과와 일치함이 모두 구절과 context 의 방향과 같다."
+        },
+        {
+          "ref": "sq2#case#0",
+          "verdict": "verify_failed",
+          "quote": "the Scenario method had a higher defect detection rate than either the Ad Hoc or Checklist methods",
+          "reason": "추출: 사례의 비교 구도(시나리오 대 체크리스트 대 ad hoc)와 결과 방향은 인용 문장으로 확인된다. 결함을 심어 둔 문서를 쓴 평가 방식과 결함 유형별 시나리오 배정은 요약 응답에서만 언급되고 인용 구절로는 옮겨지지 않았으며, 인용문은 요약 응답이 옮긴 것이라 원문 대조는 하지 않았다. / 판정: 대학원생과 Lucent 개발자 집단, 그리고 결함 유형을 겨냥한 시나리오는 context 에 있다. 그러나 결함을 심어 둔 문서라는 평가 조건은 구절과 context 에 없다. outcome '성공'은 시나리오 방식의 발견률 우위와 같은 방향이다. / 보충: 원문에는 실험 문서에 결함을 심어 두었다는 설명이 없어, 주장의 누락 요소인 결함을 심어 둔 문서라는 실험 조건을 뒷받침하는 구절이 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "SPECIFIC-NAME",
+        "SUBJECT-OBJECT",
+        "NO-MIRROR"
+      ]
+    }
+  },
+  {
+    "url": "https://strathprints.strath.ac.uk/2663/",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://strathprints.strath.ac.uk/2663/",
+      "judgments": [
+        {
+          "ref": "sq2#issue#1",
+          "verdict": "supported",
+          "quote": "This replication is broadly supportive of the results from the original experiment / namely, that the Scenario approach is superior to the Checklist approach / the meeting component of a software inspection is not an effective defect detection mechanism",
+          "reason": "추출: 재현 실험이 원 실험을 대체로 지지했다는 주장은 초록의 해당 문장으로 뒷받침된다. 검사 회의가 결함 검출에 효과적이지 않다는 주장은 별도 문장에 있어 이 구절만으로는 뒷받침되지 않으며, 두 요소가 한 문장에 함께 있지 않다. / 판정: 재현이 원 실험을 대체로 지지했다는 내용과 검사 회의 단계가 효과적이지 않다는 내용은 구절·context 와 같다. 그러나 원 실험 결과가 시나리오 우위였다는 비교 방향은 구절과 context 에 없다. / 보충: 초록에 'broadly supportive'와 'Scenario approach is superior to the Checklist approach' 및 검사 회의 단계가 효과적 결함 탐지 수단이 아니라는 구절이 있어 주장의 세 요소가 뒷받침되지만, 세 구절의 결합 문장은 전문 없이 확인하지 못했다. / 재판정: 구절은 'broadly supportive', 시나리오 우위, 회의 단계의 비효과를 그대로 적는다. 주장의 '대체로 지지'는 원문 범위와 같다."
+        },
+        {
+          "ref": "sq2#case#1",
+          "verdict": "verify_failed",
+          "quote": "The evaluation is by subject-based experimentation,",
+          "reason": "추출: 사례의 실체와 평가 방식(피험자 기반 실험)은 원문과 일치하나, 대학 피험자와 통제 실험은 초록에서 확인되지 않는다. 저장소에 전문이 없어 이 두 요소는 전문 확인 전까지 미확인으로 남는다. / 판정: context 에 따르면 초록에 '대학 피험자'와 '통제 실험'이라는 표현이 없다. 구절은 'subject-based experimentation' 만 말한다. outcome '성공'은 'broadly supportive' 와 같은 방향이다. / 보충: 초록의 'subject-based experimentation' 문장이 피험자 기반 실험 조건만 뒷받침하고, 대학 피험자와 통제 실험 표현은 원문에 없으며 전문도 저장소에 없어 확인할 수 없다. / 재판정: 구절은 피험자 기반 실험만 확인하고, 맥락은 원문에 university·students·controlled 표현이 없다고 적는다. 같은 출처의 다른 구절이 원 실험 결과를 지지하므로 성공 결말은 같다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "NO-SQUEEZE",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "ASYNC-FIRST",
+        "EVIDENCE-FIRST"
+      ]
+    }
+  },
+  {
+    "url": "https://pureportal.coventry.ac.uk/en/publications/an-experimental-comparison-of-checklist-based-reading-and-perspec/",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://pureportal.coventry.ac.uk/en/publications/an-experimental-comparison-of-checklist-based-reading-and-perspec/",
+      "judgments": [
+        {
+          "ref": "sq2#issue#2",
+          "verdict": "verify_failed",
+          "quote": "(c) cost per defect of reviewers who use CBR is smaller.",
+          "reason": "추출: 논문과 저자·학회가 주장과 일치하고, 초록의 결함 발견 비율 문장(PBR 69%, CBR 70%)과 시간·비용·3인 팀 문장이 확인되나, 한 문장에 모든 요소가 들어 있지 않아 구절을 나눠 옮겼다. 이 도구는 초록 전문을 125자 이하 발췌로만 옮기므로 인용은 발췌이며, 수치 대조는 판정 에이전트가 맡는다. / 판정: 학생 59명, PBR 69%와 CBR 70%, PBR 의 시간 절약, 3인 가상 팀에서 CBR 우위는 구절·context 와 같다. 그러나 결함당 비용의 비교 방향은 구절과 context 에 없다. / 보충: 개인 분석 결과로서 CBR 쪽 결함당 비용이 작다는 원문 문장이 초록 결과 항목 (c)에 있어 주장의 방향 요소를 뒷받침한다. 다만 '개인 분석'이라는 표지는 원문에서 명시적으로 확인되지 않았다. / 재판정: PBR 의 시간 절약, 3인 가상 팀에서 CBR 우위, CBR 의 결함당 비용 우위는 구절·맥락과 방향이 같다. 그러나 59명·69%·70%와 개인 분석 조건은 구절에 없다."
+        },
+        {
+          "ref": "sq2#case#2",
+          "verdict": "verify_failed",
+          "quote": "(c) cost per defect of reviewers who use CBR is smaller.",
+          "reason": "추출: 논문이 CBR과 PBR을 객체지향 설계 검사에서 비교한다는 사례 설정(목적·기법·대상)이 원문과 일치하고, 구절의 앞부분은 발췌 과정에서 잘려 확인되지 않아 뒷부분만 옮겼다. 결과(outcome)와 수치는 이 판정 범위가 아니므로 판정하지 않았다. / 판정: OO 설계 문서에 CBR 과 PBR 을 쓴 점과 학생 59명 통제 실험은 구절·context 와 같다. 그러나 평가 항목 중 결함당 비용은 이 주장의 구절과 context 에 없다. outcome 은 '판정 못 함'이어서 방향 충돌이 없다. / 보충: 결함당 비용이 결과 항목으로 측정·보고되었다는 원문 문장은 확인되나, 평가 항목으로 썼다는 명시 서술은 전문이 없어 확인되지 않는다. / 재판정: 결함당 비용과 3인 가상 팀 비교는 맥락에 있으나 59명과 개인 발견률은 없다. 결과가 기법마다 엇갈리므로 '판정 못 함'은 구절과 상충하지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "NO-SQUEEZE",
+        "EVIDENCE-FIRST"
+      ]
+    }
+  },
+  {
+    "url": "https://conf.researchr.org/details/profes-2024/profes-2024-Research-Papers-1/2/Can-Large-Language-Models-LLMs-compete-with-Human-Requirement-Reviewers-Replicat",
+    "subquestions": [
+      "sq2",
+      "sq3"
+    ],
+    "output": {
+      "url": "https://conf.researchr.org/details/profes-2024/profes-2024-Research-Papers-1/2/Can-Large-Language-Models-LLMs-compete-with-Human-Requirement-Reviewers-Replicat",
+      "judgments": [
+        {
+          "ref": "sq2#issue#3",
+          "verdict": "verify_failed",
+          "quote": "computer science students searched for defects in requirement documents",
+          "reason": "추출: 접근과 제목·저자·학회 일치를 확인했고, 구절은 토큰 여유에도 결함 보고가 제한된다는 내용을 다룬다. 프롬프트 간 차이가 작다는 내용은 같은 문장 뒤편에, GPT-4-Turbo 대체와 정답 일치 부족과 통찰 부족은 context 의 문장에 있다. WebFetch 요약에서 옮긴 초록 구절이라 원문과 글자 단위 대조는 하지 않았다. / 판정: GPT-4-Turbo 사용과 (a)~(d) 결과(제한된 결함 수, 프롬프트 간 차이가 작음, 정답과 드물게 일치, 통찰이 적음)는 구절·context 와 같다. 그러나 원 실험의 피험자가 학생이라는 조건은 구절과 context 에 없다. / 보충: 원 검사 실험이 컴퓨터공학 학생 대상이었다는 조건은 구절에 있으나, LLM 의 토큰 여유·결함 수 보고와 프롬프트 간 차이, 모범 답안과의 일치 등 나머지 요소는 별도 문장에 있어 한 구절에 모두 들어 있지는 않다. 전체 본문이 아니라 초록과 프로그램 정보만 확인했다. / 재판정: 구절과 맥락은 학생 실험을 GPT-4-Turbo 로 재현했다는 설계만 확인한다. 결과 네 가지는 구절에 없다."
+        },
+        {
+          "ref": "sq2#case#3",
+          "verdict": "unsupported",
+          "quote": "Second, we applied selected approaches to two requirements documents and compared the approaches to each other and to human reviewers",
+          "reason": "추출: 접근과 제목 일치를 확인했고, 구절은 요구사항 문서 두 건과 사람 검토자와의 비교를 다룬다. 단일 지시문 범위는 context 의 문장에 있고, 여러 LLM 을 실행했다는 요소는 확인한 구절과 context 어디에도 없다. 결과 방향과 범위 판정은 판정 에이전트 몫이며, WebFetch 요약에서 옮긴 구절이라 글자 단위 대조는 하지 않았다. / 판정: 단일 지시문, 세 가지 읽기 기법, 요구사항 문서 두 건, 정답 목록·사람 검토자와의 비교는 구절·context 와 같다. 그러나 context 는 GPT-4-Turbo 하나만 명시하고 결과 문장은 'LLMs' 로 적는다. 그래서 '여러 LLM 에 실행'이 맞는지 정할 수 없다. outcome '실패'는 '정답과 드물게 일치' 결과와 같은 방향이다. / 판정 불가: numbers_conditions=언어 해석"
+        },
+        {
+          "ref": "sq3#issue#2",
+          "verdict": "verify_failed",
+          "quote": "computer science students searched for defects in requirement documents",
+          "reason": "추출: 접근과 제목·저자·학회 일치를 확인했고, 구절은 토큰이 충분해도 결함 보고가 적다는 내용을 다룬다. 프롬프트 간 차이와 정답 일치 부족은 context 의 문장에 있고, 대체 실험과 읽기 기법 비교도 context 에 있다. WebFetch 요약에서 옮긴 초록 구절이라 원문과 글자 단위 대조는 하지 않았다. / 판정: 세 가지 읽기 기법의 비교, 적은 결함 보고, 프롬프트 간 차이가 작음, 모범 답안과 드물게 일치함은 구절·context 와 같다. 그러나 학생 실험이라는 조건은 구절과 context 에 없다. / 보충: 원 검사 실험이 컴퓨터공학 학생 대상이었다는 조건은 구절에 있으나, 임의·체크리스트·관점 기반 읽기 비교, LLM 의 결함 적게 보고, 프롬프트 간 차이 작음, 모범 답안과 드물게 일치 등은 별도 문장에 있어 한 구절에 모두 들어 있지는 않다. 전체 본문이 아니라 초록과 프로그램 정보만 확인했다. / 재판정: 구절은 학생 실험을 LLM 으로 대체한 설계만 확인한다. 읽기 기법 세 가지 비교와 결과는 구절에 없다."
+        },
+        {
+          "ref": "sq3#case#4",
+          "verdict": "supported",
+          "quote": "Second, we applied selected approaches to two requirements documents and compared the approaches to each other and to human reviewers",
+          "reason": "추출: 접근과 제목 일치를 확인했고, 구절은 요구사항 문서 두 건과 사람 검토자와의 비교를 다룬다. 단일 프롬프트와 읽기 기법 변형은 context 에, 정답 일치 비교는 context 의 문장에 있다. 결과 방향 판정은 판정 에이전트 몫이며, WebFetch 요약에서 옮긴 구절이라 글자 단위 대조는 하지 않았다. / 판정: 단일 프롬프트에서 읽기 기법을 바꾼 점, 요구사항 문서 두 편, 모범 답안·사람 검사자와의 비교가 구절·context 와 같다. outcome '실패'는 '드물게 일치'와 '통찰이 적음' 결과와 같은 방향이다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/1612.00330",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/1612.00330",
+      "judgments": [
+        {
+          "ref": "sq2#issue#4",
+          "verdict": "supported",
+          "quote": "In particular, STPA addresses more different software safety requirements than the traditional techniques FTA and FMEA, but STPA needs more time to carry out by safety analysts with little or no prior experience.",
+          "reason": "추출: 초록의 한 문장이 STPA의 더 많은 요구사항 발견과 더 긴 소요 시간을 함께 적고 있어 두 요소를 뒷받침하며, (3)은 다음 문장에 있다. 인용문은 WebFetch 요약 결과에서 옮긴 것이라 원문 HTML과의 글자 대조는 하지 못했고, 접근한 자료가 초록뿐이라 본문 확인은 불가하다. / 판정: 학생 21명과 세 시스템은 같은 URL 의 다른 주장 구절에 있다. 그 학생이 경험이 적은 분석가이므로 조건이 서로 충돌하지 않는다. 더 다양한 요구사항, 더 긴 시간, 적용성·이해도·사용 편의의 유의한 차이 없음은 구절·context 와 같은 방향이다."
+        },
+        {
+          "ref": "sq2#case#4",
+          "verdict": "supported",
+          "quote": "We conducted a controlled experiment with 21 master and bachelor students applying these three techniques to three safety-critical systems: train door control, anti-lock braking, traffic collision and avoidance.",
+          "reason": "추출: 초록이 석·학부 학생 21명, 세 기법, 세 안전 중요 시스템(열차 문 제어, ABS, 충돌 회피)을 명시하고 있어 사례 설명과 대상이 일치한다. 인용문은 WebFetch가 125자 단위로 나눈 조각을 한 문장으로 이어 옮긴 것이며, 원문과의 글자 대조는 하지 못했다. / 판정: 학생 21명, 열차 문 제어·ABS·충돌 회피 시스템, 효과·효율·적용성 비교가 구절·context 와 같다. outcome 은 '판정 못 함'이어서 방향 충돌이 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT",
+        "NO-SQUEEZE",
+        "SPECIFIC-NAME",
+        "ONE-IDEA",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://leshatton.org/checklists_in_code_inspections.html",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://leshatton.org/checklists_in_code_inspections.html",
+      "judgments": [
+        {
+          "ref": "sq2#issue#5",
+          "verdict": "unverifiable",
+          "quote": "",
+          "reason": "추출: 원문이 HTTP 503 으로 응답하지 않아 접근이 실패했고, 그래서 주장이 가리키는 2008년 IEEE Software 논문이 원문과 같은지 확인할 수 없다. 수치와 결론은 판정하지 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "KEEP-FAILED",
+        "TELL-NOW",
+        "STATE-ASSUME"
+      ]
+    }
+  },
+  {
+    "url": "https://snyk.io/blog/snyk-vulnbench-js-1-0-llm-security-review-repeatability/",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://snyk.io/blog/snyk-vulnbench-js-1-0-llm-security-review-repeatability/",
+      "judgments": [
+        {
+          "ref": "sq3#issue#0",
+          "verdict": "unverifiable",
+          "quote": "",
+          "reason": "추출: WebFetch 가 첫 응답에서는 붙여 넣은 본문만 확인했다고 적었고, 둘째 응답에서는 URL 에 접속할 수 없다고 적었다. 두 응답이 전제로 삼은 입력 본문은 이 요청에 없었다. 또 두 응답의 실행 수가 300회와 250회로 서로 달라, 응답 속 수치(134/158, 80/161)와 인용문은 원문 구절로 신뢰할 수 없다. 원문 접속이 확인되지 않아 주장을 검증 실패로 처리한다."
+        },
+        {
+          "ref": "sq3#case#0",
+          "verdict": "unverifiable",
+          "quote": "",
+          "reason": "추출: 원문 접속이 확인되지 않아 목적(반복성 측정), 방법(같은 감사 프롬프트로 다섯 번 반복 스캔), 기준(SAST 결과), 대상(JavaScript/Express 소형 예제 10개)을 원문 구절로 뒷받침할 수 없다. 두 WebFetch 응답의 인용문도 서로 일치하지 않아 근거로 쓸 수 없으며, 이 사례는 검증 실패로 처리한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "KEEP-FAILED",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2509.09975v1",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2509.09975v1",
+      "judgments": [
+        {
+          "ref": "sq3#issue#1",
+          "verdict": "verify_failed",
+          "quote": "Table V 재현율 (gpt-3.5 / gpt-4 / gpt-4o 순): 4,000–5,000자 0.56 / 0.83 / 0.89; 5,000–6,000자 0.13 / 0.48 / 0.47; 6,000–7,000자 0.08 / 0.14 / 0.33",
+          "reason": "추출: 논문 제목과 저자가 사례와 같고 5000자 초과에서 탐지 정확도가 떨어진다는 본문 구절이 있다. 0.83~0.89, 약 0.47, 0.33 이하의 구간별 수치는 본문 문장이 아니라 Table V에만 있어 quote에 옮기지 못했고, 자동차 도메인 70%·30% 문장은 context에 옮겼다. 구절은 WebFetch가 옮긴 것이어서 원문 글자와의 일치는 따로 대조하지 않았다. / 판정: 구절과 맥락은 GPT-4·GPT-4o 가 5,000자까지 양호했고 5,000자를 넘으면 정확도가 크게 떨어졌다는 점과 약 70%·약 30% 수치를 뒷받침한다. 그러나 구간별 재현율 수치는 구절에 없다. 하락 방향과 적용 범위는 구절과 같다. / 보충: 재현율 수치와 문자 수 구간은 산문 문장이 아니라 Table V 에만 있어 한 문장에 함께 든 구절이 없고, 인용은 fetch 가 렌더링한 텍스트라 바이트 단위 일치는 보장되지 않으며, 자동차 문서 70%·30% 내용은 PoC 결과를 말하는 별도 문장(nearly 70% of software design documents exceed 5000 characters 등)에 있다. / 재판정: 표의 0.83/0.89, 0.48/0.47, 0.14/0.33 은 주장의 범위와 맞고 5,000자 넘으면 떨어진다는 방향도 같다. 그러나 70%·30% 수치는 구절에 없다. 또 '4,000~5,000자까지'가 그 구간만을 뜻하는지 5,000자 이하 전체를 뜻하는지 두 가지로 읽힌다. / 판정 불가: scope=언어 해석"
+        },
+        {
+          "ref": "sq3#case#1",
+          "verdict": "verify_failed",
+          "quote": "converts documents into a format where headers and values are distinguishable, using Markdown and JSON",
+          "reason": "추출: 논문과 일치하고 관점 11개 구절이 있다. 관점마다 실행, 정밀도·재현율 측정, 결함 두 개, 10회 실행 구절도 원문에 있고 대상 문서가 일본어 Excel 문서라는 구절도 있다. 다만 Markdown·JSON 변환은 텍스트 특성에 따라 형식을 고르는 조건부 규칙이라는 점이 원문에 있으나 quote에는 빠졌고, '다섯 쌍'은 명시 구절이 없어 50회를 10회로 나눈 값에서 역산한 것이다. 구절은 WebFetch가 옮긴 것이어서 원문 글자와의 일치는 따로 대조하지 않았다. / 판정: 관점 11개, 관점마다 따로 실행, 결함 두 개를 심은 문서 다섯 쌍, 쌍마다 10회 실행은 구절·맥락과 같다. 표 변환과 엑셀 형식은 구절에 없다. 500자 미만 문서에서 양호했다는 맥락은 성공 결말과 같고, 일반화는 없다. / 보충: Markdown·JSON 변환 문장은 원문에 있으나 대상이 Microsoft Excel 로 작성된 일본어 설계 문서라는 조건은 'a unique characteristic of Japanese software design documents is that over half are created in Microsoft Excel' 등 다른 문장에 있고, 원문은 리뷰 관점 11개 각각의 실행을 검증한 것이 아니라 11개 중 일관성 검사 한 관점에만 적용했다고 밝힌다. / 재판정: 구절은 Markdown·JSON 변환만 확인하고 나머지 수치는 없다. 변환 뒤 정확도는 올랐으나 같은 출처가 5,000자 초과 문서에서 정확도가 크게 떨어진다고 적어, 성공 결말이 어느 조건의 결과인지 정할 수 없다. / 판정 불가: direction=조건 얽힘"
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "NO-SQUEEZE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2608.21298",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2608.21298",
+      "judgments": [
+        {
+          "ref": "sq3#issue#3",
+          "verdict": "supported",
+          "quote": "We conducted a controlled crossover design experiment with 34 participants who inspected textual specifications with and without LLM support",
+          "reason": "추출: 결과 문장과 학습 효과 문장이 원문 추출 구절로 확인되었으나, 원문 글자 단위 대조는 하지 못했다(WebFetch 추출문 기준). / 판정: 34명과 교차 설계는 구절에 없고 WebFetch 응답에서만 확인되었다고 맥락이 밝힌다. 탐지 정확도 하락, 분류·소요 시간 무효과, LLM 지원으로 먼저 수행했을 때 학습 효과 감소는 구절과 방향이 같고, 범위도 넓히지 않았다. / 보충: 34명과 교차 설계 조건은 원문 인용 구절로 확인되나, 탐지 정확도 저하와 분류·소요 시간 무효과는 인접 결과 문장에 있고 학습 효과 감소도 별도 문장에 있다. 인용은 요약형 열람 결과에서 옮긴 것이라 쉼표 등 구두점이 원문과 다를 수 있다. / 재판정: 34명 교차 설계, 탐지 정확도에 부정적 효과, 분류·소요 시간에 유의한 효과 없음, LLM 지원으로 시작한 참여자의 학습 효과 감소가 모두 구절과 맥락에 있다."
+        },
+        {
+          "ref": "sq3#case#5",
+          "verdict": "verify_failed",
+          "quote": "We conducted a controlled crossover design experiment with 34 participants who inspected textual specifications with and without LLM support",
+          "reason": "추출: 구절 'LLM support negatively affects smell detection accuracy...'가 사례의 결과 문장으로 원문 추출문에서 확인되었으나, 원문 글자 단위 대조는 하지 못했다(WebFetch 추출문 기준). / 판정: Bayesian 회귀와 탐지·분류·소요 시간 지표는 맥락과 같지만 34명 교차 설계와 목적 문장은 구절에 없다. 실패 결말은 부정적 효과를 적은 구절과 같고, 초보 검사자 대상은 맥락 문장이 뒷받침한다. / 보충: mechanism의 34명과 LLM 지원 유무 두 조건 교차 설계는 이 구절로 확인되나, purpose·evaluation·target은 이 구절에 없다. purpose는 'We aim to investigate the impact of LLM support on human-performed RI', evaluation은 'We analyzed the data using one Bayesian regression model per outcome variable', target은 'textual specifications'와 'novice inspectors' 문장으로 원문에 따로 있다. 인용은 요약형 열람 결과에서 옮긴 것이라 구두점이 원문과 다를 수 있다. / 재판정: 34명 교차 설계와 초보 검사자 대상은 맥락에 있고 부정적 효과 문장이 실패 결말과 같다. Bayesian 회귀는 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2605.12280",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2605.12280",
+      "judgments": [
+        {
+          "ref": "sq3#issue#4",
+          "verdict": "supported",
+          "quote": "a seven-lane production pipeline whose 7152-line specification surface was audited across nine rounds; surfacing 51 consistency defects (per-round counts of 15, 8, 12, 2, 8, 1, 4, 1, 0); non-monotonic convergence consistent with cascading edits and audit-scope expansion; a cross-LLM panel of four frontier vendors; multi-vendor union detects all five seeded defects; an inter-rater reliability check on a stratified subsample (Cohen's κ = 0.80 on category, 0.46 on severity)",
+          "reason": "추출: 논문 제목·저자·게재처가 사례 설명과 일치하고, 차수별 결함 수(15~0)와 심은 결함의 다중 모델 합집합 탐지, κ 0.80·0.46 구절이 초록에서 확인된다. 다만 열린 페이지가 arXiv 초록과 메타데이터뿐이라 본문 대조는 못 했고, 발췌 구절은 도구가 옮긴 조각을 이어 붙인 것이다. / 판정: 7,152줄, 아홉 차례, 차수별 15·8·12·2·8·1·4·1·0건, 네 회사 모델의 합집합이 심은 결함 5개를 모두 찾은 점, κ=0.80·0.46 이 구절과 같다. 비단조 수렴 방향도 같다. 주장은 심은 결함 결과를 작은 명세 조건으로 한정했다. κ 의 층화 일부 표본 조건은 생략했으나 수치를 넓게 일반화하지는 않았다."
+        },
+        {
+          "ref": "sq3#case#3",
+          "verdict": "supported",
+          "quote": "a seven-lane production pipeline whose 7152-line specification surface was audited across nine rounds; a locked audit protocol; surfacing 51 consistency defects; a cross-LLM panel of four frontier vendors; multi-vendor union detects all five seeded defects; Cohen's κ = 0.80 on category, 0.46 on severity",
+          "reason": "추출: 논문 제목과 저자가 사례 설명과 같고, 목적(일관성 결함 탐지)·방법(고정 감사 절차, 여러 회사 모델 합집합)·평가(차수별 결함 수, 심은 결함 탐지, κ)·대상(7152줄 명세)에 해당하는 구절이 초록에 있다. 다만 '판정 못 함' 결과를 뒷받침하는 본문은 열리지 않아 확인하지 못했고, 발췌는 초록 조각을 이어 붙인 것이다. / 판정: 고정된 감사 절차(locked audit protocol), 아홉 차례 감사, 네 회사 모델 패널, 심은 결함 탐지, κ 값, 7,152줄 명세가 구절과 같다. 판정 못 함 결말은 구절과 충돌하지 않고, 대상 범위를 넓히지 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT",
+        "EVIDENCE-FIRST",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://www.gresearch.com/news/building-a-code-review-tool-the-llm-patterns-that-actually-work/",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://www.gresearch.com/news/building-a-code-review-tool-the-llm-patterns-that-actually-work/",
+      "judgments": [
+        {
+          "ref": "sq3#issue#5",
+          "verdict": "unsupported",
+          "quote": "For integration tests involving multiple files and rules, we use severity-weighted thresholds:\nMUST / MUST NOT: 100% recall required\nOverall precision > 85%",
+          "reason": "추출: 원문 제목·저자·매체가 일치하고 규칙 색인, 1차 전체 수집과 2차 오탐 필터, 단순 호출 두 번, 회귀 시험과 임계값 구절이 모두 원문에 있으나(WebFetch 요약에 인용된 문장이며 글자 단위 대조는 하지 않았다), ID 외에 범주·수준이 색인 필드로 명시됐다는 구절은 요약에서 확인되지 않았다. / 판정: 규칙 ID 색인 검증, 1차 수집과 2차 거르기, 규칙 하나와 합성 diff 하나의 회귀 시험, MUST 재현율 100%, 정밀도 85% 초과는 구절과 같다. 범주 필드와 오탐 예시 제공은 구절에 없다. 단순한 두 번의 호출이 복잡한 프롬프트 하나보다 낫다는 비교 방향은 같다. / 보충: 접근과 제목 일치는 확인되었으나, 주장의 임계값(재현율 100%, 정밀도 85% 초과)은 회귀 시험이 아니라 통합 시험 기준으로 적혀 있어 회귀 시험 짝과 한 문장에 함께 있지 않고, 범주 필드는 원문 구절로 뒷받침되지 않는다(인용은 WebFetch 추출 결과 기준). / 재판정: 맥락에 따르면 MUST 재현율 100%·정밀도 85% 초과 기준은 여러 파일과 규칙을 다루는 통합 시험에 적용된다. 주장은 이 기준을 규칙 하나·합성 diff 하나의 회귀 시험에 붙였고, 범주 필드도 원문 구절로 확인되지 않았다. 두 번 호출의 역할과 '단순한 호출 두 번이 낫다'는 비교는 같다."
+        },
+        {
+          "ref": "sq3#case#7",
+          "verdict": "unsupported",
+          "quote": "checks git diffs against our internal Python coding standards using an LLM",
+          "reason": "추출: 제목·매체가 일치하고 1차 전체 수집과 2차 필터 구절이 원문에 있으나, 규칙 색인과 회귀 시험 구절은 이 quote 에 없고, 대상 항목 '사내 코드 변경'은 요약에 나오지 않으며, 원문에 성능 측정 결과 수치는 보고되지 않았다(WebFetch 요약). / 판정: ID 규칙 목록 검증, 2단계 호출, 회귀 시험의 재현율·정밀도 목표는 같은 원문의 구절과 같다. 판정 못 함 결말은 구절과 충돌하지 않는다. 대상이 사내 코드 변경이라는 문장은 구절과 맥락에 없다. / 보충: 접근과 사례 일치는 확인되었고 인용 문장은 사내 Python 코딩 표준에 맞춰 git diff 를 검사한다고 적어 대상과 맞닿아 있으나, 주장이 요구한 '사내 코드 변경'이라는 문장 자체는 원문에 없다. / 재판정: 같은 출처의 맥락에서 재현율·정밀도 목표는 통합 시험의 기준이다. 따라서 이 목표를 규칙·합성 diff 회귀 시험으로 관리한다는 평가 항목은 조건이 다르다. 원문은 사내 Python 코딩 표준과 git diff 를 말하고 '사내 코드 변경'이라는 표현이 없어, 대상이 원문보다 넓어졌는지 정할 수 없다. / 판정 불가: scope=언어 해석"
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2502.20747v1",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2502.20747v1",
+      "judgments": [
+        {
+          "ref": "sq3#case#2",
+          "verdict": "verify_failed",
+          "quote": "Table 4: Human Raters’ ICC2,k vs. LLM Determinism",
+          "reason": "추출: 사례의 목적(코드 리뷰 평정의 반복 실행 일관성 측정)과 온도 0, 맥락 초기화, 세 가지 지시문 길이, 다섯 번 반복의 방법이 한 문장에 담긴 원문 구절이 확인되어 존재와 구절 판정은 성공이다. 다만 요약 도구를 거친 문장이라 원문 대조는 arXiv HTML 에서 한 번 더 확인하는 것이 좋고, ICC 와 사람 평정자 비교는 이 구절에 없어 판정 에이전트가 맥락 문장으로 따로 확인해야 한다. / 판정: 온도 0, 맥락 초기화, 지시문 길이 세 종류, 다섯 번 실행, Pearson 상관, Java 커밋 70개는 구절과 맥락에 있다. ICC 와 사람 평정자 비교는 원문에서 찾지 못했다고 맥락이 밝힌다. 판정 못 함 결말과 대상 범위는 구절과 충돌하지 않는다. / 보충: 원문이 열리고 사례 제목·저자가 일치하며, 표 4 캡션이 사람 평정자의 ICC2,k 와 LLM 결정성을 나란히 비교하도록 되어 있으나, 사람 ICC 값은 선행연구 [6]에서 가져온 것이고 본문은 비교 결과를 조건부(may be comparable)로 서술하므로 수치와 결론의 판정은 판정 에이전트에게 맡긴다. / 재판정: 구절은 사람 평정자 ICC 와 LLM 결정성을 비교한 표 제목만 확인하고 실험 수치는 없다. 맥락의 '비교할 만하나 추가 연구가 필요하다'는 판정 못 함 결말과 같다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-FLEET",
+        "STATE-ASSUME",
+        "NO-SQUEEZE",
+        "WRITTEN-ONLY",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "FULL-SENTENCE",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2403.18771v3",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2403.18771v3",
+      "judgments": [
+        {
+          "ref": "sq3#case#6",
+          "verdict": "verify_failed",
+          "quote": "a checklist-based evaluation framework that improves rating reliability via decomposed binary questions",
+          "reason": "추출: 원문 초록에서 논문 제목·저자·게재처가 확인되고, 일치도 0.45 상승과 점수 분산 감소를 적은 문장이 확인된다. 다만 '12개 평가자 모델'은 이 문장이 아니라 앞 문장에 있어, 이 구절만으로는 주장의 모델 수 요소가 함께 뒷받침되지 않는다. 체크리스트(예·아니오 질문)와 기준 분해(하위 차원) 방식은 초록의 'decomposed binary questions'·'decomposes evaluation criteria into traceable binary decisions' 구절로 뒷받침된다. / 판정: 평가자 모델 12개와 평균 일치도 0.45 상승, 점수 분산 감소는 구절과 맥락에 있다. 하위 차원 분해와 예·아니오 질문 방식은 구절에 없다. 개선 방향은 성공 결말과 같고, 범위를 넓히지 않았다. / 보충: 초록에 체크리스트 기반 프레임워크가 분해된 이진 질문으로 평가 신뢰도를 높인다는 구절이 있어 주장의 방식 요소를 뒷받침하지만, WebFetch가 요약·변환한 출력이라 글자 단위 일치는 확인하지 못했다. / 재판정: 구절은 이진 질문 분해로 채점 신뢰도를 높인다는 방식과 성공 방향을 확인한다. 12개 모델과 0.45 수치는 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "KEEP-CONNECT",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "KO-SYNTAX"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2606.31308",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2606.31308",
+      "judgments": [
+        {
+          "ref": "sq4#issue#0",
+          "verdict": "unsupported",
+          "quote": "We introduce InterFLOPBench, a benchmark of 90 C kernels with 1 130 test samples",
+          "reason": "추출: 논문 제목은 주장의 이름과 다르지만 초록이 벤치마크 이름 InterFLOPBench 를 명시하고 90개 C 커널과 1,130개 시험 표본을 든다. 14개 LLM 비교, 0.88 초과, 범주별 평균 F1 수치의 구절도 확인된다. 다만 WebFetch 가 요약 형태로 돌려준 구절이라 원문과 글자 단위로 대조한 것은 아니다. 0.8479·0.6059·0.6164 의 반올림 표기와 '낮아졌다'는 서술의 적합성은 판정하지 않는다. / 판정: C 커널 90개, 표본 1,130개, LLM 14종, 정적 분류, F1 0.88 초과, 범주별 평균 F1 0.8479·0.6059·0.6164 는 반올림 값까지 구절과 같다. 범주별로 낮아지는 방향도 같다. 다만 원문은 0.88 초과를 '최신 모델(latest models)'로 한정했다. 주장은 이를 '상위 모델'로 옮겨 같은 집합인지 정할 수 없다. / 판정 불가: scope=언어 해석"
+        },
+        {
+          "ref": "sq4#case#1",
+          "verdict": "verify_failed",
+          "quote": "The evaluation framework treats floating-point error detection as a multi-label classification problem",
+          "reason": "추출: 사례 이름, 대상(C 커널 90개), 표본(1,130개), 평가 방식(범주별 F1)이 초록과 본문 구절로 확인된다. 'C 커널을 LLM 에 주고 여섯 범주로 다중 라벨 분류하게 한다'의 '다중 라벨' 방식은 확인한 구절에 나오지 않아 확인되지 않은 요소다. 결과는 판정 칸이 아니므로 판정하지 않는다. / 판정: 여섯 범주, 표본 1,130개, 상쇄 0.62·언더플로 0.61, 커널 90개는 구절·맥락과 같지만 다중 라벨 분류라는 방식은 구절에 없다. 판정 못 함 결말과 대상 범위는 구절과 충돌하지 않는다. / 보충: 주장의 누락 요소인 다중 라벨 분류 방식은 구절 'treats floating-point error detection as a multi-label classification problem'으로 뒷받침된다. 다만 구절 문장 자체에는 C 커널과 여섯 범주가 없어 그 요소는 인접 문장에 있는 것으로 보이며, 원문 대조는 요약형 WebFetch 결과에 의존한다. / 재판정: 다중 라벨 분류, 여섯 범주, C 커널 90개, 표본 1,130개는 구절과 맥락에 있다. 범주별 F1 값은 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "EVIDENCE-FIRST",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://conf.researchr.org/details/issta-2020/issta-2020-papers/30/Discovering-Discrepancies-in-Numerical-Libraries",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://conf.researchr.org/details/issta-2020/issta-2020-papers/30/Discovering-Discrepancies-in-Numerical-Libraries",
+      "judgments": [
+        {
+          "ref": "sq4#issue#1",
+          "verdict": "unsupported",
+          "quote": "Our approach automatically finds such synonymous functions, synthesizes testing drivers, and executes differential tests … provide an evaluation on four popular numerical libraries: GNU Scientific Library (GSL), SciPy, mpmath, and jmat … discovers 655 instances in which an input produces a set of disagreeing outputs between function synonyms … 150 of which we found to represent 125 unique bugs … so far, 30 bugs have been fixed, 9 have been found to be previously known … 25 more have been acknowledged by developers",
+          "reason": "추출: 논문 페이지가 열리고 제목·저자·학회가 일치하며, 방법·대상 라이브러리·수치 문장이 원문에 있으나 FPDiff 명칭은 이 페이지 텍스트에서 확인되지 않았다. / 판정: 구절에서 출력이 엇갈린 입력은 655건이다. 150건은 그중 고유 버그 125건에 해당한 사례이므로 '출력이 엇갈린 입력 150건'은 구절과 다르다. 네 라이브러리, 수정 30건, 개발자 인정 25건과 결함 발견 방향은 같다."
+        },
+        {
+          "ref": "sq4#case#0",
+          "verdict": "unsupported",
+          "quote": "Our approach automatically finds such synonymous functions, synthesizes testing drivers, and executes differential tests … provide an evaluation on four popular numerical libraries: GNU Scientific Library (GSL), SciPy, mpmath, and jmat … discovers 655 instances in which an input produces a set of disagreeing outputs between function synonyms … 150 of which we found to represent 125 unique bugs … so far, 30 bugs have been fixed, 9 have been found to be previously known",
+          "reason": "추출: 논문 페이지가 열리고 제목·저자·학회가 일치하며, 목적·방법·대상·평가 수치를 뒷받침하는 문장이 원문에 있으나 FPDiff 명칭은 이 페이지 텍스트에서 확인되지 않았다. / 판정: evaluation 의 '엇갈린 입력 150건'은 구절의 655건과 다르다. 구절의 150건은 고유 버그 125건에 해당한 사례다. 고유 버그 125건과 수정 30건, 같은 뜻의 함수를 대조하는 방식, 대상 라이브러리는 같다. 버그를 찾고 수정된 결과는 성공 결말과 같다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "FULL-SENTENCE",
+        "WRITTEN-ONLY",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://udspace.udel.edu/items/b593a5b5-e41c-45a1-9352-ae233d2599f3",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://udspace.udel.edu/items/b593a5b5-e41c-45a1-9352-ae233d2599f3",
+      "judgments": [
+        {
+          "ref": "sq4#issue#2",
+          "verdict": "verify_failed",
+          "quote": "Our results illustrate the pressing need for intelligent runtime selection of reduction operators that ensure a given degree of reproducible accuracy",
+          "reason": "추출: 접근과 서지는 주장과 일치하고 결론 문장도 뒷받침되지만, '트리 구조 변화에 대한 민감도가 결과 오차를 좌우한다'는 요소를 직접 말하는 초록 구절이 없어 강도를 판정 에이전트가 재확인해야 한다. / 판정: 리덕션 연산자를 실행 시점에 골라야 한다는 결론 방향은 구절과 같다. 그러나 재현 정확도 보장 조건은 관계절 전문이 없어 확인할 수 없다. 원문은 민감도를 추정할 매개변수를 찾았다고만 적었고, 민감도가 오차를 좌우한다는 일반화의 근거는 구절에 없다. / 보충: 학위논문 서지는 일치하고, 재현 정확도를 위해 실행 시점에 리덕션 연산자를 고른다는 결론과 관계절 전문은 찾았다. 비결정성이 재현성과 디버깅을 해친다는 문장은 초록에서 찾았다. 트리 구조 민감도가 결과 오차를 좌우한다는 문장은 원문에서 찾지 못했고, 가장 가까운 문장은 리덕션 트리 변동성에 대한 민감도를 추정할 매개변수를 찾는다는 내용이라 '좌우한다'는 주장을 뒷받침하지 않는다. 또 원문은 '필요성'을 말하고 '보장하려면 해야 한다'는 조건부 결론으로 쓰지 않았다. 근거는 초록 페이지 기준이며 전문 PDF는 확인하지 않았고, 인용문은 요약 모델이 옮긴 것이라 글자 단위 대조는 하지 않았다. / 재판정: 실행 시점 리덕션 연산자 선택이 필요하다는 결론은 구절과 같다. 그러나 민감도가 오차를 좌우한다는 결과와 비결정성의 해악은 구절과 맥락에 없다."
+        },
+        {
+          "ref": "sq4#case#3",
+          "verdict": "verify_failed",
+          "quote": "We assess the impact of these parameters on the ability of different reduction methods to successfully mitigate errors.",
+          "reason": "추출: 사례의 존재와 목적·대상(고성능 과학 계산)은 초록으로 확인되나, prior.evaluation 의 '오차 완화' 평가는 초록 구절로 뒷받침되지 않고 초록은 민감도 추정 매개변수를 찾는다고만 말한다. / 판정: 트리 구조 민감도 매개변수는 구절에 있다. 그러나 맥락이 밝히듯 초록에는 오차 완화 평가 구절이 없다. 판정 못 함 결말과 대상 범위는 구절과 충돌하지 않는다. / 보충: 오차 완화를 평가했다는 문장을 찾았다. 'these parameters'가 앞 문장의 트리 구조 민감도 매개변수를 가리킨다고 보는 것은 초록 발췌를 근거로 한 추론이며 전문으로 확정하지 않았다. 인용문은 요약 모델이 옮긴 것이라 글자 단위 대조는 하지 않았다. / 재판정: 구절은 매개변수가 리덕션 방법의 오차 완화에 주는 영향을 평가했다고 적으나 그 매개변수가 무엇인지는 적지 않는다. 비교 결과가 명시되지 않아 판정 못 함 결말과 상충하지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://docs.pytorch.org/docs/2.14/notes/randomness.html",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://docs.pytorch.org/docs/2.14/notes/randomness.html",
+      "judgments": [
+        {
+          "ref": "sq4#issue#3",
+          "verdict": "unsupported",
+          "quote": "the fused backends (Flash, Efficient, and cuDNN) emit a one-time warning but still use their default non-deterministic code paths. … Deterministic operations are often slower than nondeterministic operations, so single-run performance may decrease for your model.",
+          "reason": "추출: 첫 문장이 릴리스·커밋·플랫폼 간 재현 보장 부재를 원문 그대로 담고, 바로 다음 문장이 같은 시드에서도 CPU와 GPU 결과가 다를 수 있다는 내용을 담는다. 결정적 설정의 오류·경고·속도 문장은 이 구절에 없고 원문의 다른 절에 있으며, 경고 문장은 SDPA 백엔드(Flash, Efficient, cuDNN)에 한정된 설명이라 범위 확인이 필요하다. / 판정: 릴리스·커밋·플랫폼 사이 재현 비보장과 같은 시드에서도 CPU·GPU 결과가 다를 수 있다는 내용은 구절·맥락과 같다. 결정적 구현이 없는 연산의 오류도 같은 원문의 구절이 뒷받침한다. 경고만 내는 연산과 속도 비교는 구절에 없다. / 보충: 접근과 출처는 확인됐다. 보충 항목인 경고 문장과 느림 비교 문장은 원문에서 찾았으나 두 문장이 떨어져 있어 한 구절에 담기지 않아 \" … \" 로 이어 옮겼다. 인용은 WebFetch 추출 결과이므로 원문 HTML 과 글자 단위로 대조하지 못했다. / 재판정: 구절에서 경고만 내는 동작은 warn_only=True 조건이고, 맥락은 강제하려면 warn_only=False 를 쓰라고 한다. 주장은 이 동작을 강제 설정에 붙였다. 릴리스·플랫폼 간 비보장, CPU·GPU 차이, 미구현 연산의 오류도 구절에 없다. 결정적 연산이 대체로 느리다는 방향은 'often slower'와 같다."
+        },
+        {
+          "ref": "sq4#case#4",
+          "verdict": "supported",
+          "quote": "torch.use_deterministic_algorithms() lets you configure PyTorch to use deterministic algorithms instead of nondeterministic ones where available, and to throw an error if an operation is known to be nondeterministic (and without a deterministic alternative).",
+          "reason": "추출: 원문이 사례명과 같은 PyTorch 공식 재현성 문서이고, 인용 문장이 결정적 알고리즘 강제 설정(mechanism)을 뒷받침하며, 시드 고정은 context 의 torch.manual_seed 문장이 뒷받침한다. / 판정: 결정적 알고리즘 강제 설정(torch.use_deterministic_algorithms)과 시드 고정(torch.manual_seed)은 구절과 맥락에 있다. 평가 없음과 판정 못 함은 벤더 안내 문서와 충돌하지 않고, 대상을 넓히지 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "NO-SQUEEZE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/1804.01954",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/1804.01954",
+      "judgments": [
+        {
+          "ref": "sq4#issue#4",
+          "verdict": "unsupported",
+          "quote": "testing challenges that occur due to characteristics of scientific software such as oracle problems",
+          "reason": "추출: 구절은 오라클 문제를 과학 소프트웨어 특성에서 오는 시험 과제의 예('such as')로 적었고 '핵심 난제'라는 표현은 없다. 문화 차이와 미해결 과제 요소는 각각 다른 문장에 있어 한 구절에 세 요소가 모두 들어 있지 않다. / 판정: 오라클 문제가 과학 소프트웨어 특성에서 오는 난제라는 점은 구절과 같다. 코드와 모델을 분리하지 않는 문화 차이와 미해결 난제 서술도 같은 원문의 맥락에 있다. 다만 원문은 오라클 문제를 예시('such as')로 들었다. 주장은 이를 '핵심 난제'로 옮겨 강조 수준을 높였는지 정할 수 없다. / 판정 불가: scope=언어 해석"
+        },
+        {
+          "ref": "sq4#case#5",
+          "verdict": "supported",
+          "quote": "We conducted a systematic literature survey to identify and analyze relevant literature.",
+          "reason": "추출: 구절은 문헌 리뷰라는 수행 방식(mechanism)과 사례의 존재를 뒷받침한다. 문헌 분류로 난제를 도출했다는 평가(evaluation) 요소는 이 문장에 없고 인접 문장에 있다. / 판정: 체계적 문헌 리뷰 방식, 오라클 문제·문화 차이 난제, 과학자 대상은 같은 원문의 구절과 맥락이 뒷받침한다. 판정 못 함 결말은 구절과 충돌하지 않고, 범위를 넓히지 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "FULL-SENTENCE",
+        "WRITTEN-ONLY",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://conf.researchr.org/details/issta-2025/issta-2025-papers/72/An-Investigation-on-Numerical-Bugs-in-GPU-Programs-Towards-Automated-Bug-Detection",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://conf.researchr.org/details/issta-2025/issta-2025-papers/72/An-Investigation-on-Numerical-Bugs-in-GPU-Programs-Towards-Automated-Bug-Detection",
+      "judgments": [
+        {
+          "ref": "sq4#case#2",
+          "verdict": "supported",
+          "quote": "GPU-NBDetect detected a total of 226 bugs across 186 mathematical functions in four libraries, with 60 confirmed by developers.",
+          "reason": "추출: 논문 제목·저자·학회가 일치하고 원문 초록에 226건 발견, 186개 함수, 네 개 라이브러리, 개발자 확인 60건 문장이 있으나, 'GPU 수학 함수 라이브러리' 대상 문구는 원문에 그대로 없어 구절이 완전히 뒷받침하지는 않는다. 수치와 범위의 판정은 판정 에이전트가 맡는다. / 판정: 구절과 맥락에 226건, 함수 186개, 라이브러리 네 개, 개발자 확인 60건, 버그 397건, 여섯 범주가 모두 있다. 성공 결말은 탐지 결과 문장과 같다. target 의 'GPU 수학 함수 라이브러리'는 'mathematical functions in four libraries'를 넓히지 않은 표현이다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-FLEET",
+        "STATE-ASSUME",
+        "CHECKABLE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2508.06484v1",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2508.06484v1",
+      "judgments": [
+        {
+          "ref": "sq5#issue#0",
+          "verdict": "verify_failed",
+          "quote": "none were consistently detected; some safety-critical issues were missed entirely by all participants",
+          "reason": "추출: 결론 구절이 '스스로 신뢰성 있게 검증할 수 없다'는 결론을 그대로 뒷받침한다. 다만 주장의 다른 요소인 경고와 보상(\"The AI’s methods or results often have mistakes…\", \"we offered a $6 bonus…\")과 '일관되게 찾지 못했다'(\"none were consistently detected; some safety-critical issues were missed entirely by all participants.\")는 별도 문장에 있어 이 구절에는 없다. 원문은 요약형 fetch 로 옮겨 적었고 HTML 원문과 글자 단위로 대조하지 않았으며, 긴 문장은 추출 단계에서 잘려 '…'으로 표시됐다. / 판정: 결론 문장 'cannot reliably verify ... on their own'은 주장의 결론과 부정 방향과 한정 조건이 같다. 그러나 경고·성과 보상 조건과 치명적 결함 미발견 관찰은 구절과 맥락에 없다. 주장은 업무 실무자라는 대상을 넓히지 않았다. / 보충: 원문이 열리고 제목과 저자가 주장의 사례와 일치하며, 원문에 경고·보상 조건, 치명적 결함을 일관되게 찾지 못했다는 관찰, 자연어 설명 검토라는 요소가 모두 있으나 한 문장에 전 요소가 담기지 않아 가장 가까운 문장을 옮겼다. 옮긴 구절은 WebFetch 요약 모델이 전달한 것이라 글자 단위 대조는 하지 못했다. / 재판정: 경고 문구, 6달러 보너스, 결함을 일관되게 찾지 못함, 스스로 신뢰성 있게 검증할 수 없다는 결론이 구절과 맥락에 있다. 마케팅·영업 직무는 확인되지 않는다."
+        },
+        {
+          "ref": "sq5#case#0",
+          "verdict": "unsupported",
+          "quote": "8/9 participants identified the issue, versus 4/9 with formatting & alternatives and 5/10 in the preliminary study.",
+          "reason": "추출: 가격 결함 수치 구절(8/9, 5/10)은 주장의 수치 요소를 옮긴 것이다. 같은 구절에 4/9(서식과 대안 조건)가 함께 나와, 수치의 해석은 판정 에이전트가 맡는다. 존재 판정은 제목과 저자는 맞지만 학회 'HCC'가 원문과 달라 불일치로 판정한다. 원문은 요약형 fetch 로 옮겨 적었고 HTML 원문과 글자 단위로 대조하지 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2605.24521",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2605.24521",
+      "judgments": [
+        {
+          "ref": "sq5#issue#1",
+          "verdict": "verify_failed",
+          "quote": "a general awareness of risks in AI-generated code is broadly distributed … the capacity to evaluate, debug, and verify remains experience-dependent",
+          "reason": "추출: 162명과 비코더·초보자·전문 개발자 세 집단의 설문 설계는 위 구절이 뒷받침한다. 나머지 요소는 같은 초록의 다른 구절이 뒷받침하지만 한 문장에 묶이지 않아 quote 에 넣지 않았다. 위험 인식의 분포는 'a general awareness of risks in AI-generated code is broadly distributed', 평가·디버깅·검증 능력의 경험 의존은 'the capacity to evaluate, debug, and verify remains experience-dependent', 접근성 결론은 'vibe coding is partially democratising as it broadens access to software creation'과 'without equally distributing the expertise to evaluate it'로 확인되었다. 인식과 행동의 차이는 원문 용어 'perception--action gap'과 뜻이 같다. 이 판정은 fetch 요약에서 옮긴 구절을 근거로 하므로 전문 대조를 거친 값이 아니다. / 판정: 162명과 비코더·초보자·전문 개발자 세 집단은 구절과 같다. 맥락의 'experience selectively shapes vibe coding'만으로는 인식과 행동의 차이라는 결과 방향을 확인할 수 없다. 접근성과 전문성에 관한 일반화된 결론도 구절에 없다. / 보충: 초록 페이지에서 위험 인식은 집단 전반에 걸쳐 비슷하고 평가·디버깅·검증 능력은 경험에 따라 달라진다는 결과 구절을 찾았으나, 본문 전체는 열지 않았고 구절은 요약 도구가 옮긴 것이라 원문 대조는 한계가 있다. / 재판정: 구절은 위험 인식이 고르게 퍼져 있고 평가·디버깅·검증 능력은 경험에 따라 다르다는 대비를 보여 주므로 방향은 일치한다. 그러나 표본 수와 집단 구성은 구절에 없다. 세 집단 전체에 대한 일반화와 결론 문장도 구절과 맥락에서 확인되지 않는다."
+        },
+        {
+          "ref": "sq5#case#2",
+          "verdict": "supported",
+          "quote": "surveying 162 vibe coders belonging to three user experience groups: non-coders, novices, and professional developers.",
+          "reason": "추출: 사례의 설문 방법(설문)과 대상(162명, 세 집단)은 위 구절이 뒷받침한다. 사례의 결과 칸은 판정 못 함으로 적혀 있어 이 구절로 판정할 대상이 없다. 사례 설명의 목적과 평가 항목은 이 구절과 같은 초록의 설명으로 확인되었으나, 목적·평가 서술의 세부 방향 판단은 판정 에이전트의 몫이다. 이 판정은 fetch 요약에서 옮긴 구절을 근거로 하므로 전문 대조를 거친 값이 아니다. / 판정: 설문 방법, 162명, 세 경험 집단이 구절과 같다. outcome 이 판정 못 함이므로 구절과 상충하는 결말 주장이 없다. target 의 '자연어 지시로 소프트웨어를 만드는 사용자'는 vibe coders 를 넓히지 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "ASYNC-FIRST",
+        "SUBJECT-OBJECT",
+        "KO-SYNTAX",
+        "EVIDENCE-FIRST",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "KEEP-CONNECT"
+      ]
+    }
+  },
+  {
+    "url": "https://web.engr.oregonstate.edu/~burnett/ITR2000/empirical.html",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://web.engr.oregonstate.edu/~burnett/ITR2000/empirical.html",
+      "judgments": [
+        {
+          "ref": "sq5#issue#2",
+          "verdict": "supported",
+          "quote": "The assertions subjects were significantly better at fixing the bugs.",
+          "reason": "추출: 2002년 봄 통계 실험에서 단언 집단이 버그 수정을 유의하게 더 잘했다는 문장이 원문에 있고, 12명 HMT 실험의 유지보수 과제 결과와 자기 값 우선 시험 뒤 도구에 의지한 서술도 항목 8에서 확인된다. 세 요소가 한 문장에 없어 나머지 두 요소는 context에 옮겼고, 인용은 WebFetch 요약 모델이 옮긴 문장이라 원문 대조가 한 번 더 필요하다. / 판정: 단언 집단의 버그 수정 우위, HMT 실험 12명(6명씩), 유지보수 과제, 자기 값으로 먼저 시험한 뒤 HMT 에 의지한 관찰이 맥락에 있다. 2002년 봄은 같은 항목의 source_note 에 옮겨진 본문 표기 'Spring 2002 Assertions Study'로 확인된다. 우위 방향이 같고 주장은 요약의 범위를 넓히지 않았다."
+        },
+        {
+          "ref": "sq5#case#5",
+          "verdict": "verify_failed",
+          "quote": "to investigate how visual fault localization techniques affect and interact with the debugging efforts",
+          "reason": "추출: 원문이 같은 최종 사용자 스프레드시트 실험 요약이고, 'Both had WYSIWYT.'와 단언 집단 대 무단언 집단의 비교가 원문에 있어 사례 이름과 맞다. 목적과 기제 서술은 이 칸의 판정 범위가 아니어서 다루지 않았다. / 판정: 단언 사용 집단의 유의한 버그 수정 우위와 통제 비교, 사고발화 연구, HMT 사례는 구절과 맥락에 있다. 그러나 mechanism 의 결함 위치 추정은 구절과 맥락에 없다. 성공 결말과 스프레드시트 대상 범위는 구절과 같다. / 보충: 구절은 결함 위치 추정 기능을 다룬 원문 문장이지만, 스프레드시트나 WYSIWYT·Help-Me-Test 실험에 결함 위치 추정을 붙였다는 내용은 이 구절에 없고 다른 실험 항목의 문장이다. 원문 문장이 잘려 추출되었으므로 전체 문장은 원문에서 직접 확인이 필요하다. / 재판정: 인용 구절은 시각적 결함 위치 추정이 디버깅에 미치는 영향을 조사한다는 목적 문장이다. source_note에 따르면 이 구절은 스프레드시트·WYSIWYT 실험이 아닌 다른 항목에서 왔다. 따라서 주장의 평가 결과와 성공 결말, 대상 범위를 뒷받침하는 구절이 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "TERM-ONE",
+        "NO-SQUEEZE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2405.10250v3",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2405.10250v3",
+      "judgments": [
+        {
+          "ref": "sq5#case#1",
+          "verdict": "verify_failed",
+          "quote": "For text-to-SQL, we utilized Spider",
+          "reason": "추출: 원문이 열리고 논문 제목과 저자가 주장의 사례와 일치하며, 구절은 성공률 차이 11.53%p·25.31%p와 시간 감소를 싣고 있으나 주장의 절대 성공률 네 값과 집단당 10명은 이 구절에 없어 근거가 일부만 확인된다. 본문 6.1절의 Python 차이 29.89%p는 표 8 값 25.31%p와 다르다고 WebFetch가 보고했으며, 수치 판정은 판정 에이전트 몫이다. / 판정: 구절의 상승폭 11.53%와 25.31%는 주장의 절대값 차이와 맞지만 절대 성공률 네 값은 표 2·표 8에 있어 구절의 글로 확인할 수 없고, 집단당 10명과 SQL 재진술·Python 요약 설명 기제도 구절에 없다. 성공률 상승과 시간 감소의 방향은 구절과 같다. Spider·MBPP 과제라는 대상 범위는 구절과 맥락에 없다. / 보충: 원문 구절은 SQL 과제 출처 Spider를 담지만 Python 출처 MBPP와 과제 수준 '짧은'은 이 문장에 없고, 같은 원문의 다른 구절은 MBPP를 'entry-level programming questions'로, Spider를 'a large-scale, complex, and cross-domain dataset'으로 기술하며 '짧은 과제'라는 표현은 찾지 못했다. / 재판정: 구절은 text-to-SQL 과제에 Spider를 썼다는 사실만 보여 준다. 맥락에 나오는 10은 데이터셋별 질문 수이며 참가자 수가 아니다. 성공률 수치와 성공 결말, MBPP 대상 범위는 구절과 맥락에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "NO-MIRROR",
+        "EVIDENCE-FIRST",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2401.15232v2",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2401.15232v2",
+      "judgments": [
+        {
+          "ref": "sq5#case#3",
+          "verdict": "verify_failed",
+          "quote": "One key feature of our paradigm is that we automatically test the generated code.",
+          "reason": "추출: 원문이 열리고 제목·저자·학회가 주장과 일치하며, 인용 구절은 120명 대상 대규모 통제 연구라는 evaluation 요소를 뒷받침한다. 다만 구절은 요약 모델이 옮긴 문장이라 글자 단위로 대조하지 못했고, 목적 문장이 잘려 나와 목적 요소의 전문은 이 구절만으로 완결되지 않으며, 혼합 방법 분석과 입출력 테스트 판정 방식은 이 구절에 없다. / 판정: 초보자 120명, 세 기관에서 40명씩 모집한 통제 실험은 구절과 맥락과 같다. 입출력 테스트 자동 판정 기제와 실패 결말을 보이는 결과 문장은 구절과 맥락에 없다. 대상을 초보 프로그래머의 입문 과제로 둔 범위는 구절을 넓히지 않았다. / 보충: 논문과 저자·학회가 일치하고 접근이 되었다. 자동 판정 문장은 확인되나 입출력 테스트라는 표현은 앞뒤 문장이 아닌 §1 에서만 확인되었고, 실패 결말은 초록의 어려움 문장으로 뒷받침되나 이 quote 는 자동 판정 요소만 담는다. / 재판정: 구절과 맥락은 생성 코드를 자동으로 테스트한다는 메커니즘을 보여 준다. 맥락의 초록 문장 'beginners struggle with writing and editing prompts'는 실패 결말과 방향이 일치한다. 그러나 120명·세 기관이라는 수치와 입문 수준 과제라는 대상은 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://advait.org/publications-web/sarkar-2025-vibe-coding",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://advait.org/publications-web/sarkar-2025-vibe-coding",
+      "judgments": [
+        {
+          "ref": "sq5#case#4",
+          "verdict": "verify_failed",
+          "quote": "Rather than line-by-line code review, we observed programmers rapidly moving from point to point",
+          "reason": "추출: 원문이 공개 영상 5개를 프레임워크 분석했다고 적어 mechanism 요소를 지지하고, 평가 요소(줄 단위 읽기 대신 빠른 스캔과 실행 확인)와 대상 요소(비프로그래머 세션 없음)는 다른 문장에 있으며, 평가 요소에는 수동 검토가 계속된다는 단서가 함께 있다. / 판정: 최종 분석 영상 5개는 구절과 같다. 줄 단위로 읽지 않았다는 부정 관찰과 비프로그래머 세션을 찾지 못했다는 진술은 구절과 맥락에 없어 방향과 범위를 판정할 수 없다. / 보충: 원문과 저자·제목·학회가 일치하고 줄 단위 읽기 대신 빠른 훑기와 diff·앱 실행 확인이 관찰로 적혀 있으나, 옮긴 구절은 문장 일부이고 두 요소(방향과 범위)가 한 문장에 함께 있지 않으며 범위 근거는 4.5절의 별도 문장이다. / 재판정: 구절과 맥락에서 참가자는 줄 단위 검토 대신 빠르게 이동하며 diff를 주의 깊게 보았고, 앱을 실행해 확인했다. 따라서 방향이 일치한다. 대상도 숙련 프로그래머이며 비프로그래머 세션은 없다는 한계 절 문장과 맞아 범위가 일치한다. 그러나 영상 5개라는 수치는 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "EVIDENCE-FIRST",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "NO-SQUEEZE",
+        "SPECIFIC-NAME"
+      ]
+    }
+  }
+]

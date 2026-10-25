@@ -1,0 +1,208 @@
+{
+  "agent": "agent-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq1",
+  "search_status": "ok",
+  "queries": [
+    "empirical study interface faults proportion software defects integration faults",
+    "empirical study of bugs in data pipelines root causes data flow between stages",
+    "cross-system interaction failures empirical study cloud systems",
+    "microservice systems fault analysis empirical study interaction faults proportion",
+    "taxonomy of real faults in deep learning systems empirical study categories proportion"
+  ],
+  "read": "[\"https://users.ece.utexas.edu/~perry/work/papers/9208-DP-faults.pdf\", \"https://www.nasa.gov/wp-content/uploads/2016/10/585637main_swfaultsfailuresfixes.pdf\", \"https://www.es.mdu.se/publications/1023-Component_Testing_is_not_Enough___A_Study_of_Software_Faults_in_Telecom_Middleware\", \"https://arxiv.org/abs/2309.07067v1\", \"https://arxiv.org/abs/2104.12192v2\", \"https://usenix.org/conference/srecon24americas/presentation/xu\", \"https://nokia.com/bell-labs/publications-and-media/publications/an-empirical-study-of-software-interface-faults-an-update (403, 열지 못함)\", \"https://par.nsf.gov/servlets/purl/10427116 (접속 거부, 열지 못함)\"]",
+  "issues": [
+    {
+      "where": "질문의 전제(결함이 구성요소 사이에 몰린다)와 후보안 B의 점검 배분",
+      "type": "refuted-premise",
+      "claim": "리뷰 점검을 단계 사이 자료(인터페이스) 쪽에 몰아 배분하는 근거로 '결함이 구성요소 사이에 몰린다'는 전제를 쓴다면, 이 선행 결과는 그 전제를 지지하지 않는다. 후보안 B 자체는 단계 사이 자료를 네 대상 종류 중 하나로만 두므로 B를 반박하지는 않는다.",
+      "prior_claim": "Perry와 Stieg(AT&T Bell Labs, 1992)는 100만 줄 이상의 대규모 실시간 시스템의 한 릴리스에서 설계·코딩 결함을 조사했다. 그 결과 인터페이스 결함은 빈도 기준 49%, 구현 결함은 51%였고, 수정 노력으로 가중하면 인터페이스 결함이 56%였다. 저자들은 인터페이스 결함이 빈도는 약간 적으나 찾는 노력은 비슷하고 고치는 노력은 더 든다고 적었다.",
+      "consequence": "인터페이스 결함이 다수라는 전제로 점검을 인터페이스에 몰면 이 사례 기준으로 결함의 절반가량인 구현 결함(내부 기능 25.0%, 저수준 논리 7.9% 등)이 점검 범위에서 줄어든다.",
+      "evidence": "PDF 26페이지 TABLE 17 'Interface/Implementation Fault Comparison': frequency 49%/51%, find weighted 50%/50%, fix weighted 56%/44%. 같은 논문 1페이지는 선행 연구로 Perry·Evangelist 68%, Basili·Perricone 39%를 인용한다. 네 축 대조: 목적(결함 특성 파악)·메커니즘(설문)·평가(빈도·노력)·적용 대상(1990년대 C 실시간 시스템 유지보수) 모두 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://users.ece.utexas.edu/~perry/work/papers/9208-DP-faults.pdf",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "질문의 전제(결함이 구성요소 사이에 몰린다)",
+      "type": "refuted-premise",
+      "claim": "대규모 시스템의 결함 분류에서 통합 결함 비율이 낮게 나온 사례가 있으므로, 점검 배분을 인터페이스 집중 전제에 기대면 요구사항·코딩·데이터 결함 점검이 빠질 수 있다. 분류 체계가 '통합 결함'을 좁게 정의했을 가능성이 있어 이 사례만으로 반대 결론을 단정하지는 않는다.",
+      "prior_claim": "Goseva-Popstojanova와 Hamill(West Virginia University)은 대규모 안전 필수 NASA 임무의 비준수 SCR 2,500건(10년)을 분석했다. 결함 유형은 코딩 결함 36.00%, 요구사항 결함 34.71%, 데이터 문제(읽기·쓰기·값) 14.89%, 설계 결함 6.14%, 통합 결함 2.38%였다. 발견 활동은 분석 49.45%, 테스트 38.27%였고, 코딩 결함을 뺀 모든 유형에서 분석이 테스트보다 많이 발견했다.",
+      "consequence": "이 사례 기준으로 통합 결함은 2.38%에 그치고 요구사항 결함이 34.71%이므로, 인터페이스만 겨눈 점검 세트는 설계 문서 리뷰가 가장 많이 잡을 수 있는 요구사항 결함을 놓친다.",
+      "evidence": "슬라이드 11(SCR 2,500건, CN 4,700건), 16(결함 유형 원그래프), 19(발견 활동), 21(분석이 코딩 외 모든 유형에서 테스트보다 우세). 슬라이드 17은 외부 연구와 비교해 코딩·인터페이스·통합 결함 합이 요구사항·설계 결함에 근접하거나 넘는다고 적는다. 네 축 대조: 목적·메커니즘(변경 요청 마이닝)·평가·적용 대상(우주 임무 소프트웨어) 모두 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://www.nasa.gov/wp-content/uploads/2016/10/585637main_swfaultsfailuresfixes.pdf",
+          "kind": "vendor",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "Perry & Stieg 1992, 대규모 실시간 시스템의 결함 사례 연구",
+      "url": "https://users.ece.utexas.edu/~perry/work/papers/9208-DP-faults.pdf",
+      "axes": {
+        "purpose": {
+          "prior": "시스템 진화 중 테스트 단계에서 발견된 결함의 종류·원인·예방 수단을 파악한다",
+          "same": false,
+          "note": "대조 대상은 설계 문서 리뷰의 점검 항목 구성을 정하는 것이고, 이 사례는 결함 특성 조사다"
+        },
+        "mechanism": {
+          "prior": "변경 요청 담당자 대상 설문으로 결함을 22개 유형으로 분류하고 인터페이스·구현으로 묶는다",
+          "same": false,
+          "note": "대조 대상은 LLM 리뷰어나 점검 질문 세트를 쓰고, 이 사례는 사후 설문 분류다"
+        },
+        "evaluation": {
+          "prior": "빈도와 찾기·고치기 노력 가중 비율(인터페이스 49%/구현 51%, 수정 가중 56%/44%)",
+          "same": false,
+          "note": "대조 대상의 평가는 결함 발견과 재현성이며 이 사례는 분포를 측정했다"
+        },
+        "target": {
+          "prior": "100만 줄 이상의 C 분산 실시간 시스템, 비초기 릴리스",
+          "same": false,
+          "note": "대조 대상은 AI 코딩 도구로 만드는 대시보드형 백엔드·프론트엔드·DB·일괄 계산 시스템이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 저자 사이트 PDF",
+      "adoption": "참고"
+    },
+    {
+      "case": "Goseva-Popstojanova & Hamill, 대규모 NASA 임무의 결함·실패·수정 교훈",
+      "url": "https://www.nasa.gov/wp-content/uploads/2016/10/585637main_swfaultsfailuresfixes.pdf",
+      "axes": {
+        "purpose": {
+          "prior": "변경 요청 자료로 IV&V 효율과 품질 개선 지식을 만든다",
+          "same": false,
+          "note": "결함 분포 파악이 목적이며 리뷰 점검 설계가 아니다"
+        },
+        "mechanism": {
+          "prior": "비준수 SCR 2,500건과 CN 4,700건을 분류·분석한다",
+          "same": false,
+          "note": "기록 마이닝이며 리뷰어 구성과 무관하다"
+        },
+        "evaluation": {
+          "prior": "결함 유형 비율(코딩 36.00%, 요구사항 34.71%, 데이터 14.89%, 통합 2.38%)과 발견 활동 비율(분석 49.45%, 테스트 38.27%)",
+          "same": false,
+          "note": "분포 측정이며 리뷰 방식 간 비교 실험이 아니다"
+        },
+        "target": {
+          "prior": "안전 필수 우주 임무, CSCI 21개, 수백만 줄",
+          "same": false,
+          "note": "도메인과 규모가 대조 대상과 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 후 nasa.gov 발표 슬라이드 PDF",
+      "adoption": "참고"
+    },
+    {
+      "case": "Eldh 외 2007, Component Testing is not Enough (통신 미들웨어 결함 연구)",
+      "url": "https://www.es.mdu.se/publications/1023-Component_Testing_is_not_Enough___A_Study_of_Software_Faults_in_Telecom_Middleware",
+      "axes": {
+        "purpose": {
+          "prior": "대규모 통신 미들웨어의 결함이 어느 시험 수준에서 드러나는지 파악한다",
+          "same": false,
+          "note": "시험 자원 배분 논거이며 설계 문서 리뷰 구성이 아니다"
+        },
+        "mechanism": {
+          "prior": "2003~2006년 실패 기록을 결함 유형으로 분류한다",
+          "same": false,
+          "note": "실패 기록 분류이며 리뷰 메커니즘이 아니다"
+        },
+        "evaluation": {
+          "prior": "다수 결함(누락 코드·경로, 불필요 코드)이 컴포넌트 수준이 아닌 통합·시스템 수준에서 처음 드러난다. 단순 결함은 10% 미만",
+          "same": false,
+          "note": "초록 페이지에는 수준별 정확한 비율이 없다. 드러나는 수준을 측정했고 결함이 있는 위치를 측정하지 않았다"
+        },
+        "target": {
+          "prior": "대규모 통신 산업 미들웨어",
+          "same": false,
+          "note": "대조 대상의 대시보드형 시스템과 도메인이 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 후 Mälardalen 대학 출판 목록(TESTCOM/FATES 2007, Springer LNCS)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Foidl 외 2023, Data Pipeline Quality: 데이터 관련 이슈의 근본 원인과 처리 문제 영역",
+      "url": "https://arxiv.org/abs/2309.07067v1",
+      "axes": {
+        "purpose": {
+          "prior": "데이터 파이프라인 품질 영향 요인과 데이터 이슈 원인, 개발자 문제 영역을 파악한다",
+          "same": false,
+          "note": "파이프라인 품질 이해가 목적이며 리뷰 점검 설계가 아니다"
+        },
+        "mechanism": {
+          "prior": "다성 문헌 검토와 전문가 인터뷰 8건, GitHub 프로젝트와 Stack Overflow 게시물 마이닝",
+          "same": false,
+          "note": "자료 마이닝이며 리뷰어 구성이 아니다"
+        },
+        "evaluation": {
+          "prior": "데이터 이슈 원인 중 잘못된 자료형 33%, 정제 단계 35%, 개발자 질문 중 통합·적재 47%",
+          "same": false,
+          "note": "단계 사이 자료(자료형·통합)에 문제가 많다는 신호지만 결함 위치 비율과 질문 주제 비율이 섞여 있다"
+        },
+        "target": {
+          "prior": "데이터 파이프라인(적재·통합·정제·변환)",
+          "same": false,
+          "note": "대조 대상의 일괄 계산 구성요소와 겹치지만 대조 대상 전체(화면·DB·백엔드 포함)와는 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv(JSS 게재 예정 표기)",
+      "adoption": "참고"
+    },
+    {
+      "case": "Waseem 외 2021, 오픈소스 마이크로서비스 시스템 5개의 이슈 성격 연구",
+      "url": "https://arxiv.org/abs/2104.12192v2",
+      "axes": {
+        "purpose": {
+          "prior": "마이크로서비스 시스템 이슈의 종류를 분류한다",
+          "same": false,
+          "note": "이슈 분류가 목적이다"
+        },
+        "mechanism": {
+          "prior": "GitHub 이슈 토론 1,345건 수작업 분류",
+          "same": false,
+          "note": "이슈 마이닝이며 리뷰 메커니즘이 아니다"
+        },
+        "evaluation": {
+          "prior": "기술 부채 23.86%, 빌드 10.78%, 보안 10.18%, 서비스 실행·통신 8.84%",
+          "same": false,
+          "note": "구성요소 사이 통신 이슈는 8.84%로 최다 범주가 아니다"
+        },
+        "target": {
+          "prior": "오픈소스 마이크로서비스 시스템 5개",
+          "same": false,
+          "note": "여러 서비스로 나뉜 구조라는 점은 대조 대상과 비슷하나 개발 주체와 규모가 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv(EASE 2021)",
+      "adoption": "참고"
+    }
+  ],
+  "saturation": "3",
+  "not_found": "[\"Tang 외 EuroSys 2023 'Fail through the Cracks: Cross-System Interaction Failures' 원문은 NSF PAR 접속이 거부되어 열지 못했다. 검색 요약상 클라우드 사고 11건과 CSI 실패 120건을 분석했다고 하나 확인하지 못했으므로 근거로 쓰지 않았다.\", \"Perry·Evangelist(인터페이스 결함 68%)와 Basili·Perricone(39%)의 원 논문은 열지 못했다. Perry·Stieg 논문 1페이지의 인용으로만 확인했다(2차).\", \"AI 코딩 도구로 만든 시스템이나 비개발자가 만든 시스템의 결함 위치 분포 실증은 이번 검색에서 찾지 못했다. 존재하지 않는다는 뜻은 아니다.\", \"ML 파이프라인 사고 1,000건 연구(데이터 품질 47%)는 템플릿 페이지에서만 나와 원 논문을 확인하지 못했다.\", \"Humbatova 외 딥러닝 결함 분류의 범주별 비율은 이번 검색 결과에 없어 확인하지 못했다.\", \"Gregor 외 ICST 2025 마이크로서비스 통합 결함 분류와 Zhou 외 TSE 2018은 도구 호출 한도 때문에 열지 못했다.\"]",
+  "disclosures": "[\"nokia.com Bell Labs 페이지(403)와 par.nsf.gov(접속 거부)는 열지 못했으며 근거 지도에 넣지 않았다.\", \"NASA 슬라이드는 nasa.gov 게시 발표 자료라 동료심사 여부를 확인하지 못해 kind를 vendor로 두었다. Perry·Stieg PDF는 저자 사이트 사본이라 preprint로 두었다.\", \"연구마다 '인터페이스 결함'과 '통합 결함'의 정의가 달라(Perry는 모듈 밖 구조와 관련된 결함, NASA는 통합 결함 범주 별도) 비율을 직접 비교할 수 없다. 이 판단은 derived다.\", \"Eldh 외 연구는 결함이 드러나는 시험 수준을 측정했고 결함이 있는 위치를 측정하지 않았으므로 '구성요소 사이에 몰린다'의 직접 근거로 보기 어렵다(derived).\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"ASYNC-FIRST\", \"STATE-ASSUME\", \"WRITTEN-ONLY\", \"SUBJECT-OBJECT\"]",
+  "notes": "검토한 관점은 다음과 같다. 기시감 관점에서는 결함 위치 분포를 측정한 실증 연구를 찾았으며, 리뷰 점검 설계와 네 축이 모두 같은 사례는 없었다. 결말 관점에서 실증은 엇갈린다. Perry·Stieg는 인터페이스 49%·구현 51%, 인용된 Perry·Evangelist는 68%, Basili·Perricone는 39%였다. NASA 사례는 통합 결함 2.38%, 마이크로서비스 이슈 연구는 서비스 통신 8.84%였다. 반면 Eldh 외는 다수 결함이 통합·시스템 수준에서 처음 드러난다고 보고했고, Foidl 외는 데이터 파이프라인에서 자료형 문제(33%)와 통합·적재 질문(47%)이 많다고 보고했다. 그래서 '결함이 구성요소 사이에 몰린다'는 일반 명제는 이번 자료로 지지되지 않는다. 다만 '드러나는 시점이 통합 단계에 몰린다'와 '데이터 파이프라인에서는 단계 사이 자료형 문제가 많다'는 지지된다. 이 구분은 후보안 B가 단계 사이 자료를 계산·저장 상태·화면과 나란히 두는 구성과 충돌하지 않는다. 전이 관점에서 B를 반박하는 실패 사례는 찾지 못했다. 붐빔과 기준선 관점은 이 하위 질문 범위 밖이라 이슈로 올리지 않았다. 참고로 Perry·Stieg에서는 예방 수단으로 비형식적 application walk-through(24.5%)가 가장 많이 꼽혔고, NASA 사례에서는 분석이 코딩 외 모든 결함 유형에서 테스트보다 많이 발견했다. 추가 확인이 필요한 항목은 세 가지다. 하나는 EuroSys 2023 CSI 원문으로, 클라우드 사고 중 시스템 간 상호작용 실패 비율을 확인하기 위해서다. 다른 하나는 Gregor 외 ICST 2025로, 마이크로서비스 통합 결함 유형을 단계 사이 자료 질문 세트에 대응시킬 수 있는지 보기 위해서다. 마지막은 AI 생성 코드의 결함 분포 연구로, 대조 대상의 실제 개발 방식에 더 가까운 분포를 얻기 위해서다."
+}

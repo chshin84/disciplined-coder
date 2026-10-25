@@ -25,6 +25,9 @@ OUT="$(run "$H1" "$P1")"
 K="$H1/.claude/disciplined-coder"; UC="$H1/.claude/CLAUDE.md"
 echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
+# 에이전트원칙의 포인터가 이 경로를 가리킨다. Skill 도구가 없는 에이전트는 이 사본을 Read 로 읽는다.
+check "managing-docs 사본이 원본과 같다" "cmp -s '$HERE/skills/managing-docs/SKILL.md' '$K/managing-docs/SKILL.md' && cmp -s '$HERE/skills/managing-docs/references/reading-docs.md' '$K/managing-docs/reading-docs.md'"
+check "에이전트원칙이 사본 경로를 가리킨다" "grep -qF '~/.claude/disciplined-coder/managing-docs/SKILL.md' '$K/agent-principles.md' && grep -qF '~/.claude/disciplined-coder/managing-docs/reading-docs.md' '$K/agent-principles.md'"
 # 금지 표현 목록은 에이전트원칙과 같은 관리블록이 싣는다. 다른 플러그인이 있든 없든 같다.
 check "banlist: 관리블록은 두 줄뿐이다"   "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC' | wc -l) -eq 4 ]"
 check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words.md' ]"

@@ -4,7 +4,8 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 {
-  grep -oE '^- \*\*`[A-Z-]+`' "$HERE/agent-principles.md" | sed 's/^- \*\*`//; s/`$//'
+  # 문서 규칙 조항은 2026-10-25 에 스킬 managing-docs 로 옮겼으므로 그 파일의 조항 ID 도 이름표로 둔다.
+  grep -ohE '^- \*\*`[A-Z-]+`' "$HERE/agent-principles.md" "$HERE"/skills/managing-docs/SKILL.md "$HERE"/skills/managing-docs/references/reading-docs.md | sed 's/^- \*\*`//; s/`$//'
   grep '^## ' "$HERE/agent-principles.md" | sed 's/^## //'
   for d in "$HERE"/skills/*/; do basename "$d"; done
   for f in "$HERE"/commands/*.md; do [ -f "$f" ] && basename "$f" .md; done

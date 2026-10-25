@@ -21,8 +21,10 @@ UC="$CLAUDE_HOME/CLAUDE.md"
 mkdir -p "$KDIR"
 
 # [principles-copy] 에이전트원칙(static) 복사·갱신: principles. src==dst면 생략.
-for f in $SCAFFOLD_FILES; do
-  src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f"
+#     SCAFFOLD_REFS 의 스킬 사본도 같은 방식으로 복사한다.
+for f in $SCAFFOLD_FILES $SCAFFOLD_REFS; do
+  case "$f" in *=*) src="$PLUGIN_ROOT/${f%%=*}"; dst="$KDIR/${f#*=}"; mkdir -p "${dst%/*}" ;;
+               *)   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f" ;; esac
   if [ -f "$src" ]; then
     # 복사가 실패하면 조용히 넘어가지 않는다. 이미 옛 사본이 놓여 있는 PC에서는 파일도 있고
     # @import 배선도 남아 있어 README가 알려 준 확인 셋을 그대로 통과하므로, 에이전트원칙만 낡은 채

@@ -100,9 +100,13 @@ check "실행하는 방법 절이 회차 규칙 절로 넘긴다" "sec_has \"\$D
 
 echo "[이름은 명사구, 주장은 첫 문장 — 에이전트원칙과 가독성 렌즈]"
 CANON="$HERE/agent-principles.md"
-# 문서 타입과 수명과 수정 규율은 에이전트원칙이 소유한다. 문서를 만지는 모든 세션에 걸리는 규칙이라
-# 스킬로 두면 여는 판단을 매번 해야 했고, 안 열었을 때의 누락이 조용했다. 타입마다 무엇이
+# 문서 타입과 수명, 읽기 위한 문서의 제목 규칙은 스킬 managing-docs 가 소유한다. 2026-09-21 에는 스킬로
+# 두면 열지 않았을 때의 누락이 조용하다는 이유로 에이전트원칙에 두었다. 2026-10-25 열림 시험에서 문서
+# 과제 6개 모두 그 스킬을 열어 다시 옮겼다(docs/superpowers/specs/2026-10-25-principles-slimming-design.md).
+# 조항 ID 를 찾는 검사는 에이전트원칙과 그 스킬 파일을 합친 CANON_ALL 을 본다. 타입마다 무엇이
 # 강제하는지는 프로젝트마다 다르므로 그 칸만 저장소 CLAUDE.md 가 갖는다.
+MDOCS="$HERE/skills/managing-docs/SKILL.md"
+CANON_ALL="$(mktemp)"; cat "$CANON" "$MDOCS" "$HERE/skills/managing-docs/references/reading-docs.md" > "$CANON_ALL"
 TYPE_TBL="$HERE/CLAUDE.md"
 # 상세는 domain-korean 이 소유하고 에이전트원칙은 조항만 담는다. 양쪽을 함께 붙든다.
 WK="$HERE/docs/domain-korean.md"
@@ -130,7 +134,7 @@ check "에이전트원칙이 그 상세를 가리킨다"            "grep -qF 'd
 # 근거를 단다. 잇는 장치가 한국어 절에만 있으면 나머지 조항은 근거 없이 늘어날 수 있다.
 # ID 목록은 에이전트원칙에서 뽑되 한국어 절의 것만 뺀다. 절을 추가하거나 이름을 바꿔도 따라온다.
 DC_WK="$HERE/docs/domain-discipline.md"
-ALL_IDS="$(grep -oE '^- \*\*`[A-Z][A-Z0-9-]*`' "$CANON" | grep -oE '[A-Z][A-Z0-9-]+' | sort -u)"
+ALL_IDS="$(grep -oE '^- \*\*`[A-Z][A-Z0-9-]*`' "$CANON_ALL" | grep -oE '[A-Z][A-Z0-9-]+' | sort -u)"
 DC_IDS="$(printf '%s
 ' "$ALL_IDS" | grep -vxF "$KO_IDS" || true)"
 check "한국어 절 밖 조항 ID 를 뽑았다"        "[ -n \"\$DC_IDS\" ]"
@@ -138,7 +142,7 @@ DC_MISS=""
 DC_DUP=""
 for did in $DC_IDS; do
   grep -qE "^### \`$did\`" "$DC_WK" || DC_MISS="$DC_MISS $did"
-  dc_sent="$(grep -F "**\`$did\`" "$CANON" | sed 's/^.*\*\* — //')"
+  dc_sent="$(grep -F "**\`$did\`" "$CANON_ALL" | sed 's/^.*\*\* — //')"
   if [ -n "$dc_sent" ]; then
     if grep -qF "$dc_sent" "$DC_WK"; then DC_DUP="$DC_DUP $did"; fi
   fi
@@ -214,8 +218,7 @@ check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superp
 check "문서 검진 기록 절이 종류 check 를 적는다" "sec_has_id \"\$DOCS\" '기록' check"
 # 이름 규칙은 review-docs 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
 check "기록 이름 규칙 절이 차수 꼴을 적는다"   "sec_has \"\$DOCS\" '기록 파일 이름 규칙' '-review-2.md'"
-check "에이전트원칙이 기록 이름의 소유자를 가리킨다" "sec_has_id \"\$CANON\" '문서 타입과 수명' review-docs && sec_has \"\$CANON\" '문서 타입과 수명' '소유'"
-check "런타임이 기록 제외 이유를 조항 ID 로 적는다" "sec_has_id \"\$RUNTIME2\" '조립' SECRETS"
+check "managing-docs 가 기록 이름의 소유자를 가리킨다" "sec_has_id \"\$MDOCS\" '문서 타입과 수명' review-docs && sec_has \"\$MDOCS\" '문서 타입과 수명' '소유'"
 
 echo "[합치기와 다시 리뷰]"
 check "합치기 절이 있다"                      "has_sec \"\$CALLER\" '합치기'"
@@ -283,7 +286,7 @@ check "소유자 절이 소유를 밝히고 principles_applied 를 요구한다"
 # 가리키기만 해야 하는 문서들. 그 절을 두면 실패한다.
 for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$HERE"/skills/review-docs/SKILL.md; do
   # 스킬 문서는 파일 이름이 모두 SKILL.md라 부모 디렉터리로 부른다 — 안 그러면 어느 문서가 실패했는지
-  # 알 수 없다(`SPECIFIC-NAME`).
+  # 알 수 없다.
   dn="$(basename "$D")"; [ "$dn" = "SKILL.md" ] && dn="$(basename "$(dirname "$D")")"
   check "$dn 이 소유자를 가리킨다"        "points_to '$D' 'dispatching-lenses' \"\$OWNER_SEC\""
   check "$dn 에 그 절이 없다"             "! has_sec '$D' \"\$OWNER_SEC\""
@@ -352,7 +355,7 @@ echo "[첫 문장] 절 제목 아래 첫 줄이 산문이다"
 # 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
 # 예외 목록은 domain-korean 의 「첫 문장 규칙의 예외」 표에서 뽑는다 — 이름을 하나 더하면 저절로
 # 따라온다. 예외는 렌즈 파일 안에서만 걸리고, 제목이 괄호를 달고 갈리므로 앞부분으로 맞댄다.
-# TITLE-LAYERS 는 「읽기 위한 문서」 절의 규칙이라 영어 제목에도 적용한다.
+# TITLE-LAYERS 는 managing-docs 의 reading-docs.md(읽기 위한 문서) 규칙이라 영어 제목에도 적용한다.
 HF_WK="$HERE/docs/domain-korean.md"
 # 제목 단계는 보지 않는다. 그 표가 어느 절 아래로 들어가도 이름만 같으면 따라온다.
 HF_EXC="$(awk '/^#{3,4} 첫 문장 규칙의 예외/{f=1;next} f&&/^#{2,4} /{exit} f' "$HF_WK" | grep -oE '^[|] `[^`]+`' | sed 's/^[|] `//; s/`$//')"
@@ -736,7 +739,7 @@ RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=M --numstat --
 %s
 ' "$RV_HIST" | sed 's/^/      /'
 check "규칙이 들어온 뒤 이력에 고친 기록이 없다" "[ -z \"\$RV_HIST\" ]"
-# 지우기는 다룬 작업이 병합된 뒤 보존 태그(archive/*)를 단 커밋 위에서만 한다(에이전트원칙 「문서 타입과 수명」).
+# 지우기는 다룬 작업이 병합된 뒤 보존 태그(archive/*)를 단 커밋 위에서만 한다(managing-docs 「문서 타입과 수명」).
 # 지운 커밋의 부모를 archive 태그가 가리켜야 한다 — 원문이 태그로 남아야 봉인의 목적이 지켜진다.
 # 이 규칙은 2026-10-06에 들어왔다. 그 전의 지우기(빈 파일 정리, 기능 제거 때의 plan)는 옛 규칙 아래에서 처리했다.
 RV_DEL="$(cd "$HERE" && for c in $(git log --since="2026-10-06 00:00:00 +0900" --diff-filter=D --format=%H -- "$RVDIR" docs/superpowers/plans 2>/dev/null); do
@@ -793,9 +796,9 @@ echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nes
 check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
 check "그 절에 SUB-ORCHESTRATE 조항이 있다" "printf '%s' \"\$PO_BLOCK\" | grep -qF '**\`SUB-ORCHESTRATE\`'"
 
-# --- canon-realign: 에이전트원칙이 원칙 전부를 갖는다 ---
-# 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 갖는다.
-echo "[canon-realign] the canon owns every principle; only procedures and per-artifact rules stay skills"
+# --- canon-realign: 에이전트원칙과 managing-docs 가 원칙 전부를 갖는다 ---
+# 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 가졌고, 2026-10-25 에 문서 규칙만 managing-docs 로 옮겼다.
+echo "[canon-realign] the canon and managing-docs own every principle; only procedures and per-artifact rules stay skills"
 check "karpathy source is credited in the reference" "grep -qF 'andrej-karpathy-skills' '$HERE/docs/domain-discipline.md'"
 # 조항 ID 목록은 근거를 적는 두 참고서의 `### \`ID\`` 제목에서 도출한다(「삭제한 조항」 절은 뺀다).
 # 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어 조항이 떨어져도 그 결손을 정답으로
@@ -811,24 +814,23 @@ missing_clause_ids() {  # $1=에이전트원칙 → 참고서에 근거가 있�
   for id in $(ref_clause_ids); do grep -qF "**\`$id\`" "$1" || miss="$miss $id"; done
   printf '%s' "$miss"
 }
-MISS_IDS="$(missing_clause_ids "$CANON")"
-check "canon: every clause with a rationale in the references is in agent-principles (reference → principles)" "[ -z \"\$MISS_IDS\" ]"
-[ -n "$MISS_IDS" ] && echo "    참고서에 근거가 있는데 에이전트원칙에 없는 조항(참고서 → 에이전트원칙 방향):$MISS_IDS"
+MISS_IDS="$(missing_clause_ids "$CANON_ALL")"
+check "canon: every clause with a rationale in the references is in agent-principles or managing-docs (reference → principles)" "[ -z \"\$MISS_IDS\" ]"
+[ -n "$MISS_IDS" ] && echo "    참고서에 근거가 있는데 에이전트원칙과 managing-docs 에 없는 조항(참고서 → 원칙 방향):$MISS_IDS"
 # 도출 검사가 결손을 실제로 잡는지 임시 사본에서 본다. 조항 하나를 지운 사본이 통과하면 검사가 무의미하다.
-CANON_CUT="$(mktemp)"; grep -vF '**`YAGNI`' "$CANON" > "$CANON_CUT"
+CANON_CUT="$(mktemp)"; grep -vF '**`YAGNI`' "$CANON_ALL" > "$CANON_CUT"
 check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids '$CANON_CUT')\" = ' YAGNI' ]"
-# 한국어 절은 두 층이다. 묶는 이름은 `####` 제목(사후 검사 묶음 REVISE-ORDER 는 `###`)이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
+# 한국어 절은 두 층이다. 묶는 이름은 `####` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
 # 검사해야 이름만 남고 지시가 빠지거나 그 반대인 상태를 잡는다. 원자 지시 층은 위의 도출 검사가 본다.
 for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK; do
   check "canon: korean group $g present"             "grep -qE '^#### \`$g\`' '$CANON'"
 done
-check "canon: korean group REVISE-ORDER present"   "grep -qE '^### \`REVISE-ORDER\`' '$CANON'"
 # 조항을 더하려면 CLAUDE.md 가 정한 클린룸 소거 시험을 거쳐야 한다. 시험으로 지운 조항 ID 가
 # 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
 # 다만 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 는 그 절이 생기기 전(2026-06~09)에 지워 근거가 git 이력에만 있다.
 REVIVED_IDS=""
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN NAME-ITEMS; do
-  grep -qF "**\`$id\`" "$CANON" && REVIVED_IDS="$REVIVED_IDS $id"
+for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN NAME-ITEMS COMMA-CUT LABEL-NOUN TERM-EXPLAIN EDIT-DISCIPLINE EDIT-PRIORITY EXPLAIN-STRUCTURE KEEP-FAILED NO-FLEET SECRETS TITLE-PROOF TELL-NOW; do
+  grep -qF "**\`$id\`" "$CANON_ALL" && REVIVED_IDS="$REVIVED_IDS $id"
 done
 check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
 
