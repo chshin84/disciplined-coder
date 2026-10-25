@@ -10,15 +10,37 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 워크플로는 실행 도중에 사용자 입력을 받지 못하므로, 오케스트레이터는 승인이 필요한 지점마다 워크플로 실행을 나눈다. 단계 사이에 오케스트레이터와 사용자가 대화하는 턴이 들어가며, 그래서 선행연구는 여러 턴에 걸쳐 진행된다.
 
-**프로토콜 항목.** 프로토콜은 오케스트레이터가 실행 전에 쓰는 연구 계획이다. 항목은 연구 질문, 상황, 대조 대상, 모드, 하위 질문(ID, 범위 문장, 포함·제외 기준), 질의 금지 목록, 탐색 모드 연구자 수와 그 산정 근거, `principles_path`다. 오케스트레이터는 `principles_path`를 실행 시점에 도출하며, 도출 규칙은 `dispatching-lenses`의 「렌즈에게 에이전트원칙을 알리는 법」을 따른다. 워크플로가 그 경로를 연구자와 검증자의 프롬프트에 넣는다.
+**프로토콜 항목.** 프로토콜은 오케스트레이터가 실행 전에 쓰는 연구 계획이다. 항목은 연구 질문, 상황, 대조 대상, 용도(`intended_use`), 이미 정한 조건(`constraints`), 모드, 하위 질문(ID, 범위 문장, 포함·제외 기준), 질의 금지 목록, 탐색 모드 연구자 수와 그 산정 근거, `principles_path`다. 오케스트레이터는 `principles_path`를 실행 시점에 도출하며, 도출 규칙은 `dispatching-lenses`의 「렌즈에게 에이전트원칙을 알리는 법」을 따른다. 워크플로가 그 경로를 연구자와 검증자의 프롬프트에 넣는다.
 
-**워크플로 실행.** 오케스트레이터는 2단계와 3단계에서 Workflow 도구로 `disciplined-coder:prior-art-search`를 실행하고, `args`에는 「출력 스키마」의 「키 이름과 바깥 형식」이 정한 프로토콜 객체를 넣는다.
+`intended_use`는 이 결과로 누가 무엇을 정하는지와 그 결정에서 최적화할 기준을 적은 문자열이며 비울 수 없다. `constraints`는 대화에서 이미 정한 조건, 기각한 대안, 이미 확인한 자료를 적은 문자열 배열이며 빈 배열을 허용한다. `target`에는 대조 대상만 적고, `exclude`에는 그 하위 질문의 범위 밖만 적는다. 결정 근거 탐색에서 기각한 후보안은 `target`에서 빼고 `constraints`에 적는다.
+
+**워크플로 실행.** 오케스트레이터는 둘러보기와 2단계와 3단계에서 Workflow 도구로 `disciplined-coder:prior-art-search`를 실행하고, `args`에는 「출력 스키마」의 「키 이름과 바깥 형식」이 정한 프로토콜 객체를 넣는다.
 
 오케스트레이터는 아래 단계를 차례로 진행한다.
 
 **1. 상황 판정과 프로토콜** — 오케스트레이터가 「상황별 전략」으로 상황과 대조 대상을 정하고 프로토콜을 쓴다. 사용자에게 프로토콜을 보이고 승인을 받으며, 승인이 없으면 실행하지 않는다. 승인을 받으면 오케스트레이터는 곧바로 기록 파일을 만들고 프로토콜 전문과 승인 사실을 적는다.
 
-   - **확인** — 기록 파일에 프로토콜 전문과 승인 사실이 있다.
+오케스트레이터는 대화 맥락에서 연구 질문, 대조 대상, `intended_use`, `constraints`를 도출한다. 승인 화면에서는 칸마다 사용자 발언과 오케스트레이터의 추론을 나눠 보이고, 근거가 된 사용자 발언이 있으면 인용한다. 새 칸은 오케스트레이터가 채우고, 사용자는 틀린 칸만 고친다.
+
+질의 금지 목록에는 범주를 쓰지 않고 낱말로 펼친다. 경로는 워크플로의 경로 형태 정규식이 맡으므로 목록에 넣지 않는다. 오케스트레이터는 실행 직전에 승인 화면의 목록과 실행 args 의 `forbidden_terms`가 같은 문자열 목록인지 대조한다. 사람 이름처럼 식별성이 큰 낱말을 펼치면 기록 파일에는 범주 이름과 펼친 낱말의 개수만 적고 낱말 자체는 적지 않는다(2026-10-25 사용자 결정). 리뷰 기록은 커밋되고 봉인되므로 원격으로 보내면 낱말을 지울 수 없기 때문이다.
+
+사용자의 답이 프로토콜의 칸을 하나라도 바꾸면, 오케스트레이터는 바뀐 칸만 다시 보이고 승인을 받은 뒤 실행한다. 오케스트레이터는 사용자가 실행을 말한 메시지("이대로 실행", "진행해" 같은 메시지)만 승인으로 보고, 목적이나 조건을 답한 메시지는 승인으로 보지 않는다. 사용자가 선택 질문을 원하지 않는다고 지시했어도 재승인은 생략하지 않으며, 그때는 선택 도구 대신 산문으로 바뀐 칸을 보이고 실행해도 되는지 묻는다. 오케스트레이터는 승인마다 기록 파일에 추가하며, 앞 승인의 전문은 지우지 않고 뒤 승인에는 바뀐 칸과 승인 사실을 적는다.
+
+   - **확인** — 기록 파일에 승인마다 프로토콜 전문 또는 바뀐 칸과 승인 사실이 있고, 질의 금지 목록의 식별 낱말은 범주와 개수로만 적혀 있다.
+
+**둘러보기(1단계와 2단계 사이)** — 둘러보기는 하위 질문을 나누기 전에 주제의 자료 지형을 확인하는 실행이다. 오케스트레이터는 둘러보기를 기본으로 실행한다(2026-10-25 사용자 결정). 첫 승인 화면에는 `intended_use`·`constraints`·질의 금지 목록·연구자 수 상한과 하위 질문 초안을 함께 보이고, 둘러보기는 그 첫 승인 안에 포함한다. 둘러보기만을 위한 승인 턴은 두지 않는다.
+
+오케스트레이터는 아래 조건에서 둘러보기를 생략하고 이유를 프로토콜에 적는다.
+
+   - 대화에서 이미 그 주제의 자료를 확인했다.
+   - 상황이 사실 확인이다.
+   - 상황이 spec 대조이고, spec 이 메커니즘을 이미 나눠 두었다.
+
+둘러보기 실행은 프로토콜 `round`를 0 으로 둔 `disciplined-coder:prior-art-search` 실행이다. 워크플로는 연구자 하나를 `MODE: scout`로 실행하고, 검증 단계와 종합 단계 없이 질의 경계 검사만 거쳐 반환한다. 둘러보기 결과는 검증하지 않으므로 판정과 결론에 쓰지 않는다. 오케스트레이터는 둘러보기 결과에서 주제어와 범위만 하위 질문으로 옮기고, 사례 이름과 결말 서술은 하위 질문 문장에 옮기지 않는다. 둘러보기 출처는 `constraints`의 이미 확인한 자료로 보지 않는다. 그 출처를 연구자가 다시 찾아 보고해야 검증 단계를 거치기 때문이다.
+
+둘러보기 결과로 하위 질문이 바뀌면 오케스트레이터는 1단계의 재승인 규칙대로 바뀐 하위 질문만 보이고 실행 승인을 받는다. 하위 질문이 그대로면 둘러보기 직후 `round` 1 로 2단계를 실행한다.
+
+   - **확인** — 둘러보기를 실행했으면 원본이 반환 직후 기록 폴더에 있고, 생략했으면 프로토콜에 생략 이유가 있다.
 
 **2. 탐색** — 오케스트레이터가 `disciplined-coder:prior-art-search`를 프로토콜과 함께 실행한다. 아래 처리는 워크플로가 한다.
 
@@ -35,7 +57,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
    - **확인** — 반환값이 「출력 스키마」의 워크플로 반환값 형식을 따른다.
    오케스트레이터는 반환 직후 원본을 기록 폴더에 쓴다.
 
-**3. 공백 판단** — 오케스트레이터가 커버리지 표와 연구자의 `saturation`·`not_found`를 사용자에게 보이고, 공백 라운드를 실행할지 묻는다. 공백 라운드는 커버리지 공백이 남은 하위 질문만 대상으로 `disciplined-coder:prior-art-search`를 다시 실행하며, 한 연구 질문에 1회까지다. 오케스트레이터는 두 실행의 결과를 하위 질문 ID 로 합치고, 같은 URL 이 두 실행에 다 있으면 공백 라운드의 판정을 쓴다. 주장 참조에는 실행 차례가 없어 두 실행에서 같은 참조가 서로 다른 사례를 가리킬 수 있으므로, 합친 결과에는 참조 앞에 원본 이름의 실행 차례를 붙여 `r<n>:<참조>`로 적는다. `survey`에서는 두 실행의 종합을 따로 보고한다.
+**3. 공백 판단** — 오케스트레이터가 커버리지 표와 연구자의 `saturation`·`not_found`를 사용자에게 보이고, 공백 라운드를 실행할지 묻는다. 공백 라운드는 커버리지 공백이 남은 하위 질문만 대상으로 `disciplined-coder:prior-art-search`를 다시 실행하며, 한 연구 질문에 1회까지다. 오케스트레이터는 두 실행의 결과를 하위 질문 ID 로 합치고, 같은 URL 이 두 실행에 다 있으면 공백 라운드의 판정을 쓴다. 주장 참조에는 실행 차례가 없어 두 실행에서 같은 참조가 서로 다른 사례를 가리킬 수 있으므로, 합친 결과에는 참조 앞에 원본 이름의 실행 차례를 붙여 `r<n>:<참조>`로 적는다. `survey`에서는 두 실행의 종합을 따로 보고한다. 공백 라운드는 둘러보기를 다시 실행하지 않고, 첫 탐색과 같은 `intended_use`·`constraints`를 넘긴다.
 
    - **확인** — 기록에 공백 라운드 실행 여부와 사유가 있고, 공백 라운드 원본이 반환 직후 기록 폴더에 있다.
 
@@ -43,7 +65,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
    - **확인** — 기록 파일과 원본의 이름이 `review-docs`의 「기록 파일 이름 규칙」을 따른다.
 
-**원본 파일 규칙.** 기록 폴더 안의 원본 이름은 `review-docs`의 「기록 파일 이름 규칙」이 `prior-art` 종류에 정한 이름을 쓰며, 이름에 붙는 실행 차례 `r<n>`은 첫 탐색이 1, 공백 라운드가 2 다. 4단계 기록에 적을 항목은 `review-specs`의 「`prior-art` 기록에 적을 것」을 따르며, spec 리뷰가 아니면 그 항목에서 spec·plan 구분을 뺀다.
+**원본 파일 규칙.** 기록 폴더 안의 원본 이름은 `review-docs`의 「기록 파일 이름 규칙」이 `prior-art` 종류에 정한 이름을 쓰며, 이름에 붙는 실행 차례 `r<n>`은 둘러보기가 0, 첫 탐색이 1, 공백 라운드가 2 다. 워크플로 반환값의 `query_violations[].query`와 연구자 출력의 `queries`에는 위반 검색어가 원문으로 남는다. 그래서 오케스트레이터는 원본을 기록 폴더에 쓰기 전에 그 두 칸에서 금지 낱말을 범주 이름으로 가린다. 4단계 기록에 적을 항목은 `review-specs`의 「`prior-art` 기록에 적을 것」을 따르며, spec 리뷰가 아니면 그 항목에서 spec·plan 구분을 뺀다.
 
 **반환값을 읽는 규칙.** 판정과 보고에는 `passed`의 `ref`가 가리키는 항목만 쓴다. `rejected`·`unverifiable`·`verify_failed`의 항목은 사유와 함께 보고하되 판정에 쓰지 않는다. 사례 수는 `passed`·`rejected`·`unverifiable`로 세고 `verify_failed`는 세지 않는다. 오케스트레이터는 반환값의 원소와 사유를 아래 위치에서 읽는다.
 
@@ -63,9 +85,9 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 **상태 값.** `search_status`는 연구자마다 `ok`·`no-results`·`failed`·`not-attempted` 중 하나이며 뜻은 「출력 스키마」의 표가 정한다. `verification_status`는 하위 질문마다 `ok`·`partial` 중 하나다. 그 하위 질문의 URL 에 검증 실패(검증 단계 에이전트의 실패, 시간 초과, 속도 제한, 판정 누락, 보충 실패, 재판정 실패, 재판정 정보 부족)가 하나라도 있으면 `partial`이다. 보충 실패는 보충이 응답하지 않았거나 그 주장을 빠뜨렸거나, 보충 출력의 `access`가 `실패`이거나 `exists`가 `불일치`이거나 `quote`가 없는 때다. 판정 누락은 판정 출력에서 그 주장이 빠진 때다. 재판정 실패는 그 주장이 든 재판정 묶음이 응답하지 않았거나 재판정이 그 주장이나 칸을 빠뜨린 때이고, 재판정 정보 부족은 재판정에도 `정보 부족`이 남은 때다. 끝까지 `판정 불가`가 남은 주장은 검증 실패가 아니라 `unsupported`로 기각된다. 구절이 주장을 뒷받침한다는 확인이 없기 때문이다. 연구 질문 전체의 `overall_status`는 모든 하위 질문의 두 값이 `ok`일 때만 `ok`다. `overall_status`가 `ok`가 아니면 오케스트레이터는 `ok`가 아닌 하위 질문의 결과를 판정으로 쓰지 않고 하위 질문별 값을 보고에 적는다.
 
-**세션이 끊긴 때.** 워크플로가 실행 중에 중단되면 오케스트레이터는 같은 세션 안에서 런타임의 이어 실행 기능으로 다시 시작한다. 반환 전에 세션 자체가 끝나면 기록에는 프로토콜과 승인 사실만 남는다. 다음 세션의 오케스트레이터는 검색어가 이미 나갔을 수 있다고 기록에 적은 뒤, 같은 프로토콜로 사용자 승인을 다시 받아 처음부터 실행한다.
+**세션이 끊긴 때.** 워크플로가 실행 중에 중단되면 오케스트레이터는 같은 세션 안에서 런타임의 이어 실행 기능으로 다시 시작한다. 반환 전에 세션 자체가 끝나면 기록에는 프로토콜과 승인 사실만 남는다. 둘러보기를 실행한 뒤 끊겼으면 둘러보기 검색어는 이미 나갔다. 다음 세션의 오케스트레이터는 검색어가 이미 나갔을 수 있다고 기록에 적은 뒤, 같은 프로토콜로 사용자 승인을 다시 받아 처음부터 실행한다.
 
-**워크플로가 꺼진 환경.** `disableWorkflows`가 켜져 있으면 오케스트레이터는 같은 순서로 연구자와 검증자를 Agent 도구로 실행한다. `subagent_type`에는 `disciplined-coder:prior-art-researcher`, `disciplined-coder:prior-art-verifier`(추출과 보충), `disciplined-coder:prior-art-judge`(판정과 재판정), `disciplined-coder:prior-art-mapcheck`를 단계에 맞게 넣고, 프롬프트는 「출력 스키마」의 「에이전트에게 보내는 프롬프트」 형식으로 쓴다. 이 경로에서는 질의 경계 검사와 통과 목록 분리를 오케스트레이터가 직접 하고, 단계 출력의 합치기도 오케스트레이터가 한다. 검증 단계는 추출, 판정, 보충, 재판정 차례로 실행한다. 판정과 재판정은 주장을 「실행할 때 지킬 상한」의 묶음 크기대로 묶어 묶음마다 한 번 실행한다. 합치기는 「출력 스키마」의 「최종 판정과 실패 처리」 순서를 직접 적용하는 일이며, 접근 실패, 존재 불일치와 구절 없음, 판정 실패와 판정 누락, 처음 판정의 불일치, 보충과 재판정, 판정 불가, 칸별 불일치를 그 순서로 구분한다. 그래서 이 경로의 검사와 분리와 합치기는 지시 준수에만 기댄다. 오케스트레이터는 이 사실을 보고와 기록에 적는다.
+**워크플로가 꺼진 환경.** `disableWorkflows`가 켜져 있으면 오케스트레이터는 같은 순서로 연구자와 검증자를 Agent 도구로 실행한다. `subagent_type`에는 `disciplined-coder:prior-art-researcher`, `disciplined-coder:prior-art-verifier`(추출과 보충), `disciplined-coder:prior-art-judge`(판정과 재판정), `disciplined-coder:prior-art-mapcheck`를 단계에 맞게 넣고, 프롬프트는 「출력 스키마」의 「에이전트에게 보내는 프롬프트」 형식으로 쓴다. 이 경로에서는 질의 경계 검사와 통과 목록 분리를 오케스트레이터가 직접 하고, 단계 출력의 합치기도 오케스트레이터가 한다. 검증 단계는 추출, 판정, 보충, 재판정 차례로 실행한다. 판정과 재판정은 주장을 「실행할 때 지킬 상한」의 묶음 크기대로 묶어 묶음마다 한 번 실행한다. 합치기는 「출력 스키마」의 「최종 판정과 실패 처리」 순서를 직접 적용하는 일이며, 접근 실패, 존재 불일치와 구절 없음, 판정 실패와 판정 누락, 처음 판정의 불일치, 보충과 재판정, 판정 불가, 칸별 불일치를 그 순서로 구분한다. 둘러보기는 `subagent_type: disciplined-coder:prior-art-researcher`와 `MODE: scout` 프롬프트로 실행한다. 둘러보기 검색어의 질의 경계 검사도 이 경로에서는 오케스트레이터가 직접 한다. 그래서 이 경로의 검사와 분리와 합치기는 지시 준수에만 기댄다. 오케스트레이터는 이 사실을 보고와 기록에 적는다.
 
 ## 발동과 기록
 
@@ -85,7 +107,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 오케스트레이터는 1단계에서 아래 표로 상황을 판정하고, 그 상황에 따라 대조 대상과 하위 질문 분해와 모드를 정한다. 상황 목록은 사용자가 2026-10-18에 확정했다.
 
-| 상황 | 발동 경로 | 대조 대상 | 하위 질문 분해 | 모드 |
+| 상황 | 발동 경로 | 대조 대상 | 하위 질문 분해(기본값) | 모드 |
 |---|---|---|---|---|
 | spec 대조 | `review-specs`의 제안과 승인 | spec 의 메커니즘 | 핵심 메커니즘마다 하나 | `contrast` |
 | 제안서 검진 | `review-docs`의 제안과 승인 | 문서가 주장하는 방법 | 주장하는 방법마다 하나 | `contrast` |
@@ -93,7 +115,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 | 결정 근거 탐색 | 사용자 직접 요청("근거를 찾아 달라", "어떻게 배치해야 하나") | 사용자가 고르려는 결정 후보안 | 결정이 기대는 주제마다 하나 | `survey` |
 | 사실 확인 | 사용자 직접 요청, 단일 사실 | 확인하려는 주장 | 나누지 않음 | `survey` |
 
-오케스트레이터가 상황이나 대조 대상을 하나로 정하지 못하면 사용자에게 묻는다.
+오케스트레이터가 상황이나 대조 대상을 하나로 정하지 못하면 사용자에게 묻는다. 「하위 질문 분해」 열은 기본값이다. 오케스트레이터는 둘러보기 결과에 맞춰 다르게 나눌 수 있고, 다르게 나누면 이유를 프로토콜에 적는다.
 
 ## 실행할 때 지킬 상한
 
@@ -103,7 +125,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 **통상을 넘을 때.** 통상은 오케스트레이터가 이유를 적지 않고 고를 수 있는 값이다. 통상을 넘는 수는 프로토콜에 이유를 적어 승인받는다. 하위 질문이 통상보다 많으면 오케스트레이터는 하위 질문을 묶지 않고, 연구자 수를 올리는 근거를 적는다.
 
-**세는 대상.** 상한은 탐색 모드 연구자만 센다. 검증자와 종합 모드 연구자는 URL 수와 모드에 따라 정해지므로 상한에 넣지 않는다. 검증자 수는 URL 마다 추출 1, 보충 0~1 이고, 묶음마다 판정 1, 재판정 0~1 이다. 묶음 하나의 주장은 20개 이하이고, 한 URL 의 주장은 한 묶음에 둔다. 한 URL 의 주장이 20개를 넘으면 그 URL 만으로 묶음 하나를 만든다. 이 크기는 사용자가 2026-10-22에 정했고, 근거와 측정 계획은 spec 「Opus 일괄 판정」에 있다. 판정 묶음에는 추출을 통과한 주장만, 재판정 묶음에는 보충을 통과한 주장만 넣는다. 보충은 주장마다 한 번만 한다. 검증자 수는 탐색이 끝나야 정해지므로, 오케스트레이터는 승인 때 연구자 수만 보이고 실제 검증자 수는 보고에 적는다. 연구자 하나가 인용할 출처는 약 100개 이하로 둔다. 이 값은 Anthropic cookbook 의 research subagent 프롬프트가 적은 "under about 100 sources"를 따른다.
+**세는 대상.** 상한은 탐색 모드 연구자만 센다. 둘러보기 연구자는 실행 수가 하나로 정해져 있으므로 상한에 세지 않는다. 검증자와 종합 모드 연구자는 URL 수와 모드에 따라 정해지므로 상한에 넣지 않는다. 검증자 수는 URL 마다 추출 1, 보충 0~1 이고, 묶음마다 판정 1, 재판정 0~1 이다. 묶음 하나의 주장은 20개 이하이고, 한 URL 의 주장은 한 묶음에 둔다. 한 URL 의 주장이 20개를 넘으면 그 URL 만으로 묶음 하나를 만든다. 이 크기는 사용자가 2026-10-22에 정했고, 근거와 측정 계획은 spec 「Opus 일괄 판정」에 있다. 판정 묶음에는 추출을 통과한 주장만, 재판정 묶음에는 보충을 통과한 주장만 넣는다. 보충은 주장마다 한 번만 한다. 검증자 수는 탐색이 끝나야 정해지므로, 오케스트레이터는 승인 때 연구자 수만 보이고 실제 검증자 수는 보고에 적는다. 연구자 하나가 인용할 출처는 약 100개 이하로 둔다. 이 값은 Anthropic cookbook 의 research subagent 프롬프트가 적은 "under about 100 sources"를 따른다.
 
 **단계당 상한의 예외.** 선행연구 에이전트에는 `dispatching-lenses`의 "한 단계가 실행하는 에이전트는 10개 이하"를 적용하지 않는다. 사용자가 2026-10-18에 이 예외를 정했다. 한 단계의 규모는 연구자 상한 20과 런타임의 동시 실행 한도(기본 16)가 정한다.
 
@@ -127,6 +149,8 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 대조는 축을 나눠 판정한다. 선행 사례와 이 설계가 무엇을 이루려는가(목적), 어떻게 이루는가(메커니즘), 무엇으로 됐다고 판정하는가(평가), 어디에 쓰이는가(적용 대상) 각 축에서 같은지 다른지를 적는다. 모든 축이 같아야 같은 사례이고, 하나라도 다르면 그 차이를 `evidence`에 적는다. 축을 나누지 않으면 겉만 닮은 것을 선행 사례로 오인한다. 축의 같고 다름은 선행 사례 전체를 대조 대상 전체와 비교해 정하며, 대조 대상의 구성요소 하나와만 같은 축은 다르다고 적고 그 구성요소를 밝힌다.
 
+`survey` 모드에서는 체크리스트를 강제하지 않는다. 연구자는 축이 다른 행도 근거 지도에 넣고, 다른 축과 그 차이가 근거의 이전 가능성에 주는 영향을 `note`에 적는다. 종합 연구자는 네 축이 모두 다른 행을 결론의 단독 근거로 쓰지 않는다.
+
 **가드**
 
 - 참신함을 채점하지 않는다. 이슈가 되는 순간은 선행 결과가 이 설계의 전제를 반박하거나, 알려진 실패 원인이 이 설계에도 남아 있을 때뿐이다.
@@ -140,7 +164,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 ## 출력 스키마
 
-연구자·종합·추출·판정·합친 인용 판정·지도 대조 출력과 워크플로 반환값의 형식은 아래와 같으며, 키 이름의 원본은 계약 코드 `scripts/prior_art_contract.json`이다. 연구자 정의는 `researcher`·`synthesis`, 추출 검증자 정의는 `extract`와 입력 예시 `refetch`, 판정 정의는 `judge`와 입력 예시 `judge_input`, 지도 대조 정의는 `map`의 예시 블록을 싣는다. 출력 예시 블록은 아래 블록과 글자가 같다. 합친 `verifier` 블록은 어느 정의에도 없고 워크플로가 단계 출력을 합쳐 만든다.
+연구자·종합·추출·판정·합친 인용 판정·지도 대조 출력과 워크플로 반환값의 형식은 아래와 같으며, 키 이름의 원본은 계약 코드 `scripts/prior_art_contract.json`이다. 연구자 정의는 `researcher`·`synthesis`·`scout`, 추출 검증자 정의는 `extract`와 입력 예시 `refetch`, 판정 정의는 `judge`와 입력 예시 `judge_input`, 지도 대조 정의는 `map`의 예시 블록을 싣는다. 출력 예시 블록은 아래 블록과 글자가 같다. 합친 `verifier` 블록은 어느 정의에도 없고 워크플로가 단계 출력을 합쳐 만든다.
 
 **연구자 출력.** 연구자 출력의 칸은 아래 `researcher` 예시 블록과 같다. `agent` 칸의 값은 `agent-prior-art`다. `citations`의 `kind` 중 `standard`는 표준기구 문서이고, `derived`는 에이전트가 스스로 계산하거나 추론한 값이다. 그중 아래 표의 칸이 선행연구 에이전트가 추가한 칸이다. 이슈 하나의 `citations`는 출처 하나뿐이며, 워크플로 스키마가 `maxItems: 1`로 강제한다. 검증자가 URL 하나에 주장 전체를 대조하므로, 여러 출처에 기대는 주장은 연구자가 출처마다 이슈로 나눠 적는다.
 
@@ -306,13 +330,26 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 }
 ```
 
-**워크플로 반환값.** 반환값은 통과 목록, 탈락 목록, 판정 불가 목록, 검증 실패 목록, 하위 질문별 커버리지 표·`search_status`·`verification_status`, `overall_status`, 질의 경계 위반 목록, 실행한 검증자 수다. 원소와 사유를 읽는 위치는 「오케스트레이터 절차」의 「반환값을 읽는 규칙」이 정한다.
+**둘러보기 출력.** 둘러보기 연구자(`MODE: scout`)는 주제 묶음과 하위 질문 후보만 낸다. 워크플로 스키마가 정해진 칸 밖의 칸을 허용하지 않는다.
+
+<!-- output: scout -->
+```json
+{
+  "search_status": "ok|no-results|failed|not-attempted",
+  "queries": [ "실행한 검색어" ],
+  "clusters": [ { "topic": "주제 묶음", "sources": [ "대표 출처 URL" ], "note": "묶음 설명" } ],
+  "subquestion_candidates": [ { "scope": "하위 질문 후보의 범위 문장", "basis": "그 후보를 낸 근거" } ],
+  "principles_applied": [ "읽고 적용한 원칙 ID" ]
+}
+```
+
+**워크플로 반환값.** 반환값은 통과 목록, 탈락 목록, 판정 불가 목록, 검증 실패 목록, 하위 질문별 커버리지 표·`search_status`·`verification_status`, `overall_status`, 질의 경계 위반 목록, 실행한 검증자 수다. 원소와 사유를 읽는 위치는 「오케스트레이터 절차」의 「반환값을 읽는 규칙」이 정한다. `round`가 0 인 둘러보기 실행의 반환값은 `{ round, researchers, query_violations, scout }`이고 검증 칸은 없다.
 
 **키 이름과 바깥 형식.** 워크플로와 에이전트가 주고받는 JSON 의 키는 아래와 같다. 이 표는 계약 코드 `scripts/prior_art_contract.json`을 사람이 읽도록 옮겨 적었고, 둘이 다르면 계약 코드를 따른다.
 
 | 자료 | 형식 |
 |---|---|
-| 워크플로 `args`(프로토콜) | `{ question, situation, target, mode: "contrast"\|"survey", round: 1\|2, subquestions: [{ id, scope, include, exclude }], forbidden_terms: [string], researcher_count, researcher_count_basis, principles_path, intended_use, constraints: [string] }`. `round`는 첫 실행이 1, 공백 라운드가 2 다 |
+| 워크플로 `args`(프로토콜) | `{ question, situation, target, mode: "contrast"\|"survey", round: 0\|1\|2, subquestions: [{ id, scope, include, exclude }], forbidden_terms: [string], researcher_count, researcher_count_basis, principles_path, intended_use, constraints: [string] }`. `round`는 둘러보기가 0, 첫 실행이 1, 공백 라운드가 2 다 |
 | 연구자 출력 | 「연구자 출력」의 `researcher` 예시 블록의 칸이다. `evidence_map` 행은 `{ case, url, axes: { purpose, mechanism, evaluation, target }, outcome, kind, source_level, route, adoption?, bearing? }`다 |
 | 종합 모드 연구자 출력 | `{ evidence_map: [행], conclusions: [{ text, refs: [string], supports? }], principles_applied }` |
 | 추출 검증자 출력 | `{ url, judgments: [{ ref, access, exists, exists_note, quote, context, reason }], principles_applied }`. `ref`의 형식은 주장 참조 형식이다. 보충 출력도 같은 형식이다 |
@@ -321,8 +358,10 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 | 합친 인용 판정 출력 | `{ url, judgments: [{ ref, verdict, quote, reason }], principles_applied }`. `verdict`는 `supported`·`unsupported`·`unverifiable`·`verify_failed`다 |
 | 지도 대조 출력 | `{ cells: [{ row, column, grounded, source_ref }], principles_applied }` |
 | 워크플로 반환값 | `{ round, passed, rejected, unverifiable, verify_failed: [{ url, refs }], coverage: [{ id, cases_found, passed }], subquestion_status: [{ id, search_status, verification_status }], overall_status, query_violations: [{ id, query, rule }], verifier_count, researchers, verifiers, synthesis?, map_check? }`. `passed`·`rejected`·`unverifiable`의 원소는 `{ ref, urls }`이고, `verifiers`의 원소는 `{ url, subquestions, output, stages }`다. `verifier_count`는 검증에 보낸 URL 수(`verifiers`의 길이)다. 추출이 실패한 URL 도 세고, 에이전트 호출 수는 아니며 보충·판정·재판정 실행 수도 세지 않는다. `overall_status`는 `ok`나 `not-ok`다 |
+| 둘러보기 출력 | `{ search_status, queries, clusters: [{ topic, sources: [string], note }], subquestion_candidates: [{ scope, basis }], principles_applied }` |
+| 둘러보기 반환값 | `{ round: 0, researchers: [{ id: "scout", output }], query_violations, scout }`. `scout`는 둘러보기 출력이며 실패하면 `null`이다 |
 
-**에이전트에게 보내는 프롬프트.** 워크플로는 연구자와 검증자에게 보내는 프롬프트의 첫 줄을 `MODE: <모드>`로 쓴다. 모드 값은 연구자가 `explore`·`synthesize`, 검증 단계가 `extract`·`refetch`·`judge`·`map`이다. 추출 검증자는 추출에서 `extract`, 보충에서 `refetch`를 받는다. 판정 에이전트는 판정과 재판정에서 `judge`, 지도 대조 에이전트는 `map`을 받는다. 둘째 줄에는 `PRINCIPLES: <principles_path>`를 두고, 셋째 줄부터 모드별 입력을 json 코드 울타리 안의 `JSON.stringify(입력, null, 2)` 블록 하나로 둔다. 연구자 탐색 모드의 입력은 `{ question, situation, target, mode, subquestion, forbidden_terms, intended_use, constraints }`, 종합 모드의 입력은 `{ question, target, intended_use, constraints, passed_rows }`, 추출 모드의 입력은 `{ url, claims: [{ ref, text }] }`, 보충 모드의 입력은 `{ url, claims: [{ ref, text, missing }] }`, 판정 모드의 입력은 판정 묶음 `{ items: [{ url, claims: [{ ref, text, quote, context, source_note }] }] }`, 지도 대조 모드의 입력은 `{ evidence_map, passed }`다. 보충 입력의 `missing`은 처음 판정의 값이다. 판정 입력의 `quote`·`context`는 추출 출력(재판정이면 보충 출력)의 값이고, `source_note`는 같은 출력의 `exists_note`이며 없으면 빈 문자열이다. 추출 출력의 `reason`은 판정 입력에 넣지 않는다. 재판정의 입력도 판정 모드의 입력과 같은 형식이며, 보충한 주장만 묶는다. 판정과 재판정의 호출 label 은 `judge:<n>`·`rejudge:<n>`이고, 추출·보충은 `extract:<url>`·`refetch:<url>`, 지도 대조는 `map-check`다. `passed_rows`와 `passed`의 원소는 `{ ref, row }`다. 에이전트 정의의 모드 처리 단락은 이 첫 줄로 모드를 고른다.
+**에이전트에게 보내는 프롬프트.** 워크플로는 연구자와 검증자에게 보내는 프롬프트의 첫 줄을 `MODE: <모드>`로 쓴다. 모드 값은 연구자가 `explore`·`synthesize`·`scout`, 검증 단계가 `extract`·`refetch`·`judge`·`map`이다. 추출 검증자는 추출에서 `extract`, 보충에서 `refetch`를 받는다. 판정 에이전트는 판정과 재판정에서 `judge`, 지도 대조 에이전트는 `map`을 받는다. 둘째 줄에는 `PRINCIPLES: <principles_path>`를 두고, 셋째 줄부터 모드별 입력을 json 코드 울타리 안의 `JSON.stringify(입력, null, 2)` 블록 하나로 둔다. 연구자 탐색 모드의 입력은 `{ question, situation, target, mode, subquestion, forbidden_terms, intended_use, constraints }`, 종합 모드의 입력은 `{ question, target, intended_use, constraints, passed_rows }`, 둘러보기 모드의 입력은 `{ question, situation, target, intended_use, constraints, draft_subquestions, forbidden_terms }`, 추출 모드의 입력은 `{ url, claims: [{ ref, text }] }`, 보충 모드의 입력은 `{ url, claims: [{ ref, text, missing }] }`, 판정 모드의 입력은 판정 묶음 `{ items: [{ url, claims: [{ ref, text, quote, context, source_note }] }] }`, 지도 대조 모드의 입력은 `{ evidence_map, passed }`다. 보충 입력의 `missing`은 처음 판정의 값이다. 판정 입력의 `quote`·`context`는 추출 출력(재판정이면 보충 출력)의 값이고, `source_note`는 같은 출력의 `exists_note`이며 없으면 빈 문자열이다. 추출 출력의 `reason`은 판정 입력에 넣지 않는다. 재판정의 입력도 판정 모드의 입력과 같은 형식이며, 보충한 주장만 묶는다. 판정과 재판정의 호출 label 은 `judge:<n>`·`rejudge:<n>`이고, 추출·보충은 `extract:<url>`·`refetch:<url>`, 지도 대조는 `map-check`, 둘러보기는 `scout`다. `passed_rows`와 `passed`의 원소는 `{ ref, row }`다. 에이전트 정의의 모드 처리 단락은 이 첫 줄로 모드를 고른다.
 
 **`principles_applied`가 빈 때.** 오케스트레이터는 그 사실을 보고에 적고 자동으로 다시 실행하지 않는다.
 

@@ -95,12 +95,14 @@ description: 남에게 전달될 문서와 .html·.pptx·.xlsx·.docx·.pdf 산�
 
 스킬 디렉터리 이름을 그대로 쓰므로 `lens-` 접두사를 떼지 않으며, 레포 감사 차수의 폴더에서는 그 이름을 `scripts/audit_verify.sh`가 검사한다. 이 규칙 전의 기록은 이름이 달라도 고치지 않는다.
 
-`prior-art` 종류의 원본은 렌즈별 원본 규칙 대신 아래 이름을 쓴다. 이름의 `r<n>`은 실행 차례이며 첫 탐색이 1, 공백 라운드가 2다. 인용 판정 출력은 URL 별 판정 배열이고, 판정마다 그 URL 을 인용한 하위 질문 ID 를 적는다.
+`prior-art` 종류의 원본은 렌즈별 원본 규칙 대신 아래 이름을 쓴다. 이름의 `r<n>`은 실행 차례이며 둘러보기가 0, 첫 탐색이 1, 공백 라운드가 2다. 인용 판정 출력은 URL 별 판정 배열이고, 판정마다 그 URL 을 인용한 하위 질문 ID 를 적는다.
 
 | 원본 | 이름 |
 |---|---|
 | 워크플로 반환값 | `search-r<n>.json` |
 | 탐색 모드 연구자 출력 | `researcher-<하위 질문 ID>-r<n>.json` |
+| 둘러보기 워크플로 반환값 | `search-r0.json` |
+| 둘러보기 연구자 출력 | `researcher-scout-r0.json` |
 | 인용 판정 출력 | `verifier-r<n>.json` |
 | 종합 모드 연구자 출력 | `synthesis-r<n>.json` |
 | 지도 대조 출력 | `map-check-r<n>.json` |
