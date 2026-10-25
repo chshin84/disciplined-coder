@@ -170,4 +170,66 @@ open(sys.argv[2], "w", encoding="utf-8").write(out)
 ' "$HERE/workflows/prior-art-search.js" "$FX/w_noat/workflows/prior-art-search.js"
 check "agentType 을 뺀 호출을 잡는다" "policy_violations \"\$FX/w_noat/agents\" \"\$FX/w_noat/workflows\" 2>/dev/null | grep -q '^workflows:'"
 
+echo "[정의]"
+. "$HERE/scripts/_doc_keys.sh"
+# 정의마다 기대하는 tools 줄. spec 「에이전트 구성」 표가 원본이고, readability 의 브라우저 도구 이름은
+# docs/superpowers/decisions/2026-10-25-lens-agent-runtime.md 시험 4 가 확인한 이름이다.
+declare -A TOOLS=(
+  [lens-adversarial]="Read, Grep, Glob"
+  [lens-adversarial-claim]="Read, WebSearch, WebFetch"
+  [lens-consistency]="Read, Grep, Glob"
+  [lens-fit]="Read, Grep, Glob"
+  [lens-grounding]="Read, Grep, Glob"
+  [lens-readability]="Read, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_snapshot"
+)
+
+# example_ok <정의 파일> <렌즈 이름> — 「출력 예시」 절의 첫 ```json 블록을 계약과 대조한다.
+# 최상위는 공통 키에서 omit 을 빼고 extra 를 더한 집합, 배열 원소는 그 칸에 적힌 원소 키 집합이다.
+# `?` 키는 있어도 없어도 통과다. lens 값과 issues[].type 값(| 로 늘어놓은 것 포함)도 본다.
+example_ok() {
+  json_run '
+import json, re, sys
+path, name, cpath = sys.argv[1:4]
+c = json.load(open(cpath, encoding="utf-8")); a = c["agents"][name]
+lines = open(path, encoding="utf-8").read().splitlines()
+i = next(n for n, l in enumerate(lines) if re.match(r"##\s+출력 예시\s*$", l))
+while not lines[i].startswith("```json"): i += 1
+j = i + 1
+while not lines[j].startswith("```"): j += 1
+ex = json.loads("\n".join(lines[i+1:j]))
+spec = {k: v for k, v in c["common"].items() if k.lstrip("?") not in a["omit"]}
+spec.update(a["extra"])
+def same(obj, sp):
+    req = {k for k in sp if not k.startswith("?")}
+    allowed = {k.lstrip("?") for k in sp}
+    if not (req <= set(obj) <= allowed): return False
+    for k, v in sp.items():
+        k = k.lstrip("?")
+        if isinstance(v, list) and v and isinstance(v[0], dict) and k in obj:
+            if not all(isinstance(e, dict) and same(e, v[0]) for e in obj[k]): return False
+    return True
+ok = same(ex, spec) and ex.get("lens") == name
+for it in ex.get("issues", []):
+    ok = ok and all(t in a["types"] for t in str(it.get("type", "")).split("|"))
+sys.exit(0 if ok else 1)
+' "$1" "$2" "$CONTRACT"
+}
+
+for name in $KNOWN; do
+  d="$HERE/agents/$name.md"
+  check "$name: 정의 파일과 이름이 같다" "[ -f \"$d\" ] && grep -qx 'name: $name' \"$d\""
+  check "$name: 모델이 opus 다" "grep -qx 'model: opus' \"$d\""
+  check "$name: 도구가 spec 표와 같다" "grep -qxF 'tools: ${TOOLS[$name]}' \"$d\""
+  check "$name: 입력 절이 두 줄의 부재를 다룬다" \
+    "has_sec \"$d\" '입력' && sec_has \"$d\" '입력' MODE && sec_has \"$d\" '입력' PRINCIPLES"
+  check "$name: 출력 예시가 계약과 같다" "example_ok \"$d\" $name 2>/dev/null"
+done
+check "lens-readability: 도구 부재 처리를 적는다" "grep -qF '브라우저 도구 없음' \"\$HERE/agents/lens-readability.md\""
+
+# 예시 결함 주입 — 계약 밖 칸을 넣은 예시는 대조가 실패해야 한다.
+cp "$HERE/agents/lens-grounding.md" "$FX/bad_example.md" 2>/dev/null || : > "$FX/bad_example.md"
+sed -i 's/^{ "lens": "lens-grounding",/{ "lens": "lens-grounding", "severity": "",/' "$FX/bad_example.md"
+check "예시에 계약 밖 칸이 있으면 잡는다" \
+  "grep -qF '\"severity\"' \"\$FX/bad_example.md\" && ! example_ok \"\$FX/bad_example.md\" lens-grounding 2>/dev/null"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
