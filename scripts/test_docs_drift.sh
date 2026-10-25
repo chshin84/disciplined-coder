@@ -226,7 +226,7 @@ check "다시 리뷰를 물을 때 ASK-OPTIONS 를 따른다" "sec_has_id \"\$CA
 check "🔴 반영도 다시 리뷰 절이 다룬다"      "sec_has_id \"\$CALLER\" '작업 순서와 다시 리뷰' '🔴'"
 check "문서 검진이 재검진 금지를 소유자로 넘긴다" "points_to \"\$DOCS\" '\`dispatching-lenses\`' '「한 번만 실행하는 렌즈의 규율」'"
 check "그 절이 공통 규칙을 렌즈 그룹으로 넘긴다"               "sec_has \"\$DOCS\" '필요할 때 렌즈' '「렌즈 그룹」'"
-check "그 절이 선행연구 인용 확인을 agent-prior-art 로 넘긴다" "points_to \"\$DOCS\" '\`agent-prior-art\`' '「인용 확인」'"
+check "그 절이 선행연구 인용 확인을 researching-prior-art 로 넘긴다" "points_to \"\$DOCS\" '\`researching-prior-art\`' '「인용 확인」'"
 check "런타임이 재리뷰 금지를 소유자로 넘긴다" "points_to \"\$RUNTIME2\" '\`dispatching-lenses\`' '「한 번만 실행하는 렌즈의 규율」'"
 check "재검진 금지는 dispatching-lenses 가 소유하고 spec 리뷰의 반복 절을 가리킨다" "points_to \"\$DISP\" '\`review-specs\`' '「작업 순서와 다시 리뷰」'"
 
@@ -847,10 +847,10 @@ SC_LINE="$(grep -F -- "$CONSENT" "$CANON" || true)"
 echo "[standing-consent] lens calls carry the user's standing consent"
 check "canon: 상시 허가 조항"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- \"\$CONSENT\""
 check "canon: 허가 범위 한정"              "grep -qF -- '\`lens-*\`' <<<\"\$SC_LINE\""
-# 선행연구 에이전트는 이름이 `lens-*` 형태가 아니어서 상시 허가에 들지 않고, 승인 규칙은 자기 절이 소유한다.
+# 선행연구 스킬은 이름이 `lens-*` 형태가 아니어서 상시 허가에 들지 않고, 승인 규칙은 자기 절이 소유한다.
 # 허가 조항이 그 이름을 예외로 적을 필요가 없으므로, 소유 선언이 스킬에 있는지만 본다.
-AP="$HERE/skills/agent-prior-art/SKILL.md"
-check "선행연구 에이전트가 승인 규칙을 소유한다" "owns_sec \"\$AP\" '발동과 기록'"
+AP="$HERE/skills/researching-prior-art/SKILL.md"
+check "선행연구 스킬이 승인 규칙을 소유한다" "owns_sec \"\$AP\" '발동과 기록'"
 
 # --- question-tool: 갈림길은 질문 도구로 묻는다 (상시 로드 규칙) ---
 # 이 규칙이 리뷰 스킬 한 곳에만 있으면 그 스킬을 열지 않은 세션에는 닿지 않는다. 실제로 문서 검진
@@ -936,20 +936,21 @@ for sec in '디스패치 템플릿' '받은 메시지 처리' '이어 쓰기와 
   check "「$sec」이 프로토콜 파일을 가리킨다" "sec_has \"\$NO_DOC\" '$sec' '프로토콜 파일'"
 done
 
-echo "[선행연구 에이전트]"
-RDEF="$HERE/agents/prior-art-researcher.md"
-VDEF="$HERE/agents/prior-art-verifier.md"
+echo "[선행연구 스킬]"
+RDEF="$HERE/agents/researcher.md"
+VDEF="$HERE/agents/citation-verifier.md"
 fm() { awk 'NR==1&&/^---$/{f=1;next} f&&/^---$/{exit} f' "$1" 2>/dev/null; }
 for s in '오케스트레이터 절차' '발동과 기록' '상황별 전략' '실행할 때 지킬 상한' '판정 규약' '출력 스키마' '인용 확인' '레퍼런스 프롬프트'; do
-  check "agent-prior-art 에 절이 있다: $s" "has_sec \"\$AP\" '$s'"
+  check "researching-prior-art 에 절이 있다: $s" "has_sec \"\$AP\" '$s'"
 done
-check "spec 리뷰가 발동과 기록을 가리킨다" "points_to \"\$CALLER\" '\`agent-prior-art\`' '「발동과 기록」'"
+check "spec 리뷰가 발동과 기록을 가리킨다" "points_to \"\$CALLER\" '\`researching-prior-art\`' '「발동과 기록」'"
 check "연구자 정의의 도구가 구성과 같다" "grep -qx 'tools: WebSearch, WebFetch, Read, Grep, Glob' <<<\"\$(fm \"\$RDEF\")\""
 check "연구자 정의의 턴 상한이 20 이다" "grep -qx 'maxTurns: 20' <<<\"\$(fm \"\$RDEF\")\""
 # 검증자 정의는 추출·판정·지도 대조의 세 파일이다. 구성 값은 spec 「Opus 일괄 판정」이 정했고,
 # 판정 정의의 모델과 노력 수준은 「Opus 일괄 판정」이 바꿨다.
-JDEF="$HERE/agents/prior-art-judge.md"
-MDEF="$HERE/agents/prior-art-mapcheck.md"
+JDEF="$HERE/agents/citation-judge.md"
+MDEF="$HERE/agents/map-check.md"
+check "researcher.md 의 description 이 호출 조건을 적는다" "grep -qF '호출 절차가 이름으로 지정할 때만 실행한다' <<<\"\$(grep -m1 '^description:' <<<\"\$(fm \"\$RDEF\")\")\""
 for row in "VDEF|WebFetch, Read|claude-haiku-5-5|high" "JDEF|Read|claude-opus-5-5|medium" "MDEF|Read|claude-haiku-5-5|high"; do
   IFS='|' read -r def tools model effort <<<"$row"
   file="${!def}"; FMV="$(fm "$file" || true)"; base="$(basename "$file")"
@@ -957,12 +958,17 @@ for row in "VDEF|WebFetch, Read|claude-haiku-5-5|high" "JDEF|Read|claude-opus-5-
   check "$base 의 모델이 구성과 같다" "grep -qx 'model: $model' <<<\"\$FMV\""
   check "$base 의 노력 수준이 $effort 다" "grep -qx 'effort: $effort' <<<\"\$FMV\""
   check "$base 의 턴 상한이 20 이다" "grep -qx 'maxTurns: 20' <<<\"\$FMV\""
-  check "$base 의 description 이 실행 경로를 한정한다" "grep -qF 'agent-prior-art 절차와 워크플로 disciplined-coder:prior-art-search 에서만 실행한다' <<<\"\$(grep -m1 '^description:' <<<\"\$FMV\")\""
+  check "$base 의 description 이 호출 조건을 적는다" "grep -qF '호출 절차가 이름으로 지정할 때만 실행한다' <<<\"\$(grep -m1 '^description:' <<<\"\$FMV\")\""
 done
 RP="$( [ -f "$AP" ] && doc_sec "$AP" '레퍼런스 프롬프트' | grep -m1 '^- system: "' | sed 's/^- system: "//; s/"$//' || true)"
 check "연구자 정의가 레퍼런스 프롬프트 본문을 그대로 싣는다" "[ -n \"\$RP\" ] && grep -qF -- \"\$RP\" \"\$RDEF\""
+# survey 와 scout 지시문도 레퍼런스 프롬프트 절의 줄과 연구자 정의가 같은 글자다.
+for M in survey scout; do
+  RPM="$( [ -f "$AP" ] && doc_sec "$AP" '레퍼런스 프롬프트' | grep -m1 "^- system ($M): \"" | sed "s/^- system ($M): \"//; s/\"\$//" || true)"
+  check "연구자 정의가 레퍼런스 프롬프트의 $M 본문을 그대로 싣는다" "[ -n \"\$RPM\" ] && grep -qF -- \"\$RPM\" \"\$RDEF\""
+done
 DDISC="$HERE/docs/domain-discipline.md"
-check "근거 문서의 NO-RAW-OUTPUT 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`NO-RAW-OUTPUT\`' 'agent-prior-art'"
-check "근거 문서의 LENS-ALLOWED 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`LENS-ALLOWED\`' 'agent-prior-art'"
+check "근거 문서의 NO-RAW-OUTPUT 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`NO-RAW-OUTPUT\`' 'researching-prior-art'"
+check "근거 문서의 LENS-ALLOWED 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`LENS-ALLOWED\`' 'researching-prior-art'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

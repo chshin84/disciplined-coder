@@ -1,7 +1,7 @@
 export const meta = {
   name: 'prior-art-search',
   description: '하위 질문마다 연구자를 실행하고 인용을 검증자로 판정해 통과한 선행 사례만 모은다',
-  whenToUse: 'agent-prior-art 오케스트레이터가 사용자가 승인한 프로토콜로만 실행한다.',
+  whenToUse: 'researching-prior-art 오케스트레이터가 사용자가 승인한 프로토콜로만 실행한다.',
   phases: [
     { title: 'Research' },
     { title: 'Verify' },
@@ -14,12 +14,42 @@ export const meta = {
 // 시험 도구가 본문보다 먼저 판정 함수를 부르므로 const 를 초기화 전에 참조하면 예외가 나기 때문이다.
 // 단계 사이에는 parallel() 장벽을 둔다. thunk 는 agent() 의 반환만 돌려주고, 짝짓기는 반환 배열의 위치로 한다.
 const S = schemas();
-const RESEARCHER = 'disciplined-coder:prior-art-researcher';
-const EXTRACTOR = 'disciplined-coder:prior-art-verifier';
-const JUDGE = 'disciplined-coder:prior-art-judge';
-const MAPCHECK = 'disciplined-coder:prior-art-mapcheck';
+const RESEARCHER = 'disciplined-coder:researcher';
+const EXTRACTOR = 'disciplined-coder:citation-verifier';
+const JUDGE = 'disciplined-coder:citation-judge';
+const MAPCHECK = 'disciplined-coder:map-check';
 // 판정 묶음 하나에 넣는 주장 수의 상한이다. 값의 근거는 spec 「Opus 일괄 판정」의 묶음 크기다.
 const BATCH_SIZE = 20;
+
+// 용도는 비울 수 없는 칸이다. 비어 있으면 에이전트를 부르기 전에 끝내 비용을 쓰지 않는다.
+if (typeof args.intended_use !== 'string' || args.intended_use.trim() === '') {
+  throw new Error('args.intended_use 가 비어 있다. 프로토콜의 용도 칸을 채워 다시 실행하라.');
+}
+
+// 둘러보기 실행(round 0)은 연구자 하나를 scout 모드로 실행하고, 검증과 종합 없이 질의 경계 검사만 거쳐 반환한다.
+// parallel 로 감싸는 이유는 연구자 호출과 같이 실패한 호출을 null 로 받기 위해서다.
+if (args.round === 0) {
+  phase('Research');
+  const scout = (await parallel([() => agent(
+    prompt('scout', args.principles_path, {
+      question: args.question,
+      situation: args.situation,
+      target: args.target,
+      intended_use: args.intended_use,
+      constraints: args.constraints,
+      draft_subquestions: args.subquestions,
+      forbidden_terms: args.forbidden_terms,
+    }),
+    { agentType: RESEARCHER, label: 'scout', phase: 'Research', schema: S.SCOUT_SCHEMA },
+  )]))[0] ?? null;
+  const scoutResearchers = [{ id: 'scout', output: scout }];
+  return {
+    round: args.round,
+    researchers: scoutResearchers,
+    query_violations: checkQueries(scoutResearchers, args.forbidden_terms),
+    scout,
+  };
+}
 
 phase('Research');
 const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
@@ -30,6 +60,8 @@ const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
     mode: args.mode,
     subquestion: sq,
     forbidden_terms: args.forbidden_terms,
+    intended_use: args.intended_use,
+    constraints: args.constraints,
   }),
   { agentType: RESEARCHER, label: `research:${sq.id}`, phase: 'Research', schema: S.RESEARCHER_SCHEMA },
 )));
@@ -109,7 +141,7 @@ if (args.mode === 'survey') {
   if (passed_rows.length > 0) {
     phase('Synthesize');
     synthesis = await agent(
-      prompt('synthesize', args.principles_path, { question: args.question, target: args.target, passed_rows }),
+      prompt('synthesize', args.principles_path, { question: args.question, target: args.target, intended_use: args.intended_use, constraints: args.constraints, passed_rows }),
       { agentType: RESEARCHER, label: 'synthesize', phase: 'Synthesize', schema: S.SYNTHESIS_SCHEMA },
     );
   }
@@ -520,7 +552,7 @@ function schemas() {
   };
   const row = (axesSchema) => ({
     type: 'object',
-    properties: { case: str, url: str, outcome: str, axes: axesSchema },
+    properties: { case: str, url: str, outcome: str, axes: axesSchema, bearing: str },
     required: ['case', 'url', 'axes', 'outcome'],
   });
   const principles = { type: 'array', items: str };
@@ -608,7 +640,7 @@ function schemas() {
         type: 'array',
         items: {
           type: 'object',
-          properties: { text: str, refs: { type: 'array', items: str } },
+          properties: { text: str, refs: { type: 'array', items: str }, supports: str },
           required: ['text', 'refs'],
         },
       },
@@ -631,7 +663,16 @@ function schemas() {
     },
     required: ['cells', 'principles_applied'],
   };
-  return { RESEARCHER_SCHEMA, EXTRACT_SCHEMA, JUDGE_SCHEMA, SYNTHESIS_SCHEMA, MAP_SCHEMA };
+  // 둘러보기 출력은 검증하지 않으므로 정해진 칸 밖의 칸(사례 칸 등)을 허용하지 않는다.
+  const closed = (properties) => ({ type: 'object', properties, required: Object.keys(properties), additionalProperties: false });
+  const SCOUT_SCHEMA = closed({
+    search_status: { type: 'string', enum: ['ok', 'no-results', 'failed', 'not-attempted'] },
+    queries: { type: 'array', items: str },
+    clusters: { type: 'array', items: closed({ topic: str, sources: { type: 'array', items: str }, note: str }) },
+    subquestion_candidates: { type: 'array', items: closed({ scope: str, basis: str }) },
+    principles_applied: principles,
+  });
+  return { RESEARCHER_SCHEMA, EXTRACT_SCHEMA, JUDGE_SCHEMA, SYNTHESIS_SCHEMA, MAP_SCHEMA, SCOUT_SCHEMA };
 }
 
 // 에이전트에게 보내는 프롬프트. 첫 줄은 모드, 둘째 줄은 원칙 문서 경로, 셋째 줄부터 JSON 블록이다.

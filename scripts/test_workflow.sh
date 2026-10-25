@@ -67,7 +67,7 @@ for K in 'Date.now' 'Math.random' 'new Date(' 'require(' 'import '; do
   check "원문에 $K 가 없다" "[ -f \"\$WF\" ] && [ \"\$(grep -cF \"\$K\" \"\$WF\")\" -eq 0 ]"
 done
 check "schemas 출력을 얻는다" "printf '[]' | harn fn schemas > \"\$FX/schemas.json\""
-for S in RESEARCHER_SCHEMA EXTRACT_SCHEMA JUDGE_SCHEMA SYNTHESIS_SCHEMA MAP_SCHEMA; do
+for S in RESEARCHER_SCHEMA EXTRACT_SCHEMA JUDGE_SCHEMA SYNTHESIS_SCHEMA MAP_SCHEMA SCOUT_SCHEMA; do
   check "$S 의 루트 type 이 object 다" "json_true \"\$FX/schemas.json\" 'd[\"$S\"][\"type\"] == \"object\"'"
 done
 check "모든 노드에서 required 가 properties 의 키에 든다" "schema_subset \"\$FX/schemas.json\""
@@ -85,6 +85,8 @@ check "JUDGE_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas
 check "VERIFIER_SCHEMA 가 없다" "json_true \"\$FX/schemas.json\" '\"VERIFIER_SCHEMA\" not in d'"
 check "SYNTHESIS_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"SYNTHESIS_SCHEMA\"][\"required\"]) == {\"evidence_map\",\"conclusions\",\"principles_applied\"}'"
 check "MAP_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"MAP_SCHEMA\"][\"required\"]) == {\"cells\",\"principles_applied\"}'"
+check "SCOUT_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"SCOUT_SCHEMA\"][\"required\"]) == {\"search_status\",\"queries\",\"clusters\",\"subquestion_candidates\",\"principles_applied\"}'"
+check "SCOUT_SCHEMA 가 정해진 칸 밖의 칸을 허용하지 않는다" "json_true \"\$FX/schemas.json\" 'd[\"SCOUT_SCHEMA\"][\"additionalProperties\"] is False'"
 
 echo "[시험 도구 자체]"
 check "알 수 없는 함수 이름은 종료 코드 2 다" "printf '[]' | harn fn nosuch >/dev/null 2>&1; [ \$? -eq 2 ]"
@@ -92,7 +94,7 @@ check "깨진 JSON 입력의 run 은 종료 코드 2 다" "printf '{broken' | ha
 cat > "$FX/miss_in.json" <<'EOF'
 {"args": {"question": "Q?", "situation": "S", "target": "T", "mode": "contrast", "round": 1,
   "subquestions": [{"id": "S1", "scope": "a", "include": [], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": []}],
-  "forbidden_terms": [], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md"},
+  "forbidden_terms": [], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md", "intended_use": "U", "constraints": []},
  "responses": {"research:S1": {"search_status": "ok", "queries": [], "issues": []}}}
 EOF
 check "응답표에 없는 label 을 부르면 종료 코드 1 이고 표준 오류에 그 label 이 있다" "harn run < \"\$FX/miss_in.json\" > /dev/null 2> \"\$FX/miss_err.txt\"; [ \$? -eq 1 ] && grep -qF 'research:S2' \"\$FX/miss_err.txt\""
@@ -103,7 +105,7 @@ cat > "$FX/cq_in.json" <<'EOF'
   [
     {"id": "S1", "output": {"search_status": "ok", "issues": [], "queries": [
       "acme agent plugin",
-      "see skills/agent-prior-art/SKILL.md",
+      "see skills/researching-prior-art/SKILL.md",
       "C:\\Users\\x\\a.md notes",
       "~/.claude config",
       "cite (docs/x.md),",
@@ -121,7 +123,7 @@ EOF
 cat > "$FX/cq_want.json" <<'EOF'
 [
   {"id": "S1", "query": "acme agent plugin", "rule": "forbidden-term"},
-  {"id": "S1", "query": "see skills/agent-prior-art/SKILL.md", "rule": "path-shape"},
+  {"id": "S1", "query": "see skills/researching-prior-art/SKILL.md", "rule": "path-shape"},
   {"id": "S1", "query": "C:\\Users\\x\\a.md notes", "rule": "path-shape"},
   {"id": "S1", "query": "~/.claude config", "rule": "path-shape"},
   {"id": "S1", "query": "cite (docs/x.md),", "rule": "path-shape"},
@@ -581,14 +583,15 @@ check "mergeStatus 는 ok 하위 질문의 검증 실패만으로도 overall_sta
 cat > "$FX/args_c.json" <<'EOF'
 {"question": "Q?", "situation": "Sit", "target": "Tgt", "mode": "contrast", "round": 1,
  "subquestions": [{"id": "S1", "scope": "a", "include": ["i"], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": ["e"]}],
- "forbidden_terms": ["Acme"], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md"}
+ "forbidden_terms": ["Acme"], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md",
+ "intended_use": "U", "constraints": ["K"]}
 EOF
 cat > "$FX/row.json" <<'EOF'
-{"case": "C0", "url": "https://a", "outcome": "O0", "axes": {
+{"case": "C0", "url": "https://a", "outcome": "O0", "bearing": "B0", "axes": {
   "purpose": {"prior": "p0", "same": true, "note": "n"}, "mechanism": {"prior": "m0", "same": false, "note": "n"},
   "evaluation": {"prior": "e0", "same": false, "note": "n"}, "target": {"prior": "t0", "same": true, "note": "n"}}}
 EOF
-# mkin <응답표 파일> <출력 파일> — 응답표 파일의 "@mode" 값을 args 의 mode 로 쓰고 "@ROW@" 문자열을 row.json 의 값으로 바꿔 run 입력을 만든다.
+# mkin <응답표 파일> <출력 파일> [args 파일] — args 파일(없으면 args_c.json)을 읽고, 응답표 파일의 "@mode" 값을 args 의 mode 로 쓰고 "@ROW@" 문자열을 row.json 의 값으로 바꿔 run 입력을 만든다.
 mkin() {
   json_run '
 import json, sys
@@ -607,7 +610,7 @@ def sub(v):
     return v
 with open(sys.argv[4], "w", encoding="utf-8") as f:
     json.dump({"args": args, "responses": sub(resp["responses"])}, f, ensure_ascii=False)
-' "$1" "$FX/row.json" "$FX/args_c.json" "$2"
+' "$1" "$FX/row.json" "${3:-$FX/args_c.json}" "$2"
 }
 # 종합 프롬프트의 기대 row 는 고정 파일에서 읽는다. 한 줄로 줄여 파이썬 식에 넣는다.
 PYQ="'"
@@ -634,14 +637,14 @@ cat > "$FX/rc_resp.json" <<'EOF'
     {"ref": "S2#issue#0", "access": "성공", "exists": "일치", "quote": "", "context": "", "reason": "r"}]}}}
 EOF
 check "contrast 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rc_resp.json\" \"\$FX/rc_in.json\" && harn run < \"\$FX/rc_in.json\" > \"\$FX/rc_out.json\""
-E_RC_RES='len([c for c in d["calls"] if c["label"].startswith("research:")]) == 2 and all(c["agentType"] == "disciplined-coder:prior-art-researcher" and c["phase"] == "Research" for c in d["calls"] if c["label"].startswith("research:"))'
+E_RC_RES='len([c for c in d["calls"] if c["label"].startswith("research:")]) == 2 and all(c["agentType"] == "disciplined-coder:researcher" and c["phase"] == "Research" for c in d["calls"] if c["label"].startswith("research:"))'
 check "연구자 호출의 agentType 과 phase 가 정해진 값이다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_RES\""
 # 검증 단계의 label 접두사마다 호출 label 목록과 agentType 을 본다.
-E_RC_VER='(lambda by: by("extract:") == (["extract:https://a", "extract:https://b"], {"disciplined-coder:prior-art-verifier"}) and by("judge:") == (["judge:1"], {"disciplined-coder:prior-art-judge"}))(lambda p: ([c["label"] for c in d["calls"] if c["label"].startswith(p)], {c["agentType"] for c in d["calls"] if c["label"].startswith(p)})) and all(c["phase"] == "Verify" for c in d["calls"] if c["label"].split(":")[0] in ("extract", "judge")) and d["result"]["verifier_count"] == 2'
+E_RC_VER='(lambda by: by("extract:") == (["extract:https://a", "extract:https://b"], {"disciplined-coder:citation-verifier"}) and by("judge:") == (["judge:1"], {"disciplined-coder:citation-judge"}))(lambda p: ([c["label"] for c in d["calls"] if c["label"].startswith(p)], {c["agentType"] for c in d["calls"] if c["label"].startswith(p)})) and all(c["phase"] == "Verify" for c in d["calls"] if c["label"].split(":")[0] in ("extract", "judge")) and d["result"]["verifier_count"] == 2'
 check "검증 단계 호출의 agentType 과 phase 가 정해진 값이고 verifier_count 가 URL 수와 같다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_VER\""
 E_RC_EXP="$PY_WRAP_HEAD"'all(
-  (lambda b, sq: set(b) == {"question", "situation", "target", "mode", "subquestion", "forbidden_terms"}
-    and b["question"] == "Q?" and b["situation"] == "Sit" and b["target"] == "Tgt" and b["mode"] == "contrast"
+  (lambda b, sq: set(b) == {"question", "situation", "target", "mode", "subquestion", "forbidden_terms", "intended_use", "constraints"}
+    and b["intended_use"] == "U" and b["constraints"] == ["K"] and b["question"] == "Q?" and b["situation"] == "Sit" and b["target"] == "Tgt" and b["mode"] == "contrast"
     and b["forbidden_terms"] == ["Acme"] and b["subquestion"] == sq)(block(call("research:" + sq["id"])[0], "explore"), sq)
   for sq in [{"id": "S1", "scope": "a", "include": ["i"], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": ["e"]}])'"$PY_WRAP_TAIL"
 check "탐색 프롬프트의 줄 형식과 JSON 블록이 정해진 대로다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_EXP\""
@@ -682,10 +685,12 @@ cat > "$FX/rs_resp.json" <<'EOF'
   "map-check": {"cells": [], "principles_applied": []}}}
 EOF
 check "survey 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rs_resp.json\" \"\$FX/rs_in.json\" && harn run < \"\$FX/rs_in.json\" > \"\$FX/rs_out.json\""
-E_RS_SYN="$PY_WRAP_HEAD"'(lambda cs, b, rows: len(cs) == 1 and cs[0]["phase"] == "Synthesize" and cs[0]["agentType"] == "disciplined-coder:prior-art-researcher" and set(b) == {"question", "target", "passed_rows"} and b["question"] == "Q?" and b["target"] == "Tgt" and b["passed_rows"] == rows)(call("synthesize"), block(call("synthesize")[0], "synthesize"), [{"ref": "S1#case#0", "row": json.loads('"$PYQ$ROW_LINE$PYQ"')}])'"$PY_WRAP_TAIL"
+E_RS_SYN="$PY_WRAP_HEAD"'(lambda cs, b, rows: len(cs) == 1 and cs[0]["phase"] == "Synthesize" and cs[0]["agentType"] == "disciplined-coder:researcher" and set(b) == {"question", "target", "intended_use", "constraints", "passed_rows"} and b["intended_use"] == "U" and b["constraints"] == ["K"] and b["question"] == "Q?" and b["target"] == "Tgt" and b["passed_rows"] == rows)(call("synthesize"), block(call("synthesize")[0], "synthesize"), [{"ref": "S1#case#0", "row": json.loads('"$PYQ$ROW_LINE$PYQ"')}])'"$PY_WRAP_TAIL"
 check "종합 호출이 하나이고 프롬프트의 passed_rows 가 통과한 근거 지도 행과 같다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_SYN\""
-E_RS_MAP="$PY_WRAP_HEAD"'(lambda cm, b, syn: len(cm) == 1 and cm[0]["phase"] == "MapCheck" and cm[0]["agentType"] == "disciplined-coder:prior-art-mapcheck" and set(b) == {"evidence_map", "passed"} and b["evidence_map"] == d["result"]["synthesis"]["evidence_map"] and b["passed"] == syn["passed_rows"])(call("map-check"), block(call("map-check")[0], "map"), block(call("synthesize")[0], "synthesize"))'"$PY_WRAP_TAIL"
+E_RS_MAP="$PY_WRAP_HEAD"'(lambda cm, b, syn: len(cm) == 1 and cm[0]["phase"] == "MapCheck" and cm[0]["agentType"] == "disciplined-coder:map-check" and set(b) == {"evidence_map", "passed"} and b["evidence_map"] == d["result"]["synthesis"]["evidence_map"] and b["passed"] == syn["passed_rows"])(call("map-check"), block(call("map-check")[0], "map"), block(call("synthesize")[0], "synthesize"))'"$PY_WRAP_TAIL"
 check "지도 대조 호출이 하나이고 블록이 { evidence_map, passed } 다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_MAP\""
+E_RS_NOB="$PY_WRAP_HEAD"'all("B0" not in x["text"] for c in d["calls"] if c["label"].startswith("judge:") for it in block(c, "judge")["items"] for x in it["claims"])'"$PY_WRAP_TAIL"
+check "근거 지도 행의 bearing 은 판정 입력에 들어가지 않는다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_NOB\""
 E_RS_CNT='d["result"]["verifier_count"] == 2 and len(d["result"]["verifiers"]) == 2'
 check "verifier_count 가 지도 대조 검증자를 세지 않는다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_CNT\""
 E_RS_JUD='[c["label"] for c in d["calls"] if c["label"].startswith("judge:")] == ["judge:1"]'
@@ -761,9 +766,9 @@ E_RR_SRC="$PY_WRAP_HEAD"'(lambda item: (lambda b: [x["source_note"] for x in ite
 check "판정 입력에 source_note 가 있다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_SRC\""
 E_RR_NONOTE="$PY_WRAP_HEAD"'[it for it in block(call("judge:1")[0], "judge")["items"] if it["url"] == "https://a"][0]["claims"][1]["source_note"] == ""'"$PY_WRAP_TAIL"
 check "exists_note 없는 추출은 빈 source_note 다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NONOTE\""
-E_RR_RF="$PY_WRAP_HEAD"'(lambda rf: call("refetch:https://a")[0]["agentType"] == "disciplined-coder:prior-art-verifier" and all(c["phase"] == "Verify" for c in d["calls"] if c["label"].split(":")[0] in ("refetch", "rejudge")) and rf == {"url": "https://a", "claims": [{"ref": "S1#issue#0", "text": "claim A", "missing": {"numbers_conditions": "세션 수"}}]} and set(rf) == set(C["refetch"]) and set(rf["claims"][0]) == set(C["refetch"]["claims"][0]))(block(call("refetch:https://a")[0], "refetch"))'"$PY_WRAP_TAIL"
+E_RR_RF="$PY_WRAP_HEAD"'(lambda rf: call("refetch:https://a")[0]["agentType"] == "disciplined-coder:citation-verifier" and all(c["phase"] == "Verify" for c in d["calls"] if c["label"].split(":")[0] in ("refetch", "rejudge")) and rf == {"url": "https://a", "claims": [{"ref": "S1#issue#0", "text": "claim A", "missing": {"numbers_conditions": "세션 수"}}]} and set(rf) == set(C["refetch"]) and set(rf["claims"][0]) == set(C["refetch"]["claims"][0]))(block(call("refetch:https://a")[0], "refetch"))'"$PY_WRAP_TAIL"
 check "정보 부족은 보충으로 보낸다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_RF\""
-E_RR_RJ="$PY_WRAP_HEAD"'[c["label"] for c in d["calls"] if c["label"].startswith("rejudge:")] == ["rejudge:1"] and [c["agentType"] for c in call("rejudge:1")] == ["disciplined-coder:prior-art-judge"] and block(call("rejudge:1")[0], "judge") == {"items": [{"url": "https://a", "claims": [{"ref": "S1#issue#0", "text": "claim A", "quote": "q2", "context": "c2", "source_note": "N2"}]}, {"url": "https://e", "claims": [{"ref": "S1#issue#2", "text": "claim F", "quote": "qf2", "context": "", "source_note": "N-F2"}]}]}'"$PY_WRAP_TAIL"
+E_RR_RJ="$PY_WRAP_HEAD"'[c["label"] for c in d["calls"] if c["label"].startswith("rejudge:")] == ["rejudge:1"] and [c["agentType"] for c in call("rejudge:1")] == ["disciplined-coder:citation-judge"] and block(call("rejudge:1")[0], "judge") == {"items": [{"url": "https://a", "claims": [{"ref": "S1#issue#0", "text": "claim A", "quote": "q2", "context": "c2", "source_note": "N2"}]}, {"url": "https://e", "claims": [{"ref": "S1#issue#2", "text": "claim F", "quote": "qf2", "context": "", "source_note": "N-F2"}]}]}'"$PY_WRAP_TAIL"
 check "재판정은 보충한 주장만 묶어 부른다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_RJ\""
 E_RR_MIS='not any(c["label"] == "refetch:https://c" for c in d["calls"]) and {"ref": "S1#issue#1", "urls": ["https://c"]} in d["result"]["rejected"] and [j["verdict"] for j in d["result"]["verifiers"][1]["output"]["judgments"]] == ["unsupported"]'
 check "불일치가 있으면 보충하지 않는다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_MIS\""
@@ -773,7 +778,7 @@ E_RR_UNS='(lambda j: j["verdict"] == "unsupported" and "언어 해석" in j["rea
 check "판정 불가는 기각이고 이유가 남는다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_UNS\""
 E_RR_NI='{"url": "https://e", "refs": ["S1#issue#2"]} in d["result"]["verify_failed"] and {"ref": "S1#issue#3", "urls": ["https://e"]} in d["result"]["passed"]'
 check "재판정도 정보 부족이면 그 주장만 검증 실패다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NI\""
-E_RR_NOESC='not any(c["label"].startswith("escalate:") for c in d["calls"]) and all(c["agentType"] != "disciplined-coder:prior-art-judge-escalation" for c in d["calls"])'
+E_RR_NOESC='not any(c["label"].startswith("escalate:") for c in d["calls"]) and all(c["agentType"] != "disciplined-coder:citation-judge-escalation" for c in d["calls"])'
 check "상향 호출이 없다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NOESC\""
 E_RR_Q='(lambda o: [(j["ref"], j["verdict"], j["quote"]) for j in o["judgments"]] == [("S1#issue#0", "unsupported", "q2"), ("S2#issue#0", "supported", "qb")])(d["result"]["verifiers"][0]["output"])'
 check "합친 출력의 quote 는 보충 구절이다(실행 흐름)" "json_true \"\$FX/rr_out.json\" \"\$E_RR_Q\""
@@ -840,7 +845,7 @@ with open(out, "w", encoding="utf-8") as f:
 }
 mkbig "$FX/rb_resp.json" gap
 check "묶음 둘인 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rb_resp.json\" \"\$FX/rb_in.json\" && harn run < \"\$FX/rb_in.json\" > \"\$FX/rb_out.json\""
-E_RB_CALLS="$PY_WRAP_HEAD"'[c["label"] for c in d["calls"] if c["label"].startswith("judge:")] == ["judge:1", "judge:2"] and [[it["url"] for it in block(call(l)[0], "judge")["items"]] for l in ("judge:1", "judge:2")] == [["https://a"], ["https://b"]] and all(c["agentType"] == "disciplined-coder:prior-art-judge" and c["phase"] == "Verify" for c in d["calls"] if c["label"].startswith("judge:"))'"$PY_WRAP_TAIL"
+E_RB_CALLS="$PY_WRAP_HEAD"'[c["label"] for c in d["calls"] if c["label"].startswith("judge:")] == ["judge:1", "judge:2"] and [[it["url"] for it in block(call(l)[0], "judge")["items"]] for l in ("judge:1", "judge:2")] == [["https://a"], ["https://b"]] and all(c["agentType"] == "disciplined-coder:citation-judge" and c["phase"] == "Verify" for c in d["calls"] if c["label"].startswith("judge:"))'"$PY_WRAP_TAIL"
 check "판정은 묶음마다 한 번 부른다" "json_true \"\$FX/rb_out.json\" \"\$E_RB_CALLS\""
 E_RB_GAP='d["result"]["verify_failed"] == [{"url": "https://a", "refs": ["S1#issue#3"]}] and len(d["result"]["passed"]) == 24 and {"ref": "S1#issue#3", "urls": ["https://a"]} not in d["result"]["passed"]'
 check "빠진 주장만 검증 실패다" "json_true \"\$FX/rb_out.json\" \"\$E_RB_GAP\""
@@ -890,5 +895,47 @@ E_RF3='d["result"]["verifier_count"] == 2 and d["result"]["verifiers"][1]["outpu
 check "verifier_count 가 null 인 검증자를 센다" "json_true \"\$FX/rf_out.json\" \"\$E_RF3\""
 E_RF4='d["result"]["researchers"][0] == {"id": "S1", "output": None} and d["result"]["subquestion_status"][0]["search_status"] == "failed"'
 check "연구자가 null 인 하위 질문은 failed 이고 researchers 에 output null 로 남는다" "json_true \"\$FX/rf_out.json\" \"\$E_RF4\""
+
+echo "[실행 흐름: scout]"
+# 둘러보기 실행의 args 는 args_c.json 에 round 0 을 덮어쓴 값이다. args_s0 은 하위 질문 초안도 비운다.
+json_run '
+import json, sys
+a = json.load(open(sys.argv[1], encoding="utf-8"))
+a["round"] = 0
+json.dump(a, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
+a["subquestions"] = []
+json.dump(a, open(sys.argv[3], "w", encoding="utf-8"), ensure_ascii=False)
+' "$FX/args_c.json" "$FX/args_s.json" "$FX/args_s0.json"
+cat > "$FX/rsc_resp.json" <<'EOF'
+{"@mode": "contrast", "responses": {
+  "scout": {"search_status": "ok", "queries": ["Acme x", "y"], "clusters": [], "subquestion_candidates": [], "principles_applied": []}}}
+EOF
+check "scout 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rsc_resp.json\" \"\$FX/rsc_in.json\" \"\$FX/args_s.json\" && harn run < \"\$FX/rsc_in.json\" > \"\$FX/rsc_out.json\""
+E_SC_CALL='[c["label"] for c in d["calls"]] == ["scout"] and d["calls"][0]["phase"] == "Research" and d["calls"][0]["agentType"] == "disciplined-coder:researcher"'
+check "scout 실행은 둘러보기 연구자 하나만 부른다" "json_true \"\$FX/rsc_out.json\" \"\$E_SC_CALL\""
+E_SC_BLK="$PY_WRAP_HEAD"'(lambda b: set(b) == {"question", "situation", "target", "intended_use", "constraints", "draft_subquestions", "forbidden_terms"} and b["draft_subquestions"] == [{"id": "S1", "scope": "a", "include": ["i"], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": ["e"]}] and b["intended_use"] == "U" and b["constraints"] == ["K"])(block(call("scout")[0], "scout"))'"$PY_WRAP_TAIL"
+check "둘러보기 프롬프트가 MODE: scout 와 정해진 입력 블록이다" "json_true \"\$FX/rsc_out.json\" \"\$E_SC_BLK\""
+E_SC_RES='list(d["result"].keys()) == [k.lstrip("?") for k in C["result_scout"]] and d["result"]["round"] == 0 and d["result"]["researchers"][0]["id"] == "scout" and d["result"]["scout"]["search_status"] == "ok"'
+check "scout 반환값의 키 차례가 계약 코드 result_scout 와 같다" "json_true \"\$FX/rsc_out.json\" \"\$E_SC_RES\""
+E_SC_VIOL='d["result"]["query_violations"] == [{"id": "scout", "query": "Acme x", "rule": "forbidden-term"}]'
+check "둘러보기 검색어의 금지어가 query_violations 에 든다" "json_true \"\$FX/rsc_out.json\" \"\$E_SC_VIOL\""
+cat > "$FX/rsn_resp.json" <<'EOF'
+{"@mode": "contrast", "responses": {"scout": null}}
+EOF
+check "둘러보기 응답이 null 이면 scout 가 null 이다" "mkin \"\$FX/rsn_resp.json\" \"\$FX/rsn_in.json\" \"\$FX/args_s.json\" && harn run < \"\$FX/rsn_in.json\" > \"\$FX/rsn_out.json\" && json_true \"\$FX/rsn_out.json\" 'd[\"result\"][\"scout\"] is None'"
+# 응답표의 {"@throw": 문구} 는 그 호출을 예외로 끝낸다. 실제 런타임에서 에이전트 호출이 실패한 상황이다.
+cat > "$FX/rst_resp.json" <<'EOF'
+{"@mode": "contrast", "responses": {"scout": {"@throw": "scout down"}}}
+EOF
+check "둘러보기 호출이 예외로 끝나면 scout 가 null 이고 실행은 끝난다" "mkin \"\$FX/rst_resp.json\" \"\$FX/rst_in.json\" \"\$FX/args_s.json\" && harn run < \"\$FX/rst_in.json\" > \"\$FX/rst_out.json\" && json_true \"\$FX/rst_out.json\" 'd[\"result\"][\"scout\"] is None and d[\"result\"][\"researchers\"][0][\"output\"] is None and d[\"result\"][\"query_violations\"] == []'"
+check "SCOUT_SCHEMA 의 배열 원소도 정해진 칸 밖의 칸을 허용하지 않는다" "json_true \"\$FX/schemas.json\" 'all(d[\"SCOUT_SCHEMA\"][\"properties\"][k][\"items\"][\"additionalProperties\"] is False for k in (\"clusters\", \"subquestion_candidates\"))'"
+json_run '
+import json, sys
+a = json.load(open(sys.argv[1], encoding="utf-8"))
+a["intended_use"] = "  "
+json.dump(a, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
+' "$FX/args_c.json" "$FX/args_nu.json"
+check "intended_use 가 비면 에이전트를 부르기 전에 예외로 끝난다" "mkin \"\$FX/rsc_resp.json\" \"\$FX/rnu_in.json\" \"\$FX/args_nu.json\" && { harn run < \"\$FX/rnu_in.json\" > \"\$FX/rnu_out.json\" 2> \"\$FX/rnu_err.txt\"; [ \$? -eq 1 ]; } && grep -qF 'intended_use' \"\$FX/rnu_err.txt\""
+check "하위 질문 초안이 비어도 둘러보기 연구자 하나만 부른다" "mkin \"\$FX/rsc_resp.json\" \"\$FX/rs0_in.json\" \"\$FX/args_s0.json\" && harn run < \"\$FX/rs0_in.json\" > \"\$FX/rs0_out.json\" && json_true \"\$FX/rs0_out.json\" '[c[\"label\"] for c in d[\"calls\"]] == [\"scout\"]'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]
