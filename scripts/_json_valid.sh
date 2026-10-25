@@ -32,8 +32,3 @@ json_run() {  # $1=파이썬 프로그램 문자열, 나머지=그 프로그램�
 }
 # stdin이 유효한 JSON인지 검사한다.
 json_valid_stdin() { json_run 'import json,sys; json.load(sys.stdin)'; }
-# 훅 배선 파일($1)에서 이벤트 이름을 정렬해 한 줄씩 출력한다. 배선 파일이 이벤트를 하나 이상
-# 가지는지 확인할 때 쓴다.
-json_hook_events() {
-  json_run 'import json,sys; [print(k) for k in sorted(json.load(open(sys.argv[1],encoding="utf-8")).get("hooks",{}))]' "$1"
-}

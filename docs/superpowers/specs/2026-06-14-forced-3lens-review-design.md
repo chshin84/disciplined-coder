@@ -1,5 +1,7 @@
 # spec/plan 강제 3렌즈 독립 리뷰 — 설계
 
+> **superseded** — 렌즈는 2026-10-25 `2026-10-25-lens-agent-restructure-design.md` 에 따라 스킬(`skills/lens-*`)에서 에이전트 정의(`agents/lens-*.md`)로 옮겼다. 이 문서가 정한 스킬 구조는 더 쓰이지 않는다.
+
 > 상태: **REVIEWED (v2)**. DRAFT(v1)를 3렌즈 독립 리뷰에 돌려(전원 revise) 반영 재작성. 이 기능을 자기 자신에 dogfood.
 > 작성: 2026-06-14. 대상: disciplined-coder 플러그인. 선행: `advisor-spec-review`(MVP 1렌즈, 596a91a).
 >

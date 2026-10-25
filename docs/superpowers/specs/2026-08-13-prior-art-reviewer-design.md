@@ -1,5 +1,7 @@
 # 선행연구 대조 렌즈 설계 — `reviewer-prior-art`
 
+> **superseded** — 렌즈는 2026-10-25 `2026-10-25-lens-agent-restructure-design.md` 에 따라 스킬(`skills/lens-*`)에서 에이전트 정의(`agents/lens-*.md`)로 옮겼다. 이 문서가 정한 스킬 구조는 더 쓰이지 않는다.
+
 ## 배경 — 무엇이 문제였나
 
 **리뷰어 렌즈 넷은 스스로 문서 밖에 나가 조회하지 않는다.** `reviewer-grounding`은 호출자가 주입한

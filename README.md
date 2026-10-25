@@ -14,6 +14,7 @@ chshin84 가 본인과 사내 한국어 사용자를 위해 만들었다. 그래
 - **spec·plan 리뷰** — Claude 가 `docs/superpowers/specs/`나 `plans/`에 새 문서를 쓰고 리뷰 없이 턴을 끝내려 하면, 플러그인이 한 번 차단하고 리뷰를 지시한다.
 - **나눠 맡길지 판단** — Claude 가 새 spec 을 처음 쓰려 하면, 플러그인이 한 번 거부하고 서브 세션(별도 Claude 세션)에 나눠 맡길지 먼저 판단하게 한다.
 - **금지 표현** — Claude 가 `.md` 파일에 금지 표현을 쓰려 하면 플러그인이 쓰기를 거부하고 대체어를 보인다.
+- **규칙 위치 안내** — 세션의 첫 Write·Edit·Bash 호출에 플러그인이 에이전트원칙과 근거 문서의 위치를 한 번 알린다.
 - **문서 안내** — Claude 가 새 문서를 만들거나 보고서·발표자료를 고치면, 플러그인이 문서 타입과 검진 절차를 알리고 문서 형식(라벨 불릿, 개수 예고)을 경고한다.
 - **선행연구** — 사용자가 메시지에서 선행연구를 요청하면, 플러그인이 Claude 에게 선행연구 절차를 열라고 알린다.
 - **읽기 전용 파일** — 플러그인이 읽기 전용 속성이 붙은 파일의 수정을 거부한다.
@@ -77,7 +78,7 @@ done
 
 아래 환경 변수를 Claude Code를 여는 셸에 두거나 `~/.claude/settings.json`의 `env`에 적는다.
 
-- **`DISCIPLINED_CODER_REVIEW_GATE=off`** — spec·plan 리뷰, 나눠 맡길지 판단, 문서 안내의 검진 알림을 끈다.
+- **`DISCIPLINED_CODER_REVIEW_GATE=off`** — spec·plan 리뷰, 나눠 맡길지 판단, 규칙 위치 안내, 문서 안내의 검진 알림을 끈다.
 - **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 차단과 문서 형식 경고를 끈다.
 - **`DISCIPLINED_CODER_PRIOR_ART_NUDGE=off`** — 선행연구 알림을 끈다.
 

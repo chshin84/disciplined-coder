@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 기록을 봉인한다 — 파일 인자를 읽기 전용(chmod a-w)으로 만들고, 파일 인자가 없으면 --root(기본은 레포 루트)의
-# HEAD 에 있는 docs/superpowers/reviews/ 아래 파일 전부를 그렇게 한다. 여러 번 돌려도 같다.
+# HEAD 에 있는 docs/superpowers/reviews/ 와 decisions/ 아래 파일 전부를 그렇게 한다. 여러 번 돌려도 같다.
 # 읽기 전용 속성은 만든 쪽의 의도라 어느 저장소에서든 같은 뜻이고, 훅(hooks/readonly_pretooluse.sh)은
 # 이 속성만 읽는다. git은 이 속성을 옮기지 않으므로 새 클론에서는 SessionStart 훅이 이 스크립트를 다시 돈다.
 set -euo pipefail
@@ -19,7 +19,7 @@ done
 if [ "${#files[@]}" -eq 0 ]; then
   while IFS= read -r rel; do
     if [ -n "$rel" ]; then files+=("$ROOT/$rel"); fi
-  done < <(cd "$ROOT" && git ls-tree -r --name-only HEAD -- docs/superpowers/reviews 2>/dev/null)
+  done < <(cd "$ROOT" && git ls-tree -r --name-only HEAD -- docs/superpowers/reviews docs/superpowers/decisions 2>/dev/null)
 fi
 # 목록이 비면 여기서 끝낸다. set -u 아래 빈 배열 펼치기는 bash 4.4 미만(맥 기본 3.2)에서 unbound 로 죽는다.
 if [ "${#files[@]}" -eq 0 ]; then echo "sealed: 0"; exit 0; fi

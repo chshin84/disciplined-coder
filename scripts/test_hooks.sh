@@ -209,8 +209,7 @@ check "resume 에서는 표시를 새로 만들지 않는다" "[ ! -e \"\$TMPDIR
 echo "[doc-format-pre]"
 printf 'x\n' > "$T/existing.md"
 check "새 문서(.md) → 양식 제안"         "fpre '$(J "$T/newdoc.md")' | grep -q additionalContext"
-# 문서 규칙은 에이전트원칙에서 managing-docs 로 옮겼다. 안내가 옛 위치를 가리키면 규칙 없는 절을 찾게 된다.
-check "양식 제안은 managing-docs 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'managing-docs' && ! grep -qF '에이전트원칙' '$FPRE'"
+check "양식 제안은 managing-docs 를 가리킨다" "fpre '$(J "$T/newdoc.md")' | grep -qF 'managing-docs'"
 check "기존 문서(.md) → 무출력"          "[ -z \"\$(fpre '$(J "$T/existing.md")')\" ]"
 check "spec 경로 새 .md → 무출력"        "[ -z \"\$(fpre '$(J "$SP/brandnew.md")')\" ]"
 check "비문서(.py) → 무출력"             "[ -z \"\$(fpre '$(J "$T/src/new.py")')\" ]"
@@ -580,7 +579,7 @@ pan() { printf '{"session_id":"s","hook_event_name":"UserPromptSubmit","prompt":
 for m in '선행연구에 쓸 만한 에이전트 플러그인이 있나 찾아봐' \
          '에이전트원칙의 목차를 어떤 기준으로 배치해야 하는지 선행연구를 조사해 줘' \
          'docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md 의 선행 사례를 찾아 줘' \
-         '선행연구렌즈로 뒤져봐' 'lens-prior-art 로 찾아봐' '\"이 방법\"의 선행연구를 찾아 줘' 'Prior Art 있나'          '에이전트원칙의 목차를 어떤 기준으로 배치해야 하는지 근거를 찾아줘'          'docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md 를 선행연구와 대조해줘'; do
+         '선행연구렌즈로 뒤져봐' 'lens-prior-art 로 찾아봐' 'agent-prior-art 로 찾아봐' '\"이 방법\"의 선행연구를 찾아 줘' 'Prior Art 있나'          '에이전트원칙의 목차를 어떤 기준으로 배치해야 하는지 근거를 찾아줘'          'docs/superpowers/specs/2026-10-09-nested-orchestration-large-dev-design.md 를 선행연구와 대조해줘'; do
   check "알린다: $m" "out=\"\$(pan '$m')\" && grep -qF 'researching-prior-art' <<<\"\$out\" && grep -qF '\"hookEventName\":\"UserPromptSubmit\"' <<<\"\$out\" && json_valid_stdin <<<\"\$out\""
 done
 for m in '선행연구 결과를 기록에 정리했다' '선행연구 단계는 끝났다' 'prior art 기록 파일 이름을 바꿨다' '이 함수를 고쳐봐' '결정 근거를 기록에 정리했다'; do

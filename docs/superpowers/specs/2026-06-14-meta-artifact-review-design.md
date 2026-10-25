@@ -1,5 +1,7 @@
 # 메타 산출물 독립 리뷰 (meta-artifact independent review) — 설계
 
+> **superseded** — 렌즈는 2026-10-25 `2026-10-25-lens-agent-restructure-design.md` 에 따라 스킬(`skills/lens-*`)에서 에이전트 정의(`agents/lens-*.md`)로 옮겼다. 이 문서가 정한 스킬 구조는 더 쓰이지 않는다.
+
 > 상태: **REVIEWED** (v2). DRAFT(v1)를 3렌즈 독립 리뷰(correctness/consistency/adversarial)에 돌려
 > 발견을 반영해 재작성. 이 문서 자체가 이 기능의 첫 dogfooding 사례다.
 > 작성: 2026-06-14. 대상: disciplined-coder 플러그인 자체.

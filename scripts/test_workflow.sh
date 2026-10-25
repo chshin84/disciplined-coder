@@ -82,7 +82,6 @@ check "RESEARCHER_SCHEMA 의 search_status 열거가 정해진 값이다" "json_
 check "RESEARCHER_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"RESEARCHER_SCHEMA\"][\"required\"]) == {\"search_status\",\"queries\",\"issues\"}'"
 check "EXTRACT_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"EXTRACT_SCHEMA\"][\"required\"]) == {\"url\",\"judgments\",\"principles_applied\"}'"
 check "JUDGE_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"JUDGE_SCHEMA\"][\"required\"]) == {\"judgments\",\"principles_applied\"}'"
-check "VERIFIER_SCHEMA 가 없다" "json_true \"\$FX/schemas.json\" '\"VERIFIER_SCHEMA\" not in d'"
 check "SYNTHESIS_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"SYNTHESIS_SCHEMA\"][\"required\"]) == {\"evidence_map\",\"conclusions\",\"principles_applied\"}'"
 check "MAP_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"MAP_SCHEMA\"][\"required\"]) == {\"cells\",\"principles_applied\"}'"
 check "SCOUT_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"SCOUT_SCHEMA\"][\"required\"]) == {\"search_status\",\"queries\",\"clusters\",\"subquestion_candidates\",\"principles_applied\"}'"

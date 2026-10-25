@@ -1,5 +1,7 @@
 # 감사 뿌리 다섯을 도출 검사로 닫는다
 
+> **superseded** — 레포 문서 감사 스킬(`audit-repo-docs`)과 감사 스크립트(`scripts/audit_*.sh`)는 2026-10-25 커밋 8f267b5 에서 지웠다. 지운 결정은 `2026-10-25-lens-agent-restructure-design.md` 에 있다.
+
 2026-09-06 감사 회차가 확정 발견 아흔셋을 뿌리 다섯으로 모아 설계로 넘겼다. 이 문서는 그 다섯을 실측한 결과와 무엇을 고칠지를 담는다. 회차 기록은 `docs/superpowers/reviews/2026-09-06-self-audit.md`이고 그 요약문의 뿌리 절이 이 문서의 입력이다.
 
 ## 결론

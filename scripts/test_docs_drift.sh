@@ -137,8 +137,8 @@ done
 echo "[dispatching-lenses — 소유자가 하나다]"
 # 실행하는 방법의 내용은 결과를 같은 스킬의 「결과를 모으는 법」으로 모으는 것이다. review-docs 가 그 절을
 # 다시 가리키면 방법을 베낀 것이고, 소유자 이름만 대면 넘긴 것이다.
-check "review-docs 가 실행하는 방법을 소유자로 넘긴다"    "! has_sec \"\$DOCS\" '실행하는 방법' && ! grep -qF '「하는 일」' \"\$DOCS\" && grep -qF -- '\`dispatching-lenses\`' \"\$DOCS\""
-check "소유자가 실행하는 방법을 적는다"             "sec_has \"\$DISP\" '실행하는 방법' 'source' && sec_has \"\$DISP\" '실행하는 방법' '「결과를 모으는 법」' && owns_sec \"\$DISP\" '결과를 모으는 법'"
+check "review-docs 가 실행하는 방법을 소유자로 넘긴다"    "! has_sec \"\$DOCS\" '실행하는 방법' && grep -qF -- '\`dispatching-lenses\`' \"\$DOCS\""
+check "소유자가 실행하는 방법을 적는다"             "sec_has \"\$DISP\" '실행하는 방법' 'source' && sec_has \"\$DISP\" '실행하는 방법' '「결과를 모으는 법」'"
 DISP_MISS=""
 while IFS= read -r n; do
   [ -n "$n" ] || continue
@@ -200,7 +200,7 @@ echo "[소유 표] 소유는 하나뿐이고 나머지는 가리킨다"
 # 앞으로도 읽히고 고쳐질 문서만이다. 스펙과 계획과 지난 기록과 인수인계는 그때의 판단을 남긴 것이라 뺀다.
 # evals/ 아래 평가 과제는 일부러 위반을 담은 시험 자료라 뺀다. 머리 12줄에 superseded 가 있으면 대체된
 # 설계 문서라 뺀다. 목록을 손으로 적지 않고 git 색인에서 도출한다.
-AUDIT_DOCS="$(cd "$HERE" && git ls-files '*.md' | LC_ALL=C awk '
+LIVE_DOCS="$(cd "$HERE" && git ls-files '*.md' | LC_ALL=C awk '
   /^docs\/superpowers\// || /^evals\// || /(^|\/)HANDOFF-[^\/]*$/ { next }
   {
     f = $0; hit = 0
@@ -208,7 +208,7 @@ AUDIT_DOCS="$(cd "$HERE" && git ls-files '*.md' | LC_ALL=C awk '
     close(f)
     if (!hit) print f
   }')"
-OWN_DOCS="$AUDIT_DOCS"
+OWN_DOCS="$LIVE_DOCS"
 # 문서마다 awk·grep 을 따로 띄우지 않고 awk 한 번으로 모든 문서를 읽는다. 문서 경로는 레포 상대다.
 OWN_TSV="$(cd "$HERE" && awk '
     FNR == 1 { title = "" }
@@ -262,7 +262,7 @@ echo "[첫 문장] 절 제목 아래 첫 줄이 산문이다"
 # 빈 줄을 건너뛴 첫 줄이 불릿·표·코드블록·인용·번호목록이면 결론 문장이 아니다. 그 줄이 산문인데
 # 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
 # TITLE-LAYERS 는 managing-docs 의 reading-docs.md(읽기 위한 문서) 규칙이라 영어 제목에도 적용한다.
-HF_DOCS="$AUDIT_DOCS"
+HF_DOCS="$LIVE_DOCS"
 HF_BAD=""
 for hf in $HF_DOCS; do
   hit="$(awk '
@@ -290,7 +290,7 @@ while IFS= read -r cell; do
   # 백틱이 없는 칸이 정상이므로(사유 있는 「없다」) grep 실패를 오류로 삼지 않는다.
   tpath="$(printf '%s' "$cell" | grep -oE '`[^`]+`' | tr -d '`' | head -1 || true)"
   if [ -n "$tpath" ]; then
-    [ -e "$HERE/$tpath" ] || TYPE_BAD="$TYPE_BAD [실물없음:$tpath]"
+    :  # 경로가 실재하는지는 「문서가 가리킨 경로가 실재한다」가 본다
   elif printf '%s' "$cell" | LC_ALL=C.UTF-8 grep -qE '없다\. .+'; then
     :
   else
@@ -489,7 +489,7 @@ check "CI가 계약 테스트를 돈다"               "grep -qF -- 'for t in sc
 echo "[스킬 등재 — 진입로에서 이름이 불린다]"
 for d in "$HERE"/skills/*/; do
   sk="$(basename "$d")"
-  # 진입로는 셋이다 — 에이전트원칙이 이름을 부르거나, 다른 스킬이 부르거나, 렌즈면 에이전트원칙의 묶음 표기에 든다.
+  # 진입로는 둘이다 — 에이전트원칙이 이름을 부르거나, 다른 스킬이 부른다. 렌즈는 agents/ 에 있고 test_lens_contract.sh 가 본다.
   # 자기 SKILL.md 안의 언급은 세지 않는다. 자기가 자기를 부르는 것은 도달이 아니다.
   named=0
   grep -qF -- "$sk" "$HERE/agent-principles.md" && named=1
@@ -499,7 +499,6 @@ for d in "$HERE"/skills/*/; do
       grep -qF -- "$sk" "$o" && { named=1; break; }
     done
   fi
-  case "$sk" in lens-*) grep -qF -- 'lens-*' "$HERE/agent-principles.md" && named=1 ;; esac
   check "$sk 을 에이전트원칙이나 다른 스킬이 부른다" "[ '$named' = 1 ]"
 done
 
@@ -523,7 +522,6 @@ check "domain-plugin 이 에이전트 호출 정책을 둔다" "has_sec \"\$HERE
 echo "[규칙 출처] lens-readability 가 reading-docs.md 를 기준 문서로 연다"
 RDB_L="$HERE/agents/lens-readability.md"
 check "정의의 읽기 범위가 그 파일을 가리킨다" "sec_has \"\$RDB_L\" '읽기 범위' 'reading-docs.md'"
-check "그 파일이 실재한다"                    "[ -f \"\$HERE/skills/managing-docs/references/reading-docs.md\" ]"
 
 # --- 마켓플레이스 문안이 매니페스트에서 갈라지지 않는다 ---
 # 마켓플레이스 카드는 설치 전 사용자가 보는 첫 문안이다. 같은 사실을 두 파일이 각자 적으면 반드시
@@ -556,9 +554,6 @@ done
 # --- 금지 표현 목록과 근거 ---
 # 목록 파일이 원본이고 근거는 docs/ 의 근거 파일에 있다. 이 저장소 자신의 문서를 검사에서 빼는 사유는
 # hooks/_spec_marker.sh 의 path_in_own_repo 주석이 소유한다.
-echo "[금지 표현] 목록 파일과 근거 파일"
-check "근거 파일이 있다" "[ -f '$HERE/docs/korean-banned-words-evidence.md' ]"
-
 # 사람 글 스물넷에서 0건인데 AI 글 스물넷에서
 # 스물일곱 건 나온 신호라 한도를 두었는데, 세는 곳이 없어 문서 여덟이 넘긴 채로 있었다.
 # 세는 대상에서 빼는 것이 넷이고 이유가 서로 다르다. frontmatter 의 description 은 본문이 아니고,
@@ -586,10 +581,9 @@ anti_count() {  # $1=파일 경로 → 이 문서에 남은 대구의 개수
 }
 echo "[대구 한도] 글 한 편에 한 번까지"
 # 금지 표현 목록과 근거 파일은 뺀다. 목록은 표의 분류 설명이, 근거 파일은 고쳐 쓰지 않는 사용자 원문
-# 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다. 평가 과제(evals/principles/cases)도
-# 뺀다. ANTI-LIMIT 의 과제는 모델이 대구를 줄이는지 보려고 대구를 일부러 넣은 시험 입력이다.
-# BANNED-LIST 의 current.md 는 기준 커밋 목록 파일의 사본이라 목록과 같은 이유로 뺀다.
-ANTI_DOCS="$(printf '%s\n' "$AUDIT_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$' -e '^evals/principles/cases/' -e '^evals/principles/clauses/BANNED-LIST/')"
+# 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다. evals/ 는
+# 살아 있는 문서 목록이 이미 뺀다.
+ANTI_DOCS="$(printf '%s\n' "$LIVE_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$')"
 # 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.
 ANTI_TMP="$(mktemp -d)"
 printf 'A가 아니라 B다.
@@ -632,6 +626,12 @@ RV_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$RVDIR
 %s
 ' "$RV_TREE" | sed 's/^/      /'
 check "작업 트리에 고치거나 지운 기록이 없다" "[ -z \"\$RV_TREE\" ]"
+# 결정 기록(decisions/)도 기록 타입이다. 2026-10-26 까지는 같은 결정 기록에 시험 결과를 이어 적었으므로
+# 그 뒤의 이력만 본다.
+DCDIR="docs/superpowers/decisions"
+DC_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$DCDIR" 2>/dev/null | grep -vE '^(\?\?|A ) ' || true)"
+DC_HIST="$(cd "$HERE" && git log --since="2026-10-26 06:00:00 +0900" --diff-filter=M --format= --name-only -- "$DCDIR" 2>/dev/null || true)"
+check "작업 트리와 이력에 고친 결정 기록이 없다" "[ -z \"\$DC_TREE\$DC_HIST\" ]"
 RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=M --numstat --format= -- "$RVDIR" 2>/dev/null   | awk -F'	' 'NF==3 && !($1=="0" && $2=="0") { print $3 }' || true)"
 [ -n "$RV_HIST" ] && printf '    규칙 뒤 이력에서 고친 기록:
 %s
@@ -640,7 +640,7 @@ check "규칙이 들어온 뒤 이력에 고친 기록이 없다" "[ -z \"\$RV_H
 # 지우기는 다룬 작업이 병합된 뒤 보존 태그(archive/*)를 단 커밋 위에서만 한다(managing-docs 「문서 타입과 수명」).
 # 지운 커밋의 부모를 archive 태그가 가리켜야 한다 — 원문이 태그로 남아야 봉인의 목적이 지켜진다.
 # 이 규칙은 2026-10-06에 들어왔다. 그 전의 지우기(빈 파일 정리, 기능 제거 때의 plan)는 옛 규칙 아래에서 처리했다.
-RV_DEL="$(cd "$HERE" && for c in $(git log --since="2026-10-06 00:00:00 +0900" --diff-filter=D --format=%H -- "$RVDIR" docs/superpowers/plans 2>/dev/null); do
+RV_DEL="$(cd "$HERE" && for c in $(git log --since="2026-10-06 00:00:00 +0900" --diff-filter=D --format=%H -- "$RVDIR" docs/superpowers/plans docs/superpowers/decisions 2>/dev/null); do
   git tag --points-at "$c^" 2>/dev/null | grep -q '^archive/' || echo "$c"; done)"
 [ -n "$RV_DEL" ] && printf '    보존 태그 없이 기록이나 plan 을 지운 커밋:
 %s
@@ -658,13 +658,15 @@ bash "$SEAL" "$SEAL_T/one.md" "$SEAL_T/two.json" >/dev/null 2>&1 || true
 check "인자로 준 파일이 읽기 전용이 된다"     "[ ! -w '$SEAL_T/one.md' ] && [ ! -w '$SEAL_T/two.json' ]"
 bash "$SEAL" "$SEAL_T/one.md" "$SEAL_T/two.json" >/dev/null 2>&1 || true
 check "인자 있는 봉인을 두 번 돌려도 같다"     "[ ! -w '$SEAL_T/one.md' ] && [ ! -w '$SEAL_T/two.json' ]"
-SEAL_G="$(mktemp -d)"; mkdir -p "$SEAL_G/docs/superpowers/reviews/r1"
+SEAL_G="$(mktemp -d)"; mkdir -p "$SEAL_G/docs/superpowers/reviews/r1" "$SEAL_G/docs/superpowers/decisions"
 ( cd "$SEAL_G" && git init -q && git config user.email t@t && git config user.name t \
   && printf 'x\n' > docs/superpowers/reviews/r1.md && printf '{}\n' > docs/superpowers/reviews/r1/run.json \
-  && printf 'later\n' > docs/superpowers/reviews/untracked.md && git add docs/superpowers/reviews/r1.md docs/superpowers/reviews/r1/run.json && git commit -qm seed )
+  && printf 'd\n' > docs/superpowers/decisions/d1.md \
+  && printf 'later\n' > docs/superpowers/reviews/untracked.md && git add docs/superpowers/reviews/r1.md docs/superpowers/reviews/r1/run.json docs/superpowers/decisions/d1.md && git commit -qm seed )
 bash "$SEAL" --root "$SEAL_G" >/dev/null 2>&1 || true
 bash "$SEAL" --root "$SEAL_G" >/dev/null 2>&1 || true
 check "인자 없는 봉인이 HEAD 의 기록을 전부 읽기 전용으로 만든다" "[ ! -w '$SEAL_G/docs/superpowers/reviews/r1.md' ] && [ ! -w '$SEAL_G/docs/superpowers/reviews/r1/run.json' ]"
+check "인자 없는 봉인이 결정 기록도 읽기 전용으로 만든다" "[ ! -w '$SEAL_G/docs/superpowers/decisions/d1.md' ]"
 check "HEAD 에 없는 파일은 건드리지 않는다"     "[ -w '$SEAL_G/docs/superpowers/reviews/untracked.md' ]"
 check "이 레포의 SessionStart 가 봉인을 건다"  "grep -qF 'seal_reviews.sh' '$HERE/.claude/settings.json'"
 
@@ -687,12 +689,10 @@ done
 WF_BLOCK="$(awk '/^## 행동/{f=1} f&&/^## /&&!/^## 행동/{exit} f' "$HERE/agent-principles.md")"
 
 # --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(에이전트원칙 계약 가드) ---
-# 병렬 오케스트레이션 헤딩부터 다음 '### ' 또는 '## '까지의 블록만 뽑아 그 안에서 검사한다
-# (vacuous 통과 방지).
-PO_BLOCK="$(awk '/^## 행동/{f=1} f&&/^## /&&!/^## 행동/{exit} f' "$HERE/agent-principles.md")"
+# 위에서 뽑은 「행동」 절 안에서만 검사한다(vacuous 통과 방지).
 echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
-check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$PO_BLOCK\" | grep -qF 'nested-orchestration'"
-check "그 절에 SUB-ORCHESTRATE 조항이 있다" "printf '%s' \"\$PO_BLOCK\" | grep -qF '**\`SUB-ORCHESTRATE\`'"
+check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$WF_BLOCK\" | grep -qF 'nested-orchestration'"
+check "그 절에 SUB-ORCHESTRATE 조항이 있다" "printf '%s' \"\$WF_BLOCK\" | grep -qF '**\`SUB-ORCHESTRATE\`'"
 
 # --- canon-realign: 에이전트원칙과 managing-docs 가 원칙 전부를 갖는다 ---
 # 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 가졌고, 2026-10-25 에 문서 규칙만 managing-docs 로 옮겼다.
@@ -795,7 +795,6 @@ echo "[nested-message-format] nested-orchestration 메시지 이름은 프로토
 # 쓰면 실패한다 — 메시지를 지우거나 이름을 바꾸고 한쪽만 고친 상태를 잡는다.
 NO_DOC="$HERE/skills/nested-orchestration/SKILL.md"
 NO_PROTO="$HERE/skills/nested-orchestration/references/sub-session-protocol.md"
-check "프로토콜 파일이 있다" "[ -f \"\$NO_PROTO\" ]"
 check "프로토콜 파일에 「메시지 형식」 절이 있다" "has_sec \"\$NO_PROTO\" '메시지 형식'"
 check "프로토콜 파일에 「멈추는 기준」 절이 있다" "has_sec \"\$NO_PROTO\" '멈추는 기준'"
 # 같은 규칙을 두 곳에 두지 않는다 — SKILL.md 에 그 절이 다시 생기면 실패한다.

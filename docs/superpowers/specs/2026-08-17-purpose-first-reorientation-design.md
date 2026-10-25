@@ -1,5 +1,7 @@
 # 가독성 렌즈 — 전달을 방해하는 것을 짚는다
 
+> **superseded** — 렌즈는 2026-10-25 `2026-10-25-lens-agent-restructure-design.md` 에 따라 스킬(`skills/lens-*`)에서 에이전트 정의(`agents/lens-*.md`)로 옮겼다. 이 문서가 정한 스킬 구조는 더 쓰이지 않는다.
+
 > **1회차 리뷰를 반영해 다시 썼다.** 처음 안에는 방해를 세는 파이썬 스크립트와 남의 한국어 문체
 > 목록에 대한 참조가 있었다. 둘 다 뺐다. 왜 뺐는지는 「두었다가 뺀 것」 절에 적었다.
 > 1회차 기록은 `docs/superpowers/reviews/2026-08-17-purpose-first-reorientation-review.md`에 있다.

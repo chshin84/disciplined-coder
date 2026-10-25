@@ -8,7 +8,7 @@ description: 남에게 전달될 문서와 .html·.pptx·.xlsx·.docx·.pdf 산�
 
 ## `lens-fit`에 넘기는 계약
 
-이 계약은 여기가 소유한다. 계약은 에이전트원칙 `agent-principles.md`, `docs/domain-korean.md`, 제목·목차 규칙이 있는 `skills/managing-docs/references/reading-docs.md` 의 경로다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 계약을 넘긴다.
+이 계약은 여기가 소유한다. 계약은 에이전트원칙 `agent-principles.md`, `docs/domain-korean.md`, 문서 타입 표가 있는 `skills/managing-docs/SKILL.md`, 제목·목차 규칙이 있는 `skills/managing-docs/references/reading-docs.md` 의 경로다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 계약을 넘긴다.
 
 넘기지 않으면 그 렌즈는 계약을 모른 채 실행되어 형식만 본다. `lens-readability`를 실행하지 않은 문서도 이 경로로 에이전트원칙의 한국어 조항을 검사받는다.
 
@@ -103,7 +103,7 @@ description: 남에게 전달될 문서와 .html·.pptx·.xlsx·.docx·.pdf 산�
 
 이 규칙은 여기가 소유한다. 문서 검진과 spec·plan 리뷰와 워크플로 검증이 모두 이 규칙을 따른다.
 
-기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md` 하나다. 종류별 쓰임은 다음과 같다. `review`는 spec·plan 리뷰다. `check`는 문서 검진과 워크플로 검증이고, `prior-art`는 선행연구 대조다. 이 규칙 전의 레포 감사 기록(`*-self-audit*`)은 그대로 둔다.
+기록 파일 이름은 `docs/superpowers/reviews/YYYY-MM-DD-<주제>-<종류>.md` 하나다. 종류별 쓰임은 다음과 같다. `review`는 spec·plan 리뷰다. `check`는 문서 검진과 워크플로 검증이고, `prior-art`는 선행연구 대조다.
 
 같은 날 같은 주제의 두 번째 차수는 종류 뒤에 차수를 붙인다(`-review-2.md`·`-check-2.md`). 앞 차수를 덮거나 이어 붙이지 않는다.
 

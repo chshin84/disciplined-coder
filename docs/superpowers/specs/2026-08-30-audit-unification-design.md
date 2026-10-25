@@ -1,5 +1,7 @@
 # 렌즈를 정본 조항에 잇고 감사기를 절차 위에 세운다 — 설계
 
+> **superseded** — 레포 문서 감사 스킬(`audit-repo-docs`)과 감사 스크립트(`scripts/audit_*.sh`)는 2026-10-25 커밋 8f267b5 에서 지웠다. 지운 결정은 `2026-10-25-lens-agent-restructure-design.md` 에 있다.
+
 > 걸음 다섯과 걸음 넷의 「복제」 축은 `2026-09-02-audit-record-and-diff-design.md`가 잇는다. 「복제」 축은 체크리스트 항목이 아니라 대조 판정에서 도출된다.
 
 ## 무엇을 고치려는가

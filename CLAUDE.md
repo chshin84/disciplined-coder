@@ -39,7 +39,7 @@
 
 적용된 훅의 연결은 `hooks/hooks.json`과 `.claude/settings.json`이 소유하고, 훅마다 하는 일은 각 스크립트의 머리 주석이 소유한다. 이 저장소에서 일할 때 알아 둘 동작은 아래와 같다.
 
-**리뷰 기록 봉인** — 세션이 시작될 때 커밋된 리뷰 기록(`docs/superpowers/reviews/` 아래 전부)이 읽기 전용으로 봉인된다. 기록을 고치려다 Write나 Edit이 거부되면 훅 고장이 아니라 봉인이다.
+**리뷰 기록 봉인** — 세션이 시작될 때 커밋된 리뷰 기록과 결정 기록(`docs/superpowers/reviews/`·`decisions/` 아래 전부)이 읽기 전용으로 봉인된다. 기록을 고치려다 Write나 Edit이 거부되면 훅 고장이 아니라 봉인이다.
 
 **넛지 예외** — 리뷰 기록과 프로젝트 밖 문서에는 문서 넛지가 뜨지 않는다. 검진 넛지(`hooks/doc_review_posttooluse.sh`)는 spec·plan과 리뷰 기록을 빼고, 같은 폴더에 산출물(`.pptx`·`.xlsx`·`.docx`·`.pdf`)이 있는 `.md`와 그 산출물을 본다. 세션의 첫 Write·Edit·Bash 호출에 한 번 뜨는 규칙 넛지는 대상 경로를 보지 않으므로 이 예외가 적용되지 않는다.
 
@@ -52,7 +52,7 @@
 | **상태** (roadmap) | 없다. 무엇과 대조할지는 그 프로젝트의 코드와 인프라가 정한다 |
 | **절차·계약** | 문서와 코드를 대조하는 테스트 `scripts/test_docs_drift.sh` |
 | **설계** (spec·plan) | 경로를 지정한 대체된 spec의 superseded 표시와, 보존 태그 없이 지운 plan을 검사한다 `scripts/test_docs_drift.sh` |
-| **기록** (reviews) | 있는 기록의 수정을 거부하는 훅 `hooks/readonly_pretooluse.sh` 와, 고친 기록과 보존 태그 없이 지운 기록을 잡는 검사 `scripts/test_docs_drift.sh` |
+| **기록** (reviews·decisions) | 있는 기록의 수정을 거부하는 훅 `hooks/readonly_pretooluse.sh` 와, 고친 기록과 보존 태그 없이 지운 기록을 잡는 검사 `scripts/test_docs_drift.sh` |
 | **핸드오프** | 세션 시작에 잔존을 세어 알린다 `scripts/scaffold.sh` |
 | **맥락** (Claude 메모리) | 없다. 메모리가 git 밖이라 검사가 닿지 않는다 |
 | **규범·인덱스** | 없다. 포인터만 두므로 낡을 상태가 없다 |

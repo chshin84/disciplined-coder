@@ -1,5 +1,7 @@
 # 정본을 대화 규칙으로 좁히고 코딩 규칙을 domain-coding으로 옮긴다 — 설계
 
+> **superseded** — 다음 날 `2026-09-06-canon-consolidation-design.md` 가 `domain-coding` 을 정본으로 다시 합쳤다.
+
 ## 무엇을 고치려는가
 
 정본 `agent-principles.md`는 `@import`로 모든 세션에 실린다. 그 안에 코드나 문서가 있어야만 어길 수 있는 조항이 대화 규칙과 섞여 있다. 2026-09-05 커밋 `b24fdfa`가 카파시(Andrej Karpathy) 지침 넷을 정본에 영어로 옮기면서 이 섞임이 더 커졌다. 코드 편집 규칙과 산출물 검증 규칙이 파일을 하나도 건드리지 않는 세션에도 실린다.

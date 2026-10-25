@@ -193,7 +193,6 @@ echo "[계약 대조]"
 check "계약 코드가 JSON 으로 읽힌다" "json_valid_stdin < \"\$CONTRACT\""
 WF="$HERE/workflows/prior-art-search.js"
 HARNESS="$HERE/scripts/workflow_harness.mjs"
-check "워크플로 스크립트가 있다" "[ -f \"\$WF\" ]"
 check "node 가 있다" "command -v node >/dev/null"
 SCHEMAS="$FX/schemas.json"
 check "시험 도구가 짝지은 스키마 상수를 모두 낸다" \
@@ -207,7 +206,6 @@ RD="$HERE/agents/researcher.md"
 VD="$HERE/agents/citation-verifier.md"
 JD="$HERE/agents/citation-judge.md"
 MD="$HERE/agents/map-check.md"
-check "에이전트 정의 파일이 모두 있다" "[ -f \"\$RD\" ] && [ -f \"\$VD\" ] && [ -f \"\$JD\" ] && [ -f \"\$MD\" ]"
 for pair in researcher:RD synthesis:RD scout:RD extract:VD judge:JD map:MD; do
   name="${pair%%:*}"; def="${pair##*:}"; file="${!def}"
   check "예시 $name 이 $(basename "$file") 에서 계약 코드와 맞는다" \

@@ -1,5 +1,7 @@
 # 감사 회차를 구조화해 남기고 회차 사이를 대조한다 — 설계
 
+> **superseded** — 레포 문서 감사 스킬(`audit-repo-docs`)과 감사 스크립트(`scripts/audit_*.sh`)는 2026-10-25 커밋 8f267b5 에서 지웠다. 지운 결정은 `2026-10-25-lens-agent-restructure-design.md` 에 있다.
+
 > 이 설계의 회차 기록 구조와 반박검증과 뽑기 걸음은 `2026-09-05-findings-bar-and-deterministic-first-design.md`가 잇는다.
 
 ## 무엇을 고치려는가

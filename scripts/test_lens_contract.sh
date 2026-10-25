@@ -189,7 +189,7 @@ sys.exit(0 if ok else 1)
 
 for name in $KNOWN; do
   d="$HERE/agents/$name.md"
-  check "$name: 정의 파일과 이름이 같다" "[ -f \"$d\" ] && grep -qx 'name: $name' \"$d\""
+  check "$name: 정의 파일과 이름이 같다" "grep -qx 'name: $name' \"$d\""
   check "$name: 모델이 opus 다" "grep -qx 'model: opus' \"$d\""
   check "$name: 도구가 spec 표와 같다" "grep -qxF 'tools: ${TOOLS[$name]}' \"$d\""
   check "$name: 입력 절이 두 줄의 부재를 다룬다" \
