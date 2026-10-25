@@ -705,8 +705,8 @@ check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids
 for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK; do
   check "canon: korean group $g present"             "grep -qE '^#### \`$g\`' '$CANON'"
 done
-# 조항을 더하려면 CLAUDE.md 가 정한 클린룸 소거 시험을 거쳐야 한다. 시험으로 지운 조항 ID 가
-# 그 시험 없이 에이전트원칙에 되돌아오면 실패한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
+# 시험이나 사용자 결정으로 지운 조항 ID 가 근거 없이 에이전트원칙에 되돌아오면 실패한다. 효과 확인 방법은
+# CLAUDE.md 「조항 추가와 문구 변경」이 정한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
 # 다만 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 는 그 절이 생기기 전(2026-06~09)에 지워 근거가 git 이력에만 있다.
 REVIVED_IDS=""
 for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN NAME-ITEMS COMMA-CUT LABEL-NOUN TERM-EXPLAIN EDIT-DISCIPLINE EDIT-PRIORITY EXPLAIN-STRUCTURE KEEP-FAILED NO-FLEET SECRETS TITLE-PROOF TELL-NOW; do
