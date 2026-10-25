@@ -189,7 +189,8 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
       "kind": "peer-reviewed|preprint|vendor|blog|standard|derived",
       "source_level": "1차|2차",
       "route": "찾은 경로(목록 사이트, 저장소, 논문)",
-      "adoption": "채택|흡수|참고|해당 없음"
+      "adoption": "채택|흡수|참고|해당 없음",
+      "bearing": "그 근거가 어느 후보안을 어느 방향으로 움직이는지"
     }
   ],
   "saturation": 0,
@@ -230,10 +231,11 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
       "kind": "peer-reviewed|preprint|vendor|blog|standard|derived",
       "source_level": "1차|2차",
       "route": "찾은 경로(목록 사이트, 저장소, 논문)",
-      "adoption": "채택|흡수|참고|해당 없음"
+      "adoption": "채택|흡수|참고|해당 없음",
+      "bearing": "그 근거가 어느 후보안을 어느 방향으로 움직이는지"
     }
   ],
-  "conclusions": [ { "text": "결론 문장", "refs": [ "sq1#case#0" ] } ],
+  "conclusions": [ { "text": "결론 문장", "refs": [ "sq1#case#0" ], "supports": "지지하는 후보안" } ],
   "principles_applied": [ "읽고 적용한 원칙 ID" ]
 }
 ```
@@ -310,9 +312,9 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 
 | 자료 | 형식 |
 |---|---|
-| 워크플로 `args`(프로토콜) | `{ question, situation, target, mode: "contrast"\|"survey", round: 1\|2, subquestions: [{ id, scope, include, exclude }], forbidden_terms: [string], researcher_count, researcher_count_basis, principles_path }`. `round`는 첫 실행이 1, 공백 라운드가 2 다 |
-| 연구자 출력 | 「연구자 출력」의 `researcher` 예시 블록의 칸이다. `evidence_map` 행은 `{ case, url, axes: { purpose, mechanism, evaluation, target }, outcome, kind, source_level, route, adoption? }`다 |
-| 종합 모드 연구자 출력 | `{ evidence_map: [행], conclusions: [{ text, refs: [string] }], principles_applied }` |
+| 워크플로 `args`(프로토콜) | `{ question, situation, target, mode: "contrast"\|"survey", round: 1\|2, subquestions: [{ id, scope, include, exclude }], forbidden_terms: [string], researcher_count, researcher_count_basis, principles_path, intended_use, constraints: [string] }`. `round`는 첫 실행이 1, 공백 라운드가 2 다 |
+| 연구자 출력 | 「연구자 출력」의 `researcher` 예시 블록의 칸이다. `evidence_map` 행은 `{ case, url, axes: { purpose, mechanism, evaluation, target }, outcome, kind, source_level, route, adoption?, bearing? }`다 |
+| 종합 모드 연구자 출력 | `{ evidence_map: [행], conclusions: [{ text, refs: [string], supports? }], principles_applied }` |
 | 추출 검증자 출력 | `{ url, judgments: [{ ref, access, exists, exists_note, quote, context, reason }], principles_applied }`. `ref`의 형식은 주장 참조 형식이다. 보충 출력도 같은 형식이다 |
 | 판정·재판정 입력 | `{ items: [{ url, claims: [{ ref, text, quote, context, source_note }] }] }`. 판정 정의의 `judge_input` 입력 예시 블록이 이 형식이다 |
 | 판정·재판정 출력 | `{ judgments: [{ url, ref, numbers_conditions, direction, scope, missing, unsure_reasons, reason }], principles_applied }` |
@@ -320,7 +322,7 @@ description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이�
 | 지도 대조 출력 | `{ cells: [{ row, column, grounded, source_ref }], principles_applied }` |
 | 워크플로 반환값 | `{ round, passed, rejected, unverifiable, verify_failed: [{ url, refs }], coverage: [{ id, cases_found, passed }], subquestion_status: [{ id, search_status, verification_status }], overall_status, query_violations: [{ id, query, rule }], verifier_count, researchers, verifiers, synthesis?, map_check? }`. `passed`·`rejected`·`unverifiable`의 원소는 `{ ref, urls }`이고, `verifiers`의 원소는 `{ url, subquestions, output, stages }`다. `verifier_count`는 검증에 보낸 URL 수(`verifiers`의 길이)다. 추출이 실패한 URL 도 세고, 에이전트 호출 수는 아니며 보충·판정·재판정 실행 수도 세지 않는다. `overall_status`는 `ok`나 `not-ok`다 |
 
-**에이전트에게 보내는 프롬프트.** 워크플로는 연구자와 검증자에게 보내는 프롬프트의 첫 줄을 `MODE: <모드>`로 쓴다. 모드 값은 연구자가 `explore`·`synthesize`, 검증 단계가 `extract`·`refetch`·`judge`·`map`이다. 추출 검증자는 추출에서 `extract`, 보충에서 `refetch`를 받는다. 판정 에이전트는 판정과 재판정에서 `judge`, 지도 대조 에이전트는 `map`을 받는다. 둘째 줄에는 `PRINCIPLES: <principles_path>`를 두고, 셋째 줄부터 모드별 입력을 json 코드 울타리 안의 `JSON.stringify(입력, null, 2)` 블록 하나로 둔다. 연구자 탐색 모드의 입력은 `{ question, situation, target, mode, subquestion, forbidden_terms }`, 종합 모드의 입력은 `{ question, target, passed_rows }`, 추출 모드의 입력은 `{ url, claims: [{ ref, text }] }`, 보충 모드의 입력은 `{ url, claims: [{ ref, text, missing }] }`, 판정 모드의 입력은 판정 묶음 `{ items: [{ url, claims: [{ ref, text, quote, context, source_note }] }] }`, 지도 대조 모드의 입력은 `{ evidence_map, passed }`다. 보충 입력의 `missing`은 처음 판정의 값이다. 판정 입력의 `quote`·`context`는 추출 출력(재판정이면 보충 출력)의 값이고, `source_note`는 같은 출력의 `exists_note`이며 없으면 빈 문자열이다. 추출 출력의 `reason`은 판정 입력에 넣지 않는다. 재판정의 입력도 판정 모드의 입력과 같은 형식이며, 보충한 주장만 묶는다. 판정과 재판정의 호출 label 은 `judge:<n>`·`rejudge:<n>`이고, 추출·보충은 `extract:<url>`·`refetch:<url>`, 지도 대조는 `map-check`다. `passed_rows`와 `passed`의 원소는 `{ ref, row }`다. 에이전트 정의의 모드 처리 단락은 이 첫 줄로 모드를 고른다.
+**에이전트에게 보내는 프롬프트.** 워크플로는 연구자와 검증자에게 보내는 프롬프트의 첫 줄을 `MODE: <모드>`로 쓴다. 모드 값은 연구자가 `explore`·`synthesize`, 검증 단계가 `extract`·`refetch`·`judge`·`map`이다. 추출 검증자는 추출에서 `extract`, 보충에서 `refetch`를 받는다. 판정 에이전트는 판정과 재판정에서 `judge`, 지도 대조 에이전트는 `map`을 받는다. 둘째 줄에는 `PRINCIPLES: <principles_path>`를 두고, 셋째 줄부터 모드별 입력을 json 코드 울타리 안의 `JSON.stringify(입력, null, 2)` 블록 하나로 둔다. 연구자 탐색 모드의 입력은 `{ question, situation, target, mode, subquestion, forbidden_terms, intended_use, constraints }`, 종합 모드의 입력은 `{ question, target, intended_use, constraints, passed_rows }`, 추출 모드의 입력은 `{ url, claims: [{ ref, text }] }`, 보충 모드의 입력은 `{ url, claims: [{ ref, text, missing }] }`, 판정 모드의 입력은 판정 묶음 `{ items: [{ url, claims: [{ ref, text, quote, context, source_note }] }] }`, 지도 대조 모드의 입력은 `{ evidence_map, passed }`다. 보충 입력의 `missing`은 처음 판정의 값이다. 판정 입력의 `quote`·`context`는 추출 출력(재판정이면 보충 출력)의 값이고, `source_note`는 같은 출력의 `exists_note`이며 없으면 빈 문자열이다. 추출 출력의 `reason`은 판정 입력에 넣지 않는다. 재판정의 입력도 판정 모드의 입력과 같은 형식이며, 보충한 주장만 묶는다. 판정과 재판정의 호출 label 은 `judge:<n>`·`rejudge:<n>`이고, 추출·보충은 `extract:<url>`·`refetch:<url>`, 지도 대조는 `map-check`다. `passed_rows`와 `passed`의 원소는 `{ ref, row }`다. 에이전트 정의의 모드 처리 단락은 이 첫 줄로 모드를 고른다.
 
 **`principles_applied`가 빈 때.** 오케스트레이터는 그 사실을 보고에 적고 자동으로 다시 실행하지 않는다.
 

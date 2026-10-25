@@ -581,14 +581,15 @@ check "mergeStatus 는 ok 하위 질문의 검증 실패만으로도 overall_sta
 cat > "$FX/args_c.json" <<'EOF'
 {"question": "Q?", "situation": "Sit", "target": "Tgt", "mode": "contrast", "round": 1,
  "subquestions": [{"id": "S1", "scope": "a", "include": ["i"], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": ["e"]}],
- "forbidden_terms": ["Acme"], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md"}
+ "forbidden_terms": ["Acme"], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md",
+ "intended_use": "U", "constraints": ["K"]}
 EOF
 cat > "$FX/row.json" <<'EOF'
-{"case": "C0", "url": "https://a", "outcome": "O0", "axes": {
+{"case": "C0", "url": "https://a", "outcome": "O0", "bearing": "B0", "axes": {
   "purpose": {"prior": "p0", "same": true, "note": "n"}, "mechanism": {"prior": "m0", "same": false, "note": "n"},
   "evaluation": {"prior": "e0", "same": false, "note": "n"}, "target": {"prior": "t0", "same": true, "note": "n"}}}
 EOF
-# mkin <응답표 파일> <출력 파일> — 응답표 파일의 "@mode" 값을 args 의 mode 로 쓰고 "@ROW@" 문자열을 row.json 의 값으로 바꿔 run 입력을 만든다.
+# mkin <응답표 파일> <출력 파일> [args 파일] — args 파일(없으면 args_c.json)을 읽고, 응답표 파일의 "@mode" 값을 args 의 mode 로 쓰고 "@ROW@" 문자열을 row.json 의 값으로 바꿔 run 입력을 만든다.
 mkin() {
   json_run '
 import json, sys
@@ -607,7 +608,7 @@ def sub(v):
     return v
 with open(sys.argv[4], "w", encoding="utf-8") as f:
     json.dump({"args": args, "responses": sub(resp["responses"])}, f, ensure_ascii=False)
-' "$1" "$FX/row.json" "$FX/args_c.json" "$2"
+' "$1" "$FX/row.json" "${3:-$FX/args_c.json}" "$2"
 }
 # 종합 프롬프트의 기대 row 는 고정 파일에서 읽는다. 한 줄로 줄여 파이썬 식에 넣는다.
 PYQ="'"
@@ -640,8 +641,8 @@ check "연구자 호출의 agentType 과 phase 가 정해진 값이다" "json_tr
 E_RC_VER='(lambda by: by("extract:") == (["extract:https://a", "extract:https://b"], {"disciplined-coder:prior-art-verifier"}) and by("judge:") == (["judge:1"], {"disciplined-coder:prior-art-judge"}))(lambda p: ([c["label"] for c in d["calls"] if c["label"].startswith(p)], {c["agentType"] for c in d["calls"] if c["label"].startswith(p)})) and all(c["phase"] == "Verify" for c in d["calls"] if c["label"].split(":")[0] in ("extract", "judge")) and d["result"]["verifier_count"] == 2'
 check "검증 단계 호출의 agentType 과 phase 가 정해진 값이고 verifier_count 가 URL 수와 같다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_VER\""
 E_RC_EXP="$PY_WRAP_HEAD"'all(
-  (lambda b, sq: set(b) == {"question", "situation", "target", "mode", "subquestion", "forbidden_terms"}
-    and b["question"] == "Q?" and b["situation"] == "Sit" and b["target"] == "Tgt" and b["mode"] == "contrast"
+  (lambda b, sq: set(b) == {"question", "situation", "target", "mode", "subquestion", "forbidden_terms", "intended_use", "constraints"}
+    and b["intended_use"] == "U" and b["constraints"] == ["K"] and b["question"] == "Q?" and b["situation"] == "Sit" and b["target"] == "Tgt" and b["mode"] == "contrast"
     and b["forbidden_terms"] == ["Acme"] and b["subquestion"] == sq)(block(call("research:" + sq["id"])[0], "explore"), sq)
   for sq in [{"id": "S1", "scope": "a", "include": ["i"], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": ["e"]}])'"$PY_WRAP_TAIL"
 check "탐색 프롬프트의 줄 형식과 JSON 블록이 정해진 대로다" "json_true \"\$FX/rc_out.json\" \"\$E_RC_EXP\""
@@ -682,10 +683,12 @@ cat > "$FX/rs_resp.json" <<'EOF'
   "map-check": {"cells": [], "principles_applied": []}}}
 EOF
 check "survey 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rs_resp.json\" \"\$FX/rs_in.json\" && harn run < \"\$FX/rs_in.json\" > \"\$FX/rs_out.json\""
-E_RS_SYN="$PY_WRAP_HEAD"'(lambda cs, b, rows: len(cs) == 1 and cs[0]["phase"] == "Synthesize" and cs[0]["agentType"] == "disciplined-coder:prior-art-researcher" and set(b) == {"question", "target", "passed_rows"} and b["question"] == "Q?" and b["target"] == "Tgt" and b["passed_rows"] == rows)(call("synthesize"), block(call("synthesize")[0], "synthesize"), [{"ref": "S1#case#0", "row": json.loads('"$PYQ$ROW_LINE$PYQ"')}])'"$PY_WRAP_TAIL"
+E_RS_SYN="$PY_WRAP_HEAD"'(lambda cs, b, rows: len(cs) == 1 and cs[0]["phase"] == "Synthesize" and cs[0]["agentType"] == "disciplined-coder:prior-art-researcher" and set(b) == {"question", "target", "intended_use", "constraints", "passed_rows"} and b["intended_use"] == "U" and b["constraints"] == ["K"] and b["question"] == "Q?" and b["target"] == "Tgt" and b["passed_rows"] == rows)(call("synthesize"), block(call("synthesize")[0], "synthesize"), [{"ref": "S1#case#0", "row": json.loads('"$PYQ$ROW_LINE$PYQ"')}])'"$PY_WRAP_TAIL"
 check "종합 호출이 하나이고 프롬프트의 passed_rows 가 통과한 근거 지도 행과 같다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_SYN\""
 E_RS_MAP="$PY_WRAP_HEAD"'(lambda cm, b, syn: len(cm) == 1 and cm[0]["phase"] == "MapCheck" and cm[0]["agentType"] == "disciplined-coder:prior-art-mapcheck" and set(b) == {"evidence_map", "passed"} and b["evidence_map"] == d["result"]["synthesis"]["evidence_map"] and b["passed"] == syn["passed_rows"])(call("map-check"), block(call("map-check")[0], "map"), block(call("synthesize")[0], "synthesize"))'"$PY_WRAP_TAIL"
 check "지도 대조 호출이 하나이고 블록이 { evidence_map, passed } 다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_MAP\""
+E_RS_NOB="$PY_WRAP_HEAD"'all("B0" not in x["text"] for c in d["calls"] if c["label"].startswith("judge:") for it in block(c, "judge")["items"] for x in it["claims"])'"$PY_WRAP_TAIL"
+check "근거 지도 행의 bearing 은 판정 입력에 들어가지 않는다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_NOB\""
 E_RS_CNT='d["result"]["verifier_count"] == 2 and len(d["result"]["verifiers"]) == 2'
 check "verifier_count 가 지도 대조 검증자를 세지 않는다" "json_true \"\$FX/rs_out.json\" \"\$E_RS_CNT\""
 E_RS_JUD='[c["label"] for c in d["calls"] if c["label"].startswith("judge:")] == ["judge:1"]'

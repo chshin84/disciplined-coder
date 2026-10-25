@@ -30,6 +30,8 @@ const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
     mode: args.mode,
     subquestion: sq,
     forbidden_terms: args.forbidden_terms,
+    intended_use: args.intended_use,
+    constraints: args.constraints,
   }),
   { agentType: RESEARCHER, label: `research:${sq.id}`, phase: 'Research', schema: S.RESEARCHER_SCHEMA },
 )));
@@ -109,7 +111,7 @@ if (args.mode === 'survey') {
   if (passed_rows.length > 0) {
     phase('Synthesize');
     synthesis = await agent(
-      prompt('synthesize', args.principles_path, { question: args.question, target: args.target, passed_rows }),
+      prompt('synthesize', args.principles_path, { question: args.question, target: args.target, intended_use: args.intended_use, constraints: args.constraints, passed_rows }),
       { agentType: RESEARCHER, label: 'synthesize', phase: 'Synthesize', schema: S.SYNTHESIS_SCHEMA },
     );
   }
@@ -520,7 +522,7 @@ function schemas() {
   };
   const row = (axesSchema) => ({
     type: 'object',
-    properties: { case: str, url: str, outcome: str, axes: axesSchema },
+    properties: { case: str, url: str, outcome: str, axes: axesSchema, bearing: str },
     required: ['case', 'url', 'axes', 'outcome'],
   });
   const principles = { type: 'array', items: str };
@@ -608,7 +610,7 @@ function schemas() {
         type: 'array',
         items: {
           type: 'object',
-          properties: { text: str, refs: { type: 'array', items: str } },
+          properties: { text: str, refs: { type: 'array', items: str }, supports: str },
           required: ['text', 'refs'],
         },
       },
