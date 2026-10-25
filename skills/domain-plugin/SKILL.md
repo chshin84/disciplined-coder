@@ -21,7 +21,7 @@ Claude Code 플러그인과 마켓플레이스를 만들고 배포하는 방법�
 
 **validate** — `claude plugin validate ./`로 검증한다. `--strict`는 경고까지 실패로 취급하므로, 위 버전 정책을 쓰는 레포에서는 `--strict`가 실패하는 것이 정상이며 non-strict로 통과를 확인한다.
 
-**스킬 이름의 부류** — 이름의 모양이 그 스킬을 어떻게 쓰는지 말하게 한다. 열어서 읽는 규칙집에는 `domain-` 접두사를 붙이고(`domain-readme`·`domain-plugin`), 읽기 전용 서브에이전트로 실행하는 렌즈에는 `lens-` 접두사를 붙이며, 렌즈를 실행해 결과를 내는 절차에는 접두사 대신 동사구를 쓴다(`review-specs`·`review-docs`·`review-llm-calls`·`audit-repo-docs`·`dispatching-lenses`·`aggregating-lenses`·`nested-orchestration`). 사용자와 여러 턴을 주고받는 절차와 서브에이전트 정의와 워크플로를 묶은 구성은 `agent-` 접두사를 쓴다(`agent-prior-art`). 규칙집과 절차가 같은 접두사를 쓰면 여는 쪽이 무엇을 기대할지 알 수 없다.
+**스킬 이름의 부류** — 이름의 모양이 그 스킬을 어떻게 쓰는지 말하게 한다. 열어서 읽는 규칙집에는 `domain-` 접두사를 붙이고(`domain-readme`·`domain-plugin`), 읽기 전용 서브에이전트로 실행하는 렌즈에는 `lens-` 접두사를 붙이며, 렌즈나 에이전트를 실행해 결과를 내는 절차에는 접두사 대신 동사구를 쓴다(`review-specs`·`review-docs`·`review-llm-calls`·`audit-repo-docs`·`dispatching-lenses`·`aggregating-lenses`·`nested-orchestration`·`researching-prior-art`). 규칙집과 절차가 같은 접두사를 쓰면 여는 쪽이 무엇을 기대할지 알 수 없다.
 
 **컴포넌트 위치** — `agents/`·`skills/`·`commands/`·`workflows/`·`hooks/hooks.json`에 둔다. 플러그인 루트의 CLAUDE.md는 컨텍스트로 로드되지 않는다.
 

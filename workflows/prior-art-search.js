@@ -1,7 +1,7 @@
 export const meta = {
   name: 'prior-art-search',
   description: '하위 질문마다 연구자를 실행하고 인용을 검증자로 판정해 통과한 선행 사례만 모은다',
-  whenToUse: 'agent-prior-art 오케스트레이터가 사용자가 승인한 프로토콜로만 실행한다.',
+  whenToUse: 'researching-prior-art 오케스트레이터가 사용자가 승인한 프로토콜로만 실행한다.',
   phases: [
     { title: 'Research' },
     { title: 'Verify' },
@@ -14,10 +14,10 @@ export const meta = {
 // 시험 도구가 본문보다 먼저 판정 함수를 부르므로 const 를 초기화 전에 참조하면 예외가 나기 때문이다.
 // 단계 사이에는 parallel() 장벽을 둔다. thunk 는 agent() 의 반환만 돌려주고, 짝짓기는 반환 배열의 위치로 한다.
 const S = schemas();
-const RESEARCHER = 'disciplined-coder:prior-art-researcher';
-const EXTRACTOR = 'disciplined-coder:prior-art-verifier';
-const JUDGE = 'disciplined-coder:prior-art-judge';
-const MAPCHECK = 'disciplined-coder:prior-art-mapcheck';
+const RESEARCHER = 'disciplined-coder:researcher';
+const EXTRACTOR = 'disciplined-coder:citation-verifier';
+const JUDGE = 'disciplined-coder:citation-judge';
+const MAPCHECK = 'disciplined-coder:map-check';
 // 판정 묶음 하나에 넣는 주장 수의 상한이다. 값의 근거는 spec 「Opus 일괄 판정」의 묶음 크기다.
 const BATCH_SIZE = 20;
 

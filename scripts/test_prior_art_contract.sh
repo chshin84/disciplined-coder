@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 선행연구 에이전트의 계약 코드(scripts/prior_art_contract.json)를 워크플로의 스키마 상수와
+# 선행연구 스킬의 계약 코드(scripts/prior_art_contract.json)를 워크플로의 스키마 상수와
 # 에이전트 정의의 출력 예시에 대조한다. 계약: FAIL=0 (매직넘버 금지 — 개수는 테스트가 센다).
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -203,10 +203,10 @@ for pair in researcher:RESEARCHER_SCHEMA extract:EXTRACT_SCHEMA judge:JUDGE_SCHE
   json_run 'import json,sys; json.dump(json.load(open(sys.argv[1],encoding="utf-8"))[sys.argv[2]], open(sys.argv[3],"w",encoding="utf-8"))' "$SCHEMAS" "$const" "$FX/schema_$name.json" 2>/dev/null || true
   check "스키마 $const 가 계약 코드와 맞는다" "contract_check $name \"\$FX/schema_$name.json\" -"
 done
-RD="$HERE/agents/prior-art-researcher.md"
-VD="$HERE/agents/prior-art-verifier.md"
-JD="$HERE/agents/prior-art-judge.md"
-MD="$HERE/agents/prior-art-mapcheck.md"
+RD="$HERE/agents/researcher.md"
+VD="$HERE/agents/citation-verifier.md"
+JD="$HERE/agents/citation-judge.md"
+MD="$HERE/agents/map-check.md"
 check "에이전트 정의 파일이 모두 있다" "[ -f \"\$RD\" ] && [ -f \"\$VD\" ] && [ -f \"\$JD\" ] && [ -f \"\$MD\" ]"
 for pair in researcher:RD synthesis:RD scout:RD extract:VD judge:JD map:MD; do
   name="${pair%%:*}"; def="${pair##*:}"; file="${!def}"

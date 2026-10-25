@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# UserPromptSubmit: 사용자 메시지에 선행연구 주제어와 요청형 표현이 함께 있으면 agent-prior-art 스킬을
+# UserPromptSubmit: 사용자 메시지에 선행연구 주제어와 요청형 표현이 함께 있으면 researching-prior-art 스킬을
 # 열라고 추가 컨텍스트로 알린다(비블로킹, 게이트 아님). 메시지마다 보며 세션당 횟수 제한은 두지 않는다.
 #
 # 이 파일이 주제어 목록과 요청형 목록의 원본이다. 스킬은 낱말 목록을 옮겨 적지 않고 이 파일을 가리킨다.
@@ -28,5 +28,5 @@ for t in "${REQUESTS[@]}"; do [[ $p == *"$t"* ]] && { hit_request=1; break; }; d
 DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유
 
-msg="사용자 메시지가 선행연구를 찾아 달라는 요청으로 보인다. 그렇다면 disciplined-coder 플러그인의 agent-prior-art 스킬을 열어 그 절차대로 진행하라. 손으로 짠 워크플로나 일반 리서치로 대신하지 마라. 선행연구를 요청한 것이 아니면 이 알림을 무시하라. 넛지일 뿐 차단은 아니다."
+msg="사용자 메시지가 선행연구를 찾아 달라는 요청으로 보인다. 그렇다면 disciplined-coder 플러그인의 researching-prior-art 스킬을 열어 그 절차대로 진행하라. 손으로 짠 워크플로나 일반 리서치로 대신하지 마라. 선행연구를 요청한 것이 아니면 이 알림을 무시하라. 넛지일 뿐 차단은 아니다."
 printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"%s"}}\n' "$(escape_for_json "$msg")"

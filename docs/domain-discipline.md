@@ -467,7 +467,7 @@ action title 조합과 같은 구조다.
 
 2026-10-18에 `lens-prior-art`를 삭제하고 `agent-prior-art`로 대체했다. 위 서술의 `lens-prior-art`는
 삭제된 렌즈를 가리킨다. 발동 기준은 지금도 각 호출자(`review-specs`·`review-docs`)가 정하고,
-제안과 승인 규칙은 `agent-prior-art`의 「발동과 기록」이 정한다.
+제안과 승인 규칙은 `researching-prior-art`의 「발동과 기록」이 정한다. 2026-10-25에 `agent-prior-art`의 이름을 `researching-prior-art`로 바꿨다.
 
 2026-10-18 재편에서 다시 리뷰를 물을 때의 권장안 기준과 리뷰 범위를 넣었다. 두 세션에서 spec 리뷰가 5~6차까지 이어졌고 사용자는 "재리뷰를 너무 많이 한다", "설계 변경이 너무 잦다"고 했다. 근거는 Google 코드 리뷰 지침이다. 이 지침은 변경이 시스템 전체의 상태를 개선하면 완벽하지 않아도 승인하라고 적는다(https://google.github.io/eng-practices/review/reviewer/standard.html). 이 지침은 코드 리뷰를 대상으로 하므로 spec 리뷰에 그대로 적용할 수 있는지는 가정이다. 클린룸 시험은 하지 않았다.
 
@@ -497,9 +497,9 @@ lens-dispatch 브랜치가 `lens-readability` 를 사용자 승인 뒤 실행하
 **측정(2026-10-18 조항별 클린룸 시험).** `LENS-ALLOWED`의 현행 문안과 변경안(`evals/principles/clauses/LENS-ALLOWED/`)을 개발용 질문 5개에 한 번씩 실행하고 sonnet 으로 판정했다. 위반은 현행 문안 0건, 변경안 0건이고 판정은 '채택(차이없음)'이다. 동률이라 질문 짝을 한 번 추가했으나 여전히 같았으므로, 측정이 차이를 잡지 못한 채택이다. 변경 이유는 초안의 기록대로 다음과 같다: 내용 문제는 관측되지 않았다
 
 2026-10-18에 `lens-prior-art`를 삭제하고 `agent-prior-art`로 대체하면서 조항의 예시 괄호를 지웠다.
-위 서술과 측정의 `lens-prior-art`는 삭제된 렌즈를 가리킨다. 선행연구 에이전트의 이름은 `lens-*` 형태가 아니어서
-이 조항의 허가 밖에 있고, 승인 규칙은 `agent-prior-art`의 「발동과 기록」이 정한다. 예시 괄호 밖의 규칙 문장은 바뀌지 않았고
-지시 내용도 달라지지 않아, 사용자가 같은 날 클린룸 시험을 생략하기로 정했다.
+위 서술과 측정의 `lens-prior-art`는 삭제된 렌즈를 가리킨다. 선행연구 스킬의 이름은 `lens-*` 형태가 아니어서
+이 조항의 허가 밖에 있고, 승인 규칙은 `researching-prior-art`의 「발동과 기록」이 정한다. 예시 괄호 밖의 규칙 문장은 바뀌지 않았고
+지시 내용도 달라지지 않아, 사용자가 같은 날 클린룸 시험을 생략하기로 정했다. 2026-10-25에 `agent-prior-art`의 이름을 `researching-prior-art`로 바꿨다.
 
 ## 보고(행동 절)
 
