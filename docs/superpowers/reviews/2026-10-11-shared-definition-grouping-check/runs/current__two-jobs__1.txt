@@ -1,1 +1,0 @@
-{"tables": "| X→Y (X 설계에 Y의 실제 결과 필요) | logarchive | logretention | faqindex | faqsearch |\n|---|---|---|---|---|\n| logarchive | - | 0 | 0 | 0 |\n| logretention | 0 | - | 0 | 0 |\n| faqindex | 0 | 0 | - | 0 |\n| faqsearch | 0 | 0 | 0 | - |", "partition": [["logarchive"], ["logretention"], ["faqindex"], ["faqsearch"]]}

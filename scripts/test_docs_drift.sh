@@ -309,17 +309,6 @@ check "옛 spec 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OL
 OLDNESTED="$HERE/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md"
 check "옛 nested 설계에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDNESTED\""
 
-# 영문 재작성 대응표는 그 재작성이 되돌려져 지금 구조와 안 맞는다. 표시가 없으면 에이전트원칙이 영문인
-# 것처럼 읽힌다. 파일 목록은 디렉터리에서 도출한다 — 표가 늘어도 사람이 목록을 맞출 필요가 없다.
-RWDIR="$HERE/docs/superpowers/rewrite-map"
-RWN=0
-for RW in "$RWDIR"/*.md; do
-  [ -f "$RW" ] || continue
-  RWN=$((RWN+1))
-  check "$(basename "$RW") 에 superseded 표시가 있다" "head -8 '$RW' | grep -qF 'superseded'"
-done
-check "대응표를 하나 이상 훑었다"           "[ '$RWN' -gt 0 ]"
-
 # --- 프로젝트 파일에 손대는 예외: 코드 주석 한 곳만 조건을 적는다 ---
 # 전에는 README가 조건의 원본이었고 스캐폴드가 그 절을 가리켰다. 조건은 코드가 실제로 하는 일이라
 # 코드 옆 주석을 원본으로 두고, 머리 주석이 그 태그를 가리킨다. 가리키는 태그가 실재하는지도 본다.

@@ -1,3 +1,0 @@
-```json
-{"tables": "| X\\Y | inventory | adapter | newprovider | accountmigrate | cutover |\n|---|---|---|---|---|---|\n| inventory | - | 0 | 0 | 0 | 0 |\n| adapter | 1 | - | 0 | 0 | 0 |\n| newprovider | 0 | 0 | - | 0 | 0 |\n| accountmigrate | 0 | 0 | 0 | - | 0 |\n| cutover | 0 | 0 | 0 | 1 | - |", "partition": [["inventory"], ["adapter"], ["newprovider"], ["accountmigrate"], ["cutover"]]}
-```

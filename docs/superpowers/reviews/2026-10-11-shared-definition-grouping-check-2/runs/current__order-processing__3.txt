@@ -1,1 +1,0 @@
-{"tables": "| X\\Y | orderstate | payment | inventory | shipping | cancellation |\n|---|---|---|---|---|---|\n| orderstate | - | 0 | 0 | 0 | 0 |\n| payment | 0 | - | 0 | 0 | 0 |\n| inventory | 0 | 0 | - | 0 | 0 |\n| shipping | 0 | 0 | 0 | - | 0 |\n| cancellation | 0 | 0 | 0 | 0 | - |", "partition": [["orderstate"], ["payment"], ["inventory"], ["shipping"], ["cancellation"]]}
