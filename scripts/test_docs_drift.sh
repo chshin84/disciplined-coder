@@ -612,6 +612,8 @@ for f in "$HERE"/skills/*/SKILL.md "$HERE"/commands/*.md "$HERE"/agents/*.md; do
   check "$(basename "$(dirname "$f")")/$(basename "$f") 의 description 이 YAML 평문으로 안전하다" "! printf '%s' \"\$DESC\" | grep -qE ': | #'"
 done
 check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
+# 호출 정책의 규칙은 domain-plugin 이 소유하고, 검사는 test_lens_contract.sh 「호출 정책」 묶음이 한다.
+check "domain-plugin 이 에이전트 호출 정책을 둔다" "has_sec \"\$HERE/skills/domain-plugin/SKILL.md\" '에이전트 호출 정책'"
 
 # --- 이독성 규칙의 출처가 세 문서에 걸쳐 이어져 있다 ---
 # 에이전트원칙은 조항만 담고, domain-korean 이 상세를 담으며, lens-readability 가 그것을 열어 대조한다.
