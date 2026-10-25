@@ -5,10 +5,11 @@
               "principles_applied": true, "notes": true },
   "agents": {
     "lens-adversarial":       { "modes": ["design", "artifact"], "types": ["failure-mode", "over-engineering", "irreversible", "risk"], "extra": {}, "omit": [] },
-    "lens-adversarial-claim": { "modes": ["claim"], "types": ["counter-evidence", "weak-premise", "alternative-explanation", "missing-comparison"], "extra": {}, "omit": [] },
     "lens-consistency":       { "modes": ["spec", "plan"], "types": ["contradiction", "gap", "drift", "scope"], "extra": {}, "omit": [] },
     "lens-fit":               { "modes": ["auto"], "types": ["schema", "format", "style", "constraint", "compat"], "extra": { "doc_type": true }, "omit": [] },
     "lens-grounding":         { "modes": ["runtime", "spec", "doc"], "types": ["omission", "contradiction", "unsupported", "mismatch"], "extra": {}, "omit": [] },
-    "lens-readability":       { "modes": ["render"], "types": [], "extra": { "purpose": true, "suggestions": [{ "where": true, "why": true, "screen": true }] }, "omit": ["issues"] }
+    "lens-readability":       { "modes": ["text"], "types": [], "extra": { "purpose": true, "suggestions": [{ "where": true, "why": true, "rewrite": true }] }, "omit": ["issues"] },
+    "lens-rebuttal":          { "modes": ["claim"], "types": ["counter-evidence", "weak-premise", "alternative-explanation", "missing-comparison"], "extra": {}, "omit": [] },
+    "lens-visual":            { "modes": ["render"], "types": [], "extra": { "purpose": true, "suggestions": [{ "where": true, "why": true, "screen": true }] }, "omit": ["issues"] }
   }
 }

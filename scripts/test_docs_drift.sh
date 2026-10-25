@@ -499,8 +499,8 @@ check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
 # 호출 정책의 규칙은 domain-plugin 이 소유하고, 검사는 test_lens_contract.sh 「호출 정책」 묶음이 한다.
 check "domain-plugin 이 에이전트 호출 정책을 둔다" "has_sec \"\$HERE/skills/domain-plugin/SKILL.md\" '에이전트 호출 정책'"
 
-# --- 화면 리뷰 렌즈가 제목 규칙의 기준 문서를 연다 ---
-# lens-readability 는 렌더링된 화면의 제목을 TITLE-LAYERS·TITLE-CLAIM 으로 본다. 그 조항은 managing-docs 의
+# --- 글 가독성 렌즈가 제목 규칙의 기준 문서를 연다 ---
+# lens-readability 는 문서와 슬라이드의 제목을 TITLE-LAYERS·TITLE-CLAIM 으로 본다. 그 조항은 managing-docs 의
 # reading-docs.md 로 옮겨졌으므로, 정의가 그 파일을 기준 문서로 가리키는지 붙든다.
 echo "[규칙 출처] lens-readability 가 reading-docs.md 를 기준 문서로 연다"
 RDB_L="$HERE/agents/lens-readability.md"

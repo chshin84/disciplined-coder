@@ -10,7 +10,7 @@ FX="$(mktemp -d)"; trap 'rm -rf "$FX"' EXIT
 _json_python || true
 
 # 계약에 아는 렌즈 이름. spec 「에이전트 구성」 표가 원본이다.
-KNOWN="lens-adversarial lens-adversarial-claim lens-consistency lens-fit lens-grounding lens-readability"
+KNOWN="lens-adversarial lens-consistency lens-fit lens-grounding lens-readability lens-rebuttal lens-visual"
 
 # policy_violations <agents_dir> <workflows_dir>
 # 위반마다 `agents:<파일>:<사유>` 나 `workflows:<파일>:<줄>` 한 줄을 낸다. 0=위반 없음, 1=있음.
@@ -143,15 +143,16 @@ check "agentType 을 뺀 호출을 잡는다" "policy_violations \"\$FX/w_noat/a
 
 echo "[정의]"
 . "$HERE/scripts/_doc_keys.sh"
-# 정의마다 기대하는 tools 줄. spec 「에이전트 구성」 표가 원본이고, readability 의 브라우저 도구 이름은
+# 정의마다 기대하는 tools 줄. spec 「에이전트 구성」·「2차 변경」 표가 원본이고, visual 의 브라우저 도구 이름은
 # docs/superpowers/decisions/2026-10-25-lens-agent-runtime.md 시험 4 가 확인한 이름이다.
 declare -A TOOLS=(
   [lens-adversarial]="Read, Grep, Glob"
-  [lens-adversarial-claim]="Read, Grep, Glob, WebSearch, WebFetch"
   [lens-consistency]="Read, Grep, Glob"
   [lens-fit]="Read, Grep, Glob"
   [lens-grounding]="Read, Grep, Glob"
-  [lens-readability]="Read, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_snapshot"
+  [lens-readability]="Read, Grep, Glob"
+  [lens-rebuttal]="Read, Grep, Glob, WebSearch, WebFetch"
+  [lens-visual]="Read, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_snapshot"
 )
 
 # example_ok <정의 파일> <렌즈 이름> — 「출력 예시」 절의 첫 ```json 블록을 계약과 대조한다.
@@ -200,7 +201,7 @@ for name in $KNOWN; do
   check "$name: 출력 예시가 계약 소유자를 가리킨다" \
     "sec_has \"$d\" '출력 예시' '「결과를 모으는 법」' && sec_has \"$d\" '출력 예시' 'scripts/lens_contract.json'"
 done
-check "lens-readability: 도구 부재 처리를 적는다" "grep -qF '브라우저 도구 없음' \"\$HERE/agents/lens-readability.md\""
+check "lens-visual: 도구 부재 처리를 적는다" "grep -qF '브라우저 도구 없음' \"\$HERE/agents/lens-visual.md\""
 
 # 예시 결함 주입 — 계약 밖 칸을 넣은 예시는 대조가 실패해야 한다.
 cp "$HERE/agents/lens-grounding.md" "$FX/bad_example.md" 2>/dev/null || : > "$FX/bad_example.md"

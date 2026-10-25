@@ -59,7 +59,7 @@ done
 /show-principles     # 적용 중인 원칙 보기
 ```
 
-렌즈(문서를 한 관점에서 검토하는 읽기 전용 서브에이전트)는 에이전트로 실행한다. 프롬프트에 `@agent-disciplined-coder:lens-grounding` 처럼 이름을 적거나, "이 보고서를 근거 렌즈로 봐 줘"처럼 요청한다. 예전의 `/disciplined-coder:lens-*` 슬래시 명령은 없어졌다.
+렌즈(문서를 한 관점에서 검토하는 읽기 전용 서브에이전트)는 에이전트로 실행한다. "이 보고서 적대적 검토 해 줘", "반박해 줘", "근거 확인", "가독성 봐 줘", "디자인 검토"처럼 요청하면 Claude 가 대상에 맞는 렌즈를 고른다. 프롬프트에 `@agent-disciplined-coder:lens-grounding` 처럼 이름을 직접 적어도 된다. 예전의 `/disciplined-coder:lens-*` 슬래시 명령은 없어졌다.
 
 ## 차단되었을 때 푸는 법
 
