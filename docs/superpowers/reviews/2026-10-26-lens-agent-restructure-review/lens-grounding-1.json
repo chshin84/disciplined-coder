@@ -1,0 +1,96 @@
+{
+ "lens": "lens-grounding",
+ "read": [
+  "agents/lens-grounding.md",
+  "agent-principles.md",
+  "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+  "agents/lens-readability.md",
+  "agents/lens-adversarial-claim.md",
+  "agents/lens-*.md (frontmatter)",
+  "scripts/lens_contract.json",
+  "scripts/test_lens_contract.sh",
+  "scripts/test_docs_drift.sh (360-380, 498-510)",
+  "skills/dispatching-lenses/SKILL.md",
+  "skills/review-docs/SKILL.md",
+  "README.md (렌즈 언급 줄)",
+  "docs/domain-discipline.md (grep)",
+  "docs/superpowers/decisions/2026-10-25-lens-agent-runtime.md",
+  "git show main:skills/lens-readability/SKILL.md",
+  "repo-wide grep: lens-adversarial-claim|lens-readability|lens-visual|lens-rebuttal"
+ ],
+ "issues": [
+  {
+   "where": "2차 변경 「바뀌는 파일」",
+   "type": "omission",
+   "claim": "바뀌는 파일 목록에 scripts/test_docs_drift.sh 가 없다. 이 검사는 agents/lens-readability.md 의 「읽기 범위」가 reading-docs.md 를 기준 문서로 가리키는지 확인하고, 주석은 lens-readability 가 렌더링된 화면의 제목을 본다고 적는다. 2차 변경은 lens-readability 를 main 의 글 검토로 되살리는데, main 원문의 「읽기 범위」는 domain-korean 과 에이전트원칙만 가리키므로 그대로 옮기면 이 검사가 실패하고, 화면 제목 검토를 lens-visual 로 옮기면 주석과 검사 대상 파일이 틀린다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "**바뀌는 파일.** `agents/lens-readability.md`(글 검토로 다시 씀), `agents/lens-visual.md`(새 파일), `agents/lens-adversarial-claim.md` 를 `agents/lens-rebuttal.md` 로 이름 변경, `scripts/lens_contract.json` 과 `scripts/test_lens_contract.sh` 의 이름·도구 표, `skills/dispatching-lenses/SKILL.md`, `skills/review-docs/SKILL.md`, README 의 렌즈 실행 안내다.",
+   "counterpart_file": "scripts/test_docs_drift.sh",
+   "counterpart": "# lens-readability 는 렌더링된 화면의 제목을 TITLE-LAYERS·TITLE-CLAIM 으로 본다. 그 조항은 managing-docs 의",
+   "principle": "REPORT-DEAD",
+   "consequence": "test_docs_drift.sh 는 370행 절 참조 검사와 503-508행 기준 문서 검사에서 agents/lens-readability.md 를 화면 리뷰 렌즈로 전제한다."
+  },
+  {
+   "where": "2차 변경 「바뀌는 파일」",
+   "type": "mismatch",
+   "claim": "lens_contract.json 의 변경을 '이름·도구 표'로 적었으나 그 파일에는 도구 표가 없다. 실제로 바뀌어야 하는 칸은 에이전트 키, modes(lens-readability 의 render→text, lens-visual 의 render), suggestions 의 screen 칸 배치다. test_lens_contract.sh 도 이름·도구 표 밖에 '브라우저 도구 없음' 검사가 lens-readability.md 를 가리킨다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "`scripts/lens_contract.json` 과 `scripts/test_lens_contract.sh` 의 이름·도구 표",
+   "counterpart_file": "scripts/lens_contract.json",
+   "counterpart": "\"lens-readability\":       { \"modes\": [\"render\"], \"types\": [], \"extra\": { \"purpose\": true, \"suggestions\": [{ \"where\": true, \"why\": true, \"screen\": true }] }, \"omit\": [\"issues\"] }",
+   "principle": "NO-ASSUME",
+   "consequence": "lens_contract.json 의 lens-readability 항목은 render 모드와 screen 칸을 요구하고, test_lens_contract.sh 203행은 lens-readability.md 에서 '브라우저 도구 없음'을 찾는다."
+  },
+  {
+   "where": "2차 변경 「에이전트」 lens-visual 항목",
+   "type": "omission",
+   "claim": "lens-visual 의 출력 형식(suggestions 와 screen 칸, purpose 칸, 「목적 주입」 유지 여부)을 정하지 않았다. 「출력 계약」은 lens-readability 가 suggestions 와 화면 위치 칸을 낸다고 적고 있으나, 2차 변경은 그 절을 대체 대상으로 선언하지 않았고 lens-readability 출력은 where·why 만 둔다고 했다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "`lens-visual` 은 지금 `agents/lens-readability.md` 의 화면 검토를 옮긴 에이전트다. 배치·겹침·잘림·대비·한 화면의 분량·강조의 시각 효과만 보라.",
+   "counterpart_file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "counterpart": "`lens-readability` 는 현행처럼 `suggestions` 를 출력하고, 지적마다 화면 위치 칸을 추가로 둔다.",
+   "principle": "NO-ASSUME",
+   "consequence": "「출력 계약」 절은 화면 위치 칸을 lens-readability 에 두고, 2차 변경은 lens-readability 출력을 where·why 로 정해 두 절이 같은 에이전트에 다른 칸을 요구한다."
+  },
+  {
+   "where": "2차 변경 「에이전트」 lens-readability·lens-visual 항목",
+   "type": "omission",
+   "claim": "현행 화면 렌즈와 main 글 렌즈 모두에 있는 '끊김'(산문과 표·코드·인용 사이를 오가는 횟수) 관찰 항목이 lens-readability 의 옮길 목록에도, lens-visual 의 볼 목록에도 없다. main 의 「반드시 읽히는 곳의 필수 내용」(본문 제목의 결론 확인과 wrong-job 표시)도 lens-readability 로 옮길 대상에 적히지 않았는데, lens-visual 에서는 제목 형태를 lens-readability 가 본다며 뺀다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "「목적 주입」과 「관찰 목록」의 글 항목(이음·끼움·두루뭉술한 결과·압축 전가·길이·수식·이름 형태·형태 섞임·목록·강조)을 옮겨라.",
+   "counterpart_file": "agents/lens-readability.md",
+   "counterpart": "- **끊김** — 산문과 표·코드·인용·구분선 사이를 화면마다 몇 번 오가는가.",
+   "principle": "NO-ASSUME",
+   "consequence": "옮길 목록대로 구현하면 끊김 관찰과 wrong-job 표시는 어느 에이전트 정의에도 남지 않는다."
+  },
+  {
+   "where": "2차 변경 「대화와 첨부의 전달」",
+   "type": "unsupported",
+   "claim": "런타임 시험 6은 원칙 조항 문구를 물어 CLAUDE.md·@import 상속만 확인했다. 대화와 첨부가 상속되지 않는다는 사실과, 상속이 그것 '뿐'이라는 사실은 시험하지 않았다. 문장은 시험이 그 범위를 확인한 것처럼 단정한다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "서브에이전트는 메인 세션의 대화와 첨부를 받지 않는다. 런타임 시험 6이 확인한 상속은 사용자 CLAUDE.md 와 그 @import 뿐이다.",
+   "counterpart_file": "docs/superpowers/decisions/2026-10-25-lens-agent-runtime.md",
+   "counterpart": "| 6. 사용자 CLAUDE.md 와 @import 상속 | 프롬프트에 원칙 경로와 조항 문구를 넣지 않고 `NO-ASSUME` 첫 문장을 물었다. 에이전트는 파일을 읽지 않고(도구 호출은 결과 반환 하나) 첫 문장을 글자 그대로 답했다. 거의 빈 실행의 토큰이 30,791 이었다 | 상속한다 |",
+   "principle": "STATE-ASSUME",
+   "consequence": "시험 기록에는 대화·첨부 상속을 확인한 항목이 없고, spec 은 그 범위를 시험 6의 결론으로 적는다."
+  },
+  {
+   "where": "2차 변경 「에이전트」 lens-rebuttal 항목",
+   "type": "mismatch",
+   "claim": "'주장·제안서·보고서의 논증'을 정의 본문과 description 에서 고치라고 했으나 그 문구는 description 에만 있다. 본문 첫 문단은 이미 '대상 문서나 대화가 내세운 주장'으로 적혀 있다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "정의 본문과 description 의 \"주장·제안서·보고서의 논증\"을 \"주장\"으로 고치고, 도구는 그대로 둔다.",
+   "counterpart_file": "agents/lens-adversarial-claim.md",
+   "counterpart": "너는 주장 반박 검수자다. 대상 문서나 대화가 내세운 주장마다, 그 주장을 무너뜨리거나 약하게 만드는 반박 후보를 찾고, 근거로 받쳐지는 후보만 지적하라.",
+   "principle": "NO-ASSUME",
+   "consequence": "그 문구는 agents/lens-adversarial-claim.md 3행 description 과 skills/dispatching-lenses/SKILL.md 63행 표에 있고 정의 본문에는 없다."
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "REPORT-DEAD",
+  "STATE-ASSUME"
+ ],
+ "notes": "검토 관점: 누락·모순·환각·불일치를 항목마다 따로 보았다. 확인되어 지적하지 않은 사실: lens-adversarial-claim 의 tools(Read, Grep, Glob, WebSearch, WebFetch)는 spec 과 같다. review-docs 에 「퇴고 참고」 절이 있고 39행이 '같은 맥락에서 다시 보면 놓친 위반을 대부분 그대로 놓친다'고 적는다. dispatching-lenses 에 「실행하는 방법」「렌즈 그룹」「결과를 모으는 법」 절이 있다. 시험 4는 Playwright 도구 상속과 HTTP 제공 필요를 확인했고 표의 '(호출자가 HTTP 로 제공)'과 맞다. PDF 를 Read pages 로 화면처럼 보는지는 시험 기록에 없으며 spec 도 구현 전 시험으로 남겼다. 옛 이름 grep 결과: 살아 있는 파일 중 lens-adversarial-claim·lens-readability 를 가리키는 곳은 agents 두 파일, scripts/lens_contract.json, scripts/test_lens_contract.sh, scripts/test_docs_drift.sh, skills/dispatching-lenses, skills/review-docs, docs/domain-discipline.md(219·425행, 근거 기록), evals/principles/cases/q-edit-priority-u2/prompt.md(시험 입력), .superpowers/sdd 작업 파일이다. review-specs·review-llm-calls·hooks·README 에는 옛 이름이 없다. 그래서 test_docs_drift.sh 만 목록에서 빠진 살아 있는 검사 파일이다. docs/domain-discipline.md 219행('퇴고는 lens-fit 과 lens-readability 가 맡는다')은 근거 문서라 지적으로 올리지 않았으나, 2차 변경 뒤 뜻이 다시 맞는지 호출자가 확인할 만하다. 「출력 계약」의 lens-adversarial-claim 칸 표(counterpart_file 을 URL 만으로 적음)는 현행 정의·dispatching-lenses 의 URL·파일·conversation 과 다르나 2차 변경 절 밖이라 notes 에만 적는다. PRINCIPLES 경로의 원칙은 조항 ID 목록을 grep 으로 확인했고 본문은 세션에 실린 사본을 적용했다.",
+ "target": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md 「2차 변경」"
+}

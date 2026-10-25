@@ -1,0 +1,142 @@
+{
+ "lens": "lens-fit",
+ "doc_type": "설계 (spec·plan) 행. 이 절은 설계 결정과 그 근거(바꾸는 이유, 에이전트 표, 실행 표, 바뀌는 파일)를 포함하고, 구현자가 따를 지시를 함께 적는다. 그래서 에이전트원칙 「문서 타입과 수명」 표의 설계 행으로 골랐다. 설계 행이 포함하지 말라고 한 내용은 없다.",
+ "read": [
+  "D:/projects/Structure/disciplined-coder/.claude/worktrees/lens-agent-restructure/agents/lens-fit.md",
+  "D:/projects/Structure/disciplined-coder/.claude/worktrees/lens-agent-restructure/docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md (244-290행)",
+  "D:/projects/Structure/disciplined-coder/.claude/worktrees/lens-agent-restructure/agent-principles.md",
+  "D:/projects/Structure/disciplined-coder/.claude/worktrees/lens-agent-restructure/docs/domain-korean.md (머리말·지시문의 형태 절)",
+  "D:/projects/Structure/disciplined-coder/.claude/worktrees/lens-agent-restructure/skills/managing-docs/references/reading-docs.md"
+ ],
+ "issues": [
+  {
+   "where": "250행 「에이전트」 문단",
+   "type": "constraint",
+   "claim": "구현자가 할 일을 평서형으로 적었다. 같은 문단의 앞 문장은 '고쳐라' 명령형이어서 뒤 문장이 지시인지 사실인지 구별되지 않는다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "아래처럼 고쳐라. 나머지 행은 그대로 둔다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "INSTRUCTION-FORM — 사실은 평서문으로, 할 일은 '~하라' 긍정 명령으로 쓰고",
+   "principle": "INSTRUCTION-FORM",
+   "consequence": "'나머지 행은 그대로 둔다'가 평서형 종결로 적혀 있다."
+  },
+  {
+   "where": "260행 `lens-rebuttal` 불릿",
+   "type": "constraint",
+   "claim": "이름 변경과 대상 확대와 도구 유지라는 구현 행동을 평서형으로 적었다. 같은 불릿 안의 '고치고'는 명령 흐름에 있어 지시와 사실이 한 불릿에서 섞인다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "`lens-rebuttal` 은 `lens-adversarial-claim` 의 이름을 바꾸고 대상을 넓힌다. ... 도구는 그대로 둔다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "INSTRUCTION-FORM — 할 일은 '~하라' 긍정 명령으로 쓰고 ... 평서형 부정문은 금지로 읽히기 때문이다",
+   "principle": "INSTRUCTION-FORM",
+   "consequence": "'바꾸고 대상을 넓힌다'와 '그대로 둔다'가 평서형 종결로 적혀 있다."
+  },
+  {
+   "where": "277행 요청 표 첫 행과 285행 승인 규칙",
+   "type": "constraint",
+   "claim": "앞단 스킬이 따를 행동을 평서형으로 적었다. 이 표와 문장은 dispatching-lenses 에 옮길 지시문이다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "`review-specs` 절차를 따른다. 사용자가 그 안의 특정 주장의 반박을 요청하면 `lens-rebuttal` 을 실행한다 / 사용자의 직접 요청은 「필요할 때」 그룹의 승인으로 본다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "INSTRUCTION-FORM — 사실은 평서문으로, 할 일은 '~하라' 긍정 명령으로 쓰고",
+   "principle": "INSTRUCTION-FORM",
+   "consequence": "'따른다'·'실행한다'·'본다'가 평서형 종결로 적혀 있다."
+  },
+  {
+   "where": "275-283행 요청 표의 '실행할 에이전트' 열",
+   "type": "style",
+   "claim": "같은 열의 셀 말끝이 섞였다. 첫 행과 셋째 행은 문장으로 끝나고 나머지 행은 에이전트 이름(명사구)으로 끝난다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "`review-specs` 절차를 따른다. ...실행한다 / `lens-adversarial`(`artifact`) / `lens-grounding`(`doc`) / 그 에이전트",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "ONE-ENDING — 한 표 ... 안에서 같은 구실을 하는 요소끼리 말끝을 하나로 맞춰라",
+   "principle": "ONE-ENDING",
+   "consequence": "한 열에 문장 셀과 명사구 셀이 함께 있다."
+  },
+  {
+   "where": "264-269행 문서 종류별 실행 표",
+   "type": "style",
+   "claim": "'해당하지 않음'을 뜻하는 셀이 두 말끝으로 적혔다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": ".md 전달 문서 행 '해당 없음' / spec·plan 행 '적용하지 않는다'",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "ONE-ENDING — 한 표 ... 안에서 같은 구실을 하는 요소끼리 말끝을 하나로 맞춰라",
+   "principle": "ONE-ENDING",
+   "consequence": "같은 표에 명사구 '해당 없음'과 문장 '적용하지 않는다'가 함께 있다."
+  },
+  {
+   "where": "252-256행 에이전트 표의 '실행하는 호출자' 열",
+   "type": "style",
+   "claim": "같은 열에서 앞 두 행은 문장 뒤에 명사구 조각 '앞단 스킬'을 붙였고 셋째 행은 명사 나열이다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "review-docs 가 전달 문서를 검진할 때 제안하고 승인받는다. 앞단 스킬 / 사용자 직접 요청, review-docs, 앞단 스킬",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "ONE-ENDING — 같은 구실을 하는 요소끼리 말끝을 하나로 맞춰라 / FULL-SENTENCE — 표의 셀은 알아볼 수 있는 문장이나 구로 채워라",
+   "principle": "ONE-ENDING",
+   "consequence": "한 셀 안에 문장과 조각 '앞단 스킬'이 이어져 있고, 열의 셀 형식이 행마다 다르다."
+  },
+  {
+   "where": "254행 표 셀의 '앞단 스킬' (절 제목 244행 포함)",
+   "type": "style",
+   "claim": "저장소 안에서만 통하는 이름 '앞단 스킬'이 표에서 먼저 쓰이고, 무엇을 가리키는지는 273행에서야 '`dispatching-lenses` 를 사용자 직접 요청의 앞단으로 겸하게 하라'로 나온다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "제안하고 승인받는다. 앞단 스킬",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "TERM-EXPLAIN — 저장소 안에서만 통하는 이름과 그 분야의 용어는 답마다 처음 나올 때 한 줄로 풀어라",
+   "principle": "TERM-EXPLAIN",
+   "consequence": "254-256행에서 '앞단 스킬'이 어느 스킬인지 풀이 없이 쓰여 있다."
+  },
+  {
+   "where": "246행 대체 선언 문단",
+   "type": "style",
+   "claim": "앞에 나온 대상을 이름 대신 개수로 가리켰다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "두 곳의 본문은 기록으로 남기고, 구현은 이 절을 따르라.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "COUNT-EARNS — 앞에 나온 대상은 개수 대신 이름으로 가리켜라 / SPECIFIC-NAME",
+   "principle": "COUNT-EARNS",
+   "consequence": "'두 곳'이 「에이전트 구성」의 해당 행과 「readability 글 검토의 이전」을 개수로 가리킨다."
+  },
+  {
+   "where": "287행 대화와 첨부의 전달 문단 둘째 문장",
+   "type": "style",
+   "claim": "주어를 따로 가진 관형절이 명사를 꾸민다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "런타임 시험 6이 확인한 상속은 사용자 CLAUDE.md 와 그 @import 뿐이다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "NO-MID-MOD — 주어를 따로 가진 관형절(예: '감독원이 지적한')은 앞 문장으로 먼저 써라",
+   "principle": "NO-MID-MOD",
+   "consequence": "'런타임 시험 6이 확인한'이 '상속'을 꾸미는 관형절로 들어가 있다."
+  },
+  {
+   "where": "258행 `lens-readability` 불릿 첫 문장",
+   "type": "style",
+   "claim": "명사 '글 검토' 앞에 수식어 'main 의'·'옛'·'`lens-readability`'가 겹쳐 있다.",
+   "file": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md",
+   "evidence": "`lens-readability` 는 main 의 옛 `lens-readability` 글 검토를 되살린 에이전트다.",
+   "counterpart_file": "agent-principles.md",
+   "counterpart": "NO-STACK-MOD — 명사 앞에는 수식어를 하나만 두고, 더 꾸밀 내용은 서술어나 다음 문장에 써라",
+   "principle": "NO-STACK-MOD",
+   "consequence": "수식어 세 개가 '글 검토' 앞에 이어져 있다."
+  }
+ ],
+ "principles_applied": [
+  "INSTRUCTION-FORM",
+  "ONE-ENDING",
+  "FULL-SENTENCE",
+  "TERM-EXPLAIN",
+  "COUNT-EARNS",
+  "SPECIFIC-NAME",
+  "NO-MID-MOD",
+  "NO-STACK-MOD",
+  "KEEP-CONNECT",
+  "COMMA-CUT",
+  "ANTI-LIMIT",
+  "SUBJECT-OBJECT",
+  "WRITTEN-ONLY",
+  "BULLET-SCOPE",
+  "DOC-TYPE(문서 타입과 수명 표)"
+ ],
+ "notes": "검토 관점은 형식·스타일·오염·호환·규율이다. 대상은 JSON 출력이 아니라 spec 절이라서 형식·오염·호환 관점에서는 지적할 것이 없었다. 지침대로 라벨 불릿·목록 앞 개수 예고·제목의 개수·ONE-IDEA 는 형식 경고 검사기가 본 항목이므로 보지 않았다. 248행 '바꾸는 이유' 단락이 다섯 문장이라는 점도 ONE-IDEA 에 해당하므로 올리지 않았다. 금지 낱말은 훅이 맡으므로 보지 않았다. reading-docs.md 의 TITLES·MD-FIRST·REVIEW-DELIVERABLE 은 '읽기 위한 문서'에 적용되는 조항이다. 이 대상은 '작업 지시서'(spec)라서 그 조항들은 적용하지 않았다. 확인이 더 필요한 사항이 있다. 258행의 글 항목 이름(이음·끼움·압축 전가 등)은 저장소 안에서만 통하는 이름일 수 있다(TERM-EXPLAIN). 그러나 main 의 옛 lens-readability 를 읽기 범위 밖이라 열지 않았으므로 풀이가 필요한지 판정하지 않았다. 호출자가 정의를 옮길 항목 이름으로만 쓰는지 확인하라. 참고로 워크트리의 agent-principles.md 는 PC 전역 사본과 NO-RAW-OUTPUT·LENS-ALLOWED 문구가 다르다. 판정에는 PRINCIPLES 줄의 워크트리 파일을 썼다.",
+ "target": "docs/superpowers/specs/2026-10-25-lens-agent-restructure-design.md 「2차 변경」"
+}

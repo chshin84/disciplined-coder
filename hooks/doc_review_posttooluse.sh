@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # PostToolUse(Write|Edit|Bash): 두 가지를 알린다. 둘 다 비블로킹 경고이고 쓰기를 거부하지 않는다.
-#   문서 형식 경고 — 쓴 .md 의 라벨 불릿·개수 예고·제목 개수(판정은 _doc_form_check.py).
+#   문서 형식 경고 — 쓴 .md 의 라벨 불릿·개수 예고·제목 개수·다섯 문장 이상인 단락(ONE-IDEA)
+#     (판정은 _doc_form_check.py).
 #     스위치는 DISCIPLINED_CODER_REPLY_CHECK 다.
 #   검진 넛지 — 산출물(.pptx·.xlsx·.docx·.pdf·.hwp·.hwpx)과 그 폴더의 마크다운 작성/수정. spec/plan 은 자체
 #     하드 게이트가 맡아 뺀다. 스위치는 DISCIPLINED_CODER_REVIEW_GATE 다.

@@ -14,6 +14,7 @@ KNOWN="lens-adversarial lens-adversarial-claim lens-consistency lens-fit lens-gr
 
 # policy_violations <agents_dir> <workflows_dir>
 # 위반마다 `agents:<파일>:<사유>` 나 `workflows:<파일>:<줄>` 한 줄을 낸다. 0=위반 없음, 1=있음.
+# 워크플로는 `agent(` 라는 이름의 호출만 본다. `const run = agent` 같은 별칭으로 부르면 잡지 못한다.
 # 사유는 no-tools(tools 줄 없음), not-one-line(값이 비었거나 `[`·따옴표로 시작함), agent-tool(Agent·Task 가 있음)이다.
 policy_violations() {
   json_run '
@@ -96,6 +97,8 @@ echo "[계약]"
 check "계약 파일이 JSON 으로 읽힌다" "json_valid_stdin < \"\$CONTRACT\""
 check "계약의 렌즈 이름이 아는 이름이다" \
   "[ \"\$(json_run 'import json,sys; print(\" \".join(sorted(json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"])))' \"\$CONTRACT\" 2>/dev/null)\" = \"\$KNOWN\" ]"
+check "아는 이름이 agents/lens-*.md 집합과 같다" \
+  "[ \"\$(cd \"\$HERE/agents\" && ls lens-*.md | sed 's/\.md\$//' | sort | tr '\n' ' ' | sed 's/ \$//')\" = \"\$KNOWN\" ]"
 check "빼는 칸이 공통 최상위 칸이다" \
   "json_run 'import json,sys; c=json.load(open(sys.argv[1],encoding=\"utf-8\")); top={k.lstrip(\"?\") for k in c[\"common\"]}; sys.exit(0 if all(set(a.get(\"omit\",[]))<=top for a in c[\"agents\"].values()) else 1)' \"\$CONTRACT\""
 
