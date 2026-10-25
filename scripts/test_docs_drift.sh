@@ -383,6 +383,24 @@ EOF
 done
 check "「」 참조를 하나 이상 찾았다" "[ '$BN' -gt 0 ]"
 
+# --- 문서가 가리킨 경로가 실재한다 ---
+# 2026-10-26 결함 주입에서 지운 skills/lens-fit/SKILL.md 로 가는 링크를 되살려도 어느 검사도 실패하지
+# 않았고, 이름을 바꾼 에이전트를 옛 패턴(agents/prior-art-*.md)으로 가리킨 문장이 남아 있었다.
+echo "[문서가 가리킨 경로가 실재한다]"
+. "$HERE/scripts/_json_valid.sh"
+_json_python || true
+DP() { PYTHONUTF8=1 "${_JSON_PY:-python}" -I "$HERE/scripts/_doc_paths.py" "$1" </dev/null 2>&1 || echo "RUN-ERROR"; }
+DPOUT="$(DP "$HERE")"
+check "경로 후보를 하나 이상 확인했다" "grep -qE '^CHECKED [1-9]' <<<\"\$DPOUT\""
+check "살아 있는 문서에 깨진 경로가 없다" "[ \"\$(grep -vc '^CHECKED ' <<<\"\$DPOUT\" || true)\" = 0 ]"
+grep -v '^CHECKED ' <<<"$DPOUT" | sed 's/^/          /' || true
+DPFX="$TEST_TMP/docpaths"; mkdir -p "$DPFX/skills/x" "$DPFX/agents"; : > "$DPFX/agents/researcher.md"
+printf '%s\n' '[fit](../lens-fit/SKILL.md)' '`agents/prior-art-*.md`' '`agents/research*.md`' '옛 `skills/lens-fit/SKILL.md` 는 지웠다' > "$DPFX/skills/x/SKILL.md"
+DPFXOUT="$(DP "$DPFX")"
+check "지운 스킬로 가는 링크를 잡는다" "grep -qF 'lens-fit/SKILL.md' <<<\"\$DPFXOUT\""
+check "일치하는 파일이 없는 별표 경로를 잡는다" "grep -qF 'prior-art-*' <<<\"\$DPFXOUT\""
+check "일치하는 별표 경로와 이력 줄은 넘긴다" "[ \"\$(grep -vc '^CHECKED ' <<<\"\$DPFXOUT\" || true)\" = 2 ]"
+
 # --- spec 리뷰 마커: 코드의 리터럴이 산문 둘에 그대로 있다 ---
 # 코드가 스스로 "쌍 계약"이라 부르며 사람에게 손으로 맞추라고 지시하던 자리다. 사람이 맞추는
 # 대신 코드에서 뽑아 대조한다 — 마커를 바꾸면 산문이 안 따라온 것이 여기서 실패한다.
@@ -712,7 +730,7 @@ REVIVED_IDS=""
 for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN NAME-ITEMS COMMA-CUT LABEL-NOUN TERM-EXPLAIN EDIT-DISCIPLINE EDIT-PRIORITY EXPLAIN-STRUCTURE KEEP-FAILED NO-FLEET SECRETS TITLE-PROOF TELL-NOW; do
   grep -qF "**\`$id\`" "$CANON_ALL" && REVIVED_IDS="$REVIVED_IDS $id"
 done
-check "canon: 지운 조항 ID 가 클린룸 시험 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
+check "canon: 지운 조항 ID 가 근거 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
 
 # --- standing-consent: 렌즈 호출에 대한 상시 허가가 에이전트원칙에 있다 ---
 # 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.

@@ -282,7 +282,8 @@ def test_def_prompt_matches_workflow():
     사용자 메시지는 프롬프트로, system 프롬프트는 agentType 의 정의 본문으로 대조한다. 묶음 단계는 중립 번호로 바꾸기 전의 묶음을 대조한다."""
     args = {"question": "Q?", "situation": "S", "target": "T", "mode": "survey", "round": 1,
             "subquestions": [{"id": "S1", "scope": "a", "include": [], "exclude": []}], "forbidden_terms": [],
-            "researcher_count": 1, "researcher_count_basis": "x", "principles_path": run.PRINCIPLES}
+            "researcher_count": 1, "researcher_count_basis": "x", "principles_path": run.PRINCIPLES,
+            "intended_use": "U", "constraints": []}
     synthesis = {"evidence_map": [ROW_B], "conclusions": [], "principles_applied": []}
     responses = {"research:S1": {"search_status": "ok", "queries": ["q"], "issues": [
         {"prior_claim": "주장 A", "citations": [{"url": "https://a"}]},
