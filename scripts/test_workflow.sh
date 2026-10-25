@@ -67,7 +67,7 @@ for K in 'Date.now' 'Math.random' 'new Date(' 'require(' 'import '; do
   check "원문에 $K 가 없다" "[ -f \"\$WF\" ] && [ \"\$(grep -cF \"\$K\" \"\$WF\")\" -eq 0 ]"
 done
 check "schemas 출력을 얻는다" "printf '[]' | harn fn schemas > \"\$FX/schemas.json\""
-for S in RESEARCHER_SCHEMA EXTRACT_SCHEMA JUDGE_SCHEMA SYNTHESIS_SCHEMA MAP_SCHEMA; do
+for S in RESEARCHER_SCHEMA EXTRACT_SCHEMA JUDGE_SCHEMA SYNTHESIS_SCHEMA MAP_SCHEMA SCOUT_SCHEMA; do
   check "$S 의 루트 type 이 object 다" "json_true \"\$FX/schemas.json\" 'd[\"$S\"][\"type\"] == \"object\"'"
 done
 check "모든 노드에서 required 가 properties 의 키에 든다" "schema_subset \"\$FX/schemas.json\""
@@ -85,6 +85,8 @@ check "JUDGE_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas
 check "VERIFIER_SCHEMA 가 없다" "json_true \"\$FX/schemas.json\" '\"VERIFIER_SCHEMA\" not in d'"
 check "SYNTHESIS_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"SYNTHESIS_SCHEMA\"][\"required\"]) == {\"evidence_map\",\"conclusions\",\"principles_applied\"}'"
 check "MAP_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"MAP_SCHEMA\"][\"required\"]) == {\"cells\",\"principles_applied\"}'"
+check "SCOUT_SCHEMA 루트 required 가 표와 같다" "json_true \"\$FX/schemas.json\" 'set(d[\"SCOUT_SCHEMA\"][\"required\"]) == {\"search_status\",\"queries\",\"clusters\",\"subquestion_candidates\",\"principles_applied\"}'"
+check "SCOUT_SCHEMA 가 정해진 칸 밖의 칸을 허용하지 않는다" "json_true \"\$FX/schemas.json\" 'd[\"SCOUT_SCHEMA\"][\"additionalProperties\"] is False'"
 
 echo "[시험 도구 자체]"
 check "알 수 없는 함수 이름은 종료 코드 2 다" "printf '[]' | harn fn nosuch >/dev/null 2>&1; [ \$? -eq 2 ]"
@@ -893,5 +895,34 @@ E_RF3='d["result"]["verifier_count"] == 2 and d["result"]["verifiers"][1]["outpu
 check "verifier_count 가 null 인 검증자를 센다" "json_true \"\$FX/rf_out.json\" \"\$E_RF3\""
 E_RF4='d["result"]["researchers"][0] == {"id": "S1", "output": None} and d["result"]["subquestion_status"][0]["search_status"] == "failed"'
 check "연구자가 null 인 하위 질문은 failed 이고 researchers 에 output null 로 남는다" "json_true \"\$FX/rf_out.json\" \"\$E_RF4\""
+
+echo "[실행 흐름: scout]"
+# 둘러보기 실행의 args 는 args_c.json 에 round 0 을 덮어쓴 값이다. args_s0 은 하위 질문 초안도 비운다.
+json_run '
+import json, sys
+a = json.load(open(sys.argv[1], encoding="utf-8"))
+a["round"] = 0
+json.dump(a, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
+a["subquestions"] = []
+json.dump(a, open(sys.argv[3], "w", encoding="utf-8"), ensure_ascii=False)
+' "$FX/args_c.json" "$FX/args_s.json" "$FX/args_s0.json"
+cat > "$FX/rsc_resp.json" <<'EOF'
+{"@mode": "contrast", "responses": {
+  "scout": {"search_status": "ok", "queries": ["Acme x", "y"], "clusters": [], "subquestion_candidates": [], "principles_applied": []}}}
+EOF
+check "scout 실행이 끝나고 출력을 얻는다" "mkin \"\$FX/rsc_resp.json\" \"\$FX/rsc_in.json\" \"\$FX/args_s.json\" && harn run < \"\$FX/rsc_in.json\" > \"\$FX/rsc_out.json\""
+E_SC_CALL='[c["label"] for c in d["calls"]] == ["scout"] and d["calls"][0]["phase"] == "Research" and d["calls"][0]["agentType"] == "disciplined-coder:prior-art-researcher"'
+check "scout 실행은 둘러보기 연구자 하나만 부른다" "json_true \"\$FX/rsc_out.json\" \"\$E_SC_CALL\""
+E_SC_BLK="$PY_WRAP_HEAD"'(lambda b: set(b) == {"question", "situation", "target", "intended_use", "constraints", "draft_subquestions", "forbidden_terms"} and b["draft_subquestions"] == [{"id": "S1", "scope": "a", "include": ["i"], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": ["e"]}] and b["intended_use"] == "U" and b["constraints"] == ["K"])(block(call("scout")[0], "scout"))'"$PY_WRAP_TAIL"
+check "둘러보기 프롬프트가 MODE: scout 와 정해진 입력 블록이다" "json_true \"\$FX/rsc_out.json\" \"\$E_SC_BLK\""
+E_SC_RES='list(d["result"].keys()) == [k.lstrip("?") for k in C["result_scout"]] and d["result"]["round"] == 0 and d["result"]["researchers"][0]["id"] == "scout" and d["result"]["scout"]["search_status"] == "ok"'
+check "scout 반환값의 키 차례가 계약 코드 result_scout 와 같다" "json_true \"\$FX/rsc_out.json\" \"\$E_SC_RES\""
+E_SC_VIOL='d["result"]["query_violations"] == [{"id": "scout", "query": "Acme x", "rule": "forbidden-term"}]'
+check "둘러보기 검색어의 금지어가 query_violations 에 든다" "json_true \"\$FX/rsc_out.json\" \"\$E_SC_VIOL\""
+cat > "$FX/rsn_resp.json" <<'EOF'
+{"@mode": "contrast", "responses": {"scout": null}}
+EOF
+check "둘러보기 응답이 null 이면 scout 가 null 이다" "mkin \"\$FX/rsn_resp.json\" \"\$FX/rsn_in.json\" \"\$FX/args_s.json\" && harn run < \"\$FX/rsn_in.json\" > \"\$FX/rsn_out.json\" && json_true \"\$FX/rsn_out.json\" 'd[\"result\"][\"scout\"] is None'"
+check "하위 질문 초안이 비어도 둘러보기 연구자 하나만 부른다" "mkin \"\$FX/rsc_resp.json\" \"\$FX/rs0_in.json\" \"\$FX/args_s0.json\" && harn run < \"\$FX/rs0_in.json\" > \"\$FX/rs0_out.json\" && json_true \"\$FX/rs0_out.json\" '[c[\"label\"] for c in d[\"calls\"]] == [\"scout\"]'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

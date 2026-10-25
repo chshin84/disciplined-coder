@@ -21,6 +21,31 @@ const MAPCHECK = 'disciplined-coder:prior-art-mapcheck';
 // 판정 묶음 하나에 넣는 주장 수의 상한이다. 값의 근거는 spec 「Opus 일괄 판정」의 묶음 크기다.
 const BATCH_SIZE = 20;
 
+// 둘러보기 실행(round 0)은 연구자 하나를 scout 모드로 실행하고, 검증과 종합 없이 질의 경계 검사만 거쳐 반환한다.
+// parallel 로 감싸는 이유는 연구자 호출과 같이 실패한 호출을 null 로 받기 위해서다.
+if (args.round === 0) {
+  phase('Research');
+  const scout = (await parallel([() => agent(
+    prompt('scout', args.principles_path, {
+      question: args.question,
+      situation: args.situation,
+      target: args.target,
+      intended_use: args.intended_use,
+      constraints: args.constraints,
+      draft_subquestions: args.subquestions,
+      forbidden_terms: args.forbidden_terms,
+    }),
+    { agentType: RESEARCHER, label: 'scout', phase: 'Research', schema: S.SCOUT_SCHEMA },
+  )]))[0] ?? null;
+  const scoutResearchers = [{ id: 'scout', output: scout }];
+  return {
+    round: args.round,
+    researchers: scoutResearchers,
+    query_violations: checkQueries(scoutResearchers, args.forbidden_terms),
+    scout,
+  };
+}
+
 phase('Research');
 const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
   prompt('explore', args.principles_path, {
@@ -633,7 +658,16 @@ function schemas() {
     },
     required: ['cells', 'principles_applied'],
   };
-  return { RESEARCHER_SCHEMA, EXTRACT_SCHEMA, JUDGE_SCHEMA, SYNTHESIS_SCHEMA, MAP_SCHEMA };
+  // 둘러보기 출력은 검증하지 않으므로 정해진 칸 밖의 칸(사례 칸 등)을 허용하지 않는다.
+  const closed = (properties) => ({ type: 'object', properties, required: Object.keys(properties), additionalProperties: false });
+  const SCOUT_SCHEMA = closed({
+    search_status: { type: 'string', enum: ['ok', 'no-results', 'failed', 'not-attempted'] },
+    queries: { type: 'array', items: str },
+    clusters: { type: 'array', items: closed({ topic: str, sources: { type: 'array', items: str }, note: str }) },
+    subquestion_candidates: { type: 'array', items: closed({ scope: str, basis: str }) },
+    principles_applied: principles,
+  });
+  return { RESEARCHER_SCHEMA, EXTRACT_SCHEMA, JUDGE_SCHEMA, SYNTHESIS_SCHEMA, MAP_SCHEMA, SCOUT_SCHEMA };
 }
 
 // 에이전트에게 보내는 프롬프트. 첫 줄은 모드, 둘째 줄은 원칙 문서 경로, 셋째 줄부터 JSON 블록이다.

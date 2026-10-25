@@ -197,8 +197,8 @@ check "워크플로 스크립트가 있다" "[ -f \"\$WF\" ]"
 check "node 가 있다" "command -v node >/dev/null"
 SCHEMAS="$FX/schemas.json"
 check "시험 도구가 짝지은 스키마 상수를 모두 낸다" \
-  "printf '[]' | node \"\$HARNESS\" fn schemas > \"\$SCHEMAS\" && json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(k in d for k in (\"RESEARCHER_SCHEMA\",\"EXTRACT_SCHEMA\",\"JUDGE_SCHEMA\",\"SYNTHESIS_SCHEMA\",\"MAP_SCHEMA\")) else 1)' \"\$SCHEMAS\""
-for pair in researcher:RESEARCHER_SCHEMA extract:EXTRACT_SCHEMA judge:JUDGE_SCHEMA synthesis:SYNTHESIS_SCHEMA map:MAP_SCHEMA; do
+  "printf '[]' | node \"\$HARNESS\" fn schemas > \"\$SCHEMAS\" && json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(k in d for k in (\"RESEARCHER_SCHEMA\",\"EXTRACT_SCHEMA\",\"JUDGE_SCHEMA\",\"SYNTHESIS_SCHEMA\",\"MAP_SCHEMA\",\"SCOUT_SCHEMA\")) else 1)' \"\$SCHEMAS\""
+for pair in researcher:RESEARCHER_SCHEMA extract:EXTRACT_SCHEMA judge:JUDGE_SCHEMA synthesis:SYNTHESIS_SCHEMA map:MAP_SCHEMA scout:SCOUT_SCHEMA; do
   name="${pair%%:*}"; const="${pair##*:}"
   json_run 'import json,sys; json.dump(json.load(open(sys.argv[1],encoding="utf-8"))[sys.argv[2]], open(sys.argv[3],"w",encoding="utf-8"))' "$SCHEMAS" "$const" "$FX/schema_$name.json" 2>/dev/null || true
   check "스키마 $const 가 계약 코드와 맞는다" "contract_check $name \"\$FX/schema_$name.json\" -"
