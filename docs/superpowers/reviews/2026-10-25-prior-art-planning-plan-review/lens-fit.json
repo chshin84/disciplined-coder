@@ -1,0 +1,14 @@
+{"lens":"lens-fit","note_on_storage":"원본 보고의 issues 를 where·principle·claim·evidence 칸으로 줄여 저장했다.","issues":[
+{"where":"Global Constraints 21행","principle":"EVIDENCE-FIRST","claim":"도구 호출 상한 10 에 근거가 없고 근거 없음을 사용자에게 알린 기록도 없다.","evidence":"10 은 계획 작성자가 정했다."},
+{"where":"Global Constraints 24행","principle":"INSTRUCTION-FORM","claim":"할 일을 평서형 '따른다'로 적었다.","evidence":"… 「작업 지시서」 절을 따른다."},
+{"where":"Task 4 Interfaces 177행","principle":"INSTRUCTION-FORM, SUBJECT-OBJECT","claim":"평서형이고 행동 주체가 '문장'이다.","evidence":"문장은 그 이름을 그대로 쓴다."},
+{"where":"Task 3 Step 3 154행","principle":"NO-MID-MOD","claim":"'네 축이 모두 다른 행' 관형절이 나열 중간에 끼었고 '네 축'이 풀이되지 않는다.","evidence":"네 축이 모두 다른 행을 단독 근거로 쓰지 않는 규칙"},
+{"where":"Task 4 Step 1 181행","principle":"NO-MID-MOD","claim":"'오케스트레이터가 직접 한다는' 관형절 때문에 '실행하고'가 지금 하라는 지시인지 추가할 문장 내용인지 두 가지로 읽힌다.","evidence":"… MODE: scout로 실행하고 질의 경계 검사를 오케스트레이터가 직접 한다는 문장을 추가하라."},
+{"where":"Task 3 Step 1 139행","principle":"COUNT-EARNS","claim":"목록 앞에 개수를 썼다.","evidence":"두 검사를 추가하라."},
+{"where":"Task 1 Step 3 63행 외 68·117·144·159행","principle":"COUNT-EARNS","claim":"앞에 나온 대상을 개수로 가리켰다.","evidence":"두 입력 객체, 두 파일, 세 스크립트 모두"},
+{"where":"Global Constraints 15·19·21·23행","principle":"BULLET-SCOPE","claim":"불릿 하나에 두 문장 이상이다.","evidence":"21행 세 문장"},
+{"where":"Task 2 Step 3 113행, Task 4 Step 1 181행, Task 5 Step 1 206행","principle":"ONE-IDEA","claim":"단락이 네 문장에 이르렀다.","evidence":"181행 서로 다른 절 지시 네 가지"},
+{"where":"Task 3 Step 3 152행","principle":"TERM-ONE","claim":"같은 기법을 '인용 따라가기', 'snowballing', '그 전술'로 불렀다.","evidence":"인용 따라가기를 넣기 전에 snowballing 의 출처 … 그 전술에 '출처 미확인'"},
+{"where":"Task 2 Files 81행","principle":"FULL-SENTENCE","claim":"Modify 항목인데 '확인만'·'그대로' 조각이라 고쳐야 하는지 두 가지로 읽힌다.","evidence":"(… 확인만, 함수 목록은 그대로)"},
+{"where":"Task 5 Step 1 206행","principle":"FULL-SENTENCE, SUBJECT-OBJECT","claim":"'B 의 규칙으로 승인이 아닌지'가 조각이고 B 가 어느 절인지, 발언의 화자가 누구인지 없다.","evidence":"13:18 발언이 B 의 규칙으로 승인이 아닌지 확인하라."}
+],"principles_applied":["INSTRUCTION-FORM","EVIDENCE-FIRST","NO-MID-MOD","NO-STACK-MOD","COMMA-CUT","ONE-IDEA","BULLET-SCOPE","SUBJECT-OBJECT","FULL-SENTENCE","ONE-ENDING","TERM-ONE","COUNT-EARNS","DOC-TYPE"],"notes":"COMMA-CUT·NO-STACK-MOD·ONE-ENDING 위반은 찾지 못했다. 이슈로 올리지 않은 관찰: 181행 'spec A·B·C 의 규칙을 각 절에 옮겨라'는 어느 규칙을 어느 절에 옮길지 정하지 않는다(SPECIFIC-NAME). '네 축'·'공백 라운드'가 풀이되지 않는다. Review Focus 의 종합 빈 배열 요구와 54행 검사의 차이, Goal 이 scout 지시문을 언급하지 않는 점은 lens-consistency 가 볼 대상이다."}

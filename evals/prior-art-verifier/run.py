@@ -27,8 +27,8 @@ LOCAL_TOOLS = "Read"
 MODES = {"baseline-cite": "cite", "baseline-map": "map", "extract": "extract", "judge": "judge", "map": "map",
          "extract-def": "extract", "judge-def": "judge", "refetch-def": "refetch", "rejudge-def": "judge", "map-def": "map"}
 # -def 단계는 에이전트 정의 본문을 system 프롬프트로 넣고, 사용자 메시지는 워크플로의 prompt() 와 같게 만든다.
-DEF_AGENTS = {"extract-def": "prior-art-verifier.md", "judge-def": "prior-art-judge.md",
-              "refetch-def": "prior-art-verifier.md", "rejudge-def": "prior-art-judge.md", "map-def": "prior-art-mapcheck.md"}
+DEF_AGENTS = {"extract-def": "citation-verifier.md", "judge-def": "citation-judge.md",
+              "refetch-def": "citation-verifier.md", "rejudge-def": "citation-judge.md", "map-def": "map-check.md"}
 JUDGE_CELLS = ("numbers_conditions", "direction", "scope")
 MATCHES = ("일치", "불일치", "판정 불가", "정보 부족")
 # -def 단계가 앞 단계 출력을 고를 때 쓰는 단계마다의 설정이다. 확정 구성(spec 「Opus 일괄 판정」)과 같다.

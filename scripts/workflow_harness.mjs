@@ -120,7 +120,10 @@ async function main() {
     const { label, agentType, phase, model, effort } = opts;
     calls.push({ label, agentType, phase, model, effort, prompt });
     if (!Object.hasOwn(responses, label)) raise(`응답표에 없는 label 을 불렀다: ${label}`);
-    return structuredClone(responses[label]);
+    // {"@throw": 문구} 응답은 에이전트 호출 실패를 흉내 낸다. 치명 오류로 남기지 않고 그 호출만 예외로 끝낸다.
+    const r = responses[label];
+    if (r && typeof r === 'object' && Object.hasOwn(r, '@throw')) throw new Error(String(r['@throw']));
+    return structuredClone(r);
   };
   const parallel = async (thunks) => {
     const out = [];
