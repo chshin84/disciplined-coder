@@ -203,7 +203,7 @@ check "그 절이 규칙을 소유하고 렌즈별 「기계에 넘기는 것」
 echo "[호출자 — 디스패치와 집계 계약]"
 SR="$HERE/skills/review-specs/SKILL.md"
 MA="$HERE/skills/aggregating-lenses/SKILL.md"
-check "spec 리뷰가 렌즈마다 따로 실행하는 절을 두고 묶기 규칙을 소유자로 넘긴다" "has_sec '$SR' '2) 디스패치' && points_to '$SR' '\`dispatching-lenses\`' '「따로 실행할 때와 묶을 때」'"
+check "spec 리뷰가 렌즈마다 따로 실행하는 절을 두고 그 규칙을 소유자로 넘긴다" "has_sec '$SR' '2) 디스패치' && points_to '$SR' '\`dispatching-lenses\`' '「렌즈마다 따로 실행」'"
 check "집계 계약이 지문을 안다"             "grep -qF 'fingerprint' '$MA'"
 check "집계 계약이 제안 채널을 가른다"       "owns_sec '$MA' '렌즈가 추가하는 칸' && sec_has_id '$MA' '렌즈가 추가하는 칸' suggestions"
 check "렌즈 그룹을 소유자가 적는다" "owns_sec '$DISP' '렌즈 그룹' && sec_has_id '$DISP' '렌즈 그룹' lens-adversarial"

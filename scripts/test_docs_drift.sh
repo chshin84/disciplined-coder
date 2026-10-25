@@ -94,7 +94,7 @@ DOCS="$HERE/skills/review-docs/SKILL.md"
 RUNTIME2="$HERE/skills/review-llm-calls/SKILL.md"
 READMEF="$HERE/README.md"
 check "spec 리뷰가 회차 규칙 소유자를 가리킨다" "points_to \"\$CALLER\" 'dispatching-lenses' '「한 번만 실행하는 렌즈의 규율」'"
-check "렌즈별 결과를 한데 모으는 집계 절이 남는다" "sec_has_id \"\$CALLER\" '3) 메타 집계' aggregating-lenses"
+check "렌즈별 결과를 한데 모으는 집계 절이 남는다" "sec_has \"\$CALLER\" '3) 메타 집계' '「결과를 모으는 법」'"
 check "런타임 조립 절이 회차 규칙을 가리키고 서브에이전트 규율 밖이라고 적는다" "points_to \"\$RUNTIME2\" 'dispatching-lenses' '「한 번만 실행하는 렌즈의 규율」' && sec_has \"\$RUNTIME2\" '조립' '서브에이전트 규율'"
 check "실행하는 방법 절이 회차 규칙 절로 넘긴다" "sec_has \"\$DISP\" '실행하는 방법' '「한 번만 실행하는 렌즈의 규율」'"
 
@@ -176,21 +176,21 @@ for f in "$CALLER" "$RUNTIME2"; do
 done
 
 echo "[dispatching-lenses — 소유자가 하나다]"
-# 실행하는 방법의 내용은 결과를 aggregating-lenses 「하는 일」로 모으는 것이다. review-docs 가 그 절을
+# 실행하는 방법의 내용은 결과를 같은 스킬의 「결과를 모으는 법」으로 모으는 것이다. review-docs 가 그 절을
 # 다시 가리키면 방법을 베낀 것이고, 소유자 이름만 대면 넘긴 것이다.
 check "review-docs 가 실행하는 방법을 소유자로 넘긴다"    "! has_sec \"\$DOCS\" '실행하는 방법' && ! grep -qF '「하는 일」' \"\$DOCS\" && grep -qF -- '\`dispatching-lenses\`' \"\$DOCS\""
-check "소유자가 실행하는 방법을 적는다"             "sec_has \"\$DISP\" '실행하는 방법' 'source' && points_to \"\$DISP\" '\`aggregating-lenses\`' '「하는 일」'"
+check "소유자가 실행하는 방법을 적는다"             "sec_has \"\$DISP\" '실행하는 방법' 'source' && sec_has \"\$DISP\" '실행하는 방법' '「결과를 모으는 법」' && owns_sec \"\$DISP\" '결과를 모으는 법'"
 DISP_MISS=""
 while IFS= read -r n; do
   [ -n "$n" ] || continue
-  if [ ! -d "$HERE/skills/$n" ]; then DISP_MISS="$DISP_MISS $n"; fi
+  if [ ! -f "$HERE/agents/$n.md" ]; then DISP_MISS="$DISP_MISS $n"; fi
 done <<EOF
 $(awk '/^## 렌즈 그룹/{f=1;next} /^## /{f=0} f' "$DISP" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u)
 EOF
 check "렌즈 그룹 표의 렌즈가 모두 실재한다"      "[ -z \"\$DISP_MISS\" ]"
 GROUP_MISS=""
-for d in "$HERE"/skills/lens-*/; do
-  n="$(basename "$d")"
+for d in "$HERE"/agents/lens-*.md; do
+  n="$(basename "$d" .md)"
   awk '/^## 렌즈 그룹/{f=1;next} /^## /{f=0} f && /^\| `lens-/' "$DISP" | grep -q "^| \`$n\` |" || GROUP_MISS="$GROUP_MISS $n"
 done
 check "실재하는 렌즈가 모두 렌즈 그룹 표에 있다" "[ -z \"\$GROUP_MISS\" ]"
