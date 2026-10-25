@@ -49,9 +49,9 @@ check "끝 줄바꿈이 없는 base 파일 둘의 커밋을 따로 읽는다" "[
 cat > "$T/banned.md" <<'BANEOF'
 ### 금지 표현
 
-| 쓰지 않는 말 | 대신 쓰는 말 | 적용 대상 | 분류 | 제외 |
-|---|---|---|---|---|
-| `판` | 버전 | 문서와 답변 | 평소에 쓰지 않는 말 | `판정` |
+| 쓰지 않는 말 | 대신 쓰는 말 | 제외 |
+|---|---|---|
+| `판` | 버전 | `판정` |
 BANEOF
 . "$HERE/hooks/_banned_words.sh"
 banned_parse "$T/banned.md" "$T/pairs" "$T/toks" "$T/excl"

@@ -26,8 +26,15 @@ BANNED_TABLE_HEAD='### 금지 표현'
 banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl, $5=scopes(생략 가능)
   local excl="$4" scopes="${5:-/dev/null}"
   LC_ALL=C awk -v h="$BANNED_TABLE_HEAD" -v pairs="$2" -v toks="$3" -v excl="$excl" -v scopes="$scopes" '
-    index($0, h) == 1 { f = 1; next }
-    f && /^#/ { exit }
+    index($0, h) == 1 { f = 1; hl = index(h, " ") - 1; next }
+    # 표는 적용 대상 제목(한 단계 아래) 밑에 분류 제목(두 단계 아래)으로 묶여 있다. 적용 대상
+    # 제목의 글을 행마다 내보내고, 분류 제목은 읽지 않는다. 같거나 높은 단계의 제목이 오면 끝난다.
+    f && /^#/ {
+      lv = match($0, /[^#]/) - 1
+      if (lv <= hl) exit
+      if (lv == hl + 1) { sc = substr($0, lv + 2); gsub(/^[ \t]+|[ \t]+$/, "", sc) }
+      next
+    }
     f && /^\| `/ {
       n = split($0, c, "|")
       if (n < 4) next
@@ -43,19 +50,17 @@ banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl, $5=scopes(생략 가�
         print t > toks
       }
       print out > pairs
-      # 제외 칸은 여섯째다. pairs 와 같은 횟수로 한 줄씩 내보내 두 파일의 행이 맞는다.
+      # 제외 칸은 셋째다. pairs 와 같은 횟수로 한 줄씩 내보내 두 파일의 행이 맞는다.
       ex = ""
-      k = split(c[6], eparts, "`")
+      k = split(c[4], eparts, "`")
       for (i = 2; i <= k; i += 2) {
         e = eparts[i]
         if (e == "") continue
         ex = (ex == "") ? e : ex "\t" e
       }
       print ex > excl
-      # 적용 대상은 넷째 칸이다. 어느 행이 문서에만 걸리고 어느 행이 답변까지 걸리는지를
-      # 호출자가 가릴 수 있어야 한다. 이 칸이 없으면 빈 줄이 나가고 호출자가 전부로 본다.
-      sc = (n >= 4) ? c[4] : ""
-      gsub(/^[ \t]+|[ \t]+$/, "", sc)
+      # 어느 행이 문서에만 걸리고 어느 행이 답변까지 걸리는지를 호출자가 가릴 수 있어야 한다.
+      # 적용 대상 제목이 없으면 빈 줄이 나가고 호출자가 전부로 본다.
       print sc > scopes
     }
     END { close(pairs); close(toks); close(excl); close(scopes) }
