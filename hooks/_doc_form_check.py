@@ -1,4 +1,4 @@
-"""문서 형식 정규식 검사기. 라벨 불릿·개수 예고·제목 개수를 줄 단위로 잡는다.
+"""문서 형식 정규식 검사기. 라벨 불릿·개수 예고·제목 개수를 줄 단위로, 단락 길이(ONE-IDEA)를 단락 단위로 잡는다.
 
 CLI: python _doc_form_check.py --hook [FILE...]
   stdin 의 훅 입력 JSON 에서 Write 는 content, Edit 는 new_string 을 검사하고, 그 밖의 도구는 FILE 을 읽는다.
@@ -27,6 +27,48 @@ BACKTICK = re.compile(r"`[^`]*`")
 # 백틱 구간은 빈 문자열 대신 이 문자로 바꾼다. 지우면 `**`ID`**` 가 `****` 가 되어 라벨을 놓친다.
 CODE_MARK = "□"
 CAP = 5
+# ONE-IDEA: 단락이 네 문장에 이르면 새 단락을 시작한다. 그래서 다섯 문장 이상인 단락을 잡는다.
+# 인용부호와 괄호 안의 문장은 남의 말이나 부연이라 세지 않는다. 세면 인용한 발화가 단락 길이를 부풀린다.
+PARA_MAX = 4
+QUOTED = re.compile(r"\"[^\"]*\"|“[^”]*”|'[^']*'|‘[^’]*’|「[^」]*」|\([^()]*\)")
+TABLE = re.compile(r"^\s*\|")
+
+
+def _own_sentences(text):
+    """인용과 괄호를 뺀 뒤의 문장 끝 수."""
+    for _ in range(3):
+        text = QUOTED.sub("", text)
+    return len(SENT_END.findall(text))
+
+
+def check_paragraphs(lines):
+    """단락(빈 줄로 끊긴 산문 줄 묶음)마다 문장 수를 세어 ONE-IDEA 를 본다. 목록·표·제목·인용·펜스는 단락이 아니다."""
+    found = []
+    in_fence = False
+    para, para_start = [], 0
+
+    def flush():
+        if para and _own_sentences(" ".join(para)) > PARA_MAX:
+            found.append((para_start, "ONE-IDEA 단락 길이", para[0][:40]))
+        para.clear()
+
+    for i, raw in enumerate(lines):
+        if FENCE.match(raw):
+            flush()
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        line = BACKTICK.sub(CODE_MARK, raw)
+        if (not line.strip() or HEADING.match(line) or TABLE.match(line) or LIST_ITEM.match(line)
+                or line.lstrip().startswith(">")):
+            flush()
+            continue
+        if not para:
+            para_start = i + 1
+        para.append(line.strip())
+    flush()
+    return found
 
 
 def check(text):
@@ -51,6 +93,8 @@ def check(text):
             nxt = next((l for l in lines[i + 1:] if l.strip()), None)
             if nxt is not None and LIST_ITEM.match(nxt):
                 found.append((i + 1, "개수 예고", excerpt))
+    found += check_paragraphs(lines)
+    found.sort(key=lambda t: t[0])
     return found
 
 

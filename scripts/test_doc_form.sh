@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 문서 형식 정규식 검사기(hooks/_doc_form_check.py)의 판정을 본다. 라벨 불릿·개수 예고·제목 개수를 잡고,
+# 문서 형식 정규식 검사기(hooks/_doc_form_check.py)의 판정을 본다. 라벨 불릿·개수 예고·제목 개수·단락 길이를 잡고,
 # 펜스·인용·백틱 안은 건너뛰며, BOM 과 cp949 파일을 읽는지 확인한다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
@@ -66,6 +66,18 @@ OUT="$(run_text '## 금지사항 넷\n')"
 check "heading_count" "[ \"\$(count_of \"\$OUT\" '제목 개수')\" = 1 ]"
 OUT="$(run_text '## 1단계 준비\n')"
 check "heading_step_ok" "[ -z \"\$OUT\" ]"
+
+echo "[ONE-IDEA — 단락 길이]"
+OUT="$(run_text '첫째다. 둘째다. 셋째다.\n넷째다. 다섯째다.\n')"
+check "ONE-IDEA: 위반 예문에 경고한다" "[ \"\$(count_of \"\$OUT\" 'ONE-IDEA')\" = 1 ]"
+OUT="$(run_text '첫째다. 둘째다. 셋째다. 넷째다.\n\n다섯째다.\n')"
+check "ONE-IDEA: 통과 예문에 조용하다" "[ \"\$(count_of \"\$OUT\" 'ONE-IDEA')\" = 0 ]"
+OUT="$(run_text '- 첫째다. 둘째다. 셋째다. 넷째다. 다섯째다.\n')"
+check "ONE-IDEA: 목록 항목은 단락으로 세지 않는다" "[ \"\$(count_of \"\$OUT\" 'ONE-IDEA')\" = 0 ]"
+
+OUT="$(run_text '그는 이렇게 말했다. "첫째다. 둘째다. 셋째다." 그래서 고쳤다.
+')"
+check "ONE-IDEA: 인용 안 문장은 세지 않는다" "[ \"\$(count_of \"\$OUT\" 'ONE-IDEA')\" = 0 ]"
 
 echo "[건너뛰는 구간]"
 OUT="$(run_text '```\n- **a:** b다. c다.\n```\n')"
