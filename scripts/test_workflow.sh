@@ -94,7 +94,7 @@ check "깨진 JSON 입력의 run 은 종료 코드 2 다" "printf '{broken' | ha
 cat > "$FX/miss_in.json" <<'EOF'
 {"args": {"question": "Q?", "situation": "S", "target": "T", "mode": "contrast", "round": 1,
   "subquestions": [{"id": "S1", "scope": "a", "include": [], "exclude": []}, {"id": "S2", "scope": "b", "include": [], "exclude": []}],
-  "forbidden_terms": [], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md"},
+  "forbidden_terms": [], "researcher_count": 2, "researcher_count_basis": "x", "principles_path": "D:/x/agent-principles.md", "intended_use": "U", "constraints": []},
  "responses": {"research:S1": {"search_status": "ok", "queries": [], "issues": []}}}
 EOF
 check "응답표에 없는 label 을 부르면 종료 코드 1 이고 표준 오류에 그 label 이 있다" "harn run < \"\$FX/miss_in.json\" > /dev/null 2> \"\$FX/miss_err.txt\"; [ \$? -eq 1 ] && grep -qF 'research:S2' \"\$FX/miss_err.txt\""
@@ -923,6 +923,19 @@ cat > "$FX/rsn_resp.json" <<'EOF'
 {"@mode": "contrast", "responses": {"scout": null}}
 EOF
 check "둘러보기 응답이 null 이면 scout 가 null 이다" "mkin \"\$FX/rsn_resp.json\" \"\$FX/rsn_in.json\" \"\$FX/args_s.json\" && harn run < \"\$FX/rsn_in.json\" > \"\$FX/rsn_out.json\" && json_true \"\$FX/rsn_out.json\" 'd[\"result\"][\"scout\"] is None'"
+# 응답표의 {"@throw": 문구} 는 그 호출을 예외로 끝낸다. 실제 런타임에서 에이전트 호출이 실패한 상황이다.
+cat > "$FX/rst_resp.json" <<'EOF'
+{"@mode": "contrast", "responses": {"scout": {"@throw": "scout down"}}}
+EOF
+check "둘러보기 호출이 예외로 끝나면 scout 가 null 이고 실행은 끝난다" "mkin \"\$FX/rst_resp.json\" \"\$FX/rst_in.json\" \"\$FX/args_s.json\" && harn run < \"\$FX/rst_in.json\" > \"\$FX/rst_out.json\" && json_true \"\$FX/rst_out.json\" 'd[\"result\"][\"scout\"] is None and d[\"result\"][\"researchers\"][0][\"output\"] is None and d[\"result\"][\"query_violations\"] == []'"
+check "SCOUT_SCHEMA 의 배열 원소도 정해진 칸 밖의 칸을 허용하지 않는다" "json_true \"\$FX/schemas.json\" 'all(d[\"SCOUT_SCHEMA\"][\"properties\"][k][\"items\"][\"additionalProperties\"] is False for k in (\"clusters\", \"subquestion_candidates\"))'"
+json_run '
+import json, sys
+a = json.load(open(sys.argv[1], encoding="utf-8"))
+a["intended_use"] = "  "
+json.dump(a, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
+' "$FX/args_c.json" "$FX/args_nu.json"
+check "intended_use 가 비면 에이전트를 부르기 전에 예외로 끝난다" "mkin \"\$FX/rsc_resp.json\" \"\$FX/rnu_in.json\" \"\$FX/args_nu.json\" && { harn run < \"\$FX/rnu_in.json\" > \"\$FX/rnu_out.json\" 2> \"\$FX/rnu_err.txt\"; [ \$? -eq 1 ]; } && grep -qF 'intended_use' \"\$FX/rnu_err.txt\""
 check "하위 질문 초안이 비어도 둘러보기 연구자 하나만 부른다" "mkin \"\$FX/rsc_resp.json\" \"\$FX/rs0_in.json\" \"\$FX/args_s0.json\" && harn run < \"\$FX/rs0_in.json\" > \"\$FX/rs0_out.json\" && json_true \"\$FX/rs0_out.json\" '[c[\"label\"] for c in d[\"calls\"]] == [\"scout\"]'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

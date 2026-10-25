@@ -1,6 +1,6 @@
 ---
 name: citation-verifier
-description: 인용 추출 검증자다. URL 하나의 원문을 열어 주장마다 접근·존재·구절을 판정한다. 호출 절차가 이름으로 지정할 때만 실행한다. 지금 지정하는 절차는 researching-prior-art 스킬과 워크플로 disciplined-coder:prior-art-search 다. 다른 대화에서는 이 에이전트를 고르지 않는다.
+description: 인용 추출 검증자다. URL 하나의 원문을 열어 주장마다 접근·존재·구절을 판정한다. 호출 절차가 이름으로 지정할 때만 실행한다.
 tools: WebFetch, Read
 model: claude-haiku-5-5
 effort: high

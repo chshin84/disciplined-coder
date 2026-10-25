@@ -21,6 +21,11 @@ const MAPCHECK = 'disciplined-coder:map-check';
 // 판정 묶음 하나에 넣는 주장 수의 상한이다. 값의 근거는 spec 「Opus 일괄 판정」의 묶음 크기다.
 const BATCH_SIZE = 20;
 
+// 용도는 비울 수 없는 칸이다. 비어 있으면 에이전트를 부르기 전에 끝내 비용을 쓰지 않는다.
+if (typeof args.intended_use !== 'string' || args.intended_use.trim() === '') {
+  throw new Error('args.intended_use 가 비어 있다. 프로토콜의 용도 칸을 채워 다시 실행하라.');
+}
+
 // 둘러보기 실행(round 0)은 연구자 하나를 scout 모드로 실행하고, 검증과 종합 없이 질의 경계 검사만 거쳐 반환한다.
 // parallel 로 감싸는 이유는 연구자 호출과 같이 실패한 호출을 null 로 받기 위해서다.
 if (args.round === 0) {

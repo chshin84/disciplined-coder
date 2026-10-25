@@ -16,7 +16,7 @@
   "judge_input": { "items": [{ "url": true, "claims": [{ "ref": true, "text": true, "quote": true, "context": true, "source_note": true }] }] },
   "judge": { "judgments": [{ "url": true, "ref": true, "numbers_conditions": true, "direction": true, "scope": true, "missing": true, "unsure_reasons": true, "reason": true }], "principles_applied": true },
   "enums": { "match": ["일치", "불일치", "판정 불가", "정보 부족"], "unsure": ["조건 얽힘", "표·그림 값", "언어 해석"] },
-  "synthesis": { "evidence_map": [{ "case": true, "url": true, "outcome": true, "axes": true }],
+  "synthesis": { "evidence_map": [{ "case": true, "url": true, "outcome": true, "axes": true, "?bearing": true }],
                  "conclusions": [{ "text": true, "refs": true, "?supports": true }], "principles_applied": true },
   "map": { "cells": [{ "row": true, "column": true, "grounded": true, "source_ref": true }], "principles_applied": true },
   "scout": { "search_status": true, "queries": true, "clusters": [{ "topic": true, "sources": true, "note": true }],
