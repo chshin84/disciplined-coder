@@ -297,18 +297,33 @@ check "> 재지향은 지나간다"                         "gate_runs '$GI_ECHO
 check "따옴표 뒤의 재지향도 지나간다"               "gate_runs \"\$GI_QUOTE\""
 
 echo "[제외 칸 — 어간을 넓히고 다른 뜻으로 쓰는 말을 뺀다]"
-# 목록의 다섯째 칸은 `제외` 다. 그 칸을 안 읽으면 어간만 가지고 검색해
+# 목록의 셋째 칸은 `제외` 다. 그 칸을 안 읽으면 어간만 가지고 검색해
 # `판정`·`판단` 까지 잡히고, 산출물을 거의 못 쓰게 된다. 표를 읽는 곳이 하나여야 훅과 검사가
 # 같은 것을 본다. 픽스처로 보아 저장소 목록의 내용에 기대지 않는다.
 . "$HERE/hooks/_banned_words.sh"
 BX="$T/banx"; mkdir -p "$BX"
 cat > "$BX/list.md" <<'BANEOF'
-### 금지 표현
+## 금지 표현
 
-| 쓰지 않는 말 | 대신 쓰는 말 | 적용 대상 | 분류 | 제외 |
-|---|---|---|---|---|
-| `판` | 버전 | 문서와 답변 | 평소에 쓰지 않는 말 | `판정` · `판단` |
-| `짚` | 지적 | 답변과 산출물 | 한자어를 고유어로 되돌린 것 |  |
+### 모든 글에 적용
+
+#### 평소에 쓰지 않는 말
+
+| 쓰지 않는 말 | 대신 쓰는 말 | 제외 |
+|---|---|---|
+| `판` | 버전 | `판정` · `판단` |
+
+### 답변과 산출물에만 적용
+
+#### 한자어를 고유어로 되돌린 것
+
+| 쓰지 않는 말 | 대신 쓰는 말 | 제외 |
+|---|---|---|
+| `짚` | 지적 |  |
+
+## 표로 적을 수 없는 규칙
+
+| `새` | 이 행은 표 밖이다 |  |
 BANEOF
 banned_parse "$BX/list.md" "$BX/pairs" "$BX/toks" "$BX/excl" "$BX/scopes"
 printf '판정과 판단만 있다.\n' > "$BX/clean.md"
@@ -316,17 +331,19 @@ printf '새 판을 낸다.\n' > "$BX/dirty.md"
 check "제외 안의 것은 안 잡는다"    "[ -z \"\$(banned_report '$BX/pairs' '$BX/clean.md' '$BX/excl')\" ]"
 check "제외 밖의 것은 잡는다"       "banned_report '$BX/pairs' '$BX/dirty.md' '$BX/excl' | grep -qF '판 -> 버전'"
 printf 'clean.md\ndirty.md\n' > "$BX/files"
-BXSCAN="$(cd "$BX" && banned_scan "$BX/pairs" "$BX/excl" "$BX/scopes" '문서와 답변' "$BX/files")"
+BXSCAN="$(cd "$BX" && banned_scan "$BX/pairs" "$BX/excl" "$BX/scopes" '모든 글에 적용' "$BX/files")"
 check "한 번에 훑어 걸린 파일을 낸다" "printf '%s' \"\$BXSCAN\" | grep -qF 'dirty.md'"
 check "제외에 걸린 파일은 안 든다"   "! printf '%s' \"\$BXSCAN\" | grep -qF 'clean.md'"
 check "적용 대상으로 행을 고른다"    "[ \"\$(printf '%s\\n' \"\$BXSCAN\" | grep -c .)\" = 1 ]"
+check "적용 대상을 제목에서 읽는다"  "[ \"\$(tr '\\n' '/' < '$BX/scopes')\" = '모든 글에 적용/답변과 산출물에만 적용/' ]"
+check "같은 단계의 다음 제목에서 표를 끝낸다" "! grep -qx '새' '$BX/toks'"
 # 긴 제외어가 짧은 것에 먹히면 안 된다. `판단` 을 먼저 덮으면 `판단력` 이 더는 안 맞는다.
 cat > "$BX/list2.md" <<'BANEOF'
-### 금지 표현
+## 금지 표현
 
-| 쓰지 않는 말 | 대신 쓰는 말 | 적용 대상 | 분류 | 제외 |
-|---|---|---|---|---|
-| `판` | 버전 | 문서와 답변 | 평소에 쓰지 않는 말 | `판단` · `판단력` |
+| 쓰지 않는 말 | 대신 쓰는 말 | 제외 |
+|---|---|---|
+| `판` | 버전 | `판단` · `판단력` |
 BANEOF
 banned_parse "$BX/list2.md" "$BX/pairs2" "$BX/toks2" "$BX/excl2" "$BX/scopes2"
 printf '판단력이 있다.\n' > "$BX/long.md"

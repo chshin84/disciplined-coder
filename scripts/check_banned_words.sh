@@ -7,7 +7,7 @@
 # 기간마다 이것을 돌려 직접 본다.
 #
 # 쓰는 법:
-#   bash scripts/check_banned_words.sh          적용 대상이 `문서와 답변` 인 행만 본다
+#   bash scripts/check_banned_words.sh          적용 범위가 `모든 글에 적용` 인 행만 본다
 #   bash scripts/check_banned_words.sh --all    적용 대상을 가리지 않고 표의 모든 행을 본다
 #
 # 훅이 다른 프로젝트의 산출물에 거는 것은 모든 행이다. 훅이 무엇을 거부할지 보려면 `--all` 이다.
@@ -15,7 +15,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$HERE"
 
-WANT="문서와 답변"
+WANT="모든 글에 적용"
 [ "${1:-}" = "--all" ] && WANT=""
 
 BANSRC="$HERE/korean-banned-words.md"
