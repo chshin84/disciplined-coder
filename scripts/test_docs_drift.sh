@@ -615,11 +615,11 @@ RV_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$RVDIR
 %s
 ' "$RV_TREE" | sed 's/^/      /'
 check "작업 트리에 고치거나 지운 기록이 없다" "[ -z \"\$RV_TREE\" ]"
-# 결정 기록(decisions/)도 기록 타입이다. 2026-10-26 까지는 같은 결정 기록에 시험 결과를 이어 적었으므로
+# 결정 기록(decisions/)도 기록 타입이다. 2026-10-26 00:22(cfb0228)까지는 같은 결정 기록에 시험 결과를 이어 적었으므로
 # 그 뒤의 이력만 본다.
 DCDIR="docs/superpowers/decisions"
 DC_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$DCDIR" 2>/dev/null | grep -vE '^(\?\?|A ) ' || true)"
-DC_HIST="$(cd "$HERE" && git log --since="2026-10-26 06:00:00 +0900" --diff-filter=M --format= --name-only -- "$DCDIR" 2>/dev/null || true)"
+DC_HIST="$(cd "$HERE" && git log --since="2026-10-26 00:30:00 +0900" --diff-filter=M --format= --name-only -- "$DCDIR" 2>/dev/null || true)"
 check "작업 트리와 이력에 고친 결정 기록이 없다" "[ -z \"\$DC_TREE\$DC_HIST\" ]"
 RV_HIST="$(cd "$HERE" && git log --since=2026-09-02 --diff-filter=M --numstat --format= -- "$RVDIR" 2>/dev/null   | awk -F'	' 'NF==3 && !($1=="0" && $2=="0") { print $3 }' || true)"
 [ -n "$RV_HIST" ] && printf '    규칙 뒤 이력에서 고친 기록:
