@@ -1,0 +1,393 @@
+{
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq3",
+  "search_status": "ok",
+  "queries": [
+    "LLM linguistic accommodation style alignment to user input study",
+    "measuring and controlling instruction drift persona drift language model dialogs",
+    "LLM chatbot lexical alignment converges to user language over conversation turns",
+    "system prompt reminder reinjection long conversation instruction following degradation multi-turn",
+    "Korean honorifics speech level LLM consistency evaluation formality",
+    "LLMs get lost in multi-turn conversation instruction adherence over turns benchmark",
+    "benchmark system message following multi-turn constraint consistency LLM style format",
+    "consistent persona multi-turn reinforcement learning prompt-to-line consistency LLM drift",
+    "LLM register mirroring informal user prompt formality of response effect study",
+    "periodic reminder injected into context to keep chatbot tone instructions in long conversations vendor"
+  ],
+  "read": "[\"https://arxiv.org/html/2402.10962v1\", \"https://arxiv.org/html/2508.03276v2\", \"https://www.alphaxiv.org/abs/2605.29278\", \"https://aclanthology.org/2025.sigdial-1.16\", \"https://arxiv.org/pdf/2605.21086\", \"https://arxiv.org/html/2408.10943v1\", \"https://arxiv.org/abs/2608.13328\", \"https://aiweekly.co/alerts/hedges-and-tag-questions-shorten-llm-answers-paper-finds\", \"https://arxiv.org/abs/2511.00222v1\", \"https://www.arxiv.org/pdf/2511.12782\", \"https://vstorm-co.github.io/pydantic-deepagents/advanced/periodic-reminder/\"]",
+  "issues": [
+    {
+      "where": "두 안 공통: 세션 시작에 한 번 싣는 상시 문체 지침",
+      "type": "known-failure",
+      "claim": "대조 대상의 A안과 B안은 모두 상시 지침을 세션 첫머리에 싣는 방식에 기대며, 대화가 길어질 때 지침을 다시 넣는 장치는 target 서술에 없다. 그래서 선행 사례가 보고한 지시 표류의 원인(시스템 지시에 가는 주의의 감소)이 두 안에 그대로 남는다.",
+      "prior_claim": "Li 외(2024)는 두 챗봇의 자기 대화 벤치마크에서 LLaMA2-chat-70B 가 8라운드 안에 유의한 페르소나 표류를 보였고, 표류 대상에 대문자로만 쓰기·JSON 형식·프랑스어로만 답하기 같은 형식·문체·언어 지시가 포함되며, 상대 봇의 페르소나를 따라가기도 했다고 보고했다. 시스템 지시 반복(SPR)은 후반 라운드에 강했으나 컨텍스트를 많이 썼고, split-softmax 는 같은 MMLU 비용에서 SPR 과 비슷한 안정성을 냈다.",
+      "consequence": "A안의 문어체 고정과 B안의 축 위치 지정은 둘 다 대화 후반에 약해질 수 있으며, 어느 안을 고르든 표류 완화 장치(재주입 등)를 따로 정해야 한다.",
+      "evidence": "arXiv 2402.10962v1 본문: 'significant persona drift within eight rounds', 시스템 프롬프트 토큰 주의 비중이 턴 사이에 급감, 비교 기준선 SPR·CFG. 축 대조: 목적(지시 유지)은 같고, 메커니즘(챗봇 페르소나 프롬프트)·평가(자기 대화 프로브)·대상(영어 챗봇)은 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/html/2402.10962v1",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "두 안 공통: 문체 지시를 시스템 지시로 주는 방식",
+      "type": "known-failure",
+      "claim": "대조 대상은 문체를 시스템 수준 지시로 정하므로, 선행 벤치마크에서 다른 제약보다 지키기 어렵고 턴이 지날수록 준수율이 떨어진 제약 유형(Style)에 해당한다.",
+      "prior_claim": "SysBench(ICLR 2025)는 시스템 메시지 500개에 사용자 턴 5개를 붙여 제약 준수를 측정했다. GPT-4o 는 의존형 대화에서 첫 턴부터 모든 제약을 지킨 세션 비율이 R1 84.8% 에서 R5 33.7% 로 떨어졌고, Qwen2-7B 는 역할 제약 81.0% 에 비해 문체 제약 43.3% 로 크게 낮았다. 시스템 메시지 토큰에 주의를 많이 두는 모델일수록 점수가 높았다.",
+      "consequence": "문체 지침을 한 번 싣는 것만으로는 턴이 쌓일수록 준수가 줄어드는 현상이 남으며, 소형·약한 모델일수록 문체 제약이 먼저 무너진다.",
+      "evidence": "arXiv 2408.10943v1 3.3절 SSR 정의, 결과 표(R1~R5), 4.5절 주의 분석. 축 대조: 평가 축(다중 턴 제약 준수)은 가깝고, 대상(중국어·영어 일반 챗봇, 한국어 아님)과 메커니즘(일반 시스템 메시지)은 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/html/2408.10943v1",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "A안: 합쇼체·~다체 상시 고정의 실행 가능성",
+      "type": "known-failure",
+      "claim": "A안은 특정 종결 체계를 상시 고정한다는 전제에 기대지만, 선행 평가는 지정한 한국어 존대 등급을 현재 LLM 이 안정적으로 유지하지 못한다고 보고했다. 그래서 A안도 고정 지시만으로 문체가 유지된다고 볼 근거가 약하다.",
+      "prior_claim": "LoCar(KAIST·BMW, 2026)는 11개 LLM 에 해·해요·합쇼 중 하나를 지정해 응답시킨 결과, 공손함은 대체로 지켰으나 세부 존대 등급 통제가 불안정했고 특히 해요체와 합쇼체를 자주 섞었다고 보고했다. LLM 판정자만으로는 두 등급을 구분하지 못해, 문장별 어미 검사를 더한 혼합 판정으로 사람-판정자 일치도를 0.69 에서 0.94 로 올렸다.",
+      "consequence": "A안을 고르더라도 고정 등급의 유지를 문장 어미 단위로 기계 검사하지 않으면 해요체 혼입 같은 이탈을 잡기 어렵고, B안처럼 축 위치가 늘면 모델이 혼동하는 구분도 늘어난다.",
+      "evidence": "arXiv 2605.21086 4.3절 'Models frequently conflate haeyo and hapsyo', 3.3.1절 혼합 판정 0.69→0.94, 그림 2 의 Haeyo·Hapsyo 점수 분산. 축 대조: 대상(한국어 존대 등급)은 가깝고, 목적(차량 비서 현지화 평가)·메커니즘(턴마다 등급 지정)·평가(KPI 판정)는 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/pdf/2605.21086",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "언어 모델의 사용자 문체 수렴 측정(Gemma 3·Llama 3, 16개 모델)",
+      "url": "https://arxiv.org/html/2508.03276v2",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 이 대화 상대의 문체에 수렴하는지와 그 크기를 사람 기준선과 비교한다",
+          "same": false,
+          "note": "대조 대상은 수렴을 막는 지침 설계이고, 이 연구는 수렴 현상의 측정만 한다"
+        },
+        "mechanism": {
+          "prior": "사람 대화의 한 화자 턴을 모델 응답으로 바꿔 넣고 길이·LIWC 기능어·고유명사 중복·토큰 신규성을 측정한다",
+          "same": false,
+          "note": "문체 지침을 주지 않고 '대화를 이어 가라'는 동일 지시만 썼다"
+        },
+        "evaluation": {
+          "prior": "무작위 발화 기준선과 사람 원문 대비 수렴 정도",
+          "same": false,
+          "note": "청자 적합성이나 지침 준수는 평가하지 않는다"
+        },
+        "target": {
+          "prior": "영어 일상·영화·인터뷰 대화",
+          "same": false,
+          "note": "한국어 종결어미나 코딩 에이전트 출력이 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv HTML",
+      "adoption": "참고",
+      "bearing": "모델은 길이 81.25%, 토큰 신규성 85.42% 설정에서 문맥에 수렴했고 사람보다 과수렴한 설정이 많았다. 그래서 입력 문체 모방 금지를 명시해야 한다는 두 안 공통 전제를 받친다. 지시 조정 모델이 사전학습 모델보다 덜 수렴했다는 결과는 지시로 수렴을 줄일 여지를 보이나, 시스템 지시 효과는 시험하지 않아 A·B 사이의 선택은 움직이지 않는다."
+    },
+    {
+      "case": "사람-LLM 언어 수렴의 비대칭(WildChat 8개 언어)",
+      "url": "https://www.alphaxiv.org/abs/2605.29278",
+      "axes": {
+        "purpose": {
+          "prior": "실제 챗봇 대화에서 사람과 LLM 이 서로의 문체에 얼마나 수렴하는지 측정한다",
+          "same": false,
+          "note": "현상 측정 연구이며 지침 설계를 다루지 않는다"
+        },
+        "mechanism": {
+          "prior": "비대칭 수렴 지표를 기능어와 개방 품사 특징에 적용한다",
+          "same": false,
+          "note": "개입 없이 기록된 대화를 분석한다"
+        },
+        "evaluation": {
+          "prior": "사람-사람 기준선 대비 수렴 정도",
+          "same": false,
+          "note": "청자 적합성 평가가 아니다"
+        },
+        "target": {
+          "prior": "실사용 ChatGPT 대화 기록, 8개 언어",
+          "same": false,
+          "note": "다국어 실사용 대화이나 한국어 포함 여부와 코딩 에이전트 여부는 초록에서 확인하지 못했다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → alphaXiv 초록 페이지",
+      "adoption": "참고",
+      "bearing": "실사용 기록에서 LLM 이 사용자 문체에 유의하게 과수렴한다는 결과는 입력 문체 모방 금지를 유지해야 할 근거를 더한다. 수치를 확인하지 못해 수렴 크기의 근거로는 쓰기 어렵고, A·B 선택에는 중립이다."
+    },
+    {
+      "case": "LLM 은 의미에, 사람은 문체에 정렬한다(SIGDIAL 2025)",
+      "url": "https://aclanthology.org/2025.sigdial-1.16",
+      "axes": {
+        "purpose": {
+          "prior": "질문-답변 쌍에서 의미 정렬과 문체 정렬을 사람과 LLM 사이에 비교한다",
+          "same": false,
+          "note": "현상 측정 연구다"
+        },
+        "mechanism": {
+          "prior": "임베딩 기반 의미·문체 유사도",
+          "same": false,
+          "note": "지침 개입이 없다"
+        },
+        "evaluation": {
+          "prior": "답변이 질문과 의미·문체 면에서 얼마나 가까운지",
+          "same": false,
+          "note": "청자 적합성과 무관하다"
+        },
+        "target": {
+          "prior": "질문-답변 쌍(데이터셋 미상)",
+          "same": false,
+          "note": "단일 턴 질의응답이며 다중 턴 대화나 한국어가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 → ACL Anthology 초록",
+      "adoption": "참고",
+      "bearing": "LLM 답변이 사람 답변보다 질문 문체를 덜 닮았다는 반대 방향 결과다. 그래서 수렴의 크기는 측정 방식과 설정(단일 턴 질의응답 대 다중 턴 대화)에 따라 달라지며, 수렴이 언제나 크다고 단정할 근거는 없다. 두 안 중 어느 쪽도 직접 움직이지 않는다."
+    },
+    {
+      "case": "질문 말투(헤지·부가의문문)가 응답 격식을 낮춘다",
+      "url": "https://arxiv.org/abs/2608.13328",
+      "axes": {
+        "purpose": {
+          "prior": "여성과 연관된 언어 특징이 든 질문이 응답 품질을 바꾸는지 측정한다",
+          "same": false,
+          "note": "공정성 연구이며 문체 지침 설계가 아니다"
+        },
+        "mechanism": {
+          "prior": "질문의 헤지·부가의문문·집단 지칭을 바꾸고 응답 길이·수준·격식을 비교한다",
+          "same": false,
+          "note": "입력 레지스터를 조작하는 실험이며 지침으로 막는 실험은 없다"
+        },
+        "evaluation": {
+          "prior": "응답 길이, 정교함, 격식",
+          "same": false,
+          "note": "격식 변화를 측정한다는 점만 대조 대상의 관심사와 겹친다"
+        },
+        "target": {
+          "prior": "4개 모델, 3개 문서 유형(모델명 미확인)",
+          "same": false,
+          "note": "영어로 보이며 한국어 종결 체계가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 초록, 2차 기사로 COLM 게재 확인",
+      "adoption": "참고",
+      "bearing": "입력 레지스터가 명시적 성별 단서보다 큰 효과로 응답을 짧고 덜 격식 있게 만들었고, 그 특징은 초기 층에 얽혀 있어 사후 완화가 어렵다고 저자들이 적었다. 그래서 입력 문체가 출력 격식을 끌어내린다는 두 안 공통 전제를 받치고, 사후 재작성만으로 해결하는 안을 기각한 결정과도 방향이 같다. B안에서 청자를 입력 말투로 추정하면 이 끌림이 청자 맞춤으로 위장될 위험이 있다(derived)."
+    },
+    {
+      "case": "페르소나 표류 측정과 통제(split-softmax)",
+      "url": "https://arxiv.org/html/2402.10962v1",
+      "axes": {
+        "purpose": {
+          "prior": "시스템 프롬프트가 긴 대화 동안 행동을 유지하는지 측정하고 표류를 줄인다",
+          "same": false,
+          "note": "지시 유지라는 목적은 겹치나, 대조 대상은 청자 맞춤 어조 결정까지 포함한다"
+        },
+        "mechanism": {
+          "prior": "자기 대화 8라운드, 프로브 질문, 결정적 파이썬 판정; 완화책으로 SPR·CFG·split-softmax",
+          "same": false,
+          "note": "대조 대상은 프롬프트 수준 상시 지침이며 주의 가중 조정은 쓸 수 없다"
+        },
+        "evaluation": {
+          "prior": "라운드별 페르소나 준수율과 MMLU 손실의 교환",
+          "same": false,
+          "note": "청자 적합성은 평가하지 않는다"
+        },
+        "target": {
+          "prior": "LLaMA2-chat-70B, gpt-3.5-turbo-16k, 형식·문체·언어 페르소나 포함",
+          "same": false,
+          "note": "영어 챗봇이며 한국어 코딩 에이전트가 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv HTML",
+      "adoption": "참고",
+      "bearing": "문체·형식 지시가 8라운드 안에 표류하고 상대 페르소나를 따라가기도 한다는 결과는 두 안 모두에 표류 완화 장치가 필요하다는 근거다. 시스템 지시 반복(SPR)이 후반 라운드에 강했다는 결과는 지시 재주입을 완화책 후보로 받친다. 유지해야 할 상태가 많은 B안이 재주입 문구도 더 길어진다는 점은 상시 조항 부담 기준에서 A안 쪽으로 기운다(derived)."
+    },
+    {
+      "case": "SysBench: 시스템 메시지 다중 턴 준수 벤치마크",
+      "url": "https://arxiv.org/html/2408.10943v1",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 이 시스템 메시지 제약을 여러 턴 동안 지키는지 측정한다",
+          "same": false,
+          "note": "측정 목적이며 지침 설계안을 비교하지 않는다"
+        },
+        "mechanism": {
+          "prior": "시스템 메시지 500개 × 사용자 턴 5개, 제약 유형 6가지(역할·배경·행동·문체·내용·형식), 체크리스트 기반 LLM 판정",
+          "same": false,
+          "note": "문체 제약은 대조 대상의 문체 지침과 같은 유형이나 한국어 종결 체계를 다루지 않는다"
+        },
+        "evaluation": {
+          "prior": "제약 위반, 지시 오판, 세션 안정률(SSR)",
+          "same": false,
+          "note": "턴별 준수 유지를 평가한다는 점은 대조 대상의 관심사와 겹친다"
+        },
+        "target": {
+          "prior": "GPT-4o, Claude-3.5, Qwen2 등 범용 챗봇",
+          "same": false,
+          "note": "코딩 에이전트나 한국어 사용자 대상이 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv HTML(ICLR 2025 게재본)",
+      "adoption": "참고",
+      "bearing": "문체 제약이 약한 모델에서 역할 제약보다 크게 낮고(Qwen2-7B 81.0% 대 43.3%), 최상위 모델도 턴이 지나며 준수율이 떨어졌다. 그래서 상시 문체 지침은 단순할수록 유지에 유리하다는 방향으로 A안을 조금 지지한다(derived). 이전 응답이 올바르면 다음 준수가 좋아졌다는 결과는 첫 응답들의 문체를 바르게 두는 일이 표류를 줄인다는 근거다."
+    },
+    {
+      "case": "LoCar: 한국어 존대 등급 통제 평가",
+      "url": "https://arxiv.org/pdf/2605.21086",
+      "axes": {
+        "purpose": {
+          "prior": "차량 비서 LLM 의 한국어 현지화 능력(존대 등급 포함)을 평가한다",
+          "same": false,
+          "note": "평가 체계이며 지침 설계가 아니다"
+        },
+        "mechanism": {
+          "prior": "턴마다 해·해요·합쇼 중 하나를 지정하고 문장별 어미 검사와 LLM 판정자 다수결로 판정한다",
+          "same": false,
+          "note": "등급을 매 요청에 지정하는 방식이며 상시 지침과 다르다"
+        },
+        "evaluation": {
+          "prior": "등급 준수 이진 판정, 사람-판정자 일치도",
+          "same": false,
+          "note": "청자 적합성 판단은 하지 않는다"
+        },
+        "target": {
+          "prior": "한국어 차량 비서 대화, 국내외 LLM 11개",
+          "same": false,
+          "note": "한국어 존대 등급이라는 대상은 가장 가깝지만 코딩 에이전트 출력이 아니다"
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv PDF",
+      "adoption": "참고",
+      "bearing": "지정한 등급조차 해요체와 합쇼체가 섞인다는 결과는 A안의 고정도 지시만으로 보장되지 않음을 보인다. 또한 B안처럼 축이 늘면 모델이 혼동하는 구분이 늘어나 B안의 부담을 키운다(derived). 문장 어미 검사가 LLM 판정보다 정확했다는 결과(0.69→0.94)는 어느 안이든 종결 체계 유지를 기계 검사로 확인할 수 있다는 근거다."
+    },
+    {
+      "case": "문맥 내 강화(주기적 통제 문장 삽입) 제안",
+      "url": "https://www.arxiv.org/pdf/2511.12782",
+      "axes": {
+        "purpose": {
+          "prior": "긴 대화와 긴 추론에서 정렬 지시의 영향력이 줄어드는 문제를 줄인다",
+          "same": false,
+          "note": "안전 정렬이 목적이며 문체 유지는 다루지 않는다"
+        },
+        "mechanism": {
+          "prior": "t 토큰마다 통제 문장을 삽입해 전체 컨텍스트 중 시스템 지시 비율의 하한을 보장한다",
+          "same": false,
+          "note": "재주입이라는 메커니즘 구성요소만 대조 대상의 완화 후보와 같다"
+        },
+        "evaluation": {
+          "prior": "수식 논증만 있고 실험은 없다",
+          "same": false,
+          "note": "실증 평가가 없다"
+        },
+        "target": {
+          "prior": "일반 LLM 대화와 사고 사슬",
+          "same": false,
+          "note": "한국어 문체 지침이 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv PDF",
+      "adoption": "참고",
+      "bearing": "저자는 한 업체가 2025년 9~10월에 긴 대화 알림을 몇 메시지마다 넣어 챗봇 성격을 기본값으로 되돌렸고, 사용자가 원한 말투 조정까지 막아 비판받았다고 적었다(2차 서술). 재주입은 고정 문체를 지키는 A안에는 맞고, 청자에 따라 어조를 움직이는 B안에서는 조절 결과까지 기본값으로 되돌릴 위험이 있다(derived). 그래서 B안을 고르면 재주입 문구에 축 위치가 아닌 결정 절차와 전달 규칙만 넣어야 한다는 설계 조건이 생긴다(derived)."
+    },
+    {
+      "case": "에이전트 프레임워크의 주기적 목표 재주입 기능",
+      "url": "https://vstorm-co.github.io/pydantic-deepagents/advanced/periodic-reminder/",
+      "axes": {
+        "purpose": {
+          "prior": "도구를 많이 쓰는 긴 에이전트 실행이 원래 요청에서 벗어나지 않게 한다",
+          "same": false,
+          "note": "과업 표류가 대상이며 문체 표류가 아니다"
+        },
+        "mechanism": {
+          "prior": "5번째 모델 요청부터 10턴마다 첫 사용자 메시지(최대 400자)를 system-reminder 블록으로 다시 넣는다",
+          "same": false,
+          "note": "재주입 메커니즘만 대조 대상의 완화 후보와 같다"
+        },
+        "evaluation": {
+          "prior": "효과 측정이 없다",
+          "same": false,
+          "note": "문서는 근거 없이 '대개 표류를 막는다'고만 적는다"
+        },
+        "target": {
+          "prior": "코딩 에이전트를 포함한 범용 에이전트",
+          "same": false,
+          "note": "에이전트 대상은 가깝지만 한국어 문체를 다루지 않는다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 → 프로젝트 문서",
+      "adoption": "참고",
+      "bearing": "에이전트 하네스에서 주기적 재주입이 이미 흔한 구현 형태라는 사례다. 효과 근거가 없어 A·B 선택은 움직이지 않으며, 재주입 주기 설정의 참고값으로만 쓸 수 있다."
+    },
+    {
+      "case": "다중 턴 강화학습으로 페르소나 일관성 개선",
+      "url": "https://arxiv.org/abs/2511.00222v1",
+      "axes": {
+        "purpose": {
+          "prior": "시뮬레이션 사용자 역할 LLM 이 페르소나를 잃거나 자기모순하는 문제를 줄인다",
+          "same": false,
+          "note": "일관성 유지라는 목적은 겹치나 역할 시뮬레이션이 대상이다"
+        },
+        "mechanism": {
+          "prior": "프롬프트-발화·발화-발화·질의응답 일관성 지표를 보상으로 다중 턴 강화학습",
+          "same": false,
+          "note": "모델 미세조정이므로 프롬프트 지침만 바꿀 수 있는 대조 대상에는 적용할 수 없다"
+        },
+        "evaluation": {
+          "prior": "사람 주석으로 검증한 자동 일관성 지표, 불일치 55% 이상 감소",
+          "same": false,
+          "note": "초록 기준으로 내용 일관성 지표이며 문체 지표인지 확인하지 못했다"
+        },
+        "target": {
+          "prior": "환자·학생·대화 상대 역할",
+          "same": false,
+          "note": "코딩 에이전트나 한국어가 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 초록(NeurIPS 2025)",
+      "adoption": "해당 없음",
+      "bearing": "표류는 학습으로 줄일 수 있다는 근거이나 대조 대상은 가중치를 바꿀 수 없으므로 A·B 선택을 움직이지 않는다."
+    }
+  ],
+  "saturation": "4",
+  "not_found": "[\"시스템 지시로 입력 문체 모방을 금지했을 때 수렴이 얼마나 줄어드는지를 측정한 연구는 찾지 못했다. 열어 본 수렴 연구들은 지시를 주지 않거나 동일한 이어쓰기 지시만 썼다. 이 공백은 두 안의 효과 차이를 판정할 근거가 없다는 뜻이며 독창성의 근거가 아니다.\", \"고정 문체 지침과 청자별 조절 지침의 다중 턴 유지율을 직접 비교한 연구는 찾지 못했다. 검색 10회 안에서 해당 실험 설계가 나오지 않았다.\", \"한국어 대화에서 사용자의 반말·구어체 입력이 LLM 응답의 종결어미를 끌어내리는 크기를 측정한 연구는 찾지 못했다. LoCar 는 지정 등급 준수만 측정했고 사용자 입력 등급의 영향은 분리하지 않았다.\", \"업체가 주기적 알림을 넣었다는 사례는 2차 서술로만 확인했고, 업체 1차 문서는 질의 경계(고유명사 금지) 때문에 검색하지 않았다.\", \"WildChat 수렴 연구의 수치와 언어별 결과는 초록 페이지만 열려 확인하지 못했다.\"]",
+  "disclosures": "[\"에이전트원칙 파일은 세션 맥락에 이미 실려 있어 별도 Read 호출 없이 적용했다.\", \"arXiv 2605.29278·2608.13328·2511.00222·SIGDIAL 2025 논문은 초록 또는 2차 요약만 열었고 본문 수치는 확인하지 못했다.\", \"LoCar 는 PDF 1~3·5~6페이지만 읽었고, 부록의 모델별 등급 점수는 확인하지 못했다.\", \"bearing 의 A안·B안 방향 판단 가운데 derived 로 표시한 문장은 연구자의 추론이며 선행 사례가 직접 보인 결과가 아니다.\", \"도구 호출 수가 상한 20회를 1회 넘었다(검색 10회, 웹 열람 9회, PDF 읽기 2회).\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"TERM-ONE\", \"WRITTEN-ONLY\", \"FULL-SENTENCE\"]",
+  "notes": "탐색 방법: 넓은 검색어(accommodation, persona drift)로 시작해 좁혀 갔고, 완화책은 사례와 결말을 찾는 방식으로, 한국어 존대 등급은 대상 특화 검색으로 보완했다. intended_use 기준(입력 문체 모방 없이 청자 맞춤 어조가 나오는가, 상시 조항 부담)에 따라 근거 우선순위를 정했다. 수렴 현상 근거(2508.03276, WildChat, 레지스터 연구)는 모방 금지 유지를, 표류 근거(2402.10962, SysBench, LoCar)는 두 안 공통의 완화 장치 필요를 받친다. A·B 선택을 직접 가르는 실증은 없었으며, 방향 판단은 derived 로 표시했다. 뺀 근거: 다중 턴 과업 성능 저하 연구(LLMs Get Lost In Multi-Turn Conversation)는 문체가 아닌 과제 성능과 과소명세 지시를 다뤄 intended_use 와 맞지 않아 행에서 뺐다. 블로그·커뮤니티의 턴 수 임계값 주장(20~30턴 등)은 출처가 없어 뺐다. 더 확인할 사항: (1) 2402.10962 의 SPR 결과가 문체 페르소나 범주에서 따로 어떤지, 재주입 문구 길이 결정에 필요하다. (2) 2608.13328 본문의 프롬프트 격식-응답 격식 회귀 계수, 입력 레지스터 끌림의 크기 추정에 필요하다. (3) 한국어 구어체 입력이 응답 종결어미에 주는 영향을 측정한 자료, B안의 청자 추정 단서 설계에 필요하다."
+}

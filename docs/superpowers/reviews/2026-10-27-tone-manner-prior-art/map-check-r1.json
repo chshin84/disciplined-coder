@@ -1,0 +1,297 @@
+{
+  "cells": [
+    {
+      "row": "LLM 의 사용자 문체 과잉 수렴(8개 언어 실제 대화)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "LLM 의 사용자 문체 과잉 수렴(8개 언어 실제 대화)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "LLM 의 사용자 문체 과잉 수렴(8개 언어 실제 대화)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "LLM 의 사용자 문체 과잉 수렴(8개 언어 실제 대화)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "LLM 의 사용자 문체 과잉 수렴(8개 언어 실제 대화)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "LLM 의 사용자 문체 과잉 수렴(8개 언어 실제 대화)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#1"
+    },
+    {
+      "row": "LLM 답의 의미 정렬과 문체 정렬 비교",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "LLM 답의 의미 정렬과 문체 정렬 비교",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "LLM 답의 의미 정렬과 문체 정렬 비교",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "LLM 답의 의미 정렬과 문체 정렬 비교",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "LLM 답의 의미 정렬과 문체 정렬 비교",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "LLM 답의 의미 정렬과 문체 정렬 비교",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "PrefDisco 선호 탐색형 개인화 벤치마크",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "PrefDisco 선호 탐색형 개인화 벤치마크",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "PrefDisco 선호 탐색형 개인화 벤치마크",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "PrefDisco 선호 탐색형 개인화 벤치마크",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "PrefDisco 선호 탐색형 개인화 벤치마크",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "PrefDisco 선호 탐색형 개인화 벤치마크",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#6"
+    },
+    {
+      "row": "언어모델의 한국어 주체 높임 처리(형태 통사 대 화용)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "언어모델의 한국어 주체 높임 처리(형태 통사 대 화용)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "언어모델의 한국어 주체 높임 처리(형태 통사 대 화용)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "언어모델의 한국어 주체 높임 처리(형태 통사 대 화용)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "언어모델의 한국어 주체 높임 처리(형태 통사 대 화용)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "언어모델의 한국어 주체 높임 처리(형태 통사 대 화용)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#2"
+    },
+    {
+      "row": "사람-LLM 언어 수렴의 비대칭(WildChat 8개 언어)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "사람-LLM 언어 수렴의 비대칭(WildChat 8개 언어)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "사람-LLM 언어 수렴의 비대칭(WildChat 8개 언어)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "사람-LLM 언어 수렴의 비대칭(WildChat 8개 언어)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "사람-LLM 언어 수렴의 비대칭(WildChat 8개 언어)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "사람-LLM 언어 수렴의 비대칭(WildChat 8개 언어)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#1"
+    },
+    {
+      "row": "LLM 은 의미에, 사람은 문체에 정렬한다(SIGDIAL 2025)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "LLM 은 의미에, 사람은 문체에 정렬한다(SIGDIAL 2025)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "LLM 은 의미에, 사람은 문체에 정렬한다(SIGDIAL 2025)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "LLM 은 의미에, 사람은 문체에 정렬한다(SIGDIAL 2025)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "LLM 은 의미에, 사람은 문체에 정렬한다(SIGDIAL 2025)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "LLM 은 의미에, 사람은 문체에 정렬한다(SIGDIAL 2025)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#2"
+    },
+    {
+      "row": "페르소나 표류 측정과 통제(split-softmax)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "페르소나 표류 측정과 통제(split-softmax)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "페르소나 표류 측정과 통제(split-softmax)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "페르소나 표류 측정과 통제(split-softmax)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "페르소나 표류 측정과 통제(split-softmax)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "페르소나 표류 측정과 통제(split-softmax)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#4"
+    },
+    {
+      "row": "Biber 의 교차언어 비교에서 나온 한국어 고유 차원 Honorification",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "Biber 의 교차언어 비교에서 나온 한국어 고유 차원 Honorification",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "Biber 의 교차언어 비교에서 나온 한국어 고유 차원 Honorification",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "Biber 의 교차언어 비교에서 나온 한국어 고유 차원 Honorification",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "Biber 의 교차언어 비교에서 나온 한국어 고유 차원 Honorification",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "Biber 의 교차언어 비교에서 나온 한국어 고유 차원 Honorification",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "NO-AGREE",
+    "EVIDENCE-FIRST"
+  ]
+}

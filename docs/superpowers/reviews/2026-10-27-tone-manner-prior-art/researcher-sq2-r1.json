@@ -1,0 +1,234 @@
+{
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq2",
+  "search_status": "ok",
+  "queries": [
+    "Korean honorific speech level LLM evaluation benchmark",
+    "formality-controlled machine translation Korean honorifics",
+    "Korean sentence ending speech level classification morphological analyzer formality",
+    "LLM Korean honorifics social relationship speech level choice evaluation arxiv",
+    "Korean formality style transfer dataset honorific level classifier",
+    "language model accommodation user register mirroring formality conversation study",
+    "IWSLT 2023 formality control track findings Korean results zero-shot LLM",
+    "국립국어원 높임법 하십시오체 해요체 해라체 공문서 보고서 문체 선택",
+    "Kiwi 형태소 분석기 종결어미 EF 문체 판별 존댓말 반말 분류"
+  ],
+  "read": "[\"https://arxiv.org/abs/2605.21086\", \"https://arxiv.org/pdf/2605.21086\", \"https://arxiv.org/abs/2510.15558\", \"https://arxiv.org/pdf/2510.15558\", \"https://aclanthology.org/2026.scil-main.35/\", \"https://arxiv.org/abs/2607.26015\", \"https://aclanthology.org/2024.lrec-main.870.pdf\", \"https://iwslt.org/2023/formality\"]",
+  "issues": [
+    {
+      "where": "A안과 B안 공통: 말투 수준(합쇼체·해요체·해라체)의 유지를 지시문에 맡기는 설계. 대조 대상 서술에는 종결어미를 기계로 검사하는 단계가 적혀 있지 않다.",
+      "type": "known-failure",
+      "claim": "두 안 모두 말투 수준의 실현을 모델의 지시 준수에 맡긴다. 선행 연구는 모델이 인접한 말투 수준(해요체와 합쇼체)을 생성과 판정 양쪽에서 혼동한다고 보고했으므로, 이 실패 원인이 대조 대상에도 남아 있다.",
+      "prior_claim": "LoCar 연구는 11개 LLM에 해체·해요체·합쇼체 중 하나를 지정해 응답하게 했고, 모델들이 해요체와 합쇼체를 자주 혼동해 지정한 말투 수준을 안정적으로 유지하지 못했다고 보고했다. 같은 연구에서 LLM 판정자만으로는 해요체와 합쇼체를 구분하지 못했고, 문장 단위 종결어미 검사를 판정 앞에 추가하자 사람과 판정자의 일치율이 0.69에서 0.94로 올랐다.",
+      "consequence": "A안처럼 말투 수준을 하나로 고정해도 지시문만으로는 그 수준이 유지된다는 보장이 없다. B안처럼 청자마다 수준을 고르면 모델이 혼동하는 인접 수준 사이의 선택이 출력마다 생긴다. 또한 LLM 렌즈로 말투 수준을 판정하면 같은 혼동이 판정 단계에도 남는다.",
+      "evidence": "arXiv 2605.21086 4.3절 'Models frequently conflate haeyo and hapsyo', 3.3.1절 'LLM-only judges struggled to reliably distinguish between closely related Korean honorific forms (e.g., haeyo vs. hapsyo)', 'human–judge agreement for honorific classification improved from 0.69 (LLM-only) to 0.94', 5절 'fixed register realization requires explicit verification beyond general politeness preservation'. 네 축 중 목적(차량 비서의 현지화 평가)과 적용 대상(차량 대화 비서)은 대조 대상과 다르고, 메커니즘의 종결어미 검사만 대조 대상의 기계 검사 가능성과 겹친다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/pdf/2605.21086",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "LoCar: 차량 비서의 한국어 말투 수준 통제 평가",
+      "url": "https://arxiv.org/pdf/2605.21086",
+      "axes": {
+        "purpose": {
+          "prior": "차량용 한국어 대화 비서가 지정한 말투 수준(해체·해요체·합쇼체)을 지키는지와 대화 능력을 평가한다.",
+          "same": false,
+          "note": "말투 수준 준수를 다루는 점은 같으나, 청자에 맞춘 어조 선택이나 입력 문체 모방 방지는 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "지시문으로 말투 수준을 지정하고, 보조 LLM이 문장을 나눈 뒤 문장마다 종결어미를 지정 수준과 대조하는 검사를 LLM 판정자 앞에 둔다.",
+          "same": false,
+          "note": "대조 대상의 구성요소 중 기계 검사 가능성(종결어미 검사)과만 같다. 수준을 고르는 단계는 없고 외부에서 수준을 지정한다."
+        },
+        "evaluation": {
+          "prior": "11개 모델의 말투 수준 준수율과 사람·판정자 일치율(0.69에서 0.94로 상승)을 측정했다.",
+          "same": false,
+          "note": "대조 대상의 기준(입력 문체 모방 없음, 청자 적합성, 조항 부담)과 다르다."
+        },
+        "target": {
+          "prior": "차량 내 음성형 대화 비서의 응답.",
+          "same": false,
+          "note": "코딩 에이전트의 작업 보고·문서 출력과 다르다. 음성형이라 간결성 요구도 다르다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 후 arXiv PDF 본문 1~8페이지 확인",
+      "adoption": "참고",
+      "bearing": "A안에는 수준 하나를 지정해도 지시만으로는 유지되지 않는다는 근거이고, B안에는 인접 수준 사이의 선택을 늘리면 혼동이 늘 수 있다는 부담 요인이다. 두 안 모두에 종결어미 기계 검사를 붙이는 방향을 지지한다. 적용 대상이 달라 준수율 수치를 그대로 옮기기는 어렵다."
+    },
+    {
+      "case": "KITE: 한국어 지시 따르기 벤치마크의 존댓말·반말 전환 과제",
+      "url": "https://arxiv.org/pdf/2510.15558",
+      "axes": {
+        "purpose": {
+          "prior": "LLM의 한국어 지시 따르기 능력을 평가하며, 존댓말과 반말 사이의 전환을 한국어 특화 과제 4종 중 하나로 둔다.",
+          "same": false,
+          "note": "말투 수준을 다루지만 지시된 전환의 수행 여부를 보며, 청자에 맞춘 선택이나 상시 지침은 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "명시적 전환 지시(예: 다음 문장을 반말로 바꿔라)를 주고 규칙 기반으로 하위 지시 준수 여부를 판정한다.",
+          "same": false,
+          "note": "규칙 기반 판정이라는 구성요소만 대조 대상의 기계 검사 가능성과 겹친다."
+        },
+        "evaluation": {
+          "prior": "하위 지시 준수 비율로 정확도를 계산했다. 한국어 과제 전체 평균은 GPT-4o 64.46, 일반 과제 90.27이었고, 존댓말 과제만의 점수는 확인한 페이지에 없었다.",
+          "same": false,
+          "note": "말투 수준만 따로 본 수치를 확인하지 못했다."
+        },
+        "target": {
+          "prior": "범용 LLM과 한국어 특화 LLM 7종.",
+          "same": false,
+          "note": "코딩 에이전트 출력이 아니다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 후 arXiv PDF 본문 3~6페이지 확인",
+      "adoption": "참고",
+      "bearing": "말투 수준 전환이 규칙으로 검증할 수 있는 지시로 다뤄진다는 근거여서, 어느 안이든 종결어미 검사를 붙일 수 있다는 쪽을 약하게 지지한다. 후보안 사이의 선택은 움직이지 않는다."
+    },
+    {
+      "case": "언어모델의 한국어 주체 높임 처리(형태 통사 대 화용)",
+      "url": "https://aclanthology.org/2026.scil-main.35/",
+      "axes": {
+        "purpose": {
+          "prior": "언어모델이 한국어 주체 높임을 사람처럼 처리하는지, 사회적 지위에 따른 화용 규칙을 익혔는지 시험한다.",
+          "same": false,
+          "note": "주체 높임을 다루며, 대조 대상이 다루는 상대 높임(청자에 대한 말투 수준)과 다르다."
+        },
+        "mechanism": {
+          "prior": "높임 구문의 수용성을 모델 확률로 비교한다.",
+          "same": false,
+          "note": "생성 지침이 아니라 확률 기반 진단이다."
+        },
+        "evaluation": {
+          "prior": "모델은 형태 통사 불일치는 잡았으나, 주어의 지위가 요구하지 않아도 높임 표지를 일관되게 선호했다. 저자는 이를 화용 지식이 아닌 표면 휴리스틱 의존으로 해석했다.",
+          "same": false,
+          "note": "청자 적합성과 모방 여부를 측정하지 않았다."
+        },
+        "target": {
+          "prior": "이름이 초록에 나오지 않은 언어모델 묶음.",
+          "same": false,
+          "note": "코딩 에이전트 출력이 아니다. 초록만 확인했다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 후 ACL Anthology 초록 페이지 확인",
+      "adoption": "참고",
+      "bearing": "B안이 기대는 '청자와 관계를 보고 높임을 고르는 판단'을 모델이 표면 단서로 대신할 수 있다는 근거여서 B안의 부담을 높이는 방향이다. 다만 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "지시 조정 모델의 사용자 구문 재사용 측정",
+      "url": "https://arxiv.org/abs/2607.26015",
+      "axes": {
+        "purpose": {
+          "prior": "대화에서 언어모델이 직전 사람 발화의 구문을 얼마나 재사용하는지 사람과 비교한다.",
+          "same": false,
+          "note": "입력 모방이라는 현상을 측정하는 점에서 대조 대상의 모방 금지 조건과 관련되지만, 말투 수준이 아니라 구문 규칙을 본다."
+        },
+        "mechanism": {
+          "prior": "실제 사람 대화에서 한 화자의 차례를 Llama·Gemma 16종 모델로 바꾸고 문맥자유문법 규칙 재사용을 측정한다.",
+          "same": false,
+          "note": "지침이나 통제 장치가 아니라 관측 연구다."
+        },
+        "evaluation": {
+          "prior": "지시 조정 모델 8쌍 모두 직전 차례와의 구문 겹침이 그 자리의 실제 사람 응답보다 컸고, 어휘·의미 유사도도 사람보다 높았다.",
+          "same": false,
+          "note": "모방 정도를 측정하나 청자 적합성은 보지 않는다."
+        },
+        "target": {
+          "prior": "영어로 보이는 사람 대화 자료와 공개 가중치 모델.",
+          "same": false,
+          "note": "한국어 말투 수준을 다루지 않는다. 언어는 초록에서 확인하지 못했다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 후 arXiv 초록 페이지 확인",
+      "adoption": "참고",
+      "bearing": "지시 조정 모델이 입력 형태를 사람보다 더 따라간다는 관측이므로, 두 안 모두에 입력 문체 모방 금지를 유지하는 제약을 지지한다. 후보안 사이의 선택은 움직이지 않는다."
+    },
+    {
+      "case": "IWSLT 2023 격식 통제 번역 공동과제(영한 포함)",
+      "url": "https://iwslt.org/2023/formality",
+      "axes": {
+        "purpose": {
+          "prior": "번역 출력의 격식 수준(격식·비격식)을 지정대로 통제하는 능력을 겨룬다.",
+          "same": false,
+          "note": "격식을 지정값으로 받으며, 청자를 보고 고르는 단계가 없다."
+        },
+        "mechanism": {
+          "prior": "목표 격식을 입력으로 주고 번역 모델이 그 수준으로 생성한다. 한국어는 학습 자료가 있는 지도 설정이다.",
+          "same": false,
+          "note": "번역 과제이며 대조 대상의 상시 지침과 다르다."
+        },
+        "evaluation": {
+          "prior": "참조 번역의 구 단위 격식 표지로 출력을 격식·비격식·중립으로 분류하는 방식과, 다국어 격식 분류기를 쓰는 방식의 일치 정확도로 평가한다.",
+          "same": false,
+          "note": "격식을 이분으로만 보며, 합쇼체·해요체·해라체 구분은 없다."
+        },
+        "target": {
+          "prior": "영어에서 한국어·베트남어 등으로 번역하는 시스템.",
+          "same": false,
+          "note": "코딩 에이전트 출력이 아니다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "검색 후 공동과제 공식 페이지 확인",
+      "adoption": "참고",
+      "bearing": "격식을 표지 기반 또는 분류기로 기계 판정하는 평가 관행이 있다는 근거여서 기계 검사 가능성을 지지한다. 이분 분류라 B안의 세부 조절 축(거리·온도·밀도) 판정에는 옮기기 어렵다."
+    },
+    {
+      "case": "Kosmic: 높임 구분을 반영한 한국어 문장 유사도 지표",
+      "url": "https://aclanthology.org/2024.lrec-main.870.pdf",
+      "axes": {
+        "purpose": {
+          "prior": "의미와 어조(격식·비격식)를 함께 반영하는 한국어 문장 유사도를 측정한다.",
+          "same": false,
+          "note": "생성 지침이 아니라 평가 지표다."
+        },
+        "mechanism": {
+          "prior": "KLUE-BERT 기반으로 의미 유사도 모델, 격식·비격식 이진 분류기, 대조 학습 모델을 결합한다.",
+          "same": false,
+          "note": "학습형 이진 분류기라는 구성요소만 기계 검사 가능성과 겹친다."
+        },
+        "evaluation": {
+          "prior": "전문가가 의미와 어조 유사도를 매긴 1,000쌍 벤치마크와의 상관으로 평가했다.",
+          "same": false,
+          "note": "말투 수준 판정 정확도만 따로 본 수치는 확인한 페이지에 없다."
+        },
+        "target": {
+          "prior": "한국어 문장 쌍과 바꿔쓰기 방법.",
+          "same": false,
+          "note": "코딩 에이전트 출력이 아니다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 후 ACL Anthology PDF 1~3페이지 확인",
+      "adoption": "참고",
+      "bearing": "학습형 분류기로 격식을 판정하는 선례이지만 이진 분류여서 합쇼체와 해요체를 구분하지 못한다. 세밀한 수준 검사에는 종결어미 규칙 쪽이 맞다는 쪽으로 기계 검사 설계를 움직인다."
+    }
+  ],
+  "saturation": "1",
+  "not_found": "[\"국립국어원 등 공공기관이 공문서나 보고서에 어느 말투 수준(합쇼체·해라체)을 쓰라고 정한 공식 기준을 찾지 못했다. 검색 결과에 상대 높임 체계 설명만 나왔고 공식 지침 문서는 나오지 않았다. 이 결과는 기준이 없다는 뜻이 아니다.\", \"LLM이 청자를 보고 한국어 말투 수준을 스스로 고르는 능력을 측정한 연구를 찾지 못했다. 찾은 연구는 모두 말투 수준을 외부에서 지정했다.\", \"형태소 분석기의 종결어미 태그로 말투 수준을 판별한 공개 도구나 연구를 찾지 못했다. 검색 결과에는 종결어미 태그(EF)가 품사만 표시한다는 설명만 있었다.\", \"IWSLT 2023 격식 과제의 한국어 결과 수치와 LLM 참가팀 성적은 공동과제 요약 논문을 열지 못해 확인하지 못했다.\", \"입력의 말투 수준(반말·구어)을 LLM이 따라가는지 한국어로 측정한 연구를 찾지 못했다. 찾은 모방 측정 연구는 구문 단위이고 한국어 말투 수준을 다루지 않는다.\"]",
+  "disclosures": "[\"Cho·Kwon(SCiL 2026)과 구문 재사용 연구(arXiv 2607.26015)는 초록 페이지만 열었다. 본문 수치와 모델 목록은 확인하지 못했다.\", \"KITE의 존댓말 과제만의 점수는 확인한 3~6페이지에 없었다. 부록을 읽지 않았다.\", \"IWSLT 공동과제 페이지는 학술대회 공동과제 공식 페이지이다. kind 목록에 맞는 값이 없어 blog로 적었으며, 표준기구 문서는 아니다.\", \"LoCar 데이터셋은 산업 파트너의 독점 자료라 공개되지 않는다고 논문이 밝혔다. 종결어미 검사의 세부 구현(부록 E.1)은 읽지 않았다.\", \"에이전트원칙 파일은 세션 맥락에 이미 실려 있어 별도로 Read하지 않았다.\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"WRITTEN-ONLY\", \"FULL-SENTENCE\", \"TERM-ONE\"]",
+  "notes": "탐색 방법은 짧고 넓은 검색어로 시작해 좁혀 가는 방식과, 찾은 핵심 논문(LoCar)의 관련 연구 절을 따라가는 인용 따라가기를 함께 썼다. intended_use의 기준(입력 문체 모방 없이 청자에 맞는 어조, 상시 조항의 부담)에 비추어 말투 수준 통제 실패, 판정 능력, 기계 검사 가능성 순으로 근거의 우선순위를 정했다. 번역 문맥으로 높임을 예측하는 연구(Electronics 2021, IALP 2019, 활성화 프롬프트 연구)는 검색 결과에서 보았으나, 번역 학습 기법이어서 상시 지침 결정에 옮기기 어려워 근거 지도에서 뺐다. 언어 스타일 맞추기를 다룬 프리프린트(arXiv 2510.00339)와 모방·아첨 연구(NeurIPS 2026)는 열지 않았고, constraints의 모방 금지 유지 조건과 겹쳐 우선순위를 낮췄다. 추가 확인이 필요한 사항은 LoCar 부록 E.1의 종결어미 규칙 목록이며, 그 목록이 있으면 합쇼체·해라체 검사 규칙의 출발점으로 쓸 수 있는지 판단할 수 있다. 일본어 연구는 범위 제외 조건에 따라 보지 않았다."
+}

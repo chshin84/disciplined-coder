@@ -1,0 +1,18 @@
+{
+  "lens": "lens-grounding",
+  "read": ["plan", "spec", "scripts/_eval_clause.py", "scripts/eval_clause.sh", "scripts/eval_clause_report.sh", "scripts/test_eval_cases.sh", "scripts/_eval_lib.py", "evals/principles/cases 일부", "evals/principles/clauses/*/base 목록", "evals/principles/results/clauses 목록", "CLAUDE.md", "docs/domain-discipline.md 186-191, 522-537", "agents/lens-readability.md", "skills/review-docs/SKILL.md 1-20", "skills/dispatching-lenses/SKILL.md"],
+  "issues": [
+    {"where": "Task 2 Step 3", "type": "mismatch", "claim": "scripts/test_eval_clause.sh 는 없다. 형식 검사는 scripts/test_eval_cases.sh 다."},
+    {"where": "Task 1", "type": "omission", "claim": "base 파일이 없어 current.md 가 기본 기준 7a2d26d 와 대조되어 실패할 가능성이 높다."},
+    {"where": "Task 2 Interfaces", "type": "omission", "claim": "필수 머리 필드 failure 가 빠졌다(_eval_lib.py REQUIRED)."},
+    {"where": "Task 2 Interfaces", "type": "contradiction", "claim": "q-tone-axis-1·2 는 산출물인데 type: chat 이다. TYPES 에 deliverable 이 있다."},
+    {"where": "Task 3 Step 3·4", "type": "contradiction", "claim": "새 조항을 조항 없음 조건과 비교하라는 저장소 규칙과 달리 none 단위를 진단으로만 쓴다."},
+    {"where": "Task 3 Step 3", "type": "omission", "claim": "추가 질문 짝에 followup: true 지시가 없다."},
+    {"where": "Task 3 Step 1 앞", "type": "omission", "claim": "시험 비용 제안과 진단 실행 여부를 묻는 단계가 없다."},
+    {"where": "Task 3 Step 4", "type": "unsupported", "claim": "조항 없음 결과만으로 원인을 단정하고 현행 조건의 결과를 판정에 넣지 않았다."},
+    {"where": "Task 4 Files", "type": "unsupported", "claim": "domain-discipline.md 189·526·535줄은 현행 서술이 아니라 날짜를 단 측정 기록과 근거 표 행이어서 고치면 이력이 바뀐다."},
+    {"where": "Task 4 Step 4", "type": "omission", "claim": "접두어로 고르면 NO-SQUEEZE 를 겨누는 deliverable 질문 slidetitle-split 등이 점검에서 빠진다."}
+  ],
+  "principles_applied": ["NO-ASSUME", "EVIDENCE-FIRST", "ASK-OPTIONS", "STATE-ASSUME"],
+  "notes": "오케스트레이터가 원본 메시지에서 옮겨 저장하며 칸을 요약했다. 렌즈 확인: 두 시험 스크립트는 단위 이름 여러 개를 받는다. 조항 없음 조건은 빈 설정이라 원칙 전체가 실리지 않는다. 결과 경로와 렌즈·스킬 행 번호는 맞다."
+}

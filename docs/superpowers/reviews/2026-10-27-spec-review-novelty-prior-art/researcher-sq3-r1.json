@@ -1,0 +1,297 @@
+{
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq3",
+  "search_status": "ok",
+  "queries": [
+    "LLM code review false positive filtering verifier agent",
+    "LLM agent human-in-the-loop escalation irreversible actions approval policy",
+    "incremental review only changed hunks LLM pull request re-review",
+    "LLM code review comments confidence score threshold filter low-confidence issues before posting",
+    "automated code review LLM industrial deployment comment resolution rate noise developers ignore",
+    "LLM review findings triage auto-fix versus ask human judgment calls design decisions agent workflow",
+    "LLM self-correction without external feedback degrades performance reviewing own output",
+    "regression verification after requirements change impact analysis re-inspection only modified sections"
+  ],
+  "read": "[\"https://arxiv.org/html/2601.22952v1\", \"https://arxiv.org/pdf/2507.22358\", \"https://arxiv.org/abs/2507.22358\", \"https://arxiv.org/html/2507.22358v1\", \"https://bito.ai/blog/how-to-perform-ai-powered-incremental-code-reviews-with-bito/\", \"https://arxiv.org/html/2501.15134v1\", \"https://arxiv.org/html/2601.01129v2\", \"https://www.uber.com/ug/en/blog/ureview\", \"https://www.agentpatterns.ai/code-review/review-then-implement-loop/\", \"https://arxiv.org/abs/2310.01798\", \"https://arxiv.org/pdf/2405.13565\", \"https://homepage.iis.sinica.edu.tw/~bywang/papers/oopsla20.pdf\"]",
+  "issues": [
+    {
+      "where": "(3) 처분 규칙 중 틀린 지적을 거르는 단계",
+      "type": "known-failure",
+      "claim": "대조 대상은 렌즈 지적을 합친 뒤 틀린 지적을 LLM 판단으로 거른다. 선행 사례가 보고한 실패 원인은 강한 거짓 양성 거르기가 실제 결함도 함께 지운다는 점이다. 그 실패 원인이 대조 대상에도 남아 있을 수 있다. 다만 대조 대상이 걸러낸 지적 중 실제 결함의 비율을 측정했는지는 입력에 없으므로 확인하지 못했다.",
+      "prior_claim": "SAST 경보의 거짓 양성을 LLM 에이전트로 거른 비교 연구에서, 최선 구성은 OWASP 벤치마크의 거짓 양성 비율을 98.3%에서 6.3%로 줄였다. 그러나 같은 구성이 실제 취약점 314건을 거짓 양성으로 잘못 분류해 놓침 비율이 약 22%였고, 저자들은 LLM 에이전트가 경보를 무조건 자동으로 억제하는 용도에는 맞지 않으며 결정 지원 도구로 쓰라고 권고했다.",
+      "consequence": "대조 대상에서 거르기 단계가 버린 지적은 사람에게도 올라가지 않고 자동 수정도 되지 않는다. 그래서 거르기 단계가 실제 결함을 틀린 지적으로 판정하면 그 결함은 리뷰 기록에서 처분 대상으로 남지 않는다.",
+      "evidence": "arXiv 2601.22952 본문: 'aggressive FP reduction can come at the cost of suppressing true vulnerabilities', 'LLM-based agents are unsuitable for unconditional, automatic suppression of SAST warnings'. 네 축 대조: 목적(경보 소음 감소)은 대조 대상의 거르기 단계와만 같고, 메커니즘(코드베이스를 탐색하는 단일 판정 에이전트), 평가(라벨된 취약점 벤치마크), 적용 대상(정적 분석 경보)이 다르다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/html/2601.22952v1",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "LLM 에이전트의 SAST 거짓 양성 거르기 비교 연구",
+      "url": "https://arxiv.org/html/2601.22952v1",
+      "axes": {
+        "purpose": {
+          "prior": "정적 분석 경보에서 거짓 양성을 걸러 소음을 줄인다.",
+          "same": false,
+          "note": "대조 대상의 구성요소 중 틀린 지적 거르기 단계와만 목적이 같다. 대조 대상 전체는 설계 문서 리뷰 자동화다."
+        },
+        "mechanism": {
+          "prior": "에이전트가 경보 하나마다 코드베이스를 읽고 실제 취약점인지 판정한다.",
+          "same": false,
+          "note": "판정자가 근거를 직접 탐색한다는 점은 비슷하나, 여러 렌즈 지적을 합친 뒤 거르는 구조는 없다."
+        },
+        "evaluation": {
+          "prior": "라벨된 벤치마크에서 잔여 거짓 양성 비율과 실제 취약점 놓침 비율을 함께 측정했다.",
+          "same": false,
+          "note": "대조 대상이 거르기의 놓침 비율을 측정했다는 정보는 입력에 없다."
+        },
+        "target": {
+          "prior": "SAST 도구 경보와 소스 코드다.",
+          "same": false,
+          "note": "설계 문서 리뷰 지적과 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 본문 열람",
+      "adoption": "참고",
+      "bearing": "거짓 양성 거르기라는 메커니즘에는 선행 사례가 있다. 그래서 거르기 단계 자체는 새롭다고 보기 어렵고, 놓침 비율 22%라는 실패 근거가 강하다. 축이 모두 달라 수치를 그대로 옮겨 쓰기는 어렵다."
+    },
+    {
+      "case": "산업 코드 리뷰 시스템의 ReviewFilter 단계(바이트댄스)",
+      "url": "https://arxiv.org/html/2501.15134v1",
+      "axes": {
+        "purpose": {
+          "prior": "규칙 검사 LLM이 낸 리뷰 코멘트의 환각과 사실 오류를 거른다.",
+          "same": false,
+          "note": "대조 대상의 틀린 지적 거르기 단계와만 같다."
+        },
+        "mechanism": {
+          "prior": "미세조정한 LLM이 코멘트마다 예·아니오를 판정하며 결론 먼저 형식을 쓴다.",
+          "same": false,
+          "note": "생성 단계와 거르기 단계를 분리한 구조는 같으나, 미세조정 모델과 단일 규칙 검사기를 쓴다. 실패 유형별 렌즈 여러 개를 합치는 구조는 없다."
+        },
+        "evaluation": {
+          "prior": "정밀도(온라인 최고 75%)와 지적 뒤 수정된 줄의 비율(Outdated Rate, Go 26.7%)을 측정했다.",
+          "same": false,
+          "note": "대조 대상의 평가 방식은 입력에 없다."
+        },
+        "target": {
+          "prior": "코드 변경과 리뷰 코멘트다.",
+          "same": false,
+          "note": "설계 문서와 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 본문 열람",
+      "adoption": "참고",
+      "bearing": "생성 뒤 별도 판정자로 틀린 지적을 거르는 메커니즘에 산업 배포 사례가 있다. 그래서 거르기 메커니즘의 신규성 판단을 낮추는 방향이다. 거르기 덕분에 정밀도가 오른 근거는 강하나 적용 대상이 코드다."
+    },
+    {
+      "case": "대규모 LLM 코드 리뷰 온라인 평가(아틀라시안)",
+      "url": "https://arxiv.org/html/2601.01129v2",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 리뷰 코멘트의 소음을 줄이고 PR 처리 시간을 줄인다.",
+          "same": false,
+          "note": "대조 대상의 거르기 단계와 목적이 같으나 대조 대상 전체 목적과는 다르다."
+        },
+        "mechanism": {
+          "prior": "LLM 판정자가 사실 정합성을 이진 판정하고, 이어서 미세조정 ModernBERT 분류기가 실행 가능성 낮은 코멘트를 거른다.",
+          "same": false,
+          "note": "사실 정합성 판정은 대조 대상의 틀린 지적 거르기와 비슷하다. 실행 가능성 분류기는 대조 대상에 없다."
+        },
+        "evaluation": {
+          "prior": "1,900여 저장소에서 1년 동안 코드 해결률(38.7%)을 측정하고 거르기 단계별 제거 실험을 했다. 사실 정합성 판정자는 전체 효과에 미친 영향이 작았다.",
+          "same": false,
+          "note": "대조 대상의 평가 방식은 입력에 없다."
+        },
+        "target": {
+          "prior": "PR 코드 변경이다.",
+          "same": false,
+          "note": "설계 문서와 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 본문 열람",
+      "adoption": "참고",
+      "bearing": "거르기 메커니즘에 선행 사례가 있다는 근거다. 또한 이 사례에서 LLM 사실 정합성 판정은 효과가 작았고 실행 가능성 분류가 효과가 컸다. 그래서 틀린 지적 거르기만으로 소음이 줄어든다는 가정을 약하게 만든다. 적용 대상이 코드라 옮겨 쓰기는 제한된다."
+    },
+    {
+      "case": "LLM 코드 리뷰의 등급 프롬프트와 신뢰도 임계값(우버)",
+      "url": "https://www.uber.com/ug/en/blog/ureview",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 리뷰 코멘트 중 쓸모 낮은 코멘트를 게시 전에 제거한다.",
+          "same": false,
+          "note": "대조 대상의 거르기 단계와만 같다."
+        },
+        "mechanism": {
+          "prior": "두 번째 프롬프트가 코멘트마다 신뢰도를 매기고, 리뷰어 종류·언어·코멘트 범주별 임계값으로 자르며, 의미 유사도로 중복을 합치고, 과거 가치가 낮은 범주를 억제한다.",
+          "same": false,
+          "note": "중복 합치기와 거르기는 대조 대상과 비슷하다. 기준은 신뢰도와 범주이며 비가역성·가치판단 기준은 없다."
+        },
+        "evaluation": {
+          "prior": "사용자가 유용하다고 표시한 비율 75%, 반영된 비율 65% 이상을 보고했다.",
+          "same": false,
+          "note": "벤더 블로그의 자체 보고다."
+        },
+        "target": {
+          "prior": "사내 코드 변경이다.",
+          "same": false,
+          "note": "설계 문서와 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 후 기업 기술 블로그 열람",
+      "adoption": "참고",
+      "bearing": "지적을 합치고 걸러 사람에게 보이는 메커니즘은 상용 사례가 있다. 그러나 사람에게 올릴 지적을 비가역성·가치판단으로 고르는 기준은 이 사례에 없다. 그래서 처분 기준의 종류는 선행 사례와 다르다는 방향의 근거다."
+    },
+    {
+      "case": "사람 참여형 에이전트 시스템의 행동 감시(ActionGuard)",
+      "url": "https://arxiv.org/html/2507.22358v1",
+      "axes": {
+        "purpose": {
+          "prior": "되돌릴 수 없거나 해로울 수 있는 에이전트 행동을 실행 전에 사람이 검토하게 한다.",
+          "same": false,
+          "note": "비가역성으로 사람 승인을 고르는 목적은 대조 대상의 처분 규칙과 비슷하나, 대상이 리뷰 지적이 아니라 에이전트의 웹 행동이다."
+        },
+        "mechanism": {
+          "prior": "개발자가 행동마다 비가역성을 항상·아마·절대 아님 세 값으로 정하고, 아마인 행동만 LLM 판정자가 사람 승인 필요 여부를 정한다.",
+          "same": false,
+          "note": "비가역성을 사람 승인 기준으로 쓰는 점은 같다. 가치판단과 수정 방향 분기 기준은 없다."
+        },
+        "evaluation": {
+          "prior": "적대 시나리오 24개와 사용자 연구로 평가했으나 판정자 단독의 오판 비율은 보고하지 않았다.",
+          "same": false,
+          "note": "판정 정확도 근거가 없다."
+        },
+        "target": {
+          "prior": "웹 브라우징 에이전트의 행동이다.",
+          "same": false,
+          "note": "설계 문서 리뷰 지적과 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 본문 열람",
+      "adoption": "참고",
+      "bearing": "비가역성을 사람 승인 기준으로 쓰는 메커니즘 자체에는 선행 사례가 있다. 그래서 비가역성 기준의 신규성 판단을 낮춘다. 리뷰 지적의 처분에 적용한 사례는 아니어서 옮겨 쓰기 어렵고, 판정 정확도 근거는 약하다."
+    },
+    {
+      "case": "리뷰 후 구현 루프 패턴(지적별 자동 수정과 사람 판단 분리)",
+      "url": "https://www.agentpatterns.ai/code-review/review-then-implement-loop/",
+      "axes": {
+        "purpose": {
+          "prior": "리뷰 지적 중 기계적 수정은 에이전트가 하고 설계 판단은 사람에게 남긴다.",
+          "same": true,
+          "note": "자동 수정과 사람 판단을 나누는 목적은 대조 대상의 처분 규칙과 같다."
+        },
+        "mechanism": {
+          "prior": "구체적 수정안이 있고 심각도가 아키텍처 등급 아래인 지적만 코딩 에이전트에 보낸다. 분류는 사람이 정하며 자동 수정은 한 번만 시도한다.",
+          "same": false,
+          "note": "기준이 수정안의 유일성과 심각도다. 대조 대상은 비가역성·가치판단·수정 방향 분기를 기준으로 하고 분류를 에이전트가 한다."
+        },
+        "evaluation": {
+          "prior": "라우팅 규칙 자체의 측정값은 없고 주변 연구 수치만 인용한다.",
+          "same": false,
+          "note": "근거가 설계 권고 수준이다."
+        },
+        "target": {
+          "prior": "PR 코드 리뷰 코멘트다.",
+          "same": false,
+          "note": "설계 문서와 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "웹 검색 후 패턴 모음 사이트 열람",
+      "adoption": "참고",
+      "bearing": "리뷰 지적을 자동 수정과 사람 판단으로 나누는 발상에는 선행 사례가 있다. 그러나 수정 방향이 하나로 정해지는지를 기준으로 쓰는 점은 대조 대상의 수정 방향 분기 기준과 가깝고, 비가역성·가치판단 기준과 에이전트 자율 분류는 이 사례에 없다. 근거 강도는 약하다."
+    },
+    {
+      "case": "LLM 코드 리뷰의 증분 리뷰(변경된 줄만 재리뷰)",
+      "url": "https://bito.ai/blog/how-to-perform-ai-powered-incremental-code-reviews-with-bito/",
+      "axes": {
+        "purpose": {
+          "prior": "새 커밋에서 바뀐 줄만 다시 리뷰해 비용과 중복 코멘트를 줄인다.",
+          "same": true,
+          "note": "바뀐 범위만 재리뷰하는 목적은 같다."
+        },
+        "mechanism": {
+          "prior": "이전 리뷰 상태와 비교해 추가·삭제·수정된 줄만 리뷰하고 이전 실행의 맥락을 저장한다.",
+          "same": false,
+          "note": "범위 단위가 diff 줄이다. 대조 대상은 기능이 바뀐 절만 고르므로 의미 기준으로 범위를 정한다."
+        },
+        "evaluation": {
+          "prior": "저자의 커밋 다섯 개 시연뿐이다.",
+          "same": false,
+          "note": "측정 근거가 없다."
+        },
+        "target": {
+          "prior": "코드 PR이다.",
+          "same": false,
+          "note": "설계 문서와 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 후 벤더 블로그 열람",
+      "adoption": "참고",
+      "bearing": "변경 범위만 재리뷰하는 메커니즘은 상용 도구에 있다. 그래서 증분 재리뷰의 신규성 판단을 낮춘다. 기능 변경 여부로 절을 고르는 기준은 이 사례에 없고, 근거 강도는 약하다."
+    },
+    {
+      "case": "외부 피드백 없는 LLM 자기 수정 연구",
+      "url": "https://arxiv.org/abs/2310.01798",
+      "axes": {
+        "purpose": {
+          "prior": "LLM이 외부 피드백 없이 자기 답을 고칠 수 있는지 확인한다.",
+          "same": false,
+          "note": "대조 대상의 자동 수정 단계와 관련되나 목적이 다르다."
+        },
+        "mechanism": {
+          "prior": "같은 모델이 자기 답을 검토하고 수정한다.",
+          "same": false,
+          "note": "대조 대상은 별도 렌즈 서브에이전트가 지적하고 근거 렌즈가 출처와 대조하므로 외부 피드백이 일부 있다."
+        },
+        "evaluation": {
+          "prior": "추론 벤치마크에서 수정 전후 정확도를 비교했고 수정 뒤 성능이 떨어지기도 했다.",
+          "same": false,
+          "note": "설계 문서 품질 평가가 아니다."
+        },
+        "target": {
+          "prior": "수학·상식 추론 과제다.",
+          "same": false,
+          "note": "설계 문서와 다르다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 초록 열람(ICLR 2024 게재)",
+      "adoption": "참고",
+      "bearing": "네 축이 모두 달라 단독 근거로 쓸 수 없다. 자동 수정이 외부 근거 없이 이루어지면 품질이 오르지 않을 수 있다는 배경 근거로만 쓴다."
+    }
+  ],
+  "saturation": "3",
+  "not_found": "[\"설계 문서(spec·plan) 리뷰에서 지적을 비가역성·가치판단·수정 방향 분기 기준으로 사람에게 올리는 사례를 찾지 못했다. 검색 8회 범위의 한계이며 독창성의 근거가 아니다.\", \"문서의 기능이 바뀐 절만 다시 리뷰하는 사례를 찾지 못했다. 코드 diff 기반 증분 리뷰와 요구사항 수준 변경 영향 분석만 검색 결과에 나왔다.\", \"LLM 리뷰 지적을 사람에게 올리는 기준별(심각도·신뢰도 대 비가역성) 효과를 비교한 실증 연구를 찾지 못했다.\", \"구글 AutoCommenter 논문(arXiv 2405.13565)의 신뢰도 임계값 결과는 PDF 본문을 읽지 못해 확인하지 못했다.\", \"증분 회귀 검증 논문(OOPSLA 2020)은 PDF 본문을 읽지 못해 근거 지도에 넣지 않았다.\"]",
+  "disclosures": "[\"arXiv 2507.22358 PDF는 열리지 않았고 같은 논문의 HTML 버전으로 확인했다.\", \"arXiv 2405.13565 PDF와 OOPSLA 2020 PDF는 본문을 읽지 못해 opened=false에 해당하므로 인용하지 않았다.\", \"검색 결과 요약에 나온 Turnstone 안내서, dev.to 글, 반박 역할 검증자를 쓴 iOS 감사 글, 코드 리뷰 플러그인의 신뢰도 80 기준은 열지 않아 근거 지도에 넣지 않았다.\", \"WebFetch는 소형 모델이 페이지를 요약한 결과다. 수치는 그 요약에 의존하며, RovoDev 제거 실험 수치(20점과 15%)는 요약 안에서도 불일치가 있었다.\", \"대조 대상이 거르기 단계의 놓침 비율을 측정했는지는 입력에 없어 확인하지 못했다.\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"WRITTEN-ONLY\", \"TERM-ONE\", \"ASYNC-FIRST\"]",
+  "notes": "고른 탐색 방법은 하위 질문의 세 메커니즘(거짓 양성 거르기, 사람에게 올리는 기준, 증분 재리뷰)마다 짧고 넓은 검색어로 시작해 사례와 결말을 찾고, 이어서 산업 배포 사례와 실패 근거를 찾는 방식이다. intended_use(메커니즘마다 선행 사례 존재 여부와 근거 강도)에 맞춰 측정값이 있는 1차 출처를 우선했다. constraints에 있는 LLM 심판의 상관 오류, 자기 선호, Kim 등(ICML 2025), checklist-based reading, perspective-based reading, LLM 리뷰 체크리스트는 다시 찾지 않았다. 메커니즘별 정리는 다음과 같다. 생성 뒤 별도 판정자로 틀린 지적을 거르는 메커니즘은 산업 배포 사례(바이트댄스, 아틀라시안, 우버)와 비교 연구가 있어 근거가 강하다. 다만 거르기가 실제 결함을 놓치는 실패(약 22%)와 LLM 사실 정합성 판정의 효과가 작았다는 결과도 있다. 사람에게 올리는 기준은 선행 사례가 주로 신뢰도·범주·심각도를 쓴다. 비가역성 기준은 에이전트 행동 승인(ActionGuard)에 있으나 리뷰 지적 처분에 쓴 사례는 찾지 못했다. 가치판단·수정 방향 분기 기준은 수정안이 하나로 정해지는지를 쓰는 패턴 글 하나만 가깝다. 증분 재리뷰는 코드 diff 줄 단위 상용 기능이 있으나 기능 변경 절 단위 사례는 찾지 못했다. intended_use와 맞지 않아 뺀 근거는 Magentic-UI 외의 사람 승인 벤더 글(gravitee, mastra, truto, stackai)이다. 이 글들은 도구 호출 승인 구현 안내이고 측정값이 없어 우선순위가 낮다고 판단했다. 더 확인할 사항은 AutoCommenter의 임계값 결과(신뢰도 거르기가 놓침을 늘린다는 근거 후보)와 문서 리뷰의 변경 영향 분석 사례다. 두 항목 모두 거르기 기준과 증분 재리뷰의 근거 강도를 바꿀 수 있어 확인이 필요하다. 마지막 세 번의 검색에서 새 사례가 3건 나왔으므로 포화되지 않았다."
+}

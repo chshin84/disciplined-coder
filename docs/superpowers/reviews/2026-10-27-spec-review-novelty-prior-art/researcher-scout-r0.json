@@ -1,0 +1,116 @@
+{
+  "search_status": "ok",
+  "queries": [
+    "multi-agent LLM review of software requirements or design documents role-specialized critics",
+    "coding agent stop hook block completion until review quality gate",
+    "LLM code review false positive filtering human escalation auto-fix",
+    "LLM novelty assessment research idea retrieval citation verification hallucinated references",
+    "citation verification agent checks quoted passage supports claim LLM fact-checking references",
+    "AI agent append-only immutable audit log of reviews tamper-evident design decisions",
+    "LLM peer review multi-agent reviewers specialized aspects aggregate meta-review",
+    "spec-driven development AI agent review specification before implementation tool"
+  ],
+  "clusters": [
+    {
+      "topic": "역할을 나눈 LLM 리뷰어로 요구사항·설계 문서를 검토하는 연구와 시제품",
+      "sources": [
+        "https://trepo.tuni.fi/handle/10024/229441",
+        "https://arxiv.org/html/2509.09975v1",
+        "https://must.c.u-tokyo.ac.jp/sigam35/sigam3509.pdf",
+        "https://cdn.jsdelivr.net/npm/aiwg@2026.7.12/docs/frameworks/sdlc-complete/multi-agent-documentation-pattern.md"
+      ],
+      "note": "검색 요약에 따르면 MARV 학위논문은 개발자·아키텍트·PM 역할 에이전트로 요구사항을 차례로 검증했고, 과다 지적(over-flagging)을 남은 과제로 적었다. arXiv 2509.09975 는 설계 문서 리뷰 관점 11개를 정의하고 관점마다 범용 LLM 에 따로 프롬프트를 보냈다. 이 묶음의 분류 기준은 직무 역할 또는 검토 관점이며, 대조 대상의 기준인 실패 유형(근거·정합성·적대·계약 적합)과는 다르다. 출처를 직접 열지 않았으므로 내용은 검색 요약 기준이다."
+    },
+    {
+      "topic": "학술 논문 피어리뷰의 다중 에이전트 생성과 메타리뷰 합치기",
+      "sources": [
+        "https://arxiv.org/pdf/2501.10326",
+        "https://ar5iv.labs.arxiv.org/html/2510.08867",
+        "https://arxiv.org/pdf/2512.24754",
+        "https://www.emergentmind.com/topics/multi-agent-peer-review"
+      ],
+      "note": "MARG·MAMORX·AgentReview·ReviewerToo 같은 시스템은 측면별 전문 에이전트를 두고 리더나 메타리뷰어가 결과를 합친다. 적용 대상이 학술 논문이라 설계 문서 리뷰와는 대상 축이 다르다. 그러나 독립 실행 후 합치기 메커니즘의 선행 사례로 대조할 수 있다."
+    },
+    {
+      "topic": "코딩 에이전트의 Stop 훅 품질 게이트",
+      "sources": [
+        "https://fbakkensen.github.io/ai/devtools/development/2026/03/27/quality-gates-for-coding-agents-how-stop-hooks-make-validation-mandatory.html",
+        "https://dev.to/marcindudekdev/the-hook-that-wont-let-the-agent-say-done-bj5",
+        "https://circleci.com/blog/test-hooks-ai-development",
+        "https://awesome.ecosyste.ms/projects/github.com%2Fzhjai%2Fagent-completion-gate"
+      ],
+      "note": "실무 블로그와 저장소 README 가 Stop 훅으로 증거 파일이 없으면 종료를 차단하는 패턴을 설명한다. 무한 루프를 피하는 장치(stop_hook_active, loop_limit)도 함께 다룬다. 검사 대상은 주로 빌드·테스트 통과이며, 설계 문서 쓰기를 감지해 리뷰 마커를 요구하는 사례는 이 검색에서 확인하지 못했다. 출처 성격은 대부분 blog 이다."
+    },
+    {
+      "topic": "구현 전 spec·plan 리뷰 도구(spec-driven development)",
+      "sources": [
+        "https://skills.sh/tylerburleigh/claude-sdd-toolkit/sdd-plan-review",
+        "https://docs.plannotator.ai/learn/planning/spec-driven-development-for-ai-coding-agents.md",
+        "https://www.morphllm.com/spec-driven-development"
+      ],
+      "note": "검색 요약에 따르면 한 SDD 툴킷의 plan-review 스킬은 여러 AI 리뷰어가 구현 전에 계획을 검토하게 하되, 승인·거부 게이트가 아닌 조언용으로 둔다. Spec Kit 의 analyze 명령은 spec·plan·tasks 사이 불일치를 검사한다. 대조 대상의 메커니즘 (2)와 정합성 렌즈에 가장 가까운 상용·오픈소스 사례 묶음이다."
+    },
+    {
+      "topic": "LLM 리뷰 지적의 거짓 양성 거르기와 사람 승인 라우팅",
+      "sources": [
+        "https://www.uber.com/en-PL/blog/ureview",
+        "https://www.agentpatterns.ai/anti-patterns/llm-review-overcorrection/",
+        "https://distant-ginger-9z7b.here.now/"
+      ],
+      "note": "Uber uReview 는 지적 생성기와 수정기를 나누고 거짓 양성을 주요 과제로 다룬다. 실무 자료는 심각도·확신도에 따라 차단·사람 대기열·무시로 나누는 라우팅을 제안한다. 대상은 코드 리뷰이며, 비가역·가치판단·수정 방향 분기를 기준으로 사람에게 올리는 규칙은 이 검색에서 확인하지 못했다."
+    },
+    {
+      "topic": "자동 참신성 평가와 인용 검증",
+      "sources": [
+        "https://arxiv.org/pdf/2601.01576v2",
+        "https://arxiv.org/pdf/2608.25660",
+        "https://arxiv.org/abs/2602.23452",
+        "https://apify.com/franksterino/ai-citation-auditor",
+        "https://forum.effectivealtruism.org/posts/psuGJKhvyTWp75mqP/stop-asking-large-language-models-to-verify-large-language"
+      ],
+      "note": "OpenNovelty 같은 에이전트 파이프라인은 주장을 검색 질의로 바꿔 선행 연구를 찾고 근거 보고서를 만든다. CiteAudit(arXiv 2602.23452)은 주장 추출·근거 검색·구절 대조·지지 판정으로 인용 검증을 단계화했다. 상용 액터 하나는 원문만으로 지지 여부를 판정하고 원문 인용을 돌려준다. 대상은 학술 논문이며, 설계 문서의 선행 사례 대조에 적용한 사례는 확인하지 못했다."
+    },
+    {
+      "topic": "에이전트 행동과 결정의 변경 불가 감사 기록",
+      "sources": [
+        "https://www.c-sharpcorner.com/article/building-tamper-evident-audit-logs-for-ai-agent-actions/",
+        "https://gravitee.io/corpus/gen-221/caesium/audit-log-immutability.html",
+        "https://prefactor.tech/blog/auditability-and-reproducibility-in-autonomous-workflows"
+      ],
+      "note": "해시 체인·append-only·WORM 저장 같은 일반 패턴이 vendor·blog 자료로 많다. 리뷰 기록을 커밋 후 파일 권한으로 봉인하는 사례는 이 검색에서 확인하지 못했다. 이 묶음은 붐빔(이미 표준화된 감사 로그 패턴) 점검에 쓸 수 있다."
+    }
+  ],
+  "subquestion_candidates": [
+    {
+      "scope": "실패 유형(근거·정합성·적대·계약 적합)으로 나눈 독립 LLM 리뷰어를 설계·요구사항 문서에 적용한 선행 사례와, 직무 역할·검토 관점으로 나눈 사례(MARV, 관점별 프롬프트, SDD plan-review)의 결말(과다 지적, 정확도)",
+      "basis": "요구사항·설계 문서 리뷰 묶음과 SDD 도구 묶음은 존재하지만 분류 기준이 역할·관점이었다. 그래서 분류 기준 차이가 결과를 바꾸는지가 메커니즘 (2)의 새로움 판단에 직결된다. 초안 sq1 을 이 범위로 좁히는 안이다."
+    },
+    {
+      "scope": "에이전트 Stop 훅이 문서 쓰기를 감지해 리뷰 완료 증거를 요구하는 게이트와, 그 게이트의 우회·무한 루프 실패 사례",
+      "basis": "Stop 훅 품질 게이트는 blog·README 에서 이미 흔한 패턴으로 확인되었다. 그러나 검사 대상이 테스트·빌드였으므로 설계 문서 리뷰를 강제한 사례가 있는지를 따로 확인해야 한다. 초안 sq2 의 강제 장치 부분에 해당한다."
+    },
+    {
+      "scope": "리뷰 지적의 거짓 양성 거르기와, 지적을 사람 승인과 자동 수정으로 나누는 기준(심각도·확신도 기준 대 비가역·가치판단 기준) 및 변경된 절만 재리뷰하는 증분 리뷰",
+      "basis": "uReview 와 실무 라우팅 자료는 심각도·확신도 기준만 보였다. 비가역성·가치판단 기준과 증분 재리뷰 사례는 이 검색에서 나오지 않았다. 초안 sq3 에 증분 재리뷰를 추가하는 안이다."
+    },
+    {
+      "scope": "선행 사례 탐색 결과를 인용 구절 추출과 지지 판정으로 검증한 뒤 보고하는 파이프라인(CiteAudit, OpenNovelty 류)과 그 정확도 결말",
+      "basis": "참신성 평가와 인용 검증 묶음이 학술 논문 대상으로 존재한다. 또한 LLM 이 LLM 을 검증할 때의 상관 오류 경고가 있다. 상관 오류 자체는 constraints 에서 이미 확인했으므로 제외하고, 단계화된 인용 검증의 성능 결말에 집중하는 안이다. 초안 sq4 에 해당한다."
+    },
+    {
+      "scope": "리뷰 기록을 커밋 후 읽기 전용으로 봉인하는 방식과 기존 감사 로그 패턴(append-only, 해시 체인, 정정은 새 기록으로)의 비교",
+      "basis": "변경 불가 감사 로그는 vendor 자료가 많아 붐빔 점검 대상이다. 초안 sq2 에 섞여 있던 감사 기록을 별도 하위 질문으로 분리하는 안이며, 분리 여부는 오케스트레이터가 정한다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "ASYNC-FIRST",
+    "YAGNI",
+    "STATE-ASSUME",
+    "SUBJECT-OBJECT",
+    "VOCAB-PREF",
+    "WRITTEN-ONLY",
+    "FULL-SENTENCE"
+  ]
+}

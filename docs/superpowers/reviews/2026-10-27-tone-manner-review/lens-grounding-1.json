@@ -1,0 +1,16 @@
+{
+  "lens": "lens-grounding",
+  "read": ["spec", "agent-principles.md 64-133줄", "docs/domain-korean.md 160-209줄", "agents/lens-readability.md", "skills/review-docs/SKILL.md 1-30줄", "선행연구 기록과 원본 JSON", "hooks/_doc_form_check.py", "CLAUDE.md", "evals/principles/clauses/ 단위 존재 확인"],
+  "issues": [
+    {"where": "비목표 37줄", "type": "unsupported", "claim": "'6일 동안 실제 경고 3건' 수치와 판정의 출처가 spec 과 선행연구 기록에 없고, 선행연구 기록은 긴 단락 경고와 개조식의 충돌 확인을 설계로 넘겼다.", "consequence": "기존 검사 유지 근거가 출처 없는 수치에 기댄다."},
+    {"where": "결정 시점 76줄", "type": "contradiction", "claim": "'수준만 지시하면 중간 복잡도로 모인다'는 결과를 결정 시점의 지지 근거로 썼으나, 원본 bearing 은 B안이 축 위치를 이름으로만 정하면 효과가 작다는 압박으로 해석했다. 생성 전 추론의 효과는 검증 안 된 둘러보기 메모에만 있다.", "consequence": "B안을 압박하는 근거를 지지 근거로 인용했고, 축 이름 외의 생성 전 추론 방법이 설계에 없다."},
+    {"where": "63줄", "type": "unsupported", "claim": "'사용자가 고른 네 축'이라고 적었으나 선행연구 기록은 이를 선호로만 적고 결정이 아니라고 명시했다.", "consequence": "미결정 축 구성이 사용자 확정 사항처럼 읽힌다."},
+    {"where": "배경 25줄", "type": "omission", "claim": "단일 턴 질의응답에서 LLM 이 질문 문체를 덜 닮았다는 반대 결과를 뺐다.", "consequence": "근거가 한 방향으로만 적혀 있다."},
+    {"where": "117줄 / 71줄", "type": "omission", "claim": "「출력」 절 머리 문장(65줄 '모든 글을 한국어 문어체로')이 바꿀 대상에 없다.", "consequence": "바뀐 WRITTEN-ONLY 와 머리 문장이 함께 남는다."},
+    {"where": "98줄", "type": "omission", "claim": "KO-SYNTAX 머리 문장(82줄 '모두 적용하라')이 바꿀 대상에 없다.", "consequence": "개조식 면제와 머리 문장이 다르다."},
+    {"where": "86~98줄", "type": "omission", "claim": "ONE-IDEA 와 SECTION-HEAD 가 분류에 없다.", "consequence": "개조식 글에서의 적용이 정해지지 않았다."},
+    {"where": "검증 124~133줄", "type": "omission", "claim": "저장소 CLAUDE.md 가 요구하는 현행 대 변경안 비교, 기존 과제에 짝 추가, 채택 판정 기준이 없고 규칙에 없는 '원칙 없음' 조건만 있다.", "consequence": "검증 절이 저장소 시험 규칙과 다르다."}
+  ],
+  "principles_applied": ["NO-ASSUME", "STATE-ASSUME", "EVIDENCE-FIRST", "CHECKABLE", "TOP-DOWN", "SUBJECT-OBJECT"],
+  "notes": "오케스트레이터가 원본 메시지에서 옮겨 저장하며 칸을 요약했다. 렌즈의 추가 확인: review-docs 15줄 원문은 '개조식은 그것을 잡는 검사가 이 저장소에 없어 렌즈가 그대로 받는다'이고 이유 절도 함께 다룰지 확인할 것. LinkedIn 사례 세부는 출처 문서로 확인하지 못했다. 새 설계는 지시 없이 청자 추정으로 문체를 바꾸므로 2026-09-21·09-24 요구의 문언을 바꾸며, 사용자 승인 여부를 대화로 확인할 것."
+}

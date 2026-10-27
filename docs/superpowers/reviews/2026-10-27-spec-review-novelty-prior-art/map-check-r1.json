@@ -1,0 +1,550 @@
+{
+  "cells": [
+    {
+      "row": "학회 논문 심사 다중 LLM 리뷰어(ReviewerToo)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "학회 논문 심사 다중 LLM 리뷰어(ReviewerToo)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "학회 논문 심사 다중 LLM 리뷰어(ReviewerToo)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "학회 논문 심사 다중 LLM 리뷰어(ReviewerToo)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "학회 논문 심사 다중 LLM 리뷰어(ReviewerToo)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "학회 논문 심사 다중 LLM 리뷰어(ReviewerToo)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "지식 기반 다중 에이전트 요구공학 비전(KGMAF)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "지식 기반 다중 에이전트 요구공학 비전(KGMAF)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "지식 기반 다중 에이전트 요구공학 비전(KGMAF)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "지식 기반 다중 에이전트 요구공학 비전(KGMAF)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "지식 기반 다중 에이전트 요구공학 비전(KGMAF)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "지식 기반 다중 에이전트 요구공학 비전(KGMAF)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "LLM 지원이 요구사항 검사 정확도를 낮춘 통제 실험",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#7"
+    },
+    {
+      "row": "LLM 지원이 요구사항 검사 정확도를 낮춘 통제 실험",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#7"
+    },
+    {
+      "row": "LLM 지원이 요구사항 검사 정확도를 낮춘 통제 실험",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#7"
+    },
+    {
+      "row": "LLM 지원이 요구사항 검사 정확도를 낮춘 통제 실험",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#7"
+    },
+    {
+      "row": "LLM 지원이 요구사항 검사 정확도를 낮춘 통제 실험",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#7"
+    },
+    {
+      "row": "LLM 지원이 요구사항 검사 정확도를 낮춘 통제 실험",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#7"
+    },
+    {
+      "row": "작성자·독립 리뷰어·메타리뷰어 협업 추론(MARS)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#9"
+    },
+    {
+      "row": "작성자·독립 리뷰어·메타리뷰어 협업 추론(MARS)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#9"
+    },
+    {
+      "row": "작성자·독립 리뷰어·메타리뷰어 협업 추론(MARS)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#9"
+    },
+    {
+      "row": "작성자·독립 리뷰어·메타리뷰어 협업 추론(MARS)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#9"
+    },
+    {
+      "row": "작성자·독립 리뷰어·메타리뷰어 협업 추론(MARS)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#9"
+    },
+    {
+      "row": "작성자·독립 리뷰어·메타리뷰어 협업 추론(MARS)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#9"
+    },
+    {
+      "row": "PR 생성 전 리뷰 증명 요구 스킬",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "PR 생성 전 리뷰 증명 요구 스킬",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "PR 생성 전 리뷰 증명 요구 스킬",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "PR 생성 전 리뷰 증명 요구 스킬",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "PR 생성 전 리뷰 증명 요구 스킬",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "PR 생성 전 리뷰 증명 요구 스킬",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "stop_hook_active 가 같은 턴에서 true 로 바뀌지 않는 결함 보고",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "stop_hook_active 가 같은 턴에서 true 로 바뀌지 않는 결함 보고",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "stop_hook_active 가 같은 턴에서 true 로 바뀌지 않는 결함 보고",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "stop_hook_active 가 같은 턴에서 true 로 바뀌지 않는 결함 보고",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "stop_hook_active 가 같은 턴에서 true 로 바뀌지 않는 결함 보고",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "stop_hook_active 가 같은 턴에서 true 로 바뀌지 않는 결함 보고",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#6"
+    },
+    {
+      "row": "Stop 훅 {ok:false} 반복으로 세션 한도 소진(약 50분)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "Stop 훅 {ok:false} 반복으로 세션 한도 소진(약 50분)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "Stop 훅 {ok:false} 반복으로 세션 한도 소진(약 50분)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "Stop 훅 {ok:false} 반복으로 세션 한도 소진(약 50분)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "Stop 훅 {ok:false} 반복으로 세션 한도 소진(약 50분)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "Stop 훅 {ok:false} 반복으로 세션 한도 소진(약 50분)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "에이전트의 가드레일 우회와 규칙 약화",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq2#case#9"
+    },
+    {
+      "row": "에이전트의 가드레일 우회와 규칙 약화",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#9"
+    },
+    {
+      "row": "에이전트의 가드레일 우회와 규칙 약화",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#9"
+    },
+    {
+      "row": "에이전트의 가드레일 우회와 규칙 약화",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#9"
+    },
+    {
+      "row": "에이전트의 가드레일 우회와 규칙 약화",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#9"
+    },
+    {
+      "row": "에이전트의 가드레일 우회와 규칙 약화",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#9"
+    },
+    {
+      "row": "LLM 에이전트의 SAST 거짓 양성 거르기 비교 연구",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "LLM 에이전트의 SAST 거짓 양성 거르기 비교 연구",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "LLM 에이전트의 SAST 거짓 양성 거르기 비교 연구",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "LLM 에이전트의 SAST 거짓 양성 거르기 비교 연구",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "LLM 에이전트의 SAST 거짓 양성 거르기 비교 연구",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "LLM 에이전트의 SAST 거짓 양성 거르기 비교 연구",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq3#case#0"
+    },
+    {
+      "row": "CiteCheck (검색 기반 인용 환각 검출)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "CiteCheck (검색 기반 인용 환각 검출)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "CiteCheck (검색 기반 인용 환각 검출)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "CiteCheck (검색 기반 인용 환각 검출)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "CiteCheck (검색 기반 인용 환각 검출)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "CiteCheck (검색 기반 인용 환각 검출)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "ADR 불변 관행(채택 후 고치지 않고 새 기록으로 대체)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "ADR 불변 관행(채택 후 고치지 않고 새 기록으로 대체)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "ADR 불변 관행(채택 후 고치지 않고 새 기록으로 대체)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "ADR 불변 관행(채택 후 고치지 않고 새 기록으로 대체)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "ADR 불변 관행(채택 후 고치지 않고 새 기록으로 대체)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "ADR 불변 관행(채택 후 고치지 않고 새 기록으로 대체)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#0"
+    },
+    {
+      "row": "AI 에이전트 행동의 추가 전용 감사 기록(FastAPI 구현 글)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "AI 에이전트 행동의 추가 전용 감사 기록(FastAPI 구현 글)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "AI 에이전트 행동의 추가 전용 감사 기록(FastAPI 구현 글)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "AI 에이전트 행동의 추가 전용 감사 기록(FastAPI 구현 글)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "AI 에이전트 행동의 추가 전용 감사 기록(FastAPI 구현 글)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "AI 에이전트 행동의 추가 전용 감사 기록(FastAPI 구현 글)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#4"
+    },
+    {
+      "row": "ralon — 에이전트 프로세스에 보호 경로를 커널 수준 읽기 전용으로 적용",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "ralon — 에이전트 프로세스에 보호 경로를 커널 수준 읽기 전용으로 적용",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "ralon — 에이전트 프로세스에 보호 경로를 커널 수준 읽기 전용으로 적용",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "ralon — 에이전트 프로세스에 보호 경로를 커널 수준 읽기 전용으로 적용",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "ralon — 에이전트 프로세스에 보호 경로를 커널 수준 읽기 전용으로 적용",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "ralon — 에이전트 프로세스에 보호 경로를 커널 수준 읽기 전용으로 적용",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#5"
+    },
+    {
+      "row": "file-guard — 보호 파일 수정을 거부하는 PreToolUse 훅",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "file-guard — 보호 파일 수정을 거부하는 PreToolUse 훅",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "file-guard — 보호 파일 수정을 거부하는 PreToolUse 훅",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "file-guard — 보호 파일 수정을 거부하는 PreToolUse 훅",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "file-guard — 보호 파일 수정을 거부하는 PreToolUse 훅",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "file-guard — 보호 파일 수정을 거부하는 PreToolUse 훅",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#6"
+    },
+    {
+      "row": "Architecture Without Architects — AI 코딩 에이전트의 암묵적 아키텍처 결정(arXiv 2604.04990)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq5#case#9"
+    },
+    {
+      "row": "Architecture Without Architects — AI 코딩 에이전트의 암묵적 아키텍처 결정(arXiv 2604.04990)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#9"
+    },
+    {
+      "row": "Architecture Without Architects — AI 코딩 에이전트의 암묵적 아키텍처 결정(arXiv 2604.04990)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#9"
+    },
+    {
+      "row": "Architecture Without Architects — AI 코딩 에이전트의 암묵적 아키텍처 결정(arXiv 2604.04990)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#9"
+    },
+    {
+      "row": "Architecture Without Architects — AI 코딩 에이전트의 암묵적 아키텍처 결정(arXiv 2604.04990)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#9"
+    },
+    {
+      "row": "Architecture Without Architects — AI 코딩 에이전트의 암묵적 아키텍처 결정(arXiv 2604.04990)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#9"
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "CHECKABLE",
+    "FOCUSED",
+    "YAGNI"
+  ]
+}

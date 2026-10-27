@@ -1,0 +1,18 @@
+{
+  "lens": "lens-consistency",
+  "read": ["spec", "agent-principles.md", "agents/lens-readability.md", "skills/review-docs/SKILL.md", "docs/domain-korean.md(검색)", "docs/domain-discipline.md(검색)", "hooks/_doc_form_check.py(검색)", "evals/principles/cases/q-full-sentence-1/prompt.md", "evals/principles/cases/q-no-mirror-1/prompt.md"],
+  "issues": [
+    {"where": "바꿀 파일 / 「출력」 절 머리말", "type": "gap", "claim": "「출력」 절 머리말 '사용자에게 보내는 모든 글을 한국어 문어체로 써라'(agent-principles.md 65줄)가 바꿀 대상에 없다.", "consequence": "목록대로 고치면 머리말의 문어체 고정과 해요체를 허용하는 새 WRITTEN-ONLY 가 같은 절에 남는다."},
+    {"where": "KO-SYNTAX 머리말", "type": "contradiction", "claim": "spec 98줄은 개조식에 NO-STACK-MOD 만 적용하지만, 현행 KO-SYNTAX 머리말(82줄)은 모든 조항을 모든 글에 적용하라고 정하고 바꿀 대상에 없다.", "consequence": "개조식 면제가 현행 문안과 충돌한다."},
+    {"where": "규칙 분류", "type": "gap", "claim": "SECTION-HEAD·ONE-IDEA·INSTRUCTION-FORM·STATUS-FIRST·CONCRETE-FORM 이 어느 분류에도 없다. ONE-IDEA 의 개조식 적용이 정해지지 않았다.", "consequence": "구현자가 개조식 산출물에 ONE-IDEA·SECTION-HEAD 를 적용할지 spec 에서 찾을 수 없다."},
+    {"where": "조절 축 표 / 예시 표", "type": "contradiction", "claim": "격식 축 한쪽 끝에 합쇼체와 '~다'가 함께 있는데, 둘의 차이는 상대높임(청자 대우)이다. 예시 표에서도 격식 칸과 경어 칸이 같은 차이를 함께 표시한다.", "consequence": "'~습니다'와 '~다'의 선택이 어느 축에서 정해지는지 하나로 정해지지 않는다."},
+    {"where": "예시 표 값", "type": "drift", "claim": "예시 표의 '짧은 줄'(밀도)과 '보통'(경어)은 축 정의의 양 끝에 없는 값이다.", "consequence": "SNS 행에 FULL-SENTENCE 새 문안의 어느 쪽이 적용되는지 정해지지 않는다."},
+    {"where": "청자 신호 정의 / NO-MIRROR 새 문안", "type": "contradiction", "claim": "82줄의 청자 신호 목록에는 문체 지시가 없는데, 93줄 NO-MIRROR 새 문안은 사용자의 문체 지시를 청자 신호로 본다.", "consequence": "조항 문안에 어느 목록을 옮길지 정해지지 않는다."},
+    {"where": "결정 시점 둘째 문단", "type": "contradiction", "claim": "청자를 정할 수 없으면 묻지 말고 추정하라는 규칙이 ASK-OPTIONS('결과를 바꾸는 결정은 실행 전에 물어라')와의 관계 없이 적혀 있다.", "consequence": "청자 추정이 ASK-OPTIONS 대상인지 판정되지 않는다."},
+    {"where": "가독성 렌즈 / review-docs 15줄", "type": "gap", "claim": "축 위치를 lens-readability 에만 넘기고, 기본 검진 렌즈인 lens-fit 의 계약과 호출자 절차(review-docs 「필요할 때 렌즈」, dispatching-lenses)에는 넘기는 작업이 없다.", "consequence": "lens-readability 를 실행하지 않는 기본 검진에서 lens-fit 이 축 기준 없이 판정한다."},
+    {"where": "바꿀 파일 / 검증", "type": "gap", "claim": "바뀌는 조항의 기존 시험 단위(evals/principles/clauses/WRITTEN-ONLY 등)와 질문(q-written-only-* 등)의 처분이 바꿀 파일 목록에 없다.", "consequence": "기존 current.md 와 판정 기준을 새 문안에 맞출지 정해지지 않는다."},
+    {"where": "바꿀 파일 / domain-discipline.md", "type": "gap", "claim": "docs/domain-discipline.md 189·526·535줄도 BULLET-SCOPE·WRITTEN-ONLY·FULL-SENTENCE 를 다루는데 바꿀 파일 목록에 없다.", "consequence": "BULLET-SCOPE 를 바꾼 뒤에도 189줄이 옛 규칙을 현행으로 서술한다."}
+  ],
+  "principles_applied": ["TERM-ONE", "SPECIFIC-NAME", "ASK-OPTIONS", "REPORT-DEAD", "YAGNI", "NO-ASSUME", "INSTRUCTION-FORM"],
+  "notes": "오케스트레이터가 원본 메시지에서 옮겨 저장하며 file·evidence·counterpart 칸을 요약했다. 렌즈가 남긴 추가 확인: lens-readability 34줄(목적을 짐작하지 마라)과 spec 108줄(축 위치를 읽는 사람에서 추정)의 충돌 여부, dispatching-lenses 「렌즈 그룹」의 lens-readability 호출 계약 변경 필요 여부, domain-discipline.md 189줄의 측정 결론 유지 여부."
+}

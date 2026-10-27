@@ -1,0 +1,19 @@
+{
+  "lens": "lens-fit",
+  "doc_type": "설계 (spec·plan) 행",
+  "read": ["plan", "agent-principles.md", "docs/domain-korean.md 1-25행과 절 제목", "skills/managing-docs/SKILL.md", "skills/managing-docs/references/reading-docs.md"],
+  "issues": [
+    {"where": "Task 1~4 Step 문장 전체", "type": "style", "claim": "행동 지시를 '~하라' 대신 평서형 '~한다'로 썼다.", "principle": "INSTRUCTION-FORM"},
+    {"where": "Global Constraints 19~21행", "type": "style", "claim": "금지 지시를 평서형 부정문으로 썼다.", "principle": "INSTRUCTION-FORM"},
+    {"where": "Task 4 Step 3", "type": "constraint", "claim": "렌즈에 넣을 동작을 현재 사실처럼 적어 사실과 행동이 나뉘지 않았다.", "principle": "INSTRUCTION-FORM"},
+    {"where": "Task 2 Step 1", "type": "constraint", "claim": "LinkedIn 원문과 발표자료 네 항목의 본문이나 위치가 plan 에 없다.", "principle": "INSTRUCTION-FORM"},
+    {"where": "Task 4 Files", "type": "constraint", "claim": "domain-discipline.md 행 번호만 있고 무엇을 고칠지 적은 Step 이 없으며, 다른 행 번호도 절 이름 없이 적혔다.", "principle": "INSTRUCTION-FORM, SPECIFIC-NAME"},
+    {"where": "Task 1·2·4 의 여러 Step", "type": "constraint", "claim": "단계 문장 안에 확인 방법이 없다.", "principle": "CHECKABLE"},
+    {"where": "Task 1 Step 4·5", "type": "constraint", "claim": "Step 4 는 고친 점을 커밋 메시지에 적으라는데 Step 5 는 한 줄 고정 메시지다.", "principle": "INSTRUCTION-FORM"},
+    {"where": "Global Constraints 16행", "type": "style", "claim": "축 이름과 위치를 가운뎃점으로 압축해 구조를 풀어야 읽힌다.", "principle": "NO-SQUEEZE, FULL-SENTENCE"},
+    {"where": "Task 2 Step 1, 15·71행", "type": "style", "claim": "목록 앞에 개수를 적었다.", "principle": "COUNT-EARNS"},
+    {"where": "Review Focus 26~30행", "type": "style", "claim": "30행만 말끝이 다르다.", "principle": "ONE-ENDING"}
+  ],
+  "principles_applied": ["INSTRUCTION-FORM", "CHECKABLE", "SPECIFIC-NAME", "NO-SQUEEZE", "FULL-SENTENCE", "COUNT-EARNS", "ONE-ENDING", "ANTI-LIMIT", "TERM-ONE", "SUBJECT-OBJECT", "BULLET-SCOPE", "DOC-TYPE"],
+  "notes": "오케스트레이터가 원본 메시지에서 옮겨 저장하며 evidence·counterpart 칸을 생략했다. 렌즈의 미확인 사항: eval_clause.sh 가 단위 이름 둘을 받는지, Task 3 Step 3 의 새 질문 짝 추가 경로의 Files·커밋 대상, Task 4 행 번호의 실재."
+}

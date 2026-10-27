@@ -1,0 +1,250 @@
+{
+  "search_status": "ok",
+  "queries": [
+    "Biber register situational characteristics participants relations framework",
+    "Halliday tenor of discourse power contact affective involvement Poynton",
+    "Biber multidimensional analysis dimension 1 involved versus informational production",
+    "Heylighen Dewaele formality of language contextuality F-score",
+    "Korean speech levels honorifics register formality politeness two dimensions",
+    "Brown Levinson social distance power weightiness politeness formula",
+    "multidimensional analysis Korean register variation Kim Biber",
+    "LLM generated text register variation Biber features instruction-tuned informational density",
+    "Joos five clocks frozen formal consultative casual intimate styles"
+  ],
+  "issues": [],
+  "evidence_map": [
+    {
+      "case": "Biber 다차원 분석의 제1차원(Involved versus Informational Production)과 그 상황 요인",
+      "url": "https://kilgarriff.co.uk/Publications/1995-K-BiberReview.asc",
+      "axes": {
+        "purpose": {
+          "prior": "코퍼스의 언어 특징 공기 관계로 레지스터 변이의 차원을 기술한다.",
+          "same": false,
+          "note": "선행 사례는 기술 연구이고, 대조 대상은 LLM 출력 문체를 정하는 상시 지침이다."
+        },
+        "mechanism": {
+          "prior": "제1차원에서 사적 동사·축약·2인칭 대명사(관여 쪽)와 명사·낱말 길이·전치사·type-token ratio(정보 쪽)가 한 축의 양 끝에 함께 실린다. Biber 는 이 차원을 목적(정보 대 관여)과 생산 조건(편집 대 실시간)에 연결했고, 두 요인은 강하게 상관한다고 검색 요약이 전한다.",
+          "same": false,
+          "note": "B안은 온도·거리·밀도를 따로 둔 축으로 정한다. 그러나 제1차원에서는 관여(B안의 온도·거리에 대응)와 정보 밀도(B안의 밀도에 대응)가 하나의 차원으로 함께 움직인다. 그래서 B안의 축이 서로 독립이라는 전제는 이 근거로 뒷받침되지 않는다."
+        },
+        "evaluation": {
+          "prior": "요인분석으로 차원을 추출하고 레지스터별 점수를 비교한다.",
+          "same": false,
+          "note": "대조 대상은 청자에 맞는 어조와 입력 문체 비모방을 기준으로 삼는다."
+        },
+        "target": {
+          "prior": "영어·소말리어·한국어·투발루어 등 사람이 쓴 구어와 문어 레지스터",
+          "same": false,
+          "note": "LLM 에이전트의 한국어 출력이 아니다. 리뷰는 네 언어 모두에서 상호작용성·생산 조건·태도(stance)에 대응하는 차원이 나왔다고 적는다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "검색 결과에서 1995년 서평 원문을 열었다",
+      "adoption": "참고",
+      "bearing": "B안의 밀도 축과 온도·거리 축이 실제 글에서는 함께 움직인다는 근거다. 그래서 B안을 택하면 축을 독립 설정값으로 두기보다 묶여 움직이는 축으로 정의해야 한다는 쪽으로 B안의 설계를 움직인다. A안의 고정 문어체는 제1차원의 정보 쪽 끝에 해당한다."
+    },
+    {
+      "case": "Biber 의 교차언어 비교에서 나온 한국어 고유 차원 Honorification",
+      "url": "https://kilgarriff.co.uk/Publications/1995-K-BiberReview.asc",
+      "axes": {
+        "purpose": {
+          "prior": "언어 사이에 공통된 레지스터 차원과 언어 고유 차원을 구분한다.",
+          "same": false,
+          "note": "기술 연구이다."
+        },
+        "mechanism": {
+          "prior": "리뷰는 한국어에 언어 고유의 'Honorification' 차원이 있다고 적는다. 영어의 'Abstract style'도 언어 고유 차원의 예로 든다.",
+          "same": false,
+          "note": "B안의 격식·거리·온도·밀도에는 경어(대우) 축이 따로 없다. 한국어 레지스터 변이에서는 경어가 독립 차원으로 나왔으므로, 영어권 축만으로 한국어 어조 조절을 정의하면 이 차원이 빠진다."
+        },
+        "evaluation": {
+          "prior": "코퍼스 요인분석",
+          "same": false,
+          "note": "평가 방식이 다르다."
+        },
+        "target": {
+          "prior": "한국어를 포함한 네 언어의 레지스터",
+          "same": false,
+          "note": "한국어를 포함하지만 LLM 출력이 아니다. 리뷰는 한국어 분석을 다른 저자의 분석에 기댄 것이라 세부를 적지 않는다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "같은 서평",
+      "adoption": "참고",
+      "bearing": "B안을 택하면 한국어용 축에 경어(대우) 축을 넣거나 격식 축의 정의에 경어를 포함해야 한다는 쪽으로 B안의 설계를 움직인다. A안은 종결형을 하나로 정해 이 차원을 고정값으로 처리한다."
+    },
+    {
+      "case": "Poynton·Martin 의 tenor 세 변수(status·contact/social distance·affect)",
+      "url": "https://www.interstrataltension.org/?m=20141028",
+      "axes": {
+        "purpose": {
+          "prior": "체계기능언어학에서 tenor(참여자 관계)가 텍스트에 어떻게 실현되는지 기술한다.",
+          "same": false,
+          "note": "기술 이론이다."
+        },
+        "mechanism": {
+          "prior": "열어 본 글은 tenor 가 'status', 'contact/social distance', 'affect' 설정에 따라 달라진다고 적고, 이를 Poynton(1989)과 Martin(1992)에 귀속시킨다. 검색 요약에 따르면 Martin 은 affect 가 관여 접촉이 잦은 상황과 대등한 지위에서 나타날 확률이 높다고 적는다(이 문장은 원문을 열지 못해 확인하지 못했다).",
+          "same": false,
+          "note": "B안의 거리 축은 contact/social distance 에, 온도 축은 affect 에 대응한다. B안에는 status(권력·지위) 축이 없다. B안의 격식 축은 tenor 변수가 아니고 실현 결과에 가깝다."
+        },
+        "evaluation": {
+          "prior": "텍스트 분석 사례로 적용한다.",
+          "same": false,
+          "note": "평가 기준이 정해진 실험이 아니다."
+        },
+        "target": {
+          "prior": "사람 사이의 담화",
+          "same": false,
+          "note": "LLM 과 사용자 사이의 관계는 다루지 않는다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "검색 결과에서 세미나 슬라이드 소개 글을 열었다",
+      "adoption": "참고",
+      "bearing": "B안의 거리·온도 축이 기존 tenor 이론의 변수와 대응한다는 근거라 B안의 축 이름에 이론적 근거를 준다. 동시에 지위 축이 빠져 있다는 점을 드러낸다. affect 가 접촉·지위에 따라 확률이 달라진다는 진술은 온도 축이 거리 축과 독립이 아니라는 쪽으로 B안의 정의를 움직인다."
+    },
+    {
+      "case": "한국어 상대높임법의 격식성·공손성 두 축(하십시오체·해요체·해라체 배치)",
+      "url": "https://en.wikipedia.org/wiki/Korean_speech_levels",
+      "axes": {
+        "purpose": {
+          "prior": "한국어 화계(speech level)를 청자 존대와 상황 격식으로 분류해 설명한다.",
+          "same": false,
+          "note": "언어 설명 자료이다."
+        },
+        "mechanism": {
+          "prior": "화계는 청자에 대한 존중이나 상황의 격식을 나타내며, 문장 속 인물을 높이는 경어(honorific)와 별개 체계다. 화계마다 격식성과 공손성 등급이 있다. 하십시오체는 격식 높음·공손 높음, 해요체는 격식 낮음·공손 높음, 해라체는 격식 높음·공손 낮음이다. 해라체(plain style)는 책·신문·잡지 같은 비인칭 글과 간접 인용에 쓰인다.",
+          "same": false,
+          "note": "A안의 '합쇼체·~다체'는 이 분류에서 두 칸(격식 높음·공손 높음과 격식 높음·공손 낮음)에 걸쳐 있다. B안의 격식 축 하나로는 격식성과 공손성이 따로 움직이는 한국어 구조를 표현하지 못한다."
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "설명 자료이다."
+        },
+        "target": {
+          "prior": "한국어 화자 사이의 구어·문어",
+          "same": false,
+          "note": "한국어라는 점은 같지만 LLM 에이전트 출력이 아니다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "검색 결과에서 위키백과 문서를 열었다",
+      "adoption": "참고",
+      "bearing": "A안과 B안 모두에 적용된다. A안은 고정 대상이 실제로는 화계 두 개(하십시오체와 해라체)이므로 둘 사이를 언제 고르는지 정해야 한다. B안을 택하면 격식 축을 격식성과 공손성 두 축으로 나누는 쪽으로 움직인다."
+    },
+    {
+      "case": "한국어 레지스터 다차원 분석(59개 언어 특징, 17개 레지스터, 다섯 차원)",
+      "url": "https://m.earticle.net/Article/A445513",
+      "axes": {
+        "purpose": {
+          "prior": "한국어 레지스터 변이의 차원을 추출하고 메신저 텍스트와 국회 회의록에 적용되는지 검증한다.",
+          "same": false,
+          "note": "기술 연구이다."
+        },
+        "mechanism": {
+          "prior": "목차에 따르면 다섯 차원은 '대화적/비공식적 스타일', '학술적/격식적 담화 대 정보성 담화', '공적 견해 표출', '감정적 상호작용', '서술적 이야기'이다.",
+          "same": false,
+          "note": "B안의 격식 축은 첫째 차원, 밀도 축은 둘째 차원, 온도 축은 넷째 차원과 이름이 가깝다. 그러나 차원별 언어 특징은 페이지에 없어 대응을 특징 수준에서 확인하지 못했다. 둘째 차원은 '학술적/격식적'과 '정보성'을 대립시키므로 격식과 밀도가 같은 방향이라고 단정할 수 없다."
+        },
+        "evaluation": {
+          "prior": "요인분석과 신규 텍스트 적용 검증",
+          "same": false,
+          "note": "평가 방식이 다르다."
+        },
+        "target": {
+          "prior": "한국어 사람 글과 말의 17개 레지스터와 메신저·회의록",
+          "same": false,
+          "note": "한국어라는 점만 같다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과에서 논문 초록 페이지를 열었다",
+      "adoption": "참고",
+      "bearing": "한국어 자료에서도 격식·정보성·감정 상호작용이 별도 차원으로 나온다는 근거라 B안의 축 구성이 한국어에도 대응물을 보유한다는 쪽으로 B안을 약하게 지지한다. 다만 '격식적 담화 대 정보성 담화' 대립은 B안의 격식 축과 밀도 축의 관계를 다시 정의해야 함을 시사한다."
+    },
+    {
+      "case": "LLM 생성 텍스트의 Biber 다차원 분석 벤치마크(16개 모델, base 대 instruction-tuned)",
+      "url": "https://arxiv.org/html/2509.10179v2",
+      "axes": {
+        "purpose": {
+          "prior": "사람 글과 LLM 글의 문체 차이를 해석 가능한 차원으로 측정하고 모델을 비교한다.",
+          "same": false,
+          "note": "측정 연구이고 문체 지침을 설계하지 않는다."
+        },
+        "mechanism": {
+          "prior": "논문은 대부분의 모델이 텍스트를 제1차원의 음의 끝(관여에서 정보 생산 쪽)으로 옮겼다고 적는다. base 모델이 instruction-tuned 모델보다 문체상 더 나은 결과를 자주 냈다. 최소 프롬프트와 긴 ChatGPT 시스템 프롬프트를 비교하면 이동이 텍스트 유형 전반에 고르게 나타나지만 전체 이동이 크다고 적는다.",
+          "same": false,
+          "note": "대조 대상의 상시 지침은 시스템 프롬프트에 해당하므로, 시스템 프롬프트가 레지스터를 크게 바꾼다는 결과는 지침이 문체에 작용한다는 간접 근거다. 이동 방향은 논문에 적혀 있지 않았다."
+        },
+        "evaluation": {
+          "prior": "사람 글 코퍼스(BE21)와 대응 LLM 코퍼스(AI-Brown)를 차원 점수로 비교한다.",
+          "same": false,
+          "note": "청자 적합성은 측정하지 않는다."
+        },
+        "target": {
+          "prior": "영어와 체코어 LLM 출력",
+          "same": false,
+          "note": "LLM 출력이라는 점은 같지만 한국어가 아니고 에이전트 대화도 아니다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv HTML 본문을 열었다",
+      "adoption": "참고",
+      "bearing": "instruction-tuned 모델이 기본적으로 정보 쪽(B안의 밀도 높음)으로 쏠린다는 근거다. 그래서 B안의 밀도 축을 청자에 맞춰 낮추려면 모델 기본 습관을 거슬러야 하고, A안의 고정 문어체는 이 기본 습관과 같은 방향이다. 시스템 프롬프트 효과가 크다는 결과는 두 안 모두 지침으로 문체를 움직일 수 있다는 쪽을 지지한다."
+    },
+    {
+      "case": "Koch·Oesterreicher 의 Nähe/Distanz(구어성·문어성) 척도의 통계적 구성",
+      "url": "https://arxiv.org/abs/2502.03252",
+      "axes": {
+        "purpose": {
+          "prior": "개념적 구어성과 문어성을 코퍼스에서 측정할 수 있는 척도로 만든다.",
+          "same": false,
+          "note": "측정 도구 연구이다."
+        },
+        "mechanism": {
+          "prior": "PCA 와 자동 분석으로 척도를 만들고, 개념적 구어성 특징과 문어성 특징을 구분해야 텍스트 순위를 세분할 수 있다고 적는다. 이 척도를 Biber 제1차원과 비교하며 이론 기반의 맞춤 차원이라고 소개한다.",
+          "same": false,
+          "note": "Nähe/Distanz 는 B안의 거리 축과 이름이 같지만, 이 척도는 의사소통 조건 전체(친밀·자발성·공유 맥락)를 하나의 연속체로 묶는다. 그래서 B안의 거리 축(관계 거리)보다 넓다."
+        },
+        "evaluation": {
+          "prior": "독일어 코퍼스 두 개에 적용",
+          "same": false,
+          "note": "평가 대상이 다르다."
+        },
+        "target": {
+          "prior": "근대 고지 독일어 텍스트",
+          "same": false,
+          "note": "LLM 이나 한국어가 아니다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록을 열었다",
+      "adoption": "참고",
+      "bearing": "'거리'라는 축 이름이 기존 이론에서 관계 거리와 의사소통 조건 전체 두 뜻으로 쓰인다는 근거다. 그래서 B안을 택하면 거리 축의 정의를 하나로 고정해야 한다는 쪽으로 B안의 설계를 움직인다."
+    }
+  ],
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq5",
+  "read": "[\"https://www.uni-bamberg.de/fileadmin/eng-ling/fs/Chapter_21/3Smallscaleregisteranalysis.html\", \"https://www.interstrataltension.org/?m=20141028\", \"https://kilgarriff.co.uk/Publications/1995-K-BiberReview.asc\", \"https://arxiv.org/abs/2509.10179v2\", \"https://arxiv.org/html/2509.10179v2\", \"https://en.wikipedia.org/wiki/Korean_speech_levels\", \"https://academic.oup.com/book/53733/chapter/422174969\", \"https://www.degruyterbrill.com/document/doi/10.1515/cllt-2018-0086/html?lang=en\", \"https://m.earticle.net/Article/A445513\", \"https://typeset.io/pdf/variation-in-the-contextuality-of-language-an-empirical-4x1god7btu.pdf\", \"https://revistas.uned.es/index.php/ELIA/article/download/18284/15355/34644\", \"https://arxiv.org/abs/2502.03252\"]",
+  "saturation": "3",
+  "not_found": "[\"Biber·Conrad 의 상황 특성 목록(참여자·참여자 관계·경로·생산 조건·장소·목적·주제) 원문은 확인하지 못했다. Bamberg 강의 페이지가 HTTP 502 를 냈고, 원저는 검색 결과에 없었다. 목록 내용은 검색 요약으로만 보았다.\", \"Biber·Egbert 의 연속 상황 공간 논문(cllt-2018-0086)은 HTTP 405 로 열지 못했다.\", \"Biber 의 한국어 레지스터 장(OUP 1994)의 초록과 차원 목록은 페이지 본문에 없어 확인하지 못했다.\", \"Heylighen·Dewaele 의 formality(맥락 독립성) 정의와 F-score 원문은 redirect 때문에 열지 못했다. 검색 요약에 따르면 이들의 deep formality 는 맥락 의존을 줄이는 명시성이므로 B안의 격식 축보다 밀도·명시성에 가깝다. 이 대응은 원문 미확인 상태다.\", \"Brown·Levinson 의 D·P·R 변수와 Wx 공식을 다룬 논문 PDF 는 텍스트를 추출하지 못했다. 검색 요약에는 D·P·R 의 값이 절대값이 없고 화자가 상황과 문화에 따라 주관적으로 정한다는 진술과, 동아시아에서 부담 정도(R)가 유의하지 않았다는 2017년 연구가 있었다. 둘 다 원문 미확인이다.\", \"청자·내용을 보고 tenor 변수를 먼저 정한 뒤 어조를 고르는 방식을 LLM 문체 지침으로 시험한 연구는 이번 검색 범위에서 찾지 못했다. 도구 호출 한도 때문에 더 찾지 않았으며, 존재하지 않는다는 근거가 아니다.\", \"Joos 의 다섯 문체(frozen·formal·consultative·casual·intimate)는 교육용 2차 자료만 검색되어 열지 않았다.\"]",
+  "disclosures": "[\"근거 지도 행의 출처 대부분이 2차 자료(서평·블로그·위키백과)이다. 원저 문장과 대조하지 않았으므로 축 대응 판단은 2차 자료의 요약에 기댄다.\", \"B안 축과 이론 변수의 대응(거리-contact, 온도-affect, 밀도-제1차원 정보 쪽)은 이름과 정의를 비교해 내가 추론한 값이다(derived).\", \"Martin 의 affect 확률 진술과 Biber 제1차원의 두 상황 요인 상관 진술은 검색 요약에서 왔고 원문을 열어 확인하지 못했다.\", \"도구 호출이 지시 한도 20회를 2회 넘었다(Read 1회, WebSearch 9회, WebFetch 12회).\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"TERM-ONE\", \"SPECIFIC-NAME\", \"WRITTEN-ONLY\", \"FULL-SENTENCE\"]",
+  "notes": "탐색 방법은 짧고 넓은 검색어로 이론별(Biber 상황 변수, Halliday·Poynton tenor, Brown·Levinson 공손, Heylighen formality, 한국어 화계, 한국어 다차원 분석, LLM 레지스터 측정)로 시작해 원문이나 가까운 2차 자료를 여는 순서로 골랐다. 요약하면 B안의 거리 축은 tenor 의 contact/social distance 에, 온도 축은 affect 에, 밀도 축은 Biber 제1차원의 정보 쪽에 대응한다. 이론과 대조했을 때 B안에서 빠진 축은 status/power(Poynton, Brown·Levinson 의 P)와 한국어의 공손성·경어 축이다. 한국어 화계 자료는 격식성과 공손성이 따로 움직인다고 보여 주므로 B안의 격식 축 하나로는 하십시오체와 해라체의 차이를 표현하지 못한다. 이 차이는 A안의 '합쇼체·~다체' 고정에도 같은 질문을 남긴다. Biber 제1차원과 Martin 의 affect 진술은 B안의 축들이 독립이 아니라 함께 움직인다는 근거다. 반박이나 실패 사례로 볼 만한 결과는 찾지 못해 issues 는 비웠다. intended_use 와 맞지 않아 뺀 근거로는 Joos 다섯 문체가 있다. 이 자료는 장르·상황별 문체 목록에 가까워 사용자가 기각한 상황별 문체 목록 안과 겹치므로 우선순위에서 뺐다. 더 확인할 사항은 세 가지다. 첫째, Biber·Conrad 원저에서 '참여자 관계' 항목의 하위 변수(사회적 역할·공유 지식·개인적 관계)를 확인해 B안 축과 일대일로 맞춰 보아야 한다. 둘째, 한국어 다차원 분석 논문 본문에서 차원별 언어 특징을 확인해 격식 축과 밀도 축이 한국어에서 같은 방향인지 판단해야 한다. 셋째, LLM 벤치마크 논문에서 시스템 프롬프트가 제1차원을 어느 방향으로 옮겼는지 확인해야 한다."
+}

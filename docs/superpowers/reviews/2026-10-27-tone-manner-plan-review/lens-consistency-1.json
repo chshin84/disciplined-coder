@@ -1,0 +1,17 @@
+{
+  "lens": "lens-consistency",
+  "read": ["agent-principles.md 사본", "CLAUDE.md", "plan", "spec", "scripts/_eval_clause.py", "scripts/eval_clause.sh", "evals/principles/cases/q-full-sentence-1", "evals/principles/clauses/ 목록"],
+  "issues": [
+    {"where": "Task 3 전체", "type": "gap", "claim": "spec 이 정한 시험 비용 제안과 원칙 없음 진단의 사용자 확인 단계가 없다.", "consequence": "확인 없이 두 단위를 실행하도록 적혀 있다."},
+    {"where": "Task 3 Step 3·4", "type": "contradiction", "claim": "새 조항은 조항 없음과 비교해 위반이 적을 때만 넣는다는 저장소 규칙과 달리, plan 은 c27-tone-axis-none 을 진단으로만 해석한다.", "consequence": "none 판정이 '넣지않음'이어도 TONE-AXIS 를 넣게 된다."},
+    {"where": "Task 1 Step 2, Task 4", "type": "gap", "claim": "spec 이 정한 VOCAB-PREF 구조 예 추가 단계가 없다.", "consequence": "직역투 생성 단계 대책이 빠졌다."},
+    {"where": "Task 4 Files·Step 4·6", "type": "gap", "claim": "기존 시험 단위(evals/principles/clauses/WRITTEN-ONLY 등)의 처분이 없다.", "consequence": "Files 와 커밋 대상에 그 단위가 없다."},
+    {"where": "Task 3 Step 4·5", "type": "gap", "claim": "spec 이 판정 기록에 적으라고 한 묶음 시험 한계와 단발 시험 한계가 측정 문단에 없다.", "consequence": "두 한계가 어느 산출물에도 없다."},
+    {"where": "Task 3 Step 3", "type": "gap", "claim": "동률일 때 추가할 질문 짝의 위치, followup: true 머리, 커밋 단계가 없다.", "consequence": "스크립트가 동률로만 남긴다."},
+    {"where": "Task 1 Files·Step 1", "type": "gap", "claim": "check_units 가 current.md 를 base(기본 7a2d26d)의 원칙과 대조하는데 base 파일을 만들지 않는다.", "consequence": "현행 문안이 7a2d26d 와 다르면 형식 검사가 실패한다."},
+    {"where": "Task 2 Interfaces, Task 4 Step 4", "type": "contradiction", "claim": "산출물 질문 q-tone-axis-1·2 를 type: chat 으로 둬, 대화 답 고정 규칙과 산출물 구분이 상충한다.", "consequence": "두 질문의 응답이 대화 답 금지어 집계에 들어간다."},
+    {"where": "Task 4 Step 3", "type": "gap", "claim": "축 위치를 못 받은 렌즈가 그 사실을 notes 에 적는 지시가 빠졌다.", "consequence": "렌즈 수정 지시에 notes 기록 항목이 없다."}
+  ],
+  "principles_applied": ["NO-ASSUME", "CHECKABLE", "TERM-ONE", "ASK-OPTIONS", "SPECIFIC-NAME", "INSTRUCTION-FORM"],
+  "notes": "오케스트레이터가 원본 메시지에서 옮겨 저장하며 칸을 요약했다. 렌즈는 ASK-OPTIONS 가 current.md 에 포함되지만 ids 에 없어 시험 대상이 아님을 참고로 적었다."
+}

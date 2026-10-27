@@ -1,0 +1,360 @@
+{
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq5",
+  "search_status": "ok",
+  "queries": [
+    "architecture decision records immutable once accepted superseded new record",
+    "tamper-evident logging hash chain history tree",
+    "AI agent audit trail append-only tamper-evident decision log",
+    "git history rewrite force push protected branch audit trail tamper evidence signed commits",
+    "LLM coding agent review records persisted immutable architecture decision records agent",
+    "coding agent hook block edits to protected files PreToolUse deny write",
+    "write once read many electronic records non-rewriteable non-erasable audit trail alternative rule"
+  ],
+  "read": "[\"https://systems-playbook.pages.dev/concepts/architecture-decision-records/\", \"https://static.usenix.org/events/sec09/tech/slides/crosby.pdf\", \"https://dev.to/codemalasartes/an-immutable-audit-trail-for-ai-agent-actions-fastapi-async-sqlalchemy-4m4c\", \"https://nesbitt.io/2026/06/04/gittuf-a-signed-log-for-git-refs.html\", \"https://duncandavidson.com/agents-love-decisions\", \"https://arxiv.org/pdf/2604.04990\", \"https://arxiv.org/abs/2604.04990\", \"https://docs.github.com/en/enterprise/2.17/user/github/administering-a-repository/about-required-commit-signing\", \"https://docs.rs/crate/ralon/0.1.4\", \"https://dev.to/boucle2026/how-to-protect-your-env-from-claude-code-28f8\", \"https://sec.gov/investment/amendments-electronic-recordkeeping-requirements-broker-dealers\", \"D:\\\\projects\\\\disciplined-coder\\\\hooks\\\\readonly_pretooluse.sh\"]",
+  "issues": [
+    {
+      "where": "메커니즘 (4) 리뷰 기록 봉인 — 세션 시작 시 읽기 전용 속성 지정과 PreToolUse(Write|Edit) 거부 훅",
+      "type": "known-failure",
+      "claim": "이 설계의 봉인은 파일의 읽기 전용 속성과 Write·Edit 거부 훅에 기대므로, 같은 에이전트가 셸 명령으로 속성을 풀고 기록을 고치는 경로가 남아 있다. 이 설계는 그 경로를 사후 검사(보존 태그 없이 고치거나 지운 기록을 잡는 문서 대조 검사)로 탐지하며, 쓰기 자체를 프로세스 수준에서 차단하지는 않는다.",
+      "prior_claim": "에이전트용 파일 보호 도구 ralon 의 문서는 에이전트 편집 도구를 막는 훅이 cmd·python·node·git 같은 일반 프로그램을 통한 쓰기와 셸 명령을 덮지 못해 우회될 수 있다고 적고, 보장 수단으로 에이전트 프로세스와 그 자식 프로세스 전체에서 보호 경로를 커널 수준 읽기 전용으로 만드는 실행 방식을 제시한다.",
+      "consequence": "현재 봉인은 기록 변경을 예방하지 못하고 탐지만 한다. 그래서 문서 대조 검사가 실행되기 전까지는 변조된 기록이 작업 트리에 남을 수 있다.",
+      "evidence": "ralon 문서 인용: 훅은 'does not cover a shell command the agent runs', 'the hook is a courtesy and run is the guarantee'. 대조 대상 쪽 근거: D:\\projects\\disciplined-coder\\hooks\\readonly_pretooluse.sh 2행 'PreToolUse(Write|Edit): 대상 파일이 있고 쓰기 불가이면 거부', 5행 '풀면 되고 그 길은 셸이다'. 축 대조: 목적(에이전트가 보호 파일을 고치지 못하게 함)은 같고, 메커니즘(커널 수준 프로세스 격리 대 파일 속성과 훅)과 대상(임의 보호 경로 대 커밋된 리뷰 기록)은 다르다. 대조 대상 저장소 주석이 이 우회 경로를 이미 인정하고 있으므로, 이 지적은 설계가 모르는 결함이라기보다 남아 있는 결함을 확인한 결과다.",
+      "citations": [
+        {
+          "url": "https://docs.rs/crate/ralon/0.1.4",
+          "kind": "vendor",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "ADR 불변 관행(채택 후 고치지 않고 새 기록으로 대체)",
+      "url": "https://systems-playbook.pages.dev/concepts/architecture-decision-records/",
+      "axes": {
+        "purpose": {
+          "prior": "결정 이력과 사고 변화의 추적을 보존한다",
+          "same": false,
+          "note": "대조 대상의 봉인 목적(리뷰 기록 보존)과 가깝지만, 대조 대상은 리뷰 게이트 전체의 일부이며 이 사례는 기록 보존만 다룬다"
+        },
+        "mechanism": {
+          "prior": "고치지 않고 대체 기록을 새로 쓰는 관행이며, 강제 수단은 기술되어 있지 않다",
+          "same": false,
+          "note": "대조 대상은 읽기 전용 속성·거부 훅·문서 대조 검사로 기술적으로 강제한다"
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "효과 측정이 없다"
+        },
+        "target": {
+          "prior": "사람이 쓰는 아키텍처 결정 기록",
+          "same": false,
+          "note": "대조 대상은 LLM 에이전트가 만든 리뷰 기록과 결정 기록이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "웹 검색 → 개념 정리 페이지",
+      "adoption": "참고",
+      "bearing": "'커밋된 기록은 고치지 않고 새로 쓴다'는 규범 자체는 ADR 관행으로 이미 존재한다. 그래서 메커니즘 (4)의 새로움은 규범이 아닌 기술적 강제 방식에서만 찾을 수 있다."
+    },
+    {
+      "case": "코딩 에이전트에 ADR 을 지시 파일로 적용한 사례(수정 허용, git 이력이 변경 기록)",
+      "url": "https://duncandavidson.com/agents-love-decisions",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트에게 결정의 의도와 지속 맥락을 준다",
+          "same": false,
+          "note": "대조 대상의 봉인 목적은 기록 변조 방지이고, 이 사례의 목적은 에이전트 맥락 제공이다"
+        },
+        "mechanism": {
+          "prior": "AGENTS.md 지시로 채택·제안·대체 상태를 구분하며, 채택된 ADR 도 고쳐 쓰고 git 이력을 변경 기록으로 쓴다",
+          "same": false,
+          "note": "훅이나 권한 같은 기술적 강제가 없고, 불변 원칙을 명시적으로 택하지 않았다"
+        },
+        "evaluation": {
+          "prior": "저자 경험 서술뿐이다",
+          "same": false,
+          "note": "측정 없음"
+        },
+        "target": {
+          "prior": "LLM 코딩 에이전트가 읽는 결정 기록",
+          "same": false,
+          "note": "에이전트용 결정 기록이라는 점은 같으나 리뷰 기록은 다루지 않는다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "웹 검색",
+      "adoption": "참고",
+      "bearing": "에이전트용 결정 기록에서 불변 대신 git 이력에 맡기는 대안 설계가 실무에 존재한다. 이 사례는 봉인이 필수인지를 따질 때 비교 기준선 후보가 된다."
+    },
+    {
+      "case": "Crosby·Wallach 변조 탐지 로깅(history tree, USENIX Security 2009 발표 자료)",
+      "url": "https://static.usenix.org/events/sec09/tech/slides/crosby.pdf",
+      "axes": {
+        "purpose": {
+          "prior": "신뢰할 수 없는 로거가 과거 이벤트를 고치면 탐지한다",
+          "same": false,
+          "note": "변조 탐지라는 목적은 대조 대상의 문서 대조 검사와 겹치지만 대조 대상은 예방(읽기 전용)도 시도한다"
+        },
+        "mechanism": {
+          "prior": "추가 전용 Merkle 트리, 감사자에게 커밋먼트 전달, 로그 크기의 로그 함수 비용 증명",
+          "same": false,
+          "note": "대조 대상은 암호학적 커밋먼트나 외부 감사자를 쓰지 않고 git 이력과 저장소 내 검사에 기댄다"
+        },
+        "evaluation": {
+          "prior": "초당 1,750건 이상 기록, 초당 8,000건 이상 감사 벤치마크",
+          "same": false,
+          "note": "대조 대상에는 성능 평가가 없고 필요성도 다르다"
+        },
+        "target": {
+          "prior": "SOX·HIPAA·PCI 류 감사 로그",
+          "same": false,
+          "note": "대조 대상은 소량의 문서 기록이다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 → 학회 발표 자료(PDF 직접 열람)",
+      "adoption": "참고",
+      "bearing": "발표 자료는 한계로 '오남용을 탐지할 뿐 예방하지 못한다'를 명시한다. 이 사례는 변조 탐지 로그가 확립된 분야임을 보여 주며, 메커니즘 (4)를 감사 로그 기법으로서 새롭다고 보기 어렵게 한다. 다만 네 축이 모두 다르므로 직접 비교 근거로는 약하다."
+    },
+    {
+      "case": "gittuf 참조 상태 로그(git ref 갱신의 서명된 해시 체인)",
+      "url": "https://nesbitt.io/2026/06/04/gittuf-a-signed-log-for-git-refs.html",
+      "axes": {
+        "purpose": {
+          "prior": "git 저장소의 브랜치 끝이 정당한지 증명해 이력 바꿔치기와 롤백 공격을 탐지한다",
+          "same": false,
+          "note": "대조 대상은 개별 기록 파일의 수정을 다루고 ref 위조는 다루지 않는다"
+        },
+        "mechanism": {
+          "prior": "ref 갱신마다 서명된 항목을 저장소 안 해시 체인에 추가하고, 포지 밖에서 정책으로 검증한다",
+          "same": false,
+          "note": "대조 대상은 서명이나 별도 로그 없이 git 커밋 이력과 검사 스크립트에 기댄다"
+        },
+        "evaluation": {
+          "prior": "실제 침해 사례(php-src 2021 등) 분석으로 필요성을 논증한다",
+          "same": false,
+          "note": "정량 평가가 없다"
+        },
+        "target": {
+          "prior": "git 저장소 전체",
+          "same": false,
+          "note": "대조 대상은 저장소 안 리뷰 기록 폴더다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "웹 검색",
+      "adoption": "참고",
+      "bearing": "이 사례는 git 자체가 이력이 다시 쓰이지 않았음을 증명하지 못한다고 적는다. 그래서 git 이력을 기준으로 삼는 대조 대상의 탐지는 강제 푸시나 이력 재작성 앞에서는 보장이 약하다는 점을 판단할 때 근거가 된다."
+    },
+    {
+      "case": "AI 에이전트 행동의 추가 전용 감사 기록(FastAPI 구현 글)",
+      "url": "https://dev.to/codemalasartes/an-immutable-audit-trail-for-ai-agent-actions-fastapi-async-sqlalchemy-4m4c",
+      "axes": {
+        "purpose": {
+          "prior": "AI 에이전트 행동을 고칠 수 없는 감사 기록으로 남긴다",
+          "same": false,
+          "note": "대조 대상은 행동 로그가 아닌 리뷰 결과 문서를 보존한다"
+        },
+        "mechanism": {
+          "prior": "append 하나만 노출하는 모듈과 관행·코드 리뷰로 추가 전용을 지키며, 해시 체인은 아직 연결되지 않았다",
+          "same": false,
+          "note": "대조 대상은 파일 속성·훅·검사 스크립트로 강제한다"
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "측정 없음"
+        },
+        "target": {
+          "prior": "에이전트 행동 이벤트를 저장하는 DB 테이블",
+          "same": false,
+          "note": "대조 대상은 git 저장소의 마크다운 기록이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "웹 검색",
+      "adoption": "참고",
+      "bearing": "에이전트 감사 기록에서도 추가 전용이 관행과 리뷰에 기대는 사례가 있다. 이 사례는 기술적 강제를 둔 대조 대상이 이 사례보다 한 단계 강한 강제임을 보여 주지만 새로움의 근거로 쓰기는 어렵다."
+    },
+    {
+      "case": "ralon — 에이전트 프로세스에 보호 경로를 커널 수준 읽기 전용으로 적용",
+      "url": "https://docs.rs/crate/ralon/0.1.4",
+      "axes": {
+        "purpose": {
+          "prior": "AI 코딩 에이전트가 지정한 경로를 고치지 못하게 한다",
+          "same": false,
+          "note": "목적은 대조 대상 봉인과 같으나, 대조 대상 전체(리뷰 게이트)와 비교하면 봉인 구성요소 하나와만 같다"
+        },
+        "mechanism": {
+          "prior": "agent.lock 목록의 경로를 에이전트와 자식 프로세스 전체에 커널 수준 읽기 전용으로 만들고, 훅은 보조 수단으로 둔다",
+          "same": false,
+          "note": "대조 대상은 파일 속성과 Write·Edit 거부 훅이며 셸 경로는 사후 검사로 탐지한다"
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "측정 없음"
+        },
+        "target": {
+          "prior": "임의의 보호 경로(설정·비밀 등)",
+          "same": false,
+          "note": "대조 대상은 커밋된 리뷰·결정 기록이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 → 크레이트 문서",
+      "adoption": "참고",
+      "bearing": "에이전트가 파일을 고치지 못하게 하는 도구가 이미 존재하고, 훅만으로는 우회된다는 실패 원인도 문서화되어 있다. 이 사례는 메커니즘 (4)의 '에이전트 쓰기 차단' 구성요소를 새롭다고 보기 어렵게 한다."
+    },
+    {
+      "case": "file-guard — 보호 파일 수정을 거부하는 PreToolUse 훅",
+      "url": "https://dev.to/boucle2026/how-to-protect-your-env-from-claude-code-28f8",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트가 .env 같은 보호 파일을 고치지 못하게 한다",
+          "same": false,
+          "note": "봉인 구성요소와만 목적이 같다"
+        },
+        "mechanism": {
+          "prior": "Write·Edit·Bash 호출을 실행 전에 가로채 경로 패턴과 대조하고, Bash 는 rm·mv·리다이렉션·chmod 같은 연산자를 검사한다",
+          "same": false,
+          "note": "대조 대상 훅은 Write|Edit 만 다루고 Bash 는 다루지 않는다. 이 사례는 Bash 까지 덮는다"
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "측정 없음"
+        },
+        "target": {
+          "prior": "비밀·설정 파일",
+          "same": false,
+          "note": "대조 대상은 리뷰 기록이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "웹 검색",
+      "adoption": "참고",
+      "bearing": "같은 하네스에서 보호 파일 수정 거부 훅이 공개되어 있다. 그래서 훅 거부 자체는 선행 사례가 있는 메커니즘이며, 대조 대상만의 요소는 '커밋된 리뷰 기록에 세션 시작마다 봉인을 적용하는 범위 지정'과 '사후 문서 대조 검사와의 결합'으로 좁혀진다."
+    },
+    {
+      "case": "SEC Rule 17a-4 개정 — WORM 또는 감사 추적 대안",
+      "url": "https://sec.gov/investment/amendments-electronic-recordkeeping-requirements-broker-dealers",
+      "axes": {
+        "purpose": {
+          "prior": "브로커-딜러 전자 기록의 보존과 무결성을 보장한다",
+          "same": false,
+          "note": "규제 기록 보존이며, 대조 대상은 개발 리뷰 기록 보존이다"
+        },
+        "mechanism": {
+          "prior": "다시 쓸 수 없고 지울 수 없는 WORM 형식, 또는 수정·삭제 시 원본을 재현할 수 있는 감사 추적 시스템 중 하나를 요구한다",
+          "same": false,
+          "note": "대조 대상은 읽기 전용 속성(WORM 에 가까운 예방)과 git 이력(원본 재현이 가능한 감사 추적에 가까운 탐지)을 함께 쓴다는 점에서 구조가 비슷하지만 강도는 다르다"
+        },
+        "evaluation": {
+          "prior": "규제 준수 요건이며 실험 평가는 없다",
+          "same": false,
+          "note": "해당 없음"
+        },
+        "target": {
+          "prior": "금융회사 규제 기록",
+          "same": false,
+          "note": "대조 대상은 LLM 에이전트 리뷰 기록이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "standard",
+      "source_level": "1차",
+      "route": "웹 검색 → 규제기관 페이지",
+      "adoption": "참고",
+      "bearing": "'고칠 수 없게 하거나, 고쳐도 원본을 재현할 수 있게 하라'는 두 경로가 2022-10-12 채택된 규제에 이미 정식화되어 있다. 이 근거는 메커니즘 (4)의 예방+탐지 이중 구조를 기존 기록 보존 패턴의 적용으로 보는 방향으로 움직인다."
+    },
+    {
+      "case": "GitHub 보호 브랜치의 필수 커밋 서명",
+      "url": "https://docs.github.com/en/enterprise/2.17/user/github/administering-a-repository/about-required-commit-signing",
+      "axes": {
+        "purpose": {
+          "prior": "보호 브랜치에 검증된 서명 커밋만 푸시되게 한다",
+          "same": false,
+          "note": "작성자 진위 보장이며, 기존 기록의 수정 금지와는 다르다"
+        },
+        "mechanism": {
+          "prior": "포지가 푸시 시 서명을 검증하며, 관리자는 예외로 둘 수 있다",
+          "same": false,
+          "note": "대조 대상은 로컬 파일 속성과 훅을 쓴다"
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "제품 문서"
+        },
+        "target": {
+          "prior": "보호 브랜치의 커밋",
+          "same": false,
+          "note": "대조 대상은 기록 파일이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색",
+      "adoption": "해당 없음",
+      "bearing": "포지 수준 통제는 대조 대상과 다른 층의 수단이며, 봉인을 저장소 밖에서 보강할 선택지로만 참고된다."
+    },
+    {
+      "case": "Architecture Without Architects — AI 코딩 에이전트의 암묵적 아키텍처 결정(arXiv 2604.04990)",
+      "url": "https://arxiv.org/abs/2604.04990",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트가 내리는 암묵적 아키텍처 결정을 거버넌스 아래로 가져온다",
+          "same": false,
+          "note": "대조 대상의 봉인은 기록 보존이고, 이 논문은 결정의 가시화를 다룬다"
+        },
+        "mechanism": {
+          "prior": "리뷰 관행·결정 기록·도구를 개략적으로 제안한다",
+          "same": false,
+          "note": "초록 수준에서 기록의 불변이나 봉인은 언급되지 않는다"
+        },
+        "evaluation": {
+          "prior": "프롬프트 문구만 바꿔도 구조가 다른 시스템이 나온다는 시연",
+          "same": false,
+          "note": "기록 보존 평가는 없다"
+        },
+        "target": {
+          "prior": "AI 코딩 에이전트의 아키텍처 결정",
+          "same": false,
+          "note": "에이전트 결정이라는 대상은 가깝지만 리뷰 기록은 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 초록(본문 PDF 는 해독 실패)",
+      "adoption": "참고",
+      "bearing": "에이전트 결정에 결정 기록이 필요하다는 주장은 학계에도 있으나, 기록을 커밋 후 봉인하는 메커니즘의 선행 사례로는 쓰기 어렵다."
+    }
+  ],
+  "saturation": "5",
+  "not_found": "[\"LLM 에이전트가 만든 리뷰 기록을 커밋 후 읽기 전용으로 봉인하는 선행 사례는 찾지 못했다. 검색 7회와 열람 범위가 좁아서이며, 독창성의 근거로 쓰지 않는다.\", \"세션 시작마다 봉인을 다시 적용하고 보존 태그로 정당한 삭제를 구분하는 문서 대조 검사와 결합한 사례는 찾지 못했다. 검색어를 일반 용어로 제한했기 때문일 수 있다.\", \"arXiv 2604.04990 본문은 PDF 해독 실패로 읽지 못했고 초록만 확인했다.\", \"Crosby·Wallach 원 논문 본문은 열지 않았고 USENIX 발표 자료 앞 8페이지만 확인했다.\"]",
+  "disclosures": "[\"Crosby·Wallach 행의 kind 를 peer-reviewed 로 두었으나 실제로 연 자료는 동료 심사 논문의 학회 발표 슬라이드다.\", \"대조 대상의 봉인 동작은 프로젝트 CLAUDE.md 서술과 hooks/readonly_pretooluse.sh 머리 주석(2행·5행)만으로 확인했고, 문서 대조 검사 스크립트 본문은 읽지 않았다.\", \"gittuf 행은 2차 해설 블로그를 근거로 했고 gittuf 공식 문서는 열지 않았다.\", \"AI 에이전트 감사 기록 검색 결과의 다수가 벤더 홍보 페이지여서 근거 지도에 넣지 않았다.\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"WRITTEN-ONLY\", \"TERM-ONE\", \"FOCUSED\"]",
+  "notes": "고른 탐색 방법은 짧고 넓은 검색어로 시작해 좁혀 가기(ADR 불변 → 변조 탐지 로그 → 에이전트 감사 기록 → git 이력 위조 → 에이전트 파일 보호 훅 → 규제 기록 보존)와 실패·한계 자료 찾기다. 정리하면 메커니즘 (4)의 구성요소는 모두 선행 사례가 있다. 그 구성요소는 '커밋된 기록은 고치지 않는다'는 규범(ADR 관행), 에이전트 쓰기 차단 훅(file-guard), 커널 수준 차단(ralon), 예방+원본 재현 이중 구조(SEC 17a-4), 변조 탐지 로그(Crosby·Wallach)다. 선행 사례를 찾지 못한 지점은 이 요소들을 LLM 리뷰 기록에 적용하고 보존 태그로 정당한 삭제를 구분하는 조합이다. 근거 지도의 모든 행은 네 축이 모두 다르므로, 종합 단계에서 어느 행도 단독 근거로 쓰기 어렵다. intended_use 와 맞지 않아 뺀 근거는 AI 감사 추적 벤더 용어집(decagon, pushary, gravitee 류)이며, 제품 홍보 위주라 근거 강도가 낮아 제외했다. 추가로 확인할 일은 두 가지다. 첫째, 문서 대조 검사가 git 이력 재작성(강제 푸시, rebase) 뒤에도 수정을 탐지하는지 확인해야 한다. gittuf 해설이 git 자체는 이력이 다시 쓰이지 않았음을 증명하지 못한다고 적기 때문이다. 둘째, 기록 봉인이 Bash 를 통한 속성 해제를 사후에만 잡는다는 점을 사용자가 수용하는지 확인해야 한다."
+}

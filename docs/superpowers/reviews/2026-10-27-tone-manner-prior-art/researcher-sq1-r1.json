@@ -1,0 +1,408 @@
+{
+  "search_status": "ok",
+  "queries": [
+    "audience-aware text generation LLM persona tailoring explanation evaluation",
+    "LLM formality control prompting style transfer evaluation",
+    "plan-then-write planning step improves controllable generation audience",
+    "LLM chatbot users mimic register style alignment conversation formality drift",
+    "Korean honorifics speech level LLM generation evaluation politeness",
+    "readability control LLM reading level prompting expertise adaptation study",
+    "chain-of-thought reasoning before answer personalization user profile tailoring response style benchmark",
+    "system prompt persona consistency multi-turn instruction drift LLM style",
+    "LLM explanation tailored to user expertise layperson vs expert first infer audience then generate",
+    "steering large language models register analysis arbitrary style transfer"
+  ],
+  "issues": [
+    {
+      "where": "B안의 격식 축(청자에 따라 합쇼체·해요체 같은 상대 높임 등급을 고르는 단계)",
+      "type": "known-failure",
+      "claim": "B안은 청자에 따라 격식 축의 위치를 바꾸므로 한국어 높임 등급을 문장마다 정확히 맞추는 능력에 기대게 된다. A안은 종결 등급을 하나로 고정하므로 이 능력에 덜 기댄다.",
+      "prior_claim": "한국어 차량용 대화 비서를 평가한 연구는 현재 LLM 의 세밀한 한국어 높임 등급 제어가 불안정하다고 보고하고, 현지화 환경에서는 높임 등급 실현을 따로 평가해야 한다고 결론지었다.",
+      "consequence": "B안을 채택하면 격식 축을 바꾸는 출력마다 높임 등급이 목표와 다르게 섞일 위험이 생긴다. 소형 모델이 한국어 문체를 채점하지 못한다는 사실은 이미 확인되었으므로, 이 불안정을 사후에 잡는 검사 수단도 약하다.",
+      "evidence": "arXiv 2605.21086 초록: 'fine-grained Korean honorific control remains unstable in current LLMs'. 네 축 대조: 목적(차량 비서 현지화 평가)과 적용 대상(차량 음성 비서)이 대조 대상(코딩 에이전트 상시 문체 지침)과 다르다. 평가 방식(LLM 판정자에 규칙 기반 어미 검사 추가)도 다르다. 그래서 불안정의 크기를 대조 대상에 그대로 옮길 수 없다. 검색 요약에 나온 판정자 일치도 0.69에서 0.94로의 상승 수치는 연 초록 페이지에서 확인하지 못했다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/abs/2605.21086",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "B안의 조절 축 위치 지정(축의 위치만 정하고 어휘·구문 제약으로 옮기지 않는 단계)",
+      "type": "known-failure",
+      "claim": "B안이 축의 위치를 이름이나 수준으로만 정하면, 출력이 목표 위치와 무관하게 중간 수준으로 모이는 현상이 B안에도 남아 있을 수 있다.",
+      "prior_claim": "자유 서술 근거문을 초등 6학년부터 대학 수준까지 지정해 생성하게 한 연구는 출력이 지시에 반응하기는 하지만 수준 사이의 차이가 기존 가독성 지표와 완전히 맞지 않고, 생성된 근거문이 중간 수준의 복잡도로 모인다고 보고했다.",
+      "consequence": "B안의 격식·거리·온도·밀도 축을 위치로만 지시하면 청자가 바뀌어도 어조 차이가 작게 나올 수 있다. 그 결과 B안의 부담은 늘고 청자 맞춤 효과는 A안 대비 작게 나올 위험이 있다.",
+      "evidence": "ACL Anthology 2025.gem-1.11 초록: 'the generated rationales tend to feature medium level complexity'. 네 축 대조: 목적(설명 가독성 조절)은 대조 대상의 밀도 축과만 같고, 메커니즘(수준 지시 프롬프트)은 B안의 사전 결정 단계와 다르며, 평가(가독성 지표와 사람 평가)와 적용 대상(영어 근거문)도 다르다.",
+      "citations": [
+        {
+          "url": "https://aclanthology.org/2025.gem-1.11/",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "B안의 청자 맞춤 전반(사용자 선호를 묻지 않고 청자와 내용만 보고 어조를 고르는 방식)",
+      "type": "known-failure",
+      "claim": "B안은 사용자 선호를 따로 묻지 않고 에이전트가 청자를 추정해 어조를 고르므로, 선행 연구가 말하는 단순 개인화의 실패 원인이 B안에도 남아 있을 수 있다.",
+      "prior_claim": "21개 최신 모델을 10개 과제로 시험한 PrefDisco 연구는 단순 개인화 시도의 29.0%가 일반 응답보다 선호 정합도가 낮았다고 보고했다. 같은 연구는 일반 응답도 개인의 필요를 채우지 못한다고 보고했다.",
+      "consequence": "B안을 채택해도 조절이 일반 응답보다 나빠지는 출력이 일정 비율 생길 수 있다. 그러나 같은 연구는 고정 응답도 충분하지 않다고 보았으므로, 이 근거는 A안을 지지하지도 않는다.",
+      "evidence": "arXiv 2510.00177 초록: '29.0% of naive personalization attempts produce worse preference alignment than generic responses'. 네 축 대조: 목적(추론 과제의 개인화)과 메커니즘(질문으로 숨은 선호를 알아내기)과 평가(루브릭 기반 PrefAlign)와 적용 대상(영어 추론 벤치마크)이 모두 대조 대상과 다르다. 초록에는 격식·문체 선호에 대한 결과가 따로 없다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/abs/2510.00177",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "B안에서 청자를 판단하는 입력(사용자 메시지에서 청자 신호를 읽는 단계)",
+      "type": "known-failure",
+      "claim": "B안이 청자를 사용자 메시지에서 추정하면, 사용자의 구어체를 청자 신호로 읽어 출력 문체가 사용자 쪽으로 수렴할 위험이 B안에 남는다. A안은 종결 등급을 고정하므로 이 경로가 좁다.",
+      "prior_claim": "실제 ChatGPT 대화 기록(WildChat)을 8개 언어에서 분석한 연구는 LLM 이 기능어와 내용어 양쪽에서 사용자 문체로 크게 과잉 수렴하고, 사람의 수렴은 사람 사이 대화 기준선과 비슷하다고 보고했다.",
+      "consequence": "두 안 모두 입력 문체 모방을 금지하지만, B안은 청자를 입력에서 읽는 단계를 새로 두므로 모방 금지가 지켜지는지를 A안보다 더 자주 판단해야 한다.",
+      "evidence": "arXiv 2605.29278 초록: 'LLMs significantly overconverge toward their users on both function word and open-class features across eight languages'. 네 축 대조: 목적(수렴 현상 측정)과 메커니즘(제어 없음, 관측 연구)과 평가(비대칭 수렴 지표)와 적용 대상(범용 챗봇 대화)이 모두 대조 대상과 다르다. 초록에는 격식·등급과 완화 방법이 나오지 않는다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/abs/2605.29278",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "상황 기반 설명(SBE) 데이터셋과 프롬프트 방식 비교",
+      "url": "https://arxiv.org/abs/2406.05035",
+      "axes": {
+        "purpose": {
+          "prior": "청중 유형 세 가지에 맞춰 설명문을 조절하는 능력을 정량 평가한다",
+          "same": false,
+          "note": "청자 맞춤은 같지만 입력 문체 모방 회피와 상시 지침 부담은 다루지 않는다"
+        },
+        "mechanism": {
+          "prior": "규칙 기반 프롬프트, 모델이 프롬프트를 직접 쓰는 메타 프롬프트, 예시 학습 프롬프트를 비교한다",
+          "same": false,
+          "note": "메타 프롬프트는 생성 전에 모델이 조건을 정한다는 점에서만 B안의 사전 결정 단계와 비슷하다"
+        },
+        "evaluation": {
+          "prior": "청중-설명 대상 쌍마다 사람이 쓴 참조 설명과 비교한다",
+          "same": false,
+          "note": "대조 대상의 기준인 입력 문체 모방 여부와 조항 부담을 측정하지 않는다"
+        },
+        "target": {
+          "prior": "영어 설명문, 여러 크기의 사전학습 모델",
+          "same": false,
+          "note": "한국어 코딩 에이전트 출력이 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록 열람",
+      "adoption": "참고",
+      "bearing": "모델이 생성 전에 상황에 맞는 지시를 스스로 정하면 상황 정합도가 높아진다는 결과이므로 B안의 사전 결정 단계를 약하게 지지한다. 네 축이 모두 달라 단독 근거로 쓸 수 없다."
+    },
+    {
+      "case": "LLM 의 사용자 문체 과잉 수렴(8개 언어 실제 대화)",
+      "url": "https://arxiv.org/abs/2605.29278",
+      "axes": {
+        "purpose": {
+          "prior": "사람과 LLM 사이 문체 수렴의 방향과 크기를 측정한다",
+          "same": false,
+          "note": "문체 지침 설계가 목적이 아니다"
+        },
+        "mechanism": {
+          "prior": "제어 없이 관측한 대화 기록에 비대칭 수렴 지표를 적용한다",
+          "same": false,
+          "note": "고정이나 조절 지시를 시험하지 않는다"
+        },
+        "evaluation": {
+          "prior": "기능어와 내용어 분포의 수렴 정도",
+          "same": false,
+          "note": "격식 등급은 측정하지 않는다"
+        },
+        "target": {
+          "prior": "범용 챗봇 실제 대화, 8개 언어",
+          "same": false,
+          "note": "한국어 포함 여부를 초록에서 확인하지 못했다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록 열람",
+      "adoption": "참고",
+      "bearing": "LLM 의 기본 습관이 사용자 문체 수렴이라는 근거이므로 두 안 모두의 입력 문체 모방 금지를 지지한다. 청자를 입력에서 읽는 단계를 둔 B안 쪽에 위험을 더한다."
+    },
+    {
+      "case": "LLM 답의 의미 정렬과 문체 정렬 비교",
+      "url": "https://aclanthology.org/2025.sigdial-1.16/",
+      "axes": {
+        "purpose": {
+          "prior": "질문-답 쌍에서 사람과 LLM 의 언어 조정 전략 차이를 측정한다",
+          "same": false,
+          "note": "문체 지침 설계가 목적이 아니다"
+        },
+        "mechanism": {
+          "prior": "임베딩으로 질문과 답의 의미 유사도와 문체 유사도를 각각 계산한다",
+          "same": false,
+          "note": "제어 방식을 시험하지 않는다"
+        },
+        "evaluation": {
+          "prior": "의미 유사도와 문체 유사도",
+          "same": false,
+          "note": "격식 등급이나 청자 적합도를 따로 보지 않는다"
+        },
+        "target": {
+          "prior": "질문-답 데이터(세부는 초록에 없음)",
+          "same": false,
+          "note": "한국어 여부 미확인"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과에서 ACL Anthology 초록 열람",
+      "adoption": "참고",
+      "bearing": "LLM 답은 질문과 의미는 가깝고 문체는 덜 닮았다는 결과이다. 그래서 과잉 수렴 연구와 방향이 다르며, 입력 문체 모방 위험의 크기는 근거가 엇갈린다."
+    },
+    {
+      "case": "가독성 수준 지시에 따른 자유 서술 근거문 생성",
+      "url": "https://aclanthology.org/2025.gem-1.11/",
+      "axes": {
+        "purpose": {
+          "prior": "독자 전문성 수준(초등 6학년~대학)에 맞춰 설명을 조절할 수 있는지 시험한다",
+          "same": false,
+          "note": "대조 대상의 밀도 축과만 같다"
+        },
+        "mechanism": {
+          "prior": "목표 수준을 지시하는 프롬프트",
+          "same": false,
+          "note": "생성 전 축 결정 단계 없이 지시만 준다. 즉 B안과 비교할 '지시만 주는 방식' 쪽에 해당한다"
+        },
+        "evaluation": {
+          "prior": "기존 가독성 지표, 자동 품질 지표, 사람 평가",
+          "same": false,
+          "note": "입력 문체 모방과 조항 부담을 보지 않는다"
+        },
+        "target": {
+          "prior": "영어 근거문",
+          "same": false,
+          "note": "한국어 코딩 에이전트 출력이 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과에서 ACL Anthology 초록 열람",
+      "adoption": "참고",
+      "bearing": "수준만 지시하면 출력이 중간 복잡도로 모인다는 결과이므로, B안이 축 위치를 이름으로만 정하면 효과가 작다는 쪽으로 B안의 설계를 압박한다."
+    },
+    {
+      "case": "CEFR 수준 통제 아랍어 생성의 다차원 평가",
+      "url": "https://arxiv.org/abs/2606.21981",
+      "axes": {
+        "purpose": {
+          "prior": "지정한 CEFR 수준의 학습용 글을 안정적으로 생성하는지 평가한다",
+          "same": false,
+          "note": "밀도·난이도 축과만 같다"
+        },
+        "mechanism": {
+          "prior": "수준 지시 없음부터 수준과 어휘·구문 제약까지 단계별 프롬프트 조건을 비교한다",
+          "same": false,
+          "note": "축 위치를 구체 제약으로 바꾸는 방식이며, B안의 전달 규칙(금지 표현 회피 등)과 비슷한 구체 제약을 쓴다"
+        },
+        "evaluation": {
+          "prior": "가독성 예측 모델, 어휘 제약 검증, 구문 복잡도 프로파일",
+          "same": false,
+          "note": "격식·어조는 평가하지 않는다"
+        },
+        "target": {
+          "prior": "아랍어 학습 자료",
+          "same": false,
+          "note": "한국어 코딩 에이전트 출력이 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록 열람",
+      "adoption": "참고",
+      "bearing": "수준 지시에 어휘 제약을 더한 조건이 참조 프로파일과 코사인 유사도 0.91, 예측 수준 일치 0.99로 가장 높고 제약 없는 프롬프트는 통제가 약했다. 그래서 B안을 채택한다면 축 위치를 구체 어휘·구문 제약으로 옮겨야 한다는 쪽으로 움직인다."
+    },
+    {
+      "case": "한국어 차량 비서의 높임 등급 제어 평가(LoCar)",
+      "url": "https://arxiv.org/abs/2605.21086",
+      "axes": {
+        "purpose": {
+          "prior": "한국어 현지화를 위한 차량 대화 비서 평가 틀을 제안한다",
+          "same": false,
+          "note": "세밀한 높임 등급 제어를 평가 항목에 포함한다는 점만 대조 대상의 격식 축과 같다"
+        },
+        "mechanism": {
+          "prior": "사회언어학적 조건에 따른 높임 등급 제어를 평가하며, 제어 지정 방식은 초록에 없다",
+          "same": false,
+          "note": "생성 전 축 결정 단계 여부를 확인하지 못했다"
+        },
+        "evaluation": {
+          "prior": "LLM 판정자와 규칙 기반 어미 검사",
+          "same": false,
+          "note": "높임 등급 판정을 규칙 검사로 보강한다는 점은 대조 대상의 문자열 금지어 검사와 비슷하다"
+        },
+        "target": {
+          "prior": "한국어 차량 음성 비서",
+          "same": false,
+          "note": "한국어라는 점은 같지만 코딩 에이전트가 아니다"
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록 열람",
+      "adoption": "참고",
+      "bearing": "세밀한 한국어 높임 등급 제어가 현재 LLM 에서 불안정하다는 결과이므로 격식 축을 고정하는 A안 쪽으로 움직인다. B안을 택하면 격식 축의 가동 범위를 좁히는 쪽으로 움직인다."
+    },
+    {
+      "case": "PrefDisco 선호 탐색형 개인화 벤치마크",
+      "url": "https://arxiv.org/abs/2510.00177",
+      "axes": {
+        "purpose": {
+          "prior": "이력 없는 사용자의 숨은 선호를 알아내 추론과 응답을 맞추는 능력을 평가한다",
+          "same": false,
+          "note": "개인화는 같지만 문체 고정·조절 비교가 목적이 아니다"
+        },
+        "mechanism": {
+          "prior": "모델이 질문으로 선호를 끌어낸 뒤 응답을 맞춘다",
+          "same": false,
+          "note": "B안은 질문 없이 청자와 내용을 보고 정한다"
+        },
+        "evaluation": {
+          "prior": "루브릭 기반 선호 정합 지표 PrefAlign",
+          "same": false,
+          "note": "입력 문체 모방은 보지 않는다"
+        },
+        "target": {
+          "prior": "21개 최신 모델, 10개 정적 벤치마크를 바꾼 과제",
+          "same": false,
+          "note": "한국어 코딩 에이전트 출력이 아니다"
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록 열람",
+      "adoption": "참고",
+      "bearing": "단순 개인화의 29.0%가 일반 응답보다 나빴고 일반 응답도 충분하지 않았다. 그래서 A안과 B안 어느 쪽도 이 근거만으로 우위를 얻지 못하고, B안의 조절은 별도 설계가 필요하다는 쪽으로 움직인다."
+    },
+    {
+      "case": "대화 회차에 따른 지시 이탈 측정",
+      "url": "https://arxiv.org/abs/2402.10962",
+      "axes": {
+        "purpose": {
+          "prior": "시스템 프롬프트의 지시가 대화 내내 유지되는지 측정한다",
+          "same": false,
+          "note": "상시 지침의 유지라는 점은 대조 대상과 관련되지만 문체 고정·조절 비교가 목적이 아니다"
+        },
+        "mechanism": {
+          "prior": "두 챗봇의 자기 대화로 지시 안정성을 측정하고, 주의 감쇠 완화 방법(split-softmax)을 제안한다",
+          "same": false,
+          "note": "모델 내부 수정이며 지침 문구 설계가 아니다"
+        },
+        "evaluation": {
+          "prior": "회차별 지시 준수 정도",
+          "same": false,
+          "note": "문체 등급을 따로 보지 않는다"
+        },
+        "target": {
+          "prior": "LLaMA2-chat-70B, GPT-3.5",
+          "same": false,
+          "note": "한국어 코딩 에이전트가 아니다"
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록 열람",
+      "adoption": "참고",
+      "bearing": "8회 대화 안에 지시 이탈이 크게 나타났다는 결과이며, A안과 B안 모두 상시 지침이므로 양쪽에 같이 적용된다. B안이 더 많이 이탈한다는 근거는 이 자료에 없다."
+    },
+    {
+      "case": "전문가·비전문가용 설명을 한 응답에 내는 구조화 프롬프트(Mind the XAI Gap)",
+      "url": "https://arxiv.org/html/2506.12240v1",
+      "axes": {
+        "purpose": {
+          "prior": "블랙박스 모델 설명을 전문가와 비전문가에게 동시에 맞춰 낸다",
+          "same": false,
+          "note": "청자 맞춤은 같지만 문체 모방 회피를 다루지 않는다"
+        },
+        "mechanism": {
+          "prior": "구조화 프롬프트와 소수 예시로 전문가용 JSON 과 비전문가용 문단을 한 번에 생성한다",
+          "same": false,
+          "note": "청자 추정 단계 없이 두 청자용 출력을 모두 낸다"
+        },
+        "evaluation": {
+          "prior": "LIME 순위와의 스피어만 상관(소수 예시 0.92), 구조 품질, 56명 사용자 연구",
+          "same": false,
+          "note": "구조 품질은 일관된 개선이 없었고 A/B 비교는 유의하지 않았다"
+        },
+        "target": {
+          "prior": "Mistral 7B, LLaMA3 8B, 웰빙 군집 데이터",
+          "same": false,
+          "note": "한국어 코딩 에이전트가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv HTML 열람",
+      "adoption": "참고",
+      "bearing": "소수 예시가 내용 정확도는 크게 높였지만 문장 품질과 사용자 평가의 개선은 약했다. 그래서 청자 맞춤 지시의 어조 효과를 지지하는 근거로는 약하다."
+    },
+    {
+      "case": "레지스터 분석으로 LLM 문체 변환 유도",
+      "url": "https://arxiv.org/abs/2505.00679",
+      "axes": {
+        "purpose": {
+          "prior": "예시 글의 문체로 입력 글을 바꾸어 쓴다",
+          "same": false,
+          "note": "목표 문체를 예시 글에서 가져오므로 대조 대상의 모방 금지와 방향이 다르다"
+        },
+        "mechanism": {
+          "prior": "Biber 다차원 분석으로 목표 문체(와 입력 문체의 차이)를 먼저 서술한 뒤 다시 쓴다",
+          "same": false,
+          "note": "생성 전에 문체 차원을 명시한다는 점만 B안의 축 위치 결정 단계와 같다"
+        },
+        "evaluation": {
+          "prior": "문체 변환 강도와 의미 보존",
+          "same": false,
+          "note": "청자 적합도와 조항 부담은 보지 않는다"
+        },
+        "target": {
+          "prior": "Llama3.2-3B, Llama3.1-8B, 영어 문체 변환 과제",
+          "same": false,
+          "note": "한국어 코딩 에이전트가 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "2차",
+      "route": "검색 결과 요약(원문 미열람)",
+      "adoption": "참고",
+      "bearing": "문체 차원을 먼저 서술하고 쓰는 방식이 다른 프롬프트 방식보다 문체 강도와 의미 보존이 좋았다고 요약되었다. 그래서 B안의 사전 결정 단계를 약하게 지지하지만, 원문을 열지 못해 검증이 필요하다."
+    }
+  ],
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq1",
+  "read": "[\"https://arxiv.org/abs/2406.05035\", \"https://arxiv.org/abs/2605.29278\", \"https://arxiv.org/abs/2605.21086\", \"https://aclanthology.org/2025.gem-1.11/\", \"https://arxiv.org/abs/2510.00177\", \"https://arxiv.org/abs/2402.10962\", \"https://arxiv.org/abs/2411.03422\", \"https://arxiv.org/abs/2606.21981\", \"https://aclanthology.org/2025.sigdial-1.16/\", \"https://arxiv.org/html/2506.12240v1\"]",
+  "saturation": "4",
+  "not_found": "[\"생성 전 결정 단계(계획·추론)를 둔 조건과 지시만 준 조건을 같은 과제에서 비교해 청자 맞춤 어조를 측정한 연구는 찾지 못했다. 가장 가까운 자료는 메타 프롬프트(2406.05035)와 레지스터 분석(2505.00679)이지만, 앞의 자료는 수치 비교가 초록에 없고 뒤의 자료는 원문을 열지 못했다.\", \"문체를 하나로 고정한 조건과 청자별로 조절한 조건을 비교해 입력 문체 모방 정도를 측정한 연구는 찾지 못했다. 검색어 열 개 범위에서 두 조건을 같은 실험에 넣은 자료가 나오지 않았다.\", \"한국어 출력에서 격식·거리·온도·밀도 같은 복수 축을 함께 조절한 연구는 찾지 못했다. 한국어 자료는 높임 등급 단일 축(2605.21086)에 그쳤다.\", \"상시 지침 조항이 늘어날 때 문체 준수율이 어떻게 변하는지를 문체 지침에 한정해 측정한 자료는 찾지 못했다. 주의 한계 일반 연구는 constraints 에서 이미 확인한 자료로 정해져 있어 다시 찾지 않았다.\"]",
+  "disclosures": "[\"열어 본 자료는 모두 초록이나 초록 수준의 페이지였다. 그래서 효과 크기와 실험 세부는 대부분 확인하지 못했다.\", \"레지스터 분석 논문(https://arxiv.org/abs/2505.00679)은 열지 못했다(opened=false). 근거 지도 행의 내용은 검색 결과 요약에 기댄다. 연 URL 2411.03422 는 다른 분야 논문이어서 근거로 쓰지 않았다.\", \"LoCar 의 판정자 일치도 0.69에서 0.94 수치와 PACLIC 2024 의 한국어 공손도 실험 결과는 검색 요약에만 나왔고 원문에서 확인하지 못해 근거로 쓰지 않았다.\", \"과잉 수렴 연구(2605.29278)와 문체 정렬 연구(2025.sigdial-1.16)는 LLM 이 입력 문체를 따라가는 정도에 대해 방향이 다른 결과를 보고한다. 측정 지표가 달라 연구자는 어느 쪽이 맞는지 판정하지 않았다.\", \"issues 의 전이 판단(B안에 실패 원인이 남는지)은 연구자가 초록과 대조 대상 서술을 비교해 추론한 값이며 실험으로 확인하지 않았다.\"]",
+  "principles_applied": "[\"EVIDENCE-FIRST\", \"NO-ASSUME\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"TERM-ONE\", \"WRITTEN-ONLY\", \"FOCUSED\"]",
+  "notes": "탐색 방법으로 짧고 넓은 검색어로 시작해 좁혀 가기와 실패·한계 자료 찾기를 골랐다. 먼저 청자 맞춤 생성, 격식 제어, 계획 후 생성을 넓게 검색했다. 이어서 입력 문체 수렴, 한국어 높임 등급, 가독성 수준 제어, 개인화 실패, 지시 이탈로 좁혔다. intended_use 의 기준(입력 문체 모방 없이 청자에 맞는 어조, 상시 조항 부담)에 따라 입력 문체 수렴과 한국어 높임 등급 자료를 우선했다. 뺀 근거와 사유는 다음과 같다. 계획 후 생성(Plan-then-Generate, 2108.13740)과 blueprint 생성은 데이터-글 변환의 구조 제어라서 청자 어조와 관련이 약해 뺐다. LMStyle 벤치마크와 영일 번역 격식 프롬프트 연구는 검색 요약만 보았고 도구 호출 한도 때문에 열지 못해 뺐다. 개인 맞춤 에이전트 개관(2602.22680)과 지속 페르소나 강화학습(2511.00222)은 열지 않았고 문체 축과 거리가 있어 뺐다. 실무 블로그의 페르소나 이탈 수치(8~12회 뒤 30% 저하)는 1차 출처를 추적하지 못해 뺐다. 체크리스트 중 결말과 전이만 골라 썼다. 더 확인할 자료는 세 가지이다. 첫째, 2406.05035 원문에서 메타 프롬프트와 규칙 기반 프롬프트의 수치 차이를 확인해야 한다. 이 수치가 B안 사전 결정 단계의 효과 크기를 정하기 때문이다. 둘째, 2505.00679 원문을 열어 요약 내용을 검증해야 한다. 셋째, 2605.21086 원문에서 높임 등급별 정확도를 확인해야 한다. 이 정확도가 B안 격식 축의 가동 범위를 정하는 근거이기 때문이다."
+}

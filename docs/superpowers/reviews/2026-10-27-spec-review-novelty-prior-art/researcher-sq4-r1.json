@@ -1,0 +1,313 @@
+{
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq4",
+  "search_status": "ok",
+  "queries": [
+    "LLM novelty assessment research ideas retrieval related work evaluation",
+    "citation verification LLM claim supported by cited source hallucinated references detection",
+    "LLM agent prior art search novelty check before implementation software design",
+    "AI Scientist novelty check Semantic Scholar search LLM idea already exists failure",
+    "OpenScholar retrieval-augmented literature synthesis citation accuracy fabricated citations",
+    "attribution evaluation benchmark LLM judge whether cited passage supports generated statement accuracy",
+    "evaluation of AI Scientist novelty assessment misclassified established concepts as novel keyword literature review",
+    "deep research agents citation faithfulness evaluation claims not supported by cited sources rate",
+    "LLM coding agent search existing libraries before building avoid reinventing solution evaluation"
+  ],
+  "read": "[\"https://arxiv.org/html/2506.22026v1\", \"https://arxiv.org/abs/2602.23452\", \"https://arxiv.org/html/2411.14199v1\", \"https://arxiv.org/html/2503.01508v3\", \"https://ar5iv.labs.arxiv.org/html/2402.15089\", \"https://arxiv.org/pdf/2510.26887\", \"https://arxiv.org/abs/2502.14297\", \"https://arxiv.org/html/2509.04499v1\", \"https://skillselion.com/skills/lingzhi227/claude-research-skills/novelty-assessment\", \"https://tessl.io/registry/jbvc/search-first/quality\", \"https://www.alphaxiv.org/abs/2605.27700\", \"https://preview.aclanthology.org/ingestion-acl-25/2025.acl-long.1574.pdf\"]",
+  "issues": [
+    {
+      "where": "(5) 선행연구 대조의 웹 연구자 서브에이전트 검색 단계",
+      "type": "known-failure",
+      "claim": "대조 대상의 웹 연구자는 일반화된 기술 용어로 만든 검색어로 웹 검색만 실행하고, 임베딩 필터나 축 기준 재정렬 단계를 두지 않는다. 그래서 선행 사례가 검색어와 다른 낱말을 쓰면 놓칠 수 있다는 알려진 실패 원인이 대조 대상에도 남아 있다. 대조 대상은 못 찾음을 독창성의 근거로 쓰지 않으므로 오판으로 이어지지는 않지만, 메커니즘별로 '선행 사례를 찾지 못했다'는 결과의 재현율은 낮을 수 있다.",
+      "prior_claim": "Idea Novelty Checker 논문의 제거 실험에서 키워드 검색만 쓴 구성은 '참신하지 않음' 사례의 정확도가 5.17%였고, 전체 시스템(키워드·스니펫·시드 논문 검색, SPECTER-2 임베딩 필터, 도메인·목적·메커니즘·평가 축 기준 LLM 재정렬)은 89.66%였다.",
+      "consequence": "대조 대상이 '선행 사례를 찾지 못한 메커니즘'으로 분류한 결과에는 검색어 불일치로 놓친 사례가 섞일 수 있다. 사용자가 이 분류를 새로움의 근거로 읽으면 근거 강도를 과대평가한다.",
+      "evidence": "arXiv 2506.22026 본문의 ablation 결과(키워드 전용 5.17%, 스니펫 전용 8.62%, 임베딩 필터 제거 10.34%, 축 기준 재정렬 제거 13.79%, 전체 89.66%). 선행 사례는 과학 아이디어의 참신성 판정이 목적이고 평가 데이터는 67건이므로 목적·적용 대상 축이 대조 대상과 다르다. 검색 단계의 실패 원인만 전이된다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/html/2506.22026v1",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "(5) 선행연구 대조의 인용 추출·판정 에이전트",
+      "type": "known-failure",
+      "claim": "대조 대상은 인용 구절이 주장을 뒷받침하는지를 LLM 판정 에이전트로 가린다. 선행 벤치마크가 보고한 LLM 귀속 판정의 오류 원인(세부 정보 둔감, 판정자와 사람이 본 정보의 불일치)이 대조 대상의 판정 단계에도 남아 있다.",
+      "prior_claim": "AttributionBench 에서 GPT-4 제로샷(사고 연쇄 포함)은 분포 내 macro-F1 73.3, 분포 밖 78.9 였고, 미세조정 모델도 약 78~84 에 그쳤다. 저자들은 약 80% 수준이 실용과 거리가 멀다고 결론 내렸고, 오류의 약 66%를 숫자·날짜·이름 같은 세부 정보 둔감으로, 약 26.8%를 모델과 주석자가 본 정보의 불일치로 분류했다.",
+      "consequence": "대조 대상이 '검증을 통과한 행'으로 보고한 근거에도 귀속 판정 오류가 남을 수 있다. 판정 정확도를 측정하지 않은 상태에서는 통과 행의 신뢰도를 수치로 말할 수 없다.",
+      "evidence": "AttributionBench(Findings ACL 2024, ar5iv 2402.15089) 본문의 결과 표와 오류 분석. 선행 사례는 판정기 자체를 평가하는 벤치마크이고 질의응답 귀속 데이터를 쓰므로 목적·적용 대상 축이 다르다. 대조 대상은 Haiku 추출과 Opus 판정의 2단 구성이라 단일 판정기 결과가 그대로 옮겨지지는 않는다.",
+      "citations": [
+        {
+          "url": "https://ar5iv.labs.arxiv.org/html/2402.15089",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "Idea Novelty Checker (문헌 기반 아이디어 참신성 판정)",
+      "url": "https://arxiv.org/html/2506.22026v1",
+      "axes": {
+        "purpose": {
+          "prior": "연구 아이디어가 기존 문헌 대비 참신한지 이진 판정한다.",
+          "same": false,
+          "note": "대조 대상의 선행연구 대조는 설계 문서의 메커니즘마다 선행 사례와 결말을 찾고 참신함을 채점하지 않는다. 참신성 채점을 목적으로 하는 선행 사례와 목적이 다르다."
+        },
+        "mechanism": {
+          "prior": "LLM 이 만든 검색어와 스니펫 검색으로 후보를 모으고, 임베딩으로 100건을 거른 뒤 도메인·목적·메커니즘·평가 축으로 LLM 재정렬해 10건을 고르고, 전문가 예시를 넣은 LLM 이 판정한다.",
+          "same": false,
+          "note": "목적·메커니즘·평가·적용 대상 축 대조는 대조 대상의 4축 대조와 거의 같다. 그러나 선행 사례는 이 축을 검색 결과 재정렬에 쓰고, 대조 대상은 사례별 근거 지도 행에 쓴다. 인용 구절 검증 단계는 선행 사례에 없다."
+        },
+        "evaluation": {
+          "prior": "전문가 합의 라벨 67건으로 정확도 0.81, kappa 0.59 를 보고하고 AI Scientist 등 기준선과 비교했다.",
+          "same": false,
+          "note": "대조 대상은 사람 라벨과의 일치도를 측정하지 않았다."
+        },
+        "target": {
+          "prior": "자연어로 쓴 과학 연구 아이디어",
+          "same": false,
+          "note": "대조 대상의 적용 대상은 LLM 코딩 에이전트의 설계 문서다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 본문",
+      "adoption": "참고",
+      "bearing": "4축 대조라는 발상은 이미 선행 사례가 있다는 쪽으로 움직인다. 다만 선행 사례는 축을 재정렬 기준으로 쓰므로 근거 지도 행으로 쓰는 용법까지 같다고 볼 수는 없다."
+    },
+    {
+      "case": "AI Scientist 독립 평가 (참신성 검토의 오분류)",
+      "url": "https://arxiv.org/abs/2502.14297",
+      "axes": {
+        "purpose": {
+          "prior": "자율 연구 에이전트의 주장(참신성 검토 포함)을 독립적으로 재현·평가한다.",
+          "same": false,
+          "note": "평가 연구이며 설계 문서 리뷰 기능이 아니다."
+        },
+        "mechanism": {
+          "prior": "평가 대상 시스템은 문헌 검색 뒤 LLM 으로 참신성을 판정한다.",
+          "same": false,
+          "note": "선행 사례는 판정 결과의 오류를 보고할 뿐이며 인용 구절 검증을 다루지 않는다."
+        },
+        "evaluation": {
+          "prior": "확립된 개념(예: SGD 의 마이크로 배칭)을 참신하다고 잘못 분류하는 일이 잦았다고 보고한다.",
+          "same": false,
+          "note": "정성 평가이며 대조 대상에는 같은 평가가 없다."
+        },
+        "target": {
+          "prior": "ML 연구 아이디어",
+          "same": false,
+          "note": "적용 대상이 설계 문서와 다르다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 초록",
+      "adoption": "참고",
+      "bearing": "'못 찾으면 참신'으로 기본값을 두는 설계가 실패했다는 근거다. 못 찾음을 독창성 근거로 쓰지 않는 대조 대상의 가드가 이 실패 원인을 피한다는 쪽으로 움직인다. 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "Relative Neighbor Density (임베딩 밀도 기반 참신성 점수)",
+      "url": "https://arxiv.org/html/2503.01508v3",
+      "axes": {
+        "purpose": {
+          "prior": "아이디어 참신성을 도메인과 무관하게 점수화한다.",
+          "same": false,
+          "note": "대조 대상은 점수화하지 않는다."
+        },
+        "mechanism": {
+          "prior": "약 2,760만 편 초록의 임베딩 공간에서 이웃 밀도의 백분위로 점수를 낸다. LLM+문헌검색 기준선과 비교했다.",
+          "same": false,
+          "note": "LLM 판정 대신 임베딩 통계를 쓴다."
+        },
+        "evaluation": {
+          "prior": "AUROC 로 평가했다. 검색 도구 없는 추론 모델은 약 0.5, 문헌검색을 붙인 Sonnet-3.7 은 NeurIPS 0.813, 혼합 0.597 이었다.",
+          "same": false,
+          "note": "대조 대상에는 이런 정량 평가가 없다."
+        },
+        "target": {
+          "prior": "NeurIPS·Nature Medicine 논문",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 본문",
+      "adoption": "참고",
+      "bearing": "LLM 참신성 판정이 외부 검색 없이는 무작위 수준이고 도메인이 바뀌면 약해진다는 근거다. 웹 검색을 거친 뒤에만 판정하는 대조 대상의 구조를 지지하지만, 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "OpenScholar (검색 증강 문헌 종합과 자기 피드백 인용 점검)",
+      "url": "https://arxiv.org/html/2411.14199v1",
+      "axes": {
+        "purpose": {
+          "prior": "과학 질문에 인용이 달린 문헌 종합 답을 만든다.",
+          "same": false,
+          "note": "대조 대상의 목적은 설계 메커니즘별 선행 사례 대조다."
+        },
+        "mechanism": {
+          "prior": "4,500만 편 데이터스토어에서 구절을 검색하고, 생성 뒤 자기 피드백으로 인용 가치가 있는 문장이 검색 구절로 뒷받침되는지 점검해 인용을 보충한다. 이 점검은 별도 프로그램이 아니라 LM 지시로 실행된다.",
+          "same": false,
+          "note": "인용 지지 점검이라는 구성요소만 같다. 대조 대상은 별도 추출·판정 에이전트를 두고 통과한 것만 보고하는 반면, 선행 사례는 같은 생성기가 스스로 고친다."
+        },
+        "evaluation": {
+          "prior": "Cite-F1(인용 재현율·정밀도)과 전문가 선호로 평가했다. GPT-4o 는 인용한 논문의 78.7%(CS)~94.8%(의생명)가 실재하지 않았고 OpenScholar 는 0% 였다. 귀속 단계를 빼면 Cite-F1 이 39.5 에서 30.6 으로 떨어졌다.",
+          "same": false,
+          "note": "대조 대상은 인용 정확도를 측정하지 않았다."
+        },
+        "target": {
+          "prior": "과학 문헌 질의응답",
+          "same": false,
+          "note": "적용 대상이 설계 문서와 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 본문",
+      "adoption": "참고",
+      "bearing": "인용 지지 점검 단계가 인용 정확도를 높인다는 근거로, 대조 대상의 인용 검증 메커니즘이 이미 있는 발상이라는 쪽으로 움직인다. 검증자를 생성자와 분리한 점은 이 사례와 다르다."
+    },
+    {
+      "case": "AttributionBench (LLM 귀속 판정기 벤치마크)",
+      "url": "https://ar5iv.labs.arxiv.org/html/2402.15089",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 답의 주장이 인용 근거로 뒷받침되는지 판정하는 자동 평가기의 성능을 측정한다.",
+          "same": false,
+          "note": "판정기 벤치마크이며 리뷰 기능이 아니다."
+        },
+        "mechanism": {
+          "prior": "주장과 근거 쌍을 이진 분류한다. 제로샷 LLM 과 미세조정 모델을 비교했다.",
+          "same": false,
+          "note": "대조 대상의 인용 판정 에이전트와 과제는 같지만, 대조 대상은 추출과 판정을 두 모델로 나눈다."
+        },
+        "evaluation": {
+          "prior": "GPT-4 제로샷 macro-F1 은 분포 내 73.3, 분포 밖 78.9 였고, 미세조정 모델은 최고 84.2 였다. 저자는 약 80% 가 실용과 거리가 멀다고 보았다.",
+          "same": false,
+          "note": "대조 대상은 판정 정확도를 측정하지 않았다."
+        },
+        "target": {
+          "prior": "질의응답 귀속 데이터 7종",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "웹 검색 후 ar5iv 본문",
+      "adoption": "참고",
+      "bearing": "LLM 이 인용 지지를 판정하는 메커니즘 자체는 선행 사례가 많고, 그 정확도가 약 80% 에 머문다는 근거다. 대조 대상의 인용 검증을 새롭다고 보기 어렵게 하고, 통과 행의 신뢰도를 낮춰 보게 한다."
+    },
+    {
+      "case": "DeepTRACE (딥리서치 시스템의 인용·근거 감사)",
+      "url": "https://arxiv.org/html/2509.04499v1",
+      "axes": {
+        "purpose": {
+          "prior": "공개 생성형 검색·딥리서치 시스템이 자기 인용으로 뒷받침되지 않는 문장을 얼마나 내는지 감사한다.",
+          "same": false,
+          "note": "외부 시스템 감사가 목적이다."
+        },
+        "mechanism": {
+          "prior": "답을 문장으로 분해하고, 문장×출처 인용 행렬과 LLM 판정자가 만든 사실 지지 행렬을 만든다. 출처 전문을 스크랩해 판정하며 URL 약 15%는 가져오지 못했다.",
+          "same": false,
+          "note": "주장 단위로 출처를 열어 지지 여부를 판정하는 구성요소가 대조 대상의 인용 검증과 같다. 걸러서 보고하는 대신 비율을 측정한다는 점이 다르다."
+        },
+        "evaluation": {
+          "prior": "LLM 판정자의 사실 지지 판정은 사람과 Pearson r=0.62 였다. 딥리서치 구성의 미지지 문장 비율은 12.5%~97.5%, 인용 정확도는 약 40~80% 였다.",
+          "same": false,
+          "note": "대조 대상에는 사람 일치도 측정이 없다."
+        },
+        "target": {
+          "prior": "토론·전문 질의 303건에 대한 9개 공개 시스템의 답",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 본문",
+      "adoption": "참고",
+      "bearing": "웹 연구 에이전트의 인용이 상당 비율로 주장을 뒷받침하지 않는다는 근거로, 대조 대상이 연구자 출력 뒤에 별도 인용 검증을 두는 설계를 지지한다. 판정자의 사람 일치도가 중간 수준이라는 점은 검증 단계의 근거 강도를 낮춘다. 검색 결과에 ICLR 2026 채택으로 나왔으나 학회 페이지는 열지 않았다."
+    },
+    {
+      "case": "CiteAudit (과학 참고문헌 검증 벤치마크와 다중 에이전트 검증기)",
+      "url": "https://arxiv.org/abs/2602.23452",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 시대에 날조되거나 잘못된 참고문헌을 검출한다.",
+          "same": false,
+          "note": "참고문헌 실재·메타데이터 검증이 중심이며, 설계 메커니즘별 선행 사례 대조가 아니다."
+        },
+        "mechanism": {
+          "prior": "메타데이터 추출, 메모리 조회, 웹 검색, 최종 판정의 4단계 다중 에이전트로 검증한다.",
+          "same": false,
+          "note": "추출 에이전트와 판정 에이전트를 나누는 구성은 대조 대상의 인용 추출·판정 분리와 비슷하다. 그러나 초록 기준으로 구절이 주장을 뒷받침하는지보다 참고문헌 실재에 초점이 있다."
+        },
+        "evaluation": {
+          "prior": "사람 검증 데이터셋에서 LLM·상용 도구 대비 우수하다고 보고하며, 기존 자동 검증 도구가 취약하다고 적었다. 초록에 수치는 없다.",
+          "same": false,
+          "note": "대조 대상에는 벤치마크 평가가 없다."
+        },
+        "target": {
+          "prior": "과학 논문의 참고문헌",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 초록",
+      "adoption": "참고",
+      "bearing": "추출과 판정을 분리한 다중 에이전트 인용 검증이 이미 있다는 쪽으로 움직인다. 초록만 열었으므로 구절 지지 판정 여부는 확인하지 못했다."
+    },
+    {
+      "case": "CiteCheck (검색 기반 인용 환각 검출)",
+      "url": "https://www.alphaxiv.org/abs/2605.27700",
+      "axes": {
+        "purpose": {
+          "prior": "인용이 실재 학술 문헌과 대응하고 메타데이터가 정확한지 검출한다.",
+          "same": false,
+          "note": "인용 구절이 주장을 지지하는지는 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "외부 학술 출처에서 후보 문헌을 검색하고 구조화된 LLM 검증기와 보정된 결정 규칙으로 Exact·Minor·Major 라벨을 낸다.",
+          "same": false,
+          "note": "외부 검색 뒤 LLM 판정이라는 구성은 같지만 판정 대상이 메타데이터다."
+        },
+        "evaluation": {
+          "prior": "물리학 인용 982건 벤치마크에서 macro-F1 88.7, 정확도 88.9% 를 자체 보고했다.",
+          "same": false,
+          "note": "대조 대상에는 같은 평가가 없다."
+        },
+        "target": {
+          "prior": "물리학 과학 텍스트의 인용",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "2차",
+      "route": "웹 검색 후 alphaXiv 요약 페이지",
+      "adoption": "참고",
+      "bearing": "환각 인용 검출 메커니즘은 붐비는 연구 주제라는 근거다. 다만 대조 대상은 URL 을 열어 구절 지지를 판정하므로 이 사례와 판정 대상이 다르다."
+    }
+  ],
+  "saturation": "2",
+  "not_found": "[\"소프트웨어 설계 문서(spec·plan)를 대상으로 LLM 에이전트가 선행 사례를 찾아 메커니즘별로 대조하는 기능의 평가 연구는 찾지 못했다. 검색 결과가 과학 아이디어 참신성 판정과 특허 선행기술 검색 상용 도구에 몰렸고, 특허 상용 도구는 하위 질문 범위에서 제외했다.\", \"코딩 에이전트가 구현 전에 기존 라이브러리를 먼저 찾는 커뮤니티 스킬(search-first)은 검색 결과에 나왔으나 해당 페이지가 404 를 반환해 내용을 확인하지 못했다.\", \"커뮤니티 novelty-assessment 스킬 페이지는 열었으나 본문 없이 링크 목록만 있어 동작을 확인하지 못했다.\", \"Denario 프로젝트 논문(arXiv 2510.26887)은 PDF 가 10MB 를 넘어 열지 못했다. 검색 요약에는 반복 검색 뒤 관련 논문이 없으면 '새로움'으로 결론 낸다고 나왔으나 원문으로 확인하지 못했다.\", \"CiteEval(ACL 2025)은 인용 구절만 보는 NLI 판정의 한계를 다룬다고 검색 요약에 나왔으나 링크가 404 여서 확인하지 못했다.\", \"선행 사례를 '사실이 아님'으로 확인한 것이 아니므로, 위 항목들은 대조 대상의 독창성 근거가 아니다.\"]",
+  "disclosures": "[\"arXiv 2602.23452(CiteAudit)와 2502.14297(AI Scientist 평가)은 초록만 열었다. 본문 수치는 확인하지 않았다.\", \"CiteCheck 는 alphaXiv 요약 페이지로만 확인했으므로 source_level 을 2차로 두었다.\", \"DeepTRACE 의 ICLR 2026 채택과 OpenScholar 의 Nature 게재는 검색 결과의 2차 서술이며 학회·저널 페이지를 열지 않았다. 그래서 kind 를 preprint 로 두었다.\", \"열지 못한 출처: tessl.io search-first 페이지(404), ACL Anthology CiteEval PDF(404), arXiv 2510.26887 PDF(용량 초과).\", \"issues 의 전이 판단(검색 재현율 저하, 귀속 판정 오류가 대조 대상에 남는다는 판단)은 선행 결과를 대조 대상 설명에 적용한 derived 추론이다. 대조 대상의 실제 재현율과 판정 정확도는 측정되지 않았다.\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SPECIFIC-NAME\", \"WRITTEN-ONLY\", \"SUBJECT-OBJECT\", \"TERM-ONE\", \"FOCUSED\"]",
+  "notes": "탐색 방법으로 짧고 넓은 검색어로 시작해 좁히기, 후보 메커니즘(참신성 판정, 인용 지지 검증, 환각 인용 검출)마다 사용 사례와 결말 찾기, 실패·평가 자료 찾기(AI Scientist 독립 평가, AttributionBench, DeepTRACE)를 골랐다. intended_use 는 메커니즘별 선행 사례 존재와 근거 강도 판단이므로, 정량 평가가 있는 1차 출처를 우선했다. 특허 선행기술 검색 상용 도구(Patsnap, XLScout)는 하위 질문의 제외 범위라 근거 지도에서 뺐다. constraints 에 따라 LLM 심판의 상관 오류·자기 선호와 체크리스트 기반 리뷰는 다시 찾지 않았다. 메커니즘 (5)의 구성요소별 결과는 아래와 같다. 첫째, 웹 검색 뒤 LLM 이 선행 사례와 대조하는 구성은 과학 아이디어 참신성 판정에서 여러 선행 사례(Idea Novelty Checker, AI Scientist, RND 기준선)가 있다. 둘째, 목적·메커니즘·평가·적용 대상 축으로 선행 사례를 대조하는 발상은 Idea Novelty Checker 의 축 기준 재정렬(도메인·목적·메커니즘·평가)과 거의 같다. 셋째, 인용이 주장을 뒷받침하는지 LLM 으로 판정하는 구성은 OpenScholar 자기 피드백, AttributionBench, DeepTRACE, CiteAudit 로 붐비는 주제다. 넷째, 추출과 판정을 다른 에이전트로 나누고 통과한 행만으로 근거 지도를 다시 만드는 구성, 그리고 '못 찾음을 독창성 근거로 쓰지 않는' 가드를 설계 문서 리뷰에 적용한 사례는 찾지 못했다. 더 확인할 사항으로, CiteEval 원문(인용 구절만 보는 판정의 한계)과 Denario 원문(빈 검색 결과의 기본값 처리)을 열어야 대조 대상의 가드와 판정 범위를 더 정확히 대조할 수 있다."
+}

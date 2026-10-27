@@ -1,0 +1,588 @@
+{
+  "evidence_map": [
+    {
+      "case": "학회 논문 심사 다중 LLM 리뷰어(ReviewerToo)",
+      "url": "https://arxiv.org/abs/2510.08867",
+      "axes": {
+        "purpose": {
+          "prior": "학회 논문 심사를 LLM 리뷰어로 보조한다",
+          "same": false,
+          "note": "채택·기각 판정이 목적이며 설계 문서 결함 수정이 목적이 아니다"
+        },
+        "mechanism": {
+          "prior": "전문화된 리뷰어 페르소나와 구조화된 평가 기준을 쓴다. 초록에는 합치기 방식이 나오지 않는다",
+          "same": false,
+          "note": "역할 분할 리뷰라는 구성요소만 비슷하다. 분할 기준이 실패 유형인지는 초록에서 확인하지 못했다"
+        },
+        "evaluation": {
+          "prior": "ICLR 2025 투고 1,963편에서 채택·기각 분류 정확도 81.8%(인간 평균 83.9%)",
+          "same": false,
+          "note": "판정 정확도이며 지적별 정밀도가 아니다"
+        },
+        "target": {
+          "prior": "과학 논문",
+          "same": false,
+          "note": "설계 문서가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 초록 확인",
+      "adoption": "참고",
+      "bearing": "역할 분할 다중 리뷰어 구조가 다른 문서 종류에서 이미 쓰인다는 근거다. 네 축이 모두 달라 설계 문서 리뷰 메커니즘의 새로움 판단에는 옮겨 쓰기 어렵다."
+    },
+    {
+      "case": "지식 기반 다중 에이전트 요구공학 비전(KGMAF)",
+      "url": "https://arxiv.org/abs/2506.22656",
+      "axes": {
+        "purpose": {
+          "prior": "요구공학의 효율과 정확도를 높인다",
+          "same": false,
+          "note": "문서 생성·관리 전반이 목적이다"
+        },
+        "mechanism": {
+          "prior": "전문화된 에이전트 6개와 산출물 풀",
+          "same": false,
+          "note": "초록은 에이전트 이름과 리뷰어 동작을 적지 않는다"
+        },
+        "evaluation": {
+          "prior": "사례 연구만 있고 수치가 없다",
+          "same": false,
+          "note": "정량 평가가 없다"
+        },
+        "target": {
+          "prior": "요구사항 산출물",
+          "same": false,
+          "note": "에이전트용 spec·plan이 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 초록 확인",
+      "adoption": "해당 없음",
+      "bearing": "네 축이 모두 달라 단독 근거로 쓰지 않는다. iReDev의 전신 비전 논문이라는 맥락만 준다."
+    },
+    {
+      "case": "LLM 지원이 요구사항 검사 정확도를 낮춘 통제 실험",
+      "url": "https://arxiv.org/abs/2608.21298",
+      "axes": {
+        "purpose": {
+          "prior": "요구사항 검사에서 LLM 지원의 효과를 측정한다",
+          "same": false,
+          "note": "사람 검사자 보조가 목적이며 에이전트 자율 리뷰가 아니다"
+        },
+        "mechanism": {
+          "prior": "참가자 34명이 LLM 지원 유무를 바꿔 가며 요구사항 smell을 검사한 교차 실험",
+          "same": false,
+          "note": "다중 리뷰어 분할이 없다"
+        },
+        "evaluation": {
+          "prior": "LLM 지원이 smell 검출 정확도를 낮췄고, 분류와 소요 시간에는 유의한 효과가 없었다",
+          "same": false,
+          "note": "사람의 검출 정확도를 측정했다"
+        },
+        "target": {
+          "prior": "텍스트 요구사항 명세",
+          "same": false,
+          "note": "에이전트용 spec·plan이 아니다"
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 초록 확인",
+      "adoption": "참고",
+      "bearing": "사람에게 올린 LLM 지적이 사람의 판단을 흐릴 수 있다는 근거다. 네 축이 모두 달라 단독 근거로 쓰지 않으며, 사람에게 올리는 지적을 좁히는 처분 규칙과 함께 참고하는 정도로 쓴다."
+    },
+    {
+      "case": "작성자·독립 리뷰어·메타리뷰어 협업 추론(MARS)",
+      "url": "https://arxiv.org/abs/2509.20502",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 추론 품질을 높이면서 비용을 줄인다",
+          "same": false,
+          "note": "문서 리뷰가 아닌 추론 과제 정답률이 목적이다"
+        },
+        "mechanism": {
+          "prior": "리뷰어 에이전트들이 서로 대화하지 않고 독립적으로 판정·의견을 내고, 메타리뷰어가 합쳐 최종 결정과 수정 방향을 정한다",
+          "same": false,
+          "note": "독립 실행 후 합치기라는 구성요소가 대조 대상의 렌즈 독립 실행·지적 합치기와 같다. 실패 유형 분할은 초록에 없다"
+        },
+        "evaluation": {
+          "prior": "다중 에이전트 토론과 같은 정확도를 내면서 토큰과 추론 시간을 약 50% 줄였다",
+          "same": false,
+          "note": "추론 정확도와 비용이며 문서 지적 정밀도가 아니다"
+        },
+        "target": {
+          "prior": "추론 벤치마크 과제",
+          "same": false,
+          "note": "설계 문서가 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 초록 확인",
+      "adoption": "참고",
+      "bearing": "리뷰어 간 대화 없이 독립 실행한 뒤 합치는 구조가 토론보다 비용이 낮고 정확도가 같다는 근거다. 네 축이 모두 달라 단독 근거로 쓰지 않는다. 페르소나가 효과가 없었다는 검색 요약은 초록에서 확인하지 못해 근거로 쓰지 않았다."
+    },
+    {
+      "case": "PR 생성 전 리뷰 증명 요구 스킬",
+      "url": "https://www.skills.sh/troykelly/claude-skills/review-gate",
+      "axes": {
+        "purpose": {
+          "prior": "리뷰 증명 없이는 PR 을 만들지 못하게 한다",
+          "same": false,
+          "note": "산출물 공개 전 리뷰 강제라는 점은 비슷하나 대상 행동이 PR 생성이다"
+        },
+        "mechanism": {
+          "prior": "gh pr create 에 PreToolUse 훅을 적용해 요구 조건이 충족될 때까지 차단한다",
+          "same": false,
+          "note": "Stop 훅이 아니고, 요구하는 증거의 구체 내용은 페이지에서 확인하지 못했다"
+        },
+        "evaluation": {
+          "prior": "평가 자료 없음",
+          "same": false,
+          "note": "비교할 측정이 없다"
+        },
+        "target": {
+          "prior": "코드 PR",
+          "same": false,
+          "note": "설계 문서가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 → 스킬 목록 사이트",
+      "adoption": "참고",
+      "bearing": "'훅으로 리뷰 증거를 요구'하는 패턴이 스킬 생태계에 퍼져 있음을 보여 주지만 축이 모두 달라 단독 근거로 쓰기 어렵다"
+    },
+    {
+      "case": "stop_hook_active 가 같은 턴에서 true 로 바뀌지 않는 결함 보고",
+      "url": "https://github.com/anthropics/claude-code/issues/54360",
+      "axes": {
+        "purpose": {
+          "prior": "검증 리마인더 Stop 훅의 루프 방지",
+          "same": false,
+          "note": "결함 보고이며 리뷰 기능이 아니다"
+        },
+        "mechanism": {
+          "prior": "stop_hook_active 가 true 가 아니면 exit 2 로 차단하는 훅",
+          "same": false,
+          "note": "Stop 차단 구조만 같다"
+        },
+        "evaluation": {
+          "prior": "Claude Code 2.1.121 에서 재현 보고, 2026-05-30 '계획 없음'으로 닫힘",
+          "same": false,
+          "note": "단일 사용자 보고"
+        },
+        "target": {
+          "prior": "일반 검증 리마인더",
+          "same": false,
+          "note": "설계 문서가 아니다"
+        }
+      },
+      "outcome": "실패",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "웹 검색 → 이슈 트래커",
+      "adoption": "참고",
+      "bearing": "루프 방지를 플래그에만 맡기면 위험하다는 근거로, 대조 대상에 차단 횟수 제한이나 센티널이 있는지 확인하게 한다"
+    },
+    {
+      "case": "Stop 훅 {ok:false} 반복으로 세션 한도 소진(약 50분)",
+      "url": "https://claudeissues.com/issue/55754-bug-stop-hook-returning-ok-false-causes-infinite-loop-until-session-limit-consum",
+      "axes": {
+        "purpose": {
+          "prior": "작업 완료 판정 Stop 훅",
+          "same": false,
+          "note": "결함 보고"
+        },
+        "mechanism": {
+          "prior": "백그라운드 서브에이전트를 기다리는 동안 텍스트 응답마다 미완료로 판정돼 강제 턴이 반복됨",
+          "same": false,
+          "note": "서브에이전트 완료를 기다리는 Stop 차단이라는 점은 대조 대상 (1)·(2)의 조합과 비슷하다"
+        },
+        "evaluation": {
+          "prior": "약 50분 루프로 세션 할당량 소진",
+          "same": false,
+          "note": "단일 사례 보고"
+        },
+        "target": {
+          "prior": "비동기 다중 턴 작업",
+          "same": false,
+          "note": "설계 문서가 아니다"
+        }
+      },
+      "outcome": "실패",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "웹 검색 → 이슈 미러 사이트(원 이슈는 중복으로 닫힘)",
+      "adoption": "참고",
+      "bearing": "렌즈 서브에이전트를 백그라운드로 실행하는 동안 Stop 게이트가 차단하면 같은 루프가 생길 수 있다는 점검 항목을 준다"
+    },
+    {
+      "case": "에이전트의 가드레일 우회와 규칙 약화",
+      "url": "https://stevekinney.com/courses/self-testing-ai-agents/making-it-hard-to-cheat-the-guardrails",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트가 가드레일을 속이지 못하게 하는 설계 지침",
+          "same": false,
+          "note": "지침 자료"
+        },
+        "mechanism": {
+          "prior": "로컬 훅은 우회 가능하므로 CI·병합 규칙을 권한으로 삼는다",
+          "same": false,
+          "note": "대조 대상은 로컬 훅만으로 강제한다"
+        },
+        "evaluation": {
+          "prior": "사례 서술, 측정 없음",
+          "same": false,
+          "note": "평가 자료 없음"
+        },
+        "target": {
+          "prior": "커밋 훅과 CI",
+          "same": false,
+          "note": "설계 문서가 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "웹 검색 → 강의 자료",
+      "adoption": "참고",
+      "bearing": "대조 대상의 마커와 훅 설정을 에이전트가 쓸 수 있는지 확인해야 한다는 근거가 된다"
+    },
+    {
+      "case": "LLM 에이전트의 SAST 거짓 양성 거르기 비교 연구",
+      "url": "https://arxiv.org/html/2601.22952v1",
+      "axes": {
+        "purpose": {
+          "prior": "정적 분석 경보에서 거짓 양성을 걸러 소음을 줄인다.",
+          "same": false,
+          "note": "대조 대상의 구성요소 중 틀린 지적 거르기 단계와만 목적이 같다. 대조 대상 전체는 설계 문서 리뷰 자동화다."
+        },
+        "mechanism": {
+          "prior": "에이전트가 경보 하나마다 코드베이스를 읽고 실제 취약점인지 판정한다.",
+          "same": false,
+          "note": "판정자가 근거를 직접 탐색한다는 점은 비슷하나, 여러 렌즈 지적을 합친 뒤 거르는 구조는 없다."
+        },
+        "evaluation": {
+          "prior": "라벨된 벤치마크에서 잔여 거짓 양성 비율과 실제 취약점 놓침 비율을 함께 측정했다.",
+          "same": false,
+          "note": "대조 대상이 거르기의 놓침 비율을 측정했다는 정보는 입력에 없다."
+        },
+        "target": {
+          "prior": "SAST 도구 경보와 소스 코드다.",
+          "same": false,
+          "note": "설계 문서 리뷰 지적과 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 후 arXiv 본문 열람",
+      "adoption": "참고",
+      "bearing": "거짓 양성 거르기라는 메커니즘에는 선행 사례가 있다. 그래서 거르기 단계 자체는 새롭다고 보기 어렵고, 놓침 비율 22%라는 실패 근거가 강하다. 축이 모두 달라 수치를 그대로 옮겨 쓰기는 어렵다."
+    },
+    {
+      "case": "CiteCheck (검색 기반 인용 환각 검출)",
+      "url": "https://www.alphaxiv.org/abs/2605.27700",
+      "axes": {
+        "purpose": {
+          "prior": "인용이 실재 학술 문헌과 대응하고 메타데이터가 정확한지 검출한다.",
+          "same": false,
+          "note": "인용 구절이 주장을 지지하는지는 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "외부 학술 출처에서 후보 문헌을 검색하고 구조화된 LLM 검증기와 보정된 결정 규칙으로 Exact·Minor·Major 라벨을 낸다.",
+          "same": false,
+          "note": "외부 검색 뒤 LLM 판정이라는 구성은 같지만 판정 대상이 메타데이터다."
+        },
+        "evaluation": {
+          "prior": "물리학 인용 982건 벤치마크에서 macro-F1 88.7, 정확도 88.9% 를 자체 보고했다.",
+          "same": false,
+          "note": "대조 대상에는 같은 평가가 없다."
+        },
+        "target": {
+          "prior": "물리학 과학 텍스트의 인용",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "2차",
+      "route": "웹 검색 후 alphaXiv 요약 페이지",
+      "adoption": "참고",
+      "bearing": "환각 인용 검출 메커니즘은 붐비는 연구 주제라는 근거다. 다만 대조 대상은 URL 을 열어 구절 지지를 판정하므로 이 사례와 판정 대상이 다르다."
+    },
+    {
+      "case": "ADR 불변 관행(채택 후 고치지 않고 새 기록으로 대체)",
+      "url": "https://systems-playbook.pages.dev/concepts/architecture-decision-records/",
+      "axes": {
+        "purpose": {
+          "prior": "결정 이력과 사고 변화의 추적을 보존한다",
+          "same": false,
+          "note": "대조 대상의 봉인 목적(리뷰 기록 보존)과 가깝지만, 대조 대상은 리뷰 게이트 전체의 일부이며 이 사례는 기록 보존만 다룬다"
+        },
+        "mechanism": {
+          "prior": "고치지 않고 대체 기록을 새로 쓰는 관행이며, 강제 수단은 기술되어 있지 않다",
+          "same": false,
+          "note": "대조 대상은 읽기 전용 속성·거부 훅·문서 대조 검사로 기술적으로 강제한다"
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "효과 측정이 없다"
+        },
+        "target": {
+          "prior": "사람이 쓰는 아키텍처 결정 기록",
+          "same": false,
+          "note": "대조 대상은 LLM 에이전트가 만든 리뷰 기록과 결정 기록이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "웹 검색 → 개념 정리 페이지",
+      "adoption": "참고",
+      "bearing": "'커밋된 기록은 고치지 않고 새로 쓴다'는 규범 자체는 ADR 관행으로 이미 존재한다. 그래서 메커니즘 (4)의 새로움은 규범이 아닌 기술적 강제 방식에서만 찾을 수 있다."
+    },
+    {
+      "case": "AI 에이전트 행동의 추가 전용 감사 기록(FastAPI 구현 글)",
+      "url": "https://dev.to/codemalasartes/an-immutable-audit-trail-for-ai-agent-actions-fastapi-async-sqlalchemy-4m4c",
+      "axes": {
+        "purpose": {
+          "prior": "AI 에이전트 행동을 고칠 수 없는 감사 기록으로 남긴다",
+          "same": false,
+          "note": "대조 대상은 행동 로그가 아닌 리뷰 결과 문서를 보존한다"
+        },
+        "mechanism": {
+          "prior": "append 하나만 노출하는 모듈과 관행·코드 리뷰로 추가 전용을 지키며, 해시 체인은 아직 연결되지 않았다",
+          "same": false,
+          "note": "대조 대상은 파일 속성·훅·검사 스크립트로 강제한다"
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "측정 없음"
+        },
+        "target": {
+          "prior": "에이전트 행동 이벤트를 저장하는 DB 테이블",
+          "same": false,
+          "note": "대조 대상은 git 저장소의 마크다운 기록이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "웹 검색",
+      "adoption": "참고",
+      "bearing": "에이전트 감사 기록에서도 추가 전용이 관행과 리뷰에 기대는 사례가 있다. 이 사례는 기술적 강제를 둔 대조 대상이 이 사례보다 한 단계 강한 강제임을 보여 주지만 새로움의 근거로 쓰기는 어렵다."
+    },
+    {
+      "case": "ralon — 에이전트 프로세스에 보호 경로를 커널 수준 읽기 전용으로 적용",
+      "url": "https://docs.rs/crate/ralon/0.1.4",
+      "axes": {
+        "purpose": {
+          "prior": "AI 코딩 에이전트가 지정한 경로를 고치지 못하게 한다",
+          "same": false,
+          "note": "목적은 대조 대상 봉인과 같으나, 대조 대상 전체(리뷰 게이트)와 비교하면 봉인 구성요소 하나와만 같다"
+        },
+        "mechanism": {
+          "prior": "agent.lock 목록의 경로를 에이전트와 자식 프로세스 전체에 커널 수준 읽기 전용으로 만들고, 훅은 보조 수단으로 둔다",
+          "same": false,
+          "note": "대조 대상은 파일 속성과 Write·Edit 거부 훅이며 셸 경로는 사후 검사로 탐지한다"
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "측정 없음"
+        },
+        "target": {
+          "prior": "임의의 보호 경로(설정·비밀 등)",
+          "same": false,
+          "note": "대조 대상은 커밋된 리뷰·결정 기록이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 → 크레이트 문서",
+      "adoption": "참고",
+      "bearing": "에이전트가 파일을 고치지 못하게 하는 도구가 이미 존재하고, 훅만으로는 우회된다는 실패 원인도 문서화되어 있다. 이 사례는 메커니즘 (4)의 '에이전트 쓰기 차단' 구성요소를 새롭다고 보기 어렵게 한다."
+    },
+    {
+      "case": "file-guard — 보호 파일 수정을 거부하는 PreToolUse 훅",
+      "url": "https://dev.to/boucle2026/how-to-protect-your-env-from-claude-code-28f8",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트가 .env 같은 보호 파일을 고치지 못하게 한다",
+          "same": false,
+          "note": "봉인 구성요소와만 목적이 같다"
+        },
+        "mechanism": {
+          "prior": "Write·Edit·Bash 호출을 실행 전에 가로채 경로 패턴과 대조하고, Bash 는 rm·mv·리다이렉션·chmod 같은 연산자를 검사한다",
+          "same": false,
+          "note": "대조 대상 훅은 Write|Edit 만 다루고 Bash 는 다루지 않는다. 이 사례는 Bash 까지 덮는다"
+        },
+        "evaluation": {
+          "prior": "평가 없음",
+          "same": false,
+          "note": "측정 없음"
+        },
+        "target": {
+          "prior": "비밀·설정 파일",
+          "same": false,
+          "note": "대조 대상은 리뷰 기록이다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "웹 검색",
+      "adoption": "참고",
+      "bearing": "같은 하네스에서 보호 파일 수정 거부 훅이 공개되어 있다. 그래서 훅 거부 자체는 선행 사례가 있는 메커니즘이며, 대조 대상만의 요소는 '커밋된 리뷰 기록에 세션 시작마다 봉인을 적용하는 범위 지정'과 '사후 문서 대조 검사와의 결합'으로 좁혀진다."
+    },
+    {
+      "case": "Architecture Without Architects — AI 코딩 에이전트의 암묵적 아키텍처 결정(arXiv 2604.04990)",
+      "url": "https://arxiv.org/abs/2604.04990",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트가 내리는 암묵적 아키텍처 결정을 거버넌스 아래로 가져온다",
+          "same": false,
+          "note": "대조 대상의 봉인은 기록 보존이고, 이 논문은 결정의 가시화를 다룬다"
+        },
+        "mechanism": {
+          "prior": "리뷰 관행·결정 기록·도구를 개략적으로 제안한다",
+          "same": false,
+          "note": "초록 수준에서 기록의 불변이나 봉인은 언급되지 않는다"
+        },
+        "evaluation": {
+          "prior": "프롬프트 문구만 바꿔도 구조가 다른 시스템이 나온다는 시연",
+          "same": false,
+          "note": "기록 보존 평가는 없다"
+        },
+        "target": {
+          "prior": "AI 코딩 에이전트의 아키텍처 결정",
+          "same": false,
+          "note": "에이전트 결정이라는 대상은 가깝지만 리뷰 기록은 아니다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 초록(본문 PDF 는 해독 실패)",
+      "adoption": "참고",
+      "bearing": "에이전트 결정에 결정 기록이 필요하다는 주장은 학계에도 있으나, 기록을 커밋 후 봉인하는 메커니즘의 선행 사례로는 쓰기 어렵다."
+    }
+  ],
+  "conclusions": [
+    {
+      "text": "통과한 행 15개는 모두 네 축(목적·메커니즘·평가·적용 대상)이 대조 대상과 다르다. 그래서 스펙 검토 기능 전체와 같은 선행 사례는 통과 행에서 확인되지 않았다. 다만 이 결과는 검증을 통과한 행의 범위 안에서 찾지 못했다는 뜻이며, 선행 사례가 존재하지 않는다는 근거로 쓸 수 없다. 아래 결론은 모두 구성요소 하나와만 비슷한 사례를 여러 개 묶어 판단했으므로 근거 강도는 약하다.",
+      "refs": [
+        "sq1#case#2",
+        "sq1#case#9",
+        "sq2#case#4",
+        "sq3#case#0",
+        "sq4#case#7",
+        "sq5#case#6"
+      ],
+      "supports": "전체 기능의 새로움 판단은 보류한다"
+    },
+    {
+      "text": "메커니즘 (1) 훅 게이트에서 '훅으로 리뷰 증거를 요구하고 충족될 때까지 행동을 차단한다'는 패턴은 선행 사례가 있다. 그 사례는 PR 생성 명령에 PreToolUse 훅을 적용한 스킬이다. 그러나 그 스킬은 대상 행동이 PR 생성이고 적용 대상이 코드 PR 이며 평가 자료가 없다. 그래서 설계 문서 쓰기를 감지해 Stop 훅으로 턴 종료를 차단하는 조합의 직접 선행 사례는 통과 행에 없다. Stop 차단 구조를 쓰는 사례로는 결함 보고 두 건만 통과했고, 두 건 모두 리뷰 기능이 아니다.",
+      "refs": [
+        "sq2#case#4",
+        "sq2#case#6",
+        "sq2#case#7"
+      ],
+      "supports": "메커니즘 (1)은 패턴 수준에서 선행 사례가 있다"
+    },
+    {
+      "text": "메커니즘 (1)에는 Stop 훅의 알려진 실패 원인이 옮겨 올 수 있다. stop_hook_active 플래그가 같은 턴에서 true 로 바뀌지 않는다는 결함 보고가 있다. 또한 백그라운드 서브에이전트를 기다리는 동안 Stop 훅이 미완료 판정을 반복해 약 50분 동안 세션 할당량을 소진한 보고가 있다. 두 건은 모두 단일 사용자 보고이고 리뷰 기능이 아니므로 축이 다르다. 그러나 대조 대상은 렌즈 서브에이전트(메커니즘 (2))를 기다리며 Stop 게이트가 차단하는 구조이므로, 사용자가 차단 횟수 제한이나 별도 센티널이 있는지 확인할 근거가 된다. 이 확인 결과는 입력에 없으므로 대조 대상에 같은 결함이 있는지는 가정이다.",
+      "refs": [
+        "sq2#case#6",
+        "sq2#case#7"
+      ],
+      "supports": "메커니즘 (1)의 루프 방지 설계를 점검한다"
+    },
+    {
+      "text": "메커니즘 (1)과 (4)는 로컬 훅에 기대는데, 로컬 훅은 에이전트가 우회할 수 있다는 지침과 도구 문서가 있다. 강의 자료는 커밋 훅과 CI 를 대상으로 하고, 크레이트 문서는 임의 보호 경로를 커널 수준에서 읽기 전용으로 만들며 훅을 보조 수단으로 둔다. 두 사례는 적용 대상이 리뷰 기록이 아니어서 축이 다르다. 그래서 이 근거는 새로움 판단에 쓰기보다, 사용자가 리뷰 완료 마커와 훅 설정을 에이전트가 직접 쓸 수 있는지 확인하게 하는 점검 근거로 쓴다.",
+      "refs": [
+        "sq2#case#9",
+        "sq5#case#5"
+      ],
+      "supports": "메커니즘 (1)·(4)의 우회 가능성을 점검한다"
+    },
+    {
+      "text": "메커니즘 (2) 독립 렌즈에서 '역할을 나눈 여러 LLM 리뷰어'와 '리뷰어끼리 대화하지 않고 독립 실행한 뒤 합치기'는 다른 분야에 선행 사례가 있다. ReviewerToo 는 과학 논문 심사에서 전문화된 리뷰어 페르소나를 쓰고, MARS 는 추론 과제에서 독립 리뷰어와 메타리뷰어 구조로 토론과 같은 정확도를 내며 토큰과 시간을 약 50% 줄였다고 보고했다. 그러나 두 사례는 목적·평가·적용 대상이 모두 다르고, 리뷰어를 실패 유형(근거·정합성·적대·계약 적합)으로 나눴는지는 초록에서 확인되지 않았다. 따라서 실패 유형별 분할과 실행 전 렌즈별 주입 지식·점검 목록 작성은 통과 행에서 선행 사례를 찾지 못한 구성요소다. 근거는 preprint 초록 수준이라 강도가 약하다.",
+      "refs": [
+        "sq1#case#2",
+        "sq1#case#9",
+        "sq1#case#4"
+      ],
+      "supports": "메커니즘 (2)는 독립 실행·합치기는 선행 사례가 있고 실패 유형별 분할은 선행 사례를 찾지 못했다"
+    },
+    {
+      "text": "메커니즘 (3) 처분 규칙 중 '합친 지적에서 틀린 지적을 거르기'는 선행 사례가 있다. SAST 경보의 거짓 양성을 LLM 에이전트가 거르는 비교 연구가 있고, 이 연구는 거르기 과정에서 실제 취약점 놓침 비율(행 기록상 22%)을 함께 측정했다. MARS 의 메타리뷰어도 독립 리뷰 결과를 합쳐 최종 결정과 수정 방향을 정한다. 두 사례 모두 적용 대상이 설계 문서 지적이 아니어서 수치를 그대로 옮기기는 어렵다. 그러나 거르기 단계에 놓침 위험이 있다는 실패 근거는 상대적으로 강하며, 대조 대상이 놓침 비율을 측정했다는 정보는 입력에 없다.",
+      "refs": [
+        "sq3#case#0",
+        "sq1#case#9"
+      ],
+      "supports": "메커니즘 (3)의 거르기 단계는 새롭다고 보기 어렵다"
+    },
+    {
+      "text": "메커니즘 (3) 중 '비가역·가치판단·수정 방향 분기만 사람에게 올리고 나머지는 자동 수정한다'는 규칙과 '기능이 바뀐 절만 재리뷰한다'는 규칙의 선행 사례는 통과 행에서 찾지 못했다. 관련 근거로는 사람 검사자에게 LLM 지원을 주자 요구사항 smell 검출 정확도가 낮아진 통제 실험과, 거르기의 놓침 비율을 측정한 SAST 연구가 있다. 두 사례는 축이 모두 다르므로 규칙의 선행 사례가 되지 못한다. 다만 사람에게 올리는 LLM 지적을 줄이는 방향과, 자동 처리 쪽으로 넘긴 지적에 놓침이 생길 수 있다는 위험을 함께 보여 준다.",
+      "refs": [
+        "sq1#case#7",
+        "sq3#case#0"
+      ],
+      "supports": "메커니즘 (3)의 상향 규칙과 부분 재리뷰는 선행 사례를 찾지 못했다"
+    },
+    {
+      "text": "메커니즘 (4) 기록 봉인에서 '커밋된 기록은 고치지 않고 새 기록으로 대체한다'는 규범은 ADR 관행으로 이미 있다. 에이전트가 지정 경로를 고치지 못하게 하는 기술도 이미 있다. ralon 은 커널 수준 읽기 전용을 적용하고, file-guard 는 같은 하네스에서 Write·Edit·Bash 호출을 가로채 보호 파일 수정을 거부한다. 에이전트 행동 감사 기록을 추가 전용으로 두는 구현 글도 있으나 그 글은 관행과 코드 리뷰로만 지킨다. 그래서 규범과 쓰기 차단 기술은 새롭다고 보기 어렵다. 대조 대상만의 요소로 남는 구성은 커밋된 리뷰·결정 기록에 세션 시작마다 봉인을 적용하는 범위 지정과 사후 문서 대조 검사의 결합이다. 또한 file-guard 는 Bash 까지 검사하지만 대조 대상 훅은 Write·Edit 만 다루므로, 이 차이는 대조 대상의 차단 범위가 선행 사례보다 좁다는 근거다.",
+      "refs": [
+        "sq5#case#0",
+        "sq5#case#5",
+        "sq5#case#6",
+        "sq5#case#4"
+      ],
+      "supports": "메커니즘 (4)는 범위 지정과 사후 검사 결합만 선행 사례를 찾지 못했다"
+    },
+    {
+      "text": "에이전트 결정에 결정 기록이 필요하다는 주장은 학계에도 있다. 그러나 해당 논문 초록은 기록의 불변이나 봉인을 언급하지 않고, ADR 관행도 강제 수단을 기술하지 않는다. 두 사례 모두 축이 달라, 에이전트가 만든 리뷰 기록을 커밋 후 봉인하는 메커니즘의 직접 선행 사례로는 쓸 수 없다.",
+      "refs": [
+        "sq5#case#9",
+        "sq5#case#0"
+      ],
+      "supports": "메커니즘 (4)의 직접 선행 사례는 찾지 못했다"
+    },
+    {
+      "text": "메커니즘 (5) 선행연구 대조에서 '외부 검색 뒤 LLM 이 인용을 판정한다'는 구성은 선행 사례가 있다. CiteCheck 는 물리학 인용 982건에서 macro-F1 88.7 을 자체 보고했으며, 판정 대상은 인용의 실재와 메타데이터 정확성이다. SAST 거짓 양성 연구도 판정자가 근거를 직접 읽고 지적 하나마다 판정하는 구조를 보인다. 두 사례 모두 인용 구절이 주장을 뒷받침하는지를 판정하지 않으므로, 대조 대상의 구절 지지 판정과 판정 대상이 다르다. 따라서 인용 구절의 주장 지지를 검증한 지적만 보고하는 구성은 통과 행에서 직접 선행 사례를 찾지 못했다. CiteCheck 행은 2차 출처인 요약 페이지에서 확인되어 근거 강도가 약하다.",
+      "refs": [
+        "sq4#case#7",
+        "sq3#case#0"
+      ],
+      "supports": "메커니즘 (5)는 인용 검증 일반은 붐비는 주제이고 구절 지지 판정은 선행 사례를 찾지 못했다"
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "STATE-ASSUME",
+    "SPECIFIC-NAME",
+    "TERM-ONE",
+    "WRITTEN-ONLY",
+    "SUBJECT-OBJECT",
+    "KEEP-CONNECT",
+    "ANTI-LIMIT",
+    "ONE-IDEA",
+    "BOTTOM-LINE",
+    "INSTRUCTION-FORM"
+  ]
+}

@@ -1,0 +1,1041 @@
+[
+  {
+    "url": "https://arxiv.org/abs/2605.21086",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2605.21086",
+      "judgments": [
+        {
+          "ref": "sq1#issue#0",
+          "verdict": "supported",
+          "quote": "fine-grained Korean honorific control remains unstable in current LLMs",
+          "reason": "추출: '불안정' 보고는 원문 구절 'remains unstable'로 뒷받침되고, '따로 평가해야 한다'는 결론은 context 의 'must be explicitly evaluated' 구절로 뒷받침된다. 두 구절 모두 WebFetch 요약 응답에서 옮긴 것이며 초록 전문의 원문 대조는 하지 못했다. / 판정: 구절은 높임 등급 제어가 불안정하다고 적는다. 맥락의 'precise speech-level realization must be explicitly evaluated in localization settings'는 현지화 환경에서 따로 평가해야 한다는 결론과 같다. 주장은 차량 비서 평가 연구의 범위를 넘지 않는다."
+        },
+        {
+          "ref": "sq1#case#5",
+          "verdict": "verify_failed",
+          "quote": "Because Korean honorific realization is morphologically encoded, we apply sentence-level suffix checking to detect explicit mismatches with the configured target register. This step functions as a high-precision constraint filter, while contextual LLM reasoning remains responsible for evaluating broader dialogue KPIs.",
+          "reason": "추출: 사례 이름과 결과 '실패'는 원문 구절 'remains unstable'로 뒷받침된다. prior 의 목적과 대상은 초록 구절로 확인되었다. 제어 지정 방식은 초록에 없다는 서술과 맞고, 평가 방법(LLM 판정자·규칙 기반 어미 검사)은 초록 요약에 없어 확인하지 못했다. 이 부분은 PDF 본문 확인이 필요하다. / 판정: 결과 '실패'는 높임 등급 제어가 불안정하다는 구절과 맞고, 목적도 맥락의 framework 문장과 맞는다. 그러나 이 URL의 구절과 맥락에는 LLM 판정자와 규칙 기반 어미 검사라는 평가 방법이 없다. / 보충: 원문 본문 3.3.1절의 구절이 LLM 판정자(contextual LLM reasoning)와 문장 단위 어미 검사(sentence-level suffix checking)를 함께 평가 방법으로 밝히므로 누락된 요소가 채워진다. 초록에는 이 내용이 없고 본문 PDF에 있다. / 재판정: 구절은 목표 등급과 대조하는 문장 단위 어미 검사와 LLM 추론의 병행을 적어 평가 방식과 일치한다. 그러나 구절과 맥락에는 판정자 보정 결과만 있고, 평가 대상 모델이 실패했다는 결말 문장은 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://aclanthology.org/2025.gem-1.11/",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://aclanthology.org/2025.gem-1.11/",
+      "judgments": [
+        {
+          "ref": "sq1#issue#1",
+          "verdict": "supported",
+          "quote": "We find that explanations are adaptable to such instruction, though the observed distinction between readability levels does not fully match the defined complexity scores according to traditional readability metrics.",
+          "reason": "추출: 원문 초록이 지시에 따른 적응성, 기존 가독성 지표와의 불완전한 일치를 함께 보고하며, 중간 수준 복잡도 보고는 다음 문장에 있다. / 판정: 같은 URL의 맥락에 sixth grade·college 수준 지시가 있다. 구절의 'adaptable … though … does not fully match'와 맥락의 'tend to feature medium level complexity'가 주장의 방향과 같다."
+        },
+        {
+          "ref": "sq1#case#3",
+          "verdict": "verify_failed",
+          "quote": "As a perturbation test, we investigate how large language models (LLMs) perform rationale generation under the effects of readability level control, i.e., being prompted for an explanation targeting a specific expertise level, such as sixth grade or college.",
+          "reason": "추출: 목적·목표 수준 지시 방식·기존 가독성 지표와 자동 품질 지표·사람 평가가 원문에 있으나, 대상 언어(영어)는 원문에 명시되지 않아 확인하지 못했다. / 판정: 목표 수준 지시 방식과 가독성 지표·자동 지표·사람 평가는 맥락에서 확인된다. 결과는 지시에 반응하지만 지표와 완전히 맞지 않는 혼합 결과라 '판정 못 함'과 맞는다. 그러나 대상 언어가 영어라는 문장은 없다. / 보충: 구절은 읽기 수준 지시에 따른 설명 생성이라는 사례와 목표 수준 지시 방법을 담지만, 대상 언어가 영어라는 명시는 원문에서 찾지 못해 보충 요소를 채우지 못했다. / 재판정: 6학년~대학 수준 지시는 구절과 같다. 그러나 자동 품질 지표·사람 평가·영어 대상은 구절과 맥락에 없다. 맥락의 '지시에 적응하나 가독성 지표와 완전히 맞지는 않는다'는 엇갈린 결과이므로 '판정 못 함'과 상충하지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-AGREE",
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2510.00177",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2510.00177",
+      "judgments": [
+        {
+          "ref": "sq1#issue#2",
+          "verdict": "supported",
+          "quote": "Evaluation of 21 frontier models across 10 tasks reveals / 29.0% of naive personalization attempts produce worse preference alignment than generic responses / generic responses also fail to serve individual user needs",
+          "reason": "추출: 논문 제목과 저자가 일치하고, 원문 초록에서 21개 모델·10개 과제 시험, 단순 개인화 시도 29.0%가 일반 응답보다 선호 정합도가 낮았다는 문장, 일반 응답이 개인 필요를 채우지 못한다는 문장을 확인했다. 세 구절은 도구가 옮긴 초록 발췌이며 연속된 원문 문장인지는 확인되지 않았다. 수치와 방향의 일치 여부는 판정 에이전트가 판단한다. / 판정: 구절에 21개 모델과 10개 과제, 29.0%가 일반 응답보다 정합도가 낮다는 비교가 있다. 일반 응답도 개인 필요를 채우지 못한다는 문장도 구절에 그대로 있다."
+        },
+        {
+          "ref": "sq1#case#6",
+          "verdict": "supported",
+          "quote": "strategically elicit preference values through questioning",
+          "reason": "추출: 제목과 저자가 일치하고, 초록에서 모델이 질문으로 선호 값을 끌어낸다는 기제와 PrefAlign 루브릭 지표, 정적 벤치마크를 대화형 개인화 과제로 바꾼다는 대상을 확인했다. 목적 요소는 원문에 명시되지 않아 가장 가까운 문장을 context 에 옮겼다. 사례 결말 '실패'는 issue#2 의 발췌가 뒷받침하며 판정은 판정 에이전트가 한다. / 판정: 질문으로 선호를 끌어내는 방식, cold-start로 이력이 없는 조건, PrefAlign 지표, 정적 벤치마크를 바꾼 과제가 맥락에 있다. 같은 URL 발췌의 29.0% 결과는 '실패'와 맞는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2605.29278",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2605.29278",
+      "judgments": [
+        {
+          "ref": "sq1#issue#3",
+          "verdict": "supported",
+          "quote": "LLMs significantly overconverge toward their users on both function word and open-class features across eight languages",
+          "reason": "추출: 논문 페이지에서 8개 언어에 걸친 LLM 과잉 수렴(기능어·open-class 특성 양쪽)과 사람 수렴이 사람 사이 기준선과 비슷하다는 구절을 확인함. 다만 원문은 '내용어'가 아니라 'open-class features'라고 쓰며, 사람 수렴 구절은 하나의 문장에 함께 있지 않아 인용문은 과잉 수렴 문장만 옮겼음. / 판정: WildChat, 8개 언어, 기능어와 open-class 양쪽의 유의한 과잉 수렴이 구절과 맥락에 있다. 사람의 수렴이 human-human 기준선과 비슷하다는 문장도 맥락에 있다."
+        },
+        {
+          "ref": "sq1#case#1",
+          "verdict": "supported",
+          "quote": "LLMs significantly overconverge toward their users on both function word and open-class features across eight languages",
+          "reason": "추출: 논문이 case 의 사례와 같고, 8개 언어 과잉 수렴 구절과 WildChat 실제 ChatGPT 대화 코퍼스 사용 구절이 확인됨. 비대칭 수렴 지표와 사람과 LLM 사이 수렴 측정 목적은 초록 앞뒤 문장에서 확인됨. 원문에서 확인되지 않은 요소는 '제어 없이 관측'이라는 조건이며, '범용 챗봇'이라는 표현은 원문에 없고 ChatGPT 대화 기록이라는 설명만 있음. / 판정: 실제 ChatGPT 대화 기록에 비대칭 수렴 지표를 적용했다는 문장과 8개 언어 조건이 맥락에 있다. 관측 연구이므로 '판정 못 함'과 충돌하지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2406.05035",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2406.05035",
+      "judgments": [
+        {
+          "ref": "sq1#case#0",
+          "verdict": "verify_failed",
+          "quote": "language models can generate prompts that result in explanations more precisely aligned with the target situations",
+          "reason": "추출: 원문이 비교하는 프롬프트 세 방식(규칙 기반, 메타 프롬프트, 예시 학습)은 주장의 mechanism 과 일치하지만, 주장의 SBE 데이터셋은 인접한 문장 'we collect a benchmarking dataset, Situation-Based Explanation.' 에 있고, 사람이 쓴 참조 설명은 점수 계산에 쓴다고만 적혀 '비교한다'는 표현이 없으며, 영어 설명문은 가져온 구절에서 확인되지 않아 이 세 요소는 quote 로 뒷받침되지 않는다. / 판정: 구절은 프롬프트 방식 세 범주만 확인한다. 맥락의 발견 문장은 'not a necessary prompt technique', 'can't improve'처럼 부정 표현을 포함해 '성공'을 뒷받침하지 않는다. 청중 유형 수, 평가 방식, 대상도 구절에 없다. / 보충: 결론 구절은 원문에 있어 성공 결과를 뒷받침하지만, 한 구절에 주장의 요소가 모두 들어 있지 않다. 청중 세 유형과 사람 작성 설명은 다른 문장에 있고, 영어는 원문에 없으며, 모델 크기는 'varying sizes'로만 적혀 수치 범위가 없다. 인용 구절은 WebFetch 요약 모델이 옮긴 것이므로 arXiv 원문과 글자 단위로 대조하지 못했다. / 재판정: 청중 세 유형, 사람이 쓴 참조 설명, 여러 크기 모델은 맥락에 있다. 그러나 규칙 기반 프롬프트와 영어 대상은 확인되지 않는다. 모델이 쓴 프롬프트가 목표 상황에 더 정확히 맞는다는 구절은 성공 결말과 일치하고, 주장은 모든 방식의 성공을 말하지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SPECIFIC-NAME",
+        "ASYNC-FIRST"
+      ]
+    }
+  },
+  {
+    "url": "https://aclanthology.org/2025.sigdial-1.16/",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://aclanthology.org/2025.sigdial-1.16/",
+      "judgments": [
+        {
+          "ref": "sq1#case#2",
+          "verdict": "supported",
+          "quote": "Utilizing embedding-based measures of linguistic similarity, we find that LLM-generated answers",
+          "reason": "추출: 원문 초록이 사람과 LLM 답의 의미 정렬과 문체 정렬을 질문-답 쌍에서 비교한다고 적어 목적과 평가 축은 뒷받침되지만, 임베딩 기반 측정과 \"각각 계산\"은 초록 인용이 조각으로만 확인되고 데이터의 세부(규모·출처)는 초록에 없어 전체 구절로 확정하지 못했다. / 판정: 질문-답 쌍에서 의미 정렬과 문체 정렬을 대조한다는 구절과, 사람 답과 LLM 답을 비교한다는 맥락은 목적과 맞는다. 그러나 임베딩을 쓴다는 계산 방법은 구절에 없다. / 보충: 접속이 되고 제목·저자·학회가 주장이 가리키는 사례와 일치한다. 초록에 임베딩 기반 언어 유사도 측정이라는 방법 서술이 있어 요청한 요소의 방법 부분은 원문 구절로 뒷받침된다. 다만 인용 문장에는 의미 유사도와 문체 유사도가 명시되지 않고, 임베딩 모델과 계산 절차는 본문 PDF에서만 확인할 수 있어 확보하지 못했다. / 재판정: 임베딩 기반 유사도 측정과 의미·문체 유사도의 구분은 구절과 맥락 조각에 있다. 주장은 결말을 판정 못 함으로 두어 방향을 단정하지 않으며, 대상 세부도 초록에 없다고 한정했다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "SUBJECT-OBJECT",
+        "TERM-ONE",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2606.21981",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2606.21981",
+      "judgments": [
+        {
+          "ref": "sq1#case#4",
+          "verdict": "verify_failed",
+          "quote": "Our framework integrates controlled prompting, automatic readability prediction using a validated Taha-19 model, lexical constraint validation, and syntactic complexity profiling.",
+          "reason": "추출: 접속과 제목·저자 확인이 되었고, 구절은 구조화된 프롬프트(CEFR 지정과 어휘 제약)가 기준 언어 프로파일과 가장 높게 일치한다는 결과를 담는다. 다만 주장의 '수준 지시 없음' 조건과 '구문 제약' 프롬프트 조건, 평가 방법 세 가지(가독성 예측·어휘 제약 검증·구문 복잡도 프로파일)는 이 구절에 없고, 초록의 평가 방법 문장은 'Our framework integrates controlled prompting, automatic readability prediction using a validated Taha-19 model, lexical constraint validation, and syntactic complexity profiling.' 형태로 따로 있다. 구절은 본문 전체가 아니라 초록 기준의 근거다. / 판정: 구조화 프롬프트가 CEFR 정렬을 크게 높였고 어휘 제약을 둔 조건이 가장 높았다는 문장은 '성공'과 맞는다. 그러나 주장이 든 평가 도구 세 가지는 구절에 없다. 수준 지시 없음 조건도 확인되지 않았다. / 보충: 제목·저자·학회가 주장의 사례(CEFR 수준 통제 아랍어 생성의 다차원 평가)와 일치하고, 평가 도구 세 가지가 든 초록 문장이 확인되나, 그 문장은 도구가 준 두 조각(\"...Taha-19 model,\" 과 \"lexical constraint validation, and syntactic complexity profiling.\")을 이어 붙인 것이라 원문 한 문장의 글자 그대로인지는 직접 확인하지 못했다. 수준 지시 없음 조건은 원문에서 명시되지 않고 \"unconstrained prompting\" 에서 추론한 것이다. / 재판정: 가독성 예측·어휘 제약 검증·구문 복잡도 평가는 구절과 같고, 제약 없는 프롬프트 조건도 맥락에 있다. 그러나 맥락은 제약 없는 조건의 약한 통제만 적고, 다른 조건의 성공을 밝힌 주절은 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2402.10962",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2402.10962",
+      "judgments": [
+        {
+          "ref": "sq1#case#7",
+          "verdict": "verify_failed",
+          "quote": "we reveal a significant instruction drift within eight rounds of conversations.",
+          "reason": "추출: 초록이 self-chat 으로 지시 안정성을 측정하고 여덟 회차 안에서 지시 이탈(drift)을 확인했다고 밝혀 회차에 따른 지시 이탈 측정 주장을 뒷받침한다. 주장의 나머지 요소인 split-softmax 제안과 LLaMA2-chat-70B·GPT-3.5 대상은 다른 초록 문장으로 확인됐지만 한 문장에 함께 있지 않다. 회차별 지시 준수 정도 평가 방식은 초록에서 확인되지 않아 보충 대상이다. / 판정: 8회 대화 안의 유의한 지시 이탈, 자기 대화 방식, LLaMA2-chat-70B와 GPT-3.5는 확인된다. 그러나 split-softmax와 회차별 준수 평가 방식은 구절과 맥락에 없다. / 보충: 원문 초록에서 회차에 따른 지시 드리프트 관찰 구절은 확인했으나, 그 구절에는 split-softmax 제안과 회차별 준수 정도 평가가 없고 본문 PDF 를 열지 못해 이 두 요소는 확인하지 못했다. / 재판정: 8회차 이내의 유의한 지시 이탈과 LLaMA2-chat-70B·GPT-3.5, split-softmax 제안은 구절과 맥락에 있다. 그러나 자기 대화 방식과 회차별 준수 평가는 확인되지 않는다. 지시 이탈은 실패 결말과 일치한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2506.12240v1",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2506.12240v1",
+      "judgments": [
+        {
+          "ref": "sq1#case#8",
+          "verdict": "unsupported",
+          "quote": "LLaMA3's Spearman rank correlation improves dramatically from 0.01 in zero-shot to 0.92 in few-shot",
+          "reason": "추출: 원문이 LLaMA3 few-shot 의 Spearman 0.92 를 명시하고 기준을 LIME 으로 밝히며 56명 사용자 연구와 구조 품질 결과도 보고하지만, 인용 구절은 웹 요약 도구가 옮긴 조각이라 원문과 글자 단위로 대조하지 못했다(STATE-ASSUME). / 판정: LIME 기준, 56명 사용자 연구, 혼합된 구조 품질은 확인되므로 '판정 못 함'과 맞는다. 그러나 구절의 0.92는 LLaMA3 소수 예시에 한정되고, Mistral은 0.74이다. 주장은 이 값을 소수 예시 전체의 값처럼 적었다. JSON 출력 형식도 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2505.00679",
+    "subquestions": [
+      "sq1"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2505.00679",
+      "judgments": [
+        {
+          "ref": "sq1#case#9",
+          "verdict": "verify_failed",
+          "quote": "To address the above challenges, we propose prompting LLMs to analyze exemplars' style using Biber's multidimensional register analysis (MDA) framework.",
+          "reason": "추출: 사례(레지스터 분석 기반 LLM 문체 변환)와 제목·주제가 일치하고 원문이 열리나, 한 문장에 목적·메커니즘·평가·대상 요소가 모두 있지 않고 영어 실험을 명시한 문장은 원문에서 찾지 못했다. / 판정: Biber MDA로 문체를 분석하는 방식, 입력과 목표 문체의 대조, 두 Llama 모델이 확인된다. 의미 보존의 큰 향상과 문체 변환 강도의 동등 이상 결과는 '성공'과 맞는다. 그러나 영어라는 조건은 찾지 못했다. / 보충: 원문은 Biber 다차원 레지스터 분석으로 예시 문체를 분석하게 하는 방법을 제안하고 입력·목표 문체의 대비 여부를 비교 실험한다고 확인되나, 실험 언어가 영어라고 명시한 문장은 본문과 부록 A–F 전체에서 찾지 못해 missing 요소가 확인되지 않았다. / 재판정: Biber MDA 로 문체를 분석하는 프롬프트와 입력·목표 대비 탐색은 구절과 맥락에 있다. 그러나 평가 지표, 모델 이름, 결과 문장은 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "ASYNC-FIRST",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/pdf/2605.21086",
+    "subquestions": [
+      "sq2",
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/pdf/2605.21086",
+      "judgments": [
+        {
+          "ref": "sq2#issue#0",
+          "verdict": "verify_failed",
+          "quote": "Models frequently conflate haeyo and hapsyo, despite both encoding politeness.",
+          "reason": "추출: 0.69에서 0.94로의 일치율 변화와 문장 단위 종결어미 검사의 선행 배치는 원문 3.3.1절과 3.3.2절에 있다. 다만 'LLM 판정자만으로는 구분하지 못했다'에 대응하는 원문 'LLM-only judges struggled to reliably distinguish between closely related Korean honorific forms'는 '안정적으로 구분하기 어려웠다'는 정도로 적혀 있어 주장의 강도와 다르고, 11개 모델 지정 실험은 4.1절에, 해요체와 합쇼체 혼동은 4.3절에 따로 있다. / 판정: 11개 모델과 세 등급 지정은 같은 URL의 맥락에서 확인되고, 0.69에서 0.94로 오른 수치는 구절과 같다. 그러나 맥락의 'systematic confusion'은 LLM 판정자의 혼동을 말한다. 응답 모델이 두 등급을 혼동했다는 문장은 없다. / 보충: 원문 4.3절이 해요체와 합쇼체 혼동을 보고하고 3.3.1절 'Under this hybrid architecture, human–judge agreement for honorific classification improved from 0.69 (LLM-only) to 0.94 (+24 percentage points).' 이 일치율 상승을 보고해 두 요소가 원문에 있으나, 한 구절에 모델 수와 지정 말투와 혼동 결과가 함께 담기지 않아 혼동 결과 문장만 옮겼다. / 재판정: 11개 모델, 지정 말투 지시, 해요체·합쇼체 혼동은 이 URL 의 구절과 맥락에 있다. 그러나 0.69→0.94 수치는 이 URL 원소에 없다. 판정자 보정 때 같은 혼동이 있었다는 맥락은 LLM 판정자 단독의 구분 실패와 같은 방향이다."
+        },
+        {
+          "ref": "sq2#case#0",
+          "verdict": "verify_failed",
+          "quote": "We demonstrate that fine-grained honorific control remains unstable in current LLMs, which often fail to maintain fixed speech levels required for automotive settings.",
+          "reason": "추출: 사례의 평가 항목인 0.69에서 0.94로의 일치율 상승은 원문 3.3.1절과 일치하고, 기전인 보조 LLM의 문장 분할과 지정 수준 대조는 3.3.2절 'Responses are segmented into sentences using an auxiliary LLM (GPT-4o-mini), and each sentence is verified against the configured target honorific level (hae/haeyo/hapsyo).'에 있으나 한 구절에는 함께 들어 있지 않다. / 판정: 0.69에서 0.94로 오른 일치율과 혼합 판정 구조는 구절과 같다. 그러나 보조 LLM의 문장 분할과 준수율 값은 없다. 구절과 맥락은 판정자의 혼동만 적고, 모델의 실패는 적지 않아 '실패'를 판정할 근거가 없다. / 보충: 서론의 이 문장이 응답 모델이 지정 말투 수준을 자주 지키지 못한다고 밝혀 방향 요소를 뒷받침하고, 보조 LLM 문장 분할 단계는 3.3.2절에 따로 있어 한 구절에 함께 있지 않다. / 재판정: 보조 LLM 문장 분할과 지정 수준 대조, 11개 모델은 같은 URL 원소의 맥락에 있다. 그러나 0.69→0.94 수치는 이 원소에 없다. 고정 말투 수준 유지에 자주 실패한다는 구절은 실패 결말과 일치하고, 차량 환경 한정도 같다."
+        },
+        {
+          "ref": "sq3#issue#2",
+          "verdict": "verify_failed",
+          "quote": "Across models, fine-grained honorific control remains inconsistent despite generally high compliance with polite speech.",
+          "reason": "추출: 0.69에서 0.94로의 상승과 문장별 어미 검사를 더한 혼합 판정은 원문 3.3.1절에 있다. '공손함은 대체로 지켰으나 세부 등급 통제가 불안정했다'는 4.2절 'Across models, fine-grained honorific control remains inconsistent despite generally high compliance with polite speech.'에, '해요체와 합쇼체를 자주 섞었다'는 4.3절 'Models frequently conflate haeyo and hapsyo, despite both encoding politeness.'에 있다. 'LLM 판정자만으로는 구분하지 못했다'는 원문 'struggled to reliably distinguish'의 강도와 차이가 있다. / 판정: 11개 모델, 세 등급 지정, 0.69에서 0.94는 같은 URL의 구절과 맥락에 있다. 그러나 공손함 유지와 모델의 등급 혼용은 구절에 없다. 맥락의 혼동은 LLM 판정자에 관한 문장이다. / 보충: 원문 4.2절 문장이 공손함은 대체로 지켰으나 세부 존대 통제가 불안정하다고 밝혀 첫째 방향 요소를 뒷받침하고, 해요체와 합쇼체를 섞었다는 둘째 방향 요소는 4.3절의 다른 문장에 있어 한 구절에 함께 있지 않다. / 재판정: 공손함은 대체로 지키나 세부 존대 통제가 일관되지 않다는 구절과 해요체·합쇼체 혼동 문장은 주장과 같은 방향이다. 그러나 0.69→0.94 수치는 이 URL 원소에 없다."
+        },
+        {
+          "ref": "sq3#case#6",
+          "verdict": "verify_failed",
+          "quote": "We demonstrate that fine-grained honorific control remains unstable in current LLMs, which often fail to maintain fixed speech levels required for automotive settings.",
+          "reason": "추출: 국내외 LLM 11개와 턴마다 해·해요·합쇼 중 하나를 지정하는 설정은 원문 4.1절에 있다(다만 원문은 다중 턴 데이터에서 대화마다 목표 턴 하나를 무작위로 고른다고 적는다). 문장별 어미 검사와 LLM 판정자 다수결은 3.3.2절과 3.3.1절에, 이진 판정은 3.3.1절에 있으며, 이 셋은 한 구절에 함께 들어 있지 않다. / 판정: 한국 개발 6개를 포함한 11개 모델과 시험 사례마다 세 등급 중 하나를 무작위로 지정한 조건은 확인된다. 그러나 다수결 판정과 이진 판정은 없다. '실패'를 받칠 모델 결과 문장도 없다. / 보충: 서론의 이 문장이 응답 모델의 지정 말투 준수 실패를 보고해 방향 요소를 뒷받침하고, 다수결과 이진 판정 방식은 3.3.2절의 다른 문장에 있어 이 구절에는 없다. / 재판정: 세 LLM 판정자의 다수결, 이진 판정, 사람 주석 기준 보정, 국내외 11개 모델은 같은 URL 원소의 맥락에 있다. 그러나 턴마다 등급을 지정한다는 조건은 확인되지 않는다. 존대 통제가 불안정하다는 구절은 실패 결말과 일치한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "NO-SQUEEZE",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "TERM-ONE",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/pdf/2510.15558",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://arxiv.org/pdf/2510.15558",
+      "judgments": [
+        {
+          "ref": "sq2#case#1",
+          "verdict": "unsupported",
+          "quote": "gpt-4o-2024-05-13 89.35 90.74 89.81 91.20 90.27 61.42 64.97 65.48 65.98 64.46",
+          "reason": "추출: 논문 제목과 저자가 주장의 KITE 사례와 일치하고 존댓말·반말 전환 과제를 설명하는 문장을 찾았으나, PDF 본문은 해독되지 않아 HTML 판 요약 응답에서 옮긴 문장이라 원문 그대로임은 보장되지 않으며, GPT-4o 64.46·90.27 은 문장이 아니라 표 2 행의 Avg 열에 있고 존댓말 과제 단독 점수는 찾지 못했다(수치 판정은 판정 에이전트 몫). / 판정: 구절은 공손 수준 사이의 전환 능력을 평가한다는 과제 설명만 확인한다. 과제 수, 점수, 모델 수, 판정 방식은 구절과 맥락에 없다. 결과 수치가 없으므로 '판정 못 함'과 충돌하지 않는다. / 보충: PDF 본문은 WebFetch 로 읽히지 않아 같은 arXiv 번호(2510.15558v1)의 HTML 본문에서 구절을 얻었다. 표 2 머리글은 KITE General 과 KITE Korean 각각의 Avg. 열이며 gpt-4o 행의 90.27(General Avg.)과 64.46(Korean Avg.)이 주장의 두 수치와 맞는다. 다만 한 문장에 과제 4종, 두 점수, 모델 7종, 규칙 기반 판정이 모두 들어 있지 않아 가장 가까운 표 행을 옮겼다. 과제 4종은 'four distinct instructions that are tailored to these features'(3.3절, 첫 판정에서 확인), 존댓말 전환은 'This instruction assesses the model's proficiency in switching between different levels of politeness'(3.3절)로 뒷받침된다. 모델 7종은 명시 문장이 없고 4.2절 나열 모델 7개(gpt-3.5-turbo-0125, gpt-4o-2024-05-13, Llama 3 8B Instruct, Gemma 7b Instruct, SOLAR 1 Mini Chat, HyperCLOVA X 003, EEVE v1.0 10.8b Instruct)와 표 2의 7행으로 확인된다. 규칙 기반 판정은 4.3절 'This rule-based checking ensures each part of a multi-part instruction is addressed correctly.'로 뒷받침된다. 존댓말 과제만의 점수는 논문에 보고되지 않는다(표 2는 한국어 4과제 전체 평균만 보고). / 재판정: GPT-4o 의 90.27과 64.46은 표의 행에 있으나, 열 머리가 없어 두 값이 일반 과제 평균과 한국어 과제 평균인지 구절의 글만으로 확정할 수 없다. 주장은 결말을 판정 못 함으로 두고 존댓말 과제 점수가 없다고 한정했다. / 판정 불가: numbers_conditions=표·그림 값"
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "ASYNC-FIRST",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SPECIFIC-NAME",
+        "NO-AGREE"
+      ]
+    }
+  },
+  {
+    "url": "https://aclanthology.org/2026.scil-main.35/",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://aclanthology.org/2026.scil-main.35/",
+      "judgments": [
+        {
+          "ref": "sq2#case#2",
+          "verdict": "supported",
+          "quote": "However, models consistently favored overt honorific marking regardless of the subject’s social status,",
+          "reason": "추출: 초록 요약에 모델이 주어의 사회적 지위와 무관하게 높임 표지를 일관되게 선호했다는 평가 문장과 표면 휴리스틱 해석이 있어 평가 요소를 뒷받침한다. 확률 비교 방법은 초록에 명시되지 않고(\"as less expected\" 표현만 있음), 모델 이름과 모델 수도 초록에 없다. fetch 도구가 인용 길이 제한을 이유로 초록 전문을 주지 않아 구절은 도구가 돌려준 문장을 옮긴 것이다. / 판정: 구절은 모델이 주어의 지위와 무관하게 높임 표지를 일관되게 선호했다고 적는다. 맥락에는 사회화용 제약을 완전히 익히지 못했다는 부정과 실제 화용 지식 대신 표면 휴리스틱에 기댄다는 비교가 있어 '실패'와 맞는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2607.26015",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2607.26015",
+      "judgments": [
+        {
+          "ref": "sq2#case#3",
+          "verdict": "verify_failed",
+          "quote": "across sixteen open-weight Llama and Gemma models (1B-70B, pretrained and instruction-tuned)",
+          "reason": "추출: 원문 초록이 열리고 논문 주제가 claim 의 사례와 일치한다. 사람 응답과의 비교 구절은 있으나, 8쌍 전체에 관한 문장은 사전학습 모델과의 비교이고 어휘·의미 유사도 비교는 탐색적 분석으로 표시돼 있어 claim 의 평가 문장 전체를 한 구절이 뒷받침하지 않는다. 인용문은 WebFetch 요약 결과이므로 원문과 글자 단위로 대조하지 못했다. / 판정: 구절은 지시 조정 모델 각각이 실제 사람 응답보다 직전 차례와 더 많이 겹쳤다고 적으므로 방향이 같다. 어휘·의미 유사도도 맥락의 탐색적 분석 문장과 같다. 다만 16종이라는 모델 수와 Llama·Gemma 라는 이름은 구절과 맥락에 없다. / 보충: 원문 초록이 16종 모델과 Llama·Gemma 계열을 명시하므로 모델 수와 계열은 뒷받침된다. 모델 이름은 본문 표 2에 Llama-3.1-70B-PT, Llama-3.2-1B-IT, Gemma-3-27B-IT 등 16개가 나열되어 있다고 확인되지만, 이 이름들은 초록 구절과 같은 문장에 없고 도구가 옮긴 목록이라 원문 문장으로는 검증하지 못했다. 초록 문장 전체는 도구 출력이 잘려서 조각만 옮겼다. / 재판정: Llama·Gemma 16종(사전학습·지시 조정)은 구절과 같다. 그러나 맥락의 비교 문장은 무관한 사람 발화와 비교한 결과이고, 실제 사람 응답과의 비교와 8쌍·어휘·의미 유사도 결과는 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "ASYNC-FIRST"
+      ]
+    }
+  },
+  {
+    "url": "https://iwslt.org/2023/formality",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://iwslt.org/2023/formality",
+      "judgments": [
+        {
+          "ref": "sq2#case#4",
+          "verdict": "verify_failed",
+          "quote": "that uses a multilingual formality classifier to label a system-generated hypothesis as formal or informal.",
+          "reason": "추출: 페이지가 IWSLT 2023 격식 통제 공동과제 페이지로 확인되고, 평가 방식(구 단위 격식 표지 기반 M-Acc와 다국어 격식 분류기 기반 참조 없는 변형)과 EN-KO·EN-VI 대상 언어가 원문으로 확인되며 한국어 지도 설정(학습 데이터 제공)도 요약 응답에서 확인되었으나, 목표 격식을 모델 입력으로 주는 mechanism 요소는 원문 구절을 찾지 못해 판정 에이전트가 보충 호출로 확인해야 한다. / 판정: 구절에서 참조 번역의 구 단위 격식 표지로 격식·비격식·중립을 분류하는 M-Acc 를 확인했다. 그러나 분류기 방식과 한국어 지도 설정은 원문 문장으로 확인되지 않았다. / 보충: 다국어 격식 분류기 평가 방식은 원문 Evaluation 절의 한 문장으로 확인되지만, 한국어 지도 설정은 같은 구절에 없고 원문 Description 절 'For this year, we focus on Korean and Vietnamese in the supervised setting'에 따로 있어 한 구절에 두 요소가 함께 들어가지 않는다. 요약 도구가 문장을 말줄임하거나 표현을 달리 옮긴 기록이 있어(첫 조회의 'we focus on Korean and Vietnamese in the supervised setting' 과 Language pairs 절의 'The following language pairs will be evaluated in the supervised setting' 이 서로 다름) 원문 문장의 글자 그대로는 직접 대조하지 못했다. / 재판정: 다국어 격식 분류기 방식과 목표 격식 일치 비율은 구절과 맥락에 있다. 그러나 참조 기반 분류 방식과 한국어 지도 설정은 없다. 주장은 결말을 단정하지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "FULL-SENTENCE",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "TERM-ONE",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://aclanthology.org/2024.lrec-main.870.pdf",
+    "subquestions": [
+      "sq2"
+    ],
+    "output": {
+      "url": "https://aclanthology.org/2024.lrec-main.870.pdf",
+      "judgments": [
+        {
+          "ref": "sq2#case#5",
+          "verdict": "unsupported",
+          "quote": "",
+          "reason": "추출: PDF 본문이 압축 스트림에 있어 텍스트를 해독하지 못했으므로, 목적·기법·평가·대상 가운데 뒷받침하는 원문 구절을 하나도 옮길 수 없다. 제목과 저자는 메타데이터로 확인했다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2402.10962v1",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2402.10962v1",
+      "judgments": [
+        {
+          "ref": "sq3#issue#0",
+          "verdict": "unsupported",
+          "quote": "Testing popular models like LLaMA2-chat-70B, we reveal a significant persona drift within eight rounds of conversations.",
+          "reason": "추출: 인용 문장은 LLaMA2-chat-70B 의 8라운드 내 유의한 표류만 뒷받침하고, 대문자·JSON·프랑스어 지시 예시(부록 표의 프롬프트로만 확인됨), 상대 봇 페르소나 추종('Surprisingly, the agent LM even gradually adopts the persona of the user LM over extended rounds of conversation,' 문장), SPR·split-softmax 비교 문장은 이 구절에 없다. 인용문은 WebFetch 변환 텍스트에서 옮긴 것이다. / 판정: 구절은 LLaMA2-chat-70B 가 8라운드 안에 유의한 페르소나 표류를 보였다는 부분만 뒷받침한다. 페르소나 유형, 상대 봇 추종, SPR 과 split-softmax 비교는 구절과 맥락에 없다. / 보충: 서지와 8라운드 표류 문장이 원문과 일치하지만, 주장의 나머지 요소는 해당 문장에 없어 context에 옮겼다. 원문은 split-softmax가 SPR과 '성능'을 맞춘다고 적고, 대문자·JSON 지시는 본문 범주가 아니라 부록 표에 있다. / 재판정: 8라운드 이내 표류, 상대 봇 페르소나 추종, SPR 의 후반 강세와 컨텍스트 소모, 대문자·JSON·프랑스어 페르소나는 맥락에 있다. 그러나 원문의 'match performance' 를 안정성으로 읽을지 정할 수 없다. 6.3절은 비슷한 MMLU 하락에서 안정성을 비교하라고만 적는다. / 판정 불가: numbers_conditions=언어 해석"
+        },
+        {
+          "ref": "sq3#case#4",
+          "verdict": "supported",
+          "quote": "We propose a quantitative benchmark to test this assumption, evaluating persona stability via self-chats between two personalized chatbots.",
+          "reason": "추출: 인용 문장은 split-softmax 의 결과(그림 5 캡션)이고, 측정 방법은 \"The persona measure function can be Python code that calls a library to determine the confidence that a reply is in French.\" 문장(가능 표현 can be)에, gpt-3.5-turbo-16k 는 \"To see how close-source model compares with LLaMA2-70B-chat, we test gpt-3.5-turbo-16k\" 문장에, 라운드별 준수율과 MMLU 저하의 교환은 \"As expected, we do see an inverse relationship between performance and persona stability in all three of our methods\" 문장에 나뉘어 있으며, 프로브 질문 절차는 확인하지 못했다. / 판정: 구절은 split-softmax 가 같은 성능 저하에서 같거나 더 높은 안정성을 낸다고 적어 '성공'과 교환 평가에 맞는다. 메커니즘의 세부와 대상 모델 이름은 구절과 맥락에 없다. / 보충: 측정 방식과 split-softmax 통제, 대상 모델이 논문과 일치한다. 다만 SPR·CFG는 초록이 아닌 6.1절 Baseline Methods에 있고, '결정적 파이썬 판정'의 '결정적'은 원문에서 확인하지 못했다. / 재판정: 자기 대화 N=8, 프로브 질문, 파이썬 함수 판정, CFG·SPR 기준선과 split-softmax, 성능 하락과 안정성의 교환, 두 대상 모델은 맥락에 있다. 파이썬 함수 판정을 결정적 판정으로 읽었다. split-softmax 가 더 나은 교환을 보인다는 문장은 성공 결말과 일치한다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "NO-MIRROR",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "ASYNC-FIRST",
+        "NO-SQUEEZE",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2408.10943v1",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2408.10943v1",
+      "judgments": [
+        {
+          "ref": "sq3#issue#1",
+          "verdict": "unsupported",
+          "quote": "Our dataset contains 500 system messages from various domains, each paired with 5 turns of user conversations",
+          "reason": "추출: 사례 논문 제목과 저자가 원문과 일치하고 500개 메시지×5턴 구성을 원문에서 확인했으나, 학회 게재는 이 페이지로 확인하지 못했고 나머지 수치는 본문이 아닌 표나 다른 문장에서 찾았다. / 판정: 500개×5턴과 Qwen2-7B 81.0%·43.3% 는 원문과 같다. 그러나 GPT-4o 84.8%·33.7% 는 Table 4 에만 있어 글로 확인할 수 없다. 주의 분석의 근거는 오픈소스 모델 3개의 대표 세션 하나인데, 주장은 이 결과를 모델 일반의 경향으로 넓혔다. / 판정 불가: numbers_conditions=표·그림 값"
+        },
+        {
+          "ref": "sq3#case#5",
+          "verdict": "unsupported",
+          "quote": "Our dataset contains 500 system messages from various domains, each paired with 5 turns of user conversations",
+          "reason": "추출: 사례 논문과 메커니즘 대부분(500×5, 여섯 제약, 체크리스트 LLM 판정, SSR, Claude-3.5)은 원문에서 확인했으나, 평가 지표 '제약 위반'과 '지시 오판'은 원문에서 지표명으로 찾지 못했다. / 판정: 500개×5턴, 제약 유형 여섯 가지, 체크리스트 기반 LLM 판정, SSR, Claude-3.5 는 원문과 같다. 그러나 원문 지표는 CSR·ISR·SSR 인데, 주장은 '제약 위반'·'지시 오판'으로 지표 이름을 다르게 적었다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "INSTRUCTION-FORM",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2508.03276v2",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2508.03276v2",
+      "judgments": [
+        {
+          "ref": "sq3#case#0",
+          "verdict": "verify_failed",
+          "quote": "models significantly outscore the random baseline in 81.25%, 100%, and 85.42% of cases for Utterance Length, PROPN overlap, and Token Novelty, respectively",
+          "reason": "추출: 논문 제목·저자·arXiv 식별자가 주장의 사례와 대응하고 인용 구절이 모델의 문체 수렴과 사람 기준선 대비 과잉 수렴을 뒷받침하지만, WebFetch 가 요약한 인용이라 문장 단위 원문 대조는 완전하지 않으며 Gemma·Llama·16개 모델 구성은 이 인용문에 함께 담기지 않는다. / 판정: 모델이 대화 문체에 강하게 수렴한다는 구절, 16개 모델, 사람 발화 교체 방식, 영어 대화 코퍼스는 원문과 같다. 모델 이름, 문체 특징 목록, 기준선은 원문 구절로 확인되지 않았다. / 보충: 이 구절은 무작위 발화 기준선과 발화 길이·PROPN overlap·Token Novelty 세 지표를 담아 주장의 기준선과 측정 특징을 뒷받침하지만, 모델 이름(Gemma 3·Llama 3)과 LIWC 기능어가 한 문장에 없어 주장의 모든 요소를 담지 못한다. 모델명은 §4 Models 단락(\"We consider two open-source LLM families: Gemma 3 ...\"), LIWC 기능어는 §3.1(\"the frequency of LIWC (Linguistic Inquiry and Word Count) function word classes\")에 따로 있다. 인용 문장은 WebFetch 요약 응답에서 얻은 것이라 원문과 글자 단위로 대조하지 못했다. / 재판정: 발화 길이·고유명사 중복·토큰 신규성·LIWC 범주와 무작위 기준선 비교는 구절과 맥락에 있다. 그러나 모델 이름·개수와 대화 자료 종류는 없다. 주장은 결말을 판정 못 함으로 두어 방향이 상충하지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://www.alphaxiv.org/abs/2605.29278",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://www.alphaxiv.org/abs/2605.29278",
+      "judgments": [
+        {
+          "ref": "sq3#case#1",
+          "verdict": "supported",
+          "quote": "we find that while LLMs significantly overconverge toward their users on both function word and open-class features across eight languages, human convergence rates in this setting are broadly consistent with human-human baselines.",
+          "reason": "추출: 논문 제목과 저자, WildChat·8개 언어·비대칭 수렴 지표 등 사례의 식별 요소가 원문과 맞아 '일치'로 판정한다. 구절은 8개 언어, 기능어·개방 품사, 인간-인간 기준선을 담지만 WildChat 과 실사용 대화의 목적은 인접 문장에 있다. 또 두 페이지 응답이 원문 문장을 요약해 옮겨 구절이 원문과 글자 단위로 같은지 확인하지 못했다. / 판정: WildChat, 8개 언어, 기능어·개방 품사 특징, 사람-사람 기준선 비교가 구절과 맥락에 모두 있다. 주장은 결론 방향을 따로 단정하지 않으므로 'in this setting' 한정과도 충돌하지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://aclanthology.org/2025.sigdial-1.16",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://aclanthology.org/2025.sigdial-1.16",
+      "judgments": [
+        {
+          "ref": "sq3#case#2",
+          "verdict": "supported",
+          "quote": "LLM-generated answers demonstrate higher semantic similarity reflecting close conceptual alignment with the input questions, but relatively lower stylistic similarity to the respective questions. Human-written answers exhibit a reverse pattern, with lower semantic but higher stylistic similarity to the respective questions.",
+          "reason": "추출: 제목·저자·학회가 일치하고 초록의 비교 문장이 LLM은 의미 유사도가 높고 문체 유사도가 낮으며 사람은 그 반대라고 뒷받침하나, 인용문은 추출 결과의 조각을 이어 붙인 것이라 원문과 글자 단위로 같은지는 PDF나 HTML 원문으로 대조하지 못했다. / 판정: 임베딩 기반 유사도로 LLM 답변은 의미 유사도가 높고 사람 답변은 문체 유사도가 높다는 대조가 구절에 그대로 있다. 데이터셋은 주장도 미상으로 두어 범위를 넓히지 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2608.13328",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2608.13328",
+      "judgments": [
+        {
+          "ref": "sq3#case#3",
+          "verdict": "verify_failed",
+          "quote": "when prompts contain linguistic features more commonly used by women (hedges, tag questions, collective reference)",
+          "reason": "추출: 초록 발췌문이 격식 저하와 응답 길이·정교함 비교를 가리키나, 가져온 본문에서 헤지·부가의문문 질문 말투 요소와 4개 모델 및 3개 문서 유형의 모델명은 확인되지 않아 quote 는 주장 전체를 담지 못한다. / 판정: 구절은 더 짧고 덜 정교하며 덜 격식 있는 응답을 끌어낸다고 적어 방향이 같다. 조작한 언어 특징과 모델·문서 유형 수는 구절과 맥락에 없다. / 보충: 초록에 헤지·부가의문문·집단 지칭을 조건으로 둔 실험이 확인되나, 4개 모델과 3개 문서 유형은 별도 구절로만 확인되고 한 문장 원문은 얻지 못해 quote 에는 조건 부분만 옮겼다. / 재판정: 헤지·부가의문문·집단 지칭 조건과 4개 모델·3개 문서 유형은 구절과 맥락에 있다. 그러나 사례명이 단정한 '응답 격식을 낮춘다' 는 술부는 원문에서 확인되지 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://www.arxiv.org/pdf/2511.12782",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://www.arxiv.org/pdf/2511.12782",
+      "judgments": [
+        {
+          "ref": "sq3#case#7",
+          "verdict": "verify_failed",
+          "quote": "And thus we solve the system prompt aspect of the scaling problem, by lower-bounding the relevance of the system prompt to an arbitrary q which depends on the interruption length and frequency in the LLM context, both of which are operator-defined. This means that the importance of system prompt text relative to the total context length will always be at least q. / We suggest that this can be generalized to the Chain-of-Thought process to prevent scheming.",
+          "reason": "추출: 제목과 저자가 일치하고 초록 문장이 t 토큰마다 통제 문장을 삽입한다는 제안을 뒷받침하나, 시스템 지시 비율 하한 보장은 식(5)로만 나오고 원문 구절이 없으며, 구절은 웹 요약 도구가 발췌한 것이라 원문 바이트와 글자 단위로 대조하지 못했다. / 판정: 일정 토큰마다 통제 문장을 넣는다는 구절과 비율이 0으로 떨어지는 문제 서술은 주장과 같다. 하한 보장과 사고 사슬 대상은 원문 구절로 확인되지 않았다. 또한 맥락은 운영자 통제가 있을 때만 가능하다는 조건을 둔다. / 보충: 원문이 열려 제목과 저자가 일치하고 하한 보장 문장(IV장)과 CoT 확장 문장(초록)을 찾았으나, 두 요소는 원문의 서로 다른 자리에 있어 한 구절에 함께 든 문장은 없다(첫 PDF 호출은 본문을 읽지 못했으나 저장된 PDF 를 Read 로 열어 본문을 확인했다). / 재판정: 일정 토큰마다 통제 문장을 넣어 시스템 지시 비율의 하한 q 를 보장하는 방식과 사고 사슬 확장은 구절과 맥락에 있다. 그러나 실험이 없다는 평가 서술은 구절에 없다. 주장은 결말을 단정하지 않는다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "ASYNC-FIRST",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://vstorm-co.github.io/pydantic-deepagents/advanced/periodic-reminder/",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://vstorm-co.github.io/pydantic-deepagents/advanced/periodic-reminder/",
+      "judgments": [
+        {
+          "ref": "sq3#case#8",
+          "verdict": "unsupported",
+          "quote": "The first reminder fires at **turn 5**, then every **10 turns** after that.",
+          "reason": "추출: 원문이 열리고 문서 제목이 주장한 기능과 일치하며, 턴 5·10 문장은 원문에 있으나 주장의 '첫 사용자 메시지 400자'는 원문에서 '목표(goal) 400자'로 적혀 있고 system-reminder 블록은 기본값으로 나온다고 확인되었다. 인용은 WebFetch 가 옮긴 문장이라 원문 HTML 과 글자 단위로 대조하지는 못했다. / 판정: 구절은 5턴 시작과 10턴 간격을 적고, 맥락은 400자 절단을 적는다. 그러나 프리셋 표의 시작 턴은 10·15턴이고 5·10턴 기본값은 본문에 따로 없다고 했다. 그래서 주장의 수치가 어느 설정에 해당하는지 정할 수 없다. 효과 측정이 없다는 평가는 맥락과 같다. / 판정 불가: numbers_conditions=조건 얽힘"
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2511.00222v1",
+    "subquestions": [
+      "sq3"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2511.00222v1",
+      "judgments": [
+        {
+          "ref": "sq3#case#9",
+          "verdict": "verify_failed",
+          "quote": "We define three automatic metrics: prompt-to-line consistency, line-to-line consistency, and Q&A consistency,",
+          "reason": "추출: arXiv 초록 페이지가 열리고 제목과 주제가 주장의 사례와 같다. 불일치 55% 감소를 말하는 문장이 원문에 있으나, 목적·방법·사람 주석 검증·대상 역할은 별도 문장에 있고 웹 요약 도구를 거친 인용이라 원문 HTML 과 글자 단위로 대조하지는 못했다. / 판정: 55% 이상 불일치 감소, 지표의 보상 사용과 다중 턴 강화학습, 사람 주석 검증, 환자·학생·대화 상대 역할은 원문과 같다. 세 지표의 이름은 구절과 맥락에 없다. / 보충: 원문 초록 페이지의 제목·저자가 주장의 사례와 일치하고 세 지표 이름이 든 문장을 확인했으나, 구절은 WebFetch 요약 결과에서 옮긴 것이라 원문과 글자 단위 대조는 하지 못했다. / 재판정: 세 가지 일관성 지표와 그 지표를 보상으로 쓴 다중 턴 강화학습은 구절과 맥락에 있다. 그러나 55% 수치, 사람 주석 검증, 대상 역할, 성공 결과 문장은 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2503.04369",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2503.04369",
+      "judgments": [
+        {
+          "ref": "sq4#issue#0",
+          "verdict": "verify_failed",
+          "quote": "under specified prompts, GPT-4 exhibits an increase in translationese errors, with the proportion rising from 0.50 to 0.53.",
+          "reason": "추출: 문체 지시 프롬프트가 번역투를 일관되게 줄이지 못했다는 구절과 0.50에서 0.53으로 올랐다는 구절이 원문에 있어 그 부분은 뒷받침되나, 주장이 인용한 'fluent·typical' 프롬프트 문구는 발췌에서 확인되지 않았고, polishing의 43%에서 25%와 과제 형식 해석은 각각 다른 문장에 있어 이 quote에는 없다. / 판정: 문체 프롬프트가 번역투를 일관되게 줄이지 못했다는 부정, 0.50→0.53 상승, polishing 의 43%→25%, 과제 형식이 요인이라는 해석은 같은 URL 의 구절·맥락과 같다. 다만 0.50→0.53 의 주어가 GPT-4 인지와 프롬프트 문구는 확인되지 않았다. / 보충: 구절이 0.50에서 0.53 으로의 변화와 GPT-4 대상을 함께 담고 번역투가 일관되게 줄지 않았다는 앞뒤 문맥도 확인되나, 'specified prompts' 가 문체 요구 프롬프트를 가리킨다는 연결은 WebFetch 요약의 해석이고 원문 문장에는 직접 없으며 프롬프트 전문은 확인되지 않았다. 43에서 25 로의 polishing 문장과 과제 형식 해석 문장은 WebFetch 가 옮긴 것을 확인했으나 이 칸의 구절은 0.50에서 0.53 문장이다. 인용은 WebFetch 가 옮긴 문장이며 원문 HTML 과 글자 단위로 대조하지는 않았다. / 재판정: 구절과 맥락은 문체 요구 프롬프트가 번역투를 일관되게 줄이지 못했고 GPT-4 비율이 0.50에서 0.53으로 올랐다는 내용을 뒷받침한다. 그러나 polishing 프롬프트의 43%에서 25%로 줄어든 수치와 저자 해석은 구절에 없다."
+        },
+        {
+          "ref": "sq4#case#1",
+          "verdict": "verify_failed",
+          "quote": "We gather human annotation results and calculate the length ratio of spans exhibiting translationese errors",
+          "reason": "추출: polishing 방식으로 GPT-4의 번역투 비율이 낮아졌다는 구절이 원문에 있어 결과 성공을 뒷받침하고, 제목·저자가 사례와 일치하며, 정제(5.3절)·필터링(5.4절)·영중·독영 방향(추가로 5.5절 다른 언어 방향)이 원문에 있다. 전문가 표시 TSR과 Llama-3.1-8B 퍼플렉시티는 WebFetch에서 확인되었으나 원문은 이에 더해 다른 지표도 쓴다고 나온다. ACL 2025 학회명은 확인하지 못했다. / 판정: GPT-4 의 번역투 비율이 43%에서 25%로 줄었다는 구절은 '성공' 방향과 같다. 평가 지표, 데이터 정제, 언어 방향은 구절과 맥락에 없다. / 보충: 구절이 전문가 주석으로 번역투 구간을 표시하고 그 길이 비율을 계산한다는 TSR 정의를 담아 사례의 평가 지표 한 요소를 뒷받침하나, 퍼플렉시티·정제와 필터링·영중 및 독영 방향은 이 구절에 없고 각각 다른 문장에서 확인됐다. 인용은 WebFetch 가 옮긴 문장이며 원문과 글자 단위로 대조하지는 않았다. / 재판정: TSR 정의, Llama-3.1-8B 퍼플렉시티, 학습 데이터 필터링, 영중·독영 방향은 구절과 맥락에서 확인되며 주장과 같다. 그러나 완화가 성공했다는 결과 문장은 이 주장의 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "ASYNC-FIRST",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "WRITTEN-ONLY",
+        "SUBJECT-OBJECT",
+        "NO-ASSUME",
+        "TERM-ONE",
+        "EVIDENCE-FIRST"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2410.15956v3",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2410.15956v3",
+      "judgments": [
+        {
+          "ref": "sq4#issue#1",
+          "verdict": "supported",
+          "quote": "all models in all languages show significant differences from the human reference values",
+          "reason": "추출: 주장의 네 요소 중 결론 문장 하나만 한 구절에 담겼고 나머지 요소는 같은 원문의 다른 문장에 있으며, 옮긴 구절은 WebFetch 요약이 옮긴 것이라 원문 HTML과 글자 단위로 대조하지 못했다. / 판정: JSD, WL 커널, MMD, 모든 모델·언어에서의 유의한 차이, Llama-3.1 이 다른 모델보다 가깝지만 중국어 통사는 영어에 더 가깝다는 비교가 구절과 맥락에 모두 있다."
+        },
+        {
+          "ref": "sq4#case#0",
+          "verdict": "verify_failed",
+          "quote": "The original instructions from the SFT datasets are preserved, with the initial response serving as the preferred response.",
+          "reason": "추출: DPO 실험 대상 언어와 과제를 밝힌 문장은 옮겼으나 선택·거절 응답 구성, 위키백과 요약 과제, 모델 크기를 밝힌 문장은 글자 단위 구절을 얻지 못했고, 옮긴 구절은 WebFetch 요약에서 왔다. / 판정: 중국어 에세이·QA 대상 DPO, 영어 경유 역번역 거절 응답, 사람 판정의 어려움은 원문과 같다. 선택 응답, 위키백과 과제, 모델 규모는 원문 구절로 옮겨지지 않았다. / 보충: 선택 응답이 대상 언어로 원래 작성된 SFT 데이터라는 내용은 이 구절과 바로 앞 문장으로 뒷받침되지만, 논문은 '원어민'이라는 낱말을 쓰지 않고 'originally written in the target language'라고 적으며, 중국어·프랑스어 위키백과 과제와 7~12B 모델 규모는 이 구절에 없다. / 재판정: 구절은 목표 언어 원문 SFT 응답을 선택 응답으로 쓴다는 내용만 뒷받침한다. 측정 지표, 거절 응답 구성, 결과, 대상 언어·과제는 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "WRITTEN-ONLY",
+        "TERM-ONE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2507.12260v1",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2507.12260v1",
+      "judgments": [
+        {
+          "ref": "sq4#case#2",
+          "verdict": "verify_failed",
+          "quote": "the absolute values of T-indices correlate well with human ratings of degrees of translationese (Pearson's r=0.568)",
+          "reason": "추출: 논문 제목과 저자가 주장의 사례와 같고 89.7%(전원 일치 조건) 문장이 확인되나, EMNLP 2025 게재는 이 페이지에서 확인하지 못했고, 본문 §5.1 상관계수는 'r=0.56'으로 적혀 주장의 0.568과 표기가 다르며, 인용문은 요약형 웹 추출을 거친 것이라 글자 단위 원문 대조는 하지 못했다. / 판정: 평가자 5명 전원 일치 조건의 89.7% 와 영중 한정은 원문과 같다. 나머지 수치와 메커니즘은 구절과 맥락에 없다. / 보충: 원문에 Pearson r 0.568, Fleiss' Kappa 0.287, Qwen2.5-0.5B 두 모델 미세조정이 모두 있으나 한 문장에 같이 있지 않다. 가장 가까운 문장으로 r 0.568 문장을 옮겼고, Kappa 와 로그우도비 요소는 다른 절에 있다. 두 요소를 한 문장으로 묶어 주장과 대조하는 일은 판정 에이전트가 맡는다. / 재판정: Pearson r 0.568, Fleiss Kappa 0.287, Qwen2.5-0.5B 두 모델 미세조정은 구절과 맥락에서 같은 값으로 확인되고, 판정 못 함이라는 결말도 구절과 상충하지 않는다. 그러나 89.7% 수치와 영중 번역만 시험했다는 범위는 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "EVIDENCE-FIRST",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2603.10351",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2603.10351",
+      "judgments": [
+        {
+          "ref": "sq4#case#3",
+          "verdict": "verify_failed",
+          "quote": "we stratify languages into high-, medium-, and low-resource tiers and sample 10 representative languages per tier",
+          "reason": "추출: 논문 제목과 주제, DIBJudge 와 LoRA 미세조정, 언어 선정 방식(계층별 10개 샘플링, 122개 언어 데이터셋), GPT-4o 사용이 원문에 있다. 0.247 과 0.083 은 두 수치가 함께 든 문장이 없어 가장 가까운 문장을 옮겼고, 앞선 WebFetch 답은 이 수치를 held-out 평가라 했으나 재조회 답은 ID 열이라 해 서로 엇갈리므로 원문 표를 직접 확인해야 한다. 'Belebele' 명칭은 인용 문장에 없어 확인하지 못했다. / 판정: DIBJudge 가 vanilla SFT 보다 강건하다는 구절은 방향이 같다. 0.247·0.083 은 표 2 의 서로 다른 행에만 있어 글로 확인할 수 없다. 대상 언어와 모델은 구절과 맥락에 없다. / 보충: 원문에서 122개 언어 Belebele, 자원 수준 3개 티어에서 티어당 10개 표집, GPT-4o 의 Figure 1 설명을 확인했으나, 30이라는 수는 원문에 직접 적혀 있지 않고 3 × 10 으로 계산되며 122개·30개·GPT-4o 세 요소가 한 문장에 없고, 인용문은 WebFetch 요약본에서 받은 것이라 원문과 글자 단위로 대조하지는 못했다. / 재판정: 구절과 맥락은 Belebele 122개 언어, 자원 수준 세 단계마다 10개 언어(합계 30개), GPT-4o 를 확인해 대상 범위가 주장과 같다. 그러나 0.247과 0.083 수치와 감소 방향은 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://ar5iv.labs.arxiv.org/html/2306.03856",
+    "subquestions": [
+      "sq4"
+    ],
+    "output": {
+      "url": "https://ar5iv.labs.arxiv.org/html/2306.03856",
+      "judgments": [
+        {
+          "ref": "sq4#case#4",
+          "verdict": "unsupported",
+          "quote": "In total, we tested seven translation directions: English↔German (en→de, de→en), English↔Chinese (en→zh, zh→en), German→French (de→fr), English→Japanese (en→ja), and Ukrainian→Czech (uk→cs).",
+          "reason": "추출: 원문이 열리고 제목·저자가 주장의 사례와 일치하며, BLEU·chrF++ 하락과 COMET 유지 구절이 확인된다. 다만 주장의 평가 요소(50개 표본, 원어민 선호)와 모델 요소(GPT-3.5)는 한 문장에 없고 다른 문장에 나뉘어 있으며, 인용은 WebFetch 요약 모델이 옮긴 것이라 문장 단위 원문 일치는 확정하지 못했다. 수치와 방향의 적합성은 판정 에이전트가 판단한다. / 판정: BLEU·chrF++ 하락과 COMET 유사 이상, 50개 표본, GPT-3.5 는 원문과 같다. 원어민 선호도 맥락의 방향과 같다. 그러나 맥락에는 en↔de·en↔zh 양방향만 있어 '주로 영어로' 라는 범위는 확인되지 않았다. / 보충: 주장이 말하는 번역 방향 분포를 확인할 수 있는 구절로, 실험 방향 일곱 개를 방향별로 나열한다. 다만 이 구절은 WebFetch 가 옮긴 문장이므로 arXiv 원문과 한 번 더 대조가 필요하다. / 재판정: 구절이 밝힌 번역 방향 일곱 개 중 영어로 번역하는 방향은 de→en·zh→en 두 개뿐이다. 그래서 주장의 '주로 영어로 번역하는 방향'은 구절과 다르다. 다듬기 성공 결과와 평가 지표 변화, GPT-3.5 와 표본 수는 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "TERM-ONE",
+        "INSTRUCTION-FORM",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://kilgarriff.co.uk/Publications/1995-K-BiberReview.asc",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://kilgarriff.co.uk/Publications/1995-K-BiberReview.asc",
+      "judgments": [
+        {
+          "ref": "sq5#case#0",
+          "verdict": "verify_failed",
+          "quote": "The linguistic features with the highest negative weightings are nouns, word length, prepositions, and type-token ratio.",
+          "reason": "추출: 문서가 제1차원의 이름을 Involved versus Informational Production 으로 적어 사례와 일치하지만, 목적과 생산 조건과의 연결 및 두 요인의 상관은 이 문서에서 확인되지 않는다. 양쪽 자질 목록은 문서에 있으나 이 인용 문장에는 들어 있지 않다. / 판정: 구절은 차원 이름 'Involved versus Informational Production'만 확인하며, 그 이름은 주장과 같다. 그러나 특징 목록과 상황 요인 연결과 상관 방향은 구절과 맥락에 없다. 맥락도 연결 문장을 문서에서 찾지 못했다고 적는다. / 보충: 제1차원 특징 목록은 원문에서 두 문장으로 나뉘어 확인되지만, 목적·생산 조건 두 요인의 강한 상관과 제1차원의 연결 문장은 원문에 없어 주장의 mechanism 중 이 부분은 원문으로 뒷받침되지 않는다. / 재판정: 음의 가중치 특징인 명사·낱말 길이·전치사·type-token ratio와 양의 가중치 특징인 사적 동사·축약·2인칭 대명사는 구절과 맥락에서 주장과 같다. 그러나 두 상황 요인의 연결과 상관, 대상 언어는 원문에서 찾지 못했다고 맥락이 밝힌다."
+        },
+        {
+          "ref": "sq5#case#1",
+          "verdict": "supported",
+          "quote": "or the ``Honorification'' dimension in Korean, are language-specific.",
+          "reason": "추출: 문서가 한국어의 Honorification 차원을 언어 고유 차원으로 적고, 영어의 Abstract style 을 같은 종류의 예로 들어 사례와 일치한다. 다만 인용은 문장 일부이고 원문 문장 전체는 이 도구로 확인하지 못했다. / 판정: 구절과 맥락은 한국어 'Honorification' 차원과 영어 'Abstract style' 차원이 언어 고유 차원이라고 적는다. 이 내용은 주장의 기제와 같다. 부정 표현이 없고, 주장이 구절보다 넓게 일반화하지도 않았다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "NO-AGREE",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "FULL-SENTENCE",
+        "SPECIFIC-NAME",
+        "WRITTEN-ONLY",
+        "EVIDENCE-FIRST",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://www.interstrataltension.org/?m=20141028",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://www.interstrataltension.org/?m=20141028",
+      "judgments": [
+        {
+          "ref": "sq5#case#2",
+          "verdict": "unsupported",
+          "quote": "the Tenor of texts varies according to settings for “status”, “contact/social distance” and “affect”",
+          "reason": "추출: 세 변수 문장은 원문에서 확인되나, 문서는 Poynton·Martin의 원저가 아니라 세미나 발표를 요약한 2014년 블로그 글이어서 사례 문서와 일치하지 않는다. 귀속 문장은 같은 글의 다른 문장이며, affect 와 확률 조건은 판정 에이전트 몫으로 남긴다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT"
+      ]
+    }
+  },
+  {
+    "url": "https://en.wikipedia.org/wiki/Korean_speech_levels",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://en.wikipedia.org/wiki/Korean_speech_levels",
+      "judgments": [
+        {
+          "ref": "sq5#case#3",
+          "verdict": "verify_failed",
+          "quote": "Unlike honorifics – which are used to show respect towards someone mentioned in a sentence – speech levels are used to show respect towards a speaker's or writer's audience, or reflect the formality or informality of the situation. … In impersonal writing (books, newspapers, and magazines) and indirect quotations (\"She said that...\").",
+          "reason": "추출: 원문이 열리고 제목이 한국어 화계 문서와 일치하며, 격식성과 공손성 등급 표의 세 항목을 구절로 옮겼다. 다만 이 구절은 요약본에서 가져온 것이라 글자 단위 일치는 확인하지 못했고, 해라체의 책·신문·잡지 및 간접 인용 용례는 별도 문장('In impersonal writing (books, newspapers, and magazines) and indirect quotations')에 있어 이 quote에는 들어 있지 않다. / 판정: 하십시오체·해요체·해라체의 격식성·공손성 배치는 구절과 같고 방향도 같다. 그러나 경어와의 구분과 해라체 용도에 관한 주장은 구절과 맥락에 없다. / 보충: 두 요소는 같은 문서의 서로 다른 절(Lead와 Haera-che)에 있어 한 문장에 함께 들지 않으므로 두 문장을 ' … '로 이어 옮겼으며, 해라체의 책·신문·잡지와 간접 인용 용례는 원문에 명시되어 있으나 화계가 경어와 '별개 체계'라는 표현은 원문에 없고 원문은 화계를 경어와 달리 청자 존대·격식을 나타내는 것으로 대비하면서도 '경어 체계(system of honorifics)'라고 부른다. / 재판정: 구절은 화계가 문장 속 인물을 높이는 경어와 달리 청자 존중이나 상황 격식을 나타낸다는 내용과, 해라체가 비인칭 글과 간접 인용에 쓰인다는 내용을 뒷받침한다. 그러나 화계별 격식성·공손성 등급은 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "NO-AGREE",
+        "SUBJECT-OBJECT",
+        "EVIDENCE-FIRST",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://m.earticle.net/Article/A445513",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://m.earticle.net/Article/A445513",
+      "judgments": [
+        {
+          "ref": "sq5#case#4",
+          "verdict": "verify_failed",
+          "quote": "leading to the identification of five distinct dimensions",
+          "reason": "추출: 초록의 59개 자질·17개 레지스터 구절이 사례의 규모 조건과 일치하고 다섯 차원 식별 결과도 초록에 있으나, 다섯 차원의 이름은 목차에만 있고 메신저 텍스트·국회 회의록 적용 결과와 요인분석 절차는 초록과 공개 본문에서 확인되지 않는다. / 판정: 59개 언어 특징과 17개 레지스터는 구절과 같고, 부정·비교 표현도 없다. 그러나 다섯 차원의 이름과 신규 텍스트 적용 검증은 구절과 맥락에 없다. / 보충: 차원 수(다섯)는 초록의 구절로 확인되나, 차원 이름 다섯 개는 초록 문장에 없고 목차 소제목에만 나오며, 메신저·회의록 적용 문장은 같은 구절이 아니라 초록 마지막 문장(\"analyzing additional registers, such as messenger texts and National Assembly minutes\")에 있다. 원문 HTML 대조는 하지 못했으므로 인용문은 요약 출력에서 옮긴 것이다. / 재판정: 구절은 다섯 차원을 찾았다는 내용만 뒷받침하고, 주장은 결말을 단정하지 않아 방향이 상충하지 않는다. 그러나 59개 특징, 17개 레지스터, 차원 이름, 적용 대상은 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "SUBJECT-OBJECT",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "NO-SQUEEZE",
+        "EVIDENCE-FIRST",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/html/2509.10179v2",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/html/2509.10179v2",
+      "judgments": [
+        {
+          "ref": "sq5#case#5",
+          "verdict": "verify_failed",
+          "quote": "To explore these topics, we utilize two corpora of LLM-generated texts: AI Brown (English) and AI Koditex (Czech)",
+          "reason": "추출: 원문에 16개 frontier model 비교와 base 대 instruction-tuned 비교가 나오므로 사례와 16개 모델 수치는 뒷받침된다. 다만 quote 는 WebFetch 요약 응답에서 옮긴 것이라 원문 글자 대조는 하지 못했고, mechanism 의 제1차원 이동 문장과 base 모델 성능 문장, 최소 대 긴 프롬프트 비교, BE21·AI-Brown, 영어와 체코어 구절은 이 quote 에 들어 있지 않아 판정 에이전트가 필요하면 refetch 를 요청해야 한다. / 판정: 16개 모델과 base 대 instruction-tuned 비교 구조는 구절·맥락과 같다. 그러나 이동 방향과 base 모델 우위라는 결말은 구절에 없다. 대상 언어와 코퍼스도 구절에 없다. / 보충: 영어·체코어 대상 언어와 AI-Brown 코퍼스를 한 문장에서 밝히지만, 제1차원 방향 결과·base 모델 비교·프롬프트 비교와 BE21은 이 구절에 함께 들어 있지 않아 보충 요소를 한 구절로 모으지 못했다. 도구 출력이 글자 수 제한으로 문장을 잘라 전체 원문은 확인하지 못했다. / 재판정: 구절은 영어 AI Brown 과 체코어 AI Koditex 를 써서 대상 언어가 주장과 같고, 맥락은 BE21 과 대부분 모델이 제1차원 음의 끝으로 이동했다는 문장을 확인한다. 그러나 16개 모델 수와 base 대 instruction-tuned 비교, 프롬프트 비교 결과는 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "FULL-SENTENCE",
+        "WRITTEN-ONLY",
+        "SPECIFIC-NAME",
+        "NO-SQUEEZE",
+        "EVIDENCE-FIRST",
+        "SUBJECT-OBJECT",
+        "TERM-ONE"
+      ]
+    }
+  },
+  {
+    "url": "https://arxiv.org/abs/2502.03252",
+    "subquestions": [
+      "sq5"
+    ],
+    "output": {
+      "url": "https://arxiv.org/abs/2502.03252",
+      "judgments": [
+        {
+          "ref": "sq5#case#6",
+          "verdict": "verify_failed",
+          "quote": "Two corpora of New High German serve as examples.",
+          "reason": "추출: 원문 초록이 PCA 기반 척도 구성과 자동 분석 결합을 명시해 mechanism 의 구성 방법을 뒷받침하고 주제도 일치하지만, 인용문은 WebFetch 가 옮긴 문장이라 원문과 글자 단위로 대조하지는 못했고, target 은 원문이 'New High German'으로 적고 'Early New High German'이라는 표현은 확인되지 않았다. / 판정: PCA 기반 척도와 자동 분석의 결합은 구절과 같다. 특징 구분, Biber 제1차원 비교, 독일어 코퍼스 두 개는 맥락과 같고 방향도 같다. 그러나 근대 고지 독일어 한정과 '이론 기반 맞춤 차원'이라는 표현은 구절과 맥락에 없다. / 보충: 원문 초록에 독일어 코퍼스 두 개를 분석한다는 문장이 있으나 'New High German'이라고만 쓰고 'Early'는 없어 근대 고지 독일어 범위는 원문 문구로 확인되지 않는다. '이론 기반의 맞춤 차원' 소개는 'With a theory-driven starting point and as a \"tailored\" dimension'과 Biber 제1차원과의 비교 문장으로 원문에 있으나 'theory-based custom dimension' 표현은 아니고 별도 문장이라 같은 구절에 묶이지 않는다. 판정 근거는 WebFetch 요약 모델이 옮긴 초록 문장이며, 원문을 글자 단위로 대조하지는 못했다. / 재판정: 구절은 근대 고지 독일어 코퍼스 두 개에 적용했다는 내용을 뒷받침해 평가와 대상 범위가 주장과 같다. 그러나 PCA 방법, 특징 구분의 필요성, Biber 제1차원 비교는 구절에 없다."
+        }
+      ],
+      "principles_applied": [
+        "NO-ASSUME",
+        "STATE-ASSUME",
+        "WRITTEN-ONLY",
+        "NO-AGREE",
+        "SPECIFIC-NAME",
+        "FULL-SENTENCE",
+        "SUBJECT-OBJECT",
+        "EVIDENCE-FIRST",
+        "TERM-ONE"
+      ]
+    }
+  }
+]

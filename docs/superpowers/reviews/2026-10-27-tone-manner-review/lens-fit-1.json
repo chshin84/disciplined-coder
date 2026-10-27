@@ -1,0 +1,26 @@
+{
+  "lens": "lens-fit",
+  "doc_type": "설계 (spec·plan) 행. 대상은 docs/superpowers/specs/ 아래 spec이고, 내용은 목적·배경·목표·설계 근거·검증 방침·구현자 위임 사항이다. 진행 상태와 다음 단계는 적혀 있지 않다. 그래서 '설계 근거' 행에 해당하고, 상태·핸드오프 성격의 내용은 섞이지 않았다.",
+  "read": [
+    "D:\\projects\\disciplined-coder\\docs\\superpowers\\specs\\2026-10-27-tone-manner-design.md",
+    "D:\\projects\\disciplined-coder\\skills\\managing-docs\\SKILL.md",
+    "D:\\projects\\disciplined-coder\\skills\\managing-docs\\references\\reading-docs.md",
+    "D:\\projects\\disciplined-coder\\agent-principles.md (1-30줄)",
+    "D:\\projects\\disciplined-coder\\docs\\domain-korean.md (절 제목만 Grep)",
+    "C:\\Users\\CHSHIN\\.claude\\disciplined-coder\\agent-principles.md (세션에 실린 전문)"
+  ],
+  "issues": [
+    {"where": "53줄", "type": "style", "claim": "53줄은 표 앞에 개수를 예고하는 문장을 두었다.", "evidence": "축은 다섯 개다. Claude 는 쓰기 전에 축마다 위치를 정한다.", "principle": "COUNT-EARNS", "consequence": "축 표(55-61줄) 바로 앞 문장이 '다섯 개'라는 개수로 시작한다."},
+    {"where": "17줄", "type": "style", "claim": "17줄은 뒤에 이어지는 사례 단락 앞에 개수를 예고한다.", "evidence": "2026-10-27 사용자가 두 사례를 보였다.", "principle": "COUNT-EARNS", "consequence": "사례 단락 앞 문장이 사례 이름 대신 '두 사례'라는 개수만 적는다."},
+    {"where": "15줄, 63줄", "type": "style", "claim": "15줄과 63줄은 앞에 나온 대상을 이름 대신 개수로 가리킨다.", "evidence": "15줄 '이 설계는 그 두 요구의 목적을 유지한다.' / 63줄 '사용자가 고른 네 축에 Claude 가 더한 축이다.'", "principle": "COUNT-EARNS", "consequence": "'두 요구'와 '네 축'의 대상 이름이 적혀 있지 않다."},
+    {"where": "65줄", "type": "style", "claim": "'A가 아니라 B' 대구가 23줄에 이어 65줄에서 두 번째로 쓰였다.", "evidence": "23줄 '예외 장르가 아니라 주된 산출물이다.' / 65줄 '이 표는 목록이 아니라 축이 움직이는 모습을 보이는 예다.'", "principle": "ANTI-LIMIT", "consequence": "한 spec 안에 이 대구가 두 번 나온다."},
+    {"where": "21줄, 63줄, 82줄, 110줄, 133줄", "type": "style", "claim": "주어를 따로 가진 관형절이 독립 문장으로 분리되지 않았다.", "evidence": "21줄 '사용자가 압축하며 뺀 뜻(...)은 Claude 가 찾았다.' 등", "principle": "NO-MID-MOD", "consequence": "관형절의 주어와 본 문장의 주어가 한 문장에 함께 들어 있다."},
+    {"where": "90-96줄 조항 변경 표", "type": "style", "claim": "같은 열의 셀끼리 말끝이 평서 종결·명사구·명령형으로 섞여 있다.", "evidence": "'지금' 열과 '바꾼 뒤' 열의 셀", "principle": "ONE-ENDING", "consequence": "같은 열의 다섯 셀이 세 형태로 끝난다."},
+    {"where": "36-39줄, 108·110줄, 137줄", "type": "style", "claim": "불릿 한 항목에 두 문장 이상이 들어 있다.", "evidence": "37줄 비목표 항목은 세 문장이다.", "principle": "BULLET-SCOPE", "consequence": "결정과 근거와 측정 결과가 한 불릿에 섞였다."},
+    {"where": "117-120줄, 137-139줄", "type": "style", "claim": "본문 불릿이 서술어 없는 조각으로 끝나고 말끝이 섞였다.", "evidence": "117줄 '`agent-principles.md` 「출력」 절: 새 조항(...), 위 표의 조항 문안.'", "principle": "FULL-SENTENCE, ONE-ENDING", "consequence": "항목에 서술어가 없다."},
+    {"where": "23줄", "type": "style", "claim": "영어 원어 'register' 가 풀이 없이 쓰였고, 같은 개념을 '톤앤매너'·'문체'로도 부른다.", "evidence": "23줄 '개조식 명사구 register'", "principle": "출력 언어 지시, TERM-ONE", "consequence": "같은 개념이 세 낱말로 나뉘었다."},
+    {"where": "137줄", "type": "constraint", "claim": "구현자에게 주는 할 일이 명령형이 아닌 평서형으로 쓰였다.", "evidence": "137줄 '저장소 CLAUDE.md 「퇴고 기준」을 따른다.'", "principle": "INSTRUCTION-FORM", "consequence": "사실과 지시가 같은 형태로 적혀 있다."}
+  ],
+  "principles_applied": ["COUNT-EARNS", "ANTI-LIMIT", "NO-MID-MOD", "ONE-ENDING", "BULLET-SCOPE", "FULL-SENTENCE", "TERM-ONE", "INSTRUCTION-FORM", "WRITTEN-ONLY", "SUBJECT-OBJECT", "NO-STACK-MOD", "ONE-IDEA", "DOC-TYPE"],
+  "notes": "오케스트레이터가 원본 메시지에서 옮겨 저장했다. issues 의 file·counterpart 칸은 모두 대상 spec 과 에이전트원칙이라 생략했다. 렌즈는 spec 이 「작업 지시서」 대상이라 TITLE-LAYERS 를 적용하지 않았다고 적었다. 금지어(63줄 '더한', 102·111줄 '더한다')는 훅에 맡기고 올리지 않았다."
+}

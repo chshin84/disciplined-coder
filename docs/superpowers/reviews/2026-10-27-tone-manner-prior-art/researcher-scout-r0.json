@@ -1,0 +1,107 @@
+{
+  "search_status": "ok",
+  "queries": [
+    "LLM formality control audience-aware text generation tone",
+    "Korean honorifics speech level LLM evaluation benchmark",
+    "LLM mimics user writing style linguistic accommodation style drift conversation",
+    "translationese Korean detection reduction machine translation post-editing",
+    "persona drift system prompt instruction stability multi-turn dialogue measurement",
+    "register variation dimensions situational parameters Biber tenor formality model",
+    "LLM Korean formal informal style transfer honorific generation dataset",
+    "LLM generated text translationese non-English languages unnatural structure",
+    "LLM adapting explanation to reader expertise personalization evaluation readability audience"
+  ],
+  "clusters": [
+    {
+      "topic": "제어 가능한 텍스트 생성과 격식 수준 제어",
+      "sources": [
+        "https://arxiv.org/pdf/2408.12599",
+        "https://arxiv.org/pdf/2601.05637",
+        "https://par.nsf.gov/servlets/purl/10609253"
+      ],
+      "note": "조사 논문은 문체 제어를 명시적 제어와 암묵적 제어로 나눈다. 명시적 제어는 지시문에 문체를 지정하는 방식이고, 암묵적 제어는 지정 없이 기준을 지키는 방식이다. 소형 모델이 목표 격식 수준을 피드백 재프롬프트로 맞추는지 시험한 연구가 있다. 또 하나의 연구는 속성 강도 지시를 모델이 얼마나 매끄럽게 따르는지 측정했다. 다만 청자를 조건으로 한 격식 선택을 직접 다룬 연구는 이 검색에서 나오지 않았다."
+    },
+    {
+      "topic": "청자 맞춤 생성(독자 수준·전문성에 맞춘 설명)",
+      "sources": [
+        "https://arxiv.org/abs/2407.01384v1",
+        "https://preview.aclanthology.org/setup/2025.gem-1.11",
+        "https://doaj.org/article/b9768299fd4b4ecd95c4e2f6d578ec85",
+        "https://aclanthology.org/people/samraj-moorjani/unverified/"
+      ],
+      "note": "LLM 은 지시받은 독자 수준에 어느 정도 맞추지만, 측정한 가독성은 목표와 자주 불일치한다. 한 연구는 LLM 마다 가독성 범위가 고정되어 있어 프롬프트를 줘도 청자에 잘 맞추지 못한다고 보고한다. 독자 프로필 연구는 chain-of-thought 같은 생성 전 추론을 더한 프롬프트에서 정렬이 나아졌다고 보고한다. 이 결과는 B안의 생성 전 결정이 효과를 내는지 판단할 근거가 된다."
+    },
+    {
+      "topic": "register 이론의 상황 차원",
+      "sources": [
+        "https://wjmll.ncl.ac.uk/issue02/armstrong2.htm",
+        "https://realis.linguistik.hu-berlin.de/index.php/REALIS/article/view/27",
+        "https://core-prod.cambridgecore.org/core/services/aop-cambridge-core/content/view/359924EC9DF7498D62F58C7EF39EBEA9/S1360674322000478a.pdf/elena-seoane-and-douglas-biber-eds-corpus-based-approaches-to-register-variation-studies-in-corpus-linguistics-103-amsterdam-and-philadelphia-john-benjamins-2021-pp-xi-341-isbn-97827210548.pdf"
+      ],
+      "note": "Biber 계열 연구는 상황 변수(개인적-비개인적, 근접-원거리, 상호작용-일방향 등)를 연속 축으로 코딩한다. 이 축 구성은 B안의 조절 축(격식·거리·온도·밀도)을 정의할 때 대조할 언어학 기준선이 된다. Halliday 의 field·tenor·mode 틀은 이 검색 결과에 직접 나오지 않았다."
+    },
+    {
+      "topic": "한국어 높임법·말투 수준과 LLM 의 제어 능력",
+      "sources": [
+        "https://arxiv.org/pdf/2510.15558",
+        "https://arxiv.org/pdf/2605.21086",
+        "https://aclanthology.org/2026.scil-main.35/",
+        "https://iwslt.org/2023/formality",
+        "https://www.catalyzex.com/paper/stylekqc-a-style-variant-paraphrase-corpus",
+        "https://preview.aclanthology.org/moar-dois/2024.paclic-1.86.pdf"
+      ],
+      "note": "한국어 지시 수행 벤치마크에 높임말과 반말 전환 범주가 있다. 차량용 비서 평가 연구는 LLM 판정자가 해요체와 합쇼체를 자주 혼동한다고 보고한다. 같은 연구에서 형태소 어미 검사를 더하자 사람 판정과의 일치도가 0.69 에서 0.94 로 올랐다. 주체 높임 연구는 모델이 사회적 지위와 무관하게 높임 표지를 선호한다고 보고한다. IWSLT 2023 은 영한 격식 제어 번역 과제를 두었다. 이 묶음은 말투 수준을 기계 검사로 확인할 수 있는지에 근거가 된다."
+    },
+    {
+      "topic": "입력 문체 수렴(언어 적응)과 페르소나 표류",
+      "sources": [
+        "https://arxiv.org/html/2508.03276v2",
+        "https://aclanthology.org/2025.sigdial-1.16.pdf",
+        "https://arxiv.org/html/2402.10962v1"
+      ],
+      "note": "EACL 2026 연구는 16개 모델에서 모델이 대화 문체를 따라가며, 그 정도가 사람 응답보다 강한 조건이 많다고 보고한다. 같은 연구에서 큰 모델과 지시 튜닝 모델은 덜 수렴했다. SIGDIAL 2025 연구는 반대로 LLM 이 문체보다 내용을 맞춘다고 보고한다. 그래서 수렴의 크기는 측정 조건에 따라 다르다. 페르소나 표류 연구는 시스템 지시의 영향이 대화 8라운드 안에 크게 줄어든다고 보고하며, 원인으로 주의 감쇠를 제시한다."
+    },
+    {
+      "topic": "LLM 출력의 번역투와 영어 중심 구조",
+      "sources": [
+        "https://arxiv.org/pdf/2410.15956",
+        "https://arxiv.org/pdf/2503.04369",
+        "https://arxiv.org/pdf/2608.17399",
+        "https://arxiv.org/pdf/1907.00900"
+      ],
+      "note": "다국어 LLM 의 비영어 출력이 어휘와 구문 양쪽에서 영어 중심 패턴을 보인다는 연구가 있고, 이 연구는 사람 글과 분포를 비교하는 말뭉치 지표를 제안한다. 다른 연구는 번역투의 원인으로 지도 미세조정 데이터를 지목한다. 사후 편집문이 원문 간섭을 더 많이 남긴다는 연구도 있어, 사후 교정만으로 번역투를 줄이는 방식의 한계를 보여 준다. 한국어 번역투를 구조 단위로 측정한 연구는 이 검색에서 찾지 못했다."
+    }
+  ],
+  "subquestion_candidates": [
+    {
+      "scope": "청자와 목적을 조건으로 LLM 출력의 어조·격식·밀도를 조절하는 방법과 효과. 생성 전 결정(계획·추론 단계)과 지시만 주는 방식의 비교를 포함한다",
+      "basis": "독자 수준 맞춤 연구들은 지시만으로는 가독성이 목표에 맞지 않고, 생성 전 추론을 더하면 정렬이 나아진다고 보고한다. 그래서 초안 sq1 을 유지하되 생성 전 결정의 효과에 초점을 둔다."
+    },
+    {
+      "scope": "register 이론(Biber 의 상황 변수, Halliday 의 tenor)이 정의한 조절 차원과 B안 조절 축(격식·거리·온도·밀도)의 대응 관계",
+      "basis": "Biber 계열 연구는 상황 변수를 연속 축으로 코딩하는 방법을 제시한다. B안의 축 구성은 이 기준선과 대조되지 않았으므로 별도 하위 질문으로 분리할 근거가 있다."
+    },
+    {
+      "scope": "한국어 말투 수준(합쇼체·해요체·해라체)의 선택 기준과 LLM 의 생성·판정 능력, 그리고 어미 형태소 검사 같은 기계 검사의 가능성",
+      "basis": "LLM 판정자가 해요체와 합쇼체를 혼동하고 형태소 어미 검사로 일치도가 크게 오른다는 보고가 있다. 높임 표지를 과잉 사용한다는 보고도 있다. 이 결과는 상시 조항의 부담과 검사 방식 선택에 직접 쓰인다."
+    },
+    {
+      "scope": "LLM 이 입력 문체에 수렴하는 현상의 크기와 조건, 그리고 시스템 지시의 문체 유지가 대화 길이에 따라 약해지는 현상과 그 완화 방법",
+      "basis": "언어 수렴 연구는 수렴 크기가 모델 크기와 지시 튜닝에 따라 다르다고 보고한다. 페르소나 표류 연구는 지시 영향이 8라운드 안에 줄어든다고 보고한다. 두 안 모두 입력 문체 모방 금지를 유지하므로 금지의 유지 방법이 핵심 질문이 된다."
+    },
+    {
+      "scope": "LLM 비영어 출력의 번역투 구조 패턴(어휘·구문 분포)을 측정하는 지표와 생성 단계에서 줄이는 방법. 낱말 단위 금지어 목록은 제외한다",
+      "basis": "영어 중심 구조를 말뭉치 지표로 측정하는 연구와 번역투 원인을 학습 데이터로 보는 연구가 있다. 사후 편집이 원문 간섭을 남긴다는 연구는 사용자가 기각한 사후 재작성 방식의 한계와 맞닿는다. 한국어 구조 단위 연구는 이 검색에서 찾지 못해 추가 탐색이 필요하다."
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "EVIDENCE-FIRST",
+    "ASYNC-FIRST",
+    "YAGNI",
+    "STATE-ASSUME",
+    "SUBJECT-OBJECT",
+    "INSTRUCTION-FORM",
+    "TERM-ONE"
+  ]
+}

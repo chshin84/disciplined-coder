@@ -1,0 +1,19 @@
+{
+  "lens": "lens-adversarial",
+  "read": ["spec", "agent-principles.md 사본", "docs/domain-korean.md 165-207행", "agents/lens-readability.md", "skills/review-docs/SKILL.md 1-30행", "선행연구 기록", "skills/domain-plugin/SKILL.md 80-86행", "evals/principles/cases/q-full-sentence-1/prompt.md·criteria.md"],
+  "issues": [
+    {"where": "94-95행, 61행", "type": "failure-mode", "claim": "대화 답의 밀도 축 위치를 고정하는 문장이 없어, 훑어보는 대화 답에서 개조식이 골라져 압축 조각이 다시 생긴다.", "consequence": "대화 답의 격식만 고정되고 밀도는 구속력 없는 예시 표에만 있다."},
+    {"where": "96행 NO-SQUEEZE", "type": "risk", "claim": "변경안이 개조식으로 한정되지 않아 산문에도 압축 허용으로 읽힌다.", "consequence": "산문 글에도 압축이 허용된다."},
+    {"where": "95행 BULLET-SCOPE", "type": "failure-mode", "claim": "'지금' 칸이 세 문장 중 한 문장만 요약해, 구현자가 '같은 종류만 불릿'과 '두 문장 이상은 문단'을 지울 수 있다.", "consequence": "논증이 불릿으로 끊길 수 있다."},
+    {"where": "98행", "type": "failure-mode", "claim": "개조식 명사구는 수식어를 여러 겹 두므로 개조식에 NO-STACK-MOD 를 적용하면 사용자가 고친 예문이 위반이 된다.", "consequence": "사용자가 승인한 형태를 금지한다."},
+    {"where": "82행, 93행", "type": "failure-mode", "claim": "고칠 대상으로 받은 원문과 본보기 예시 문서를 구분하지 않아, 원문 문체를 청자 신호로 따를 수 있다.", "consequence": "대표 사례 두 건이 모두 원문 수정 과제인데 원문의 위치가 정해지지 않았다."},
+    {"where": "78행", "type": "risk", "claim": "추정 배경 한 줄 규칙이 대화 답 전부에 발동해 소음이 되고, '산출물 앞'이 파일 안으로 읽힌다. STATE-ASSUME 와 겹친다.", "consequence": "발동 범위와 위치가 정해지지 않았다."},
+    {"where": "78행", "type": "risk", "claim": "묻지 말고 추정하라는 규칙과 ASK-OPTIONS 가 함께 실리면 어느 쪽을 따를지 정해지지 않는다.", "consequence": "ASK-OPTIONS 예외가 명시되지 않았다."},
+    {"where": "58·63·67-72행", "type": "over-engineering", "claim": "합쇼체와 해요체는 상대높임 등급이라 경어 축이 격식 축과 겹치고, 경어 값은 정의되지 않았으며, 근거는 판정에 쓰지 않겠다고 한 자료다.", "consequence": "정의되지 않은 축이 상시 조항에 추가된다."},
+    {"where": "117행", "type": "over-engineering", "claim": "축 표와 예시 표가 상시 에이전트원칙에 들어갈지 정하지 않았다. 결정 규칙만 두고 표는 근거 문서로 옮기는 방식이 단순하다.", "consequence": "상시 지시가 10줄 넘게 늘 수 있다."},
+    {"where": "15행, 93행", "type": "risk", "claim": "2026-09-24 사용자 지시('지시가 있을 때만 바꿀 것')의 문언을 바꾸는데 사용자의 대체 승인 기록이 없다.", "consequence": "사용자가 정한 기준을 Claude 의 해석만으로 바꾼다."},
+    {"where": "130행", "type": "failure-mode", "claim": "should-not 후보가 단발 질문이라 긴 세션의 표류를 재현하지 못한다.", "consequence": "반목표 '대화 답이 구어를 따라간다'를 확인하는 시험이 사실상 없다."}
+  ],
+  "principles_applied": ["YAGNI", "REVERSIBLE", "EVIDENCE-FIRST", "TOP-DOWN", "ASK-OPTIONS", "CHECKABLE", "NO-MIRROR", "WRITTEN-ONLY", "FULL-SENTENCE", "BULLET-SCOPE", "NO-SQUEEZE", "NO-STACK-MOD", "STATE-ASSUME"],
+  "notes": "오케스트레이터가 원본 메시지에서 옮겨 저장하며 칸을 요약했다. 렌즈의 참고: 비가역 결정은 없으나 agent-principles.md 만 바뀌고 lens-readability 27·93행이 남는 절반 상태는 위험하므로 한 커밋으로 바꿀 것(plan 몫). 비 chat 과제의 기존 criteria 는 새 규칙에서 판정이 뒤집힐 수 있어 구현 전 확인할 것. 여섯 조항을 한 단위로 묶으면 결과가 나빠질 때 원인 조항을 구분할 수 없다."
+}
