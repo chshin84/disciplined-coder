@@ -82,7 +82,7 @@ spec·plan 에 적대적 검토를 요청받으면 `lens-adversarial` 하나만 
 | 에이전트 | 대상과 모드 | tools | 그룹 | 실행하는 호출자 | 기계에 넘기는 것 |
 |---|---|---|---|---|---|
 | `lens-grounding` | `runtime`(LLM 출력), `spec`(spec·plan), `doc`(문서 검진) | Read, Grep, Glob | 문서 단위 | 모든 호출자 | 인용한 문장이 그 파일에 그 글자로 있는지를 호출자가 확인한다 |
-| `lens-fit` | `auto`(대상 타입을 렌즈가 판정). 전달 문서에는 축 위치(`TONE-AXIS`)를 계약과 함께 넘긴다 | Read, Grep, Glob | 문서 단위 | 모든 호출자 | 스키마 필수 키와 폐쇄 집합 값은 결정론 검사가, 금지 낱말은 훅이 먼저 본다 |
+| `lens-fit` | `auto`(대상 타입을 렌즈가 판정). 모든 대상에 축 위치(`TONE-AXIS`)를 계약과 함께 넘긴다(작업 문서는 `TONE-AXIS` 의 고정 위치) | Read, Grep, Glob | 문서 단위 | 모든 호출자 | 스키마 필수 키와 폐쇄 집합 값은 결정론 검사가, 금지 낱말은 훅이 먼저 본다 |
 | `lens-adversarial` | `design`(spec·plan), `artifact`(코드·실험 결과·테스트 출력) | Read, Grep, Glob | 묶음 전체 | `design` 은 `review-specs` 와 서브 세션, `artifact` 는 사용자 직접 요청 | 없음 |
 | `lens-consistency` | `spec`, `plan` | Read, Grep, Glob | 묶음 전체 | `review-specs` 와 서브 세션 | 없음 |
 | `lens-rebuttal` | `claim`(주장: 보고서·제안서·설계 문서·대화·사용자 메시지) | Read, Grep, Glob, WebSearch, WebFetch | 필요할 때 | 사용자 직접 요청, `review-docs` | 인용 구절이 원문에 있는지를 메인 세션이 확인한다(아래 「결과를 모으는 법」). 주장 목록은 위 「사용자가 직접 요청할 때」의 **주장 반박의 준비**대로 넘긴다 |
