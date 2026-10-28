@@ -8,11 +8,11 @@ description: 남에게 전달될 문서와 .html·.pptx·.xlsx·.docx·.pdf 산�
 
 ## `lens-fit`에 넘기는 계약
 
-이 계약은 여기가 소유한다. 계약은 에이전트원칙 `agent-principles.md`, `docs/domain-korean.md`, 문서 타입 표가 있는 `skills/managing-docs/SKILL.md`, 제목·목차 규칙이 있는 `skills/managing-docs/references/reading-docs.md` 의 경로다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 계약을 넘긴다.
+이 계약은 여기가 소유한다. 계약은 에이전트원칙 `agent-principles.md`, `docs/domain-korean.md`, 문서 타입 표가 있는 `skills/managing-docs/SKILL.md`, 제목·목차 규칙이 있는 `skills/managing-docs/references/reading-docs.md` 의 경로다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. 경로와 함께 그 문서의 축 위치(격식·거리·온도·밀도, `TONE-AXIS`)를 한 줄로 넘긴다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 계약을 넘긴다.
 
 넘기지 않으면 그 렌즈는 계약을 모른 채 실행되어 형식만 본다. `lens-readability`를 실행하지 않은 문서도 이 경로로 에이전트원칙의 한국어 조항을 검사받는다.
 
-금지 낱말은 렌즈에 넘기지 않고 렌즈도 보지 않는다. 다른 프로젝트의 `.md` 산출물은 기본 설정에서 쓰는 순간 `hooks/doc_word_pretooluse.sh` 가 거부하고(.html·.pptx 같은 다른 형식은 그 훅이 보지 않는다), 이 저장소의 문서는 일부러 그 검사에서 뺐다. 개조식은 그것을 잡는 검사가 이 저장소에 없어 렌즈가 그대로 받는다.
+금지 낱말은 렌즈에 넘기지 않고 렌즈도 보지 않는다. 다른 프로젝트의 `.md` 산출물은 기본 설정에서 쓰는 순간 `hooks/doc_word_pretooluse.sh` 가 거부하고(.html·.pptx 같은 다른 형식은 그 훅이 보지 않는다), 이 저장소의 문서는 일부러 그 검사에서 뺐다. 개조식이 축 위치와 맞는지 렌즈가 본다.
 
 ## 언제 여는지
 
