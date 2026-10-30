@@ -1,0 +1,11 @@
+{ "lens": "lens-fit", "target": "docs/superpowers/specs/2026-10-29-simplify-gap-round-and-verify-design.md", "doc_type": "설계 (spec·plan)", "issues": [
+{ "where": "D1·D2·D3 불릿, 「근거」 불릿", "type": "style", "claim": "불릿 하나에 문장 세 개나 네 개가 있다(13·20·23·29·41·43행).", "principle": "BULLET-SCOPE, ONE-IDEA" },
+{ "where": "'바뀌는 곳' 불릿", "type": "style", "claim": "같은 목록의 다른 항목은 '~다' 문장인데 '바뀌는 곳'만 명사구로 끝난다.", "principle": "FULL-SENTENCE, ONE-ENDING" },
+{ "where": "13·23·30·47행", "type": "style", "claim": "주어를 따로 가진 관형절이 명사 앞에 있다.", "principle": "NO-MID-MOD" },
+{ "where": "41행", "type": "style", "claim": "'주장' 앞에 수식어가 세 겹이다.", "principle": "NO-STACK-MOD" },
+{ "where": "29·31행", "type": "style", "claim": "앞에서 이름으로 든 렌즈를 '네 렌즈'로 다시 가리킨다.", "principle": "COUNT-EARNS" },
+{ "where": "「하지 않는 것」, '바뀌는 곳', '네 곳'", "type": "style", "claim": "'것'·'곳'으로 대상을 가리킨다.", "principle": "SPECIFIC-NAME" },
+{ "where": "13·14행", "type": "style", "claim": "같은 사유를 '에이전트 실패'와 '에이전트 무응답'으로 적었다.", "principle": "TERM-ONE" },
+{ "where": "11·36·48행", "type": "style", "claim": "판단·확인의 주체가 없다.", "principle": "SUBJECT-OBJECT" },
+{ "where": "35행", "type": "constraint", "claim": "'D1 로 partial 의 주된 원인이 사라진다'를 재확인하지 않은 수치에 기대 단정한다.", "principle": "STATE-ASSUME" }
+], "principles_applied": ["TONE-AXIS", "FULL-SENTENCE", "ONE-ENDING", "BULLET-SCOPE", "ONE-IDEA", "NO-MID-MOD", "NO-STACK-MOD", "SUBJECT-OBJECT", "SPECIFIC-NAME", "TERM-ONE", "COUNT-EARNS", "STATE-ASSUME"], "notes": "호출자가 준 밀도 축(개조식 허용)은 TONE-AXIS 의 작업 지시서 산문 고정과 충돌해 원칙의 고정값으로 판정했다. (원본은 대화에 전달된 보고에서 옮겼고 근거 칸을 줄였다.)" }

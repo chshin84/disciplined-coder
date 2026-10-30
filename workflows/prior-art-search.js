@@ -353,14 +353,15 @@ function nextStep(j) {
 
 // 주장 하나의 판정 차례다. j 는 세 칸이 정해진 처음 판정, rf 와 rj 는 그 주장의 보충·재판정 판정(없으면 null)이다.
 // step 은 supported·unsupported·verify_failed 중 하나이고, j 는 step 을 정한 판정(검증 실패면 null)이다.
-// 보충이 없거나 보충 출력이 추출 기준을 통과하지 못하거나, 재판정이 없거나 칸이 빠지거나, 재판정도 정보 부족이면 verify_failed 다.
+// 보충이 없거나 보충 출력이 추출 기준을 통과하지 못하거나, 재판정이 없거나 칸이 빠지면 verify_failed 다.
+// 재판정도 정보 부족이면 판정 불가처럼 unsupported 다(2026-10-29 사용자 결정). 이유는 mergeUrl 이 reason 에 남긴다.
 function routeClaim(j, rf, rj) {
   const first = nextStep(j);
   if (first !== 'refetch') return { step: first, j };
   if (rf == null || !passesExtract(rf)) return { step: 'verify_failed', j: null };
   if (rj == null || !cellsOk(rj)) return { step: 'verify_failed', j: null };
   const second = nextStep(rj);
-  return { step: second === 'refetch' ? 'verify_failed' : second, j: rj };
+  return { step: second === 'refetch' ? 'unsupported' : second, j: rj };
 }
 
 // 판정 출력에서 refs 중 판정이 있는 ref 의 판정을 Map 으로 돌려준다. 판정이 빠진 ref 는 Map 에 없고, 그 주장만 검증 실패가 된다.
@@ -463,6 +464,7 @@ function mergeStages(refsByUrl, extract, judge, refetch, rejudge) {
 // URL 하나의 합치기다. spec 「최종 판정과 실패 처리」와 「충분성 판단과 보충·Opus 상향」(이 절의 상향 부분은 「Opus 일괄 판정」이 대체했다), 「Opus 일괄 판정」의 차례로 verdict 를 정하고,
 // URL 검증 실패이면 null 이다. 처음 판정의 무응답과 칸 누락은 URL 검증 실패이고, 처음 판정에서 빠진 주장과 보충·재판정의 실패는
 // 그 주장만 verify_failed 다. 끝까지 판정 불가가 남은 주장은 unsupported 이고, 판정 불가 칸의 이유 유형을 reason 에 남긴다.
+// 재판정도 정보 부족인 주장도 unsupported 이고, 정보 부족 칸 이름을 reason 의 `재판정 정보 부족:` 항목에 남긴다(spec 2026-10-29 D1).
 // quote 는 보충 출력이 추출 기준을 통과했으면 보충 구절이고, 아니면 추출 구절이다. reason 은 단계 이름을 붙인 이유를 ' / ' 로 이어 붙인다.
 function mergeUrl(url, refs, st) {
   const exBy = judgmentsByRef(refs, st.extract);
@@ -495,6 +497,8 @@ function mergeUrl(url, refs, st) {
     if (unsure.length > 0) {
       reasons.push(`판정 불가: ${unsure.map((k) => `${k}=${route.j.unsure_reasons?.[k] ?? ''}`).join(', ')}`);
     }
+    const short = route.j == null || route.j === j ? [] : judgeCells().filter((k) => route.j[k] === '정보 부족');
+    if (short.length > 0) reasons.push(`재판정 정보 부족: ${short.join(', ')}`);
     return out(route.step);
   });
   const principles = [];

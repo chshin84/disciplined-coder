@@ -1,0 +1,329 @@
+{
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq4",
+  "search_status": "ok",
+  "queries": [
+    "why do multi-agent LLM systems fail taxonomy",
+    "single agent vs multi-agent LLM comparison cost accuracy when to use",
+    "towards a science of scaling agent systems coordination overhead error amplification",
+    "don't build multi-agents context sharing subagents blog",
+    "rethinking multi-agent debate single agent strong baseline self-consistency matches",
+    "prompt chaining versus single prompt decomposition overhead too many steps LLM pipeline evaluation",
+    "multi-agent research system lessons token usage 15x chat orchestrator subagents engineering blog",
+    "building effective agents start with simplest solution add complexity only when needed workflows vs agents"
+  ],
+  "read": "[\"https://arxiv.org/html/2503.13657v3\", \"https://arxiv.org/abs/2505.18286\", \"https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them\", \"https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/\", \"https://cognition.com/blog/dont-build-multi-agents\", \"https://cognition.com/blog/multi-agents-working\", \"https://arxiv.org/html/2502.08788v3\", \"https://code.claude.com/docs/en/sub-agents\", \"https://www.anthropic.com/engineering/multi-agent-research-system\"]",
+  "issues": [
+    {
+      "where": "질문 (2) 후보안 B1·B2·B3 의 비교 범위",
+      "type": "weak-baseline",
+      "claim": "B1·B2·B3 는 모두 리뷰를 서브에이전트에 맡기는 구조이며, 입력의 후보안과 제약에는 단일 에이전트가 프롬프트만 다듬어 리뷰하는 기준선과의 비교가 보이지 않는다. 이 기준선과 비교되지 않았다.",
+      "prior_claim": "Anthropic 의 다중 에이전트 안내 글은 정교한 다중 에이전트 시스템을 만든 팀들에서 단일 에이전트의 프롬프트 개선이 같은 결과를 낸 사례가 반복해서 나왔다고 적고, 다중 에이전트 구현이 같은 작업에 3~10배 토큰을 쓴다고 적는다.",
+      "consequence": "리뷰 역할 분리의 비용 대비 효과가 서브에이전트 구조끼리만 비교되어, 분해 자체가 과한지는 판정할 근거가 현재 없다.",
+      "evidence": "글의 문장 'improved prompting on a single agent achieved equivalent results' 와 'multi-agent implementations typically use 3-10x more tokens than single-agent approaches for equivalent tasks'. 같은 글은 blackbox verification 을 분할이 잘 되는 사례로 꼽으므로, 리뷰 분리 자체를 반박하지는 않는다. 축 대조에서 목적(일반 에이전트 설계 안내)과 적용 대상(코딩·조사 일반)이 대조 대상과 다르다.",
+      "citations": [
+        {
+          "url": "https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them",
+          "kind": "vendor",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "다중 에이전트 실패 분류(MAST)",
+      "url": "https://arxiv.org/html/2503.13657v3",
+      "axes": {
+        "purpose": {
+          "prior": "다중 에이전트 시스템이 왜 실패하는지 분류한다",
+          "same": false,
+          "note": "대조 대상의 목적은 추가 탐색 라운드와 리뷰 구조의 선택이며, MAST 는 실패 원인 분류를 목적으로 한다"
+        },
+        "mechanism": {
+          "prior": "7개 프레임워크 1600여 실행 기록을 사람이 주석해 14개 실패 유형을 세 범주(명세·에이전트 간 불일치·검증)로 묶는다",
+          "same": false,
+          "note": "실행 기록 분석이며 대조 대상의 설계 변경과 다르다"
+        },
+        "evaluation": {
+          "prior": "실패 유형 빈도와 개입(역할 명세 명확화 +9.4%, 상위 목표 검증 단계 추가 +15.6%)의 성공률 변화",
+          "same": false,
+          "note": "대조 대상은 토큰·시간·질문 수 대비 반영 지적으로 평가한다"
+        },
+        "target": {
+          "prior": "소프트웨어 개발·수학 등 범용 다중 에이전트 프레임워크",
+          "same": false,
+          "note": "리뷰·검증 서브에이전트 묶음과 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과의 arXiv 논문(NeurIPS 2025 게재 목록 확인)",
+      "adoption": "참고",
+      "bearing": "실패 원인의 44% 가량이 명세·시스템 설계 문제이고 검증 실패가 23% 가량이라는 결과는, 역할 정의를 고정하는 B1·B2 쪽을 약하게 지지한다. 논문이 MAS 이득이 단일 에이전트·best-of-N 대비 미미한 경우가 많다고 적은 점은 분해 확대를 경계하는 근거다. 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "단일 에이전트와 다중 에이전트 비교(성능 향상에 따라 MAS 이득 감소)",
+      "url": "https://arxiv.org/abs/2505.18286",
+      "axes": {
+        "purpose": {
+          "prior": "MAS 와 SAS 중 어느 쪽이 나은지 실증 비교한다",
+          "same": false,
+          "note": "분해 여부 판단이라는 관심사는 질문 (2)와 겹치나, 리뷰 역할 구조 선택과는 다르다"
+        },
+        "mechanism": {
+          "prior": "여러 에이전트 응용에서 MAS 와 SAS 를 비교하고 둘 사이 요청 전달(cascading) 혼합안을 제안한다",
+          "same": false,
+          "note": "대조 대상은 실행 구조 정의 방식의 비교다"
+        },
+        "evaluation": {
+          "prior": "정확도와 배포 비용(혼합안 정확도 1.1~12% 향상, 비용 최대 20% 절감)",
+          "same": false,
+          "note": "초록만 열어 세부 지표를 확인하지 못했다"
+        },
+        "target": {
+          "prior": "범용 에이전트 응용",
+          "same": false,
+          "note": "리뷰 역할에 한정되지 않는다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과의 arXiv 초록",
+      "adoption": "참고",
+      "bearing": "모델 성능이 오를수록 MAS 이득이 줄고 비용 격차는 남는다는 결과는 역할 분해를 늘리는 방향을 약화하고, 실행 규칙 문서를 줄이는 B2 나 단순 구조 쪽으로 기운다. 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "다중 에이전트를 언제 쓰는지에 관한 공급사 안내",
+      "url": "https://www.claude.com/blog/building-multi-agent-systems-when-and-how-to-use-them",
+      "axes": {
+        "purpose": {
+          "prior": "다중 에이전트가 이득인 조건과 손해인 조건을 안내한다",
+          "same": false,
+          "note": "분해 과다 기준이라는 관심사는 질문 (2)와 같으나, 일반 설계 안내다"
+        },
+        "mechanism": {
+          "prior": "역할·작업 유형별 분할(계획자·구현자·검사자·리뷰어)을 피하고 맥락 경계로 분할하라고 권한다. 검증 서브에이전트는 맥락 전달이 적어 잘 맞는다고 적는다",
+          "same": false,
+          "note": "리뷰 서브에이전트 분리라는 구성요소만 같다"
+        },
+        "evaluation": {
+          "prior": "팀 경험과 사내 실험(조정에 실제 작업보다 많은 토큰 사용), 토큰 3~10배",
+          "same": false,
+          "note": "통제 실험 수치가 공개되지 않았다"
+        },
+        "target": {
+          "prior": "코딩·조사 등 범용 에이전트",
+          "same": false,
+          "note": "리뷰 렌즈 묶음에 한정되지 않는다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과의 공급사 블로그",
+      "adoption": "참고",
+      "bearing": "리뷰·검증은 맥락 분리가 쉬운 분할로 분류되므로 리뷰 역할을 서브에이전트로 두는 B1·B2 를 지지한다. 그러나 같은 작업의 순차 단계를 역할로 쪼개는 일은 과도한 분해로 보므로, 리뷰 역할 수를 늘리는 방향에는 반대 근거다. 검증 에이전트가 일부만 확인하고 통과를 선언하는 실패(early victory)는 어느 후보안에도 남는 위험이다."
+    },
+    {
+      "case": "에이전트 시스템 확장 과학(구성 180개 비교)",
+      "url": "https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트 구조가 언제 이득인지 예측 모형을 만든다",
+          "same": false,
+          "note": "분해 과다 판단 기준이라는 관심사는 겹치나 리뷰 구조 선택과 다르다"
+        },
+        "mechanism": {
+          "prior": "단일·독립·중앙집중·분산 등 조정 구조를 세 모델 계열과 네 벤치마크에서 비교한다",
+          "same": false,
+          "note": "대조 대상은 정의 파일과 실행 규칙 문서의 배치 비교다"
+        },
+        "evaluation": {
+          "prior": "과제 성공률. 독립 에이전트 오류 증폭 17.2배, 중앙집중 4.4배, 순차 추론 과제에서 모든 다중 변형이 39~70% 하락, 최적 구조 예측 87%",
+          "same": false,
+          "note": "약 45% 기준치는 블로그 본문에서 확인하지 못했다"
+        },
+        "target": {
+          "prior": "금융 추론·웹 탐색·계획·도구 사용 벤치마크",
+          "same": false,
+          "note": "리뷰·검증 작업과 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "2차",
+      "route": "검색 결과의 연구기관 블로그(원 논문은 arXiv 2512.08296, 열지 않음)",
+      "adoption": "참고",
+      "bearing": "병렬로 나눌 수 있는 작업에서만 다중 구조가 이득이고 순차 의존 작업에서는 손해라는 결과는, 서로 독립인 리뷰 렌즈 병렬 실행(B1·B2·B3 공통)을 막지 않으며 중앙 집계가 오류 증폭을 줄인다는 점은 집계 규칙을 두는 B1·B2 를 약하게 지지한다. 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "다중 에이전트 분할 반대 의견(맥락 공유 원칙)",
+      "url": "https://cognition.com/blog/dont-build-multi-agents",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트 구조 설계 원칙을 제시한다",
+          "same": false,
+          "note": "일반 원칙 글이다"
+        },
+        "mechanism": {
+          "prior": "전체 실행 기록 공유와, 행동에 암묵적 결정이 따른다는 원칙을 들어 병렬 하위 에이전트 분할을 피하라고 한다",
+          "same": false,
+          "note": "쓰기 작업을 나누는 분할을 다루며 읽기 전용 리뷰는 다루지 않는다"
+        },
+        "evaluation": {
+          "prior": "사례 서술(서로 다른 가정으로 만든 조각이 맞지 않는 예)",
+          "same": false,
+          "note": "정량 평가가 없다"
+        },
+        "target": {
+          "prior": "코딩 에이전트",
+          "same": false,
+          "note": "리뷰 역할과 다르다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "검색 결과의 기업 블로그",
+      "adoption": "참고",
+      "bearing": "쓰기 작업의 병렬 분할을 반대하므로, 읽기 전용인 리뷰 렌즈 분리에는 직접 적용되지 않는다. 후보안 사이 방향은 중립이다."
+    },
+    {
+      "case": "실제로 작동하는 다중 에이전트 패턴(리뷰 에이전트 포함)",
+      "url": "https://cognition.com/blog/multi-agents-working",
+      "axes": {
+        "purpose": {
+          "prior": "운영 환경에서 작동한 다중 에이전트 패턴을 보고한다",
+          "same": false,
+          "note": "일반 운영 경험 보고다"
+        },
+        "mechanism": {
+          "prior": "쓰기는 단일 흐름으로 두고, 코딩 에이전트와 맥락을 공유하지 않는 리뷰 에이전트가 변경분만 보고 지적한다",
+          "same": false,
+          "note": "맥락 없는 리뷰 에이전트라는 구성요소만 같다"
+        },
+        "evaluation": {
+          "prior": "PR 당 평균 2건의 버그 검출, 그중 약 58%가 심각",
+          "same": false,
+          "note": "대조 대상은 재검출률과 토큰으로 평가한다"
+        },
+        "target": {
+          "prior": "코드 변경 리뷰",
+          "same": false,
+          "note": "문서·설계 리뷰와 다르다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과에서 같은 회사 후속 글로 이동",
+      "adoption": "참고",
+      "bearing": "맥락을 공유하지 않는 별도 리뷰 에이전트가 운영에서 효과를 냈다는 보고는 리뷰를 서브에이전트로 분리하는 B1·B2·B3 공통 전제를 지지한다. 정의 고정(B1·B2)과 템플릿 전달(B3) 사이는 가르지 않는다. 리뷰 지적을 사용자 지시와 대조해 걸러 끝없는 반복을 피할 연결 장치가 필요하다고 적는다."
+    },
+    {
+      "case": "다중 에이전트 토론 과대평가 비판",
+      "url": "https://arxiv.org/html/2502.08788v3",
+      "axes": {
+        "purpose": {
+          "prior": "다중 에이전트 토론이 단일 에이전트보다 나은지 평가한다",
+          "same": false,
+          "note": "추론 정확도 향상 방법 평가다"
+        },
+        "mechanism": {
+          "prior": "토론 방법 5개를 벤치마크 9개와 모델 4개에서 CoT·Self-Consistency 와 비교한다",
+          "same": false,
+          "note": "역할 분리 리뷰와 다른 토론 구조다"
+        },
+        "evaluation": {
+          "prior": "정확도와 추론 연산량. 토론 방법이 더 많은 연산을 쓰고도 단순 단일 에이전트 기준선을 넘지 못하는 일이 잦다",
+          "same": false,
+          "note": "연산량을 맞춘 비교인지는 열어 본 쪽에서 확인하지 못했다"
+        },
+        "target": {
+          "prior": "추론 벤치마크",
+          "same": false,
+          "note": "리뷰 작업과 다르다"
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과의 arXiv 논문",
+      "adoption": "참고",
+      "bearing": "같은 모델 여러 개를 엮는 구조가 단순 기준선을 자주 넘지 못한다는 결과는 렌즈 수를 늘리는 방향에 반대 근거이며, 단일 에이전트 기준선 비교가 필요하다는 근거다. 모델 이질성이 효과를 낸다는 주장은 역할마다 모델을 고정하는 B1·B2 와 방향이 맞는다. 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "서브에이전트 정의 기능 공식 문서",
+      "url": "https://code.claude.com/docs/en/sub-agents",
+      "axes": {
+        "purpose": {
+          "prior": "반복되는 작업자를 도구·모델·시스템 프롬프트가 고정된 정의로 재사용하게 한다",
+          "same": true,
+          "note": "같은 지시로 같은 종류의 작업자를 반복 실행할 때 정의를 두라는 목적이 B1·B2 의 목적과 같다"
+        },
+        "mechanism": {
+          "prior": "정의 파일이 도구 허용 목록·모델·시스템 프롬프트·권한을 고정하고, 서브에이전트는 기본 시스템 프롬프트 없이 그 프롬프트만 받는다",
+          "same": false,
+          "note": "B1·B2 의 정의 고정과 같으나 실행 규칙 문서·집계는 다루지 않는다"
+        },
+        "evaluation": {
+          "prior": "평가 수치 없이 장점(맥락 보존·제약 강제·재사용·비용 제어)과 쓰지 말 조건(지연, 잦은 왕복, 단계 간 맥락 공유)을 적는다",
+          "same": false,
+          "note": "정량 평가가 없다"
+        },
+        "target": {
+          "prior": "코딩 도구의 하위 작업자 일반",
+          "same": false,
+          "note": "리뷰 역할에 한정되지 않는다"
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "공식 문서 직접 열람",
+      "adoption": "참고",
+      "bearing": "같은 지시로 같은 작업자를 반복 실행하면 정의를 두라는 지침과 저가 모델 지정에 의한 비용 제어는 B1·B2 를 B3 보다 지지한다. 서브에이전트 설명이 합계 15,000 토큰을 넘으면 시작 경고가 나온다는 기준은 정의 수가 과해지는 기준의 하나로 쓸 수 있다."
+    },
+    {
+      "case": "다중 에이전트 조사 시스템 구축 기록",
+      "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+      "axes": {
+        "purpose": {
+          "prior": "조사 작업을 오케스트레이터와 병렬 하위 에이전트로 수행한다",
+          "same": false,
+          "note": "조사 절차라는 관심사는 질문 (1)과 겹치나 추가 라운드 결정과 리뷰 구조 결정은 다루지 않는다"
+        },
+        "mechanism": {
+          "prior": "질문 복잡도에 따라 하위 에이전트 수와 도구 호출 수를 프롬프트 규칙으로 정한다. 평가는 단일 프롬프트 단일 호출 판정자가 가장 일관되었다고 적는다",
+          "same": false,
+          "note": "노력 조절 규칙과 단일 판정자라는 구성요소만 비교할 수 있다"
+        },
+        "evaluation": {
+          "prior": "사내 조사 평가와 BrowseComp. 토큰 사용량이 성능 분산의 80%를 설명하고, 다중 에이전트는 채팅의 약 15배 토큰을 쓴다",
+          "same": false,
+          "note": "대조 대상은 반영 지적 수와 사용자 질문 수도 본다"
+        },
+        "target": {
+          "prior": "웹 조사",
+          "same": false,
+          "note": "선행연구 탐색과 유사하나 리뷰는 아니다"
+        }
+      },
+      "outcome": "성공",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과의 공급사 엔지니어링 블로그",
+      "adoption": "참고",
+      "bearing": "초기 실패로 단순 질문에 하위 에이전트 50개를 띄운 사례를 들고 복잡도에 맞춰 노력을 조절하는 규칙을 둔 점은, 고정 횟수를 모든 작업에 적용하기보다 조건부로 추가 탐색을 권하는 A2 를 지지한다. 판정을 단일 호출로 둔 쪽이 가장 일관되었다는 서술은 판정 역할을 잘게 나누는 방향에 반대 근거다."
+    }
+  ],
+  "saturation": "1",
+  "not_found": "[\"리뷰·검증 역할을 고정 정의 서브에이전트로 두는 방식과 프롬프트 템플릿을 범용 서브에이전트에 넘기는 방식을 비용·재현성으로 직접 비교한 공개 연구를 찾지 못했다. 공개 자료는 서브에이전트 사용 여부 단위로만 비교한다.\", \"역할 수가 몇 개를 넘으면 분해가 과하다는 수치 기준을 찾지 못했다. 찾은 기준은 맥락 분리 가능성, 순차 의존성, 단일 에이전트 성능 수준 같은 조건형이다.\", \"에이전트 확장 과학 논문의 약 45% 단일 에이전트 기준치는 검색 요약에만 있고 열어 본 블로그 본문에서 확인하지 못했다. 원 논문(arXiv 2512.08296)은 열지 않았다.\"]",
+  "disclosures": "[\"2505.18286 과 2502.08788 은 초록 쪽만 열려 세부 실험 조건을 확인하지 못했다.\", \"MAST 논문은 본문 앞쪽 100,000자만 읽었다.\", \"Google 블로그는 원 논문의 2차 요약이다.\", \"중앙 집계가 오류 증폭을 줄인다는 결과를 리뷰 집계 규칙에 옮기는 판단은 연구자의 추론(derived)이다.\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SPECIFIC-NAME\", \"WRITTEN-ONLY\"]",
+  "notes": "탐색 방법은 짧고 넓은 검색어로 시작해 좁혀 가기와, 실패·반대 의견 자료 찾기, 같은 저자 후속 글 따라가기를 함께 썼다. 체크리스트는 기준선(단일 에이전트 기준선)과 전이(검증 에이전트의 조기 통과 선언 실패)만 골라 썼다. 검증 에이전트가 일부만 확인하고 통과를 선언하는 실패는 대조 대상의 렌즈 정의가 이미 전수 확인 지시를 두었는지 확인할 수 없어 issues 에 올리지 않았다. 확인하려면 각 렌즈 정의의 지시문에 전수 검사 요구가 있는지 보아야 한다. 프롬프트 연쇄(chaining) 대 단일 프롬프트 검색 결과는 수치 출처가 불분명한 블로그와 용어집뿐이어서 intended_use 의 비용 근거로 쓰기 어렵다고 보고 뺐다. 제약에 있는 자체 측정과 deep-research 스킬 문구는 다시 찾지 않았다."
+}

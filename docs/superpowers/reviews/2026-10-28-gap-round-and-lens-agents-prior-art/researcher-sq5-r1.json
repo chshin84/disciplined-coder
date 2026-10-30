@@ -1,0 +1,311 @@
+{
+  "search_status": "ok",
+  "queries": [
+    "multi-agent LLM code review specialized reviewer agents false positives evaluation",
+    "LLM-as-judge ensemble number of judges diminishing returns",
+    "LLM code review run-to-run variability same model repeated runs different findings",
+    "self-consistency multiple samples vs multiple different models ensemble error detection LLM verifier",
+    "multi-agent code review specialized agents ablation number of agents precision recall arxiv",
+    "LLM judge panel diverse models outperforms single large judge cost PoLL",
+    "LLM code review multiple passes union of runs recall improvement cost",
+    "same LLM different persona prompts reviewers diversity correlated errors multi-perspective evaluation"
+  ],
+  "issues": [
+    {
+      "where": "B1·B2의 리뷰 역할 수(렌즈를 여럿 두는 구조)",
+      "type": "known-failure",
+      "claim": "리뷰 역할을 늘리면 지적 수와 함께 오탐도 늘 수 있다. 대조 대상의 자체 측정 자료(constraints)에는 역할 수에 따른 오탐률이 없어서, 이 실패 원인이 대조 대상에 남아 있는지는 확인되지 않았다.",
+      "prior_claim": "4개 전문 에이전트로 코드를 검증한 프리프린트의 에이전트 수 소거 실험(29개 표본)에서 평균 정확도는 1개 32.8%, 4개 72.4%로 올랐으나 한계 이득은 +14.9, +13.5, +11.2pp로 줄었다. 평균 오탐률은 1개 10.0%에서 4개 40.0%로 올랐고, 최고의 2개 조합(79.3%)이 4개 전체(72.4%)보다 높았다.",
+      "consequence": "역할을 추가할 때 지적 수만 보면 순이득이 과대평가될 수 있다. 그래서 B1·B2에서 역할 수를 정할 근거로 오탐률이나 반영률 측정이 빠져 있다.",
+      "evidence": "arXiv 2511.16708v3 HTML 6.2절과 부록 A. 축 대조 결과, 목적(검증)은 비슷하나 적용 대상(코드 버그 탐지 대 문서 리뷰), 메커니즘(정적 분석형 에이전트 조합 대 LLM 리뷰 역할), 평가(라벨된 버그 표본 대 재검출률)가 다르다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/html/2511.16708v3",
+          "kind": "preprint",
+          "opened": true
+        }
+      ]
+    },
+    {
+      "where": "같은 렌즈 재실행 시 새 지적 21~55% 측정의 해석",
+      "type": "known-failure",
+      "claim": "같은 리뷰어를 재실행해 나온 새 지적을 추가 근거로 셀 때, 그 새 지적 중 상당수가 1회성 지적일 수 있다. 대조 대상의 자체 측정은 새 지적의 비율만 적고 그 지적의 정확도나 재현 여부를 구분하지 않았다.",
+      "prior_claim": "LLM 보안 리뷰를 같은 조건으로 5회씩 반복한 벤치마크에서 기준 목록과 맞는 지적 158건 중 134건(84.8%)은 5회 모두 나왔다. 그러나 기준 목록 밖의 지적 161건 중 80건(49.7%)은 5회 중 1회만 나왔고 5회 모두 나온 지적은 22건(13.7%)이었다.",
+      "consequence": "재실행으로 늘어난 지적 수가 반영할 근거의 증가로 읽히면 재실행의 효용이 과대평가된다.",
+      "evidence": "Snyk 블로그(벤치마크 작성사 자료이며 같은 내용이 arXiv 2606.15762로 공개됨). 적용 대상은 코드 보안 리뷰이고 대조 대상은 문서 리뷰이므로 비율을 그대로 옮길 수 없다.",
+      "citations": [
+        {
+          "url": "https://snyk.io/blog/snyk-vulnbench-js-1-0-llm-security-review-repeatability/",
+          "kind": "vendor",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "전문 에이전트 수 소거 실험(정보이론 기반 다중 에이전트 코드 검증)",
+      "url": "https://arxiv.org/html/2511.16708v3",
+      "axes": {
+        "purpose": {
+          "prior": "코드의 버그를 여러 전문 에이전트로 검출한다.",
+          "same": false,
+          "note": "검증이라는 목적은 비슷하나 대조 대상은 spec·plan 문서 리뷰다."
+        },
+        "mechanism": {
+          "prior": "정확성·보안·성능·스타일 에이전트를 조합하고 합의로 판정한다.",
+          "same": false,
+          "note": "역할 분리 구조는 같으나 서브에이전트 정의·모델 고정 여부는 다루지 않는다."
+        },
+        "evaluation": {
+          "prior": "29개 수작업 표본에서 정확도·TPR·FPR을 에이전트 수별로 측정했다.",
+          "same": false,
+          "note": "대조 대상은 라벨 없는 재검출률과 토큰 합으로 측정했다."
+        },
+        "target": {
+          "prior": "LLM이 생성한 코드 표본이다.",
+          "same": false,
+          "note": "대조 대상은 사람이 읽을 설계 문서다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv HTML 본문 열람",
+      "adoption": "참고",
+      "bearing": "역할 수를 늘리면 한계 이득이 줄고 오탐이 오른다는 근거이므로, B1·B2에서 역할 수를 줄이거나 역할 추가 시 오탐을 측정하는 쪽으로 움직인다. B1·B2·B3 사이의 실행 구조 선택에는 직접 영향이 없다."
+    },
+    {
+      "case": "9개 LLM 심판 패널의 상관 오류",
+      "url": "https://arxiv.org/abs/2605.29800",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 심판 패널의 판정 신뢰성을 평가한다.",
+          "same": false,
+          "note": "판정 정확도가 목적이고 결함 발견은 아니다."
+        },
+        "mechanism": {
+          "prior": "7개 계열 9개 모델이 같은 항목을 판정하고 투표로 집계한다.",
+          "same": false,
+          "note": "대조 대상은 역할이 서로 다른 리뷰어이고 같은 질문에 투표하지 않는다."
+        },
+        "evaluation": {
+          "prior": "사람 주석 100개씩 붙은 NLI 데이터셋 3종에서 Kish 유효 표본 수로 독립성을 측정했다.",
+          "same": false,
+          "note": "대조 대상의 평가와 지표가 다르다."
+        },
+        "target": {
+          "prior": "자연어 추론 판정 과제다.",
+          "same": false,
+          "note": "문서 리뷰가 아니다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록 열람",
+      "adoption": "참고",
+      "bearing": "같은 질문을 여러 심판에게 묻는 방식은 유효 표 수가 약 2개에 그치고 최고의 단일 심판이 패널과 같거나 낫다는 근거다. 같은 역할을 여러 번 실행하는 방식에는 불리하게 움직이나, 역할을 나눈 B1·B2에는 축이 달라 옮겨 쓰기 어렵다."
+    },
+    {
+      "case": "LLM 보안 리뷰 반복 실행 벤치마크",
+      "url": "https://snyk.io/blog/snyk-vulnbench-js-1-0-llm-security-review-repeatability/",
+      "axes": {
+        "purpose": {
+          "prior": "같은 LLM 리뷰를 반복할 때 지적이 재현되는지 측정한다.",
+          "same": false,
+          "note": "재실행 변동이라는 관심사는 같으나 대조 대상의 목적은 리뷰 구조 결정이다."
+        },
+        "mechanism": {
+          "prior": "같은 설정으로 5회 반복 실행했다.",
+          "same": false,
+          "note": "같은 리뷰어 재실행 구성요소만 같다."
+        },
+        "evaluation": {
+          "prior": "기준 목록 대비 F1과 5회 중 재등장 횟수를 측정했다.",
+          "same": false,
+          "note": "대조 대상은 기준 목록 없이 새 지적 비율을 측정했다."
+        },
+        "target": {
+          "prior": "Express/JavaScript 코드 10개다.",
+          "same": false,
+          "note": "문서 리뷰가 아니다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과에서 작성사 블로그 열람(arXiv 2606.15762 요약도 확인)",
+      "adoption": "참고",
+      "bearing": "재실행에서 나온 새 지적의 절반가량이 1회성일 수 있다는 근거이므로, 같은 렌즈 재실행을 근거 증가 수단으로 쓰는 안에 불리하게 움직인다. B1·B2·B3 선택과는 무관하다."
+    },
+    {
+      "case": "자기일관 오류 연구",
+      "url": "https://arxiv.org/abs/2505.17656",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 오류 검출 방법이 반복 샘플에서 같은 오답을 잡는지 본다.",
+          "same": false,
+          "note": "오류 검출이라는 목적은 비슷하나 리뷰가 아니다."
+        },
+        "mechanism": {
+          "prior": "외부 검증 LLM의 은닉 상태를 결합한 교차 모델 탐침을 쓴다.",
+          "same": false,
+          "note": "대조 대상은 은닉 상태를 쓰지 않는다."
+        },
+        "evaluation": {
+          "prior": "3개 LLM 계열에서 검출 성능을 비교했다.",
+          "same": false,
+          "note": "평가 과제와 지표가 다르다."
+        },
+        "target": {
+          "prior": "질의응답 과제다.",
+          "same": false,
+          "note": "문서 리뷰가 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록 열람(EMNLP 2025 본회의)",
+      "adoption": "참고",
+      "bearing": "같은 모델 재샘플링으로는 자기일관 오류를 못 잡고 모델 규모가 커져도 그 오류가 줄지 않는다는 근거다. 같은 리뷰어 재실행보다 다른 모델 리뷰어 추가 쪽으로 움직이나, 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "자기일관성 대 교차 모델 일관성의 환각 검출",
+      "url": "https://arxiv.org/html/2502.15845v1",
+      "axes": {
+        "purpose": {
+          "prior": "환각 검출에서 재샘플링과 검증 모델 추가를 비교한다.",
+          "same": false,
+          "note": "리뷰 결함 발견이 아니다."
+        },
+        "mechanism": {
+          "prior": "자기일관성으로 먼저 거르고 불확실한 구간만 검증 모델에 보내는 2단계 방식이다.",
+          "same": false,
+          "note": "불확실할 때만 추가 리뷰어를 호출하는 구성요소만 대조 대상의 선택적 추가 실행과 비슷하다."
+        },
+        "evaluation": {
+          "prior": "AUROC·AURAC와 검증 비용 비율을 측정했다.",
+          "same": false,
+          "note": "대조 대상은 토큰 합과 재검출률을 측정했다."
+        },
+        "target": {
+          "prior": "질의응답 과제다.",
+          "same": false,
+          "note": "문서 리뷰가 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "인용 따라가기(검색 결과의 HTML 본문 열람)",
+      "adoption": "참고",
+      "bearing": "재샘플링 방법은 이미 상한 근처라 개선 여지가 작고, 검증 모델을 불확실 구간에만 호출해도 최대 이득의 95%를 유지하며 검증 비용을 13.5~28% 줄였다. 추가 실행을 조건부로만 권하는 A2형 설계와 같은 방향이지만 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "다양한 모델 패널 대 단일 대형 심판(PoLL)",
+      "url": "https://arxiv.org/abs/2404.18796v2",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 생성물 평가를 싸고 덜 편향되게 한다.",
+          "same": false,
+          "note": "생성물 채점이 목적이다."
+        },
+        "mechanism": {
+          "prior": "서로 다른 계열의 작은 모델 여럿이 판정하고 최대값이나 평균으로 집계한다.",
+          "same": false,
+          "note": "대조 대상은 모델이 아닌 역할로 리뷰어를 나눈다."
+        },
+        "evaluation": {
+          "prior": "3개 심판 설정, 6개 데이터셋에서 사람 판정과의 상관과 비용을 비교했다.",
+          "same": false,
+          "note": "지표가 다르다."
+        },
+        "target": {
+          "prior": "질의응답과 챗봇 응답이다.",
+          "same": false,
+          "note": "문서 리뷰가 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록 열람",
+      "adoption": "참고",
+      "bearing": "작은 모델 여럿의 패널이 단일 대형 심판보다 7배 넘게 싸고 성능도 높았다는 근거다. 서브에이전트 정의에 모델을 고정하는 B1·B2에서 역할마다 더 싼 모델을 지정할 여지를 지지하나, 네 축이 모두 달라 단독 근거로 쓰기 어렵다."
+    },
+    {
+      "case": "다중 제공사 모델 코드 리뷰 사례연구",
+      "url": "https://zenodo.org/records/20519585",
+      "axes": {
+        "purpose": {
+          "prior": "LLM 리뷰의 결함 발견률을 모델 조합별로 비교한다.",
+          "same": true,
+          "note": "리뷰어 추가의 한계 효용을 본다는 목적이 같다."
+        },
+        "mechanism": {
+          "prior": "5개 제공사 8개 모델이 같은 산출물을 독립 리뷰하고 사람이 합친다.",
+          "same": false,
+          "note": "대조 대상은 같은 모델의 역할 분리이고 리뷰어를 모델로 나누지 않는다."
+        },
+        "evaluation": {
+          "prior": "사람이 확정한 결함 154건 대비 재현율과 모델 간 Jaccard 중복도를 측정했다.",
+          "same": false,
+          "note": "대조 대상은 정답 집합 없이 재검출률을 측정했다."
+        },
+        "target": {
+          "prior": "코드와 혼합 산출물 18건이다.",
+          "same": false,
+          "note": "혼합 산출물에 문서가 일부 포함되나 대조 대상의 spec·plan과 같다고 확인하지 못했다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 Zenodo 기록 열람",
+      "adoption": "참고",
+      "bearing": "두 번째 모델(다른 제공사)을 넣을 때 범위가 33.6%에서 57.1%로 가장 크게 늘고 이후 이득은 줄었다. 같은 모델 반복 실행의 변동은 확인하지 못했다고 저자가 적었다. 리뷰어를 늘릴 때 같은 리뷰어 재실행보다 성격이 다른 리뷰어를 1개 추가하는 쪽으로 움직인다."
+    },
+    {
+      "case": "코드 리뷰 에이전트의 마이크로 에이전트 전환 사례",
+      "url": "https://www.zenml.io/llmops-database/reducing-false-positives-in-ai-code-review-agents-through-architecture-refinement",
+      "axes": {
+        "purpose": {
+          "prior": "코드 리뷰 에이전트의 오탐을 줄인다.",
+          "same": false,
+          "note": "오탐 감소가 목적이고 대조 대상은 구조 정리와 비용이 목적이다."
+        },
+        "mechanism": {
+          "prior": "추론 기록 강제, 도구 축소, 큰 프롬프트를 좁은 책임의 마이크로 에이전트로 분할하는 변경을 함께 적용했다.",
+          "same": false,
+          "note": "역할별 에이전트 분리 구성요소만 B1과 같다."
+        },
+        "evaluation": {
+          "prior": "오프라인 시험에서 오탐 51% 감소를 보고했으나 데이터셋과 기준값은 공개하지 않았다.",
+          "same": false,
+          "note": "세 변경의 기여를 분리하지 않았다."
+        },
+        "target": {
+          "prior": "실제 풀 리퀘스트 코드 리뷰다.",
+          "same": false,
+          "note": "문서 리뷰가 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "검색 결과에서 사례 데이터베이스 요약 열람",
+      "adoption": "참고",
+      "bearing": "큰 단일 프롬프트에 규칙을 쌓는 방식이 오탐을 늘렸다는 실무 보고로, 범용 에이전트에 큰 템플릿을 넘기는 B3보다 역할을 좁힌 B1·B2 쪽으로 약하게 움직인다. 효과가 분리되지 않아 근거가 약하다."
+    }
+  ],
+  "subquestion_id": "sq5",
+  "mode": "survey",
+  "read": "[\"D:\\\\projects\\\\disciplined-coder\\\\agent-principles.md\", \"https://arxiv.org/abs/2605.29800\", \"https://www.zenml.io/llmops-database/reducing-false-positives-in-ai-code-review-agents-through-architecture-refinement\", \"https://snyk.io/blog/snyk-vulnbench-js-1-0-llm-security-review-repeatability/\", \"https://www.emergentmind.com/papers/2606.15762\", \"https://arxiv.org/abs/2505.17656\", \"https://arxiv.org/abs/2607.10139\", \"https://arxiv.org/pdf/2511.16708\", \"https://arxiv.org/html/2511.16708v3\", \"https://arxiv.org/html/2502.15845v1\", \"https://arxiv.org/abs/2404.18796v2\", \"https://arxiv.org/pdf/2509.01494\", \"https://zenodo.org/records/20519585\"]",
+  "saturation": "3",
+  "not_found": "[\"문서(spec·plan) 리뷰에서 리뷰 역할 수에 따른 오탐률이나 반영률을 측정한 연구는 찾지 못했다. 검색 결과가 코드 리뷰와 판정 과제에 몰려 있었다.\", \"같은 모델에 역할 프롬프트만 바꾼 리뷰어들 사이의 오류 상관을 직접 측정한 연구는 찾지 못했다. 페르소나 검색 결과는 정확도 변동만 다뤘다.\", \"같은 리뷰어 재실행 합집합과 다른 리뷰어 추가를 같은 비용으로 비교한 연구는 찾지 못했다.\", \"SWR-Bench(arXiv 2509.01494)의 반복 리뷰 합치기 결과(n=10에서 재현율 118.83% 증가로 검색 결과가 전함)는 PDF 본문을 읽지 못해 확인하지 못했다.\", \"LLMs as a Jury(arXiv 2607.10139)의 '자기 채점 0% 대 3개 모델 100%', '4개 모델이 32개 샘플보다 낫다'는 수치는 초록에 없어 확인하지 못했다.\"]",
+  "disclosures": "[\"SWR-Bench PDF는 열었으나 본문이 압축되어 읽지 못했으므로 근거 지도에 넣지 않았다(opened=false 상당).\", \"9개 심판 연구와 LLMs as a Jury는 초록만 열었다. 검색 요약이 전한 '5개 넘으면 이득 미미'와 '같은 계열 상관이 약간 높음'은 초록에서 확인되지 않아 쓰지 않았다.\", \"Snyk 벤치마크는 작성사가 자기 도구 결과를 기준 목록으로 삼았으므로 기준 목록 밖 지적이 모두 오탐이라고 볼 수 없다.\", \"대조 대상이 리뷰 역할마다 같은 모델을 쓰는지는 입력에 명시되지 않았다. 다른 모델 추가 관련 행의 bearing은 그 가정 위에 있다.\"]",
+  "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SPECIFIC-NAME\", \"SUBJECT-OBJECT\", \"WRITTEN-ONLY\", \"TERM-ONE\", \"YAGNI\"]",
+  "notes": "탐색 방법은 짧고 넓은 검색어로 시작해 좁혀 가기와 인용 따라가기(검색 요약이 가리킨 1차 논문 초록·본문 열람)를 골랐다. intended_use의 기준(작업당 비용 대비 반영 지적, 구조 이해 용이성)에 맞춰 리뷰어 수의 한계 효용, 오탐, 재실행 대 다른 리뷰어 추가를 우선했다. 기시감·결말·전이 체크리스트만 썼고 붐빔·기준선은 이 하위 질문에 맞지 않아 쓰지 않았다. 뺀 근거와 사유는 아래와 같다. 다중 에이전트 코드 리뷰 석사 논문과 22쌍 적대적 리뷰 실무 글은 오탐 측정이 없거나 자가 보고뿐이라 뺐다. 페르소나 벤치마크 논문들은 리뷰가 아닌 정확도 변동만 다뤄 뺐다. 리뷰 도구 패키지의 재현율 주장(88%에서 99%)은 프로젝트 자가 주장이라 뺐다. 종합하면 공개 근거는 세 방향으로 모인다. 첫째, 같은 질문에 리뷰어를 더하면 오류 상관 때문에 한계 효용이 빠르게 준다. 둘째, 같은 모델 재실행의 새 지적은 1회성 비율이 높다. 셋째, 다른 계열 모델 하나를 추가할 때 범위 이득이 가장 크다. 다만 모든 행이 코드나 판정 과제여서 문서 리뷰로 옮기려면 대조 대상 안에서 역할별 반영률(사용자가 받아들인 지적 비율)을 측정해야 한다. 그 측정이 왜 필요한지는 issues의 두 건에 적었다."
+}
