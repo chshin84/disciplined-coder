@@ -2,6 +2,7 @@
 
 시험 단위는 evals/principles/clauses/<단위 이름>/ 폴더 하나다. ids 파일이 있으면 그 줄들이, 없으면 폴더 이름이
 단위의 조항 ID 다. current.md 가 있으면 문구 변경(current·new 비교), 없으면 새 조항(none·new 비교)이다.
+new-deliverable.md 가 있으면 type 이 deliverable 인 질문의 변경안은 new.md 대신 그 문안을 쓴다(범위마다 실리는 규칙이 다른 변경을 시험할 때).
 같은 질문을 같은 조건으로 두 번 생성하지 않도록 생성은 생성 키로, 판정은 판정 키로 기록한다(2026-10-18 사용자 지시).
 
 사용: python _eval_clause.py run <과제> <단위> <결과> <임시> [단위 이름...]
@@ -50,7 +51,7 @@ def load_units(root, names=None):
         rd = lambda f: open(os.path.join(d, f), encoding="utf-8").read() if os.path.isfile(os.path.join(d, f)) else None
         ids = [x.strip() for x in (rd("ids") or n).splitlines() if x.strip()]
         base = (rd("base") or "").strip() or None
-        units[n] = {"ids": ids, "current": rd("current.md"), "new": rd("new.md") or "", "base": base,
+        units[n] = {"ids": ids, "current": rd("current.md"), "new": rd("new.md") or "", "new_deliverable": rd("new-deliverable.md"), "base": base,
                     "system": rd("system.md") or None}
     missing = set(names or []) - set(units)
     if missing:
@@ -63,17 +64,19 @@ def questions(cases, unit):
                   if "dev" in (c["meta"].get("tags") or []) and set(c["meta"].get("clause") or []) & set(unit["ids"]))
 
 
-def conditions(unit):
+def conditions(unit, case=None):
     """(조건 이름, 문안). 첫째가 비교 조건이다."""
     cmp = ("current", unit["current"]) if unit["current"] is not None else ("none", "")
-    return [cmp, ("new", unit["new"])]
+    deliv = unit.get("new_deliverable")
+    new = deliv if deliv and case and case["meta"].get("type") == "deliverable" else unit["new"]
+    return [cmp, ("new", new)]
 
 
 def plan_jobs(cases, units, done_gen, done_judge):
     gen_jobs, judge_jobs, seen = [], [], set()
     for u in units.values():
         for q in questions(cases, u):
-            for cond, text in conditions(u):
+            for cond, text in conditions(u, cases[q]):
                 gk = gen_key(cases[q], text, u.get("system"))
                 if gk in seen:
                     continue
@@ -102,11 +105,12 @@ def read_jsonl(path):
 
 def report_unit(cases, unit, gens, judges, count):
     qs = questions(cases, unit)
-    (cmp, ctext), (_, ntext) = conditions(unit)
+    cmp = conditions(unit)[0][0]
     tot = {"c": 0, "n": 0}
     chat = {"c": [], "n": []}
     complete = True
     for q in qs:
+        (_, ctext), (_, ntext) = conditions(unit, cases[q])
         for side, text in (("c", ctext), ("n", ntext)):
             gk = gen_key(cases[q], text, unit.get("system"))
             j = judges.get(judge_key(gk, cases[q]["criteria"]))

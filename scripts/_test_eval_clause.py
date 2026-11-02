@@ -102,6 +102,12 @@ fc["n1"]["meta"]["pair"] = "없는과제"
 say("없는 과제를 가리키는 pair 는 실패한다", lib["check_pairs"](fc) != [])
 # 단위별 기준 커밋과 시스템 프롬프트
 ev = runpy.run_path(os.path.join(scripts, "_eval_run.py"))
+# new-deliverable.md 가 있으면 deliverable 질문만 그 문안으로 생성한다.
+qd = {"c1": case("챗", clause=["D"]), "d1": case("문서", clause=["D"], kind="should-not", typ="deliverable")}
+ud = {"ids": ["D"], "current": "옛", "new": "새", "new_deliverable": "새문서", "base": None, "system": None}
+gd, _ = cl["plan_jobs"](qd, {"u": ud}, set(), set())
+texts = {(j[1], j[2]): j[3] for j in gd}
+say("deliverable 질문은 new-deliverable 문안을 쓴다", texts[("d1", "new")] == "새문서" and texts[("c1", "new")] == "새")
 qs3 = {f"b{i}": case(f"본문{i}", clause=["B-ONE"], kind=("should" if i else "should-not")) for i in range(3)}
 bases = {"7a2d26d": "기본 줄\n", "abc1234": "기본 줄\n새 기준에만 있는 줄\n"}
 ub = {"B-ONE": {"ids": ["B-ONE"], "current": "새 기준에만 있는 줄", "new": "n", "base": "abc1234", "system": None}}
