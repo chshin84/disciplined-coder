@@ -443,7 +443,7 @@ check "보충 실패는 그 주장만 검증 실패다" "v2 'v(\"n4\", \"N#4\")[
 check "보충 출력의 access 실패는 그 주장만 검증 실패다" "v2 'v(\"n5\", \"N#6\")[\"verdict\"] == \"verify_failed\" and v(\"n5\", \"N#7\")[\"verdict\"] == \"supported\"'"
 check "보충 출력의 exists 불일치는 그 주장만 검증 실패다" "v2 'v(\"n10\", \"N#15\")[\"verdict\"] == \"verify_failed\" and v(\"n10\", \"N#16\")[\"verdict\"] == \"supported\"'"
 check "재판정 실패는 그 주장만 검증 실패다" "v2 'v(\"n6\", \"N#8\")[\"verdict\"] == \"verify_failed\" and v(\"n6\", \"N#9\")[\"verdict\"] == \"supported\"'"
-check "재판정도 정보 부족이면 그 주장만 검증 실패다(합치기)" "v2 'v(\"n7\", \"N#10\")[\"verdict\"] == \"verify_failed\" and v(\"n7\", \"N#11\")[\"verdict\"] == \"supported\"'"
+check "재판정도 정보 부족이면 그 주장만 기각이고 이유가 남는다(합치기)" "v2 'v(\"n7\", \"N#10\")[\"verdict\"] == \"unsupported\" and \"재판정 정보 부족: numbers_conditions\" in v(\"n7\", \"N#10\")[\"reason\"] and v(\"n7\", \"N#11\")[\"verdict\"] == \"supported\"'"
 check "재판정의 판정 불가도 기각이고 이유가 남는다" "v2 'v(\"n8\", \"N#12\")[\"verdict\"] == \"unsupported\" and v(\"n8\", \"N#12\")[\"quote\"] == \"r12\" and \"언어 해석\" in v(\"n8\", \"N#12\")[\"reason\"]'"
 check "처음 판정의 판정 불가는 보충 없이 기각이다" "v2 'v(\"n9\", \"N#13\")[\"verdict\"] == \"unsupported\" and \"조건 얽힘\" in v(\"n9\", \"N#13\")[\"reason\"] and v(\"n9\", \"N#14\")[\"verdict\"] == \"supported\"'"
 E_MG2_STG='d["stages"]["https://n1"]["refetch"]["judgments"][0]["quote"] == "r1" and d["stages"]["https://n1"]["rejudge"]["judgments"][0]["reason"] == "rj1" and d["stages"]["https://n4"]["refetch"] is None and d["stages"]["https://n9"]["rejudge"] is None'
@@ -725,7 +725,7 @@ check "종합 응답이 null 이면 지도 대조를 부르지 않고 map_check 
 echo "[실행 흐름: 보충과 재판정]"
 # 주장은 A(S1#issue#0, a), C(S1#issue#1, c), F(S1#issue#2, e), G(S1#issue#3, e), B(S2#issue#0, a), D(S2#issue#1, d), E(S2#issue#2, d) 다.
 # A 는 정보 부족으로 보충·재판정을 거쳐 판정 불가가 남는다. C 는 불일치와 정보 부족이 함께 있다. D 는 보충이 응답하지 않는다.
-# F 는 재판정에도 정보 부족이다. 주장이 일곱이므로 판정과 재판정은 묶음 하나다.
+# F 는 재판정에도 정보 부족이라 기각된다. 주장이 일곱이므로 판정과 재판정은 묶음 하나다.
 cat > "$FX/rr_resp.json" <<'EOF'
 {"@mode": "contrast", "responses": {
   "research:S1": {"search_status": "ok", "queries": ["q"], "issues": [{"prior_claim": "claim A", "citations": [{"url": "https://a"}]}, {"prior_claim": "claim C", "citations": [{"url": "https://c"}]}, {"prior_claim": "claim F", "citations": [{"url": "https://e"}]}, {"prior_claim": "claim G", "citations": [{"url": "https://e"}]}]},
@@ -775,8 +775,10 @@ E_RR_FAIL='{"url": "https://d", "refs": ["S2#issue#1"]} in d["result"]["verify_f
 check "보충이 응답하지 않으면 그 주장만 검증 실패다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_FAIL\""
 E_RR_UNS='(lambda j: j["verdict"] == "unsupported" and "언어 해석" in j["reason"])([j for j in d["result"]["verifiers"][0]["output"]["judgments"] if j["ref"] == "S1#issue#0"][0]) and {"ref": "S1#issue#0", "urls": ["https://a"]} in d["result"]["rejected"]'
 check "판정 불가는 기각이고 이유가 남는다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_UNS\""
-E_RR_NI='{"url": "https://e", "refs": ["S1#issue#2"]} in d["result"]["verify_failed"] and {"ref": "S1#issue#3", "urls": ["https://e"]} in d["result"]["passed"]'
-check "재판정도 정보 부족이면 그 주장만 검증 실패다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NI\""
+E_RR_NI='{"ref": "S1#issue#2", "urls": ["https://e"]} in d["result"]["rejected"] and not any(f["url"] == "https://e" for f in d["result"]["verify_failed"]) and {"ref": "S1#issue#3", "urls": ["https://e"]} in d["result"]["passed"]'
+check "재판정도 정보 부족이면 그 주장만 기각이다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NI\""
+E_RR_NIST='[s for s in d["result"]["subquestion_status"] if s["id"] == "S1"][0]["verification_status"] == "ok"'
+check "재판정 정보 부족 기각은 하위 질문을 partial 로 만들지 않는다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NIST\""
 E_RR_NOESC='not any(c["label"].startswith("escalate:") for c in d["calls"]) and all(c["agentType"] != "disciplined-coder:citation-judge-escalation" for c in d["calls"])'
 check "상향 호출이 없다" "json_true \"\$FX/rr_out.json\" \"\$E_RR_NOESC\""
 E_RR_Q='(lambda o: [(j["ref"], j["verdict"], j["quote"]) for j in o["judgments"]] == [("S1#issue#0", "unsupported", "q2"), ("S2#issue#0", "supported", "qb")])(d["result"]["verifiers"][0]["output"])'

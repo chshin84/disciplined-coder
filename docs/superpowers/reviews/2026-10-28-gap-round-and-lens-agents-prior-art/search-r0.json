@@ -1,0 +1,243 @@
+{
+  "round": 0,
+  "researchers": [
+    {
+      "id": "scout",
+      "output": {
+        "search_status": "ok",
+        "queries": [
+          "deep research agent iterative search rounds diminishing returns stopping criterion",
+          "systematic review search stopping rule saturation capture-recapture estimate missing studies",
+          "multi-agent research system subagents token usage context isolation lessons",
+          "why do multi-agent LLM systems fail taxonomy single agent vs multi-agent comparison",
+          "LLM agent knowing when to stop searching adaptive retrieval sufficiency judgment",
+          "single agent with skills vs multi-agent system cost accuracy comparison when to use multi-agent",
+          "LLM code review multiple specialized reviewer agents vs single reviewer false positives cost evaluation",
+          "deep research agent coverage gap detection follow-up search round evaluation benchmark"
+        ],
+        "clusters": [
+          {
+            "topic": "반복 탐색의 중단 규칙과 한계 효용(deep research agent)",
+            "sources": [
+              "https://arxiv.org/pdf/2602.06540",
+              "https://arxiv.org/html/2605.07042",
+              "https://tianpan.co/blog/2026-04-12-deep-research-agents-orchestrating-multi-step-search-that-converges",
+              "https://agentpatterns.ai/tool-engineering/web-search-agent-loop/"
+            ],
+            "note": "AgentCPM-Report 는 심화 단계가 약 9단계에서 정체된다고 보고한다. 2605.07042 는 LLM 이 스스로 중단을 판정하는 방식이 불안정하다고 보고, 휴리스틱 정체 신호로 작동하는 소진 게이트를 제안한다. 실무 자료는 고정 상한과 반복별 정보 이득 같은 품질 신호를 함께 쓰라고 권한다. 검색 요약만 확인했고 본문은 열지 않았다."
+          },
+          {
+            "topic": "검색 충분성 판정과 과다·과소 탐색(iterative RAG 중단 제어)",
+            "sources": [
+              "https://arxiv.org/pdf/2608.02009",
+              "https://arxiv.org/abs/2510.14337",
+              "https://arxiv.org/html/2602.03304"
+            ],
+            "note": "HALT 는 생성기의 확신도 대신 근거가 추론 단계마다 덮였는지로 중단을 정한다. 그리고 공개 코퍼스에서 근거 충분성을 확인할 수 없으면 판정을 보류한다고 보고한다. Stop-RAG 는 고정 반복 횟수와 LLM 프롬프트 중단보다 학습한 가치 추정이 낫다고 보고한다. 2602.03304 는 과다 탐색과 과소 탐색이라는 경계 오류를 진단한다. 다만 세 논문 모두 단일 질의 다중 단계 QA 를 다루므로 초안의 제외 범위(단일 RAG 질의 최적화)와 경계에 있다."
+          },
+          {
+            "topic": "체계적 문헌고찰의 검색 중단 규칙과 누락 추정",
+            "sources": [
+              "https://pmc.ncbi.nlm.nih.gov/articles/PMC2655834",
+              "https://www.cambridge.org/core/journals/international-journal-of-technology-assessment-in-health-care/article/abs/how-much-searching-is-enough-comprehensive-versus-optimal-retrieval-for-technology-assessments/420FE198E07703FB1AAFE762958CFE4A",
+              "https://core.ac.uk/works/100848577"
+            ],
+            "note": "capture-mark-recapture 는 여러 출처에서 겹쳐 잡힌 문헌 수로 놓친 문헌 수를 추정해 검색 중단 규칙으로 쓴다. 이 추정은 탐색 부족과 자료 부재를 구분하는 정량 신호가 된다. HTA 문헌은 중단 기법들의 공식 평가가 드물다고 적는다. 초록과 검색 요약만 확인했고 본문은 열지 않았다."
+          },
+          {
+            "topic": "역할별 서브에이전트 분리의 맥락 격리와 토큰 비용",
+            "sources": [
+              "https://claude.com/resources/articles/building-multi-agent-systems-when-and-how-to-use-them",
+              "https://blog.bytebytego.com/p/how-anthropic-built-a-multi-agent",
+              "https://futureagi.com/blog/organizing-context-in-a-multi-agent-harness/",
+              "https://www.morphllm.com/blog/multi-agent-systems.md"
+            ],
+            "note": "Anthropic 지침은 출력이 크고 대부분 버릴 내용이며 경계가 분명한 하위 작업에서 서브에이전트 격리가 이득이라고 적는다. 다중 에이전트 조사 시스템은 일반 대화보다 토큰을 약 15배 쓰고 성능 향상은 토큰 사용량과 밀접하다고 보고된다. 2차 자료의 배수는 서로 다르므로 1차 Anthropic 글을 직접 확인해야 한다. 도구·모델 고정 정의와 프롬프트 템플릿 전달을 직접 비교한 자료는 이 둘러보기에서 찾지 못했다."
+          },
+          {
+            "topic": "다중 에이전트 실패 분류와 단일·다중 에이전트 비교(과도한 분해)",
+            "sources": [
+              "https://arxiv.org/html/2503.13657v3",
+              "https://www.emergentmind.com/papers/2505.18286",
+              "https://arxiv.org/abs/2601.04748",
+              "https://www.codebridge.tech/articles/single-agent-vs-multi-agent-architecture-what-changes-in-reliability-cost-and-debuggability"
+            ],
+            "note": "MAST 는 7개 프레임워크의 실행 기록에서 실패 14가지를 명세·설계, 에이전트 간 불일치, 검증·종료의 세 범주로 나눈다. 2505.18286 은 최신 모델일수록 다중 에이전트의 정확도 이점이 줄고 비용 격차는 커진다고 보고한다. 2601.04748 은 다중 에이전트를 스킬 라이브러리를 쓰는 단일 에이전트로 옮겨 토큰과 지연을 줄였다고 보고한다. 실무 지침은 측정한 단일 에이전트 기준선 뒤에만 분해하라고 권한다."
+          },
+          {
+            "topic": "LLM 리뷰를 전문 에이전트 여럿으로 나눈 사례(오탐과 비용)",
+            "sources": [
+              "https://www.zenml.io/llmops-database/reducing-false-positives-in-ai-code-review-agents-through-architecture-refinement",
+              "https://arxiv.org/pdf/2511.16708v2",
+              "https://zenodo.org/records/20519585/files/LLM_Code_Reviews.pdf",
+              "https://reviewate-website.pages.dev/blog/multi-agent-code-review-architecture"
+            ],
+            "note": "한 벤더는 단일 리뷰 에이전트를 전문 마이크로 에이전트로 나눈 뒤 오탐이 51% 줄었다고 보고한다. CodeX-Verify 프리프린트는 에이전트를 추가할수록 이득이 줄어든다고 보고한다. 대부분 벤더 자료와 소표본 프리프린트이며, 총 토큰을 고정한 통제 비교는 이 둘러보기에서 찾지 못했다. 대상이 코드 리뷰이므로 문서·설계 리뷰로 옮길 때 적용 대상 축이 다르다."
+          },
+          {
+            "topic": "deep research 평가에서 커버리지 공백 탐지와 후속 라운드",
+            "sources": [
+              "https://arxiv.org/pdf/2601.10504",
+              "https://arxiv.org/html/2606.09748v1",
+              "https://liner.com/ko/review/characterizing-deep-research-a-benchmark-and-formal-definition",
+              "https://arxiv.org/abs/2602.18940"
+            ],
+            "note": "DR-Arena 는 에이전트가 멈추면 원인이 검색 공백인지 추론 결함인지 구분하고 이후 라운드에서 그 약점을 다시 묻는다. 2606.09748 은 자기 성찰과 과정 수준 피드백을 비교하고 Research Gap Inference 로 과정 공백을 추정한다. LiveDRBench 분석은 시스템들이 필요한 검색 질의의 약 절반만 덮는다고 보고한다. 이 묶음은 평가자 쪽 설계이므로 조사 시스템 안의 추가 라운드 결정으로 옮기려면 목적 축 차이를 따져야 한다."
+          }
+        ],
+        "subquestion_candidates": [
+          {
+            "scope": "반복 탐색 에이전트에서 라운드나 단계를 늘릴 때 성능이 어디서 정체되는지와, 중단 신호(고정 상한, 정보 이득 임계값, 반복 질의 탐지, LLM 자기 판정)별 효과를 비교한다.",
+            "basis": "AgentCPM-Report 는 약 9단계에서 성능이 정체된다고 보고한다. 2605.07042 는 LLM 자기 판정 중단이 불안정하다며 휴리스틱 정체 신호 게이트를 제안한다. 두 자료는 후보안 A1(매번 사용자에게 묻기)과 A2(신호 기반 권고)를 구분하는 근거가 된다."
+          },
+          {
+            "scope": "근거 충분성 판정이 자료 부재형 공백과 탐색 부족형 공백을 구분하는 방법, 그리고 충분성을 확인할 수 없을 때 판정을 보류하는 정책의 효과를 조사한다.",
+            "basis": "HALT 는 근거 커버리지로 중단하고 확인 불가 시 보류한다. 2602.03304 는 과다·과소 탐색을 경계 오류로 진단한다. 자체 기록의 남은 공백 대부분이 자료 부재형이었다는 제약과 직접 맞물린다."
+          },
+          {
+            "scope": "체계적 문헌고찰의 검색 중단 규칙(capture-recapture, 포화, 사전 중단 규칙)이 누락 문헌 수를 어떻게 추정하며, 그 추정을 LLM 조사 시스템의 공백 유형 판정으로 옮길 수 있는지 확인한다.",
+            "basis": "Kastner 등은 CMR 로 놓친 문헌 수를 추정해 중단 규칙으로 썼다. 여러 연구자가 독립적으로 같은 출처를 찾았는지가 같은 신호를 준다. HTA 문헌은 이 기법들의 공식 평가가 드물다고 적는다."
+          },
+          {
+            "scope": "역할별 서브에이전트 정의(도구·모델 고정)와 범용 서브에이전트에 프롬프트를 넘기는 방식, 그리고 단일 에이전트에 스킬을 싣는 방식을 비용·재현성·디버깅 용이성으로 비교한 자료를 찾는다.",
+            "basis": "Anthropic 지침과 2601.04748(다중 에이전트를 스킬 단일 에이전트로 옮김)이 있으나, 정의 고정과 템플릿 전달을 직접 비교한 자료는 이 둘러보기에서 찾지 못했다. 후보안 B1·B2·B3 를 구분하려면 이 공백을 별도로 탐색해야 한다."
+          },
+          {
+            "scope": "다중 에이전트 분해가 과해지는 조건(최신 모델에서 정확도 이점 축소, 조정 실패, 측정 기준선 없는 분해)을 MAST 분류와 단일·다중 비교 연구로 정리한다.",
+            "basis": "MAST 는 실패 대부분이 에이전트 간 상호작용과 설계에서 온다고 보고한다. 2505.18286 은 정확도 격차는 줄고 비용 격차는 커진다고 보고한다. 실무 지침은 측정한 단일 에이전트 기준선을 먼저 두라고 권한다."
+          },
+          {
+            "scope": "LLM 리뷰를 여러 전문 리뷰어로 나눌 때 리뷰어 수에 따른 한계 효용과 오탐 감소, 그리고 같은 리뷰어 재실행과 다른 리뷰어 추가의 차이를 조사한다.",
+            "basis": "CodeX-Verify 는 에이전트를 늘릴수록 이득이 줄어든다고 보고하고, 벤더 사례는 전문 분리 후 오탐 감소를 보고한다. 제약에 적힌 자체 측정(같은 렌즈 재실행 시 새 지적 21~55%)과 비교할 외부 기준선이 된다."
+          }
+        ],
+        "principles_applied": [
+          "NO-ASSUME",
+          "EVIDENCE-FIRST",
+          "ASYNC-FIRST",
+          "YAGNI",
+          "STATE-ASSUME",
+          "INSTRUCTION-FORM"
+        ]
+      }
+    }
+  ],
+  "query_violations": [],
+  "scout": {
+    "search_status": "ok",
+    "queries": [
+      "deep research agent iterative search rounds diminishing returns stopping criterion",
+      "systematic review search stopping rule saturation capture-recapture estimate missing studies",
+      "multi-agent research system subagents token usage context isolation lessons",
+      "why do multi-agent LLM systems fail taxonomy single agent vs multi-agent comparison",
+      "LLM agent knowing when to stop searching adaptive retrieval sufficiency judgment",
+      "single agent with skills vs multi-agent system cost accuracy comparison when to use multi-agent",
+      "LLM code review multiple specialized reviewer agents vs single reviewer false positives cost evaluation",
+      "deep research agent coverage gap detection follow-up search round evaluation benchmark"
+    ],
+    "clusters": [
+      {
+        "topic": "반복 탐색의 중단 규칙과 한계 효용(deep research agent)",
+        "sources": [
+          "https://arxiv.org/pdf/2602.06540",
+          "https://arxiv.org/html/2605.07042",
+          "https://tianpan.co/blog/2026-04-12-deep-research-agents-orchestrating-multi-step-search-that-converges",
+          "https://agentpatterns.ai/tool-engineering/web-search-agent-loop/"
+        ],
+        "note": "AgentCPM-Report 는 심화 단계가 약 9단계에서 정체된다고 보고한다. 2605.07042 는 LLM 이 스스로 중단을 판정하는 방식이 불안정하다고 보고, 휴리스틱 정체 신호로 작동하는 소진 게이트를 제안한다. 실무 자료는 고정 상한과 반복별 정보 이득 같은 품질 신호를 함께 쓰라고 권한다. 검색 요약만 확인했고 본문은 열지 않았다."
+      },
+      {
+        "topic": "검색 충분성 판정과 과다·과소 탐색(iterative RAG 중단 제어)",
+        "sources": [
+          "https://arxiv.org/pdf/2608.02009",
+          "https://arxiv.org/abs/2510.14337",
+          "https://arxiv.org/html/2602.03304"
+        ],
+        "note": "HALT 는 생성기의 확신도 대신 근거가 추론 단계마다 덮였는지로 중단을 정한다. 그리고 공개 코퍼스에서 근거 충분성을 확인할 수 없으면 판정을 보류한다고 보고한다. Stop-RAG 는 고정 반복 횟수와 LLM 프롬프트 중단보다 학습한 가치 추정이 낫다고 보고한다. 2602.03304 는 과다 탐색과 과소 탐색이라는 경계 오류를 진단한다. 다만 세 논문 모두 단일 질의 다중 단계 QA 를 다루므로 초안의 제외 범위(단일 RAG 질의 최적화)와 경계에 있다."
+      },
+      {
+        "topic": "체계적 문헌고찰의 검색 중단 규칙과 누락 추정",
+        "sources": [
+          "https://pmc.ncbi.nlm.nih.gov/articles/PMC2655834",
+          "https://www.cambridge.org/core/journals/international-journal-of-technology-assessment-in-health-care/article/abs/how-much-searching-is-enough-comprehensive-versus-optimal-retrieval-for-technology-assessments/420FE198E07703FB1AAFE762958CFE4A",
+          "https://core.ac.uk/works/100848577"
+        ],
+        "note": "capture-mark-recapture 는 여러 출처에서 겹쳐 잡힌 문헌 수로 놓친 문헌 수를 추정해 검색 중단 규칙으로 쓴다. 이 추정은 탐색 부족과 자료 부재를 구분하는 정량 신호가 된다. HTA 문헌은 중단 기법들의 공식 평가가 드물다고 적는다. 초록과 검색 요약만 확인했고 본문은 열지 않았다."
+      },
+      {
+        "topic": "역할별 서브에이전트 분리의 맥락 격리와 토큰 비용",
+        "sources": [
+          "https://claude.com/resources/articles/building-multi-agent-systems-when-and-how-to-use-them",
+          "https://blog.bytebytego.com/p/how-anthropic-built-a-multi-agent",
+          "https://futureagi.com/blog/organizing-context-in-a-multi-agent-harness/",
+          "https://www.morphllm.com/blog/multi-agent-systems.md"
+        ],
+        "note": "Anthropic 지침은 출력이 크고 대부분 버릴 내용이며 경계가 분명한 하위 작업에서 서브에이전트 격리가 이득이라고 적는다. 다중 에이전트 조사 시스템은 일반 대화보다 토큰을 약 15배 쓰고 성능 향상은 토큰 사용량과 밀접하다고 보고된다. 2차 자료의 배수는 서로 다르므로 1차 Anthropic 글을 직접 확인해야 한다. 도구·모델 고정 정의와 프롬프트 템플릿 전달을 직접 비교한 자료는 이 둘러보기에서 찾지 못했다."
+      },
+      {
+        "topic": "다중 에이전트 실패 분류와 단일·다중 에이전트 비교(과도한 분해)",
+        "sources": [
+          "https://arxiv.org/html/2503.13657v3",
+          "https://www.emergentmind.com/papers/2505.18286",
+          "https://arxiv.org/abs/2601.04748",
+          "https://www.codebridge.tech/articles/single-agent-vs-multi-agent-architecture-what-changes-in-reliability-cost-and-debuggability"
+        ],
+        "note": "MAST 는 7개 프레임워크의 실행 기록에서 실패 14가지를 명세·설계, 에이전트 간 불일치, 검증·종료의 세 범주로 나눈다. 2505.18286 은 최신 모델일수록 다중 에이전트의 정확도 이점이 줄고 비용 격차는 커진다고 보고한다. 2601.04748 은 다중 에이전트를 스킬 라이브러리를 쓰는 단일 에이전트로 옮겨 토큰과 지연을 줄였다고 보고한다. 실무 지침은 측정한 단일 에이전트 기준선 뒤에만 분해하라고 권한다."
+      },
+      {
+        "topic": "LLM 리뷰를 전문 에이전트 여럿으로 나눈 사례(오탐과 비용)",
+        "sources": [
+          "https://www.zenml.io/llmops-database/reducing-false-positives-in-ai-code-review-agents-through-architecture-refinement",
+          "https://arxiv.org/pdf/2511.16708v2",
+          "https://zenodo.org/records/20519585/files/LLM_Code_Reviews.pdf",
+          "https://reviewate-website.pages.dev/blog/multi-agent-code-review-architecture"
+        ],
+        "note": "한 벤더는 단일 리뷰 에이전트를 전문 마이크로 에이전트로 나눈 뒤 오탐이 51% 줄었다고 보고한다. CodeX-Verify 프리프린트는 에이전트를 추가할수록 이득이 줄어든다고 보고한다. 대부분 벤더 자료와 소표본 프리프린트이며, 총 토큰을 고정한 통제 비교는 이 둘러보기에서 찾지 못했다. 대상이 코드 리뷰이므로 문서·설계 리뷰로 옮길 때 적용 대상 축이 다르다."
+      },
+      {
+        "topic": "deep research 평가에서 커버리지 공백 탐지와 후속 라운드",
+        "sources": [
+          "https://arxiv.org/pdf/2601.10504",
+          "https://arxiv.org/html/2606.09748v1",
+          "https://liner.com/ko/review/characterizing-deep-research-a-benchmark-and-formal-definition",
+          "https://arxiv.org/abs/2602.18940"
+        ],
+        "note": "DR-Arena 는 에이전트가 멈추면 원인이 검색 공백인지 추론 결함인지 구분하고 이후 라운드에서 그 약점을 다시 묻는다. 2606.09748 은 자기 성찰과 과정 수준 피드백을 비교하고 Research Gap Inference 로 과정 공백을 추정한다. LiveDRBench 분석은 시스템들이 필요한 검색 질의의 약 절반만 덮는다고 보고한다. 이 묶음은 평가자 쪽 설계이므로 조사 시스템 안의 추가 라운드 결정으로 옮기려면 목적 축 차이를 따져야 한다."
+      }
+    ],
+    "subquestion_candidates": [
+      {
+        "scope": "반복 탐색 에이전트에서 라운드나 단계를 늘릴 때 성능이 어디서 정체되는지와, 중단 신호(고정 상한, 정보 이득 임계값, 반복 질의 탐지, LLM 자기 판정)별 효과를 비교한다.",
+        "basis": "AgentCPM-Report 는 약 9단계에서 성능이 정체된다고 보고한다. 2605.07042 는 LLM 자기 판정 중단이 불안정하다며 휴리스틱 정체 신호 게이트를 제안한다. 두 자료는 후보안 A1(매번 사용자에게 묻기)과 A2(신호 기반 권고)를 구분하는 근거가 된다."
+      },
+      {
+        "scope": "근거 충분성 판정이 자료 부재형 공백과 탐색 부족형 공백을 구분하는 방법, 그리고 충분성을 확인할 수 없을 때 판정을 보류하는 정책의 효과를 조사한다.",
+        "basis": "HALT 는 근거 커버리지로 중단하고 확인 불가 시 보류한다. 2602.03304 는 과다·과소 탐색을 경계 오류로 진단한다. 자체 기록의 남은 공백 대부분이 자료 부재형이었다는 제약과 직접 맞물린다."
+      },
+      {
+        "scope": "체계적 문헌고찰의 검색 중단 규칙(capture-recapture, 포화, 사전 중단 규칙)이 누락 문헌 수를 어떻게 추정하며, 그 추정을 LLM 조사 시스템의 공백 유형 판정으로 옮길 수 있는지 확인한다.",
+        "basis": "Kastner 등은 CMR 로 놓친 문헌 수를 추정해 중단 규칙으로 썼다. 여러 연구자가 독립적으로 같은 출처를 찾았는지가 같은 신호를 준다. HTA 문헌은 이 기법들의 공식 평가가 드물다고 적는다."
+      },
+      {
+        "scope": "역할별 서브에이전트 정의(도구·모델 고정)와 범용 서브에이전트에 프롬프트를 넘기는 방식, 그리고 단일 에이전트에 스킬을 싣는 방식을 비용·재현성·디버깅 용이성으로 비교한 자료를 찾는다.",
+        "basis": "Anthropic 지침과 2601.04748(다중 에이전트를 스킬 단일 에이전트로 옮김)이 있으나, 정의 고정과 템플릿 전달을 직접 비교한 자료는 이 둘러보기에서 찾지 못했다. 후보안 B1·B2·B3 를 구분하려면 이 공백을 별도로 탐색해야 한다."
+      },
+      {
+        "scope": "다중 에이전트 분해가 과해지는 조건(최신 모델에서 정확도 이점 축소, 조정 실패, 측정 기준선 없는 분해)을 MAST 분류와 단일·다중 비교 연구로 정리한다.",
+        "basis": "MAST 는 실패 대부분이 에이전트 간 상호작용과 설계에서 온다고 보고한다. 2505.18286 은 정확도 격차는 줄고 비용 격차는 커진다고 보고한다. 실무 지침은 측정한 단일 에이전트 기준선을 먼저 두라고 권한다."
+      },
+      {
+        "scope": "LLM 리뷰를 여러 전문 리뷰어로 나눌 때 리뷰어 수에 따른 한계 효용과 오탐 감소, 그리고 같은 리뷰어 재실행과 다른 리뷰어 추가의 차이를 조사한다.",
+        "basis": "CodeX-Verify 는 에이전트를 늘릴수록 이득이 줄어든다고 보고하고, 벤더 사례는 전문 분리 후 오탐 감소를 보고한다. 제약에 적힌 자체 측정(같은 렌즈 재실행 시 새 지적 21~55%)과 비교할 외부 기준선이 된다."
+      }
+    ],
+    "principles_applied": [
+      "NO-ASSUME",
+      "EVIDENCE-FIRST",
+      "ASYNC-FIRST",
+      "YAGNI",
+      "STATE-ASSUME",
+      "INSTRUCTION-FORM"
+    ]
+  }
+}

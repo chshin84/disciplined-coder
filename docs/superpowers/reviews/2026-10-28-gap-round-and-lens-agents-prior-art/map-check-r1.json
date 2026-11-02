@@ -1,0 +1,404 @@
+{
+  "cells": [
+    {
+      "row": "반복 RAG의 가치 기반 중단 제어기(Stop-RAG)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "반복 RAG의 가치 기반 중단 제어기(Stop-RAG)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "반복 RAG의 가치 기반 중단 제어기(Stop-RAG)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "반복 RAG의 가치 기반 중단 제어기(Stop-RAG)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "반복 RAG의 가치 기반 중단 제어기(Stop-RAG)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "반복 RAG의 가치 기반 중단 제어기(Stop-RAG)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#0"
+    },
+    {
+      "row": "심층 조사 에이전트의 정체와 검색 인지형 제어기(RAAC)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "심층 조사 에이전트의 정체와 검색 인지형 제어기(RAAC)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "심층 조사 에이전트의 정체와 검색 인지형 제어기(RAAC)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "심층 조사 에이전트의 정체와 검색 인지형 제어기(RAAC)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "심층 조사 에이전트의 정체와 검색 인지형 제어기(RAAC)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "심층 조사 에이전트의 정체와 검색 인지형 제어기(RAAC)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#2"
+    },
+    {
+      "row": "심층 조사 에이전트의 다회차 피드백 평가",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "심층 조사 에이전트의 다회차 피드백 평가",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "심층 조사 에이전트의 다회차 피드백 평가",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "심층 조사 에이전트의 다회차 피드백 평가",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "심층 조사 에이전트의 다회차 피드백 평가",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "심층 조사 에이전트의 다회차 피드백 평가",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq1#case#4"
+    },
+    {
+      "row": "근거 충분성 기반 중단(Confidence-Based Stopping)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "근거 충분성 기반 중단(Confidence-Based Stopping)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "근거 충분성 기반 중단(Confidence-Based Stopping)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "근거 충분성 기반 중단(Confidence-Based Stopping)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "근거 충분성 기반 중단(Confidence-Based Stopping)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "근거 충분성 기반 중단(Confidence-Based Stopping)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#1"
+    },
+    {
+      "row": "포함 연구가 없는 Cochrane 리뷰(empty review) 실태 조사",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "포함 연구가 없는 Cochrane 리뷰(empty review) 실태 조사",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "포함 연구가 없는 Cochrane 리뷰(empty review) 실태 조사",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "포함 연구가 없는 Cochrane 리뷰(empty review) 실태 조사",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "포함 연구가 없는 Cochrane 리뷰(empty review) 실태 조사",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "포함 연구가 없는 Cochrane 리뷰(empty review) 실태 조사",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#4"
+    },
+    {
+      "row": "누락 정보 식별 후 검증(Identify-then-Verify) 충분성 판정",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "누락 정보 식별 후 검증(Identify-then-Verify) 충분성 판정",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "누락 정보 식별 후 검증(Identify-then-Verify) 충분성 판정",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "누락 정보 식별 후 검증(Identify-then-Verify) 충분성 판정",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "누락 정보 식별 후 검증(Identify-then-Verify) 충분성 판정",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "누락 정보 식별 후 검증(Identify-then-Verify) 충분성 판정",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq2#case#7"
+    },
+    {
+      "row": "단일 에이전트와 다중 에이전트 비교(성능 향상에 따라 MAS 이득 감소)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "단일 에이전트와 다중 에이전트 비교(성능 향상에 따라 MAS 이득 감소)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "단일 에이전트와 다중 에이전트 비교(성능 향상에 따라 MAS 이득 감소)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "단일 에이전트와 다중 에이전트 비교(성능 향상에 따라 MAS 이득 감소)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "단일 에이전트와 다중 에이전트 비교(성능 향상에 따라 MAS 이득 감소)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "단일 에이전트와 다중 에이전트 비교(성능 향상에 따라 MAS 이득 감소)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#1"
+    },
+    {
+      "row": "다중 에이전트 분할 반대 의견(맥락 공유 원칙)",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "다중 에이전트 분할 반대 의견(맥락 공유 원칙)",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "다중 에이전트 분할 반대 의견(맥락 공유 원칙)",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "다중 에이전트 분할 반대 의견(맥락 공유 원칙)",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "다중 에이전트 분할 반대 의견(맥락 공유 원칙)",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "다중 에이전트 분할 반대 의견(맥락 공유 원칙)",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#4"
+    },
+    {
+      "row": "다중 에이전트 토론 과대평가 비판",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "다중 에이전트 토론 과대평가 비판",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "다중 에이전트 토론 과대평가 비판",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "다중 에이전트 토론 과대평가 비판",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "다중 에이전트 토론 과대평가 비판",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "다중 에이전트 토론 과대평가 비판",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#6"
+    },
+    {
+      "row": "서브에이전트 정의 기능 공식 문서",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "서브에이전트 정의 기능 공식 문서",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "서브에이전트 정의 기능 공식 문서",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "서브에이전트 정의 기능 공식 문서",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "서브에이전트 정의 기능 공식 문서",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "서브에이전트 정의 기능 공식 문서",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq4#case#7"
+    },
+    {
+      "row": "9개 LLM 심판 패널의 상관 오류",
+      "column": "case",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "9개 LLM 심판 패널의 상관 오류",
+      "column": "outcome",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "9개 LLM 심판 패널의 상관 오류",
+      "column": "axes.purpose.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "9개 LLM 심판 패널의 상관 오류",
+      "column": "axes.mechanism.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "9개 LLM 심판 패널의 상관 오류",
+      "column": "axes.evaluation.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    },
+    {
+      "row": "9개 LLM 심판 패널의 상관 오류",
+      "column": "axes.target.prior",
+      "grounded": true,
+      "source_ref": "sq5#case#1"
+    }
+  ],
+  "principles_applied": [
+    "NO-ASSUME",
+    "STATE-ASSUME"
+  ]
+}

@@ -1,0 +1,9 @@
+{ "lens": "lens-consistency", "target": "docs/superpowers/specs/2026-10-29-simplify-gap-round-and-verify-design.md", "issues": [
+{ "where": "D1 이유와 「남는 검증 실패」", "type": "contradiction", "claim": "D1 은 원문 열기에 성공했으면 검증 실패로 셀 이유가 없다고 하면서, 보충 출력의 exists 불일치·quote 없음은 '보충 실패'로 검증 실패에 남긴다. 처음 추출의 같은 결과는 이미 unsupported 다.", "counterpart": "SKILL.md 「상태 값」 보충 실패 정의, 「최종 판정과 실패 처리」 3", "principle": "NO-ASSUME" },
+{ "where": "D3 「바뀌는 곳」", "type": "gap", "claim": "dispatching-lenses 170행이 메인 세션에게 MODE·PRINCIPLES 줄을 채우라고 지시하는데 바뀌는 곳에 없다.", "principle": "TERM-ONE" },
+{ "where": "D2 변경과 3단계 공백 라운드 대상", "type": "gap", "claim": "D2 는 묻는 조건만 정하고 실행 대상(현행: 커버리지 공백이 남은 하위 질문)과의 관계, 사용자가 직접 요청했을 때의 대상을 정하지 않았다.", "principle": "CHECKABLE" },
+{ "where": "「하지 않는 것」 둘째 항목과 「확인 방법」", "type": "gap", "claim": "'다음 실행에서 먼저 확인한다'의 판정 기준이 확인 방법에 없다.", "principle": "CHECKABLE" },
+{ "where": "D1 reason 기록과 「확인 방법」", "type": "gap", "claim": "reason 에 정보 부족 사실과 빈 칸 이름을 남기는지에 대한 기대값이 계획되어 있지 않다.", "principle": "CHECKABLE" },
+{ "where": "D2·D3 「확인 방법」", "type": "gap", "claim": "test_lens_contract.sh 196행은 MODE·PRINCIPLES 낱말만 보므로 변경 전 문서도 통과한다.", "principle": "CHECKABLE" },
+{ "where": "D1 「현행」과 D2 신호 둘째 항목", "type": "drift", "claim": "partial 이 verification_status 값과 런타임의 턴 상한 표시 두 대상을 가리킨다.", "principle": "TERM-ONE" }
+], "principles_applied": ["NO-ASSUME", "CHECKABLE", "TERM-ONE", "YAGNI"], "notes": "산출물 공백 없음. 스코프는 '심플하게'를 넘지 않음. D3 은 다른 두 결정과 주제가 다르다. 추가 확인: test_workflow.sh 기대값 두 곳(446·779), SKILL 54행과 workflow 72행 주석, 단일 모드 비렌즈 에이전트 범위, no-results 는 신호에 넣지 않은 것이 사용자 지시와 맞음. (원본은 대화에 전달된 보고에서 옮겼고 근거 인용 칸을 줄였다.)" }

@@ -1,0 +1,296 @@
+{
+  "search_status": "ok",
+  "queries": [
+    "systematic review stopping rules when to stop searching",
+    "capture-recapture estimate number of missed studies literature search",
+    "deep research agent knowledge gap detection iterative retrieval when to stop",
+    "empty systematic reviews no included studies absence of evidence reporting",
+    "supplementary search methods citation chasing yield additional unique studies systematic review",
+    "Booth \"when to stop searching\" literature saturation qualitative evidence synthesis",
+    "LLM research agent distinguish unanswerable from insufficient retrieval abstain evidence sufficiency"
+  ],
+  "issues": [
+    {
+      "where": "질문 (1) 후보안 A2의 재탐색 발동 조건(턴 상한 도달, 연구자 실패, 검증 실패 다수)",
+      "type": "known-failure",
+      "claim": "A2의 발동 조건은 커버리지 추정치와 연결되지 않은 휴리스틱 신호다. 그래서 A2가 추가 라운드를 권하지 않고 멈춘 경우에 근거가 얼마나 누락됐는지는 사용자에게 전달되지 않는다.",
+      "prior_claim": "ML 우선순위 선별을 쓰는 체계적 문헌고찰의 중단 기준을 다룬 논문은 회수율 추정과 연결되지 않은 휴리스틱(예: 연속 50건 제외 뒤 중단)을 실패 사례로 든다. 100회 실행 평가에서 이 규칙의 회수율 5분위수는 53%였고, 논문은 중단 시 누락 위험을 정량화해 알리라고 권한다.",
+      "consequence": "A2를 채택하면 '탐색 부족 신호 없음'이 '근거 충분'으로 읽힐 수 있다. 그러면 자료 부재형 공백과 탐색 미흡이 같은 '공백'으로 보고된다.",
+      "evidence": "pmc.ncbi.nlm.nih.gov/articles/PMC11583672 본문의 heuristic 규칙 평가와 권고 절을 확인했다. 축 대조 결과 목적(중단 시점 결정)만 비슷하다. 메커니즘(통계적 회수율 추정 대 실패 신호), 평가(회수율·작업 절감 대 반영 근거), 적용 대상(사람의 선별 작업 대 LLM 다중 에이전트 탐색)은 다르다. 따라서 이 지적은 '누락 위험을 따로 알려야 한다'는 권고까지만 옮겨 쓸 수 있다.",
+      "citations": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11583672/",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "ML 우선 선별 체계적 문헌고찰의 중단 기준 검토",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11583672/",
+      "axes": {
+        "purpose": {
+          "prior": "선별을 언제 멈출지 정하고 누락 위험을 알린다",
+          "same": false,
+          "note": "목적은 탐색 종료 판단으로 비슷하다. 그러나 대조 대상은 추가 라운드 실행 여부를 정하고, 이 논문은 선별 종료 시점을 정한다."
+        },
+        "mechanism": {
+          "prior": "목표 회수율을 정하고 통계적 신뢰도로 중단하라고 권한다. 휴리스틱 규칙은 비판한다",
+          "same": false,
+          "note": "대조 대상의 A2는 실패 신호로 판단하며 회수율을 추정하지 않는다."
+        },
+        "evaluation": {
+          "prior": "회수율과 작업 절감으로 평가한다",
+          "same": false,
+          "note": "대조 대상은 비용 대비 반영 근거로 평가한다."
+        },
+        "target": {
+          "prior": "사람의 문헌 선별",
+          "same": false,
+          "note": "적용 대상이 LLM 다중 에이전트 웹 탐색과 다르다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "peer-reviewed",
+      "source_level": "2차",
+      "route": "검색 결과에서 찾은 논문",
+      "adoption": "참고",
+      "bearing": "A2를 쓸 때 멈춘 이유와 남은 누락 위험을 보고하라는 쪽으로 움직인다. A1과 A3 사이의 선택에는 직접 영향이 없다."
+    },
+    {
+      "case": "근거 충분성 기반 중단(Confidence-Based Stopping)",
+      "url": "https://www.alphaxiv.org/abs/2606.15380v1",
+      "axes": {
+        "purpose": {
+          "prior": "리뷰 질문에 결론을 낼 만큼 근거가 모였는지로 중단을 정한다",
+          "same": false,
+          "note": "결정에 충분한지로 멈춘다는 점은 대조 대상의 기준(반영되는 근거)과 가깝다. 그러나 추가 라운드 여부를 묻는 설계는 아니다."
+        },
+        "mechanism": {
+          "prior": "휴리스틱 두 가지로 판정하며 회수율 목표를 쓰지 않는다",
+          "same": false,
+          "note": "공백 유형은 구분하지 않는다."
+        },
+        "evaluation": {
+          "prior": "진단정확도 리뷰 데이터셋에서 선별 문서 수와 결론 일치를 측정했다",
+          "same": false,
+          "note": "초록에 수치가 없어 감소 폭을 확인하지 못했다."
+        },
+        "target": {
+          "prior": "기술 지원 문헌 선별",
+          "same": false,
+          "note": "적용 대상이 LLM 에이전트 탐색과 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 찾은 논문 초록",
+      "adoption": "참고",
+      "bearing": "결정에 쓸 근거가 이미 충분하면 추가 라운드를 돌리지 않는 쪽, 즉 A2·A3 쪽으로 약하게 움직인다."
+    },
+    {
+      "case": "문헌 검색 누락 추정을 위한 capture-recapture 타당성 연구(소화기 분야)",
+      "url": "https://abstracts.cochrane.org/2009-singapore/number-needed-read-are-capture-recapture-techniques-feasible-searching-literature",
+      "axes": {
+        "purpose": {
+          "prior": "검색이 놓친 논문 수를 추정한다",
+          "same": false,
+          "note": "커버리지 추정은 대조 대상의 공백 판정에 쓸 수 있는 구성요소 하나에만 해당한다."
+        },
+        "mechanism": {
+          "prior": "데이터베이스 여섯 곳의 중복 포착으로 로그선형 모형을 적합했다",
+          "same": false,
+          "note": "대조 대상은 이런 추정 모형을 쓰지 않는다."
+        },
+        "evaluation": {
+          "prior": "모형별 누락 추정치는 56건, 1,439건, 82건으로 크게 달랐다",
+          "same": false,
+          "note": "저자는 유용성이 의문이라고 결론냈다. 이유로 중복 판별의 수작업 부담과 과적합을 들었다."
+        },
+        "target": {
+          "prior": "의학 체계적 문헌고찰",
+          "same": false,
+          "note": "자료원이 둘 이상 겹치는 대량 검색이 전제다. 하위 질문당 출처 수십 건 규모와 다르다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과의 Cochrane 학회 초록",
+      "adoption": "해당 없음",
+      "bearing": "공백 판정에 누락 추정 모형을 새로 들이는 방안을 약화한다. 그러므로 A2는 단순 신호 기반으로 두는 쪽이 비용 기준에 맞는다."
+    },
+    {
+      "case": "인용 추적 추가 검색이 메타분석 결과에 준 영향(칼륨 보충과 혈압)",
+      "url": "https://abstracts.cochrane.org/2017-cape-town-global-evidence-summit/implications-different-methods-literature-searching-and",
+      "axes": {
+        "purpose": {
+          "prior": "기본 검색 뒤 추가 검색이 결론을 바꾸는지 확인한다",
+          "same": true,
+          "note": "추가 탐색 라운드의 비용 대비 효과를 묻는 목적이 같다."
+        },
+        "mechanism": {
+          "prior": "기본 데이터베이스 검색 뒤 전방·후방 인용 추적을 추가했다",
+          "same": false,
+          "note": "대조 대상의 추가 라운드는 공백 하위 질문을 웹에서 재탐색한다."
+        },
+        "evaluation": {
+          "prior": "적격 연구 26건에 7건이 더 발견됐고 메타분석 포함은 3건 늘었다. 효과 추정치는 약 0.8 mmHg 커졌고 GRADE와 RoB 평가는 거의 같았다",
+          "same": false,
+          "note": "평가 기준이 효과 추정치 변화다. 대조 대상은 반영된 근거와 지적으로 평가한다."
+        },
+        "target": {
+          "prior": "임상 메타분석",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과의 Cochrane 학회 초록",
+      "adoption": "참고",
+      "bearing": "추가 검색은 연구를 조금 더 찾았지만 확실성 평가는 거의 바꾸지 않았다. 그래서 첫 탐색이 넓을 때는 추가 라운드의 한계 이득이 작다는 쪽, 즉 A2·A3 쪽으로 약하게 움직인다."
+    },
+    {
+      "case": "포함 연구가 없는 Cochrane 리뷰(empty review) 실태 조사",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3344923/",
+      "axes": {
+        "purpose": {
+          "prior": "근거가 없는 리뷰가 얼마나 있고 결론을 어떻게 보고하는지 조사한다",
+          "same": false,
+          "note": "자료 부재형 공백의 보고 방식과 관련된다. 재탐색 결정과는 다르다."
+        },
+        "mechanism": {
+          "prior": "CDSR 전수 조사로 리뷰 4,320건 중 376건(8.7%)이 포함 연구 0건임을 확인했다",
+          "same": false,
+          "note": "대조 대상과 메커니즘 비교가 해당되지 않는다."
+        },
+        "evaluation": {
+          "prior": "결론 유형과 제외 연구 보고 여부를 집계했다",
+          "same": false,
+          "note": "논문은 자료 부재와 검색 미흡을 구분하지 않았다고 확인했다."
+        },
+        "target": {
+          "prior": "의학 체계적 문헌고찰",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과에서 찾은 논문",
+      "adoption": "참고",
+      "bearing": "자료 부재형 공백은 재탐색 대상으로 두지 않는다. 대신 '근거 없음'을 판정 보류로 보고하고 제외한 자료를 함께 적는 쪽으로 움직인다. 이 방향은 A2를 지지한다."
+    },
+    {
+      "case": "프로그램 기반 소진 게이트(Programmatic Exhaustion Gate)",
+      "url": "https://arxiv.org/html/2605.07042",
+      "axes": {
+        "purpose": {
+          "prior": "반복 검색 루프를 언제 멈출지 정한다",
+          "same": false,
+          "note": "목적은 탐색 종료 판단이다. 대조 대상은 라운드 단위로 추가 실행을 정한다."
+        },
+        "mechanism": {
+          "prior": "질의 Jaccard 유사도와 새 패시지 비율(UPR)로 정체를 감지해 멈춘다. LLM 자기 판단은 쓰지 않는다",
+          "same": false,
+          "note": "A2처럼 LLM 판단 대신 관측 신호를 쓴다는 점은 같다. 그러나 신호 종류가 다르다."
+        },
+        "evaluation": {
+          "prior": "다중 홉 QA에서 정확도 +1.1~6.9%를 보였다. IRCoT의 SWE-QA-Pro에서는 토큰을 39% 절감했다. LLM 자기 판단 프롬프트는 토큰이 159% 늘거나 정확도가 5% 떨어졌다",
+          "same": false,
+          "note": "QA 정확도 평가로, 근거 지도 평가와 다르다."
+        },
+        "target": {
+          "prior": "단일 에이전트 검색 QA",
+          "same": false,
+          "note": "다중 에이전트 조사와 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 찾은 arXiv 논문",
+      "adoption": "참고",
+      "bearing": "재탐색 여부를 LLM의 자기 평가로 정하지 않고 관측 신호로 정하는 A2 쪽으로 움직인다. 새 출처 비율이 낮으면 재탐색을 권하지 않는 신호로 쓸 수 있다. A1처럼 사람에게 매번 묻는 방식은 이 논문이 시험하지 않았다."
+    },
+    {
+      "case": "검색 결정 경계의 과탐색·저탐색 진단(DAS)",
+      "url": "https://arxiv.org/html/2602.03304v1",
+      "axes": {
+        "purpose": {
+          "prior": "에이전트가 더 검색할지 답할지의 오류를 줄인다",
+          "same": false,
+          "note": "목적은 검색 지속 판단으로 비슷하다. 다만 단계 단위의 판단이다."
+        },
+        "mechanism": {
+          "prior": "반사실 개입으로 과탐색·저탐색 궤적을 만들고 DPO로 학습한다",
+          "same": false,
+          "note": "모델 학습이 필요해 대조 대상의 실행 구조와 다르다."
+        },
+        "evaluation": {
+          "prior": "과탐색과 저탐색이 모든 모델에서 흔했다. 과탐색은 첫 단계에, 저탐색은 뒤 단계에 많았다. 개선 폭은 EM 0.7~2.1%p로 작았다",
+          "same": false,
+          "note": "QA EM으로 평가했다."
+        },
+        "target": {
+          "prior": "검색 증강 QA 에이전트",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 찾은 arXiv 논문",
+      "adoption": "해당 없음",
+      "bearing": "탐색 지속 판단에는 두 방향의 오류가 함께 있다는 점만 보여 준다. 그래서 후보안 사이의 선택을 직접 움직이지 않는다."
+    },
+    {
+      "case": "누락 정보 식별 후 검증(Identify-then-Verify) 충분성 판정",
+      "url": "https://arxiv.org/html/2512.06476v1",
+      "axes": {
+        "purpose": {
+          "prior": "주어진 맥락이 질문에 답하기에 충분한지 판정한다",
+          "same": false,
+          "note": "근거 충분성 판정은 대조 대상의 공백 판정 구성요소 하나와만 같다."
+        },
+        "mechanism": {
+          "prior": "빠진 정보 가설을 여럿 생성하고 합의 가설을 고른 뒤 맥락에 정말 없는지 검증한다",
+          "same": false,
+          "note": "대조 대상은 공백을 실패 신호로 분류하며 누락 항목을 명시해 검증하지 않는다."
+        },
+        "evaluation": {
+          "prior": "다중 홉 데이터셋에서 이진 분류보다 정확했다. 식별만 한 경우 대비 오류를 최대 37% 줄였다. SQuAD v2와 FaithEval에서는 이진 분류보다 낮았다",
+          "same": false,
+          "note": "QA 충분성 레이블 정확도로 평가했다."
+        },
+        "target": {
+          "prior": "QA 맥락 충분성",
+          "same": false,
+          "note": "적용 대상이 다르다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 찾은 arXiv 논문",
+      "adoption": "참고",
+      "bearing": "공백을 '무엇이 빠졌는가'로 명시하고 그 항목이 자료에 없는지 확인하는 방식을 지지한다. 이 방식은 자료 부재와 탐색 부족을 나누는 A2의 분류를 보강한다. 다만 추가 판정 호출 비용이 든다."
+    }
+  ],
+  "read": "[\"D:\\\\projects\\\\disciplined-coder\\\\agent-principles.md\", \"https://www.alphaxiv.org/abs/2606.15380v1\", \"https://pmc.ncbi.nlm.nih.gov/articles/PMC11583672/\", \"https://abstracts.cochrane.org/2009-singapore/number-needed-read-are-capture-recapture-techniques-feasible-searching-literature\", \"https://arxiv.org/html/2605.07042\", \"https://arxiv.org/html/2602.03304v1\", \"https://pmc.ncbi.nlm.nih.gov/articles/PMC3344923/\", \"https://abstracts.cochrane.org/2017-cape-town-global-evidence-summit/implications-different-methods-literature-searching-and\", \"https://arxiv.org/pdf/1707.02553\", \"https://arxiv.org/pdf/2604.14170\", \"https://arxiv.org/html/2512.06476v1\"]",
+  "saturation": "2",
+  "not_found": "[\"자료 부재와 탐색 부족을 구분해 재탐색 여부를 정하는 절차를 다중 에이전트 LLM 조사 시스템에서 비교 평가한 연구는 이번 검색에서 찾지 못했다. 검색어 수와 도구 호출 상한 때문이며, 그런 연구가 없다는 근거가 아니다.\", \"질적 근거 종합의 검색 중단 기준(포화)에 관한 원저 문헌은 열지 못했다. 검색 결과에 슬라이드와 2차 언급만 나왔다.\", \"회색 문헌 리뷰 지침(arXiv 1707.02553)의 중단 기준 절은 PDF 추출 페이지(11~13쪽)에 없어 확인하지 못했다.\", \"증거 풀의 미지지 항목과 수익 체감을 보고 기권하는 RAG 프레임워크(arXiv 2604.14170)는 PDF 본문을 해독하지 못해 확인하지 못했다.\"]",
+  "disclosures": "[\"arXiv 1707.02553과 2604.14170은 열었으나 본문을 읽지 못했으므로 근거 지도에 넣지 않았다.\", \"2606.15380은 초록만 읽었다. 그래서 감소 폭 수치는 확인하지 못했다.\", \"2602.03304의 RL 수치는 본문과 표 사이에 차이가 있다고 요약 모델이 알렸다. 그래서 표 값을 인용했다.\", \"검색 결과 요약에 나온 엔지니어링 블로그(tianpan.co)와 증거 충분성 벤치마크(techscience.com)는 열지 않았고 인용하지 않았다.\"]",
+  "principles_applied": "[\"EVIDENCE-FIRST\", \"NO-ASSUME\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"SPECIFIC-NAME\", \"FULL-SENTENCE\"]",
+  "notes": "고른 탐색 방법은 짧고 넓은 검색어로 시작해 좁혀 가는 방식이다. 체계적 문헌고찰 쪽의 중단 규칙, capture-recapture, empty review, 추가 검색 수익은 결말 자료로 보았다. LLM 에이전트 쪽의 탐색 중단과 충분성 판정은 메커니즘 자료로 보았다. 기시감·결말·전이 체크리스트를 썼고, 붐빔과 기준선 체크리스트는 쓰지 않았다. 이유는 추가 라운드 결정에 상용 표준이 없기 때문이다. intended_use 기준(비용 대비 반영 근거, 구조 이해 용이성)에 따라 모델 학습이 필요한 방법(DAS 학습, GRACE)은 근거 우선순위를 낮췄고 GRACE는 열지 않았다. constraints에 있는 deep-research 스킬 문구와 자체 측정은 다시 찾지 않았다. 종합 관찰은 다음과 같다. 체계적 문헌고찰 자료에서 추가 검색은 연구 몇 건을 더 찾지만 확실성 평가를 거의 바꾸지 않았다(칼륨 사례). 누락 추정 모형은 소표본에서 불안정했다. 자료 부재(empty review)는 재탐색보다 보고 방식의 문제로 다뤄졌다. LLM 쪽 자료는 자기 판단보다 관측 신호(새 출처 비율, 질의 반복)로 멈추라고 권한다. 이 결과는 A2를 지지하되, A2가 멈춘 경우에도 남은 누락 위험을 보고하라는 조건을 붙인다. 더 확인할 사항은 두 가지다. 첫째, 질적 근거 종합의 포화 기반 중단 기준 원문을 확인해야 한다. 자료 부재형 공백의 판정 근거가 되기 때문이다. 둘째, 2604.14170의 기권 조건을 텍스트 추출로 확인해야 한다. 그 조건이 A2 신호 설계와 가장 가깝기 때문이다.",
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq2"
+}

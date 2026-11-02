@@ -1,0 +1,362 @@
+{
+  "agent": "researching-prior-art",
+  "mode": "survey",
+  "subquestion_id": "sq3",
+  "search_status": "ok",
+  "queries": [
+    "multi-agent research system token usage subagents context isolation performance",
+    "why do multi-agent LLM systems fail taxonomy study",
+    "towards a science of scaling agent systems single-agent vs multi-agent coordination overhead",
+    "single agent with skills versus multi-agent system token cost accuracy comparison",
+    "arXiv 2604.02460 single agent multi-agent equal thinking token budget",
+    "Claude Code custom subagents tools model field frontmatter documentation",
+    "multi-agent debate versus self-consistency equal compute budget LLM evaluation",
+    "don't build multi-agents context engineering share full agent traces",
+    "LLM code review specialized reviewer agents versus single reviewer run-to-run variance findings"
+  ],
+  "read": "[\"https://claude.com/resources/articles/building-multi-agent-systems-when-and-how-to-use-them\", \"https://arxiv.org/html/2503.13657v3\", \"https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/\", \"https://www.anthropic.com/engineering/multi-agent-research-system\", \"https://arxiv.org/html/2601.04748v1\", \"https://arxiv.org/html/2604.02460v1\", \"https://code.claude.com/docs/en/sub-agents\", \"https://arxiv.org/html/2406.06461v3\", \"https://cognition.com/blog/dont-build-multi-agents\", \"https://arxiv.org/pdf/2608.18167\"]",
+  "issues": [
+    {
+      "where": "질문 (2) 후보안 B1·B2·B3 비교 기준",
+      "type": "weak-baseline",
+      "claim": "리뷰 역할 분리의 자체 측정(토큰 합 18~29% 감소, 같은 렌즈 재실행 시 새 지적 21~55%)은 같은 토큰 예산에서 범용 리뷰어 하나를 여러 번 표본 추출해 합치는 기준선과 비교되지 않았다.",
+      "prior_claim": "Wang 등(EMNLP 2024)은 질의·토큰·비용을 같은 예산으로 맞춘 비교에서 CoT self-consistency 기준선이 다중 에이전트 토론(MAD, 6 에이전트 x 3 라운드)과 Reflexion 같은 복잡한 전략보다 자주 앞서며, 복잡한 전략의 이득 중 상당분이 더 큰 연산 배분에서 왔다고 보고했다.",
+      "consequence": "B1의 토큰 감소와 지적 수가 역할 분리 덕분인지, 같은 예산의 반복 표본 추출로도 얻을 수 있는지 지금 자료로는 가를 수 없다. 재실행 시 새 지적이 21~55% 나온다는 자체 측정은 표본 분산이 크다는 신호이므로 이 기준선이 결정에 직접 관련된다.",
+      "evidence": "arxiv.org/html/2406.06461v3 본문: 문항당 20 질의 또는 1만 토큰 상한, MAD와 Reflexion은 예산이 늘수록 나빠질 수 있으나 self-consistency는 고르게 개선된다. 축 차이: 목적(추론 정확도)·평가(GSM8K 등 정답 벤치마크)·대상(문서 리뷰가 아님)이 대조 대상과 다르다. 자체 측정에 이 기준선이 없다는 판단은 constraints 문구에서 추론한 derived 값이다.",
+      "citations": [
+        {
+          "url": "https://arxiv.org/html/2406.06461v3",
+          "kind": "peer-reviewed",
+          "opened": true
+        }
+      ]
+    }
+  ],
+  "evidence_map": [
+    {
+      "case": "Anthropic 다중 에이전트 조사 시스템(리드 에이전트 + 병렬 서브에이전트 + 인용 에이전트)",
+      "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+      "axes": {
+        "purpose": {
+          "prior": "넓은 웹 조사 질문에 답하는 조사 품질 향상",
+          "same": false,
+          "note": "대조 대상은 리뷰·검증 역할의 실행 구조 결정이며, 이 사례는 조사 작업 전체의 품질을 다룬다."
+        },
+        "mechanism": {
+          "prior": "역할별 서브에이전트가 각자 맥락 창에서 탐색하고 요약을 리드에 돌려주며, 프롬프트에 질의 복잡도별 서브에이전트 수 규칙을 둔다",
+          "same": false,
+          "note": "서브에이전트 분리와 맥락 격리는 B1·B3 공통 요소와 같다. 그러나 고정된 정의 파일과 프롬프트 템플릿 방식 중 무엇인지는 공개되지 않았다."
+        },
+        "evaluation": {
+          "prior": "내부 조사 평가에서 단일 Opus 4 대비 90.2% 향상, BrowseComp 분석에서 토큰 사용량이 성능 분산의 80%를 설명, 다중 에이전트는 채팅 대비 약 15배 토큰",
+          "same": false,
+          "note": "평가는 조사 결과 품질이고, 리뷰 지적의 재검출률이나 재현성은 측정하지 않았다."
+        },
+        "target": {
+          "prior": "범용 웹 조사 질의",
+          "same": false,
+          "note": "대상이 문서 리뷰가 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과에서 원문 공학 블로그로 이동",
+      "adoption": "참고",
+      "bearing": "서브에이전트 분리 자체(B1·B2·B3 공통)는 읽기 중심 작업에서 근거가 있으나 성능 이득의 대부분이 토큰 증가로 설명되므로, 비용 기준으로는 서브에이전트 수를 줄이는 쪽(B2)에 무게를 둔다. 초기 실패로 단순 질의에 서브에이전트 50개를 띄운 사례가 있어 분해 과잉의 기준으로 쓸 수 있다."
+    },
+    {
+      "case": "Anthropic 안내문: 다중 에이전트를 언제 쓰는가",
+      "url": "https://claude.com/resources/articles/building-multi-agent-systems-when-and-how-to-use-them",
+      "axes": {
+        "purpose": {
+          "prior": "단일 에이전트와 다중 에이전트 중 선택 기준 제시",
+          "same": false,
+          "note": "분해 기준을 다루는 점은 질문 (2)와 겹치지만 리뷰 역할 정의 방식(B1 대 B3)은 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "맥락 오염·병렬화·전문화 세 조건에서만 분리하고, 문제 유형이 아닌 맥락 경계로 분해하며, 검증 서브에이전트는 맥락 전달이 적어 적합하다고 본다",
+          "same": false,
+          "note": "검증 서브에이전트 권고는 대조 대상의 리뷰 역할 분리와 같은 구성요소다. 그러나 실행 규칙 문서와 정의 파일의 구분은 다루지 않는다."
+        },
+        "evaluation": {
+          "prior": "정량 실험은 제한적이며 다중 에이전트가 같은 작업에 3~10배 토큰을 쓴다고 서술, 계획·구현·테스트·리뷰 에이전트 실험에서 조정에 실제 작업보다 많은 토큰을 썼다고 서술",
+          "same": false,
+          "note": "통제 실험 수치가 아닌 실무 서술이다."
+        },
+        "target": {
+          "prior": "일반 에이전트 시스템 설계",
+          "same": false,
+          "note": "문서 리뷰 렌즈에 한정되지 않는다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "첫 검색 결과",
+      "adoption": "참고",
+      "bearing": "분해 과잉의 기준(문제 유형별 분할은 흔히 역효과, 강한 오케스트레이터는 검증 서브에이전트 필요성이 줄어듦)을 준다. 리뷰 렌즈를 관점 유형별로 늘리는 B1을 약하게 반대하고, 정의 수를 줄이는 B2를 약하게 지지한다."
+    },
+    {
+      "case": "Claude Code 서브에이전트 공식 문서(정의 파일 frontmatter)",
+      "url": "https://code.claude.com/docs/en/sub-agents",
+      "axes": {
+        "purpose": {
+          "prior": "맥락 보존, 도구 제한, 구성 재사용, 모델 선택을 통한 비용 통제",
+          "same": false,
+          "note": "제품 기능 설명이며 리뷰 역할 분리의 효과 측정이 아니다."
+        },
+        "mechanism": {
+          "prior": "tools·disallowedTools·model·maxTurns·skills·effort를 정의 파일에 고정하고, 호출 시 model 매개변수가 frontmatter보다 우선한다",
+          "same": false,
+          "note": "B1·B2의 정의 파일 방식과 같은 메커니즘이다. 다만 호출자가 모델을 덮어쓸 수 있어 정의 고정만으로 재현성이 보장되지는 않는다. 별도 실행 규칙 문서는 없다."
+        },
+        "evaluation": {
+          "prior": "평가 없음. 사용자 정의 서브에이전트 설명 합이 1만 5천 토큰을 넘으면 시작 경고를 낸다고 명시",
+          "same": false,
+          "note": "측정 자료가 아니다."
+        },
+        "target": {
+          "prior": "Claude Code 사용자 전체",
+          "same": false,
+          "note": "리뷰 역할에 한정되지 않는다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과의 공식 문서",
+      "adoption": "참고",
+      "bearing": "도구·모델·턴 상한을 정의에 두는 기능이 표준으로 제공되므로, 모드 기본값을 정의에 두는 B2가 별도 규칙 문서를 두는 B1보다 구조가 단순하다. 정의 설명이 항상 맥락에 실리므로 렌즈 정의 수가 늘면 상시 비용이 늘어 B3와 정의 수 축소 쪽에 무게를 둔다."
+    },
+    {
+      "case": "구글 리서치: 에이전트 시스템 확장의 과학(180개 구성 비교)",
+      "url": "https://research.google/blog/towards-a-science-of-scaling-agent-systems-when-and-why-agent-systems-work/",
+      "axes": {
+        "purpose": {
+          "prior": "단일 에이전트와 다중 에이전트 구조 중 어느 것이 언제 나은지 예측",
+          "same": false,
+          "note": "분해 과잉의 기준을 찾는 점은 질문 (2) 후반과 같으나 리뷰 역할 정의 방식은 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "단일 에이전트 1종과 독립·중앙집중·분산·혼합 다중 에이전트 4종을 4개 벤치마크·3개 모델군에서 비교",
+          "same": false,
+          "note": "구조 위상 비교이며 정의 파일과 템플릿의 차이가 아니다."
+        },
+        "evaluation": {
+          "prior": "병렬 가능 과제에서 중앙집중형 +80.9%, 순차 과제에서 모든 다중 에이전트 변형이 39~70% 저하, 독립형 오류 증폭 17.2배 대 중앙집중형 4.4배, 도구가 많을수록 조정 비용이 불균형하게 증가",
+          "same": false,
+          "note": "과제 정답률 평가이며 리뷰 지적 품질이 아니다."
+        },
+        "target": {
+          "prior": "금융 분석·웹 탐색·계획·업무 도구 벤치마크",
+          "same": false,
+          "note": "문서 리뷰가 대상이 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과에서 원문 블로그로 이동(논문은 arXiv 2512.08296)",
+      "adoption": "참고",
+      "bearing": "독립 병렬 리뷰는 분해 이득이 나는 조건이지만 결과를 중앙에서 집계하지 않으면 오류가 증폭된다. 집계를 정하는 실행 규칙(B1의 집계 기능)은 필요하다는 쪽으로 움직이며, 그 집계를 어디에 둘지는 이 근거로 정할 수 없다."
+    },
+    {
+      "case": "MAST: 다중 에이전트 LLM 시스템 실패 분류",
+      "url": "https://arxiv.org/html/2503.13657v3",
+      "axes": {
+        "purpose": {
+          "prior": "다중 에이전트 시스템이 왜 실패하는지 분류",
+          "same": false,
+          "note": "실패 원인 분류이며 역할 정의 방식 선택이 아니다."
+        },
+        "mechanism": {
+          "prior": "7개 프레임워크의 실행 기록 1,642건을 주석해 14개 실패 유형·3개 범주를 도출",
+          "same": false,
+          "note": "분석 방법이며 설계 후보가 아니다."
+        },
+        "evaluation": {
+          "prior": "ChatDev 역할 명세·작업 흐름 개선 +9.4%, 상위 목표 검증 단계 추가 +15.6%, 검증 실패(누락 8.2%, 오검증 9.1%)가 흔하고 검증자는 철저 검토를 지시받아도 피상 검사에 그치기 쉽다",
+          "same": false,
+          "note": "코드 생성 과제 성공률 평가다."
+        },
+        "target": {
+          "prior": "ChatDev 등 범용 다중 에이전트 프레임워크",
+          "same": false,
+          "note": "문서 리뷰 렌즈가 아니다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과의 arXiv 원문",
+      "adoption": "참고",
+      "bearing": "역할 명세를 명확히 하는 개입의 이득이 크지 않고 일관되지 않았다. 그래서 역할 정의를 세분하는 것만으로 리뷰 품질이 오른다는 기대를 낮추며, B1·B2·B3 중 어느 쪽도 강하게 지지하지 않는다."
+    },
+    {
+      "case": "기술 묶음을 가진 단일 에이전트가 다중 에이전트를 대체하는 조건",
+      "url": "https://arxiv.org/html/2601.04748v1",
+      "axes": {
+        "purpose": {
+          "prior": "다중 에이전트를 기술 묶음을 가진 단일 에이전트로 컴파일해 비용을 줄일 수 있는지 확인",
+          "same": false,
+          "note": "비용 대비 품질을 묻는 점은 질문 (2)와 같으나 리뷰 역할 분리가 대상은 아니다."
+        },
+        "mechanism": {
+          "prior": "분해·풀이·검증 등 역할 에이전트를 한 번의 호출 안의 구조화된 기술로 바꿈",
+          "same": false,
+          "note": "B3는 템플릿을 범용 서브에이전트에 넘기므로 여전히 별도 호출이다. 한 호출에 합치는 이 사례와 메커니즘이 다르다."
+        },
+        "evaluation": {
+          "prior": "GPT-4o-mini, 3개 벤치마크 평균 정확도 +0.7%, 토큰 -53.7%, 지연 -49.5%. 기술 수 50~100 넘으면 선택 정확도 급락, 비슷한 경쟁 기술 1~2개가 정확도를 7~63% 낮춤",
+          "same": false,
+          "note": "선택 정확도는 합성 기술 묶음으로 측정했고 리뷰 품질은 아니다."
+        },
+        "target": {
+          "prior": "GSM8K·HumanEval·HotpotQA",
+          "same": false,
+          "note": "문서 리뷰가 대상이 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과의 arXiv 원문",
+      "adoption": "참고",
+      "bearing": "역할 수가 적으면 분리하지 않는 쪽이 토큰을 크게 줄인다는 근거로 정의 수 축소(B2 또는 B3)를 지지한다. 설명이 서로 비슷한 역할이 많으면 선택 혼동이 커진다는 결과는 렌즈 설명이 겹치는 상태가 분해 과잉의 신호라는 기준으로 쓸 수 있다."
+    },
+    {
+      "case": "같은 사고 토큰 예산에서 단일 에이전트가 다중 에이전트를 앞선다는 연구",
+      "url": "https://arxiv.org/html/2604.02460v1",
+      "axes": {
+        "purpose": {
+          "prior": "다중 에이전트 이득이 구조 때문인지 추가 연산 때문인지 분리",
+          "same": false,
+          "note": "비용 통제 비교라는 점은 관련 있으나 리뷰 역할 정의 방식은 다루지 않는다."
+        },
+        "mechanism": {
+          "prior": "순차·하위과제 병렬·병렬 역할·토론·앙상블 다중 에이전트와 단일 에이전트를 같은 사고 토큰 예산으로 비교",
+          "same": false,
+          "note": "병렬 역할 변형이 대조 대상의 역할 분리와 같은 구성요소다."
+        },
+        "evaluation": {
+          "prior": "1,000 토큰 예산 평균 단일 0.418 대 토론 0.388 등 100 토큰을 뺀 모든 예산에서 단일이 같거나 앞섬, 맥락이 심하게 훼손되면 순차 다중 에이전트가 앞섬",
+          "same": false,
+          "note": "다단계 질의응답 정확도를 LLM 채점자로 평가했다."
+        },
+        "target": {
+          "prior": "FRAMES, MuSiQue 4단계 질문",
+          "same": false,
+          "note": "문서 리뷰가 대상이 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "블로그 언급을 따라 arXiv 원문으로 이동(snowballing)",
+      "adoption": "참고",
+      "bearing": "역할 분리의 측정 이득을 같은 예산 기준선과 비교해야 한다는 근거다. 맥락 훼손(긴 맥락 오염)이 있을 때만 분리가 유리하다는 조건은 분해 기준을 맥락 크기에 두는 쪽으로 움직인다."
+    },
+    {
+      "case": "예산을 맞춘 추론 전략 평가(self-consistency 대 다중 에이전트 토론)",
+      "url": "https://arxiv.org/html/2406.06461v3",
+      "axes": {
+        "purpose": {
+          "prior": "추론 전략을 같은 연산 예산으로 공정 비교",
+          "same": false,
+          "note": "비용 대비 효과를 묻는 점만 같다."
+        },
+        "mechanism": {
+          "prior": "CoT self-consistency, 다중 에이전트 토론, Reflexion 등을 질의·토큰 예산으로 정렬",
+          "same": false,
+          "note": "역할 고정 서브에이전트 정의가 아니다."
+        },
+        "evaluation": {
+          "prior": "같은 예산에서 self-consistency가 자주 앞서고, 토론과 Reflexion은 예산 증가 시 나빠질 수 있다",
+          "same": false,
+          "note": "정답이 있는 추론 벤치마크다."
+        },
+        "target": {
+          "prior": "GSM8K·MATH·HotpotQA 등",
+          "same": false,
+          "note": "문서 리뷰가 대상이 아니다."
+        }
+      },
+      "outcome": "실패",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과의 arXiv 원문(EMNLP 2024)",
+      "adoption": "참고",
+      "bearing": "같은 렌즈 재실행으로 새 지적이 21~55% 나온다는 자체 측정과 묶으면, 역할 수를 늘리기 전에 같은 예산의 반복 실행 기준선과 비교해야 한다는 쪽으로 움직인다. 후보안 하나를 직접 지지하지는 않는다."
+    },
+    {
+      "case": "Cognition: 다중 에이전트를 만들지 말라",
+      "url": "https://cognition.com/blog/dont-build-multi-agents",
+      "axes": {
+        "purpose": {
+          "prior": "장시간 코딩 에이전트의 신뢰성 확보",
+          "same": false,
+          "note": "쓰기 작업 중심이며 리뷰 역할이 아니다."
+        },
+        "mechanism": {
+          "prior": "맥락과 전체 실행 기록을 공유하는 단일 스레드 에이전트를 기본으로 하고, 잘 정의된 질문에만 답하는 비병렬 서브에이전트는 합리적 설계로 서술",
+          "same": false,
+          "note": "읽기 전용 질문 응답 서브에이전트가 리뷰 서브에이전트와 같은 구성요소다."
+        },
+        "evaluation": {
+          "prior": "정량 평가 없음, 하위과제 분리로 결과 스타일이 충돌한 사례 서술",
+          "same": false,
+          "note": "사례 서술이다."
+        },
+        "target": {
+          "prior": "코딩 에이전트",
+          "same": false,
+          "note": "문서 리뷰가 대상이 아니다."
+        }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "1차",
+      "route": "검색 결과의 원문 블로그",
+      "adoption": "참고",
+      "bearing": "리뷰처럼 읽기만 하고 판정을 돌려주는 역할은 분리해도 이 글의 실패 원인(충돌하는 암묵적 결정)에 해당하지 않는다. 그래서 리뷰 역할 분리 자체는 유지하되, 산출물을 고치는 역할까지 나누는 것은 분해 과잉으로 보는 기준이 된다."
+    },
+    {
+      "case": "적대적 리뷰: 코드 리뷰에서 리뷰어 수와 상호작용 구조 비교",
+      "url": "https://arxiv.org/pdf/2608.18167",
+      "axes": {
+        "purpose": {
+          "prior": "주 에이전트와 서브에이전트 구조에서 최소 협력 리뷰 프로토콜 설계",
+          "same": false,
+          "note": "리뷰 역할을 서브에이전트로 둔다는 점은 같으나 정의 파일과 템플릿의 비교는 아니다."
+        },
+        "mechanism": {
+          "prior": "단일 리뷰어, 독립 리뷰어 2명 합집합, 리뷰어 3+메타리뷰어(MARS), 리뷰어+비평자 상호작용(AR)을 비교하고 SKILL.md 텍스트 프로토콜로도 실행",
+          "same": false,
+          "note": "리뷰 역할 수와 상호작용 방식 비교이며, 도구·모델 고정 정의 여부는 변수가 아니다."
+        },
+        "evaluation": {
+          "prior": "LiveCodeBench 통과율: 단일 리뷰어 77%, 독립 리뷰어 2명 75%, MARS 82%(5 에이전트), AR 87%(3 에이전트). 저자는 독립 리뷰어 추가가 잡음 범위 안이라고 보고, MARS는 이득이 토큰 비용에 비해 작다고 서술",
+          "same": false,
+          "note": "코드 통과율 평가이며 문서 리뷰 지적 재검출률이 아니다."
+        },
+        "target": {
+          "prior": "코드 생성·코드 리뷰 벤치마크",
+          "same": false,
+          "note": "문서 리뷰가 대상이 아니다."
+        }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "코드 리뷰 검색 결과의 arXiv PDF 1~4페이지",
+      "adoption": "참고",
+      "bearing": "독립 리뷰어를 늘리는 것만으로는 이득이 잡음 범위였고 역할 수가 적은 상호작용 구조가 더 나았다. 그래서 리뷰 역할 수를 늘리는 방향의 분해를 약하게 반대하고 정의 수 축소(B2)에 무게를 둔다. 정의 파일과 템플릿 중 무엇이 나은지는 이 근거로 정할 수 없다."
+    }
+  ],
+  "saturation": "3",
+  "not_found": "[\"고정된 서브에이전트 정의(도구·모델 고정)와 범용 서브에이전트에 프롬프트 템플릿을 넘기는 방식을 비용·재현성·사용성으로 직접 비교한 연구나 회고를 찾지 못했다. 검색한 자료는 모두 단일 대 다중 에이전트 또는 역할 수 비교였다. 독창성의 근거가 아니다.\", \"같은 리뷰 서브에이전트를 반복 실행할 때의 지적 재현성(run-to-run 분산)을 역할 분리 방식별로 측정한 자료를 찾지 못했다. 코드 리뷰 검색에서도 반복 실행 통제 연구는 나오지 않았다.\", \"별도 실행 규칙 문서를 두는 구조가 사람의 구조 이해도에 주는 영향을 측정한 자료를 찾지 못했다. 도구 호출 상한 안에서 사용성 연구까지 검색하지 못한 탓도 있다.\"]",
+  "disclosures": "[\"weak-baseline 이슈에서 자체 측정에 같은 예산 반복 실행 기준선이 없다는 판단은 constraints 문구만 보고 추론한 derived 값이다. 자체 측정 원문을 열어 확인하지 않았다.\", \"2608.18167 PDF는 1~4페이지만 읽었고, SWE-PRBench 결과와 토큰 비용 표는 확인하지 않았다.\", \"2503.13657, 2601.04748, 2604.02460 원문은 앞쪽 10만 자까지만 읽었다.\", \"Anthropic 조사 시스템과 Claude Code 문서는 대조 대상의 실행 환경과 같은 회사 자료이므로 이해관계가 있는 vendor 출처다.\"]",
+  "principles_applied": "[\"EVIDENCE-FIRST\", \"NO-ASSUME\", \"STATE-ASSUME\", \"SPECIFIC-NAME\", \"TERM-ONE\", \"FULL-SENTENCE\", \"WRITTEN-ONLY\"]",
+  "notes": "탐색 방법은 짧고 넓은 검색어로 시작해 좁히기, 블로그 언급을 따라 원문 논문으로 가는 인용 따라가기, 실패·비판 자료 찾기를 골랐다. intended_use의 기준(작업당 비용 대비 반영 지적, 구조 이해 용이성)에 맞춰 같은 예산 비교와 분해 과잉 기준을 우선했다. 결정에 쓸 때 주의할 점은 모든 행이 단일 대 다중 에이전트 또는 역할 수를 비교한다는 사실이다. 그래서 B1·B2(정의 파일)와 B3(템플릿을 범용 서브에이전트에 전달)의 차이에는 직접 근거가 없고, 정의 수와 역할 수를 줄이는 방향(B2 쪽)에 간접 근거가 모인다. 분해 과잉의 기준으로 쓸 수 있는 근거는 다음과 같다. 문제 유형별 분할은 흔히 역효과라는 Anthropic 안내문이 있다. 순차 과제와 도구가 많은 과제에서 조정 비용이 커진다는 구글 연구가 있다. 비슷한 역할 설명이 많으면 선택 혼동이 커진다는 2601.04748이 있다. 독립 리뷰어를 늘려도 이득이 잡음 범위였다는 2608.18167이 있다. 강화학습 기반 다중 에이전트 자료는 exclude 조건이라 뺐다. 2차 요약 자료(themoonlight, dev.to, agentwiki, codebridge)는 1차 원문을 열 수 있었으므로 인용에서 뺐다. 추가로 확인할 사항은 자체 리뷰 측정에 같은 예산 반복 실행 기준선이 있는지 여부다. 이 기준선이 없으면 B1의 토큰 감소가 역할 분리 덕분인지 가를 수 없기 때문이다."
+}
