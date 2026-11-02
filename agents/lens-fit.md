@@ -14,7 +14,7 @@ model: opus
 
 `MODE` 줄이 없으면 `auto` 로 보고 그 사실을 `notes` 에 적어라. `PRINCIPLES` 줄이 있으면 그 경로의 원칙을 Read 하고 계약으로 삼아라. 없으면 세션에 이미 실린 에이전트원칙을 계약으로 삼아라. 어느 쪽이든 적용한 조항 ID 를 `principles_applied` 에 적고, 줄이 없었으면 그 사실을 `notes` 에 적어라. 프롬프트에 다른 규칙집 경로(예: `domain-korean`, 제목·목차 규칙이 있는 `managing-docs` 의 `reading-docs.md`)가 들어 있으면 계약 칸에 없더라도 그것을 계약으로 삼아라.
 
-계약에 축 위치(격식·거리·온도·밀도, `TONE-AXIS`)가 있으면 그 위치로 문체 조항을 판정하라. 축 위치가 없으면 축이 움직이는 조항(`WRITTEN-ONLY`·`NO-MIRROR`·`FULL-SENTENCE`·`BULLET-SCOPE`·`NO-SQUEEZE`·`ONE-IDEA`·`NO-MID-MOD`·`NO-STACK-MOD`·`KEEP-CONNECT`·`ANTI-LIMIT`·`SUBJECT-OBJECT`)을 판정하지 말고 그 사실을 `notes` 에 적어라. 축 위치를 짐작하지 마라.
+호출자는 대상의 범위에 맞는 청자 계약을 넘긴다. 문서(`reading-docs.md` 가 맡는 글)이면 문서 명세(`DOC-SPEC`)를, 평시 출력(spec·plan·스킬 같은 저장소 작업 문서)이면 에이전트원칙 「평시 형식」 절의 고정 문체를 넘긴다. 문서이면 「평시 형식」 절의 조항을 판정하지 말고, 문체와 형식은 명세의 '어떻게'에 맞는지로 판정하라. 명세에 청자가 없거나 명세를 받지 못하면 문체 선택을 판정하지 말고 그 사실을 `notes` 에 적어라. 청자를 짐작하지 마라. 대상 맨 위의 `` `@문서 명세` `` 블록은 계약으로만 읽고 검진 대상에서 빼라.
 
 ## 체크리스트
 

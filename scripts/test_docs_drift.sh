@@ -72,7 +72,8 @@ WK="$HERE/docs/domain-korean.md"
 # 에이전트원칙이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
 # 그 검사가 우리가 없애려던 중복을 오히려 요구했다. 이제 ID 로 잇고, 지시 문장이 스킬에 그대로
 # 있으면 실패한다.
-KO_IDS="$(awk '/^#### `PLAIN-KO`/{f=1;print;next} f&&/^##?#? /{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
+# 한국어 조항은 「출력」의 「공통」과 「평시 형식」 두 절에 나뉘어 있다(2026-10-30). 두 절을 함께 뽑는다.
+KO_IDS="$(awk '/^### 공통$/{f=1;next} f&&/^### /&&!/^### 평시 형식$/{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
 check "에이전트원칙에서 한국어 조항 ID 를 뽑았다"    "[ -n \"\$KO_IDS\" ]"
 KO_MISS=""
 KO_DUP=""
@@ -716,7 +717,7 @@ done
 # CLAUDE.md 「조항 추가와 문구 변경」이 정한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
 # 다만 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 는 그 절이 생기기 전(2026-06~09)에 지워 근거가 git 이력에만 있다.
 REVIVED_IDS=""
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN NAME-ITEMS COMMA-CUT LABEL-NOUN TERM-EXPLAIN EDIT-DISCIPLINE EDIT-PRIORITY EXPLAIN-STRUCTURE KEEP-FAILED NO-FLEET SECRETS TITLE-PROOF TELL-NOW; do
+for id in TONE-AXIS ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN NAME-ITEMS COMMA-CUT LABEL-NOUN TERM-EXPLAIN EDIT-DISCIPLINE EDIT-PRIORITY EXPLAIN-STRUCTURE KEEP-FAILED NO-FLEET SECRETS TITLE-PROOF TELL-NOW; do
   grep -qF "**\`$id\`" "$CANON_ALL" && REVIVED_IDS="$REVIVED_IDS $id"
 done
 check "canon: 지운 조항 ID 가 근거 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"

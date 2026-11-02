@@ -1,0 +1,15 @@
+{"lens":"lens-grounding","mode":"spec","target":"docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md",
+"issues":[
+{"where":"배경 첫 문단","type":"mismatch","claim":"TONE-AXIS ID 를 직접 적은 곳은 「출력」 머리·ASK-OPTIONS·WRITTEN-ONLY 다. 나머지는 '밀도 축'·'개조식 항목'만 언급하고, 「출력」 머리가 목록에서 빠졌다.","principle":"NO-ASSUME"},
+{"where":"공통 규칙과 범위별 규칙 셋째 문단","type":"mismatch","claim":"'a1ec1d41 이전'은 c1a299d5(축 조건 포함)다. 축 조건 없는 기준 커밋은 a38f5e5b 다.","principle":"NO-ASSUME"},
+{"where":"시험 결과·문서 정의","type":"unsupported","claim":"q-tone-axis-2 원인을 관례 지식 부족으로 단정했으나, A 는 명사형 종결을 문안에 직접 적었고 B~D 는 지웠다. domain-korean 10-27 진단도 축 이전 문안이 '~다'를 냈고 모델 기본값이 작용한다고 했다.","principle":"STATE-ASSUME"},
+{"where":"시험 결과 표 B·D 행","type":"mismatch","claim":"B 는 READER-TONE 외에 여러 조항 문안도 고쳤고, D 의 READER-TONE 에는 B 의 추정·알림 문장이 없다.","principle":"NO-ASSUME"},
+{"where":"바꿀 파일","type":"omission","claim":"docs/domain-discipline.md 127행 ASK-OPTIONS 근거가 TONE-AXIS 를 가리킨다.","principle":"REPORT-DEAD"},
+{"where":"바꿀 파일 domain-korean","type":"omission","claim":"WRITTEN-ONLY·NO-MIRROR·FULL-SENTENCE·BULLET-SCOPE·ONE-IDEA·NO-SQUEEZE 근거 절(226·259·274·316·326·427행)이 TONE-AXIS 절을 가리킨다.","principle":"NO-ASSUME"},
+{"where":"렌즈 절","type":"omission","claim":"평시 범위(spec·plan·작업 문서)의 lens-fit 기준이 없고 review-docs 15행 문장도 언급되지 않았다.","principle":"NO-ASSUME"},
+{"where":"정의의 기록","type":"unsupported","claim":".html 로 옮길 때 HTML 주석을 빼는 단계가 없다.","principle":"STATE-ASSUME"},
+{"where":"확인과 기본값","type":"unsupported","claim":"기본 독자 예시 값에 출처가 없고 현행 파일·확정 spec 에도 없다.","principle":"EVIDENCE-FIRST"},
+{"where":"두 범위 표 문서 행","type":"omission","claim":"reading-docs.md 5행의 작업 정리용 마크다운이 목록에서 빠졌다.","principle":"NO-ASSUME"},
+{"where":"바꿀 파일 evals·클린룸 시험","type":"contradiction","claim":"질문은 ids∩clause 로 고른다. q-tone-axis-1~4 clause 가 [TONE-AXIS] 하나라 바꾸면 기존 단위에서 빠진다.","principle":"NO-ASSUME"}
+],
+"notes":"원본 보고는 대화로 받았고 이 파일은 지적마다 위치·주장·원칙을 옮겼다. 확인됨: 위반 합계 9·7·11·10(조건 키별), 판정 모델 sonnet-5-5, q-tone-axis-2 A 만 통과, B 의 '~다 평서문' 문구, slidetitle-chat C·D 실패. C 가 뽑은 청자는 '동료와 관련 팀', 게재처가 사내 발표자료다. VOCAB-PREF 의 '(직역 금지 포함)' 누락. lens-readability 27행 고정 규칙도 다시 써야 한다."}

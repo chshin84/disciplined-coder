@@ -1,0 +1,23 @@
+{"lens":"lens-consistency","mode":"spec","target":"docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md",
+"issues":[
+{"where":"64·5행","type":"contradiction","claim":"한정어 없는 '작업 보고'를 평시로 적어 파일로 쓰는 작업 보고가 두 범위에 든다.","principle":"TERM-ONE"},
+{"where":"5·56·58행","type":"contradiction","claim":"목적은 '남이 읽을 문서', 표는 reading-docs.md 범위(사용자 본인이 정리용으로 만드는 마크다운 포함)로 정의가 다르고 표 목록에 그 마크다운이 없다.","principle":"TERM-ONE"},
+{"where":"55행","type":"gap","claim":"결정 기록·핸드오프·근거 문서가 두 범위 목록에 없다.","principle":"상호 배타 분리"},
+{"where":"74·138행","type":"contradiction","claim":"평시 전용 조항이 공통 조항과 세 절에 흩어져 있어 범위 머리를 둘 절이 없고 재배치가 설계되지 않았다.","principle":"FOCUSED"},
+{"where":"134행","type":"contradiction","claim":"평시 고정 문체를 모든 글에 적용되는 「출력」 머리에 둔다.","principle":"상호 배타 분리"},
+{"where":"76행","type":"contradiction","claim":"'문서의 형식은 reading-docs.md 만 정한다'와 공통 형식 조항(ONE-ENDING·SECTION-HEAD·BOTTOM-LINE·NO-SQUEEZE)의 문서 적용이 함께 적혔다.","principle":"TERM-ONE"},
+{"where":"95·99행","type":"gap","claim":"기본값은 '누가'만 있어 나머지 항목을 채울 방법이 없다.","principle":"NO-ASSUME"},
+{"where":"115행","type":"gap","claim":"'창에 보이지 않는다'의 사용자 요구가 「사용자 결정」에 없다.","principle":"TOP-DOWN"},
+{"where":"115·56·113행","type":"drift","claim":"'초안'이 대화 안 초안과 MD-FIRST 마크다운 초안을 함께 가리킨다.","principle":"TERM-ONE"},
+{"where":"119~121행","type":"drift","claim":"렌즈에 넘기는 대상 이름(청자 계약·정의·한 줄·청자)이 하나가 아니고, 기록 없는 문서에서 한 줄의 출처가 없다.","principle":"TERM-ONE"},
+{"where":"119~121·141~142행","type":"gap","claim":"평시 범위(spec·plan·스킬) 검토 때 lens-fit 에 넘길 문체 기준이 없고 review-specs 가 바꿀 파일에 없다.","principle":"FOCUSED"},
+{"where":"56·130행","type":"gap","claim":"대화 안 초안에 REVIEW-DELIVERABLE·TITLES 가 적용되는지 정하지 않았다.","principle":"YAGNI"},
+{"where":"60·138행","type":"gap","claim":"판별 문장의 원칙 쪽 위치와 「읽기 위한 문서」 포인터 수정이 바꿀 파일에 없다.","principle":"FOCUSED"},
+{"where":"44·138행","type":"gap","claim":"ASK-OPTIONS 예외 문장이 TONE-AXIS 대신 가리킬 곳이 없고 '산출물' 이름이 남는다.","principle":"TERM-ONE"},
+{"where":"7행","type":"contradiction","claim":"이어받는 범위 선언(목표 하나·반목표)과 본문이 인용하는 확정 spec 요소(비목표·항상 지키는 규칙·ASK-OPTIONS 예외·직역투 절)가 다르다.","principle":"TOP-DOWN"},
+{"where":"134·172행","type":"contradiction","claim":"'새 조항 ID 는 만들지 않는다'와 '새 절 ID 를 정하라'가 함께 있다.","principle":"TERM-ONE"},
+{"where":"157행","type":"contradiction","claim":"1차 채택을 '현행 이하'로 두면서 같으면 짝을 추가한다고 해 부딪친다. 저장소 규칙은 1차 '적으면', 짝 추가 뒤 '이하'.","principle":"EVIDENCE-FIRST"},
+{"where":"153행","type":"gap","claim":"새 should·should-not 짝 2개 추가 규칙과 시험 제안·승인 기록이 없다.","principle":"EVIDENCE-FIRST"},
+{"where":"26·157행","type":"contradiction","claim":"합계를 근거에서 빼 놓고 합계 비교로 채택한다. q-tone-axis-2 도 한 번 실행 결과다.","principle":"EVIDENCE-FIRST"}
+],
+"notes":"원본 보고는 대화로 받았고 이 파일은 지적마다 위치·주장·원칙을 옮겼다. 렌즈 notes: 'a1ec1d41 이전 문안'이 c1a299d5 를 가리키면 축 조건이 남은 문안이다(되돌릴 기준 커밋 확인 필요). HTML 주석의 .html 잔존·형식 경고 확인 필요. lens-readability 목적 주입과 6하 누가·왜 관계 미정. 단서 목록이 본보기 문서·도구 출력 문체를 다루지 않는다."}

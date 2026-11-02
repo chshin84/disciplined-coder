@@ -1,0 +1,19 @@
+{"lens":"lens-adversarial","mode":"design","target":"docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md",
+"issues":[
+{"where":"157행 채택 규칙","type":"failure-mode","claim":"합계를 근거에서 뺀 뒤 채택 기준으로 다시 쓴다. 기록된 A 와 새 단일 실행 비교라 흔들림이 크다.","principle":"CHECKABLE"},
+{"where":"157행·107행","type":"failure-mode","claim":"관례 예시가 q-tone-axis-2 성공 기준을 그대로 옮긴 문장이라, 그 질문 통과를 채택 조건으로 삼으면 정답을 실은 시험이 된다.","principle":"CHECKABLE"},
+{"where":"155행 클린룸 조건","type":"risk","claim":"모든 질문에 문서 규칙을 실어 상호 배타 분리를 재현하지 못한다. 질문 type(chat·deliverable)에 따라 실을 문안을 고르면 비용 없이 분리를 흉내 낼 수 있다.","principle":"CHECKABLE"},
+{"where":"167행 흐름 시험","type":"risk","claim":"스킬 열기 계기가 가장 새로운 실패 지점인데 채택 판정에 쓰는 시험이 없다. 스킬이 안 열리면 대화 안 초안에 규칙 공백이 생긴다.","principle":"CHECKABLE"},
+{"where":"60행 판별 문장·127~128행 계기","type":"failure-mode","claim":"'써 달라'만 적고 '고쳐 달라'(q-tone-axis-2)를 덮지 않는다. '정리해 줘' 같은 설명 요청의 분류가 열려 있다.","principle":"TERM-ONE"},
+{"where":"95·99행","type":"failure-mode","claim":"기본 독자 표는 '누가'만 정하는데 여섯 항목 모두를 확인값이나 기본값으로 채우라 한다. 문서 종류를 모르면 '누가' 기본값도 없다.","principle":"NO-ASSUME"},
+{"where":"99행·172행","type":"risk","claim":"'기본값은 규칙이므로 NO-ASSUME 위반이 아니다'는 짐작을 표로 옮긴 순환이다. 표 행이 근거 없이 구현자에게 맡겨져 EVIDENCE-FIRST 와 충돌한다. 실제 충족 장치는 한 줄 알림(STATE-ASSUME)이다.","principle":"EVIDENCE-FIRST"},
+{"where":"82~91·101행","type":"over-engineering","claim":"'언제'·'왜'는 문체 결정에 이어지지 않고 '무엇을'은 BOTTOM-LINE 과 겹친다. '누가'·'어디서'만 남기면 렌즈 계약과도 맞는다.","principle":"YAGNI"},
+{"where":"7·109행","type":"risk","claim":"관례 예시와 행 추가 규칙은 확정 spec 이 금지한 장르별 문체 목록과 형태가 같다. 비목표를 좁힌다는 사실을 적어야 한다.","principle":"TOP-DOWN"},
+{"where":"47행","type":"risk","claim":"'그거 빼곤 권장안'의 '그거'가 무엇인지 적지 않았다.","principle":"SPECIFIC-NAME"},
+{"where":"74행","type":"failure-mode","claim":"평시 전용 조항이 공통 조항과 함께 KO-SYNTAX·PROSE-FORM·READ-FLOW 에 흩어져 있어 절 머리 범위 선언을 하려면 재배치가 필요한데 바꿀 파일에 없다.","principle":"FOCUSED"},
+{"where":"74행","type":"risk","claim":"a1ec1d41 이전 문안은 '모든 글을'처럼 범위를 품어 절 머리 범위와 충돌한다. 「출력」 첫 문장 'Claude 가 쓰는 모든 글에 적용하라'와도 충돌하고 고칠 머리 문장이 어느 것인지 정하지 않았다.","principle":"TERM-ONE"},
+{"where":"113행","type":"failure-mode","claim":"초안 머리 HTML 주석이 .html 로 옮겨지면 남아 유출된다. review-docs 는 HTML 주석이 검사 대상이라 마커로 쓰지 말라고 한다.","principle":"REVERSIBLE"},
+{"where":"138행","type":"failure-mode","claim":"원칙의 「읽기 위한 문서」 절('사용자가 읽거나 남에게 전달할 문서')이 독자 기준 경계로 남는데 바꿀 파일에 없다. 「문서 관리」 포인터는 reading-docs.md 를 읽으라고 하지 않는다.","principle":"TERM-ONE"},
+{"where":"145행","type":"irreversible","claim":"기존 시험 단위(c27·c28~c30) ids 를 고치면 기록된 결과를 재현할 수 없다. 수정 대상을 질문 clause 와 새 단위로 한정해야 한다.","principle":"REVERSIBLE"}
+],
+"notes":"원본 보고는 대화로 받았고 이 파일은 지적마다 위치·주장·원칙을 옮겼다. 렌즈 notes: 앞 13건 중 매핑표·기록 파일·훅·slidetitle-chat 판별은 해소, 합계 흔들림은 채택 규칙에서 재발, 6하 과설계·스킬 열기 공백은 부분 해소. A 의 q-tone-axis-2 통과는 상시 원칙의 FULL-SENTENCE·BULLET-SCOPE 명사형 문구 덕일 가능성(가정)."}

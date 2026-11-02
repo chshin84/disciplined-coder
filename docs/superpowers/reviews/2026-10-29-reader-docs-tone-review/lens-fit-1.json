@@ -1,0 +1,16 @@
+{"lens":"lens-fit","target":"docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md","doc_type":"설계 (spec·plan). 설계 행의 금지 항목에 해당하는 내용 없음.",
+"issues":[
+{"where":"11행 외 28·60·74·97·101·107·134·153행","type":"style","claim":"단락이 네 문장이다.","principle":"ONE-IDEA"},
+{"where":"11·125·157·165행","type":"style","claim":"목록 앞 문장이 개수를 예고한다(세 가지·두 곳·두 가지·세 가지).","principle":"COUNT-EARNS"},
+{"where":"41~44행, 145행","type":"style","claim":"불릿 한 항목에 두 문장 이상이 있다.","principle":"BULLET-SCOPE"},
+{"where":"138~145행 「바꿀 파일」","type":"style","claim":"명사 나열 항목과 완결 문장 항목의 말끝이 섞였다.","principle":"ONE-ENDING, FULL-SENTENCE"},
+{"where":"19~24행 시험 결과 표 '문안 요지' 열","type":"style","claim":"셀 말끝이 명사구·현재형·과거형으로 섞였다.","principle":"ONE-ENDING"},
+{"where":"91·99행","type":"style","claim":"'A가 아니라 B' 대구를 두 번 썼다(30행도 같은 대비).","principle":"ANTI-LIMIT"},
+{"where":"5·11·42·58·60·107행","type":"style","claim":"주어를 가진 관형절, 60행은 'X는 Y가 Z하는 W다' 용어 풀이.","principle":"NO-MID-MOD"},
+{"where":"30·44·84·95~99·119~121행","type":"style","claim":"같은 대상을 청자·독자·읽는 사람으로 번갈아 부른다.","principle":"TERM-ONE"},
+{"where":"26·91행","type":"style","claim":"판단 주체가 spec 이거나 빠졌다.","principle":"SUBJECT-OBJECT"},
+{"where":"13·165행","type":"style","claim":"대상을 '것'으로 가리킨다.","principle":"SPECIFIC-NAME"},
+{"where":"72행 NO-SQUEEZE 변경 문안","type":"constraint","claim":"'형식이나 분량에 맞추려고' 조건, '분량이 넘치면 나누어라' 문장, 한정어 정의 괄호가 빠져 범위가 넓어졌다.","principle":"CLAUDE.md 퇴고 기준 — 범위의 정확성"},
+{"where":"107행 관례 예시","type":"constraint","claim":"원하는 형태만 주고 피할 형태('~다' 완결 문장)를 정의하지 않는다.","principle":"CLAUDE.md 퇴고 기준 — 습관 반대 조항"}
+],
+"notes":"원본 보고는 대화로 받았고, 이 파일은 지적마다 위치·주장·원칙을 옮겼다. 렌즈 notes: 72행 '형식에 따라 갈리지 않는다'와 문안 안의 산문·목록 구분의 모순은 lens-grounding 확인 사항. 173행 '가르는'은 금지어 `가르` 후보."}
