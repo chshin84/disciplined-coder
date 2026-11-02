@@ -8,11 +8,11 @@ description: 남에게 전달될 문서와 .html·.pptx·.xlsx·.docx·.pdf 산�
 
 ## `lens-fit`에 넘기는 계약
 
-이 계약은 여기가 소유한다. 계약은 에이전트원칙 `agent-principles.md`, `docs/domain-korean.md`, 문서 타입 표가 있는 `skills/managing-docs/SKILL.md`, 제목·목차 규칙이 있는 `skills/managing-docs/references/reading-docs.md` 의 경로다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. 경로와 함께 청자 계약을 넘긴다. 문서이면 보관소의 문서 명세 파일(`DOC-SPEC`)이나 초안 맨 위의 명세 블록을, 평시 출력이면 에이전트원칙 「평시 형식」 절의 고정 문체를 넘긴다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 경로를 넘기고, 청자 계약은 「평시 형식」 절의 고정 문체다.
+이 계약은 여기가 소유한다. 계약은 에이전트원칙 `agent-principles.md`, `docs/domain-korean.md`, 문서 타입 표가 있는 `skills/managing-docs/SKILL.md`, 제목·목차 규칙이 있는 `skills/managing-docs/references/reading-docs.md` 의 경로다. README를 검진할 때만 `skills/domain-readme/SKILL.md`를 추가한다. 경로와 함께 청자 계약을 넘긴다. 문서이면 문서 종류와 청자 한 줄을, 평시 출력이면 에이전트원칙 「평시 형식」 절의 고정 문체를 넘긴다. `review-specs`가 spec·plan 에 이 렌즈를 적용할 때도 같은 경로를 넘기고, 청자 계약은 「평시 형식」 절의 고정 문체다.
 
 넘기지 않으면 그 렌즈는 계약을 모른 채 실행되어 형식만 본다. `lens-readability`를 실행하지 않은 문서도 이 경로로 에이전트원칙의 한국어 조항을 검사받는다.
 
-금지 낱말은 렌즈에 넘기지 않고 렌즈도 보지 않는다. 다른 프로젝트의 `.md` 산출물은 기본 설정에서 쓰는 순간 `hooks/doc_word_pretooluse.sh` 가 거부하고(.html·.pptx 같은 다른 형식은 그 훅이 보지 않는다), 이 저장소의 문서는 일부러 그 검사에서 뺐다. 개조식이 명세의 '어떻게'와 맞는지 렌즈가 본다.
+금지 낱말은 렌즈에 넘기지 않고 렌즈도 보지 않는다. 다른 프로젝트의 `.md` 산출물은 기본 설정에서 쓰는 순간 `hooks/doc_word_pretooluse.sh` 가 거부하고(.html·.pptx 같은 다른 형식은 그 훅이 보지 않는다), 이 저장소의 문서는 일부러 그 검사에서 뺐다. 개조식이 문서 종류와 청자에 맞는지 렌즈가 본다.
 
 ## 언제 여는지
 
@@ -46,8 +46,6 @@ description: 남에게 전달될 문서와 .html·.pptx·.xlsx·.docx·.pdf 산�
 | 수정, 20줄 초과이거나 결론 제목을 바꿈 | 고칠 절의 .md 에서 실행된다 | 검진 질문에서 묻는다 |
 | .xlsx | 실행되지 않는다 | 문장 칸이 있으면 검진 질문에서 묻는다 |
 | 대시보드·도구·앱 화면·랜딩 페이지 HTML, 시험 픽스처 | 대상이 아니다 | 대상이 아니다 |
-
-**문서 명세.** 초안 맨 위에 `` `@문서 명세` `` 마커 줄을 두고, 그 아래 코드 블록에 `DOC-SPEC` 명세를 옮겨 적어라. 마커와 코드 블록 안은 기계 검사가 보지 않는다. 그 블록은 원본으로 옮기지 말고, 렌즈에 넘길 때는 청자 계약으로만 읽게 하고 검진 대상에서 빼라.
 
 **처음 만들 때.** 본문을 마크다운으로 임시 폴더에 쓰고 퇴고한 뒤 그 형식으로 옮겨라. 초안은 원본에 반영한 뒤 지워라. 다시 뽑는 비용이 거의 없어서, 남기면 낡은 사본만 생긴다. HTML 은 보고서와 발표자료만 대상이고, 남에게 보낼 HTML 메일 본문도 보고서로 본다.
 

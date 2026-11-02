@@ -10,7 +10,7 @@
 
 금지 표현을 누가 검사하는지는 `review-docs` 「`lens-fit`에 넘기는 계약」이 적는다.
 
-2026-10-30 에 에이전트원칙(`agent-principles.md`) 「출력」을 「공통」과 「평시 형식」 두 절로 나누면서 `ONE-ENDING` 을 `READ-FLOW` 로, `SUBJECT-OBJECT` 를 `UNPACK` 으로, `BULLET-SCOPE`·`ONE-IDEA` 를 `PROSE-FORM` 으로 옮겼다. 이 파일은 근거를 찾기 쉽게 옛 묶음을 그대로 둔다.
+2026-11-02 에 에이전트원칙(`agent-principles.md`) 「출력」을 「공통」과 「평시 형식」 두 절로 나누면서 `ONE-ENDING` 을 `READ-FLOW` 로, `SUBJECT-OBJECT` 를 `UNPACK` 으로, `BULLET-SCOPE`·`ONE-IDEA` 를 `PROSE-FORM` 으로 옮겼다. 이 파일은 근거를 찾기 쉽게 옛 묶음을 그대로 둔다.
 
 `agent-principles.md` 의 옛 '출력지시' 머리말은 번역할 때 한국어 어법과 적절한 낱말을 고르라고 지시한다.
 그 이유는 직역체가 대화의 품질을 크게 떨어뜨리기 때문이다. 2026-10-03까지는 이 이유가 머리말에 지시와 함께 적혀 있었고, 같은 날
@@ -183,7 +183,7 @@ quant_structure 세션(2026-09-26~27)에서 모델이 trial ledger 를 "시도 �
 
 2026-10-27 에 종결을 '~다'·'~습니다' 고정에서 `TONE-AXIS` 의 격식 축이 정한 종결로 바꿨다. 대화 답과 작업 문서는 그 조항이 고정하므로 구어 혼입을 차단하는 목적은 그대로다. 사용자가 같은 날 승인했고 측정은 「삭제한 조항」의 `TONE-AXIS` 에 있다.
 
-2026-10-30 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 의 `DOC-SPEC` 이 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
+2026-11-02 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 가 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
 
 ### `NO-MIRROR`
 
@@ -218,7 +218,7 @@ quant_structure 세션(2026-09-26~27)에서 한국어 사용자에게 본답 전
 
 2026-10-27 에 이 조항의 문언을 "사용자가 지시할 때만 문체를 바꾼다"에서 "문체의 근거는 청자 신호와 내용뿐이다"로 바꿨다. 입력 문체를 따르지 않는다는 2026-09-24 요청의 목적은 유지하고, 청자 신호에 독자·게재처·문서 종류·본보기 문서를 넣었다. 고칠 대상으로 받은 원문은 청자 신호에서 뺐다. 선행연구에서 8개 언어 실사용 대화의 LLM 이 사용자 문체로 과잉 수렴했고 페르소나 지시가 8라운드 안에 표류했으므로, 모방 금지의 위험은 긴 대화에서 크다고 본다. 사용자가 같은 날 승인했고 측정은 「삭제한 조항」의 `TONE-AXIS` 에 있다.
 
-2026-10-30 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 의 `DOC-SPEC` 이 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
+2026-11-02 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 가 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
 
 ## PROSE-FORM — 문장으로 끝낸다
 
@@ -235,7 +235,7 @@ quant_structure 세션(2026-09-26~27)에서 한국어 사용자에게 본답 전
 
 2026-10-27 에 밀도 축이 개조식인 산출물의 항목을 명사구·명사형 종결로 쓸 수 있게 했다. 위의 인과 손실은 `NO-SQUEEZE` 가 한정어와 근거를 남기게 하는 방식으로 막는다. 사용자가 같은 날 승인했고 측정은 「삭제한 조항」의 `TONE-AXIS` 에 있다.
 
-2026-10-30 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 의 `DOC-SPEC` 이 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
+2026-11-02 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 가 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
 
 ### `ONE-ENDING`
 
@@ -279,7 +279,7 @@ quant_structure 세션(2026-09-26~27)에서 한국어 사용자에게 본답 전
 
 2026-10-27 에 밀도 축이 개조식인 산출물에서 항목을 명사구로 쓸 수 있게 했다. 같은 종류만 불릿으로 쓰고 두 문장 이상의 설명은 문단으로 쓰는 문장은 바꾸지 않았다. 사용자가 같은 날 승인했고 측정은 「삭제한 조항」의 `TONE-AXIS` 에 있다.
 
-2026-10-30 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 의 `DOC-SPEC` 이 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
+2026-11-02 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 가 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
 
 ### `ONE-IDEA`
 
@@ -291,7 +291,7 @@ quant_structure 세션(2026-09-26~27)에서 한국어 사용자에게 본답 전
 
 2026-10-27 에 개조식 항목의 단위를 문장 대신 항목 하나의 생각으로 정했다. 사용자가 같은 날 승인했고 측정은 「삭제한 조항」의 `TONE-AXIS` 에 있다.
 
-2026-10-30 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 의 `DOC-SPEC` 이 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
+2026-11-02 에 `TONE-AXIS` 를 지우며 되돌렸다. 「평시 형식」 절이 맡는 평시 출력에는 2026-10-27 이전 문안을 쓰고, 문서는 `reading-docs.md` 가 맡는다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
 
 ## UNPACK — 풀어서 건넨다
 
@@ -394,7 +394,7 @@ trial 33개를 지웠다. 두 숫자는 사용자가 의미 없다고 든 오류
 
 2026-10-27 에 개조식 압축을 허용하되 인과의 근거와 한정어를 남기게 했다. 발표자료 사례에서 사용자가 압축하며 '직접'과 '전용선 공유'의 뜻을 뺐고, 이 조항이 막으려던 손실이 바로 그 형태다. 사용자가 같은 날 승인했고 측정은 「삭제한 조항」의 `TONE-AXIS` 에 있다.
 
-2026-10-30 에 `TONE-AXIS` 를 지우며 축 조건만 지웠다. 이 조항은 「공통」 절로 옮겨 문서에도 적용하므로, 목록 항목을 줄여 쓸 때 근거와 한정어를 남기라는 문장은 축 없이 남겼다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
+2026-11-02 에 `TONE-AXIS` 를 지우며 축 조건만 지웠다. 이 조항은 「공통」 절로 옮겨 문서에도 적용하므로, 목록 항목을 줄여 쓸 때 근거와 한정어를 남기라는 문장은 축 없이 남겼다(`docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md`).
 
 ### `STATE-ASSUME`
 
@@ -489,7 +489,7 @@ CLAUDE.md 「조항 추가와 문구 변경」이 정한다.
 
 ### `TONE-AXIS`
 
-2026-10-30 에 에이전트원칙에서 지웠다. 축 조건이 여러 조항에 흩어져 조항의 독립성이 사라졌기 때문이다. 대체 구조는 `docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md` 이고, 평시 출력은 에이전트원칙 「평시 형식」 절이, 문서는 `reading-docs.md` 의 `DOC-SPEC` 이 맡는다. 아래 축 표와 측정은 배경 지식으로 남긴다.
+2026-11-02 에 에이전트원칙에서 지웠다. 축 조건이 여러 조항에 흩어져 조항의 독립성이 사라졌기 때문이다. 대체 구조는 `docs/superpowers/specs/2026-10-29-reader-docs-tone-design.md` 이고, 평시 출력은 에이전트원칙 「평시 형식」 절이, 문서는 `reading-docs.md` 가 맡는다. 아래 축 표와 측정은 배경 지식으로 남긴다.
 
 2026-10-27 사용자 승인으로 2026-09-21·09-24 의 고정 문어체 기준을 이 조항으로 바꿨다. 사용자는 선택 도구로 "승인"을 골랐고, 질문은 "2026-09-21·09-24의 문체 기준을 조절 축 방식(격식·거리·온도·밀도, 대화 답과 작업 문서는 문어체 산문 고정)으로 바꾸는 것을 승인하십니까?"였다. 설계는 `docs/superpowers/specs/2026-10-27-tone-manner-design.md` 에 있다.
 
