@@ -81,6 +81,7 @@ done
 - **`DISCIPLINED_CODER_REVIEW_GATE=off`** — spec·plan 리뷰, 나눠 맡길지 판단, 규칙 위치 안내, 문서 안내의 검진 알림을 끈다.
 - **`DISCIPLINED_CODER_REPLY_CHECK=off`** — 금지 표현 차단과 문서 형식 경고를 끈다.
 - **`DISCIPLINED_CODER_PRIOR_ART_NUDGE=off`** — 선행연구 알림을 끈다.
+- **`DISCIPLINED_CODER_REPLY_REMINDER=off`** — 사용자 메시지마다 붙는 대화 답 형태 지시(세 줄)를 끈다.
 
 읽기 전용 차단과 세션 시작의 셋업은 끄는 변수가 없다.
 
