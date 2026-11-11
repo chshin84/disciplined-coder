@@ -764,6 +764,17 @@ check "유예 날짜가 남았으면 안 알린다"   "! printf '%s' \"\$OUTHO\"
 check "유예 날짜가 지났으면 알린다"      "printf '%s' \"\$OUTHO\" | grep -qF 'HANDOFF-expired.md'"
 check "유예 표시가 없으면 알린다"        "printf '%s' \"\$OUTHO\" | grep -qF 'HANDOFF-plain.md'"
 
+# --- worktree-docs: 워크트리에 커밋하지 않은 설계·기록이 있으면 브랜치 이름과 함께 알리고, 없으면 조용하다 ---
+HWT="$(mktemp -d)"; PWT="$(mktemp -d)"; WTX="$(mktemp -d)/side"
+( cd "$PWT" && git init -q -b main && git -c user.name=t -c user.email=t@t commit -q --allow-empty -m init \
+  && git worktree add -q -b side-work "$WTX" ) >/dev/null 2>&1
+OUTWT0="$(run "$HWT" "$PWT")"
+mkdir -p "$WTX/docs/superpowers/specs"; printf '# 초안\n' > "$WTX/docs/superpowers/specs/x-design.md"
+OUTWT1="$(run "$HWT" "$PWT")"
+echo "[worktree-docs] 워크트리 미커밋 설계·기록 알림"
+check "남은 것이 없으면 조용하다"          "! printf '%s' \"\$OUTWT0\" | grep -qF '워크트리에 남아 있다'"
+check "다른 워크트리의 미커밋 spec 을 알린다" "printf '%s' \"\$OUTWT1\" | grep -qF 'side-work(1개)'"
+
 echo "[파이썬 고르기 — 한 프로세스에서 한 번만 찾고 윈도우는 python 이 먼저다]"
 # 윈도우의 python3 은 스토어 안내판일 수 있어 먼저 부르면 실패하는 데만 프로세스를 쓴다. 맥·리눅스는
 # python 이 없거나 파이썬 2 일 수 있어 python3 이 먼저다. 둘 다 부르는 이름을 기록하는 가짜로 본다 —

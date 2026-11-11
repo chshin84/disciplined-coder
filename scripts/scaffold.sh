@@ -249,4 +249,22 @@ if [ -n "${CLAUDE_PROJECT_DIR:-}" ] && [ -d "${CLAUDE_PROJECT_DIR:-}" ]; then
   fi
 fi
 
+# [worktree-docs] 워크트리 미커밋 설계·기록 알림: 저장소의 워크트리마다 커밋하지 않은 spec·plan·리뷰·결정 기록이 있으면 알린다.
+#     세션이 끝난 워크트리에 설계와 리뷰가 커밋되지 않은 채 남으면 아무도 다시 보지 않아, 작업의 결과와 근거가 조용히 사라진다.
+#     읽기만 한다(git status). 다른 세션의 워크트리를 제어하지 않는다. 값이 0 이면 아무것도 안 낸다.
+if [ -n "${CLAUDE_PROJECT_DIR:-}" ] && git -C "$CLAUDE_PROJECT_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+  wt_left=""
+  while IFS= read -r wt_line; do
+    case "$wt_line" in "worktree "*) wt_path="${wt_line#worktree }" ;; *) continue ;; esac
+    [ -d "$wt_path" ] || continue
+    wt_n="$(git -C "$wt_path" status --porcelain --untracked-files=normal -- docs/superpowers/specs docs/superpowers/plans docs/superpowers/reviews docs/superpowers/decisions 2>/dev/null | wc -l | tr -d ' ')"
+    [ "${wt_n:-0}" -gt 0 ] || continue
+    wt_br="$(git -C "$wt_path" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
+    wt_left="$wt_left $wt_br(${wt_n}개)"
+  done < <(git -C "$CLAUDE_PROJECT_DIR" worktree list --porcelain 2>/dev/null)
+  if [ -n "$wt_left" ]; then
+    echo "WARNING disciplined-coder: 커밋하지 않은 spec·plan·리뷰·결정 기록이 워크트리에 남아 있다 —$wt_left. 그 작업을 맡은 세션에서 커밋하거나 버릴지 정하라."
+  fi
+fi
+
 exit 0
