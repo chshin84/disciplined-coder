@@ -591,6 +591,14 @@ check "빈 표준 입력은 침묵하고 0 으로 끝난다" "out=\"\$(printf ''
 check "prompt 값이 빈 입력은 침묵하고 0 으로 끝난다" "out=\"\$(pan '')\" && [ -z \"\$out\" ]"
 check "UserPromptSubmit 이 넛지를 연결한다" "json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")).get(\"hooks\",{}).get(\"UserPromptSubmit\",[]); sys.exit(0 if any(\"prior_art_nudge_userpromptsubmit.sh\" in h[\"command\"] for g in d for h in g[\"hooks\"]) else 1)' \"\$HERE/hooks/hooks.json\""
 
+echo "[reply-reminder]"
+RR="$HERE/hooks/reply_reminder_userpromptsubmit.sh"
+rr() { printf '{"session_id":"s","hook_event_name":"UserPromptSubmit","prompt":"%s"}' "$1" | bash "$RR"; }
+check "메시지마다 세 줄을 붙인다" "out=\"\$(rr '이 함수를 고쳐봐')\" && grep -qF '감독자' <<<\"\$out\" && grep -qF '한 건만' <<<\"\$out\" && grep -qF '\"hookEventName\":\"UserPromptSubmit\"' <<<\"\$out\" && json_valid_stdin <<<\"\$out\""
+check "빈 표준 입력에도 붙이고 0 으로 끝난다" "out=\"\$(printf '' | bash \"\$RR\")\" && json_valid_stdin <<<\"\$out\""
+check "끄면 침묵한다" "out=\"\$(DISCIPLINED_CODER_REPLY_REMINDER=off rr '이 함수를 고쳐봐')\" && [ -z \"\$out\" ]"
+check "UserPromptSubmit 이 리마인더를 연결한다" "json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")).get(\"hooks\",{}).get(\"UserPromptSubmit\",[]); sys.exit(0 if any(\"reply_reminder_userpromptsubmit.sh\" in h[\"command\"] for g in d for h in g[\"hooks\"]) else 1)' \"\$HERE/hooks/hooks.json\""
+
 echo "[문서 형식 경고 — 검진 훅이 .md 의 형식을 알린다]"
 # 경고만 내고 쓰기는 막지 않는다. 대상은 .md 이고 리뷰 기록과 Claude 메모리는 뺀다.
 FM="$T/form"; mkdir -p "$FM" "$T/docs/superpowers/reviews"

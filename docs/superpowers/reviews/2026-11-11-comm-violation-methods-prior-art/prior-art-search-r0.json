@@ -1,0 +1,269 @@
+{
+ "round": 0,
+ "researchers": [
+  {
+   "id": "scout",
+   "output": {
+    "search_status": "ok",
+    "queries": [
+     "LLM instruction following degradation multi-turn conversation system prompt drift",
+     "self-refine critique revise style constraint violations LLM output",
+     "LLM explanation adapt to lay reader expertise curse of knowledge jargon",
+     "Claude Code hooks UserPromptSubmit inject reminder output style enforce",
+     "Vale prose linter LLM generated text style rules check rewrite loop",
+     "Claude Code output styles documentation system prompt replace",
+     "prompt \"you are the owner\" project focus on durable valuable output LLM agent improvement",
+     "instruction hierarchy conflicting constraints prompt LLM compliance benchmark too many instructions"
+    ],
+    "clusters": [
+     {
+      "topic": "긴 대화에서 시스템 프롬프트 지시 준수가 떨어지는 현상의 측정과 기제",
+      "sources": [
+       "https://www.alphaxiv.org/abs/2603.01423",
+       "https://arxiv.org/html/2605.12922",
+       "https://arxiv.org/pdf/2510.07777v1",
+       "https://arxiv.org/pdf/2603.03111"
+      ],
+      "note": "2026년 다중 턴 신뢰도 연구(2603.01423)는 여러 과제 중 지시 준수가 가장 크게 떨어진다고 보고하고 instruction drift를 실패 유형으로 든다. 2605.12922는 생성 토큰이 시스템 프롬프트에서 멀어질수록 그 토큰에 가는 attention 비중이 줄어든다는 기제를 제시한다. 2510.07777은 drift가 무한히 커지지 않고 평형에 머물 수 있다고 주장한다. 이번 둘러보기에서는 지시 재주입의 효과를 직접 측정한 1차 연구를 찾지 못했다."
+     },
+     {
+      "topic": "메시지마다 규칙을 다시 주입하는 훅 실무 사례",
+      "sources": [
+       "https://dev.to/kanta13jp1/claude-code-hooks-injecting-rules-every-turn-instead-of-hoping-ai-remembers-4bfm",
+       "https://scottspence.com/posts/how-to-make-claude-code-follow-hook-instructions",
+       "https://github.com/JMCodes-Studio/remindcc",
+       "https://claudeissues.com/issue/19643-userpromptsubmit-hook-systemmessage-not-injected-into-context",
+       "https://reddit.sentinel-team.org/posts/1ryuky6/snapshots/2026-03-20T18%3A55%3A41.336186Z"
+      ],
+      "note": "사용자 프롬프트 제출 훅으로 규칙 파일을 매 턴 system-reminder에 넣는 실무 사례가 여럿 있다. 한 작성자는 훅 지시만으로는 잘 지켜지지 않아 설정 파일에 '훅 지시는 필수'라는 문구를 함께 넣었다고 보고한다. 한 이슈는 systemMessage 필드가 문맥에 주입되지 않았다고 보고하므로 additionalContext 형식을 확인해야 한다. 모두 블로그와 커뮤니티 수준의 근거이며 위반률을 측정한 자료는 없다."
+     },
+     {
+      "topic": "생성 뒤 비평과 재작성으로 제약 위반 줄이기",
+      "sources": [
+       "https://arxiv.org/pdf/2303.17651v1.pdf",
+       "https://arxiv.org/pdf/2410.06458",
+       "https://arxiv.org/pdf/2310.18679"
+      ],
+      "note": "Self-Refine은 같은 모델이 쓰고 비평하고 고치는 방식을 반복한다. DeCRIM(EMNLP 2024 Findings)은 지시를 제약 목록으로 분해하고 별도 Critic이 위반 위치를 지적하게 한다. DeCRIM 저자들은 'Make Sure' 기준선보다 지시 정확도가 3.7%, 제약 정확도가 2.3% 올랐다고 보고하므로 개선 폭이 작다. 이 연구들은 영어 일반 제약 대상이며, 한국어 문체와 대화 맥락을 모르는 검사자 조건은 다루지 않는다. 지연과 비용 측정은 아직 확인하지 못했다."
+     },
+     {
+      "topic": "문자열 규칙 기반 문체 린터와 에이전트 피드백 고리",
+      "sources": [
+       "https://www.thoughtworks.com/radar/tools/vale",
+       "https://github.com/jdkato/voices",
+       "https://www.everydev.ai/tools/vale-ai-tells",
+       "https://hn.jakechampion.name/reader/https://ammil.industries/signs-of-ai-writing-a-vale-ruleset"
+      ],
+      "note": "Vale 규칙 묶음으로 AI 문체 흔적을 잡고, 에이전트가 쓴 글을 같은 턴에 린트해 경고를 되돌려 주는 사례가 있다(voices, vale-ai-tells). Thoughtworks Radar는 Vale을 코딩 에이전트의 피드백 센서로 권하면서도, 표면 패턴만 잡고 추론 결함은 놓친다고 경고한다. voices README는 아무것도 맞지 않는 규칙이 조용히 실패하므로 규칙마다 시험 자료(fixture)를 두라고 한다. 이 사례들은 파일로 쓴 글을 대상으로 하므로, 대화 답에 적용할 수 있는지는 따로 확인해야 한다."
+     },
+     {
+      "topic": "전용 출력 스타일과 시스템 프롬프트 교체",
+      "sources": [
+       "https://code.claude.com/docs/en/output-styles",
+       "https://docs.claude.com/en/api/agent-sdk/modifying-system-prompts",
+       "https://wmedia.es/en/tips/claude-code-output-style-deletes-engineering"
+      ],
+      "note": "공식 문서에 따르면 출력 스타일은 기본 시스템 프롬프트의 소프트웨어 공학 지시를 교체한다. 반면 CLAUDE.md는 기본 시스템 프롬프트 뒤에 사용자 메시지로 들어간다. keep-coding-instructions를 켜지 않으면 범위 설정과 검증 같은 코딩 지침이 빠진다는 부작용이 있다. 스타일 파일은 세션 시작에 한 번 읽히므로 긴 대화의 drift는 그대로 남을 수 있다. 출력 스타일이 위반률을 줄인다는 측정 자료는 찾지 못했다."
+     },
+     {
+      "topic": "지시 충돌과 지시 위계 벤치마크",
+      "sources": [
+       "https://arxiv.org/pdf/2502.08745",
+       "https://arxiv.org/pdf/2607.25987",
+       "https://www.arxiv.org/pdf/2511.14342",
+       "https://tianpan.co/blog/2026-05-07-system-prompt-instruction-contradiction-layered-architecture"
+      ],
+      "note": "IHEval과 IH-Benchmark는 우선순위가 다른 지시가 충돌할 때 준수율이 크게 떨어진다고 보고한다. 2511.14342는 한 프롬프트 안의 상충 제약을 다룬다. 실무 블로그는 시스템 프롬프트 안의 모순 지시가 예측하기 어려운 행동을 낳고 뒤쪽 지시가 더 강하게 작동할 수 있다고 주장한다. 지시 개수 자체가 준수를 떨어뜨리는지는 이번 결과에서 직접 확인하지 못했다."
+     },
+     {
+      "topic": "비전문가 독자에 맞춘 설명과 전문 용어",
+      "sources": [
+       "https://aclanthology.org/2024.emnlp-main.357.pdf",
+       "https://arxiv.org/pdf/2211.03818v2.pdf",
+       "https://www.arxiv.org/pdf/2505.16227",
+       "https://preview.aclanthology.org/ingest-emnlp/2025.tsar-1.3.pdf",
+       "https://hifa.org/node/96857496"
+      ],
+      "note": "배경 설명을 추가하는 방식이 낱말 바꾸기(단순화)보다 독자 이해를 더 높인다는 연구가 있다(2211.03818, EMNLP 2024). 2025년 워크숍 논문은 프롬프트에 전문 용어를 표시해도 단순화 품질이 일관되게 오르지 않았다고 보고한다. 개인화 연구는 독자가 직접 밝힌 전문성을 입력으로 쓴다. 이 결과는 constraints의 '청자 추론 지시 무효' 관찰과 방향이 같다. 다만 대부분 의료와 과학 요약 대상이고 대화형 에이전트 답은 다루지 않는다."
+     },
+     {
+      "topic": "'프로젝트 오너로서 지속 가치 있는 산출물에 집중' 한 줄 프롬프트의 원문",
+      "sources": [
+       "https://bmdpat.com/prompts.md",
+       "https://wwsun.github.io/blogs/12-factor-agents",
+       "https://reddit.sentinel-team.org/subreddits/PromptEngineering/snapshots/2026-06-12T21%3A15%3A48.451468Z"
+      ],
+      "note": "사용자 요청에 따라 원문을 찾았다. 그러나 이번 검색에서는 해당 문구가 그대로 실린 출처를 찾지 못했다. 그래서 출처도 효과 주장도 확인하지 못했다. 소유자 관점의 에스컬레이션 목록이나 검증 가능한 상태 기록 같은 인접 실무 글만 나왔다. 원문을 찾으려면 영어 원문 표현을 바꿔 가며 다시 검색해야 하고, 사용자가 본 게시처(커뮤니티 이름이나 날짜)를 알면 범위를 좁힐 수 있다."
+     }
+    ],
+    "subquestion_candidates": [
+     {
+      "scope": "긴 대화에서 시스템 프롬프트 지시 준수가 떨어지는 현상의 측정 결과와, 매 턴 지시 재주입(훅·리마인더)이 위반률을 줄였다는 측정 근거와 그 비용",
+      "basis": "drift 측정·기제 연구(2603.01423, 2605.12922)는 있다. 재주입 사례는 실무 글뿐이고 측정 근거가 비어 있어, 재현 시험 우선순위를 정하려면 이 빈칸을 확인해야 한다."
+     },
+     {
+      "scope": "생성 뒤 별도 검사자(맥락 없는 비평 모델 포함)가 형식·문체 제약 위반을 지적하고 재작성하게 한 연구에서 나온 개선 폭, 지연·토큰 비용, 과잉 수정 같은 부작용",
+      "basis": "Self-Refine과 DeCRIM은 개선 폭이 작은 근거(+2~4%p)를 준다. 그러나 비용과 지연, 문체 제약 결과는 확인하지 못했다. intended_use의 지연 기준에 직접 연결된다."
+     },
+     {
+      "scope": "문자열·패턴 규칙 린터(Vale 등)를 에이전트 출력 검사에 넣어 같은 턴에 되돌려 준 실무 사례와, 대화 답에 적용할 때의 한계(오탐·조용한 실패)",
+      "basis": "voices, vale-ai-tells, Thoughtworks Radar가 피드백 고리 사례와 한계를 보여 준다. 다만 모두 파일 대상이라, 대화 답 적용 사례를 따로 찾아야 한다."
+     },
+     {
+      "scope": "출력 스타일·시스템 프롬프트 교체가 기본 프롬프트에 쌓인 지시와의 충돌을 줄여 형식 준수를 높였다는 근거, 그리고 지시 충돌과 지시 개수가 준수율에 미치는 영향",
+      "basis": "공식 문서에 교체와 덧붙임의 차이가 있고, IHEval·IH-Benchmark가 충돌 시 준수 하락을 보인다. 출력 스타일 후보와 충돌 조항 정리 후보는 같은 기제(충돌 감소)에 기대므로 한 하위 질문으로 묶었다."
+     },
+     {
+      "scope": "독자 배경을 명시하거나 배경 설명을 추가하게 한 방식이 설명 없는 용어와 과도한 압축을 줄였다는 연구",
+      "basis": "배경 추가가 단순화보다 낫고 용어 표시 프롬프트는 효과가 일관되지 않다는 연구가 있다. 이 결과는 '원하는 형태를 직접 적은 지시는 출력을 바꿨다'는 constraints 관찰과 연결된다. 대상 축(의료 요약과 대화 답)이 달라 옮겨 쓸 수 있는지 확인해야 한다."
+     },
+     {
+      "scope": "'프로젝트 오너로서 지속 가치 있는 산출물에 집중하라'류 역할·목표 한 줄 프롬프트의 원문 출처와, 그런 역할 부여가 출력 품질을 바꾼다는 측정 근거",
+      "basis": "사용자가 직접 요청했다. 이번 검색에서 원문을 찾지 못했으므로 영어 표현을 바꾼 질의와 역할 프롬프트(persona) 효과 연구로 범위를 넓혀야 한다."
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "EVIDENCE-FIRST",
+     "YAGNI",
+     "ASYNC-FIRST",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "FULL-SENTENCE",
+     "INSTRUCTION-FORM"
+    ]
+   }
+  }
+ ],
+ "query_violations": [],
+ "scout": {
+  "search_status": "ok",
+  "queries": [
+   "LLM instruction following degradation multi-turn conversation system prompt drift",
+   "self-refine critique revise style constraint violations LLM output",
+   "LLM explanation adapt to lay reader expertise curse of knowledge jargon",
+   "Claude Code hooks UserPromptSubmit inject reminder output style enforce",
+   "Vale prose linter LLM generated text style rules check rewrite loop",
+   "Claude Code output styles documentation system prompt replace",
+   "prompt \"you are the owner\" project focus on durable valuable output LLM agent improvement",
+   "instruction hierarchy conflicting constraints prompt LLM compliance benchmark too many instructions"
+  ],
+  "clusters": [
+   {
+    "topic": "긴 대화에서 시스템 프롬프트 지시 준수가 떨어지는 현상의 측정과 기제",
+    "sources": [
+     "https://www.alphaxiv.org/abs/2603.01423",
+     "https://arxiv.org/html/2605.12922",
+     "https://arxiv.org/pdf/2510.07777v1",
+     "https://arxiv.org/pdf/2603.03111"
+    ],
+    "note": "2026년 다중 턴 신뢰도 연구(2603.01423)는 여러 과제 중 지시 준수가 가장 크게 떨어진다고 보고하고 instruction drift를 실패 유형으로 든다. 2605.12922는 생성 토큰이 시스템 프롬프트에서 멀어질수록 그 토큰에 가는 attention 비중이 줄어든다는 기제를 제시한다. 2510.07777은 drift가 무한히 커지지 않고 평형에 머물 수 있다고 주장한다. 이번 둘러보기에서는 지시 재주입의 효과를 직접 측정한 1차 연구를 찾지 못했다."
+   },
+   {
+    "topic": "메시지마다 규칙을 다시 주입하는 훅 실무 사례",
+    "sources": [
+     "https://dev.to/kanta13jp1/claude-code-hooks-injecting-rules-every-turn-instead-of-hoping-ai-remembers-4bfm",
+     "https://scottspence.com/posts/how-to-make-claude-code-follow-hook-instructions",
+     "https://github.com/JMCodes-Studio/remindcc",
+     "https://claudeissues.com/issue/19643-userpromptsubmit-hook-systemmessage-not-injected-into-context",
+     "https://reddit.sentinel-team.org/posts/1ryuky6/snapshots/2026-03-20T18%3A55%3A41.336186Z"
+    ],
+    "note": "사용자 프롬프트 제출 훅으로 규칙 파일을 매 턴 system-reminder에 넣는 실무 사례가 여럿 있다. 한 작성자는 훅 지시만으로는 잘 지켜지지 않아 설정 파일에 '훅 지시는 필수'라는 문구를 함께 넣었다고 보고한다. 한 이슈는 systemMessage 필드가 문맥에 주입되지 않았다고 보고하므로 additionalContext 형식을 확인해야 한다. 모두 블로그와 커뮤니티 수준의 근거이며 위반률을 측정한 자료는 없다."
+   },
+   {
+    "topic": "생성 뒤 비평과 재작성으로 제약 위반 줄이기",
+    "sources": [
+     "https://arxiv.org/pdf/2303.17651v1.pdf",
+     "https://arxiv.org/pdf/2410.06458",
+     "https://arxiv.org/pdf/2310.18679"
+    ],
+    "note": "Self-Refine은 같은 모델이 쓰고 비평하고 고치는 방식을 반복한다. DeCRIM(EMNLP 2024 Findings)은 지시를 제약 목록으로 분해하고 별도 Critic이 위반 위치를 지적하게 한다. DeCRIM 저자들은 'Make Sure' 기준선보다 지시 정확도가 3.7%, 제약 정확도가 2.3% 올랐다고 보고하므로 개선 폭이 작다. 이 연구들은 영어 일반 제약 대상이며, 한국어 문체와 대화 맥락을 모르는 검사자 조건은 다루지 않는다. 지연과 비용 측정은 아직 확인하지 못했다."
+   },
+   {
+    "topic": "문자열 규칙 기반 문체 린터와 에이전트 피드백 고리",
+    "sources": [
+     "https://www.thoughtworks.com/radar/tools/vale",
+     "https://github.com/jdkato/voices",
+     "https://www.everydev.ai/tools/vale-ai-tells",
+     "https://hn.jakechampion.name/reader/https://ammil.industries/signs-of-ai-writing-a-vale-ruleset"
+    ],
+    "note": "Vale 규칙 묶음으로 AI 문체 흔적을 잡고, 에이전트가 쓴 글을 같은 턴에 린트해 경고를 되돌려 주는 사례가 있다(voices, vale-ai-tells). Thoughtworks Radar는 Vale을 코딩 에이전트의 피드백 센서로 권하면서도, 표면 패턴만 잡고 추론 결함은 놓친다고 경고한다. voices README는 아무것도 맞지 않는 규칙이 조용히 실패하므로 규칙마다 시험 자료(fixture)를 두라고 한다. 이 사례들은 파일로 쓴 글을 대상으로 하므로, 대화 답에 적용할 수 있는지는 따로 확인해야 한다."
+   },
+   {
+    "topic": "전용 출력 스타일과 시스템 프롬프트 교체",
+    "sources": [
+     "https://code.claude.com/docs/en/output-styles",
+     "https://docs.claude.com/en/api/agent-sdk/modifying-system-prompts",
+     "https://wmedia.es/en/tips/claude-code-output-style-deletes-engineering"
+    ],
+    "note": "공식 문서에 따르면 출력 스타일은 기본 시스템 프롬프트의 소프트웨어 공학 지시를 교체한다. 반면 CLAUDE.md는 기본 시스템 프롬프트 뒤에 사용자 메시지로 들어간다. keep-coding-instructions를 켜지 않으면 범위 설정과 검증 같은 코딩 지침이 빠진다는 부작용이 있다. 스타일 파일은 세션 시작에 한 번 읽히므로 긴 대화의 drift는 그대로 남을 수 있다. 출력 스타일이 위반률을 줄인다는 측정 자료는 찾지 못했다."
+   },
+   {
+    "topic": "지시 충돌과 지시 위계 벤치마크",
+    "sources": [
+     "https://arxiv.org/pdf/2502.08745",
+     "https://arxiv.org/pdf/2607.25987",
+     "https://www.arxiv.org/pdf/2511.14342",
+     "https://tianpan.co/blog/2026-05-07-system-prompt-instruction-contradiction-layered-architecture"
+    ],
+    "note": "IHEval과 IH-Benchmark는 우선순위가 다른 지시가 충돌할 때 준수율이 크게 떨어진다고 보고한다. 2511.14342는 한 프롬프트 안의 상충 제약을 다룬다. 실무 블로그는 시스템 프롬프트 안의 모순 지시가 예측하기 어려운 행동을 낳고 뒤쪽 지시가 더 강하게 작동할 수 있다고 주장한다. 지시 개수 자체가 준수를 떨어뜨리는지는 이번 결과에서 직접 확인하지 못했다."
+   },
+   {
+    "topic": "비전문가 독자에 맞춘 설명과 전문 용어",
+    "sources": [
+     "https://aclanthology.org/2024.emnlp-main.357.pdf",
+     "https://arxiv.org/pdf/2211.03818v2.pdf",
+     "https://www.arxiv.org/pdf/2505.16227",
+     "https://preview.aclanthology.org/ingest-emnlp/2025.tsar-1.3.pdf",
+     "https://hifa.org/node/96857496"
+    ],
+    "note": "배경 설명을 추가하는 방식이 낱말 바꾸기(단순화)보다 독자 이해를 더 높인다는 연구가 있다(2211.03818, EMNLP 2024). 2025년 워크숍 논문은 프롬프트에 전문 용어를 표시해도 단순화 품질이 일관되게 오르지 않았다고 보고한다. 개인화 연구는 독자가 직접 밝힌 전문성을 입력으로 쓴다. 이 결과는 constraints의 '청자 추론 지시 무효' 관찰과 방향이 같다. 다만 대부분 의료와 과학 요약 대상이고 대화형 에이전트 답은 다루지 않는다."
+   },
+   {
+    "topic": "'프로젝트 오너로서 지속 가치 있는 산출물에 집중' 한 줄 프롬프트의 원문",
+    "sources": [
+     "https://bmdpat.com/prompts.md",
+     "https://wwsun.github.io/blogs/12-factor-agents",
+     "https://reddit.sentinel-team.org/subreddits/PromptEngineering/snapshots/2026-06-12T21%3A15%3A48.451468Z"
+    ],
+    "note": "사용자 요청에 따라 원문을 찾았다. 그러나 이번 검색에서는 해당 문구가 그대로 실린 출처를 찾지 못했다. 그래서 출처도 효과 주장도 확인하지 못했다. 소유자 관점의 에스컬레이션 목록이나 검증 가능한 상태 기록 같은 인접 실무 글만 나왔다. 원문을 찾으려면 영어 원문 표현을 바꿔 가며 다시 검색해야 하고, 사용자가 본 게시처(커뮤니티 이름이나 날짜)를 알면 범위를 좁힐 수 있다."
+   }
+  ],
+  "subquestion_candidates": [
+   {
+    "scope": "긴 대화에서 시스템 프롬프트 지시 준수가 떨어지는 현상의 측정 결과와, 매 턴 지시 재주입(훅·리마인더)이 위반률을 줄였다는 측정 근거와 그 비용",
+    "basis": "drift 측정·기제 연구(2603.01423, 2605.12922)는 있다. 재주입 사례는 실무 글뿐이고 측정 근거가 비어 있어, 재현 시험 우선순위를 정하려면 이 빈칸을 확인해야 한다."
+   },
+   {
+    "scope": "생성 뒤 별도 검사자(맥락 없는 비평 모델 포함)가 형식·문체 제약 위반을 지적하고 재작성하게 한 연구에서 나온 개선 폭, 지연·토큰 비용, 과잉 수정 같은 부작용",
+    "basis": "Self-Refine과 DeCRIM은 개선 폭이 작은 근거(+2~4%p)를 준다. 그러나 비용과 지연, 문체 제약 결과는 확인하지 못했다. intended_use의 지연 기준에 직접 연결된다."
+   },
+   {
+    "scope": "문자열·패턴 규칙 린터(Vale 등)를 에이전트 출력 검사에 넣어 같은 턴에 되돌려 준 실무 사례와, 대화 답에 적용할 때의 한계(오탐·조용한 실패)",
+    "basis": "voices, vale-ai-tells, Thoughtworks Radar가 피드백 고리 사례와 한계를 보여 준다. 다만 모두 파일 대상이라, 대화 답 적용 사례를 따로 찾아야 한다."
+   },
+   {
+    "scope": "출력 스타일·시스템 프롬프트 교체가 기본 프롬프트에 쌓인 지시와의 충돌을 줄여 형식 준수를 높였다는 근거, 그리고 지시 충돌과 지시 개수가 준수율에 미치는 영향",
+    "basis": "공식 문서에 교체와 덧붙임의 차이가 있고, IHEval·IH-Benchmark가 충돌 시 준수 하락을 보인다. 출력 스타일 후보와 충돌 조항 정리 후보는 같은 기제(충돌 감소)에 기대므로 한 하위 질문으로 묶었다."
+   },
+   {
+    "scope": "독자 배경을 명시하거나 배경 설명을 추가하게 한 방식이 설명 없는 용어와 과도한 압축을 줄였다는 연구",
+    "basis": "배경 추가가 단순화보다 낫고 용어 표시 프롬프트는 효과가 일관되지 않다는 연구가 있다. 이 결과는 '원하는 형태를 직접 적은 지시는 출력을 바꿨다'는 constraints 관찰과 연결된다. 대상 축(의료 요약과 대화 답)이 달라 옮겨 쓸 수 있는지 확인해야 한다."
+   },
+   {
+    "scope": "'프로젝트 오너로서 지속 가치 있는 산출물에 집중하라'류 역할·목표 한 줄 프롬프트의 원문 출처와, 그런 역할 부여가 출력 품질을 바꾼다는 측정 근거",
+    "basis": "사용자가 직접 요청했다. 이번 검색에서 원문을 찾지 못했으므로 영어 표현을 바꾼 질의와 역할 프롬프트(persona) 효과 연구로 범위를 넓혀야 한다."
+   }
+  ],
+  "principles_applied": [
+   "NO-ASSUME",
+   "EVIDENCE-FIRST",
+   "YAGNI",
+   "ASYNC-FIRST",
+   "STATE-ASSUME",
+   "SPECIFIC-NAME",
+   "FULL-SENTENCE",
+   "INSTRUCTION-FORM"
+  ]
+ }
+}
