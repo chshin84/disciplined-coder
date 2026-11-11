@@ -1,0 +1,17 @@
+{
+ "lens": "lens-adversarial",
+ "principles_applied": ["YAGNI", "REVERSIBLE", "NO-ASSUME", "CHECKABLE", "EVIDENCE-FIRST", "DELEGATED-SCORE"],
+ "issues": [
+  {"where": "5번 판정 규칙", "type": "failure-mode", "claim": "현행 조건 위반 수 하한이 없어 소수 턴 조항(YAGNI 6건)은 잡음으로 매 턴 후보가 된다. 현행 위반이 지적 턴의 절반 이상일 때만 판정하라."},
+  {"where": "5번 사용자 판독", "type": "failure-mode", "claim": "판독이 판정자와 다를 때 후보를 바꾸는 규칙이 없다."},
+  {"where": "2번·5번 입력", "type": "risk", "claim": "조항 배정을 Opus 하나가 판독 없이 했고 복수 배정 턴이 두 조항 입력에 함께 들어간다. 배정을 판독 표본에 넣고 복수 배정 턴은 따로 표시하라."},
+  {"where": "행위 모델 대리 지표와 5번 규칙", "type": "failure-mode", "claim": "5번은 위반 수만 본다. 누락·글자 수가 판정에 없고 '필요 정보' 정의가 없다."},
+  {"where": "5번 재현 대상", "type": "over-engineering", "claim": "4건 미만 조항 재현은 판정에 쓰이지 않는다. 4번에서 바로 상주로 확정하라."},
+  {"where": "6번 상위 5개 비교", "type": "over-engineering", "claim": "217자 상한 때문에 5줄 조건은 이겨도 완료 기준을 넘는다."},
+  {"where": "5번 대조 조건 '같으면'", "type": "failure-mode", "claim": "'같다' 기준이 없고 비교 턴 묶음이 다르다."},
+  {"where": "10번 실패 시 reply-reminder 병합안", "type": "failure-mode", "claim": "현재 리마인더는 판독이 없고 차이가 잡음 크기다. 5번에서 매 턴 후보로 판정된 때로 한정하라."},
+  {"where": "남은 위험과 9번", "type": "risk", "claim": "9번이 상주 조항 문구도 다시 쓰므로 '나빠지지 않는다'는 문장이 틀리다."},
+  {"where": "시험 조건과 02 기록의 경로", "type": "risk", "claim": "지적 턴 원문이 git 밖 단일 사본이고 경로 표기가 두 문서에서 다르다. 턴 식별자를 저장소 기록에 남기라."}
+ ],
+ "notes": "01-decision-points.md 와 1차 리뷰 기록은 읽지 않았다."
+}

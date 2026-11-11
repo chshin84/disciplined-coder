@@ -1,0 +1,16 @@
+{
+ "lens": "lens-grounding",
+ "principles_applied": ["NO-ASSUME", "EVIDENCE-FIRST", "STATE-ASSUME", "TERM-ONE", "SPECIFIC-NAME", "DELEGATED-SCORE", "REVERSIBLE"],
+ "issues": [
+  {"where": "목적 11행", "type": "mismatch", "claim": "Fable 답 세 개 모두가 STATUS-FIRST 와 ASK-OPTIONS '순서' 충돌을 지적했다고 적었으나, answer-1 에는 없고 answer-2·3 은 개수(모두 적기 대 한 건씩 묻기) 충돌을 지적했다."},
+  {"where": "실행 중 확인한 사항", "type": "contradiction", "claim": "수집 기간 시작일이 spec 은 10-07, 02 기록은 10-01 이고, 10-07 이 가장 이른 메시지라는 근거가 출처에 없다."},
+  {"where": "배치 근거의 출처", "type": "contradiction", "claim": "2026-11-04 문구 변형 시험은 실제 세션 턴과 5,000자 이상 앞 대화를 실었으므로 spec 의 클린룸 정의에 맞지 않는다."},
+  {"where": "가이드 표 턴 단위 리마인더 행", "type": "unsupported", "claim": "가이드의 측정은 긴 무응답 구간 감소이고 대화 답 형태와 무관한데 시험 없이 근거로 채택했다."},
+  {"where": "기준선과 5·7·10번, 처분 표", "type": "omission", "claim": "위임 발언의 '질문하지 말라'와 비가역 작업 승인을 적지 않아 사용자 승인 단계와의 관계가 정해지지 않았다."},
+  {"where": "5번 대조 조건", "type": "mismatch", "claim": "사용자 발언은 '에이전트 원칙을 잊지 마라'가 효과 없는지 묻는 질문이었고 시험 제안이 아니다. 큰따옴표 문구가 사용자 원문처럼 읽힌다."},
+  {"where": "남은 작업 처분과 5번", "type": "contradiction", "claim": "'내비두고'를 병합 보류로만 읽은 해석의 근거가 없고, 리마인더를 교체 대상으로 둔다."},
+  {"where": "비목표", "type": "mismatch", "claim": "2026-10-18 비교 조건은 목록을 뺀 조건이 아니라 대체어 칸만 남긴 지시형 트랙이다."},
+  {"where": "실행 중 확인한 사항 후반", "type": "mismatch", "claim": "비가역 행동 결정점 문장이 조항 단위 기준을 결정점에 적용했다. OTHER-SESSIONS 는 4번 단계가 처리한다."}
+ ],
+ "notes": "수치 대부분은 출처와 일치. 217자는 줄바꿈 제외 기준. Replit '한 루프에' 한정은 원문 인용에 없다. hook 주석과 domain-korean.md 가 Replit 을 세 줄 근거로 든 문장은 spec 판단과 불일치한다(spec 밖 문서). 'compact 때 지워짐'의 근거가 출처에 없다."
+}

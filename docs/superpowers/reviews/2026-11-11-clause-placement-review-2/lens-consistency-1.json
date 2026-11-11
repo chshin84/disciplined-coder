@@ -1,0 +1,20 @@
+{
+ "lens": "lens-consistency",
+ "principles_applied": ["NO-ASSUME", "CHECKABLE", "TERM-ONE", "SPECIFIC-NAME", "INSTRUCTION-FORM", "NO-RAW-OUTPUT", "STATE-ASSUME"],
+ "issues": [
+  {"where": "실행 중 확인한 사항 ↔ 01 기록", "type": "drift", "claim": "spec 은 「실행 순서」 결정점을 더했다는데 01 기록은 ASYNC-FIRST 를 '해당 결정점 없음'으로 둔다."},
+  {"where": "완료 기준 첫 항목 ↔ 01 기록 열", "type": "gap", "claim": "완료 기준은 결정점·행동·비용 항목·제약을 요구하나 01 기록에 '행동' 열이 없고 비용 항목과 제약이 한 열이다. 행위 모델 규칙도 '비용 항목이나 제약 하나'라 다르다."},
+  {"where": "행위 모델 규칙 ↔ 01 기록 '쓰기 셋'", "type": "contradiction", "claim": "01 기록은 결정점 셋을 '쓰기 셋'으로 묶어 조항 20개를 배정했고 spec 에는 그 이름과 예외 해석이 없다."},
+  {"where": "4·5번 ↔ 실행 중 확인한 사항·남은 위험", "type": "contradiction", "claim": "하한은 조항 단위인데 다른 절은 결정점 단위로 적는다."},
+  {"where": "2번 출력 → 4·5번", "type": "gap", "claim": "현행 문구/이전 문구 구분값을 4·5번이 쓰는지(합계인지 현행 칸인지) 정하지 않았다. YAGNI 는 합계 6, 현행 1."},
+  {"where": "3번 실패 경로", "type": "contradiction", "claim": "열림 시험에 실패한 스킬 후보는 상주로 고정되어 5번을 거치지 않는다(TONE-AXIS 10회)."},
+  {"where": "1번 삭제 후보 → 7번", "type": "gap", "claim": "지적이 있는 삭제 후보가 7번 삭제 확인에 닿는 경로가 없다(「문서 관리」)."},
+  {"where": "1번 합치기·나누기 → 5·8·9번", "type": "gap", "claim": "합치기 후보끼리 배치가 다를 때 따를 규칙이 없다(NO-ASSUME 18회와 EVIDENCE-FIRST 2회)."},
+  {"where": "5번 판정 규칙 경계", "type": "contradiction", "claim": "매 턴 후보 조건과 기계 검사 후보 조건이 매 턴 위반이 정확히 절반일 때 함께 성립한다."},
+  {"where": "5번 대조 조건 → 6·8·9번", "type": "gap", "claim": "대조 조건이 이겼을 때 받는 단계가 없고 '같으면' 기준이 없다."},
+  {"where": "가이드 반영 ↔ 판정 순서", "type": "gap", "claim": "가이드를 읽고 후보 문안을 만드는 단계가 판정 순서에 없다."},
+  {"where": "10번 지표 ↔ 완료 기준", "type": "gap", "claim": "스킬 description 글자 수의 기준값이 없다."},
+  {"where": "7번 지속성 검사 → 8·9번", "type": "gap", "claim": "조항에 매이지 않은 지속성 검사 후보를 승인·구현할 단계와 기록 위치가 없다."}
+ ],
+ "notes": "1차 처분 약속은 모두 반영으로 판정했다. reply-reminder 훅이 어느 브랜치에 있는지는 확인하지 못했다."
+}

@@ -1,0 +1,117 @@
+{
+ "lens": "lens-fit",
+ "doc_type": "설계 (spec·plan)",
+ "principles_applied": [
+  "INSTRUCTION-FORM",
+  "TONE-AXIS",
+  "SUBJECT-OBJECT",
+  "NO-MID-MOD",
+  "NO-STACK-MOD",
+  "KEEP-CONNECT",
+  "TERM-ONE",
+  "COUNT-EARNS",
+  "ONE-ENDING",
+  "BULLET-SCOPE",
+  "SPECIFIC-NAME",
+  "VOCAB-PREF"
+ ],
+ "issues": [
+  {
+   "where": "35-38, 66, 70-98행",
+   "type": "constraint",
+   "principle": "INSTRUCTION-FORM",
+   "claim": "할 일을 '~하라'가 아닌 '~한다' 평서형으로 써서 사실과 할 일이 같은 종결로 섞였다."
+  },
+  {
+   "where": "26, 27, 60, 66, 70, 111, 140, 141행",
+   "type": "constraint",
+   "principle": "INSTRUCTION-FORM",
+   "claim": "할 일을 평서형 부정문으로 적었다. 26행은 '묻지 않고 하지 않는다'로 부정이 겹쳐 뜻이 정해지지 않는다."
+  },
+  {
+   "where": "9, 31, 120, 123행",
+   "type": "constraint",
+   "principle": "INSTRUCTION-FORM",
+   "claim": "sq4, 감독자 문구, 스탠스 세 문장, 13·15 같은 맥락을 이름만 대고 풀지 않았다."
+  },
+  {
+   "where": "31, 120, 123행",
+   "type": "style",
+   "principle": "SPECIFIC-NAME",
+   "claim": "남는 문서에 날짜 대신 '오늘'을 썼다."
+  },
+  {
+   "where": "31, 58, 78, 82행",
+   "type": "style",
+   "principle": "SUBJECT-OBJECT",
+   "claim": "무생물 주어와 타동사(문구가 줄인, 커밋이 되돌렸다, 조항이 시험을 한다)."
+  },
+  {
+   "where": "120행",
+   "type": "style",
+   "principle": "SUBJECT-OBJECT",
+   "claim": "기각의 주체가 없다."
+  },
+  {
+   "where": "9, 26, 31, 62, 74, 78, 86행",
+   "type": "style",
+   "principle": "NO-MID-MOD",
+   "claim": "주어를 가진 관형절을 문장 중간에 넣었다."
+  },
+  {
+   "where": "74행",
+   "type": "style",
+   "principle": "NO-STACK-MOD",
+   "claim": "'지금 재현 시험의 지적 턴' 수식어 중첩."
+  },
+  {
+   "where": "7, 50, 54, 86-123행",
+   "type": "style",
+   "principle": "TERM-ONE",
+   "claim": "같은 배치를 매 턴·매 턴 칸·메시지 옆·리마인더·세 줄로, 상주를 상주·원칙으로 섞어 불렀다."
+  },
+  {
+   "where": "42, 44, 62, 86행",
+   "type": "style",
+   "principle": "COUNT-EARNS",
+   "claim": "목록 앞 문장의 개수, 대상을 개수로 가리킴."
+  },
+  {
+   "where": "7, 90, 123행",
+   "type": "style",
+   "principle": "COUNT-EARNS",
+   "claim": "리마인더를 '세 줄'로 가리켰다."
+  },
+  {
+   "where": "132행",
+   "type": "style",
+   "principle": "COUNT-EARNS",
+   "claim": "처분과 무관한 '기록 3건, 파일 12개'."
+  },
+  {
+   "where": "46-52행 배치표",
+   "type": "style",
+   "principle": "ONE-ENDING",
+   "claim": "같은 열 말끝이 명사구·명사형·평서문으로 섞였다."
+  },
+  {
+   "where": "38, 108-112, 139-146행",
+   "type": "style",
+   "principle": "BULLET-SCOPE",
+   "claim": "불릿 하나에 두 문장 이상, 109행은 논증."
+  },
+  {
+   "where": "62행",
+   "type": "style",
+   "principle": "KEEP-CONNECT",
+   "claim": "이유 관계가 없는 문장을 '그러므로'로 이었다."
+  },
+  {
+   "where": "31행",
+   "type": "style",
+   "principle": "VOCAB-PREF",
+   "claim": "상충을 '서로 당긴다'로 적었다."
+  }
+ ],
+ "notes": "INSTRUCTION-FORM 첫 지적은 superpowers spec 관례 확인 범위 밖이라 호출자가 기각할 수 있다고 적었다."
+}
