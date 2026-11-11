@@ -1,0 +1,68 @@
+{
+ "lens": "lens-grounding",
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "STATE-ASSUME",
+  "TERM-ONE",
+  "NO-SQUEEZE",
+  "TOP-DOWN"
+ ],
+ "issues": [
+  {
+   "where": "「목적」 둘째 문단",
+   "type": "mismatch",
+   "claim": "사용자 판독 0쌍 위반은 감독자 문구로 바꾸기 전의 세 줄 조건 결과인데, spec 은 같은 문단에서 11건을 낸 '리마인더'(현재 훅)의 결과처럼 적었다.",
+   "consequence": "현재 훅 문구는 사용자 판독을 받은 적이 없다."
+  },
+  {
+   "where": "「남은 작업 처분」 managing-docs-agent 행",
+   "type": "mismatch",
+   "claim": "2026-11-04 사용자 결정의 조항 표기 형식을 원문과 다른 칸 이름({비고})으로 적었다. 원문은 지시, [목적 및 기대효과], {단, 조건적인 상황}.",
+   "consequence": "문안 작성 기준이 원문과 다른 이름이 된다."
+  },
+  {
+   "where": "「프롬프팅 가이드 반영」 low-context reader 행",
+   "type": "mismatch",
+   "claim": "측정 기록은 「Communicating clearly」 문단을 시험했다고 적는데 spec 은 「Make reports easy to follow」의 low-context reader 문단 결과로 적었다. 두 문단이 같은지는 출처에 없다.",
+   "consequence": "13·15·15 수치의 귀속이 불확실하다."
+  },
+  {
+   "where": "「목적」 셋째 문단",
+   "type": "unsupported",
+   "claim": "조항 충돌 예시 세 건(STATUS-FIRST 와 ASK-OPTIONS, 표 셀 예외, NO-ANALOGY)의 출처가 없다.",
+   "consequence": "동기 중 하나가 근거 위치 없이 적혔다."
+  },
+  {
+   "where": "「배치 근거의 출처」 셋째 문단",
+   "type": "unsupported",
+   "claim": "사용자 발언 인용 '너가 주체니깐 나한테 뭘할지 역으로 제안해주는게 좋아'가 제공된 대화 원문과 메모리에 없다.",
+   "consequence": "인용이 실제 발언인지 확인되지 않는다."
+  },
+  {
+   "where": "6번, reply-reminder 행",
+   "type": "contradiction",
+   "claim": "사용자는 '리플라이 리마인더는 내비두고'라고 했는데 spec 은 세 줄을 경쟁시켜 밀려날 수 있게 했고 지시와 다르게 처리한 근거를 적지 않았다.",
+   "consequence": "지시와 판단 근거가 본문에 없다."
+  },
+  {
+   "where": "3. 스킬 후보",
+   "type": "omission",
+   "claim": "54ee432 는 스킬에서 원칙으로 '옮겼다'인데 '되돌렸다'로 적었고, 2026-10-25 사용자 결정(열림 시험 선행, 설명만으로 잘 열린다고 봄)을 빠뜨렸다.",
+   "consequence": "3번이 사용자 결정을 반영하지 않는다."
+  },
+  {
+   "where": "「시험 조건」 셋째 항목",
+   "type": "mismatch",
+   "claim": "21건 혼입은 2026-11-04 문구 변형 시험 기록인데 '2026-11-04 시험'으로만 적어 같은 날 재현 시험과 구분되지 않는다.",
+   "consequence": "어느 시험인지 구분 불가."
+  },
+  {
+   "where": "소유 문장 행",
+   "type": "omission",
+   "claim": "가이드가 보고한 부작용 중 출력 토큰 1.5배를 뺐다.",
+   "consequence": "토큰 증가를 볼 지표가 지정되지 않았다."
+  }
+ ],
+ "notes": "확인한 값: 17·17·17, 20, 12·13, 11, 13·15·15, 18·14, 133·115, Replit, sq4 보고 전용, 금지어 2·32회. 10,055자·217자와 브랜치·태그 존재는 렌즈가 확인 못함."
+}

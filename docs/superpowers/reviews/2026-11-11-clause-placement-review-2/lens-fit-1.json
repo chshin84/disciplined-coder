@@ -1,0 +1,22 @@
+{
+ "lens": "lens-fit",
+ "doc_type": "설계 (spec·plan)",
+ "principles_applied": ["INSTRUCTION-FORM", "TONE-AXIS", "SUBJECT-OBJECT", "NO-MID-MOD", "NO-STACK-MOD", "KEEP-CONNECT", "ANTI-LIMIT", "TERM-ONE", "SPECIFIC-NAME", "COUNT-EARNS", "ONE-ENDING", "BULLET-SCOPE", "ONE-IDEA", "FULL-SENTENCE", "VOCAB-PREF", "STATE-ASSUME", "CHECKABLE"],
+ "issues": [
+  {"where": "본문 여러 행", "type": "constraint", "principle": "INSTRUCTION-FORM", "claim": "실행자가 할 일이 '~한다' 평서형으로 남아 있고 일부는 평서형 부정문이다."},
+  {"where": "가이드 표·처분 표 셀", "type": "constraint", "principle": "INSTRUCTION-FORM", "claim": "표 셀의 할 일이 평서형이다."},
+  {"where": "5, 95, 117, 205, 207, 213, 223행", "type": "style", "principle": "SUBJECT-OBJECT", "claim": "무생물 주어와 타동사가 남았다."},
+  {"where": "32, 113, 121, 127, 143, 183, 213행", "type": "style", "principle": "NO-MID-MOD", "claim": "주어를 가진 관형절이 남았다."},
+  {"where": "9, 121행", "type": "style", "principle": "NO-STACK-MOD", "claim": "수식어 중첩."},
+  {"where": "9, 17, 133, 187행", "type": "style", "principle": "TERM-ONE", "claim": "'현행'과 시험 조건 이름이 섞였다."},
+  {"where": "95, 127, 139, 155, 193행", "type": "style", "principle": "TERM-ONE", "claim": "'칸'과 '줄'이 섞였고 '기준선'이 두 뜻으로 쓰였다."},
+  {"where": "193행", "type": "style", "principle": "SPECIFIC-NAME", "claim": "'오늘'·'지금'이 남았다."},
+  {"where": "193행 마지막 문장", "type": "style", "principle": "ONE-IDEA, SUBJECT-OBJECT", "claim": "사실과 목적이 한 문장에 섞였고 주체가 없다."},
+  {"where": "83, 163, 227행", "type": "style", "principle": "COUNT-EARNS", "claim": "개수 예고와 개수로 가리킴이 남았다."},
+  {"where": "75행", "type": "format", "principle": "BULLET-SCOPE", "claim": "불릿 하나에 두 문장."},
+  {"where": "배치표 열", "type": "style", "principle": "ONE-ENDING", "claim": "명사구와 명사형 종결이 섞였다."},
+  {"where": "51, 131행", "type": "style", "principle": "ANTI-LIMIT", "claim": "'A가 아니라 B' 대구 두 번."},
+  {"where": "85, 171, 187, 199행", "type": "constraint", "principle": "INSTRUCTION-FORM", "claim": "경로 없는 경량화 설계, AX 블록 설명 없음, Communicating clearly 출처 없음, 브랜치 이름 말줄임."}
+ ],
+ "notes": "금지 표현과 단락 길이는 훅에 맡겼다."
+}

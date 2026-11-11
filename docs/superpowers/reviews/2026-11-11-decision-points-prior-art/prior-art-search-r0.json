@@ -1,0 +1,223 @@
+{
+ "round": 0,
+ "researchers": [
+  {
+   "id": "scout",
+   "output": {
+    "search_status": "ok",
+    "queries": [
+     "LLM instruction drift multi-turn system prompt reminder re-injection effect",
+     "generic reminder vs specific instruction LLM agent compliance study",
+     "knowledge work process model decision points checklist review gates document writing",
+     "LLM coding agent human-in-the-loop checkpoints irreversible actions approval taxonomy",
+     "measuring instruction instability language model dialogs split-softmax system prompt",
+     "LLM agent workflow stages plan act verify handoff checklist software engineering agent loop",
+     "ambiguity clarifying questions LLM agent when to ask user underspecified tasks benchmark",
+     "quality gates document review process report writing checklist stage-gate professional services",
+     "repeating instructions at end of context improves LLM instruction following lost in the middle long context"
+    ],
+    "clusters": [
+     {
+      "topic": "다회 대화에서 시스템 프롬프트 지시가 약해지는 현상과 그 측정",
+      "sources": [
+       "https://arxiv.org/abs/2402.10962",
+       "https://arxiv.org/pdf/2605.12922",
+       "https://tianpan.co/blog/2026-05-02-persona-drift-long-horizon-agent-sessions"
+      ],
+      "note": "검색 요약에 따르면 2402.10962 는 8라운드 안에 지시 표류가 생기고 원인을 주의 감쇠로 보며, 시스템 프롬프트 반복을 기준선으로 두고 split-softmax 와 비교한다. 2605.12922 는 원래 목표 블록을 사용자 메시지로 다시 넣어도 회복되지 않았다는 부정 결과(Mistral-7B 한 모델)를 보고한다. 원문은 열지 않았다."
+     },
+     {
+      "topic": "리마인더·반복 주입의 효과(구체 재진술, 위치, 전체 반복)",
+      "sources": [
+       "https://arxiv.org/pdf/2603.23530",
+       "https://arxiv.org/html/2403.05004v1",
+       "https://orq.ai/blog/copy-pasting-your-prompt-twice-makes-llms-smarter",
+       "https://pydantic.dev/docs/ai/harness/system-reminders/index.md",
+       "https://docs.vectara.com/docs/agents/reminders",
+       "https://passo.uno/if-you-are-an-agent-read-this/"
+      ],
+      "note": "2603.23530(전향 기억 실패)은 끝에 붙인 리마인더가 준수율을 회복시켰다고 보고하나 그 리마인더는 제약을 구체적으로 다시 적은 형태다. R&R(EMNLP Findings 2024)은 지시를 관련 문맥 가까이 반복하면 효과가 있다고 본다. 일반 상기 문구와 구체 지시를 같은 조건에서 비교한 연구는 이번 검색에서 찾지 못했다. 프레임워크 문서는 설계 설명일 뿐 효과 측정이 아니다."
+     },
+     {
+      "topic": "에이전트 작업 루프와 단계별 체크포인트(계획·실행·검증·넘김)",
+      "sources": [
+       "https://urandom.io/blog/2026-03-14-plan-act-verify-agent-control-loops",
+       "https://simeononsecurity.com/articles/effective-ai-bounded-agent-loops/",
+       "https://redreamality.com/visuals/loop-engineering/",
+       "https://aman.ai/primers/ai/loop-and-graph-engineering/"
+      ],
+      "note": "실무 블로그가 대부분이다. 공통 요소는 완료 기준 정의, 범위 명시, 외부 증거로 검증, 재시도와 중단 규칙, 최종 상태와 미결을 적은 넘김이다. 대조 대상의 범위 결정·단계 넘김 결정점과 겹친다."
+     },
+     {
+      "topic": "에이전트의 사람 승인 지점: 비가역성·영향 범위 기준 분류와 승인 피로",
+      "sources": [
+       "https://tianpan.co/blog/2026-04-27-tool-approval-risk-class-taxonomy",
+       "https://tianpan.co/blog/2026-04-27-coding-agent-autonomy-curve-blast-radius-tiers",
+       "https://dev.to/brennhill/when-should-an-ai-agent-ask-for-human-approval-5a16",
+       "https://www.zartis.com/when-should-your-agent-ask-for-permission/"
+      ],
+      "note": "되돌릴 수 있는지와 영향 범위로 행동 등급을 나누고 상위 등급만 승인받는 형태가 반복된다. 단계마다 묻는 방식은 반사적 승인(승인 피로)을 부른다는 경고가 있다. 프롬프트가 아닌 하네스에서 강제하라는 주장도 있다. 대부분 2차 블로그이고 인용 수치는 원 연구를 확인하지 못했다."
+     },
+     {
+      "topic": "불충분하게 명시된 과제에서 언제 사용자에게 물을지(판단 위임 결정점)",
+      "sources": [
+       "https://arxiv.org/html/2503.22674v2",
+       "https://www.themoonlight.io/review/lhaw-controllable-underspecification-for-long-horizon-tasks",
+       "https://arxiv.org/html/2511.08798v1"
+      ],
+      "note": "QuestBench, LHAW, ClarifyBench 는 묻기와 과잉 질문 사이의 교환을 측정한다. LHAW 는 방해 비용이 큰 사용자 설정에서 질문 수는 줄고 질문당 이득은 오른다고 보고한다. 사용자 비용 최소화 기준과 직접 연결된다."
+     },
+     {
+      "topic": "사람의 문서 업무 품질 게이트와 단계별 검토 체크리스트",
+      "sources": [
+       "https://www.docsie.io/blog/glossary/knowledge-workflow/",
+       "https://www.docsie.io/blog/glossary/quality-checkpoints/",
+       "https://us.fitgap.com/stack-guides/establish-documentation-quality-gates-that-prevent-entry-into-service-surprises",
+       "https://sloanreview.mit.edu/article/improving-knowledge-work-processes",
+       "https://www.dwrl.utexas.edu/old/node/76.html"
+      ],
+      "note": "초안·자체 검토·동료 검토·전문가 승인·배포 단계와, 단계마다 다른 체크리스트(일반 체크리스트 하나는 검토를 일관되지 않게 만든다는 주장)를 다룬다. 실무 자료가 대부분이며 지식노동 공정 모델의 표준은 찾지 못했다. 소프트웨어 개발의 계획·검증·넘김 단계와 대응되는지는 아직 대조하지 않았다."
+     }
+    ],
+    "subquestion_candidates": [
+     {
+      "scope": "다회 대화나 긴 에이전트 세션에서 시스템 프롬프트 지시의 준수율이 떨어지는지, 그리고 원래 지시를 다시 주입했을 때 회복되는지를 측정한 연구의 결과와 조건(모델, 대화 길이, 주입 위치와 역할)",
+      "basis": "2402.10962 는 반복을 기준선으로 두었고 2605.12922 는 재주입 부정 결과를 냈다. 두 결과의 조건 차이가 매 턴 리마인더 방식 결정에 직접 쓰인다."
+     },
+     {
+      "scope": "리마인더 문구의 구체성(제약을 구체적으로 다시 적은 문구 대 '지침을 따르라' 같은 일반 문구)이 준수율에 주는 효과를 비교한 연구나 실무 실험",
+      "basis": "2603.23530 의 리마인더 효과는 구체 재진술에서 나왔고, 일반 문구와 직접 비교한 연구는 이번 검색에서 찾지 못했다. 초안 sq2 의 핵심 비교 축이므로 별도 하위 질문으로 유지한다."
+     },
+     {
+      "scope": "지시를 관련 작업 지점 가까이(결정 시점에) 두는 배치와 앞머리에 한 번 두는 배치의 효과 비교",
+      "basis": "R&R 은 지시와 관련 문맥 사이 거리를 줄이면 효과가 있다고 본다. 결정점에 묶은 리마인더 안을 지지하거나 반박할 근거가 된다. 이미 확인한 Replit 결정 시점 리마인더 사례는 다시 보고하지 않는다."
+     },
+     {
+      "scope": "에이전트 작업 루프(계획·실행·검증·넘김)와 사람 문서 업무 품질 게이트(초안·검토·승인·배포)가 같은 결정점을 공유하는지 대조",
+      "basis": "두 자료 묶음이 모두 완료 기준 정의, 검증, 넘김 단계를 두지만 서로 대조한 자료는 없었다. 초안 sq1 을 두 유형의 대응표 작성 범위로 좁힌다."
+     },
+     {
+      "scope": "에이전트가 사용자에게 묻거나 승인받아야 하는 지점(불충분한 명시, 비가역 행동)을 정하는 기준과 과잉 질문·승인 피로가 사용자 비용에 주는 영향",
+      "basis": "QuestBench·LHAW·ClarifyBench 와 비가역성 등급 분류 자료가 판단 위임·비가역 행동 결정점을 다루고, 사용자 개입 비용을 지표로 쓴다. intended_use 의 사용자 비용 기준과 맞는다."
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "EVIDENCE-FIRST",
+     "ASYNC-FIRST",
+     "YAGNI",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME"
+    ]
+   }
+  }
+ ],
+ "query_violations": [],
+ "scout": {
+  "search_status": "ok",
+  "queries": [
+   "LLM instruction drift multi-turn system prompt reminder re-injection effect",
+   "generic reminder vs specific instruction LLM agent compliance study",
+   "knowledge work process model decision points checklist review gates document writing",
+   "LLM coding agent human-in-the-loop checkpoints irreversible actions approval taxonomy",
+   "measuring instruction instability language model dialogs split-softmax system prompt",
+   "LLM agent workflow stages plan act verify handoff checklist software engineering agent loop",
+   "ambiguity clarifying questions LLM agent when to ask user underspecified tasks benchmark",
+   "quality gates document review process report writing checklist stage-gate professional services",
+   "repeating instructions at end of context improves LLM instruction following lost in the middle long context"
+  ],
+  "clusters": [
+   {
+    "topic": "다회 대화에서 시스템 프롬프트 지시가 약해지는 현상과 그 측정",
+    "sources": [
+     "https://arxiv.org/abs/2402.10962",
+     "https://arxiv.org/pdf/2605.12922",
+     "https://tianpan.co/blog/2026-05-02-persona-drift-long-horizon-agent-sessions"
+    ],
+    "note": "검색 요약에 따르면 2402.10962 는 8라운드 안에 지시 표류가 생기고 원인을 주의 감쇠로 보며, 시스템 프롬프트 반복을 기준선으로 두고 split-softmax 와 비교한다. 2605.12922 는 원래 목표 블록을 사용자 메시지로 다시 넣어도 회복되지 않았다는 부정 결과(Mistral-7B 한 모델)를 보고한다. 원문은 열지 않았다."
+   },
+   {
+    "topic": "리마인더·반복 주입의 효과(구체 재진술, 위치, 전체 반복)",
+    "sources": [
+     "https://arxiv.org/pdf/2603.23530",
+     "https://arxiv.org/html/2403.05004v1",
+     "https://orq.ai/blog/copy-pasting-your-prompt-twice-makes-llms-smarter",
+     "https://pydantic.dev/docs/ai/harness/system-reminders/index.md",
+     "https://docs.vectara.com/docs/agents/reminders",
+     "https://passo.uno/if-you-are-an-agent-read-this/"
+    ],
+    "note": "2603.23530(전향 기억 실패)은 끝에 붙인 리마인더가 준수율을 회복시켰다고 보고하나 그 리마인더는 제약을 구체적으로 다시 적은 형태다. R&R(EMNLP Findings 2024)은 지시를 관련 문맥 가까이 반복하면 효과가 있다고 본다. 일반 상기 문구와 구체 지시를 같은 조건에서 비교한 연구는 이번 검색에서 찾지 못했다. 프레임워크 문서는 설계 설명일 뿐 효과 측정이 아니다."
+   },
+   {
+    "topic": "에이전트 작업 루프와 단계별 체크포인트(계획·실행·검증·넘김)",
+    "sources": [
+     "https://urandom.io/blog/2026-03-14-plan-act-verify-agent-control-loops",
+     "https://simeononsecurity.com/articles/effective-ai-bounded-agent-loops/",
+     "https://redreamality.com/visuals/loop-engineering/",
+     "https://aman.ai/primers/ai/loop-and-graph-engineering/"
+    ],
+    "note": "실무 블로그가 대부분이다. 공통 요소는 완료 기준 정의, 범위 명시, 외부 증거로 검증, 재시도와 중단 규칙, 최종 상태와 미결을 적은 넘김이다. 대조 대상의 범위 결정·단계 넘김 결정점과 겹친다."
+   },
+   {
+    "topic": "에이전트의 사람 승인 지점: 비가역성·영향 범위 기준 분류와 승인 피로",
+    "sources": [
+     "https://tianpan.co/blog/2026-04-27-tool-approval-risk-class-taxonomy",
+     "https://tianpan.co/blog/2026-04-27-coding-agent-autonomy-curve-blast-radius-tiers",
+     "https://dev.to/brennhill/when-should-an-ai-agent-ask-for-human-approval-5a16",
+     "https://www.zartis.com/when-should-your-agent-ask-for-permission/"
+    ],
+    "note": "되돌릴 수 있는지와 영향 범위로 행동 등급을 나누고 상위 등급만 승인받는 형태가 반복된다. 단계마다 묻는 방식은 반사적 승인(승인 피로)을 부른다는 경고가 있다. 프롬프트가 아닌 하네스에서 강제하라는 주장도 있다. 대부분 2차 블로그이고 인용 수치는 원 연구를 확인하지 못했다."
+   },
+   {
+    "topic": "불충분하게 명시된 과제에서 언제 사용자에게 물을지(판단 위임 결정점)",
+    "sources": [
+     "https://arxiv.org/html/2503.22674v2",
+     "https://www.themoonlight.io/review/lhaw-controllable-underspecification-for-long-horizon-tasks",
+     "https://arxiv.org/html/2511.08798v1"
+    ],
+    "note": "QuestBench, LHAW, ClarifyBench 는 묻기와 과잉 질문 사이의 교환을 측정한다. LHAW 는 방해 비용이 큰 사용자 설정에서 질문 수는 줄고 질문당 이득은 오른다고 보고한다. 사용자 비용 최소화 기준과 직접 연결된다."
+   },
+   {
+    "topic": "사람의 문서 업무 품질 게이트와 단계별 검토 체크리스트",
+    "sources": [
+     "https://www.docsie.io/blog/glossary/knowledge-workflow/",
+     "https://www.docsie.io/blog/glossary/quality-checkpoints/",
+     "https://us.fitgap.com/stack-guides/establish-documentation-quality-gates-that-prevent-entry-into-service-surprises",
+     "https://sloanreview.mit.edu/article/improving-knowledge-work-processes",
+     "https://www.dwrl.utexas.edu/old/node/76.html"
+    ],
+    "note": "초안·자체 검토·동료 검토·전문가 승인·배포 단계와, 단계마다 다른 체크리스트(일반 체크리스트 하나는 검토를 일관되지 않게 만든다는 주장)를 다룬다. 실무 자료가 대부분이며 지식노동 공정 모델의 표준은 찾지 못했다. 소프트웨어 개발의 계획·검증·넘김 단계와 대응되는지는 아직 대조하지 않았다."
+   }
+  ],
+  "subquestion_candidates": [
+   {
+    "scope": "다회 대화나 긴 에이전트 세션에서 시스템 프롬프트 지시의 준수율이 떨어지는지, 그리고 원래 지시를 다시 주입했을 때 회복되는지를 측정한 연구의 결과와 조건(모델, 대화 길이, 주입 위치와 역할)",
+    "basis": "2402.10962 는 반복을 기준선으로 두었고 2605.12922 는 재주입 부정 결과를 냈다. 두 결과의 조건 차이가 매 턴 리마인더 방식 결정에 직접 쓰인다."
+   },
+   {
+    "scope": "리마인더 문구의 구체성(제약을 구체적으로 다시 적은 문구 대 '지침을 따르라' 같은 일반 문구)이 준수율에 주는 효과를 비교한 연구나 실무 실험",
+    "basis": "2603.23530 의 리마인더 효과는 구체 재진술에서 나왔고, 일반 문구와 직접 비교한 연구는 이번 검색에서 찾지 못했다. 초안 sq2 의 핵심 비교 축이므로 별도 하위 질문으로 유지한다."
+   },
+   {
+    "scope": "지시를 관련 작업 지점 가까이(결정 시점에) 두는 배치와 앞머리에 한 번 두는 배치의 효과 비교",
+    "basis": "R&R 은 지시와 관련 문맥 사이 거리를 줄이면 효과가 있다고 본다. 결정점에 묶은 리마인더 안을 지지하거나 반박할 근거가 된다. 이미 확인한 Replit 결정 시점 리마인더 사례는 다시 보고하지 않는다."
+   },
+   {
+    "scope": "에이전트 작업 루프(계획·실행·검증·넘김)와 사람 문서 업무 품질 게이트(초안·검토·승인·배포)가 같은 결정점을 공유하는지 대조",
+    "basis": "두 자료 묶음이 모두 완료 기준 정의, 검증, 넘김 단계를 두지만 서로 대조한 자료는 없었다. 초안 sq1 을 두 유형의 대응표 작성 범위로 좁힌다."
+   },
+   {
+    "scope": "에이전트가 사용자에게 묻거나 승인받아야 하는 지점(불충분한 명시, 비가역 행동)을 정하는 기준과 과잉 질문·승인 피로가 사용자 비용에 주는 영향",
+    "basis": "QuestBench·LHAW·ClarifyBench 와 비가역성 등급 분류 자료가 판단 위임·비가역 행동 결정점을 다루고, 사용자 개입 비용을 지표로 쓴다. intended_use 의 사용자 비용 기준과 맞는다."
+   }
+  ],
+  "principles_applied": [
+   "NO-ASSUME",
+   "EVIDENCE-FIRST",
+   "ASYNC-FIRST",
+   "YAGNI",
+   "STATE-ASSUME",
+   "SPECIFIC-NAME"
+  ]
+ }
+}

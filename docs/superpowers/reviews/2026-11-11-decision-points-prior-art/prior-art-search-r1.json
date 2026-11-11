@@ -1,0 +1,3571 @@
+{
+ "round": 1,
+ "passed": [
+  {
+   "ref": "sq2#case#3",
+   "urls": [
+    "https://www.anthropic.com/research/measuring-agent-autonomy"
+   ]
+  },
+  {
+   "ref": "sq3#case#2",
+   "urls": [
+    "https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/"
+   ]
+  }
+ ],
+ "rejected": [
+  {
+   "ref": "sq1#issue#0",
+   "urls": [
+    "https://arxiv.org/pdf/2604.28031"
+   ]
+  },
+  {
+   "ref": "sq1#case#0",
+   "urls": [
+    "https://arxiv.org/html/2402.10962v4"
+   ]
+  },
+  {
+   "ref": "sq1#case#1",
+   "urls": [
+    "https://arxiv.org/pdf/2604.28031"
+   ]
+  },
+  {
+   "ref": "sq1#case#2",
+   "urls": [
+    "https://arxiv.org/html/2505.06120"
+   ]
+  },
+  {
+   "ref": "sq1#case#3",
+   "urls": [
+    "https://arxiv.org/html/2603.05344"
+   ]
+  },
+  {
+   "ref": "sq1#case#4",
+   "urls": [
+    "https://arxiv.org/html/2603.23530"
+   ]
+  },
+  {
+   "ref": "sq2#issue#0",
+   "urls": [
+    "https://anthropic.com/engineering/claude-code-auto-mode"
+   ]
+  },
+  {
+   "ref": "sq2#issue#1",
+   "urls": [
+    "https://www.anthropic.com/research/measuring-agent-autonomy"
+   ]
+  },
+  {
+   "ref": "sq2#case#0",
+   "urls": [
+    "https://arxiv.org/html/2503.22674v2"
+   ]
+  },
+  {
+   "ref": "sq2#case#1",
+   "urls": [
+    "https://arxiv.org/html/2511.08798v1"
+   ]
+  },
+  {
+   "ref": "sq2#case#2",
+   "urls": [
+    "https://arxiv.org/html/2602.10525v1"
+   ]
+  },
+  {
+   "ref": "sq2#case#4",
+   "urls": [
+    "https://anthropic.com/engineering/claude-code-auto-mode"
+   ]
+  },
+  {
+   "ref": "sq2#case#5",
+   "urls": [
+    "https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentrel02-bp05.html"
+   ]
+  },
+  {
+   "ref": "sq2#case#6",
+   "urls": [
+    "https://www.dare.uva.nl/id/2cbf36e0-24e3-4be3-bc5c-01e332c33c9c"
+   ]
+  },
+  {
+   "ref": "sq2#case#7",
+   "urls": [
+    "https://www.buildmvpfast.com/blog/approval-fatigue-agent-permission-ux-2026"
+   ]
+  },
+  {
+   "ref": "sq3#case#0",
+   "urls": [
+    "https://www.contentstack.com/academy/md/courses/workflow-branches-and-collaboration/content-lifecycle-draft-review-publish.md"
+   ]
+  },
+  {
+   "ref": "sq3#case#1",
+   "urls": [
+    "https://qms2go.com/learn/document-control"
+   ]
+  },
+  {
+   "ref": "sq3#case#3",
+   "urls": [
+    "https://www.aakashx.com/blog/agent-architecture-loops-planning-verification/"
+   ]
+  },
+  {
+   "ref": "sq3#case#4",
+   "urls": [
+    "https://www.kunalganglani.com/blog/tool-approval-patterns-ai-agents"
+   ]
+  },
+  {
+   "ref": "sq3#case#5",
+   "urls": [
+    "https://writingcommons.org/section/writing-process/problem-solving-strategies/"
+   ]
+  },
+  {
+   "ref": "sq3#case#6",
+   "urls": [
+    "https://arxiv.org/html/2502.13069v3"
+   ]
+  },
+  {
+   "ref": "sq3#case#7",
+   "urls": [
+    "https://arxiv.org/abs/2602.10525"
+   ]
+  },
+  {
+   "ref": "sq3#case#8",
+   "urls": [
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC7810441"
+   ]
+  }
+ ],
+ "unverifiable": [],
+ "verify_failed": [],
+ "coverage": [
+  {
+   "id": "sq1",
+   "cases_found": 6,
+   "passed": 0
+  },
+  {
+   "id": "sq2",
+   "cases_found": 10,
+   "passed": 1
+  },
+  {
+   "id": "sq3",
+   "cases_found": 9,
+   "passed": 1
+  }
+ ],
+ "subquestion_status": [
+  {
+   "id": "sq1",
+   "search_status": "ok",
+   "verification_status": "ok"
+  },
+  {
+   "id": "sq2",
+   "search_status": "ok",
+   "verification_status": "ok"
+  },
+  {
+   "id": "sq3",
+   "search_status": "ok",
+   "verification_status": "ok"
+  }
+ ],
+ "overall_status": "ok",
+ "query_violations": [],
+ "verifier_count": 22,
+ "researchers": [
+  {
+   "id": "sq1",
+   "output": {
+    "agent": "researching-prior-art",
+    "mode": "survey",
+    "subquestion_id": "sq1",
+    "search_status": "ok",
+    "queries": [
+     "instruction drift multi-turn LLM system prompt adherence measurement",
+     "LLM system prompt reminder reinjection mitigates instruction forgetting long conversation experiment",
+     "LLMs get lost in multi-turn conversation recap snowball restating instructions",
+     "self-reminder system mode jailbreak defense ChatGPT reminder sentence effect",
+     "instruction position before or after long context LLM performance experiment placement",
+     "multi-turn instruction following benchmark reminder intervention specific versus generic restatement compliance"
+    ],
+    "read": "[\"https://arxiv.org/abs/2402.10962v3\", \"https://arxiv.org/html/2402.10962v4\", \"https://arxiv.org/pdf/2604.28031 (PDF 1-8페이지를 내려받아 읽음)\", \"https://arxiv.org/html/2603.05344 (0-200000자)\", \"https://arxiv.org/html/2505.06120 (0-100000자)\", \"https://arxiv.org/html/2603.23530\", \"https://www.nature.com/articles/s42256-023-00765-8 (로그인 리다이렉트로 열지 못함)\", \"https://arxiv.org/pdf/2309.13345 (PDF 본문을 읽지 못함)\"]",
+    "issues": [
+     {
+      "where": "매 턴 리마인더 중 '원칙을 잊지 말고 적용하라' 한 줄 안",
+      "type": "refuted-premise",
+      "claim": "일반 상기 문구 한 줄 안은 다회 대화의 지시 위반이 망각에서 온다는 전제에 기대고 있다. 아래 선행 결과는 위반의 상당수가 지시를 기억한 채로 일어난다고 보고하므로 이 전제와 상충한다.",
+      "prior_claim": "DriftBench 는 38개 연구 브리프와 7개 모델, 2,116회 실행에서 반복 개선 압력을 주었다. 그 결과 모델이 제약을 매 턴 거의 완벽하게 다시 말하면서도(최종 재진술 정확도 97.3%) 제약을 위반하는 knows-but-violates 비율이 대부분 모델에서 50%를 넘었다. 2·4턴 뒤에 브리프를 다시 꺼내게 한 체크포인트는 일부 모델의 위반만 줄였다(Qwen3 55.4%→36.0%, Sonnet 4.6 98.7%→86.8%, Llama 92.1%·Flash-Lite 72.4%·Gemini Pro 25.0%로 거의 그대로).",
+      "consequence": "'잊지 말라'는 상기는 기억 회복을 겨냥하므로, 기억은 남아 있고 적용에서 위반이 나는 상황에서는 효과가 제한될 가능성이 높다. 이 연구는 일반 상기 문구 자체를 시험하지 않았으므로, 이 판단은 전이 추론이다(derived).",
+      "evidence": "arXiv 2604.28031v3 초록과 4.3·4.5절. 축 차이: 목적(제약 준수 유지)은 비슷하지만, 메커니즘(브리프 재요청 체크포인트), 평가(과학 아이디어 제안 6턴, LLM 심판), 적용 대상(연구 제안 대화)은 대조 대상과 다르다.",
+      "citations": [
+       {
+        "url": "https://arxiv.org/pdf/2604.28031",
+        "kind": "preprint",
+        "opened": true
+       }
+      ]
+     }
+    ],
+    "evidence_map": [
+     {
+      "case": "Measuring and Controlling Instruction (In)Stability in Language Model Dialogs (split-softmax 와 시스템 프롬프트 반복 비교)",
+      "url": "https://arxiv.org/html/2402.10962v4",
+      "axes": {
+       "purpose": {
+        "prior": "다회 대화에서 시스템 프롬프트 지시(페르소나)가 유지되는지 측정하고 표류를 줄인다",
+        "same": true,
+        "note": "긴 대화에서 처음 지시의 준수를 유지하려는 목적이 대조 대상의 매 턴 리마인더 목적과 같다"
+       },
+       "mechanism": {
+        "prior": "주의 가중치를 시스템 프롬프트로 키우는 split-softmax 를 제안하고, 시스템 프롬프트 전체 반복(SPR)과 classifier-free guidance 를 기준선으로 비교했다",
+        "same": false,
+        "note": "SPR 은 지시 전체를 다시 넣는 방식이라 대조 대상의 조항별 구체 지시 안과 가깝지만, 결정점에 맞춘 선택 주입이나 한 줄 상기 문구는 시험하지 않았다"
+       },
+       "evaluation": {
+        "prior": "두 챗봇의 자기 대화에서 라운드마다 탐침 질문으로 페르소나 준수를 측정했고, LLaMA2-chat-70B 와 GPT-3.5 에서 8라운드 안에 유의한 표류가 나왔다",
+        "same": false,
+        "note": "페르소나 탐침으로 측정했으며, 업무 규칙 준수나 사용자 비용은 측정하지 않았다"
+       },
+       "target": {
+        "prior": "범용 채팅 대화의 페르소나 지시",
+        "same": false,
+        "note": "도구를 쓰는 긴 에이전트 세션과 업무 규칙 목록이 아니다"
+       }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 초록과 HTML 본문을 열어 확인",
+      "adoption": "참고",
+      "bearing": "지시 재주입이 뒤쪽 턴의 표류를 줄인다는 근거로 매 턴 리마인더 자체를 지지한다. 논문은 SPR 이 '문맥 창을 상당히 소비한다'고 적었으므로, 원칙 전체를 매 턴 다시 넣는 안보다 짧은 조항별 지시 쪽으로 기운다."
+     },
+     {
+      "case": "DriftBench: 다회 아이디어 대화의 제약 준수(knows-but-violates)",
+      "url": "https://arxiv.org/pdf/2604.28031",
+      "axes": {
+       "purpose": {
+        "prior": "반복 압력 아래 원래 브리프의 강한 제약이 유지되는지 측정한다",
+        "same": true,
+        "note": "긴 상호작용에서 처음 규칙의 준수를 유지하는지 묻는 목적이 같다"
+       },
+       "mechanism": {
+        "prior": "6턴 압력 조건과 2·4턴 뒤 브리프 재요청(체크포인트) 조건, 매 턴 위반 제약을 지목하는 모니터 조건을 비교했다",
+        "same": false,
+        "note": "체크포인트는 모델에게 제약을 스스로 다시 말하게 하는 방식이며, 하네스가 넣는 조항별 지시나 일반 상기 문구와 다르다"
+       },
+       "evaluation": {
+        "prior": "0-4 루브릭 LLM 심판(교차 심판), 인간 평정 보조. 7개 모델 중 4개(Opus 심판)가 KBV 50% 초과, 압력 조건 표류 첫 신호의 72.0%가 2턴 이내에 나왔다",
+        "same": false,
+        "note": "연구 제안의 제약 준수를 측정했으며, 사용자 개입이나 재작업 비용은 측정하지 않았다"
+       },
+       "target": {
+        "prior": "과학 아이디어 제안을 다듬는 6턴 대화",
+        "same": false,
+        "note": "도구를 쓰는 에이전트 세션과 다르고, 대화 길이도 짧다"
+       }
+      },
+      "outcome": "실패",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv PDF 를 내려받아 1-8페이지를 읽음",
+      "adoption": "참고",
+      "bearing": "규칙을 기억시키는 일반 상기 문구 안의 근거를 약화한다. 재요청 효과가 모델마다 갈렸고(Sonnet 98.7%→86.8%, Llama 거의 변화 없음) 위반 지목 모니터도 Flash-Lite 에서만 효과가 보였으므로, 어느 리마인더 안이든 효과를 해당 모델에서 직접 측정하라는 방향으로 움직인다."
+     },
+     {
+      "case": "LLMs Get Lost In Multi-Turn Conversation (Recap·Snowball 재진술 개입)",
+      "url": "https://arxiv.org/html/2505.06120",
+      "axes": {
+       "purpose": {
+        "prior": "여러 턴에 나누어 준 지시에서 성능이 떨어지는지 측정하고 완화책을 시험한다",
+        "same": false,
+        "note": "목적은 과제 정보의 분할 전달에서 오는 성능 저하이며, 처음 준 행동 규칙의 준수 유지와 다르다"
+       },
+       "mechanism": {
+        "prior": "Recap 은 마지막 턴에 앞선 정보 조각을 모두 다시 붙이고, Snowball 은 매 사용자 턴에 앞선 조각을 모두 반복한다",
+        "same": false,
+        "note": "Snowball 은 매 턴 재주입이라 리마인더와 비슷하지만, 재주입 대상이 규칙이 아니라 과제 정보 조각이다"
+       },
+       "evaluation": {
+        "prior": "GPT-4o-mini·GPT-4o, 4개 과제. Full 86.8/93.0, Sharded 50.4/59.1, Recap 66.5/76.6, Snowball 61.8/65.3",
+        "same": false,
+        "note": "과제 정답률로 측정했다. 회복률(Snowball 약 18-31%, Recap 약 44-52%)은 표 2에서 계산한 값이다(derived)"
+       },
+       "target": {
+        "prior": "코드·DB·수학·액션 과제의 분할 지시 대화",
+        "same": false,
+        "note": "에이전트 원칙 준수가 아니다"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv HTML 본문을 열어 표 2와 결론을 확인 (ICLR 2026 채택)",
+      "adoption": "참고",
+      "bearing": "매 턴 단순 반복은 저하를 일부만 회복한다는 근거다. 저자들은 에이전트 쪽 반복에 기대는 방식이 '제한적일 수 있다'고 결론지었다. 네 축이 모두 달라 단독 근거로 쓰기 어렵고, 리마인더 효과의 상한이 낮을 수 있다는 보조 근거로만 쓴다."
+     },
+     {
+      "case": "터미널 코딩 에이전트의 이벤트 기반 시스템 리마인더",
+      "url": "https://arxiv.org/html/2603.05344",
+      "axes": {
+       "purpose": {
+        "prior": "긴 세션에서 지시가 희미해지는 현상(instruction fade-out)을 상쇄한다",
+        "same": true,
+        "note": "긴 에이전트 세션의 지시 준수 유지라는 목적이 같다"
+       },
+       "mechanism": {
+        "prior": "이벤트 감지기가 잘못되기 쉬운 결정점 바로 앞에 짧은 user 역할 메시지를 넣는다. 초기 실험에서 system 역할 주입보다 user 역할 주입의 준수율이 '눈에 띄게 높았다'. 오류 복구에서 일반 재시도 메시지 하나를 6개 오류 유형별 구체 지시로 바꾸자 복구율이 '상당히' 올랐다",
+        "same": false,
+        "note": "결정점 앞 구체 지시는 대조 대상의 조항별 구체 지시 안과 가깝다. 다만 매 턴 고정 주입이 아니라 이벤트가 있을 때만 주입한다"
+       },
+       "evaluation": {
+        "prior": "통제 실험이나 효과 크기 없이 저자의 개발 경험으로 보고했다",
+        "same": false,
+        "note": "수치가 없어 효과 크기를 옮겨 쓸 수 없다"
+       },
+       "target": {
+        "prior": "도구를 쓰는 터미널 코딩 에이전트",
+        "same": false,
+        "note": "개발 작업 에이전트이며, 문서 업무와 대화 답 작성 결정점은 다루지 않는다"
+       }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv HTML 을 열고 2.3.4절 'Rationale for role: user' 를 확인",
+      "adoption": "참고",
+      "bearing": "조항별 구체 지시 안을 지지하고 일반 한 줄 안을 약화한다(일반 재시도 메시지보다 유형별 구체 지시가 나았다는 보고). 주입 위치는 가장 최근 위치의 user 역할 쪽으로 움직인다. 근거 수준은 비공식 보고다."
+     },
+     {
+      "case": "Did You Forget What I Asked? 동시 과제 부하 아래 형식 지시 준수와 리마인더",
+      "url": "https://arxiv.org/html/2603.23530",
+      "axes": {
+       "purpose": {
+        "prior": "다른 과제를 함께 풀 때 형식 지시를 잊는지(prospective memory) 측정하고 리마인더로 회복되는지 본다",
+        "same": true,
+        "note": "처리 부하 속에서 규칙 준수를 유지하려는 목적이 같다"
+       },
+       "mechanism": {
+        "prior": "지시 문장에서 뽑은 구체 제약을 'IMPORTANT FORMATTING INSTRUCTION:' 머리와 함께 앞에 두고, 끝에 'Remember to follow ALL of my formatting instructions above.' 일반 상기 문장을 붙였다",
+        "same": false,
+        "note": "구체 재진술과 일반 상기 문장을 한 번에 넣었으므로 두 리마인더 안의 혼합이다. 저자들은 구성요소별 기여를 분리하지 않았다고 적었다"
+       },
+       "evaluation": {
+        "prior": "IFEval 15개 유형, 3개 모델, 8,000개 넘는 프롬프트를 코드 검사기로 채점했다. 부하 아래 준수는 2-21% 떨어졌고, 리마인더가 67-87% 범위를 90-100%로 회복했다(평균 +12.7~+17.7). 여러 제약을 쌓으면 리마인더 효과가 +1.7~+5.8로 줄었다",
+        "same": false,
+        "note": "단일 턴 프롬프트의 형식 제약을 측정했으며, 다회 세션 표류는 측정하지 않았다"
+       },
+       "target": {
+        "prior": "단일 턴 질의응답과 형식 지시",
+        "same": false,
+        "note": "긴 에이전트 세션과 업무 원칙 목록이 아니다"
+       }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "구체-일반 비교를 찾는 검색에서 arXiv HTML 을 열어 확인",
+      "adoption": "참고",
+      "bearing": "구체 제약을 다시 적고 끝에 상기 문장을 둔 리마인더가 효과적이라는 근거로, 조항별 구체 지시 안 쪽으로 움직인다. 그러나 일반 상기 문장만의 효과는 분리되지 않았고, 제약이 여럿일수록 효과가 줄었다. 그래서 매 턴 모든 조항을 넣기보다 그 결정점에 해당하는 조항만 넣는 방향을 시사한다(derived)."
+     }
+    ],
+    "saturation": "6",
+    "not_found": "[\"일반 상기 문구('원칙을 잊지 말고 적용하라')와 조항별 구체 재진술을 같은 조건에서 직접 비교한 통제 실험은 찾지 못했다. 2603.23530 은 두 요소를 섞어 넣고 분리하지 않았다고 스스로 밝혔다. 도구 호출 한도 안에서 VerIFY 등 다른 후보 논문의 본문을 열지 못했다.\", \"자기 상기 문구(self-reminder) 탈옥 방어 연구(Nature Machine Intelligence 2023, 공격 성공률 67.21%→19.34%로 검색 결과에 요약됨)는 일반 상기 문구의 효과를 보인 사례 후보지만, 본문이 로그인 리다이렉트로 열리지 않아 근거 지도에 넣지 않았다.\", \"지시 위치 실험(BAMBOO 의 Pre-Ins/Post-Ins/Both-Ins, LongIns, LongReason)은 검색 결과 요약만 확인했고 PDF 본문을 읽지 못해 근거 지도에 넣지 않았다. 요약상으로는 지시를 질의 가까이·끝에 둘 때 대체로 낫고 모델마다 차이가 있다고 한다.\", \"다회 업무 세션에서 리마인더가 사용자 개입·재작업·대기 같은 사용자 비용을 줄였는지 측정한 연구는 찾지 못했다. 찾은 연구는 모두 준수율이나 과제 정답률을 측정했다.\"]",
+    "disclosures": "[\"Recap·Snowball 회복률(약 18-52%)은 표 2 값으로 계산한 derived 값이다. 논문 본문은 Snowball 완화를 15-20%로 적어 계산값과 일부 다르다.\", \"2603.05344 의 user 역할 우위와 구체 오류 지시 우위는 수치 없는 저자 경험 보고다.\", \"DriftBench 의 위반 판정은 LLM 심판 기준이고, 심판에 따라 KBV 수준이 크게 달랐다(GPT-5.4 심판에서 42.1-98.7%). 방향은 심판 사이에 안정적이었다.\", \"2402.10962 의 SPR 과 split-softmax 비교는 WebFetch 요약으로 확인했고, 그림의 수치를 직접 읽지 않았다.\"]",
+    "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SPECIFIC-NAME\", \"INSTRUCTION-FORM\", \"FOCUSED\"]",
+    "notes": "고른 탐색 방법은 짧고 넓은 검색어로 시작해 좁혀 가기와 후보안별 결말 찾기다. 표류 측정 연구, 재주입·리마인더 실험, 구체-일반 비교, 위치 실험 순서로 검색했다. constraints 에 있는 Replit 결정 시점 리마인더, 독자 수준 명시 연구, 규칙 수와 준수율 연구는 다시 찾지 않았다. 원칙 이원화 안도 다루지 않았다. 측정 없는 실무 블로그(Hugging Face 포럼, tianpan.co, DEV, agentpatterns.ai, Vectara 문서, towardsai)는 subquestion 의 exclude 조건(측정 없는 설계 설명)에 해당해 근거에서 뺐다. intended_use 의 판단 기준은 사용자 비용 최소화다. 그런데 찾은 연구는 모두 모델 준수율을 측정했으므로, 사용자 비용과의 연결은 추론으로만 할 수 있다. 종합 방향을 정리한다. 첫째, 표류는 실재하고 재주입은 효과가 있다(2402.10962). 둘째, 결정점 직전의 가장 최근 위치에 구체 지시를 넣는 쪽이 일반 문구보다 근거가 많다(2603.05344, 2603.23530). 셋째, 위반이 기억 상실 없이도 일어나고 리마인더 효과가 모델마다 다르다(2604.28031). 그래서 어느 안을 고르든 대상 모델로 직접 측정할 필요가 있다. 더 확인할 자료는 두 가지다. 하나는 자기 상기 문구 논문의 문구·위치 ablation 유무로, 일반 상기 문구의 유일한 정량 근거 후보이기 때문이다. 다른 하나는 VerIFY 의 6가지 완화 기법 비교로, 다회 장문 대화에서 리마인더 유형을 비교했을 가능성이 있기 때문이다."
+   }
+  },
+  {
+   "id": "sq2",
+   "output": {
+    "search_status": "ok",
+    "queries": [
+     "LLM agent clarifying questions benchmark underspecified tasks when to ask",
+     "approval fatigue human-in-the-loop AI agent permission prompts study",
+     "Anthropic auto mode permission prompts approve 93% classifier",
+     "Measuring AI agent autonomy in practice human interruption clarification frequency",
+     "LHAW underspecified long-horizon agent tasks clarification cost benchmark",
+     "Anthropic measuring agent autonomy in practice Claude Code stops to ask clarification twice as often",
+     "\"mixed-initiative\" interruption cost user study proactive agent asks too many questions annoyance",
+     "agent action risk tiers reversible irreversible require human confirmation framework levels of autonomy",
+     "user satisfaction clarifying questions conversational search study too many questions decreases satisfaction",
+     "\"Asking Clarifying Questions: To Benefit or to Disturb Users in Web Search\" findings"
+    ],
+    "issues": [
+     {
+      "where": "결정점 '비가역 행동' — 파일을 지우거나 덮어쓰는 작업마다 실행 전 확인을 받는 기준",
+      "type": "known-failure",
+      "claim": "대조 대상은 파일 덮어쓰기 전체를 확인 대상으로 둔다. 그래서 버전 관리로 되돌릴 수 있는 프로젝트 안 파일 수정까지 확인 질문이 생길 수 있다. 선행 사례가 보고한 승인 피로의 원인(되돌릴 수 있는 저위험 행동까지 사람에게 묻는 일)이 이 기준에도 남아 있다.",
+      "prior_claim": "한 코딩 에이전트 제품의 엔지니어링 글은 수동 권한 확인 요청을 사용자가 실제로 93% 승인했다고 보고했다. 같은 글은 이 반복이 승인 피로로 이어져 사람들이 무엇을 승인하는지 주의 깊게 보지 않게 된다고 적었다. 그 제품은 대응으로 읽기·검색은 허용 목록으로, 프로젝트 디렉터리 안의 파일 쓰기와 수정은 분류기 호출 없이 허용하고, 그 밖의 셸 명령·웹 요청·프로젝트 밖 파일 작업만 분류기가 검토하도록 등급을 나눴다. 전체 파이프라인의 오탐률은 0.4%, 실제 과잉 행동에 대한 미탐률은 17%로 보고했다.",
+      "consequence": "확인 질문이 되돌릴 수 있는 수정에까지 나가면 사용자 주의 비용이 늘고, 정작 되돌릴 수 없는 행동의 확인 요청을 사용자가 습관적으로 승인할 위험이 생긴다.",
+      "evidence": "엔지니어링 글 원문: 'in practice users accept 93% of them anyway', 'Over time that leads to approval fatigue, where people stop paying close attention to what they're approving', 'File writes and edits inside the project directory are allowed without a classifier call'. 네 축 비교: 목적(권한 확인 비용 절감)은 대조 대상의 비가역 행동 결정점과만 같고, 메커니즘은 분류기 기반 런타임 게이트로 대조 대상의 문서형 원칙과 다르며, 평가는 운영 트래픽 오탐·미탐률이고, 적용 대상은 코딩 에이전트 도구 호출이다. 대조 대상의 문서·산출물 작업 전체와는 다르다.",
+      "citations": [
+       {
+        "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+        "kind": "vendor",
+        "opened": true
+       }
+      ]
+     },
+     {
+      "where": "결정점 '비가역 행동'과 '판단 위임' — 사람이 매 행동을 승인하는 방식",
+      "type": "known-failure",
+      "claim": "대조 대상이 확인 대상을 행동 종류(삭제·덮어쓰기·외부 전송)로 정하면, 선행 연구가 지적한 '모든 행동 승인 요구'의 마찰 문제가 행동 종류 안에서 그대로 생길 수 있다.",
+      "prior_claim": "한 모델 개발사의 실사용 자율성 연구는 공개 API 도구 호출 약 99.8만 건과 대화형 코딩 세션 50만 건을 분석했다. 이 연구는 사람이 모든 행동을 승인하도록 요구하면 안전 이득 없이 마찰만 만들 수 있다고 적었다. 또한 사람이 효과적으로 감시하고 개입할 수 있는지에 초점을 두라고 권했다. 숙련 사용자일수록 전체 자동 승인 비율이 약 20%(50세션 미만)에서 40% 이상(750세션)으로 올랐고, 개입률도 약 5%에서 9%로 올랐다. 에이전트가 스스로 멈춘 이유는 접근법 선택지 제시 35%, 진단 정보 수집 21%, 모호한 요청 명확화 13%, 자격 증명 요청 12%, 실행 전 승인 11%였다.",
+      "consequence": "확인 질문의 빈도가 사용자 숙련도와 무관하게 고정되면 숙련 사용자에게 개입 비용이 커진다. 숙련 사용자는 승인을 위임하고 필요할 때 개입하는 쪽으로 감독 방식을 바꾼다.",
+      "evidence": "연구 원문 요약: 모든 행동 승인 요구는 'will create friction without necessarily producing safety benefits'. 네 축 비교: 목적은 대조 대상의 질문·승인 결정점과만 같고, 메커니즘은 로그 관측 연구(개입 설계가 아님)이며, 평가는 세션 지속 시간과 개입 사유 비율이고, 적용 대상은 코딩 에이전트 사용자다.",
+      "citations": [
+       {
+        "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+        "kind": "vendor",
+        "opened": true
+       }
+      ]
+     }
+    ],
+    "evidence_map": [
+     {
+      "case": "QuestBench — 미명시 추론 문제에서 필요한 질문 하나 고르기",
+      "url": "https://arxiv.org/html/2503.22674v2",
+      "axes": {
+       "purpose": {
+        "prior": "LLM 이 문제의 누락 정보를 알아채고 그것을 해소할 질문 하나를 고르는지 측정",
+        "same": false,
+        "note": "대조 대상의 '불충분한 명시' 결정점과만 같음. 리마인더 방식과 다른 결정점은 다루지 않음"
+       },
+       "mechanism": {
+        "prior": "1-sufficient 제약 만족 문제로 정형화하고 객관식 질문 후보에서 고르게 함",
+        "same": false,
+        "note": "대조 대상은 원칙 문서의 결정 규칙. 선행은 벤치마크 과제 설계"
+       },
+       "evaluation": {
+        "prior": "질문 선택 정확도와 '모름' 판별 F1. 계획 과제에서 정답 '모름' 비율 약 42% 대비 모델은 0.7~4.6%만 '모름' 선택",
+        "same": false,
+        "note": "사용자 비용(주의·재작업)을 측정하지 않음"
+       },
+       "target": {
+        "prior": "논리·계획·수학 문제",
+        "same": false,
+        "note": "실제 업무 대화가 아님"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 원문",
+      "adoption": "참고",
+      "bearing": "모델이 명시 부족을 스스로 잘 감지하지 못한다는 근거. '불충분한 명시'를 결정점으로 원칙에 명시하는 안을 지지함. 질문 과잉은 측정하지 않았으므로 질문 빈도 기준에는 쓰지 않음"
+     },
+     {
+      "case": "SAGE-Agent / ClarifyBench — 정보 가치 기반 질문 선택",
+      "url": "https://arxiv.org/html/2511.08798v1",
+      "axes": {
+       "purpose": {
+        "prior": "도구 호출 에이전트가 언제, 무엇을 물을지 결정",
+        "same": false,
+        "note": "대조 대상의 '불충분한 명시' 결정점과만 같음"
+       },
+       "mechanism": {
+        "prior": "후보 도구 호출의 확신도가 실행 임계값을 넘으면 실행하고, 못 넘으면 기대 정보 가치(EVPI)가 가장 큰 질문을 하며 중복 질문에 벌점(λ)을 줌",
+        "same": false,
+        "note": "수치 확신도와 질문 예산을 쓰는 알고리즘. 대조 대상은 자연어 규칙"
+       },
+       "evaluation": {
+        "prior": "모호한 과제 커버리지 59.7% 대 최고 기준선 55.7%, 평균 질문 수 1.39 대 2.56. λ를 0에서 0.5로 올리면 질문 수 18~27% 감소, 커버리지 변화 약 3% 이내",
+        "same": false,
+        "note": "질문 수를 사용자 비용 대리 지표로 씀. 실제 사용자가 아닌 시뮬레이터"
+       },
+       "target": {
+        "prior": "문서 편집·차량 제어·주식·여행·파일 시스템 도구 호출",
+        "same": false,
+        "note": "업무 도구 호출이라 일부 유사하나 원칙 문서 적용과 다름"
+       }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 원문",
+      "adoption": "참고",
+      "bearing": "질문 여부를 '답이 최선 행동을 바꾸는가'로 정하면 질문 수를 줄여도 결과가 유지된다는 근거. ASK-OPTIONS 의 '결과를 바꾸는 결정만 묻는다' 기준을 지지하고, 이미 물은 항목을 다시 묻지 않는 조건을 추가할 근거가 됨"
+     },
+     {
+      "case": "LHAW — 장기 과제의 통제된 미명시와 질문 비용",
+      "url": "https://arxiv.org/html/2602.10525v1",
+      "axes": {
+       "purpose": {
+        "prior": "장기 에이전트 과제에서 미명시가 성능에 주는 영향과 질문의 효율 측정",
+        "same": false,
+        "note": "대조 대상의 '불충분한 명시' 결정점과 사용자 비용 기준과만 같음"
+       },
+       "mechanism": {
+        "prior": "목표·제약·입력·맥락에서 정보를 지우고, 시행 결과로 결과 결정적/분기/무해로 분류. 사용자 페르소나(감독자·표준·바쁜 임원)로 질문 비용을 프롬프트에 알림",
+        "same": false,
+        "note": "페르소나로 비용을 알리는 방식은 리마인더 방식과 유사하나 같은 설계는 아님"
+       },
+       "evaluation": {
+        "prior": "Gain/Q(질문 하나당 성능 상승). 바쁜 임원 페르소나는 질문 124건에 0.13%/Q, 감독자는 266건에 0.09%/Q. 한 모델은 질문 시행의 38%가 과잉 질문, 다른 모델은 27~31%가 과소 질문. 질문으로 기준선을 대체로 회복하지 못함(MCP-Atlas 0.96 → 0.44 → 0.73)",
+        "same": false,
+        "note": "사용자 비용을 질문 수로만 측정. 대기·재작업은 직접 측정 안 함"
+       },
+       "target": {
+        "prior": "업무 시뮬레이션·코드 수정·MCP 도구 과제",
+        "same": false,
+        "note": "개발·업무 과제 혼합. 문서 업무 일부와 유사"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "1차",
+      "route": "검색 결과에서 arXiv 원문(ICLR 2026 게재 표기 확인)",
+      "adoption": "참고",
+      "bearing": "결정점 목록에 '불충분한 명시'를 두되, 묻는 기준을 결과 결정적 누락에 한정하고 사용자의 질문 비용을 에이전트에게 알리는 안을 지지함. 무해한 누락에도 58~88% 질문한 에이전트 사례는 일반 지시만으로 과잉 질문이 줄지 않을 수 있다는 근거"
+     },
+     {
+      "case": "실사용 에이전트 자율성 측정 연구",
+      "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+      "axes": {
+       "purpose": {
+        "prior": "실제 배치에서 에이전트 자율성과 사람 감독 방식 관측",
+        "same": false,
+        "note": "질문·승인 결정점과 사용자 개입 비용과만 같음"
+       },
+       "mechanism": {
+        "prior": "도구 호출과 세션 로그 분석. 에이전트의 자발적 멈춤과 사람의 개입을 분류",
+        "same": false,
+        "note": "관측 연구. 개입 설계가 아님"
+       },
+       "evaluation": {
+        "prior": "가장 복잡한 과제에서 에이전트가 명확화를 위해 멈춘 횟수가 사람 개입의 2배 이상. 사람 개입 사유 1위는 기술 맥락 보충·수정 32%, 2위는 느림·과잉 17%",
+        "same": false,
+        "note": "개입 사유 비율로 비용을 간접 측정"
+       },
+       "target": {
+        "prior": "코딩 에이전트 사용자 세션",
+        "same": false,
+        "note": "개발자형 사용. 문서 업무와 다를 수 있음"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과에서 개발사 연구 페이지",
+      "adoption": "참고",
+      "bearing": "모든 행동 승인보다 효과적 감시·개입 가능성을 우선하라는 권고. 비가역 행동만 묻는 좁은 승인 기준을 지지하고, 행동 종류 전체에 확인을 요구하는 안을 약하게 함. 사람 개입 1위가 맥락 보충이라는 점은 '전제 사용' 결정점(NO-ASSUME)을 지지함"
+     },
+     {
+      "case": "코딩 에이전트 자동 모드의 등급별 권한 검토",
+      "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+      "axes": {
+       "purpose": {
+        "prior": "권한 확인 요청의 승인 피로를 줄이면서 위험 행동을 차단",
+        "same": false,
+        "note": "비가역 행동 결정점과만 같음"
+       },
+       "mechanism": {
+        "prior": "허용 목록, 프로젝트 내 파일 수정 무검토 허용, 나머지는 2단계 분류기 검토. 연속 3회 또는 누적 20회 차단 시 사람에게 넘김",
+        "same": false,
+        "note": "런타임 게이트. 대조 대상은 에이전트가 읽는 원칙"
+       },
+       "evaluation": {
+        "prior": "수동 확인 승인률 93%. 분류기 전체 오탐 0.4%, 실제 과잉 행동 미탐 17%",
+        "same": false,
+        "note": "운영 트래픽 기반 측정"
+       },
+       "target": {
+        "prior": "코딩 에이전트의 도구 호출",
+        "same": false,
+        "note": "문서 산출물·대화 답 결정점은 다루지 않음"
+       }
+      },
+      "outcome": "성공",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과에서 개발사 엔지니어링 글",
+      "adoption": "참고",
+      "bearing": "되돌릴 수 있는 수정은 묻지 않고 되돌릴 수 없는 행동과 범위 밖 행동만 확인하는 등급 기준을 지지함. REVERSIBLE 의 '덮어쓰기' 전체 확인 문구를 좁히는 방향"
+     },
+     {
+      "case": "클라우드 사업자 에이전트 설계 지침의 등급별 감독",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentrel02-bp05.html",
+      "axes": {
+       "purpose": {
+        "prior": "위험과 되돌림 가능성에 맞춰 감독 수준을 나눠 처리량과 통제를 함께 확보",
+        "same": false,
+        "note": "비가역 행동 결정점과만 같음"
+       },
+       "mechanism": {
+        "prior": "자동·알림·승인 3등급. 승인 요청에 행동 설명·추론·영향 평가·실행 이력을 포함. 시간 초과 시 대체 검토자나 안전 기본값",
+        "same": false,
+        "note": "정책 엔진 런타임 집행. 승인 요청 형식 요구는 ASK-OPTIONS 의 한 화면 맥락 제공과 유사"
+       },
+       "evaluation": {
+        "prior": "측정 없음. 일률 감독을 안티패턴으로 제시",
+        "same": false,
+        "note": "실무 지침이라 효과 측정이 없음"
+       },
+       "target": {
+        "prior": "기업용 에이전트 시스템",
+        "same": false,
+        "note": "단일 사용자 대화 에이전트와 다름"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "검색 결과에서 사업자 설계 지침 문서",
+      "adoption": "참고",
+      "bearing": "중간 등급(알리고 진행)을 두는 안을 지지함. 대조 대상은 묻기와 진행 후 보고 두 단계뿐이므로, 되돌릴 수 있는 중위험 행동을 '진행 후 결과 보고에 적기'로 처리하는 현행 하위 결정 규칙과 일치함"
+     },
+     {
+      "case": "웹 검색의 명확화 질문 사용자 연구(89명)",
+      "url": "https://www.dare.uva.nl/id/2cbf36e0-24e3-4be3-bc5c-01e332c33c9c",
+      "axes": {
+       "purpose": {
+        "prior": "명확화 질문이 사용자에게 이득인지 방해인지 확인",
+        "same": false,
+        "note": "불충분한 명시 결정점의 질문 품질과만 같음"
+       },
+       "mechanism": {
+        "prior": "품질이 다른 질문 순서를 보여 주고 행동과 만족도 관측. 보여 줄 질문을 고르는 예측 모델 제안",
+        "same": false,
+        "note": "검색 인터페이스 실험"
+       },
+       "evaluation": {
+        "prior": "저품질 질문은 이후 결과 탐색을 줄이고 만족도를 낮춤. 고품질 질문만 보이면 적은 노력으로 더 나은 성과. 항상 질문을 보이는 방식은 위험하다고 결론",
+        "same": false,
+        "note": "실제 사용자 만족도 측정. 다만 결과 요약은 검색 결과 스니펫 기준(원문 PDF 판독 실패)"
+       },
+       "target": {
+        "prior": "웹 검색 사용자",
+        "same": false,
+        "note": "에이전트 업무 위임과 다름"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "peer-reviewed",
+      "source_level": "2차",
+      "route": "검색 결과 요약. 원문 PDF는 열었으나 텍스트 추출 실패",
+      "adoption": "참고",
+      "bearing": "질문 횟수보다 질문 품질과 필요성이 사용자 비용을 정한다는 근거. 묻기 전에 근거·선택지·권장안을 갖추게 하는 ASK-OPTIONS 형식 요구를 지지함"
+     },
+     {
+      "case": "에이전트 권한 확인 UX 실무 글(승인 피로)",
+      "url": "https://www.buildmvpfast.com/blog/approval-fatigue-agent-permission-ux-2026",
+      "axes": {
+       "purpose": {
+        "prior": "권한 확인이 형식적 승인으로 변하는 문제 해결",
+        "same": false,
+        "note": "비가역 행동 결정점과만 같음"
+       },
+       "mechanism": {
+        "prior": "자동 허용·취소 가능한 알림·차단 후 확인 3단계, 승인 기억, 샌드박스, 확인 대신 되돌리기",
+        "same": false,
+        "note": "제품 UX 설계"
+       },
+       "evaluation": {
+        "prior": "자체 측정 없음. 자동화 안주(complacency) 연구와 보안 경보 무시 통계를 인용. 93% 수치는 출처 불명이라고 지적",
+        "same": false,
+        "note": "2차 정리 글"
+       },
+       "target": {
+        "prior": "에이전트 제품 권한 UI",
+        "same": false,
+        "note": "원칙 문서와 다름"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "검색 결과 블로그",
+      "adoption": "참고",
+      "bearing": "자동 허용 등급이 충분히 넓어야 확인 요청이 의미를 유지한다는 주장. 비가역 행동 결정점을 좁게 두는 안을 약하게 지지함(측정 근거 없음)"
+     }
+    ],
+    "read": "[\"D:/projects/disciplined-coder/agent-principles.md\", \"https://arxiv.org/html/2511.08798v1\", \"https://arxiv.org/html/2503.22674v2\", \"https://anthropic.com/engineering/claude-code-auto-mode\", \"https://arxiv.org/html/2602.10525v1\", \"https://www.anthropic.com/research/measuring-agent-autonomy\", \"https://www.interruptions.net/literature/Gluck-CHI07.pdf\", \"https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentrel02-bp05.html\", \"https://irlab.science.uva.nl/wp-content/papercite-data/pdf/zou2022asking.pdf\", \"https://www.buildmvpfast.com/blog/approval-fatigue-agent-permission-ux-2026\"]",
+    "saturation": "2",
+    "not_found": "[\"질문 횟수 하나만을 변수로 두고 사용자 만족도나 재작업 비용을 측정한 연구는 찾지 못했다. 검색 결과는 질문 품질이나 필요성을 변수로 두었다. 이 결과는 독창성의 근거가 아니다.\", \"사람이 승인 요청에서 위험 명령을 잡아낸 비율(13.6%, 50회 이후 약 5%)은 2차 글에만 나왔고 1차 엔지니어링 글에서는 확인하지 못했다. 그래서 근거로 쓰지 않았다.\", \"주의 요구와 효용을 맞춘 인터럽트 연구(CHI 2007)는 PDF 텍스트 추출이 실패해 내용을 확인하지 못했다.\", \"문서 업무(보고서·제안서 작성) 에이전트에서 질문·승인 빈도를 측정한 연구는 찾지 못했다. 찾은 근거는 코딩·도구 호출·검색 대상이다.\"]",
+    "disclosures": "[\"웹 페치 결과는 작은 모델이 요약한 내용이다. 수치는 요약에 인용된 값이며 원문 표와 직접 대조하지 않았다.\", \"LHAW 요약에서 Ckpt% 수치가 본문과 표에서 서로 다르다는 지적이 있어 그 수치는 쓰지 않았다.\", \"웹 검색 명확화 질문 연구(89명)는 원문 PDF를 열었으나 판독하지 못했고, 근거 행의 내용은 검색 결과 요약에 기댄다. 출처 페이지 자체는 열지 않았다.\", \"승인률은 개발사 자료끼리 93%와 97%로 다르다. 이 출력은 열어 확인한 엔지니어링 글의 93%만 인용했다.\"]",
+    "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"TERM-ONE\", \"FULL-SENTENCE\", \"INSTRUCTION-FORM\"]",
+    "notes": "고른 탐색 방법은 짧고 넓은 검색어로 시작해 좁히기와 실패·피로 자료 찾기다. 체크리스트 중 결말(질문 과잉·승인 피로의 결과)과 전이(비가역 행동 결정점)만 썼다. 우선순위는 intended_use 의 사용자 비용(주의·개입·재작업·대기)을 측정하거나 다룬 근거에 두었다. 뺀 근거는 다음과 같다. 선제적 AI 도움이 위협감을 높인다는 시나리오 실험은 질문·승인 결정점이 아닌 선제 도움을 다뤄 뺐다. 등급 분류 실무 블로그 다수(신호등 등급, 단계 사다리)는 측정 없이 같은 주장을 반복해 대표 지침 문서 하나와 블로그 하나만 남겼다. 매 턴 리마인더 효과는 sq2 범위가 아니므로 다루지 않았다. 종합하면 근거들은 묻는 기준을 '답이 결과를 바꾸는가'와 '되돌릴 수 없는가'로 좁히는 방향을 지지한다. 더 확인할 일: 대조 대상 REVERSIBLE 의 '덮어쓰기' 문구가 버전 관리 아래 파일 수정까지 포함하는지 원칙 작성자가 의도를 확인해야 한다. 포함한다면 승인 피로 근거가 직접 적용된다."
+   }
+  },
+  {
+   "id": "sq3",
+   "output": {
+    "agent": "researching-prior-art",
+    "mode": "survey",
+    "subquestion_id": "sq3",
+    "search_status": "ok",
+    "queries": [
+     "LLM agent human-in-the-loop checkpoints approval before irreversible actions design patterns",
+     "document review approval workflow stages draft review approve publish quality gate",
+     "LLM agent loop plan act observe reflect verify stages survey decision points",
+     "stage-gate process gate criteria go/kill decision knowledge work deliverables",
+     "cognitive process theory of writing planning translating reviewing Flower Hayes",
+     "when should LLM agents ask users clarification underspecified tasks benchmark interaction cost",
+     "ISO 9001 7.5.2 documented information review and approval for suitability and adequacy before release",
+     "alert fatigue override rate frequent interruptive alerts clinicians systematic review"
+    ],
+    "read": "[\"D:/projects/disciplined-coder/agent-principles.md\", \"https://www.contentstack.com/academy/md/courses/workflow-branches-and-collaboration/content-lifecycle-draft-review-publish.md\", \"https://www.kunalganglani.com/blog/tool-approval-patterns-ai-agents\", \"https://www.aakashx.com/blog/agent-architecture-loops-planning-verification/\", \"https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/\", \"https://arxiv.org/abs/2602.10525\", \"https://arxiv.org/html/2502.13069v3\", \"https://writingcommons.org/section/writing-process/problem-solving-strategies/\", \"https://pmc.ncbi.nlm.nih.gov/articles/PMC7810441\", \"https://qms2go.com/learn/document-control\"]",
+    "issues": [],
+    "evidence_map": [
+     {
+      "case": "콘텐츠 관리 도구의 초안·검토·승인·게시 작업 흐름",
+      "url": "https://www.contentstack.com/academy/md/courses/workflow-branches-and-collaboration/content-lifecycle-draft-review-publish.md",
+      "axes": {
+       "purpose": {
+        "prior": "문서가 검토와 승인을 거쳐서만 외부 환경에 게시되게 함",
+        "same": false,
+        "note": "사람 문서 업무의 품질 게이트이며, 에이전트가 검토 규칙을 적용할 결정점 목록을 정하려는 목적과 다름"
+       },
+       "mechanism": {
+        "prior": "Draft→Review→Approved 단계 전이에 권한을 두고, 게시는 승인과 별개 행동으로 둠(\"An entry in the Approved stage is not automatically published\")",
+        "same": false,
+        "note": "권한과 게시 규칙으로 강제하는 장치이며 프롬프트 리마인더가 아님. 다만 검토(산출물 작성 후)와 게시(비가역·외부 전송)를 별개 결정점으로 둔 구조는 대조 대상의 '산출물 작성'과 '비가역 행동' 구분과 대응함"
+       },
+       "evaluation": {
+        "prior": "평가 결과 없음. 절차 설명 문서임",
+        "same": false,
+        "note": "효과 측정이 없음"
+       },
+       "target": {
+        "prior": "사람 편집자와 검토자",
+        "same": false,
+        "note": "LLM 에이전트가 아님"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 → 제품 교육 문서",
+      "adoption": "참고",
+      "bearing": "결정점 목록에서 '산출물 작성 후 검토'와 '게시·외부 전송(비가역 행동)'을 한 결정점으로 합치지 말고 따로 두는 안을 지지함. 근거가 절차 설명뿐이라 효과 근거로는 약함"
+     },
+     {
+      "case": "품질경영 표준의 문서 작성·갱신 시 검토와 승인 요구(7.5.2 c) 해설",
+      "url": "https://qms2go.com/learn/document-control",
+      "axes": {
+       "purpose": {
+        "prior": "문서가 사용·배포되기 전에 적합성과 충분성을 검토·승인받게 함",
+        "same": false,
+        "note": "조직 문서 통제 목적이며 에이전트 결정점 설계와 다름"
+       },
+       "mechanism": {
+        "prior": "지정된 승인권자가 배포 전에 승인하고, 실무자가 내용을, 품질 담당이 충분성을 검토함",
+        "same": false,
+        "note": "사람 역할 분리와 승인 기록으로 강제함. 대조 대상의 '단계 넘김'과 '산출물 작성' 결정점과만 대응함"
+       },
+       "evaluation": {
+        "prior": "심사원이 '사용 전 승인'을 가장 먼저 시험하는 통제라고 서술함. 효과 측정은 없음",
+        "same": false,
+        "note": "준수 여부 심사이며 비용·품질 측정이 아님"
+       },
+       "target": {
+        "prior": "품질경영체계를 운영하는 조직의 문서",
+        "same": false,
+        "note": "LLM 에이전트가 아님"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "웹 검색 → 컨설팅 해설 페이지(표준 원문은 열지 못함)",
+      "adoption": "참고",
+      "bearing": "사람 문서 업무에서도 '배포 전 검토·승인'이 표준화된 결정점임을 보여 '단계 넘김'과 '산출물 작성' 결정점을 유지하는 쪽을 지지함. 리마인더 방식 선택에는 근거가 되지 않음"
+     },
+     {
+      "case": "제품 개발 Stage-Gate 모델의 게이트 구성(산출물·기준·결정)",
+      "url": "https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/",
+      "axes": {
+       "purpose": {
+        "prior": "단계 사이 게이트에서 다음 단계로 갈지와 자원을 투입할지 정함",
+        "same": false,
+        "note": "투자 결정 목적이며 에이전트 검토 규칙 적용 시점과 다름"
+       },
+       "mechanism": {
+        "prior": "게이트마다 미리 정한 산출물(\"Defined outputs from the previous Stage\")과 기준(준비도·가치)으로 Go/Kill/Hold/Recycle을 결정함",
+        "same": false,
+        "note": "사람 게이트키퍼 회의임. 다만 '미리 정한 기준으로 단계 넘김을 판정'하는 구조는 대조 대상의 '단계 넘김' 결정점과 CHECKABLE 조항에 대응함"
+       },
+       "evaluation": {
+        "prior": "이 페이지에는 효과 측정이 없음",
+        "same": false,
+        "note": "개요 문서임"
+       },
+       "target": {
+        "prior": "기업의 신제품 개발 프로젝트",
+        "same": false,
+        "note": "LLM 에이전트가 아님"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "vendor",
+      "source_level": "1차",
+      "route": "웹 검색 → 모델 창안 측 회사 블로그",
+      "adoption": "참고",
+      "bearing": "게이트에서 쓰는 기준을 미리 구체적으로 정해 두는 구조라서, 매 턴 리마인더에 '원칙을 잊지 마라' 한 줄보다 결정점마다 구체 기준을 제시하는 안 쪽으로 약하게 기움. 대상이 사람 회의라 옮겨 쓰기 어려움"
+     },
+     {
+      "case": "에이전트 실행 루프의 단계와 결정점(검증·종료·사람 확인)",
+      "url": "https://www.aakashx.com/blog/agent-architecture-loops-planning-verification/",
+      "axes": {
+       "purpose": {
+        "prior": "에이전트 루프에서 계획·검증·종료·사람 확인을 어디에 둘지 설계함",
+        "same": false,
+        "note": "목적은 가까우나 사용자에게 보내는 글(대화 답·산출물·지시문) 작성 결정점을 다루지 않음"
+       },
+       "mechanism": {
+        "prior": "맥락 수집 → 다음 행동 결정 → 정책·권한·위험 검사 → 행동 → 관측 → 결과 검증 → 계속·종료. 신뢰도 낮음·위험 높음·근거 없음·승인 필요 시 사람에게 넘김",
+        "same": false,
+        "note": "실행 전 검사는 '비가역 행동', 맥락 수집은 '전제 사용', 사람에게 넘김은 '판단 위임', 결과 검증은 '단계 넘김'에 대응함. 장치는 코드 수준 검사이며 프롬프트 리마인더가 아님. \"In production the verifier is usually not the agent\"라고 적음"
+       },
+       "evaluation": {
+        "prior": "측정 없음. 설계 지침 글",
+        "same": false,
+        "note": "효과 근거 없음"
+       },
+       "target": {
+        "prior": "운영 환경의 도구 호출 에이전트",
+        "same": false,
+        "note": "사용자와 대화하며 문서를 쓰는 코딩 에이전트와 일부만 겹침"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "웹 검색 → 개인 기술 블로그",
+      "adoption": "참고",
+      "bearing": "에이전트 루프의 결정점이 대조 대상의 '전제 사용·판단 위임·비가역 행동·단계 넘김'과 겹친다는 근거가 됨. 그러나 '대화 답·산출물·지시문 작성'은 에이전트 루프 문헌에 없고 문서 업무 쪽에만 있어, 두 흐름의 결정점을 합친 목록이 필요하다는 쪽을 지지함"
+     },
+     {
+      "case": "에이전트 도구 승인 패턴과 승인 피로",
+      "url": "https://www.kunalganglani.com/blog/tool-approval-patterns-ai-agents",
+      "axes": {
+       "purpose": {
+        "prior": "에이전트 도구 호출에 사람 승인을 어떤 단위로 둘지 정함",
+        "same": false,
+        "note": "대조 대상의 '판단 위임'·'비가역 행동' 결정점과만 대응함"
+       },
+       "mechanism": {
+        "prior": "정책 자동 허용, 범위 승인, 계획 단위 승인(\"Tools can run only if they match the plan\"), 위험 단계별 승인 등을 사다리로 조합함",
+        "same": false,
+        "note": "권한·샌드박스 장치이며 리마인더가 아님"
+       },
+       "evaluation": {
+        "prior": "측정 없음. \"Review quality collapses when approvals are frequent\"라는 주장만 있음",
+        "same": false,
+        "note": "주장 근거가 실측이 아님"
+       },
+       "target": {
+        "prior": "도구를 쓰는 LLM 에이전트와 그 운영자",
+        "same": false,
+        "note": "대상은 가까우나 문서 업무를 다루지 않음"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "웹 검색 → 개인 기술 블로그",
+      "adoption": "참고",
+      "bearing": "사용자 비용 최소화 기준에서 '판단 위임' 결정점의 질문 단위를 개별 행동이 아닌 계획 단위로 묶는 안을 지지함. 승인 요청이 잦으면 사용자 주의가 떨어진다는 주장은 실측이 아니므로 가정으로 다뤄야 함"
+     },
+     {
+      "case": "Flower·Hayes 글쓰기 인지 과정 모델(계획·번역·검토, 재귀적)",
+      "url": "https://writingcommons.org/section/writing-process/problem-solving-strategies/",
+      "axes": {
+       "purpose": {
+        "prior": "숙련 필자가 글을 쓸 때의 인지 과정을 설명함",
+        "same": false,
+        "note": "설명 모델이며 품질 게이트나 에이전트 지시 설계가 아님"
+       },
+       "mechanism": {
+        "prior": "계획·번역·검토 세 과정을 감시 장치(monitor)가 오가며 조정함. 2012 개정판은 과정이 선형 단계가 아니라 재귀적이라고 봄",
+        "same": false,
+        "note": "검토가 고정된 한 단계가 아니라 쓰는 도중 반복된다는 점만 대조 대상의 '조건이 맞으면 단계와 무관하게 적용' 구조와 대응함"
+       },
+       "evaluation": {
+        "prior": "사고 구술 프로토콜 연구에서 나온 모델이며 이 페이지는 해설임",
+        "same": false,
+        "note": "개입 효과 측정이 아님"
+       },
+       "target": {
+        "prior": "사람 필자",
+        "same": false,
+        "note": "LLM 에이전트가 아님"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "blog",
+      "source_level": "2차",
+      "route": "웹 검색 → 글쓰기 교육 사이트 해설",
+      "adoption": "참고",
+      "bearing": "문서 업무에서 검토가 선형 게이트 한 번이 아니라 작성 중에 반복된다는 근거라서, '산출물 작성' 결정점을 배포 직전 한 번이 아닌 작성 행위 단위로 두는 안을 약하게 지지함. 사람 인지 모델이라 옮겨 쓰기 어려움"
+     },
+     {
+      "case": "정보가 빠진 소프트웨어 과제에서 에이전트의 질문 행동(Ambig-SWE)",
+      "url": "https://arxiv.org/html/2502.13069v3",
+      "axes": {
+       "purpose": {
+        "prior": "명세가 부족한 과제에서 에이전트가 질문으로 빠진 정보를 회복하는지 측정함",
+        "same": false,
+        "note": "대조 대상의 '전제 사용'·'판단 위임' 결정점과만 대응함"
+       },
+       "mechanism": {
+        "prior": "전체·숨김·상호작용 조건을 비교하고 질문을 장려하는 프롬프트 강도를 바꿈",
+        "same": false,
+        "note": "프롬프트 지시 강도를 바꾼 점은 리마인더 안과 가깝지만 매 턴 반복 주입은 시험하지 않음"
+       },
+       "evaluation": {
+        "prior": "상호작용이 비상호작용 대비 성능을 최대 74% 높임. \"LLMs default to non-interactive behavior without explicit encouragement\". 강한 프롬프트에서 일부 모델만 빠진 정보 감지가 정확했음(최고 89%)",
+        "same": false,
+        "note": "과제 해결률과 감지 정확도 측정이며 사용자 비용은 측정하지 않음. 상호작용해도 단계 수는 줄지 않았음"
+       },
+       "target": {
+        "prior": "코딩 에이전트(여러 모델)와 사용자 대리 모델",
+        "same": false,
+        "note": "대상은 가까우나 실제 사용자가 아니고 문서 업무가 없음"
+       }
+      },
+      "outcome": "성공",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 논문",
+      "adoption": "참고",
+      "bearing": "'전제 사용'과 '판단 위임' 결정점에서 모델이 명시적 장려 없이는 묻지 않는다는 근거라서, 그 결정점에 구체 지시를 주는 안을 지지함. 저자는 프롬프트만으로는 부족하다고 결론지었으므로 어느 리마인더 안도 충분하다고 보증하지 않음"
+     },
+     {
+      "case": "정보 누락 작업 흐름 합성 벤치마크(LHAW)",
+      "url": "https://arxiv.org/abs/2602.10525",
+      "axes": {
+       "purpose": {
+        "prior": "장기 작업 흐름 에이전트가 목표·제약·입력·맥락의 누락을 어떻게 다루는지 평가함",
+        "same": false,
+        "note": "'전제 사용'·'판단 위임' 결정점과만 대응함"
+       },
+       "mechanism": {
+        "prior": "잘 정의된 과제에서 정보를 지운 변형 285개를 만들고, 결과 상태 차이로 결과 결정적·분기·무해로 분류함. 질문 비용을 고려한 설계라고 적음",
+        "same": false,
+        "note": "평가 장치이며 지시 주입 방식이 아님"
+       },
+       "evaluation": {
+        "prior": "초록 페이지에는 수치 결과가 없음",
+        "same": false,
+        "note": "본문을 열지 않아 결과를 확인하지 못함"
+       },
+       "target": {
+        "prior": "작업 흐름 에이전트",
+        "same": false,
+        "note": "대상은 가까움. 문서 업무 포함 여부는 확인하지 못함"
+       }
+      },
+      "outcome": "판정 못 함",
+      "kind": "preprint",
+      "source_level": "1차",
+      "route": "웹 검색 → arXiv 초록",
+      "adoption": "참고",
+      "bearing": "질문 자체가 사용자 작업을 끊는 비용이라는 문제 설정을 지지함. 결과 수치를 확인하지 못해 어느 안도 움직이지 않음"
+     },
+     {
+      "case": "임상 의사결정 지원 경고 최적화 체계적 문헌고찰(경고 피로)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7810441",
+      "axes": {
+       "purpose": {
+        "prior": "병원 전자의무기록 경고의 무시율과 경고 피로를 줄이는 전략을 정리함",
+        "same": false,
+        "note": "사람 임상의 대상 반복 경고 연구이며 에이전트 리마인더가 아님"
+       },
+       "mechanism": {
+        "prior": "경고를 맥락·사용자에 맞게 제한하고 관련성을 높이는 전략",
+        "same": false,
+        "note": "매 턴 반복 문구와 형태는 비슷하나 받는 쪽이 사람임"
+       },
+       "evaluation": {
+        "prior": "\"Clinicians are more likely to override alerts as the volume of alerts increases and relevance of alerts decreases\". 약물 상호작용 경고 무시율 최고 95% 보고를 인용함",
+        "same": false,
+        "note": "사람의 무시율 측정이며 LLM 준수율이 아님"
+       },
+       "target": {
+        "prior": "병원 임상의",
+        "same": false,
+        "note": "LLM 에이전트가 아님"
+       }
+      },
+      "outcome": "실패",
+      "kind": "peer-reviewed",
+      "source_level": "2차",
+      "route": "웹 검색 → PubMed Central 체계적 문헌고찰",
+      "adoption": "참고",
+      "bearing": "관련성 낮은 일반 경고를 자주 반복하면 무시가 늘어난다는 사람 쪽 근거라서 '원칙을 잊지 말고 적용하라' 한 줄 안에 불리하게 기울 수 있음. 대상이 사람이라 LLM에 같은 기제가 있는지는 이 근거로 알 수 없으며, 결정 근거로 쓰려면 LLM 대상 측정이 필요함"
+     }
+    ],
+    "saturation": "4",
+    "not_found": "[\"에이전트 작업 루프와 사람 문서 품질 게이트의 결정점을 직접 대응시킨 연구는 찾지 못했다. 검색 8회 범위 안의 결과이며 그런 연구가 없다는 뜻이 아니다.\", \"'대화 답 작성'과 '지시문 작성'을 별도 결정점으로 다룬 에이전트 루프 자료는 찾지 못했다. 검색한 루프 자료는 도구 행동 중심이었다.\", \"매 턴 반복 주입한 일반 상기 문구의 효과를 LLM에서 측정한 자료는 이 하위 질문 범위에서 찾지 못했다. 같은 날 확인한 규칙 수·리마인더 자료는 constraints 에 따라 다시 찾지 않았다.\", \"품질경영 표준 7.5.2 원문은 유료라 열지 못하고 해설 페이지로 확인했다.\", \"LHAW 논문 본문의 수치 결과는 초록 페이지만 열어 확인하지 못했다.\"]",
+    "disclosures": "[\"모든 행에서 네 축이 모두 same: false 다. 결론의 단독 근거로 쓰지 말아야 한다.\", \"에이전트 루프와 도구 승인 자료는 개인 블로그이며 실측이 없다.\", \"경고 피로 근거는 사람 임상의 대상이며 LLM으로 옮겨 쓸 수 있는지는 derived 추론이다.\", \"결정점 대응(어느 단계가 어느 결정점에 해당하는지)은 연구자가 스스로 판단한 derived 값이다.\"]",
+    "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"STATE-ASSUME\", \"SPECIFIC-NAME\", \"TERM-ONE\", \"INSTRUCTION-FORM\"]",
+    "notes": "탐색 방법은 짧고 넓은 검색어로 시작해 좁히는 방법이다. 에이전트 루프, 사람 문서 게이트, 지식노동 과정 모델, 질문 비용, 반복 경고 피로 순서로 각 흐름의 대표 자료를 열었다. 관찰 요약: 에이전트 루프 자료의 결정점(맥락 수집, 실행 전 검사, 결과 검증, 사람에게 넘김)은 대조 대상의 전제 사용·비가역 행동·단계 넘김·판단 위임과 겹친다. 사람 문서 게이트(초안·검토·승인·게시)는 단계 넘김·산출물 작성·비가역 행동(게시)과 겹친다. 대화 답 작성과 지시문 작성은 두 흐름 어디에도 명시 결정점으로 없었다. 그래서 두 흐름은 결정점 일부를 공유하고, 글쓰기 결정점은 대조 대상이 추가한 결정점으로 보인다(derived). 체크리스트 중 기준선만 검토했다. 그 결과 사람 게이트는 '미리 정한 기준으로 판정'을 기준선으로 쓰는데, 이 기준선은 구체 지시 안과 같은 방향이다. 뺀 근거: 승인 도구 제품 문서 다수(ServiceNow 등)는 특정 제품 사용법이라 exclude 범위로 보고 열지 않았다. 더 확인할 사항: LLM에서 매 턴 일반 문구 반복의 효과를 측정한 자료가 있는지, 그리고 LHAW 본문의 질문 비용 결과가 판단 위임 결정점의 질문 빈도를 정하는 데 쓸 수 있는지 확인해야 한다."
+   }
+  }
+ ],
+ "verifiers": [
+  {
+   "url": "https://arxiv.org/pdf/2604.28031",
+   "subquestions": [
+    "sq1"
+   ],
+   "output": {
+    "url": "https://arxiv.org/pdf/2604.28031",
+    "judgments": [
+     {
+      "ref": "sq1#issue#0",
+      "verdict": "unsupported",
+      "quote": "It pairs 38 research briefs from 24 scientific domains, each with hard constraints and banned moves, with four interaction conditions and seven models from five providers (two open-weight), scored on 2,116 runs.",
+      "reason": "추출: 논문 실재, 38개 브리프·7개 모델·2,116회 실행, 반복 압력, 대부분 모델에서 KBV 50% 초과 구절은 확인했다. 97.3%와 체크포인트 수치는 §4.3·§4.5에 있어 quote 밖 context 에 옮겼고, 두 수치 모두 확인됐으나 조건(Gemini Pro 예외, published arm, 잘린 최종 응답)이 붙어 있다. / 판정: 38개 브리프·7개 모델·2,116회, 97.3%, Qwen3 55.4%→36.0%, Sonnet 4.6 98.7%→86.8%, Llama 92.1%는 구절과 맥락에 있으나 Flash-Lite와 Gemini Pro 수치는 없다. 체크포인트가 일부 모델만 줄였다는 방향은 맞다. 그러나 원문의 97.3%는 최종 탐침의 합산값이고 Gemini Pro는 예외이며 KBV 50% 초과는 심판 조건부인데, 주장은 '매 턴 거의 완벽하게'로 넓혀 썼다."
+     },
+     {
+      "ref": "sq1#case#1",
+      "verdict": "unsupported",
+      "quote": "Under the Opus 4.6 judge, pressure KBV ranges from 7.9% (GPT-5.4) to 93.4% (Llama-3.3-70B), and 4/7 models exceed 50% (Llama-3.3-70B, Gemini Flash-Lite, Sonnet 4.6, Qwen3-235B), spanning 4 providers.",
+      "reason": "추출: DriftBench 논문 실재를 확인했다. 'Opus 심판 4개 KBV 50% 초과'는 원문이 판정자별로 4/7(Opus)과 6/7(GPT-5.4)을 나눠 보고하므로 quote 와 context 의 판정자 조건으로 뒷받침된다. 72.0% 표류 신호와 모니터 조건도 원문에서 확인했다. / 판정: 4/7·6/7과 72.0%(표류 판정 압력 실행 중 2턴 이내), 6턴 압력·2·4턴 체크포인트·매 턴 모니터 조건은 맥락과 같다. 다만 4/7이 Opus 심판의 값이라는 이름과 루브릭·인간 평정은 구절에 없다. 실패 결말과 범위는 원문과 맞다. / 보충: Opus 4.6 심판 기준 4/7 모델이 50%를 넘는다는 명시와 Opus 대응이 4.2절 한 문장에 있고, 0–4 루브릭과 인간 평정은 같은 문장이 아닌 3.4절·3.7절에 있어 한 구절로 모든 요소를 담지는 못했다. / 재판정: 구절은 Opus 심판 기준 7개 모델 중 4개가 KBV 50%를 넘는다는 값과 일치한다. 그러나 72.0% 수치와 6턴·체크포인트 조건은 구절과 맥락에 없다. 다수 모델의 제약 위반이라는 실패 방향과 Opus 심판 한정 범위는 주장과 같다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT",
+     "NO-AGREE",
+     "KO-SYNTAX"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/pdf/2604.28031",
+     "judgments": [
+      {
+       "ref": "sq1#issue#0",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "PDF 첫 쪽 제목 'Constraint Adherence Under Iterative Pressure in Multi-Turn LLM Ideation', 저자 Garvin Kruthof (Technical University of Munich), 쪽 하단 표기 'NeurIPS 2026 Evaluations and Datasets track', arXiv:2604.28031v3. 본문 HTML(arxiv.org/html/2604.28031v3)에서도 DriftBench 와 38 briefs 구절을 확인했다. 요약 도구는 제목을 'Models Recall What They Violate'로 옮겼으나 원문 첫 쪽 제목은 위와 같다.",
+       "quote": "It pairs 38 research briefs from 24 scientific domains, each with hard constraints and banned moves, with four interaction conditions and seven models from five providers (two open-weight), scored on 2,116 runs.",
+       "context": "바로 뒤 문장: 'Iterative pressure to improve a proposal raises structural complexity in every model and lowers adherence to the brief's hard constraints.' 바로 앞 문장: 'A restatement probe shows that the constraints stay legible and reproducible on demand while the proposal departs from them.' (대조 while). KBV 구절: 'The knows-but-violates (KBV) rate, the share of pressure runs scored non-compliant on a hard constraint despite a correct restatement, exceeds 50% for most models.' (양보 despite, 범위 for most models). 본문 조건: 'The rate is judge-conditional.' 재진술 수치(§4.3): 'Pooled over all models and multi-turn runs, the stored final-probe accuracy is 97.3%, as submitted' 뒤 문장에 'Every model except Gemini Pro clears the cut in every pressure run (Recall column, Table 3).' (예외 except Gemini Pro). 체크포인트(§4.5): 'On the published arm, KBV falls from 55.4% to 36.0% for Qwen3-235B and from 98.7% to 86.8% for Sonnet 4.6.' 바로 앞 문장 'It does not.' (부정), 뒤 문장 'It stays near its pressure level for Llama-3.3-70B (92.1%, from 93.4%)' (비교). 본문 주석: 'Part of the published-arm 86.8% reflects truncated finals.'",
+       "reason": "논문 실재, 38개 브리프·7개 모델·2,116회 실행, 반복 압력, 대부분 모델에서 KBV 50% 초과 구절은 확인했다. 97.3%와 체크포인트 수치는 §4.3·§4.5에 있어 quote 밖 context 에 옮겼고, 두 수치 모두 확인됐으나 조건(Gemini Pro 예외, published arm, 잘린 최종 응답)이 붙어 있다."
+      },
+      {
+       "ref": "sq1#case#1",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "위와 같은 논문(arXiv:2604.28031v3, Garvin Kruthof, NeurIPS 2026 Evaluations and Datasets track 표기)이며 DriftBench 벤치마크를 다룬다. 대상 과업(6턴 과학 아이디어 제안 대화)과 6턴 압력·2·4턴 체크포인트·매 턴 모니터 조건은 Table 1과 §5.1에 있다.",
+       "quote": "Under the two judges, 4/7 and 6/7 models exceed 50%.",
+       "context": "바로 앞 문장: 'The rate is judge-conditional.' 앞 문장 끝부분: 'and a common GPT-5.4 judge gives every model a higher rate.' 바로 뒤 문장: 'The top of the ranking (GPT-5.4) is stable across judges.' 판정자 조건은 'Under the two judges' 와 'judge-conditional' 로 명시된다. 표류 신호 구절(§4.4): 'Among pressure runs the auditor classifies as drifting, the first flag falls on turn 2 or earlier in 72.0% (226/314) and on turn 3 or earlier in 95.2% (299/314), so intervention windows are narrow.' 모니터 조건(§5.1): 'A GPT-5.4-mini monitor names non-compliant constraints after each of turns 1–5.'",
+       "reason": "DriftBench 논문 실재를 확인했다. 'Opus 심판 4개 KBV 50% 초과'는 원문이 판정자별로 4/7(Opus)과 6/7(GPT-5.4)을 나눠 보고하므로 quote 와 context 의 판정자 조건으로 뒷받침된다. 72.0% 표류 신호와 모니터 조건도 원문에서 확인했다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/pdf/2604.28031",
+       "ref": "sq1#issue#0",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "불일치",
+       "missing": {
+        "numbers_conditions": "Flash-Lite 72.4%와 Gemini Pro 25.0% 체크포인트 수치"
+       },
+       "unsure_reasons": {},
+       "reason": "38개 브리프·7개 모델·2,116회, 97.3%, Qwen3 55.4%→36.0%, Sonnet 4.6 98.7%→86.8%, Llama 92.1%는 구절과 맥락에 있으나 Flash-Lite와 Gemini Pro 수치는 없다. 체크포인트가 일부 모델만 줄였다는 방향은 맞다. 그러나 원문의 97.3%는 최종 탐침의 합산값이고 Gemini Pro는 예외이며 KBV 50% 초과는 심판 조건부인데, 주장은 '매 턴 거의 완벽하게'로 넓혀 썼다."
+      },
+      {
+       "url": "https://arxiv.org/pdf/2604.28031",
+       "ref": "sq1#case#1",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "4/7에 대응하는 심판이 Opus라는 명시, 0-4 루브릭, 인간 평정 보조"
+       },
+       "unsure_reasons": {},
+       "reason": "4/7·6/7과 72.0%(표류 판정 압력 실행 중 2턴 이내), 6턴 압력·2·4턴 체크포인트·매 턴 모니터 조건은 맥락과 같다. 다만 4/7이 Opus 심판의 값이라는 이름과 루브릭·인간 평정은 구절에 없다. 실패 결말과 범위는 원문과 맞다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://arxiv.org/pdf/2604.28031",
+     "judgments": [
+      {
+       "ref": "sq1#case#1",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "원문 PDF(arXiv:2604.28031v3) 제목 'Constraint Adherence Under Iterative Pressure in Multi-Turn LLM Ideation', 저자 Garvin Kruthof(TU Munich), 학회 NeurIPS 2026 Evaluations and Datasets 트랙. 본문이 벤치마크 명칭 DriftBench 를 도입한다고 밝힘. 참고로 최초 WebFetch 메타데이터의 제목은 'Models Recall What They Violate...' 로 달라 제목 표기는 버전에 따라 다를 수 있음.",
+       "quote": "Under the Opus 4.6 judge, pressure KBV ranges from 7.9% (GPT-5.4) to 93.4% (Llama-3.3-70B), and 4/7 models exceed 50% (Llama-3.3-70B, Gemini Flash-Lite, Sonnet 4.6, Qwen3-235B), spanning 4 providers.",
+       "context": "WebFetch 답: 대상 문장과 앞뒤 문장에는 not·no·only·unless·if·than·compared 같은 부정·조건·비교 표현이 없다. 앞 문장은 'Constraint non-compliance varies widely across models (Table 3, Figure 2).' 이고 뒤 문장은 'Under GPT-5.4 the range is 42.1%–98.7% and 6/7 models exceed 50%.' 이다. 이 구절에 없는 요소: 0–4 루브릭은 3.4절 'Four core metrics are scored on a 0–4 rubric with concrete anchors (Appendix A).' 에 있고, 인간 평정은 3.7절 'Human raters, blind to model and condition, ...' 와 초록 'Blind human raters find more constraint violations than the LLM judge.' 에 있다. 두 요소 모두 4/7 문장과 같은 문장에는 없다.",
+       "reason": "Opus 4.6 심판 기준 4/7 모델이 50%를 넘는다는 명시와 Opus 대응이 4.2절 한 문장에 있고, 0–4 루브릭과 인간 평정은 같은 문장이 아닌 3.4절·3.7절에 있어 한 구절로 모든 요소를 담지는 못했다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-AGREE",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME",
+      "KO-SYNTAX"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/pdf/2604.28031",
+       "ref": "sq1#case#1",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "압력 조건 표류 첫 신호의 72.0%가 2턴 이내라는 수치, 6턴 압력·2·4턴 체크포인트·모니터 조건"
+       },
+       "unsure_reasons": {},
+       "reason": "구절은 Opus 심판 기준 7개 모델 중 4개가 KBV 50%를 넘는다는 값과 일치한다. 그러나 72.0% 수치와 6턴·체크포인트 조건은 구절과 맥락에 없다. 다수 모델의 제약 위반이라는 실패 방향과 Opus 심판 한정 범위는 주장과 같다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://arxiv.org/html/2402.10962v4",
+   "subquestions": [
+    "sq1"
+   ],
+   "output": {
+    "url": "https://arxiv.org/html/2402.10962v4",
+    "judgments": [
+     {
+      "ref": "sq1#case#0",
+      "verdict": "unsupported",
+      "quote": "Compared to two baselines (classifier-free guidance and system prompt repetition), split-softmax produces equal or higher stability for a given level of performance degradation.",
+      "reason": "추출: 원문 접근과 제목·저자 일치는 확인됐고, 인용 문장은 평가 결과(LLaMA2-chat-70B·GPT-3.5, 8라운드 안의 significant drift)를 뒷받침하나 목적·기준선 명칭·탐침 질문 방식은 이 구절에 없어 해당 요소는 인접 절에서 찾아야 함. / 판정: LLaMA2-chat-70B·GPT-3.5와 8라운드 안의 유의한 표류는 구절과 같다. 그러나 기준선 이름과 측정 방식, 그리고 '성공' 결말을 받치는 split-softmax 효과 문장이 구절과 맥락에 없다. / 보충: 논문 제목과 저자가 일치하고, 원문 Figure 5 캡션이 CFG·SPR 두 기준선과의 비교를 조건부 안정성으로 말한다. 다만 페이지 추출이 길이 제한으로 잘린 조각이므로 구절이 원문과 글자 단위로 같은지는 확정하지 못했다. 라운드별 탐침 측정과 라운드 수는 이 구절에 없고 인접한 다른 문장에 있다. / 재판정: 맥락에는 라운드마다 탐침 질문을 썼다는 측정 방식과 8라운드 설정만 있다. 두 모델 이름과 유의한 표류 결과는 구절과 맥락에 없다. 두 기준선보다 안정성이 같거나 높다는 구절은 성공 방향과 맞는다. 다만 원문은 이 비교를 성능 저하 수준을 맞춘 조건에서만 한다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT",
+     "NO-SQUEEZE"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/html/2402.10962v4",
+     "judgments": [
+      {
+       "ref": "sq1#case#0",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'Measuring and Controlling Instruction (In)Stability in Language Model Dialogs', 저자 Kenneth Li, Tianle Liu, Naomi Bashkansky, David Bau, Fernanda Viégas, Hanspeter Pfister, Martin Wattenberg (Harvard University, Northeastern University). 학회·저널명은 원문에서 확인되지 않고 arXiv 프리프린트(2402.10962v4, 2024년 7월 25일 표기)만 확인됨.",
+       "quote": "Testing popular models like LLaMA2-chat-70B and GPT-3.5, we reveal a significant instruction drift within eight rounds of conversations.",
+       "context": "앞 문장 'We propose a quantitative benchmark to test this assumption, evaluating instruction stability via self-chats between two instructed chatbots.'에는 부정·조건·비교 표현이 없음(보조 조회 기준). 뒤 문장 'An empirical and theoretical analysis of this phenomenon suggests the transformer attention mechanism plays a role, due to attention decay over long exchanges.'에도 부정·조건·비교 표현이 없음(보조 조회 기준). 구절 안에 없는 요소: 목적 문장 'An implicit assumption in the use of system prompts is that they will be stable'는 인접 문장이며, 기준선 SPR·CFG 명칭은 초록에 없고 그림 6 캡션에 있다고 보조 조회됨, split-softmax 의 세부 방식은 초록에서 'a lightweight method'로만 서술됨, 라운드별 탐침 질문 측정은 3.1절에 있음. 보조 조회 결과 6.3절에 16-turn 대화 표현이 있다고 나왔으나 미검증이므로 판정 에이전트가 확인할 것.",
+       "reason": "원문 접근과 제목·저자 일치는 확인됐고, 인용 문장은 평가 결과(LLaMA2-chat-70B·GPT-3.5, 8라운드 안의 significant drift)를 뒷받침하나 목적·기준선 명칭·탐침 질문 방식은 이 구절에 없어 해당 요소는 인접 절에서 찾아야 함."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2402.10962v4",
+       "ref": "sq1#case#0",
+       "numbers_conditions": "정보 부족",
+       "direction": "정보 부족",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "SPR·classifier-free guidance 기준선 비교 조건과 라운드별 탐침 질문 측정",
+        "direction": "split-softmax가 기준선보다 표류를 줄였다는 결과 문장"
+       },
+       "unsure_reasons": {},
+       "reason": "LLaMA2-chat-70B·GPT-3.5와 8라운드 안의 유의한 표류는 구절과 같다. 그러나 기준선 이름과 측정 방식, 그리고 '성공' 결말을 받치는 split-softmax 효과 문장이 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://arxiv.org/html/2402.10962v4",
+     "judgments": [
+      {
+       "ref": "sq1#case#0",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'Measuring and Controlling Instruction (In)Stability in Language Model Dialogs', 저자 Kenneth Li, Tianle Liu, Naomi Bashkansky, David Bau, Fernanda Viégas, Hanspeter Pfister, Martin Wattenberg. 학회 정보는 페이지에 없고 arXiv:2402.10962v4 프리프린트로만 표기되어 있다.",
+       "quote": "Compared to two baselines (classifier-free guidance and system prompt repetition), split-softmax produces equal or higher stability for a given level of performance degradation.",
+       "context": "구절 앞뒤 문장에는 부정·조건·비교 표현이 없다. 구절 자체에는 기준선 비교('Compared to two baselines')와 조건('for a given level of performance degradation')이 있다. 이 구절에는 라운드마다 탐침 질문으로 측정했다는 내용과 라운드 수가 없다. 측정 방식은 6.3절 'Then we probe the agent LM at each round to test its instruction stability in the same fashion as section 3.'에, 라운드 수는 Figure 2 캡션 'After the conversation reaches a preset length (8 rounds in our experiment),'에 있다. 원문은 표류를 직접 수치로 재지 않고 MMLU 성능 저하 수준을 맞춘 안정성으로 비교한다.",
+       "reason": "논문 제목과 저자가 일치하고, 원문 Figure 5 캡션이 CFG·SPR 두 기준선과의 비교를 조건부 안정성으로 말한다. 다만 페이지 추출이 길이 제한으로 잘린 조각이므로 구절이 원문과 글자 단위로 같은지는 확정하지 못했다. 라운드별 탐침 측정과 라운드 수는 이 구절에 없고 인접한 다른 문장에 있다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "NO-SQUEEZE"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2402.10962v4",
+       "ref": "sq1#case#0",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "LLaMA2-chat-70B·GPT-3.5 모델 이름과 8라운드 안의 유의한 표류 결과"
+       },
+       "unsure_reasons": {},
+       "reason": "맥락에는 라운드마다 탐침 질문을 썼다는 측정 방식과 8라운드 설정만 있다. 두 모델 이름과 유의한 표류 결과는 구절과 맥락에 없다. 두 기준선보다 안정성이 같거나 높다는 구절은 성공 방향과 맞는다. 다만 원문은 이 비교를 성능 저하 수준을 맞춘 조건에서만 한다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://arxiv.org/html/2505.06120",
+   "subquestions": [
+    "sq1"
+   ],
+   "output": {
+    "url": "https://arxiv.org/html/2505.06120",
+    "judgments": [
+     {
+      "ref": "sq1#case#2",
+      "verdict": "unsupported",
+      "quote": "Snowball is a more gradual recapitulation: at each turn, the user simulator reveals a new shard … repeats all previously revealed shards at that point",
+      "reason": "추출: 제목과 저자가 원문과 일치하고, Recap 의 마지막 턴 재진술 구절은 원문 7.1절에 있으나, Snowball 의 매 턴 재진술 구절은 quote 에 함께 담기지 않았고, 수치는 Table 2 에 있어 한 문장에 함께 있지 않으며, fetch 가 전체 184,346자 중 100,000자까지만 읽어 나머지는 확인하지 못했다. / 판정: Recap 정의는 구절과 같지만 성능 수치와 모델 조건은 구절에 없다. Recap이 Snowball보다 높고 둘 다 Full보다 낮다는 맥락의 비교는 주장 수치의 순서와 맞고, 주장은 범위를 넓히지 않았다. / 보충: Snowball 정의와 모델 조건(GPT-4o·GPT-4o-mini)과 점수 수치가 원문에서 확인되나, 세 요소가 한 문장에 함께 있지 않고 열 헤더가 이미지라 수치의 열 매핑은 추정이다. / 재판정: 점수는 Table 2 에 있다. 열 헤더가 이미지라 추출 검증자가 열 순서를 추정해 매핑했으므로 구절의 글만으로 수치를 확정할 수 없다. 4개 과제라는 조건도 맥락에 없다. Sharded 보다 낫지만 Full 에는 못 미친다는 맥락은 판정 못 함 결말과 맞고, 두 모델로 한정한 범위도 같다. / 판정 불가: numbers_conditions=표·그림 값"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT",
+     "NO-SQUEEZE"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/html/2505.06120",
+     "judgments": [
+      {
+       "ref": "sq1#case#2",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 LLMs Get Lost In Multi-Turn Conversation, 저자 Philippe Laban·Hiroaki Hayashi·Yingbo Zhou·Jennifer Neville, arXiv:2505.06120v1 사전 인쇄본(2025년 5월 9일). 학회 정보는 확인되지 않았고, 주장 본문에도 학회가 적혀 있지 않다.",
+       "quote": "a user turn is added at the end, which recapitulates all the previous user turns",
+       "context": "While Recap outperforms Snowball, we note that Recap is an unrealistic setting, which is not known a priori when conversation unfolds with a real user. Recap 과 Snowball 은 모두 Full 이나 Concat 과 비교해 여전히 성능이 낮다(the performance still lags behind Full or Concat).",
+       "reason": "제목과 저자가 원문과 일치하고, Recap 의 마지막 턴 재진술 구절은 원문 7.1절에 있으나, Snowball 의 매 턴 재진술 구절은 quote 에 함께 담기지 않았고, 수치는 Table 2 에 있어 한 문장에 함께 있지 않으며, fetch 가 전체 184,346자 중 100,000자까지만 읽어 나머지는 확인하지 못했다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2505.06120",
+       "ref": "sq1#case#2",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "Full·Sharded·Recap·Snowball 수치, GPT-4o-mini·GPT-4o 모델 조건, Snowball 정의 문장"
+       },
+       "unsure_reasons": {},
+       "reason": "Recap 정의는 구절과 같지만 성능 수치와 모델 조건은 구절에 없다. Recap이 Snowball보다 높고 둘 다 Full보다 낮다는 맥락의 비교는 주장 수치의 순서와 맞고, 주장은 범위를 넓히지 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://arxiv.org/html/2505.06120",
+     "judgments": [
+      {
+       "ref": "sq1#case#2",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'LLMs Get Lost In Multi-Turn Conversation', 저자 Philippe Laban, Hiroaki Hayashi, Yingbo Zhou, Jennifer Neville. 게재처는 확인되지 않았고 본문에 'arXiv:2505.06120v1 [cs.CL] 09 May 2025' 만 표기되어 있다. 주장의 사례명과 같다.",
+       "quote": "Snowball is a more gradual recapitulation: at each turn, the user simulator reveals a new shard … repeats all previously revealed shards at that point",
+       "context": "Snowball 정의 구절 바로 앞 문장: \"multi-turn capabilities are not a necessary feature of LLMs\". Table 2 앞 문장: \"with improvements over Sharded simulations\" 과 \"but the performance still lags behind Full or Concat\". Table 2 뒤 문장: \"While Recap outperforms Snowball, we note that Recap is an unrealistic setting\" 과 \"the intervention is conducted on the last turn of the conversation, which is not known a priori\". 모델 조건은 7.1절의 \"for two tested models (GPT-4o, GPT-4o-mini).\" 에 있어 이 구절 밖에 있다. 점수 수치는 본문 문장이 아니라 Table 2 표 데이터이며, 열 헤더가 이미지로만 있어 열 순서 Full, Concat, Sharded, Recap, Snowball 로 매핑했다(추정). 매핑 결과는 GPT-4o-mini 86.8/84.4/50.4/66.5/61.8, GPT-4o 93.0/90.9/59.1/76.6/65.3 이며 주장의 수치와 같다. 인용 구절은 추출 과정에서 두 조각으로 나뉘어 나왔으므로 바이트 단위 일치는 보장되지 않는다.",
+       "reason": "Snowball 정의와 모델 조건(GPT-4o·GPT-4o-mini)과 점수 수치가 원문에서 확인되나, 세 요소가 한 문장에 함께 있지 않고 열 헤더가 이미지라 수치의 열 매핑은 추정이다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "NO-SQUEEZE"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2505.06120",
+       "ref": "sq1#case#2",
+       "numbers_conditions": "판정 불가",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {},
+       "unsure_reasons": {
+        "numbers_conditions": "표·그림 값"
+       },
+       "reason": "점수는 Table 2 에 있다. 열 헤더가 이미지라 추출 검증자가 열 순서를 추정해 매핑했으므로 구절의 글만으로 수치를 확정할 수 없다. 4개 과제라는 조건도 맥락에 없다. Sharded 보다 낫지만 Full 에는 못 미친다는 맥락은 판정 못 함 결말과 맞고, 두 모델로 한정한 범위도 같다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://arxiv.org/html/2603.05344",
+   "subquestions": [
+    "sq1"
+   ],
+   "output": {
+    "url": "https://arxiv.org/html/2603.05344",
+    "judgments": [
+     {
+      "ref": "sq1#case#3",
+      "verdict": "unsupported",
+      "quote": "Early experiments with role: system injection confirmed this: user-role reminders produced noticeably higher compliance rates.",
+      "reason": "추출: 논문이 열리고 이벤트 기반 시스템 리마인더(2.3.4)와 맥락 주입 오류 복구(2.3.5) 절이 주장과 같은 사례이며, 결정점 직전 주입과 복구율 향상의 원문 구절이 있으나 주장 요소를 한 문장에 모두 담은 구절은 없고, 원문에 통제 실험이나 효과 크기 표현은 확인되지 않아 인용은 WebFetch 추출본 기준이다. / 판정: 결정점 직전 주입, 8개 조건 감시, 6개 오류 유형 지시로 복구율이 상당히 올랐다는 서술은 맥락과 같다. 그러나 user와 system 역할 비교 결과와 평가 방식은 구절과 맥락에 없다. / 보충: 원문이 열리고 제목·저자가 주장의 사례와 일치하며, 인용 구절은 user 역할 리마인더의 준수율이 system 역할보다 눈에 띄게 높았다는 비교를 담는다. 짧은 user 메시지 주입 조건은 다른 문장에 있고, 평가는 'Early experiments'라는 정성적 서술이며 대조군·표본 수·효과 크기가 없다는 사실을 context 에 적었다. 오류 복구의 6개 유형 구체 지시는 'Design evolution' 절의 'classifying errors into six types with specific guidance substantially improved recovery rates'에 정성적 서술로 있다. / 재판정: user 역할 리마인더의 준수율이 system 역할보다 눈에 띄게 높았다는 구절은 주장과 같다. 대조군과 효과 크기가 없다는 점도 맥락과 맞다. 그러나 6개 오류 유형별 복구율 개선은 구절과 맥락에 없다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT",
+     "NO-SQUEEZE"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/html/2603.05344",
+     "judgments": [
+      {
+       "ref": "sq1#case#3",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'Building Effective AI Coding Agents for the Terminal: Scaffolding, Harness, Context Engineering, and Lessons Learned', 저자 Nghi D. Q. Bui (OpenDev), arXiv:2603.05344v3 프리프린트(2026-03-13). 학회·저널 게재 정보는 확인되지 않음.",
+       "quote": "right before the decision point where it would otherwise go wrong.",
+       "context": "앞뒤 인접 여부는 확인하지 못함. 같은 절에서 WebFetch 가 추출한 부정·조건·비교 문장: 'Putting all instructions up front works initially but degrades over long sessions.' / 'Re-injecting the entire system prompt every few turns wastes tokens on instructions the agent does not currently need.' / 'A reminder that fires on every iteration stops being helpful and becomes noise the model learns to ignore.' 주장의 요소 중 '이벤트 감지기가 짧은 user 메시지를 넣는다'는 같은 문장에 없음. 감지기 설명은 'the injection layer monitors eight conditions at the boundary between tool execution and the next LLM call'. 오류 복구 6유형 문장은 'classifying errors into six types with specific guidance substantially improved recovery rates'.",
+       "reason": "논문이 열리고 이벤트 기반 시스템 리마인더(2.3.4)와 맥락 주입 오류 복구(2.3.5) 절이 주장과 같은 사례이며, 결정점 직전 주입과 복구율 향상의 원문 구절이 있으나 주장 요소를 한 문장에 모두 담은 구절은 없고, 원문에 통제 실험이나 효과 크기 표현은 확인되지 않아 인용은 WebFetch 추출본 기준이다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2603.05344",
+       "ref": "sq1#case#3",
+       "numbers_conditions": "정보 부족",
+       "direction": "정보 부족",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "짧은 user 역할 메시지 주입 조건과 '저자 개발 경험' 평가 방식",
+        "direction": "user 역할 주입이 system 역할 주입보다 준수율이 높았다는 비교 문장"
+       },
+       "unsure_reasons": {},
+       "reason": "결정점 직전 주입, 8개 조건 감시, 6개 오류 유형 지시로 복구율이 상당히 올랐다는 서술은 맥락과 같다. 그러나 user와 system 역할 비교 결과와 평가 방식은 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://arxiv.org/html/2603.05344",
+     "judgments": [
+      {
+       "ref": "sq1#case#3",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목: Building Effective AI Coding Agents for the Terminal: Scaffolding, Harness, Context Engineering, and Lessons Learned / 저자: Nghi D. Q. Bui (OpenDev) / 게재처: 학회·저널 정보 없음, arXiv:2603.05344v3 [cs.AI] 13 Mar 2026. 2.3.4 Context-Aware System Reminders 절이 주장의 터미널 코딩 에이전트 이벤트 기반 리마인더 사례에 해당한다.",
+       "quote": "Early experiments with role: system injection confirmed this: user-role reminders produced noticeably higher compliance rates.",
+       "context": "같은 단락 앞 문장 'Reminders are injected as role: user messages rather than role: system.'에 system 역할 대비 비교('rather than')가 있고, 'After 40 turns of conversation, another system message blends into the background that the model has already partially forgotten.'에 40턴 경과라는 조건이 있다. 짧은 user 메시지 조건은 같은 절 도입부의 'Each reminder is a brief role: user message placed at maximum recency in the conversation, immediately before the next LLM call.'에 있으며 이 문장은 인용 구절 단락 안에 없다. 해당 단락에는 대조군(control group), 표본 수(sample size), 효과 크기(effect size) 표현이 없다.",
+       "reason": "원문이 열리고 제목·저자가 주장의 사례와 일치하며, 인용 구절은 user 역할 리마인더의 준수율이 system 역할보다 눈에 띄게 높았다는 비교를 담는다. 짧은 user 메시지 주입 조건은 다른 문장에 있고, 평가는 'Early experiments'라는 정성적 서술이며 대조군·표본 수·효과 크기가 없다는 사실을 context 에 적었다. 오류 복구의 6개 유형 구체 지시는 'Design evolution' 절의 'classifying errors into six types with specific guidance substantially improved recovery rates'에 정성적 서술로 있다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "NO-SQUEEZE"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2603.05344",
+       "ref": "sq1#case#3",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "오류 복구에서 일반 재시도 메시지를 6개 오류 유형별 지시로 바꾸어 복구율이 올랐다는 내용"
+       },
+       "unsure_reasons": {},
+       "reason": "user 역할 리마인더의 준수율이 system 역할보다 눈에 띄게 높았다는 구절은 주장과 같다. 대조군과 효과 크기가 없다는 점도 맥락과 맞다. 그러나 6개 오류 유형별 복구율 개선은 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://arxiv.org/html/2603.23530",
+   "subquestions": [
+    "sq1"
+   ],
+   "output": {
+    "url": "https://arxiv.org/html/2603.23530",
+    "judgments": [
+     {
+      "ref": "sq1#case#4",
+      "verdict": "unsupported",
+      "quote": "The average compliance gain is 17.7% for o4-mini, 16.9% for DeepSeek, and 12.7% for Llama (Figure 4).",
+      "reason": "추출: 접근과 제목·저자가 주장과 일치하고 3개 모델·8,000개 넘는 프롬프트·준수 2–21% 하락은 이 문장에 있으나, 67–87%에서 90–100% 회복, 평균 이득, 스태킹 수치, IMPORTANT 머리글, 목적과 대상 범위는 이 문장에 없고 다른 절에 있어 판정 에이전트가 해당 절을 함께 봐야 한다. / 판정: 8,000개 넘는 프롬프트·3개 모델 계열·2-21% 하락, 67-87%→90-100% 회복, 스태킹 +1.7~+5.8, IFEval 15개 유형, IMPORTANT 머리글은 맥락과 같다. 평균 상승폭과 끝 상기 문장은 맥락에 없다. 회복 방향과 범위는 §5.1 서술과 맞다. / 보충: 인용 구절의 모델별 평균 이득 17.7·16.9·12.7%가 주장의 '평균 +12.7~+17.7' 수치를 뒷받침하나, 'Remember to follow ALL...' 상기 문장은 이 구절에 없어 두 보충 요소가 한 구절에 모이지 않으며, 구절은 WebFetch 요약 결과이고 원문 HTML과 직접 대조하지 않았다. / 재판정: 평균 상승 17.7·16.9·12.7%는 주장의 +12.7~+17.7과 같다. 맥락의 연쇄 부하 수치도 회복 방향과 맞는다. 나머지 규모 수치와 제약 누적 효과는 구절에 없다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/html/2603.23530",
+     "judgments": [
+      {
+       "ref": "sq1#case#4",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'Did You Forget What I Asked? Prospective Memory Failures in Large Language Models', 저자 Avni Mittal(단독), 게재처 없음(arXiv 2603.23530v2 [cs.CL] 프리프린트). 주장의 제목 표기와 같은 논문이다.",
+       "quote": "Across three model families and over 8,000 prompts, compliance drops by 2–21% under concurrent task load.",
+       "context": "앞 문장: 해당 표현 없음(연구 설계 설명). 뒤 문장(비교): \"Vulnerability is highly type-dependent: terminal constraints (requiring action at the response boundary) degrade most,\" 와 \"while avoidance constraints remain comparatively robust.\" 이 구절에 없는 주장 요소: 리마인더 회복 67–87%에서 90–100%는 §5.1 \"recovers compliance from the 67–87% range to 90–100% across all models and tasks.\" 에, 초록에서는 \"restoring performance to 90–100% in many settings.\" 로 한정되어 있다. 스태킹 수치는 §5.4 \"The matched reminder-on minus reminder-off differences are small on average: +5.8% for o4-mini, +2.5% for Llama, and +1.7% for DeepSeek (Table 12).\" 에 있고, 같은 절에 \"In several high-load cells, adding the reminder actually hurts compliance.\" 가 있다. IFEval 15개 유형은 §3.2 \"We use 15 of IFEval’s 25 instruction types\" 에, IMPORTANT 머리글은 §3.4 \"IMPORTANT FORMATTING INSTRUCTION: {extracted constraint text} Now please help me with the following task:\" 에 있다.",
+       "reason": "접근과 제목·저자가 주장과 일치하고 3개 모델·8,000개 넘는 프롬프트·준수 2–21% 하락은 이 문장에 있으나, 67–87%에서 90–100% 회복, 평균 이득, 스태킹 수치, IMPORTANT 머리글, 목적과 대상 범위는 이 문장에 없고 다른 절에 있어 판정 에이전트가 해당 절을 함께 봐야 한다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2603.23530",
+       "ref": "sq1#case#4",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "평균 +12.7~+17.7 수치와 끝에 붙인 'Remember to follow ALL...' 상기 문장"
+       },
+       "unsure_reasons": {},
+       "reason": "8,000개 넘는 프롬프트·3개 모델 계열·2-21% 하락, 67-87%→90-100% 회복, 스태킹 +1.7~+5.8, IFEval 15개 유형, IMPORTANT 머리글은 맥락과 같다. 평균 상승폭과 끝 상기 문장은 맥락에 없다. 회복 방향과 범위는 §5.1 서술과 맞다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://arxiv.org/html/2603.23530",
+     "judgments": [
+      {
+       "ref": "sq1#case#4",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 \"Did You Forget What I Asked? Prospective Memory Failures in Large Language Models\", 저자 Avni Mittal(단독), 학회 정보 없음(arXiv:2603.23530v2 [cs.CL] 프리프린트, 2026-06-11). 주장의 case 제목과 일치한다.",
+       "quote": "The average compliance gain is 17.7% for o4-mini, 16.9% for DeepSeek, and 12.7% for Llama (Figure 4).",
+       "context": "앞 문장: \"The recovery holds even under heavy chaining: at 3×GSM8K, DeepSeek and Llama reach 100% (vs. 84.4% natural);\" \"at 5×GSM8K, DeepSeek reaches 100% (vs. 72.2% natural) and Llama 98.1% (vs. 70.4%).\" 뒤 문장: \"The gain is largest for CNN/DM (+13 to +21%), where the instruction is most temporally distant from the response end.\" 대상 문장 자체에는 부정·조건·비교 표현이 없고, 앞 문장에 조건(under heavy chaining)과 비교(vs.)가 있다. 'Remember to follow ALL of my formatting instructions above.' 문장은 이 세 문장 안에 없고 같은 단락 첫 문장(reminder 템플릿 설명, §3.4)에 있다.",
+       "reason": "인용 구절의 모델별 평균 이득 17.7·16.9·12.7%가 주장의 '평균 +12.7~+17.7' 수치를 뒷받침하나, 'Remember to follow ALL...' 상기 문장은 이 구절에 없어 두 보충 요소가 한 구절에 모이지 않으며, 구절은 WebFetch 요약 결과이고 원문 HTML과 직접 대조하지 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2603.23530",
+       "ref": "sq1#case#4",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "IFEval 15개 유형·8,000개 넘는 프롬프트, 부하 아래 2-21% 하락, 67-87%에서 90-100%로의 회복 범위, 제약을 쌓았을 때 +1.7~+5.8"
+       },
+       "unsure_reasons": {},
+       "reason": "평균 상승 17.7·16.9·12.7%는 주장의 +12.7~+17.7과 같다. 맥락의 연쇄 부하 수치도 회복 방향과 맞는다. 나머지 규모 수치와 제약 누적 효과는 구절에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+   "subquestions": [
+    "sq2"
+   ],
+   "output": {
+    "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+    "judgments": [
+     {
+      "ref": "sq2#issue#0",
+      "verdict": "unsupported",
+      "quote": "A fixed allowlist includes tools that can’t modify state, including file reads, text and file-pattern search. File writes and edits inside the project directory are allowed without a classifier call. The transcript classifier sees everything else, including shell commands, web fetches, external tool integrations…",
+      "reason": "추출: 원문 저자와 기관이 주장의 글과 일치하고, 93% 승인 구절은 원문에 있으나 승인 피로와 등급별 대응은 이 구절에 없어 구절 하나로는 주장 전체를 뒷받침하지 못한다. / 판정: 93% 승인, 승인 피로 문장, 프로젝트 안 쓰기의 분류기 없는 허용, 오탐률 0.4%와 실제 과잉 행동 미탐률 17%는 같은 URL의 구절과 맥락에 있다. 그러나 허용 목록과 분류기 검토 대상 문장은 없다. 방향과 범위는 원문과 같다. / 보충: 허용 목록·프로젝트 내 쓰기 무분류기 허용·분류기 검토 문장이 한 구절에 확인되나 분류기 문장의 목록은 셸 명령·웹 요청 뒤에 외부 도구 연동 등이 더 이어지고 93%·승인 피로·0.4%·17%는 이 구절 밖 다른 문장에 있으며, 인용은 요약 도구가 옮긴 글이라 원본 HTML 과 글자 단위로는 대조하지 못했다. / 재판정: 구절의 등급 구성은 주장과 같다. 읽기·검색은 허용 목록이고, 프로젝트 안 쓰기·수정은 분류기 없이 허용되며, 나머지 셸·웹 요청은 분류기가 본다. 그러나 93%·0.4%·17% 수치와 승인 피로 서술은 구절과 맥락에 없다. / 재판정 정보 부족: numbers_conditions"
+     },
+     {
+      "ref": "sq2#case#4",
+      "verdict": "unsupported",
+      "quote": "A fixed allowlist includes tools that can’t modify state, including file reads, text and file-pattern search. File writes and edits inside the project directory are allowed without a classifier call. The transcript classifier sees everything else, including shell commands, web fetches, external tool integrations…",
+      "reason": "추출: 원문 저자와 기관이 사례 글과 일치하고, 0.4% 오탐률 구절은 있으나 17% 미탐률, 93% 승인율, 3회·20회 차단 기준과 등급별 허용 목록은 이 구절에 없어 사례 요소 일부만 뒷받침한다. / 판정: 2단계 분류기, 8.5%→0.4% 오탐, 17% 미탐, 93% 승인, 연속 3회 또는 누적 20회 차단 시 사람에게 넘김은 구절과 맥락에 있다. 허용 목록 문장은 없다. 재현율을 일부 희생한 개선이라는 맥락과 '성공' 결말은 상충하지 않는다. / 보충: 허용 목록과 프로젝트 내 쓰기 무분류기 허용과 분류기 검토 문장이 한 구절에 확인되고 Stage 1·Stage 2 문장으로 2단계 구조가 확인되며, 연속 3회·누적 20회 문장은 이 구절 밖에 있으나 원문에 존재하고, 인용은 요약 도구가 옮긴 글이라 원본 HTML 과 글자 단위로는 대조하지 못했다. / 재판정: 허용 목록·프로젝트 내 수정 허용·분류기 검토 구성과 Stage 1 필터는 구절 및 맥락과 같다. 연속 3회 또는 누적 20회 차단 시 사람에게 넘긴다는 내용도 맥락과 같다. 평가 수치 세 개는 구절과 맥락에 없다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "NO-AGREE",
+     "ASYNC-FIRST",
+     "SPECIFIC-NAME",
+     "FULL-SENTENCE",
+     "TERM-ONE",
+     "SUBJECT-OBJECT",
+     "STATE-ASSUME"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+     "judgments": [
+      {
+       "ref": "sq2#issue#0",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "Anthropic Engineering 팀의 글 \"How we built Claude Code auto mode: a safer way to skip permissions\", 저자 John Hughes, 게시 기관 Anthropic (페이지 기준 2026년 3월 25일 게시)",
+       "quote": "Manual prompts sit in the middle, and in practice users accept 93% of them anyway.",
+       "context": "바로 앞 문장: \"Bypassing permissions is zero-maintenance but offers no protection.\" (부정 no, 대조 but). 바로 뒤 문장: 없음. 이 단락은 이 문장으로 끝나고 다음은 그림 캡션(\"The permission modes available in Claude Code, positioned by task autonomy and security.\")이다. 승인 피로 문장 \"Over time that leads to approval fatigue, where people stop paying close attention to what they're approving.\"은 이 문장과 바로 이어지지 않고 문장 네 개 뒤에 있다. 이 구절에는 읽기·검색 허용 목록, 프로젝트 내 쓰기 무검토 허용, 분류기 검토 대상 문장과 0.4%·17% 수치가 없다. 등급 대응 문장 \"File writes and edits inside the project directory are allowed without a classifier call.\"은 다른 절에 있다.",
+       "reason": "원문 저자와 기관이 주장의 글과 일치하고, 93% 승인 구절은 원문에 있으나 승인 피로와 등급별 대응은 이 구절에 없어 구절 하나로는 주장 전체를 뒷받침하지 못한다."
+      },
+      {
+       "ref": "sq2#case#4",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "Anthropic Engineering 팀의 글 \"How we built Claude Code auto mode: a safer way to skip permissions\", 저자 John Hughes, 게시 기관 Anthropic (페이지 기준 2026년 3월 25일 게시)",
+       "quote": "That reduces the 8.5% FPR down to 0.4%.",
+       "context": "바로 앞 문장: \"Stage 2 sees the same prompt and only the final instruction changes, asking for careful reasoning.\" (한정 only, 부정·비교 표현 없음). 바로 뒤 문장: \"Because the input is identical other than the final instruction, stage 2's prompt is almost entirely cache-hit from stage 1.\" (원인 Because, 비교 other than, 부정·조건 표현 없음). 이 구절에 없는 요소: 17% 미탐률 문장 \"The 17% false-negative rate on real overeager actions is the honest number.\"은 Results 절에 있고 이 문장과 바로 이어지지 않는다. Results 설명에는 \"FPR drops from 8.5% to 0.4%, at the cost of some recall.\"이 있어 오탐 감소에 재현율 희생이 따른다는 비교 표현이 있다. 93% 승인율은 Figure 1 설명 단락에, 연속 3회 또는 누적 20회 차단 시 사람에게 넘기는 문장 \"If a session accumulates 3 consecutive denials or 20 total, we stop the model and escalate to the human.\"은 Deny-and-continue 절에 있다. 읽기·검색 허용 목록과 등급 분류 문장도 이 구절에 없다.",
+       "reason": "원문 저자와 기관이 사례 글과 일치하고, 0.4% 오탐률 구절은 있으나 17% 미탐률, 93% 승인율, 3회·20회 차단 기준과 등급별 허용 목록은 이 구절에 없어 사례 요소 일부만 뒷받침한다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-AGREE",
+      "ASYNC-FIRST",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+       "ref": "sq2#issue#0",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "읽기·검색 허용 목록 문장과 셸 명령·웹 요청·프로젝트 밖 파일 작업을 분류기가 검토한다는 문장"
+       },
+       "unsure_reasons": {},
+       "reason": "93% 승인, 승인 피로 문장, 프로젝트 안 쓰기의 분류기 없는 허용, 오탐률 0.4%와 실제 과잉 행동 미탐률 17%는 같은 URL의 구절과 맥락에 있다. 그러나 허용 목록과 분류기 검토 대상 문장은 없다. 방향과 범위는 원문과 같다."
+      },
+      {
+       "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+       "ref": "sq2#case#4",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "허용 목록과 등급 분류 문장"
+       },
+       "unsure_reasons": {},
+       "reason": "2단계 분류기, 8.5%→0.4% 오탐, 17% 미탐, 93% 승인, 연속 3회 또는 누적 20회 차단 시 사람에게 넘김은 구절과 맥락에 있다. 허용 목록 문장은 없다. 재현율을 일부 희생한 개선이라는 맥락과 '성공' 결말은 상충하지 않는다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+     "judgments": [
+      {
+       "ref": "sq2#issue#0",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 \"How we built Claude Code auto mode: a safer way to skip permissions\", 필자 John Hughes, 발행일 Mar 25, 2026, 경로 /engineering/ (Anthropic 엔지니어링 글)",
+       "quote": "A fixed allowlist includes tools that can’t modify state, including file reads, text and file-pattern search. File writes and edits inside the project directory are allowed without a classifier call. The transcript classifier sees everything else, including shell commands, web fetches, external tool integrations…",
+       "context": "앞 문장: \"All of the examples above would reach the classifier, but most actions are allowed prior to that step\" [비교]. 앞 문장: \"Only actions with real downside potential reach the final tier:\" [조건]. 뒤 문장: \"Routine coding (e.g. editing source files in your repo) doesn't pay classifier latency…\" [부정]. 뒤 문장: \"Stage 1 is a fast single-token (yes/no) filter instructed to err toward blocking; if it flags…\" [조건]",
+       "reason": "허용 목록·프로젝트 내 쓰기 무분류기 허용·분류기 검토 문장이 한 구절에 확인되나 분류기 문장의 목록은 셸 명령·웹 요청 뒤에 외부 도구 연동 등이 더 이어지고 93%·승인 피로·0.4%·17%는 이 구절 밖 다른 문장에 있으며, 인용은 요약 도구가 옮긴 글이라 원본 HTML 과 글자 단위로는 대조하지 못했다."
+      },
+      {
+       "ref": "sq2#case#4",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 \"How we built Claude Code auto mode: a safer way to skip permissions\", 필자 John Hughes, 발행일 Mar 25, 2026, 경로 /engineering/ (Anthropic 엔지니어링 글)",
+       "quote": "A fixed allowlist includes tools that can’t modify state, including file reads, text and file-pattern search. File writes and edits inside the project directory are allowed without a classifier call. The transcript classifier sees everything else, including shell commands, web fetches, external tool integrations…",
+       "context": "앞 문장: \"All of the examples above would reach the classifier, but most actions are allowed prior to that step\" [비교]. 앞 문장: \"Only actions with real downside potential reach the final tier:\" [조건]. 뒤 문장: \"Stage 1 is a fast single-token (yes/no) filter instructed to err toward blocking; if it flags…\" [조건]. 원문 다른 문장: \"If a session accumulates 3 consecutive denials or 20 total, we stop the model and escalate to the human.\" (이 구절 밖, 뒤 문장 \"This is the backstop against a compromised or overeager agent repeatedly pushing towards an outcome the user wouldn't want.\" [부정])",
+       "reason": "허용 목록과 프로젝트 내 쓰기 무분류기 허용과 분류기 검토 문장이 한 구절에 확인되고 Stage 1·Stage 2 문장으로 2단계 구조가 확인되며, 연속 3회·누적 20회 문장은 이 구절 밖에 있으나 원문에 존재하고, 인용은 요약 도구가 옮긴 글이라 원본 HTML 과 글자 단위로는 대조하지 못했다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-AGREE",
+      "STATE-ASSUME"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+       "ref": "sq2#issue#0",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "수동 확인 승인률 93%, 오탐률 0.4%, 미탐률 17%, 승인 피로 서술"
+       },
+       "unsure_reasons": {},
+       "reason": "구절의 등급 구성은 주장과 같다. 읽기·검색은 허용 목록이고, 프로젝트 안 쓰기·수정은 분류기 없이 허용되며, 나머지 셸·웹 요청은 분류기가 본다. 그러나 93%·0.4%·17% 수치와 승인 피로 서술은 구절과 맥락에 없다."
+      },
+      {
+       "url": "https://anthropic.com/engineering/claude-code-auto-mode",
+       "ref": "sq2#case#4",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "수동 확인 승인률 93%, 분류기 오탐 0.4%, 미탐 17%"
+       },
+       "unsure_reasons": {},
+       "reason": "허용 목록·프로젝트 내 수정 허용·분류기 검토 구성과 Stage 1 필터는 구절 및 맥락과 같다. 연속 3회 또는 누적 20회 차단 시 사람에게 넘긴다는 내용도 맥락과 같다. 평가 수치 세 개는 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+   "subquestions": [
+    "sq2"
+   ],
+   "output": {
+    "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+    "judgments": [
+     {
+      "ref": "sq2#issue#1",
+      "verdict": "unsupported",
+      "quote": "Newer users (<50 sessions) employ full auto-approve roughly 20% of the time; by 750 sessions, this increases to over 40%",
+      "reason": "추출: 승인 마찰에 관한 주장은 원문 구절로 뒷받침된다. 다만 이 구절에는 998,481건 도구 호출, 50만 건 규모, 감시·개입 초점, 자동 승인 비율 변화(약 20%에서 40% 이상), 개입률 변화(약 5%에서 9%), 멈춘 사유 비율이 없으며 별도 문장에 있다. 원문 대조는 WebFetch 요약 모델이 옮긴 구절에 기대므로 글자 단위 일치는 확인하지 못했다. / 판정: 모든 행동 승인 요구가 안전 이득 없이 마찰을 만들 수 있다는 문장과 감시·개입으로 옮기라는 권고는 구절과 맥락에 있다. 그러나 주장의 수치는 구절과 맥락에 하나도 없다. / 보충: 페이지와 연구의 제목·게시처가 일치하고 자동 승인 20%에서 40% 이상으로 오르는 문장이 원문에 있으나, 한 문장에 주장의 수치가 모두 들어 있지 않아 가장 가까운 문장을 옮겼고 수치와 단위의 판정은 판정 에이전트에 맡긴다. / 재판정: 자동 승인 비율 약 20%(50세션 미만)에서 40% 이상(750세션)으로 오른다는 값은 구절과 같다. 그러나 주장은 '대화형 코딩 세션 50만 건'이라고 적었고, 원문 단위는 사람 개입 50만 건과 완료 턴 50만 건이다. 개입률 5%도 원문은 약 10세션 사용자 기준이다. 마찰과 감독 초점에 관한 서술의 방향은 맥락과 같다."
+     },
+     {
+      "ref": "sq2#case#3",
+      "verdict": "supported",
+      "quote": "On the most complex tasks, Claude Code stops to ask for clarification more than twice as often as humans interrupt it.",
+      "reason": "추출: 가장 복잡한 과제에서 명확화를 위해 멈춘 횟수가 사람 개입의 2배 이상이라는 내용은 원문 구절로 확인된다. 사람 개입 사유 1위(기술 맥락 보충·수정 32%)와 2위(느림·과잉 17%)는 이 구절에 없고 별도 문장이며, 원문에는 비교 기준이 다른 문장도 함께 있다. 구절은 WebFetch 요약 모델이 옮긴 것이라 글자 단위 원문 대조는 하지 못했다. / 판정: 가장 복잡한 과제에서 명확화 멈춤이 사람 개입의 2배 이상이라는 비교는 구절과 같다. 개입 사유 비율은 구절에 없다. / 보충: 페이지와 연구의 제목·게시처가 일치하고 가장 복잡한 과제에서 명확화 멈춤이 사람 개입의 2배 이상이라는 문장이 원문에 있으나, 사유별 32%와 17%는 같은 표의 서로 다른 행에 있어 한 구절로 묶이지 않는다. / 재판정: 가장 복잡한 과제에서 에이전트가 명확화를 위해 멈춘 횟수가 사람 개입의 2배 이상이라는 내용은 구절과 같다. 사람 개입 사유 32%·17%는 맥락이 옮긴 Table 1 행 문구와 같다. 주장은 복잡한 과제 한정을 유지했다."
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT",
+     "NO-SQUEEZE",
+     "ASYNC-FIRST"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+     "judgments": [
+      {
+       "ref": "sq2#issue#1",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'Measuring AI agent autonomy in practice', 발행 Anthropic (Societal Impacts 팀), 발행일 2026-02-18. 페이지는 실제 연구 글이며 404나 빈 페이지가 아님.",
+       "quote": "Oversight requirements that prescribe specific interaction patterns, such as requiring humans to approve every action, will create friction without necessarily producing safety benefits.",
+       "context": "바로 앞 문장: \"shift away from approving individual agent actions and toward monitoring and intervening when needed.\" 바로 뒤 문장: \"As agents and the science of agent measurement mature\"로 시작하며 \"rather than\" 비교를 담는다. 대상 문장 자체에는 부정(\"without\")과 완화 표현(\"necessarily\")이 있고, 명시적 조건이나 비교 구조는 없다.",
+       "reason": "승인 마찰에 관한 주장은 원문 구절로 뒷받침된다. 다만 이 구절에는 998,481건 도구 호출, 50만 건 규모, 감시·개입 초점, 자동 승인 비율 변화(약 20%에서 40% 이상), 개입률 변화(약 5%에서 9%), 멈춘 사유 비율이 없으며 별도 문장에 있다. 원문 대조는 WebFetch 요약 모델이 옮긴 구절에 기대므로 글자 단위 일치는 확인하지 못했다."
+      },
+      {
+       "ref": "sq2#case#3",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'Measuring AI agent autonomy in practice', 발행 Anthropic, 발행일 2026-02-18. 사례 설명(실사용 자율성 측정 연구)과 같은 문서다.",
+       "quote": "On the most complex tasks, Claude Code stops to ask for clarification more than twice as often as humans interrupt it.",
+       "context": "본문의 다른 비교 문장: \"On the most complex tasks, Claude Code asks for clarification more than twice as often as on minimal-complexity tasks\" (비교 기준이 사람 개입이 아니라 가장 단순한 과제로 다름). 이 두 문장이 원문의 어느 절에 있는지는 요약 응답에서 확인되지 않았다.",
+       "reason": "가장 복잡한 과제에서 명확화를 위해 멈춘 횟수가 사람 개입의 2배 이상이라는 내용은 원문 구절로 확인된다. 사람 개입 사유 1위(기술 맥락 보충·수정 32%)와 2위(느림·과잉 17%)는 이 구절에 없고 별도 문장이며, 원문에는 비교 기준이 다른 문장도 함께 있다. 구절은 WebFetch 요약 모델이 옮긴 것이라 글자 단위 원문 대조는 하지 못했다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+       "ref": "sq2#issue#1",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "도구 호출 99.8만 건·세션 50만 건, 자동 승인 20%→40%, 개입률 5%→9%, 멈춤 이유 비율"
+       },
+       "unsure_reasons": {},
+       "reason": "모든 행동 승인 요구가 안전 이득 없이 마찰을 만들 수 있다는 문장과 감시·개입으로 옮기라는 권고는 구절과 맥락에 있다. 그러나 주장의 수치는 구절과 맥락에 하나도 없다."
+      },
+      {
+       "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+       "ref": "sq2#case#3",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "사람 개입 사유 32%·17% 수치"
+       },
+       "unsure_reasons": {},
+       "reason": "가장 복잡한 과제에서 명확화 멈춤이 사람 개입의 2배 이상이라는 비교는 구절과 같다. 개입 사유 비율은 구절에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+     "judgments": [
+      {
+       "ref": "sq2#issue#1",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "페이지 제목 'Measuring AI agent autonomy in practice', 게시 주체 Anthropic(Societal Impacts 팀), 게시일 2026년 2월 18일. 주장이 가리키는 실사용 자율성 연구와 같다.",
+       "quote": "Newer users (<50 sessions) employ full auto-approve roughly 20% of the time; by 750 sessions, this increases to over 40%",
+       "context": "앞 문장(비교 있음): \"We found that people grant Claude Code more autonomy as they gain experience using it (Figure 2).\" 뒤 문장(부정·조건·비교 없음): \"This shift is gradual, suggesting a steady accumulation of trust.\" 후속 조회는 구절 끝에 \"of sessions.\"가 이어진다고 보고했으나 이 구절에는 옮기지 않았다. 없는 요소: 도구 호출 99.8만 건은 \"Based on a sample of 998,481 random tool calls from our public API.\"에, 세션 50만 건 대응 문장은 \"based on a sample of 500k human interruptions and 500k completed turns in interactive Claude Code sessions\"에 있다(단위가 세션이 아니라 개입과 완료 턴). 개입률 5%·9%는 \"New users (those with around 10 sessions) interrupt Claude in 5% of turns,\"와 \"more experienced users interrupt in around 9% of turns\"에 나뉘어 있다. 멈춤 이유 비율 35·21·13·12·11%는 Table 1의 서로 다른 행에 있다. 모든 행동 승인 요구의 한계는 \"requiring humans to approve every action, will create friction without necessarily producing safety benefits\"에, 감독 초점은 \"the focus should be on whether humans are in a position to effectively monitor and intervene\"에 있다.",
+       "reason": "페이지와 연구의 제목·게시처가 일치하고 자동 승인 20%에서 40% 이상으로 오르는 문장이 원문에 있으나, 한 문장에 주장의 수치가 모두 들어 있지 않아 가장 가까운 문장을 옮겼고 수치와 단위의 판정은 판정 에이전트에 맡긴다."
+      },
+      {
+       "ref": "sq2#case#3",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "페이지 제목 'Measuring AI agent autonomy in practice', 게시 주체 Anthropic, 게시일 2026년 2월 18일. 주장이 가리키는 실사용 에이전트 자율성 측정 연구와 같다.",
+       "quote": "On the most complex tasks, Claude Code stops to ask for clarification more than twice as often as humans interrupt it.",
+       "context": "앞 문장(부정·조건·비교 없음): \"In addition to human-initiated stops, agent-initiated stops are also an important form of oversight in deployed systems.\" 뒤 문장(부정 있음): \"Agents are used in risky domains, but not yet at scale.\" 없는 요소: 사람 개입 사유 32%는 Table 1의 \"To provide missing technical context or corrections (32%)\" 행에, 17%는 같은 표의 \"Claude was slow, hanging, or excessive (17%)\" 행에 있다. 두 행을 한 구절에 묶은 원문 문장은 없다.",
+       "reason": "페이지와 연구의 제목·게시처가 일치하고 가장 복잡한 과제에서 명확화 멈춤이 사람 개입의 2배 이상이라는 문장이 원문에 있으나, 사유별 32%와 17%는 같은 표의 서로 다른 행에 있어 한 구절로 묶이지 않는다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-SQUEEZE",
+      "STATE-ASSUME",
+      "ASYNC-FIRST"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+       "ref": "sq2#issue#1",
+       "numbers_conditions": "불일치",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {},
+       "unsure_reasons": {},
+       "reason": "자동 승인 비율 약 20%(50세션 미만)에서 40% 이상(750세션)으로 오른다는 값은 구절과 같다. 그러나 주장은 '대화형 코딩 세션 50만 건'이라고 적었고, 원문 단위는 사람 개입 50만 건과 완료 턴 50만 건이다. 개입률 5%도 원문은 약 10세션 사용자 기준이다. 마찰과 감독 초점에 관한 서술의 방향은 맥락과 같다."
+      },
+      {
+       "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+       "ref": "sq2#case#3",
+       "numbers_conditions": "일치",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {},
+       "unsure_reasons": {},
+       "reason": "가장 복잡한 과제에서 에이전트가 명확화를 위해 멈춘 횟수가 사람 개입의 2배 이상이라는 내용은 구절과 같다. 사람 개입 사유 32%·17%는 맥락이 옮긴 Table 1 행 문구와 같다. 주장은 복잡한 과제 한정을 유지했다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://arxiv.org/html/2503.22674v2",
+   "subquestions": [
+    "sq2"
+   ],
+   "output": {
+    "url": "https://arxiv.org/html/2503.22674v2",
+    "judgments": [
+     {
+      "ref": "sq2#case#0",
+      "verdict": "unsupported",
+      "quote": "As further support for this hypothesis, we found that Gemini Flash Thinking, Claude 3.5, and GPT-4o predicted “not sure” on only 1.4%, 4.6%, and 0.7% of cases in the zero-shot (no chain-of-thought) setting on Planning-Q, when the ground-truth ratio is 41.8%.",
+      "reason": "추출: 원문이 열리고 제목·저자가 QuestBench 논문과 일치하며, '모름' 비율 수치 문장은 찾았으나 그 문장은 세 모델과 zero-shot 설정으로 한정되고 목적·방법·정확도·F1·대상 도메인은 다른 구절에 있으며, 인용문은 두 추출 결과의 앞부분과 뒷부분을 이어 붙인 것이라 한 번의 원문 인용으로 확인되지 않았다. / 판정: 0.7~4.6%와 정답 비율 41.8%(약 42%)는 구절과 같고, 모델이 불확실성을 알아채지 못한다는 방향도 같다. 그러나 구절의 값은 zero-shot(사고 사슬 없음) 조건의 Planning-Q 세 모델에 한정되는데, 주장은 이 조건을 빼고 계획 과제 전반으로 적었다."
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "ASYNC-FIRST",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/html/2503.22674v2",
+     "judgments": [
+      {
+       "ref": "sq2#case#0",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목: QuestBench: Can LLMs ask the right question to acquire information in reasoning tasks? / 저자: Belinda Z. Li, Been Kim, Zi Wang / 게재처: arXiv 프리프린트 2503.22674v2 (학회 표기 없음)",
+       "quote": "As further support for this hypothesis, we found that Gemini Flash Thinking, Claude 3.5, and GPT-4o predicted “not sure” on only 1.4%, 4.6%, and 0.7% of cases in the zero-shot (no chain-of-thought) setting on Planning-Q, when the ground-truth ratio is 41.8%.",
+       "context": "앞 문장: \"We hypothesize that Planning-Q problems are sufficiently difficult that models cannot recognize uncertainty,\" (부정 cannot 있음). 뒤 문장: 이 단락에는 없고, 다음 절 첫 문장은 \"We introduced QuestBench for identifying underspecification and asking clarification questions in reasoning problems.\" (부정·조건·비교 없음). 구절 안의 한정: \"only\", \"in the zero-shot (no chain-of-thought) setting\", 세 모델 이름(Gemini Flash Thinking, Claude 3.5, GPT-4o). 구절에 없는 요소: 목적 \"This work investigates whether LLMs can identify and acquire the missing information necessary to solve reasoning tasks.\"; 방법 \"We focus on a simple special case of underspecified CSPs\"; 대상 도메인 \"(1) Logic-Q: logical reasoning tasks with one missing proposition,\" \"(2) Planning-Q: PDDL planning problems with partially-observed initial states,\" \"(3) GSM-Q: human-annotated grade school math problems with one unknown variable,\"; 정확도 \"they achieve only 40-50% accuracy on Logic-Q and Planning-Q.\" (다른 절, 초록으로 보고됨); F1 값은 이 단락에 없음(표 7 참조).",
+       "reason": "원문이 열리고 제목·저자가 QuestBench 논문과 일치하며, '모름' 비율 수치 문장은 찾았으나 그 문장은 세 모델과 zero-shot 설정으로 한정되고 목적·방법·정확도·F1·대상 도메인은 다른 구절에 있으며, 인용문은 두 추출 결과의 앞부분과 뒷부분을 이어 붙인 것이라 한 번의 원문 인용으로 확인되지 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "ASYNC-FIRST"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2503.22674v2",
+       "ref": "sq2#case#0",
+       "numbers_conditions": "일치",
+       "direction": "일치",
+       "scope": "불일치",
+       "missing": {},
+       "unsure_reasons": {},
+       "reason": "0.7~4.6%와 정답 비율 41.8%(약 42%)는 구절과 같고, 모델이 불확실성을 알아채지 못한다는 방향도 같다. 그러나 구절의 값은 zero-shot(사고 사슬 없음) 조건의 Planning-Q 세 모델에 한정되는데, 주장은 이 조건을 빼고 계획 과제 전반으로 적었다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": null,
+    "rejudge": null
+   }
+  },
+  {
+   "url": "https://arxiv.org/html/2511.08798v1",
+   "subquestions": [
+    "sq2"
+   ],
+   "output": {
+    "url": "https://arxiv.org/html/2511.08798v1",
+    "judgments": [
+     {
+      "ref": "sq2#case#1",
+      "verdict": "unsupported",
+      "quote": "On Ambiguous tasks with GPT-4o, SAGE-Agent achieves 59.73% Coverage Rate",
+      "reason": "추출: 문서가 주장의 사례(SAGE-Agent·ClarifyBench 의 정보 가치 기반 질문 선택)와 같은 논문이며, 평가 구절은 모호한 과제 커버리지 수치를 담은 문장을 옮겼다. 주장의 메커니즘(EVPI·λ 벌점)과 질문 수 1.39 대 2.56, λ 0→0.5 의 질문 감소, 대상 도메인 구절은 별개 문장에 있어 이 구절 하나에는 없다. 메커니즘의 실행 임계값 규칙은 수식으로만 제시되어 그대로 옮길 수 있는 문장이 없다. 구절은 WebFetch 가 추출한 내용이므로 원문 HTML 과 글자 단위로 대조하지는 않았다. / 판정: 59.73% 대 Domain-aware ReAct 55.70%는 구절과 맥락에 있고 우위 방향도 같다. 질문 수와 λ 수치는 없다. 구절은 GPT-4o 조건의 값인데 주장은 모델 조건을 빼고 적었다."
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/html/2511.08798v1",
+     "judgments": [
+      {
+       "ref": "sq2#case#1",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목: Structured Uncertainty guided Clarification for LLM Agents. 저자: Manan Suri, Puneet Mathur, Nedim Lipka, Franck Dernoncourt, Ryan A. Rossi, Dinesh Manocha. 게재처: arXiv 프리프린트 2511.08798v1 (cs.CL, 2025-11-11). 본문에 학회 채택 표기는 없음. 본문에서 SAGE-Agent 와 ClarifyBench 명칭을 확인함.",
+       "quote": "On Ambiguous tasks with GPT-4o, SAGE-Agent achieves 59.73% Coverage Rate",
+       "context": "substantially outperforming the strongest baseline (Domain-aware ReAct at 55.70%) / This reduction is even more pronounced compared to Active Task Disambiguation",
+       "reason": "문서가 주장의 사례(SAGE-Agent·ClarifyBench 의 정보 가치 기반 질문 선택)와 같은 논문이며, 평가 구절은 모호한 과제 커버리지 수치를 담은 문장을 옮겼다. 주장의 메커니즘(EVPI·λ 벌점)과 질문 수 1.39 대 2.56, λ 0→0.5 의 질문 감소, 대상 도메인 구절은 별개 문장에 있어 이 구절 하나에는 없다. 메커니즘의 실행 임계값 규칙은 수식으로만 제시되어 그대로 옮길 수 있는 문장이 없다. 구절은 WebFetch 가 추출한 내용이므로 원문 HTML 과 글자 단위로 대조하지는 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2511.08798v1",
+       "ref": "sq2#case#1",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "불일치",
+       "missing": {
+        "numbers_conditions": "평균 질문 수 1.39 대 2.56, λ 0→0.5의 질문 수 18~27% 감소와 커버리지 약 3% 변화"
+       },
+       "unsure_reasons": {},
+       "reason": "59.73% 대 Domain-aware ReAct 55.70%는 구절과 맥락에 있고 우위 방향도 같다. 질문 수와 λ 수치는 없다. 구절은 GPT-4o 조건의 값인데 주장은 모델 조건을 빼고 적었다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": null,
+    "rejudge": null
+   }
+  },
+  {
+   "url": "https://arxiv.org/html/2602.10525v1",
+   "subquestions": [
+    "sq2"
+   ],
+   "output": {
+    "url": "https://arxiv.org/html/2602.10525v1",
+    "judgments": [
+     {
+      "ref": "sq2#case#2",
+      "verdict": "unsupported",
+      "quote": "models generally do not fully recover their original baselines with the exception of GPT-5.2 on SWE-Bench Pro.",
+      "reason": "추출: 논문 제목·arXiv 번호가 LHAW 사례와 일치하고 원문이 열리지만, 옮긴 구절은 Gain/Q 0.09% 문장 하나뿐이라 주장의 정보 제거·분류·질문 건수·MCP-Atlas 수치를 한 구절로 받치지 못한다. / 판정: 0.13%와 0.09%의 높고 낮음, 과잉 질문 38%, 과소 질문 31%, 부록 표의 MCP-Atlas 수치는 맥락에 있다. 그러나 페르소나 대응과 질문 건수, 27%, 회복 실패 서술은 찾지 못했다고 맥락이 적었다. / 보충: 기준선 미회복 서술은 본문 구절로 확인했으나, 0.13%/Q·0.09%/Q의 페르소나 대응, 질문 124건·266건, 과소 질문 27%, MCP-Atlas 0.96→0.44→0.73 구절은 가져온 원문 두 구간 어디에서도 찾지 못했다. 본문에 적힌 과소 질문 비율은 27%가 아니라 31%(Gemini 계열)이고, 0.13%는 Original 행에도 나와 페르소나 대응을 특정할 수 없다. / 재판정: 모델이 대체로 기준선을 완전히 회복하지 못한다는 구절은 주장의 '대체로 회복하지 못함'과 방향과 범위가 같다. 예외인 GPT-5.2 SWE-Bench Pro 를 고려해도 '대체로'라는 한정과 맞는다. 페르소나별 수치와 MCP-Atlas 값은 구절에 없다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "ASYNC-FIRST",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT",
+     "NO-AGREE"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/html/2602.10525v1",
+     "judgments": [
+      {
+       "ref": "sq2#case#2",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'LHAW: Controllable Underspecification for Long-Horizon Tasks', 저자 George Pu 외 8인(Scale AI 소속), 학회·저널 정보 없음, arXiv 2602.10525v1 [cs.CL] 프리프린트(2026-02-11 표기)",
+       "quote": "but with a lower Gain%/Q (0.09%)",
+       "context": "0.09% 문장의 앞뒤: 조건 'when asking ...', 대비 'but', 비교 'lower' 있음. 0.13% 문장('but with a higher Gain%/Q (0.13%)')의 앞뒤: 대비 'On the other hand', 조건 'when', 비교 'higher' 있음. 이 구절에 없는 요소: 임원 0.13%/Q 와 감독자 0.09%/Q 에 대응하는 질문 건수 124건·266건, 목표·제약·입력·맥락 네 차원의 정보 제거 구절('systematically removing information across four dimensions'), 결정적·분기·무해 분류 구절('classifying them as outcome-critical, divergent, or benign based on observed terminal state divergence'), 페르소나 3종 구절('creating 3 user personas'), 과잉 질문 38% 구절('GPT-5.2 has a significant propensity to ask over-clarifying questions (38% of all trials with questions)')과 과소 질문 31% 구절('the Gemini model families are the most likely to under-clarify with the user (31% of all trials with questions)'), 과소 질문 27% 수치(WebFetch 가 찾지 못함), 질문 후 기준선 회복 실패 서술(WebFetch 가 찾지 못함). MCP-Atlas 0.96·0.44·0.73 수치는 본문이 아니라 부록 A.6 표 14 에만 있다(WebFetch 가 원문 앞 100000자 안에서 확인, 전체 139559자 중 뒷부분은 읽지 않음). 대상 과제 구절은 'long-horizon tasks drawn from three benchmarks spanning tool-use and real-world workflows'. 위 인용은 WebFetch 요약이 옮긴 조각이므로 문장 전체가 아니다.",
+       "reason": "논문 제목·arXiv 번호가 LHAW 사례와 일치하고 원문이 열리지만, 옮긴 구절은 Gain/Q 0.09% 문장 하나뿐이라 주장의 정보 제거·분류·질문 건수·MCP-Atlas 수치를 한 구절로 받치지 못한다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "ASYNC-FIRST",
+      "STATE-ASSUME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2602.10525v1",
+       "ref": "sq2#case#2",
+       "numbers_conditions": "정보 부족",
+       "direction": "정보 부족",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "0.13%·0.09%에 대응하는 페르소나 이름, 질문 124건·266건, 과소 질문 27%",
+        "direction": "질문으로 기준선을 회복하지 못했다는 서술"
+       },
+       "unsure_reasons": {},
+       "reason": "0.13%와 0.09%의 높고 낮음, 과잉 질문 38%, 과소 질문 31%, 부록 표의 MCP-Atlas 수치는 맥락에 있다. 그러나 페르소나 대응과 질문 건수, 27%, 회복 실패 서술은 찾지 못했다고 맥락이 적었다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://arxiv.org/html/2602.10525v1",
+     "judgments": [
+      {
+       "ref": "sq2#case#2",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "arXiv 2602.10525v1 HTML 본문에서 LHAW 벤치마크를 확인했다. 목표·제약·입력·맥락 네 차원에서 정보를 지운 변형을 만들고, TheAgentCompany·SWE-Bench Pro·MCP-Atlas에 총 285개 변형을 제공한다는 내용이다. 논문 제목과 저자는 가져온 텍스트에서 확인하지 못했다.",
+       "quote": "models generally do not fully recover their original baselines with the exception of GPT-5.2 on SWE-Bench Pro.",
+       "context": "앞 문장에는 'though'라는 양보 표현이 있다. 문장 안에는 부정('do not fully'), 예외('with the exception of'), 완화('generally') 표현이 있다. 이 답은 WebFetch 요약 결과에서 가져온 것이고, 원문과 글자 단위로 대조하지는 못했다.",
+       "reason": "기준선 미회복 서술은 본문 구절로 확인했으나, 0.13%/Q·0.09%/Q의 페르소나 대응, 질문 124건·266건, 과소 질문 27%, MCP-Atlas 0.96→0.44→0.73 구절은 가져온 원문 두 구간 어디에서도 찾지 못했다. 본문에 적힌 과소 질문 비율은 27%가 아니라 31%(Gemini 계열)이고, 0.13%는 Original 행에도 나와 페르소나 대응을 특정할 수 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-AGREE",
+      "STATE-ASSUME"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2602.10525v1",
+       "ref": "sq2#case#2",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "Gain/Q 0.13%·0.09%, 질문 124건·266건, 과잉 질문 38%·과소 질문 27~31%, MCP-Atlas 0.96→0.44→0.73"
+       },
+       "unsure_reasons": {},
+       "reason": "모델이 대체로 기준선을 완전히 회복하지 못한다는 구절은 주장의 '대체로 회복하지 못함'과 방향과 범위가 같다. 예외인 GPT-5.2 SWE-Bench Pro 를 고려해도 '대체로'라는 한정과 맞는다. 페르소나별 수치와 MCP-Atlas 값은 구절에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentrel02-bp05.html",
+   "subquestions": [
+    "sq2"
+   ],
+   "output": {
+    "url": "https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentrel02-bp05.html",
+    "judgments": [
+     {
+      "ref": "sq2#case#5",
+      "verdict": "unsupported",
+      "quote": "Approval workflows need structure, not just a pause. A structured review request should include the action description, the agent's reasoning, an impact assessment, and the execution history so the reviewer can decide quickly. Configure timeouts that escalate to secondary reviewers or fall back to safe defaults when primary reviewers are unavailable so the system handles reviewer unavailability without blocking indefinitely.",
+      "reason": "추출: 구절이 자동·알림·승인 3등급을 명시해 mechanism 의 등급 부분을 뒷받침하고, 일률 감독의 안티패턴은 목록 항목으로 있으나, 승인 요청의 행동 설명·추론·영향 평가·실행 이력과 시간 초과 시 대체 검토자나 안전 기본값은 이 구절에 없고 다음 단락 'Approval workflows need structure, not just a pause.' 에 있으며, 측정 결과는 원문에 없다. / 판정: 자동·알림·승인 3등급과 위험·되돌림 기준, 일률 감독을 안티패턴으로 든 문장은 구절과 맥락에 있다. 승인 요청 구성과 시간 초과 처리 문장은 없다. / 보충: 원문 한 단락에 승인 요청 4항목(행동 설명·추론·영향 평가·실행 이력)과 시간 초과 시 보조 검토자 상향 또는 안전 기본값 처리가 모두 들어 있어, missing 요소를 포함한 구절을 찾았다. 항목별 수치나 조건의 적합성 판정은 이 판정 칸의 범위 밖이다. / 재판정: 승인 요청에 행동 설명·추론·영향 평가·실행 이력을 넣는다는 구절은 주장과 같다. 시간 초과 시 대체 검토자나 안전 기본값으로 넘긴다는 구절도 주장과 같다. 3등급 구분과 안티패턴 서술은 구절과 맥락에 없다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "NO-AGREE",
+     "FULL-SENTENCE",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "SUBJECT-OBJECT",
+     "STATE-ASSUME",
+     "ASYNC-FIRST"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentrel02-bp05.html",
+     "judgments": [
+      {
+       "ref": "sq2#case#5",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "AWS Well-Architected Agentic AI Lens 의 모범 사례 AGENTREL02-BP05 'Establish tiered human oversight and approval workflows' (Amazon Web Services 발행). 클라우드 사업자의 에이전트 설계 지침이며 등급별 감독을 다룬다는 주장과 일치한다.",
+       "quote": "Risk classification is the first design choice. Categorize agent actions into three tiers. Autonomous actions are low-risk and reversible. Notify actions are medium-risk and proceed with operator awareness. Approve actions are high-risk or irreversible and require explicit human approval.",
+       "context": "Policy-based enforcement applies the classification at runtime rather than relying on reference documentation alone. | Applying uniform oversight regardless of risk, creating bottlenecks for routine tasks or letting high-consequence actions slip through unchecked.",
+       "reason": "구절이 자동·알림·승인 3등급을 명시해 mechanism 의 등급 부분을 뒷받침하고, 일률 감독의 안티패턴은 목록 항목으로 있으나, 승인 요청의 행동 설명·추론·영향 평가·실행 이력과 시간 초과 시 대체 검토자나 안전 기본값은 이 구절에 없고 다음 단락 'Approval workflows need structure, not just a pause.' 에 있으며, 측정 결과는 원문에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-AGREE",
+      "FULL-SENTENCE"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentrel02-bp05.html",
+       "ref": "sq2#case#5",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "승인 요청에 넣는 항목(행동 설명·추론·영향 평가·실행 이력)과 시간 초과 시 대체 검토자·안전 기본값"
+       },
+       "unsure_reasons": {},
+       "reason": "자동·알림·승인 3등급과 위험·되돌림 기준, 일률 감독을 안티패턴으로 든 문장은 구절과 맥락에 있다. 승인 요청 구성과 시간 초과 처리 문장은 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentrel02-bp05.html",
+     "judgments": [
+      {
+       "ref": "sq2#case#5",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "원문 제목 'AGENTREL02-BP05 Establish tiered human oversight and approval workflows' (AWS Well-Architected Agentic AI Lens, 모범 사례 페이지). 주장의 '클라우드 사업자 에이전트 설계 지침의 등급별 감독'과 주제(등급별 감독·승인 워크플로)가 같다. 저자·발행일은 페이지에 따로 확인되지 않았다.",
+       "quote": "Approval workflows need structure, not just a pause. A structured review request should include the action description, the agent's reasoning, an impact assessment, and the execution history so the reviewer can decide quickly. Configure timeouts that escalate to secondary reviewers or fall back to safe defaults when primary reviewers are unavailable so the system handles reviewer unavailability without blocking indefinitely.",
+       "context": "앞 문장(같은 단락 직전): \"What reaches the human queue should be the genuinely ambiguous cases, with policy violations filtered automatically.\" 뒤 문장: \"Log every decision with reviewer identity, rationale, and timestamp, and monitor approval queue depth through Amazon CloudWatch to detect when reviews are accumulating.\" 구절 안의 부정·비교·조건: \"not just a pause\"(일시정지만으로는 부족하다는 대비), \"when primary reviewers are unavailable\"(대체 검토자 또는 안전 기본값 처리가 걸리는 조건).",
+       "reason": "원문 한 단락에 승인 요청 4항목(행동 설명·추론·영향 평가·실행 이력)과 시간 초과 시 보조 검토자 상향 또는 안전 기본값 처리가 모두 들어 있어, missing 요소를 포함한 구절을 찾았다. 항목별 수치나 조건의 적합성 판정은 이 판정 칸의 범위 밖이다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-AGREE",
+      "STATE-ASSUME",
+      "ASYNC-FIRST"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentrel02-bp05.html",
+       "ref": "sq2#case#5",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "자동·알림·승인 3등급 구성과 일률 감독을 안티패턴으로 제시한 문장"
+       },
+       "unsure_reasons": {},
+       "reason": "승인 요청에 행동 설명·추론·영향 평가·실행 이력을 넣는다는 구절은 주장과 같다. 시간 초과 시 대체 검토자나 안전 기본값으로 넘긴다는 구절도 주장과 같다. 3등급 구분과 안티패턴 서술은 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://www.dare.uva.nl/id/2cbf36e0-24e3-4be3-bc5c-01e332c33c9c",
+   "subquestions": [
+    "sq2"
+   ],
+   "output": {
+    "url": "https://www.dare.uva.nl/id/2cbf36e0-24e3-4be3-bc5c-01e332c33c9c",
+    "judgments": [
+     {
+      "ref": "sq2#case#6",
+      "verdict": "unsupported",
+      "quote": "always showing all CQs may be risky and low-quality CQs do disturb users",
+      "reason": "추출: 원문이 열리고 제목·저자가 같은 웹 검색 명확화 질문 사용자 연구이며 인용 구절에 89명 표본이 있어 사례 존재는 일치한다. 다만 이 구절에는 목적·평가 결론이 없고, 그 내용은 초록의 다른 문장에 있으며 본문은 확인하지 못했다. / 판정: 89명 참가자와 품질이 다른 질문 순서를 보여 주는 설계는 구절과 맥락에 있다. 결과와 결론 문장, 예측 모델 제안은 구절과 맥락에 없다. / 보충: 원문 초록이 열려 저자·제목·게재지가 주장의 사례와 일치하고, 'always showing all CQs may be risky and low-quality CQs do disturb users'가 항상 보이기의 위험과 저품질 질문의 방해를 말하지만, 예측 모델 제안·고품질 질문의 이득·탐색 감소와 만족도 저하는 각각 다른 문장에 있어 한 구절에 모든 요소가 들어 있지 않음. / 재판정: 항상 모든 질문을 보이면 위험할 수 있고 저품질 질문이 사용자를 방해한다는 구절은 주장의 결론 방향과 같다. 고품질 질문만 보이면 적은 노력으로 더 나은 성과를 얻는다는 맥락도 주장과 같다. 89명과 탐색·만족도 효과는 구절과 맥락에 없다. 원문의 'may be' 한정은 주장에서 약해졌으나 결론 범위를 넓히지는 않았다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "EVIDENCE-FIRST",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://www.dare.uva.nl/id/2cbf36e0-24e3-4be3-bc5c-01e332c33c9c",
+     "judgments": [
+      {
+       "ref": "sq2#case#6",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목: Asking Clarifying Questions: To benefit or to disturb users in Web search? / 저자: J. Zou, A. Sun, C. Long, M. Aliannejadi, E. Kanoulas / 게재지: Information Processing and Management 60(2), 논문 번호 103176, 2023년 3월 (학술지 논문이며 학회 논문이 아님). 확인 범위는 초록과 메타데이터이고 본문은 확인하지 못했다.",
+       "quote": "Our user study is conducted with 89 participants as search engine users.",
+       "context": "앞 문장: \"We aim to investigate to what extent the trajectory of CQs of different qualities affects user search behavior\" \"and satisfaction, on both query-level and session-level.\" 뒤 문장: \"Participants are asked to complete a set of Web search tasks.\" 두 문장 모두 부정·조건·비교 문장이 아니다.",
+       "reason": "원문이 열리고 제목·저자가 같은 웹 검색 명확화 질문 사용자 연구이며 인용 구절에 89명 표본이 있어 사례 존재는 일치한다. 다만 이 구절에는 목적·평가 결론이 없고, 그 내용은 초록의 다른 문장에 있으며 본문은 확인하지 못했다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "EVIDENCE-FIRST"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://www.dare.uva.nl/id/2cbf36e0-24e3-4be3-bc5c-01e332c33c9c",
+       "ref": "sq2#case#6",
+       "numbers_conditions": "정보 부족",
+       "direction": "정보 부족",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "보여 줄 질문을 고르는 예측 모델 제안",
+        "direction": "저품질 질문의 영향, 고품질 질문의 이득, 항상 질문을 보이는 방식이 위험하다는 결론 문장"
+       },
+       "unsure_reasons": {},
+       "reason": "89명 참가자와 품질이 다른 질문 순서를 보여 주는 설계는 구절과 맥락에 있다. 결과와 결론 문장, 예측 모델 제안은 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://www.dare.uva.nl/id/2cbf36e0-24e3-4be3-bc5c-01e332c33c9c",
+     "judgments": [
+      {
+       "ref": "sq2#case#6",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'Asking Clarifying Questions: To benefit or to disturb users in Web search?', 저자 J. Zou, A. Sun, C. Long, M. Aliannejadi, E. Kanoulas, Information Processing and Management 60(2), 103176 (2023년 3월) 학술지 논문. 초록에 참가자 89명 연구라고 기재됨. 본문은 열리지 않고 초록만 확인함(전문은 PDF 링크만 제공).",
+       "quote": "always showing all CQs may be risky and low-quality CQs do disturb users",
+       "context": "앞 문장 'only showing high-quality CQs while hiding other CQs receives better gains with less effort'에는 제한(only), 대조(while), 비교(better, less) 표현이 있고 부정어는 없음. 뒤 문장 'we further propose a transformer-based model to predict which CQs to ask'에는 목적 표현(to avoid)이 있고 부정어는 없음. 두 문장 모두 원문 그대로 옮긴 것은 WebFetch 응답 안의 인용이며 PDF 본문으로 대조하지 않음.",
+       "reason": "원문 초록이 열려 저자·제목·게재지가 주장의 사례와 일치하고, 'always showing all CQs may be risky and low-quality CQs do disturb users'가 항상 보이기의 위험과 저품질 질문의 방해를 말하지만, 예측 모델 제안·고품질 질문의 이득·탐색 감소와 만족도 저하는 각각 다른 문장에 있어 한 구절에 모든 요소가 들어 있지 않음."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://www.dare.uva.nl/id/2cbf36e0-24e3-4be3-bc5c-01e332c33c9c",
+       "ref": "sq2#case#6",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "참가자 89명, 저품질 질문이 결과 탐색을 줄이고 만족도를 낮춘다는 구체 효과"
+       },
+       "unsure_reasons": {},
+       "reason": "항상 모든 질문을 보이면 위험할 수 있고 저품질 질문이 사용자를 방해한다는 구절은 주장의 결론 방향과 같다. 고품질 질문만 보이면 적은 노력으로 더 나은 성과를 얻는다는 맥락도 주장과 같다. 89명과 탐색·만족도 효과는 구절과 맥락에 없다. 원문의 'may be' 한정은 주장에서 약해졌으나 결론 범위를 넓히지는 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://www.buildmvpfast.com/blog/approval-fatigue-agent-permission-ux-2026",
+   "subquestions": [
+    "sq2"
+   ],
+   "output": {
+    "url": "https://www.buildmvpfast.com/blog/approval-fatigue-agent-permission-ux-2026",
+    "judgments": [
+     {
+      "ref": "sq2#case#7",
+      "verdict": "unsupported",
+      "quote": "Sort them on two axes, reversibility and blast radius, and you fall into three buckets pretty naturally. … Auto-allow, just log it / Run it, async notification with a cancel window / Block and confirm, every time. … And when a user does approve something, save it. … The strongest move is to make a dangerous action safe to run, so you never have to ask about it. … For anything reversible, a confirm dialog is the wrong tool. … Let the action happen and give a one-click undo. … You have probably seen the number: users approve 93 percent of agent permission prompts. … I went looking for the study behind it. There isn’t one. … Parasuraman and Manzey’s 2010 work on automation complacency showed that under real task load, humans defer",
+      "reason": "추출: 사례의 제목·저자·게재처가 실무 글 사례와 맞고 승인 피로로 권한 확인이 형식적 승인이 되는 문제를 직접 서술한 문장을 찾았으나, 3단계 방식 항목은 가져온 구절에서 확인되지 않았고 인용문은 WebFetch 요약을 거쳐 옮긴 것이라 원문 글자 대조가 남아 있다. / 판정: 승인 피로가 권한 확인을 형식적 승인으로 만든다는 문제 정의는 구절과 같다. 해결 방식과 93% 출처 지적은 구절과 맥락에 없다. / 보충: 원문에 3단계 게이트(자동 허용·취소 가능 알림·차단 후 확인), 승인 기억, 샌드박스, 되돌리기 방식, '93 percent' 수치의 출처 부재 지적, 자동화 안주(Parasuraman·Manzey 2010) 인용이 모두 있어 주장의 요소가 확인되지만, 한 문장에 모든 요소가 들어 있지 않아 여러 원문 구절을 …로 이어 옮겼고, 전문 복사는 fetch 모델이 거부해 짧은 인용 조각을 기준으로 판정함. / 재판정: 3단계 구분, 승인 기억, 샌드박스, 되돌리기, 93% 수치의 출처 부재 지적, Parasuraman·Manzey 자동화 안주 연구 인용은 구절과 같다. 보안 경보 무시 통계는 구절에 없다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://www.buildmvpfast.com/blog/approval-fatigue-agent-permission-ux-2026",
+     "judgments": [
+      {
+       "ref": "sq2#case#7",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목: Approval Fatigue Is Breaking Human-in-the-Loop: Designing Agent Permission UX / 저자: Umapathy A / 게재처: BuildMVPFast 블로그, 2026년 7월 5일",
+       "quote": "Approval fatigue turns agent permission prompts into a rubber stamp.",
+       "context": "뒤 문장: \"A developer's guide to permission UX and sandboxing that stays meaningful as agents scale.\" 이 뒤 문장에는 부정이나 비교가 없고 \"as agents scale\" 조건절만 있다. 앞 문장은 본문에 없고 제목이 앞에 있다.",
+       "reason": "사례의 제목·저자·게재처가 실무 글 사례와 맞고 승인 피로로 권한 확인이 형식적 승인이 되는 문제를 직접 서술한 문장을 찾았으나, 3단계 방식 항목은 가져온 구절에서 확인되지 않았고 인용문은 WebFetch 요약을 거쳐 옮긴 것이라 원문 글자 대조가 남아 있다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://www.buildmvpfast.com/blog/approval-fatigue-agent-permission-ux-2026",
+       "ref": "sq2#case#7",
+       "numbers_conditions": "정보 부족",
+       "direction": "정보 부족",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "3단계 권한 구성, 승인 기억, 샌드박스, 되돌리기 방식",
+        "direction": "93% 수치가 출처 불명이라는 지적 문장과 자동화 안주 연구 인용"
+       },
+       "unsure_reasons": {},
+       "reason": "승인 피로가 권한 확인을 형식적 승인으로 만든다는 문제 정의는 구절과 같다. 해결 방식과 93% 출처 지적은 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://www.buildmvpfast.com/blog/approval-fatigue-agent-permission-ux-2026",
+     "judgments": [
+      {
+       "ref": "sq2#case#7",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "확인한 제목·저자는 원문 페이지에서 확인하지 못함. 주제가 에이전트 권한 승인 피로(approval fatigue)를 다룬 실무 블로그 글(buildmvpfast.com)이라 주장의 '에이전트 권한 확인 UX 실무 글(승인 피로)'과 일치함.",
+       "quote": "Sort them on two axes, reversibility and blast radius, and you fall into three buckets pretty naturally. … Auto-allow, just log it / Run it, async notification with a cancel window / Block and confirm, every time. … And when a user does approve something, save it. … The strongest move is to make a dangerous action safe to run, so you never have to ask about it. … For anything reversible, a confirm dialog is the wrong tool. … Let the action happen and give a one-click undo. … You have probably seen the number: users approve 93 percent of agent permission prompts. … I went looking for the study behind it. There isn’t one. … Parasuraman and Manzey’s 2010 work on automation complacency showed that under real task load, humans defer",
+       "context": "'Sort them…' 문장 앞: \"Not every action deserves the same gate.\" / 'I went looking…' 문장 뒤: \"It shows up in blog posts attributed to “Claude Code telemetry” with no link, no sample size, nothing you can check.\" / 샌드박스 문장 앞 소제목: \"Sandbox instead of ask\" (비교 표현). 조건 표현은 확인되지 않음.",
+       "reason": "원문에 3단계 게이트(자동 허용·취소 가능 알림·차단 후 확인), 승인 기억, 샌드박스, 되돌리기 방식, '93 percent' 수치의 출처 부재 지적, 자동화 안주(Parasuraman·Manzey 2010) 인용이 모두 있어 주장의 요소가 확인되지만, 한 문장에 모든 요소가 들어 있지 않아 여러 원문 구절을 …로 이어 옮겼고, 전문 복사는 fetch 모델이 거부해 짧은 인용 조각을 기준으로 판정함."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://www.buildmvpfast.com/blog/approval-fatigue-agent-permission-ux-2026",
+       "ref": "sq2#case#7",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "인용했다는 보안 경보 무시 통계"
+       },
+       "unsure_reasons": {},
+       "reason": "3단계 구분, 승인 기억, 샌드박스, 되돌리기, 93% 수치의 출처 부재 지적, Parasuraman·Manzey 자동화 안주 연구 인용은 구절과 같다. 보안 경보 무시 통계는 구절에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://www.contentstack.com/academy/md/courses/workflow-branches-and-collaboration/content-lifecycle-draft-review-publish.md",
+   "subquestions": [
+    "sq3"
+   ],
+   "output": {
+    "url": "https://www.contentstack.com/academy/md/courses/workflow-branches-and-collaboration/content-lifecycle-draft-review-publish.md",
+    "judgments": [
+     {
+      "ref": "sq3#case#0",
+      "verdict": "unsupported",
+      "quote": "An entry in the \"Approved\" stage is not automatically published.",
+      "reason": "추출: 사례 문서와 승인 후 자동 게시가 아니라는 구절이 원문에 있어 근거로 성립하나, 옮긴 구절은 WebFetch 추출본이라 원문 바이트와는 대조하지 못했다. / 판정: 승인 단계가 자동 게시되지 않고 게시는 별개 행동이라는 서술은 구절과 같다. 그러나 맥락에는 게시 규칙이 허용하면 Review 단계에서도 staging에 게시할 수 있다는 문장이 있다. 그래서 '검토와 승인을 거쳐서만 게시'라는 목적은 원문과 상충한다."
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://www.contentstack.com/academy/md/courses/workflow-branches-and-collaboration/content-lifecycle-draft-review-publish.md",
+     "judgments": [
+      {
+       "ref": "sq3#case#0",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "문서 제목 'Content lifecycle: draft, review, publish' (Contentstack Academy, 과정 'Workflow, Branches, and Collaboration', 레슨 02). 저자는 문서에 명시되지 않았다. 주장의 사례 '콘텐츠 관리 도구의 초안·검토·승인·게시 작업 흐름'을 이 문서가 다룬다.",
+       "quote": "An entry in the \"Approved\" stage is not automatically published.",
+       "context": "구절이 든 콜아웃의 절 제목은 'Publishing is separate from workflow stages'이고, 콜아웃 안에 앞 문장은 없다. 뒤 문장은 'Publishing and workflow status are independent dimensions, always check both when debugging content visibility.'이다. 같은 절 다음 단락에 부정 'The publish action is not a workflow transition.'과 비교 'An entry can be Approved yet published to zero environments'(yet), 'published to staging while still in Review'(while)가 있고, 조건 '(if publish rules allow it)'이 있다. 구절 앞뒤에 'only'·'unless'는 없다.",
+       "reason": "사례 문서와 승인 후 자동 게시가 아니라는 구절이 원문에 있어 근거로 성립하나, 옮긴 구절은 WebFetch 추출본이라 원문 바이트와는 대조하지 못했다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://www.contentstack.com/academy/md/courses/workflow-branches-and-collaboration/content-lifecycle-draft-review-publish.md",
+       "ref": "sq3#case#0",
+       "numbers_conditions": "정보 부족",
+       "direction": "불일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "Draft→Review→Approved 단계 전이에 권한을 둔다는 문장"
+       },
+       "unsure_reasons": {},
+       "reason": "승인 단계가 자동 게시되지 않고 게시는 별개 행동이라는 서술은 구절과 같다. 그러나 맥락에는 게시 규칙이 허용하면 Review 단계에서도 staging에 게시할 수 있다는 문장이 있다. 그래서 '검토와 승인을 거쳐서만 게시'라는 목적은 원문과 상충한다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": null,
+    "rejudge": null
+   }
+  },
+  {
+   "url": "https://qms2go.com/learn/document-control",
+   "subquestions": [
+    "sq3"
+   ],
+   "output": {
+    "url": "https://qms2go.com/learn/document-control",
+    "judgments": [
+     {
+      "ref": "sq3#case#1",
+      "verdict": "unsupported",
+      "quote": "A named authority approves for suitability and adequacy before release.",
+      "reason": "추출: 원문이 열리고 승인 목적과 승인권자·실무자·품질 담당의 역할 분담은 뒷받침되나, 심사원이 사용 전 승인을 가장 먼저 시험한다는 평가와 효과 측정 데이터는 원문에 없고, 대상은 'the organization'으로 서술돼 'QMS 운영 조직' 표현은 그대로 없다. / 판정: 지정 승인권자가 배포 전 승인하고 실무자 기술 검토와 품질 충분성 검토를 둔다는 서술은 구절과 같다. 그러나 맥락에 따르면 심사원이 점검하는 순서에서 승인 증거는 세 번째이고 첫 번째는 마스터 목록이므로 '가장 먼저 시험한다'는 평가는 원문과 다르다."
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "NO-AGREE",
+     "STATE-ASSUME",
+     "SUBJECT-OBJECT",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://qms2go.com/learn/document-control",
+     "judgments": [
+      {
+       "ref": "sq3#case#1",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "페이지 제목 'ISO 9001 Document Control: Complete Guide'(WebFetch 응답 기준)로, ISO 9001 clause 7.5 문서 관리를 해설하는 페이지다. 저자·발행 기관은 확인하지 못했다.",
+       "quote": "A named authority approves for suitability and adequacy before release.",
+       "context": "구절은 표 인접 셀에서 옮겼다. 인접 문장으로 \"The process owner writes it, not the quality department.\"(부정 'not')와 \"Quality writes the work instruction alone, so the floor never recognizes it as theirs.\"(부정 'never')가 있다. 같은 역할 분담을 적은 \"Technical review by someone who does the work, plus a quality review for adequacy.\"는 조건·부정 표현이 없다. 없는 요소: 심사원이 '사용 전 승인'을 가장 먼저 시험한다는 평가는 원문에 없다. 가장 가까운 문장은 \"The eight checks above, in the order a registrar walks them:\" 뒤의 목록으로, 승인 증거는 세 번째이고 첫 번째는 마스터 목록이다. 효과 측정 데이터도 없다. 구절은 WebFetch 요약 응답에서 옮긴 것이며 원문과 글자 단위로 대조하지 않았다.",
+       "reason": "원문이 열리고 승인 목적과 승인권자·실무자·품질 담당의 역할 분담은 뒷받침되나, 심사원이 사용 전 승인을 가장 먼저 시험한다는 평가와 효과 측정 데이터는 원문에 없고, 대상은 'the organization'으로 서술돼 'QMS 운영 조직' 표현은 그대로 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-AGREE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://qms2go.com/learn/document-control",
+       "ref": "sq3#case#1",
+       "numbers_conditions": "불일치",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {},
+       "unsure_reasons": {},
+       "reason": "지정 승인권자가 배포 전 승인하고 실무자 기술 검토와 품질 충분성 검토를 둔다는 서술은 구절과 같다. 그러나 맥락에 따르면 심사원이 점검하는 순서에서 승인 증거는 세 번째이고 첫 번째는 마스터 목록이므로 '가장 먼저 시험한다'는 평가는 원문과 다르다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": null,
+    "rejudge": null
+   }
+  },
+  {
+   "url": "https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/",
+   "subquestions": [
+    "sq3"
+   ],
+   "output": {
+    "url": "https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/",
+    "judgments": [
+     {
+      "ref": "sq3#case#2",
+      "verdict": "supported",
+      "quote": "Defined outputs from the previous Stage – such as research findings, technical results,",
+      "reason": "추출: 원문이 열려 Cooper 의 Stage-Gate 개요 문서임을 확인했고, 인용한 문장이 결정 요소(Go/Kill/Hold/Recycle)를 뒷받침하며, 산출물(\"Defined outputs from the previous Stage\")과 기준(readiness·value)은 다른 문장에 있고 페이지가 결정을 기준에 명시적으로 연결하지 않으며, prior.evaluation 의 효과 측정 유무는 수치 판정 영역이라 판정하지 않으나 fetch 결과에는 \"often reduced by 30%\" 문장이 보고되었다. / 판정: Go/Kill/Hold/Recycle 결정과 Go일 때 자원을 확정한다는 조건은 구절과 맥락에 있다. 그러나 산출물과 기준 항목 문장은 없다. / 보충: 원문은 이전 단계 산출물을 게이트 기준으로 쓴다는 문장을 담고 있으나, 준비도·가치 기준과 Go/Kill/Hold/Recycle 결정은 각각 다른 문장에 있어 한 구절에 주장의 요소가 모두 들어 있지 않다. / 재판정: 게이트마다 이전 단계의 정해진 산출물을 둔다는 구절은 주장과 같다. 준비도·가치 기준과 Go/Kill/Hold/Recycle 결정도 맥락의 별도 문장에 그대로 있다. 주장은 게이트 구성을 넘어 일반화하지 않았다."
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "ASYNC-FIRST",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT",
+     "NO-SQUEEZE",
+     "STATE-ASSUME"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/",
+     "judgments": [
+      {
+       "ref": "sq3#case#2",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "stage-gate.com 블로그의 Stage-Gate 모델 개요 글(URL 슬러그 the-stage-gate-model-an-overview), 저자 Dr. Robert G. Cooper (WebFetch 결과 기준, 페이지 제목 문구는 결과에 명시되지 않음)",
+       "quote": "Typical outcomes are Go, Kill, Hold, or Recycle.",
+       "context": "조건: \"For Go decisions, the Gate also confirms the resourcing for the next Stage\". 부정: \"approval without resources\". 비교: \"than traditional financial models alone\" (앞 문단 Gate criteria 항목).",
+       "reason": "원문이 열려 Cooper 의 Stage-Gate 개요 문서임을 확인했고, 인용한 문장이 결정 요소(Go/Kill/Hold/Recycle)를 뒷받침하며, 산출물(\"Defined outputs from the previous Stage\")과 기준(readiness·value)은 다른 문장에 있고 페이지가 결정을 기준에 명시적으로 연결하지 않으며, prior.evaluation 의 효과 측정 유무는 수치 판정 영역이라 판정하지 않으나 fetch 결과에는 \"often reduced by 30%\" 문장이 보고되었다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "ASYNC-FIRST",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/",
+       "ref": "sq3#case#2",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "'Defined outputs from the previous Stage' 문장과 준비도·가치 기준"
+       },
+       "unsure_reasons": {},
+       "reason": "Go/Kill/Hold/Recycle 결정과 Go일 때 자원을 확정한다는 조건은 구절과 맥락에 있다. 그러나 산출물과 기준 항목 문장은 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/",
+     "judgments": [
+      {
+       "ref": "sq3#case#2",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "페이지 제목 'The Stage-Gate Model: An Overview', 사이트 stage-gate.com. 저자와 학회는 확인하지 못함. 페이지가 Stage-Gate 모델의 게이트 구성을 설명하므로 주장이 가리키는 사례와 같은 문서로 판단함.",
+       "quote": "Defined outputs from the previous Stage – such as research findings, technical results,",
+       "context": "앞 문장 'Each Gate typically comprises three components:' 에는 부정·조건·비교 표현이 없다. 뒤 문장 'Because deliverables are clearly specified ahead of time, expectations are transparent' 에는 인과 표현 'Because' 만 있고 부정·비교 표현은 없다. 주장의 준비도·가치 기준은 이 구절에 없고 'They include both project readiness and project value.' 라는 별도 문장에 있으며, Go/Kill/Hold/Recycle 결정은 'Typical outcomes are Go, Kill, Hold, or Recycle.' 라는 또 다른 문장에 있다.",
+       "reason": "원문은 이전 단계 산출물을 게이트 기준으로 쓴다는 문장을 담고 있으나, 준비도·가치 기준과 Go/Kill/Hold/Recycle 결정은 각각 다른 문장에 있어 한 구절에 주장의 요소가 모두 들어 있지 않다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-SQUEEZE",
+      "STATE-ASSUME"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/",
+       "ref": "sq3#case#2",
+       "numbers_conditions": "일치",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {},
+       "unsure_reasons": {},
+       "reason": "게이트마다 이전 단계의 정해진 산출물을 둔다는 구절은 주장과 같다. 준비도·가치 기준과 Go/Kill/Hold/Recycle 결정도 맥락의 별도 문장에 그대로 있다. 주장은 게이트 구성을 넘어 일반화하지 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://www.aakashx.com/blog/agent-architecture-loops-planning-verification/",
+   "subquestions": [
+    "sq3"
+   ],
+   "output": {
+    "url": "https://www.aakashx.com/blog/agent-architecture-loops-planning-verification/",
+    "judgments": [
+     {
+      "ref": "sq3#case#3",
+      "verdict": "unsupported",
+      "quote": "Possible triggers: \"confidence below threshold\", \"policy conflict\", \"missing evidence\", \"budget exhaustion\", \"repeated failure\", \"tool unavailable\", \"high-value action\", \"security-sensitive operation\", \"legal ambiguity\", \"customer dispute\"",
+      "reason": "추출: 원문 6.56 에스컬레이션 절이 사람 확인을 설계 대상으로 두고, 이어지는 'Possible triggers' 목록에 신뢰도 기준 미달과 근거 부족(missing evidence), 고가치 행동이 있으며, 6.54 에 '< .60 → escalate', 6.65 에 'HUMAN APPROVAL REQUIRED' 가 있어 사람 확인 요소는 확인된다. 루프 단계 목록(6.63, 번호 항목 3·6·8·9·11·12·13·15·17 등에서 맥락 수집·행동 제안·권한·정책·도구 호출·관측·결과 검증·종료·계속 확인)은 원문에 있으나 목록을 한 구절로 옮길 수 없어 quote 에서 뺐다. / 판정: 사람에게 넘기는 조건을 미리 설계하라는 방향은 구절과 같다. 그러나 루프 단계와 넘김 조건 목록은 구절과 맥락에 없다. / 보충: 6.56 목록은 신뢰도 낮음(confidence below threshold)·위험 높음(high-value action)·근거 없음(missing evidence)을 원문 영어로 담지만, 승인 필요는 이 목록에 없고 6.63 의 단계 \"Obtain approval if needed\" 에만 있으며, 루프 단계 순서는 원문 구절로 확인하지 못해 요소를 모두 담은 구절이 없다. / 재판정: 사람에게 넘기는 트리거 중 신뢰도 기준 미달·근거 누락·고가치·보안 민감 작업은 주장의 신뢰도 낮음·근거 없음·위험 높음과 맞는다. 루프 단계 순서와 '승인 필요' 트리거는 구절과 맥락에 없다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "SPECIFIC-NAME",
+     "TERM-ONE",
+     "FULL-SENTENCE",
+     "SUBJECT-OBJECT",
+     "STATE-ASSUME"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://www.aakashx.com/blog/agent-architecture-loops-planning-verification/",
+     "judgments": [
+      {
+       "ref": "sq3#case#3",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'Agent Architecture: Loops, Planning, Verification and Termination', 저자 Aakash Ahuja, 게시처는 저자 개인 블로그 aakashx.com(학회·학술지 아님), 게시일 2026-08-16. 주장의 에이전트 실행 루프·검증·종료·사람 확인 내용이 본문에 있다.",
+       "quote": "Escalation should be designed, not improvised.",
+       "context": "앞 문장 \"Do not use one universal threshold across the whole platform.\" 에 부정 표현이 있다. 뒤 문장 \"Possible triggers:\" 에는 부정·조건·비교 표현이 없다. 앞뒤 문장 모두 조건 표현(if, when, only if)과 비교 표현(than, rather than)은 없다.",
+       "reason": "원문 6.56 에스컬레이션 절이 사람 확인을 설계 대상으로 두고, 이어지는 'Possible triggers' 목록에 신뢰도 기준 미달과 근거 부족(missing evidence), 고가치 행동이 있으며, 6.54 에 '< .60 → escalate', 6.65 에 'HUMAN APPROVAL REQUIRED' 가 있어 사람 확인 요소는 확인된다. 루프 단계 목록(6.63, 번호 항목 3·6·8·9·11·12·13·15·17 등에서 맥락 수집·행동 제안·권한·정책·도구 호출·관측·결과 검증·종료·계속 확인)은 원문에 있으나 목록을 한 구절로 옮길 수 없어 quote 에서 뺐다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://www.aakashx.com/blog/agent-architecture-loops-planning-verification/",
+       "ref": "sq3#case#3",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "루프 단계 순서와 사람에게 넘기는 조건(신뢰도 낮음·위험 높음·근거 없음·승인 필요)"
+       },
+       "unsure_reasons": {},
+       "reason": "사람에게 넘기는 조건을 미리 설계하라는 방향은 구절과 같다. 그러나 루프 단계와 넘김 조건 목록은 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "TERM-ONE",
+      "FULL-SENTENCE",
+      "SUBJECT-OBJECT"
+     ]
+    },
+    "refetch": {
+     "url": "https://www.aakashx.com/blog/agent-architecture-loops-planning-verification/",
+     "judgments": [
+      {
+       "ref": "sq3#case#3",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "페이지 제목과 저자는 확인하지 못했다. 열린 문서는 에이전트 아키텍처 글이고 6.17 Agent Loops, 6.56 Escalation Policies, 6.63 A More Precise Agent Execution Lifecycle 절을 담고 있다.",
+       "quote": "Possible triggers: \"confidence below threshold\", \"policy conflict\", \"missing evidence\", \"budget exhaustion\", \"repeated failure\", \"tool unavailable\", \"high-value action\", \"security-sensitive operation\", \"legal ambiguity\", \"customer dispute\"",
+       "context": "앞 문장 \"Escalation should be designed, not improvised.\" 에는 부정 표현 not 이 있고 조건·비교는 없다. 뒤 문장 \"Possible escalation destinations:\" 에는 부정·조건·비교가 없다.",
+       "reason": "6.56 목록은 신뢰도 낮음(confidence below threshold)·위험 높음(high-value action)·근거 없음(missing evidence)을 원문 영어로 담지만, 승인 필요는 이 목록에 없고 6.63 의 단계 \"Obtain approval if needed\" 에만 있으며, 루프 단계 순서는 원문 구절로 확인하지 못해 요소를 모두 담은 구절이 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://www.aakashx.com/blog/agent-architecture-loops-planning-verification/",
+       "ref": "sq3#case#3",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "맥락 수집→행동 결정→정책 검사→행동→관측→검증→계속·종료 루프 단계, '승인 필요' 트리거"
+       },
+       "unsure_reasons": {},
+       "reason": "사람에게 넘기는 트리거 중 신뢰도 기준 미달·근거 누락·고가치·보안 민감 작업은 주장의 신뢰도 낮음·근거 없음·위험 높음과 맞는다. 루프 단계 순서와 '승인 필요' 트리거는 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://www.kunalganglani.com/blog/tool-approval-patterns-ai-agents",
+   "subquestions": [
+    "sq3"
+   ],
+   "output": {
+    "url": "https://www.kunalganglani.com/blog/tool-approval-patterns-ai-agents",
+    "judgments": [
+     {
+      "ref": "sq3#case#4",
+      "verdict": "unsupported",
+      "quote": "The uncomfortable truth is that review quality collapses when approvals are frequent.",
+      "reason": "추출: 원문이 열리고 승인 방식 분류(자동 허용·범위 승인·계획 단위 승인·위험 단계별 승인)를 사다리로 조합하라는 문장이 원문에 있다. 다만 분류에는 실험이나 측정이 없고 비교 표의 Low/Medium/High 는 저자의 정성 평가이며, 'The uncomfortable truth is that review quality collapses when approvals are frequent.' 문장도 저자 경험에 근거한 주장으로 측정 수치가 없다. 인용 구절은 WebFetch 요약 모델이 옮긴 것이므로 원문 HTML 과 글자 단위로는 대조하지 않았다. / 판정: 구절 'These patterns are composable. Don't pick one. Build a ladder.'와 뒤 문장 'If a tool is safe-by-construction, don't ask.'는 승인 패턴을 사다리로 조합한다는 메커니즘과 정책 자동 허용에 맞는다. 그러나 주장이 인용한 계획 단위 승인 문장과 승인 피로 문장은 구절과 맥락에 없다. 주장은 구절보다 넓게 일반화하지 않았다. / 보충: 원문이 열리고 같은 주제(AI 에이전트 도구 승인 패턴)를 다루므로 일치하며, 한 문장에 주장의 모든 요소가 없어 승인 피로 문장을 옮기고 계획 단위·위험 단계별 항목은 context 에 옮김. / 재판정: 승인이 잦으면 검토 품질이 무너진다는 구절은 주장의 인용과 같다. 계획 단위 승인과 위험 단계별 승인 항목도 맥락이 원문으로 확인했다. 정책 자동 허용·범위 승인 항목과 측정 유무는 맥락이 옮기지 않았다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "ASYNC-FIRST",
+     "SPECIFIC-NAME",
+     "FULL-SENTENCE",
+     "TERM-ONE",
+     "SUBJECT-OBJECT"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://www.kunalganglani.com/blog/tool-approval-patterns-ai-agents",
+     "judgments": [
+      {
+       "ref": "sq3#case#4",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "확인한 제목: \"10 HITL Tool Approval Patterns for AI Agents\". 저자: Kunal Ganglani. 발행처: 개인 블로그 kunalganglani.com (학회 없음). 발행일: 2026-08-07, 최종 검토 2026-10-29 (WebFetch 요약 기준). 주장의 사례명 '에이전트 도구 승인 패턴과 승인 피로'의 주제와 같은 글이다.",
+       "quote": "These patterns are composable. Don't pick one. Build a ladder.",
+       "context": "앞 문장: \"Below is the catalog I wish more teams started with.\" 뒤 문장(목록 첫 항목): \"If a tool is safe-by-construction, don't ask.\" 구절 안과 뒤 문장에 부정(Don't pick one, don't ask)과 조건(If ...)이 있고, 앞뒤 문장에 비교 표현은 없다. 비교 표는 이 구절 뒤의 별도 섹션에 있다.",
+       "reason": "원문이 열리고 승인 방식 분류(자동 허용·범위 승인·계획 단위 승인·위험 단계별 승인)를 사다리로 조합하라는 문장이 원문에 있다. 다만 분류에는 실험이나 측정이 없고 비교 표의 Low/Medium/High 는 저자의 정성 평가이며, 'The uncomfortable truth is that review quality collapses when approvals are frequent.' 문장도 저자 경험에 근거한 주장으로 측정 수치가 없다. 인용 구절은 WebFetch 요약 모델이 옮긴 것이므로 원문 HTML 과 글자 단위로는 대조하지 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "ASYNC-FIRST",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://www.kunalganglani.com/blog/tool-approval-patterns-ai-agents",
+       "ref": "sq3#case#4",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "계획 단위 승인 인용문 'Tools can run only if they match the plan', 'Review quality collapses when approvals are frequent' 문장, 위험 단계별 승인 항목"
+       },
+       "unsure_reasons": {},
+       "reason": "구절 'These patterns are composable. Don't pick one. Build a ladder.'와 뒤 문장 'If a tool is safe-by-construction, don't ask.'는 승인 패턴을 사다리로 조합한다는 메커니즘과 정책 자동 허용에 맞는다. 그러나 주장이 인용한 계획 단위 승인 문장과 승인 피로 문장은 구절과 맥락에 없다. 주장은 구절보다 넓게 일반화하지 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE"
+     ]
+    },
+    "refetch": {
+     "url": "https://www.kunalganglani.com/blog/tool-approval-patterns-ai-agents",
+     "judgments": [
+      {
+       "ref": "sq3#case#4",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 '10 HITL Tool Approval Patterns for AI Agents' (브라우저 제목 'HITL Approval Patterns for AI Agent Tool Calls'), 저자 Kunal Ganglani, kunalganglani.com 블로그, 2026-08-07 게재로 확인함(저자·게재일은 첫 조회 요약 기준).",
+       "quote": "The uncomfortable truth is that review quality collapses when approvals are frequent.",
+       "context": "구절 직후 문장 \"It’s not just that you miss threats.\" 에 부정(not)과 비교(not just)가 있음. 구절 직전 문장은 원문 그대로 옮기지 못함(두 번째 조회에서 문장 전체가 확인되지 않음). 없는 요소: 계획 단위 승인 항목 원문 \"Plan-level checkpoint. Human approves the agent’s plan before execution. Tools can run only if they match the plan.\" 와 위험 단계별 승인 항목 원문 \"Risk-tiered step-up. Low risk auto, medium risk single-approver, high risk two-person rule.\" 는 이 구절과 다른 문단(목록 항목)에 있음. 두 항목은 이번 조회에서 원문 그대로 확인함. 정책 자동 허용·범위 승인 항목과 측정 유무는 이번 조회에서 옮기지 않음.",
+       "reason": "원문이 열리고 같은 주제(AI 에이전트 도구 승인 패턴)를 다루므로 일치하며, 한 문장에 주장의 모든 요소가 없어 승인 피로 문장을 옮기고 계획 단위·위험 단계별 항목은 context 에 옮김."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://www.kunalganglani.com/blog/tool-approval-patterns-ai-agents",
+       "ref": "sq3#case#4",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "정책 자동 허용·범위 승인 항목 원문과 측정이 없다는 사실"
+       },
+       "unsure_reasons": {},
+       "reason": "승인이 잦으면 검토 품질이 무너진다는 구절은 주장의 인용과 같다. 계획 단위 승인과 위험 단계별 승인 항목도 맥락이 원문으로 확인했다. 정책 자동 허용·범위 승인 항목과 측정 유무는 맥락이 옮기지 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://writingcommons.org/section/writing-process/problem-solving-strategies/",
+   "subquestions": [
+    "sq3"
+   ],
+   "output": {
+    "url": "https://writingcommons.org/section/writing-process/problem-solving-strategies/",
+    "judgments": [
+     {
+      "ref": "sq3#case#5",
+      "verdict": "unsupported",
+      "quote": "Flower and Hayes conceptualized the writing process to be composed of three major cognitive activities:",
+      "reason": "추출: 원문이 열리고 Hayes·Flower 모델을 해설하는 페이지가 맞으나, 구절은 monitor 를 원 모델의 개념으로 두고 2012 개정에서 그 개념을 뺐다고 적어 주장의 감시 장치 서술을 그대로 뒷받침하지 않으며, 사고 구술 프로토콜 언급은 페이지에 없다. / 판정: 구절은 monitor 가 planning·translating·reviewing 사이 전환을 설명한다고 적는다. 맥락은 2012 모델이 선형 제시와 달리 recursive and iterative 라고 강조한다고 적으므로 방향과 범위가 맞는다. 그러나 사고 구술 프로토콜 연구라는 출처 조건은 구절과 맥락에 없고, source_note 도 이 페이지에 그 언급이 없다고 적는다. / 보충: 계획·번역·검토 세 과정과 재귀성은 페이지에 있으나, 모델이 사고 구술 프로토콜 연구에서 나왔다는 보충 요소의 근거는 페이지에 없다(WebFetch 두 번 호출 모두 think-aloud 나 연구 방법에 대한 언급이 없다고 확인했다). 그래서 missing 요소는 뒷받침되지 않는다. / 재판정: 세 인지 활동과 계획·번역·검토 구성은 구절과 맥락에 있다. 원래 모델이 선형이었고 개정판이 재귀적이라는 내용도 맥락에 있어 주장의 방향과 같다. 사고 구술 프로토콜 근거는 구절과 맥락에 없다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "FULL-SENTENCE",
+     "TERM-ONE",
+     "EVIDENCE-FIRST",
+     "SUBJECT-OBJECT"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://writingcommons.org/section/writing-process/problem-solving-strategies/",
+     "judgments": [
+      {
+       "ref": "sq3#case#5",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "페이지 제목 'Problem-Solving Strategies for Writers: a Review of Research', 저자 Joseph M. Moxley, Writing Commons (© 2023). 이 해설 페이지가 Hayes & Flower 모델(1980, 2012 개정 Hayes)을 다룬다. 원 논문 자체가 아니며 사고 구술 프로토콜 언급은 페이지에 없다.",
+       "quote": "introduced the concept of a “monitor” to account for how writers switch between planning, translating, and reviewing",
+       "context": "원문 앞 문장은 planning, translating, reviewing 을 나열하며 부정·비교 표현이 없다. 같은 문장 안에 조건 표현 'based on the writer’s assessment of the text' 가 있다. 뒤 문장은 \"In his revision, Hayes omitted the concept of the monitor and he suggested that composing occurs on three levels:\" 이다. 2012 개정 단락은 \"presented the writing subprocesses (planning, translating, and reviewing) in a linear fashion\" 과 \"However, the 2012 model emphasizes that these processes are recursive and iterative, meaning that writers continually move back and forth between these stages\" 를 담는다. 인용 구절은 125자 제한으로 앞 'They also' 가 잘려 있다.",
+       "reason": "원문이 열리고 Hayes·Flower 모델을 해설하는 페이지가 맞으나, 구절은 monitor 를 원 모델의 개념으로 두고 2012 개정에서 그 개념을 뺐다고 적어 주장의 감시 장치 서술을 그대로 뒷받침하지 않으며, 사고 구술 프로토콜 언급은 페이지에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://writingcommons.org/section/writing-process/problem-solving-strategies/",
+       "ref": "sq3#case#5",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "모델이 사고 구술 프로토콜 연구에서 나왔다는 근거"
+       },
+       "unsure_reasons": {},
+       "reason": "구절은 monitor 가 planning·translating·reviewing 사이 전환을 설명한다고 적는다. 맥락은 2012 모델이 선형 제시와 달리 recursive and iterative 라고 강조한다고 적으므로 방향과 범위가 맞는다. 그러나 사고 구술 프로토콜 연구라는 출처 조건은 구절과 맥락에 없고, source_note 도 이 페이지에 그 언급이 없다고 적는다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE"
+     ]
+    },
+    "refetch": {
+     "url": "https://writingcommons.org/section/writing-process/problem-solving-strategies/",
+     "judgments": [
+      {
+       "ref": "sq3#case#5",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "페이지 제목은 확인하지 못했다(URL 경로 problem-solving-strategies, Writing Commons writing-process 절). 페이지가 Flower·Hayes 모델을 해설하므로 사례는 일치한다. 저자와 학회는 이 페이지에서 확인하지 못했다.",
+       "quote": "Flower and Hayes conceptualized the writing process to be composed of three major cognitive activities:",
+       "context": "The original Hayes-Flower model presented the writing subprocesses (planning, translating, and reviewing) in a linear fashion. / In his revision, Hayes omitted the concept of the monitor. (페이지가 2012 개정판 재귀성을 다룬 문장은 \"these processes are recursive and iterative\"이다. 이 구절은 WebFetch 요약이 옮긴 것이므로 원문 대조가 필요하다.)",
+       "reason": "계획·번역·검토 세 과정과 재귀성은 페이지에 있으나, 모델이 사고 구술 프로토콜 연구에서 나왔다는 보충 요소의 근거는 페이지에 없다(WebFetch 두 번 호출 모두 think-aloud 나 연구 방법에 대한 언급이 없다고 확인했다). 그래서 missing 요소는 뒷받침되지 않는다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "EVIDENCE-FIRST"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://writingcommons.org/section/writing-process/problem-solving-strategies/",
+       "ref": "sq3#case#5",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "사고 구술 프로토콜 연구에서 나왔다는 내용"
+       },
+       "unsure_reasons": {},
+       "reason": "세 인지 활동과 계획·번역·검토 구성은 구절과 맥락에 있다. 원래 모델이 선형이었고 개정판이 재귀적이라는 내용도 맥락에 있어 주장의 방향과 같다. 사고 구술 프로토콜 근거는 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://arxiv.org/html/2502.13069v3",
+   "subquestions": [
+    "sq3"
+   ],
+   "output": {
+    "url": "https://arxiv.org/html/2502.13069v3",
+    "judgments": [
+     {
+      "ref": "sq3#case#6",
+      "verdict": "unsupported",
+      "quote": "up to 74% over the non-interactive settings",
+      "reason": "추출: 사례의 제목·저자·목적·조건(Full·Hidden·Interaction, Neutral·Moderate·Strong)과 대상 모델(OpenHands 환경의 코딩 에이전트, GPT-4o 사용자 대리 모델)은 원문과 일치하고, 74% 상호작용 이득 문장은 원문에서 확인된다. 다만 evaluation 의 89%와 강한 프롬프트 조건은 한 문장에 함께 있지 않고 여러 문장에 나뉘어 있어, 한 문장 구절로는 모든 요소를 옮길 수 없다. / 판정: 'up to 74% over the non-interactive settings'와 'LLMs default to non-interactive behavior without explicit encouragement'는 주장과 같다. 그러나 89%는 'Claude Sonnet 4 and Claude Sonnet 3.5 ... (89% and 84%)' 문장에 있다. 강한 프롬프트 조건은 'Claude Sonnet 4 achieves the best performance with Strong Encouragement'라는 별도 문장에 있어서, 89% 가 강한 프롬프트 조건의 값인지 정할 수 없다. 상호작용이 성능을 높였다는 방향과 '최대'라는 한정은 구절과 같다. / 판정 불가: numbers_conditions=조건 얽힘"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "FULL-SENTENCE",
+     "TERM-ONE"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/html/2502.13069v3",
+     "judgments": [
+      {
+       "ref": "sq3#case#6",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목: Ambig-SWE: Interactive Agents to Overcome Underspecificity in Software Engineering. 저자: Sanidhya Vijayvargiya, Xuhui Zhou, Akhila Yerukola, Maarten Sap, Graham Neubig. 게재처: 본문에 학회명 없음, arXiv 프리프린트 2502.13069v3(cs.AI).",
+       "quote": "up to 74% over the non-interactive settings",
+       "context": "요약 도구가 옮긴 부분 구절 기준. 74% 문장에는 \"However, when models interact for underspecified inputs\"(대비·조건)와 \"over the non-interactive settings\"(비교)가 있다. 89% 관련 구절은 \"(89% and 84%, respectively)\"(비교)와 \"Prompt engineering offers limited improvement\"(제한적 효과)이며, \"Claude Sonnet 4 and Claude Sonnet 3.5 are the only evaluated LLMs that achieve notable accuracy\"는 한정 구절이다. 강한 프롬프트 조건은 별도 문장 \"Claude Sonnet 4 achieves the best performance with Strong Encouragement\"에 있다. 그 \"LLMs default to non-interactive behavior without explicit encouragement\" 구절은 \"even with it\"(조건)과 \"without explicit encouragement\"(부정)을 포함한다.",
+       "reason": "사례의 제목·저자·목적·조건(Full·Hidden·Interaction, Neutral·Moderate·Strong)과 대상 모델(OpenHands 환경의 코딩 에이전트, GPT-4o 사용자 대리 모델)은 원문과 일치하고, 74% 상호작용 이득 문장은 원문에서 확인된다. 다만 evaluation 의 89%와 강한 프롬프트 조건은 한 문장에 함께 있지 않고 여러 문장에 나뉘어 있어, 한 문장 구절로는 모든 요소를 옮길 수 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/html/2502.13069v3",
+       "ref": "sq3#case#6",
+       "numbers_conditions": "판정 불가",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {},
+       "unsure_reasons": {
+        "numbers_conditions": "조건 얽힘"
+       },
+       "reason": "'up to 74% over the non-interactive settings'와 'LLMs default to non-interactive behavior without explicit encouragement'는 주장과 같다. 그러나 89%는 'Claude Sonnet 4 and Claude Sonnet 3.5 ... (89% and 84%)' 문장에 있다. 강한 프롬프트 조건은 'Claude Sonnet 4 achieves the best performance with Strong Encouragement'라는 별도 문장에 있어서, 89% 가 강한 프롬프트 조건의 값인지 정할 수 없다. 상호작용이 성능을 높였다는 방향과 '최대'라는 한정은 구절과 같다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE"
+     ]
+    },
+    "refetch": null,
+    "rejudge": null
+   }
+  },
+  {
+   "url": "https://arxiv.org/abs/2602.10525",
+   "subquestions": [
+    "sq3"
+   ],
+   "output": {
+    "url": "https://arxiv.org/abs/2602.10525",
+    "judgments": [
+     {
+      "ref": "sq3#case#7",
+      "verdict": "unsupported",
+      "quote": "transforms any well-specified task into controllable underspecified variants by systematically removing information",
+      "reason": "추출: 285개 변형과 결과 결정적·분기·무해 3범주, 목적(목표·제약·입력·맥락 정보 누락 평가)과 질문 비용 고려 설계는 초록 원문에서 확인되나, 두 번의 WebFetch 가 분류 문장의 위치와 문구를 다르게 옮겨 인용 구절을 문자 대조하지 못했고(quote 는 요약 모델이 옮긴 구절이라 원문과 한 글자씩 맞는지 확인되지 않음) 초록에 수치 결과가 없다는 점만 확인됨; 'outcome' 판정은 하지 않음. / 판정: 변형 285개와 TheAgentCompany·SWE-Bench Pro·MCP-Atlas 출처, outcome-critical·divergent·benign 분류와 'cost-sensitive evaluation of agent clarification behavior'는 구절·맥락과 같다. 그러나 목표·제약·입력·맥락이라는 누락 차원은 구절과 맥락에 없다. 주장은 결과를 '판정 못 함'으로 두어 구절보다 넓게 일반화하지 않았다. / 보충: 생성 조건(잘 정의된 과제에서 정보를 제거해 변형을 만든다)을 담은 구절은 확인했으나, 누락 차원 네 가지는 같은 문장의 조각으로만 확인돼 한 구절에 모두 들어 있다고 원문으로 입증하지 못했다. / 재판정: 잘 정의된 과제에서 정보를 체계적으로 지워 미명시 변형을 만든다는 구절은 주장과 같다. 목표·제약·입력·맥락 네 차원도 맥락에 있다. 285개 수치와 세 종류 분류는 구절과 맥락에 없다. / 재판정 정보 부족: numbers_conditions"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "STATE-ASSUME",
+     "EVIDENCE-FIRST",
+     "SPECIFIC-NAME",
+     "FULL-SENTENCE",
+     "TERM-ONE",
+     "NO-SQUEEZE",
+     "SUBJECT-OBJECT"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://arxiv.org/abs/2602.10525",
+     "judgments": [
+      {
+       "ref": "sq3#case#7",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목 'LHAW: Controllable Underspecification for Long-Horizon Tasks', 저자 George Pu 외 8인, 학회 정보 없음(arXiv:2602.10525, cs.CL 프리프린트). 초록 페이지만 확인했고 본문 전체는 확인하지 못함.",
+       "quote": "We release 285 task variants from TheAgentCompany, SWE-Bench Pro and MCP-Atlas according to our taxonomy",
+       "context": "앞 문장에는 비교 표현이 있다: \"Unlike approaches that rely on LLM predictions of ambiguity, LHAW validates variants through empirical agent trials,\" 뒤 문장에는 부정·조건·비교 표현이 없다: \"LHAW provides the first systematic framework for cost-sensitive evaluation of agent clarification behavior\". 분류 기준 문장은 원문에 있다: \"classifying them as outcome-critical, divergent, or benign based on observed terminal state divergence\".",
+       "reason": "285개 변형과 결과 결정적·분기·무해 3범주, 목적(목표·제약·입력·맥락 정보 누락 평가)과 질문 비용 고려 설계는 초록 원문에서 확인되나, 두 번의 WebFetch 가 분류 문장의 위치와 문구를 다르게 옮겨 인용 구절을 문자 대조하지 못했고(quote 는 요약 모델이 옮긴 구절이라 원문과 한 글자씩 맞는지 확인되지 않음) 초록에 수치 결과가 없다는 점만 확인됨; 'outcome' 판정은 하지 않음."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "EVIDENCE-FIRST"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/abs/2602.10525",
+       "ref": "sq3#case#7",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "누락 대상인 목표·제약·입력·맥락 차원과 잘 정의된 과제에서 정보를 지웠다는 생성 조건"
+       },
+       "unsure_reasons": {},
+       "reason": "변형 285개와 TheAgentCompany·SWE-Bench Pro·MCP-Atlas 출처, outcome-critical·divergent·benign 분류와 'cost-sensitive evaluation of agent clarification behavior'는 구절·맥락과 같다. 그러나 목표·제약·입력·맥락이라는 누락 차원은 구절과 맥락에 없다. 주장은 결과를 '판정 못 함'으로 두어 구절보다 넓게 일반화하지 않았다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE"
+     ]
+    },
+    "refetch": {
+     "url": "https://arxiv.org/abs/2602.10525",
+     "judgments": [
+      {
+       "ref": "sq3#case#7",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "arXiv 2602.10525 초록 페이지에서 LHAW 벤치마크를 소개하는 문장이 확인됨. 제목·저자·학회는 이번 호출에서 추출하지 못해 확인하지 못함.",
+       "quote": "transforms any well-specified task into controllable underspecified variants by systematically removing information",
+       "context": "같은 문장의 뒤쪽에 네 차원 목록이 있다는 요약 답: 'by systematically removing information across four dimensions - Goals, Constraints, Inputs, and Context' (이 인용은 두 번째 요약 답의 조각이며, 앞 인용과 'by systematically removing information'에서 겹쳐 같은 문장으로 보이나 연속 원문으로는 확인하지 못함). 앞 문장 요약 답: 'However, progress is limited by the lack of scalable, task-agnostic frameworks' (부정 'lack of'와 역접 'However' 있음, 조건 없음, 일부 인용). 뒤 문장 요약 답: 'Unlike approaches that rely on LLM predictions of ambiguity' (비교 'Unlike' 있음, 부정·조건 없음, 일부 인용). 제거가 설정 가능한 심각도 수준에 따라 이루어진다는 요약 답도 있으나 원문 대조는 못 함.",
+       "reason": "생성 조건(잘 정의된 과제에서 정보를 제거해 변형을 만든다)을 담은 구절은 확인했으나, 누락 차원 네 가지는 같은 문장의 조각으로만 확인돼 한 구절에 모두 들어 있다고 원문으로 입증하지 못했다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "NO-SQUEEZE"
+     ]
+    },
+    "rejudge": {
+     "judgments": [
+      {
+       "url": "https://arxiv.org/abs/2602.10525",
+       "ref": "sq3#case#7",
+       "numbers_conditions": "정보 부족",
+       "direction": "일치",
+       "scope": "일치",
+       "missing": {
+        "numbers_conditions": "변형 285개, 결과 결정적·분기·무해 분류, 질문 비용 고려 설계"
+       },
+       "unsure_reasons": {},
+       "reason": "잘 정의된 과제에서 정보를 체계적으로 지워 미명시 변형을 만든다는 구절은 주장과 같다. 목표·제약·입력·맥락 네 차원도 맥락에 있다. 285개 수치와 세 종류 분류는 구절과 맥락에 없다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE",
+      "STATE-ASSUME",
+      "SUBJECT-OBJECT"
+     ]
+    }
+   }
+  },
+  {
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7810441",
+   "subquestions": [
+    "sq3"
+   ],
+   "output": {
+    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7810441",
+    "judgments": [
+     {
+      "ref": "sq3#case#8",
+      "verdict": "unsupported",
+      "quote": "The literature also suggests that DDI alerts are often ignored with override rates as high as 95% reported.",
+      "reason": "추출: 원문 Discussion 둘째 문단에 'DDI 경고가 최고 95% 무시율로 보고된다'는 구절이 있어 주장의 95% 인용을 뒷받침한다. 주장의 인용 문장 'Clinicians are more likely to override...'도 Introduction에 원문 그대로 있어 두 요소 모두 존재가 확인된다. 다만 두 요소는 서로 다른 문장이므로 판정 에이전트가 각각 따로 본다. 구절은 WebFetch 가 전한 요약 추출이며 원문 HTML 을 직접 대조한 것이 아니다. / 판정: 약물 상호작용(DDI) 경고 무시율 최고 95% 보고와 'Clinicians are more likely to override alerts as the volume of alerts increases and relevance of alerts decreases' 문장은 구절·맥락과 같다. 그러나 결말 '실패'가 경고 체계의 실패를 뜻하는지, 문헌고찰이 다룬 최적화 전략의 실패를 뜻하는지 정할 수 없다. 맥락에는 전략의 효과에 대한 결론 문장이 없다. '보고를 인용함'이라는 한정은 구절의 'reported'와 범위가 같다. / 판정 불가: direction=언어 해석"
+     }
+    ],
+    "principles_applied": [
+     "NO-ASSUME",
+     "NO-SQUEEZE",
+     "STATE-ASSUME",
+     "SPECIFIC-NAME",
+     "FULL-SENTENCE",
+     "TERM-ONE"
+    ]
+   },
+   "stages": {
+    "extract": {
+     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7810441",
+     "judgments": [
+      {
+       "ref": "sq3#case#8",
+       "access": "성공",
+       "exists": "일치",
+       "exists_note": "제목: Optimizing clinical decision support alerts in electronic medical records: a systematic review. 첫 저자 Bethany A. Van Dort, 마지막 저자 Melissa T. Baysari. 학회지: Journal of the American Medical Informatics Association (J Am Med Inform Assoc), 2020, 28(1):177–183. 주장의 '임상 의사결정 지원 경고 최적화 체계적 문헌고찰'과 주제·유형(EMR 경고 최적화 체계적 문헌고찰)이 같다. 주장에 저자·학회가 적혀 있지 않아 주제와 유형으로만 대조했다.",
+       "quote": "The literature also suggests that DDI alerts are often ignored with override rates as high as 95% reported.",
+       "context": "같은 원문 구절의 앞 문장은 'This may be due to the fact that medication alerts are a core feature of many CPOE/EMR systems[…]'로 125자 제한 때문에 잘려 나왔고, 전체 문장은 'and, as a result, are a major contributor to alert fatigue.'로 끝난다고 WebFetch 가 전했다. 이 앞 문장에는 조건·부정·비교가 없다. 뒤 문장은 'Lack of relevance and specificity are frequently cited reasons for the high override rates observed.'이며 조건·비교는 없고, 명시적 부정어는 없으나 'Lack of'가 결여를 뜻한다. 주장의 다른 요소인 'Clinicians are more likely to override alerts as the volume of alerts increases and relevance of alerts decreases.' 문장은 Introduction 둘째 문단에 원문 그대로 있고, 비교('more likely')와 함께 두 변수의 증감 관계를 담는다. 이 문장은 95% 문장과 별개 문장이다.",
+       "reason": "원문 Discussion 둘째 문단에 'DDI 경고가 최고 95% 무시율로 보고된다'는 구절이 있어 주장의 95% 인용을 뒷받침한다. 주장의 인용 문장 'Clinicians are more likely to override...'도 Introduction에 원문 그대로 있어 두 요소 모두 존재가 확인된다. 다만 두 요소는 서로 다른 문장이므로 판정 에이전트가 각각 따로 본다. 구절은 WebFetch 가 전한 요약 추출이며 원문 HTML 을 직접 대조한 것이 아니다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "NO-SQUEEZE",
+      "STATE-ASSUME"
+     ]
+    },
+    "judge": {
+     "judgments": [
+      {
+       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7810441",
+       "ref": "sq3#case#8",
+       "numbers_conditions": "일치",
+       "direction": "판정 불가",
+       "scope": "일치",
+       "missing": {},
+       "unsure_reasons": {
+        "direction": "언어 해석"
+       },
+       "reason": "약물 상호작용(DDI) 경고 무시율 최고 95% 보고와 'Clinicians are more likely to override alerts as the volume of alerts increases and relevance of alerts decreases' 문장은 구절·맥락과 같다. 그러나 결말 '실패'가 경고 체계의 실패를 뜻하는지, 문헌고찰이 다룬 최적화 전략의 실패를 뜻하는지 정할 수 없다. 맥락에는 전략의 효과에 대한 결론 문장이 없다. '보고를 인용함'이라는 한정은 구절의 'reported'와 범위가 같다."
+      }
+     ],
+     "principles_applied": [
+      "NO-ASSUME",
+      "STATE-ASSUME",
+      "SPECIFIC-NAME",
+      "FULL-SENTENCE",
+      "TERM-ONE"
+     ]
+    },
+    "refetch": null,
+    "rejudge": null
+   }
+  }
+ ],
+ "synthesis": {
+  "evidence_map": [
+   {
+    "case": "실사용 에이전트 자율성 측정 연구",
+    "url": "https://www.anthropic.com/research/measuring-agent-autonomy",
+    "axes": {
+     "purpose": {
+      "prior": "실제 배치에서 에이전트 자율성과 사람 감독 방식 관측",
+      "same": false,
+      "note": "질문·승인 결정점과 사용자 개입 비용과만 같음"
+     },
+     "mechanism": {
+      "prior": "도구 호출과 세션 로그 분석. 에이전트의 자발적 멈춤과 사람의 개입을 분류",
+      "same": false,
+      "note": "관측 연구. 개입 설계가 아님"
+     },
+     "evaluation": {
+      "prior": "가장 복잡한 과제에서 에이전트가 명확화를 위해 멈춘 횟수가 사람 개입의 2배 이상. 사람 개입 사유 1위는 기술 맥락 보충·수정 32%, 2위는 느림·과잉 17%",
+      "same": false,
+      "note": "개입 사유 비율로 비용을 간접 측정"
+     },
+     "target": {
+      "prior": "코딩 에이전트 사용자 세션",
+      "same": false,
+      "note": "개발자형 사용. 문서 업무와 다를 수 있음"
+     }
+    },
+    "outcome": "판정 못 함",
+    "kind": "vendor",
+    "source_level": "1차",
+    "route": "검색 결과에서 개발사 연구 페이지",
+    "adoption": "참고",
+    "bearing": "모든 행동 승인보다 효과적 감시·개입 가능성을 우선하라는 권고. 비가역 행동만 묻는 좁은 승인 기준을 지지하고, 행동 종류 전체에 확인을 요구하는 안을 약하게 함. 사람 개입 1위가 맥락 보충이라는 점은 '전제 사용' 결정점(NO-ASSUME)을 지지함"
+   },
+   {
+    "case": "제품 개발 Stage-Gate 모델의 게이트 구성(산출물·기준·결정)",
+    "url": "https://www.stage-gate.com/blog/the-stage-gate-model-an-overview/",
+    "axes": {
+     "purpose": {
+      "prior": "단계 사이 게이트에서 다음 단계로 갈지와 자원을 투입할지 정함",
+      "same": false,
+      "note": "투자 결정 목적이며 에이전트 검토 규칙 적용 시점과 다름"
+     },
+     "mechanism": {
+      "prior": "게이트마다 미리 정한 산출물(\"Defined outputs from the previous Stage\")과 기준(준비도·가치)으로 Go/Kill/Hold/Recycle을 결정함",
+      "same": false,
+      "note": "사람 게이트키퍼 회의임. 다만 '미리 정한 기준으로 단계 넘김을 판정'하는 구조는 대조 대상의 '단계 넘김' 결정점과 CHECKABLE 조항에 대응함"
+     },
+     "evaluation": {
+      "prior": "이 페이지에는 효과 측정이 없음",
+      "same": false,
+      "note": "개요 문서임"
+     },
+     "target": {
+      "prior": "기업의 신제품 개발 프로젝트",
+      "same": false,
+      "note": "LLM 에이전트가 아님"
+     }
+    },
+    "outcome": "판정 못 함",
+    "kind": "vendor",
+    "source_level": "1차",
+    "route": "웹 검색 → 모델 창안 측 회사 블로그",
+    "adoption": "참고",
+    "bearing": "게이트에서 쓰는 기준을 미리 구체적으로 정해 두는 구조라서, 매 턴 리마인더에 '원칙을 잊지 마라' 한 줄보다 결정점마다 구체 기준을 제시하는 안 쪽으로 약하게 기움. 대상이 사람 회의라 옮겨 쓰기 어려움"
+   }
+  ],
+  "conclusions": [
+   {
+    "text": "검증을 통과한 행은 두 건이다. 두 행 모두 목적·메커니즘·평가·적용 대상 네 축이 대조 대상과 다르다(same: false). 그래서 이번 근거 지도만으로는 결정점 목록의 항목이나 매 턴 리마인더 방식을 확정할 수 없다. Claude 는 두 안의 선택을 같은 날 확인한 선행연구(결정 시점 리마인더, 규칙 수와 준수율 연구)와 자체 시험 결과에 기대어 정해야 하며, 이 두 행은 방향을 보강하는 참고로만 쓴다.",
+    "refs": [
+     "sq2#case#3",
+     "sq3#case#2"
+    ],
+    "supports": "판정 보류(이번 근거 지도는 어느 후보안도 단독으로 확정하지 못함)"
+   },
+   {
+    "text": "실사용 에이전트 자율성 측정 연구는 '비가역 행동' 결정점을 좁게 두는 방향과 '전제 사용' 결정점을 두는 방향에 약하게 기운다. 이 연구는 모든 행동 승인보다 효과적 감시와 개입 가능성을 권고한다. 또 사람 개입 사유 1위가 기술 맥락 보충·수정(32%)이고 2위가 느림·과잉(17%)이다. 그러나 이 행은 관측 연구이고 적용 대상이 코딩 에이전트 사용자 세션이다. 그래서 문서 업무 사용자의 개입 비용에 그대로 옮겨 쓰기 어렵고, Stage-Gate 행과 함께 읽을 때만 방향 참고로 쓴다.",
+    "refs": [
+     "sq2#case#3",
+     "sq3#case#2"
+    ],
+    "supports": "결정점 목록 유지(비가역 행동만 묻는 좁은 승인 기준, 전제 사용 결정점 포함) — 약한 지지"
+   },
+   {
+    "text": "Stage-Gate 모델은 게이트마다 미리 정한 산출물과 기준으로 단계 넘김을 판정한다. 이 구조는 '단계 넘김' 결정점과 CHECKABLE 조항에 대응하며, 한 줄 상기 문구보다 결정점별 구체 기준을 주는 안 쪽으로 약하게 기운다. 그러나 이 행은 사람 게이트키퍼 회의를 다루는 개요 문서이고 효과 측정이 없다. 그래서 매 턴 리마인더에 조항별 구체 지시를 넣는 안의 효과 근거로는 쓸 수 없고, 반복 주입의 효과 여부는 이번 근거 지도로 판정하지 못한다.",
+    "refs": [
+     "sq3#case#2",
+     "sq2#case#3"
+    ],
+    "supports": "매 턴 리마인더에 결정점별 구체 지시를 넣는 안 — 약한 지지, 효과 미확인"
+   }
+  ],
+  "principles_applied": [
+   "EVIDENCE-FIRST",
+   "NO-ASSUME",
+   "STATE-ASSUME",
+   "SUBJECT-OBJECT",
+   "TERM-ONE",
+   "ONE-IDEA",
+   "KEEP-CONNECT",
+   "BOTTOM-LINE"
+  ]
+ },
+ "map_check": {
+  "cells": [
+   {
+    "row": "실사용 에이전트 자율성 측정 연구",
+    "column": "case",
+    "grounded": true,
+    "source_ref": "sq2#case#3"
+   },
+   {
+    "row": "실사용 에이전트 자율성 측정 연구",
+    "column": "outcome",
+    "grounded": true,
+    "source_ref": "sq2#case#3"
+   },
+   {
+    "row": "실사용 에이전트 자율성 측정 연구",
+    "column": "axes.purpose.prior",
+    "grounded": true,
+    "source_ref": "sq2#case#3"
+   },
+   {
+    "row": "실사용 에이전트 자율성 측정 연구",
+    "column": "axes.mechanism.prior",
+    "grounded": true,
+    "source_ref": "sq2#case#3"
+   },
+   {
+    "row": "실사용 에이전트 자율성 측정 연구",
+    "column": "axes.evaluation.prior",
+    "grounded": true,
+    "source_ref": "sq2#case#3"
+   },
+   {
+    "row": "실사용 에이전트 자율성 측정 연구",
+    "column": "axes.target.prior",
+    "grounded": true,
+    "source_ref": "sq2#case#3"
+   },
+   {
+    "row": "제품 개발 Stage-Gate 모델의 게이트 구성(산출물·기준·결정)",
+    "column": "case",
+    "grounded": true,
+    "source_ref": "sq3#case#2"
+   },
+   {
+    "row": "제품 개발 Stage-Gate 모델의 게이트 구성(산출물·기준·결정)",
+    "column": "outcome",
+    "grounded": true,
+    "source_ref": "sq3#case#2"
+   },
+   {
+    "row": "제품 개발 Stage-Gate 모델의 게이트 구성(산출물·기준·결정)",
+    "column": "axes.purpose.prior",
+    "grounded": true,
+    "source_ref": "sq3#case#2"
+   },
+   {
+    "row": "제품 개발 Stage-Gate 모델의 게이트 구성(산출물·기준·결정)",
+    "column": "axes.mechanism.prior",
+    "grounded": true,
+    "source_ref": "sq3#case#2"
+   },
+   {
+    "row": "제품 개발 Stage-Gate 모델의 게이트 구성(산출물·기준·결정)",
+    "column": "axes.evaluation.prior",
+    "grounded": true,
+    "source_ref": "sq3#case#2"
+   },
+   {
+    "row": "제품 개발 Stage-Gate 모델의 게이트 구성(산출물·기준·결정)",
+    "column": "axes.target.prior",
+    "grounded": true,
+    "source_ref": "sq3#case#2"
+   }
+  ],
+  "principles_applied": [
+   "NO-ASSUME",
+   "SPECIFIC-NAME"
+  ]
+ }
+}
