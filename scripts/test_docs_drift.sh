@@ -72,7 +72,7 @@ WK="$HERE/docs/domain-korean.md"
 # 에이전트원칙이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
 # 그 검사가 우리가 없애려던 중복을 오히려 요구했다. 이제 ID 로 잇고, 지시 문장이 스킬에 그대로
 # 있으면 실패한다.
-KO_IDS="$(awk '/^#### `PLAIN-KO`/{f=1;print;next} f&&/^##?#? /{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
+KO_IDS="$(awk '/^## 출력/{f=1;next} f&&/^## /{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
 check "에이전트원칙에서 한국어 조항 ID 를 뽑았다"    "[ -n \"\$KO_IDS\" ]"
 KO_MISS=""
 KO_DUP=""
@@ -707,11 +707,8 @@ check "canon: every clause with a rationale in the references is in agent-princi
 # 도출 검사가 결손을 실제로 잡는지 임시 사본에서 본다. 조항 하나를 지운 사본이 통과하면 검사가 무의미하다.
 CANON_CUT="$(mktemp)"; grep -vF '**`YAGNI`' "$CANON_ALL" > "$CANON_CUT"
 check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids '$CANON_CUT')\" = ' YAGNI' ]"
-# 한국어 절은 두 층이다. 묶는 이름은 `####` 제목이고 원자 지시는 그 아래 굵은 ID 다. 층을 갈라
-# 검사해야 이름만 남고 지시가 빠지거나 그 반대인 상태를 잡는다. 원자 지시 층은 위의 도출 검사가 본다.
-for g in PLAIN-KO KO-SYNTAX PROSE-FORM READ-FLOW UNPACK; do
-  check "canon: korean group $g present"             "grep -qE '^#### \`$g\`' '$CANON'"
-done
+# 한국어 절의 묶음 제목(PLAIN-KO 등)은 2026-11-12 줄인 판에서 뺐다. 출력 조항은 「출력」 절 아래 한 층이고
+# 원자 지시는 위의 도출 검사가 본다(decisions/2026-11-12-principles-lite.md).
 # 시험이나 사용자 결정으로 지운 조항 ID 가 근거 없이 에이전트원칙에 되돌아오면 실패한다. 효과 확인 방법은
 # CLAUDE.md 「조항 추가와 문구 변경」이 정한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
 # 다만 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 는 그 절이 생기기 전(2026-06~09)에 지워 근거가 git 이력에만 있다.
