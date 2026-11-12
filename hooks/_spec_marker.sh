@@ -114,4 +114,4 @@ path_is_form_target() {  # $1=경로 → 검사 대상이면 0
 
 # spec/plan 리뷰 안내문. PostToolUse 넛지와 Stop 차단 사유가 같은 문장을 쓴다. 렌즈 구성은
 # review-specs가 정하므로 여기 개수를 박지 않는다.
-SPEC_REVIEW_INSTRUCTION="disciplined-coder review-specs 스킬로 PREP+독립 렌즈 리뷰를 수행하라(어느 렌즈를 돌릴지는 그 스킬이 정한다). 리뷰와 처분 분류가 끝나면 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영하라."
+SPEC_REVIEW_INSTRUCTION="disciplined-coder review-specs 스킬로 PREP+독립 렌즈 리뷰를 수행하라(어느 렌즈를 실행할지는 그 스킬이 정한다). 리뷰와 처분 분류가 끝나면 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영하라."

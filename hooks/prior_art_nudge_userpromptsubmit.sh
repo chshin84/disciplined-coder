@@ -28,5 +28,5 @@ for t in "${REQUESTS[@]}"; do [[ $p == *"$t"* ]] && { hit_request=1; break; }; d
 DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
 . "$DIR/_json_escape.sh"   # JSON 문자열 이스케이프 공유
 
-msg="사용자 메시지가 선행연구를 찾아 달라는 요청으로 보인다. 그렇다면 disciplined-coder 플러그인의 researching-prior-art 스킬을 열어 그 절차대로 진행하라. 손으로 짠 워크플로나 일반 리서치로 대신하지 마라. 선행연구를 요청한 것이 아니면 이 알림을 무시하라. 넛지일 뿐 차단은 아니다."
+msg="사용자 메시지가 선행연구를 찾아 달라는 요청으로 보인다. 그렇다면 disciplined-coder 플러그인의 researching-prior-art 스킬을 열어 그 절차대로 진행하라. 직접 작성한 워크플로나 일반 리서치로 대신하지 마라. 선행연구를 요청한 것이 아니면 이 알림을 무시하라. 넛지일 뿐 차단은 아니다."
 printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"%s"}}\n' "$(escape_for_json "$msg")"

@@ -1,6 +1,6 @@
 ---
 name: researching-prior-art
-description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이걸 이미 누가 해봤나"·"쓸 만한 도구가 있나"·"이 결정의 근거를 찾아 달라"고 할 때, 그리고 review-specs·review-docs가 선행연구를 제안해 승인받았을 때 연다. 연구 계획을 승인받고 연구자 서브에이전트 여럿으로 웹을 탐색한 뒤 검증자가 인용을 판정하는 선행연구 스킬이다. 옛 이름 agent-prior-art(선행연구 에이전트)와 lens-prior-art(선행연구렌즈)를 부르는 요청도 여기서 받는다.
+description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이걸 이미 누가 해봤나"·"쓸 만한 도구가 있나"·"이 결정의 근거를 찾아 달라"고 할 때, 그리고 review-specs·review-docs가 선행연구를 제안해 승인받았을 때 연다. 연구 계획을 승인받고 연구자 서브에이전트 여럿으로 웹을 탐색한 뒤 검증자가 인용을 판정하는 선행연구 스킬이다. 옛 이름 agent-prior-art(선행연구 에이전트)와 lens-prior-art(선행연구렌즈)를 호출하는 요청도 여기서 받는다.
 ---
 # researching-prior-art — 선행연구 스킬
 

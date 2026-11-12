@@ -25,7 +25,7 @@ done <<EOF
 $FILE_PATHS
 EOF
 [ -n "$match" ] || exit 0
-msg="📝 새 문서 작성 — 쓰기 전에 disciplined-coder managing-docs 를 열어 이 문서의 타입과 수명을 가리고, 결론을 앞에 두고 내용을 배치하라. README 라면 disciplined-coder domain-readme 를 함께 열어라."
+msg="📝 새 문서 작성 — 쓰기 전에 disciplined-coder managing-docs 를 열어 이 문서의 타입과 수명을 정하고, 결론을 앞에 두고 내용을 배치하라. README 라면 disciplined-coder domain-readme 를 함께 열어라."
 esc="$(escape_for_json "$msg")"
 printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$esc"
 exit 0

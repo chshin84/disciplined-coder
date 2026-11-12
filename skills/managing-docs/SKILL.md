@@ -1,6 +1,6 @@
 ---
 name: managing-docs
-description: 문서를 새로 만들거나 고치기 전에 연다. 마크다운·HTML·보고서·제안서·발표자료(.pptx)·워드 문서(.docx)·한글 문서(.hwp·.hwpx)·README·CLAUDE.md·스킬(SKILL.md)·rules·메모리 파일이 대상이다. 문서의 타입과 수명, 둘 곳, 자동 생성 구간의 규칙이 있고, 사람이 읽을 문서의 제목·목차 규칙과 전달 전 검증은 하위 파일에 있다.
+description: 문서를 새로 만들거나 고치기 전에 연다. 마크다운·HTML·보고서·제안서·발표자료(.pptx)·워드 문서(.docx)·한글 문서(.hwp·.hwpx)·README·CLAUDE.md·스킬(SKILL.md)·rules·메모리 파일이 대상이다. 문서의 타입과 수명, 저장 위치, 자동 생성 구간의 규칙이 있고, 사람이 읽을 문서의 제목·목차 규칙과 전달 전 검증은 하위 파일에 있다.
 ---
 
 # managing-docs — 문서의 타입·수명·위치

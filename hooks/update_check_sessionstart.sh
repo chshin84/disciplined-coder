@@ -16,7 +16,7 @@ MSG="$(ensure_install_current "$(resolve_home claude 2>/dev/null)")"
 # 다시 켜야 하면 재시작을 요구하게 하고, 옮기지 못했으면 적힌 명령을 대신 실행할지 묻게 한다.
 CTX="$MSG
 이 알림을 사용자의 첫 요청에 답하기 전에 먼저 전하라."
-case "$MSG" in *"다시 켜야"*) CTX="$CTX 클로드 코드를 다시 켜 달라고 요구하라." ;; esac
+case "$MSG" in *"다시 켜야"*) CTX="$CTX Claude Code 를 다시 켜 달라고 요구하라." ;; esac
 case "$MSG" in *"직접 실행하라"*) CTX="$CTX 적힌 명령을 대신 실행할지 물어라." ;; esac
 printf '{"systemMessage":"%s","hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' \
   "$(escape_for_json "$MSG")" "$(escape_for_json "$CTX")"
