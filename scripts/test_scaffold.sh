@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # scaffold.sh(PC-레벨) 검증. 계약: FAIL=0.
+# `# 핵심 계약:` 표시가 달린 검사는 v2 정리에서 지우지 않는다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 # 픽스처는 모두 이 뿌리 아래에 만들고 끝나면 통째로 지운다. mktemp 가 TMPDIR 을 따르므로 아래의
@@ -79,6 +80,7 @@ echo "[marketplace-autoupdate] 자동 갱신을 켠다"
 # 켰다는 사실은 stderr 가 아니라 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않고,
 # 옛 관리블록을 걷어낸 알림(pointer_note)이 이미 쓰는 통로가 stdout 이다. 사용자 설정 파일을 고쳐
 # 놓고 아무도 모르게 두면 안 된다.
+# 핵심 계약: settings 백업 — 결함 주입: 사본 만들기 줄을 지운다
 check "알림에 고친 파일 경로가 있다"       "printf '%s' \"\$OUT_A\" | grep -qF 'settings.json'"
 check "우리 항목에 autoUpdate가 켜졌다"   "[ \"\$(json_autoupdate '$SET_A' \"\$MKT\")\" = 'true' ]"
 check "알려진 마켓플레이스에도 켜졌다"     "[ \"\$(json_autoupdate '$KNOWN_A' \"\$MKT\")\" = 'true' ]"
@@ -128,6 +130,7 @@ printf '{ "extraKnownMarketplaces": { "%s": { "source": { "source": "github", "r
 mkdir -p "$HE/.claude/settings.json.dc-tmp/막는다"
 set +e; ERR_E="$(run "$HE" "$PE" 2>/dev/null)"; set -e
 echo "[marketplace-autoupdate] a write failure is reported as a write failure"
+# 핵심 계약: settings 백업 — 결함 주입: 사본 만들기 줄을 지운다
 check "쓰기 실패에 자리가 따로 있다"        "printf '%s' \"\$ERR_E\" | grep -qF '고쳐 쓰지 못했다'"
 check "쓰기 실패를 읽기 실패로 안 부른다"   "! printf '%s' \"\$ERR_E\" | grep -qF '읽지 못했거나 내용이 JSON이 아니다'"
 # 사유는 stdout 으로 나오되 "켰다" 머리말 아래 섞이지 않는다. 이 픽스처는 켠 것이 없는 갈래라
@@ -138,6 +141,7 @@ check "쓰기 실패에도 임시 파일이 안 남는다" "[ ! -e '$HE/.claude/
 
 # --- project-untouched: 프로젝트 폴더 무오염 ---
 echo "[project-untouched] project untouched"
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "no principles in project"      "[ ! -f '$P1/agent-principles.md' ]"
 check "no CLAUDE.md in project"       "[ ! -f '$P1/CLAUDE.md' ]"
 
@@ -148,6 +152,7 @@ mkdir -p "$H5/.claude"; printf 'my personal global note
 for _ in 1 2 3; do run "$H5" "$P5" >/dev/null; done
 UC5="$H5/.claude/CLAUDE.md"
 echo "[user-content-preserved] preserve user content + no blank accumulation"
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "personal note preserved"      "grep -qxF 'my personal global note' '$UC5'"
 check "one region after 3 runs"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC5') -eq 1 ]"
 check "principles import not dup"     "[ \$(grep -cxF '@disciplined-coder/agent-principles.md' '$UC5') -eq 1 ]"
@@ -295,6 +300,7 @@ STUB
 H38="$(mktemp -d)"; O38="$(lock_fixture "$H38" '{"name":"chshin-tools"}')"
 OUT38="$(run_uc "$H38")"
 echo "[install-current] 사본 폴더가 잡혀 있으면 폴더 안 git 으로 옮긴다"
+# 핵심 계약: 갱신 잠금과 폴더 잠금 대처 — 결함 주입: 잠금 확인을 건너뛰게 got=0 을 got=1 로 바꾼다
 check "사본이 origin 의 커밋으로 옮겨진다" "[ \"\$(git -C '$H38/.claude/plugins/marketplaces/chshin-tools' rev-parse HEAD)\" = '$O38' ]"
 check "이어서 설치본을 옮긴다"           "grep -qxF 'plugin update disciplined-coder@chshin-tools' '$H38/args.txt'"
 check "다시 켜라고 한다"                 "printf '%s' \"\$OUT38\" | grep -qF '다시 켜야'"
@@ -374,6 +380,7 @@ HAU2="$(mktemp -d)"; uc_fixture "$HAU2" "$A40" 0 "$B40" > /dev/null
 mkdir -p "$HAU2/.claude/disciplined-coder/update.lock"
 run_uc "$HAU2" > /dev/null
 echo "[install-current] 다른 창이 갱신 중이면 이 창은 갱신하지 않는다"
+# 핵심 계약: 갱신 잠금과 폴더 잠금 대처 — 결함 주입: 잠금 확인을 건너뛰게 got=0 을 got=1 로 바꾼다
 check "잠금이 있으면 갱신을 실행하지 않는다"     "[ ! -f '$HAU2/args.txt' ]"
 touch -d '2000-01-01' "$HAU2/.claude/disciplined-coder/update.lock"
 run_uc "$HAU2" > /dev/null
@@ -426,6 +433,7 @@ check "missing source still exit 0"         "[ $rc8 -eq 0 ]"
 H9="$(mktemp -d)/cfg"; P9="$(mktemp -d)"; HJUNK="$(mktemp -d)"
 OUT9="$(HOME="$HJUNK" CLAUDE_CONFIG_DIR="$H9" CLAUDE_PROJECT_DIR="$P9" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD")"
 echo "[home-resolution] home resolution honors CLAUDE_CONFIG_DIR, not bash \$HOME"
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "CLAUDE_CONFIG_DIR honored (KDIR)"     "[ -f '$H9/disciplined-coder/agent-principles.md' ]"
 check "CLAUDE_CONFIG_DIR honored (CLAUDE.md)" "[ -f '$H9/CLAUDE.md' ]"
 check "did not fall back to bash \$HOME"      "[ ! -d '$HJUNK/.claude' ]"
@@ -436,6 +444,7 @@ if command -v cygpath >/dev/null 2>&1; then
   H9B="$(mktemp -d)"; P9B="$(mktemp -d)"; HJUNK2="$(mktemp -d)"
   ( HOME="$HJUNK2" USERPROFILE="$(cygpath -w "$H9B")" CLAUDE_CONFIG_DIR= CLAUDE_HOME_DIR= CLAUDE_PROJECT_DIR="$P9B" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" >/dev/null 2>&1 ) || true
   echo "[home-resolution] USERPROFILE beats bash \$HOME when no override is set"
+  # 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
   check "USERPROFILE honored (KDIR)"            "[ -f '$H9B/.claude/disciplined-coder/agent-principles.md' ]"
   check "USERPROFILE: did not touch bash \$HOME" "[ ! -d '$HJUNK2/.claude' ]"
 else
@@ -611,6 +620,7 @@ for i in $(seq 1 "$LN"); do
 done
 wait
 echo "[stale-lock] stealing a stale lock still admits one writer at a time"
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "낡은 락 빼앗기: 모두 들어갔다"          "[ \"\$(grep -c '^IN\$' '$LW')\" = '$LN' ]"
 check "낡은 락 빼앗기: 겹쳐 들어가지 않았다"   "awk '\$0==\"IN\" && prev==\"IN\" { bad=1 } { prev=\$0 } END { exit bad?1:0 }' '$LW'"
 check "낡은 락 빼앗기: 락이 남지 않는다"       "[ ! -e '$LK' ]"
@@ -625,6 +635,7 @@ OWN_TOK1="$( . "$HERE/scripts/_managed_block.sh"; managed_block_lock "$OL" )"
 rm -rf "$OL"   # 빼앗김
 OWN_TOK2="$( . "$HERE/scripts/_managed_block.sh"; managed_block_lock "$OL" )"
 ( . "$HERE/scripts/_managed_block.sh"; managed_block_unlock "$OL" "$OWN_TOK1" )   # 옛 주인이 푼다
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "옛 주인이 새 주인의 락을 안 지운다"     "[ -d '$OL' ]"
 ( . "$HERE/scripts/_managed_block.sh"; managed_block_unlock "$OL" "$OWN_TOK2" )
 check "제 주인은 푼다"                         "[ ! -e '$OL' ]"
@@ -643,6 +654,7 @@ TERR="$TT/err"; TRC=0
 ( . "$HERE/scripts/_managed_block.sh"
   MANAGED_LOCK_TOTAL_TICKS=5
   printf 'body\n' | managed_block_inject "$TF" "# B" "# E" ) 2>"$TERR" || TRC=$?
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "락을 못 잡으면 실패로 돌아온다"         "[ '$TRC' -ne 0 ]"
 check "못 잡은 사유를 알린다"                  "grep -qF '락을 잡지 못했다' '$TERR'"
 check "못 잡으면 파일을 안 고친다"             "[ \"\$(cat '$TF')\" = 'keep' ]"
@@ -668,6 +680,7 @@ ARC=0
 ( . "$HERE/scripts/_managed_block.sh"
   PATH="$ABIN:$PATH"
   printf 'body\n' | managed_block_inject "$AF" "# B" "# E" ) >/dev/null 2>&1 || ARC=$?
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "걷어내기 실패: 사용자 줄이 남는다"    "[ \"\$(grep -c '^user keep' '$AF')\" = 2 ]"
 check "걷어내기 실패: 실패로 돌아온다"       "[ '$ARC' -ne 0 ]"
 check "걷어내기 실패: 관리블록을 안 남긴다"  "! grep -qF '# B' '$AF'"

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # 훅 스크립트 검증. 계약: FAIL=0 (매직넘버 금지 — 개수는 테스트가 센다).
+# `# 핵심 계약:` 표시가 달린 검사는 v2 정리에서 지우지 않는다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 # 픽스처는 모두 이 뿌리 아래에 만들고 끝나면 통째로 지운다. mktemp 가 TMPDIR 을 따르므로 아래의
@@ -144,6 +145,7 @@ echo "[readonly-pre — 읽기 전용 파일은 고치지 않는다]"
 RPRE="$HERE/hooks/readonly_pretooluse.sh"
 rpre() { printf '%s' "$1" | bash "$RPRE"; }
 RO="$(mktemp -d)"; printf 'sealed\n' > "$RO/sealed.md"; printf 'open\n' > "$RO/open.md"; chmod a-w "$RO/sealed.md"
+# 핵심 계약: 읽기 전용 차단 — 결함 주입: 훅이 항상 통과하게 바꾼다
 check "읽기 전용 파일(절대경로) → deny"        "rpre '$(J "$RO/sealed.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
 check "거부 응답이 유효한 JSON"                "rpre '$(J "$RO/sealed.md")' | json_valid_stdin"
 check "쓸 수 있는 파일 → 무출력"               "[ -z \"\$(rpre '$(J "$RO/open.md")')\" ]"

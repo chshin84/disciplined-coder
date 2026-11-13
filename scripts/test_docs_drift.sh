@@ -12,6 +12,7 @@
 # 포인터가 사라지거나 이름이 바뀌면 실패한다. 복제 금지 검사는 되도록 구조(사본 쪽에 그 절 제목이나
 # 소유 선언이 없다)로 보고, 구조로 못 적는 것만 가장 짧은 고유 조각을 남겼다. 그런 곳에는 그 자리에
 # '짧은 조각' 이라고 적어 두었다. 렌즈 프롬프트처럼 제목이 없는 한 줄 페이로드도 짧은 조각으로 본다.
+# `# 핵심 계약:` 표시가 달린 검사는 v2 정리에서 지우지 않는다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 . "$HERE/scripts/_doc_keys.sh"   # doc_sec·has_sec·sec_has·sec_has_id·owns_sec·points_to
@@ -305,9 +306,34 @@ check "장치 칸이 모두 실물 경로이거나 사유 있는 「없다」다
 
 echo "[대체된 설계 문서에 superseded 표시]"
 OLDSPEC="$HERE/docs/superpowers/specs/2026-08-16-review-layer-redesign-design.md"
+# 핵심 계약: superseded 표시 — 결함 주입: 대체된 spec 하나의 표시를 지운다
 check "옛 spec 에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDSPEC\""
 OLDNESTED="$HERE/docs/superpowers/specs/2026-07-05-nested-orchestration-design.md"
 check "옛 nested 설계에 superseded 표시가 있다"   "grep -qF 'superseded' \"\$OLDNESTED\""
+
+# 경로 고정 검사는 이미 표시가 달린 옛 spec 을 지키고, 아래 검사는 spec 머리의 `supersedes:` 줄이
+# 가리키는 문서를 데이터로 읽어 지킨다. 줄 첫머리가 `supersedes:` 인 줄만 읽으므로 `> **상태:**`·
+# `> 대체 예정:` 줄은 읽지 않는다.
+superseded_missing() {  # $1=specs 폴더 → 줄마다 "<spec 파일 이름> → <대상 파일 이름>"
+  local f t
+  for f in "$1"/*.md; do
+    [ -f "$f" ] || continue
+    head -12 "$f" | tr -d '\r' | grep -E '^>?[[:space:]]*supersedes:' | grep -oE '`[^`]+\.md`' | tr -d '`' \
+      | while IFS= read -r t; do
+          if [ ! -f "$1/$t" ] || ! head -12 "$1/$t" | tr -d '\r' | grep -qi 'superseded'; then
+            printf '%s → %s\n' "$(basename "$f")" "$t"
+          fi
+        done || true
+  done
+  return 0
+}
+echo "[supersedes 줄이 가리키는 문서에 superseded 표시]"
+SUP_FX="$(mktemp -d)"
+printf '> supersedes: `old.md`, `gone.md`\n' > "$SUP_FX/new.md"
+printf '# old\n' > "$SUP_FX/old.md"
+check "supersedes 줄을 읽는 검사가 표시 없는 대상과 없는 파일을 잡는다" "[ \"\$(superseded_missing \"\$SUP_FX\" | wc -l | tr -d ' ')\" = 2 ]"
+check "표시를 단 대상은 넘긴다" "printf '> **superseded**\n' > \"\$SUP_FX/old.md\" && [ \"\$(superseded_missing \"\$SUP_FX\")\" = 'new.md → gone.md' ]"
+check "supersedes 줄이 가리키는 문서마다 superseded 표시가 있다" "[ -z \"\$(superseded_missing \"\$HERE/docs/superpowers/specs\")\" ]"
 
 # --- 프로젝트 파일에 손대는 예외: 코드 주석 한 곳만 조건을 적는다 ---
 # 전에는 README가 조건의 원본이었고 스캐폴드가 그 절을 가리켰다. 조건은 코드가 실제로 하는 일이라
@@ -609,6 +635,7 @@ rm -rf "$ANTI_TMP"
 # 작업 트리 검사는 이 예외를 두지 않는다. 커밋 전에는 되돌릴 수 있어 지금 알리는 값이 더 크다.
 echo "[리뷰 기록은 찍은 뒤 고치지 않는다]"
 RVDIR="docs/superpowers/reviews"
+# 핵심 계약: 기록 봉인 — 결함 주입: 결정 기록 하나를 태그 없이 지운다
 check "기록 폴더에 기록이 하나 이상 있다" "ls \"\$HERE/\$RVDIR\"/*.md >/dev/null 2>&1"
 RV_TREE="$(cd "$HERE" && git status --porcelain --untracked-files=all -- "$RVDIR" 2>/dev/null | grep -vE '^(\?\?|A ) ' || true)"
 [ -n "$RV_TREE" ] && printf '    작업 트리에서 고치거나 지운 기록:
@@ -644,6 +671,7 @@ echo "[봉인 — 기록은 읽기 전용이 된다]"
 SEAL="$HERE/scripts/seal_reviews.sh"
 SEAL_T="$(mktemp -d)"; printf 'a\n' > "$SEAL_T/one.md"; printf 'b\n' > "$SEAL_T/two.json"
 bash "$SEAL" "$SEAL_T/one.md" "$SEAL_T/two.json" >/dev/null 2>&1 || true
+# 핵심 계약: 기록 봉인 — 결함 주입: 결정 기록 하나를 태그 없이 지운다
 check "인자로 준 파일이 읽기 전용이 된다"     "[ ! -w '$SEAL_T/one.md' ] && [ ! -w '$SEAL_T/two.json' ]"
 bash "$SEAL" "$SEAL_T/one.md" "$SEAL_T/two.json" >/dev/null 2>&1 || true
 check "인자 있는 봉인을 두 번 돌려도 같다"     "[ ! -w '$SEAL_T/one.md' ] && [ ! -w '$SEAL_T/two.json' ]"
