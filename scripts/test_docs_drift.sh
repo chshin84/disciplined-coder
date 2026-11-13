@@ -66,59 +66,35 @@ check "실행하는 방법 절이 회차 규칙 절로 넘긴다" "sec_has \"\$D
 
 echo "[이름은 명사구, 주장은 첫 문장 — 에이전트원칙과 가독성 렌즈]"
 CANON="$HERE/agent-principles.md"
-# 문서 타입과 수명, 읽기 위한 문서의 제목 규칙은 스킬 managing-docs 가 소유한다. 2026-09-21 에는 스킬로
-# 두면 열지 않았을 때의 누락이 조용하다는 이유로 에이전트원칙에 두었다. 2026-10-25 열림 시험에서 문서
-# 과제 6개 모두 그 스킬을 열어 다시 옮겼다(docs/superpowers/specs/2026-10-25-principles-slimming-design.md).
-# 조항 ID 를 찾는 검사는 에이전트원칙과 그 스킬 파일을 합친 CANON_ALL 을 본다. 타입마다 무엇이
+# 문서 타입과 수명, 읽기 위한 문서의 제목 규칙은 스킬 managing-docs 가 소유한다. 타입마다 무엇이
 # 강제하는지는 프로젝트마다 다르므로 그 칸만 저장소 CLAUDE.md 가 갖는다.
 MDOCS="$HERE/skills/managing-docs/SKILL.md"
-CANON_ALL="$(mktemp)"; cat "$CANON" "$MDOCS" "$HERE/skills/managing-docs/references/reading-docs.md" > "$CANON_ALL"
 TYPE_TBL="$HERE/CLAUDE.md"
-# 상세는 domain-korean 이 소유하고 에이전트원칙은 조항만 담는다. 양쪽을 함께 붙든다.
+# 에이전트원칙이 지시를 소유하고 두 참고서가 같은 조항 ID 로 근거를 단다. 「행동」 절의 조항은
+# docs/domain-discipline.md 에, 「출력」 절의 조항은 docs/domain-korean.md 에 정확히 `### \`ID\`` 인
+# 제목 줄이 있어야 한다. 제목 뒤에 설명이 붙은 절(` (v1)`·`(원칙에서 내림)`)은 세지 않는다.
+# 방향은 원칙 → 참고서 하나다. v1 은 반대 방향과 문장 복제 금지도 봤는데, v2 에서 참고서가 v1 조항
+# 근거를 계속 보관하므로 반대 방향 검사를 지웠다(spec 2026-11-13-v2-rebuild-design 「버리는 검사」).
 WK="$HERE/docs/domain-korean.md"
-# 에이전트원칙이 지시를 갖고 스킬이 같은 ID 로 근거를 단다. 예전에는 같은 문장이 양쪽에 있는지를 봤는데,
-# 그 검사가 우리가 없애려던 중복을 오히려 요구했다. 이제 ID 로 잇고, 지시 문장이 스킬에 그대로
-# 있으면 실패한다.
-KO_IDS="$(awk '/^## 출력/{f=1;next} f&&/^## /{exit} f' "$CANON" | grep -oE '^- \*\*`[A-Z-]+`\*\*' | grep -oE '[A-Z][A-Z-]+')"
-check "에이전트원칙에서 한국어 조항 ID 를 뽑았다"    "[ -n \"\$KO_IDS\" ]"
-KO_MISS=""
-KO_DUP=""
-for kid in $KO_IDS; do
-  grep -qF "\`$kid\`" "$WK" || KO_MISS="$KO_MISS $kid"
-  ko_sent="$(grep -F "**\`$kid\`**" "$CANON" | sed 's/^.*\*\* — //')"
-  if [ -n "$ko_sent" ]; then
-    if grep -qF "$ko_sent" "$WK"; then KO_DUP="$KO_DUP $kid"; fi
-  fi
-done
-[ -n "$KO_MISS" ] && printf '    스킬에 근거가 없는 조항:%s\n' "$KO_MISS"
-[ -n "$KO_DUP" ] && printf '    스킬이 지시를 그대로 옮겨 적은 조항:%s\n' "$KO_DUP"
-check "스킬이 모든 조항 ID 로 근거를 단다"   "[ -z \"\$KO_MISS\" ]"
-check "스킬이 지시 문장을 다시 적지 않는다"  "[ -z \"\$KO_DUP\" ]"
-check "에이전트원칙이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
-
-# 한국어 절 밖의 조항도 같은 방식으로 붙든다. 에이전트원칙이 지시를 소유하고 참고서가 같은 ID 로
-# 근거를 단다. 잇는 장치가 한국어 절에만 있으면 나머지 조항은 근거 없이 늘어날 수 있다.
-# ID 목록은 에이전트원칙에서 뽑되 한국어 절의 것만 뺀다. 절을 추가하거나 이름을 바꿔도 따라온다.
 DC_WK="$HERE/docs/domain-discipline.md"
-ALL_IDS="$(grep -oE '^- \*\*`[A-Z][A-Z0-9-]*`' "$CANON_ALL" | grep -oE '[A-Z][A-Z0-9-]+' | sort -u)"
-DC_IDS="$(printf '%s
-' "$ALL_IDS" | grep -vxF "$KO_IDS" || true)"
-check "한국어 절 밖 조항 ID 를 뽑았다"        "[ -n \"\$DC_IDS\" ]"
-DC_MISS=""
-DC_DUP=""
-for did in $DC_IDS; do
-  grep -qE "^### \`$did\`" "$DC_WK" || DC_MISS="$DC_MISS $did"
-  dc_sent="$(grep -F "**\`$did\`" "$CANON_ALL" | sed 's/^.*\*\* — //')"
-  if [ -n "$dc_sent" ]; then
-    if grep -qF "$dc_sent" "$DC_WK"; then DC_DUP="$DC_DUP $did"; fi
-  fi
-done
-[ -n "$DC_MISS" ] && printf '    참고서에 근거가 없는 조항:%s
-' "$DC_MISS"
-[ -n "$DC_DUP" ] && printf '    참고서가 지시를 그대로 옮겨 적은 조항:%s
-' "$DC_DUP"
-check "참고서가 모든 조항 ID 로 근거를 단다"  "[ -z \"\$DC_MISS\" ]"
-check "참고서가 지시 문장을 다시 적지 않는다" "[ -z \"\$DC_DUP\" ]"
+clause_ref_missing() {  # $1=에이전트원칙 → 근거 절이 없는 ID 를 공백으로 이은 글
+  local sec ref id miss=""
+  for sec in 행동 출력; do
+    if [ "$sec" = 행동 ]; then ref="$DC_WK"; else ref="$WK"; fi
+    for id in $(awk -v s="## $sec" '{ sub(/\r$/, "") } $0 == s { f=1; next } /^## / { f=0 } f' "$1" \
+                | grep -oE '^- \*\*`[A-Z][A-Z0-9-]*`\*\*' | grep -oE '[A-Z][A-Z0-9-]+' || true); do
+      grep -qxF "### \`$id\`" "$ref" || miss="$miss $id"
+    done
+  done
+  printf '%s' "${miss# }"
+}
+REF_MISS="$(clause_ref_missing "$CANON")"
+[ -n "$REF_MISS" ] && printf '    참고서에 근거 절이 없는 조항: %s\n' "$REF_MISS"
+check "참고서가 원칙의 모든 조항 ID 로 근거를 단다" "[ -z \"\$REF_MISS\" ]"
+# 자기시험 — 「행동」 절에 가짜 조항을 넣은 사본에서 그 ID 가 나와야 한다. 안 나오면 검사가 무의미하다.
+CANON_FAKE="$(mktemp)"; awk '{ print } $0 == "## 행동" { print ""; print "- **`FAKE-ID`** — x" }' "$CANON" > "$CANON_FAKE"
+check "근거 검사가 가짜 조항을 잡는다" "[[ \" \$(clause_ref_missing '$CANON_FAKE') \" == *' FAKE-ID '* ]]"
+check "에이전트원칙이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
 check "에이전트원칙이 그 참고서를 가리킨다"   "grep -qF 'domain-discipline' \"$CANON\""
 
 echo "[검진 개시 — 묻는 자리와 건너뛰는 자리]"
@@ -203,7 +179,7 @@ echo "[소유 표] 소유는 하나뿐이고 나머지는 가리킨다"
 # 가리키는 문장은 이 꼴을 쓰지 않으므로 포인터가 소유자로 잡히지 않는다.
 # 전에는 「렌즈에게 에이전트원칙을 알리는 법」 하나에만 이 검사가 걸렸고 가리킬 문서 셋도 손으로 적혀
 # 있었다. 넷째 문서가 복제하면 검사가 지나쳤다. 이제 소유자도 대상도 도출한다.
-# 살아 있는 문서 목록은 아래 세 구획(소유 표·첫 문장·대구 한도)이 함께 쓴다. 한 번만 뽑는다.
+# 살아 있는 문서 목록은 아래 두 구획(소유 표·대구 한도)이 함께 쓴다. 한 번만 뽑는다.
 # 앞으로도 읽히고 고쳐질 문서만이다. 스펙과 계획과 지난 기록과 인수인계는 그때의 판단을 남긴 것이라 뺀다.
 # evals/ 아래 평가 과제는 일부러 위반을 담은 시험 자료라 뺀다. 머리 12줄에 superseded 가 있으면 대체된
 # 설계 문서라 뺀다. 목록을 손으로 적지 않고 git 색인에서 도출한다.
@@ -263,27 +239,6 @@ EOF
 check "소유자로 불리는 절이 스스로 선언한다" "[ -z \"\$OWN_UNDECL\" ]"
 [ -n "$OWN_BAD" ] && printf '    소유자를 안 가리키고 절 이름만 담은 곳:%s\n' "$OWN_BAD"
 check "절 이름을 담은 문서가 소유자를 가리킨다" "[ -z \"\$OWN_BAD\" ]"
-
-echo "[첫 문장] 절 제목 아래 첫 줄이 산문이다"
-# TITLE-LAYERS 가 "절의 첫 문장이 본문 제목이다"라고 정한다(문서의 본문 제목은 결론 한 문장).
-# 빈 줄을 건너뛴 첫 줄이 불릿·표·코드블록·인용·번호목록이면 결론 문장이 아니다. 그 줄이 산문인데
-# 결론이 아닌 것은 기계가 못 가르므로 여기서 잡는 것은 구조로 드러나는 위반뿐이다.
-# TITLE-LAYERS 는 managing-docs 의 reading-docs.md(읽기 위한 문서) 규칙이라 영어 제목에도 적용한다.
-HF_DOCS="$LIVE_DOCS"
-HF_BAD=""
-for hf in $HF_DOCS; do
-  hit="$(awk '
-    /^#{2,3} / {
-      title=$0; sub(/^#+ /, "", title)
-      first=""
-      while ((getline line) > 0) { if (line ~ /^[ \t]*$/) continue; first=line; break }
-      if (first == "") next
-      if (first ~ /^[-*+] / || first ~ /^\|/ || first ~ /^```/ || first ~ /^> / || first ~ /^[0-9]+\. /) print title
-    }' "$HERE/$hf")"
-  [ -n "$hit" ] && HF_BAD="$HF_BAD [$hf: $(printf '%s' "$hit" | tr '\n' ',')]"
-done
-[ -n "$HF_BAD" ] && printf '    첫 줄이 산문이 아닌 소제목:%s\n' "$HF_BAD"
-check "절 제목 아래 첫 줄이 모두 산문이다" "[ -z \"\$HF_BAD\" ]"
 
 echo "[문서 타입 표] 강제하는 장치 칸이 실물을 가리킨다"
 # 표가 장치를 이름으로만 적으면 실물이 없어도 그 행은 갖춰진 것처럼 읽힌다. 칸을 표가 사는 곳에서
@@ -706,82 +661,19 @@ for c in "$HERE"/commands/*.md; do
   check "README commands section lists $n" "printf '%s' \"\$CMD_SECTION\" | grep -qF -- '$n'"
 done
 
-# 「행동」 절을 뽑아 둔다. 아래 canon 검사(LENS-ALLOWED)가 쓴다.
-# 파일 전역 grep이 아니라 「행동」 절만 뽑아 그 안에서 검사한다(다른 절·다른 파일의 문자열로
-# vacuous 통과하지 않게 한다).
-WF_BLOCK="$(awk '/^## 행동/{f=1} f&&/^## /&&!/^## 행동/{exit} f' "$HERE/agent-principles.md")"
-
-# --- parallel-orchestration-nudge: 병렬 오케스트레이션 넛지(에이전트원칙 계약 가드) ---
-# 위에서 뽑은 「행동」 절 안에서만 검사한다(vacuous 통과 방지).
-echo "[parallel-orchestration-nudge] principles 병렬 오케스트레이션 nested-orchestration nudge"
-check "병렬 오케스트레이션 points to skill" "printf '%s' \"\$WF_BLOCK\" | grep -qF 'nested-orchestration'"
-check "그 절에 SUB-ORCHESTRATE 조항이 있다" "printf '%s' \"\$WF_BLOCK\" | grep -qF '**\`SUB-ORCHESTRATE\`'"
-
-# --- canon-realign: 에이전트원칙과 managing-docs 가 원칙 전부를 갖는다 ---
-# 접기(3fced53) 뒤에 에이전트원칙이 원칙 전부를 가졌고, 2026-10-25 에 문서 규칙만 managing-docs 로 옮겼다.
-echo "[canon-realign] the canon and managing-docs own every principle; only procedures and per-artifact rules stay skills"
+# --- canon-realign: 참고서가 빌려 온 원칙의 출처를 밝힌다 ---
+echo "[canon-realign] the reference credits the borrowed principles"
 check "karpathy source is credited in the reference" "grep -qF 'andrej-karpathy-skills' '$HERE/docs/domain-discipline.md'"
-# 조항 ID 목록은 근거를 적는 두 참고서의 `### \`ID\`` 제목에서 도출한다(「삭제한 조항」 절은 뺀다).
-# 에이전트원칙에서 읽어 오면 단언의 출처가 단언 대상 자신이 되어 조항이 떨어져도 그 결손을 정답으로
-# 굳히고, 목록을 여기 손으로 적으면 조항을 더할 때 이쪽이 낡는다. 방향은 참고서 → 에이전트원칙이다.
-ref_clause_ids() {
-  local f
-  for f in "$HERE/docs/domain-discipline.md" "$HERE/docs/domain-korean.md"; do
-    awk '{ sub(/\r$/, "") } /^## 삭제한 조항/ { exit } /^### `[A-Z0-9-]+`$/ { gsub(/^### `|`$/, ""); print }' "$f"
-  done
-}
-missing_clause_ids() {  # $1=에이전트원칙 → 참고서에 근거가 있는데 원칙에 없는 ID
-  local id miss=""
-  for id in $(ref_clause_ids); do grep -qF "**\`$id\`" "$1" || miss="$miss $id"; done
-  printf '%s' "$miss"
-}
-MISS_IDS="$(missing_clause_ids "$CANON_ALL")"
-check "canon: every clause with a rationale in the references is in agent-principles or managing-docs (reference → principles)" "[ -z \"\$MISS_IDS\" ]"
-[ -n "$MISS_IDS" ] && echo "    참고서에 근거가 있는데 에이전트원칙과 managing-docs 에 없는 조항(참고서 → 원칙 방향):$MISS_IDS"
-# 도출 검사가 결손을 실제로 잡는지 임시 사본에서 본다. 조항 하나를 지운 사본이 통과하면 검사가 무의미하다.
-CANON_CUT="$(mktemp)"; grep -vF '**`YAGNI`' "$CANON_ALL" > "$CANON_CUT"
-check "canon: derived check catches a removed clause" "[ \"\$(missing_clause_ids '$CANON_CUT')\" = ' YAGNI' ]"
-# 한국어 절의 묶음 제목(PLAIN-KO 등)은 2026-11-12 줄인 판에서 뺐다. 출력 조항은 「출력」 절 아래 한 층이고
-# 원자 지시는 위의 도출 검사가 본다(decisions/2026-11-12-principles-lite.md).
-# 시험이나 사용자 결정으로 지운 조항 ID 가 근거 없이 에이전트원칙에 되돌아오면 실패한다. 효과 확인 방법은
-# CLAUDE.md 「조항 추가와 문구 변경」이 정한다. 지운 근거는 두 참고서의 「삭제한 조항」 절에 있다.
-# 다만 ASK-FORK·MEASURE-FIRST·SIMPLE·SURGICAL·TDD 는 그 절이 생기기 전(2026-06~09)에 지워 근거가 git 이력에만 있다.
-REVIVED_IDS=""
-for id in ASK-FORK MEASURE-FIRST SIMPLE SURGICAL TDD ASK-CONTEXT NO-DOC-STATE HANDOFF-CONSUME SINO-KEEP VOCAB-FREQ REWRITE-NOT-ADD REWRITE-TO-ADD FAIL-LOUD EXPLICIT SSOT NAME-UNRESOLVED TRACE-REQUEST KEEP-STYLE IDEMPOTENT LOCAL-FIRST FACT-VS-JUDGE MEMO-DEFER LOANWORD-KEEP LEXICAL-CHAIN NAME-ITEMS COMMA-CUT LABEL-NOUN TERM-EXPLAIN EDIT-DISCIPLINE EDIT-PRIORITY EXPLAIN-STRUCTURE KEEP-FAILED NO-FLEET SECRETS TITLE-PROOF TELL-NOW; do
-  grep -qF "**\`$id\`" "$CANON_ALL" && REVIVED_IDS="$REVIVED_IDS $id"
-done
-check "canon: 지운 조항 ID 가 근거 없이 되살아나지 않는다" "[ -z \"\$REVIVED_IDS\" ]"
 
-# --- standing-consent: 렌즈 호출에 대한 상시 허가가 에이전트원칙에 있다 ---
-# 세션 기본 지침이 "사용자가 요청하지 않으면 서브에이전트를 부르지 마라"로 들어오는 환경이 있다.
-# 그 문구는 조건부라 사용자 지침으로 상시 허가를 남기면 열린다. 에이전트원칙은 @import로 실리므로 이 한
-# 문장이 있으면 검진이 돈다.
-# 파일 전역 grep이 아니라 「행동」 절만 뽑아 그 안에서 본다 — 허가 문장과 범위를 좁히는 문장이
-# 서로 떨어져 나가도 각각 어딘가에 남아 있으면 통과해 버리는 항진을 막는다(이 파일의 다른 절과 같은 방식).
-# 절을 뽑는 계산은 위 WF_BLOCK 을 그대로 쓴다.
-# 백틱이 든 패턴은 작은따옴표 변수에 담아 grep -qF -- 로 넘긴다 — 큰따옴표 안에 두면 eval을 지나며
-# 명령 치환으로 실행되어, 검사가 엉뚱한 문자열을 찾으면서도 초록으로 남는다.
-# 문장이 아니라 조항 ID 로 본다. 허가 범위는 그 조항 줄이 `lens-*` 를 부르는지로 본다.
-CONSENT='**`LENS-ALLOWED`'
-SC_LINE="$(grep -F -- "$CONSENT" "$CANON" || true)"
-echo "[standing-consent] lens calls carry the user's standing consent"
-check "canon: 상시 허가 조항"              "printf '%s' \"\$WF_BLOCK\" | grep -qF -- \"\$CONSENT\""
-check "canon: 허가 범위 한정"              "grep -qF -- '\`lens-*\`' <<<\"\$SC_LINE\""
-# 선행연구 스킬은 이름이 `lens-*` 형태가 아니어서 상시 허가에 들지 않고, 승인 규칙은 자기 절이 소유한다.
-# 허가 조항이 그 이름을 예외로 적을 필요가 없으므로, 소유 선언이 스킬에 있는지만 본다.
+# --- standing-consent: 선행연구 스킬의 승인 규칙 ---
+# 선행연구 스킬은 이름이 `lens-*` 형태가 아니어서 렌즈 허가에 들지 않고, 승인 규칙은 자기 절이 소유한다.
 AP="$HERE/skills/researching-prior-art/SKILL.md"
+echo "[standing-consent] the prior-art skill owns its approval rule"
 check "선행연구 스킬이 승인 규칙을 소유한다" "owns_sec \"\$AP\" '발동과 기록'"
 
-# --- question-tool: 갈림길은 질문 도구로 묻는다 (상시 로드 규칙) ---
-# 이 규칙이 리뷰 스킬 한 곳에만 있으면 그 스킬을 열지 않은 세션에는 닿지 않는다. 실제로 문서 검진
-# 세션이 다시 돌릴지를 평문으로 물어 선택 대화창이 뜨지 않았다. 묻는 방식은 특정 절차의 성질이 아니라
-# 소통 규칙이므로 상시 로드되는 항목에 두고, 리뷰 스킬은 그것을 가리키기만 한다.
+# --- question-tool: 리뷰 스킬은 묻는 규칙을 다시 정의하지 않는다 ---
 SR="$HERE/skills/review-specs/SKILL.md"
-echo "[question-tool] the fork-in-the-road question rule is always loaded"
-# 언제 묻는지와 어떻게 묻는지를 `ASK-OPTIONS` 하나가 정한다(2026-09-24 에 `ASK-CONTEXT` 를 합쳤다).
-# 조항 안의 세 문장(정해지지 않으면 묻는다·하나씩 묻는다·대목적을 되짚는다)을 조항 ID 하나로 합쳤다.
-check "canon: 묻는 조항이 행동 절에 있다"    "sec_has '$CANON' '행동' '**\`ASK-OPTIONS\`'"
-# 사용 여부(「작업 순서와 다시 리뷰」 절의 ASK-OPTIONS)는 위 「합치기와 다시 리뷰」가 본다.
+echo "[question-tool] the review skill does not redefine the asking rule"
 check "spec-review: 규칙을 재정의 말고 인용" "! grep -qF '**\`ASK-OPTIONS\`' '$SR'"
 
 # --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---

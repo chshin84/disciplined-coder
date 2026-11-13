@@ -28,7 +28,7 @@ echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
 # 에이전트원칙의 포인터가 이 경로를 가리킨다. Skill 도구가 없는 에이전트는 이 사본을 Read 로 읽는다.
 check "managing-docs 사본이 원본과 같다" "cmp -s '$HERE/skills/managing-docs/SKILL.md' '$K/managing-docs/SKILL.md' && cmp -s '$HERE/skills/managing-docs/references/reading-docs.md' '$K/managing-docs/reading-docs.md'"
-check "에이전트원칙이 사본 경로를 가리킨다" "grep -qF '~/.claude/disciplined-coder/managing-docs/SKILL.md' '$K/agent-principles.md' && grep -qF '~/.claude/disciplined-coder/managing-docs/reading-docs.md' '$K/agent-principles.md'"
+check "에이전트원칙이 사본 경로를 가리킨다" "grep -qF '~/.claude/disciplined-coder/managing-docs/SKILL.md' '$K/agent-principles.md'"
 # 금지 표현 목록은 에이전트원칙과 같은 관리블록이 싣는다. 다른 플러그인이 있든 없든 같다.
 check "banlist: 관리블록은 두 줄뿐이다"   "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC' | wc -l) -eq 4 ]"
 check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words.md' ]"
@@ -598,14 +598,13 @@ check "single managed region after run"         "[ \$(grep -cF '# BEGIN discipli
 # --- canon-refresh: 이미 옛 에이전트원칙을 갖고 있는 PC도 갱신을 받는다 ---
 # 갓 설치한 경로만 검사하면, 에이전트원칙 복사를 '없을 때만'으로 바꿔도 초록이 유지된다.
 # 그 순간 이미 깔린 모든 설치가 옛 에이전트원칙에 멈추는데, 새 문장이 필요한 쪽은 정확히 그 설치들이다.
-# 문장이 아니라 조항 ID 로 본다 — 문구를 다듬어도 조항이 남아 있으면 통과한다.
-CONSENT='**`LENS-ALLOWED`'
+# 문장이나 조항 ID 가 아니라 저장소 원본과 같은지로 본다 — 조항을 바꿔도 이 검사를 고치지 않는다.
 HRU="$(mktemp -d)"; PRU="$(mktemp -d)"; mkdir -p "$HRU/.claude/disciplined-coder"
 OLDCANON="$HRU/.claude/disciplined-coder/agent-principles.md"
 printf '# 디시플린 (팀 원칙)\n\n옛 사본이라 새 문장이 없다.\n' > "$OLDCANON"
 run "$HRU" "$PRU" >/dev/null
 echo "[canon-refresh] an existing older canon copy is refreshed, not left behind"
-check "옛 사본이 갱신된다"                 "grep -qF -- '$CONSENT' '$OLDCANON'"
+check "옛 사본이 갱신된다"                 "cmp -s '$HERE/agent-principles.md' '$OLDCANON'"
 check "옛 내용이 남지 않는다"              "! grep -qF '옛 사본이라 새 문장이 없다' '$OLDCANON'"
 
 # --- 동시 진입: 창을 여럿 열면 SessionStart가 같은 ~/.claude/CLAUDE.md를 동시에 고친다 ---
