@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 공유 헬퍼: 「금지 표현」 표를 한 번 읽어 여러 파일로 낸다. 그 표는 에이전트원칙이 아니라
 # korean-banned-words.md 에 있고, 그 파일이 목록의 원본이다.
-# 소비자는 doc_word 훅 셋(pretooluse·posttooluse·stop)과 scripts/check_banned_words.sh 다.
+# 소비자는 doc_word 훅 셋(pretooluse·posttooluse·stop)과 scripts/check_banned_words.sh, scripts/scaffold.sh 다.
 # 표를 읽는 자리를 늘리지 않으려고 파싱은 여기 한 벌만 둔다.
 #
 # awk 한 번으로 끝낸다. 윈도우는 프로세스 하나 띄우는 값이 커서 행마다 파이프를 돌리는 셸 반복은
@@ -65,6 +65,51 @@ banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl, $5=scopes(생략 가�
     }
     END { close(pairs); close(toks); close(excl); close(scopes) }
   ' "$1"
+}
+
+# 세션에 싣는 짧은 상시 보기를 stdout 으로 낸다. 표를 다시 읽지 않고 banned_parse 결과만 쓴다 —
+# 파서가 둘이면 표의 모양이 바뀔 때 한쪽만 따라간다. 제외어는 넣지 않는다. 제외어는 검사기가 쓰는
+# 값이고, 세션에 실으면 분량만 늘린다.
+# 형식: 원본 첫 줄(제목), 범위 제목 없는 행, 범위마다 `## <범위>` 와 그 행들, 마지막에 원본의
+# 「표로 적을 수 없는 규칙」 절의 `- ` 줄. 덩어리 사이는 빈 줄 하나이고 줄 끝 CR 과 끝 빈 줄이 없다.
+# 표에서 행을 하나도 읽지 못하면 아무것도 내지 않고 1 을 돌려준다. 빈 보기를 사본으로 깔면
+# 세션에 목록이 조용히 빠진다.
+BANNED_RULES_HEAD='## 표로 적을 수 없는 규칙'
+banned_view() {  # $1=표 → stdout 상시 보기
+  local d rc=0
+  d="$(mktemp -d)" || return 1
+  banned_parse "$1" "$d/pairs" "$d/toks" "$d/excl" "$d/scopes" || rc=1
+  if [ "$rc" -eq 0 ] && [ -s "$d/pairs" ]; then
+    LC_ALL=C awk -v rh="$BANNED_RULES_HEAD" '
+      FNR == 1 { fi++ }
+      { sub(/\r$/, "") }
+      fi == 1 { sc[FNR] = $0; next }
+      fi == 2 {
+        n = split($0, p, "\t"); line = "-"
+        for (i = 2; i <= n; i++) line = line (i > 2 ? " ·" : "") " `" p[i] "`"
+        line = line " → " p[1]
+        s = sc[FNR]
+        if (!(s in grp)) { grp[s] = ""; if (s != "") order[++no] = s }
+        grp[s] = grp[s] (grp[s] == "" ? "" : "\n") line
+        next
+      }
+      FNR == 1 { title = $0 }
+      $0 == rh { inr = 1; next }
+      inr && /^## / { inr = 0 }
+      inr && /^- / { rules = rules (rules == "" ? "" : "\n") $0 }
+      END {
+        out = title
+        if ("" in grp) out = out "\n\n" grp[""]
+        for (i = 1; i <= no; i++) out = out "\n\n## " order[i] "\n\n" grp[order[i]]
+        if (rules != "") out = out "\n\n" rh "\n\n" rules
+        print out
+      }
+    ' "$d/scopes" "$d/pairs" "$1" || rc=1
+  else
+    rc=1
+  fi
+  rm -rf "$d"
+  return "$rc"
 }
 
 # 문서 여럿을 한 번에 훑어 "금지어<탭>걸린 파일들" 줄을 낸다. 제외 칸을 적용한 뒤에 찾는다.

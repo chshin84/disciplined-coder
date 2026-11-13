@@ -14,6 +14,8 @@ PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$(cd "$SDIR/.." && pwd)}"
 . "$SDIR/_resolve_home.sh"
 . "$SDIR/_scaffold_common.sh"
 . "$SDIR/_ensure_autoupdate.sh"
+# 금지어 상시 보기를 만드는 함수. PLUGIN_ROOT 가 빈 폴더여도 함수는 이 스크립트 옆에서 온다.
+. "$SDIR/../hooks/_banned_words.sh"
 CLAUDE_HOME="$(resolve_home claude)"
 KDIR="$CLAUDE_HOME/disciplined-coder"
 UC="$CLAUDE_HOME/CLAUDE.md"
@@ -22,9 +24,23 @@ mkdir -p "$KDIR"
 
 # [principles-copy] 에이전트원칙(static) 복사·갱신: principles. src==dst면 생략.
 #     SCAFFOLD_REFS 의 스킬 사본도 같은 방식으로 복사한다.
+#     금지어 목록은 원본 표 전체가 아니라 그 표로 만든 상시 보기를 사본으로 둔다. 제외어와 분류 설명은
+#     검사기와 사람이 쓰는 값이라 세션에 실으면 분량만 늘어난다. 보기를 못 만들면 옛 사본을 그대로 둔다 —
+#     빈 보기를 깔면 세션에서 목록이 조용히 빠진다.
 for f in $SCAFFOLD_FILES $SCAFFOLD_REFS; do
   case "$f" in *=*) src="$PLUGIN_ROOT/${f%%=*}"; dst="$KDIR/${f#*=}"; mkdir -p "${dst%/*}" ;;
                *)   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f" ;; esac
+  view=""
+  if [ "$f" = "korean-banned-words.md" ] && [ -f "$src" ]; then
+    view="$(mktemp)"
+    if banned_view "$src" > "$view" 2>/dev/null; then
+      src="$view"
+    else
+      rm -f "$view"
+      echo "[disciplined-coder] ERROR: 금지어 상시 보기를 만들지 못했다 — $src (이전 사본이 있으면 그것이 그대로 쓰인다). 나머지 셋업은 계속한다."
+      continue
+    fi
+  fi
   if [ -f "$src" ]; then
     # 복사가 실패하면 조용히 넘어가지 않는다. 이미 옛 사본이 놓여 있는 PC에서는 파일도 있고
     # @import 배선도 남아 있어 README가 알려 준 확인 셋을 그대로 통과하므로, 에이전트원칙만 낡은 채
@@ -44,6 +60,7 @@ for f in $SCAFFOLD_FILES $SCAFFOLD_REFS; do
   else
     echo "[disciplined-coder] WARNING: source not found at $src"
   fi
+  if [ -n "$view" ]; then rm -f "$view"; fi
 done
 
 # [managed-dir-hygiene] 관리 디렉터리 위생(멱등): 정책 원본은 _scaffold_common.sh(SCAFFOLD_WHITELIST·STALE).

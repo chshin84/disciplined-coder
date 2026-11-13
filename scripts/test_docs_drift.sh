@@ -23,6 +23,12 @@ README="$HERE/README.md"
 CALLER="$HERE/skills/review-specs/SKILL.md"
 DISP="$HERE/skills/dispatching-lenses/SKILL.md"
 . "$HERE/scripts/_test_check.sh"
+. "$HERE/scripts/_json_valid.sh"
+. "$HERE/hooks/_banned_words.sh"
+# 금지어 원본 표를 한 번 읽어 둔다. 상시 보기 검사와 그 보기를 쓰는 뒤 검사가 같은 결과를 본다.
+BW="$(mktemp -d)"
+banned_parse "$HERE/korean-banned-words.md" "$BW/pairs" "$BW/toks" "$BW/excl" "$BW/scopes"
+VIEW="$BW/view.md"; banned_view "$HERE/korean-banned-words.md" > "$VIEW" || true
 
 # 진실 — 렌즈 에이전트 정의에서 짧은 이름을 도출한다.
 ALL="$(for f in "$HERE"/agents/lens-*.md; do [ -f "$f" ] || continue; basename "$f" .md | sed 's/^lens-//'; done | sort)"
@@ -872,5 +878,10 @@ done
 DDISC="$HERE/docs/domain-discipline.md"
 check "근거 문서의 NO-RAW-OUTPUT 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`NO-RAW-OUTPUT\`' 'researching-prior-art'"
 check "근거 문서의 LENS-ALLOWED 절이 대체를 적는다" "sec_has \"\$DDISC\" '\`LENS-ALLOWED\`' 'researching-prior-art'"
+
+echo "[상시 보기 — 원본 표의 행이 모두 있다]"
+VIEW_MISS="$(while read -r t; do grep -qF -- "\`$t\`" "$VIEW" || echo "$t"; done < "$BW/toks")"
+check "상시 보기 행 수가 원본 표 행 수와 같다" "[ \"\$(grep -c '^- \`' \"\$VIEW\")\" = \"\$(wc -l < \"\$BW/pairs\" | tr -d ' ')\" ]"
+check "원본 표의 금지어가 모두 상시 보기에 있다" "[ -z \"\$VIEW_MISS\" ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

@@ -34,6 +34,14 @@ check "banlist: 관리블록은 두 줄뿐이다"   "[ \$(sed -n '/BEGIN discipl
 check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words.md' ]"
 # 첫 세션은 @import 가 아직 안 실렸으므로 목록도 에이전트원칙과 함께 stdout 으로 보강한다.
 check "banlist: 첫 세션 stdout 에 목록도 실린다" "printf '%s' \"\$OUT\" | grep -qxF \"\$(head -1 '$HERE/korean-banned-words.md')\""
+# 사본은 원본 표 전체가 아니라 상시 보기다. 표와 제외어는 검사기만 쓰므로 세션에 싣지 않는다.
+VIEW_REF="$(mktemp)"; ( . "$HERE/hooks/_banned_words.sh"; banned_view "$HERE/korean-banned-words.md" ) > "$VIEW_REF"
+check "금지어 사본이 원본 표로 만든 상시 보기와 같다" "cmp -s '$VIEW_REF' '$K/korean-banned-words.md'"
+check "금지어 사본에 표가 없다"                     "! grep -qF '|---|' '$K/korean-banned-words.md'"
+touch -d '2000-01-01' "$K/korean-banned-words.md"; REF6="$(mktemp)"; touch -d '2001-01-01' "$REF6"
+run "$H1" "$P1" > /dev/null
+check "같은 상시 보기는 다시 쓰지 않는다"           "[ ! '$K/korean-banned-words.md' -nt '$REF6' ]"
+rm -f "$REF6"
 touch -d '2000-01-01' "$UC"; REF5="$(mktemp)"; touch -d '2001-01-01' "$REF5"
 run "$H1" "$P1" > /dev/null
 check "같은 블록이면 전역 CLAUDE.md 를 다시 쓰지 않는다" "[ ! '$UC' -nt '$REF5' ]"
@@ -426,6 +434,16 @@ set -e
 echo "[missing-canon] missing source → warning, exit 0"
 check "missing source warns to stdout"      "printf '%s' \"\$ERR8\" | grep -qF 'WARNING: source not found'"
 check "missing source still exit 0"         "[ $rc8 -eq 0 ]"
+# 금지어 원본 표가 없거나 행을 못 읽으면 옛 사본을 지우지 않는다. 빈 보기를 깔면 세션에서 목록이 조용히 빠진다.
+HV1="$(mktemp -d)"; HV2="$(mktemp -d)"; PV="$(mktemp -d)"; RV1="$(mktemp -d)"; RV2="$(mktemp -d)"
+for hv in "$HV1" "$HV2"; do mkdir -p "$hv/.claude/disciplined-coder"; printf 'old view\n' > "$hv/.claude/disciplined-coder/korean-banned-words.md"; done
+cp "$HERE/agent-principles.md" "$RV1/"; cp "$HERE/agent-principles.md" "$RV2/"; printf '# 빈 목록\n' > "$RV2/korean-banned-words.md"
+set +e
+OUTV1="$(CLAUDE_HOME_DIR="$HV1/.claude" CLAUDE_PROJECT_DIR="$PV" CLAUDE_PLUGIN_ROOT="$RV1" bash "$SCAFFOLD" 2>/dev/null)"; rcv1=$?
+OUTV2="$(CLAUDE_HOME_DIR="$HV2/.claude" CLAUDE_PROJECT_DIR="$PV" CLAUDE_PLUGIN_ROOT="$RV2" bash "$SCAFFOLD" 2>/dev/null)"; rcv2=$?
+set -e
+check "원본 표가 없으면 경고하고 옛 금지어 사본을 남긴다" "printf '%s' \"\$OUTV1\" | grep -qF 'WARNING: source not found' && [ \"\$(cat '$HV1/.claude/disciplined-coder/korean-banned-words.md')\" = 'old view' ] && [ $rcv1 -eq 0 ]"
+check "행 없는 표면 오류를 알리고 옛 금지어 사본을 남긴다" "printf '%s' \"\$OUTV2\" | grep -qF 'ERROR: 금지어 상시 보기를 만들지 못했다' && [ \"\$(cat '$HV2/.claude/disciplined-coder/korean-banned-words.md')\" = 'old view' ] && [ $rcv2 -eq 0 ]"
 
 # --- home-resolution: 홈 해석이 bash $HOME에 의존하지 않음 (CLAUDE_CONFIG_DIR 우선) ---
 # AD 리다이렉트 홈(예: $HOME=U:\ 네트워크 드라이브)에서 Claude Code 실제 홈(USERPROFILE/CLAUDE_CONFIG_DIR)과

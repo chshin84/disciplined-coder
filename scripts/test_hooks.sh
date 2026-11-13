@@ -349,6 +349,34 @@ BANEOF
 banned_parse "$BX/list2.md" "$BX/pairs2" "$BX/toks2" "$BX/excl2" "$BX/scopes2"
 printf '판단력이 있다.\n' > "$BX/long.md"
 check "긴 제외어가 먼저 덮인다"      "[ -z \"\$(banned_report '$BX/pairs2' '$BX/long.md' '$BX/excl2')\" ]"
+# 상시 보기는 세션에 싣는 짧은 목록이다. 표 읽기는 banned_parse 결과만 쓰고 제외어는 넣지 않는다.
+cat > "$BX/list3.md" <<'BANEOF'
+# 금지어 시험 목록
+
+## 금지 표현
+
+설명 문단이다.
+
+| 쓰지 않는 말 | 대신 쓰는 말 | 제외 |
+|---|---|---|
+| `앞` | 머리 | — |
+
+### 모든 글에 적용
+
+| 쓰지 않는 말 | 대신 쓰는 말 | 제외 |
+|---|---|---|
+| `판` | 버전 | `판정` · `판단` |
+
+## 표로 적을 수 없는 규칙
+
+설명 문장이다.
+
+- 규칙 하나다.
+BANEOF
+check "상시 보기가 정한 형식을 낸다" "[ \"\$(banned_view '$BX/list3.md')\" = \"\$(printf '# 금지어 시험 목록\n\n- \`앞\` → 머리\n\n## 모든 글에 적용\n\n- \`판\` → 버전\n\n## 표로 적을 수 없는 규칙\n\n- 규칙 하나다.')\" ]"
+check "상시 보기에 제외어가 없다"      "! banned_view '$BX/list3.md' | grep -qF '판정'"
+check "CRLF 표도 같은 보기를 낸다"    "sed 's/\$/\r/' '$BX/list3.md' > '$BX/list3crlf.md' && [ \"\$(banned_view '$BX/list3crlf.md')\" = \"\$(banned_view '$BX/list3.md')\" ] && ! banned_view '$BX/list3crlf.md' | grep -q \$'\r'"
+check "행이 없는 표는 실패하고 아무것도 내지 않는다" "printf '# 빈 목록\n' > '$BX/empty.md' && ! banned_view '$BX/empty.md' > '$BX/empty.out' && [ ! -s '$BX/empty.out' ]"
 
 echo "[stop 겹 — 도구를 묻지 않고 결과를 본다]"
 # 명령줄에 대상이 안 나타나는 변경(파이썬 스크립트, git checkout)을 앞 두 겹이 못 본다.
