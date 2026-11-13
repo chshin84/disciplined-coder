@@ -12,7 +12,8 @@ import runpy
 import subprocess
 import sys
 
-JOBS = 4
+# 동시 시험은 3개까지다(메모리 부족으로 세션이 강제 종료된 기록, 사용자 지시).
+JOBS = 3
 GEN_MODEL = "claude-opus-5-5"
 # 2026-10-18 첫 클린룸 실행에서 haiku 판정은 같은 응답을 다르게 판정하거나, 판정 이유와 반대로 기록했다
 # (evals/principles/README.md 「클린룸 시험」). 그래서 생성 모델(opus)과 크기가 다른 sonnet 으로 판정한다.
