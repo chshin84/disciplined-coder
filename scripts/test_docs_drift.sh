@@ -776,4 +776,18 @@ VIEW_MISS="$(while read -r t; do grep -qF -- "\`$t\`" "$VIEW" || echo "$t"; done
 check "상시 보기 행 수가 원본 표 행 수와 같다" "[ \"\$(grep -c '^- \`' \"\$VIEW\")\" = \"\$(wc -l < \"\$BW/pairs\" | tr -d ' ')\" ]"
 check "원본 표의 금지어가 모두 상시 보기에 있다" "[ -z \"\$VIEW_MISS\" ]"
 
+echo "[지시문 금지어 — 실리는 지시문에 금지어가 백틱 밖에 없다]"
+# 모든 세션에 싣는 원칙 사본·상시 보기와 매 턴 리마인더가 대상이다. 모델이 지시문 낱말을 답에 그대로 옮기기 때문이다.
+REMIND_TXT="$BW/remind.txt"
+bash "$HERE/hooks/reply_reminder_userpromptsubmit.sh" </dev/null \
+  | json_run 'import json,sys; sys.stdout.write(json.load(sys.stdin)["hookSpecificOutput"]["additionalContext"])' > "$REMIND_TXT" || true
+IB_FX="$(mktemp -d)"
+printf '결정 사항은 정할 일이 아니다.\n' > "$IB_FX/out.md"
+printf '결정 사항은 `정할 일` 이 아니다.\n' > "$IB_FX/in.md"
+check "백틱 밖 금지어를 잡는다"   "[ -n \"\$(banned_report \"\$BW/pairs\" \"\$IB_FX/out.md\" \"\$BW/excl\")\" ]"
+check "백틱 안 금지어는 넘긴다"   "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$IB_FX/in.md\" \"\$BW/excl\")\" ]"
+check "원칙 사본에 금지어가 없다"   "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$HERE/agent-principles.md\" \"\$BW/excl\")\" ]"
+check "상시 보기에 금지어가 없다"   "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$VIEW\" \"\$BW/excl\")\" ]"
+check "리마인더에 금지어가 없다"    "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$REMIND_TXT\" \"\$BW/excl\")\" ]"
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

@@ -624,7 +624,10 @@ check "UserPromptSubmit 이 넛지를 연결한다" "json_run 'import json,sys; 
 echo "[reply-reminder]"
 RR="$HERE/hooks/reply_reminder_userpromptsubmit.sh"
 rr() { printf '{"session_id":"s","hook_event_name":"UserPromptSubmit","prompt":"%s"}' "$1" | bash "$RR"; }
-check "메시지마다 세 줄을 붙인다" "out=\"\$(rr '이 함수를 고쳐봐')\" && grep -qF '감독자' <<<\"\$out\" && grep -qF '한 건만' <<<\"\$out\" && grep -qF '\"hookEventName\":\"UserPromptSubmit\"' <<<\"\$out\" && json_valid_stdin <<<\"\$out\""
+RR_CTX='import json,sys; print(json.load(sys.stdin)["hookSpecificOutput"]["additionalContext"])'
+check "리마인더가 올바른 UserPromptSubmit JSON 이다" "out=\"\$(rr '이 함수를 고쳐봐')\" && json_valid_stdin <<<\"\$out\" && grep -qF '\"hookEventName\":\"UserPromptSubmit\"' <<<\"\$out\""
+check "리마인더 본문이 비어 있지 않다"              "[ -n \"\$(rr '이 함수를 고쳐봐' | json_run \"\$RR_CTX\")\" ]"
+check "메시지와 무관하게 같은 글을 낸다"            "[ \"\$(rr '이 함수를 고쳐봐')\" = \"\$(rr '커밋 됐어')\" ]"
 check "빈 표준 입력에도 붙이고 0 으로 끝난다" "out=\"\$(printf '' | bash \"\$RR\")\" && json_valid_stdin <<<\"\$out\""
 check "끄면 침묵한다" "out=\"\$(DISCIPLINED_CODER_REPLY_REMINDER=off rr '이 함수를 고쳐봐')\" && [ -z \"\$out\" ]"
 check "UserPromptSubmit 이 리마인더를 연결한다" "json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")).get(\"hooks\",{}).get(\"UserPromptSubmit\",[]); sys.exit(0 if any(\"reply_reminder_userpromptsubmit.sh\" in h[\"command\"] for g in d for h in g[\"hooks\"]) else 1)' \"\$HERE/hooks/hooks.json\""
