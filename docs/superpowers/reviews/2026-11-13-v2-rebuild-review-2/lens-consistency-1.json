@@ -1,0 +1,14 @@
+{"lens": "lens-consistency", "target": "docs/superpowers/plans/2026-11-13-v2-rebuild-stage0-3.md (짝 spec 2026-11-13-v2-rebuild-design.md)", "note": "서브에이전트 출력 파일이 비어 메인 세션이 받은 보고에서 줄여 옮겼다",
+ "issues": [
+  {"where": "Task 3 Step 1·8", "type": "gap", "claim": "경로 고정 superseded 검사(2026-08-16 review-layer-redesign, 2026-07-05 nested-orchestration)를 supersedes: 줄 기반으로 바꾸면 그 줄이 0건이라 두 옛 spec 표시를 지키는 검사가 없어진다", "consequence": "두 옛 spec 의 표시를 지워도 실패하는 검사가 없다"},
+  {"where": "Task 3 머리", "type": "contradiction", "claim": "spec 은 핵심 계약 여섯 가지를 새로 쓴다는데 plan 은 다섯 가지를 표시만 달아 재사용하고 「spec 과 다른 점」에 없다", "consequence": "차이가 본문에만 있다"},
+  {"where": "Task 7 Step 4 count_banned.py", "type": "gap", "claim": "banlist/pairs·excl 을 만드는 단계가 없다", "consequence": "금지어 판정 입력의 생성 명령이 없다"},
+  {"where": "Task 8 Step 5, Task 11 Step 3", "type": "gap", "claim": "완료 기준 「금지어가 늘지 않았다」가 3단계 통과 조건에 없고 미달 처리도 없다", "consequence": "금지어 비교가 참고 지표로만 쓰인다"},
+  {"where": "Task 8 Step 3", "type": "gap", "claim": "80달러 계산식에 Task 2·12 의 분류 호출 비용이 없다", "consequence": "분류 비용이 어느 합계에도 없다"},
+  {"where": "Task 12 Step 2", "type": "gap", "claim": "150턴 확대를 말하지만 pick_hidden.py·label_pool.py 가 60·60, 120턴으로 고정이다", "consequence": "두 번째 세트는 정의상 120턴만 고른다"},
+  {"where": "Task 11 Step 2·3", "type": "gap", "claim": "틀린 쌍만 고치라고 요청하면서 과반을 셀 때 고치지 않은 쌍 처리와 reading.json 형식이 없다", "consequence": "판독 과반 조건의 입력이 정의되지 않았다"},
+  {"where": "Task 9 Step 5, Task 6 Interfaces", "type": "drift", "claim": "V2_REV 가 세 시점의 다른 커밋을 가리키고 결과 파일에 생성 리비전이 없다", "consequence": "채택 판정이 어느 커밋의 결과인지 정해지지 않는다"},
+  {"where": "Task 10 Step 2", "type": "gap", "claim": "정리 확인이 replay- 접두어를 기대하지만 만드는 단계에 접두어가 없다", "consequence": "확인 명령의 폴더 이름 규칙이 없다"}
+ ],
+ "principles_applied": ["NO-ASSUME", "EVIDENCE-FIRST", "CHECKABLE", "SPECIFIC-NAME", "STATE-ASSUME"],
+ "notes": "결함 주입 문자열 다섯 개와 Expected 검사 이름은 현행 파일에 있음을 확인했다. 확인 필요: sec_has 가 #### 로 내린 v1 절을 찾는지, report_hidden.py 가 쓰는 history_msgs 키가 replay5 결과에 있는지, domain-discipline.md 의 조항 제목 가정, plan 파일 자체가 미추적이며 커밋 단계가 없음."}

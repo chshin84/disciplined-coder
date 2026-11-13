@@ -1,0 +1,10 @@
+{"lens": "lens-grounding", "target": "docs/superpowers/plans/2026-11-13-v2-rebuild-stage0-3.md", "note": "서브에이전트 출력 파일이 비어 메인 세션이 받은 보고에서 줄여 옮겼다",
+ "issues": [
+  {"where": "Task 3 머리·Step 1·Step 8", "type": "contradiction", "claim": "superseded 결함을 7단계로 미루는 근거가 틀렸다. 지금도 표시가 달린 대체 spec 두 개(2026-08-16 review-layer-redesign, 2026-07-05 nested-orchestration)가 있고, 경로 고정 검사를 지우면 이를 지키는 검사가 없어지며 v2 spec 의 대체 예정 목록에도 두 문서가 없다", "consequence": "두 옛 spec 표시를 지워도 test_docs_drift.sh 가 통과한다"},
+  {"where": "「spec 과 다른 점」 판정 단가", "type": "unsupported", "claim": "0.043달러는 짧은 judge_brev 틀의 값이고, 지적 턴에 쓰는 judge_pair 틀의 실측은 호출당 약 0.058달러(순서 교차 약 0.116)로 spec 0.087 보다 높다", "consequence": "실행 전 비용 안내가 spec 의 절반으로 적혀 있다"},
+  {"where": "Task 4 Step 10 Expected", "type": "contradiction", "claim": "spec 의 1,943자는 규칙 일곱 줄을 넣은 형태라고 적혀 있는데 plan 은 일곱 줄 없이 계산한 값이라 하고 2,444자 시제품은 저장소 밖 측정이다", "consequence": "같은 상시 보기 분량을 두 문서가 다르게 적는다"},
+  {"where": "Task 3 Step 5·8 결함 주입 방법", "type": "mismatch", "claim": "설치 안전과 갱신 잠금의 주입 방법이 spec 표(보존 줄 삭제, 잠금 확인 줄 삭제)와 다르다", "consequence": "표시 주석과 주입 명령이 다른 방법을 적는다"},
+  {"where": "Task 2 Step 1 인용 메시지 제외", "type": "unsupported", "claim": "out 파일 #번호를 0부터 센 줄 번호로 단정하지만 그렇게 밝힌 파일은 out3.md 뿐이다", "consequence": "out1·out2 가 1부터 셌다면 인용 메시지가 숨긴 세트에 남는다"}
+ ],
+ "principles_applied": ["EVIDENCE-FIRST", "NO-ASSUME", "STATE-ASSUME", "NO-AGREE"],
+ "notes": "검사 이름·태그·inject 대상 문자열·.gitignore·판독 페이지 절·키 이름·spec 수치 이관은 확인했다. 확인 필요: 원칙 글자 수 3,129 대 3,130, Task 5·6 예상 실패 목록(실행 안 함), 지적없음 턴의 decision_point 칸."}
