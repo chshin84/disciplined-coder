@@ -1,0 +1,730 @@
+{
+ "cells": [
+  {
+   "row": "Phase Transitions in Compositional Constraint Satisfaction",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq1#case#2"
+  },
+  {
+   "row": "Phase Transitions in Compositional Constraint Satisfaction",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq1#case#2"
+  },
+  {
+   "row": "Phase Transitions in Compositional Constraint Satisfaction",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#2"
+  },
+  {
+   "row": "Phase Transitions in Compositional Constraint Satisfaction",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#2"
+  },
+  {
+   "row": "Phase Transitions in Compositional Constraint Satisfaction",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#2"
+  },
+  {
+   "row": "Phase Transitions in Compositional Constraint Satisfaction",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#2"
+  },
+  {
+   "row": "Evaluating AGENTS.md (저장소 컨텍스트 파일 평가)",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq1#case#3"
+  },
+  {
+   "row": "Evaluating AGENTS.md (저장소 컨텍스트 파일 평가)",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq1#case#3"
+  },
+  {
+   "row": "Evaluating AGENTS.md (저장소 컨텍스트 파일 평가)",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#3"
+  },
+  {
+   "row": "Evaluating AGENTS.md (저장소 컨텍스트 파일 평가)",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#3"
+  },
+  {
+   "row": "Evaluating AGENTS.md (저장소 컨텍스트 파일 평가)",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#3"
+  },
+  {
+   "row": "Evaluating AGENTS.md (저장소 컨텍스트 파일 평가)",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#3"
+  },
+  {
+   "row": "AgentSpec (런타임 규칙 강제 DSL)",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq1#case#7"
+  },
+  {
+   "row": "AgentSpec (런타임 규칙 강제 DSL)",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq1#case#7"
+  },
+  {
+   "row": "AgentSpec (런타임 규칙 강제 DSL)",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#7"
+  },
+  {
+   "row": "AgentSpec (런타임 규칙 강제 DSL)",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#7"
+  },
+  {
+   "row": "AgentSpec (런타임 규칙 강제 DSL)",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#7"
+  },
+  {
+   "row": "AgentSpec (런타임 규칙 강제 DSL)",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq1#case#7"
+  },
+  {
+   "row": "Do Context Files Help Coding Agents? 두 에이전트 소거 연구",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq2#case#3"
+  },
+  {
+   "row": "Do Context Files Help Coding Agents? 두 에이전트 소거 연구",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq2#case#3"
+  },
+  {
+   "row": "Do Context Files Help Coding Agents? 두 에이전트 소거 연구",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq2#case#3"
+  },
+  {
+   "row": "Do Context Files Help Coding Agents? 두 에이전트 소거 연구",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq2#case#3"
+  },
+  {
+   "row": "Do Context Files Help Coding Agents? 두 에이전트 소거 연구",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq2#case#3"
+  },
+  {
+   "row": "Do Context Files Help Coding Agents? 두 에이전트 소거 연구",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq2#case#3"
+  },
+  {
+   "row": "τ-bench pass^k 신뢰성 지표",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq2#case#6"
+  },
+  {
+   "row": "τ-bench pass^k 신뢰성 지표",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq2#case#6"
+  },
+  {
+   "row": "τ-bench pass^k 신뢰성 지표",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq2#case#6"
+  },
+  {
+   "row": "τ-bench pass^k 신뢰성 지표",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq2#case#6"
+  },
+  {
+   "row": "τ-bench pass^k 신뢰성 지표",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq2#case#6"
+  },
+  {
+   "row": "τ-bench pass^k 신뢰성 지표",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq2#case#6"
+  },
+  {
+   "row": "Large Language Models Cannot Self-Correct Reasoning Yet (Huang 등, ICLR 2024)",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq3#case#4"
+  },
+  {
+   "row": "Large Language Models Cannot Self-Correct Reasoning Yet (Huang 등, ICLR 2024)",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq3#case#4"
+  },
+  {
+   "row": "Large Language Models Cannot Self-Correct Reasoning Yet (Huang 등, ICLR 2024)",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#4"
+  },
+  {
+   "row": "Large Language Models Cannot Self-Correct Reasoning Yet (Huang 등, ICLR 2024)",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#4"
+  },
+  {
+   "row": "Large Language Models Cannot Self-Correct Reasoning Yet (Huang 등, ICLR 2024)",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#4"
+  },
+  {
+   "row": "Large Language Models Cannot Self-Correct Reasoning Yet (Huang 등, ICLR 2024)",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#4"
+  },
+  {
+   "row": "ImpossibleBench (Zhong·Raghunathan·Carlini, 프리프린트)",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq3#case#6"
+  },
+  {
+   "row": "ImpossibleBench (Zhong·Raghunathan·Carlini, 프리프린트)",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq3#case#6"
+  },
+  {
+   "row": "ImpossibleBench (Zhong·Raghunathan·Carlini, 프리프린트)",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#6"
+  },
+  {
+   "row": "ImpossibleBench (Zhong·Raghunathan·Carlini, 프리프린트)",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#6"
+  },
+  {
+   "row": "ImpossibleBench (Zhong·Raghunathan·Carlini, 프리프린트)",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#6"
+  },
+  {
+   "row": "ImpossibleBench (Zhong·Raghunathan·Carlini, 프리프린트)",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#6"
+  },
+  {
+   "row": "Uncovering Systematic Failures of LLMs in Verifying Code Against Natural Language Specifications (arXiv 2508.12358, 프리프린트)",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq3#case#7"
+  },
+  {
+   "row": "Uncovering Systematic Failures of LLMs in Verifying Code Against Natural Language Specifications (arXiv 2508.12358, 프리프린트)",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq3#case#7"
+  },
+  {
+   "row": "Uncovering Systematic Failures of LLMs in Verifying Code Against Natural Language Specifications (arXiv 2508.12358, 프리프린트)",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#7"
+  },
+  {
+   "row": "Uncovering Systematic Failures of LLMs in Verifying Code Against Natural Language Specifications (arXiv 2508.12358, 프리프린트)",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#7"
+  },
+  {
+   "row": "Uncovering Systematic Failures of LLMs in Verifying Code Against Natural Language Specifications (arXiv 2508.12358, 프리프린트)",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#7"
+  },
+  {
+   "row": "Uncovering Systematic Failures of LLMs in Verifying Code Against Natural Language Specifications (arXiv 2508.12358, 프리프린트)",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq3#case#7"
+  },
+  {
+   "row": "Anthropic 장기 실행 에이전트 하네스(진행 파일·JSON 기능 목록·init.sh)",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq4#case#0"
+  },
+  {
+   "row": "Anthropic 장기 실행 에이전트 하네스(진행 파일·JSON 기능 목록·init.sh)",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq4#case#0"
+  },
+  {
+   "row": "Anthropic 장기 실행 에이전트 하네스(진행 파일·JSON 기능 목록·init.sh)",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#0"
+  },
+  {
+   "row": "Anthropic 장기 실행 에이전트 하네스(진행 파일·JSON 기능 목록·init.sh)",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#0"
+  },
+  {
+   "row": "Anthropic 장기 실행 에이전트 하네스(진행 파일·JSON 기능 목록·init.sh)",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#0"
+  },
+  {
+   "row": "Anthropic 장기 실행 에이전트 하네스(진행 파일·JSON 기능 목록·init.sh)",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#0"
+  },
+  {
+   "row": "Claude Code 메모리 문서의 CLAUDE.md 길이 지침",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq4#case#2"
+  },
+  {
+   "row": "Claude Code 메모리 문서의 CLAUDE.md 길이 지침",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq4#case#2"
+  },
+  {
+   "row": "Claude Code 메모리 문서의 CLAUDE.md 길이 지침",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#2"
+  },
+  {
+   "row": "Claude Code 메모리 문서의 CLAUDE.md 길이 지침",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#2"
+  },
+  {
+   "row": "Claude Code 메모리 문서의 CLAUDE.md 길이 지침",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#2"
+  },
+  {
+   "row": "Claude Code 메모리 문서의 CLAUDE.md 길이 지침",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#2"
+  },
+  {
+   "row": "Claude Code 압축 후 유지 항목 표",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq4#case#3"
+  },
+  {
+   "row": "Claude Code 압축 후 유지 항목 표",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq4#case#3"
+  },
+  {
+   "row": "Claude Code 압축 후 유지 항목 표",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#3"
+  },
+  {
+   "row": "Claude Code 압축 후 유지 항목 표",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#3"
+  },
+  {
+   "row": "Claude Code 압축 후 유지 항목 표",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#3"
+  },
+  {
+   "row": "Claude Code 압축 후 유지 항목 표",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#3"
+  },
+  {
+   "row": "ManyIFEval·StyleMBPP(다중 지시 준수 측정)",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq4#case#6"
+  },
+  {
+   "row": "ManyIFEval·StyleMBPP(다중 지시 준수 측정)",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq4#case#6"
+  },
+  {
+   "row": "ManyIFEval·StyleMBPP(다중 지시 준수 측정)",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#6"
+  },
+  {
+   "row": "ManyIFEval·StyleMBPP(다중 지시 준수 측정)",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#6"
+  },
+  {
+   "row": "ManyIFEval·StyleMBPP(다중 지시 준수 측정)",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#6"
+  },
+  {
+   "row": "ManyIFEval·StyleMBPP(다중 지시 준수 측정)",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#6"
+  },
+  {
+   "row": "ACE(진화하는 맥락의 증분 갱신)",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq4#case#7"
+  },
+  {
+   "row": "ACE(진화하는 맥락의 증분 갱신)",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq4#case#7"
+  },
+  {
+   "row": "ACE(진화하는 맥락의 증분 갱신)",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#7"
+  },
+  {
+   "row": "ACE(진화하는 맥락의 증분 갱신)",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#7"
+  },
+  {
+   "row": "ACE(진화하는 맥락의 증분 갱신)",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#7"
+  },
+  {
+   "row": "ACE(진화하는 맥락의 증분 갱신)",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq4#case#7"
+  },
+  {
+   "row": "코딩 보조 에이전트 프롬프트 인젝션 체계화 연구",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq5#case#2"
+  },
+  {
+   "row": "코딩 보조 에이전트 프롬프트 인젝션 체계화 연구",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq5#case#2"
+  },
+  {
+   "row": "코딩 보조 에이전트 프롬프트 인젝션 체계화 연구",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#2"
+  },
+  {
+   "row": "코딩 보조 에이전트 프롬프트 인젝션 체계화 연구",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#2"
+  },
+  {
+   "row": "코딩 보조 에이전트 프롬프트 인젝션 체계화 연구",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#2"
+  },
+  {
+   "row": "코딩 보조 에이전트 프롬프트 인젝션 체계화 연구",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#2"
+  },
+  {
+   "row": "에이전트형 코딩 편집기 인젝션 실증",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq5#case#3"
+  },
+  {
+   "row": "에이전트형 코딩 편집기 인젝션 실증",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq5#case#3"
+  },
+  {
+   "row": "에이전트형 코딩 편집기 인젝션 실증",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#3"
+  },
+  {
+   "row": "에이전트형 코딩 편집기 인젝션 실증",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#3"
+  },
+  {
+   "row": "에이전트형 코딩 편집기 인젝션 실증",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#3"
+  },
+  {
+   "row": "에이전트형 코딩 편집기 인젝션 실증",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#3"
+  },
+  {
+   "row": "호스트 CLI 권한 규칙과 PreToolUse 훅",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq5#case#5"
+  },
+  {
+   "row": "호스트 CLI 권한 규칙과 PreToolUse 훅",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq5#case#5"
+  },
+  {
+   "row": "호스트 CLI 권한 규칙과 PreToolUse 훅",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#5"
+  },
+  {
+   "row": "호스트 CLI 권한 규칙과 PreToolUse 훅",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#5"
+  },
+  {
+   "row": "호스트 CLI 권한 규칙과 PreToolUse 훅",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#5"
+  },
+  {
+   "row": "호스트 CLI 권한 규칙과 PreToolUse 훅",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq5#case#5"
+  },
+  {
+   "row": "Claude Code auto mode 기본값 전환",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq6#case#4"
+  },
+  {
+   "row": "Claude Code auto mode 기본값 전환",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq6#case#4"
+  },
+  {
+   "row": "Claude Code auto mode 기본값 전환",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#4"
+  },
+  {
+   "row": "Claude Code auto mode 기본값 전환",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#4"
+  },
+  {
+   "row": "Claude Code auto mode 기본값 전환",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#4"
+  },
+  {
+   "row": "Claude Code auto mode 기본값 전환",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#4"
+  },
+  {
+   "row": "Cursor 에이전트 샌드박스",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq6#case#5"
+  },
+  {
+   "row": "Cursor 에이전트 샌드박스",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq6#case#5"
+  },
+  {
+   "row": "Cursor 에이전트 샌드박스",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#5"
+  },
+  {
+   "row": "Cursor 에이전트 샌드박스",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#5"
+  },
+  {
+   "row": "Cursor 에이전트 샌드박스",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#5"
+  },
+  {
+   "row": "Cursor 에이전트 샌드박스",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#5"
+  },
+  {
+   "row": "Measuring AI agent autonomy in practice",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq6#case#6"
+  },
+  {
+   "row": "Measuring AI agent autonomy in practice",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq6#case#6"
+  },
+  {
+   "row": "Measuring AI agent autonomy in practice",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#6"
+  },
+  {
+   "row": "Measuring AI agent autonomy in practice",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#6"
+  },
+  {
+   "row": "Measuring AI agent autonomy in practice",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#6"
+  },
+  {
+   "row": "Measuring AI agent autonomy in practice",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq6#case#6"
+  },
+  {
+   "row": "OpenTelemetry GenAI 에이전트 span 규약",
+   "column": "case",
+   "grounded": true,
+   "source_ref": "sq7#case#4"
+  },
+  {
+   "row": "OpenTelemetry GenAI 에이전트 span 규약",
+   "column": "outcome",
+   "grounded": true,
+   "source_ref": "sq7#case#4"
+  },
+  {
+   "row": "OpenTelemetry GenAI 에이전트 span 규약",
+   "column": "axes.purpose.prior",
+   "grounded": true,
+   "source_ref": "sq7#case#4"
+  },
+  {
+   "row": "OpenTelemetry GenAI 에이전트 span 규약",
+   "column": "axes.mechanism.prior",
+   "grounded": true,
+   "source_ref": "sq7#case#4"
+  },
+  {
+   "row": "OpenTelemetry GenAI 에이전트 span 규약",
+   "column": "axes.evaluation.prior",
+   "grounded": true,
+   "source_ref": "sq7#case#4"
+  },
+  {
+   "row": "OpenTelemetry GenAI 에이전트 span 규약",
+   "column": "axes.target.prior",
+   "grounded": true,
+   "source_ref": "sq7#case#4"
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME: 각 칸의 근거를 입력 passed 항목의 row 값과 대조해 확인하고, 대조 없이 추정으로 채우지 않았다",
+  "SPECIFIC-NAME: row 에 사례 이름을 evidence_map 의 case 값 그대로 적었다",
+  "WRITTEN-ONLY: 출력 문자열을 문어체 종결로 작성했다",
+  "KO-SYNTAX: 판정 근거 표기를 키 경로와 ref 로 한정해 주체와 대상을 흐리지 않았다"
+ ]
+}

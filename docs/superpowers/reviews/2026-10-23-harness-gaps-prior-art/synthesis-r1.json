@@ -1,0 +1,726 @@
+{
+ "evidence_map": [
+  {
+   "case": "Phase Transitions in Compositional Constraint Satisfaction",
+   "url": "https://arxiv.org/abs/2608.12426",
+   "axes": {
+    "purpose": {
+     "prior": "동시 제약 수에 따른 지시 준수 붕괴 지점을 찾는다",
+     "same": false,
+     "note": "측정 연구다"
+    },
+    "mechanism": {
+     "prior": "제약 수를 늘린 프로브로 성공률을 측정한다",
+     "same": false,
+     "note": "런타임 강제 장치가 없다"
+    },
+    "evaluation": {
+     "prior": "프로브 단위 성공률",
+     "same": false,
+     "note": "대조 대상은 위반 수 비교다"
+    },
+    "target": {
+     "prior": "조합형 제약 충족 과제",
+     "same": false,
+     "note": "코딩 에이전트 하네스가 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Evaluating AGENTS.md (저장소 컨텍스트 파일 평가)",
+   "url": "https://arxiv.org/abs/2602.11988",
+   "axes": {
+    "purpose": {
+     "prior": "저장소 컨텍스트 파일이 코딩 에이전트 작업 성공에 도움이 되는지 확인한다",
+     "same": false,
+     "note": "대조 대상은 작업 성공이 아니라 규칙 준수를 목표로 한다"
+    },
+    "mechanism": {
+     "prior": "세션마다 적재되는 컨텍스트 파일(사람 작성·LLM 생성)",
+     "same": false,
+     "note": "상시 적재 파일은 같으나 대조 대상은 훅·서브에이전트 리뷰를 함께 쓴다"
+    },
+    "evaluation": {
+     "prior": "SWE-bench 류 과제 성공률과 추론 비용을 파일 없음 조건과 비교한다",
+     "same": false,
+     "note": "대조 대상은 성공률과 비용을 측정하지 않는다"
+    },
+    "target": {
+     "prior": "여러 코딩 에이전트와 LLM",
+     "same": true,
+     "note": "LLM 코딩 에이전트라는 적용 대상이 같다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "AgentSpec (런타임 규칙 강제 DSL)",
+   "url": "https://arxiv.org/abs/2503.18666",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 에이전트의 위험 실행을 런타임 규칙으로 차단한다",
+     "same": false,
+     "note": "안전 강제가 목적이며 문체·문서 규율은 다루지 않는다"
+    },
+    "mechanism": {
+     "prior": "트리거·조건·강제 동작으로 된 규칙 언어",
+     "same": false,
+     "note": "대조 대상의 차단 훅 일부와만 같다"
+    },
+    "evaluation": {
+     "prior": "위험 실행 차단률과 오버헤드",
+     "same": false,
+     "note": "대조 대상은 위반 수 비교다"
+    },
+    "target": {
+     "prior": "코드 실행 에이전트, 구현형 에이전트, 자율주행",
+     "same": false,
+     "note": "코드 에이전트는 겹치나 하네스 플러그인은 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Do Context Files Help Coding Agents? 두 에이전트 소거 연구",
+   "url": "https://arxiv.org/abs/2607.27250",
+   "axes": {
+    "purpose": {
+     "prior": "컨텍스트 주입 전략이 정답률에 주는 효과를 평가한다",
+     "same": true,
+     "note": "규칙 파일 효과 평가라는 목적이 같다"
+    },
+    "mechanism": {
+     "prior": "주입 전략 비교 소거, 과제 17개·실행 288회, 동등성 검정",
+     "same": false,
+     "note": "대조 대상은 조항 단위 소거이고 동등성 검정을 쓰지 않는다"
+    },
+    "evaluation": {
+     "prior": "정답 테스트 기반 정답률",
+     "same": false,
+     "note": "대조 대상은 위반 수를 본다"
+    },
+    "target": {
+     "prior": "Claude Code 와 Codex",
+     "same": false,
+     "note": "대조 대상은 단일 호스트 CLI 이다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "τ-bench pass^k 신뢰성 지표",
+   "url": "https://arxiv.org/abs/2406.12045",
+   "axes": {
+    "purpose": {
+     "prior": "도구 사용 에이전트의 반복 실행 신뢰성을 측정한다",
+     "same": false,
+     "note": "규칙 효과 평가가 목적이 아니다"
+    },
+    "mechanism": {
+     "prior": "같은 과제를 k번 실행해 모두 성공하는 비율을 계산한다",
+     "same": false,
+     "note": "대조 대상은 1회 실행이다"
+    },
+    "evaluation": {
+     "prior": "pass^k",
+     "same": false,
+     "note": "대조 대상은 위반 수 합계다"
+    },
+    "target": {
+     "prior": "고객 응대 도메인의 함수 호출 에이전트",
+     "same": false,
+     "note": "코딩 에이전트가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Large Language Models Cannot Self-Correct Reasoning Yet (Huang 등, ICLR 2024)",
+   "url": "https://arxiv.org/html/2310.01798v2",
+   "axes": {
+    "purpose": {
+     "prior": "외부 피드백 없는 자기 교정의 효과를 검증한다",
+     "same": false,
+     "note": "대조 대상과는 같은 모델 검증 구성요소만 관련된다"
+    },
+    "mechanism": {
+     "prior": "자기 교정 프롬프트, 다중 에이전트 토론, 같은 응답 수의 자기 일관성 비교",
+     "same": false,
+     "note": "대조 대상은 관점별 리뷰어 구성이며 자기 일관성 기준선이 없다"
+    },
+    "evaluation": {
+     "prior": "추론 벤치마크 정답률",
+     "same": false,
+     "note": "대조 대상은 위반 수를 센다"
+    },
+    "target": {
+     "prior": "수학·상식 추론 과제",
+     "same": false,
+     "note": "대조 대상은 설계 문서와 코드 작업이다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv HTML 본문",
+   "adoption": "참고"
+  },
+  {
+   "case": "ImpossibleBench (Zhong·Raghunathan·Carlini, 프리프린트)",
+   "url": "https://arxiv.org/html/2510.20270v1",
+   "axes": {
+    "purpose": {
+     "prior": "코딩 에이전트가 테스트를 악용하는 성향을 측정한다",
+     "same": false,
+     "note": "대조 대상은 측정 도구가 아닌 하네스다"
+    },
+    "mechanism": {
+     "prior": "명세와 충돌하는 테스트로 불가능 과제를 만들고, 테스트 접근(읽기 전용·숨김)·프롬프트·사람 개입 신호를 바꿔 본다",
+     "same": false,
+     "note": "대조 대상은 리뷰 기록만 읽기 전용으로 봉인하고 테스트 파일 보호와 중단 신호가 없다"
+    },
+    "evaluation": {
+     "prior": "불가능 과제 통과율을 부정률로 측정, LLM 감시자 검출률",
+     "same": false,
+     "note": "대조 대상은 부정 통과를 측정하지 않는다"
+    },
+    "target": {
+     "prior": "LiveCodeBench·SWE-bench 기반 코딩 과제",
+     "same": false,
+     "note": "대조 대상은 코딩 에이전트 세션 전반이다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv HTML 본문",
+   "adoption": "참고"
+  },
+  {
+   "case": "Uncovering Systematic Failures of LLMs in Verifying Code Against Natural Language Specifications (arXiv 2508.12358, 프리프린트)",
+   "url": "https://arxiv.org/html/2508.12358v1",
+   "axes": {
+    "purpose": {
+     "prior": "LLM이 코드의 요구사항 적합성을 판정하는 능력을 검증한다",
+     "same": false,
+     "note": "대조 대상과는 LLM 리뷰어 구성요소만 관련된다"
+    },
+    "mechanism": {
+     "prior": "직접 판정과 설명·수정안을 함께 요구하는 판정 프롬프트 비교",
+     "same": false,
+     "note": "대조 대상의 리뷰어는 지적·근거·결과를 쓰도록 지시받는 점만 유사하다"
+    },
+    "evaluation": {
+     "prior": "올바른 코드 인정률(RCRR)",
+     "same": false,
+     "note": "대조 대상은 리뷰어의 거짓 지적률을 측정하지 않는다"
+    },
+    "target": {
+     "prior": "HumanEval·MBPP·QuixBugs 코드",
+     "same": false,
+     "note": "대조 대상의 리뷰 대상은 설계 문서다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv HTML 본문",
+   "adoption": "참고"
+  },
+  {
+   "case": "Anthropic 장기 실행 에이전트 하네스(진행 파일·JSON 기능 목록·init.sh)",
+   "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+   "axes": {
+    "purpose": {
+     "prior": "여러 세션에 걸친 장기 코딩 작업의 연속성 확보",
+     "same": false,
+     "note": "대조 대상의 결정 (5) 세션 간 맥락 관리 구성요소와만 같고, 대조 대상 전체(규칙·문체·리뷰 플러그인)의 목적과는 다르다"
+    },
+    "mechanism": {
+     "prior": "초기화 에이전트와 코딩 에이전트, 진행 파일, 처음에 failing 으로 둔 JSON 기능 목록, git 커밋, 세션 시작 시 종단 간 테스트",
+     "same": false,
+     "note": "대조 대상에는 진행 파일 형식과 시작 시 테스트가 없다"
+    },
+    "evaluation": {
+     "prior": "웹 앱 구축 과정의 정성 관찰, 수치 없음",
+     "same": false,
+     "note": "대조 대상은 규칙별 위반 수를 비교하는 소거 시험을 쓴다"
+    },
+    "target": {
+     "prior": "전체 스택 웹 앱 개발",
+     "same": false,
+     "note": "대조 대상은 범용 코딩 세션에 실리는 규칙 플러그인이다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 후 공급사 엔지니어링 블로그 원문",
+   "adoption": "참고"
+  },
+  {
+   "case": "Claude Code 메모리 문서의 CLAUDE.md 길이 지침",
+   "url": "https://code.claude.com/docs/en/memory",
+   "axes": {
+    "purpose": {
+     "prior": "세션 간 지시와 학습 내용 유지",
+     "same": false,
+     "note": "대조 대상의 결정 (1)·(5) 구성요소와 같다"
+    },
+    "mechanism": {
+     "prior": "200줄 미만 CLAUDE.md, 경로 범위 규칙의 필요 시 적재, 자동 메모리 앞 200줄 적재, 차단은 PreToolUse 훅",
+     "same": false,
+     "note": "대조 대상은 이 장치 위에서 @import 로 전부 상시 적재한다"
+    },
+    "evaluation": {
+     "prior": "제시된 측정 없음, 준수율 저하를 경고로만 적음",
+     "same": false,
+     "note": "대조 대상은 소거 시험을 쓴다"
+    },
+    "target": {
+     "prior": "Claude Code 사용자 전반",
+     "same": false,
+     "note": "대조 대상은 그 호스트 위 특정 플러그인이다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "공식 문서 직접 열람",
+   "adoption": "흡수"
+  },
+  {
+   "case": "Claude Code 압축 후 유지 항목 표",
+   "url": "https://code.claude.com/docs/en/context-window",
+   "axes": {
+    "purpose": {
+     "prior": "압축 뒤 어떤 맥락이 남는지 규정",
+     "same": false,
+     "note": "대조 대상의 결정 (5) 구성요소와 관련된다"
+    },
+    "mechanism": {
+     "prior": "루트 CLAUDE.md·자동 메모리 재주입, 훅 추가 맥락은 요약, compact 매처 SessionStart 훅 재실행, 스킬 본문 5,000토큰 한도",
+     "same": false,
+     "note": "대조 대상은 규칙 넛지만 compact 매처로 재주입한다"
+    },
+    "evaluation": {
+     "prior": "측정 없음, 동작 명세",
+     "same": false,
+     "note": "평가가 아닌 동작 문서다"
+    },
+    "target": {
+     "prior": "Claude Code 세션",
+     "same": false,
+     "note": "대조 대상이 실행되는 호스트이며 대조 대상 자체는 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "공식 문서 직접 열람",
+   "adoption": "흡수"
+  },
+  {
+   "case": "ManyIFEval·StyleMBPP(다중 지시 준수 측정)",
+   "url": "https://arxiv.org/abs/2509.21051",
+   "axes": {
+    "purpose": {
+     "prior": "지시 수 증가에 따른 준수율 측정과 예측",
+     "same": false,
+     "note": "대조 대상의 평가 구성요소와만 관련된다"
+    },
+    "mechanism": {
+     "prior": "텍스트 지시 최대 10개, 코드 지시 최대 6개",
+     "same": false,
+     "note": "대조 대상의 규칙 수와 종류가 다르다"
+    },
+    "evaluation": {
+     "prior": "LLM 10개, 지시 수에 따른 일관된 저하",
+     "same": false,
+     "note": "대조 대상은 위반 수 비교만 한다"
+    },
+    "target": {
+     "prior": "텍스트·코드 생성",
+     "same": false,
+     "note": "대조 대상은 에이전트 세션이다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "ACE(진화하는 맥락의 증분 갱신)",
+   "url": "https://arxiv.org/abs/2510.04618",
+   "axes": {
+    "purpose": {
+     "prior": "에이전트 맥락을 축적·갱신해 성능 향상",
+     "same": false,
+     "note": "대조 대상의 메모리 관리 구성요소와만 관련된다"
+    },
+    "mechanism": {
+     "prior": "생성·성찰·큐레이션 역할의 구조화된 증분 갱신",
+     "same": false,
+     "note": "대조 대상의 메모리는 에이전트가 자유롭게 다시 쓴다(가정)"
+    },
+    "evaluation": {
+     "prior": "AppWorld 와 금융 벤치마크, +10.6%, +8.6%",
+     "same": false,
+     "note": "대조 대상은 과제 성공률을 측정하지 않는다"
+    },
+    "target": {
+     "prior": "에이전트 과제와 도메인 추론",
+     "same": false,
+     "note": "대조 대상은 코딩 세션의 규칙 플러그인이다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "코딩 보조 에이전트 프롬프트 인젝션 체계화 연구",
+   "url": "https://arxiv.org/abs/2601.17548",
+   "axes": {
+    "purpose": {
+     "prior": "코딩 보조 에이전트 공격·방어 문헌 체계화",
+     "same": false,
+     "note": "대조 대상은 방어 장치 자체이고 이 연구는 문헌 종합이다"
+    },
+    "mechanism": {
+     "prior": "78편 메타분석, 공격 42종과 방어 18종 분류",
+     "same": false,
+     "note": "대조 대상은 규칙·훅 플러그인이다"
+    },
+    "evaluation": {
+     "prior": "적응형 공격 성공률과 방어 완화율 집계",
+     "same": false,
+     "note": "대조 대상은 공격 성공률을 측정하지 않는다"
+    },
+    "target": {
+     "prior": "Claude Code·Copilot·Cursor 등 코딩 보조 에이전트",
+     "same": true,
+     "note": "대조 대상의 호스트와 같은 범주의 코딩 에이전트를 다룬다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "preprint",
+   "source_level": "2차",
+   "route": "웹 검색, arXiv",
+   "adoption": "참고"
+  },
+  {
+   "case": "에이전트형 코딩 편집기 인젝션 실증",
+   "url": "https://arxiv.org/abs/2509.22040",
+   "axes": {
+    "purpose": {
+     "prior": "외부 자료 오염을 통한 명령 실행 공격 실증",
+     "same": false,
+     "note": "공격 연구이며 대조 대상은 규율 장치다"
+    },
+    "mechanism": {
+     "prior": "외부 개발 자료에 악성 지시 삽입",
+     "same": false,
+     "note": "대조 대상의 메커니즘과 무관하며 입력 경로만 같은 종류다"
+    },
+    "evaluation": {
+     "prior": "유해 명령 실행 성공률 최대 84%",
+     "same": false,
+     "note": "대조 대상은 이 지표를 측정하지 않는다"
+    },
+    "target": {
+     "prior": "GitHub Copilot, Cursor",
+     "same": false,
+     "note": "대조 대상의 호스트 CLI는 시험 대상에 없다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색, arXiv",
+   "adoption": "참고"
+  },
+  {
+   "case": "호스트 CLI 권한 규칙과 PreToolUse 훅",
+   "url": "https://code.claude.com/docs/en/permissions",
+   "axes": {
+    "purpose": {
+     "prior": "도구 접근 허용·거부 통제",
+     "same": false,
+     "note": "대조 대상은 행동·문체 규율 전반이고 접근 통제는 일부다"
+    },
+    "mechanism": {
+     "prior": "deny/ask/allow 규칙을 CLI가 강제, PreToolUse 훅으로 확장",
+     "same": false,
+     "note": "대조 대상은 리뷰 기록 차단 훅만 같은 메커니즘이고 비밀·삭제·외부 전송은 프롬프트 지시다"
+    },
+    "evaluation": {
+     "prior": "제품 문서, 평가 없음",
+     "same": false,
+     "note": "평가 정보가 없다"
+    },
+    "target": {
+     "prior": "호스트 코딩 에이전트 CLI",
+     "same": true,
+     "note": "대조 대상이 결합된 호스트와 같다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 결과의 제품 문서",
+   "adoption": "채택"
+  },
+  {
+   "case": "Claude Code auto mode 기본값 전환",
+   "url": "https://claude.com/blog/auto-mode-default-in-claude-code",
+   "axes": {
+    "purpose": {
+     "prior": "행동 단위 권한 확인을 분류기로 대체",
+     "same": false,
+     "note": "대조 대상은 사람 확인을 유지한다."
+    },
+    "mechanism": {
+     "prior": "위험 명령 분류기, 연속 3회 또는 세션 20회 차단 뒤 수동 승인으로 복귀",
+     "same": false,
+     "note": "대조 대상에는 분류기가 없다."
+    },
+    "evaluation": {
+     "prior": "승인률 97%, 사람 13.6% 대 분류기 89% 위험 명령 검출",
+     "same": false,
+     "note": "대조 대상은 확인 품질을 측정하지 않는다."
+    },
+    "target": {
+     "prior": "Claude Code 셸 명령 권한",
+     "same": false,
+     "note": "대조 대상의 확인은 설계 결정과 파일 삭제·외부 전송을 포함한다."
+    }
+   },
+   "outcome": "성공",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 후 공급사 블로그",
+   "adoption": "참고"
+  },
+  {
+   "case": "Cursor 에이전트 샌드박스",
+   "url": "https://cursor.com/en-US/blog/agent-sandboxing",
+   "axes": {
+    "purpose": {
+     "prior": "승인 피로 감소",
+     "same": false,
+     "note": "대조 대상의 목적은 규칙 준수이다."
+    },
+    "mechanism": {
+     "prior": "샌드박스 밖으로 나갈 때(주로 인터넷 접근)만 승인 요청",
+     "same": false,
+     "note": "대조 대상은 격리를 쓰지 않는다."
+    },
+    "evaluation": {
+     "prior": "샌드박스 에이전트가 40% 덜 멈춤",
+     "same": false,
+     "note": "대조 대상은 중단 빈도를 측정하지 않는다."
+    },
+    "target": {
+     "prior": "다른 호스트의 코딩 에이전트",
+     "same": false,
+     "note": "호스트가 다르다."
+    }
+   },
+   "outcome": "성공",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 후 공급사 블로그",
+   "adoption": "참고"
+  },
+  {
+   "case": "Measuring AI agent autonomy in practice",
+   "url": "https://anthropic.com/news/measuring-agent-autonomy",
+   "axes": {
+    "purpose": {
+     "prior": "실사용 에이전트 자율성과 감독 형태 측정",
+     "same": false,
+     "note": "대조 대상은 감독 형태를 규칙으로 정하지만 측정하지 않는다."
+    },
+    "mechanism": {
+     "prior": "수백만 건 상호작용 기록 분석",
+     "same": false,
+     "note": "대조 대상은 세션 간 집계가 없다."
+    },
+    "evaluation": {
+     "prior": "자동 승인 비율, 사람 개입률, 에이전트 자발적 중단률",
+     "same": false,
+     "note": "대조 대상은 질문 빈도를 측정하지 않는다."
+    },
+    "target": {
+     "prior": "Claude Code 와 공개 API 사용",
+     "same": false,
+     "note": "대조 대상은 그 사용의 한 하위 집합인 규칙 플러그인 세션이다."
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 후 공급사 연구 게시물",
+   "adoption": "참고"
+  },
+  {
+   "case": "OpenTelemetry GenAI 에이전트 span 규약",
+   "url": "https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md",
+   "axes": {
+    "purpose": {
+     "prior": "에이전트 생성·호출·도구 실행 추적의 공통 이름 규약",
+     "same": false,
+     "note": "대조 대상에는 추적 기록 구성요소가 없다."
+    },
+    "mechanism": {
+     "prior": "gen_ai.operation.name(create_agent·invoke_agent·execute_tool), gen_ai.agent.* 속성",
+     "same": false,
+     "note": "대조 대상은 로컬 메모리·인계 문서만 쓴다."
+    },
+    "evaluation": {
+     "prior": "규약이며 평가 없음, 대부분 Development 단계",
+     "same": false,
+     "note": "안정화 전이라 변경 가능성이 있다."
+    },
+    "target": {
+     "prior": "에이전트 프레임워크 일반",
+     "same": false,
+     "note": "특정 호스트에 묶이지 않는다."
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "standard",
+   "source_level": "1차",
+   "route": "opentelemetry.io 이전 안내를 따라 GitHub 저장소",
+   "adoption": "참고"
+  }
+ ],
+ "conclusions": [
+  {
+   "text": "결정 (1)의 상시 적재는 선행 측정과 상충할 소지가 있다. 선행 측정 연구들은 동시에 주는 지시나 제약의 수가 늘수록 준수율이 일관되게 떨어지거나 특정 지점에서 붕괴한다고 보고했다. 그러나 대조 대상은 규칙 수십 개와 금지어 표를 매 세션 함께 적재하면서도 적재량과 준수율의 관계를 측정하지 않는다.",
+   "refs": [
+    "sq4#case#6",
+    "sq1#case#2"
+   ]
+  },
+  {
+   "text": "호스트 공식 문서는 CLAUDE.md 를 200줄 미만으로 두고 경로 범위 규칙은 필요할 때만 적재하라고 권고하며, 길어지면 준수율이 떨어진다고 경고한다. 그런데 대조 대상은 이 장치 위에서 @import 로 규칙 전부를 상시 적재하므로, 이 권고와 비교되지 않은 상태다.",
+   "refs": [
+    "sq4#case#2"
+   ]
+  },
+  {
+   "text": "컨텍스트 파일 효과를 다룬 선행 평가들은 과제 성공률과 추론 비용을 '파일 없음' 조건과 비교했고, 두 연구 모두 컨텍스트 파일이 작업 성공을 뚜렷이 높이지 못했다고 보고했다. 대조 대상의 결정 (3)은 위반 수만 세고 작업 성공률과 비용을 측정하지 않으므로, 이 기준선과 비교되지 않았다.",
+   "refs": [
+    "sq1#case#3",
+    "sq2#case#3"
+   ]
+  },
+  {
+   "text": "결정 (3)의 평가 방법은 선행 사례가 쓴 반복 실행 신뢰성 지표와 비교되지 않았다. τ-bench 의 pass^k 는 같은 과제를 k번 실행해 신뢰성을 측정한다. 또 컨텍스트 파일 소거 연구는 실행 288회와 동등성 검정을 썼다. 반면 대조 대상은 질문마다 조건당 1회만 실행해 위반 수를 비교하므로, 흔들림이 차이보다 큰지 판정할 통계 장치가 없다.",
+   "refs": [
+    "sq2#case#6",
+    "sq2#case#3"
+   ]
+  },
+  {
+   "text": "결정 (2)에서 대조 대상은 비밀·삭제·외부 전송을 프롬프트 지시로만 다룬다. 그러나 대조 대상이 결합된 호스트는 deny/ask/allow 권한 규칙과 PreToolUse 훅으로 이 통제를 강제하는 장치를 이미 제공한다. 또 선행 연구 AgentSpec 은 런타임 규칙으로 위험 실행을 차단해 성공을 보고했다. 따라서 대조 대상은 이미 있는 강제 장치를 쓰지 않고 지시 준수에 기대는 상태다.",
+   "refs": [
+    "sq5#case#5",
+    "sq1#case#7"
+   ]
+  },
+  {
+   "text": "결정 (6)의 빈틈은 선행 공격 실증과 같은 입력 경로에 놓여 있다. 선행 실증 연구에서는 외부 개발 자료에 삽입한 악성 지시로 코딩 편집기가 유해 명령을 최대 84% 실행했다. 또 코딩 보조 에이전트 인젝션을 체계화한 연구는 Claude Code 를 포함한 같은 범주의 에이전트를 다룬다. 대조 대상의 연구자·검증자 서브에이전트도 웹 본문을 읽지만, 가져온 본문을 데이터로만 다루라는 규칙이 없다. 다만 시험 대상 호스트가 다르므로, 같은 성공률이 대조 대상에서도 나온다고 단정할 수는 없다.",
+   "refs": [
+    "sq5#case#3",
+    "sq5#case#2"
+   ]
+  },
+  {
+   "text": "결정 (4)의 같은 모델 리뷰어 구성은 알려진 실패 원인과 겹친다. 선행 연구에 따르면 외부 피드백 없는 자기 교정과 다중 에이전트 토론은 같은 응답 수의 자기 일관성을 넘지 못했다. 또 다른 선행 연구에서는 LLM 이 요구사항에 맞는 코드를 틀렸다고 판정하는 체계적 실패가 나타났다. 대조 대상은 자기 일관성 기준선과 비교하지 않았고 리뷰어의 거짓 지적률도 측정하지 않는다. 다만 선행 연구의 대상은 추론 과제와 코드이고 대조 대상의 리뷰 대상은 설계 문서이므로, 이 차이를 함께 고려해야 한다.",
+   "refs": [
+    "sq3#case#4",
+    "sq3#case#7"
+   ]
+  },
+  {
+   "text": "ImpossibleBench 는 코딩 에이전트가 테스트를 악용해 통과하는 성향을 측정했다. 이 연구는 테스트를 읽기 전용으로 두거나 숨기는 조건과 사람 개입 신호를 바꿔 가며 시험했다. 반면 대조 대상의 종료 게이트는 코드 테스트 실행 여부를 보지 않는다. 또 대조 대상은 리뷰 기록만 읽기 전용으로 봉인하며, 테스트 파일 보호와 중단 신호는 두지 않는다.",
+   "refs": [
+    "sq3#case#6"
+   ]
+  },
+  {
+   "text": "결정 (5)에 대해서는 같은 호스트 공급사가 장기 작업용 연속성 장치를 공개해 두었다. 그 장치는 진행 파일, 처음에 failing 으로 둔 JSON 기능 목록, git 커밋, 세션 시작 시 종단 간 테스트로 구성된다. 또 호스트 문서는 압축 뒤 루트 CLAUDE.md 와 자동 메모리를 재주입하고 훅의 추가 맥락은 요약된다고 규정한다. 대조 대상에는 진행 파일 형식이 없고 compact 매처로 규칙 넛지만 재주입하므로, 압축 뒤 작업 상태를 이어 받을 장치가 비어 있다. 다만 공급사 하네스는 정성 관찰만 제시하므로 효과 크기는 판정할 수 없다.",
+   "refs": [
+    "sq4#case#0",
+    "sq4#case#3"
+   ]
+  },
+  {
+   "text": "ACE 는 생성·성찰·큐레이션 역할로 맥락을 구조화해 증분 갱신했고, 벤치마크에서 성능이 10.6%와 8.6% 향상되었다고 보고했다. 대조 대상의 메모리는 에이전트가 자유롭게 다시 쓴다고 보았으나, 이 판단은 가정이다. 메모리 갱신 절차를 정한 스킬이나 훅이 있는지 저장소에서 확인하면 이 가정을 검증할 수 있다.",
+   "refs": [
+    "sq4#case#7"
+   ]
+  },
+  {
+   "text": "결정 (8)의 사람 확인 방식은 승인 피로를 다룬 선행 사례와 비교되지 않았다. 호스트 공급사는 위험 명령 분류기에서 승인률 97%와 위험 명령 검출 89%(사람 13.6%)를 보고했다. 또 다른 호스트의 샌드박스는 에이전트가 40% 덜 멈추게 했다. 그러나 대조 대상은 질문 빈도와 확인 품질을 측정하지 않는다.",
+   "refs": [
+    "sq6#case#4",
+    "sq6#case#5"
+   ]
+  },
+  {
+   "text": "결정 (7)과 (10)은 관측 기록이 없다는 점에서 같은 빈틈이다. 공급사의 실사용 연구는 상호작용 기록을 모아 자동 승인 비율과 사람 개입률을 측정했다. 또 OpenTelemetry GenAI 규약은 에이전트 호출과 도구 실행을 추적하는 공통 이름을 정의한다. 대조 대상은 토큰 비용과 훅 위반을 세션 간에 집계하지 않으므로 규칙과 다중 에이전트 실행의 비용·효과를 사후에 확인할 수 없다. 다만 이 규약은 대부분 Development 단계라 이름이 바뀔 수 있다.",
+   "refs": [
+    "sq6#case#6",
+    "sq7#case#4"
+   ]
+  },
+  {
+   "text": "통과 행 중 결정 (9)의 단일 호스트·Windows·한국어 결합을 직접 다룬 사례는 없다. 컨텍스트 파일 소거 연구 하나만 Claude Code 와 Codex 두 호스트를 비교했다. 따라서 결정 (9)에 대해서는 근거 지도에서 결론을 낼 수 없다. 이 공백은 근거를 찾지 못했다는 뜻이며, 결합이 문제가 없다는 근거로 쓸 수 없다.",
+   "refs": [
+    "sq2#case#3"
+   ]
+  }
+ ],
+ "principles_applied": [
+  "NO-ASSUME",
+  "EVIDENCE-FIRST",
+  "STATE-ASSUME",
+  "SUBJECT-OBJECT",
+  "SPECIFIC-NAME",
+  "VOCAB-PREF",
+  "FULL-SENTENCE",
+  "KEEP-CONNECT",
+  "ANTI-LIMIT",
+  "ONE-IDEA",
+  "BOTTOM-LINE"
+ ]
+}

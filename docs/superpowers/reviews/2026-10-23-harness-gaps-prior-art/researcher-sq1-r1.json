@@ -1,0 +1,438 @@
+{
+ "agent": "agent-prior-art",
+ "mode": "survey",
+ "subquestion_id": "sq1",
+ "search_status": "ok",
+ "queries": [
+  "how many instructions can LLMs follow at once instruction density benchmark",
+  "curse of instructions LLM multiple instructions simultaneously success rate",
+  "evaluating AGENTS.md context files coding agents task success",
+  "runtime enforcement rules LLM agents deterministic policy vs prompt instructions unsafe actions",
+  "system prompt too many rules LLM agent ignores instructions guardrails deterministic enforcement coding agent",
+  "instruction following degradation long system prompt number of constraints agentic benchmark 2026"
+ ],
+ "read": "[\"https://arxiv.org/abs/2507.11538\", \"https://arxiv.org/abs/2602.11988\", \"https://arxiv.org/abs/2608.12426\", \"https://arxiv.org/abs/2509.21051\", \"https://code.claude.com/docs/en/hooks-guide\", \"https://arxiv.org/abs/2607.07405\", \"https://arxiv.org/abs/2503.18666\", \"https://code.claude.com/docs/en/best-practices\", \"https://arxiv.org/abs/2505.16944\"]",
+ "issues": [
+  {
+   "where": "설계 결정 (1) 상시 적재되는 행동 규칙·문체 규칙 수십 개와 금지어 표",
+   "type": "known-failure",
+   "claim": "대조 대상은 수십 개 규칙과 금지어 표를 매 세션 동시에 적재한다. IFScale 이 관측한 밀도에 따른 준수율 하락과 앞쪽 지시 편향은 이 설계에도 그대로 남아 있다. 그래서 시스템 지시 뒤쪽에 놓인 문체 규칙과 금지어 표가 앞쪽 행동 규칙보다 덜 지켜질 수 있다.",
+   "prior_claim": "IFScale 은 보고서 작성 과제에 키워드 포함 지시를 최대 500개까지 넣어 측정했다. 그 결과 20개 모델 중 최상위 모델도 500개 밀도에서 정확도가 약 68%에 그쳤고, 모델은 앞쪽에 놓인 지시를 더 잘 지키는 편향을 보였다.",
+   "consequence": "규칙 수가 늘수록 규칙 하나당 준수율이 떨어지고, 적재 순서가 뒤인 규칙이 체계적으로 덜 지켜질 수 있다. 대조 대상의 소거 시험은 규칙을 하나씩 넣고 빼므로 이 순서 효과와 밀도 효과를 관측하지 못한다.",
+   "evidence": "arXiv 2507.11538 초록(열어 확인): 500개 지시, 최상위 68%, 앞쪽 지시 편향. 네 축 중 목적(벤치마크 측정)과 적용 대상(키워드 포함 지시)이 대조 대상과 다르다. 그래서 수치를 그대로 옮기지 말고 경향만 전이로 본다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2507.11538",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1) 상시 적재 규칙 수",
+   "type": "known-failure",
+   "claim": "대조 대상은 규칙 수를 줄이는 기준을 두지 않고 상시 적재한다. ManyIFEval 이 보인 지시 수에 따른 일관된 성능 하락이 이 설계에도 남아 있다.",
+   "prior_claim": "ManyIFEval(텍스트, 지시 최대 10개)과 StyleMBPP(코드, 지시 최대 6개)로 10개 LLM 을 측정한 결과 지시 수가 늘수록 성능이 일관되게 떨어졌다. 지시 수 하나를 설명 변수로 쓴 로지스틱 회귀가 보지 못한 조합에서도 약 10% 오차로 성능을 예측했다.",
+   "consequence": "규칙 하나하나가 단독으로 효과가 있어도, 규칙 전체가 동시에 지켜질 확률은 규칙 수에 따라 떨어진다. 대조 대상은 묶음 비교를 기각했으므로 이 하락을 측정하는 장치가 없다.",
+   "evidence": "arXiv 2509.21051 초록(열어 확인). 이 연구는 지시 10개 이하에서 측정했고 대조 대상은 수십 개를 적재한다. 따라서 적용 대상 축이 다르며 하락 폭은 외삽이다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2509.21051",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1) 상시 적재 규칙 수",
+   "type": "known-failure",
+   "claim": "대조 대상이 한 응답에 동시에 적용하라고 지시하는 문체·행동 규칙 수는 이 연구가 보고한 붕괴 지점(동시 제약 5~6개)을 크게 넘는다.",
+   "prior_claim": "이 프리프린트는 동시 제약이 5~6개를 넘으면 지시 준수가 신뢰할 수 없게 무너지고, 가장 강한 모델도 제약 7개에서 프로브 단위 성공률이 50% 아래로 떨어진다고 보고했다.",
+   "consequence": "한 답변에 수십 개 문체 규칙을 동시에 지키라는 지시는 붕괴 구간 안에서 실행된다. 그래서 개별 조항의 위반이 조항 문구보다 조항 개수 때문에 생길 수 있다.",
+   "evidence": "arXiv 2608.12426 초록(열어 확인). 개입 효과(계획, 자기 수정)에 관한 서술은 검색 요약에만 있고 초록에는 없어 인용하지 않았다. 프리프린트이며 과제가 대조 대상과 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2608.12426",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1)과 (3) 상시 적재 규칙의 효과 평가",
+   "type": "weak-baseline",
+   "claim": "대조 대상의 규칙 묶음은 작업 성공률과 추론 비용을 기준으로 '컨텍스트 파일 없음' 기준선과 비교되지 않았다.",
+   "prior_claim": "저장소 수준 컨텍스트 파일(AGENTS.md 류)을 여러 코딩 에이전트와 LLM 에 적용해 측정한 결과 작업 성공률이 대체로 개선되지 않았고 추론 비용은 평균 20% 넘게 늘었다. 저자들은 컨텍스트 파일이 비표준 코딩 관행을 지정할 때 유용하며 개선 시도는 배포 전에 엄밀히 평가해야 한다고 적었다.",
+   "consequence": "대조 대상은 위반 수만 측정하고 작업 성공률과 토큰 비용을 측정하지 않는다. 그래서 상시 적재 규칙이 작업 결과를 낮추거나 비용을 늘려도 소거 시험에서 드러나지 않는다.",
+   "evidence": "arXiv 2602.11988 초록(열어 확인). 이 연구의 목적은 작업 성공률 측정이고 대조 대상의 목적은 행동·문체 준수다. 목적 축이 다르므로 '규칙이 해롭다'로 단정하지 않고 기준선 미비교만 지적한다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2602.11988",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1)과 (2) 긴 상시 지시와 프롬프트 의존 강제",
+   "type": "known-failure",
+   "claim": "대조 대상은 상시 지시가 길고, 반드시 지켜야 할 일(삭제·외부 전송·비밀)을 프롬프트 지시로만 다룬다. 호스트 공급사가 문서화한 실패 형태가 이 설계에 그대로 남아 있다.",
+   "prior_claim": "호스트 공급사 문서는 CLAUDE.md 가 너무 길면 Claude 가 중요한 규칙을 놓치고 절반가량을 무시한다고 적는다. 그리고 CLAUDE.md 지시는 권고에 그치는 반면 훅은 결정적으로 실행되므로, 예외 없이 일어나야 할 동작은 훅으로 옮기라고 권한다.",
+   "consequence": "규칙이 길수록 비가역 행동을 다루는 조항까지 노이즈 속에서 누락될 수 있다. 대조 대상은 그 조항을 훅으로 옮기지 않았으므로 누락이 생겨도 차단되지 않는다.",
+   "evidence": "https://code.claude.com/docs/en/best-practices 의 'Write an effective CLAUDE.md'와 'Set up hooks'와 'The over-specified CLAUDE.md' 항목(열어 확인). 공급사 권고이며 통제 실험 결과가 아니다.",
+   "citations": [
+    {
+     "url": "https://code.claude.com/docs/en/best-practices",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (2) 삭제·외부 전송·비밀을 프롬프트 지시로만 다룸",
+   "type": "weak-baseline",
+   "claim": "대조 대상의 비가역 행동 통제는 호스트가 제공하는 PreToolUse 차단 훅 기준선과 비교되지 않았다.",
+   "prior_claim": "호스트 공식 훅 안내서는 PreToolUse 훅이 보호 경로 목록과 대상 파일을 대조해 종료 코드 2로 편집을 차단하는 예시와, rm -rf 명령을 차단하는 예시를 제공한다. 이 안내서는 훅이 LLM 의 선택에 기대지 않는 결정적 통제라고 설명한다.",
+   "consequence": "대조 대상은 같은 호스트에서 리뷰 기록 수정 차단에는 이 메커니즘을 이미 쓰면서, 삭제·외부 전송·비밀에는 쓰지 않는다. 그래서 이 행동의 통제력은 모델의 지시 준수율에 묶여 있다.",
+   "evidence": "https://code.claude.com/docs/en/hooks-guide 의 'Block edits to protected files' 절과 rm -rf 차단 예시(열어 확인, 242~306행과 541~590행).",
+   "citations": [
+    {
+     "url": "https://code.claude.com/docs/en/hooks-guide",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (2) 비차단 넛지 위주 강제",
+   "type": "known-failure",
+   "claim": "대조 대상의 강제는 대부분 알리고 끝나는 넛지이며 행동 경계에서 실행을 거부하지 않는다. 이 연구가 지적한 '조용한 정책 위반' 실패 형태가 이 설계에도 남아 있다.",
+   "prior_claim": "이 연구는 τ²-bench 항공 도메인에서 관측된 실패의 78%가 도구 오류 없이 잘못된 상태를 남기는 조용한 실패였다고 보고했다. 쓰기 직전에 호출과 상태를 검사하는 결정적 읽기 전용 게이트 4개를 넣자 gpt-4o-mini 의 성공률이 29.6%에서 42.0%로 올랐다. 저자들은 게이트가 작업 성공을 보장하지는 않지만 알려진 종류의 조용한 정책 위반 쓰기를 결정적으로 차단한다고 적었다.",
+   "consequence": "넛지는 위반이 이미 일어난 뒤 알리므로, 되돌리기 어려운 쓰기나 전송이 상태를 바꾼 뒤에야 드러난다. 자기 보고로는 이 위반이 드러나지 않을 수 있다.",
+   "evidence": "arXiv 2607.07405 초록(열어 확인). 적용 대상이 항공 예약 도구 에이전트이므로 코딩 하네스와 다르다. 이 연구는 게이트가 정책을 이미 스스로 강제하는 도구에서는 효과가 작다고도 적었다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2607.07405",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (2) 비가역 행동 통제",
+   "type": "weak-baseline",
+   "claim": "대조 대상의 프롬프트 기반 위험 행동 통제는 AgentSpec 류 런타임 규칙 강제 기준선과 비교되지 않았다.",
+   "prior_claim": "AgentSpec 은 트리거·조건·강제 동작으로 된 런타임 규칙 언어이며, 코드 에이전트에서 위험한 실행의 90% 이상을 차단했고 오버헤드는 밀리초 수준이었다.",
+   "consequence": "대조 대상은 프롬프트 지시의 위반 수만 비교하므로, 같은 규칙을 런타임에서 강제했을 때의 차단률과 비용을 알지 못한다.",
+   "evidence": "arXiv 2503.18666 초록(열어 확인). 메커니즘(DSL 규칙 엔진)과 평가(위험 실행 차단률)가 대조 대상과 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2503.18666",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1) 길고 제약이 많은 에이전트 지시",
+   "type": "known-failure",
+   "claim": "대조 대상의 상시 지시는 AgentIF 가 다룬 길고 제약이 많은 에이전트 지시와 같은 형태이며, 이 벤치마크가 관측한 낮은 준수 성능이 이 설계에도 해당할 수 있다.",
+   "prior_claim": "AgentIF 는 평균 1,723단어(최대 15,630단어)이고 지시당 평균 11.9개 제약을 둔 실제 에이전트 지시로 모델을 평가했으며, 현재 모델은 대체로 성능이 낮았고 특히 복잡한 제약 구조와 도구 명세에서 약했다.",
+   "consequence": "조건부 적용 규칙(작은 변경이면 생략, 위임이면 점수화 등)처럼 구조가 복잡한 메타 제약이 많을수록 대조 대상의 조항 준수가 더 떨어질 수 있다.",
+   "evidence": "arXiv 2505.16944 초록(열어 확인). 길이와 성능 관계의 구체 수치는 초록에 없어 인용하지 않았다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2505.16944",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  }
+ ],
+ "evidence_map": [
+  {
+   "case": "IFScale (How Many Instructions Can LLMs Follow at Once?)",
+   "url": "https://arxiv.org/abs/2507.11538",
+   "axes": {
+    "purpose": {
+     "prior": "지시 밀도에 따른 지시 준수 저하를 측정한다",
+     "same": false,
+     "note": "대조 대상의 목적은 코딩 에이전트의 행동·문체 통제이고, 이 연구는 측정 벤치마크다"
+    },
+    "mechanism": {
+     "prior": "한 프롬프트에 키워드 포함 지시를 10~500개 넣는다",
+     "same": false,
+     "note": "다수 지시를 동시에 적재하는 점만 같고, 훅과 서브에이전트 같은 구성요소가 없다"
+    },
+    "evaluation": {
+     "prior": "밀도별 지시 준수 정확도를 5회 평균한다",
+     "same": false,
+     "note": "대조 대상은 규칙 하나씩 소거하고 조건마다 1회 실행한다"
+    },
+    "target": {
+     "prior": "보고서 작성 과제의 키워드 포함 지시",
+     "same": false,
+     "note": "대조 대상은 코딩 에이전트 세션의 행동·문체 규칙이다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "ManyIFEval·StyleMBPP (When Instructions Multiply)",
+   "url": "https://arxiv.org/abs/2509.21051",
+   "axes": {
+    "purpose": {
+     "prior": "다중 지시 준수 능력을 측정하고 예측한다",
+     "same": false,
+     "note": "측정 연구이며 하네스가 아니다"
+    },
+    "mechanism": {
+     "prior": "텍스트 지시 최대 10개, 코드 지시 최대 6개를 조합하고 지시 수로 회귀 예측한다",
+     "same": false,
+     "note": "지시를 넣고 빼며 비교하는 점은 소거 시험과 비슷하나 조합 전체를 표본으로 쓴다"
+    },
+    "evaluation": {
+     "prior": "프롬프트 단위 정확도, ManyIFEval 약 500개·StyleMBPP 약 300개 표본",
+     "same": false,
+     "note": "대조 대상은 질문 3개 이상, 조건마다 1회다"
+    },
+    "target": {
+     "prior": "일반 텍스트 생성과 코드 생성",
+     "same": false,
+     "note": "코드 생성은 겹치나 에이전트 세션 규칙은 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Phase Transitions in Compositional Constraint Satisfaction",
+   "url": "https://arxiv.org/abs/2608.12426",
+   "axes": {
+    "purpose": {
+     "prior": "동시 제약 수에 따른 지시 준수 붕괴 지점을 찾는다",
+     "same": false,
+     "note": "측정 연구다"
+    },
+    "mechanism": {
+     "prior": "제약 수를 늘린 프로브로 성공률을 측정한다",
+     "same": false,
+     "note": "런타임 강제 장치가 없다"
+    },
+    "evaluation": {
+     "prior": "프로브 단위 성공률",
+     "same": false,
+     "note": "대조 대상은 위반 수 비교다"
+    },
+    "target": {
+     "prior": "조합형 제약 충족 과제",
+     "same": false,
+     "note": "코딩 에이전트 하네스가 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Evaluating AGENTS.md (저장소 컨텍스트 파일 평가)",
+   "url": "https://arxiv.org/abs/2602.11988",
+   "axes": {
+    "purpose": {
+     "prior": "저장소 컨텍스트 파일이 코딩 에이전트 작업 성공에 도움이 되는지 확인한다",
+     "same": false,
+     "note": "대조 대상은 작업 성공이 아니라 규칙 준수를 목표로 한다"
+    },
+    "mechanism": {
+     "prior": "세션마다 적재되는 컨텍스트 파일(사람 작성·LLM 생성)",
+     "same": false,
+     "note": "상시 적재 파일은 같으나 대조 대상은 훅·서브에이전트 리뷰를 함께 쓴다"
+    },
+    "evaluation": {
+     "prior": "SWE-bench 류 과제 성공률과 추론 비용을 파일 없음 조건과 비교한다",
+     "same": false,
+     "note": "대조 대상은 성공률과 비용을 측정하지 않는다"
+    },
+    "target": {
+     "prior": "여러 코딩 에이전트와 LLM",
+     "same": true,
+     "note": "LLM 코딩 에이전트라는 적용 대상이 같다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Claude Code 모범 사례 문서(CLAUDE.md 간결화와 훅 권고)",
+   "url": "https://code.claude.com/docs/en/best-practices",
+   "axes": {
+    "purpose": {
+     "prior": "코딩 에이전트 사용자가 지시를 효과적으로 적재하고 강제하게 돕는다",
+     "same": true,
+     "note": "코딩 에이전트의 행동 통제라는 목적이 같다"
+    },
+    "mechanism": {
+     "prior": "짧은 CLAUDE.md, 필요할 때만 여는 스킬, 예외 없이 실행할 일은 결정적 훅",
+     "same": false,
+     "note": "대조 대상은 긴 상시 지시와 비차단 넛지를 쓴다"
+    },
+    "evaluation": {
+     "prior": "행동이 실제로 바뀌는지 관찰하며 정기적으로 줄인다",
+     "same": false,
+     "note": "대조 대상은 조항별 소거 시험을 쓴다"
+    },
+    "target": {
+     "prior": "같은 호스트 CLI 의 사용자 설정",
+     "same": true,
+     "note": "같은 호스트 CLI 위의 지시와 훅이다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "공급사 공식 문서",
+   "adoption": "참고"
+  },
+  {
+   "case": "Claude Code 훅 안내서(PreToolUse 차단 훅)",
+   "url": "https://code.claude.com/docs/en/hooks-guide",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 선택에 기대지 않는 결정적 통제로 프로젝트 규칙을 강제한다",
+     "same": true,
+     "note": "규칙 강제라는 목적이 같다"
+    },
+    "mechanism": {
+     "prior": "PreToolUse 훅이 종료 코드 2로 보호 파일 편집과 위험 명령을 차단한다",
+     "same": false,
+     "note": "대조 대상은 리뷰 기록 보호에만 이 메커니즘을 쓰고 나머지는 넛지와 프롬프트다"
+    },
+    "evaluation": {
+     "prior": "평가 절차를 두지 않는다",
+     "same": false,
+     "note": "대조 대상은 소거 시험을 둔다"
+    },
+    "target": {
+     "prior": "같은 호스트 CLI",
+     "same": true,
+     "note": "적용 대상이 같다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "공급사 공식 문서",
+   "adoption": "참고"
+  },
+  {
+   "case": "Reason Less, Verify More (결정적 실행 전 게이트)",
+   "url": "https://arxiv.org/abs/2607.07405",
+   "axes": {
+    "purpose": {
+     "prior": "도구 사용 에이전트의 조용한 정책 위반 쓰기를 차단한다",
+     "same": false,
+     "note": "정책 준수라는 점은 비슷하나 대조 대상은 문체 규칙까지 포함한다"
+    },
+    "mechanism": {
+     "prior": "쓰기 직전 호출 인자와 상태를 검사하는 읽기 전용 결정적 게이트",
+     "same": false,
+     "note": "대조 대상의 차단 훅 일부와만 같다"
+    },
+    "evaluation": {
+     "prior": "과제 성공률을 게이트 유무로 비교하고 부트스트랩 검정과 별도 시드 재현을 한다",
+     "same": false,
+     "note": "대조 대상은 성공률을 측정하지 않는다"
+    },
+    "target": {
+     "prior": "τ²-bench 항공 도메인 도구 에이전트",
+     "same": false,
+     "note": "코딩 에이전트가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "AgentSpec (런타임 규칙 강제 DSL)",
+   "url": "https://arxiv.org/abs/2503.18666",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 에이전트의 위험 실행을 런타임 규칙으로 차단한다",
+     "same": false,
+     "note": "안전 강제가 목적이며 문체·문서 규율은 다루지 않는다"
+    },
+    "mechanism": {
+     "prior": "트리거·조건·강제 동작으로 된 규칙 언어",
+     "same": false,
+     "note": "대조 대상의 차단 훅 일부와만 같다"
+    },
+    "evaluation": {
+     "prior": "위험 실행 차단률과 오버헤드",
+     "same": false,
+     "note": "대조 대상은 위반 수 비교다"
+    },
+    "target": {
+     "prior": "코드 실행 에이전트, 구현형 에이전트, 자율주행",
+     "same": false,
+     "note": "코드 에이전트는 겹치나 하네스 플러그인은 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "AgentIF (에이전트 시나리오 지시 준수 벤치마크)",
+   "url": "https://arxiv.org/abs/2505.16944",
+   "axes": {
+    "purpose": {
+     "prior": "실제 에이전트 지시의 준수 능력을 측정한다",
+     "same": false,
+     "note": "측정 벤치마크다"
+    },
+    "mechanism": {
+     "prior": "평균 1,723단어, 평균 11.9개 제약의 긴 지시",
+     "same": false,
+     "note": "긴 상시 지시라는 형태만 같다"
+    },
+    "evaluation": {
+     "prior": "제약 단위 준수 평가와 길이·메타 제약 분석",
+     "same": false,
+     "note": "대조 대상은 조항 소거 시험이다"
+    },
+    "target": {
+     "prior": "실제 에이전트 애플리케이션 지시",
+     "same": false,
+     "note": "코딩 하네스에 한정되지 않는다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  }
+ ],
+ "saturation": "4",
+ "not_found": "[\"한국어 문체 규칙이나 금지어 표처럼 출력 문체 제약을 상시 적재했을 때의 준수율을 측정한 선행 연구는 찾지 못했다. 검색을 영어 일반 용어로 한정했기 때문이며 독창성의 근거가 아니다.\", \"규칙을 하나씩 넣고 빼는 소거 시험과 규칙 묶음 비교를 같은 조건에서 대조한 연구는 찾지 못했다. 이 하위 질문의 범위가 상시 지시 분량과 강제 방식이어서 평가 방법론은 깊이 검색하지 않았다.\", \"넛지(비차단 알림)와 차단 훅의 준수율을 같은 과제에서 직접 비교한 통제 실험은 찾지 못했다. 실무 블로그와 포럼 글만 나왔고 열지 않았다.\"]",
+ "disclosures": "[\"arXiv 논문은 초록만 열어 확인했고 본문은 읽지 않았다. 효과 크기는 초록에 적힌 값만 인용했다.\", \"2608.12426 의 개입 효과(계획·자기 수정·재시도)는 검색 요약에만 나왔고 초록에서 확인되지 않아 인용하지 않았다.\", \"2607.07405 가 프롬프트 기반 방법과 직접 비교했다는 서술은 검색 요약에만 있었고 초록에는 없어 prior_claim 에 넣지 않았다.\", \"Cursor 포럼, 실무 블로그, 공급사 블로그 결과는 열지 않아 인용하지 않았다.\"]",
+ "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"ASYNC-FIRST\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"WRITTEN-ONLY\"]",
+ "notes": "검토한 관점은 지시 수에 따른 준수율 저하(IFScale, ManyIFEval, 붕괴 지점 프리프린트, AgentIF), 상시 컨텍스트 파일의 작업 성공·비용 효과(AGENTS.md 평가), 프롬프트 규칙과 결정적 런타임 강제의 비교(공급사 훅 문서, 결정적 게이트, AgentSpec)다. 모델 학습 단계의 정렬 기법은 범위 밖이라 제외했다. 범위 밖이지만 기록할 사항으로, ManyIFEval 저자들은 성능 추정에 ManyIFEval 약 500개, StyleMBPP 약 300개 표본이 충분하다고 적었다. 대조 대상의 질문 3개·조건당 1회 소거 시험과 표본 규모 차이가 크므로 설계 결정 (3)을 맡은 하위 질문에서 확인할 필요가 있다. 추가 확인이 필요한 사항은 두 가지다. 첫째, 상시 지시의 순서 편향(앞쪽 지시 우선)이 대조 대상의 적재 순서(행동 규칙 다음 문체 규칙과 금지어 표)에서 실제로 나타나는지 확인해야 한다. IFScale 본문의 순서 효과 분석을 읽으면 확인할 수 있다. 둘째, 넛지와 차단의 준수율 직접 비교 연구가 있는지 확인해야 한다. 이 비교가 설계 결정 (2)의 근거를 바로 정하기 때문이다."
+}

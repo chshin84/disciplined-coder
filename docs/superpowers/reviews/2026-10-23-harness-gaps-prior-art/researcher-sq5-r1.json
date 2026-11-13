@@ -1,0 +1,378 @@
+{
+ "agent": "agent-prior-art",
+ "mode": "survey",
+ "subquestion_id": "sq5",
+ "search_status": "ok",
+ "queries": [
+  "indirect prompt injection coding agent web content defense",
+  "lethal trifecta AI agents private data untrusted content exfiltration",
+  "design patterns for securing LLM agents against prompt injections",
+  "coding agent CLI sandboxing filesystem network isolation permission deny rules secrets",
+  "prompt injection attacks agentic coding assistants systematic analysis arXiv 2026",
+  "OWASP top 10 agentic applications tool misuse excessive agency least privilege",
+  "spotlighting defend indirect prompt injection datamarking encoding attack success rate"
+ ],
+ "read": "[\"https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/\", \"https://arxiv.org/html/2506.08837v1\", \"https://code.claude.com/docs/en/sandboxing\", \"https://arxiv.org/abs/2601.17548\", \"https://code.claude.com/docs/en/security\", \"https://arxiv.org/abs/2406.13352\", \"https://arxiv.org/html/2403.14720v1\", \"https://code.claude.com/docs/en/permissions\", \"https://arxiv.org/abs/2509.22040\"]",
+ "issues": [
+  {
+   "where": "설계 결정 (2) 삭제·외부 전송·비밀 취급을 프롬프트 지시로만 다룸",
+   "type": "refuted-premise",
+   "claim": "대조 대상은 삭제·외부 전송·비밀 취급을 프롬프트 지시로만 다룬다. 호스트 CLI 문서는 그런 지시가 허용 범위를 바꾸지 않는다고 적으므로, 지시만으로 이 행동이 통제된다는 전제는 호스트 문서와 상충한다.",
+   "prior_claim": "호스트 CLI의 권한 문서는 권한 규칙을 모델이 아닌 CLI가 강제한다고 적는다. 같은 문서는 프롬프트나 CLAUDE.md의 지시가 모델의 시도를 바꿀 뿐 허용 범위를 바꾸지 않는다고 적고, Read(./.env) 같은 deny 규칙과 PreToolUse 훅을 비밀 파일 차단 수단으로 안내한다.",
+   "consequence": "현재 대조 대상에서는 비밀 파일 읽기와 외부 전송을 차단하는 장치가 모델의 지시 준수 하나뿐이다. 그래서 주입된 지시가 모델을 움직이면 그 행동을 거부할 층이 없다.",
+   "evidence": "권한 문서 68행: 'Permission rules are enforced by Claude Code, not by the model. Instructions in your prompt or CLAUDE.md shape what Claude tries to do, but they don't change what Claude Code allows.' 339행: Read(./.env)·Read(./secrets/**) deny 규칙 안내. 네 축 중 목적(보안 통제와 규율 플러그인)과 메커니즘(설정 규칙과 프롬프트 규칙)이 다르다.",
+   "citations": [
+    {
+     "url": "https://code.claude.com/docs/en/permissions",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (6) 웹을 읽는 연구자·검증자 서브에이전트",
+   "type": "known-failure",
+   "claim": "대조 대상의 연구자 서브에이전트는 웹 본문을 읽고 검색어를 외부로 보낸다. 같은 세션이 로컬 저장소와 메모리에 접근할 수 있으면 선행 사례가 지목한 세 조건이 한 에이전트에 모일 수 있다. 서브에이전트별 도구 목록은 이번 탐색에서 확인하지 못했으므로 이 결합은 가정이다.",
+   "prior_claim": "Willison은 사적 데이터 접근, 신뢰할 수 없는 콘텐츠 노출, 외부 통신 능력이 한 에이전트에 모이면 공격자가 데이터를 빼낼 수 있다고 적었다. 그는 LLM이 출처를 구분해 지시를 거르지 못하며 이를 100% 막는 방법을 아직 모른다고 썼고, 세 조건 중 하나를 빼라고 권했다.",
+   "consequence": "현재 대조 대상에는 웹을 읽은 서브에이전트에서 세 조건 중 하나를 제거하는 구조 규칙이 없다. 그래서 주입이 성공하면 검색어나 가져오기 URL로 로컬 내용이 나갈 경로가 남는다.",
+   "evidence": "Willison 글의 세 조건 정의와 '조합을 피하라' 권고. 네 축 중 목적(위협 모델 서술)과 메커니즘(능력 조합 회피 원칙)이 대조 대상과 다르다.",
+   "citations": [
+    {
+     "url": "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/",
+     "kind": "blog",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (2)·(6) 비차단 넛지와 지시 중심 방어",
+   "type": "known-failure",
+   "claim": "대조 대상의 보안 관련 강제는 대부분 프롬프트 지시와 비차단 알림이다. 선행 연구가 취약하다고 본 휴리스틱·지시 기반 방어 범주에 해당한다.",
+   "prior_claim": "프롬프트 인젝션 대응 설계 패턴 논문은 탐지와 휴리스틱 방어가 본질적으로 깨지기 쉽다고 보고, 신뢰할 수 없는 입력을 읽은 에이전트가 중대한 행동을 일으키지 못하도록 구조를 제약하는 여섯 패턴을 제시했다. 이 논문은 코딩 보조 사례에서 사용자 확인 방식은 부담이 크고 우회되기 쉽다고 평가했다.",
+   "consequence": "현재 대조 대상에는 웹 본문을 읽은 뒤의 행동을 구조로 제한하는 장치(예: 읽기 전용 격리, 형식 제한 출력)가 명시되어 있지 않다.",
+   "evidence": "논문 3절 '공격 탐지 개선은 휴리스틱에 머물러 본질적으로 깨지기 쉽다', 4.10절 코딩 보조 사례. 네 축 중 목적(보안)과 적용 대상(범용 LLM 에이전트, 코딩 보조는 사례 하나)이 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2506.08837v1",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (2)·(6) 지시 중심 방어",
+   "type": "known-failure",
+   "claim": "대조 대상은 코딩 에이전트 위에 지시 중심 규칙을 얹는 구조다. 선행 체계화 연구가 적응형 공격에 약하다고 정리한 방어 범주가 대조 대상에 남아 있다.",
+   "prior_claim": "코딩 보조 에이전트의 프롬프트 인젝션 체계화 연구는 78편을 종합해 적응형 공격이 최신 방어에 대해 85%를 넘는 성공률을 보이고, 검토한 방어 18종 대부분이 50% 미만의 완화에 그친다고 보고했다. 저자들은 임시 필터링 대신 아키텍처 수준의 완화를 요구했다.",
+   "consequence": "현재 대조 대상에는 지시 준수가 실패했을 때 행동을 거부할 아키텍처 층이 리뷰 기록 보호 같은 일부 대상에만 있다.",
+   "evidence": "초록: 'attack success rates against state-of-the-art defenses exceed 85%'; 'most achieve less than 50% mitigation'; 'architectural-level mitigations rather than ad-hoc filtering'. 목적(보안 체계화)이 대조 대상과 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2601.17548",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (6) 외부 문서를 읽는 서브에이전트",
+   "type": "known-failure",
+   "claim": "대조 대상의 연구자 서브에이전트는 외부 개발 자료(문서·블로그·논문 페이지)를 읽는다. 선행 연구가 공격 경로로 지목한 입력과 같은 종류의 입력을 받는다.",
+   "prior_claim": "에이전트형 코딩 편집기 실증 연구는 외부 개발 자료에 악성 지시를 심는 방식으로 GitHub Copilot과 Cursor를 공격해 유해 명령 실행 성공률이 최대 84%에 이르렀다고 보고했다.",
+   "consequence": "현재 대조 대상은 웹 본문을 데이터로만 다루라는 규칙도 차단 훅도 두지 않는다. 그래서 오염된 페이지가 서브에이전트 출력에 지시를 실어 상위 에이전트로 넘길 경로가 남는다.",
+   "evidence": "초록: 'poisoning external development resources with malicious instructions', 'attack success rates can reach as high as 84%'. 적용 대상 도구(Copilot·Cursor)와 목적(공격 실증)이 대조 대상과 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2509.22040",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (6) 가져온 본문 처리 규칙의 부재와 향후 보완안",
+   "type": "weak-baseline",
+   "claim": "대조 대상은 웹 본문 처리 방식을 지시문 방어·구분자·데이터 표시(datamarking) 같은 기준선과 비교하지 않았다.",
+   "prior_claim": "Spotlighting 논문은 GPT-3.5-Turbo에서 시스템 프롬프트에 방어 지시를 넣는 방식은 공격 성공률에 거의 영향이 없었고, 특수 구분자는 성공률을 절반가량 낮췄으며, datamarking은 약 50%에서 3% 미만으로 낮췄다고 보고했다.",
+   "consequence": "현재 대조 대상에는 '본문을 데이터로만 다루라'는 지시를 넣을지, 구분자나 표시 방식을 쓸지 고를 비교 근거가 없다. 대조 대상의 소거 시험(결정 3)은 문체·행동 위반 수만 세고 주입 저항은 측정하지 않는다.",
+   "evidence": "논문 본문: 'including defensive instructions in the system prompt has only a negligible impact on ASR', 'special delimiters can reduce ASR by about half', 'ASR is reduced from approximately 50% to below 3%'. 실험 모델(GPT 계열)과 과제(요약·질의응답)가 대조 대상과 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2403.14720v1",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (9) Windows 결합과 (2) 비밀 취급",
+   "type": "known-failure",
+   "claim": "대조 대상은 Windows에 결합되어 있다. 호스트 문서에 따르면 네이티브 Windows에서는 OS 샌드박스가 동작하지 않으므로, 대조 대상 환경에서는 파일·네트워크 격리 층이 기본으로 비어 있다.",
+   "prior_claim": "호스트 CLI 샌드박스 문서는 샌드박스가 macOS·Linux·WSL2에서만 동작하고 네이티브 Windows에서는 명령을 샌드박스 없이 실행한다고 적는다. 같은 문서는 샌드박스가 셸 명령만 덮고 파일 도구·WebFetch·MCP·훅은 그 밖에서 실행되며, denyRead가 Read 도구를 차단하지 않는다고 적는다.",
+   "consequence": "현재 대조 대상 환경에서 비밀 파일 보호는 권한 deny 규칙이나 PreToolUse 훅으로만 구현할 수 있는데, 대조 대상은 둘 다 두지 않고 프롬프트 지시에 맡긴다.",
+   "evidence": "샌드박스 문서: 'On native Windows, Claude Code runs commands unsandboxed.'; 'A denyRead entry doesn't stop the Read tool, and allowedDomains doesn't limit WebFetch'; 'There is no built-in credential deny list'. 목적(호스트 기능 설명)과 메커니즘이 대조 대상과 다르다.",
+   "citations": [
+    {
+     "url": "https://code.claude.com/docs/en/sandboxing",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  }
+ ],
+ "evidence_map": [
+  {
+   "case": "Lethal trifecta 위협 모델",
+   "url": "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/",
+   "axes": {
+    "purpose": {
+     "prior": "에이전트 데이터 유출 위험의 조건을 정의한다",
+     "same": false,
+     "note": "대조 대상의 목적은 코딩 에이전트의 행동·문체 규율이며 보안 위협 모델은 그중 일부 관심사다"
+    },
+    "mechanism": {
+     "prior": "사적 데이터·비신뢰 콘텐츠·외부 통신 중 하나를 빼는 능력 조합 회피",
+     "same": false,
+     "note": "대조 대상은 프롬프트 지시와 비차단 넛지를 쓰고 능력 조합을 제한하지 않는다"
+    },
+    "evaluation": {
+     "prior": "공개 사례 열거, 정량 평가 없음",
+     "same": false,
+     "note": "대조 대상은 규칙 소거 시험으로 위반 수를 센다"
+    },
+    "target": {
+     "prior": "도구를 쓰는 LLM 에이전트 일반",
+     "same": false,
+     "note": "대조 대상은 코딩 에이전트 CLI 하나이며 범용 에이전트의 일부 형태다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "blog",
+   "source_level": "1차",
+   "route": "웹 검색",
+   "adoption": "참고"
+  },
+  {
+   "case": "프롬프트 인젝션 대응 설계 패턴 6종",
+   "url": "https://arxiv.org/html/2506.08837v1",
+   "axes": {
+    "purpose": {
+     "prior": "프롬프트 인젝션에 견디는 에이전트 구조 제시",
+     "same": false,
+     "note": "대조 대상의 목적은 규율 전반이고 인젝션 방어는 그 일부다"
+    },
+    "mechanism": {
+     "prior": "Action-Selector, Plan-Then-Execute, Dual LLM 등 구조 제약",
+     "same": false,
+     "note": "대조 대상의 읽기 전용 리뷰어 서브에이전트만 격리 패턴과 부분적으로 비슷하고, 연구자 서브에이전트에는 구조 제약이 명시되지 않았다"
+    },
+    "evaluation": {
+     "prior": "사례 연구 10개로 보안·효용 절충을 정성 평가",
+     "same": false,
+     "note": "대조 대상은 주입 저항을 평가하지 않는다"
+    },
+    "target": {
+     "prior": "LLM 에이전트 일반, 코딩 보조는 4.10절 사례",
+     "same": false,
+     "note": "코딩 보조 사례 하나만 대조 대상과 같은 종류다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색, arXiv",
+   "adoption": "참고"
+  },
+  {
+   "case": "코딩 보조 에이전트 프롬프트 인젝션 체계화 연구",
+   "url": "https://arxiv.org/abs/2601.17548",
+   "axes": {
+    "purpose": {
+     "prior": "코딩 보조 에이전트 공격·방어 문헌 체계화",
+     "same": false,
+     "note": "대조 대상은 방어 장치 자체이고 이 연구는 문헌 종합이다"
+    },
+    "mechanism": {
+     "prior": "78편 메타분석, 공격 42종과 방어 18종 분류",
+     "same": false,
+     "note": "대조 대상은 규칙·훅 플러그인이다"
+    },
+    "evaluation": {
+     "prior": "적응형 공격 성공률과 방어 완화율 집계",
+     "same": false,
+     "note": "대조 대상은 공격 성공률을 측정하지 않는다"
+    },
+    "target": {
+     "prior": "Claude Code·Copilot·Cursor 등 코딩 보조 에이전트",
+     "same": true,
+     "note": "대조 대상의 호스트와 같은 범주의 코딩 에이전트를 다룬다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "preprint",
+   "source_level": "2차",
+   "route": "웹 검색, arXiv",
+   "adoption": "참고"
+  },
+  {
+   "case": "에이전트형 코딩 편집기 인젝션 실증",
+   "url": "https://arxiv.org/abs/2509.22040",
+   "axes": {
+    "purpose": {
+     "prior": "외부 자료 오염을 통한 명령 실행 공격 실증",
+     "same": false,
+     "note": "공격 연구이며 대조 대상은 규율 장치다"
+    },
+    "mechanism": {
+     "prior": "외부 개발 자료에 악성 지시 삽입",
+     "same": false,
+     "note": "대조 대상의 메커니즘과 무관하며 입력 경로만 같은 종류다"
+    },
+    "evaluation": {
+     "prior": "유해 명령 실행 성공률 최대 84%",
+     "same": false,
+     "note": "대조 대상은 이 지표를 측정하지 않는다"
+    },
+    "target": {
+     "prior": "GitHub Copilot, Cursor",
+     "same": false,
+     "note": "대조 대상의 호스트 CLI는 시험 대상에 없다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색, arXiv",
+   "adoption": "참고"
+  },
+  {
+   "case": "Spotlighting(구분자·datamarking·인코딩)",
+   "url": "https://arxiv.org/html/2403.14720v1",
+   "axes": {
+    "purpose": {
+     "prior": "간접 인젝션 성공률 저감",
+     "same": false,
+     "note": "대조 대상의 목적은 규율 전반이다"
+    },
+    "mechanism": {
+     "prior": "비신뢰 입력에 구분자·표시·인코딩 적용",
+     "same": false,
+     "note": "대조 대상에는 가져온 본문 표시 규칙이 없다"
+    },
+    "evaluation": {
+     "prior": "합성 문서 1000건에서 공격 성공률과 과제 성능 측정",
+     "same": false,
+     "note": "대조 대상은 위반 수 소거 시험이다"
+    },
+    "target": {
+     "prior": "GPT 계열 모델의 요약·질의응답",
+     "same": false,
+     "note": "코딩 에이전트가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색, arXiv",
+   "adoption": "참고"
+  },
+  {
+   "case": "호스트 CLI 권한 규칙과 PreToolUse 훅",
+   "url": "https://code.claude.com/docs/en/permissions",
+   "axes": {
+    "purpose": {
+     "prior": "도구 접근 허용·거부 통제",
+     "same": false,
+     "note": "대조 대상은 행동·문체 규율 전반이고 접근 통제는 일부다"
+    },
+    "mechanism": {
+     "prior": "deny/ask/allow 규칙을 CLI가 강제, PreToolUse 훅으로 확장",
+     "same": false,
+     "note": "대조 대상은 리뷰 기록 차단 훅만 같은 메커니즘이고 비밀·삭제·외부 전송은 프롬프트 지시다"
+    },
+    "evaluation": {
+     "prior": "제품 문서, 평가 없음",
+     "same": false,
+     "note": "평가 정보가 없다"
+    },
+    "target": {
+     "prior": "호스트 코딩 에이전트 CLI",
+     "same": true,
+     "note": "대조 대상이 결합된 호스트와 같다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 결과의 제품 문서",
+   "adoption": "채택"
+  },
+  {
+   "case": "호스트 CLI Bash 샌드박스와 credentials 보호",
+   "url": "https://code.claude.com/docs/en/sandboxing",
+   "axes": {
+    "purpose": {
+     "prior": "셸 명령의 파일·네트워크 접근 격리",
+     "same": false,
+     "note": "대조 대상의 목적과 범위가 다르다"
+    },
+    "mechanism": {
+     "prior": "OS 강제 격리, denyRead, credentials deny/mask, 환경변수 제거",
+     "same": false,
+     "note": "대조 대상은 OS 격리를 쓰지 않는다"
+    },
+    "evaluation": {
+     "prior": "제품 문서, 평가 없음",
+     "same": false,
+     "note": "평가 정보가 없다"
+    },
+    "target": {
+     "prior": "macOS·Linux·WSL2의 호스트 CLI, 네이티브 Windows 제외",
+     "same": false,
+     "note": "대조 대상은 네이티브 Windows에 결합되어 이 기능의 적용 범위 밖이다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "제품 문서",
+   "adoption": "참고"
+  },
+  {
+   "case": "호스트 CLI 보안 안내(WebFetch 요약, 네트워크 명령 승인)",
+   "url": "https://code.claude.com/docs/en/security",
+   "axes": {
+    "purpose": {
+     "prior": "호스트 CLI의 인젝션 방어 장치 안내",
+     "same": false,
+     "note": "대조 대상의 목적은 규율 전반이다"
+    },
+    "mechanism": {
+     "prior": "WebFetch가 별도 모델 호출 결과만 전달, curl·wget 비자동 승인, 비신뢰 콘텐츠는 VM 권장",
+     "same": false,
+     "note": "WebFetch 별도 모델 요약은 대조 대상 결정 (6)의 공백을 호스트가 일부 덮는 장치다. 대조 대상 자체의 메커니즘은 아니다"
+    },
+    "evaluation": {
+     "prior": "제품 문서, 평가 없음",
+     "same": false,
+     "note": "평가 정보가 없다"
+    },
+    "target": {
+     "prior": "호스트 코딩 에이전트 CLI",
+     "same": true,
+     "note": "대조 대상이 결합된 호스트와 같다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "제품 문서",
+   "adoption": "흡수"
+  }
+ ],
+ "saturation": "2",
+ "not_found": "[\"OWASP Agentic Top 10(ASI02·ASI03) 원문을 열지 못했다. 검색 결과가 모두 2차 블로그였으므로 인용하지 않았다.\", \"AgentDojo가 비교한 방어 기준선(도구 필터, 프롬프트 방어)은 초록에 없어 확인하지 못했다. 본문을 열지 않았다.\", \"대조 대상의 연구자·검증자 서브에이전트가 실제로 어떤 도구 목록을 보유하는지는 이번 웹 탐색 범위 밖이라 확인하지 못했다.\", \"규칙·훅 플러그인 형태로 인젝션 방어를 추가해 효과를 측정한 선행 사례는 찾지 못했다. 독창성의 근거가 아니다.\"]",
+ "disclosures": "[\"Willison 글은 저자 개인 블로그이고 정량 평가가 없다.\", \"2601.17548의 85%·50% 수치는 메타분석 초록 값이며 본문 표를 확인하지 않았다.\", \"Spotlighting 결과는 GPT 계열과 합성 데이터 기준이라 대조 대상 호스트 모델에 그대로 옮겨진다는 근거는 없다.\", \"호스트 문서는 버전마다 바뀌며 2026-10-23에 연 내용 기준이다.\", \"issue 2(세 조건 결합)는 서브에이전트 도구 목록을 확인하지 않은 가정 위에 있다.\"]",
+ "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\", \"WRITTEN-ONLY\", \"ASYNC-FIRST\"]",
+ "notes": "검토 관점은 기시감(인젝션 위협 모델·설계 패턴), 결말(코딩 에이전트 대상 공격 성공률), 전이(지시 중심 방어의 취약성이 대조 대상 결정 2·6에 남는지), 기준선(구분자·datamarking 대비 지시문 방어), 붐빔(호스트 CLI가 이미 제공하는 deny 규칙·훅·샌드박스)이다. 붐빔 관점에서는 호스트 권한 규칙과 PreToolUse 훅이 이미 비밀 파일 차단 수단을 제공하므로, 대조 대상이 직접 새 장치를 짓기보다 그 설정을 배포하는 방안을 검토할 수 있다. 추가 확인이 필요한 항목은 세 가지다. 첫째, 연구자 서브에이전트의 도구 목록을 저장소에서 확인해 세 조건 결합 가정을 검증해야 한다. 둘째, WebSearch 결과 요약에도 WebFetch와 같은 별도 모델 처리가 적용되는지 호스트 문서로 확인해야 한다. 셋째, OWASP Agentic Top 10 원문을 열어 최소 권한 권고를 1차 출처로 확인해야 한다."
+}

@@ -1,0 +1,393 @@
+{
+ "agent": "agent-prior-art",
+ "mode": "survey",
+ "subquestion_id": "sq2",
+ "search_status": "ok",
+ "queries": [
+  "LLM non-determinism evaluation single run variance agent benchmark repeated trials",
+  "system prompt instruction ablation coding agent rules file effect on task success",
+  "adding error bars to evals statistical approach language model evaluations clustered standard errors paired differences",
+  "tau-bench pass^k reliability agent consistency repeated trials metric",
+  "curse of instructions LLM compliance drops as number of simultaneous instructions increases",
+  "Evaluating AGENTS.md repository-level context files helpful coding agents Gloaguen",
+  "promptfoo repeat option eval prompt regression testing assertions multiple runs"
+ ],
+ "read": "[\"https://arxiv.org/abs/2607.27250\", \"https://arxiv.org/abs/2602.07150\", \"https://arxiv.org/abs/2411.00640\", \"https://codex.danielvaughan.com/2026/07/04/agents-md-structure-doesnt-matter-factorial-study-instruction-adherence-codex-cli/\", \"https://arxiv.org/abs/2605.10039\", \"https://arxiv.org/abs/2602.11988\", \"https://arxiv.org/abs/2607.19257\", \"https://arxiv.org/abs/2406.12045\", \"https://www.anthropic.com/research/statistical-approach-to-model-evals\", \"https://www.promptfoo.dev/docs/configuration/reference\"]",
+ "issues": [
+  {
+   "where": "설계 결정 (3) 규칙 평가: 조건마다 1회 실행, 위반 수 비교",
+   "type": "known-failure",
+   "claim": "대조 대상은 조건마다 질문 3개 이상을 1회씩 실행해 위반 수를 비교한다. 그래서 선행 사례가 보고한 실행 간 변동이 위반 수 차이에 그대로 섞인다.",
+   "prior_claim": "SWE-Bench-Verified 에서 궤적 60,000건을 수집한 연구는 단일 실행 pass@1 추정치가 어느 실행을 고르느냐에 따라 2.2~6.0%p 달라지고 temperature 0 에서도 표준편차가 1.5%p 를 넘는다고 보고했다. 그 연구는 과제마다 여러 번 독립 실행하고 검정력 분석으로 실행 수를 정하라고 권했다.",
+   "consequence": "현재 채택 규칙은 위반이 하나라도 적으면 변경안을 채택하므로, 실행 간 변동만으로 생긴 차이가 조항 채택과 기각을 정할 수 있다.",
+   "evidence": "arXiv 2602.07150 초록(On Randomness in Agentic Evals). 축 대조: 목적(평가 잡음 측정)은 대조 대상의 평가 구성요소와만 같고, 지표는 작업 성공률(pass@1)이며 대조 대상은 규칙 위반 수다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2602.07150",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (3) 위반 수 비교의 통계 처리",
+   "type": "known-failure",
+   "claim": "대조 대상은 위반 수를 원시 합계로 비교하고 표준오차·쌍대 차이·검정력 계산을 쓰지 않는다. 그래서 선행 사례가 지적한 과소 추정된 잡음 문제가 남아 있다.",
+   "prior_claim": "Anthropic 의 평가 통계 권고는 질문이 서로 독립이 아니면 표준오차를 묶음 단위로 계산하라고 하며, 묶음 표준오차가 단순 표준오차의 3배를 넘을 수 있다고 보고했다. 같은 글은 같은 질문 목록에 대한 쌍대 차이 비교, 답 재표집, 검정력 분석으로 필요한 관측 수를 정하라고 권했다.",
+   "consequence": "질문 3~4개, 1회 실행 조건에서 위반 1건 차이가 의미 있는 차이인지 판단할 근거가 현재 설계에는 없다.",
+   "evidence": "anthropic.com 연구 글의 권고 2~5번 인용. 축 대조: 대상은 모델 간 비교이고 대조 대상은 같은 모델에서 규칙 문구 간 비교라서 적용 대상이 다르다. 그러나 같은 질문 목록을 두 조건에 쓰는 구조는 쌍대 비교와 같다.",
+   "citations": [
+    {
+     "url": "https://www.anthropic.com/research/statistical-approach-to-model-evals",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (3) 작업 성공률을 측정하지 않음",
+   "type": "weak-baseline",
+   "claim": "대조 대상의 규칙 묶음은 '규칙 파일 없음' 조건의 작업 성공률·추론 비용 기준선과 비교되지 않았다.",
+   "prior_claim": "저장소 수준 컨텍스트 파일을 평가한 연구는 컨텍스트 파일이 대체로 작업 성공률을 높이지 못하고 추론 비용을 평균 20% 넘게 늘렸으며, 파일 속 지시는 에이전트가 잘 따랐다고 보고했다. 저자들은 성능 개선용 변경은 배포 전에 엄밀히 평가하라고 권했다.",
+   "consequence": "대조 대상은 지시 준수(위반 수)만 측정하므로, 지시는 잘 지켜지되 성공률은 그대로이고 비용만 늘어나는 상황을 현재 평가로는 검출할 수 없다.",
+   "evidence": "arXiv 2602.11988 초록. 축 대조: 목적(규칙 파일의 효과 평가)은 같다. 메커니즘은 파일 전체 유무 비교이고 대조 대상은 조항 하나씩 소거한다. 평가는 성공률·비용이고 대조 대상은 위반 수다. 적용 대상은 Python 저장소 과제다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2602.11988",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (3) '같으면 넣지 않는다' 판정",
+   "type": "weak-baseline",
+   "claim": "대조 대상의 '효과 없음' 판정은 동등성 검정처럼 효과의 상한을 정하는 방법과 비교되지 않았다.",
+   "prior_claim": "Claude Code 와 Codex 에서 컨텍스트 주입 전략을 비교한 연구(과제 17개, 실행 288회)는 전략이 정답률을 측정 가능하게 바꾸지 않았다고 보고하면서, 동등성 검정으로 효과를 10~15%p 이하로 한정했다. 이 연구는 경계 난이도 과제가 에이전트마다 다르다(Spearman rho=0.75)는 점이 이전 단일 에이전트 연구의 상충 결과를 설명할 수 있다고 했다.",
+   "consequence": "대조 대상은 위반 수가 같을 때 효과가 없다고 보지만, 그 판정이 어느 크기까지의 효과를 배제하는지 알 수 없다.",
+   "evidence": "arXiv 2607.27250 초록. 축 대조: 목적(규칙 파일 효과 평가)은 같고, 메커니즘은 전략 3종 비교, 평가는 정답 테스트, 적용 대상은 두 에이전트라서 대조 대상(단일 호스트, 조항 단위, 위반 수)과 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2607.27250",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (3) 조항마다 질문 3개 이상",
+   "type": "known-failure",
+   "claim": "대조 대상은 조항마다 질문 3~4개로 위반 수를 비교한다. 그래서 질문(과제) 정체성에서 오는 준수율 차이가 조항 효과와 섞인다.",
+   "prior_claim": "Claude Code 세션 1,650회와 함수 단위 관측 16,050건으로 설정 파일 구조 변수 4개를 요인 실험한 연구는 파일 크기·위치·구조·충돌 어느 것도 다중검정 보정 뒤 유의한 효과가 없었고, 준수율은 코딩 과제마다 체계적으로 달랐다고 보고했다.",
+   "consequence": "질문 몇 개를 바꾸면 위반 수 차이가 뒤집힐 수 있는데, 현재 설계는 과제 효과를 따로 추정하지 않는다.",
+   "evidence": "arXiv 2605.10039 초록. 2차 해설(codex.danielvaughan.com)은 과제 간 차이를 26.2%p 로 적었으나 초록에는 효과 크기가 없다. 축 대조: 목적(지시 준수 측정)과 적용 대상(Claude Code CLI)은 가깝다. 그러나 대상 지시는 사소한 코드 스타일 규칙 하나이며 대조 대상은 행동·문체 조항이다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2605.10039",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1)과 (3) 규칙 수십 개 상시 적재와 조항 단위 소거",
+   "type": "known-failure",
+   "claim": "대조 대상은 조항을 하나씩 넣고 빼며 평가하고 전체 묶음 비교는 기각했다. 그래서 동시에 실린 규칙 수가 준수율을 떨어뜨리는 효과는 측정되지 않는다.",
+   "prior_claim": "시스템 프롬프트의 동시 규칙 수를 10개에서 160개까지 바꾼 연구는 모든 모델·형식·위치에서 완전 준수 응답 비율이 규칙 80개에서 0으로 떨어졌다고 보고했다.",
+   "consequence": "대조 대상의 상시 적재 규칙은 조항 ID 61개(agent-principles.md 의 굵은 조항 ID 수를 grep 으로 센 derived 값)와 금지어 표로 구성된다. 조항 하나의 소거 시험은 이 총량 효과를 드러내지 못한다.",
+   "evidence": "arXiv 2607.19257 초록. 축 대조: 메커니즘(규칙 수 변화)과 평가(완전 준수율)가 다르고, 적용 대상은 단일 응답 과제라서 코딩 에이전트 세션과 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2607.19257",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (3) 조건마다 1회 실행",
+   "type": "weak-baseline",
+   "claim": "대조 대상의 평가는 반복 실행 일관성 지표(pass^k)와 비교되지 않았다.",
+   "prior_claim": "τ-bench 는 여러 번 실행해 모두 성공하는 비율인 pass^k 를 신뢰성 지표로 도입했고, 당시 최고 수준 함수 호출 에이전트도 retail 영역에서 pass^8 이 25% 미만이라고 보고했다.",
+   "consequence": "1회 실행으로는 조항이 매번 지켜지는지와 가끔 지켜지는지를 구분할 수 없다.",
+   "evidence": "arXiv 2406.12045 초록. 축 대조: 목적(에이전트 신뢰성 측정)과 적용 대상(고객 응대 도구 에이전트)이 다르다. 대조 대상과 겹치는 구성요소는 반복 실행 지표뿐이다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2406.12045",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (3) 자체 평가 스크립트",
+   "type": "crowded",
+   "claim": "대조 대상은 조항 시험 실행과 판정을 자체 셸 스크립트로 구현했다. 반복 실행과 LLM 채점 단언은 공개 평가 도구가 이미 기능으로 제공한다.",
+   "prior_claim": "promptfoo 는 각 테스트 사례의 실행 횟수를 정하는 evaluateOptions.repeat(기본값 1)와 llm-rubric·model-graded·javascript·python 단언 유형을 제공한다.",
+   "consequence": "반복 실행·집계를 새로 지으려면 자체 스크립트를 넓혀야 하며, 기존 도구가 같은 기능을 이미 제공한다는 점이 비교되지 않았다.",
+   "evidence": "promptfoo 설정 참조 문서. 축 대조: promptfoo 는 범용 프롬프트 평가 도구이고 코딩 에이전트 CLI 세션의 훅·도구 사용을 그대로 실행하는지는 확인하지 못했다. 그래서 같은 사례로 단정하지 않는다.",
+   "citations": [
+    {
+     "url": "https://www.promptfoo.dev/docs/configuration/reference",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  }
+ ],
+ "evidence_map": [
+  {
+   "case": "On Randomness in Agentic Evals (SWE-Bench-Verified 궤적 60,000건)",
+   "url": "https://arxiv.org/abs/2602.07150",
+   "axes": {
+    "purpose": {
+     "prior": "에이전트 평가에서 단일 실행 추정치의 잡음 크기를 측정한다",
+     "same": false,
+     "note": "대조 대상의 평가 구성요소(잡음 처리)와만 겹치고 규칙 효과 판정은 목적이 아니다"
+    },
+    "mechanism": {
+     "prior": "모델 3종·스캐폴드 2종으로 반복 실행해 pass@1 분포를 구한다",
+     "same": false,
+     "note": "대조 대상은 조항 소거 조건을 1회씩 실행한다"
+    },
+    "evaluation": {
+     "prior": "pass@1, pass@k, pass^k, 검정력 분석",
+     "same": false,
+     "note": "대조 대상은 규칙 위반 수 합계를 비교한다"
+    },
+    "target": {
+     "prior": "SWE-Bench-Verified 코딩 에이전트",
+     "same": false,
+     "note": "코딩 에이전트라는 점은 같으나 규칙 파일 평가가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Adding Error Bars to Evals (Anthropic 평가 통계 권고)",
+   "url": "https://www.anthropic.com/research/statistical-approach-to-model-evals",
+   "axes": {
+    "purpose": {
+     "prior": "평가 결과를 실험으로 보고 통계적으로 해석한다",
+     "same": false,
+     "note": "대조 대상의 평가 구성요소와만 겹친다"
+    },
+    "mechanism": {
+     "prior": "묶음 표준오차, 답 재표집, 쌍대 차이, 검정력 분석",
+     "same": false,
+     "note": "대조 대상은 원시 위반 수 비교만 한다"
+    },
+    "evaluation": {
+     "prior": "평균 차이·표준오차·신뢰구간·상관 보고",
+     "same": false,
+     "note": "대조 대상은 표준오차를 보고하지 않는다"
+    },
+    "target": {
+     "prior": "모델 간 벤치마크 비교",
+     "same": false,
+     "note": "대조 대상은 같은 모델에서 규칙 문구 간 비교다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 → anthropic.com 연구 글, arXiv 2411.00640 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Evaluating AGENTS.md (저장소 컨텍스트 파일 평가, ICLR 2026)",
+   "url": "https://arxiv.org/abs/2602.11988",
+   "axes": {
+    "purpose": {
+     "prior": "규칙·컨텍스트 파일이 코딩 에이전트에 도움이 되는지 평가한다",
+     "same": true,
+     "note": "규칙 파일의 효과 평가라는 목적이 같다"
+    },
+    "mechanism": {
+     "prior": "파일 없음·LLM 생성·개발자 작성 조건의 파일 단위 비교",
+     "same": false,
+     "note": "대조 대상은 조항 단위 소거이며 파일 전체 비교는 기각했다"
+    },
+    "evaluation": {
+     "prior": "작업 성공률과 추론 비용, 지시 준수 관찰",
+     "same": false,
+     "note": "대조 대상은 위반 수만 측정하고 성공률·비용은 측정하지 않는다"
+    },
+    "target": {
+     "prior": "Python 저장소 과제와 SWE-bench 의 코딩 에이전트",
+     "same": false,
+     "note": "대조 대상의 규칙은 행동·한국어 문체 규칙이며 Python 과제 성공률과 무관한 조항이 많다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Do Context Files Help Coding Agents? 두 에이전트 소거 연구",
+   "url": "https://arxiv.org/abs/2607.27250",
+   "axes": {
+    "purpose": {
+     "prior": "컨텍스트 주입 전략이 정답률에 주는 효과를 평가한다",
+     "same": true,
+     "note": "규칙 파일 효과 평가라는 목적이 같다"
+    },
+    "mechanism": {
+     "prior": "주입 전략 비교 소거, 과제 17개·실행 288회, 동등성 검정",
+     "same": false,
+     "note": "대조 대상은 조항 단위 소거이고 동등성 검정을 쓰지 않는다"
+    },
+    "evaluation": {
+     "prior": "정답 테스트 기반 정답률",
+     "same": false,
+     "note": "대조 대상은 위반 수를 본다"
+    },
+    "target": {
+     "prior": "Claude Code 와 Codex",
+     "same": false,
+     "note": "대조 대상은 단일 호스트 CLI 이다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Instruction Adherence in Coding Agent Configuration Files: 요인 실험",
+   "url": "https://arxiv.org/abs/2605.10039",
+   "axes": {
+    "purpose": {
+     "prior": "설정 파일 구조가 지시 준수에 주는 효과를 측정한다",
+     "same": true,
+     "note": "지시 준수 측정이라는 목적이 같다"
+    },
+    "mechanism": {
+     "prior": "구조 변수 4개 요인 실험, 혼합효과 모형과 베이즈 인자",
+     "same": false,
+     "note": "대조 대상은 조항 문구 유무 소거이고 통계 모형이 없다"
+    },
+    "evaluation": {
+     "prior": "함수 단위 준수율 16,050건",
+     "same": false,
+     "note": "위반 판정이라는 점은 가깝지만 관측 규모와 분석 방법이 다르다"
+    },
+    "target": {
+     "prior": "Claude Code CLI, TypeScript 코드베이스 2개, 사소한 코드 스타일 규칙 하나",
+     "same": false,
+     "note": "호스트는 같으나 대상 지시의 종류가 다르다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 → 2차 해설 블로그 → arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "Prompt Design at Scale: 규칙 수에 따른 준수율",
+   "url": "https://arxiv.org/abs/2607.19257",
+   "axes": {
+    "purpose": {
+     "prior": "시스템 프롬프트가 감당하는 동시 규칙 수를 측정한다",
+     "same": false,
+     "note": "대조 대상의 상시 적재 결정과만 관련된다"
+    },
+    "mechanism": {
+     "prior": "규칙 수 10~160개 × 형식 4종 × 위치 2종",
+     "same": false,
+     "note": "대조 대상은 규칙 수를 변수로 두지 않는다"
+    },
+    "evaluation": {
+     "prior": "완전 준수 응답 비율",
+     "same": false,
+     "note": "대조 대상은 조항별 위반 수다"
+    },
+    "target": {
+     "prior": "모델 5종의 단일 호출",
+     "same": false,
+     "note": "코딩 에이전트 세션이 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "τ-bench pass^k 신뢰성 지표",
+   "url": "https://arxiv.org/abs/2406.12045",
+   "axes": {
+    "purpose": {
+     "prior": "도구 사용 에이전트의 반복 실행 신뢰성을 측정한다",
+     "same": false,
+     "note": "규칙 효과 평가가 목적이 아니다"
+    },
+    "mechanism": {
+     "prior": "같은 과제를 k번 실행해 모두 성공하는 비율을 계산한다",
+     "same": false,
+     "note": "대조 대상은 1회 실행이다"
+    },
+    "evaluation": {
+     "prior": "pass^k",
+     "same": false,
+     "note": "대조 대상은 위반 수 합계다"
+    },
+    "target": {
+     "prior": "고객 응대 도메인의 함수 호출 에이전트",
+     "same": false,
+     "note": "코딩 에이전트가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "promptfoo 반복 실행·단언 평가",
+   "url": "https://www.promptfoo.dev/docs/configuration/reference",
+   "axes": {
+    "purpose": {
+     "prior": "프롬프트 회귀 시험",
+     "same": false,
+     "note": "프롬프트 변경 평가라는 점은 가깝지만 에이전트 세션 규칙 평가 전용이 아니다"
+    },
+    "mechanism": {
+     "prior": "테스트 사례 반복 실행(repeat, 기본 1)과 단언",
+     "same": false,
+     "note": "대조 대상은 자체 셸 스크립트로 1회 실행한다"
+    },
+    "evaluation": {
+     "prior": "llm-rubric·코드 단언 통과율",
+     "same": false,
+     "note": "위반 판정을 LLM 으로 한다는 점은 가깝지만 집계 방식은 확인하지 못했다"
+    },
+    "target": {
+     "prior": "범용 LLM 프롬프트·제공자",
+     "same": false,
+     "note": "훅이 동작하는 CLI 세션을 그대로 실행하는지 확인하지 못했다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 → 공식 문서",
+   "adoption": "참고"
+  }
+ ],
+ "saturation": "3",
+ "not_found": "[\"한국어 문체 규칙의 준수를 LLM 채점자로 판정할 때의 채점자 신뢰도 연구는 검색하지 않았다. 도구 호출 한도 때문이며 독창성의 근거가 아니다.\", \"조항 하나 단위로 소거 시험을 한 공개 사례는 이번 검색에서 찾지 못했다. 찾지 못한 결과는 그런 사례가 없다는 뜻이 아니다.\", \"작은 표본(질문 3~4개)에서 위반 수 비교에 쓸 수 있는 정확 검정(예: McNemar, 부호 검정) 적용 사례는 검색하지 않았다.\"]",
+ "disclosures": "[\"arXiv 사례는 모두 초록 페이지만 열었고 본문 수치(과제 간 26.2%p, 비용 20% 등)는 초록 또는 2차 해설에 기댄다.\", \"조항 ID 61개는 agent-principles.md 의 굵은 조항 ID 를 grep 으로 센 derived 값이며 하위 조항 묶음 ID 포함 여부를 따로 확인하지 않았다.\", \"2607.27250, 2607.19257, 2605.10039 는 동료 심사를 거치지 않은 preprint 이다.\"]",
+ "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"ASYNC-FIRST\", \"STATE-ASSUME\", \"WRITTEN-ONLY\", \"SUBJECT-OBJECT\"]",
+ "notes": "검토한 관점은 기시감(규칙 파일 소거 연구), 결말(성공률 무변화·비용 증가), 전이(1회 실행 잡음, 과제 정체성 효과, 규칙 수 효과), 기준선(규칙 없음 성공률, pass^k, 동등성 검정), 붐빔(promptfoo)이다. 마지막 세 번의 검색이 모두 새 사례를 냈으므로 포화되지 않았다. 추가로 확인할 사항은 LLM 채점자의 한국어 문체 판정 신뢰도(메모리에 Haiku 채점 불가 기록이 있어 평가 타당성과 직결된다)와 작은 표본용 정확 검정 적용 사례다."
+}

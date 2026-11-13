@@ -114,7 +114,7 @@ Bash 로 고친 파일은 모드와 무관하게 Write·Edit 훅에 걸리지 �
 
 조항 변경은 조항별 클린룸 시험으로 확인한다. 도구는 `scripts/eval_clause.sh` 이고, 단위는 `evals/principles/clauses/<조항>/` 의 current.md·new.md 다. 과제는 `evals/principles/cases/` 에 둔다. 생성 모델은 claude-opus-5-5, 판정 모델은 claude-sonnet-5-5 다. 이 시험은 조항 파일 하나만 `CLAUDE.md` 로 싣는다(`evals/principles/README.md`).
 
-2026-10-12 강화 시험의 과제와 채점 기준(`clauses/<조항>/tasks.json·rubric.md`)은 cases 형식으로 옮겨 쓴다. 원본은 main 저장소의 미추적 폴더 `D:\projects\disciplined-coder\docs\superpowers\reviews\2026-10-12-clause-strengthening-check\` 에만 있다. 구현자는 그 폴더를 읽기만 하라.
+2026-10-12 강화 시험의 과제와 채점 기준(`clauses/<조항>/tasks.json·rubric.md`)은 cases 형식으로 옮겨 쓴다. 원본은 저장소 밖 `%USERPROFILE%\.dc-eval\archive\reviews\2026-10-12-clause-strengthening-check\` 에만 있다(2026-11-13 에 main 의 미추적 폴더에서 옮겼다. 시험 원자료 5,616개라 공개 저장소에 커밋하지 않는다). 구현자는 그 폴더를 읽기만 하라.
 
 T4 는 형태를 고르는 과제가 아니라, `BULLET-SCOPE`·`NO-MID-MOD` 의 문안을 정하는 과제다. 구현자는 결정점 문안, 지목형 문안, 긍정형 문안을 각각 현행과 짝지어 조항별 클린룸 시험을 실행하라. 채택 조건을 통과한 문안 중 위반이 가장 적은 문안을 채택하고, 위반 수가 같으면 짧은 문안을 채택하라. T5 는 T4 결과를 문안 초안의 방향으로만 참고하고, 조항마다 따로 조항별 클린룸 시험을 거친다. 위반 1~2건 차이가 측정 흔들림 안에 들기 때문이다(`evals/principles/README.md` 86행).
 

@@ -1,0 +1,439 @@
+{
+ "agent": "agent-prior-art",
+ "mode": "survey",
+ "subquestion_id": "sq4",
+ "search_status": "ok",
+ "queries": [
+  "effective harnesses for long-running agents progress file",
+  "context rot long context performance degradation LLM study",
+  "effective context engineering for AI agents compaction structured note-taking",
+  "instruction following many simultaneous instructions benchmark degradation number of instructions",
+  "Claude Code compaction custom instructions PreCompact hook memory CLAUDE.md docs",
+  "Agentic Context Engineering evolving contexts context collapse brevity bias",
+  "OpenHands context condensation agent long horizon cost performance"
+ ],
+ "read": "[\"https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents\", \"https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents\", \"https://www.trychroma.com/research/context-rot\", \"https://arxiv.org/abs/2507.11538\", \"https://arxiv.org/abs/2509.21051\", \"https://code.claude.com/docs/en/memory\", \"https://code.claude.com/docs/en/context-window\", \"https://arxiv.org/abs/2510.04618\", \"https://openhands.dev/blog/openhands-context-condensensation-for-more-efficient-ai-agents\", \"D:/projects/disciplined-coder/hooks/hooks.json\"]",
+ "issues": [
+  {
+   "where": "설계 결정 (5) 세션 간 맥락 관리: 메모리 파일과 1회성 인계 문서만 두고 압축 뒤 이어 갈 작업 진행 파일 형식이 없다",
+   "type": "known-failure",
+   "claim": "대조 대상에는 진행 파일, 상태를 기계가 읽는 형식의 기능 목록, 세션 시작 시의 동작 확인 단계가 없다. 그래서 선행 사례가 관찰한 실패 원인 두 가지(완료를 일찍 선언하는 문제와 진행 상황을 문서로 남기지 않는 문제)가 대조 대상에도 남아 있다. 게다가 종료 게이트가 코드 테스트 실행 여부를 보지 않으므로, 선행 사례가 '통과' 표시 전에 요구한 테스트 확인 장치에 해당하는 장치도 없다.",
+   "prior_claim": "Anthropic 의 장기 실행 에이전트 하네스는 새 세션이 이전 작업의 기억 없이 시작된다는 문제를 진행 파일(claude-progress.txt), 처음에 모두 failing 으로 표시한 JSON 기능 목록, git 커밋, init.sh 와 세션 시작 시의 기본 종단 간 테스트로 다루었다. 이 사례가 관찰한 실패는 일을 한 번에 너무 많이 하려는 문제, 완료를 일찍 선언하는 문제, 진행을 문서로 남기지 않는 문제, 기능을 일찍 통과로 표시하는 문제였다. Markdown 은 모델이 부적절하게 고치기 쉬워 기능 목록에 JSON 을 골랐다. 벤치마크 수치는 제시하지 않았다.",
+   "consequence": "자동 압축이나 세션 교체 뒤 에이전트는 남은 단계와 검증 상태를 대화 요약과 메모리 색인에서 추정해야 한다. 그 결과 끝나지 않은 단계를 끝났다고 보고할 위험이 대조 대상에서 통제되지 않는다.",
+   "evidence": "선행 사례 원문에 'each new session begins with no memory of what came before', 'It is unacceptable to remove or edit tests' 라고 적혀 있다. 네 축 대조: 목적(장기 작업의 연속성)은 대조 대상의 결정 (5)와 같다. 메커니즘(진행 파일·JSON 기능 목록·시작 시 테스트)은 대조 대상에 없다. 평가는 웹 앱 구축 작업에 대한 정성 관찰이고, 적용 대상은 전체 스택 웹 앱 하나이므로 대조 대상의 범용 규칙 플러그인과 다르다.",
+   "citations": [
+    {
+     "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1) 행동 규칙·문체 규칙·금지어 표를 매 세션 @import 로 상시 적재한다",
+   "type": "known-failure",
+   "claim": "대조 대상은 행동 규칙 문서와 금지어 표를 사용자 전역 CLAUDE.md 의 @import 로 매 세션 전부 적재한다. 공식 문서는 @import 로 나누어도 맥락 비용이 줄지 않는다고 적는다. 그래서 문서가 경고한 '긴 지시 파일이 준수율을 낮춘다'는 조건이 대조 대상에도 적용된다. 대조 대상의 규칙 중 특정 작업(문서 작성, 슬라이드 제목)에만 쓰이는 규칙도 상시 적재되어 있다.",
+   "prior_claim": "Claude Code 공식 메모리 문서는 CLAUDE.md 파일 하나를 200줄 미만으로 두라고 권하고, 긴 파일은 맥락을 더 소비하고 준수율을 낮춘다고 적는다. 일부 코드베이스에만 필요한 지시는 경로 범위 규칙으로 옮겨 해당 파일을 다룰 때만 적재하라고 권한다. @import 는 정리에는 도움이 되지만 가져온 파일도 시작 시 적재되므로 맥락 비용을 줄이지 않는다고 적는다. 또 CLAUDE.md 는 강제 설정이 아닌 맥락으로 취급되며, 반드시 차단해야 할 동작은 PreToolUse 훅을 쓰라고 적는다.",
+   "consequence": "규칙이 늘어날수록 모든 세션의 첫 맥락이 커지고, 문서가 경고한 준수율 저하 조건에 대조 대상이 상시 놓인다. 프롬프트 지시로만 다루는 삭제·외부 전송·비밀 취급(결정 2)도 같은 '맥락' 지위에 머문다.",
+   "evidence": "문서 원문: 'target under 200 lines per CLAUDE.md file. Longer files consume more context and reduce adherence.', 'Imports ... don't reduce its context cost', 'Claude treats them as context, not enforced configuration. To block an action regardless of what Claude decides, use a PreToolUse hook'. 대조 대상의 규칙 문서와 금지어 표의 실제 줄 수는 이번 탐색에서 세지 않았다(파생 판단).",
+   "citations": [
+    {
+     "url": "https://code.claude.com/docs/en/memory",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1) 상시 적재와 (3) 규칙 하나씩 넣고 빼는 소거 시험",
+   "type": "known-failure",
+   "claim": "대조 대상은 규칙 수십 개를 동시에 적재하면서 평가는 규칙 하나씩 넣고 빼는 소거 시험으로 하고, 전체 묶음 비교는 기각했다. 선행 연구가 보고한 '지시 수가 늘면 준수율이 떨어지고 앞쪽 지시에 치우친다'는 효과는 규칙 하나씩의 소거 시험으로는 드러나지 않는다. 그래서 규칙 밀도 효과와 배치 순서 효과가 대조 대상의 평가 체계에서 측정되지 않은 채 남아 있다.",
+   "prior_claim": "IFScale 벤치마크(Jaroslawicz 외, 2025)는 사업 보고서 작성 과제에 키워드 포함 지시를 최대 500개까지 넣어 7개 공급사의 모델 20개를 평가했다. 가장 좋은 최신 모델도 지시 500개에서 정확도가 68%에 그쳤고, 앞쪽 지시를 우선하는 편향이 관찰되었다.",
+   "consequence": "규칙을 더할 때마다 기존 규칙의 준수율이 떨어지더라도 대조 대상의 소거 시험은 새 규칙 하나의 효과만 보므로 그 저하를 검출하지 못한다. 문서 뒤쪽에 놓인 문체 규칙과 금지어 표가 앞쪽 규칙보다 덜 지켜질 가능성도 측정되지 않는다.",
+   "evidence": "초록 원문: 'even the best frontier models only achieve 68% accuracy at the max density of 500 instructions', 'bias towards earlier instructions'. 네 축 대조: 목적(다수 지시의 동시 준수 측정)은 대조 대상의 결정 (3)과 일부만 같다. 메커니즘은 키워드 포함이라는 기계 채점 지시로, 대조 대상의 행동·문체 규칙과 다르다. 적용 대상은 단일 생성 과제로, 대조 대상의 다단계 코딩 세션과 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2507.11538",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1) 상시 적재와 (3) 규칙 하나씩 넣고 빼는 소거 시험",
+   "type": "known-failure",
+   "claim": "대조 대상의 문체 규칙은 코드 생성에도 문체 제약을 동시에 거는 구조다. 선행 연구는 코드 생성에서도 동시 지시 수가 늘면 성능이 일관되게 떨어진다고 보고했다. 대조 대상의 소거 시험은 규칙 하나의 유무만 비교하므로 지시 수에 따른 저하를 측정하지 않는다.",
+   "prior_claim": "ManyIFEval(텍스트, 지시 최대 10개)과 StyleMBPP(코드, 지시 최대 6개) 벤치마크로 LLM 10개를 평가한 연구는 지시 수가 늘수록 성능이 일관되게 떨어진다고 보고했다.",
+   "consequence": "대조 대상이 규칙을 추가해도 규칙 수 증가에 따른 전체 준수율 저하는 대조 대상의 시험 결과에 나타나지 않는다.",
+   "evidence": "초록 원문: 'performance consistently degrades as the number of instructions increases'. 지시 수 범위(최대 10개)는 대조 대상의 규칙 수(수십 개)보다 작아 그대로 외삽할 수 없다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2509.21051",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1) 상시 적재와 (5) 장기 세션 맥락 관리",
+   "type": "known-failure",
+   "claim": "대조 대상은 매 세션 고정 규칙을 맥락 앞쪽에 적재하고 장기 세션의 맥락 길이 관리는 호스트의 자동 압축에 맡긴다. 선행 연구가 보고한 입력 길이 증가에 따른 성능 저하는 대조 대상의 장기 세션에도 적용되며, 대조 대상은 맥락 길이와 규칙 준수의 관계를 측정하지 않는다.",
+   "prior_claim": "Chroma 의 Context Rot 보고서(2025년 7월)는 4개 공급사의 LLM 18개에 194,480회 호출을 실행해, 단순한 과제에서도 입력 길이가 늘면 성능이 크게 달라진다고 보고했다. LongMemEval 에서는 평균 약 300토큰의 집중 프롬프트가 평균 약 113k 토큰의 전체 프롬프트보다 모든 모델에서 성능이 크게 높았고, 방해 문장 하나만 추가해도 성능이 기준보다 떨어졌다.",
+   "consequence": "세션 후반부, 곧 압축 직전 구간에서 규칙 준수율이 떨어지더라도 대조 대상은 그 저하를 관측할 수단이 없다. 대조 대상의 소거 시험은 짧은 단일 질문으로 실행되므로 이 조건을 재현하지 않는다(파생 판단).",
+   "evidence": "보고서 원문: 'model performance varies significantly as input length changes, even on simple tasks', 'Across all models, we see significantly higher performance on focused prompts compared to full prompts'. 과제는 검색·반복 복사 같은 단순 과제로, 대조 대상의 규칙 준수 과제와 메커니즘이 다르다.",
+   "citations": [
+    {
+     "url": "https://www.trychroma.com/research/context-rot",
+     "kind": "blog",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (5) 메모리 파일과 인계 문서의 갱신 방식",
+   "type": "known-failure",
+   "claim": "대조 대상의 메모리 색인과 인계 문서는 에이전트가 요약해 다시 쓰는 방식으로 관리되며, 항목 단위의 증분 갱신 규칙은 확인되지 않았다. 선행 연구가 보고한 '반복 재작성에 따른 맥락 붕괴'의 조건이 대조 대상에도 있다. 이 판단은 대조 대상의 메모리 갱신 절차를 이번 탐색에서 확인하지 않은 가정에 기댄다.",
+   "prior_claim": "ACE(Agentic Context Engineering) 논문은 기존 맥락 적응 방법이 간결한 요약을 위해 도메인 통찰을 버리는 간결성 편향과, 반복 재작성으로 세부가 지워지는 맥락 붕괴를 겪는다고 보고했다. 이 논문은 구조화된 증분 갱신으로 이를 막아 에이전트 과제에서 +10.6%, 금융 과제에서 +8.6% 향상을 보고했다.",
+   "consequence": "메모리 색인을 압축해 다시 쓸 때마다 결정의 근거와 예외 조건이 줄어들어, 다음 세션이 그 결정을 잘못 적용할 수 있다.",
+   "evidence": "초록 원문: 'brevity bias, which drops domain insights for concise summaries', 'context collapse, where iterative rewriting erodes details over time', 'structured, incremental updates that preserve detailed knowledge'. 적용 대상은 AppWorld 에이전트 과제와 금융 과제로, 대조 대상의 세션 간 메모리와 메커니즘이 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2510.04618",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (3) 작업 성공률 미측정과 (7) 토큰 비용 미기록",
+   "type": "weak-baseline",
+   "claim": "대조 대상의 맥락 관리 방식(상시 적재 규칙과 호스트 자동 압축)은 '압축 장치 없음 대 있음'에서 과제 해결률과 비용을 함께 비교하는 기준선과 비교되지 않았다.",
+   "prior_claim": "OpenHands 의 맥락 응축기는 대화가 크기 기준을 넘으면 오래된 상호작용을 사용자 목표·진행·남은 작업·핵심 파일·실패 테스트 중심으로 요약한다. SWE-bench Verified 일부에서 응축기 사용 시 평균 54%, 미사용 기준선 53%를 해결했고, 턴당 API 비용은 최대 2배 줄었다.",
+   "consequence": "대조 대상은 규칙 적재와 맥락 관리 방식이 과제 해결률과 토큰 비용에 주는 영향을 수치로 말할 수 없다.",
+   "evidence": "블로그 원문: 응축기 54% 대 기준선 53%, 'less than half the cost'. 이 수치는 공급사 자체 보고이며 독립 재현을 찾지 못했다.",
+   "citations": [
+    {
+     "url": "https://openhands.dev/blog/openhands-context-condensensation-for-more-efficient-ai-agents",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (1) 행동 규칙 수십 개를 목록으로 상시 적재한다",
+   "type": "known-failure",
+   "claim": "대조 대상의 규칙은 조항 목록과 금지어 표 형식이다. 선행 지침이 피하라고 한 '예외 상황의 긴 목록' 형식이 대조 대상의 형식과 같다. 대조 대상은 그 지침이 권한 '대표 예시 몇 개' 형식과 비교하지 않았다.",
+   "prior_claim": "Anthropic 의 맥락 공학 지침은 맥락을 한계 효용이 줄어드는 유한 자원으로 보고, 토큰이 늘수록 맥락에서 정보를 정확히 회상하는 능력이 떨어진다고 적는다. 이 지침은 시스템 프롬프트에 예외 상황의 긴 목록을 채우지 말고 다양한 대표 예시를 두라고 권한다. 장기 작업 기법으로 압축, 구조화된 메모(NOTES.md 와 할 일 목록), 서브에이전트를 제시하며 효과 수치는 제시하지 않았다.",
+   "consequence": "규칙이 늘어날수록 맥락 비용과 회상 저하가 같이 커지는 형식을 대조 대상이 유지하고 있다.",
+   "evidence": "원문: 'a finite resource with diminishing marginal returns', 'laundry list of edge cases', 'diverse, canonical examples'. 지침이며 정량 결과가 없으므로 실패 사례 근거로는 약하다.",
+   "citations": [
+    {
+     "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "설계 결정 (2) 비차단 넛지 훅과 (5) 압축 뒤 맥락 유지",
+   "type": "known-failure",
+   "claim": "대조 대상의 문서 검진 넛지는 PostToolUse 훅이 맥락에 추가하는 알림이다. 공식 문서에 따르면 그런 알림은 압축 때 대화와 함께 요약된다. 대조 대상은 규칙 넛지만 SessionStart 의 compact 매처로 다시 주입하므로, 압축 이전에 받은 검진 넛지의 미처리 지적은 요약 품질에 따라 사라질 수 있다.",
+   "prior_claim": "Claude Code 공식 문서에 따르면 압축 뒤 프로젝트 루트 CLAUDE.md 와 자동 메모리는 디스크에서 다시 주입되지만, 훅이 앞서 추가한 맥락은 대화와 함께 요약된다. compact 소스에 매칭된 SessionStart 훅은 실행되어 출력이 압축된 맥락에 추가된다. 실행한 스킬 본문은 스킬당 5,000토큰, 합계 25,000토큰 한도로 다시 주입되며 앞부분만 남기고 잘린다.",
+   "consequence": "장기 세션에서 압축이 일어나면 넛지로 알린 위반과 미처리 검진 항목이 이후 작업에서 빠질 수 있고, 길이가 5,000토큰을 넘는 스킬은 뒷부분 지시가 잘린 채 다시 주입된다.",
+   "evidence": "문서 표: 'Context that hooks added earlier | Summarized with the rest of the conversation', 'Invoked skill bodies | Re-injected, capped at 5,000 tokens per skill'. 대조 대상 D:/projects/disciplined-coder/hooks/hooks.json 24-28행에서 rules_nudge_sessionstart.sh 만 'startup|resume|clear|compact' 매처를 쓴다. 대조 대상 스킬 본문의 토큰 수는 세지 않았다.",
+   "citations": [
+    {
+     "url": "https://code.claude.com/docs/en/context-window",
+     "kind": "vendor",
+     "opened": true
+    }
+   ]
+  }
+ ],
+ "evidence_map": [
+  {
+   "case": "Anthropic 장기 실행 에이전트 하네스(진행 파일·JSON 기능 목록·init.sh)",
+   "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents",
+   "axes": {
+    "purpose": {
+     "prior": "여러 세션에 걸친 장기 코딩 작업의 연속성 확보",
+     "same": false,
+     "note": "대조 대상의 결정 (5) 세션 간 맥락 관리 구성요소와만 같고, 대조 대상 전체(규칙·문체·리뷰 플러그인)의 목적과는 다르다"
+    },
+    "mechanism": {
+     "prior": "초기화 에이전트와 코딩 에이전트, 진행 파일, 처음에 failing 으로 둔 JSON 기능 목록, git 커밋, 세션 시작 시 종단 간 테스트",
+     "same": false,
+     "note": "대조 대상에는 진행 파일 형식과 시작 시 테스트가 없다"
+    },
+    "evaluation": {
+     "prior": "웹 앱 구축 과정의 정성 관찰, 수치 없음",
+     "same": false,
+     "note": "대조 대상은 규칙별 위반 수를 비교하는 소거 시험을 쓴다"
+    },
+    "target": {
+     "prior": "전체 스택 웹 앱 개발",
+     "same": false,
+     "note": "대조 대상은 범용 코딩 세션에 실리는 규칙 플러그인이다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 후 공급사 엔지니어링 블로그 원문",
+   "adoption": "참고"
+  },
+  {
+   "case": "Anthropic 맥락 공학 지침(압축·구조화된 메모·서브에이전트)",
+   "url": "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents",
+   "axes": {
+    "purpose": {
+     "prior": "유한한 맥락을 장기 작업에 맞게 관리",
+     "same": false,
+     "note": "대조 대상의 결정 (1)·(5) 구성요소와만 관련된다"
+    },
+    "mechanism": {
+     "prior": "적절한 추상 수준의 시스템 프롬프트, 대표 예시, 압축, 도구 결과 삭제, NOTES.md 메모, 서브에이전트",
+     "same": false,
+     "note": "대조 대상은 조항 목록을 상시 적재하고 서브에이전트 리뷰어를 쓴다. 서브에이전트 사용만 일부 같다"
+    },
+    "evaluation": {
+     "prior": "정량 결과 없음, 정성 서술",
+     "same": false,
+     "note": "평가 방식이 없다"
+    },
+    "target": {
+     "prior": "일반 LLM 에이전트",
+     "same": false,
+     "note": "대조 대상은 특정 CLI 호스트의 플러그인이다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 후 공급사 엔지니어링 블로그 원문",
+   "adoption": "참고"
+  },
+  {
+   "case": "Claude Code 메모리 문서의 CLAUDE.md 길이 지침",
+   "url": "https://code.claude.com/docs/en/memory",
+   "axes": {
+    "purpose": {
+     "prior": "세션 간 지시와 학습 내용 유지",
+     "same": false,
+     "note": "대조 대상의 결정 (1)·(5) 구성요소와 같다"
+    },
+    "mechanism": {
+     "prior": "200줄 미만 CLAUDE.md, 경로 범위 규칙의 필요 시 적재, 자동 메모리 앞 200줄 적재, 차단은 PreToolUse 훅",
+     "same": false,
+     "note": "대조 대상은 이 장치 위에서 @import 로 전부 상시 적재한다"
+    },
+    "evaluation": {
+     "prior": "제시된 측정 없음, 준수율 저하를 경고로만 적음",
+     "same": false,
+     "note": "대조 대상은 소거 시험을 쓴다"
+    },
+    "target": {
+     "prior": "Claude Code 사용자 전반",
+     "same": false,
+     "note": "대조 대상은 그 호스트 위 특정 플러그인이다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "공식 문서 직접 열람",
+   "adoption": "흡수"
+  },
+  {
+   "case": "Claude Code 압축 후 유지 항목 표",
+   "url": "https://code.claude.com/docs/en/context-window",
+   "axes": {
+    "purpose": {
+     "prior": "압축 뒤 어떤 맥락이 남는지 규정",
+     "same": false,
+     "note": "대조 대상의 결정 (5) 구성요소와 관련된다"
+    },
+    "mechanism": {
+     "prior": "루트 CLAUDE.md·자동 메모리 재주입, 훅 추가 맥락은 요약, compact 매처 SessionStart 훅 재실행, 스킬 본문 5,000토큰 한도",
+     "same": false,
+     "note": "대조 대상은 규칙 넛지만 compact 매처로 재주입한다"
+    },
+    "evaluation": {
+     "prior": "측정 없음, 동작 명세",
+     "same": false,
+     "note": "평가가 아닌 동작 문서다"
+    },
+    "target": {
+     "prior": "Claude Code 세션",
+     "same": false,
+     "note": "대조 대상이 실행되는 호스트이며 대조 대상 자체는 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "공식 문서 직접 열람",
+   "adoption": "흡수"
+  },
+  {
+   "case": "Chroma Context Rot 보고서",
+   "url": "https://www.trychroma.com/research/context-rot",
+   "axes": {
+    "purpose": {
+     "prior": "입력 길이 증가가 LLM 성능에 주는 영향 측정",
+     "same": false,
+     "note": "대조 대상의 목적은 규칙 준수 유도이며 맥락 길이 측정은 하지 않는다"
+    },
+    "mechanism": {
+     "prior": "변형 바늘 찾기, 방해 문장, 반복 단어 복사, LongMemEval 집중 대 전체 프롬프트",
+     "same": false,
+     "note": "측정 방법이며 대조 대상의 메커니즘과 다르다"
+    },
+    "evaluation": {
+     "prior": "LLM 18개, 194,480회 호출",
+     "same": false,
+     "note": "대조 대상은 질문 3개 이상, 조건마다 1회 실행한다"
+    },
+    "target": {
+     "prior": "단순 검색·복사 과제",
+     "same": false,
+     "note": "대조 대상은 다단계 코딩 세션이다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "blog",
+   "source_level": "1차",
+   "route": "웹 검색 후 연구 보고서 원문",
+   "adoption": "참고"
+  },
+  {
+   "case": "IFScale(지시 수 확장 벤치마크)",
+   "url": "https://arxiv.org/abs/2507.11538",
+   "axes": {
+    "purpose": {
+     "prior": "동시 지시 수 증가에 따른 준수율 측정",
+     "same": false,
+     "note": "대조 대상의 결정 (3) 평가 구성요소와 관련되나 대조 대상은 지시 밀도를 측정하지 않는다"
+    },
+    "mechanism": {
+     "prior": "보고서 작성 과제에 키워드 포함 지시 최대 500개",
+     "same": false,
+     "note": "대조 대상 규칙은 행동·문체 규칙이다"
+    },
+    "evaluation": {
+     "prior": "모델 20개, 규칙 기반 채점, 최고 68%, 앞쪽 지시 편향",
+     "same": false,
+     "note": "대조 대상은 규칙 하나씩의 소거 시험이다"
+    },
+    "target": {
+     "prior": "단일 생성 과제",
+     "same": false,
+     "note": "대조 대상은 코딩 에이전트 세션이다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "ManyIFEval·StyleMBPP(다중 지시 준수 측정)",
+   "url": "https://arxiv.org/abs/2509.21051",
+   "axes": {
+    "purpose": {
+     "prior": "지시 수 증가에 따른 준수율 측정과 예측",
+     "same": false,
+     "note": "대조 대상의 평가 구성요소와만 관련된다"
+    },
+    "mechanism": {
+     "prior": "텍스트 지시 최대 10개, 코드 지시 최대 6개",
+     "same": false,
+     "note": "대조 대상의 규칙 수와 종류가 다르다"
+    },
+    "evaluation": {
+     "prior": "LLM 10개, 지시 수에 따른 일관된 저하",
+     "same": false,
+     "note": "대조 대상은 위반 수 비교만 한다"
+    },
+    "target": {
+     "prior": "텍스트·코드 생성",
+     "same": false,
+     "note": "대조 대상은 에이전트 세션이다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "ACE(진화하는 맥락의 증분 갱신)",
+   "url": "https://arxiv.org/abs/2510.04618",
+   "axes": {
+    "purpose": {
+     "prior": "에이전트 맥락을 축적·갱신해 성능 향상",
+     "same": false,
+     "note": "대조 대상의 메모리 관리 구성요소와만 관련된다"
+    },
+    "mechanism": {
+     "prior": "생성·성찰·큐레이션 역할의 구조화된 증분 갱신",
+     "same": false,
+     "note": "대조 대상의 메모리는 에이전트가 자유롭게 다시 쓴다(가정)"
+    },
+    "evaluation": {
+     "prior": "AppWorld 와 금융 벤치마크, +10.6%, +8.6%",
+     "same": false,
+     "note": "대조 대상은 과제 성공률을 측정하지 않는다"
+    },
+    "target": {
+     "prior": "에이전트 과제와 도메인 추론",
+     "same": false,
+     "note": "대조 대상은 코딩 세션의 규칙 플러그인이다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고"
+  },
+  {
+   "case": "OpenHands 맥락 응축기",
+   "url": "https://openhands.dev/blog/openhands-context-condensensation-for-more-efficient-ai-agents",
+   "axes": {
+    "purpose": {
+     "prior": "장기 코딩 세션의 비용 억제와 성능 유지",
+     "same": false,
+     "note": "대조 대상의 결정 (5)·(7) 구성요소와 관련된다"
+    },
+    "mechanism": {
+     "prior": "크기 기준 초과 시 오래된 턴을 목표·진행·남은 작업·실패 테스트 중심으로 요약",
+     "same": false,
+     "note": "대조 대상은 압축을 호스트에 맡기고 자체 요약 형식이 없다"
+    },
+    "evaluation": {
+     "prior": "SWE-bench Verified 일부, 54% 대 53%, 턴당 비용 최대 2배 절감",
+     "same": false,
+     "note": "대조 대상은 성공률과 비용을 측정하지 않는다"
+    },
+    "target": {
+     "prior": "소프트웨어 공학 과제 에이전트",
+     "same": false,
+     "note": "대조 대상은 규칙 플러그인이다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 후 공급사 블로그",
+   "adoption": "참고"
+  }
+ ],
+ "saturation": "2",
+ "not_found": "[\"압축 뒤 규칙 준수율 변화를 직접 측정한 공개 연구는 찾지 못했다. 사용자 이슈 보고(압축 뒤 CLAUDE.md 를 무시한다는 보고)만 검색 결과에 있었고 열지 않았다. 이 결과는 독창성의 근거가 아니다.\", \"한국어 문체 규칙을 상시 적재한 조건의 준수율 연구는 찾지 못했다. 검색 범위를 영어 일반 용어로 한정했기 때문이다.\", \"Context-Folding(arXiv 2510.11967)과 ACON(arXiv 2510.00615)은 검색 결과에 나왔으나 도구 호출 한도 때문에 열지 않아 인용하지 않았다.\"]",
+ "disclosures": "[\"Chroma 보고서는 벡터 DB 공급사의 연구 페이지이며 동료 심사를 거치지 않았다.\", \"OpenHands 의 54% 대 53%와 2배 비용 절감은 공급사 자체 보고이며 독립 재현을 찾지 못했다.\", \"대조 대상의 규칙 문서 줄 수, 스킬 본문의 토큰 수, 메모리 갱신 절차는 이번 탐색에서 측정하거나 확인하지 않았다. 해당 이슈의 전이 판단은 이 가정에 기댄다(derived).\", \"ArXiv 논문은 초록만 열었고 본문 수치는 확인하지 않았다.\"]",
+ "principles_applied": "[\"NO-ASSUME\", \"EVIDENCE-FIRST\", \"SECRETS\", \"ASYNC-FIRST\", \"STATE-ASSUME\", \"SUBJECT-OBJECT\"]",
+ "notes": "검토한 관점은 진행 상태 파일 유무, 상시 적재 규칙의 길이와 밀도, 맥락 길이에 따른 성능 저하, 압축 뒤 유지 항목, 메모리 재작성에 따른 정보 손실, 압축 기준선과 비용 측정이다. 붐빔 관점에서는 호스트가 이미 경로 범위 규칙, 자동 메모리, compact 매처 SessionStart 훅, PreCompact 훅을 제공하므로 대조 대상이 별도 맥락 관리 장치를 새로 지을 이유는 약하다. 그러나 대조 대상이 그런 장치를 새로 짓고 있다는 증거가 없어 crowded 이슈로 올리지 않았다. 추가 확인이 필요한 항목은 세 가지다. 첫째, 대조 대상 규칙 문서와 금지어 표의 실제 줄 수와 토큰 수를 세어 호스트 문서의 200줄 권고와 비교해야 한다. 둘째, 스킬 본문 중 5,000토큰을 넘는 스킬이 있는지 확인해야 압축 뒤 잘림 위험을 확정할 수 있다. 셋째, Context-Folding 과 ACON 논문을 열어 요약 기반 압축 대비 결과를 확인해야 한다."
+}
