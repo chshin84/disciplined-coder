@@ -32,11 +32,11 @@ for f in $SCAFFOLD_FILES $SCAFFOLD_REFS; do
                *)   src="$PLUGIN_ROOT/$f"; dst="$KDIR/$f" ;; esac
   view=""
   if [ "$f" = "korean-banned-words.md" ] && [ -f "$src" ]; then
-    view="$(mktemp)"
-    if banned_view "$src" > "$view" 2>/dev/null; then
+    if view="$(mktemp 2>/dev/null)" && banned_view "$src" > "$view" 2>/dev/null; then
       src="$view"
     else
-      rm -f "$view"
+      if [ -n "$view" ]; then rm -f "$view"; fi
+      view=""
       echo "[disciplined-coder] ERROR: 금지어 상시 보기를 만들지 못했다 — $src (이전 사본이 있으면 그것이 그대로 쓰인다). 나머지 셋업은 계속한다."
       continue
     fi

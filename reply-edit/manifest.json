@@ -12,7 +12,7 @@
     { "id": "NO-ANALOGY", "kind": "edit" },
     { "id": "COUNT-EARNS", "kind": "edit" },
     { "id": "NUM-PRONOUN", "kind": "edit", "source": "korean-banned-words.md", "match": "수사를 대명사처럼" },
-    { "id": "PERIOD-NAE", "kind": "edit", "source": "korean-banned-words.md", "match": "기간은 'N내'" },
+    { "id": "PERIOD-NAE", "kind": "edit", "source": "korean-banned-words.md", "match": "기간은 `N내`" },
     { "id": "BOTTOM-LINE", "kind": "reorder" },
     { "id": "STATUS-FIRST", "kind": "reorder" }
   ],

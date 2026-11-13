@@ -38,6 +38,7 @@ check "banlist: 첫 세션 stdout 에 목록도 실린다" "printf '%s' \"\$OUT\
 VIEW_REF="$(mktemp)"; ( . "$HERE/hooks/_banned_words.sh"; banned_view "$HERE/korean-banned-words.md" ) > "$VIEW_REF"
 check "금지어 사본이 원본 표로 만든 상시 보기와 같다" "cmp -s '$VIEW_REF' '$K/korean-banned-words.md'"
 check "금지어 사본에 표가 없다"                     "! grep -qF '|---|' '$K/korean-banned-words.md'"
+rm -f "$VIEW_REF"
 touch -d '2000-01-01' "$K/korean-banned-words.md"; REF6="$(mktemp)"; touch -d '2001-01-01' "$REF6"
 run "$H1" "$P1" > /dev/null
 check "같은 상시 보기는 다시 쓰지 않는다"           "[ ! '$K/korean-banned-words.md' -nt '$REF6' ]"
