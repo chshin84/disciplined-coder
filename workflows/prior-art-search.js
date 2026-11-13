@@ -1,7 +1,7 @@
 export const meta = {
   name: 'prior-art-search',
   description: '하위 질문마다 연구자를 실행하고 인용을 검증자로 판정해 통과한 선행 사례만 모은다',
-  whenToUse: 'researching-prior-art 오케스트레이터가 사용자가 승인한 프로토콜로만 실행한다.',
+  whenToUse: 'researching-prior-art 오케스트레이터가 쓴 프로토콜로만 실행한다.',
   phases: [
     { title: 'Research' },
     { title: 'Verify' },
