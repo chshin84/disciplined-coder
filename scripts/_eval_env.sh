@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# 공유: 평가 실행 스크립트(eval_clause.sh)의 환경 준비. 인증 키 읽기, 실제 설정 지문,
-# 평가 임시 폴더를 둔다.
+# 공유: 평가 실행 스크립트(eval_replay.sh)의 환경 준비. 인증 키 읽기, 실제 설정 지문,
+# 평가 임시 폴더를 둔다. eval_replay.sh 는 ancestor_claude 로 생성 임시 폴더의 상위 CLAUDE.md 를 확인한다.
 
 # 인증 키를 저장소 밖 파일에서 읽어 환경 변수로만 넘긴다. 출력하거나 다른 파일에 쓰지 않는다.
 eval_load_key() {
@@ -15,7 +15,7 @@ eval_fingerprint() { (cd "$1" && sha256sum CLAUDE.md disciplined-coder/*.md sett
 
 # $1 의 상위 경로(자신 포함)에서 가장 가까운 CLAUDE.md 나 .claude/CLAUDE.md 의 경로를 낸다. 없으면 아무것도 내지 않는다.
 # Claude Code 는 작업 폴더에서 위로 올라가며 이 파일들을 싣는다. 2026-10-18 측정에서 사용자 홈 아래 /tmp 의
-# 세션에는 ~/.claude/CLAUDE.md 가 실렸다(evals/principles/README.md 「실행 도구」).
+# 세션에는 ~/.claude/CLAUDE.md 가 실렸다(2026-11-17 삭제한 evals/principles/README.md 「실행 도구」, 태그 archive/v1-final).
 ancestor_claude() {
   local d="$1"
   while :; do

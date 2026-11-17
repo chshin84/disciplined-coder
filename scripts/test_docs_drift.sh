@@ -73,7 +73,7 @@ check "스캐폴드 사본 목록에 문체 공격 항목이 있다" "( . \"\$HE
 # 지운 스킬 이름을 가리키는 문서가 남으면 열리지 않는 스킬을 찾는다. 살아 있는 문서는 실리는 지시문과
 # 실행 코드(원칙·스킬·에이전트·훅·스크립트·워크플로·커맨드·설정)와 참고서다. 공통 제외 목록은
 # REMOVED_REF_EXCLUDES 가 소유하고, 참고서의 「v1 조항 근거」 절은 v1 의 근거를 보관하므로 뺀다. 이 검사
-# 파일은 찾을 이름을 적고 있어 뺀다. evals/ 의 평가 과제와 docs/html-reports/ 는 그때의 입력과 결과다.
+# 파일은 찾을 이름을 적고 있어 뺀다. docs/html-reports/ 는 그때의 결과다.
 REMOVED_SKILLS_RE='dispatching-lenses|review-specs|review-docs'
 ref_excluded() {  # $1=레포 상대 경로 → 공통 제외 목록에 들면 참
   local e
@@ -151,10 +151,10 @@ echo "[소유 표] 소유는 하나뿐이고 나머지는 가리킨다"
 # 있었다. 넷째 문서가 복제하면 검사가 지나쳤다. 이제 소유자도 대상도 도출한다.
 # 살아 있는 문서 목록은 아래 두 구획(소유 표·대구 한도)이 함께 쓴다. 한 번만 뽑는다.
 # 앞으로도 읽히고 고쳐질 문서만이다. 스펙과 계획과 지난 기록과 인수인계는 그때의 판단을 남긴 것이라 뺀다.
-# evals/ 아래 평가 과제는 일부러 위반을 담은 시험 자료라 뺀다. 머리 12줄에 superseded 가 있으면 대체된
+# 머리 12줄에 superseded 가 있으면 대체된
 # 설계 문서라 뺀다. 목록을 손으로 적지 않고 git 색인에서 도출한다.
 LIVE_DOCS="$(cd "$HERE" && git ls-files '*.md' | LC_ALL=C awk '
-  /^docs\/superpowers\// || /^evals\// || /(^|\/)HANDOFF-[^\/]*$/ { next }
+  /^docs\/superpowers\// || /(^|\/)HANDOFF-[^\/]*$/ { next }
   {
     f = $0; hit = 0
     for (i = 0; i < 12 && (getline line < f) > 0; i++) if (tolower(line) ~ /superseded/) { hit = 1; break }
@@ -305,7 +305,7 @@ EOF
 #
 # 「」 참조는 레포 전체의 제목 집합과 맞춘다. 문서끼리 「」로 절을 가리키는 것이 이 레포의 관례라 한 파일
 # 안으로 좁히면 정당한 상호 참조가 실패한다. 이름 뒤에 설명절(` (`·` —`)을 다는 제목이 많아 이름 부분만
-# 맞춘다. 평가 과제의 프롬프트(evals/principles/cases)는 문서가 아닌 시험 입력이라 제목 집합에서 뺀다.
+# 맞춘다.
 # 「」 참조를 보는 문서는 실리는 지시문(원칙·금지어 목록·스킬·에이전트)이다. 참고서는 지운 절과 문서 밖 자료의
 # 이름을 「」로 적은 이력 문장이 많아 경로만 본다.
 # 제목 집합을 파이프로 넘기지 않고 here-string 으로 넘긴다. `printf | grep -q` 는 pipefail 과 맞물려
@@ -313,7 +313,7 @@ EOF
 echo "[문서가 가리키는 경로와 「」 절이 실재한다]"
 # 제목 집합은 git 이 추적하거나 추적할 문서(.gitignore 밖)에서만 뽑는다. 작업 폴더에 남은 임시 문서의 제목이
 # 섞이면 지운 절을 가리킨 참조가 그 임시 문서 덕에 통과한다.
-HEADINGS="$(cd "$HERE" && git ls-files -z --cached --others --exclude-standard -- '*.md' ':!:evals/principles/cases/*' \
+HEADINGS="$(cd "$HERE" && git ls-files -z --cached --others --exclude-standard -- '*.md' \
   | xargs -0 cat 2>/dev/null | grep -E '^#+ '| sed 's/^#\+ *//' | LC_ALL=C.UTF-8 sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
 sec_refs() {  # $1=파일 → 「」 참조 이름(코드 블록과 「v1 조항 근거」 절 밖, 설명절을 뗀 이름)
   awk '{ sub(/\r$/, "") } /^```/ { fence = !fence; next } !fence && /^## / { v1 = (index($0, "## v1 조항 근거") == 1) } !fence && !v1' "$1" \
@@ -515,8 +515,7 @@ anti_count() {  # $1=파일 경로 → 이 문서에 남은 대구의 개수
 }
 echo "[대구 한도] 글 한 편에 한 번까지"
 # 금지 표현 목록과 근거 파일은 뺀다. 목록은 표의 분류 설명이, 근거 파일은 고쳐 쓰지 않는 사용자 원문
-# 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다. evals/ 는
-# 살아 있는 문서 목록이 이미 뺀다.
+# 인용이 대구를 쓴다. 한도에 맞추려면 그 설명이나 원문을 바꿔야 한다.
 ANTI_DOCS="$(printf '%s\n' "$LIVE_DOCS" | grep -v -e '^korean-banned-words.md$' -e '^docs/korean-banned-words-evidence.md$')"
 # 세는 것이 실제로 세는지 먼저 본다. 이 자기시험이 없으면 세는 함수가 늘 0 을 내도 초록이 된다.
 ANTI_TMP="$(mktemp -d)"
