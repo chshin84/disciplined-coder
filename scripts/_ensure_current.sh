@@ -36,7 +36,7 @@
 # $1=설정 홈(~/.claude). 사용자에게 보일 줄을 stdout 으로 낸다. 어느 분기에서도 0 으로 끝난다 —
 # 갱신 확인이 세션 시작을 막지 않는다.
 ensure_install_current() {
-  local home="$1" inst out id sha url ref name dir head rc bin curl kdir seen stuck restart=0 notes="" root au lock tmo got today err
+  local home="$1" inst out id sha url ref name dir head rc bin curl kdir seen stuck restart=0 notes="" root au lock tmo got today err hlocal nsha
   inst="$home/plugins/installed_plugins.json"
   [ -f "$inst" ] || return 0
 
@@ -96,12 +96,18 @@ sys.exit(1)
     head="$("$curl" -s -f -m 2 "$url/info/refs?service=git-upload-pack" 2>/dev/null \
       | grep -ao '[0-9a-f]\{40\} HEAD' | head -1 | cut -c1-40)"
   fi
-  [ -n "$head" ] || head="$(git -C "$dir" rev-parse HEAD 2>/dev/null || true)"
+  # 로컬 사본과 비교할 때는 사본이 설치본의 후손일 때만 뒤처진 것으로 본다. 사본이 옛 커밋이거나 설치본
+  # 커밋을 사본에서 찾지 못하면(조상 관계를 확인할 수 없으면) 알리지 않는다 — 갱신을 실행해도 옮길 새 버전이
+  # 없고, 매 세션 거짓 알림이 뜬다.
+  hlocal=0
+  if [ -z "$head" ]; then head="$(git -C "$dir" rev-parse HEAD 2>/dev/null || true)"; hlocal=1; fi
 
   # 설치 기록의 값이 줄임 해시일 수 있어 양쪽으로 접두사를 비교한다.
   if [ -z "$head" ] || case "$head" in "$sha"*) true ;; *) false ;; esac \
      || case "$sha" in "$head"*) true ;; *) false ;; esac; then
     rm -f "$kdir/update.stuck"
+  elif [ "$hlocal" -eq 1 ] && ! git -C "$dir" merge-base --is-ancestor "$sha" "$head" >/dev/null 2>&1; then
+    :
   else
     # 시험에서 실제 명령을 실행하지 않도록 주입한다.
     bin="${DISCIPLINED_CODER_CLAUDE_BIN:-claude}"
@@ -138,15 +144,26 @@ sys.exit(1)
       rm -f "$err"
       [ "$rc" -eq 0 ] && { $tmo "$bin" plugin update "$id" >/dev/null 2>&1 || rc=$?; }
       rmdir "$lock" 2>/dev/null || true
+      # 명령이 0 으로 끝나도 설치 기록의 커밋이 바뀌어야 옮긴 것이다. 그대로면 다시 켜도 옛 버전이 실리므로
+      # 실패와 같이 그날은 다시 시도하지 않고 알린다.
+      nsha="$sha"
+      if [ "$rc" -eq 0 ]; then
+        out="$(json_run "$prog" "$inst" "$home/plugins/known_marketplaces.json" "$home/settings.json" 2>/dev/null || true)"
+        IFS='|' read -r _ nsha _ <<< "$out"
+        if [ -z "$nsha" ] || [ "$nsha" = "$sha" ]; then rc=-1; nsha="$sha"; fi
+      fi
       if [ "$rc" -eq 0 ]; then
         restart=1
         rm -f "$kdir/update.stuck"
-        printf '%s\n' "$head" > "$kdir/update.seen"
+        printf '%s\n' "$nsha" > "$kdir/update.seen"
         notes="${notes:+$notes
-}설치본을 원격에 맞춰 옮겼다(${sha:0:7} → ${head:0:7}). 클로드 코드는 켤 때 플러그인을 읽으므로 이 세션은 옛 버전으로 실행된다."
+}설치본을 원격에 맞춰 옮겼다(${sha:0:7} → ${nsha:0:7}). 클로드 코드는 켤 때 플러그인을 읽으므로 이 세션은 옛 버전으로 실행된다."
       else
         printf '%s\n' "$today" > "$kdir/update.stuck"
-        if [ "$rc" -eq 124 ]; then
+        if [ "$rc" -eq -1 ]; then
+          notes="${notes:+$notes
+}설치본이 원격보다 뒤처져 갱신 명령을 실행했는데 설치 기록의 커밋이 그대로다(${sha:0:7} → ${head:0:7}). 내일 첫 세션에서 다시 시도한다. 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
+        elif [ "$rc" -eq 124 ]; then
           notes="${notes:+$notes
 }설치본이 원격보다 뒤처졌는데 갱신 명령이 60초 안에 끝나지 않아 멈췄다(${sha:0:7} → ${head:0:7}). 내일 첫 세션에서 다시 시도한다. 직접 실행하라: $bin plugin marketplace update $name && $bin plugin update $id"
         else

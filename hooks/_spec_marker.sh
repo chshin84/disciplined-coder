@@ -5,13 +5,15 @@
 # 여기와 같은 마커를 적는지는 scripts/test_docs_drift.sh가 코드에서 뽑아 대조한다.
 # 마커는 줄 전체여야 한다. 문자열 일부로 찾으면 마커를 산문으로 언급하기만 한 문서도 통과해
 # 하드 게이트가 조용히 열린다 — 마커를 남기라고 안내하는 문장이 마지막 줄이면 그렇게 된다.
-# 그래서 마커로 시작하고 주석이 닫히는 줄만 인정한다. CRLF 체크아웃의 끝 CR은 먼저 걷는다.
+# 그래서 마커로 시작하고 주석이 닫히는 줄만 인정한다. 줄 끝 공백과 CRLF 체크아웃의 끝 CR은 먼저 걷는다.
+# passed·escalated 바로 뒤에는 공백이나 주석 닫힘만 온다 — `passedX` 같은 다른 낱말은 마커가 아니다.
 marker_is_terminal() {  # $1=파일 → 마지막 비공백 줄이 terminal 마커면 0, 아니면 1
   local last
   last="$(grep -v '^[[:space:]]*$' "$1" 2>/dev/null | tail -n 1 || true)"
-  last="${last%$'\r'}"
+  last="${last%"${last##*[![:space:]]}"}"
   case "$last" in
-    '<!-- spec-review: passed'*'-->'|'<!-- spec-review: escalated'*'-->') return 0 ;;
+    '<!-- spec-review: passed-->'|'<!-- spec-review: passed '*'-->') return 0 ;;
+    '<!-- spec-review: escalated-->'|'<!-- spec-review: escalated '*'-->') return 0 ;;
     *) return 1 ;;
   esac
 }
@@ -20,12 +22,12 @@ marker_is_terminal() {  # $1=파일 → 마지막 비공백 줄이 terminal 마�
 # 한쪽에 손으로 한 번 더 적으면 디렉터리를 더할 때 그쪽만 낡는다.
 SPECPLAN_DIRS="docs/superpowers/specs docs/superpowers/plans"
 
-# spec/plan 경로 술어: superpowers 기본 경로에 있는 .md인가.
+# spec/plan 경로 술어: superpowers 기본 경로에 있는 .md인가(확장자 대소문자 무관).
 # 절대경로(훅 입력)와 상대경로(git 출력) 모두 매치되도록 선행 구분자를 요구하지 않는다.
 path_is_specplan() {  # $1=경로 → spec/plan 경로면 0
   local d
   for d in $SPECPLAN_DIRS; do
-    case "$1" in *"$d"/*.md) return 0 ;; esac
+    case "$1" in *"$d"/*.[mM][dD]) return 0 ;; esac
   done
   return 1
 }
@@ -84,12 +86,13 @@ path_in_own_repo() {  # $1=경로 → 이 저장소 자신의 문서이면 0
   return 1
 }
 
-# 금지 표현 검사(doc_word_posttooluse.sh)의 대상인가. 대상은 `.md` 가운데 아래 셋에 안 드는 것이다.
+# 금지 표현 검사(doc_word_posttooluse.sh)의 대상인가. 대상은 `.md`·`.html`·`.htm`(확장자 대소문자 무관)
+# 가운데 아래 셋에 안 드는 것이다.
 #   Claude 메모리(`/.claude/projects/`) — 나에게 남기는 쪽지이고 금지어를 목록으로 적어 둘 곳이다.
 #   `docs/superpowers/` 아래 — spec·plan·리뷰 기록이다. 레포 뿌리 기준 상대경로(git status)도 받는다.
 #   이 저장소 자신의 문서 — path_in_own_repo 가 판정한다.
 path_is_banned_target() {  # $1=경로 → 검사 대상이면 0
-  case "$1" in *.md) ;; *) return 1 ;; esac
+  case "$1" in *.[mM][dD]|*.[hH][tT][mM]|*.[hH][tT][mM][lL]) ;; *) return 1 ;; esac
   case "$1" in */.claude/projects/*|*/docs/superpowers/*|docs/superpowers/*) return 1 ;; esac
   path_in_own_repo "$1" && return 1
   return 0

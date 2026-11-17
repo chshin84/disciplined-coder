@@ -109,11 +109,12 @@ check "HEAD spec에 마커 추가 후 → 통과(Fix C)"    "[ -z \"\$(stop '{\"
 ( cd "$G3" && git add -A && git commit -qm 'mark reviewed' )
 check "마커 커밋 후(HEAD=수정 커밋) → 통과(Fix C)" "[ -z \"\$(stop '{\"cwd\":\"$G3\"}')\" ]"
 
-# 세션이 시작되기 전에 만든 초안은 이 세션의 일이 아니다(FOCUSED). 표시가 없으면 지금처럼 전부 본다.
+# 세션이 시작되기 전에 만든 초안은 이 세션의 작업이 아니다. 표시 파일에 적힌 목록이 그 초안이다.
+# 표시가 없으면 지금처럼 전부 본다.
 G4="$(mktemp -d)"; ( cd "$G4" && git init -q && git config user.email t@t && git config user.name t )
 mkdir -p "$G4/docs/superpowers/specs"; printf 'old draft\n' > "$G4/docs/superpowers/specs/old.md"
 touch -d '2000-01-01' "$G4/docs/superpowers/specs/old.md"
-mkdir -p "$TMPDIR/disciplined-coder"; : > "$TMPDIR/disciplined-coder/session-start-s9"
+mkdir -p "$TMPDIR/disciplined-coder"; printf 'docs/superpowers/specs/old.md\n' > "$TMPDIR/disciplined-coder/session-start-s9"
 check "세션 전 초안은 막지 않는다"          "[ -z \"\$(stop '{\"cwd\":\"$G4\",\"session_id\":\"s9\"}')\" ]"
 check "세션 표시가 없으면 전부 본다"        "stop '{\"cwd\":\"$G4\",\"session_id\":\"s10\"}' | grep -q '\"block\"'"
 check "세션 ID 가 없으면 전부 본다"         "stop '{\"cwd\":\"$G4\"}' | grep -q '\"block\"'"
@@ -137,11 +138,13 @@ JSU() { printf '{"session_id":"%s","hook_event_name":"SessionStart","source":"%s
 check "세션 시작은 아무것도 안 낸다"           "[ -z \"\$(printf '%s' '$(JSU st0 startup)' | bash '$CSTA')\" ]"
 printf '%s' "$(JSU st1 startup)" | bash "$CSTA" || true
 check "startup 이면 세션 시작 표시를 남긴다"   "[ -f \"\$TMPDIR/disciplined-coder/session-start-st1\" ]"
-touch -d '2000-01-01' "$TMPDIR/disciplined-coder/session-start-st1"
+# 수정 시각을 옛날로 돌리면 7일 지난 표시 지우기에 걸리므로 내용으로 본다.
+printf 'keep\n' > "$TMPDIR/disciplined-coder/session-start-st1"
 printf '%s' "$(JSU st1 startup)" | bash "$CSTA" || true
-check "있는 표시는 다시 쓰지 않는다"          "[ ! \"\$TMPDIR/disciplined-coder/session-start-st1\" -nt \"\$HERE/README.md\" ]"
+check "있는 표시는 다시 쓰지 않는다"          "[ \"\$(cat \"\$TMPDIR/disciplined-coder/session-start-st1\")\" = keep ]"
 printf '%s' "$(JSU st2 resume)" | bash "$CSTA" || true
-check "resume 에서는 표시를 새로 만들지 않는다" "[ ! -e \"\$TMPDIR/disciplined-coder/session-start-st2\" ]"
+printf '%s' "$(JSU st3 clear)" | bash "$CSTA" || true
+check "resume·clear 에서도 표시가 없으면 만든다" "[ -e \"\$TMPDIR/disciplined-coder/session-start-st2\" ] && [ -e \"\$TMPDIR/disciplined-coder/session-start-st3\" ]"
 
 echo "[bash 매처 — 셸로 고쳐도 걸린다]"
 # 셸로 고치면 Write·Edit 입력에 경로가 없어 금지 표현 통지가 빠지는 것을 이 묶음이 막는다.
@@ -167,7 +170,8 @@ DWPOST_OUT="$(JB "sed -i s/x/y/ $BW/draft.md" | bash "$DWPOST")"
 check "셸 편집 → 금지 표현 통지를 PostToolUse JSON 의 additionalContext 로 낸다" \
   "printf '%s' \"\$DWPOST_OUT\" | grep -qF '\"additionalContext\"' && printf '%s' \"\$DWPOST_OUT\" | grep -qF '\"hookEventName\":\"PostToolUse\"' && ! printf '%s' \"\$DWPOST_OUT\" | grep -qF 'systemMessage' && printf '%s' \"\$DWPOST_OUT\" | json_valid_stdin"
 check "통지가 파일 이름을 담는다"   "printf '%s' \"\$DWPOST_OUT\" | grep -qF 'draft.md'"
-check "셸 통지는 원래 있던 문장을 고치지 말라고 한다" "printf '%s' \"\$DWPOST_OUT\" | grep -qF '원래 있던 문장의 말은 고치지 말고'"
+check "셸 통지는 원래 있던 문장을 고치지 말라고 한다" "printf '%s' \"\$DWPOST_OUT\" | grep -qF '원래 있던 문장은 고치지 마라'"
+check "셸 통지는 사용자에게 알리라고 하지 않는다" "! printf '%s' \"\$DWPOST_OUT\" | grep -qF '사용자에게 알리'"
 check "이 저장소 문서는 대상 아님"  "[ -z \"\$(JB 'sed -i s/x/y/ $HERE/README.md' | bash '$DWPOST')\" ]"
 # 금지 표현이 없는 산출물에는 통지가 없어야 한다. 늘 뜨면 통지가 뜻을 잃는다.
 printf '이 문서는 대상을 지적한다.\n' > "$BW/clean.md"
@@ -245,15 +249,22 @@ echo 자리
 
 본문 문장이다.
 ' > "$DWDIR/fenced.md"
-check "코드 블록 안을 고친 Edit 은 알리지 않는다" "[ -z \"\$(dwp '$(JEd "$DWDIR/fenced.md" 'echo old' 'echo 자리')')\" ]"
+check "코드 블록 안을 고친 Edit 은 알리지 않는다" "[ -z \"\$(dwp '$(JEd "$DWDIR/fenced.md" 'echo old' 'echo 자리' '' ',"tool_response":{"originalFile":"# 제목\n\n```sh\necho old\n```\n\n본문 문장이다.\n"}')')\" ]"
 printf '```sh
 echo 자리
 ```
 
 echo 자리 는 산문이다.
 ' > "$DWDIR/replall.md"
-check "replace_all 은 바뀐 곳 전부를 본다"      "dwp '$(JEd "$DWDIR/replall.md" 'echo old' 'echo 자리' ',"replace_all":true')' | grep -qF additionalContext"
-check "replace_all 이 아니면 처음 한 곳만 본다" "[ -z \"\$(dwp '$(JEd "$DWDIR/replall.md" 'echo old' 'echo 자리')')\" ]"
+printf '```sh
+echo 자리
+```
+
+echo old 는 산문이다.
+' > "$DWDIR/replone.md"
+DWRORIG=',"tool_response":{"originalFile":"```sh\necho old\n```\n\necho old 는 산문이다.\n"}'
+check "replace_all 은 바뀐 곳 전부를 본다"      "dwp '$(JEd "$DWDIR/replall.md" 'echo old' 'echo 자리' ',"replace_all":true' "$DWRORIG")' | grep -qF additionalContext"
+check "replace_all 이 아니면 처음 한 곳만 본다" "[ -z \"\$(dwp '$(JEd "$DWDIR/replone.md" 'echo old' 'echo 자리' '' "$DWRORIG")')\" ]"
 # tool_response 의 원래 파일이 있으면 치환을 다시 적용해 바뀐 곳을 정확히 찾는다. 같은 글자가 앞의 코드 블록에
 # 있어도 산문에 넣은 쪽을 본다.
 printf '```
@@ -413,6 +424,84 @@ done
 check "모든 훅 스크립트가 어딘가에 배선되어 있다" "[ -z \"\$unwired\" ]"
 [ -n "$unwired" ] && echo "    어느 배선 파일에도 없는 훅:$unwired"
 
+echo "[적대 점검 — PowerShell 연결과 셸 쓰기 구문]"
+# 2026-11-17 적대 점검이 재현한 결함마다 검사를 하나 이상 둔다. 실제 훅 입력처럼 cwd 를 tool_name 앞에 둔다.
+JP() { printf '{"tool_name":"PowerShell","tool_input":{"command":"%s"}}' "$1"; }
+JBC() { printf '{"cwd":"%s","tool_name":"%s","tool_input":{"command":"%s"}}' "$1" "$2" "$3"; }
+psx() { ( . "$HERE/hooks/_hook_input.sh"; . "$HERE/hooks/_extract_ps_targets.sh"; ps_write_targets "$1" ) 2>/dev/null | tr '\n' ' '; }
+hmatch() { json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding="utf-8"))["hooks"][sys.argv[2]]; print(" ".join(g.get("matcher","") for g in d for h in g["hooks"] if sys.argv[3] in h["command"]))' "$HJ" "$1" "$2"; }
+check "읽기 전용 훅 매처에 Bash·PowerShell 이 있다" "hmatch PreToolUse readonly_pretooluse.sh | grep -qw Bash && hmatch PreToolUse readonly_pretooluse.sh | grep -qw PowerShell"
+check "금지어 훅 매처에 PowerShell 이 있다"         "hmatch PostToolUse doc_word_posttooluse.sh | grep -qw PowerShell"
+PSCMD='Set-Content -Path a.md -Value x; Get-Date | Out-File -FilePath b.md; "x" | Add-Content c.md; Copy-Item s.md -Destination d.md; echo x > e.md; echo y 2>$null; Set-Content -Encoding utf8 f.md "z"'
+check "PowerShell 쓰기 대상을 뽑는다"               "[ \"\$(psx \"\$PSCMD\")\" = 'a.md b.md c.md d.md e.md f.md ' ]"
+check "PowerShell 읽기 명령은 대상이 없다"          "[ -z \"\$(psx 'Get-Content a.md | Select-String \"x > y.md\"')\" ]"
+check "PowerShell 로 쓴 산출물의 금지 표현을 알린다" "dwp '$(JP "Set-Content -Path $BW/draft.md -Value x")' | grep -qF additionalContext"
+# 읽기 전용 파일은 셸로 고쳐도 거부한다.
+check "셸 재지향으로 읽기 전용 파일에 쓰면 deny"    "rpre '$(JB "echo x > $RO/sealed.md")' | grep -qF '\"permissionDecision\":\"deny\"'"
+check "sed -i·cp 대상이 읽기 전용이면 deny"         "rpre '$(JB "sed -i s/a/b/ $RO/sealed.md")' | grep -qF deny && rpre '$(JB "cp $RO/open.md $RO/sealed.md")' | grep -qF deny"
+check "PowerShell 로 읽기 전용 파일에 쓰면 deny"    "rpre '$(JP "Set-Content -Path $RO/sealed.md -Value x")' | grep -qF deny"
+check "셸로 읽기만 하면 읽기 전용이어도 통과"       "[ -z \"\$(rpre '$(JB "cat $RO/sealed.md")')\" ]"
+# 쓰기 구문: 1>·&>·>| 는 쓰기이고 2> 와 따옴표 안의 > 는 쓰기가 아니다.
+check "1>·&>·>| 재지향을 쓰기로 본다"               "gate_runs '$(JB 'echo x 1> f.md')' && gate_runs '$(JB 'echo x &> f.md')' && gate_runs '$(JB 'echo x >| f.md')' && [ \"\$(ebt 'echo x 1> f.md; echo y &> g.md; echo z >| h.md')\" = 'f.md g.md h.md ' ]"
+check "따옴표 안의 > 는 재지향이 아니다"            "! gate_runs '$(JB 'git commit -m \"a > notes.md\"')' && [ -z \"\$(ebt 'git commit -m \"a > notes.md\"')\" ]"
+mkdir -p "$BW/outdir" "$BW/outdir2"; cp "$BW/draft.md" "$BW/outdir/"; cp "$BW/draft.md" "$BW/outdir2/"
+check "cp 목적지가 폴더면 원본 이름을 붙인다"       "dwp '$(JB "cp $BW/draft.md $BW/outdir")' | grep -qF 'outdir/draft.md'"
+check "cp -t 폴더 형식을 처리한다"                  "dwp '$(JB "cp -t $BW/outdir2 $BW/draft.md")' | grep -qF 'outdir2/draft.md'"
+check "셸 상대 경로는 훅 입력 cwd 기준으로 푼다"    "( cd / && printf '%s' '$(JBC "$BW" Bash "sed -i s/x/y/ draft.md")' | bash '$DWPOST' ) | grep -qF additionalContext"
+check "읽기 전용 훅도 cwd 기준으로 푼다"            "( cd / && printf '%s' '$(JBC "$RO" Bash "echo x > sealed.md")' | bash '$RPRE' ) | grep -qF deny"
+check "Write 상대 경로도 cwd 기준으로 푼다"         "( cd / && printf '{\"cwd\":\"%s\",\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"draft.md\"}}' '$BW' | bash '$DWPOST' ) | grep -qF additionalContext"
+
+echo "[적대 점검 — 세션 시작 표시와 Stop 게이트]"
+check "세션 시작 표시 훅이 startup·resume·clear 에 실행된다" "[ \"\$(ssm spec_gate_sessionstart.sh)\" = 'startup|resume|clear' ]"
+G5="$(mktemp -d)"; ( cd "$G5" && git init -q && git config user.email t@t && git config user.name t )
+mkdir -p "$G5/docs/superpowers/specs"; printf 'pre\n' > "$G5/docs/superpowers/specs/pre.md"
+printf '{"session_id":"s5","cwd":"%s","hook_event_name":"SessionStart","source":"startup"}' "$G5" | bash "$CSTA" || true
+check "세션 시작 표시에 그때의 미추적 spec 목록을 적는다" "grep -qxF 'docs/superpowers/specs/pre.md' \"\$TMPDIR/disciplined-coder/session-start-s5\""
+printf 'late\n' > "$G5/docs/superpowers/specs/late.md"; touch -d '2000-01-01' "$G5/docs/superpowers/specs/late.md"
+check "목록에 없는 새 spec 은 수정 시각이 오래되어도 막는다" "stop '{\"cwd\":\"$G5\",\"session_id\":\"s5\"}' | grep -qF 'late.md'"
+check "목록에 있는 세션 전 초안은 막지 않는다"     "! stop '{\"cwd\":\"$G5\",\"session_id\":\"s5\"}' | grep -qF 'pre.md'"
+mkdir -p "$TMPDIR/disciplined-coder"; : > "$TMPDIR/disciplined-coder/session-start-old7"; touch -d '2000-01-01' "$TMPDIR/disciplined-coder/session-start-old7"
+printf '%s' "$(JSU st7 startup)" | bash "$CSTA" || true
+check "7일 지난 세션 시작 표시를 지운다"            "[ ! -e \"\$TMPDIR/disciplined-coder/session-start-old7\" ] && [ -e \"\$TMPDIR/disciplined-coder/session-start-st7\" ]"
+GW="$(mktemp -d)"; REALGIT="$(command -v git)"
+printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s/log"\nexec "%s" "$@"\n' "$GW" "$REALGIT" > "$GW/git"; chmod +x "$GW/git"
+( PATH="$GW:$PATH"; export PATH; stop "{\"cwd\":\"$G5\"}" ) >/dev/null || true
+check "Stop 의 git status 는 spec·plan 폴더만 본다" "grep '^status' '$GW/log' | grep -qF 'docs/superpowers/specs'"
+G6="$(mktemp -d)"; ( cd "$G6" && git init -q && git config user.email t@t && git config user.name t )
+mkdir -p "$G6/docs/superpowers/specs"; printf 'draft\n' > "$G6/docs/superpowers/specs/UPPER.MD"
+check "대문자 .MD spec 도 Stop 이 막는다"           "stop '{\"cwd\":\"$G6\"}' | grep -qF 'UPPER.MD'"
+mterm() { ( . "$HERE/hooks/_spec_marker.sh"; marker_is_terminal "$1" ); }
+printf 'body\n<!-- spec-review: passed -->   \n' > "$T/mk-trail.md"
+printf 'body\n<!-- spec-review: passedX -->\n' > "$T/mk-glued.md"
+printf 'body\n<!-- spec-review: escalatedfoo lenses=2 -->\n' > "$T/mk-glued2.md"
+check "마커 뒤 줄 끝 공백을 허용한다"               "mterm '$T/mk-trail.md'"
+check "passed·escalated 에 글자가 붙은 마커는 인정하지 않는다" "! mterm '$T/mk-glued.md' && ! mterm '$T/mk-glued2.md'"
+
+echo "[적대 점검 — 금지어 알림]"
+printf '값은 `x 이고 이 자리는 남는다.\n다음 줄의 ` 표시다.\n' > "$DWDIR/tick.md"
+check "짝 없는 백틱은 다음 줄까지 가리지 않는다"   "dwp '$(JW "$DWDIR/tick.md")' | grep -qF additionalContext"
+printf '\xff\xfe 이 자리는 남는다.\n' > "$DWDIR/badutf.md"
+check "잘못된 UTF-8 이 섞여도 검사한다"             "dwp '$(JW "$DWDIR/badutf.md")' | grep -qF additionalContext"
+printf '현재는 상태다.\n' > "$DWDIR/excl.md"
+check "Edit 구간 밖 제외어로 이어진 말은 잡지 않는다" "[ -z \"\$(dwp '$(JEd "$DWDIR/excl.md" 'X' '재는' '' ',"tool_response":{"originalFile":"현X 상태다.\n"}')')\" ]"
+printf '```\n자리\n```\n\n자리\n' > "$DWDIR/noorig.md"
+check "원래 파일이 없으면 new_string 자체를 검사한다" "dwp '$(JEd "$DWDIR/noorig.md" 'X' '자리')' | grep -qF additionalContext"
+printf '%s\n' "$DWBODY" > "$DWDIR/upper.MD"
+check "대문자 .MD 산출물도 검사한다"               "dwp '$(JW "$DWDIR/upper.MD")' | grep -qF additionalContext"
+printf '<html><body><p>이 자리는 남는다.</p></body></html>\n' > "$DWDIR/page.html"
+printf '<p class="자리">본문이다.</p><script>var 자리 = 1;</script><style>/* 자리 */</style>\n' > "$DWDIR/tags.html"
+check "HTML 산출물 본문의 금지 표현을 알린다"      "dwp '$(JW "$DWDIR/page.html")' | grep -qF additionalContext"
+check "HTML 의 태그·script·style 안은 검사하지 않는다" "[ -z \"\$(dwp '$(JW "$DWDIR/tags.html")')\" ]"
+check "알림이 자연스러우면 그대로 두라고 한다"     "printf '%s' \"\$DWW_OUT\" | grep -qF '문장 전체가 자연스러우면 그대로 두고'"
+NL="$T/nolist"; mkdir -p "$NL/hooks" "$NL/scripts"; cp "$HERE"/hooks/*.sh "$NL/hooks/"; cp "$HERE/scripts/_json_valid.sh" "$NL/scripts/"
+check "금지어 목록이 없으면 검사하지 못했다고 알린다" "printf '%s' '$(JW "$DWDIR/report.md")' | bash '$NL/hooks/doc_word_posttooluse.sh' | grep -qF '금지어 목록이 없어 검사하지 못했다'"
+check "doc_word 는 입력을 한 번에 읽는다"           "! grep -qF \"read -r -d ''\" '$DWPOST' && grep -qF 'INPUT=\"\$(cat)\"' '$DWPOST'"
+check "낡은 주석: 셸 대상 뽑기가 Stop 겹을 말하지 않는다" "! grep -qF 'Stop 에서' '$EBT'"
+check "낡은 주석: 금지어 헬퍼가 없는 훅을 소비자로 적지 않는다" "! grep -qF '훅 셋' '$HERE/hooks/_banned_words.sh'"
+check "낡은 주석: doc_word 가 프로그램이 쓴 파일을 못 본다고 적는다" "grep -qF '프로그램이 쓴 파일' '$DWPOST'"
+check "낡은 주석: 리마인더가 3단계 측정을 가리킨다" "! grep -qF '측정은 아직 없' '$HERE/hooks/reply_reminder_userpromptsubmit.sh' && grep -qF 'v2 상시 지시 검증' '$HERE/hooks/reply_reminder_userpromptsubmit.sh'"
+check "낡은 주석: Stop 이 v1 조항 ID 를 쓰지 않는다" "! grep -qF 'FOCUSED' '$STOP'"
+
 echo "[훅 계약 — 끄는 변수 없음, 거부 없는 알림, 금지어 없는 지시문]"
 # 끄는 환경 변수를 두지 않는다. 판정 대상은 훅 코드의 `"${DISCIPLINED_CODER_X:-on}" = "off"` 같은 비교다.
 check "끄는 환경 변수가 없다" "! grep -rqE 'DISCIPLINED_CODER_[A-Z_]+.*= *\"?off' '$HERE/hooks'"
@@ -433,6 +522,11 @@ HU1="$(mktemp -d)"; uc_fixture "$HU1" "$A40" 0 "$B40" > /dev/null; run_uc "$HU1"
 HU2="$(mktemp -d)"; uc_fixture "$HU2" "$A40" 7 "$B40" > /dev/null; run_uc "$HU2" | htext > "$HB/update_fail.txt" || true
 rpre "$(J "$RO/sealed.md")" | htext > "$HB/readonly.txt" || true
 printf '' | bash "$HERE/hooks/reply_reminder_userpromptsubmit.sh" | htext > "$HB/reply_reminder.txt" || true
+# scaffold 의 stdout 은 SessionStart 맥락으로 Claude 에게 간다. 두 번째 실행의 출력(핸드오프·플러그인 알림)을 본다 —
+# 첫 실행은 원칙과 목록 전문을 싣는데 그 검사는 test_docs_drift.sh 가 맡는다. 홈은 모두 임시 폴더로 돌린다.
+HSC="$(mktemp -d)"; PSC="$(mktemp -d)"; printf '# 인계\n' > "$PSC/HANDOFF-x.md"
+scf() { HOME="$HSC" USERPROFILE="$HSC" CLAUDE_CONFIG_DIR="$HSC/.claude" CLAUDE_HOME_DIR="$HSC/.claude" CLAUDE_PROJECT_DIR="$PSC" CLAUDE_PLUGIN_ROOT="$HERE" bash "$HERE/scripts/scaffold.sh" 2>/dev/null; }
+scf > /dev/null || true; scf > "$HB/scaffold.txt" || true
 HB_EMPTY=""; HB_BAD=""
 for f in "$HB"/*.txt; do
   [ -s "$f" ] || HB_EMPTY="$HB_EMPTY $(basename "$f")"

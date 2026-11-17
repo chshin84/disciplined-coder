@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 공유: 훅 입력 JSON 을 셸 파라미터 확장만으로 읽는다. 소비자는 이 파일을 source 하는 훅이다.
-# 외부 명령을 띄우지 않는다. 훅은 Write·Edit·Bash 마다 돌아 프로세스 하나가 곧 매 호출의 값이다.
+# 외부 명령을 띄우지 않는다. 훅은 Write·Edit·Bash·PowerShell 마다 돌아 프로세스 하나가 곧 매 호출의 값이다.
 # 읽는 입력은 호출자의 $INPUT 이다. 값은 찍지 않고 변수에 담는다 — `$( )` 는 외부 명령이 없어도
 # 서브셸을 하나 만든다. jq 에 기대지 않는다.
 # 입력이 작은 훅(Bash 전용·SessionStart·Stop)은 stdin 을 `IFS= read -r -d '' INPUT || true` 로 읽는다.
@@ -72,29 +72,105 @@ hook_command() {
   CMD="$rest"
 }
 
-# 셸 명령에 파일을 쓰는 구문이 있는가. 대상 뽑기(_extract_bash_targets.sh) 앞의 거르기라 넓게 두되
-# 낱말 경계로 본다 — `passed`·`used` 속의 sed 와 `2>/dev/null` 이 걸리면 거의 모든 셸 호출이 지나간다.
-# 명령어 자리는 줄 처음이거나 구분자(; & | ( 개행) 뒤다. sed 와 tee 는 xargs 뒤에도 오므로 낱말이면 된다.
-# 재지향은 > 와 >> 이되, 앞에 숫자나 & 가 붙은 것(2> &>)과 >&2 와 >/dev/null 은 파일에 쓰지 않는다.
-bash_cmd_writes() {  # $1=명령 → 쓰기 구문이 있으면 0
-  local c rest pre post
-  c=";${1//[$'\n\t']/ }"
-  c="${c//[&|()]/;}"
-  while [[ $c == *'; '* ]]; do c="${c//; /;}"; done
-  case "$c" in
-    *[\;\ ]sed\ -i*|*[\;\ ]sed\ *\ -i*|*[\;\ ]tee\ *|*\;cp\ *|*\;mv\ *|*\;git\ mv\ *) return 0 ;;
+
+# 훅 입력의 cwd 를 HOOK_CWD 에 담는다(슬래시 정규화). 셸 명령과 Write·Edit 의 상대 경로를 풀 기준이다.
+# 훅 프로세스의 현재 폴더는 세션의 작업 폴더와 다를 수 있다. cwd 가 없으면 빈 값이고, 그때 상대 경로는
+# 현재 폴더 기준으로 남는다.
+hook_cwd() {
+  json_str cwd HOOK_CWD
+  slash_norm HOOK_CWD
+}
+
+# 상대 경로를 기준 폴더 아래로 옮긴다. 절대 경로(/…, D:…, //서버)와 기준 폴더가 빈 값이면 그대로다.
+path_resolve() {  # $1=변수 이름, $2=기준 폴더
+  local _pr_v="${!1}"
+  slash_norm _pr_v
+  case "$_pr_v" in
+    /*|[A-Za-z]:*) ;;
+    *) if [ -n "${2:-}" ]; then _pr_v="${2%/}/${_pr_v#./}"; fi ;;
   esac
-  rest="$1"
+  printf -v "$1" '%s' "$_pr_v"
+}
+
+# 따옴표 안의 글자를 Q 한 글자로 바꿔 UNQ 에 담는다. 따옴표 안의 > 와 명령 이름은 셸 구문이 아니다
+# (`git commit -m "a > b.md"`). 짝이 없는 따옴표부터 끝까지는 그대로 둔다. 따옴표 안의 이스케이프는
+# 풀지 않는다 — 거르기라 넓게 지나가도 대상 뽑기가 한 번 더 가른다.
+cmd_unquote() {  # $1=명령 → UNQ
+  local s="$1" pre q d='"' sq="'"
+  UNQ=""
+  while :; do
+    pre="${s%%[$d$sq]*}"
+    if [ "${#pre}" -eq "${#s}" ]; then UNQ+="$s"; return 0; fi
+    q="${s:${#pre}:1}"; s="${s:$((${#pre}+1))}"
+    case "$s" in
+      *"$q"*) UNQ+="${pre}Q"; s="${s#*"$q"}" ;;
+      *) UNQ+="$pre$q$s"; return 0 ;;
+    esac
+  done
+}
+
+# 따옴표를 걷은 명령에 파일로 가는 재지향이 있는가. >·>>·>|·1>·&>·*> 는 쓰기다. 1 이 아닌 번호(2>)와
+# 복제(>&2·2>&1), /dev/null·$null 은 파일에 쓰지 않는다. bash 와 PowerShell 이 같은 판정을 쓴다.
+cmd_redirect_writes() {  # $1=따옴표를 걷은 명령 → 파일 재지향이 있으면 0
+  local rest="$1" pre post w
   while [[ $rest == *'>'* ]]; do
     pre="${rest%%>*}"; post="${rest#*>}"
     [[ $post == '>'* ]] && post="${post#>}"
+    [[ $post == '|'* ]] && post="${post#|}"
     rest="$post"
-    case "$pre" in *[0-9\&]) continue ;; esac
+    w="${pre##*[[:space:]\;\&\|\(]}"
+    if [[ -n $w && $w != *[!0-9]* ]]; then [ "$w" = 1 ] || continue; fi
     post="${post#"${post%%[![:space:]]*}"}"
     case "$post" in
-      ''|'&'*|/dev/null|/dev/null[\ \;\|\&\)]*) continue ;;
+      ''|'&'*|/dev/null|/dev/null[\ \;\|\&\)]*|'$null'|'$null'[\ \;\|\)]*) continue ;;
     esac
     return 0
   done
   return 1
+}
+
+# 셸 명령에 파일을 쓰는 구문이 있는가. 대상 뽑기(_extract_bash_targets.sh) 앞의 거르기라 넓게 두되
+# 낱말 경계로 본다 — `passed`·`used` 속의 sed 와 `2>/dev/null` 이 걸리면 거의 모든 셸 호출이 지나간다.
+# 명령어 자리는 줄 처음이거나 구분자(; & | ( 개행) 뒤다. sed 와 tee 는 xargs 뒤에도 오므로 낱말이면 된다.
+bash_cmd_writes() {  # $1=명령 → 쓰기 구문이 있으면 0
+  local c
+  cmd_unquote "$1"
+  c=";${UNQ//[$'\n\t']/ }"
+  c="${c//[&|()]/;}"
+  while [[ $c == *'; '* ]]; do c="${c//; /;}"; done
+  case "$c" in
+    *[\;\ ]sed\ -i*|*[\;\ ]sed\ *\ -i*|*[\;\ ]sed\ --in-place*|*[\;\ ]tee\ *|*\;cp\ *|*\;mv\ *|*\;git\ mv\ *) return 0 ;;
+  esac
+  cmd_redirect_writes "$UNQ"
+}
+
+# 셸 대상 뽑기(_extract_bash_targets.sh·_extract_ps_targets.sh)가 낸 줄을 경로로 푼다. 보통 줄은 경로 하나다.
+# "@c<탭>목적지<탭>원본…" 은 cp·mv 줄이라 목적지가 폴더이면 원본 이름을 붙이고, "@d<탭>폴더<탭>원본…" 은
+# 목적지가 폴더로 정해진 줄(cp -t)이다. 상대 경로는 기준 폴더 아래로 옮기고, 같은 경로는 한 번만 낸다.
+targets_resolve() {  # $1=기준 폴더, stdin=뽑은 줄 → 경로를 한 줄에 하나
+  local line k dst rest s b p seen=$'\n'
+  local -a srcs
+  while IFS= read -r line; do
+    [ -n "$line" ] || continue
+    case "$line" in
+      @[cd]$'\t'*)
+        k="${line:1:1}"; line="${line:3}"
+        dst="${line%%$'\t'*}"; rest=""
+        [[ $line == *$'\t'* ]] && rest="${line#*$'\t'}"
+        path_resolve dst "${1:-}"
+        if [ "$k" = d ] || [ -d "$dst" ]; then
+          IFS=$'\t' read -r -a srcs <<< "$rest"
+          for s in ${srcs+"${srcs[@]}"}; do
+            slash_norm s; s="${s%/}"; b="${s##*/}"
+            [ -n "$b" ] || continue
+            p="${dst%/}/$b"
+            case "$seen" in *$'\n'"$p"$'\n'*) ;; *) seen+="$p"$'\n'; printf '%s\n' "$p" ;; esac
+          done
+          continue
+        fi
+        p="$dst" ;;
+      *) p="$line"; path_resolve p "${1:-}" ;;
+    esac
+    case "$seen" in *$'\n'"$p"$'\n'*) ;; *) seen+="$p"$'\n'; printf '%s\n' "$p" ;; esac
+  done
 }

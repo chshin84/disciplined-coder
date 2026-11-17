@@ -167,11 +167,20 @@ esac
 # @import만 빠지면 세션은 원칙 없이 도는데 파일이 다 있어 아무도 눈치채지 못한다.
 inject_rc=0
 # 관리블록은 에이전트원칙과 금지 표현 목록을 함께 싣는다. 다른 플러그인이 목록을 싣고 있어도
-# 이 두 줄은 그대로 쓴다.
-printf '%s\n' '@disciplined-coder/agent-principles.md' '@disciplined-coder/korean-banned-words.md' \
-  | managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" 2>&1 || inject_rc=$?
-if [ "$inject_rc" -ne 0 ]; then
+# 이 두 줄은 그대로 쓴다. 블록 안에 이 두 줄과 다른 줄이 있으면 다시 쓰기 전에 사본을 뜬다(_managed_block.sh).
+# 사본 경로를 돌려받아야 하므로 파이프로 부르지 않는다.
+block_bk="$KDIR/backups/CLAUDE.md.block.$(date +%Y%m%d-%H%M%S 2>/dev/null || echo unknown).bak"
+managed_block_inject "$UC" "$MANAGED_BEGIN" "$MANAGED_END" "$block_bk" 2>&1 <<'BODYEOF' || inject_rc=$?
+@disciplined-coder/agent-principles.md
+@disciplined-coder/korean-banned-words.md
+BODYEOF
+block_note=""
+if [ "$inject_rc" -eq 3 ]; then
+  block_note="🔵 disciplined-coder: $UC 의 관리블록 안에 기대 본문과 다른 줄이 있는데 사본을 뜨지 못해 그대로 두었다($KDIR/backups 에 쓸 수 있게 되면 다음 세션에 다시 시도한다)."
+elif [ "$inject_rc" -ne 0 ]; then
   echo "[disciplined-coder] ERROR: $UC 의 @import 배선을 못 했다 — 이 세션에는 원칙이 실리지 않는다. 위 사유를 보고 고친 뒤 새 세션을 열어라."
+elif [ -n "$managed_block_backup" ]; then
+  block_note="🔵 disciplined-coder: $UC 의 관리블록 안에 기대 본문과 다른 줄이 있어 블록을 다시 썼다. 블록 밖 줄은 그대로 두었다(사본: $managed_block_backup)."
 fi
 
 # [first-session-dump] 첫 세션 도달 보강: CLAUDE.md는 이 훅보다 먼저 로드되므로, 블록을 방금 만든 세션은
@@ -189,7 +198,7 @@ if [ "$had_import" -eq 0 ]; then
 fi
 # 무엇을 했는지 알린다. 파일을 고쳤으면 조용히 넘기지 않는다 — 사용자가 열어 둔 레포가 바뀌었을 수
 # 있고, 그 사실은 사본 경로와 함께 눈에 보여야 한다.
-for note in "$pointer_note" "$shared_note"; do
+for note in "$pointer_note" "$shared_note" "$block_note"; do
   if [ -n "$note" ]; then printf '%s\n' "$note"; fi
 done
 
@@ -262,7 +271,7 @@ if [ -n "${CLAUDE_PROJECT_DIR:-}" ] && [ -d "${CLAUDE_PROJECT_DIR:-}" ]; then
     ho_left="$ho_left $(basename "$ho")"
   done
   if [ -n "$ho_left" ]; then
-    echo "WARNING disciplined-coder: 핸드오프가 남아 있다 —$ho_left. 담긴 것을 영속처로 옮긴 뒤 지워라. 미루려면 그 파일 머리에 handoff-keep-until: YYYY-MM-DD 를 적어라."
+    echo "WARNING disciplined-coder: 핸드오프가 남아 있다 —$ho_left. 그 내용을 오래 남길 문서(spec·결정 기록·메모리)로 옮긴 뒤 지워라. 미루려면 그 파일 머리에 handoff-keep-until: YYYY-MM-DD 를 적어라."
   fi
 fi
 
