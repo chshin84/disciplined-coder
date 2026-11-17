@@ -53,6 +53,16 @@ done <<EOF
 $( [ -f "$LR" ] && doc_sec "$LR" '카테고리와 렌즈' | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u )
 EOF
 check "lens-review 카테고리 표의 렌즈가 모두 실재한다" "[ -f \"\$LR\" ] && [ -z \"\$LR_MISS\" ]"
+# 렌즈에 기준으로 넘기는 파일(CRITERIA)이 없으면 렌즈가 기준 없이 판정한다. 경로는 저장소 뿌리나 스킬 폴더 기준이다.
+CR_MISS=""
+while IFS= read -r p; do
+  [ -n "$p" ] || continue
+  [ -f "$HERE/$p" ] || [ -f "$(dirname "$LR")/$p" ] || CR_MISS="$CR_MISS $p"
+done <<EOF
+$( [ -f "$LR" ] && doc_sec "$LR" '카테고리와 렌즈' | grep -oE '`[A-Za-z0-9_./-]+\.md`' | tr -d '`' | sort -u )
+EOF
+[ -n "$CR_MISS" ] && echo "    없는 기준 파일:$CR_MISS"
+check "lens-review 가 기준으로 넘기는 파일이 모두 실재한다" "[ -f \"\$LR\" ] && [ -z \"\$CR_MISS\" ]"
 
 # 지운 스킬 이름을 가리키는 문서가 남으면 열리지 않는 스킬을 찾는다. 살아 있는 문서는 실리는 지시문과
 # 실행 코드(원칙·스킬·에이전트·훅·스크립트·워크플로·커맨드·설정)와 참고서다. 공통 제외 목록은
@@ -440,12 +450,11 @@ check "frontmatter 를 하나 이상 훑었다" "[ '$FMN' -gt 0 ]"
 # 호출 정책의 규칙은 domain-plugin 이 소유하고, 검사는 test_lens_contract.sh 「호출 정책」 묶음이 한다.
 check "domain-plugin 이 에이전트 호출 정책을 둔다" "has_sec \"\$HERE/skills/domain-plugin/SKILL.md\" '에이전트 호출 정책'"
 
-# --- 글 가독성 렌즈가 제목 규칙의 기준 문서를 연다 ---
-# lens-readability 는 문서와 슬라이드의 제목을 TITLE-LAYERS·TITLE-CLAIM 으로 본다. 그 조항은 managing-docs 의
-# reading-docs.md 로 옮겨졌으므로, 정의가 그 파일을 기준 문서로 가리키는지 붙든다.
-echo "[규칙 출처] lens-readability 가 reading-docs.md 를 기준 문서로 연다"
-RDB_L="$HERE/agents/lens-readability.md"
-check "정의의 읽기 범위가 그 파일을 가리킨다" "sec_has \"\$RDB_L\" '읽기 범위' 'reading-docs.md'"
+# --- 제목 규칙의 기준 문서를 대조 렌즈에 넘긴다 ---
+# 문서와 슬라이드의 제목 규칙(TITLE-LAYERS·TITLE-CLAIM)은 managing-docs 의 reading-docs.md 에 있다. v2 에서는
+# 형식 계약을 대조 렌즈(lens-grounding)가 보므로, lens-review 가 그 파일을 기준으로 넘기는지 붙든다.
+echo "[규칙 출처] lens-review 가 reading-docs.md 를 대조 기준으로 넘긴다"
+check "카테고리 표가 그 파일을 가리킨다" "sec_has \"\$LR\" '카테고리와 렌즈' 'reading-docs.md'"
 
 # --- 마켓플레이스 문안이 매니페스트에서 갈라지지 않는다 ---
 # 마켓플레이스 카드는 설치 전 사용자가 보는 첫 문안이다. 같은 사실을 두 파일이 각자 적으면 반드시
@@ -674,12 +683,11 @@ done
 check "spec 리뷰가 발동과 기록을 가리킨다" "points_to \"\$CALLER\" '\`researching-prior-art\`' '「발동과 기록」'"
 check "연구자 정의의 도구가 구성과 같다" "grep -qx 'tools: WebSearch, WebFetch, Read, Grep, Glob' <<<\"\$(fm \"\$RDEF\")\""
 check "연구자 정의의 턴 상한이 20 이다" "grep -qx 'maxTurns: 20' <<<\"\$(fm \"\$RDEF\")\""
-# 검증자 정의는 추출·판정·지도 대조의 세 파일이다. 구성 값은 spec 「Opus 일괄 판정」이 정했고,
+# 검증자 정의는 추출·판정의 두 파일이다. 구성 값은 spec 「Opus 일괄 판정」이 정했고,
 # 판정 정의의 모델과 노력 수준은 「Opus 일괄 판정」이 바꿨다.
 JDEF="$HERE/agents/citation-judge.md"
-MDEF="$HERE/agents/map-check.md"
 check "researcher.md 의 description 이 호출 조건을 적는다" "grep -qF '호출 절차가 이름으로 지정할 때만 실행한다' <<<\"\$(grep -m1 '^description:' <<<\"\$(fm \"\$RDEF\")\")\""
-for row in "VDEF|WebFetch, Read|claude-haiku-5-5|high" "JDEF|Read|claude-opus-5-5|medium" "MDEF|Read|claude-haiku-5-5|high"; do
+for row in "VDEF|WebFetch, Read|claude-haiku-5-5|high" "JDEF|Read|claude-opus-5-5|medium"; do
   IFS='|' read -r def tools model effort <<<"$row"
   file="${!def}"; FMV="$(fm "$file" || true)"; base="$(basename "$file")"
   check "$base 의 도구가 구성과 같다" "grep -qx 'tools: $tools' <<<\"\$FMV\""

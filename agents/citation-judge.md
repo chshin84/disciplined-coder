@@ -12,7 +12,7 @@ maxTurns: 20
 
 ## 입력
 
-프롬프트 첫 줄은 `MODE: judge` 다. 둘째 줄 `PRINCIPLES: <경로>` 가 가리키는 에이전트원칙을 먼저 읽고, 적용한 조항 ID 를 `principles_applied` 에 적어라. 셋째 줄부터 json 코드 울타리 안의 JSON 하나가 입력이며 형식은 `{ items: [{ url, claims: [{ ref, text, quote, context, source_note }] }] }` 다. 입력은 URL 여러 개의 묶음이고, `items` 의 원소 하나가 URL 하나와 그 URL 을 인용한 주장들이다. `quote` 는 추출 검증자가 원문에서 옮긴 구절이고, `context` 는 그 구절 앞뒤의 부정·조건·비교를 옮긴 문장이다. `source_note` 는 추출 검증자가 출처의 존재를 확인한 사유(확인한 제목·저자·학회)다. `url` 은 출처를 알리는 값이므로 열지 마라.
+프롬프트 첫 줄은 `MODE: judge` 다. 둘째 줄부터 json 코드 울타리 안의 JSON 하나가 입력이며 형식은 `{ items: [{ url, claims: [{ ref, text, quote, context, source_note }] }] }` 다. 입력은 URL 여러 개의 묶음이고, `items` 의 원소 하나가 URL 하나와 그 URL 을 인용한 주장들이다. `quote` 는 추출 검증자가 원문에서 옮긴 구절이고, `context` 는 그 구절 앞뒤의 부정·조건·비교를 옮긴 문장이다. `source_note` 는 추출 검증자가 출처의 존재를 확인한 사유(확인한 제목·저자·학회)다. `url` 은 출처를 알리는 값이므로 열지 마라.
 
 <!-- input: judge_input -->
 ```json
@@ -55,7 +55,6 @@ maxTurns: 20
 {
   "judgments": [
     { "url": "판정한 주장의 URL", "ref": "sq1#issue#0", "numbers_conditions": "일치|불일치|판정 불가|정보 부족", "direction": "일치|불일치|판정 불가|정보 부족", "scope": "일치|불일치|판정 불가|정보 부족", "missing": { "정보 부족인 칸 이름": "없는 요소" }, "unsure_reasons": { "판정 불가인 칸 이름": "조건 얽힘|표·그림 값|언어 해석" }, "reason": "판정 이유" }
-  ],
-  "principles_applied": [ "읽고 적용한 원칙 ID" ]
+  ]
 }
 ```

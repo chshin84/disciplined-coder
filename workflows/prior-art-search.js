@@ -6,7 +6,6 @@ export const meta = {
     { title: 'Research' },
     { title: 'Verify' },
     { title: 'Synthesize' },
-    { title: 'MapCheck' },
   ],
 };
 
@@ -17,7 +16,6 @@ const S = schemas();
 const RESEARCHER = 'disciplined-coder:researcher';
 const EXTRACTOR = 'disciplined-coder:citation-verifier';
 const JUDGE = 'disciplined-coder:citation-judge';
-const MAPCHECK = 'disciplined-coder:map-check';
 // 판정 묶음 하나에 넣는 주장 수의 상한이다. 값의 근거는 spec 「Opus 일괄 판정」의 묶음 크기다.
 const BATCH_SIZE = 20;
 
@@ -31,7 +29,7 @@ if (typeof args.intended_use !== 'string' || args.intended_use.trim() === '') {
 if (args.round === 0) {
   phase('Research');
   const scout = (await parallel([() => agent(
-    prompt('scout', args.principles_path, {
+    prompt('scout', {
       question: args.question,
       situation: args.situation,
       target: args.target,
@@ -53,7 +51,7 @@ if (args.round === 0) {
 
 phase('Research');
 const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
-  prompt('explore', args.principles_path, {
+  prompt('explore', {
     question: args.question,
     situation: args.situation,
     target: args.target,
@@ -77,7 +75,7 @@ const refsByUrl = {};
 const extract = {};
 const refetch = {};
 const extractOut = await parallel(groups.map((g) => () => agent(
-  prompt('extract', args.principles_path, { url: g.url, claims: g.claims }),
+  prompt('extract', { url: g.url, claims: g.claims }),
   { agentType: EXTRACTOR, label: `extract:${g.url}`, phase: 'Verify', schema: S.EXTRACT_SCHEMA },
 )));
 groups.forEach((g, i) => {
@@ -88,7 +86,7 @@ const judgeIn = {};
 groups.forEach((g) => { judgeIn[g.url] = judgeClaims(g.claims, extract[g.url]); });
 const judgeBatches = batchClaims(judgeIn, BATCH_SIZE);
 const judgeOut = await parallel(judgeBatches.map((b, i) => () => agent(
-  prompt('judge', args.principles_path, b),
+  prompt('judge', b),
   { agentType: JUDGE, label: `judge:${i + 1}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
 )));
 const judge = splitByUrl(judgeOut, judgeBatches);
@@ -96,7 +94,7 @@ const refetchJobs = judgeBatches.flatMap((b) => b.items)
   .map((x) => ({ url: x.url, claims: refetchClaims(x.claims, judge[x.url]) }))
   .filter((x) => x.claims.length > 0);
 const refetchOut = await parallel(refetchJobs.map((x) => () => agent(
-  prompt('refetch', args.principles_path, { url: x.url, claims: x.claims }),
+  prompt('refetch', { url: x.url, claims: x.claims }),
   { agentType: EXTRACTOR, label: `refetch:${x.url}`, phase: 'Verify', schema: S.EXTRACT_SCHEMA },
 )));
 refetchJobs.forEach((x, i) => { refetch[x.url] = refetchOut[i] ?? null; });
@@ -104,7 +102,7 @@ const rejudgeIn = {};
 refetchJobs.forEach((x) => { rejudgeIn[x.url] = rejudgeClaims(x.claims, refetch[x.url]); });
 const rejudgeBatches = batchClaims(rejudgeIn, BATCH_SIZE);
 const rejudgeOut = await parallel(rejudgeBatches.map((b, i) => () => agent(
-  prompt('judge', args.principles_path, b),
+  prompt('judge', b),
   { agentType: JUDGE, label: `rejudge:${i + 1}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
 )));
 const rejudge = splitByUrl(rejudgeOut, rejudgeBatches);
@@ -137,23 +135,14 @@ if (args.mode === 'survey') {
     .filter((p) => p.ref.includes('#case#'))
     .map((p) => ({ ref: p.ref, row: items.find((it) => it.ref === p.ref).row }));
   let synthesis = null;
-  let map_check = null;
   if (passed_rows.length > 0) {
     phase('Synthesize');
     synthesis = await agent(
-      prompt('synthesize', args.principles_path, { question: args.question, target: args.target, intended_use: args.intended_use, constraints: args.constraints, passed_rows }),
+      prompt('synthesize', { question: args.question, target: args.target, intended_use: args.intended_use, constraints: args.constraints, passed_rows }),
       { agentType: RESEARCHER, label: 'synthesize', phase: 'Synthesize', schema: S.SYNTHESIS_SCHEMA },
     );
   }
-  if (synthesis != null) {
-    phase('MapCheck');
-    map_check = await agent(
-      prompt('map', args.principles_path, { evidence_map: synthesis.evidence_map, passed: passed_rows }),
-      { agentType: MAPCHECK, label: 'map-check', phase: 'MapCheck', schema: S.MAP_SCHEMA },
-    );
-  }
   result.synthesis = synthesis;
-  result.map_check = map_check;
 }
 return result;
 
@@ -416,7 +405,7 @@ function batchClaims(claimsByUrl, size) {
   return batches;
 }
 
-// 묶음 출력 나누기. batchOutputs[i] 는 batches[i] 의 출력이다. 반환값은 URL 을 키로 둔 { judgments, principles_applied } 다.
+// 묶음 출력 나누기. batchOutputs[i] 는 batches[i] 의 출력이다. 반환값은 URL 을 키로 둔 { judgments } 다.
 // 응답이 없거나 judgments 가 배열이 아닌 묶음의 URL 은 null 이다. 판정은 url 과 ref 가 그 URL 의 입력 주장과 맞는 것만 남기고,
 // 입력에 없던 URL 이나 ref 의 판정은 버린다. 같은 (url, ref) 의 판정이 둘 이상이면 어느 판정을 믿을지 정할 수 없으므로
 // 그 ref 의 판정을 모두 버린다. 버린 주장은 빠진 주장과 같이 그 주장만 검증 실패가 된다.
@@ -434,7 +423,6 @@ function splitByUrl(batchOutputs, batches) {
       const mine = o.judgments.filter((j) => j != null && j.url === it.url && refs.includes(j.ref));
       out[it.url] = {
         judgments: mine.filter((j) => mine.filter((x) => x.ref === j.ref).length === 1),
-        principles_applied: o.principles_applied ?? [],
       };
     }
   });
@@ -501,11 +489,7 @@ function mergeUrl(url, refs, st) {
     if (short.length > 0) reasons.push(`재판정 정보 부족: ${short.join(', ')}`);
     return out(route.step);
   });
-  const principles = [];
-  for (const o of [st.extract, st.judge, st.refetch, st.rejudge]) {
-    for (const p of o?.principles_applied ?? []) if (!principles.includes(p)) principles.push(p);
-  }
-  return { url, judgments, principles_applied: principles };
+  return { url, judgments };
 }
 
 // 상태 합치기. 참조가 하위 질문 X 에 속하는지는 `X#` 로 시작하는지로 본다.
@@ -559,7 +543,6 @@ function schemas() {
     properties: { case: str, url: str, outcome: str, axes: axesSchema, bearing: str },
     required: ['case', 'url', 'axes', 'outcome'],
   });
-  const principles = { type: 'array', items: str };
   const RESEARCHER_SCHEMA = {
     type: 'object',
     properties: {
@@ -600,9 +583,8 @@ function schemas() {
           required: ['ref', 'access', 'exists', 'exists_note', 'quote', 'context', 'reason'],
         },
       },
-      principles_applied: principles,
     },
-    required: ['url', 'judgments', 'principles_applied'],
+    required: ['url', 'judgments'],
   };
   // 판정과 재판정이 같은 스키마를 쓴다. 판정마다 url 은 그 주장이 든 묶음 입력 원소의 URL 이다. 보충은 추출 스키마를 쓴다.
   const match = { type: 'string', enum: ['일치', '불일치', '판정 불가', '정보 부족'] };
@@ -632,9 +614,8 @@ function schemas() {
           required: ['url', 'ref', 'numbers_conditions', 'direction', 'scope', 'missing', 'unsure_reasons', 'reason'],
         },
       },
-      principles_applied: principles,
     },
-    required: ['judgments', 'principles_applied'],
+    required: ['judgments'],
   };
   const SYNTHESIS_SCHEMA = {
     type: 'object',
@@ -648,24 +629,8 @@ function schemas() {
           required: ['text', 'refs'],
         },
       },
-      principles_applied: principles,
     },
-    required: ['evidence_map', 'conclusions', 'principles_applied'],
-  };
-  const MAP_SCHEMA = {
-    type: 'object',
-    properties: {
-      cells: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: { row: str, column: str, grounded: { type: 'boolean' }, source_ref: str },
-          required: ['row', 'column', 'grounded', 'source_ref'],
-        },
-      },
-      principles_applied: principles,
-    },
-    required: ['cells', 'principles_applied'],
+    required: ['evidence_map', 'conclusions'],
   };
   // 둘러보기 출력은 검증하지 않으므로 정해진 칸 밖의 칸(사례 칸 등)을 허용하지 않는다.
   const closed = (properties) => ({ type: 'object', properties, required: Object.keys(properties), additionalProperties: false });
@@ -674,12 +639,11 @@ function schemas() {
     queries: { type: 'array', items: str },
     clusters: { type: 'array', items: closed({ topic: str, sources: { type: 'array', items: str }, note: str }) },
     subquestion_candidates: { type: 'array', items: closed({ scope: str, basis: str }) },
-    principles_applied: principles,
   });
-  return { RESEARCHER_SCHEMA, EXTRACT_SCHEMA, JUDGE_SCHEMA, SYNTHESIS_SCHEMA, MAP_SCHEMA, SCOUT_SCHEMA };
+  return { RESEARCHER_SCHEMA, EXTRACT_SCHEMA, JUDGE_SCHEMA, SYNTHESIS_SCHEMA, SCOUT_SCHEMA };
 }
 
-// 에이전트에게 보내는 프롬프트. 첫 줄은 모드, 둘째 줄은 원칙 문서 경로, 셋째 줄부터 JSON 블록이다.
-function prompt(mode, principlesPath, input) {
-  return `MODE: ${mode}\nPRINCIPLES: ${principlesPath}\n\`\`\`json\n${JSON.stringify(input, null, 2)}\n\`\`\``;
+// 에이전트에게 보내는 프롬프트. 첫 줄은 모드, 둘째 줄부터 JSON 블록이다.
+function prompt(mode, input) {
+  return `MODE: ${mode}\n\`\`\`json\n${JSON.stringify(input, null, 2)}\n\`\`\``;
 }

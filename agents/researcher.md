@@ -10,7 +10,9 @@ maxTurns: 20
 
 ## 공통
 
-프롬프트 첫 줄 `MODE: <모드>`의 값으로 모드를 골라라. 값은 `explore`, `synthesize`, `scout` 중 하나다. 둘째 줄 `PRINCIPLES: <경로>`가 가리키는 에이전트원칙을 먼저 읽고, 적용한 조항 ID 를 `principles_applied`에 적어라. 셋째 줄부터 json 코드 울타리 안에 있는 JSON 블록 하나가 입력이다. 출력은 아래 「출력 형식」에 있는 그 모드의 JSON 하나이며, 앞뒤에 다른 글을 두지 마라.
+프롬프트 첫 줄 `MODE: <모드>`의 값으로 모드를 골라라. 값은 `explore`, `synthesize`, `scout` 중 하나다. 둘째 줄부터 json 코드 울타리 안에 있는 JSON 블록 하나가 입력이다. 출력은 아래 「출력 형식」에 있는 그 모드의 JSON 하나이며, 앞뒤에 다른 글을 두지 마라.
+
+`kofia.or.kr` 와 그 아래 주소는 검색 결과에 나와도 열지 마라. 반복 접속이 사내 접속 차단으로 이어진다. 검색어는 외부 검색 서비스의 로그에 남으므로, 모드마다 아래 지시문이 정한 대로 사내 정보를 빼고 일반화한 개념어로만 써라.
 
 ## explore 모드
 
@@ -108,7 +110,6 @@ maxTurns: 20
   "saturation": 0,
   "not_found": [ "찾지 못한 것과 그 이유 — 독창성의 근거가 아니다" ],
   "disclosures": [ "렌즈 자신의 불확실성" ],
-  "principles_applied": [ "읽고 적용한 원칙 ID" ],
   "notes": ""
 }
 ```
@@ -134,8 +135,7 @@ maxTurns: 20
       "bearing": "그 근거가 어느 후보안을 어느 방향으로 움직이는지"
     }
   ],
-  "conclusions": [ { "text": "결론 문장", "refs": [ "sq1#case#0" ], "supports": "지지하는 후보안" } ],
-  "principles_applied": [ "읽고 적용한 원칙 ID" ]
+  "conclusions": [ { "text": "결론 문장", "refs": [ "sq1#case#0" ], "supports": "지지하는 후보안" } ]
 }
 ```
 
@@ -145,7 +145,6 @@ maxTurns: 20
   "search_status": "ok|no-results|failed|not-attempted",
   "queries": [ "실행한 검색어" ],
   "clusters": [ { "topic": "주제 묶음", "sources": [ "대표 출처 URL" ], "note": "묶음 설명" } ],
-  "subquestion_candidates": [ { "scope": "하위 질문 후보의 범위 문장", "basis": "그 후보를 낸 근거" } ],
-  "principles_applied": [ "읽고 적용한 원칙 ID" ]
+  "subquestion_candidates": [ { "scope": "하위 질문 후보의 범위 문장", "basis": "그 후보를 낸 근거" } ]
 }
 ```

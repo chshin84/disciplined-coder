@@ -51,7 +51,6 @@ description: 문서를 새로 만들거나 고치기 전에 연다. 마크다운
 | 둘러보기 연구자 출력 | `researcher-scout-r0.json` |
 | 인용 판정 출력 | `verifier-r<n>.json` |
 | 종합 모드 연구자 출력 | `synthesis-r<n>.json` |
-| 지도 대조 출력 | `map-check-r<n>.json` |
 
 ### 메모리와 문서 맵
 

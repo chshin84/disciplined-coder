@@ -150,20 +150,20 @@ contract_check_example() {
 
 # 픽스처. 파일 경로는 json_run 에 인자로만 넘긴다.
 cat > "$FX/ok_schema.json" <<'J'
-{"type":"object","required":["url","judgments","principles_applied"],"properties":{"url":{},"principles_applied":{},
+{"type":"object","required":["url","judgments"],"properties":{"url":{},
  "judgments":{"type":"array","items":{"type":"object","required":["ref","verdict","quote","reason"],
   "properties":{"ref":{},"verdict":{},"quote":{},"reason":{}}}}}}
 J
 cat > "$FX/no_required_schema.json" <<'J'
-{"type":"object","required":["url","judgments","principles_applied"],"properties":{"url":{},"principles_applied":{},
+{"type":"object","required":["url","judgments"],"properties":{"url":{},
  "judgments":{"type":"array","items":{"type":"object","required":["ref","verdict","reason"],
   "properties":{"ref":{},"verdict":{},"quote":{},"reason":{}}}}}}
 J
 cat > "$FX/ok_example.json" <<'J'
-{"url":"u","principles_applied":[],"judgments":[{"ref":"r","verdict":"v","quote":"q","reason":"x"}]}
+{"url":"u","judgments":[{"ref":"r","verdict":"v","quote":"q","reason":"x"}]}
 J
 cat > "$FX/missing_quote.json" <<'J'
-{"url":"u","principles_applied":[],"judgments":[{"ref":"r","verdict":"v","reason":"x"}]}
+{"url":"u","judgments":[{"ref":"r","verdict":"v","reason":"x"}]}
 J
 cat > "$FX/r_no_prior_claim.json" <<'J'
 {"search_status":"s","queries":[],"issues":[{"citations":[]}]}
@@ -196,8 +196,8 @@ HARNESS="$HERE/scripts/workflow_harness.mjs"
 check "node 가 있다" "command -v node >/dev/null"
 SCHEMAS="$FX/schemas.json"
 check "시험 도구가 짝지은 스키마 상수를 모두 낸다" \
-  "printf '[]' | node \"\$HARNESS\" fn schemas > \"\$SCHEMAS\" && json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(k in d for k in (\"RESEARCHER_SCHEMA\",\"EXTRACT_SCHEMA\",\"JUDGE_SCHEMA\",\"SYNTHESIS_SCHEMA\",\"MAP_SCHEMA\",\"SCOUT_SCHEMA\")) else 1)' \"\$SCHEMAS\""
-for pair in researcher:RESEARCHER_SCHEMA extract:EXTRACT_SCHEMA judge:JUDGE_SCHEMA synthesis:SYNTHESIS_SCHEMA map:MAP_SCHEMA scout:SCOUT_SCHEMA; do
+  "printf '[]' | node \"\$HARNESS\" fn schemas > \"\$SCHEMAS\" && json_run 'import json,sys; d=json.load(open(sys.argv[1],encoding=\"utf-8\")); sys.exit(0 if all(k in d for k in (\"RESEARCHER_SCHEMA\",\"EXTRACT_SCHEMA\",\"JUDGE_SCHEMA\",\"SYNTHESIS_SCHEMA\",\"SCOUT_SCHEMA\")) else 1)' \"\$SCHEMAS\""
+for pair in researcher:RESEARCHER_SCHEMA extract:EXTRACT_SCHEMA judge:JUDGE_SCHEMA synthesis:SYNTHESIS_SCHEMA scout:SCOUT_SCHEMA; do
   name="${pair%%:*}"; const="${pair##*:}"
   json_run 'import json,sys; json.dump(json.load(open(sys.argv[1],encoding="utf-8"))[sys.argv[2]], open(sys.argv[3],"w",encoding="utf-8"))' "$SCHEMAS" "$const" "$FX/schema_$name.json" 2>/dev/null || true
   check "스키마 $const 가 계약 코드와 맞는다" "contract_check $name \"\$FX/schema_$name.json\" -"
@@ -205,8 +205,7 @@ done
 RD="$HERE/agents/researcher.md"
 VD="$HERE/agents/citation-verifier.md"
 JD="$HERE/agents/citation-judge.md"
-MD="$HERE/agents/map-check.md"
-for pair in researcher:RD synthesis:RD scout:RD extract:VD judge:JD map:MD; do
+for pair in researcher:RD synthesis:RD scout:RD extract:VD judge:JD; do
   name="${pair%%:*}"; def="${pair##*:}"; file="${!def}"
   check "예시 $name 이 $(basename "$file") 에서 계약 코드와 맞는다" \
     "contract_check_example $name \"$file\""
@@ -218,15 +217,12 @@ check "입력 예시 judge_input 이 $(basename "$JD") 에서 계약 코드와 �
 # 판정 칸의 네 값과 판정 불가 이유 유형은 계약 코드 enums 가 원본이다. 판정 정의의 예시는 그 값을 | 로 이어 적는다.
 check "예시 judge 가 $(basename "$JD") 에서 계약 코드 enums 의 값을 적는다" \
   "extract_block judge \"\$JD\" > \"\$FX/enum_judge.json\" && json_run 'import json,sys; j=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"judgments\"][0]; e=json.load(open(sys.argv[2],encoding=\"utf-8\"))[\"enums\"]; m=\"|\".join(e[\"match\"]); u=\"|\".join(e[\"unsure\"]); sys.exit(0 if all(j[k] == m for k in (\"numbers_conditions\",\"direction\",\"scope\")) and list(j[\"unsure_reasons\"].values()) == [u] else 1)' \"\$FX/enum_judge.json\" \"\$CONTRACT\""
-# 지도 대조 정의의 예시는 행마다 판정할 칸(case, outcome, 축마다 prior)을 모두 포함한다.
-check "예시 map 이 행마다 판정할 칸을 모두 포함한다" \
-  "extract_block map \"\$MD\" > \"\$FX/map_cells.json\" && json_run 'import json,sys; c=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"cells\"]; want={\"case\",\"outcome\"} | {\"axes.\"+a+\".prior\" for a in (\"purpose\",\"mechanism\",\"evaluation\",\"target\")}; sys.exit(0 if c and all({x[\"column\"] for x in c if x[\"row\"] == r} == want for r in {x[\"row\"] for x in c}) else 1)' \"\$FX/map_cells.json\""
 # 인용 판정 출력은 에이전트가 내지 않고 워크플로의 mergeStages 가 단계 출력을 합쳐 만든다.
 # 그래서 계약 코드 verifier 는 정의 파일 대신 mergeStages 의 출력에 대조한다.
 cat > "$FX/mg_in.json" <<'J'
 [{"https://a": ["S1#issue#0"]},
- {"https://a": {"url": "https://a", "principles_applied": [], "judgments": [{"ref": "S1#issue#0", "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"}]}},
- {"https://a": {"principles_applied": [], "judgments": [{"url": "https://a", "ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]}},
+ {"https://a": {"url": "https://a", "judgments": [{"ref": "S1#issue#0", "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"}]}},
+ {"https://a": {"judgments": [{"url": "https://a", "ref": "S1#issue#0", "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "missing": {}, "unsure_reasons": {}, "reason": "r"}]}},
  {}, {}]
 J
 check "mergeStages 의 합친 출력이 계약 코드 verifier 와 맞는다" \
