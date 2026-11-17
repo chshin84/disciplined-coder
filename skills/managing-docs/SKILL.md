@@ -55,7 +55,7 @@ description: 보고서·발표자료·문서 파일처럼 사람이 읽을 문�
 
 ## 상황별로 더 읽을 파일
 
-- 사용자가 읽거나 남에게 전달할 문서(보고서·제안서·발표자료·README·.html·.pptx·.docx·.hwp(x), 파일로 쓰는 작업 보고)를 쓰거나 고치면 같은 폴더의 `references/reading-docs.md` 를 읽고 따르라.
+- 사용자가 읽거나 남에게 전달할 문서(보고서·제안서·발표자료·README·.html·.pptx·.docx·.hwp(x), 파일로 쓰는 작업 보고)를 쓰거나 고치면 같은 폴더의 `references/reading-docs.md` 를 읽고 따르라. 사용자가 고객·외부에 보낸다고 한 문서를 완성하면 완료를 보고하기 전에 `lens-review` 의 전달 문서 절차로 검진하라.
 - README 를 쓰거나 고치면 `domain-readme` 도 열어라.
 - 플러그인·훅·사용자 설정 파일을 고치면 `domain-plugin` 을 열어라.
 - 두 글을 좌우로 비교하는 페이지나 사용자 판독을 받을 페이지를 만들면 `side-by-side` 를 열어라.
