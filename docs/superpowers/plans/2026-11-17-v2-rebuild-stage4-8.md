@@ -27,7 +27,16 @@
 
 ## spec 과 다른 점
 
-- **리뷰 구조(2026-11-17 사용자 지시):** spec 은 spec·plan 게이트에서 적대 렌즈와 근거 렌즈 두 개를 실행한다고 정했다. 사용자는 "카테고리별로 적대를 만들고, 메인 세션에서 통합 후 1차 디펜스 하고, 반영"하라고 지시했다. 그래서 `lens-review` 는 대상에 맞는 카테고리 렌즈(설계 결함, 근거, 문체, 형식 계약, 시각)를 모두 적대 자세로 실행하고, 메인 세션이 통합한 뒤 **1차 디펜스**(지적마다 원문·코드·사용자 원문으로 반박을 시도해 받쳐지지 않는 지적을 거름)를 거쳐 남은 지적만 반영한다. spec·plan 게이트는 설계 결함·근거 두 카테고리, 전달 문서는 근거·문체·형식(시각 산출물이면 시각 추가) 카테고리를 쓴다.
+- **리뷰 구조(2026-11-17 사용자 지시와 그 뒤 재설계):** spec 은 spec·plan 게이트에서 적대 렌즈와 근거 렌즈 두 개를 실행한다고 정했다. 사용자는 "카테고리별로 적대를 만들고, 메인 세션에서 통합 후 1차 디펜스 하고, 반영"하라고 지시했고, 이어서 기존 렌즈 구분이 검토 내용(근거·형식)과 접근 방식(적대)을 섞었다고 지적했다. 그래서 렌즈를 접근 방식과 컨텍스트 분리 필요로 다시 나눠 일곱 개에서 네 개로 줄인다. 이름은 바꾸지 않는다.
+  - `lens-grounding`(대조, 드라이): 주장과 형식을 출처·코드·형식 계약(`reading-docs.md` 의 제목 규칙 포함)과 맞춰 보고 다른 점만 낸다. 옛 `lens-fit` 의 형식 계약과 문서 타입 판정(`doc_type`)을 흡수한다. 옛 `domain-pruning` 의 "근거 렌즈와 형식 렌즈를 합치지 않는다" 결정(입력이 출처와 계약으로 다르다)은 이 재설계로 대체한다. 두 입력은 `CRITERIA` 줄에 함께 넘기고, 런타임 출력 검토도 출력 종류와 무관하게 이 렌즈 하나를 쓴다.
+  - `lens-adversarial`(설계 결함, 적대): 실패 모드·과설계·되돌릴 수 없는 위험과 옛 `lens-consistency` 의 내부 모순·커버리지 공백·이름 드리프트·스코프(산출물 공백 포함)를 본다.
+  - `lens-rebuttal`(반대 근거, 적대): 웹 검색·웹 조회 권한은 렌즈 중 이 렌즈에만 둔다.
+  - `lens-readability`(독자, 적대): 대상과 목적 한 줄과 문체 공격 항목만 받고 출처·대화는 받지 않는다. 맥락 없이 읽다 막히는 곳과 AI 티 문체를 공격하고, 렌더링 산출물이면 화면을 열어 배치·겹침·잘림·대비·분량을 본다(옛 `lens-visual` 흡수). 화면은 대조할 출처가 없는 목적 기반 판정이라 독자 렌즈가 맡는다. 브라우저 도구는 호출자가 준 `http://localhost` 주소에만 쓴다.
+  - 네 개로 나눈 기준은 한 렌즈에 합치면 판정이 오염되는 조건이다. 적대 자세가 대조 판정에 섞이는 조건, 출처를 읽은 렌즈는 맥락 없는 독자를 흉내 낼 수 없는 조건, 웹 권한을 필요한 렌즈에만 두는 조건이다.
+  - spec·plan 은 대조·설계 결함, 전달 문서는 대조·독자를 쓰고, 사용자가 반박을 요청하면 반대 근거를 추가한다. 메인 세션이 통합한 뒤 적대 렌즈의 지적에는 **1차 디펜스**(원문·코드·사용자 원문으로 반박을 시도해 받쳐지지 않는 지적을 거름)를 한다. 대조 렌즈의 지적은 반박을 시도하지 않고, 인용 위치가 실제로 그렇게 적혀 있는지와 지적한 결과가 그 근거에서 따라 나오는지만 확인한다. 기각마다 근거 위치를 기록하고, 사용자 보고에 기각 수를 적어 작성자 편향을 감시한다.
+  - 통합 렌즈가 옛 렌즈의 단독 발견을 놓치는지는 측정하지 않았다. spec 「미결 쟁점」 4행과 같이 v2 이후 첫 전달 문서·spec 2~3건에서 옛 `lens-fit`·`lens-visual`·`lens-consistency` 정의(태그 `archive/v1-final`)를 한 번씩 실행해 비교한다.
+  - 재현 시험 판정자는 렌즈가 아니라 드라이 측정 도구로 둔다(Task 6).
+  - 이 재설계는 Task 2 커밋 뒤에 정했으므로, `lens-review` 의 렌즈 표·입력 형식·디펜스 구분은 Task 3 이 렌즈 정의와 한 커밋에서 고친다.
 - **문체 카테고리 기준:** spec 은 `lens-readability` 를 사용자 판정 기준점 5개로만 본다고 정했다. 2026-11-17 다른 세션이 전달한 사용자 원문 AI 티 목록(저장소 밖 `%USERPROFILE%\.dc-eval\wants\ai-tells-2026-11-17.md`, 사용자 지시로 반영)을 공격 항목으로 더하고, 기준점 5개와 과잉 지적 반례를 디펜스 기준으로 쓴다. 저장소에는 항목 이름과 짧은 설명만 두고 긴 원문 인용은 넣지 않는다. 사용자가 반박을 요청한 주장(보고서·제안서의 결론)은 반박 카테고리(`lens-rebuttal`)를 더 쓴다.
 - **동시 실행과 테스트 실행 방식:** spec 은 재현 생성 동시 3개와 「변경 뒤 실행」의 동시 실행 명령을 정했다. 2026-11-16 PC 메모리 부족으로 예약 작업이 두 번 중단되어, 생성은 동시 2개(기본값), 테스트는 차례 실행으로 바꾼다.
 - **이관 원본:** spec 은 `replay5.py`·`gen_reading_v4.py`·`diff\sbs.py` 를 옮긴다고 적었다. 3단계에서 그 후속판 `replay6.py`(재개 방식·리비전 기록·원자적 쓰기)와 `gen_reading_v5.py`(점수 먼저·판독 복사)를 만들어 썼으므로 후속판을 옮긴다. `sbs.py` 의 좌우 비교 기능은 `gen_reading_v5.py` 에 포함되어 있다.
@@ -74,7 +83,7 @@
 
 - [ ] **Step 1:** `test_docs_drift.sh` 에 검사를 쓴다: `lens-review 본문이 8,000자 이하다`, `지운 스킬 이름(dispatching-lenses·review-specs·review-docs)을 가리키는 살아 있는 문서가 없다`(기록·spec·plan·참고서 「v1 조항 근거」 제외), `lens-review 가 세 진입점 절을 가진다`(절 제목: 직접 요청, 설계 문서, 전달 문서), `lens-review 기록 형식에 기각 근거 칸이 있다`, `managing-docs 에 기록 파일 이름 규칙 절이 있다`, `spec 리뷰 지시문이 lens-review 를 가리킨다`.
 - [ ] **Step 2:** Run: `bash scripts/test_docs_drift.sh 2>&1 | grep FAIL` Expected: Step 1 검사 이름이 `FAIL:` 로 나온다.
-- [ ] **Step 3:** 스킬을 쓴다. 내용은 spec 「스킬」 표의 `lens-review` 계약과 「spec 과 다른 점」 리뷰 구조를 따른다. 절차는 (1) 대상 종류로 카테고리 렌즈를 고른다, (2) 렌즈마다 한 번 실행한다(동시 4개 이하), (3) 메인 세션이 같은 지적을 합친다, (4) 1차 디펜스: 지적마다 원문·코드·사용자 원문으로 반박을 시도하고, 반박이 받쳐지면 기각하며 기각 근거(위치)를 기록에 남긴다, (5) 남은 지적은 Claude 가 반영하고 가치 판단·되돌릴 수 없는 항목만 사용자에게 올린다, (6) spec·plan 은 마지막 줄에 마커를 남긴다, (7) 다시 리뷰는 설계를 틀리게 만드는 지적이 남았을 때 바뀐 절만 한다. 선행연구는 발동 기준(아직 해 본 적 없고 되는지 미지수)에 들면 묻지 않고 실행한다. 사용자가 렌즈를 요청하면 묻지 않고 실행한다. 전달 문서는 사용자 요청이나 외부 공개 직전에만 검진하고 사용자가 지정한 형식·발신 주체·문장은 고치지 않는다. 기록 위치·이름은 `managing-docs` 를 가리킨다.
+- [ ] **Step 3:** 스킬을 쓴다. 내용은 spec 「스킬」 표의 `lens-review` 계약과 「spec 과 다른 점」 리뷰 구조를 따른다. 절차는 (1) 대상 종류로 카테고리 렌즈를 고른다, (2) 렌즈마다 한 번 실행한다(동시 4개 이하), (3) 메인 세션이 같은 지적을 합친다, (4) 1차 디펜스: 적대 렌즈의 지적마다 원문·코드·사용자 원문으로 반박을 시도하고, 반박이 받쳐지면 기각하며 기각 근거(위치)를 기록에 남긴다. 대조 렌즈의 지적은 인용 위치와 귀결만 확인한다(이 구분은 Task 3 에서 넣는다). 사용자 보고에 기각 수를 적는다, (5) 남은 지적은 Claude 가 반영하고 가치 판단·되돌릴 수 없는 항목만 사용자에게 올린다, (6) spec·plan 은 마지막 줄에 마커를 남긴다, (7) 다시 리뷰는 설계를 틀리게 만드는 지적이 남았을 때 바뀐 절만 한다. 선행연구는 발동 기준(아직 해 본 적 없고 되는지 미지수)에 들면 묻지 않고 실행한다. 사용자가 렌즈를 요청하면 묻지 않고 실행한다. 전달 문서는 사용자 요청이나 외부 공개 직전에만 검진하고 사용자가 지정한 형식·발신 주체·문장은 고치지 않는다. 기록 위치·이름은 `managing-docs` 를 가리킨다.
 - [ ] **Step 4:** `review-docs` 의 기록 이름 규칙 절을 `managing-docs` 로 옮기고, `_spec_marker.sh` 의 `REVIEW_SKILL` 을 `lens-review` 로 바꾼 뒤 세 스킬을 지운다. Step 1 의 이름 검사가 가리키는 곳(`.claude/settings.json`·`hooks/` 포함)을 고치고, 지운 스킬을 대상으로 하던 옛 검사를 지운다.
 - [ ] **Step 5:** Global Constraints 검증 명령. Expected: `BAD` 줄 없음, `Validation passed`.
 - [ ] **Step 6:** 커밋 `리뷰 스킬 셋을 카테고리 적대 리뷰와 1차 디펜스를 맡는 lens-review 하나로 합친다`.
@@ -82,19 +91,27 @@
 ### Task 3: 렌즈 에이전트 정리 (5단계)
 
 **Files:**
-- Delete: `agents/lens-consistency.md`, `agents/map-check.md`
-- Modify: `agents/lens-adversarial.md`(모순·커버리지·이름 드리프트 흡수), `agents/lens-grounding.md`, `agents/lens-fit.md`(형식·계약만), `agents/lens-readability.md`(문체 카테고리: 공격 항목 = 사용자 AI 티 항목, 디펜스 기준 = 판정 기준점 5개와 과잉 지적 반례), `agents/lens-rebuttal.md`, `agents/lens-visual.md`, `agents/researcher.md`, `agents/citation-verifier.md`, `agents/citation-judge.md`, `scripts/lens_contract.json`(`lens-consistency`·`principles_applied` 삭제), `scripts/test_lens_contract.sh`
+- Delete: `agents/lens-consistency.md`, `agents/lens-fit.md`, `agents/lens-visual.md`, `agents/map-check.md`
+- Modify:
+  - `agents/lens-adversarial.md`: 「spec 과 다른 점」의 설계 결함 범위.
+  - `agents/lens-grounding.md`: 옛 `lens-fit` 의 형식 계약 판정과 `doc_type`(null 이면 빈 지적을 판정으로 쓰지 않는 규칙 포함)을 옮긴다. 출처와 다른 점만 내고 추정 지적은 내지 않는다. 웹 도구는 두지 않는다.
+  - `agents/lens-readability.md`: 기준 문서 읽기 절·축 위치 입력·관찰 목록·"항목을 묶거나 줄이지 마라" 규칙을 지우고, 「입력」 절에 대상·목적·`style-attacks.md` 만 받는다고 적는다. 옛 `lens-visual` 의 화면 관찰과 `purpose`·화면 `suggestions`, 브라우저 도구, 브라우저 도구가 없을 때의 처리를 옮기고 `kofia.or.kr` 금지를 둔다.
+  - `agents/lens-rebuttal.md`, `agents/researcher.md`, `agents/citation-verifier.md`, `agents/citation-judge.md`: `PRINCIPLES` 줄 제거와 웹 규칙 확인.
+  - `scripts/lens_contract.json`: 지운 렌즈 넷과 `principles_applied` 삭제. `lens-adversarial` types 에 `contradiction`·`gap`·`drift`·`scope` 추가, `lens-grounding` 에 형식 지적 type 과 `doc_type` 추가, `lens-readability` 에 화면 `suggestions` 추가.
+  - `skills/lens-review/SKILL.md`: 렌즈 표를 네 렌즈로, 입력 형식의 `CRITERIA`(대조는 출처와 형식 계약, 독자는 `style-attacks.md`), 디펜스를 적대 렌즈에만 하고 대조 렌즈는 위치와 귀결만 확인, 사용자 보고에 기각 수를 적는다. 독자 렌즈의 `suggestions` 도 디펜스 대상이며 기각 수에 넣는다.
+  - `skills/domain-pruning/SKILL.md`(`doc_type` 출처, "두 렌즈의 통합" 결정), `skills/review-llm-calls/SKILL.md`(출력 종류별 배정표), `skills/researching-prior-art/SKILL.md`(지도 대조 단계·`map_check` 반환 칸 서술), 그 밖에 지운 렌즈 이름을 가리키는 스킬·스크립트.
+  - `scripts/test_lens_contract.sh` 와 지운 렌즈를 대상으로 하던 옛 검사.
 - Create: `skills/lens-review/references/style-attacks.md`(문체 공격 항목: 직역투, 어울리지 않는 고유어, 평소 안 쓰는 말, 뜻 없는 단위·차수, 대명사처럼 쓰는 말, 얼버무림, 비유, 내부 맥락·용어, 장황함·묻지 않은 답, 톤 없는 정보 교환체, 형식. 항목마다 한두 줄 설명. 과잉 지적 반례 절: 전체가 자연스러우면 통과, 흔한 업무 표현은 직역투로 보지 않음. 원문 인용은 넣지 않는다)
 
 **Interfaces:**
 - Consumes: Task 2 의 렌즈 입력 형식.
-- Produces: 렌즈 정의는 `PRINCIPLES` 줄과 `principles_applied` 가 없다. 모든 렌즈가 적대 자세로 지적하고, 지적마다 원문 위치와 근거를 낸다(디펜스가 대조할 수 있게).
+- Produces: 렌즈 정의는 `PRINCIPLES` 줄과 `principles_applied` 가 없고 Task 2 의 입력 형식(`MODE`·`TARGET`·`CRITERIA`)을 읽는다. 적대 렌즈 셋(설계 결함·반대 근거·독자)은 적대 자세로, 대조 렌즈는 드라이하게 지적하며, 모든 지적은 원문 위치와 근거를 낸다(디펜스가 대조할 수 있게).
 
-- [ ] **Step 1:** `test_lens_contract.sh` 에 검사를 쓴다: `렌즈 이름 목록은 agents/lens-*.md 에서 도출한다`, `계약 JSON 의 렌즈가 정의 파일과 같다`, `렌즈 정의에 PRINCIPLES·principles_applied 가 없다`, `웹을 쓰는 에이전트 정의에 kofia.or.kr 금지가 있다`, `웹을 쓰는 렌즈(lens-rebuttal·lens-visual)에 사내 정보 검색어 금지가 있다`, `researcher·citation-verifier 에 검색어 일반화 규칙이 있다`, `모든 에이전트 frontmatter 가 안전하다`(agents/*.md 전부, name·description 존재, description 에 백틱 밖 금지어 없음), `style-attacks.md 에 과잉 지적 반례 절이 있다`.
-- [ ] **Step 2:** Run: `bash scripts/test_lens_contract.sh 2>&1 | grep FAIL` Expected: Step 1 검사 이름이 `FAIL:` 로 나온다.
-- [ ] **Step 3:** Files 대로 고친다. 렌즈별 계약은 spec 「에이전트」 표. `workflows/prior-art-search.js` 와 `scripts/prior_art_contract.json` 의 `MapCheck`·`map-check` 를 지우고 `test_workflow.sh`·`test_prior_art_contract.sh` 를 맞춘다.
+- [ ] **Step 1:** `test_lens_contract.sh` 에 검사를 쓴다: `계약 JSON 의 렌즈가 정의 파일과 같다`(렌즈 목록은 `agents/lens-*.md` 에서 도출), `렌즈 정의에 PRINCIPLES·principles_applied 가 없다`, `웹 주소를 여는 도구(WebSearch·WebFetch·browser_navigate)를 가진 에이전트 정의에 kofia.or.kr 금지가 있다`, `WebSearch·WebFetch 를 가진 렌즈는 lens-rebuttal 뿐이다`, `browser_navigate 를 가진 렌즈는 lens-readability 뿐이다`, `lens-readability 에 입력 절이 있다`(절 제목 「입력」), `지운 렌즈 이름(lens-consistency·lens-fit·lens-visual·map-check)을 가리키는 살아 있는 지시문이 없다`(범위는 `agents/`·`skills/`·`hooks/`·`workflows/`·`scripts/*.json`, 참고서와 테스트 픽스처는 범위 밖), `모든 에이전트 frontmatter 가 안전하다`(agents/*.md 전부, name·description 존재, description 에 백틱 밖 금지어 없음), `style-attacks.md 에 과잉 지적 반례 절이 있다`(절 제목), `lens-adversarial 계약 types 에 contradiction 이 있다`. 사내 정보 검색어 금지(`lens-rebuttal`)와 검색어 일반화(`researcher`·`citation-verifier`)는 이미 있으므로 기존 검사가 없으면 절 제목으로 판정하는 검사를 추가하되 Step 2 의 실패 대상에서 뺀다.
+- [ ] **Step 2:** Run: `bash scripts/test_lens_contract.sh 2>&1 | grep FAIL` Expected: Step 1 의 새 검사 중 지금 참인 검사(사내 정보·검색어 일반화)를 뺀 이름이 `FAIL:` 로 나온다.
+- [ ] **Step 3:** Files 대로 고친다. 렌즈별 계약은 spec 「에이전트」 표와 「spec 과 다른 점」 리뷰 구조. `workflows/prior-art-search.js` 와 `scripts/prior_art_contract.json` 의 `MapCheck`·`map-check` 를 지우고 `test_workflow.sh`·`test_prior_art_contract.sh` 를 맞춘다.
 - [ ] **Step 4:** Global Constraints 검증 명령. Expected: `BAD` 줄 없음, `Validation passed`.
-- [ ] **Step 5:** 커밋 `렌즈를 카테고리 적대 렌즈로 정리하고 문체 공격 항목을 둔다`.
+- [ ] **Step 5:** 커밋 `렌즈를 대조·설계 결함·반대 근거·독자 네 개로 정리하고 문체 공격 항목을 둔다`.
 
 ### Task 4: 나머지 스킬 정리와 `side-by-side` 신설 (5단계)
 
