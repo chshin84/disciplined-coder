@@ -53,7 +53,6 @@ RUNTIME="$HERE/skills/review-llm-calls/SKILL.md"
 echo "[런타임 — 등급이 아니라 type 으로 행동을 정한다]"
 check "조립 절이 type 값으로 accept·escalate 를 가른다" "sec_has_id \"\$RUNTIME\" '조립' type && sec_has_id \"\$RUNTIME\" '조립' accept && sec_has_id \"\$RUNTIME\" '조립' escalate"
 
-STOPH="$HERE/hooks/stop_gates.sh"
 
 echo "[리뷰 절차 — 렌즈를 한 번씩 실행하고 결과를 한데 모은다]"
 DOCS="$HERE/skills/review-docs/SKILL.md"
@@ -365,8 +364,8 @@ check "「」 참조를 하나 이상 찾았다" "[ '$BN' -gt 0 ]"
 echo "[문서가 가리킨 경로가 실재한다]"
 . "$HERE/scripts/_json_valid.sh"
 _json_python || true
-DP() { PYTHONUTF8=1 "${_JSON_PY:-python}" -I "$HERE/scripts/_doc_paths.py" "$1" </dev/null 2>&1 || echo "RUN-ERROR"; }
-DPOUT="$(DP "$HERE")"
+DP() { PYTHONUTF8=1 "${_JSON_PY:-python}" -I "$HERE/scripts/_doc_paths.py" "$@" </dev/null 2>&1 || echo "RUN-ERROR"; }
+DPOUT="$(DP "$HERE" "${REMOVED_REF_EXCLUDES[@]}")"
 check "경로 후보를 하나 이상 확인했다" "grep -qE '^CHECKED [1-9]' <<<\"\$DPOUT\""
 check "살아 있는 문서에 깨진 경로가 없다" "[ \"\$(grep -vc '^CHECKED ' <<<\"\$DPOUT\" || true)\" = 0 ]"
 grep -v '^CHECKED ' <<<"$DPOUT" | sed 's/^/          /' || true
@@ -394,12 +393,6 @@ for D in "$CALLER" "$README"; do
   dn="$(basename "$D")"
   check "$dn 이 통과 마커를 코드와 같이 적는다"       "grep -qF -- '$MARK_OK' '$D'"
   check "$dn 이 에스컬레이트 마커를 코드와 같이 적는다" "grep -qF -- '$MARK_ESC' '$D'"
-done
-# 끄기 변수 이름도 코드에서 뽑아 산문과 맞댄다.
-GATE_VAR="$(grep -oE 'DISCIPLINED_CODER_[A-Z_]+' "$STOPH" | head -1 || true)"
-check "코드에서 끄기 변수 이름을 뽑아냈다" "[ -n \"\$GATE_VAR\" ]"
-for D in "$CALLER" "$README"; do
-  check "$(basename "$D") 이 끄기 변수 이름을 코드와 같이 적는다" "grep -qF -- '$GATE_VAR' '$D'"
 done
 
 # --- 렌즈 전체 개수를 산문에 박지 않는다 ---

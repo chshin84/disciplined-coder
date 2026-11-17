@@ -8,9 +8,8 @@
 # 세 줄을 함께 실은 측정은 아직 없고, 3단계 검증의 v2 조건에서 측정한다. 지시를 셋보다 늘리면 리마인더끼리
 # 경쟁해 효과가 줄었다는 선행 사례가 있어 세 줄로 둔다.
 #
-# 입력은 읽지 않는다. 메시지 내용과 무관하게 같은 글을 내며, 끄려면 DISCIPLINED_CODER_REPLY_REMINDER=off 로 둔다.
+# 입력은 읽지 않는다. 메시지 내용과 무관하게 같은 글을 낸다.
 set -euo pipefail
-[ "${DISCIPLINED_CODER_REPLY_REMINDER:-on}" = "off" ] && exit 0
 cat >/dev/null || true
 
 DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.

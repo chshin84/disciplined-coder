@@ -30,7 +30,7 @@ path_is_specplan() {  # $1=경로 → spec/plan 경로면 0
   return 1
 }
 
-# 프로젝트 안의 경로인가. 문서 넛지 훅이 메모리 파일이나 계획 파일처럼 프로젝트 밖 문서에 걸리지
+# 프로젝트 안의 경로인가. spec 리뷰 알림이 프로젝트 밖 spec·plan 에 나가지
 # 않게 한다. 기준은 CLAUDE_PROJECT_DIR이고 없으면 현재 폴더다. 상대경로는 프로젝트 안으로 본다.
 # 훅 입력은 Windows 형식(D:\...)이고 셸의 현재 폴더는 POSIX 형식(/d/...)일 수 있다. 두 형식이
 # 다를 때만 cygpath 로 POSIX 쪽을 Windows 형식으로 옮긴다. 같으면 옮길 것이 없어 프로세스를 안 띄운다.
@@ -54,7 +54,7 @@ path_in_project() {  # $1=경로 → 프로젝트 안이면 0
 }
 
 # 이 플러그인 저장소 자신의 문서인지 본다. 조상 폴더에 agent-principles.md 가 있으면 그렇다. 금지 표현 검사가
-# 이 저장소의 문서를 빼는 판정이고, 훅 셋이 같은 판정을 해야 하므로 여기 하나만 둔다.
+# 이 저장소의 문서를 빼는 판정이다.
 #
 # 상대경로를 받는 쪽이 있다. git status 가 돌려주는 경로가 레포 루트 기준이라 `skills/x/a.md`
 # 처럼 온다. 폴더가 한 조각만 남으면 `${d%/*}` 가 그 조각을 그대로 돌려주어 루프가 거기서 끝나고,
@@ -63,7 +63,7 @@ path_in_project() {  # $1=경로 → 프로젝트 안이면 0
 # 이 저장소를 cwd 로 연 세션에서 저장소 밖의 모든 문서가 이 저장소의 것으로 판정된다.
 # 이 저장소 자신의 문서를 금지 표현 검사에서 빼는 술어다. 2026-09-22 에 사용자가 이 제외를
 # 영구로 정했고 위반이 있었다는 통지도 남기지 않기로 했다. 표에 낱말이 추가되면 이 저장소의 문서가
-# 아무것도 안 했는데 편집이 거부된다. 표와 근거를
+# 아무것도 안 했는데 알림이 뜬다. 표와 근거를
 # 적는 문서는 그 말을 이름으로 불러야 한다는 것도 이유다. 검토는 사람이 직접 한다 —
 # scripts/check_banned_words.sh 가 그 수단이다. 되살리지 말고 지우지도 마라.
 path_in_own_repo() {  # $1=경로 → 이 저장소 자신의 문서이면 0
@@ -84,8 +84,7 @@ path_in_own_repo() {  # $1=경로 → 이 저장소 자신의 문서이면 0
   return 1
 }
 
-# 금지 표현 검사의 대상인가. Pre·Post·Stop 훅 셋이 같은 제외를 써야 같은 파일이 도구에 따라
-# 다르게 판정되지 않는다. 대상은 `.md` 가운데 아래 셋에 안 드는 것이다.
+# 금지 표현 검사(doc_word_posttooluse.sh)의 대상인가. 대상은 `.md` 가운데 아래 셋에 안 드는 것이다.
 #   Claude 메모리(`/.claude/projects/`) — 나에게 남기는 쪽지이고 금지어를 목록으로 적어 둘 곳이다.
 #   `docs/superpowers/` 아래 — spec·plan·리뷰 기록이다. 레포 뿌리 기준 상대경로(git status)도 받는다.
 #   이 저장소 자신의 문서 — path_in_own_repo 가 판정한다.
@@ -96,22 +95,7 @@ path_is_banned_target() {  # $1=경로 → 검사 대상이면 0
   return 0
 }
 
-# 리뷰 기록인가. 양식은 검진 절이 정하고, 검진 넛지가 뜨면 기록에 대한 기록을 또 쓰는 순환이 생긴다.
-# 새 문서 넛지와 검진 넛지가 함께 뺀다 — 한쪽만 빼면 같은 파일에 한 훅은 조용하고 다른 훅은 떠든다.
-path_is_review_record() {  # $1=경로 → 리뷰 기록이면 0
-  case "$1" in *docs/superpowers/reviews/*.md) return 0 ;; esac
-  return 1
-}
-
-# 문서 형식 검사(hooks/_doc_form_check.py)의 대상인가. `.md` 전부에서 리뷰 기록과 Claude 메모리를 뺀다.
-# 리뷰 기록은 고치지 않는 기록이고, 메모리는 나에게 남기는 쪽지라 남에게 전달되지 않는다.
-path_is_form_target() {  # $1=경로 → 검사 대상이면 0
-  case "$1" in *.md) ;; *) return 1 ;; esac
-  path_is_review_record "$1" && return 1
-  case "$1" in */.claude/projects/*) return 1 ;; esac
-  return 0
-}
-
-# spec/plan 리뷰 안내문. PostToolUse 넛지와 Stop 차단 사유가 같은 문장을 쓴다. 렌즈 구성은
-# review-specs가 정하므로 여기 개수를 박지 않는다.
-SPEC_REVIEW_INSTRUCTION="disciplined-coder review-specs 스킬로 PREP+독립 렌즈 리뷰를 수행하라(어느 렌즈를 실행할지는 그 스킬이 정한다). 리뷰와 처분 분류가 끝나면 개선보다 앞서 문서 마지막 줄에 spec-review 마커를 먼저 남기고(passed 또는 escalated, HTML 주석) 그다음 개선을 반영하라."
+# spec/plan 리뷰 지시문. PostToolUse 알림과 Stop 차단 사유가 같은 문장을 쓴다. 리뷰 절차와 렌즈 구성은
+# REVIEW_SKILL 이 가리키는 스킬이 정하므로 여기 개수를 적지 않는다. 스킬 이름은 이 변수 하나가 소유한다.
+REVIEW_SKILL="disciplined-coder review-specs"
+SPEC_REVIEW_INSTRUCTION="\`${REVIEW_SKILL}\` 의 설계 문서 절차로 리뷰하라. 사용자가 상시 요청한 절차이므로 승인을 묻지 말고 실행하라. 처분을 끝내고 마지막 줄에 spec-review 마커를 남겨라."

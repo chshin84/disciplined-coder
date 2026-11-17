@@ -235,30 +235,8 @@ check "사본을 뜨지 않는다"             "[ \"\$(bak_count '$H25')\" -eq 0
 check "에이전트원칙 줄은 그대로 쓴다"  "MB_SEC '$UC25' | grep -qxF '@disciplined-coder/agent-principles.md'"
 
 # --- install-current: 설치본이 원격보다 뒤처지면 옮기고 다시 켜라고 알린다 ---
-# 갱신 확인은 scaffold 가 아니라 hooks/update_check_sessionstart.sh 가 실행한다. claude 와 curl 을
-# 실제로 부르지 않도록 스텁을 주입한다. claude 스텁은 받은 인자를 args.txt 에 적어 무엇을 실행했는지
-# 단언하게 하고, curl 스텁은 remote.txt 의 커밋을 git smart HTTP 의 pkt-line 형식으로 낸다.
-run_uc() { CLAUDE_HOME_DIR="$1/.claude" DISCIPLINED_CODER_CLAUDE_BIN="$1/claude-stub" DISCIPLINED_CODER_CURL_BIN="$1/curl-stub" CLAUDE_PLUGIN_ROOT="${2:-}" bash "$HERE/hooks/update_check_sessionstart.sh" < /dev/null; }
-uc_fixture() {  # $1=HOME $2=설치본 커밋 $3=claude 스텁 종료 코드 $4=원격 커밋(빈 값이면 원격을 못 읽는다) $5=source 의 ref → 사본의 HEAD 를 출력한다
-  local m="$1/.claude/plugins/marketplaces/chshin-tools" ref=""
-  mkdir -p "$m"
-  if [ -n "${5:-}" ]; then ref=", \"ref\": \"$5\""; fi
-  printf '{ "version": 2, "plugins": { "disciplined-coder@chshin-tools": [ { "scope": "user", "gitCommitSha": "%s" } ] } }\n' "$2" > "$1/.claude/plugins/installed_plugins.json"
-  printf '{ "chshin-tools": { "source": { "source": "github", "repo": "chshin84/disciplined-coder"%s } } }\n' "$ref" > "$1/.claude/plugins/known_marketplaces.json"
-  git init -q "$m"; git -C "$m" -c user.email=t@t -c user.name=t commit -q --allow-empty -m x
-  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s/args.txt"\nexit %s\n' "$1" "$3" > "$1/claude-stub"
-  printf '%s' "${4:-}" > "$1/remote.txt"
-  # 실제 응답처럼 길이 접두사 4자와 NUL 이 섞인 줄을 낸다. 길이 접두사를 커밋으로 잘못 읽으면 실패한다.
-  cat > "$1/curl-stub" <<STUB
-#!/usr/bin/env bash
-printf '%s\n' "\$*" >> "$1/curl-args.txt"
-r="\$(cat "$1/remote.txt")"; [ -n "\$r" ] || exit 22
-printf '001e# service=git-upload-pack\n0000015b%s HEAD\0multi_ack side-band\n003f%s refs/heads/main\n0000' "\$r" "\$r"
-STUB
-  chmod +x "$1/claude-stub" "$1/curl-stub"
-  git -C "$m" rev-parse HEAD
-}
-A40="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; B40="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"; C40="cccccccccccccccccccccccccccccccccccccccc"
+# 갱신 확인은 scaffold 가 아니라 hooks/update_check_sessionstart.sh 가 실행한다. 스텁 픽스처는 공유 파일에 있다.
+. "$HERE/scripts/_test_uc_fixture.sh"
 first_line() { json_run 'import json,sys; print(json.load(sys.stdin)["systemMessage"].splitlines()[0])'; }
 
 # 마켓플레이스 새로고침은 세션 시작 훅보다 늦게 도착해, 훅이 실행되는 시점에는 로컬 사본도 옛 커밋이다.

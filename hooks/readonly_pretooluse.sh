@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PreToolUse(Write|Edit): 대상 파일이 있고 쓰기 불가이면 거부하고 사유를 낸다.
 # 경로·저장소·HEAD는 보지 않는다 — 읽기 전용이라는 속성은 그 파일을 만든 쪽의 의도라 어느 프로젝트에서든
-# 같은 뜻이다. 끄는 스위치를 두지 않는다(DISCIPLINED_CODER_REVIEW_GATE 도 미치지 않는다). 풀려면 속성을
+# 같은 뜻이다. 끄는 스위치를 두지 않는다. 풀려면 속성을
 # 풀면 되고 그 길은 셸이다. Write 는 훅 없이도 EPERM 으로 막히므로 이 훅의 몫은 왜 막혔는지 말하는 것이다.
 set -euo pipefail
 DIR="${BASH_SOURCE[0]%/*}"; [ "$DIR" != "${BASH_SOURCE[0]}" ] || DIR=.
