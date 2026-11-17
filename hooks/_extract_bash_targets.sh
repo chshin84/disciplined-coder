@@ -116,10 +116,10 @@ END {
     }
     if (mode == "") {
       # 명령어 자리는 명령의 첫 낱말이다. 환경 변수 대입과 sudo·xargs 같은 앞머리 뒤도 명령어 자리다.
-      # sed 와 tee 는 명령어 자리가 아니어도 받는다(옛 판정과 같다).
+      # sed 와 tee 도 명령어 자리에 올 때만 받는다. 다른 명령의 인자로 나온 낱말(grep tee x.md)을 쓰기로 보면 읽기 전용 훅이 읽기를 거부한다.
       if (cmdpos && w ~ /^[A-Za-z_][A-Za-z0-9_]*=/) continue
-      if (w == "sed") { mode = "sed"; continue }
-      if (w == "tee") { mode = "tee"; continue }
+      if (cmdpos && w == "sed") { mode = "sed"; continue }
+      if (cmdpos && w == "tee") { mode = "tee"; continue }
       if (cmdpos && (w == "cp" || w == "mv")) { mode = "cp"; continue }
       if (cmdpos && w == "git") { mode = "git"; continue }
       if (cmdpos && (w == "sudo" || w == "xargs" || w == "env" || w == "command" || w == "time" || w == "nice" || w == "nohup" || w == "exec")) continue

@@ -157,6 +157,8 @@ check "sed -i 대상 여럿이 뽑힌다"   "[ \"\$(ebt 'sed -i s/a/b/ one.md tw
 check "재지향 대상이 뽑힌다"        "[ \"\$(ebt 'printf x > out.md')\" = 'out.md ' ]"
 check "붙여 쓴 재지향도 뽑힌다"     "[ \"\$(ebt 'cat >dst.md')\" = 'dst.md ' ]"
 check "tee 대상이 뽑힌다"           "[ \"\$(ebt 'tee -a log.md')\" = 'log.md ' ]"
+check "셸 인자의 tee 낱말은 대상이 아니다" "[ -z \"\$(ebt 'grep tee ro.md')\" ]"
+check "파이프 뒤 tee 는 대상이다"     "[ \"\$(ebt 'cat a | tee out.md')\" = 'out.md ' ]"
 check "cp 의 목적지만 뽑힌다"       "[ \"\$(ebt 'cp src.md dest.md')\" = 'dest.md ' ]"
 check "git mv 의 목적지만 뽑힌다"   "[ \"\$(ebt 'git mv old.md new.md')\" = 'new.md ' ]"
 check "읽기만 하는 sed 는 안 뽑힌다" "[ -z \"\$(ebt 'sed -n 1,5p onlyread.md')\" ]"
