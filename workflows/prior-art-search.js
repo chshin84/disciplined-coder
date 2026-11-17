@@ -20,8 +20,9 @@ const JUDGE = 'disciplined-coder:citation-judge';
 const BATCH_SIZE = 20;
 // 한 번에 실행하는 에이전트 수의 상한이다. 2026-11-16 PC 메모리 부족으로 작업이 두 번 중단된 뒤 사용자가 정했다.
 const CONCURRENCY = 4;
-// 비용 상한이다. 하위 질문 수는 스킬의 탐색 연구자 상한 20 과 같고, 연구자당 인용 URL 수는 검증 호출 수를 묶는다.
-// 넘는 실행은 묻지 않고 실행하는 경로에서 비용이 커지므로 거부하고, 오케스트레이터가 사용자에게 묻게 한다.
+// 비용 상한이다. 하위 질문 수는 스킬의 탐색 연구자 상한 20 과 같고, 넘으면 에이전트를 부르기 전에 거부한다.
+// 연구자당 인용 URL 수는 검증 호출 수를 묶는다. 넘으면 연구 결과를 버리지 않고 앞의 30개만 검증하고, 잘라 낸 URL 을
+// 반환값의 url_trimmed 에 남긴다. 잘라 낸 URL 의 인용은 확인할 수 없는 인용(unverifiable)으로 센다.
 const MAX_SUBQUESTIONS = 20;
 const MAX_URLS_PER_RESEARCHER = 30;
 
@@ -74,13 +75,11 @@ const researchOut = await inChunks(args.subquestions.map((sq) => () => agent(
 )));
 const researchers = args.subquestions.map((sq, i) => ({ id: sq.id, output: researchOut[i] ?? null }));
 const query_violations = checkQueries(researchers, args.forbidden_terms);
-for (const r of researchers) {
-  const n = citedUrls(r.output).length;
-  if (n > MAX_URLS_PER_RESEARCHER) {
-    throw new Error(`연구자 ${r.id} 의 인용 URL 이 ${n}개로 상한 ${MAX_URLS_PER_RESEARCHER} 을 넘어 검증을 실행하지 않는다. 하위 질문을 좁혀 다시 실행하라.`);
-  }
-}
-const { items, groups } = groupByUrl(researchers);
+const url_trimmed = researchers
+  .map((r) => ({ id: r.id, urls: citedUrls(r.output) }))
+  .filter((x) => x.urls.length > MAX_URLS_PER_RESEARCHER)
+  .map((x) => ({ id: x.id, cited: x.urls.length, kept: MAX_URLS_PER_RESEARCHER, dropped: x.urls.slice(MAX_URLS_PER_RESEARCHER) }));
+const { items, groups } = groupByUrl(researchers, MAX_URLS_PER_RESEARCHER);
 
 // 검증은 네 단계다. URL 마다 추출하고, 추출을 통과한 주장만 묶음으로 모아 판정한다. 정보 부족이 있고 불일치가 없는 주장은
 // 추출 검증자가 URL 마다 원문을 다시 열어 보충하고(refetch), 보충 구절을 다시 묶음으로 모아 판정한다(rejudge).
@@ -139,6 +138,7 @@ const result = {
   subquestion_status: merged.subquestion_status,
   overall_status: merged.overall_status,
   query_violations,
+  url_trimmed,
   verifier_count: verifiers.length,
   researchers,
   verifiers,
@@ -190,7 +190,12 @@ function citedUrls(output) {
 // 금융투자협회 홈페이지(kofia.or.kr 와 그 하위 주소)는 반복 접속하면 사내 접속이 차단되므로 검증자가 열지 않는다.
 // 이 주소의 인용은 묶음에 넣지 않고 확인할 수 없는 인용(unverifiable)으로 둔다.
 function isBlockedUrl(url) {
-  return /^(?:[a-z][a-z0-9+.-]*:\/\/)?(?:[^\/?#@]*@)?(?:[^\/?#:]*\.)?kofia\.or\.kr\.?(?::\d+)?(?:[\/?#]|$)/i.test(String(url ?? '').trim());
+  return /^(?:[a-z][a-z0-9+.-]*:)?(?:\/\/)?(?:[^\/?#@]*@)?(?:[^\/?#:]*\.)?kofia\.or\.kr\.?(?::\d+)?(?:[\/?#]|$)/i.test(String(url ?? '').trim());
+}
+
+// 검증자에게 보내지 않는 URL. 금융투자협회 주소와 연구자당 URL 상한으로 잘라 낸 주소다.
+function unsent(item, url) {
+  return isBlockedUrl(url) || (item.skip ?? []).includes(url);
 }
 
 // 질의 경계 검사. output 이 null 이 아닌 연구자의 검색어마다 금지어와 경로 형태를 본다.
@@ -218,10 +223,13 @@ function checkQueries(researchers, forbiddenTerms) {
 
 // URL 묶기. 항목은 하위 질문 차례, 이슈, 근거 지도 행의 차례로 만든다.
 // 선행 서술이 결측인 항목은 items 에 남기고 어느 묶음의 claims 에도 넣지 않는다.
-function groupByUrl(researchers) {
+// maxUrls 를 넘는 연구자는 citedUrls 차례로 앞의 maxUrls 개만 묶고, 나머지는 그 항목의 skip 에 적어 검증에서 뺀다.
+function groupByUrl(researchers, maxUrls = Infinity) {
   const items = [];
   for (const r of researchers) {
     if (r.output == null) continue;
+    const over = citedUrls(r.output).slice(maxUrls);
+    const start = items.length;
     (r.output.issues ?? []).forEach((issue, i) => {
       const urls = [];
       for (const c of issue.citations ?? []) {
@@ -246,13 +254,17 @@ function groupByUrl(researchers) {
         row,
       });
     });
+    for (const item of items.slice(start)) {
+      const skip = item.urls.filter((u) => over.includes(u));
+      if (skip.length > 0) item.skip = skip;
+    }
   }
   const groups = [];
   for (const item of items) {
     if (lacksPrior(item)) continue;
     const sub = item.ref.slice(0, item.ref.indexOf('#'));
     for (const url of item.urls) {
-      if (isBlockedUrl(url)) continue;
+      if (unsent(item, url)) continue;
       let g = groups.find((x) => x.url === url);
       if (!g) {
         g = { url, subquestions: [], claims: [] };
@@ -273,7 +285,7 @@ function classify(items, verifiers) {
   for (const item of items) {
     if (lacksPrior(item)) continue;
     for (const url of item.urls) {
-      if (isBlockedUrl(url)) continue;
+      if (unsent(item, url)) continue;
       if (!sent.has(url)) sent.set(url, []);
       sent.get(url).push(item.ref);
     }
@@ -308,7 +320,7 @@ function classify(items, verifiers) {
       rejected.push(entry);
       continue;
     }
-    const vs = (verdicts.get(item.ref) ?? []).concat(item.urls.filter(isBlockedUrl).map(() => 'unverifiable'));
+    const vs = (verdicts.get(item.ref) ?? []).concat(item.urls.filter((u) => unsent(item, u)).map(() => 'unverifiable'));
     if (vs.includes('supported')) passed.push(entry);
     else if (item.urls.some((u) => failed.has(u) || (claimFailed.get(u) ?? []).includes(item.ref))) continue;
     else if (vs.length > 0 && vs.every((v) => v === 'unverifiable')) unverifiable.push(entry);

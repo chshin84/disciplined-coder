@@ -975,11 +975,35 @@ check "나눠 실행해도 연구자와 추출을 하나씩 모두 부른다" "j
 # 금융투자협회 주소는 검증자가 열지 않게 묶음에서 빼고 확인할 수 없는 항목으로 둔다. 다른 주소가 받치면 통과한다.
 check "kofia.or.kr 주소는 추출에 보내지 않는다" "json_true \"\$FX/cap5_out.json\" 'not any(\"kofia.or.kr\" in c[\"label\"] for c in d[\"calls\"]) and all(\"kofia.or.kr\" not in v[\"url\"] for v in d[\"result\"][\"verifiers\"])'"
 check "kofia.or.kr 만 인용한 항목은 unverifiable 이다" "json_true \"\$FX/cap5_out.json\" '{\"ref\": \"S1#issue#1\", \"urls\": [\"https://www.kofia.or.kr/brd/x\"]} in d[\"result\"][\"unverifiable\"] and any(p[\"ref\"] == \"S1#issue#2\" for p in d[\"result\"][\"passed\"]) and d[\"result\"][\"overall_status\"] == \"ok\"'"
-# 비용 상한: 하위 질문 20개, 연구자당 인용 URL 30개. 넘으면 실행을 거부한다(한 번 실행의 관측 비용 약 0.5달러).
+# 비용 상한: 하위 질문 20개(넘으면 거부), 연구자당 인용 URL 30개(넘으면 앞의 30개만 검증하고 잘라 낸 URL 을 남긴다).
 check "하위 질문이 20개를 넘으면 에이전트를 부르기 전에 거부한다" "mkcap 21 1 \"\$FX/cap21_in.json\" && { harn run < \"\$FX/cap21_in.json\" > \"\$FX/cap21_out.json\" 2> \"\$FX/cap21_err.txt\"; [ \$? -eq 1 ]; } && grep -qF 'subquestions' \"\$FX/cap21_err.txt\""
 check "하위 질문 20개는 실행한다" "mkcap 20 1 \"\$FX/cap20_in.json\" && harn run < \"\$FX/cap20_in.json\" > \"\$FX/cap20_out.json\""
-check "연구자 하나의 인용 URL 이 30개를 넘으면 검증 전에 거부한다" "mkcap 2 31 \"\$FX/u31_in.json\" && { harn run < \"\$FX/u31_in.json\" > \"\$FX/u31_out.json\" 2> \"\$FX/u31_err.txt\"; [ \$? -eq 1 ]; } && grep -qF 'URL' \"\$FX/u31_err.txt\""
+# S1 은 일반 URL 31개 뒤에 금융투자협회 주소 둘을 인용하므로 인용 URL 은 33개이고 앞의 30개만 남는다.
+check "연구자 하나의 인용 URL 이 30개를 넘어도 실행이 끝난다" "mkcap 2 31 \"\$FX/u31_in.json\" && harn run < \"\$FX/u31_in.json\" > \"\$FX/u31_out.json\""
+E_TRIM='(lambda t: len(t) == 1 and t[0]["id"] == "S1" and t[0]["cited"] == 33 and t[0]["kept"] == 30 and t[0]["dropped"][0] == "https://u1-31" and len(t[0]["dropped"]) == 3)(d["result"]["url_trimmed"]) and len([c for c in d["calls"] if c["label"].startswith("extract:https://u1-")]) == 30 and not any(c["label"] == "extract:https://u1-31" for c in d["calls"]) and any(u["ref"] == "S1#issue#30" for u in d["result"]["unverifiable"])'
+check "잘라 낸 URL 수를 url_trimmed 에 남기고 S1 의 추출은 30번이다" "json_true \"\$FX/u31_out.json\" '$E_TRIM'"
 # S1 은 금융투자협회 주소 둘을 더 인용하므로 28 이면 30개다.
-check "연구자 하나의 인용 URL 30개는 실행한다" "mkcap 2 28 \"\$FX/u30_in.json\" && harn run < \"\$FX/u30_in.json\" > \"\$FX/u30_out.json\""
+check "연구자 하나의 인용 URL 30개는 자르지 않는다" "mkcap 2 28 \"\$FX/u30_in.json\" && harn run < \"\$FX/u30_in.json\" > \"\$FX/u30_out.json\" && json_true \"\$FX/u30_out.json\" 'd[\"result\"][\"url_trimmed\"] == []'"
+# 동시 실행 상한은 inChunks 한 곳이 지킨다. 그 밖의 parallel 호출은 호출이 하나뿐인 둘러보기만 허용한다.
+# 출력은 inChunks 안의 parallel 수, 밖의 단일 호출 parallel 수, 밖의 parallel 전체 수다.
+PAR_OUT="$(json_run '
+import re, sys
+src = re.sub(r"//[^\n]*", "", open(sys.argv[1], encoding="utf-8").read())
+body = re.search(r"async function inChunks\([^)]*\) \{.*?\n\}", src, re.S)
+inner = body.group(0) if body else ""
+rest = src.replace(inner, "") if body else src
+pat = r"(?<![A-Za-z0-9_$.])parallel\("
+print(len(re.findall(pat, inner)), len(re.findall(pat + r"\[\(\) => agent\(", rest)), len(re.findall(pat, rest)))
+' "$WF")"
+check "inChunks 밖의 parallel 은 둘러보기 호출 하나뿐이다" "[ \"\$PAR_OUT\" = '1 1 1' ]"
+# 금융투자협회 주소 판정: 스킴이 http 이거나 생략된 주소(//)도 막고, 이름에 그 도메인이 섞인 다른 도메인은 막지 않는다.
+cat > "$FX/kf_in.json" <<'EOF'
+[[{"id": "K", "output": {"search_status": "ok", "queries": [], "issues": [
+  {"prior_claim": "a", "citations": [{"url": "http://kofia.or.kr/a"}]},
+  {"prior_claim": "b", "citations": [{"url": "//www.kofia.or.kr/b"}]},
+  {"prior_claim": "c", "citations": [{"url": "https://notkofia.or.kr/c"}]},
+  {"prior_claim": "d", "citations": [{"url": "https://kofia.or.kr.example.com/d"}]}]}}]]
+EOF
+check "http·스킴 생략 주소는 묶지 않고 다른 도메인은 묶는다" "harn fn groupByUrl < \"\$FX/kf_in.json\" > \"\$FX/kf_out.json\" && json_true \"\$FX/kf_out.json\" '[g[\"url\"] for g in d[\"groups\"]] == [\"https://notkofia.or.kr/c\", \"https://kofia.or.kr.example.com/d\"]'"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

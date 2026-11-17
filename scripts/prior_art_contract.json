@@ -27,7 +27,7 @@
               "coverage": [{ "id": true, "cases_found": true, "passed": true }],
               "subquestion_status": [{ "id": true, "search_status": true, "verification_status": true }],
               "overall_status": true, "query_violations": [{ "id": true, "query": true, "rule": true }],
-              "verifier_count": true, "researchers": [{ "id": true, "output": true }],
+              "url_trimmed": [{ "id": true, "cited": true, "kept": true, "dropped": true }], "verifier_count": true, "researchers": [{ "id": true, "output": true }],
               "verifiers": [{ "url": true, "subquestions": true, "output": true,
                               "stages": { "extract": true, "judge": true, "refetch": true, "rejudge": true } }], "?synthesis": true }
 }
