@@ -761,6 +761,14 @@ printf '%s\n' '실적이 컨센서스를 웃돌았다.' '수요가 전망치를 
 FP_HITS="$(banned_report "$BW/pairs" "$FP_FX" "$BW/excl")"
 [ -n "$FP_HITS" ] && printf '    오검출:\n%s\n' "$FP_HITS"
 check "적대 점검 오검출 표본에서 금지어를 검출하지 않는다" "[ -z \"\$FP_HITS\" ]"
+# 제외어가 넓으면 금지할 쓰임까지 덮는다. 아래 문장은 제외어를 넣은 뒤에도 문장마다 검출되어야 한다.
+TP_MISS=""
+for s in '같은 함수를 두 자리에서 호출한다.' '세 자리를 고쳤다.' '정책을 모든 파일 걸었다.' '실행 시간 걸고 본다.'; do
+  printf '%s\n' "$s" > "$IB_FX/true-positive.md"
+  [ -n "$(banned_report "$BW/pairs" "$IB_FX/true-positive.md" "$BW/excl")" ] || TP_MISS="$TP_MISS [$s]"
+done
+[ -n "$TP_MISS" ] && echo "    놓친 문장:$TP_MISS"
+check "제외어를 넣은 행도 금지할 쓰임은 검출한다" "[ -z \"\$TP_MISS\" ]"
 check "상시 보기 머리에 적용 제외 줄이 있다" "grep -qF '법령·회계 용어에는 이 목록을 적용하지 마라' \"\$VIEW\""
 # 한 글자 어간과 두루 쓰이는 낱말은 다른 뜻으로도 쓰이므로 상시 보기가 금지할 뜻을 함께 싣는다.
 STEM_BAD="$(for w in 판 담 걸 자리 부분 영역; do grep -E "^- .*\`$w\`" "$VIEW" | grep -qF '뜻' || echo "$w"; done)"
