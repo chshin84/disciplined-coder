@@ -167,6 +167,7 @@ DWPOST_OUT="$(JB "sed -i s/x/y/ $BW/draft.md" | bash "$DWPOST")"
 check "셸 편집 → 금지 표현 통지를 PostToolUse JSON 의 additionalContext 로 낸다" \
   "printf '%s' \"\$DWPOST_OUT\" | grep -qF '\"additionalContext\"' && printf '%s' \"\$DWPOST_OUT\" | grep -qF '\"hookEventName\":\"PostToolUse\"' && ! printf '%s' \"\$DWPOST_OUT\" | grep -qF 'systemMessage' && printf '%s' \"\$DWPOST_OUT\" | json_valid_stdin"
 check "통지가 파일 이름을 담는다"   "printf '%s' \"\$DWPOST_OUT\" | grep -qF 'draft.md'"
+check "셸 통지는 원래 있던 문장을 고치지 말라고 한다" "printf '%s' \"\$DWPOST_OUT\" | grep -qF '원래 있던 문장의 말은 고치지 말고'"
 check "이 저장소 문서는 대상 아님"  "[ -z \"\$(JB 'sed -i s/x/y/ $HERE/README.md' | bash '$DWPOST')\" ]"
 # 금지 표현이 없는 산출물에는 통지가 없어야 한다. 늘 뜨면 통지가 뜻을 잃는다.
 printf '이 문서는 대상을 지적한다.\n' > "$BW/clean.md"
@@ -196,7 +197,8 @@ echo "[doc-word-post — Write·Edit 로 쓴 산출물 문서의 금지 표현�
 DWPOST="$HERE/hooks/doc_word_posttooluse.sh"
 dwp() { printf '%s' "$1" | bash "$DWPOST"; }
 JW() { printf '{"tool_name":"Write","tool_input":{"file_path":"%s"}}' "$1"; }
-JEd() { printf '{"tool_name":"Edit","tool_input":{"file_path":"%s","old_string":"a","new_string":"b"}}' "$1"; }
+# Edit 입력. $4 는 tool_input 에 덧붙일 칸, $5 는 훅 입력 끝에 덧붙일 칸(tool_response)이다.
+JEd() { printf '{"tool_name":"Edit","tool_input":{"file_path":"%s","old_string":"%s","new_string":"%s"%s}%s}' "$1" "$2" "$3" "${4:-}" "${5:-}"; }
 DWBODY='확인이 이루어지는 자리는 절차의 마지막이다. 다음 걸음을 정해 달라.'
 DWCLEAN='확인이 이루어지는 단계는 절차의 마지막이다. 다음 단계를 정해 달라.'
 DWQUOTE='표의 `자리` 행과 `걸음` 행을 그대로 두었다.'
@@ -213,7 +215,6 @@ check "Write 한 산출물의 금지 표현을 additionalContext 로 알린다" 
 check "알림이 JSON 으로 파싱된다"            "printf '%s' \"\$DWW_OUT\" | json_valid_stdin"
 check "알림이 검출된 말을 적는다"            "printf '%s' \"\$DWW_OUT\" | grep -qF '자리'"
 check "알림이 대체어를 적는다"               "printf '%s' \"\$DWW_OUT\" | grep -qF '단계'"
-check "Edit 한 산출물도 본다"                "dwp '$(JEd "$DWDIR/report.md")' | grep -qF additionalContext"
 check "금지 표현이 없으면 무출력"            "[ -z \"\$(dwp '$(JW "$DWDIR/clean.md")')\" ]"
 check "백틱 안은 안 잡는다"                  "[ -z \"\$(dwp '$(JW "$DWDIR/quote.md")')\" ]"
 check "md 가 아니면 무출력"                  "[ -z \"\$(dwp '$(JW "$DWDIR/report.txt")')\" ]"
@@ -225,6 +226,43 @@ check "설계 문서 상대경로도 무출력"          "[ -z \"\$( cd '$DWDIR'
 check "저장소 cwd 에서 밖의 산출물을 알린다" "( cd '$HERE' && dwp '$(JW "$DWDIR/report.md")' ) | grep -qF additionalContext"
 check "상대경로는 현재 폴더 기준으로 제외한다" "[ -z \"\$( cd '$DWREPO' && dwp '$(JW "x.md")' )\" ]"
 check "경로가 없으면 무출력"                 "[ -z \"\$(dwp '{}')\" ]"
+# Edit 은 new_string 이 놓인 글자만 본다. 아래 픽스처는 모두 Edit 이 끝난 뒤의 파일이다.
+printf '본문: %s
+' "$DWBODY" > "$DWDIR/edited.md"
+check "Edit 로 넣은 산문의 금지 표현을 알린다" "dwp '$(JEd "$DWDIR/edited.md" '옛 문장' "$DWBODY")' | grep -qF additionalContext"
+printf '# 제목
+
+이 자리는 원래 있던 문장이다.
+
+고친 문장이다.
+' > "$DWDIR/preexisting.md"
+check "원래 있던 말은 무관한 Edit 에 알리지 않는다" "[ -z \"\$(dwp '$(JEd "$DWDIR/preexisting.md" '고칠 문장이다.' '고친 문장이다.')')\" ]"
+printf '# 제목
+
+```sh
+echo 자리
+```
+
+본문 문장이다.
+' > "$DWDIR/fenced.md"
+check "코드 블록 안을 고친 Edit 은 알리지 않는다" "[ -z \"\$(dwp '$(JEd "$DWDIR/fenced.md" 'echo old' 'echo 자리')')\" ]"
+printf '```sh
+echo 자리
+```
+
+echo 자리 는 산문이다.
+' > "$DWDIR/replall.md"
+check "replace_all 은 바뀐 곳 전부를 본다"      "dwp '$(JEd "$DWDIR/replall.md" 'echo old' 'echo 자리' ',"replace_all":true')' | grep -qF additionalContext"
+check "replace_all 이 아니면 처음 한 곳만 본다" "[ -z \"\$(dwp '$(JEd "$DWDIR/replall.md" 'echo old' 'echo 자리')')\" ]"
+# tool_response 의 원래 파일이 있으면 치환을 다시 적용해 바뀐 곳을 정확히 찾는다. 같은 글자가 앞의 코드 블록에
+# 있어도 산문에 넣은 쪽을 본다.
+printf '```
+자리
+```
+
+자리
+' > "$DWDIR/orig.md"
+check "원래 파일이 있으면 바뀐 곳을 정확히 본다" "dwp '$(JEd "$DWDIR/orig.md" 'X' '자리' '' ',"tool_response":{"originalFile":"```\n자리\n```\n\nX\n"}')' | grep -qF additionalContext"
 # 파이썬이 없는 PC 를 흉내 낸다. 실패하는 python·python3 를 PATH 앞에 둔다.
 NOPY="$T/nopy"; mkdir -p "$NOPY"
 for n in python python3; do printf '#!/bin/sh\nexit 1\n' > "$NOPY/$n"; chmod +x "$NOPY/$n"; done
@@ -382,9 +420,10 @@ check "끄는 환경 변수가 없다" "! grep -rqE 'DISCIPLINED_CODER_[A-Z_]+.*
 check "doc_word 는 거부하지 않는다" \
   "( for o in \"\$DWW_OUT\" \"\$DWPOST_OUT\"; do printf '%s' \"\$o\" | grep -qF additionalContext || exit 1; ! printf '%s' \"\$o\" | grep -qE '\"decision\" *: *\"block\"|permissionDecision' || exit 1; done )"
 # 훅이 Claude 에게 보내는 글은 모델이 낱말을 따라 쓰므로 금지어가 백틱 밖에 없어야 한다.
-# 출력 픽스처는 spec 리뷰 지시, Stop 차단 사유, 금지어 알림, 갱신 알림(성공·실패) 이다.
+# 출력 픽스처는 spec 리뷰 지시, Stop 차단 사유, 금지어 알림, 갱신 알림(성공·실패), 읽기 전용 거부 사유,
+# 리마인더다.
 banned_parse "$HERE/korean-banned-words.md" "$T/rbw.pairs" "$T/rbw.toks" "$T/rbw.excl"
-htext() { json_run 'import json,sys; d=json.load(sys.stdin); h=d.get("hookSpecificOutput") or {}; sys.stdout.write("\n".join(str(x) for x in (d.get("reason"), d.get("systemMessage"), h.get("additionalContext")) if x))' 2>/dev/null; }
+htext() { json_run 'import json,sys; d=json.load(sys.stdin); h=d.get("hookSpecificOutput") or {}; sys.stdout.write("\n".join(str(x) for x in (d.get("reason"), d.get("systemMessage"), h.get("additionalContext"), h.get("permissionDecisionReason")) if x))' 2>/dev/null; }
 HB="$T/hookmsg"; mkdir -p "$HB"
 ptu "$(J "$SP/nomark.md")" | htext > "$HB/spec_review.txt" || true
 stop "{\"cwd\":\"$G4\",\"session_id\":\"s9\"}" | htext > "$HB/stop_gates.txt" || true
@@ -392,6 +431,8 @@ printf '%s' "$DWW_OUT" | htext > "$HB/doc_word.txt" || true
 . "$HERE/scripts/_test_uc_fixture.sh"
 HU1="$(mktemp -d)"; uc_fixture "$HU1" "$A40" 0 "$B40" > /dev/null; run_uc "$HU1" | htext > "$HB/update_ok.txt" || true
 HU2="$(mktemp -d)"; uc_fixture "$HU2" "$A40" 7 "$B40" > /dev/null; run_uc "$HU2" | htext > "$HB/update_fail.txt" || true
+rpre "$(J "$RO/sealed.md")" | htext > "$HB/readonly.txt" || true
+printf '' | bash "$HERE/hooks/reply_reminder_userpromptsubmit.sh" | htext > "$HB/reply_reminder.txt" || true
 HB_EMPTY=""; HB_BAD=""
 for f in "$HB"/*.txt; do
   [ -s "$f" ] || HB_EMPTY="$HB_EMPTY $(basename "$f")"
