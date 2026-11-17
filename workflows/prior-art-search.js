@@ -6,7 +6,6 @@ export const meta = {
     { title: 'Research' },
     { title: 'Verify' },
     { title: 'Synthesize' },
-    { title: 'MapCheck' },
   ],
 };
 
@@ -17,13 +16,22 @@ const S = schemas();
 const RESEARCHER = 'disciplined-coder:researcher';
 const EXTRACTOR = 'disciplined-coder:citation-verifier';
 const JUDGE = 'disciplined-coder:citation-judge';
-const MAPCHECK = 'disciplined-coder:map-check';
 // 판정 묶음 하나에 넣는 주장 수의 상한이다. 값의 근거는 spec 「Opus 일괄 판정」의 묶음 크기다.
 const BATCH_SIZE = 20;
+// 한 번에 실행하는 에이전트 수의 상한이다. 2026-11-16 PC 메모리 부족으로 작업이 두 번 중단된 뒤 사용자가 정했다.
+const CONCURRENCY = 4;
+// 비용 상한이다. 하위 질문 수는 스킬의 탐색 연구자 상한 20 과 같고, 넘으면 에이전트를 부르기 전에 거부한다.
+// 연구자당 인용 URL 수는 검증 호출 수를 묶는다. 넘으면 연구 결과를 버리지 않고 앞의 30개만 검증하고, 잘라 낸 URL 을
+// 반환값의 url_trimmed 에 남긴다. 잘라 낸 URL 의 인용은 확인할 수 없는 인용(unverifiable)으로 센다.
+const MAX_SUBQUESTIONS = 20;
+const MAX_URLS_PER_RESEARCHER = 30;
 
 // 용도는 비울 수 없는 칸이다. 비어 있으면 에이전트를 부르기 전에 끝내 비용을 쓰지 않는다.
 if (typeof args.intended_use !== 'string' || args.intended_use.trim() === '') {
   throw new Error('args.intended_use 가 비어 있다. 프로토콜의 용도 칸을 채워 다시 실행하라.');
+}
+if ((args.subquestions ?? []).length > MAX_SUBQUESTIONS) {
+  throw new Error(`args.subquestions 가 ${args.subquestions.length}개로 상한 ${MAX_SUBQUESTIONS} 을 넘는다. 하위 질문을 줄이거나 사용자에게 물어 나눠 실행하라.`);
 }
 
 // 둘러보기 실행(round 0)은 연구자 하나를 scout 모드로 실행하고, 검증과 종합 없이 질의 경계 검사만 거쳐 반환한다.
@@ -31,7 +39,7 @@ if (typeof args.intended_use !== 'string' || args.intended_use.trim() === '') {
 if (args.round === 0) {
   phase('Research');
   const scout = (await parallel([() => agent(
-    prompt('scout', args.principles_path, {
+    prompt('scout', {
       question: args.question,
       situation: args.situation,
       target: args.target,
@@ -52,8 +60,8 @@ if (args.round === 0) {
 }
 
 phase('Research');
-const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
-  prompt('explore', args.principles_path, {
+const researchOut = await inChunks(args.subquestions.map((sq) => () => agent(
+  prompt('explore', {
     question: args.question,
     situation: args.situation,
     target: args.target,
@@ -67,7 +75,11 @@ const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
 )));
 const researchers = args.subquestions.map((sq, i) => ({ id: sq.id, output: researchOut[i] ?? null }));
 const query_violations = checkQueries(researchers, args.forbidden_terms);
-const { items, groups } = groupByUrl(researchers);
+const url_trimmed = researchers
+  .map((r) => ({ id: r.id, urls: citedUrls(r.output) }))
+  .filter((x) => x.urls.length > MAX_URLS_PER_RESEARCHER)
+  .map((x) => ({ id: x.id, cited: x.urls.length, kept: MAX_URLS_PER_RESEARCHER, dropped: x.urls.slice(MAX_URLS_PER_RESEARCHER) }));
+const { items, groups } = groupByUrl(researchers, MAX_URLS_PER_RESEARCHER);
 
 // 검증은 네 단계다. URL 마다 추출하고, 추출을 통과한 주장만 묶음으로 모아 판정한다. 정보 부족이 있고 불일치가 없는 주장은
 // 추출 검증자가 URL 마다 원문을 다시 열어 보충하고(refetch), 보충 구절을 다시 묶음으로 모아 판정한다(rejudge).
@@ -76,8 +88,8 @@ phase('Verify');
 const refsByUrl = {};
 const extract = {};
 const refetch = {};
-const extractOut = await parallel(groups.map((g) => () => agent(
-  prompt('extract', args.principles_path, { url: g.url, claims: g.claims }),
+const extractOut = await inChunks(groups.map((g) => () => agent(
+  prompt('extract', { url: g.url, claims: g.claims }),
   { agentType: EXTRACTOR, label: `extract:${g.url}`, phase: 'Verify', schema: S.EXTRACT_SCHEMA },
 )));
 groups.forEach((g, i) => {
@@ -87,24 +99,24 @@ groups.forEach((g, i) => {
 const judgeIn = {};
 groups.forEach((g) => { judgeIn[g.url] = judgeClaims(g.claims, extract[g.url]); });
 const judgeBatches = batchClaims(judgeIn, BATCH_SIZE);
-const judgeOut = await parallel(judgeBatches.map((b, i) => () => agent(
-  prompt('judge', args.principles_path, b),
+const judgeOut = await inChunks(judgeBatches.map((b, i) => () => agent(
+  prompt('judge', b),
   { agentType: JUDGE, label: `judge:${i + 1}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
 )));
 const judge = splitByUrl(judgeOut, judgeBatches);
 const refetchJobs = judgeBatches.flatMap((b) => b.items)
   .map((x) => ({ url: x.url, claims: refetchClaims(x.claims, judge[x.url]) }))
   .filter((x) => x.claims.length > 0);
-const refetchOut = await parallel(refetchJobs.map((x) => () => agent(
-  prompt('refetch', args.principles_path, { url: x.url, claims: x.claims }),
+const refetchOut = await inChunks(refetchJobs.map((x) => () => agent(
+  prompt('refetch', { url: x.url, claims: x.claims }),
   { agentType: EXTRACTOR, label: `refetch:${x.url}`, phase: 'Verify', schema: S.EXTRACT_SCHEMA },
 )));
 refetchJobs.forEach((x, i) => { refetch[x.url] = refetchOut[i] ?? null; });
 const rejudgeIn = {};
 refetchJobs.forEach((x) => { rejudgeIn[x.url] = rejudgeClaims(x.claims, refetch[x.url]); });
 const rejudgeBatches = batchClaims(rejudgeIn, BATCH_SIZE);
-const rejudgeOut = await parallel(rejudgeBatches.map((b, i) => () => agent(
-  prompt('judge', args.principles_path, b),
+const rejudgeOut = await inChunks(rejudgeBatches.map((b, i) => () => agent(
+  prompt('judge', b),
   { agentType: JUDGE, label: `rejudge:${i + 1}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
 )));
 const rejudge = splitByUrl(rejudgeOut, rejudgeBatches);
@@ -126,6 +138,7 @@ const result = {
   subquestion_status: merged.subquestion_status,
   overall_status: merged.overall_status,
   query_violations,
+  url_trimmed,
   verifier_count: verifiers.length,
   researchers,
   verifiers,
@@ -137,25 +150,53 @@ if (args.mode === 'survey') {
     .filter((p) => p.ref.includes('#case#'))
     .map((p) => ({ ref: p.ref, row: items.find((it) => it.ref === p.ref).row }));
   let synthesis = null;
-  let map_check = null;
   if (passed_rows.length > 0) {
     phase('Synthesize');
     synthesis = await agent(
-      prompt('synthesize', args.principles_path, { question: args.question, target: args.target, intended_use: args.intended_use, constraints: args.constraints, passed_rows }),
+      prompt('synthesize', { question: args.question, target: args.target, intended_use: args.intended_use, constraints: args.constraints, passed_rows }),
       { agentType: RESEARCHER, label: 'synthesize', phase: 'Synthesize', schema: S.SYNTHESIS_SCHEMA },
     );
   }
-  if (synthesis != null) {
-    phase('MapCheck');
-    map_check = await agent(
-      prompt('map', args.principles_path, { evidence_map: synthesis.evidence_map, passed: passed_rows }),
-      { agentType: MAPCHECK, label: 'map-check', phase: 'MapCheck', schema: S.MAP_SCHEMA },
-    );
-  }
   result.synthesis = synthesis;
-  result.map_check = map_check;
 }
 return result;
+
+// parallel 을 CONCURRENCY 개씩 차례로 실행한다. 반환 배열의 위치는 입력 thunk 의 위치와 같다.
+async function inChunks(thunks) {
+  const out = [];
+  for (let i = 0; i < thunks.length; i += CONCURRENCY) {
+    out.push(...await parallel(thunks.slice(i, i + CONCURRENCY)));
+  }
+  return out;
+}
+
+// 연구자 출력이 인용한 서로 다른 URL. 이슈의 인용과 근거 지도 행의 URL 을 모두 센다.
+function citedUrls(output) {
+  const urls = new Set();
+  if (output == null) return [];
+  for (const issue of output.issues ?? []) {
+    for (const c of issue.citations ?? []) {
+      const u = String(c.url ?? '');
+      if (u !== '') urls.add(u);
+    }
+  }
+  for (const row of output.evidence_map ?? []) {
+    const u = String(row.url ?? '');
+    if (u !== '') urls.add(u);
+  }
+  return [...urls];
+}
+
+// 금융투자협회 홈페이지(kofia.or.kr 와 그 하위 주소)는 반복 접속하면 사내 접속이 차단되므로 검증자가 열지 않는다.
+// 이 주소의 인용은 묶음에 넣지 않고 확인할 수 없는 인용(unverifiable)으로 둔다.
+function isBlockedUrl(url) {
+  return /^(?:[a-z][a-z0-9+.-]*:)?(?:\/\/)?(?:[^\/?#@]*@)?(?:[^\/?#:]*\.)?kofia\.or\.kr\.?(?::\d+)?(?:[\/?#]|$)/i.test(String(url ?? '').trim());
+}
+
+// 검증자에게 보내지 않는 URL. 금융투자협회 주소와 연구자당 URL 상한으로 잘라 낸 주소다.
+function unsent(item, url) {
+  return isBlockedUrl(url) || (item.skip ?? []).includes(url);
+}
 
 // 질의 경계 검사. output 이 null 이 아닌 연구자의 검색어마다 금지어와 경로 형태를 본다.
 // 한 검색어 안에서는 forbidden-term 원소가 path-shape 원소보다 앞이다.
@@ -182,10 +223,13 @@ function checkQueries(researchers, forbiddenTerms) {
 
 // URL 묶기. 항목은 하위 질문 차례, 이슈, 근거 지도 행의 차례로 만든다.
 // 선행 서술이 결측인 항목은 items 에 남기고 어느 묶음의 claims 에도 넣지 않는다.
-function groupByUrl(researchers) {
+// maxUrls 를 넘는 연구자는 citedUrls 차례로 앞의 maxUrls 개만 묶고, 나머지는 그 항목의 skip 에 적어 검증에서 뺀다.
+function groupByUrl(researchers, maxUrls = Infinity) {
   const items = [];
   for (const r of researchers) {
     if (r.output == null) continue;
+    const over = citedUrls(r.output).slice(maxUrls);
+    const start = items.length;
     (r.output.issues ?? []).forEach((issue, i) => {
       const urls = [];
       for (const c of issue.citations ?? []) {
@@ -210,12 +254,17 @@ function groupByUrl(researchers) {
         row,
       });
     });
+    for (const item of items.slice(start)) {
+      const skip = item.urls.filter((u) => over.includes(u));
+      if (skip.length > 0) item.skip = skip;
+    }
   }
   const groups = [];
   for (const item of items) {
     if (lacksPrior(item)) continue;
     const sub = item.ref.slice(0, item.ref.indexOf('#'));
     for (const url of item.urls) {
+      if (unsent(item, url)) continue;
       let g = groups.find((x) => x.url === url);
       if (!g) {
         g = { url, subquestions: [], claims: [] };
@@ -236,6 +285,7 @@ function classify(items, verifiers) {
   for (const item of items) {
     if (lacksPrior(item)) continue;
     for (const url of item.urls) {
+      if (unsent(item, url)) continue;
       if (!sent.has(url)) sent.set(url, []);
       sent.get(url).push(item.ref);
     }
@@ -270,7 +320,7 @@ function classify(items, verifiers) {
       rejected.push(entry);
       continue;
     }
-    const vs = verdicts.get(item.ref) ?? [];
+    const vs = (verdicts.get(item.ref) ?? []).concat(item.urls.filter((u) => unsent(item, u)).map(() => 'unverifiable'));
     if (vs.includes('supported')) passed.push(entry);
     else if (item.urls.some((u) => failed.has(u) || (claimFailed.get(u) ?? []).includes(item.ref))) continue;
     else if (vs.length > 0 && vs.every((v) => v === 'unverifiable')) unverifiable.push(entry);
@@ -416,7 +466,7 @@ function batchClaims(claimsByUrl, size) {
   return batches;
 }
 
-// 묶음 출력 나누기. batchOutputs[i] 는 batches[i] 의 출력이다. 반환값은 URL 을 키로 둔 { judgments, principles_applied } 다.
+// 묶음 출력 나누기. batchOutputs[i] 는 batches[i] 의 출력이다. 반환값은 URL 을 키로 둔 { judgments } 다.
 // 응답이 없거나 judgments 가 배열이 아닌 묶음의 URL 은 null 이다. 판정은 url 과 ref 가 그 URL 의 입력 주장과 맞는 것만 남기고,
 // 입력에 없던 URL 이나 ref 의 판정은 버린다. 같은 (url, ref) 의 판정이 둘 이상이면 어느 판정을 믿을지 정할 수 없으므로
 // 그 ref 의 판정을 모두 버린다. 버린 주장은 빠진 주장과 같이 그 주장만 검증 실패가 된다.
@@ -434,7 +484,6 @@ function splitByUrl(batchOutputs, batches) {
       const mine = o.judgments.filter((j) => j != null && j.url === it.url && refs.includes(j.ref));
       out[it.url] = {
         judgments: mine.filter((j) => mine.filter((x) => x.ref === j.ref).length === 1),
-        principles_applied: o.principles_applied ?? [],
       };
     }
   });
@@ -501,11 +550,7 @@ function mergeUrl(url, refs, st) {
     if (short.length > 0) reasons.push(`재판정 정보 부족: ${short.join(', ')}`);
     return out(route.step);
   });
-  const principles = [];
-  for (const o of [st.extract, st.judge, st.refetch, st.rejudge]) {
-    for (const p of o?.principles_applied ?? []) if (!principles.includes(p)) principles.push(p);
-  }
-  return { url, judgments, principles_applied: principles };
+  return { url, judgments };
 }
 
 // 상태 합치기. 참조가 하위 질문 X 에 속하는지는 `X#` 로 시작하는지로 본다.
@@ -559,7 +604,6 @@ function schemas() {
     properties: { case: str, url: str, outcome: str, axes: axesSchema, bearing: str },
     required: ['case', 'url', 'axes', 'outcome'],
   });
-  const principles = { type: 'array', items: str };
   const RESEARCHER_SCHEMA = {
     type: 'object',
     properties: {
@@ -600,9 +644,8 @@ function schemas() {
           required: ['ref', 'access', 'exists', 'exists_note', 'quote', 'context', 'reason'],
         },
       },
-      principles_applied: principles,
     },
-    required: ['url', 'judgments', 'principles_applied'],
+    required: ['url', 'judgments'],
   };
   // 판정과 재판정이 같은 스키마를 쓴다. 판정마다 url 은 그 주장이 든 묶음 입력 원소의 URL 이다. 보충은 추출 스키마를 쓴다.
   const match = { type: 'string', enum: ['일치', '불일치', '판정 불가', '정보 부족'] };
@@ -632,9 +675,8 @@ function schemas() {
           required: ['url', 'ref', 'numbers_conditions', 'direction', 'scope', 'missing', 'unsure_reasons', 'reason'],
         },
       },
-      principles_applied: principles,
     },
-    required: ['judgments', 'principles_applied'],
+    required: ['judgments'],
   };
   const SYNTHESIS_SCHEMA = {
     type: 'object',
@@ -648,24 +690,8 @@ function schemas() {
           required: ['text', 'refs'],
         },
       },
-      principles_applied: principles,
     },
-    required: ['evidence_map', 'conclusions', 'principles_applied'],
-  };
-  const MAP_SCHEMA = {
-    type: 'object',
-    properties: {
-      cells: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: { row: str, column: str, grounded: { type: 'boolean' }, source_ref: str },
-          required: ['row', 'column', 'grounded', 'source_ref'],
-        },
-      },
-      principles_applied: principles,
-    },
-    required: ['cells', 'principles_applied'],
+    required: ['evidence_map', 'conclusions'],
   };
   // 둘러보기 출력은 검증하지 않으므로 정해진 칸 밖의 칸(사례 칸 등)을 허용하지 않는다.
   const closed = (properties) => ({ type: 'object', properties, required: Object.keys(properties), additionalProperties: false });
@@ -674,12 +700,11 @@ function schemas() {
     queries: { type: 'array', items: str },
     clusters: { type: 'array', items: closed({ topic: str, sources: { type: 'array', items: str }, note: str }) },
     subquestion_candidates: { type: 'array', items: closed({ scope: str, basis: str }) },
-    principles_applied: principles,
   });
-  return { RESEARCHER_SCHEMA, EXTRACT_SCHEMA, JUDGE_SCHEMA, SYNTHESIS_SCHEMA, MAP_SCHEMA, SCOUT_SCHEMA };
+  return { RESEARCHER_SCHEMA, EXTRACT_SCHEMA, JUDGE_SCHEMA, SYNTHESIS_SCHEMA, SCOUT_SCHEMA };
 }
 
-// 에이전트에게 보내는 프롬프트. 첫 줄은 모드, 둘째 줄은 원칙 문서 경로, 셋째 줄부터 JSON 블록이다.
-function prompt(mode, principlesPath, input) {
-  return `MODE: ${mode}\nPRINCIPLES: ${principlesPath}\n\`\`\`json\n${JSON.stringify(input, null, 2)}\n\`\`\``;
+// 에이전트에게 보내는 프롬프트. 첫 줄은 모드, 둘째 줄부터 JSON 블록이다.
+function prompt(mode, input) {
+  return `MODE: ${mode}\n\`\`\`json\n${JSON.stringify(input, null, 2)}\n\`\`\``;
 }

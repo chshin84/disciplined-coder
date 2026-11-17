@@ -1,0 +1,13 @@
+{"lens":"lens-consistency","target":"docs/superpowers/plans/2026-11-17-v2-rebuild-stage4-8.md","note":"메인 세션이 받은 보고에서 옮겼다",
+"issues":[
+{"where":"Task 2 Step 1","type":"contradiction","claim":"이름 검사 제외 목록에 Task 7 로 미룬 README·CLAUDE.md 가 없다"},
+{"where":"Task 4 Step 1","type":"gap","claim":"경로 실재 검사가 Task 7 전까지 CLAUDE.md·README 때문에 실패한다"},
+{"where":"Task 2","type":"gap","claim":"기록 이름 규칙의 소유처가 Task 2~4 사이에 없다"},
+{"where":"전체","type":"gap","claim":"test_docs_drift 축소와 _doc_keys·_doc_paths 정리를 맡은 태스크가 없다"},
+{"where":"Global Constraints / Task 6","type":"contradiction","claim":"동시 실행 2와 3"},
+{"where":"Task 6","type":"drift","claim":"이관 원본 이름이 spec 과 다르다"},
+{"where":"Task 4 side-by-side","type":"contradiction","claim":"아티팩트 허용이 spec 과 다르고 다른 점에 없다"},
+{"where":"Task 6 Step 1","type":"gap","claim":"설정 폴더 분리와 판정 응답 읽기 검사가 없다"},
+{"where":"Task 3 Step 1","type":"gap","claim":"렌즈가 아닌 에이전트 description 금지어 검사가 없다"},
+{"where":"spec 과 다른 점","type":"gap","claim":"반박 렌즈를 실행하는 카테고리가 없다"},
+{"where":"Review Focus","type":"drift","claim":"검사 소유 태스크 번호가 다르다"}]}

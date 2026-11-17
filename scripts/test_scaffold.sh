@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # scaffold.sh(PC-레벨) 검증. 계약: FAIL=0.
+# `# 핵심 계약:` 표시가 달린 검사는 v2 정리에서 지우지 않는다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 # 픽스처는 모두 이 뿌리 아래에 만들고 끝나면 통째로 지운다. mktemp 가 TMPDIR 을 따르므로 아래의
@@ -27,12 +28,23 @@ echo "[fresh-pc] fresh PC"
 check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
 # 에이전트원칙의 포인터가 이 경로를 가리킨다. Skill 도구가 없는 에이전트는 이 사본을 Read 로 읽는다.
 check "managing-docs 사본이 원본과 같다" "cmp -s '$HERE/skills/managing-docs/SKILL.md' '$K/managing-docs/SKILL.md' && cmp -s '$HERE/skills/managing-docs/references/reading-docs.md' '$K/managing-docs/reading-docs.md'"
-check "에이전트원칙이 사본 경로를 가리킨다" "grep -qF '~/.claude/disciplined-coder/managing-docs/SKILL.md' '$K/agent-principles.md' && grep -qF '~/.claude/disciplined-coder/managing-docs/reading-docs.md' '$K/agent-principles.md'"
+check "에이전트원칙이 사본 경로를 가리킨다" "grep -qF '~/.claude/disciplined-coder/managing-docs/SKILL.md' '$K/agent-principles.md'"
+# 다른 프로젝트의 lens-review 는 독자 렌즈에 이 사본 경로를 기준으로 넘긴다.
+check "문체 공격 항목 사본이 원본과 같다" "cmp -s '$HERE/skills/lens-review/references/style-attacks.md' '$K/lens-review/style-attacks.md'"
 # 금지 표현 목록은 에이전트원칙과 같은 관리블록이 싣는다. 다른 플러그인이 있든 없든 같다.
 check "banlist: 관리블록은 두 줄뿐이다"   "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC' | wc -l) -eq 4 ]"
 check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words.md' ]"
 # 첫 세션은 @import 가 아직 안 실렸으므로 목록도 에이전트원칙과 함께 stdout 으로 보강한다.
 check "banlist: 첫 세션 stdout 에 목록도 실린다" "printf '%s' \"\$OUT\" | grep -qxF \"\$(head -1 '$HERE/korean-banned-words.md')\""
+# 사본은 원본 표 전체가 아니라 상시 보기다. 표와 제외어는 검사기만 쓰므로 세션에 싣지 않는다.
+VIEW_REF="$(mktemp)"; ( . "$HERE/hooks/_banned_words.sh"; banned_view "$HERE/korean-banned-words.md" ) > "$VIEW_REF"
+check "금지어 사본이 원본 표로 만든 상시 보기와 같다" "cmp -s '$VIEW_REF' '$K/korean-banned-words.md'"
+check "금지어 사본에 표가 없다"                     "! grep -qF '|---|' '$K/korean-banned-words.md'"
+rm -f "$VIEW_REF"
+touch -d '2000-01-01' "$K/korean-banned-words.md"; REF6="$(mktemp)"; touch -d '2001-01-01' "$REF6"
+run "$H1" "$P1" > /dev/null
+check "같은 상시 보기는 다시 쓰지 않는다"           "[ ! '$K/korean-banned-words.md' -nt '$REF6' ]"
+rm -f "$REF6"
 touch -d '2000-01-01' "$UC"; REF5="$(mktemp)"; touch -d '2001-01-01' "$REF5"
 run "$H1" "$P1" > /dev/null
 check "같은 블록이면 전역 CLAUDE.md 를 다시 쓰지 않는다" "[ ! '$UC' -nt '$REF5' ]"
@@ -79,6 +91,7 @@ echo "[marketplace-autoupdate] 자동 갱신을 켠다"
 # 켰다는 사실은 stderr 가 아니라 stdout 으로 알린다 — SessionStart 의 stderr 는 사용자에게 닿지 않고,
 # 옛 관리블록을 걷어낸 알림(pointer_note)이 이미 쓰는 통로가 stdout 이다. 사용자 설정 파일을 고쳐
 # 놓고 아무도 모르게 두면 안 된다.
+# 핵심 계약: settings 백업 — 결함 주입: 사본 만들기 줄을 지운다
 check "알림에 고친 파일 경로가 있다"       "printf '%s' \"\$OUT_A\" | grep -qF 'settings.json'"
 check "우리 항목에 autoUpdate가 켜졌다"   "[ \"\$(json_autoupdate '$SET_A' \"\$MKT\")\" = 'true' ]"
 check "알려진 마켓플레이스에도 켜졌다"     "[ \"\$(json_autoupdate '$KNOWN_A' \"\$MKT\")\" = 'true' ]"
@@ -128,6 +141,7 @@ printf '{ "extraKnownMarketplaces": { "%s": { "source": { "source": "github", "r
 mkdir -p "$HE/.claude/settings.json.dc-tmp/막는다"
 set +e; ERR_E="$(run "$HE" "$PE" 2>/dev/null)"; set -e
 echo "[marketplace-autoupdate] a write failure is reported as a write failure"
+# 핵심 계약: settings 백업 — 결함 주입: 사본 만들기 줄을 지운다
 check "쓰기 실패에 자리가 따로 있다"        "printf '%s' \"\$ERR_E\" | grep -qF '고쳐 쓰지 못했다'"
 check "쓰기 실패를 읽기 실패로 안 부른다"   "! printf '%s' \"\$ERR_E\" | grep -qF '읽지 못했거나 내용이 JSON이 아니다'"
 # 사유는 stdout 으로 나오되 "켰다" 머리말 아래 섞이지 않는다. 이 픽스처는 켠 것이 없는 갈래라
@@ -138,6 +152,7 @@ check "쓰기 실패에도 임시 파일이 안 남는다" "[ ! -e '$HE/.claude/
 
 # --- project-untouched: 프로젝트 폴더 무오염 ---
 echo "[project-untouched] project untouched"
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "no principles in project"      "[ ! -f '$P1/agent-principles.md' ]"
 check "no CLAUDE.md in project"       "[ ! -f '$P1/CLAUDE.md' ]"
 
@@ -148,6 +163,7 @@ mkdir -p "$H5/.claude"; printf 'my personal global note
 for _ in 1 2 3; do run "$H5" "$P5" >/dev/null; done
 UC5="$H5/.claude/CLAUDE.md"
 echo "[user-content-preserved] preserve user content + no blank accumulation"
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "personal note preserved"      "grep -qxF 'my personal global note' '$UC5'"
 check "one region after 3 runs"      "[ \$(grep -cF '# BEGIN disciplined-coder' '$UC5') -eq 1 ]"
 check "principles import not dup"     "[ \$(grep -cxF '@disciplined-coder/agent-principles.md' '$UC5') -eq 1 ]"
@@ -221,30 +237,8 @@ check "사본을 뜨지 않는다"             "[ \"\$(bak_count '$H25')\" -eq 0
 check "에이전트원칙 줄은 그대로 쓴다"  "MB_SEC '$UC25' | grep -qxF '@disciplined-coder/agent-principles.md'"
 
 # --- install-current: 설치본이 원격보다 뒤처지면 옮기고 다시 켜라고 알린다 ---
-# 갱신 확인은 scaffold 가 아니라 hooks/update_check_sessionstart.sh 가 실행한다. claude 와 curl 을
-# 실제로 부르지 않도록 스텁을 주입한다. claude 스텁은 받은 인자를 args.txt 에 적어 무엇을 실행했는지
-# 단언하게 하고, curl 스텁은 remote.txt 의 커밋을 git smart HTTP 의 pkt-line 형식으로 낸다.
-run_uc() { CLAUDE_HOME_DIR="$1/.claude" DISCIPLINED_CODER_CLAUDE_BIN="$1/claude-stub" DISCIPLINED_CODER_CURL_BIN="$1/curl-stub" CLAUDE_PLUGIN_ROOT="${2:-}" bash "$HERE/hooks/update_check_sessionstart.sh" < /dev/null; }
-uc_fixture() {  # $1=HOME $2=설치본 커밋 $3=claude 스텁 종료 코드 $4=원격 커밋(빈 값이면 원격을 못 읽는다) $5=source 의 ref → 사본의 HEAD 를 출력한다
-  local m="$1/.claude/plugins/marketplaces/chshin-tools" ref=""
-  mkdir -p "$m"
-  if [ -n "${5:-}" ]; then ref=", \"ref\": \"$5\""; fi
-  printf '{ "version": 2, "plugins": { "disciplined-coder@chshin-tools": [ { "scope": "user", "gitCommitSha": "%s" } ] } }\n' "$2" > "$1/.claude/plugins/installed_plugins.json"
-  printf '{ "chshin-tools": { "source": { "source": "github", "repo": "chshin84/disciplined-coder"%s } } }\n' "$ref" > "$1/.claude/plugins/known_marketplaces.json"
-  git init -q "$m"; git -C "$m" -c user.email=t@t -c user.name=t commit -q --allow-empty -m x
-  printf '#!/usr/bin/env bash\nprintf "%%s\\n" "$*" >> "%s/args.txt"\nexit %s\n' "$1" "$3" > "$1/claude-stub"
-  printf '%s' "${4:-}" > "$1/remote.txt"
-  # 실제 응답처럼 길이 접두사 4자와 NUL 이 섞인 줄을 낸다. 길이 접두사를 커밋으로 잘못 읽으면 실패한다.
-  cat > "$1/curl-stub" <<STUB
-#!/usr/bin/env bash
-printf '%s\n' "\$*" >> "$1/curl-args.txt"
-r="\$(cat "$1/remote.txt")"; [ -n "\$r" ] || exit 22
-printf '001e# service=git-upload-pack\n0000015b%s HEAD\0multi_ack side-band\n003f%s refs/heads/main\n0000' "\$r" "\$r"
-STUB
-  chmod +x "$1/claude-stub" "$1/curl-stub"
-  git -C "$m" rev-parse HEAD
-}
-A40="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; B40="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"; C40="cccccccccccccccccccccccccccccccccccccccc"
+# 갱신 확인은 scaffold 가 아니라 hooks/update_check_sessionstart.sh 가 실행한다. 스텁 픽스처는 공유 파일에 있다.
+. "$HERE/scripts/_test_uc_fixture.sh"
 first_line() { json_run 'import json,sys; print(json.load(sys.stdin)["systemMessage"].splitlines()[0])'; }
 
 # 마켓플레이스 새로고침은 세션 시작 훅보다 늦게 도착해, 훅이 실행되는 시점에는 로컬 사본도 옛 커밋이다.
@@ -284,17 +278,13 @@ lock_fixture() {  # $1=HOME $2=origin 의 marketplace.json 내용 → origin 의
   git init -q "$o"; mkdir -p "$o/.claude-plugin"; printf '%s' "$2" > "$o/.claude-plugin/marketplace.json"
   git -C "$o" add -A; git -C "$o" -c user.email=t@t -c user.name=t commit -q -m new
   git -C "$m" remote add origin "$o"
-  cat > "$1/claude-stub" <<STUB
-#!/usr/bin/env bash
-printf '%s\n' "\$*" >> "$1/args.txt"
-case "\$*" in *"marketplace update"*) echo "Could not replace the marketplace directory because it is in use" >&2; exit 1 ;; esac
-exit 0
-STUB
+  uc_stub "$1" 0 'case "$*" in *"marketplace update"*) echo "Could not replace the marketplace directory because it is in use" >&2; exit 1 ;; esac'
   git -C "$o" rev-parse HEAD
 }
 H38="$(mktemp -d)"; O38="$(lock_fixture "$H38" '{"name":"chshin-tools"}')"
 OUT38="$(run_uc "$H38")"
 echo "[install-current] 사본 폴더가 잡혀 있으면 폴더 안 git 으로 옮긴다"
+# 핵심 계약: 갱신 잠금과 폴더 잠금 대처 — 결함 주입: 잠금 확인을 건너뛰게 got=0 을 got=1 로 바꾼다
 check "사본이 origin 의 커밋으로 옮겨진다" "[ \"\$(git -C '$H38/.claude/plugins/marketplaces/chshin-tools' rev-parse HEAD)\" = '$O38' ]"
 check "이어서 설치본을 옮긴다"           "grep -qxF 'plugin update disciplined-coder@chshin-tools' '$H38/args.txt'"
 check "다시 켜라고 한다"                 "printf '%s' \"\$OUT38\" | grep -qF '다시 켜야'"
@@ -305,6 +295,20 @@ echo "[install-current] 받은 커밋의 marketplace.json 이 깨졌으면 사�
 check "사본이 그대로다"                  "[ \"\$(git -C '$H39/.claude/plugins/marketplaces/chshin-tools' rev-parse HEAD)\" = '$OLD39' ]"
 check "설치본을 옮기지 않는다"           "! grep -qF 'plugin update disciplined-coder' '$H39/args.txt'"
 check "실패를 알린다"                    "printf '%s' \"\$OUT39\" | grep -qF '옮기지 못했다'"
+
+# 갱신 명령이 0 으로 끝나도 설치 기록의 커밋이 그대로면 옮긴 것이 아니다. 옮겼다고 알리면 다시 켜도
+# 옛 버전이 실려 사용자가 원인을 찾지 못한다.
+H40="$(mktemp -d)"; uc_fixture "$H40" "$A40" 0 "$B40" > /dev/null; : > "$H40/nomove"
+OUT40="$(run_uc "$H40")"
+echo "[install-current] 갱신 명령 뒤 설치본이 그대로면 옮겼다고 하지 않는다"
+check "설치본이 그대로면 옮겼다고 알리지 않는다"   "! printf '%s' \"\$OUT40\" | grep -qF '옮겼다(' && ! printf '%s' \"\$OUT40\" | grep -qF '다시 켜야'"
+check "설치본이 그대로면 그날은 다시 시도하지 않는다" "[ \"\$(cat '$H40/.claude/disciplined-coder/update.stuck' 2>/dev/null)\" = \"\$(date +%F)\" ]"
+# 원격을 못 읽어 로컬 사본과 비교할 때, 사본이 설치본보다 옛 커밋이거나 조상 관계를 확인할 수 없으면
+# 뒤처졌다고 할 근거가 없다.
+H41="$(mktemp -d)"; uc_fixture "$H41" "$C40" 0 "" > /dev/null
+OUT41="$(run_uc "$H41")"
+echo "[install-current] 사본이 설치본의 후손인지 모르면 갱신하지 않는다"
+check "조상 관계를 모르면 갱신하지 않는다" "[ ! -f '$H41/args.txt' ] && [ -z \"\$OUT41\" ]"
 
 H32="$(mktemp -d)"; uc_fixture "$H32" "$A40" 0 "$A40" > /dev/null
 OUT32="$(run_uc "$H32")"
@@ -374,6 +378,7 @@ HAU2="$(mktemp -d)"; uc_fixture "$HAU2" "$A40" 0 "$B40" > /dev/null
 mkdir -p "$HAU2/.claude/disciplined-coder/update.lock"
 run_uc "$HAU2" > /dev/null
 echo "[install-current] 다른 창이 갱신 중이면 이 창은 갱신하지 않는다"
+# 핵심 계약: 갱신 잠금과 폴더 잠금 대처 — 결함 주입: 잠금 확인을 건너뛰게 got=0 을 got=1 로 바꾼다
 check "잠금이 있으면 갱신을 실행하지 않는다"     "[ ! -f '$HAU2/args.txt' ]"
 touch -d '2000-01-01' "$HAU2/.claude/disciplined-coder/update.lock"
 run_uc "$HAU2" > /dev/null
@@ -419,6 +424,16 @@ set -e
 echo "[missing-canon] missing source → warning, exit 0"
 check "missing source warns to stdout"      "printf '%s' \"\$ERR8\" | grep -qF 'WARNING: source not found'"
 check "missing source still exit 0"         "[ $rc8 -eq 0 ]"
+# 금지어 원본 표가 없거나 행을 못 읽으면 옛 사본을 지우지 않는다. 빈 보기를 깔면 세션에서 목록이 조용히 빠진다.
+HV1="$(mktemp -d)"; HV2="$(mktemp -d)"; PV="$(mktemp -d)"; RV1="$(mktemp -d)"; RV2="$(mktemp -d)"
+for hv in "$HV1" "$HV2"; do mkdir -p "$hv/.claude/disciplined-coder"; printf 'old view\n' > "$hv/.claude/disciplined-coder/korean-banned-words.md"; done
+cp "$HERE/agent-principles.md" "$RV1/"; cp "$HERE/agent-principles.md" "$RV2/"; printf '# 빈 목록\n' > "$RV2/korean-banned-words.md"
+set +e
+OUTV1="$(CLAUDE_HOME_DIR="$HV1/.claude" CLAUDE_PROJECT_DIR="$PV" CLAUDE_PLUGIN_ROOT="$RV1" bash "$SCAFFOLD" 2>/dev/null)"; rcv1=$?
+OUTV2="$(CLAUDE_HOME_DIR="$HV2/.claude" CLAUDE_PROJECT_DIR="$PV" CLAUDE_PLUGIN_ROOT="$RV2" bash "$SCAFFOLD" 2>/dev/null)"; rcv2=$?
+set -e
+check "원본 표가 없으면 경고하고 옛 금지어 사본을 남긴다" "printf '%s' \"\$OUTV1\" | grep -qF 'WARNING: source not found' && [ \"\$(cat '$HV1/.claude/disciplined-coder/korean-banned-words.md')\" = 'old view' ] && [ $rcv1 -eq 0 ]"
+check "행 없는 표면 오류를 알리고 옛 금지어 사본을 남긴다" "printf '%s' \"\$OUTV2\" | grep -qF 'ERROR: 금지어 상시 보기를 만들지 못했다' && [ \"\$(cat '$HV2/.claude/disciplined-coder/korean-banned-words.md')\" = 'old view' ] && [ $rcv2 -eq 0 ]"
 
 # --- home-resolution: 홈 해석이 bash $HOME에 의존하지 않음 (CLAUDE_CONFIG_DIR 우선) ---
 # AD 리다이렉트 홈(예: $HOME=U:\ 네트워크 드라이브)에서 Claude Code 실제 홈(USERPROFILE/CLAUDE_CONFIG_DIR)과
@@ -426,6 +441,7 @@ check "missing source still exit 0"         "[ $rc8 -eq 0 ]"
 H9="$(mktemp -d)/cfg"; P9="$(mktemp -d)"; HJUNK="$(mktemp -d)"
 OUT9="$(HOME="$HJUNK" CLAUDE_CONFIG_DIR="$H9" CLAUDE_PROJECT_DIR="$P9" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD")"
 echo "[home-resolution] home resolution honors CLAUDE_CONFIG_DIR, not bash \$HOME"
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "CLAUDE_CONFIG_DIR honored (KDIR)"     "[ -f '$H9/disciplined-coder/agent-principles.md' ]"
 check "CLAUDE_CONFIG_DIR honored (CLAUDE.md)" "[ -f '$H9/CLAUDE.md' ]"
 check "did not fall back to bash \$HOME"      "[ ! -d '$HJUNK/.claude' ]"
@@ -436,6 +452,7 @@ if command -v cygpath >/dev/null 2>&1; then
   H9B="$(mktemp -d)"; P9B="$(mktemp -d)"; HJUNK2="$(mktemp -d)"
   ( HOME="$HJUNK2" USERPROFILE="$(cygpath -w "$H9B")" CLAUDE_CONFIG_DIR= CLAUDE_HOME_DIR= CLAUDE_PROJECT_DIR="$P9B" CLAUDE_PLUGIN_ROOT="$HERE" bash "$SCAFFOLD" >/dev/null 2>&1 ) || true
   echo "[home-resolution] USERPROFILE beats bash \$HOME when no override is set"
+  # 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
   check "USERPROFILE honored (KDIR)"            "[ -f '$H9B/.claude/disciplined-coder/agent-principles.md' ]"
   check "USERPROFILE: did not touch bash \$HOME" "[ ! -d '$HJUNK2/.claude' ]"
 else
@@ -474,6 +491,7 @@ check "non-empty orphan surfaced"       "printf '%s' \"\$ERR10\" | grep -qF 'my_
 check "subdir does not abort scaffold"  "[ $rc10 -eq 0 ]"
 check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rogue_dir'"
 check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
+check "사본 폴더 lens-review 는 비관리로 알리지 않는다" "! printf '%s' \"\$ERR10\" | grep -qF \"'lens-review'\""
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
 # 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
@@ -545,7 +563,8 @@ H21="$(mktemp -d)"; P21="$(mktemp -d)"; mkdir -p "$H21/.claude/plugins"
 # 잠재우고, "아무것도 안 보낸다" 단언은 그대로 둔다.
 printf '{ "version": 2, "plugins": { "superpowers@claude-plugins-official": [ { "scope": "user" } ] } }
 ' > "$H21/.claude/plugins/installed_plugins.json"
-printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/domains-index.md\r\n@disciplined-coder/solved_problems.md\r\n@disciplined-coder/korean-banned-words.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
+# 블록 안 줄이 기대 본문과 다르면 사본을 뜨고 알리므로(global-block-preserve), 본문은 현재 두 줄로 둔다.
+printf '# BEGIN disciplined-coder (managed — do not edit)\r\n@disciplined-coder/agent-principles.md\r\n@disciplined-coder/korean-banned-words.md\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$H21/.claude/CLAUDE.md"
 OUT21="$(run "$H21" "$P21")"
 echo "[crlf-import-line] CRLF import line still counts as present"
 check "CRLF: sends nothing"           "[ -z \"\$OUT21\" ]"
@@ -570,14 +589,13 @@ check "single managed region after run"         "[ \$(grep -cF '# BEGIN discipli
 # --- canon-refresh: 이미 옛 에이전트원칙을 갖고 있는 PC도 갱신을 받는다 ---
 # 갓 설치한 경로만 검사하면, 에이전트원칙 복사를 '없을 때만'으로 바꿔도 초록이 유지된다.
 # 그 순간 이미 깔린 모든 설치가 옛 에이전트원칙에 멈추는데, 새 문장이 필요한 쪽은 정확히 그 설치들이다.
-# 문장이 아니라 조항 ID 로 본다 — 문구를 다듬어도 조항이 남아 있으면 통과한다.
-CONSENT='**`LENS-ALLOWED`'
+# 문장이나 조항 ID 가 아니라 저장소 원본과 같은지로 본다 — 조항을 바꿔도 이 검사를 고치지 않는다.
 HRU="$(mktemp -d)"; PRU="$(mktemp -d)"; mkdir -p "$HRU/.claude/disciplined-coder"
 OLDCANON="$HRU/.claude/disciplined-coder/agent-principles.md"
 printf '# 디시플린 (팀 원칙)\n\n옛 사본이라 새 문장이 없다.\n' > "$OLDCANON"
 run "$HRU" "$PRU" >/dev/null
 echo "[canon-refresh] an existing older canon copy is refreshed, not left behind"
-check "옛 사본이 갱신된다"                 "grep -qF -- '$CONSENT' '$OLDCANON'"
+check "옛 사본이 갱신된다"                 "cmp -s '$HERE/agent-principles.md' '$OLDCANON'"
 check "옛 내용이 남지 않는다"              "! grep -qF '옛 사본이라 새 문장이 없다' '$OLDCANON'"
 
 # --- 동시 진입: 창을 여럿 열면 SessionStart가 같은 ~/.claude/CLAUDE.md를 동시에 고친다 ---
@@ -611,6 +629,7 @@ for i in $(seq 1 "$LN"); do
 done
 wait
 echo "[stale-lock] stealing a stale lock still admits one writer at a time"
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "낡은 락 빼앗기: 모두 들어갔다"          "[ \"\$(grep -c '^IN\$' '$LW')\" = '$LN' ]"
 check "낡은 락 빼앗기: 겹쳐 들어가지 않았다"   "awk '\$0==\"IN\" && prev==\"IN\" { bad=1 } { prev=\$0 } END { exit bad?1:0 }' '$LW'"
 check "낡은 락 빼앗기: 락이 남지 않는다"       "[ ! -e '$LK' ]"
@@ -625,6 +644,7 @@ OWN_TOK1="$( . "$HERE/scripts/_managed_block.sh"; managed_block_lock "$OL" )"
 rm -rf "$OL"   # 빼앗김
 OWN_TOK2="$( . "$HERE/scripts/_managed_block.sh"; managed_block_lock "$OL" )"
 ( . "$HERE/scripts/_managed_block.sh"; managed_block_unlock "$OL" "$OWN_TOK1" )   # 옛 주인이 푼다
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "옛 주인이 새 주인의 락을 안 지운다"     "[ -d '$OL' ]"
 ( . "$HERE/scripts/_managed_block.sh"; managed_block_unlock "$OL" "$OWN_TOK2" )
 check "제 주인은 푼다"                         "[ ! -e '$OL' ]"
@@ -643,6 +663,7 @@ TERR="$TT/err"; TRC=0
 ( . "$HERE/scripts/_managed_block.sh"
   MANAGED_LOCK_TOTAL_TICKS=5
   printf 'body\n' | managed_block_inject "$TF" "# B" "# E" ) 2>"$TERR" || TRC=$?
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "락을 못 잡으면 실패로 돌아온다"         "[ '$TRC' -ne 0 ]"
 check "못 잡은 사유를 알린다"                  "grep -qF '락을 잡지 못했다' '$TERR'"
 check "못 잡으면 파일을 안 고친다"             "[ \"\$(cat '$TF')\" = 'keep' ]"
@@ -668,6 +689,7 @@ ARC=0
 ( . "$HERE/scripts/_managed_block.sh"
   PATH="$ABIN:$PATH"
   printf 'body\n' | managed_block_inject "$AF" "# B" "# E" ) >/dev/null 2>&1 || ARC=$?
+# 핵심 계약: 설치 안전 — 결함 주입: 관리블록 쓰기에서 블록 밖 내용 보존 줄을 지운다
 check "걷어내기 실패: 사용자 줄이 남는다"    "[ \"\$(grep -c '^user keep' '$AF')\" = 2 ]"
 check "걷어내기 실패: 실패로 돌아온다"       "[ '$ARC' -ne 0 ]"
 check "걷어내기 실패: 관리블록을 안 남긴다"  "! grep -qF '# B' '$AF'"
@@ -710,6 +732,13 @@ check "포인터: 사본 경로를 알린다"        "printf '%s' \"\$OUTR11\" |
 check "포인터: 사본은 전역에 쌓인다"      "[ ! -d '$PR11/backups' ]"
 run "$HR11" "$PR11" >/dev/null
 check "포인터: 재실행도 사용자 줄 보존"   "grep -qF '이 줄은 사용자 것이라 남아야 한다' '$PR11/CLAUDE.md'"
+# CRLF 로 쓴 프로젝트 CLAUDE.md 에서 옛 블록을 걷어내도 남은 줄의 줄 끝을 LF 로 바꾸지 않는다(주입과 같은 규칙).
+HR12="$(mktemp -d)"; PR12="$(mktemp -d)"
+printf 'user line one\r\n\r\nuser line two\r\n# BEGIN disciplined-coder (managed — do not edit)\r\nold body\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$PR12/CLAUDE.md"
+run "$HR12" "$PR12" >/dev/null
+echo "[project-old-block-crlf] 걷어낸 뒤에도 CRLF 를 유지한다"
+check "포인터 CRLF: 블록을 걷어낸다"          "! grep -qF 'BEGIN disciplined-coder' '$PR12/CLAUDE.md' && grep -qF 'user line two' '$PR12/CLAUDE.md'"
+check "포인터 CRLF: 남은 모든 줄이 CRLF 다"   "[ \"\$(tr -cd '\r' < '$PR12/CLAUDE.md' | wc -c)\" = \"\$(tr -cd '\n' < '$PR12/CLAUDE.md' | wc -c)\" ]"
 
 # --- project-old-block-nobackup: 사본을 못 뜨면 블록을 걷어내지 않는다. 못 뜨는 채로 걷어내면 되돌릴 방법이 없기 때문이다.
 # backups 자리를 파일이 막고 있으면 mkdir이 실패한다 — 권한이나 백신이 막는 PC를 흉내 낸 것이다.
@@ -724,6 +753,39 @@ echo "[project-old-block-nobackup] a block that cannot be copied is left alone"
 check "사본 실패: 블록을 안 걷어낸다"     "grep -qF 'BEGIN disciplined-coder' '$PR13/CLAUDE.md'"
 check "사본 실패: 사유를 알린다"          "printf '%s' \"\$OUTR13\" | grep -qF '사본을 뜨지 못해'"
 check "사본 실패: 나머지 셋업은 돈다"     "[ -f '$HR13/.claude/disciplined-coder/agent-principles.md' ]"
+
+# --- project-marker-quote: 마커를 문장 안에 인용만 한 프로젝트 CLAUDE.md 는 고치지 않고 사본도 뜨지 않는다 ---
+HR14="$(mktemp -d)"; PR14="$(mktemp -d)"
+printf '# 지침\n\n마커는 `# BEGIN disciplined-coder (managed — do not edit)` 이다.\n' > "$PR14/CLAUDE.md"
+cp "$PR14/CLAUDE.md" "$HR14/orig.md"
+OUTR14="$(run "$HR14" "$PR14")"
+echo "[project-marker-quote] 마커를 인용만 한 줄은 블록이 아니다"
+check "마커 인용: 사본을 뜨지 않는다"   "! ls '$HR14/.claude/disciplined-coder/backups' 2>/dev/null | grep -q '^CLAUDE.md'"
+check "마커 인용: 걷어냈다고 알리지 않는다" "! printf '%s' \"\$OUTR14\" | grep -qF '옛 관리블록'"
+check "마커 인용: 파일이 그대로다"      "cmp -s '$HR14/orig.md' '$PR14/CLAUDE.md'"
+
+# --- global-block-preserve: 전역 관리블록 안에 사람이 넣은 줄이 있으면 다시 쓰기 전에 사본을 뜨고 알린다 ---
+HG1="$(mktemp -d)"; PG1="$(mktemp -d)"; mkdir -p "$HG1/.claude"
+{ printf 'user top\n\n'
+  printf '# BEGIN disciplined-coder (managed — do not edit)\n'
+  printf '@disciplined-coder/agent-principles.md\n'
+  printf '내가 끼워 넣은 줄\n'
+  printf '@disciplined-coder/korean-banned-words.md\n'
+  printf '# END disciplined-coder (managed — do not edit)\n'
+} > "$HG1/.claude/CLAUDE.md"
+OUTG1="$(run "$HG1" "$PG1")"
+echo "[global-block-preserve] 블록 안 줄이 기대 본문과 다르면 사본을 남긴다"
+check "블록 보존: 끼워 넣은 줄이 사본에 남는다" "grep -rqF '내가 끼워 넣은 줄' '$HG1/.claude/disciplined-coder/backups'"
+check "블록 보존: 사본 경로를 알린다"           "printf '%s' \"\$OUTG1\" | grep -F '관리블록' | grep -qF '사본:'"
+check "블록 보존: 블록이 기대 본문이 된다"      "! grep -qF '내가 끼워 넣은 줄' '$HG1/.claude/CLAUDE.md'"
+# CRLF 로 쓴 전역 CLAUDE.md 에 LF 줄을 섞지 않는다. 다시 실행해도 파일이 바뀌지 않는다.
+HG2="$(mktemp -d)"; PG2="$(mktemp -d)"; mkdir -p "$HG2/.claude"
+printf 'user line one\r\nuser line two\r\n' > "$HG2/.claude/CLAUDE.md"
+run "$HG2" "$PG2" >/dev/null
+cp "$HG2/.claude/CLAUDE.md" "$HG2/after1.md"
+run "$HG2" "$PG2" >/dev/null
+check "줄 끝 유지: CRLF 파일의 모든 줄이 CRLF 다" "[ \"\$(tr -cd '\r' < '$HG2/.claude/CLAUDE.md' | wc -c)\" = \"\$(tr -cd '\n' < '$HG2/.claude/CLAUDE.md' | wc -c)\" ] && grep -qF 'BEGIN disciplined-coder' '$HG2/.claude/CLAUDE.md'"
+check "줄 끝 유지: 다시 실행해도 그대로다"      "cmp -s '$HG2/after1.md' '$HG2/.claude/CLAUDE.md'"
 
 # --- deps-notice: 함께 쓰는 플러그인 확인 — 매 세션, 없을 때만, 건너뛸 이름은 skip 파일이 정한다 ---
 HDN1="$(mktemp -d)"; PDN1="$(mktemp -d)"

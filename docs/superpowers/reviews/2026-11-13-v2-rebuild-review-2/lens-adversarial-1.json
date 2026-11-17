@@ -1,0 +1,15 @@
+{"lens": "lens-adversarial", "target": "docs/superpowers/plans/2026-11-13-v2-rebuild-stage0-3.md", "note": "서브에이전트 출력 파일이 비어 메인 세션이 받은 보고에서 줄여 옮겼다",
+ "issues": [
+  {"where": "Task 11 Step 3~4, Task 12 Step 4", "type": "failure-mode", "claim": "미달 경로에 결과 기록·결정 기록·브랜치 처분이 없어 v2 커밋이 ALL PASS 상태로 브랜치에 남고 다음 세션이 병합으로 진행할 수 있다", "consequence": "미달 경로에 참고서 기록, 결정 기록, 브랜치 처분이 없다"},
+  {"where": "Task 9 Step 5, Task 10 Step 2, Task 11 Step 3", "type": "failure-mode", "claim": "목록 비교 미달 시 V2_REV.txt 를 덮어써 시험한 v2 와 채택하는 v2 가 달라지고 한 조건에 두 리비전 답이 섞일 수 있다", "consequence": "V2_REV.txt 하나를 여러 태스크가 공유하고 덮어쓰며 판정 파일에 생성 리비전이 없다"},
+  {"where": "Task 12 Step 2, Task 2 Step 3", "type": "failure-mode", "claim": "label_pool.py 가 60·60 이 모이면 멈춰 두 번째 세트를 모으지 못하고 이어받기 규칙이 없다", "consequence": "멈춤 조건이 고정이고 목표 개수·이어받기 규칙이 없다"},
+  {"where": "Task 3 Step 8 inject()", "type": "failure-mode", "claim": "치환 실패와 클론 기준 상태를 확인하지 않고 아무 FAIL 줄이나 나오면 잡았다고 본다", "consequence": "결함 주입 판정이 기대 검사 이름을 대조하지 않는다"},
+  {"where": "Global Constraints 27·31행", "type": "risk", "claim": "판정도 OAuth 구독으로 실행하는데 업무 시간 밖 제약은 생성에만 둔다", "consequence": "분류·판정 단계에 시간 제약 표시가 없다"},
+  {"where": "Task 8 Step 3 예상 합계 식", "type": "risk", "claim": "80달러 확인이 한 번뿐이고 식에 분류·시범·150턴 재시험이 빠졌다", "consequence": "재시험 경로에서 상한 확인이 없다"},
+  {"where": "Task 12 Step 1", "type": "risk", "claim": "판정 인용문(y_quotes)을 근거로 참고서에 적어 공개 저장소에 커밋할 때 대화 원문 금지가 없다", "consequence": "Task 12 Step 1 커밋 대상에 인용 금지 조건이 없다"},
+  {"where": "Task 7 Interfaces 생략 규칙, replay5.py 175·210행", "type": "risk", "claim": "결과 파일 존재만으로 생략해 중단 시 잘린 JSON 이 남으면 재실행이 건너뛴다", "consequence": "원자적 쓰기나 내용 검증이 없다"},
+  {"where": "Task 2 Step 1", "type": "risk", "claim": "숨긴 세트 후보를 요구 분석 입력(msgs.jsonl 942개) 안으로 한정해, 문구를 만들 때 읽힌 메시지가 시험 세트에 남는다", "consequence": "후보 풀이 msgs.jsonl 소속 메시지로만 이루어진다"},
+  {"where": "Task 9 Step 5 BANNED_VIEW_FULL_ROWS", "type": "over-engineering", "claim": "조건부 단계 하나를 위해 행 식별 설정 값을 두 번째 원본으로 만든다", "consequence": "행 식별 정보가 두 곳에 생긴다"}
+ ],
+ "principles_applied": ["REVERSIBLE", "YAGNI", "CHECKABLE", "EVIDENCE-FIRST", "OTHER-SESSIONS", "NO-ASSUME"],
+ "notes": "replay5 는 원본 jsonl 을 읽기만 하고 임시 설정 폴더의 합성 세션으로 재개해 실제 기록을 바꾸지 않음을 확인했다. 결함 주입은 클론에서 한다. test_scaffold.sh 가 클론에서도 실제 HOME 을 건드리지 않는지, 미추적 plan 파일이 문서 경로 검사를 실패시키는지, label_pool 동시 배치 순서가 pick_hidden 의 앞에서부터 규칙과 맞는지는 확인 필요."}

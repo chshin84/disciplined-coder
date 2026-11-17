@@ -125,7 +125,10 @@ async function main() {
     if (r && typeof r === 'object' && Object.hasOwn(r, '@throw')) throw new Error(String(r['@throw']));
     return structuredClone(r);
   };
+  // 한 번에 넘긴 호출 수를 남긴다. 시험이 이 값으로 동시 실행 상한을 확인한다.
+  const parallelSizes = [];
   const parallel = async (thunks) => {
+    parallelSizes.push(thunks.length);
     const out = [];
     for (const t of thunks) {
       try {
@@ -152,7 +155,7 @@ async function main() {
     process.exitCode = 1;
     return;
   }
-  process.stdout.write(JSON.stringify({ result: result ?? null, calls, logs }) + '\n');
+  process.stdout.write(JSON.stringify({ result: result ?? null, calls, logs, parallel_sizes: parallelSizes }) + '\n');
 }
 
 await main();

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 공유 헬퍼: 「금지 표현」 표를 한 번 읽어 여러 파일로 낸다. 그 표는 에이전트원칙이 아니라
 # korean-banned-words.md 에 있고, 그 파일이 목록의 원본이다.
-# 소비자는 doc_word 훅 셋(pretooluse·posttooluse·stop)과 scripts/check_banned_words.sh 다.
+# 소비자는 hooks/doc_word_posttooluse.sh 와 scripts/check_banned_words.sh, scripts/scaffold.sh 다.
 # 표를 읽는 자리를 늘리지 않으려고 파싱은 여기 한 벌만 둔다.
 #
 # awk 한 번으로 끝낸다. 윈도우는 프로세스 하나 띄우는 값이 커서 행마다 파이프를 돌리는 셸 반복은
@@ -67,6 +67,57 @@ banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl, $5=scopes(생략 가�
   ' "$1"
 }
 
+# 세션에 싣는 짧은 상시 보기를 stdout 으로 낸다. 표를 다시 읽지 않고 banned_parse 결과만 쓴다 —
+# 파서가 둘이면 표의 모양이 바뀔 때 한쪽만 따라간다. 제외어는 넣지 않는다. 제외어는 검사기가 쓰는
+# 값이고, 세션에 실으면 분량만 늘린다.
+# 형식: 원본 첫 줄(제목), 「금지 표현」 제목 바로 아래 머리 문단(표에 쓰지 않을 글을 정한 줄),
+# 범위 제목 없는 행, 범위마다 `## <범위>` 와 그 행들, 마지막에 원본의
+# 「표로 적을 수 없는 규칙」 절의 `- ` 줄. 덩어리 사이는 빈 줄 하나이고 줄 끝 CR 과 끝 빈 줄이 없다.
+# 표에서 행을 하나도 읽지 못하면 아무것도 내지 않고 1 을 돌려준다. 빈 보기를 사본으로 깔면
+# 세션에 목록이 조용히 빠진다.
+BANNED_RULES_HEAD='## 표로 적을 수 없는 규칙'
+banned_view() {  # $1=표 → stdout 상시 보기
+  local d rc=0
+  d="$(mktemp -d)" || return 1
+  banned_parse "$1" "$d/pairs" "$d/toks" "$d/excl" "$d/scopes" || rc=1
+  if [ "$rc" -eq 0 ] && [ -s "$d/pairs" ]; then
+    LC_ALL=C awk -v rh="$BANNED_RULES_HEAD" -v th="$BANNED_TABLE_HEAD" '
+      FNR == 1 { fi++ }
+      { sub(/\r$/, "") }
+      fi == 1 { sc[FNR] = $0; next }
+      fi == 2 {
+        n = split($0, p, "\t"); line = "-"
+        for (i = 2; i <= n; i++) line = line (i > 2 ? " ·" : "") " `" p[i] "`"
+        line = line " → " p[1]
+        s = sc[FNR]
+        if (!(s in grp)) { grp[s] = ""; if (s != "") order[++no] = s }
+        grp[s] = grp[s] (grp[s] == "" ? "" : "\n") line
+        next
+      }
+      FNR == 1 { title = $0 }
+      # 머리 문단은 「금지 표현」 제목과 그 아래 첫 제목·표 사이의 글 줄이다.
+      $0 == th { inh = 1; next }
+      inh && (/^#/ || /^\|/) { inh = 0 }
+      inh && $0 != "" { head = head (head == "" ? "" : "\n") $0 }
+      $0 == rh { inr = 1; next }
+      inr && /^## / { inr = 0 }
+      inr && /^- / { rules = rules (rules == "" ? "" : "\n") $0 }
+      END {
+        out = title
+        if (head != "") out = out "\n\n" head
+        if ("" in grp) out = out "\n\n" grp[""]
+        for (i = 1; i <= no; i++) out = out "\n\n## " order[i] "\n\n" grp[order[i]]
+        if (rules != "") out = out "\n\n" rh "\n\n" rules
+        print out
+      }
+    ' "$d/scopes" "$d/pairs" "$1" || rc=1
+  else
+    rc=1
+  fi
+  rm -rf "$d"
+  return "$rc"
+}
+
 # 문서 여럿을 한 번에 훑어 "금지어<탭>걸린 파일들" 줄을 낸다. 제외 칸을 적용한 뒤에 찾는다.
 # 검사 스크립트가 쓰던 자기 파서를 없애려고 둔다 — 파서가 둘이면 표의 모양이 바뀔 때 한쪽만
 # 따라간다. 제외 칸이 생겼을 때 실제로 그랬다.
@@ -102,7 +153,7 @@ for f in read_lines(files_path):
     # 코드 블록과 백틱 안은 걷는다. banned_report 와 같은 규칙이어야 같은 문장이 통로에 따라
     # 다르게 판정되지 않는다. 목록 파일이 인용은 검사 대상이 아니라고 규정한다.
     body = re.sub(r"```.*?```", " ", raw, flags=re.S)
-    body = re.sub(r"`[^`]*`", " ", body)
+    body = re.sub(r"`[^`\n]*`", " ", body)
     docs.append((f, body))
 
 def masked(b, exclusions):
@@ -122,17 +173,22 @@ for i, words in enumerate(rows):
 ' "$1" "$2" "$3" "$4" "$5" 2>/dev/null | tr -d '\r' || true
 }
 
-# 본문에서 금지 표현을 찾아 "걸린 말 · 걸린 말 -> 대체어" 줄들을 낸다. 못 찾으면 아무것도 안 낸다.
-# 맞추는 곳을 여기 하나로 둔다. Pre 는 쓰려는 내용을, Post 는 이미 쓰인 파일을 넘기는데, 맞추는
-# 규칙이 둘이면 같은 문장이 도구에 따라 다르게 판정된다.
+# 본문에서 금지 표현을 찾아 "검출된 말 · 검출된 말 -> 대체어" 줄들을 낸다. 못 찾으면 아무것도 안 낸다.
+# 맞추는 곳을 여기 하나로 둔다. 맞추는 규칙이 둘이면 같은 문장이 도구에 따라 다르게 판정된다.
 #
 # 코드 블록과 백틱 안은 걷어 낸다. 파일 내용과 식별자를 인용한 것까지 잡으면 거짓 판정이 되어
-# 훅을 끄게 만든다. 금지어를 문서에 적어야 할 때는 백틱으로 감싸면 지나간다.
-banned_report() {  # $1=pairs 경로, $2=검사할 텍스트 파일, $3=excl 경로 → 보고 줄들
+# 훅을 끄게 만든다. 금지어를 문서에 적어야 할 때는 백틱으로 감싸면 지나간다. 인라인 백틱은 한 줄 안에서만
+# 짝을 짓는다 — 짝 없는 백틱 하나가 다음 줄의 백틱까지 본문을 통째로 가리면 안 된다.
+# .html·.htm 은 script·style 블록과 태그를 걷고 본문 글자만 본다.
+# 걷은 글자는 같은 길이의 공백으로 바꾼다. 넷째 인자(구간 파일, 한 줄에 "시작 끝" 글자 위치)를 주면
+# 파일 전체에 제외어를 덮은 뒤 그 구간만 본다 — 구간을 먼저 자르면 구간 밖 글자와 이어진 제외어(`현재는`)가
+# 안 맞아 구간 안의 `재는` 이 검출된다. 깨진 UTF-8 바이트는 대체 문자로 읽고 나머지를 검사한다.
+banned_report() {  # $1=pairs 경로, $2=검사할 텍스트 파일, $3=excl 경로, $4=구간 파일(생략 가능) → 보고 줄들
   json_run '
 import re, sys
 
 pairs_path, text_path, excl_path = sys.argv[1:4]
+spans_path = sys.argv[4] if len(sys.argv) > 4 else ""
 
 rows = []
 for line in open(pairs_path, encoding="utf-8"):
@@ -149,12 +205,29 @@ except Exception:
     excls = []
 
 try:
-    text = open(text_path, encoding="utf-8").read()
+    text = open(text_path, encoding="utf-8", errors="replace", newline="").read()
 except Exception:
     sys.exit(0)
 
-body = re.sub(r"```.*?```", " ", text, flags=re.S)
-body = re.sub(r"`[^`]*`", " ", body)
+spans = []
+if spans_path:
+    try:
+        for line in open(spans_path, encoding="utf-8"):
+            if line.strip():
+                a, b = line.split()
+                spans.append((int(a), int(b)))
+    except Exception:
+        sys.exit(0)
+    if not spans:
+        sys.exit(0)
+
+blank = lambda m: re.sub(r"[^\n]", " ", m.group(0))
+body = text
+if re.search(r"\.html?$", text_path, re.I):
+    body = re.sub(r"<(script|style)\b.*?</\1\s*>", blank, body, flags=re.S | re.I)
+    body = re.sub(r"<[^>]*>", blank, body)
+body = re.sub(r"```.*?```", blank, body, flags=re.S)
+body = re.sub(r"`[^`\n]*`", blank, body)
 
 def masked(b, exclusions):
     """제외어가 놓인 곳을 같은 길이의 공백으로 덮는다. 그 안에서 잡힌 것은 세지 않는다는 뜻이다.
@@ -169,8 +242,10 @@ def masked(b, exclusions):
 for i, (words, repl) in enumerate(rows):
     ex = excls[i] if i < len(excls) else []
     target = masked(body, ex)
+    if spans:
+        target = "\n".join(target[a:b] for a, b in spans)
     found = [w for w in words if w and w in target]
     if found:
         print(" · ".join(found) + " -> " + repl)
-' "$1" "$2" "$3" 2>/dev/null | tr -d '\r' || true
+' "$@" 2>/dev/null | tr -d '\r' || true
 }

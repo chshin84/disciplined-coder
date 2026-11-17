@@ -147,11 +147,13 @@ managed_block_unlock() {  # $1=락 디렉터리 경로, $2=managed_block_lock �
 # 리턴: 0=걷어냄, 1=대상이 없어 아무것도 안 함, 2=사본을 못 떠서 걷어내지 않음,
 #       3=락을 못 잡아 걷어내지 않음, 4=변환이 실패해 원본을 그대로 두었음.
 # 호출은 반드시 `|| rc=$?`로 감싼다(set -e).
+# 마커는 줄 전체가 같을 때만 블록으로 본다(줄 끝 CR 허용). 문장 안에 마커를 인용만 한 파일은 걷어낼 것이
+# 없으므로 사본도 뜨지 않고 알리지도 않는다 — 부분 일치로 보면 매 세션 사본이 쌓이고 거짓 알림이 뜬다.
 managed_block_remove() {
   local uc="$1" begin="$2" end="$3" bk="${4:-}" tmp norm lock tok
   managed_block_backup=""
   [ -f "$uc" ] || return 1
-  grep -qF "$begin" "$uc" 2>/dev/null || return 1
+  grep -qxF -e "$begin" -e "$begin"$'\r' "$uc" 2>/dev/null || return 1
   if [ -n "$bk" ]; then
     if ! mkdir -p "$(dirname "$bk")" 2>/dev/null || ! cp "$uc" "$bk" 2>/dev/null; then
       return 2
@@ -166,21 +168,40 @@ managed_block_remove() {
   # 사람이 적은 줄이 사라진다.
   awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" -v tag="$MANAGED_TAG" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 4
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 4
+  # 줄 끝은 주입과 같은 규칙이다. Git Bash 의 awk 는 읽을 때 줄 끝 CR 을 떼므로 원본이 CRLF 이면 다시 붙인다.
+  # CR 이 있는지는 grep 이 아니라 tr 로 본다. Git Bash 의 grep 도 줄 끝 CR 을 떼고 읽어 CRLF 파일을 놓친다.
+  if [ -n "$(tr -cd '\r' < "$uc" 2>/dev/null | head -c 1)" ]; then
+    awk '{ sub(/\r$/, ""); printf "%s\r\n", $0 }' "$norm" > "$tmp" && cat "$tmp" > "$norm" || return 4
+  fi
+  # 내용이 그대로면 고친 것이 없다. 떠 둔 사본을 치우고 아무것도 안 한 것으로 돌아간다.
+  if cmp -s "$norm" "$uc"; then
+    if [ -n "$managed_block_backup" ]; then rm -f "$managed_block_backup"; managed_block_backup=""; fi
+    return 1
+  fi
   mv "$norm" "$uc" || return 4
   return 0
 }
 
-# 리턴: 0=넣었거나 이미 같다, 1=락을 못 잡아 아무것도 안 함, 2=변환이 실패해 원본을 그대로 두었음.
+# 리턴: 0=넣었거나 이미 같다, 1=락을 못 잡아 아무것도 안 함, 2=변환이 실패해 원본을 그대로 두었음,
+#       3=블록 안 줄이 기대 본문과 다른데 사본을 뜨지 못해 그대로 두었음.
 # 락을 못 잡았으면 파일을 건드리지 않고 물러난다 — 반쪽만 쓴 관리블록을 남기는 것보다 안 쓰는
 # 것이 낫고, 못 썼다는 사실은 managed_block_lock 이 stderr 로 알린다. 호출자가 그 stderr 를 stdout 에 합쳐 사용자에게 닿게 한다.
+# 사본($4, 생략 가능): 블록 안에 기대 본문과 다른 줄이 있으면 사람이 끼워 넣은 줄일 수 있다. 다시 쓰면 그 줄이
+# 사라지고 이 파일은 git 밖이라, 고치기 전에 사본을 뜨고 경로를 managed_block_backup 에 남긴다. 알리는 것은
+# 호출자다. 그래서 호출자는 파이프가 아니라 같은 셸에서 이 함수를 부른다(파이프 안의 변수는 돌아오지 않는다).
+# 줄 끝: 원본이 CRLF 이면 넣는 줄도 CRLF 로 쓴다. 섞이면 사용자 파일의 줄 끝이 바뀌고 같은지 판정도 어긋난다.
 managed_block_inject() {
-  local uc="$1" begin="$2" end="$3" body tmp norm lock tok cur rest rest2
+  local uc="$1" begin="$2" end="$3" bk="${4:-}" body tmp norm lock tok cur rest rest2 eol=$'\n' differs
+  managed_block_backup=""
   body="$(cat)"
   [ -e "$uc" ] || : > "$uc"
   # 같은 블록이 하나만 들어 있고 고아 주석도 없으면 손대지 않는다. 매 세션 다시 쓰면 그 사이에
   # 시작하는 다른 창이 블록 없는 파일을 읽을 수 있고, 락과 임시 파일에 프로세스 열 개 남짓이 든다.
+  # 마커는 줄 전체로 견준다. CR 은 걷고 견준다.
   cur="$(<"$uc")"
-  if [[ $cur == *"$begin"$'\n'"$body"$'\n'"$end"* ]] && [[ $cur != *"$MANAGED_ORPHAN"* ]]; then
+  if [[ $cur == *$'\r\n'* ]]; then eol=$'\r\n'; fi
+  cur="${cur//$'\r'/}"
+  if [[ $'\n'$cur$'\n' == *$'\n'"$begin"$'\n'"$body"$'\n'"$end"$'\n'* ]] && [[ $cur != *"$MANAGED_ORPHAN"* ]]; then
     rest="${cur#*"$begin"}"
     rest2="${cur#*"$end"}"
     [[ $rest != *"$begin"* && $rest2 != *"$end"* ]] && return 0
@@ -191,15 +212,31 @@ managed_block_inject() {
   tmp="$(mktemp "$uc.XXXXXX")"; norm="$(mktemp "$uc.XXXXXX")"
   # 중간에 죽어도 임시 파일과 락을 남기지 않는다.
   trap 'rm -f "$tmp" "$norm"; managed_block_unlock "$lock" "$tok"' RETURN
+  # 완결된 블록마다 안쪽 줄을 기대 본문과 견준다. 하나라도 다르면 사본을 뜬다.
+  differs="$(MB_B="$begin" MB_E="$end" MB_BODY="$body" awk '
+    BEGIN { b = ENVIRON["MB_B"]; e = ENVIRON["MB_E"]; body = ENVIRON["MB_BODY"] }
+    { l = $0; sub(/\r$/, "", l) }
+    inb && l == e { if (txt != body) d = 1; inb = 0; next }
+    l == b { inb = 1; txt = ""; first = 1; next }
+    inb { txt = (first ? l : txt "\n" l); first = 0 }
+    END { if (d) print "diff" }' "$uc")" || return 2
+  if [ -n "$differs" ] && [ -n "$bk" ]; then
+    if ! mkdir -p "$(dirname "$bk")" 2>/dev/null || ! cp "$uc" "$bk" 2>/dev/null; then return 3; fi
+    managed_block_backup="$bk"
+  fi
   # 걷어내기와 같은 이유로 두 변환의 종료 코드를 각각 본다.
   awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" -v tag="$MANAGED_TAG" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 2
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 2
+  # Git Bash 의 awk 는 읽을 때 줄 끝 CR 을 떼므로 CRLF 파일이면 남은 줄의 CR 을 다시 붙인다.
+  if [ "$eol" != $'\n' ]; then
+    awk '{ sub(/\r$/, ""); printf "%s\r\n", $0 }' "$norm" > "$tmp" && cat "$tmp" > "$norm" || return 2
+  fi
   # 완성본을 임시 파일에 다 만든 뒤 한 번에 옮긴다. 옮긴 뒤 덧붙이면 그 사이에 블록 없는 파일이 놓인다.
   {
-    if [ -s "$norm" ]; then printf '\n'; fi
-    printf '%s\n' "$begin"
-    printf '%s\n' "$body"
-    printf '%s\n' "$end"
+    if [ -s "$norm" ]; then printf '%s' "$eol"; fi
+    printf '%s%s' "$begin" "$eol"
+    printf '%s%s' "${body//$'\n'/$eol}" "$eol"
+    printf '%s%s' "$end" "$eol"
   } >> "$norm" || return 2
   mv "$norm" "$uc" || return 2
 }

@@ -9,8 +9,8 @@ FX="$(mktemp -d)"; trap 'rm -rf "$FX"' EXIT
 . "$HERE/scripts/_json_valid.sh"
 _json_python || true
 
-# 계약에 아는 렌즈 이름. spec 「에이전트 구성」 표가 원본이다.
-KNOWN="lens-adversarial lens-consistency lens-fit lens-grounding lens-readability lens-rebuttal lens-visual"
+# 렌즈 이름은 정의 파일(agents/lens-*.md)에서 도출한다. 손으로 적은 목록은 렌즈를 지우거나 합칠 때 먼저 낡는다.
+KNOWN="$(cd "$HERE/agents" && ls lens-*.md 2>/dev/null | sed 's/\.md$//' | sort | tr '\n' ' ' | sed 's/ $//')"
 
 # policy_violations <agents_dir> <workflows_dir>
 # 위반마다 `agents:<파일>:<사유>` 나 `workflows:<파일>:<줄>` 한 줄을 낸다. 0=위반 없음, 1=있음.
@@ -95,12 +95,21 @@ sys.exit(1 if bad else 0)
 
 echo "[계약]"
 check "계약 파일이 JSON 으로 읽힌다" "json_valid_stdin < \"\$CONTRACT\""
-check "계약의 렌즈 이름이 아는 이름이다" \
-  "[ \"\$(json_run 'import json,sys; print(\" \".join(sorted(json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"])))' \"\$CONTRACT\" 2>/dev/null)\" = \"\$KNOWN\" ]"
-check "아는 이름이 agents/lens-*.md 집합과 같다" \
-  "[ \"\$(cd \"\$HERE/agents\" && ls lens-*.md | sed 's/\.md\$//' | sort | tr '\n' ' ' | sed 's/ \$//')\" = \"\$KNOWN\" ]"
+check "계약 JSON 의 렌즈가 정의 파일과 같다" \
+  "[ -n \"\$KNOWN\" ] && [ \"\$(json_run 'import json,sys; print(\" \".join(sorted(json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"])))' \"\$CONTRACT\" 2>/dev/null)\" = \"\$KNOWN\" ]"
+check "lens-adversarial 계약 types 에 contradiction 이 있다" \
+  "json_run 'import json,sys; sys.exit(0 if \"contradiction\" in json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"][\"lens-adversarial\"][\"types\"] else 1)' \"\$CONTRACT\""
 check "빼는 칸이 공통 최상위 칸이다" \
   "json_run 'import json,sys; c=json.load(open(sys.argv[1],encoding=\"utf-8\")); top={k.lstrip(\"?\") for k in c[\"common\"]}; sys.exit(0 if all(set(a.get(\"omit\",[]))<=top for a in c[\"agents\"].values()) else 1)' \"\$CONTRACT\""
+# 문서 타입 판정은 호출자가 타입 표를 넘긴 doc 모드에서만 한다. 다른 모드에서도 칸을 요구하면 렌즈가 null 을 내고
+# 호출자가 그 렌즈를 실행하지 않은 것으로 친다.
+check "lens-grounding 계약의 doc_type 이 선택 칸이다" \
+  "json_run 'import json,sys; e=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"][\"lens-grounding\"][\"extra\"]; sys.exit(0 if \"?doc_type\" in e and \"doc_type\" not in e else 1)' \"\$CONTRACT\""
+# 반박 렌즈가 실행한 검색어는 외부 로그에 남으므로 메인 세션이 사내 식별 낱말과 대조할 수 있게 출력에 둔다.
+check "lens-rebuttal 계약에 queries 가 필수 칸이다" \
+  "json_run 'import json,sys; e=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"][\"lens-rebuttal\"][\"extra\"]; sys.exit(0 if \"queries\" in e else 1)' \"\$CONTRACT\""
+check "lens-readability 계약 suggestions 의 rewrite 가 필수 칸이다" \
+  "json_run 'import json,sys; s=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"][\"lens-readability\"][\"extra\"][\"suggestions\"][0]; sys.exit(0 if \"rewrite\" in s and \"?rewrite\" not in s else 1)' \"\$CONTRACT\""
 
 echo "[호출 정책]"
 # 정책: 사전 정의 호출만 허용한다(docs/superpowers/decisions/2026-10-25-agent-call-policy.md).
@@ -116,7 +125,7 @@ mk_tools_fx() {  # $1=픽스처 이름, $2=sed 식. agents/ 를 복사하고 첫
 }
 mk_tools_fx t_agent     's/^\(tools: .*\)$/\1, Agent/'
 mk_tools_fx t_task      's/^\(tools: .*\)$/\1, Task/'
-mk_tools_fx t_agentsub  's/^\(tools: .*\)$/\1, Agent(lens-fit)/'
+mk_tools_fx t_agentsub  's/^\(tools: .*\)$/\1, Agent(lens-grounding)/'
 mk_tools_fx t_yaml      's/^tools: .*$/tools:\n  - Read/'
 mk_tools_fx t_none      '/^tools: /d'
 mk_tools_fx t_flow      's/^tools: .*$/tools: [Read, Agent]/'
@@ -147,12 +156,9 @@ echo "[정의]"
 # docs/superpowers/decisions/2026-10-25-lens-agent-runtime.md 시험 4 가 확인한 이름이다.
 declare -A TOOLS=(
   [lens-adversarial]="Read, Grep, Glob"
-  [lens-consistency]="Read, Grep, Glob"
-  [lens-fit]="Read, Grep, Glob"
   [lens-grounding]="Read, Grep, Glob"
-  [lens-readability]="Read, Grep, Glob"
+  [lens-readability]="Read, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_snapshot"
   [lens-rebuttal]="Read, Grep, Glob, WebSearch, WebFetch"
-  [lens-visual]="Read, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_snapshot"
 )
 
 # example_ok <정의 파일> <렌즈 이름> — 「출력 예시」 절의 첫 ```json 블록을 계약과 대조한다.
@@ -191,17 +197,82 @@ for name in $KNOWN; do
   d="$HERE/agents/$name.md"
   check "$name: 정의 파일과 이름이 같다" "grep -qx 'name: $name' \"$d\""
   check "$name: 모델이 opus 다" "grep -qx 'model: opus' \"$d\""
-  check "$name: 도구가 spec 표와 같다" "grep -qxF 'tools: ${TOOLS[$name]}' \"$d\""
-  check "$name: 입력 절이 두 줄의 부재를 다룬다" \
-    "has_sec \"$d\" '입력' && sec_has \"$d\" '입력' MODE && sec_has \"$d\" '입력' PRINCIPLES"
+  check "$name: 도구가 spec 표와 같다" "grep -qxF 'tools: ${TOOLS[$name]:-}' \"$d\""
+  check "$name: 입력 절이 lens-review 의 입력 형식을 읽는다" \
+    "has_sec \"$d\" '입력' && sec_has \"$d\" '입력' MODE && sec_has \"$d\" '입력' TARGET && sec_has \"$d\" '입력' CRITERIA"
   check "$name: 출력 예시가 계약과 같다" "example_ok \"$d\" $name 2>/dev/null"
   check "$name: 읽기 범위 절이 있다" "has_sec \"$d\" '읽기 범위'"
-  check "$name: description 이 입력 안내로 dispatching-lenses 를 가리킨다" \
-    "grep -E '^description: ' \"$d\" | grep -qF '\`dispatching-lenses\`'"
+  check "$name: description 이 입력 안내로 lens-review 를 가리킨다" \
+    "grep -E '^description: ' \"$d\" | grep -qF '\`lens-review\`'"
   check "$name: 출력 예시가 계약 소유자를 가리킨다" \
-    "sec_has \"$d\" '출력 예시' '「결과를 모으는 법」' && sec_has \"$d\" '출력 예시' 'scripts/lens_contract.json'"
+    "sec_has \"$d\" '출력 예시' '「통합과 1차 디펜스」' && sec_has \"$d\" '출력 예시' 'scripts/lens_contract.json'"
 done
-check "lens-visual: 도구 부재 처리를 적는다" "grep -qF '브라우저 도구 없음' \"\$HERE/agents/lens-visual.md\""
+RDL="$HERE/agents/lens-readability.md"
+check "lens-readability: 도구 부재 처리를 적는다" "grep -qF '브라우저 도구 없음' \"\$RDL\""
+# 독자 렌즈는 대상·목적·문체 공격 항목만 받는다. 출처를 읽은 렌즈는 맥락 없는 독자를 흉내 낼 수 없기 때문이다.
+check "lens-readability 에 입력 절이 있다" "has_sec \"\$RDL\" '입력' && sec_has \"\$RDL\" '입력' 'style-attacks.md'"
+SA="$HERE/skills/lens-review/references/style-attacks.md"
+check "style-attacks.md 에 과잉 지적 반례 절이 있다" "[ -f \"\$SA\" ] && has_sec \"\$SA\" '과잉 지적 반례'"
+
+echo "[렌즈 공통과 웹 규칙]"
+# v2 의 렌즈는 에이전트원칙을 읽지 않고, 판정 기준은 lens-review 가 CRITERIA 줄로 넘긴다(spec 「에이전트」 렌즈 공통 행).
+PR_HIT="$(grep -lE 'PRINCIPLES|principles_applied' "$HERE"/agents/lens-*.md 2>/dev/null || true)"
+check "렌즈 정의에 PRINCIPLES·principles_applied 가 없다" "[ -z \"\$PR_HIT\" ]"
+
+fm_of() { awk 'NR==1&&/^---/{f=1;next} f&&/^---/{exit} f' "$1" | tr -d '\r'; }
+# has_tool <정의> <정규식> — frontmatter 의 tools 목록에 정규식과 통째로 맞는 도구가 있으면 참.
+has_tool() { grep -qxE "$2" <<<"$(fm_of "$1" | sed -n 's/^tools:[ ]*//p' | tr ',' '\n' | sed 's/^ *//; s/ *$//; s/(.*//')"; }
+# 웹 주소를 여는 도구를 가진 정의는 금융투자협회 홈페이지 접속 금지를 직접 적는다. 반복 접속은 사내 접속 차단으로
+# 이어지고, 서브에이전트는 메인 세션의 지시를 물려받는다고 볼 수 없다.
+OPEN_RE='WebSearch|WebFetch|mcp__.*browser_navigate'
+KOFIA_MISS=""; WEBN=0
+for f in "$HERE"/agents/*.md; do
+  has_tool "$f" "$OPEN_RE" || continue
+  WEBN=$((WEBN+1))
+  grep -qE '마라|금지' <<<"$(grep -F 'kofia.or.kr' "$f" || true)" || KOFIA_MISS="$KOFIA_MISS $(basename "$f")"
+done
+[ -n "$KOFIA_MISS" ] && echo "    금지가 없는 정의:$KOFIA_MISS"
+check "웹 주소를 여는 도구(WebSearch·WebFetch·browser_navigate)를 가진 에이전트 정의에 kofia.or.kr 금지가 있다" \
+  "[ \"\$WEBN\" -gt 0 ] && [ -z \"\$KOFIA_MISS\" ]"
+lenses_with() { for f in "$HERE"/agents/lens-*.md; do has_tool "$f" "$1" && basename "$f" .md || true; done | tr '\n' ' ' | sed 's/ $//'; }
+check "WebSearch·WebFetch 를 가진 렌즈는 lens-rebuttal 뿐이다" "[ \"\$(lenses_with 'WebSearch|WebFetch')\" = lens-rebuttal ]"
+check "browser_navigate 를 가진 렌즈는 lens-readability 뿐이다" "[ \"\$(lenses_with 'mcp__.*browser_navigate')\" = lens-readability ]"
+# 검색어는 외부 검색 서비스의 로그에 남는다. 검색하는 정의는 사내 정보를 빼고 일반화한 검색어를 쓰라고 적는다.
+check "lens-rebuttal 가드가 사내 정보 검색어 금지를 둔다" "sec_has \"\$HERE/agents/lens-rebuttal.md\" '가드' '사내 정보'"
+check "researcher 의 탐색 지시가 검색어 일반화를 둔다" "sec_has \"\$HERE/agents/researcher.md\" 'explore 모드' '사내 식별자'"
+
+# 지운 렌즈 이름이 실리는 지시문과 실행 설정에 남으면 없는 에이전트를 부른다. 참고서(docs/domain-*.md)와 테스트
+# 픽스처는 범위 밖이고, 공통 제외 목록은 _doc_keys.sh 의 REMOVED_REF_EXCLUDES 가 소유한다.
+REMOVED_LENS_RE='lens-consistency|lens-fit|lens-visual|map-check|map_check|MapCheck'
+RL_BAD=""
+while IFS= read -r f; do
+  [ -f "$HERE/$f" ] || continue
+  skip=0
+  for e in "${REMOVED_REF_EXCLUDES[@]}"; do
+    # shellcheck disable=SC2053
+    case "$e" in */) [[ $f == "$e"* ]] && skip=1 ;; *) [[ $f == $e ]] && skip=1 ;; esac
+  done
+  [ "$skip" = 1 ] && continue
+  grep -qE "$REMOVED_LENS_RE" "$HERE/$f" && RL_BAD="$RL_BAD $f"
+done <<EOF
+$(cd "$HERE" && git ls-files --cached --others --exclude-standard -- agents skills hooks workflows 'scripts/*.json')
+EOF
+[ -n "$RL_BAD" ] && echo "    지운 렌즈 이름이 남은 곳:$RL_BAD"
+check "지운 렌즈 이름(lens-consistency·lens-fit·lens-visual·map-check·map_check·MapCheck)을 가리키는 살아 있는 지시문이 없다" "[ -z \"\$RL_BAD\" ]"
+
+# 에이전트 description 은 세션마다 실리는 지시문이다. name·description 이 있고 description 에 백틱 밖 금지어가 없다.
+. "$HERE/hooks/_banned_words.sh"
+mkdir -p "$FX/bw"
+banned_parse "$HERE/korean-banned-words.md" "$FX/bw/pairs" "$FX/bw/toks" "$FX/bw/excl"
+FM_BAD=""
+for f in "$HERE"/agents/*.md; do
+  b="$(basename "$f")"; fmv="$(fm_of "$f")"
+  if ! grep -q '^name: ' <<<"$fmv" || ! grep -q '^description: ' <<<"$fmv"; then FM_BAD="$FM_BAD $b(name·description)"; continue; fi
+  grep -m1 '^description: ' <<<"$fmv" | sed 's/^description: //' > "$FX/desc.txt"
+  [ -z "$(banned_report "$FX/bw/pairs" "$FX/desc.txt" "$FX/bw/excl")" ] || FM_BAD="$FM_BAD $b(금지어)"
+done
+[ -n "$FM_BAD" ] && echo "    안전하지 않은 frontmatter:$FM_BAD"
+check "모든 에이전트 frontmatter 가 안전하다" "[ -z \"\$FM_BAD\" ]"
 
 # 예시 결함 주입 — 계약 밖 칸을 넣은 예시는 대조가 실패해야 한다.
 cp "$HERE/agents/lens-grounding.md" "$FX/bad_example.md" 2>/dev/null || : > "$FX/bad_example.md"
