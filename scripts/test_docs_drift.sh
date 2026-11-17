@@ -2,7 +2,7 @@
 # 문서의 렌즈 열거가 진실과 어긋나지 않는지 검증. 계약: FAIL=0 (매직넘버 금지 — 개수는 테스트가 센다).
 #
 # 아래 불변식을 단언한다. 개수를 박지 않고 두 집합의 일치를 본다.
-#   렌즈 그룹   — dispatching-lenses 「렌즈 그룹」 표의 에이전트 == agents/lens-*.md 집합
+#   카테고리 표 — lens-review 「카테고리와 렌즈」 표의 에이전트 ⊆ agents/lens-*.md 집합
 # 권위 있는 출처는 에이전트 정의 디렉터리이고 산문의 열거는 그 캐시다. 렌즈 출력 칸은
 # scripts/test_lens_contract.sh 가 계약 파일과 정의의 출력 예시로 본다.
 #
@@ -20,8 +20,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 # mktemp 호출과 이 검사가 부르는 스크립트의 임시 파일이 모두 여기로 온다.
 TEST_TMP="$(mktemp -d)"; trap 'rm -rf "$TEST_TMP"' EXIT; export TMPDIR="$TEST_TMP"
 README="$HERE/README.md"
-CALLER="$HERE/skills/review-specs/SKILL.md"
-DISP="$HERE/skills/dispatching-lenses/SKILL.md"
+CALLER="$HERE/skills/lens-review/SKILL.md"
 . "$HERE/scripts/_test_check.sh"
 . "$HERE/scripts/_json_valid.sh"
 . "$HERE/hooks/_banned_words.sh"
@@ -33,35 +32,67 @@ VIEW="$BW/view.md"; banned_view "$HERE/korean-banned-words.md" > "$VIEW" || true
 # 진실 — 렌즈 에이전트 정의에서 짧은 이름을 도출한다.
 ALL="$(for f in "$HERE"/agents/lens-*.md; do [ -f "$f" ] || continue; basename "$f" .md | sed 's/^lens-//'; done | sort)"
 
-echo "[결과를 모으는 법 — dispatching-lenses 가 소유한다]"
-# 렌즈 출력의 칸은 scripts/lens_contract.json 이, 칸에 딸린 산문 규칙은 이 절이 소유한다.
-check "그 절이 소유를 밝히고 빈 issues 를 다룬다"  "owns_sec \"\$DISP\" '결과를 모으는 법' && sec_has_id \"\$DISP\" '결과를 모으는 법' issues"
-check "그 절이 principles_applied 를 언제 요구하는지 정한다" "sec_has_id \"\$DISP\" '결과를 모으는 법' principles_applied"
-check "그 절이 spec 리뷰의 처분을 따로 넘긴다"  "sec_has_id \"\$DISP\" '결과를 모으는 법' review-specs"
-check "그 절이 계약 파일을 가리킨다"            "sec_has \"\$DISP\" '결과를 모으는 법' 'scripts/lens_contract.json'"
-# 렌즈 지적도 틀릴 수 있어 메인 세션이 반영 전에 거른다. 거르기는 이 절이 소유하고 호출자는 가리킨다.
-check "그 절이 틀린 지적 거르기를 정한다"       "sec_has \"\$DISP\" '결과를 모으는 법' '**틀린 지적 거르기**'"
-check "spec 리뷰와 문서 검진이 그 절로 거른다"  "sec_has \"\$CALLER\" '합치기' '「결과를 모으는 법」' && sec_has \"\$HERE/skills/review-docs/SKILL.md\" '기록' '「결과를 모으는 법」'"
+echo "[lens-review — 리뷰 스킬 셋을 하나로 합친 스킬]"
+# 렌즈 실행·spec 리뷰·문서 검진을 맡던 스킬 셋(합계 27,043자)을 한 스킬로 합쳤다(spec 2026-11-13-v2-rebuild-design
+# 「스킬」). 본문은 frontmatter 를 뺀 글자 수로 센다.
+LR="$CALLER"
+MDOCS="$HERE/skills/managing-docs/SKILL.md"
+body_chars() { awk 'NR==1 && /^---\r?$/ { f=1; next } f==1 && /^---\r?$/ { f=2; next } f!=1' "$1" | LC_ALL=C.UTF-8 wc -m | tr -d ' '; }
+check "lens-review 본문이 8,000자 이하다" "[ -f \"\$LR\" ] && [ \"\$(body_chars \"\$LR\")\" -le 8000 ]"
+check "lens-review 가 세 진입점 절을 가진다" "has_sec \"\$LR\" '직접 요청' && has_sec \"\$LR\" '설계 문서' && has_sec \"\$LR\" '전달 문서'"
+# 1차 디펜스가 근거 없이 지적을 기각하면 리뷰가 무력해지므로, 기각마다 반박한 원문 위치를 적는 칸을 둔다.
+check "lens-review 기록 형식에 기각 근거 칸이 있다" "sec_has \"\$LR\" '기록' '| 기각 근거 |'"
+check "managing-docs 에 기록 파일 이름 규칙 절이 있다" "owns_sec \"\$MDOCS\" '기록 파일 이름 규칙' && sec_has \"\$MDOCS\" '기록 파일 이름 규칙' '-review-2.md'"
+SPEC_INSTR="$( . "$HERE/hooks/_spec_marker.sh"; printf '%s' "${SPEC_REVIEW_INSTRUCTION:-}" )"
+check "spec 리뷰 지시문이 lens-review 를 가리킨다" "grep -qF 'lens-review' <<<\"\$SPEC_INSTR\""
+LR_MISS=""
+while IFS= read -r n; do
+  [ -n "$n" ] || continue
+  [ -f "$HERE/agents/$n.md" ] || LR_MISS="$LR_MISS $n"
+done <<EOF
+$( [ -f "$LR" ] && doc_sec "$LR" '카테고리와 렌즈' | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u )
+EOF
+check "lens-review 카테고리 표의 렌즈가 모두 실재한다" "[ -f \"\$LR\" ] && [ -z \"\$LR_MISS\" ]"
 
-
-echo "[spec 리뷰 — 처분은 호출자가 정한다]"
-# 처분 절이 🔴 진입 기준을 조항 ID 로 걸고, 🔴 을 예외로 두는 기본값(고치기)을 적는다.
-check "🔴 진입 기준이 처분 절에 조항 ID 로 있다" "sec_has_id \"\$CALLER\" '처분' REVERSIBLE"
-check "처분 절이 🔴 를 예외로 다룬다"          "sec_has_id \"\$CALLER\" '처분' '🔴'"
+# 지운 스킬 이름을 가리키는 문서가 남으면 열리지 않는 스킬을 찾는다. 살아 있는 문서는 실리는 지시문과
+# 실행 코드(원칙·스킬·에이전트·훅·스크립트·워크플로·커맨드·설정)와 참고서다. 공통 제외 목록은
+# REMOVED_REF_EXCLUDES 가 소유하고, 참고서의 「v1 조항 근거」 절은 v1 의 근거를 보관하므로 뺀다. 이 검사
+# 파일은 찾을 이름을 적고 있어 뺀다. evals/ 의 평가 과제와 docs/html-reports/ 는 그때의 입력과 결과다.
+REMOVED_SKILLS_RE='dispatching-lenses|review-specs|review-docs'
+ref_excluded() {  # $1=레포 상대 경로 → 공통 제외 목록에 들면 참
+  local e
+  for e in "${REMOVED_REF_EXCLUDES[@]}"; do
+    case "$e" in
+      */) [[ $1 == "$e"* ]] && return 0 ;;
+      *) # shellcheck disable=SC2053
+         [[ $1 == $e ]] && return 0 ;;
+    esac
+  done
+  return 1
+}
+removed_name_hits() {  # $1=파일 → 지운 이름이 든 줄 번호(「v1 조항 근거」 절 제외)
+  awk '{ sub(/\r$/, "") } /^## v1 조항 근거/ { s=1; next } s && /^## / { s=0 } !s { print NR ":" $0 }' "$1" \
+    | grep -E "$REMOVED_SKILLS_RE" | cut -d: -f1 | tr '\n' ' ' || true
+}
+RN_FX="$TEST_TMP/removed-names.md"
+printf '%s\n' '`review-docs` 를 따른다' '## v1 조항 근거' '`dispatching-lenses` 의 근거' '## 다음' '`review-specs`' > "$RN_FX"
+check "지운 이름 검사가 v1 절 밖의 줄만 잡는다" "[ \"\$(removed_name_hits \"\$RN_FX\")\" = '1 5 ' ]"
+RN_BAD=""
+while IFS= read -r f; do
+  [ -f "$HERE/$f" ] || continue
+  case "$f" in scripts/test_docs_drift.sh) continue ;; esac
+  ref_excluded "$f" && continue
+  h="$(removed_name_hits "$HERE/$f")"
+  [ -n "$h" ] && RN_BAD="$RN_BAD [$f: $h]"
+done <<EOF
+$(cd "$HERE" && git ls-files --cached --others --exclude-standard -- agent-principles.md korean-banned-words.md skills agents hooks scripts workflows commands .claude/settings.json 'docs/domain-*.md')
+EOF
+[ -n "$RN_BAD" ] && printf '    지운 스킬 이름이 남은 곳:%s\n' "$RN_BAD"
+check "지운 스킬 이름(dispatching-lenses·review-specs·review-docs)을 가리키는 살아 있는 문서가 없다" "[ -z \"\$RN_BAD\" ]"
 
 RUNTIME="$HERE/skills/review-llm-calls/SKILL.md"
 echo "[런타임 — 등급이 아니라 type 으로 행동을 정한다]"
 check "조립 절이 type 값으로 accept·escalate 를 가른다" "sec_has_id \"\$RUNTIME\" '조립' type && sec_has_id \"\$RUNTIME\" '조립' accept && sec_has_id \"\$RUNTIME\" '조립' escalate"
-
-
-echo "[리뷰 절차 — 렌즈를 한 번씩 실행하고 결과를 한데 모은다]"
-DOCS="$HERE/skills/review-docs/SKILL.md"
-RUNTIME2="$HERE/skills/review-llm-calls/SKILL.md"
-READMEF="$HERE/README.md"
-check "spec 리뷰가 회차 규칙 소유자를 가리킨다" "points_to \"\$CALLER\" 'dispatching-lenses' '「한 번만 실행하는 렌즈의 규율」'"
-check "렌즈별 결과를 한데 모으는 집계 절이 남는다" "sec_has \"\$CALLER\" '3) 메타 집계' '「결과를 모으는 법」'"
-check "런타임 조립 절이 회차 규칙을 가리키고 서브에이전트 규율 밖이라고 적는다" "points_to \"\$RUNTIME2\" 'dispatching-lenses' '「한 번만 실행하는 렌즈의 규율」' && sec_has \"\$RUNTIME2\" '조립' '서브에이전트 규율'"
-check "실행하는 방법 절이 회차 규칙 절로 넘긴다" "sec_has \"\$DISP\" '실행하는 방법' '「한 번만 실행하는 렌즈의 규율」'"
 
 echo "[이름은 명사구, 주장은 첫 문장 — 에이전트원칙과 가독성 렌즈]"
 CANON="$HERE/agent-principles.md"
@@ -96,82 +127,6 @@ check "근거 검사가 가짜 조항을 잡는다" "[[ \" \$(clause_ref_missing
 check "에이전트원칙이 그 상세를 가리킨다"            "grep -qF 'domain-korean' \"$CANON\""
 check "에이전트원칙이 그 참고서를 가리킨다"   "grep -qF 'domain-discipline' \"$CANON\""
 
-echo "[검진 개시 — 묻는 자리와 건너뛰는 자리]"
-check "검진을 여는 때를 정하는 절이 있다"    "has_sec \"\$DOCS\" '언제 여는지'"
-
-echo "[한 번만 실행하므로 지킬 것 — 소유자]"
-# 소유 선언은 「소유 표」 블록이 정한 꼴을 쓰고, 그 절이 소유 표에서 빠지면 거기서도 함께 실패한다.
-check "dispatching-lenses가 그 규칙의 소유자다" "owns_sec \"\$DISP\" '한 번만 실행하는 렌즈의 규율'"
-# 이어 묻기(notes)와 3층 예외(nested-orchestration)를 그 절이 함께 갖는다.
-check "이어 묻기를 notes 로 적는다"           "sec_has_id \"\$DISP\" '한 번만 실행하는 렌즈의 규율' notes"
-check "3층 오케스트레이션 예외를 적는다"      "sec_has_id \"\$DISP\" '한 번만 실행하는 렌즈의 규율' nested-orchestration"
-
-echo "[렌즈끼리 볼 것을 나눠 주지 않는다 — 소유자 하나, 호출자는 가리킨다]"
-# 디스패치 규율이라 dispatching-lenses 가 규칙과 근거를 「실행하는 방법」 절에서 진다. 호출자에는
-# 소유자를 가리키는 포인터가 있고 규칙 절이 없는지만 본다.
-check "소유자 절이 그 규칙을 소유한다"        "owns_sec \"\$DISP\" '실행하는 방법'"
-for f in "$CALLER" "$RUNTIME2"; do
-  fn="$(basename "$(dirname "$f")")"
-  check "$fn 이 소유자를 가리킨다"          "points_to '$f' '\`dispatching-lenses\`' '「실행하는 방법」'"
-  check "$fn 에 규칙 절이 없다"             "! has_sec '$f' '실행하는 방법'"
-done
-
-echo "[dispatching-lenses — 소유자가 하나다]"
-# 실행하는 방법의 내용은 결과를 같은 스킬의 「결과를 모으는 법」으로 모으는 것이다. review-docs 가 그 절을
-# 다시 가리키면 방법을 베낀 것이고, 소유자 이름만 대면 넘긴 것이다.
-check "review-docs 가 실행하는 방법을 소유자로 넘긴다"    "! has_sec \"\$DOCS\" '실행하는 방법' && grep -qF -- '\`dispatching-lenses\`' \"\$DOCS\""
-check "소유자가 실행하는 방법을 적는다"             "sec_has \"\$DISP\" '실행하는 방법' 'source' && sec_has \"\$DISP\" '실행하는 방법' '「결과를 모으는 법」'"
-DISP_MISS=""
-while IFS= read -r n; do
-  [ -n "$n" ] || continue
-  if [ ! -f "$HERE/agents/$n.md" ]; then DISP_MISS="$DISP_MISS $n"; fi
-done <<EOF
-$(awk '/^## 렌즈 그룹/{f=1;next} /^## /{f=0} f' "$DISP" | grep -oE '`lens-[a-z-]+`' | tr -d '`' | sort -u)
-EOF
-check "렌즈 그룹 표의 렌즈가 모두 실재한다"      "[ -z \"\$DISP_MISS\" ]"
-GROUP_MISS=""
-for d in "$HERE"/agents/lens-*.md; do
-  n="$(basename "$d" .md)"
-  awk '/^## 렌즈 그룹/{f=1;next} /^## /{f=0} f && /^\| `lens-/' "$DISP" | grep -q "^| \`$n\` |" || GROUP_MISS="$GROUP_MISS $n"
-done
-check "실재하는 렌즈가 모두 렌즈 그룹 표에 있다" "[ -z \"\$GROUP_MISS\" ]"
-
-echo "[기록 — 자리와 담을 것]"
-# 기록에 무엇을 담고 빼는지는 review-docs 「기록」과 review-specs 「리뷰 기록」 절이 정한다. 절 안의
-# 문장마다 붙들던 단언은 절과 그 안의 식별자로 합쳤다.
-check "spec 리뷰가 리뷰 기록 절에서 이름 규칙 소유자를 가리킨다" "has_sec \"\$CALLER\" '리뷰 기록' && points_to \"\$CALLER\" '\`review-docs\`' '「기록 파일 이름 규칙」'"
-check "문서 검진 기록의 자리를 적는다"       "grep -qF 'docs/superpowers/reviews/' \"\$DOCS\""
-check "문서 검진 기록 절이 종류 check 를 적는다" "sec_has_id \"\$DOCS\" '기록' check"
-# 이름 규칙은 review-docs 가 소유한다. 호출자에게 같은 문구를 요구하면 검사가 복제를 강제한다.
-check "기록 이름 규칙 절이 차수 꼴을 적는다"   "sec_has \"\$DOCS\" '기록 파일 이름 규칙' '-review-2.md'"
-check "managing-docs 가 기록 이름의 소유자를 가리킨다" "sec_has_id \"\$MDOCS\" '문서 타입과 수명' review-docs && sec_has \"\$MDOCS\" '문서 타입과 수명' '소유'"
-
-echo "[합치기와 다시 리뷰]"
-check "합치기 절이 있다"                      "has_sec \"\$CALLER\" '합치기'"
-# 다시 리뷰할지는 묻지 않고 NO-RAW-OUTPUT 대로 정한다(2026-10-25 클린룸 시험, domain-discipline 「NO-RAW-OUTPUT」).
-check "다시 리뷰 판단을 NO-RAW-OUTPUT 으로 넘긴다" "sec_has_id \"\$CALLER\" '작업 순서와 다시 리뷰' NO-RAW-OUTPUT"
-check "🔴 반영도 다시 리뷰 절이 다룬다"      "sec_has_id \"\$CALLER\" '작업 순서와 다시 리뷰' '🔴'"
-check "문서 검진이 재검진 금지를 소유자로 넘긴다" "points_to \"\$DOCS\" '\`dispatching-lenses\`' '「한 번만 실행하는 렌즈의 규율」'"
-check "그 절이 공통 규칙을 렌즈 그룹으로 넘긴다"               "sec_has \"\$DOCS\" '필요할 때 렌즈' '「렌즈 그룹」'"
-check "그 절이 선행연구 인용 확인을 researching-prior-art 로 넘긴다" "points_to \"\$DOCS\" '\`researching-prior-art\`' '「인용 확인」'"
-check "런타임이 재리뷰 금지를 소유자로 넘긴다" "points_to \"\$RUNTIME2\" '\`dispatching-lenses\`' '「한 번만 실행하는 렌즈의 규율」'"
-check "재검진 금지는 dispatching-lenses 가 소유하고 spec 리뷰의 반복 절을 가리킨다" "points_to \"\$DISP\" '\`review-specs\`' '「작업 순서와 다시 리뷰」'"
-
-echo "[렌즈에게 에이전트원칙을 알리는 법 — dispatching-lenses 한 곳만 규율을 적는다]"
-# 전에 여러 문서가 각자 적었다가 하나에서 둘이 빠져 갈라졌다. 소유자를 하나로 두고
-# 나머지는 가리키기만 하게 묶는다. 앵커는 소유자의 절 제목이라 제목을 고치면 실패한다.
-OWNER_DOC="$HERE/skills/dispatching-lenses/SKILL.md"
-OWNER_SEC='렌즈에게 에이전트원칙을 알리는 법'
-check "소유자 절이 소유를 밝히고 principles_applied 를 요구한다" "owns_sec \"\$OWNER_DOC\" \"\$OWNER_SEC\" && sec_has_id \"\$OWNER_DOC\" \"\$OWNER_SEC\" principles_applied"
-# 가리키기만 해야 하는 문서들. 그 절을 두면 실패한다.
-for D in "$HERE"/skills/review-specs/SKILL.md "$HERE"/skills/nested-orchestration/SKILL.md "$HERE"/skills/review-docs/SKILL.md; do
-  # 스킬 문서는 파일 이름이 모두 SKILL.md라 부모 디렉터리로 부른다 — 안 그러면 어느 문서가 실패했는지
-  # 알 수 없다.
-  dn="$(basename "$D")"; [ "$dn" = "SKILL.md" ] && dn="$(basename "$(dirname "$D")")"
-  check "$dn 이 소유자를 가리킨다"        "points_to '$D' 'dispatching-lenses' \"\$OWNER_SEC\""
-  check "$dn 에 그 절이 없다"             "! has_sec '$D' \"\$OWNER_SEC\""
-done
-
 echo "[소유 표] 소유는 하나뿐이고 나머지는 가리킨다"
 # 소유 선언을 데이터 파일에 적지 않고 문서에서 도출한다. 자기 소유를 밝히는 문장은
 # 「이 <무엇>은 여기가 소유한다」 한 꼴이고, 그 문장이 놓인 절 제목이 소유 표의 키다. 다른 절을
@@ -197,7 +152,7 @@ OWN_TSV="$(cd "$HERE" && awk '
     /^#{1,3} / { title=$0; sub(/^#+ /, "", title) }
     /여기가 소유한다/ { if (title != "") print title "\t" FILENAME }' $OWN_DOCS | sort || true)"
 # 앵커 자가시험 — 목록이 비면 아래 단언이 모두 근거 없이 통과한다.
-check "알려진 소유자가 표에 있다" "printf '%s' \"\$OWN_TSV\" | grep -qF '한 번만 실행하는 렌즈의 규율'"
+check "알려진 소유자가 표에 있다" "printf '%s' \"\$OWN_TSV\" | grep -qF '통합과 1차 디펜스'"
 OWN_DUP="$(printf '%s' "$OWN_TSV" | cut -f1 | sort | uniq -d || true)"
 [ -n "$OWN_DUP" ] && printf '    둘 이상이 소유한 절:%s\n' "$(printf '%s' "$OWN_DUP" | tr '\n' ' ')"
 check "같은 절을 둘 이상이 소유하지 않는다" "[ -z \"\$OWN_DUP\" ]"
@@ -415,7 +370,7 @@ NUM='(두|세|네|다섯|여섯|일곱|여덟|아홉|열)'
 NUMB='(둘|셋|넷|다섯|여섯|일곱|여덟|아홉|열)'
 # 렌즈 이름은 에이전트 정의에서 도출한다 — 여기 손으로 적으면 그 목록이 먼저 낡는다.
 LENS_RE="$(printf '%s' "$ALL" | tr '\n' '|' | sed 's/|$//')"
-COUNT_SCAN="$HERE/agents/lens-*.md $HERE/skills/review-docs/SKILL.md $HERE/skills/domain-readme/SKILL.md $DISP $CALLER $CANON $HERE/README.md"
+COUNT_SCAN="$HERE/agents/lens-*.md $HERE/skills/domain-readme/SKILL.md $CALLER $CANON $HERE/README.md"
 # shellcheck disable=SC2086
 NUMHIT="$(LC_ALL=C.UTF-8 grep -nE "$NUM[ ]?렌즈|렌즈[ ]?$NUMB|다른 $NUMB[ ]?(렌즈|은|는)|$NUMB[ ]?곳에" $COUNT_SCAN 2>/dev/null \
   | grep -v '개수를 산문에\|이름을 같은 줄에' \
@@ -508,17 +463,6 @@ print("MISSING" if not ent else ("SAME" if ent[0].get("description")==pl.get("de
 . "$HERE/scripts/_json_valid.sh"   # 인터프리터 고르기는 한 곳(json_run)이 한다
 MKCMP="$(json_run "$JSONPROG" "$HERE/.claude-plugin/marketplace.json" "$HERE/.claude-plugin/plugin.json" 2>&1)" || MKCMP="PARSE-ERROR"
 check "두 문안이 같다"                         "[ '$MKCMP' = 'SAME' ]"
-
-# --- 렌즈에게 에이전트원칙을 알리는 법: dispatching-lenses 한 곳만 내용을 갖는다 ---
-# 다른 스킬은 그 절을 가리키기만 한다. 그 절 제목을 두거나 첫 항목의 조각이 나타나면 베낀 것이다.
-# 짧은 조각 — dispatching-lenses 본문이 "첫 항목 문장이 다른 스킬에 나타나지 않는지"를 이 검사가 본다고
-# 적으므로, 제목 검사만으로 바꾸면 그 문장이 거짓이 된다. 첫 항목에서 고유한 조각만 남긴다.
-echo "[렌즈에게 에이전트원칙을 알리는 법] 다른 스킬이 내용을 베끼지 않는다"
-TELL_SENT='렌즈가 직접 읽게'
-for f in "$HERE"/skills/*/SKILL.md; do
-  case "$f" in */dispatching-lenses/*) continue ;; esac
-  check "$(basename "$(dirname "$f")") 이 베끼지 않는다" "! has_sec '$f' '렌즈에게 에이전트원칙을 알리는 법' && ! grep -qF -- '$TELL_SENT' '$f'"
-done
 
 # --- 금지 표현 목록과 근거 ---
 # 목록 파일이 원본이고 근거는 docs/ 의 근거 파일에 있다. 이 저장소 자신의 문서를 검사에서 빼는 사유는
@@ -664,21 +608,12 @@ AP="$HERE/skills/researching-prior-art/SKILL.md"
 echo "[standing-consent] the prior-art skill owns its approval rule"
 check "선행연구 스킬이 승인 규칙을 소유한다" "owns_sec \"\$AP\" '발동과 기록'"
 
-# --- question-tool: 리뷰 스킬은 묻는 규칙을 다시 정의하지 않는다 ---
-SR="$HERE/skills/review-specs/SKILL.md"
-echo "[question-tool] the review skill does not redefine the asking rule"
-check "spec-review: 규칙을 재정의 말고 인용" "! grep -qF '**\`ASK-OPTIONS\`' '$SR'"
-
-# --- lens-contract: 읽기 전용 렌즈를 띄우는 호출자 셋이 같은 계약에 닿는다 ---
-# 전에는 셋이 규율 넷을 각자 적고 이 검사가 그 사본들을 맞춰 세웠다. 사본이라 갈라졌다 — 한 곳에서
-# 재시도 금지 항목만 빠져 그 경로가 금지된 재시도를 허용한 채 오래 남았고, DESIGN-NOTES 쪽은 넷 중
-# 둘만 갖고 있었다. 지금은 `dispatching-lenses`가 규율을 소유하고 나머지는 가리키기만 한다.
-# 소유자가 규율을 갖는지와 다른 문서가 베끼지 않는지는 `test_docs_drift.sh`가 본다. 여기서는 호출자
-# 셋이 그 소유자에 닿는지와 런타임 중립만 본다.
-echo "[lens-contract] callers reach the canon-path rules and stay runtime-neutral"
-for s in review-specs review-docs nested-orchestration; do
+# --- lens-contract: 렌즈를 실행하는 스킬이 런타임 중립을 지킨다 ---
+# 렌즈 실행 규율은 `lens-review` 가 소유한다. 여기서는 그 스킬과 서브 세션 절차가 특정 에이전트 종류 이름과
+# 관리 디렉터리 절대 경로를 박지 않는지만 본다.
+echo "[lens-contract] lens callers stay runtime-neutral"
+for s in lens-review nested-orchestration; do
   F="$HERE/skills/$s/SKILL.md"
-  # 규율 소유자에 닿는지는 위 「렌즈에게 에이전트원칙을 알리는 법」 블록의 points_to 가 본다.
   # 런타임 중립: 특정 에이전트 종류 이름과 관리 디렉터리 절대 경로를 박지 않는다.
   check "$s: Claude 전용 종류 이름 없음"    "! grep -qF 'Explore' '$F'"
   check "$s: 관리 디렉터리 절대경로 없음"   "! grep -qF '~/.claude/disciplined-coder/' '$F'"

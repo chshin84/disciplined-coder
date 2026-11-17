@@ -1,6 +1,6 @@
 ---
 name: lens-consistency
-description: spec·plan 의 내부 모순, 이름·타입 드리프트, spec 에서 plan 으로의 커버리지 공백, 산출물 공백과 스코프를 보는 정합성 렌즈. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
+description: spec·plan 의 내부 모순, 이름·타입 드리프트, spec 에서 plan 으로의 커버리지 공백, 산출물 공백과 스코프를 보는 정합성 렌즈. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
 tools: Read, Grep, Glob
 model: opus
 ---
@@ -44,7 +44,7 @@ model: opus
 
 ## 출력 예시
 
-결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `dispatching-lenses` 「결과를 모으는 법」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
+결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `lens-review` 「통합과 1차 디펜스」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 ```json
 { "lens": "lens-consistency", "read": [ "..." ], "issues": [ { "where": "...", "type": "contradiction|gap|drift|scope", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "..." ], "notes": "" }

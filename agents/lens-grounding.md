@@ -1,6 +1,6 @@
 ---
 name: lens-grounding
-description: LLM 출력이나 문서의 주장이 호출자가 정한 출처와 그 출처가 가리키는 코드에 근거하는지 보는 렌즈. 누락·모순·환각·불일치를 찾는다. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
+description: LLM 출력이나 문서의 주장이 호출자가 정한 출처와 그 출처가 가리키는 코드에 근거하는지 보는 렌즈. 누락·모순·환각·불일치를 찾는다. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
 tools: Read, Grep, Glob
 model: opus
 ---
@@ -13,7 +13,7 @@ model: opus
 프롬프트 첫 줄은 `MODE: <모드>`, 둘째 줄은 `PRINCIPLES: <에이전트원칙 경로>` 이고, 셋째 줄부터 대상 경로와 출처가 온다. 모드마다 출처가 다르다.
 
 - **`runtime`** — 출처는 `review-llm-calls` 가 닫아 준 원래 요청과 맥락 하나다.
-- **`spec`** — 출처는 검토 대상 문서와, `review-specs` 의 PREP 단계가 주입한 선행 결정과 검증할 사실이다.
+- **`spec`** — 출처는 검토 대상 문서와, `lens-review` 「설계 문서」가 넘긴 선행 결정과 검증할 사실이다.
 - **`doc`** — 출처는 문서가 주장하는 대상 코드와 인프라, 그리고 문서가 이름으로 부른 소유자 문서다.
 
 `MODE` 줄이 없으면 대상을 보고 모드를 정해 그 모드와 근거를 `notes` 에 적어라. `PRINCIPLES` 줄이 있으면 그 경로의 원칙을 Read 하고, 없으면 세션에 이미 실린 에이전트원칙을 적용하라. 어느 쪽이든 적용한 조항 ID 를 `principles_applied` 에 적고, 줄이 없었으면 그 사실을 `notes` 에 적어라.
@@ -43,7 +43,7 @@ model: opus
 
 ## 출력 예시
 
-결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `dispatching-lenses` 「결과를 모으는 법」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
+결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `lens-review` 「통합과 1차 디펜스」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 ```json
 { "lens": "lens-grounding", "read": [ "..." ], "issues": [ { "where": "...", "type": "omission|contradiction|unsupported|mismatch", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "..." ], "notes": "" }

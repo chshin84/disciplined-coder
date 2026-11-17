@@ -196,10 +196,10 @@ for name in $KNOWN; do
     "has_sec \"$d\" '입력' && sec_has \"$d\" '입력' MODE && sec_has \"$d\" '입력' PRINCIPLES"
   check "$name: 출력 예시가 계약과 같다" "example_ok \"$d\" $name 2>/dev/null"
   check "$name: 읽기 범위 절이 있다" "has_sec \"$d\" '읽기 범위'"
-  check "$name: description 이 입력 안내로 dispatching-lenses 를 가리킨다" \
-    "grep -E '^description: ' \"$d\" | grep -qF '\`dispatching-lenses\`'"
+  check "$name: description 이 입력 안내로 lens-review 를 가리킨다" \
+    "grep -E '^description: ' \"$d\" | grep -qF '\`lens-review\`'"
   check "$name: 출력 예시가 계약 소유자를 가리킨다" \
-    "sec_has \"$d\" '출력 예시' '「결과를 모으는 법」' && sec_has \"$d\" '출력 예시' 'scripts/lens_contract.json'"
+    "sec_has \"$d\" '출력 예시' '「통합과 1차 디펜스」' && sec_has \"$d\" '출력 예시' 'scripts/lens_contract.json'"
 done
 check "lens-visual: 도구 부재 처리를 적는다" "grep -qF '브라우저 도구 없음' \"\$HERE/agents/lens-visual.md\""
 

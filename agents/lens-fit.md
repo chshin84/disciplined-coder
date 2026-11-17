@@ -1,6 +1,6 @@
 ---
 name: lens-fit
-description: LLM 출력이나 문서가 소비자 계약(형식·스키마·길이·스타일·금지사항)과 호출자가 계약으로 넘긴 규칙집(에이전트원칙·domain-korean 같은 것)을 지키는지 보는 적합성 렌즈. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
+description: LLM 출력이나 문서가 소비자 계약(형식·스키마·길이·스타일·금지사항)과 호출자가 계약으로 넘긴 규칙집(에이전트원칙·domain-korean 같은 것)을 지키는지 보는 적합성 렌즈. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
 tools: Read, Grep, Glob
 model: opus
 ---
@@ -50,7 +50,7 @@ model: opus
 
 ## 출력 예시
 
-결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `dispatching-lenses` 「결과를 모으는 법」과 `scripts/lens_contract.json` 이 정한다. `doc_type` 은 이 렌즈가 추가하는 칸이라 집계 대상이 아니다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
+결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `lens-review` 「통합과 1차 디펜스」과 `scripts/lens_contract.json` 이 정한다. `doc_type` 은 이 렌즈가 추가하는 칸이라 집계 대상이 아니다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 ```json
 { "lens": "lens-fit", "doc_type": "고른 타입 행의 이름과 근거, 못 가렸으면 null", "read": [ "..." ], "issues": [ { "where": "...", "type": "schema|format|style|constraint|compat", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "..." ], "notes": "" }

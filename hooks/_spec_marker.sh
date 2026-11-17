@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 공유: spec/plan 문서의 마지막 비공백 줄이 terminal 마커(passed|escalated)인지 판정.
 # spec_review_posttooluse.sh·stop_gates.sh가 같은 마커 계약을 한 곳에서 쓰도록 단일화한다.
-# 마커·경로 규약의 코드 원본은 이 파일이다(바꾸려면 여기를 고친다). 산문(review-specs·README)이
+# 마커·경로 규약의 코드 원본은 이 파일이다(바꾸려면 여기를 고친다). 산문(lens-review·README)이
 # 여기와 같은 마커를 적는지는 scripts/test_docs_drift.sh가 코드에서 뽑아 대조한다.
 # 마커는 줄 전체여야 한다. 문자열 일부로 찾으면 마커를 산문으로 언급하기만 한 문서도 통과해
 # 하드 게이트가 조용히 열린다 — 마커를 남기라고 안내하는 문장이 마지막 줄이면 그렇게 된다.
@@ -97,5 +97,5 @@ path_is_banned_target() {  # $1=경로 → 검사 대상이면 0
 
 # spec/plan 리뷰 지시문. PostToolUse 알림과 Stop 차단 사유가 같은 문장을 쓴다. 리뷰 절차와 렌즈 구성은
 # REVIEW_SKILL 이 가리키는 스킬이 정하므로 여기 개수를 적지 않는다. 스킬 이름은 이 변수 하나가 소유한다.
-REVIEW_SKILL="disciplined-coder review-specs"
+REVIEW_SKILL="disciplined-coder lens-review"
 SPEC_REVIEW_INSTRUCTION="\`${REVIEW_SKILL}\` 의 설계 문서 절차로 리뷰하라. 사용자가 상시 요청한 절차이므로 승인을 묻지 말고 실행하라. 처분을 끝내고 마지막 줄에 spec-review 마커를 남겨라."

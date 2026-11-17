@@ -1,6 +1,6 @@
 ---
 name: lens-readability
-description: 전달 문서의 글이 전하려는 내용을 무엇이 방해하는지 보고 고쳐 쓴 문장을 제안하는 글 가독성 렌즈. 남에게 전달하는 문서(README·인수인계·보고·제안서·발표자료 문안)가 대상이며 spec·plan에는 적용하지 않는다. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
+description: 전달 문서의 글이 전하려는 내용을 무엇이 방해하는지 보고 고쳐 쓴 문장을 제안하는 글 가독성 렌즈. 남에게 전달하는 문서(README·인수인계·보고·제안서·발표자료 문안)가 대상이며 spec·plan에는 적용하지 않는다. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
 tools: Read, Grep, Glob
 model: opus
 ---
@@ -125,7 +125,7 @@ model: opus
 
 ## 출력 예시
 
-결과는 아래 형식의 JSON 하나로 돌려줘라. 공통 칸의 뜻은 `dispatching-lenses` 「결과를 모으는 법」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
+결과는 아래 형식의 JSON 하나로 돌려줘라. 공통 칸의 뜻은 `lens-review` 「통합과 1차 디펜스」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 ```json
 { "lens": "lens-readability", "purpose": "판정에 쓴 목적 한 줄, 못 받았거나 읽는 사람과 할 수 있어야 하는 것 중 하나라도 빠졌으면 null", "read": [ "..." ], "suggestions": [ { "where": "문제 문장을 그대로 인용한 것", "why": "무엇이 전달을 방해하는가. wrong-job 이면 그렇게 적고, rewrite 가 문서 안 문장을 옮기거나 나눈 것인지 추론해 새로 쓴 것인지도 끝에 적는다", "rewrite": "고친 것. 손대지 않는 요소에 해당할 때만 null" } ], "principles_applied": [ "..." ], "notes": "" }

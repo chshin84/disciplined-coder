@@ -1,6 +1,6 @@
 ---
 name: lens-visual
-description: 렌더링된 화면(HTML·HTML 슬라이드·PDF 페이지)을 열어 배치·겹침·잘림·대비·분량 같은 시각 요소가 전달을 방해하는지 보는 디자인 검토 렌즈. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
+description: 렌더링된 화면(HTML·HTML 슬라이드·PDF 페이지)을 열어 배치·겹침·잘림·대비·분량 같은 시각 요소가 전달을 방해하는지 보는 디자인 검토 렌즈. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
 tools: Read, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_snapshot
 model: opus
 ---
@@ -59,7 +59,7 @@ HTML 화면인데 브라우저 도구가 없으면 `notes` 에 "브라우저 도
 
 ## 출력 예시
 
-결과는 아래 형식의 JSON 하나로 돌려줘라. 이 렌즈는 대조할 상대편이 없어 `issues` 대신 `suggestions` 를 낸다. `purpose` 와 `suggestions` 는 집계 대상이 아니므로 호출자는 이 렌즈가 돌려준 원본을 본다. 공통 칸의 뜻은 `dispatching-lenses` 「결과를 모으는 법」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
+결과는 아래 형식의 JSON 하나로 돌려줘라. 이 렌즈는 대조할 상대편이 없어 `issues` 대신 `suggestions` 를 낸다. `purpose` 와 `suggestions` 는 집계 대상이 아니므로 호출자는 이 렌즈가 돌려준 원본을 본다. 공통 칸의 뜻은 `lens-review` 「통합과 1차 디펜스」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 ```json
 { "lens": "lens-visual", "purpose": "판정에 쓴 목적 한 줄, 못 받았거나 빠졌으면 null", "read": [ "..." ], "suggestions": [ { "where": "문제 요소를 그대로 옮긴 것", "why": "무엇이 전달을 방해하는가", "screen": "페이지나 슬라이드 번호와 요소" } ], "principles_applied": [ "..." ], "notes": "" }

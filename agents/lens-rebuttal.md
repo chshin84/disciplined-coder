@@ -1,6 +1,6 @@
 ---
 name: lens-rebuttal
-description: 주장(보고서·제안서·설계 문서·대화·사용자 메시지 어디에 있든)에 반박 후보를 모두 늘어놓고, 주어진 데이터와 맥락이나 사실 검증 검색으로 받쳐진 것만 지적하는 적대 렌즈. 반대 근거·약한 전제·다른 설명·빠진 비교 대상을 본다. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
+description: 주장(보고서·제안서·설계 문서·대화·사용자 메시지 어디에 있든)에 반박 후보를 모두 늘어놓고, 주어진 데이터와 맥락이나 사실 검증 검색으로 받쳐진 것만 지적하는 적대 렌즈. 반대 근거·약한 전제·다른 설명·빠진 비교 대상을 본다. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
 tools: Read, Grep, Glob, WebSearch, WebFetch
 model: opus
 ---
@@ -64,7 +64,7 @@ model: opus
 
 ## 출력 예시
 
-결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `dispatching-lenses` 「결과를 모으는 법」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
+결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `lens-review` 「통합과 1차 디펜스」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 ```json
 { "lens": "lens-rebuttal", "read": [ "..." ], "issues": [ { "where": "...", "type": "counter-evidence|weak-premise|alternative-explanation|missing-comparison", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "..." ], "notes": "" }

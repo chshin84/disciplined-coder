@@ -1,6 +1,6 @@
 ---
 name: lens-adversarial
-description: 설계 문서나 코드·실험 결과에서 실패 모드·과설계·비가역·완화할 위험을 공격적으로 찾는 적대적·YAGNI 렌즈. 실행하는 쪽은 먼저 `dispatching-lenses` 를 Read 한다.
+description: 설계 문서나 코드·실험 결과에서 실패 모드·과설계·비가역·완화할 위험을 공격적으로 찾는 적대적·YAGNI 렌즈. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
 tools: Read, Grep, Glob
 model: opus
 ---
@@ -46,7 +46,7 @@ model: opus
 
 ## 출력 예시
 
-결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `dispatching-lenses` 「결과를 모으는 법」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
+결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `lens-review` 「통합과 1차 디펜스」과 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 ```json
 { "lens": "lens-adversarial", "read": [ "..." ], "issues": [ { "where": "...", "type": "failure-mode|over-engineering|irreversible|risk", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "principles_applied": [ "..." ], "notes": "" }
