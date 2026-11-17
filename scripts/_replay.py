@@ -13,11 +13,14 @@ DC_EVAL_HOME 의 기본값은 %USERPROFILE%\\.dc-eval 이다.
 
 지키는 것:
 - 생성 모델은 claude-opus-5-5 다. 응답의 modelUsage 에 다른 모델이 있으면 답을 쓰지 않고 실행을 멈춘다(ModelError).
+  modelUsage 가 비어 있으면 모델을 확인할 수 없으므로 그 턴의 답을 쓰지 않는다(다음 실행에서 다시 생성).
 - 같은 턴·같은 조건의 답 파일이 있으면 다시 생성하지 않는다.
-- 평일 09:00~18:00 에는 --now 없이 생성하지 않는다(2026-11-17 사용자 지시).
+- 평일 09:00~18:00 에는 --now 없이 생성하지 않는다(2026-11-17 사용자 지시). 시작할 때와 턴마다 시작 직전에 확인하고,
+  실행 중 업무 시간에 들어가면 남은 턴을 취소한다(OfficeHoursError).
 - 설정 폴더(CLAUDE_CONFIG_DIR)는 EVAL_TMP(기본 D:/dc-eval-tmp) 아래 임시 폴더라 실제 ~/.claude 와 분리된다.
 - 로그인 토큰은 실제 설정의 .credentials.json 에서 읽어 환경 변수로만 넘긴다. 출력하거나 파일에 쓰지 않는다.
-  남은 시간이 TOKEN_MIN_H 미만이면 갱신될 때까지 1분마다 다시 읽고, TOKEN_WAIT_MIN(기본 60)분이 지나면 멈춘다.
+  남은 시간이 TOKEN_MIN_H 미만이면 갱신될 때까지 1분마다 다시 읽고, 처음 기다리기 시작한 때부터 TOKEN_WAIT_MIN(기본 60)분이
+  지나면 남은 턴을 취소하고 멈춘다(TokenError). 기한은 프로세스에 하나라 턴마다 다시 60분을 기다리지 않는다.
 - 여유 메모리가 MEM_MIN_GB(기본 2.5) 미만이면 다음 턴 시작을 미룬다. 동시 실행은 PAR(기본 2)개다.
 - 원본 세션 파일이 없으면 <DC_EVAL_HOME>/replay/sessions-backup/ 의 사본을 읽는다(backup_sessions.py 가 만든다).
 
@@ -55,8 +58,27 @@ SECRET_PATTERNS = (
 )
 
 
-class ModelError(Exception):
+class Stop(Exception):
+    """남은 작업을 모두 취소하고 실행을 멈출 사유. code 는 프로세스 종료 코드다."""
+    code = 3
+
+
+class ModelError(Stop):
     """생성·판정 응답에 claude-opus-5-5 밖의 모델이 있다."""
+    code = 3
+
+
+class OfficeHoursError(Stop):
+    """평일 업무 시간에 --now 없이 claude -p 를 실행하려 했다."""
+    code = 4
+
+
+class TokenError(Stop):
+    """로그인 토큰이 기다리는 기한 안에 갱신되지 않았다."""
+    code = 5
+
+
+_token_deadline = None  # 토큰 갱신을 기다리기 시작한 뒤의 기한. 갱신되면 None 으로 되돌린다
 
 
 def home():
@@ -98,12 +120,21 @@ def office_hours(t):
     return t.weekday() < 5 and 9 <= t.hour < 18
 
 
-def guard_office_hours(force):
-    """평일 업무 시간이면 force(--now) 없이 멈춘다. claude -p 는 그 시간 밖에서만 실행한다(2026-11-17 사용자 지시)."""
+def check_office_hours(force):
+    """평일 업무 시간이면 force(--now) 없이 OfficeHoursError. claude -p 는 그 시간 밖에서만 실행한다(2026-11-17 사용자 지시)."""
     t = now()
     if office_hours(t) and not force:
-        print(f'평일 09:00~18:00 에는 claude -p 를 실행하지 않는다(지금 {t:%a %H:%M}). 지금 실행하려면 --now 를 붙인다.', file=sys.stderr)
-        raise SystemExit(4)
+        raise OfficeHoursError(f'평일 09:00~18:00 에는 claude -p 를 실행하지 않는다(지금 {t:%a %H:%M}). '
+                               '남은 작업을 취소했다. 지금 실행하려면 --now 를 붙인다')
+
+
+def guard_office_hours(force):
+    """시작할 때의 확인. 업무 시간이면 안내를 내고 종료 코드 4 로 멈춘다."""
+    try:
+        check_office_hours(force)
+    except OfficeHoursError as e:
+        print(e, file=sys.stderr)
+        raise SystemExit(e.code)
 
 
 def parse_cond(cond):
@@ -243,16 +274,19 @@ def context(cond):
 
 
 def token():
-    """실제 설정의 로그인 토큰. 만료가 가까우면 갱신을 기다린다."""
+    """실제 설정의 로그인 토큰. 만료가 가까우면 프로세스에 하나인 기한까지 갱신을 기다린다."""
+    global _token_deadline
     path = os.path.join(home(), '.claude', '.credentials.json')
-    deadline = time.time() + 60 * float(os.environ.get('TOKEN_WAIT_MIN', '60'))
     while True:
         c = json.load(open(path, encoding='utf-8'))['claudeAiOauth']
         left = (c['expiresAt'] / 1000 - time.time()) / 3600
         if left >= TOKEN_MIN_H:
+            _token_deadline = None
             return c['accessToken']
-        if time.time() > deadline:
-            raise SystemExit(f'토큰 남은 시간 {left:.1f}시간. 평소 Claude Code 세션을 한 번 열어 갱신한 뒤 다시 실행한다')
+        if _token_deadline is None:
+            _token_deadline = time.time() + 60 * float(os.environ.get('TOKEN_WAIT_MIN', '60'))
+        if time.time() >= _token_deadline:
+            raise TokenError(f'토큰 남은 시간 {left:.1f}시간. 평소 Claude Code 세션을 한 번 열어 갱신한 뒤 다시 실행한다')
         print(f'토큰 남은 시간 {left:.1f}시간, 갱신을 기다린다', file=sys.stderr, flush=True)
         time.sleep(60)
 
@@ -412,6 +446,8 @@ def run(t, out_dir, cond, rev, text, remind):
             j = {'is_error': True, 'result': stdout[-400:]}
         models = list((j.get('modelUsage') or {}).keys())
         require_model(models)
+        if not models and not j.get('is_error'):
+            return f'{idx} FAIL modelUsage 가 비어 모델을 확인하지 못함'
         res = {'idx': idx, 'cond': cond, 'kind': t['kind'], 'rev': rev, 'decision_point': t.get('decision_point', ''),
                'clauses': t['clauses'] if isinstance(t.get('clauses'), list) else ast.literal_eval(t.get('clauses') or '[]'),
                'ask': judge_ask, 'old': old, 'correction': t.get('user', ''), 'why': t.get('why', ''), 'history_msgs': n,
@@ -440,29 +476,32 @@ def free_gb():
     return m.avail / 2**30
 
 
-def gated(fn):
-    """여유 메모리가 MEM_MIN_GB(기본 2.5) 미만이면 작업 시작을 미룬다."""
+def gated(fn, force):
+    """작업마다 시작 직전에 업무 시간을 확인하고(force 면 생략), 여유 메모리가 MEM_MIN_GB(기본 2.5) 미만이면 시작을 미룬다."""
     def w(*a, **k):
+        check_office_hours(force)
         lim = float(os.environ.get('MEM_MIN_GB', '2.5'))
         while free_gb() < lim:
             time.sleep(30)
+        check_office_hours(force)
         return fn(*a, **k)
     return w
 
 
-def pool(jobs, fn, on_result):
-    """jobs 를 PAR(기본 2)개씩 실행한다. ModelError 가 나면 남은 작업을 취소하고 그 예외를 다시 낸다."""
+def pool(jobs, fn, on_result, force):
+    """jobs 를 PAR(기본 2)개씩 실행한다. Stop(다른 모델, 업무 시간, 토큰 기한)이 나면 남은 작업을 취소하고 그 예외를 다시 낸다.
+    다른 예외는 그 작업만 ERR 로 알리고 나머지를 계속한다."""
     with cf.ThreadPoolExecutor(int(os.environ.get('PAR', '2'))) as ex:
-        futs = {ex.submit(gated(fn), *j): j for j in jobs}
+        futs = {ex.submit(gated(fn, force), *j): j for j in jobs}
         try:
             for f in cf.as_completed(futs):
                 try:
                     on_result(futs[f], f.result())
-                except ModelError:
+                except Stop:
                     raise
                 except Exception as e:  # 한 턴의 실패가 나머지 턴을 멈추지 않게 한다
                     print('ERR', futs[f][0].get('idx') if isinstance(futs[f][0], dict) else futs[f][0], repr(e)[:300], flush=True)
-        except ModelError:
+        except Stop:
             ex.shutdown(cancel_futures=True)
             raise
 
@@ -491,10 +530,10 @@ def main(argv):
     os.makedirs(out_dir, exist_ok=True)
     rev, text, remind = context(cond)
     try:
-        pool([(turns[i], out_dir, cond, rev, text, remind) for i in ids], run, lambda job, r: print(r, flush=True))
-    except ModelError as e:
+        pool([(turns[i], out_dir, cond, rev, text, remind) for i in ids], run, lambda job, r: print(r, flush=True), force)
+    except Stop as e:
         print('중단:', e, file=sys.stderr)
-        return 3
+        return e.code
     return 0
 
 

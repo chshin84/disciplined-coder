@@ -131,6 +131,8 @@ def ask(q):
             return {'error': f'claude 출력을 읽지 못함: {out[-200:]}'}
         models = list((jj.get('modelUsage') or {}).keys())
         R.require_model(models)
+        if not models:  # 모델을 확인할 수 없는 판정은 쓰지 않는다(cls 가 없으므로 다음 실행에서 다시 판정)
+            return {'error': f"modelUsage 가 비어 모델을 확인하지 못함: {str(jj.get('result', ''))[:120]}"}
         v = parse_reply(jj.get('result', ''))
         v['models'] = models
         v['cost'] = jj.get('total_cost_usd')
@@ -143,7 +145,7 @@ def one(A, B, order, tools):
     x, y = (A, B) if order == 'AB' else (B, A)
     try:
         return ask(prompt(A, x, y, tools))
-    except R.ModelError:
+    except R.Stop:
         raise
     except Exception as e:
         return {'error': repr(e)[:200]}
@@ -204,10 +206,10 @@ def judge_main(argv):
             print(i, r.get('cls') or 'ERROR ' + str(r['error'])[:120], r.get('s1'), r.get('s2'), flush=True)
 
     try:
-        R.pool([(i, o) for i, o in jobs], lambda i, o: one(*pairs[i], o, tools), on)
-    except R.ModelError as e:
+        R.pool([(i, o) for i, o in jobs], lambda i, o: one(*pairs[i], o, tools), on, force)
+    except R.Stop as e:
         print('중단:', e, file=sys.stderr)
-        return 3
+        return e.code
     print('cost', round(cost[0], 4))
     return 0
 
