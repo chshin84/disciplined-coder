@@ -70,7 +70,8 @@ banned_parse() {  # $1=표, $2=pairs, $3=tokens, $4=excl, $5=scopes(생략 가�
 # 세션에 싣는 짧은 상시 보기를 stdout 으로 낸다. 표를 다시 읽지 않고 banned_parse 결과만 쓴다 —
 # 파서가 둘이면 표의 모양이 바뀔 때 한쪽만 따라간다. 제외어는 넣지 않는다. 제외어는 검사기가 쓰는
 # 값이고, 세션에 실으면 분량만 늘린다.
-# 형식: 원본 첫 줄(제목), 범위 제목 없는 행, 범위마다 `## <범위>` 와 그 행들, 마지막에 원본의
+# 형식: 원본 첫 줄(제목), 「금지 표현」 제목 바로 아래 머리 문단(표에 쓰지 않을 글을 정한 줄),
+# 범위 제목 없는 행, 범위마다 `## <범위>` 와 그 행들, 마지막에 원본의
 # 「표로 적을 수 없는 규칙」 절의 `- ` 줄. 덩어리 사이는 빈 줄 하나이고 줄 끝 CR 과 끝 빈 줄이 없다.
 # 표에서 행을 하나도 읽지 못하면 아무것도 내지 않고 1 을 돌려준다. 빈 보기를 사본으로 깔면
 # 세션에 목록이 조용히 빠진다.
@@ -80,7 +81,7 @@ banned_view() {  # $1=표 → stdout 상시 보기
   d="$(mktemp -d)" || return 1
   banned_parse "$1" "$d/pairs" "$d/toks" "$d/excl" "$d/scopes" || rc=1
   if [ "$rc" -eq 0 ] && [ -s "$d/pairs" ]; then
-    LC_ALL=C awk -v rh="$BANNED_RULES_HEAD" '
+    LC_ALL=C awk -v rh="$BANNED_RULES_HEAD" -v th="$BANNED_TABLE_HEAD" '
       FNR == 1 { fi++ }
       { sub(/\r$/, "") }
       fi == 1 { sc[FNR] = $0; next }
@@ -94,11 +95,16 @@ banned_view() {  # $1=표 → stdout 상시 보기
         next
       }
       FNR == 1 { title = $0 }
+      # 머리 문단은 「금지 표현」 제목과 그 아래 첫 제목·표 사이의 글 줄이다.
+      $0 == th { inh = 1; next }
+      inh && (/^#/ || /^\|/) { inh = 0 }
+      inh && $0 != "" { head = head (head == "" ? "" : "\n") $0 }
       $0 == rh { inr = 1; next }
       inr && /^## / { inr = 0 }
       inr && /^- / { rules = rules (rules == "" ? "" : "\n") $0 }
       END {
         out = title
+        if (head != "") out = out "\n\n" head
         if ("" in grp) out = out "\n\n" grp[""]
         for (i = 1; i <= no; i++) out = out "\n\n## " order[i] "\n\n" grp[order[i]]
         if (rules != "") out = out "\n\n" rh "\n\n" rules

@@ -750,6 +750,36 @@ check "백틱 안 금지어는 넘긴다"   "[ -z \"\$(banned_report \"\$BW/pair
 check "원칙 사본에 금지어가 없다"   "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$HERE/agent-principles.md\" \"\$BW/excl\")\" ]"
 check "상시 보기에 금지어가 없다"   "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$VIEW\" \"\$BW/excl\")\" ]"
 check "리마인더에 금지어가 없다"    "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$REMIND_TXT\" \"\$BW/excl\")\" ]"
+# 2026-11-17 적대 점검에서 금융·법령·차트 설명 문장이 오검출되었다. 그 문장을 원본 표로 다시 검사해 제외어가 덮는지 본다.
+# `판결 정본` 의 `정본` 은 법령 용어라 검사기가 아니라 상시 보기의 적용 제외 줄이 맡으므로 표본에 넣지 않는다.
+FP_FX="$IB_FX/false-positive.md"
+printf '%s\n' '실적이 컨센서스를 웃돌았다.' '수요가 전망치를 밑돌고 있다.' '투자자들이 채권으로 눈을 돌리고 있다.' '판관비가 늘었다.' \
+  '대법원 판결이 나왔다.' '전담 조직을 두었다.' '부분 상환과 부분 체결을 처리했다.' '사업 영역을 넓혔다.' '영역형 차트를 쓴다.' \
+  '소수점 이하 두 자리와 세 자리로 맞춘다.' '실행에 2시간 걸립니다.' '처리에 3일 걸린다.' '빨간색 막대는 상승일이다.' \
+  '초록색 선은 이동평균이다.' '제목은 가운데 정렬이다.' '3개월에 한 번꼴로 점검한다.' '납입 회차별 이자를 계산한다.' \
+  '재지급 대상자를 뽑는다.' '재지시를 받았다.' > "$FP_FX"
+FP_HITS="$(banned_report "$BW/pairs" "$FP_FX" "$BW/excl")"
+[ -n "$FP_HITS" ] && printf '    오검출:\n%s\n' "$FP_HITS"
+check "적대 점검 오검출 표본에서 금지어를 검출하지 않는다" "[ -z \"\$FP_HITS\" ]"
+check "상시 보기 머리에 적용 제외 줄이 있다" "grep -qF '법령·회계 용어에는 이 목록을 적용하지 마라' \"\$VIEW\""
+# 한 글자 어간과 두루 쓰이는 낱말은 다른 뜻으로도 쓰이므로 상시 보기가 금지할 뜻을 함께 싣는다.
+STEM_BAD="$(for w in 판 담 걸 자리 부분 영역; do grep -E "^- .*\`$w\`" "$VIEW" | grep -qF '뜻' || echo "$w"; done)"
+check "한 글자 어간 행이 상시 보기에 금지할 뜻을 싣는다" "[ -z \"\$STEM_BAD\" ]"
+
+echo "[상시 지시 — 리마인더의 묻는 조건과 분량]"
+# 리마인더 셋째 줄은 원칙 `ROLES` 의 묻는 조건과 같은 낱말이어야 한다. 낱말이 갈라지면 두 지시 중 어느 쪽을 따를지 모델이 추정한다.
+# 조건 목록은 원칙의 "그 결정이 … 중 하나인지" 문장에서 괄호를 걷고 쉼표로 나눠 뽑는다.
+ASK_CONDS="$(grep -m1 -F '그 결정이 ' "$CANON" | sed 's/.*그 결정이 //; s/ 중 하나인지.*//; s/([^)]*)//g' | sed 's/, /\n/g' | sed 's/[[:space:]]*$//' || true)"
+ASK_MISS="$(while IFS= read -r c; do [ -n "$c" ] && ! grep -qF -- "$c" "$REMIND_TXT" && echo "$c"; done <<<"$ASK_CONDS" || true)"
+[ -n "$ASK_MISS" ] && printf '    리마인더에 없는 조건:\n%s\n' "$ASK_MISS"
+check "원칙에서 묻는 조건 낱말을 여럿 뽑는다" "[ \"\$(grep -c . <<<\"\$ASK_CONDS\")\" -gt 1 ]"
+check "리마인더에 원칙의 묻는 조건 낱말이 모두 있다" "[ -z \"\$ASK_MISS\" ]"
+# 상한은 spec 2026-11-13-v2-rebuild-design 「완료 기준」의 값이다(리마인더는 줄바꿈 제외).
+REMIND_N="$(tr -d '\n' < "$REMIND_TXT" | LC_ALL=C.UTF-8 wc -m | tr -d ' ')"
+ALWAYS_N="$(cat "$CANON" "$VIEW" | LC_ALL=C.UTF-8 wc -m | tr -d ' ')"
+echo "    리마인더 $REMIND_N 자, 원칙 사본과 상시 보기 합계 $ALWAYS_N 자"
+check "리마인더가 217자 이하다" "[ -s \"\$REMIND_TXT\" ] && [ \"\$REMIND_N\" -le 217 ]"
+check "원칙 사본과 상시 보기의 합이 9,600자 미만이다" "[ -s \"\$VIEW\" ] && [ \"\$ALWAYS_N\" -lt 9600 ]"
 
 echo "[스킬 description — 호출 조건만 짧게]"
 # description 은 모든 세션에 실리므로 짧을수록 다른 지시가 덜 밀린다. 기준은 v2 설계 때의 합계 2,002자다
