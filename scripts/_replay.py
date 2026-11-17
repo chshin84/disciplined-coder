@@ -259,14 +259,18 @@ def banned_view(rev):
 
 
 def context(cond):
-    """(rev, 설정 CLAUDE.md 글, 리마인더 블록). CLAUDE.md 는 실제 PC 전역 지시(kw-ax)에 그 리비전의 원칙과 금지어를 잇는다."""
+    """(rev, 설정 CLAUDE.md 글, 리마인더 블록). CLAUDE.md 는 실제 PC 전역 지시(DC_EVAL_BASE_MD)에 그 리비전의 원칙과 금지어를 잇는다."""
     base, suffix = parse_cond(cond)
     rev = rev_of(cond)
     if base == 'v1' or suffix == '-table':
         banned = show(rev, 'korean-banned-words.md')
     else:
         banned = banned_view(rev)
-    ax = open(os.path.join(home(), '.claude', 'kw-ax', 'claude-md-ko.md'), encoding='utf-8').read()
+    # PC 전역 지시 파일. 경로는 환경 변수로 받는다(사내 플러그인 경로를 공개 저장소에 적지 않는다). 없으면 빈 글.
+    base_md = os.environ.get('DC_EVAL_BASE_MD', '')
+    ax = open(base_md, encoding='utf-8').read() if base_md and os.path.isfile(base_md) else ''
+    if base_md and not ax:
+        print(f'경고: DC_EVAL_BASE_MD 파일을 읽지 못해 PC 전역 지시 없이 진행한다: {base_md}', file=sys.stderr)
     text = ax + NL + NL + show(rev, 'agent-principles.md') + NL + NL + banned
     hook = show(rev, 'hooks/reply_reminder_userpromptsubmit.sh')
     remind = hook.split('msg="', 1)[1].split('"' + NL + 'printf', 1)[0]

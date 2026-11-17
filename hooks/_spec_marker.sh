@@ -100,5 +100,5 @@ path_is_banned_target() {  # $1=경로 → 검사 대상이면 0
 
 # spec/plan 리뷰 지시문. PostToolUse 알림과 Stop 차단 사유가 같은 문장을 쓴다. 리뷰 절차와 렌즈 구성은
 # REVIEW_SKILL 이 가리키는 스킬이 정하므로 여기 개수를 적지 않는다. 스킬 이름은 이 변수 하나가 소유한다.
-REVIEW_SKILL="disciplined-coder lens-review"
+REVIEW_SKILL="disciplined-coder:lens-review"
 SPEC_REVIEW_INSTRUCTION="\`${REVIEW_SKILL}\` 의 설계 문서 절차로 리뷰하라. 사용자가 상시 요청한 절차이므로 승인을 묻지 말고 실행하라. 처분을 끝내고 마지막 줄에 spec-review 마커를 남겨라."
