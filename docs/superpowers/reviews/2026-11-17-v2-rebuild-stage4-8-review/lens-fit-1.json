@@ -1,0 +1,10 @@
+{"lens":"lens-fit","target":"docs/superpowers/plans/2026-11-17-v2-rebuild-stage4-8.md","note":"메인 세션이 받은 보고에서 옮겼다",
+"issues":[
+{"where":"Task 1~4·6·7 Step 1","type":"format","claim":"테스트 단계가 검사 이름만 산문으로 적고 단언 코드가 없다"},
+{"where":"Task 1~4·6·7 Step 2","type":"format","claim":"실패 확인 단계에 명령이나 Expected 가 없다"},
+{"where":"Task 4 Step 5","type":"constraint","claim":"스킬이 열리는지 판정 기준과 두 번째도 안 열릴 때의 행동이 없다"},
+{"where":"Task 5","type":"format","claim":"Files·Steps·검증이 없다"},
+{"where":"Task 4·7·8","type":"format","claim":"Interfaces 블록이 없고 Task 2 가 넘기는 기록 이름 규칙을 Task 4 가 받지 않는다"},
+{"where":"Review Focus","type":"constraint","claim":"스킬 이름 검사의 소유 태스크가 틀리고 기각 근거 기록 검사가 Task 2 에 없다"},
+{"where":"Task 2~4·6 Step 3","type":"format","claim":"코드 단계가 'Files 대로 고친다' 한 문장이거나 여러 행동을 섞었다"},
+{"where":"Global Constraints, Task 1 Step 5","type":"constraint","claim":"실행 방식 둘을 허용하고 검증 단계에 삭제 행동을 섞었다"}]}
