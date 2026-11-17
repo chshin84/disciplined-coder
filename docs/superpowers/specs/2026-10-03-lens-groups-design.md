@@ -1,5 +1,7 @@
 # 렌즈 그룹 재분류 — 설계
 
+> **superseded** — 2026-11-17 v2 재건축에서 `2026-11-13-v2-rebuild-design.md` 가 이 설계를 대체했다. 이 문서는 그때의 판단 기록으로 남긴다.
+
 이 설계는 2026-10-03에 썼다. 렌즈를 고르는 기준을 문서 유형별 배정표에서 실행 상황별 그룹으로 바꾸고, 그 그룹표를 `dispatching-lenses` 한 곳이 소유하게 한다. 작업은 워크트리 `../dc-lens-dispatch`의 브랜치 `lens-dispatch`에서 한다. 같은 날 렌즈 리뷰(`docs/superpowers/reviews/2026-10-03-lens-groups-review.md`) 뒤에 다시 썼고, 무엇이 왜 바뀌었는지는 「리뷰가 바꾼 것」에 적는다.
 
 ## 용어

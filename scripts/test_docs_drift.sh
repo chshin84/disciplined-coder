@@ -409,13 +409,17 @@ CMD="$HERE/CLAUDE.md"
 # 지키는 다른 구현(동시 실행)으로 바꾸자 계약이 아니라 구현이 깨졌다고 알렸다. 여기서는 그 줄을
 # CLAUDE.md에서 뽑아 픽스처에 대고 실제로 돌린다 — 실패한 스크립트를 이름으로 지목하는지, 전부
 # 통과하면 통과라고 하는지 둘 다 본다.
-RUNCMD="$(grep -F -- 'for t in scripts/test_*.sh' "$CMD" | head -1 | sed 's/^[[:space:]]*`//; s/`[[:space:]]*$//')"
+# 명령은 「변경 뒤 실행」 절에서만 뽑는다. 다른 절에 같은 꼴의 줄이 있어도 그 절의 명령을 대신하지 않는다.
+RUNCMD="$(doc_sec "$CMD" '변경 뒤 실행' | grep -F -- 'for t in scripts/test_*.sh' | head -1 | sed 's/^[[:space:]]*`//; s/`[[:space:]]*$//' || true)"
 # 이름을 aaa로 두어 정렬상 맨 앞에 오게 한다 — 묻히는 것은 언제나 '앞' 스크립트의 실패다.
 FXB="$(mktemp -d)"; mkdir -p "$FXB/scripts"
 printf '#!/usr/bin/env bash\necho "  FAIL: 일부러 심은 회귀"\nexit 1\n' > "$FXB/scripts/test_aaa_bad.sh"
 printf '#!/usr/bin/env bash\necho "  PASS: ok"\n' > "$FXB/scripts/test_zzz_ok.sh"
-FXBOUT="$(cd "$FXB" && bash -c "$RUNCMD" 2>&1 || true)"
-check "앞 스크립트가 실패하면 이름을 지목한다" "printf '%s' \"\$FXBOUT\" | grep -qF 'test_aaa_bad.sh'"
+FXBOUT="$( [ -n "$RUNCMD" ] && cd "$FXB" && bash -c "$RUNCMD" 2>&1 || true)"
+check "CLAUDE.md 「변경 뒤 실행」 명령이 앞의 실패를 묻지 않는다" "[ -n \"\$RUNCMD\" ] && printf '%s' \"\$FXBOUT\" | grep -qF 'FAILED' && printf '%s' \"\$FXBOUT\" | grep -qF 'test_aaa_bad.sh'"
+# PC 메모리 부족으로 예약 작업이 두 번 중단된 뒤 테스트는 하나씩 차례로 실행한다(v2 4~8단계 plan
+# 「Global Constraints」). 명령이 스크립트를 백그라운드(`&`)로 띄우면 동시에 실행된다. 재지향의 `>&`·`&>` 는 백그라운드가 아니다.
+check "「변경 뒤 실행」 명령이 테스트를 하나씩 차례로 실행한다" "[ -n \"\$RUNCMD\" ] && ! printf '%s' \"\$RUNCMD\" | grep -qE '(^|[^&>])&([^&>]|\$)'"
 check "실패했는데 ALL PASS라고 하지 않는다"   "! printf '%s' \"\$FXBOUT\" | grep -qF 'ALL PASS'"
 FXG="$(mktemp -d)"; mkdir -p "$FXG/scripts"
 printf '#!/usr/bin/env bash\necho "  PASS: ok"\n' > "$FXG/scripts/test_zzz_ok.sh"
@@ -846,5 +850,19 @@ $(cd "$HERE" && git ls-files --cached --others --exclude-standard -- 'skills/*.m
 EOF
 [ -n "$CID_BAD" ] && printf '    v2 원칙에 없는 조항 ID:%s\n' "$CID_BAD"
 check "스킬·에이전트가 v2 원칙에 없는 조항 ID 를 인용하지 않는다" "[ -z \"\$CID_BAD\" ]"
+# 스킬·에이전트 밖의 살아 있는 문서(README·저장소 CLAUDE.md·evals 절차 등)도 같은 ID 집합으로 본다. 원칙과
+# 참고서(domain-*·금지어 근거)는 v1 근거를 보관하고, 기록·spec·plan·인수인계는 LIVE_DOCS 와 공통 제외 목록이 뺀다.
+LIVE_ID_BAD=""
+while IFS= read -r f; do
+  [ -n "$f" ] && [ -f "$HERE/$f" ] || continue
+  case "$f" in agent-principles.md|docs/domain-*.md|docs/korean-banned-words-evidence.md) continue ;; esac
+  ref_excluded "$f" && continue
+  h="$(non_v2_hits "$HERE/$f")"
+  [ -n "$h" ] && LIVE_ID_BAD="$LIVE_ID_BAD [$f: $h]"
+done <<EOF
+$LIVE_DOCS
+EOF
+[ -n "$LIVE_ID_BAD" ] && printf '    v1 에만 있던 조항 ID:%s\n' "$LIVE_ID_BAD"
+check "살아 있는 문서가 v1 에만 있던 조항 ID 를 인용하지 않는다" "[ -n \"\$LIVE_DOCS\" ] && [ -z \"\$LIVE_ID_BAD\" ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

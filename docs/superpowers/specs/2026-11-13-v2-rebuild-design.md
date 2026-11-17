@@ -1,7 +1,7 @@
 # disciplined-coder v2 재건축 설계
 
-> **상태:** 설계 초안(2026-11-13). 이 설계가 채택되어 구현되면 아래 문서는 대체된다. 아래 줄의 머리 이름은 7단계 전까지 `대체 예정:` 으로 두어 superseded 검사가 읽지 않게 한다. 7단계에서 이 이름을 `supersedes:` 로 바꾸고, 같은 커밋에서 대상 문서마다 머리에 superseded 표시를 붙인다(이 설계는 그 전까지 다른 파일을 고치지 않는다).
-> 대체 예정: `2026-10-18-principles-action-output-split-design.md`, `2026-10-18-principles-positive-restructure-design.md`, `2026-10-20-clause-decision-point-design.md`, `2026-10-25-principles-slimming-design.md`, `2026-11-11-clause-placement-design.md`, `2026-10-03-lens-groups-design.md`
+> **상태:** 2026-11-13 설계, 2026-11-17 v2 재건축 7단계에서 구현과 함께 아래 문서를 대체했다. 대상 문서마다 머리에 대체되었다는 표시가 있다.
+> supersedes: `2026-10-18-principles-action-output-split-design.md`, `2026-10-18-principles-positive-restructure-design.md`, `2026-10-20-clause-decision-point-design.md`, `2026-10-25-principles-slimming-design.md`, `2026-11-11-clause-placement-design.md`, `2026-10-03-lens-groups-design.md`
 
 ## 목적
 

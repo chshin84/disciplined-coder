@@ -32,6 +32,5 @@ points_to()  { grep -qF -- "$2" <<<"$(grep -F -- "$3" "$1")"; }         # $1=파
 
 # 지운 이름·경로를 찾는 검사의 공통 제외 목록. 저장소 뿌리 기준 경로이고 글롭을 쓸 수 있으며, 끝이 / 면
 # 그 폴더 아래 전부다. 기록(spec·plan·리뷰)과 인수인계·보존 파일은 옛 이름을 적은 채 두는 문서다.
-# README.md·CLAUDE.md 는 v2 정리 7단계에서 고쳐 쓰기 전까지 뺀다. 참고서의 「v1 조항 근거」 절은 경로가
-# 아니라 절이므로 조항 ID 검사가 따로 뺀다.
-REMOVED_REF_EXCLUDES=(docs/superpowers/ 'HANDOFF-*.md' reply-edit/ scripts/trial_reply_edit.py README.md CLAUDE.md)
+# 참고서의 「v1 조항 근거」 절은 경로가 아니라 절이므로 조항 ID 검사가 따로 뺀다.
+REMOVED_REF_EXCLUDES=(docs/superpowers/ 'HANDOFF-*.md' reply-edit/ scripts/trial_reply_edit.py)

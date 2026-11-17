@@ -42,6 +42,7 @@
 - **이관 원본:** spec 은 `replay5.py`·`gen_reading_v4.py`·`diff\sbs.py` 를 옮긴다고 적었다. 3단계에서 그 후속판 `replay6.py`(재개 방식·리비전 기록·원자적 쓰기)와 `gen_reading_v5.py`(점수 먼저·판독 복사)를 만들어 썼으므로 후속판을 옮긴다. `sbs.py` 의 좌우 비교 기능은 `gen_reading_v5.py` 에 포함되어 있다.
 - **좌우 비교 출력:** spec 은 아티팩트가 아닌 로컬 HTML 이라고 정했다. 2026-11-14 사용자가 집에서 판독 페이지를 아티팩트로 요청했으므로, 기본은 로컬 HTML 로 두고 사용자가 요청하면 아티팩트로 올린다.
 - **원칙 문장:** 3단계 뒤 원칙을 두 차례 고쳤다(완료 기준 확인, 반대 사례 점검 열한 곳). 채택 근거는 `docs/domain-discipline.md` 「v2 상시 지시 검증」.
+- **`_eval_env.sh` 의 인증·설정 지문:** spec 「뼈대 지도」는 `_eval_env.sh` 를 인증과 설정 지문으로 유지한다고 적었다. 재현 시험(Task 6)은 API 키 대신 로그인 토큰으로 `claude -p` 를 실행해 그 함수들을 쓰지 않으므로, Task 6 에서 지우고 상위 경로의 CLAUDE.md 를 찾는 `ancestor_claude` 만 남겼다.
 
 ## Review Focus
 
