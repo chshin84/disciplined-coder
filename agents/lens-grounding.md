@@ -31,9 +31,9 @@ model: opus
 - **제약**(`constraint`) — 길이·언어·금지사항 같은 계약의 제약을 지키는가.
 - **호환**(`compat`) — 기존 출력 계약과 하위 호환되는가.
 
-인용이 그 파일에 그 글자로 있는지는 호출자가 확인한다. 이 렌즈는 인용한 내용이 그 주장을 실제로 받치는지를 보라. 결정론 검사(스키마 validator, 정규식)로 답할 수 있는 항목은 그 검사를 먼저 실행하라. 금지 낱말과 문체는 보지 마라.
+인용이 그 파일에 그 글자로 있는지는 호출자가 확인한다. 이 렌즈는 인용한 내용이 그 주장을 실제로 받치는지를 보라. 금지 낱말과 문체는 보지 마라.
 
-**문서 타입.** `CRITERIA` 에 문서 타입 표가 있으면 대상이 어느 타입인지 먼저 가려라. 파일의 종류가 아니라 문서가 포함하는 내용으로 가려라. 고른 행의 이름과 근거를 `doc_type` 에 적고, 그 행이 포함하지 말라고 한 내용을 포함했으면 그 행을 상대편으로 삼아 올려라. 타입을 못 가렸거나 타입 표가 없으면 `doc_type` 을 null 로 두고 이유를 `notes` 에 적어라. `doc_type` 이 null 이면 호출자는 빈 `issues` 를 판정으로 쓰지 않는다.
+**문서 타입.** 문서 타입 판정은 `CRITERIA` 에 문서 타입 표(`skills/managing-docs/SKILL.md` 「문서 타입과 수명」이나 그 사본)가 있을 때만 하라. 표가 없으면 `doc_type` 칸을 내지 마라. 표가 있으면 대상이 어느 타입인지 먼저 가려라. 파일의 종류가 아니라 문서가 포함하는 내용으로 가려라. 고른 행의 이름과 근거를 `doc_type` 에 적고, 그 행이 포함하지 말라고 한 내용을 포함했으면 그 행을 상대편으로 삼아 올려라. 표를 받았는데 타입을 못 가렸으면 `doc_type` 을 null 로 두고 이유를 `notes` 에 적어라. 호출자는 표를 넘겼는데 `doc_type` 이 null 이면 빈 `issues` 를 판정으로 쓰지 않는다.
 
 ## 가드
 
@@ -50,5 +50,5 @@ model: opus
 결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `lens-review` 「통합과 1차 디펜스」와 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 ```json
-{ "lens": "lens-grounding", "doc_type": "고른 타입 행의 이름과 근거, 못 가렸거나 타입 표가 없으면 null", "read": [ "..." ], "issues": [ { "where": "...", "type": "omission|contradiction|unsupported|mismatch|schema|format|constraint|compat", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "notes": "" }
+{ "lens": "lens-grounding", "doc_type": "고른 타입 행의 이름과 근거. 타입 표를 받았는데 못 가렸으면 null, 타입 표를 받지 않았으면 이 칸을 내지 않는다", "read": [ "..." ], "issues": [ { "where": "...", "type": "omission|contradiction|unsupported|mismatch|schema|format|constraint|compat", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "notes": "" }
 ```

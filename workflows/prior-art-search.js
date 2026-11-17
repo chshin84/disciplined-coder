@@ -18,10 +18,19 @@ const EXTRACTOR = 'disciplined-coder:citation-verifier';
 const JUDGE = 'disciplined-coder:citation-judge';
 // 판정 묶음 하나에 넣는 주장 수의 상한이다. 값의 근거는 spec 「Opus 일괄 판정」의 묶음 크기다.
 const BATCH_SIZE = 20;
+// 한 번에 실행하는 에이전트 수의 상한이다. 2026-11-16 PC 메모리 부족으로 작업이 두 번 중단된 뒤 사용자가 정했다.
+const CONCURRENCY = 4;
+// 비용 상한이다. 하위 질문 수는 스킬의 탐색 연구자 상한 20 과 같고, 연구자당 인용 URL 수는 검증 호출 수를 묶는다.
+// 넘는 실행은 묻지 않고 실행하는 경로에서 비용이 커지므로 거부하고, 오케스트레이터가 사용자에게 묻게 한다.
+const MAX_SUBQUESTIONS = 20;
+const MAX_URLS_PER_RESEARCHER = 30;
 
 // 용도는 비울 수 없는 칸이다. 비어 있으면 에이전트를 부르기 전에 끝내 비용을 쓰지 않는다.
 if (typeof args.intended_use !== 'string' || args.intended_use.trim() === '') {
   throw new Error('args.intended_use 가 비어 있다. 프로토콜의 용도 칸을 채워 다시 실행하라.');
+}
+if ((args.subquestions ?? []).length > MAX_SUBQUESTIONS) {
+  throw new Error(`args.subquestions 가 ${args.subquestions.length}개로 상한 ${MAX_SUBQUESTIONS} 을 넘는다. 하위 질문을 줄이거나 사용자에게 물어 나눠 실행하라.`);
 }
 
 // 둘러보기 실행(round 0)은 연구자 하나를 scout 모드로 실행하고, 검증과 종합 없이 질의 경계 검사만 거쳐 반환한다.
@@ -50,7 +59,7 @@ if (args.round === 0) {
 }
 
 phase('Research');
-const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
+const researchOut = await inChunks(args.subquestions.map((sq) => () => agent(
   prompt('explore', {
     question: args.question,
     situation: args.situation,
@@ -65,6 +74,12 @@ const researchOut = await parallel(args.subquestions.map((sq) => () => agent(
 )));
 const researchers = args.subquestions.map((sq, i) => ({ id: sq.id, output: researchOut[i] ?? null }));
 const query_violations = checkQueries(researchers, args.forbidden_terms);
+for (const r of researchers) {
+  const n = citedUrls(r.output).length;
+  if (n > MAX_URLS_PER_RESEARCHER) {
+    throw new Error(`연구자 ${r.id} 의 인용 URL 이 ${n}개로 상한 ${MAX_URLS_PER_RESEARCHER} 을 넘어 검증을 실행하지 않는다. 하위 질문을 좁혀 다시 실행하라.`);
+  }
+}
 const { items, groups } = groupByUrl(researchers);
 
 // 검증은 네 단계다. URL 마다 추출하고, 추출을 통과한 주장만 묶음으로 모아 판정한다. 정보 부족이 있고 불일치가 없는 주장은
@@ -74,7 +89,7 @@ phase('Verify');
 const refsByUrl = {};
 const extract = {};
 const refetch = {};
-const extractOut = await parallel(groups.map((g) => () => agent(
+const extractOut = await inChunks(groups.map((g) => () => agent(
   prompt('extract', { url: g.url, claims: g.claims }),
   { agentType: EXTRACTOR, label: `extract:${g.url}`, phase: 'Verify', schema: S.EXTRACT_SCHEMA },
 )));
@@ -85,7 +100,7 @@ groups.forEach((g, i) => {
 const judgeIn = {};
 groups.forEach((g) => { judgeIn[g.url] = judgeClaims(g.claims, extract[g.url]); });
 const judgeBatches = batchClaims(judgeIn, BATCH_SIZE);
-const judgeOut = await parallel(judgeBatches.map((b, i) => () => agent(
+const judgeOut = await inChunks(judgeBatches.map((b, i) => () => agent(
   prompt('judge', b),
   { agentType: JUDGE, label: `judge:${i + 1}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
 )));
@@ -93,7 +108,7 @@ const judge = splitByUrl(judgeOut, judgeBatches);
 const refetchJobs = judgeBatches.flatMap((b) => b.items)
   .map((x) => ({ url: x.url, claims: refetchClaims(x.claims, judge[x.url]) }))
   .filter((x) => x.claims.length > 0);
-const refetchOut = await parallel(refetchJobs.map((x) => () => agent(
+const refetchOut = await inChunks(refetchJobs.map((x) => () => agent(
   prompt('refetch', { url: x.url, claims: x.claims }),
   { agentType: EXTRACTOR, label: `refetch:${x.url}`, phase: 'Verify', schema: S.EXTRACT_SCHEMA },
 )));
@@ -101,7 +116,7 @@ refetchJobs.forEach((x, i) => { refetch[x.url] = refetchOut[i] ?? null; });
 const rejudgeIn = {};
 refetchJobs.forEach((x) => { rejudgeIn[x.url] = rejudgeClaims(x.claims, refetch[x.url]); });
 const rejudgeBatches = batchClaims(rejudgeIn, BATCH_SIZE);
-const rejudgeOut = await parallel(rejudgeBatches.map((b, i) => () => agent(
+const rejudgeOut = await inChunks(rejudgeBatches.map((b, i) => () => agent(
   prompt('judge', b),
   { agentType: JUDGE, label: `rejudge:${i + 1}`, phase: 'Verify', schema: S.JUDGE_SCHEMA },
 )));
@@ -145,6 +160,38 @@ if (args.mode === 'survey') {
   result.synthesis = synthesis;
 }
 return result;
+
+// parallel 을 CONCURRENCY 개씩 차례로 실행한다. 반환 배열의 위치는 입력 thunk 의 위치와 같다.
+async function inChunks(thunks) {
+  const out = [];
+  for (let i = 0; i < thunks.length; i += CONCURRENCY) {
+    out.push(...await parallel(thunks.slice(i, i + CONCURRENCY)));
+  }
+  return out;
+}
+
+// 연구자 출력이 인용한 서로 다른 URL. 이슈의 인용과 근거 지도 행의 URL 을 모두 센다.
+function citedUrls(output) {
+  const urls = new Set();
+  if (output == null) return [];
+  for (const issue of output.issues ?? []) {
+    for (const c of issue.citations ?? []) {
+      const u = String(c.url ?? '');
+      if (u !== '') urls.add(u);
+    }
+  }
+  for (const row of output.evidence_map ?? []) {
+    const u = String(row.url ?? '');
+    if (u !== '') urls.add(u);
+  }
+  return [...urls];
+}
+
+// 금융투자협회 홈페이지(kofia.or.kr 와 그 하위 주소)는 반복 접속하면 사내 접속이 차단되므로 검증자가 열지 않는다.
+// 이 주소의 인용은 묶음에 넣지 않고 확인할 수 없는 인용(unverifiable)으로 둔다.
+function isBlockedUrl(url) {
+  return /^(?:[a-z][a-z0-9+.-]*:\/\/)?(?:[^\/?#@]*@)?(?:[^\/?#:]*\.)?kofia\.or\.kr\.?(?::\d+)?(?:[\/?#]|$)/i.test(String(url ?? '').trim());
+}
 
 // 질의 경계 검사. output 이 null 이 아닌 연구자의 검색어마다 금지어와 경로 형태를 본다.
 // 한 검색어 안에서는 forbidden-term 원소가 path-shape 원소보다 앞이다.
@@ -205,6 +252,7 @@ function groupByUrl(researchers) {
     if (lacksPrior(item)) continue;
     const sub = item.ref.slice(0, item.ref.indexOf('#'));
     for (const url of item.urls) {
+      if (isBlockedUrl(url)) continue;
       let g = groups.find((x) => x.url === url);
       if (!g) {
         g = { url, subquestions: [], claims: [] };
@@ -225,6 +273,7 @@ function classify(items, verifiers) {
   for (const item of items) {
     if (lacksPrior(item)) continue;
     for (const url of item.urls) {
+      if (isBlockedUrl(url)) continue;
       if (!sent.has(url)) sent.set(url, []);
       sent.get(url).push(item.ref);
     }
@@ -259,7 +308,7 @@ function classify(items, verifiers) {
       rejected.push(entry);
       continue;
     }
-    const vs = verdicts.get(item.ref) ?? [];
+    const vs = (verdicts.get(item.ref) ?? []).concat(item.urls.filter(isBlockedUrl).map(() => 'unverifiable'));
     if (vs.includes('supported')) passed.push(entry);
     else if (item.urls.some((u) => failed.has(u) || (claimFailed.get(u) ?? []).includes(item.ref))) continue;
     else if (vs.length > 0 && vs.every((v) => v === 'unverifiable')) unverifiable.push(entry);

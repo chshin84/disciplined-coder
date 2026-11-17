@@ -41,7 +41,8 @@ model: opus
 - **검색의 쓰임:** 검색은 대상 주장을 확인하고 반박하는 데 필요한 사실 근거를 마련할 때 써라. 반박 논리 자체를 검색 결과에서 가져오지 마라.
 - **접속 금지:** `kofia.or.kr` 와 그 아래 주소에 접속하지 마라. 검색 결과에 그 주소가 나와도 열지 마라.
 - **검색어:** 검색어에 대상 문서의 문장이나 수치를 그대로 넣지 말고 일반화한 개념어로 써라.
-- **사내 정보:** 검색어에 고객명·거래 상대방·보유 종목·내부 수치·사내 시스템과 프로젝트 이름을 넣지 말고, 공개된 개념어와 공개 지표 이름으로 일반화하라. 검색어는 외부 검색 서비스의 로그에 남아 되돌릴 수 없다.
+- **사내 정보:** 검색어에 고객명·거래 상대방·보유 종목·내부 수치·사내 시스템과 프로젝트 이름을 넣지 말고, 공개된 개념어와 공개 지표 이름으로 일반화하라. 호출자가 배경에 사내 식별 낱말 목록을 주면 그 낱말도 넣지 마라. 검색어는 외부 검색 서비스의 로그에 남아 되돌릴 수 없다.
+- **검색어 기록:** 실행한 검색어를 빠짐없이 `queries` 에 적어라. 검색하지 않았으면 빈 목록이다. 메인 세션이 이 목록을 사내 식별 낱말 목록과 대조한다.
 
 `counterpart` 에는 원문의 구절이나 파일의 값을 그대로 옮겨라. 메인 세션이 그 구절이 원문에 있는지 확인하므로, 요약하거나 다듬은 구절은 확인에 실패한다.
 
@@ -67,5 +68,5 @@ model: opus
 결과는 아래 형식의 JSON 하나로 돌려줘라. 칸의 뜻과 발견으로 올리는 기준은 `lens-review` 「통합과 1차 디펜스」와 `scripts/lens_contract.json` 이 정한다. 처분은 이 렌즈가 정하지 않고 호출자가 정한다.
 
 ```json
-{ "lens": "lens-rebuttal", "read": [ "..." ], "issues": [ { "where": "...", "type": "counter-evidence|weak-premise|alternative-explanation|missing-comparison", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "notes": "" }
+{ "lens": "lens-rebuttal", "read": [ "..." ], "queries": [ "실행한 검색어 그대로" ], "issues": [ { "where": "...", "type": "counter-evidence|weak-premise|alternative-explanation|missing-comparison", "claim": "...", "file": "...", "evidence": "...", "counterpart_file": "...", "counterpart": "...", "principle": "...", "consequence": "..." } ], "notes": "" }
 ```

@@ -168,6 +168,11 @@ managed_block_remove() {
   # 사람이 적은 줄이 사라진다.
   awk -v b="$begin" -v e="$end" -v o="$MANAGED_ORPHAN" -v f="$uc" -v tag="$MANAGED_TAG" "$MANAGED_STRIP_AWK" "$uc" > "$tmp" || return 4
   awk "$MANAGED_TRIM_AWK" "$tmp" > "$norm" || return 4
+  # 줄 끝은 주입과 같은 규칙이다. Git Bash 의 awk 는 읽을 때 줄 끝 CR 을 떼므로 원본이 CRLF 이면 다시 붙인다.
+  # CR 이 있는지는 grep 이 아니라 tr 로 본다. Git Bash 의 grep 도 줄 끝 CR 을 떼고 읽어 CRLF 파일을 놓친다.
+  if [ -n "$(tr -cd '\r' < "$uc" 2>/dev/null | head -c 1)" ]; then
+    awk '{ sub(/\r$/, ""); printf "%s\r\n", $0 }' "$norm" > "$tmp" && cat "$tmp" > "$norm" || return 4
+  fi
   # 내용이 그대로면 고친 것이 없다. 떠 둔 사본을 치우고 아무것도 안 한 것으로 돌아간다.
   if cmp -s "$norm" "$uc"; then
     if [ -n "$managed_block_backup" ]; then rm -f "$managed_block_backup"; managed_block_backup=""; fi

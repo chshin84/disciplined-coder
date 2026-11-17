@@ -935,4 +935,51 @@ json.dump(a, open(sys.argv[2], "w", encoding="utf-8"), ensure_ascii=False)
 check "intended_use 가 비면 에이전트를 부르기 전에 예외로 끝난다" "mkin \"\$FX/rsc_resp.json\" \"\$FX/rnu_in.json\" \"\$FX/args_nu.json\" && { harn run < \"\$FX/rnu_in.json\" > \"\$FX/rnu_out.json\" 2> \"\$FX/rnu_err.txt\"; [ \$? -eq 1 ]; } && grep -qF 'intended_use' \"\$FX/rnu_err.txt\""
 check "하위 질문 초안이 비어도 둘러보기 연구자 하나만 부른다" "mkin \"\$FX/rsc_resp.json\" \"\$FX/rs0_in.json\" \"\$FX/args_s0.json\" && harn run < \"\$FX/rs0_in.json\" > \"\$FX/rs0_out.json\" && json_true \"\$FX/rs0_out.json\" '[c[\"label\"] for c in d[\"calls\"]] == [\"scout\"]'"
 
+echo "[동시 실행과 비용 상한]"
+# mkcap <하위 질문 수> <연구자 S1 의 URL 수> <출력 파일> — 하위 질문마다 URL 하나(S1 은 지정한 수)를 인용하고
+# 모든 추출·판정이 통과하는 run 입력을 만든다. S1 의 첫 이슈는 금융투자협회 주소도 인용한다.
+mkcap() {
+  json_run '
+import json, sys
+n, m, out = int(sys.argv[1]), int(sys.argv[2]), sys.argv[3]
+args = json.load(open(sys.argv[4], encoding="utf-8"))
+args["subquestions"] = [{"id": "S%d" % i, "scope": "s", "include": [], "exclude": []} for i in range(1, n + 1)]
+resp = {}
+urls = {}
+for i in range(1, n + 1):
+    sid = "S%d" % i
+    us = ["https://u%d-%d" % (i, k) for k in range(1, (m if i == 1 else 1) + 1)]
+    issues = [{"prior_claim": "claim %s %d" % (sid, k), "citations": [{"url": u}]} for k, u in enumerate(us)]
+    if i == 1:
+        issues.append({"prior_claim": "kofia only", "citations": [{"url": "https://www.kofia.or.kr/brd/x"}]})
+        issues.append({"prior_claim": "kofia and other", "citations": [{"url": "https://dis.kofia.or.kr/y"}, {"url": us[0]}]})
+    resp["research:" + sid] = {"search_status": "ok", "queries": ["q"], "issues": issues}
+    for k, u in enumerate(us):
+        urls.setdefault(u, []).append("%s#issue#%d" % (sid, k))
+    if i == 1:
+        urls[us[0]].append("S1#issue#%d" % (len(issues) - 1))
+judg = []
+for u, refs in urls.items():
+    resp["extract:" + u] = {"url": u, "judgments": [{"ref": r, "access": "성공", "exists": "일치", "quote": "q", "context": "", "reason": "r"} for r in refs]}
+    judg += [{"url": u, "ref": r, "numbers_conditions": "일치", "direction": "일치", "scope": "일치", "unsure_reasons": {}, "reason": "r"} for r in refs]
+for b in range(0, (len(judg) + 19) // 20):
+    resp["judge:%d" % (b + 1)] = {"judgments": judg[b * 20:(b + 1) * 20]}
+json.dump({"args": args, "responses": resp}, open(out, "w", encoding="utf-8"), ensure_ascii=False)
+' "$1" "$2" "$3" "$FX/args_c.json"
+}
+# 동시에 실행하는 에이전트는 4개 이하다(2026-11-16 PC 메모리 부족 뒤 사용자가 정한 상한). 하위 질문 5개와 URL 5개면
+# 연구자와 추출이 모두 4개를 넘으므로 나눠 실행해야 한다.
+check "하위 질문 5개 실행이 끝나고 출력을 얻는다" "mkcap 5 1 \"\$FX/cap5_in.json\" && harn run < \"\$FX/cap5_in.json\" > \"\$FX/cap5_out.json\""
+check "parallel 한 번에 넘기는 호출이 4개 이하다" "json_true \"\$FX/cap5_out.json\" 'len(d[\"parallel_sizes\"]) > 0 and max(d[\"parallel_sizes\"]) == 4'"
+check "나눠 실행해도 연구자와 추출을 하나씩 모두 부른다" "json_true \"\$FX/cap5_out.json\" 'sorted(c[\"label\"] for c in d[\"calls\"] if c[\"label\"].startswith(\"research:\")) == [\"research:S%d\" % i for i in range(1, 6)] and len([c for c in d[\"calls\"] if c[\"label\"].startswith(\"extract:\")]) == 5 and [r[\"id\"] for r in d[\"result\"][\"researchers\"]] == [\"S%d\" % i for i in range(1, 6)]'"
+# 금융투자협회 주소는 검증자가 열지 않게 묶음에서 빼고 확인할 수 없는 항목으로 둔다. 다른 주소가 받치면 통과한다.
+check "kofia.or.kr 주소는 추출에 보내지 않는다" "json_true \"\$FX/cap5_out.json\" 'not any(\"kofia.or.kr\" in c[\"label\"] for c in d[\"calls\"]) and all(\"kofia.or.kr\" not in v[\"url\"] for v in d[\"result\"][\"verifiers\"])'"
+check "kofia.or.kr 만 인용한 항목은 unverifiable 이다" "json_true \"\$FX/cap5_out.json\" '{\"ref\": \"S1#issue#1\", \"urls\": [\"https://www.kofia.or.kr/brd/x\"]} in d[\"result\"][\"unverifiable\"] and any(p[\"ref\"] == \"S1#issue#2\" for p in d[\"result\"][\"passed\"]) and d[\"result\"][\"overall_status\"] == \"ok\"'"
+# 비용 상한: 하위 질문 20개, 연구자당 인용 URL 30개. 넘으면 실행을 거부한다(한 번 실행의 관측 비용 약 0.5달러).
+check "하위 질문이 20개를 넘으면 에이전트를 부르기 전에 거부한다" "mkcap 21 1 \"\$FX/cap21_in.json\" && { harn run < \"\$FX/cap21_in.json\" > \"\$FX/cap21_out.json\" 2> \"\$FX/cap21_err.txt\"; [ \$? -eq 1 ]; } && grep -qF 'subquestions' \"\$FX/cap21_err.txt\""
+check "하위 질문 20개는 실행한다" "mkcap 20 1 \"\$FX/cap20_in.json\" && harn run < \"\$FX/cap20_in.json\" > \"\$FX/cap20_out.json\""
+check "연구자 하나의 인용 URL 이 30개를 넘으면 검증 전에 거부한다" "mkcap 2 31 \"\$FX/u31_in.json\" && { harn run < \"\$FX/u31_in.json\" > \"\$FX/u31_out.json\" 2> \"\$FX/u31_err.txt\"; [ \$? -eq 1 ]; } && grep -qF 'URL' \"\$FX/u31_err.txt\""
+# S1 은 금융투자협회 주소 둘을 더 인용하므로 28 이면 30개다.
+check "연구자 하나의 인용 URL 30개는 실행한다" "mkcap 2 28 \"\$FX/u30_in.json\" && harn run < \"\$FX/u30_in.json\" > \"\$FX/u30_out.json\""
+
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

@@ -29,6 +29,8 @@ check "principles in PC dir"          "[ -f '$K/agent-principles.md' ]"
 # 에이전트원칙의 포인터가 이 경로를 가리킨다. Skill 도구가 없는 에이전트는 이 사본을 Read 로 읽는다.
 check "managing-docs 사본이 원본과 같다" "cmp -s '$HERE/skills/managing-docs/SKILL.md' '$K/managing-docs/SKILL.md' && cmp -s '$HERE/skills/managing-docs/references/reading-docs.md' '$K/managing-docs/reading-docs.md'"
 check "에이전트원칙이 사본 경로를 가리킨다" "grep -qF '~/.claude/disciplined-coder/managing-docs/SKILL.md' '$K/agent-principles.md'"
+# 다른 프로젝트의 lens-review 는 독자 렌즈에 이 사본 경로를 기준으로 넘긴다.
+check "문체 공격 항목 사본이 원본과 같다" "cmp -s '$HERE/skills/lens-review/references/style-attacks.md' '$K/lens-review/style-attacks.md'"
 # 금지 표현 목록은 에이전트원칙과 같은 관리블록이 싣는다. 다른 플러그인이 있든 없든 같다.
 check "banlist: 관리블록은 두 줄뿐이다"   "[ \$(sed -n '/BEGIN disciplined-coder/,/END disciplined-coder/p' '$UC' | wc -l) -eq 4 ]"
 check "banlist: 파일도 놓인다"          "[ -f '$K/korean-banned-words.md' ]"
@@ -489,6 +491,7 @@ check "non-empty orphan surfaced"       "printf '%s' \"\$ERR10\" | grep -qF 'my_
 check "subdir does not abort scaffold"  "[ $rc10 -eq 0 ]"
 check "subdir surfaced to stderr"       "printf '%s' \"\$ERR10\" | grep -qF 'rogue_dir'"
 check "subdir preserved"                "[ -d '$K10/rogue_dir' ]"
+check "사본 폴더 lens-review 는 비관리로 알리지 않는다" "! printf '%s' \"\$ERR10\" | grep -qF \"'lens-review'\""
 
 # --- managed-region-heal: 손상된 관리영역 자기 치유 (실측 ~/.claude/CLAUDE.md 모양 재현) ---
 # 고아 무해화 주석이 여는 마커 자리를 대신한 반복 블록 + 짝 없는 END + 사용자 줄.
@@ -729,6 +732,13 @@ check "포인터: 사본 경로를 알린다"        "printf '%s' \"\$OUTR11\" |
 check "포인터: 사본은 전역에 쌓인다"      "[ ! -d '$PR11/backups' ]"
 run "$HR11" "$PR11" >/dev/null
 check "포인터: 재실행도 사용자 줄 보존"   "grep -qF '이 줄은 사용자 것이라 남아야 한다' '$PR11/CLAUDE.md'"
+# CRLF 로 쓴 프로젝트 CLAUDE.md 에서 옛 블록을 걷어내도 남은 줄의 줄 끝을 LF 로 바꾸지 않는다(주입과 같은 규칙).
+HR12="$(mktemp -d)"; PR12="$(mktemp -d)"
+printf 'user line one\r\n\r\nuser line two\r\n# BEGIN disciplined-coder (managed — do not edit)\r\nold body\r\n# END disciplined-coder (managed — do not edit)\r\n' > "$PR12/CLAUDE.md"
+run "$HR12" "$PR12" >/dev/null
+echo "[project-old-block-crlf] 걷어낸 뒤에도 CRLF 를 유지한다"
+check "포인터 CRLF: 블록을 걷어낸다"          "! grep -qF 'BEGIN disciplined-coder' '$PR12/CLAUDE.md' && grep -qF 'user line two' '$PR12/CLAUDE.md'"
+check "포인터 CRLF: 남은 모든 줄이 CRLF 다"   "[ \"\$(tr -cd '\r' < '$PR12/CLAUDE.md' | wc -c)\" = \"\$(tr -cd '\n' < '$PR12/CLAUDE.md' | wc -c)\" ]"
 
 # --- project-old-block-nobackup: 사본을 못 뜨면 블록을 걷어내지 않는다. 못 뜨는 채로 걷어내면 되돌릴 방법이 없기 때문이다.
 # backups 자리를 파일이 막고 있으면 mkdir이 실패한다 — 권한이나 백신이 막는 PC를 흉내 낸 것이다.

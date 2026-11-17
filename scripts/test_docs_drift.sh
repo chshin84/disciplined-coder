@@ -63,6 +63,12 @@ $( [ -f "$LR" ] && doc_sec "$LR" '카테고리와 렌즈' | grep -oE '`[A-Za-z0-
 EOF
 [ -n "$CR_MISS" ] && echo "    없는 기준 파일:$CR_MISS"
 check "lens-review 가 기준으로 넘기는 파일이 모두 실재한다" "[ -f \"\$LR\" ] && [ -z \"\$CR_MISS\" ]"
+# 대조 렌즈는 문서 타입 표를 받았을 때만 doc_type 을 판정한다. doc 모드에 표를 넘기지 않으면 판정이 늘 비어 있다.
+check "lens-review 가 대조 렌즈에 문서 타입 표를 넘긴다" "sec_has \"\$LR\" '카테고리와 렌즈' 'skills/managing-docs/SKILL.md'"
+# 렌즈를 넷으로 줄인 결정은 옛 렌즈의 단독 발견을 놓치는지 측정하지 않았다. 비교 결과를 기록 칸으로 모은다.
+check "lens-review 기록에 옛 렌즈 비교 칸이 있다" "sec_has \"\$LR\" '기록' '옛 렌즈 비교'"
+# 다른 프로젝트에서 문체 공격 항목을 넘길 수 있게 스캐폴드가 PC 전역 폴더에 사본을 둔다.
+check "스캐폴드 사본 목록에 문체 공격 항목이 있다" "( . \"\$HERE/scripts/_scaffold_common.sh\"; grep -qF 'skills/lens-review/references/style-attacks.md=' <<<\"\$SCAFFOLD_REFS\" )"
 
 # 지운 스킬 이름을 가리키는 문서가 남으면 열리지 않는 스킬을 찾는다. 살아 있는 문서는 실리는 지시문과
 # 실행 코드(원칙·스킬·에이전트·훅·스크립트·워크플로·커맨드·설정)와 참고서다. 공통 제외 목록은
@@ -305,8 +311,10 @@ EOF
 # 제목 집합을 파이프로 넘기지 않고 here-string 으로 넘긴다. `printf | grep -q` 는 pipefail 과 맞물려
 # grep 이 먼저 끝나면 찾았는데도 실패로 계상된다.
 echo "[문서가 가리키는 경로와 「」 절이 실재한다]"
-HEADINGS="$(find "$HERE" -name '*.md' -not -path '*/.git/*' -not -path '*/evals/principles/cases/*' -exec cat {} + \
-  | grep -E '^#+ ' | sed 's/^#\+ *//' | LC_ALL=C.UTF-8 sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
+# 제목 집합은 git 이 추적하거나 추적할 문서(.gitignore 밖)에서만 뽑는다. 작업 폴더에 남은 임시 문서의 제목이
+# 섞이면 지운 절을 가리킨 참조가 그 임시 문서 덕에 통과한다.
+HEADINGS="$(cd "$HERE" && git ls-files -z --cached --others --exclude-standard -- '*.md' ':!:evals/principles/cases/*' \
+  | xargs -0 cat 2>/dev/null | grep -E '^#+ '| sed 's/^#\+ *//' | LC_ALL=C.UTF-8 sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
 sec_refs() {  # $1=파일 → 「」 참조 이름(코드 블록과 「v1 조항 근거」 절 밖, 설명절을 뗀 이름)
   awk '{ sub(/\r$/, "") } /^```/ { fence = !fence; next } !fence && /^## / { v1 = (index($0, "## v1 조항 근거") == 1) } !fence && !v1' "$1" \
     | LC_ALL=C.UTF-8 grep -oE '「[^」]*」' | LC_ALL=C.UTF-8 sed 's/^「//; s/」$//; s/ *[—(].*$//; s/ *$//' | sort -u || true
@@ -656,9 +664,14 @@ check "SKILL.md 에 「멈추는 기준」 절이 없다" "! has_sec \"\$NO_DOC\
 nested_defined() {  # 프로토콜 파일 「메시지 형식」 표의 첫 칸 이름
   doc_sec "$NO_PROTO" '메시지 형식' | grep -oE '^\| `[A-Za-z_-]+' | sed 's/^| `//' | LC_ALL=C sort -u
 }
-nested_used() {  # $@=파일 → 쓰인 메시지 이름과 사유 코드
-  # 표 첫 칸의 소문자 이름은 SKILL.md 「BLOCKED 처리」 표의 사유 코드다.
-  cat "$@" | grep -oE '`[A-Z][A-Z_]*(-[A-Z]+)*`|`BLOCKED [a-z-]+`|^\| `[a-z][a-z-]*`' | sed 's/^| //' | tr -d '`' | sed 's/^BLOCKED //' | LC_ALL=C sort -u
+nested_used() {  # $@=파일 → 메시지 자리에 쓰인 메시지 이름과 사유 코드
+  # 백틱 안 대문자 이름은 원칙 ID·약어(`SDD`)와 구별되지 않으므로 메시지 자리에 놓인 이름만 본다. 메시지 자리는
+  # `BLOCKED <코드>` 의 코드, 표 첫 칸의 소문자 사유 코드, SKILL.md 「BLOCKED 처리」 표의 마지막 칸(보낼 메시지)이다.
+  local f
+  for f in "$@"; do
+    grep -oE '`BLOCKED [a-z-]+`|^\| `[a-z][a-z-]*`' "$f" | sed 's/^| //' | tr -d '`' | sed 's/^BLOCKED //' || true
+    doc_sec "$f" 'BLOCKED 처리' | grep -E '^\|' | awk -F'|' 'NF > 3 { print $(NF-1) }' | grep -oE '`[A-Z][A-Z_]*(-[A-Z]+)*`' | tr -d '`' || true
+  done | LC_ALL=C sort -u
 }
 nested_undefined() {  # $@=파일 → 정의되지 않은 이름
   comm -23 <(nested_used "$@") <(nested_defined)
@@ -669,13 +682,21 @@ NO_UNDEF="$(nested_undefined "$NO_DOC" "$NO_PROTO")"
 [ -n "$NO_UNDEF" ] && echo "    정의되지 않은 메시지 이름:$(printf ' %s' $NO_UNDEF)"
 check "두 파일이 쓰는 메시지 이름이 모두 표에 정의되어 있다" "[ -z \"\$NO_UNDEF\" ]"
 # 결함 주입 — 정의되지 않은 이름을 넣은 사본에서 검사가 그 이름을 잡아야 한다.
-NO_CUT="$(mktemp)"; { cat "$NO_DOC"; printf '%s\n' '`BOGUS-MESSAGE` 와 `BLOCKED bogus-code`' '| `bogus-row`(유형) | 할 일 | 메시지 |'; } > "$NO_CUT"
+# 가짜 행은 「BLOCKED 처리」 표 안에 넣어야 마지막 칸이 메시지 자리로 읽힌다. 메시지 자리 밖의 원칙 ID(`ROLES`)는 잡지 않는다.
+NO_CUT="$(mktemp)"
+awk '{ print } /^\| `dependency-add`/ { print "| `bogus-row`(유형) | 할 일 | 요청한 쪽에 `BOGUS-MESSAGE` |" }' "$NO_DOC" > "$NO_CUT"
+printf '%s\n' '`BLOCKED bogus-code` 와 원칙 `ROLES`' >> "$NO_CUT"
 check "도출 검사가 정의되지 않은 이름을 잡는다" "[ \"\$(nested_undefined '$NO_CUT' | tr '\n' ' ')\" = 'BOGUS-MESSAGE bogus-code bogus-row ' ]"
 # SKILL.md 가 서브 세션에 넘기는 곳과 메시지를 처리하는 곳이 프로토콜 파일을 가리킨다.
 check "SKILL.md 머리가 프로토콜 파일 경로를 적는다" "grep -qF 'references/sub-session-protocol.md' \"\$NO_DOC\""
 for sec in '디스패치 템플릿' '받은 메시지 처리' '이어 쓰기와 재개'; do
   check "「$sec」이 프로토콜 파일을 가리킨다" "sec_has \"\$NO_DOC\" '$sec' '프로토콜 파일'"
 done
+# v2 리뷰는 등급을 매기지 않고 처분(반영·기각·사용자)만 낸다. 옛 등급 표시와 렌즈 그룹 칸, 지운 원칙 ID 가
+# 남으면 서브 세션이 없는 값을 기다리며 멈추지 않는다.
+OLD_REVIEW_HIT="$(grep -lE '🔴|렌즈 그룹 판정|LENS-ALLOWED' "$NO_DOC" "$NO_PROTO" "$HERE/skills/researching-prior-art/SKILL.md" 2>/dev/null || true)"
+[ -n "$OLD_REVIEW_HIT" ] && echo "    옛 리뷰 등급·칸이 남은 곳: $(printf '%s ' $OLD_REVIEW_HIT)"
+check "nested-orchestration 과 선행연구 스킬에 옛 리뷰 등급·렌즈 그룹 칸·LENS-ALLOWED 가 없다" "[ -z \"\$OLD_REVIEW_HIT\" ]"
 
 echo "[선행연구 스킬]"
 RDEF="$HERE/agents/researcher.md"
@@ -737,6 +758,14 @@ SK_DESC="$BW/skill-desc.txt"
 for f in "$HERE"/skills/*/SKILL.md; do
   awk 'NR==1 && /^---\r?$/ { f=1; next } f && /^---\r?$/ { exit } f' "$f" | grep -m1 '^description:' | sed 's/^description:[[:space:]]*//; s/\r$//'
 done > "$SK_DESC"
+# 접힘·블록 형식(`description: >`·`|`)은 값이 다음 줄들로 넘어가 위의 한 줄 추출과 합계가 값을 놓친다.
+FOLD_BAD=""
+for f in "$HERE"/skills/*/SKILL.md "$HERE"/agents/*.md; do
+  awk 'NR==1 && /^---\r?$/ { f=1; next } f && /^---\r?$/ { exit } f' "$f" | grep -qE '^description:[[:space:]]*[>|][-+0-9]*[[:space:]]*\r?$' \
+    && FOLD_BAD="$FOLD_BAD ${f#"$HERE"/}"
+done
+[ -n "$FOLD_BAD" ] && echo "    접힘 형식 description:$FOLD_BAD"
+check "스킬·에이전트 description 이 접힘·블록 형식이 아니다" "[ -z \"\$FOLD_BAD\" ]"
 SK_DESC_N="$(tr -d '\n' < "$SK_DESC" | LC_ALL=C.UTF-8 wc -m | tr -d ' ')"
 echo "    description 합계: $SK_DESC_N 자"
 check "스킬 description 합계가 2,002자보다 작다" "[ -s \"\$SK_DESC\" ] && [ \"\$SK_DESC_N\" -lt 2002 ]"
@@ -762,8 +791,14 @@ non_v2_hits() {  # $1=파일 → v2 원칙에 없는 조항 ID(「v1 조항 근�
 }
 check "조항 ID 집합에 v2 조항과 v1 조항이 함께 있다" "grep -qx 'ROLES' <<<\"\$V2_IDS\" && grep -qx 'ASK-OPTIONS' <<<\"\$NON_V2_IDS\" && ! grep -qx 'ROLES' <<<\"\$NON_V2_IDS\""
 CID_FX="$TEST_TMP/clause-ids.md"
-printf '%s\n' '`ASK-OPTIONS` 를 따른다' '`ROLES` 와 `BASE-UPDATED`' '## v1 조항 근거' '`NO-ASSUME`' > "$CID_FX"
-check "조항 ID 검사가 v1 절 밖의 v2 에 없는 조항만 잡는다" "[ \"\$(non_v2_hits \"\$CID_FX\")\" = 'ASK-OPTIONS ' ]"
+# FOCUSED 는 하이픈이 없어 참고서의 ID 정규식에는 안 잡히고 v1 원칙에서만 들어온다.
+printf '%s\n' '`ASK-OPTIONS` 를 따른다' '`FOCUSED` 와 `ROLES` 와 `BASE-UPDATED`' '## v1 조항 근거' '`NO-ASSUME`' > "$CID_FX"
+check "조항 ID 검사가 v1 절 밖의 v2 에 없는 조항만 잡는다" "[ \"\$(non_v2_hits \"\$CID_FX\")\" = 'ASK-OPTIONS FOCUSED ' ]"
+# 스킬이 스스로 정의한 ID 는 원칙 인용에서 빠진다. 그 ID 가 v1 원칙 ID 와 겹치면 v1 조항 인용이 예외로 숨는다.
+V1_IDS="$( (cd "$HERE" && git show archive/v1-final:agent-principles.md 2>/dev/null) | grep -oE '\*\*`[A-Z][A-Z0-9-]+`\*\*' | tr -d '*`' | sort -u || true)"
+OWN_V1="$(comm -12 <(printf '%s\n' "$SKILL_OWN_IDS") <(printf '%s\n' "$V1_IDS") | grep -v '^$' || true)"
+[ -n "$OWN_V1" ] && echo "    v1 원칙 ID 와 겹치는 스킬 정의 ID: $(printf '%s ' $OWN_V1)"
+check "스킬이 정의한 ID 가 v1 원칙 ID 와 겹치지 않는다" "[ -n \"\$V1_IDS\" ] && [ -z \"\$OWN_V1\" ]"
 CID_BAD=""
 while IFS= read -r f; do
   [ -f "$HERE/$f" ] || continue

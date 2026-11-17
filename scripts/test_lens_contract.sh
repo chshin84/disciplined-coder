@@ -101,6 +101,15 @@ check "lens-adversarial 계약 types 에 contradiction 이 있다" \
   "json_run 'import json,sys; sys.exit(0 if \"contradiction\" in json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"][\"lens-adversarial\"][\"types\"] else 1)' \"\$CONTRACT\""
 check "빼는 칸이 공통 최상위 칸이다" \
   "json_run 'import json,sys; c=json.load(open(sys.argv[1],encoding=\"utf-8\")); top={k.lstrip(\"?\") for k in c[\"common\"]}; sys.exit(0 if all(set(a.get(\"omit\",[]))<=top for a in c[\"agents\"].values()) else 1)' \"\$CONTRACT\""
+# 문서 타입 판정은 호출자가 타입 표를 넘긴 doc 모드에서만 한다. 다른 모드에서도 칸을 요구하면 렌즈가 null 을 내고
+# 호출자가 그 렌즈를 실행하지 않은 것으로 친다.
+check "lens-grounding 계약의 doc_type 이 선택 칸이다" \
+  "json_run 'import json,sys; e=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"][\"lens-grounding\"][\"extra\"]; sys.exit(0 if \"?doc_type\" in e and \"doc_type\" not in e else 1)' \"\$CONTRACT\""
+# 반박 렌즈가 실행한 검색어는 외부 로그에 남으므로 메인 세션이 사내 식별 낱말과 대조할 수 있게 출력에 둔다.
+check "lens-rebuttal 계약에 queries 가 필수 칸이다" \
+  "json_run 'import json,sys; e=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"][\"lens-rebuttal\"][\"extra\"]; sys.exit(0 if \"queries\" in e else 1)' \"\$CONTRACT\""
+check "lens-readability 계약 suggestions 의 rewrite 가 필수 칸이다" \
+  "json_run 'import json,sys; s=json.load(open(sys.argv[1],encoding=\"utf-8\"))[\"agents\"][\"lens-readability\"][\"extra\"][\"suggestions\"][0]; sys.exit(0 if \"rewrite\" in s and \"?rewrite\" not in s else 1)' \"\$CONTRACT\""
 
 echo "[호출 정책]"
 # 정책: 사전 정의 호출만 허용한다(docs/superpowers/decisions/2026-10-25-agent-call-policy.md).
@@ -234,7 +243,7 @@ check "researcher 의 탐색 지시가 검색어 일반화를 둔다" "sec_has \
 
 # 지운 렌즈 이름이 실리는 지시문과 실행 설정에 남으면 없는 에이전트를 부른다. 참고서(docs/domain-*.md)와 테스트
 # 픽스처는 범위 밖이고, 공통 제외 목록은 _doc_keys.sh 의 REMOVED_REF_EXCLUDES 가 소유한다.
-REMOVED_LENS_RE='lens-consistency|lens-fit|lens-visual|map-check'
+REMOVED_LENS_RE='lens-consistency|lens-fit|lens-visual|map-check|map_check|MapCheck'
 RL_BAD=""
 while IFS= read -r f; do
   [ -f "$HERE/$f" ] || continue
@@ -249,7 +258,7 @@ done <<EOF
 $(cd "$HERE" && git ls-files --cached --others --exclude-standard -- agents skills hooks workflows 'scripts/*.json')
 EOF
 [ -n "$RL_BAD" ] && echo "    지운 렌즈 이름이 남은 곳:$RL_BAD"
-check "지운 렌즈 이름(lens-consistency·lens-fit·lens-visual·map-check)을 가리키는 살아 있는 지시문이 없다" "[ -z \"\$RL_BAD\" ]"
+check "지운 렌즈 이름(lens-consistency·lens-fit·lens-visual·map-check·map_check·MapCheck)을 가리키는 살아 있는 지시문이 없다" "[ -z \"\$RL_BAD\" ]"
 
 # 에이전트 description 은 세션마다 실리는 지시문이다. name·description 이 있고 description 에 백틱 밖 금지어가 없다.
 . "$HERE/hooks/_banned_words.sh"
