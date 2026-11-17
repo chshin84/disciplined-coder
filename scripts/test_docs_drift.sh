@@ -291,55 +291,59 @@ done <<EOF
 $HOME_CANDS
 EOF
 
-# --- 「」로 가리킨 절이 실재한다 ---
-# 「이렇게 보이면 성공이다」가 README에서 이름이 바뀐 뒤에도 아무 신호 없이 남았고, 렌즈가 자기
-# 절을 다른 이름으로 불렀다. 그래서 「」 참조를 레포 전체의 제목 집합과 맞댄다.
+# --- 문서가 가리키는 경로와 「」 절이 실재한다 ---
+# 2026-10-26 결함 주입에서 지운 skills/lens-fit/SKILL.md 로 가는 링크를 되살려도 어느 검사도 실패하지
+# 않았고, README 의 절 이름이 바뀐 뒤에도 그 절을 가리킨 「」 참조가 아무 신호 없이 남았다. v2 에서 스킬을
+# 합치고 지우면서 끊긴 참조가 더 늘 수 있어, 살아 있는 문서 전부의 경로와 「」 참조를 본다(spec 「보조 계약」).
+# 공통 제외 목록은 REMOVED_REF_EXCLUDES 가 소유하고, 참고서의 「v1 조항 근거」 절은 v1 의 기록이라 뺀다.
 #
-# 자기 파일만 훑지 않는 이유는 문서끼리 「」로 절을 가리키는 것이 이 레포의 관례이기 때문이다.
-# 한 파일 안으로 좁히면 정당한 상호 참조가 실패하고, 고치는 압력이 그 참조를 지우는 쪽으로 간다.
-# 제목 전체 일치를 요구하지 않는 이유도 같다 — 이 레포는 이름 뒤에 설명절을 다는 쪽이 다수라,
-# 전체 일치로 재면 이름은 그대로인데 설명절을 붙이는 순간 실패한다. 이름 부분만 맞대면 원래
-# 잡으려던 것(가리키는 이름이 어디에도 없다)은 그대로 잡힌다.
-echo "[「」로 가리킨 절이 레포 어딘가에 실재한다]"
-# grep 을 find -exec 로 묶어 실행하면, 제목이 하나도 없는 파일 묶음에서 grep 이 1을 내고 pipefail 이
-# 검사 전체를 멈춘다(평가 과제가 늘어난 2026-10-18 에 일어났다). 그래서 파일을 이어 붙인 뒤 한 번만 거른다.
-# 평가 과제의 프롬프트(evals/principles/cases)는 문서가 아닌 시험 입력이라 제목 집합에서 뺀다.
+# 「」 참조는 레포 전체의 제목 집합과 맞춘다. 문서끼리 「」로 절을 가리키는 것이 이 레포의 관례라 한 파일
+# 안으로 좁히면 정당한 상호 참조가 실패한다. 이름 뒤에 설명절(` (`·` —`)을 다는 제목이 많아 이름 부분만
+# 맞춘다. 평가 과제의 프롬프트(evals/principles/cases)는 문서가 아닌 시험 입력이라 제목 집합에서 뺀다.
+# 「」 참조를 보는 문서는 실리는 지시문(원칙·금지어 목록·스킬·에이전트)이다. 참고서는 지운 절과 문서 밖 자료의
+# 이름을 「」로 적은 이력 문장이 많아 경로만 본다.
+# 제목 집합을 파이프로 넘기지 않고 here-string 으로 넘긴다. `printf | grep -q` 는 pipefail 과 맞물려
+# grep 이 먼저 끝나면 찾았는데도 실패로 계상된다.
+echo "[문서가 가리키는 경로와 「」 절이 실재한다]"
 HEADINGS="$(find "$HERE" -name '*.md' -not -path '*/.git/*' -not -path '*/evals/principles/cases/*' -exec cat {} + \
-  | grep -E '^#+ ' | sed 's/^#\+ *//' | sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
-BN=0
-for SRC in "$HERE/agents/lens-readability.md" "$CALLER" "$CANON"; do
-  sn="$(basename "$(dirname "$SRC")")/$(basename "$SRC")"
+  | grep -E '^#+ ' | sed 's/^#\+ *//' | LC_ALL=C.UTF-8 sed 's/ *[—(].*$//' | sed 's/ *$//' | grep -v '^$' | sort -u)"
+sec_refs() {  # $1=파일 → 「」 참조 이름(코드 블록과 「v1 조항 근거」 절 밖, 설명절을 뗀 이름)
+  awk '{ sub(/\r$/, "") } /^```/ { fence = !fence; next } !fence && /^## / { v1 = (index($0, "## v1 조항 근거") == 1) } !fence && !v1' "$1" \
+    | LC_ALL=C.UTF-8 grep -oE '「[^」]*」' | LC_ALL=C.UTF-8 sed 's/^「//; s/」$//; s/ *[—(].*$//; s/ *$//' | sort -u || true
+}
+missing_secs() {  # $1=파일 → 제목 집합에 없는 「」 참조
+  local sec
   while IFS= read -r sec; do
     [ -n "$sec" ] || continue
-    BN=$((BN+1))
-    # 파이프 대신 here-string 으로 넘긴다. `printf | grep -q` 는 이 스크립트의 pipefail 과 맞물려
-    # 뒤집힌 실패를 낸다 — grep -q 는 찾는 즉시 빠져나가고, 그러면 아직 쓰고 있던 printf 가 EPIPE 를
-    # 받아 파이프라인 전체가 실패로 계상된다. 제목이 있어서 실패하는 것이라 로컬에서는 통과하고
-    # CI 에서만 붉게 뜬다. 제목 집합이 32KB 를 넘긴 뒤로 grep 의 첫 읽기가 전부를 못 담아 갈렸다.
-    check "$sn 이 가리킨 절이 있다: $sec" "grep -qxF -- '$sec' <<<\"\$HEADINGS\""
-  done <<EOF
-$(LC_ALL=C.UTF-8 grep -oE '「[^」]*」' "$SRC" | sed 's/^「//; s/」$//; s/ *[—(].*$//; s/ *$//' | sort -u)
+    grep -qxF -- "$sec" <<<"$HEADINGS" || printf '%s\n' "$sec"
+  done <<<"$(sec_refs "$1")"
+}
+SR_FX="$TEST_TMP/secrefs.md"
+printf '%s\n' '「없는 절」' '```' '「코드 속」' '```' '## v1 조항 근거' '「옛 절」' '## 다음' '「v1 조항 근거」' > "$SR_FX"
+check "절 참조 검사가 코드 블록과 v1 절 밖의 없는 절만 잡는다" "[ \"\$(missing_secs \"\$SR_FX\" | tr '\n' ' ')\" = '없는 절 ' ]"
+SEC_BAD=""; SEC_N=0
+while IFS= read -r f; do
+  [ -f "$HERE/$f" ] || continue
+  ref_excluded "$f" && continue
+  SEC_N=$((SEC_N+1))
+  m="$(missing_secs "$HERE/$f" | tr '\n' '|')"
+  [ -n "$m" ] && SEC_BAD="$SEC_BAD [$f: $m]"
+done <<EOF
+$(cd "$HERE" && git ls-files --cached --others --exclude-standard -- agent-principles.md korean-banned-words.md 'skills/*.md' 'agents/*.md')
 EOF
-done
-check "「」 참조를 하나 이상 찾았다" "[ '$BN' -gt 0 ]"
-
-# --- 문서가 가리킨 경로가 실재한다 ---
-# 2026-10-26 결함 주입에서 지운 skills/lens-fit/SKILL.md 로 가는 링크를 되살려도 어느 검사도 실패하지
-# 않았고, 이름을 바꾼 에이전트를 옛 패턴(agents/prior-art-*.md)으로 가리킨 문장이 남아 있었다.
-echo "[문서가 가리킨 경로가 실재한다]"
-. "$HERE/scripts/_json_valid.sh"
+[ -n "$SEC_BAD" ] && printf '    없는 절을 가리키는 곳:%s\n' "$SEC_BAD"
 _json_python || true
 DP() { PYTHONUTF8=1 "${_JSON_PY:-python}" -I "$HERE/scripts/_doc_paths.py" "$@" </dev/null 2>&1 || echo "RUN-ERROR"; }
 DPOUT="$(DP "$HERE" "${REMOVED_REF_EXCLUDES[@]}")"
-check "경로 후보를 하나 이상 확인했다" "grep -qE '^CHECKED [1-9]' <<<\"\$DPOUT\""
-check "살아 있는 문서에 깨진 경로가 없다" "[ \"\$(grep -vc '^CHECKED ' <<<\"\$DPOUT\" || true)\" = 0 ]"
-grep -v '^CHECKED ' <<<"$DPOUT" | sed 's/^/          /' || true
+grep -v '^CHECKED ' <<<"$DPOUT" | sed 's/^/    깨진 경로: /' || true
+check "경로 후보와 절 참조를 하나 이상 확인했다" "grep -qE '^CHECKED [1-9]' <<<\"\$DPOUT\" && [ \"\$SEC_N\" -gt 0 ]"
+check "문서가 가리키는 경로와 「」 절이 실재한다" "[ -z \"\$SEC_BAD\" ] && [ \"\$(grep -vc '^CHECKED ' <<<\"\$DPOUT\" || true)\" = 0 ]"
 DPFX="$TEST_TMP/docpaths"; mkdir -p "$DPFX/skills/x" "$DPFX/agents"; : > "$DPFX/agents/researcher.md"
-printf '%s\n' '[fit](../lens-fit/SKILL.md)' '`agents/prior-art-*.md`' '`agents/research*.md`' '옛 `skills/lens-fit/SKILL.md` 는 지웠다' > "$DPFX/skills/x/SKILL.md"
+printf '%s\n' '[fit](../lens-fit/SKILL.md)' '`agents/prior-art-*.md`' '`agents/research*.md`' '옛 `skills/lens-fit/SKILL.md` 는 지웠다' '## v1 조항 근거' '`evals/gone/x.md`' > "$DPFX/skills/x/SKILL.md"
 DPFXOUT="$(DP "$DPFX")"
 check "지운 스킬로 가는 링크를 잡는다" "grep -qF 'lens-fit/SKILL.md' <<<\"\$DPFXOUT\""
 check "일치하는 파일이 없는 별표 경로를 잡는다" "grep -qF 'prior-art-*' <<<\"\$DPFXOUT\""
-check "일치하는 별표 경로와 이력 줄은 넘긴다" "[ \"\$(grep -vc '^CHECKED ' <<<\"\$DPFXOUT\" || true)\" = 2 ]"
+check "일치하는 별표 경로와 이력 줄과 v1 절은 넘긴다" "[ \"\$(grep -vc '^CHECKED ' <<<\"\$DPFXOUT\" || true)\" = 2 ]"
 
 # --- spec 리뷰 마커: 코드의 리터럴이 산문 둘에 그대로 있다 ---
 # 코드가 스스로 "쌍 계약"이라 부르며 사람에게 손으로 맞추라고 지시하던 자리다. 사람이 맞추는
@@ -725,5 +729,50 @@ check "백틱 안 금지어는 넘긴다"   "[ -z \"\$(banned_report \"\$BW/pair
 check "원칙 사본에 금지어가 없다"   "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$HERE/agent-principles.md\" \"\$BW/excl\")\" ]"
 check "상시 보기에 금지어가 없다"   "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$VIEW\" \"\$BW/excl\")\" ]"
 check "리마인더에 금지어가 없다"    "[ -z \"\$(banned_report \"\$BW/pairs\" \"\$REMIND_TXT\" \"\$BW/excl\")\" ]"
+
+echo "[스킬 description — 호출 조건만 짧게]"
+# description 은 모든 세션에 실리므로 짧을수록 다른 지시가 덜 밀린다. 기준은 v2 설계 때의 합계 2,002자다
+# (spec 2026-11-13-v2-rebuild-design 「스킬」). 글자 수는 frontmatter 의 description 값으로 센다.
+SK_DESC="$BW/skill-desc.txt"
+for f in "$HERE"/skills/*/SKILL.md; do
+  awk 'NR==1 && /^---\r?$/ { f=1; next } f && /^---\r?$/ { exit } f' "$f" | grep -m1 '^description:' | sed 's/^description:[[:space:]]*//; s/\r$//'
+done > "$SK_DESC"
+SK_DESC_N="$(tr -d '\n' < "$SK_DESC" | LC_ALL=C.UTF-8 wc -m | tr -d ' ')"
+echo "    description 합계: $SK_DESC_N 자"
+check "스킬 description 합계가 2,002자보다 작다" "[ -s \"\$SK_DESC\" ] && [ \"\$SK_DESC_N\" -lt 2002 ]"
+SK_DESC_BW="$(banned_report "$BW/pairs" "$SK_DESC" "$BW/excl")"
+[ -n "$SK_DESC_BW" ] && printf '    description 의 금지어:\n%s\n' "$SK_DESC_BW"
+check "스킬 description 에 백틱 밖 금지어가 없다" "[ -s \"\$SK_DESC\" ] && [ -z \"\$SK_DESC_BW\" ]"
+
+echo "[원칙 조항 ID — 스킬·에이전트는 v2 원칙에 있는 조항만 가리킨다]"
+# v1 조항을 지운 뒤에도 스킬이 그 ID 를 부르면 읽는 쪽이 없는 규칙을 찾는다. 유효한 ID 는 저장소 뿌리의
+# agent-principles.md 에서 뽑는다. 조항 ID 의 전체 집합은 참고서 두 파일이 적은 ID(v1·삭제 조항 포함)와 v1 원칙
+# (태그 archive/v1-final)의 ID 다. 스킬이 `- **`ID`**` 형태로 스스로 정의한 규칙(managing-docs 의 문서 규칙)은
+# 그 스킬이 소유한 규칙이라 원칙 인용으로 보지 않는다. 참고서의 「v1 조항 근거」 절은 범위 밖이지만 스킬이
+# 같은 이름의 절을 두면 그 절도 뺀다.
+V2_IDS="$(grep -oE '\*\*`[A-Z][A-Z0-9-]+`\*\*' "$CANON" | tr -d '*`' | sort -u)"
+CLAUSE_UNIV="$( { cat "$HERE/docs/domain-discipline.md" "$HERE/docs/domain-korean.md" | grep -oE '`[A-Z][A-Z0-9]*(-[A-Z0-9]+)+`' | tr -d '`'
+  (cd "$HERE" && git show archive/v1-final:agent-principles.md 2>/dev/null) | grep -oE '\*\*`[A-Z][A-Z0-9-]+`\*\*' | tr -d '*`'; } | sort -u || true)"
+SKILL_OWN_IDS="$(cat "$HERE"/skills/*/SKILL.md "$HERE"/skills/*/references/*.md 2>/dev/null | grep -oE '^- \*\*`[A-Z][A-Z0-9-]+`\*\*' | sed 's/^- \*\*`//; s/`\*\*$//' | sort -u || true)"
+NON_V2_IDS="$(comm -23 <(printf '%s\n' "$CLAUSE_UNIV") <(printf '%s\n%s\n' "$V2_IDS" "$SKILL_OWN_IDS" | sort -u) | grep -v '^$' || true)"
+non_v2_hits() {  # $1=파일 → v2 원칙에 없는 조항 ID(「v1 조항 근거」 절 밖)
+  [ -n "$NON_V2_IDS" ] || return 0
+  awk '{ sub(/\r$/, "") } /^## / { v1 = (index($0, "## v1 조항 근거") == 1) } !v1' "$1" \
+    | grep -owE "$(printf '%s' "$NON_V2_IDS" | tr '\n' '|')" | sort -u | tr '\n' ' ' || true
+}
+check "조항 ID 집합에 v2 조항과 v1 조항이 함께 있다" "grep -qx 'ROLES' <<<\"\$V2_IDS\" && grep -qx 'ASK-OPTIONS' <<<\"\$NON_V2_IDS\" && ! grep -qx 'ROLES' <<<\"\$NON_V2_IDS\""
+CID_FX="$TEST_TMP/clause-ids.md"
+printf '%s\n' '`ASK-OPTIONS` 를 따른다' '`ROLES` 와 `BASE-UPDATED`' '## v1 조항 근거' '`NO-ASSUME`' > "$CID_FX"
+check "조항 ID 검사가 v1 절 밖의 v2 에 없는 조항만 잡는다" "[ \"\$(non_v2_hits \"\$CID_FX\")\" = 'ASK-OPTIONS ' ]"
+CID_BAD=""
+while IFS= read -r f; do
+  [ -f "$HERE/$f" ] || continue
+  h="$(non_v2_hits "$HERE/$f")"
+  [ -n "$h" ] && CID_BAD="$CID_BAD [$f: $h]"
+done <<EOF
+$(cd "$HERE" && git ls-files --cached --others --exclude-standard -- 'skills/*.md' 'agents/*.md')
+EOF
+[ -n "$CID_BAD" ] && printf '    v2 원칙에 없는 조항 ID:%s\n' "$CID_BAD"
+check "스킬·에이전트가 v2 원칙에 없는 조항 ID 를 인용하지 않는다" "[ -z \"\$CID_BAD\" ]"
 
 echo "----"; echo "PASS=$pass FAIL=$fail"; [ "$fail" -eq 0 ]

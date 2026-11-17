@@ -1,6 +1,6 @@
 ---
 name: review-llm-calls
-description: 제품이 런타임에 LLM을 호출하는 기능을 만들 때의 검증 호출자. 단일 호출로 끝내지 말고 호출 종류별 고정표로 렌즈(lens-*)를 골라 제품 코드의 리뷰 호출로 구현하고, 비기능 체크리스트는 항상 적용한다. 렌즈 청사진은 agents/lens-*.md 에, 발견으로 올리는 기준은 `lens-review` 「통합과 1차 디펜스」에 있다.
+description: 제품 코드가 런타임에 LLM을 호출하는 기능을 만들거나 고칠 때 연다.
 ---
 # review-llm-calls — 런타임 LLM 검증 호출자
 
