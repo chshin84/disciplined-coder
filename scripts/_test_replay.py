@@ -6,7 +6,6 @@ claude 실행은 가짜 함수로 바꾸므로 생성·판정 비용이 들지 �
 사용: python _test_replay.py <scripts 폴더> <임시 폴더>
 """
 import contextlib
-import datetime
 import io
 import json
 import os
@@ -27,8 +26,6 @@ NAMES = {
     "bg": "생성 환경에 백그라운드 대기 상한 0 이 들어간다",
     "parse": "판정 응답 JSON 을 읽는다",
     "backup": "원본이 없으면 세션 사본을 읽는다",
-    "office": "평일 업무 시간에는 --now 없이 생성하지 않는다",
-    "cross": "실행 중 09:00 이 되면 남은 턴을 취소한다",
     "token": "토큰 갱신 기한이 지나면 남은 턴을 취소하고 멈춘다",
     "empty": "modelUsage 가 빈 응답은 답이나 판정으로 쓰지 않는다",
     "banned": "금지어는 횟수로 세고 제외어는 뺀다",
@@ -176,42 +173,6 @@ def t_parse():
             and ok.get("cls") == "개선" and ok.get("score") == 1)
 
 
-def t_office():
-    oh = R.office_hours
-    hours = (oh(datetime.datetime(2026, 11, 17, 10, 0)) and oh(datetime.datetime(2026, 11, 17, 9, 0))
-             and not oh(datetime.datetime(2026, 11, 17, 18, 0)) and not oh(datetime.datetime(2026, 11, 17, 8, 59))
-             and not oh(datetime.datetime(2026, 11, 21, 10, 0)))
-    R.now = lambda: datetime.datetime(2026, 11, 17, 10, 0)
-    R.call_claude = fake(["claude-opus-5-5"])
-    out2 = os.path.join(tmp, "answers2")
-    CALLS.clear()
-    refused = jrefused = False
-    with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):  # 안내 문구는 시험 출력에 내지 않는다
-        try:
-            R.main([out2, "v2.1", LIST])
-        except SystemExit as e:
-            refused = e.code not in (0, None)
-        try:
-            J.main(["judge", out2, os.path.join(tmp, "judge"), "v1", "v2.1", LIST])
-        except SystemExit as e:
-            jrefused = e.code not in (0, None)
-        none_called = not CALLS
-        rc = R.main([out2, "v2.1", LIST, "--now"])
-    return hours and refused and jrefused and none_called and rc == 0 and os.path.exists(os.path.join(out2, "v2.1-1.json"))
-
-
-def t_cross():
-    """시작 08:58, 첫 턴 직전 08:59, 그 뒤 09:00. 첫 턴만 생성하고 둘째 턴은 취소한다."""
-    times = iter([datetime.datetime(2026, 11, 17, 8, m) for m in (58, 59, 59)])
-    R.now = lambda: next(times, datetime.datetime(2026, 11, 17, 9, 0))
-    R.call_claude = fake(["claude-opus-5-5"])
-    out = os.path.join(tmp, "answers-cross")
-    CALLS.clear()
-    rc, _ = quiet(R.main, [out, "v1", LIST2])
-    return (rc == R.OfficeHoursError.code and len(CALLS) == 1
-            and os.path.exists(os.path.join(out, "v1-1.json")) and not os.path.exists(os.path.join(out, "v1-2.json")))
-
-
 def t_token():
     """만료가 가까운 토큰과 대기 0분. 첫 턴에서 멈추고 claude 를 실행하지 않으며 둘째 턴을 기다리지 않는다."""
     import time
@@ -226,7 +187,7 @@ def t_token():
     CALLS.clear()
     t0 = time.time()
     try:
-        rc, _ = quiet(R.main, [os.path.join(tmp, "answers-token"), "v1", LIST2, "--now"])
+        rc, _ = quiet(R.main, [os.path.join(tmp, "answers-token"), "v1", LIST2])
     finally:
         for k, v in old.items():
             if v is None:
@@ -258,8 +219,6 @@ check("bg", t_bg)
 check("skip", t_skip)
 check("cls", t_cls)
 check("parse", t_parse)
-check("office", t_office)
-check("cross", t_cross)
 check("token", t_token)
 check("empty", t_empty)
 check("banned", t_banned)

@@ -15,8 +15,6 @@ DC_EVAL_HOME 의 기본값은 %USERPROFILE%\\.dc-eval 이다.
 - 생성 모델은 claude-opus-5-5 다. 응답의 modelUsage 에 다른 모델이 있으면 답을 쓰지 않고 실행을 멈춘다(ModelError).
   modelUsage 가 비어 있으면 모델을 확인할 수 없으므로 그 턴의 답을 쓰지 않는다(다음 실행에서 다시 생성).
 - 같은 턴·같은 조건의 답 파일이 있으면 다시 생성하지 않는다.
-- 평일 09:00~18:00 에는 --now 없이 생성하지 않는다(2026-11-17 사용자 지시). 시작할 때와 턴마다 시작 직전에 확인하고,
-  실행 중 업무 시간에 들어가면 남은 턴을 취소한다(OfficeHoursError).
 - 설정 폴더(CLAUDE_CONFIG_DIR)는 EVAL_TMP(기본 D:/dc-eval-tmp) 아래 임시 폴더라 실제 ~/.claude 와 분리된다.
 - 로그인 토큰은 실제 설정의 .credentials.json 에서 읽어 환경 변수로만 넘긴다. 출력하거나 파일에 쓰지 않는다.
   남은 시간이 TOKEN_MIN_H 미만이면 갱신될 때까지 1분마다 다시 읽고, 처음 기다리기 시작한 때부터 TOKEN_WAIT_MIN(기본 60)분이
@@ -24,11 +22,10 @@ DC_EVAL_HOME 의 기본값은 %USERPROFILE%\\.dc-eval 이다.
 - 여유 메모리가 MEM_MIN_GB(기본 2.5) 미만이면 다음 턴 시작을 미룬다. 동시 실행은 PAR(기본 2)개다.
 - 원본 세션 파일이 없으면 <DC_EVAL_HOME>/replay/sessions-backup/ 의 사본을 읽는다(backup_sessions.py 가 만든다).
 
-사용: python _replay.py <답 폴더> <조건> <턴 목록> [--now]
+사용: python _replay.py <답 폴더> <조건> <턴 목록>
       python _replay.py --print-context <조건>   (생성 없이 설정 CLAUDE.md 와 리마인더 블록만 출력)"""
 import ast
 import concurrent.futures as cf
-import datetime
 import glob
 import json
 import os
@@ -66,11 +63,6 @@ class Stop(Exception):
 class ModelError(Stop):
     """생성·판정 응답에 claude-opus-5-5 밖의 모델이 있다."""
     code = 3
-
-
-class OfficeHoursError(Stop):
-    """평일 업무 시간에 --now 없이 claude -p 를 실행하려 했다."""
-    code = 4
 
 
 class TokenError(Stop):
@@ -111,37 +103,19 @@ def require_model(models):
         raise ModelError(f'{MODEL} 밖의 모델이 응답에 있다: {other}')
 
 
-def now():
-    return datetime.datetime.now()
-
-
-def office_hours(t):
-    """평일 09:00 이상 18:00 미만이면 참."""
-    return t.weekday() < 5 and 9 <= t.hour < 18
-
-
-def check_office_hours(force):
-    """평일 업무 시간이면 force(--now) 없이 OfficeHoursError. claude -p 는 그 시간 밖에서만 실행한다(2026-11-17 사용자 지시)."""
-    t = now()
-    if office_hours(t) and not force:
-        raise OfficeHoursError(f'평일 09:00~18:00 에는 claude -p 를 실행하지 않는다(지금 {t:%a %H:%M}). '
-                               '남은 작업을 취소했다. 지금 실행하려면 --now 를 붙인다')
-
-
-def guard_office_hours(force):
-    """시작할 때의 확인. 업무 시간이면 안내를 내고 종료 코드 4 로 멈춘다."""
-    try:
-        check_office_hours(force)
-    except OfficeHoursError as e:
-        print(e, file=sys.stderr)
-        raise SystemExit(e.code)
-
-
 def parse_cond(cond):
     m = COND_RE.match(cond)
     if not m or (m.group(1) == 'v1' and m.group(3) == '-table'):
         raise SystemExit(f'알 수 없는 조건: {cond}')
     return m.group(1), m.group(3) or ''
+
+
+def rev_lines(cond):
+    """V2_REV.<n>.txt 의 비어 있지 않은 줄. 첫 줄은 커밋이고, 이어지는 `extra=<경로>` 줄은 그 조건에만 덧붙일 지시 파일이다
+    (예: 조건마다 다른 PC 전역 CLAUDE.md 의 사용자 절, Claude 메모리 목록)."""
+    base, _ = parse_cond(cond)
+    p = os.path.join(dc_eval(), 'replay', f'V2_REV.{base[3:]}.txt')
+    return [l.strip() for l in open(p, encoding='utf-8') if l.strip()]
 
 
 def rev_of(cond):
@@ -150,7 +124,7 @@ def rev_of(cond):
     if base == 'v1':
         ref = V1_TAG
     else:
-        ref = open(os.path.join(dc_eval(), 'replay', f'V2_REV.{base[3:]}.txt'), encoding='utf-8').read().strip()
+        ref = rev_lines(cond)[0]
     p = subprocess.run(['git', '-C', RT, 'rev-parse', '--verify', ref + '^{commit}'], capture_output=True, text=True)
     if p.returncode != 0:
         raise SystemExit(f'리비전을 찾지 못함: {ref}')
@@ -272,9 +246,23 @@ def context(cond):
     if base_md and not ax:
         print(f'경고: DC_EVAL_BASE_MD 파일을 읽지 못해 PC 전역 지시 없이 진행한다: {base_md}', file=sys.stderr)
     text = ax + NL + NL + show(rev, 'agent-principles.md') + NL + NL + banned
+    if base != 'v1':
+        for l in rev_lines(cond)[1:]:
+            if l.startswith('extra='):
+                text += NL + NL + open(l[6:], encoding='utf-8').read()
     hook = show(rev, 'hooks/reply_reminder_userpromptsubmit.sh')
     remind = hook.split('msg="', 1)[1].split('"' + NL + 'printf', 1)[0]
     return rev, text, remind
+
+
+def skills_block(cond):
+    """V2_REV.<n>.txt 의 `skills=<경로>` 줄이 가리키는 파일(스킬·에이전트 description 목록의 system-reminder)을 이어 붙인 글.
+    실제 세션처럼 사용자 메시지와 함께 싣는다. 줄이 없으면 빈 글."""
+    base, _ = parse_cond(cond)
+    if base == 'v1' or not os.path.isfile(os.path.join(dc_eval(), 'replay', f'V2_REV.{base[3:]}.txt')):
+        return ''  # 조건 파일이 없으면 rev_of 가 먼저 멈춘다. 시험은 context 를 가짜로 바꿔 이 파일 없이 실행한다
+    return ''.join(open(l[7:], encoding='utf-8').read().rstrip(NL) + NL
+                   for l in rev_lines(cond)[1:] if l.startswith('skills='))
 
 
 def token():
@@ -433,7 +421,7 @@ def run(t, out_dir, cond, rev, text, remind):
         open(cfg + '/settings.json', 'w', encoding='utf-8').write('{"outputStyle": "Concise"}')
         hist, ask, old = conversation(session_path(t), t['correction_uuid'])
         judge_ask = ask
-        ask = ask + NL + NL + '<system-reminder>' + NL + 'UserPromptSubmit hook additional context:' + NL + remind + NL + '</system-reminder>' + NL
+        ask = ask + NL + NL + skills_block(cond) + '<system-reminder>' + NL + 'UserPromptSubmit hook additional context:' + NL + remind + NL + '</system-reminder>' + NL
         sid = str(uuid.uuid4())
         n = write_session(hist, cfg, cwd, sid)
         # 이전 대화가 없는 첫 메시지 턴은 재개할 세션이 없으므로(`No conversation found`) 같은 설정으로 새 세션을 시작한다
@@ -480,23 +468,21 @@ def free_gb():
     return m.avail / 2**30
 
 
-def gated(fn, force):
-    """작업마다 시작 직전에 업무 시간을 확인하고(force 면 생략), 여유 메모리가 MEM_MIN_GB(기본 2.5) 미만이면 시작을 미룬다."""
+def gated(fn):
+    """여유 메모리가 MEM_MIN_GB(기본 2.5) 미만이면 작업 시작을 미룬다."""
     def w(*a, **k):
-        check_office_hours(force)
         lim = float(os.environ.get('MEM_MIN_GB', '2.5'))
         while free_gb() < lim:
             time.sleep(30)
-        check_office_hours(force)
         return fn(*a, **k)
     return w
 
 
-def pool(jobs, fn, on_result, force):
-    """jobs 를 PAR(기본 2)개씩 실행한다. Stop(다른 모델, 업무 시간, 토큰 기한)이 나면 남은 작업을 취소하고 그 예외를 다시 낸다.
+def pool(jobs, fn, on_result):
+    """jobs 를 PAR(기본 2)개씩 실행한다. Stop(다른 모델, 토큰 기한)이 나면 남은 작업을 취소하고 그 예외를 다시 낸다.
     다른 예외는 그 작업만 ERR 로 알리고 나머지를 계속한다."""
     with cf.ThreadPoolExecutor(int(os.environ.get('PAR', '2'))) as ex:
-        futs = {ex.submit(gated(fn, force), *j): j for j in jobs}
+        futs = {ex.submit(gated(fn), *j): j for j in jobs}
         try:
             for f in cf.as_completed(futs):
                 try:
@@ -518,14 +504,11 @@ def main(argv):
         print()
         print('<system-reminder>' + NL + 'UserPromptSubmit hook additional context:' + NL + remind + NL + '</system-reminder>')
         return 0
-    force = '--now' in argv
-    argv = [a for a in argv if a != '--now']
     if len(argv) != 3 or argv[0] in ('-h', '--help'):
-        print('사용: python _replay.py <답 폴더> <조건> <턴 목록> [--now]  |  python _replay.py --print-context <조건>')
+        print('사용: python _replay.py <답 폴더> <조건> <턴 목록>  |  python _replay.py --print-context <조건>')
         return 2
     out_dir, cond, turn_list = argv
     parse_cond(cond)
-    guard_office_hours(force)
     ids = read_ids(turn_list)
     turns = turn_details()
     missing = [i for i in ids if i not in turns]
@@ -534,7 +517,7 @@ def main(argv):
     os.makedirs(out_dir, exist_ok=True)
     rev, text, remind = context(cond)
     try:
-        pool([(turns[i], out_dir, cond, rev, text, remind) for i in ids], run, lambda job, r: print(r, flush=True), force)
+        pool([(turns[i], out_dir, cond, rev, text, remind) for i in ids], run, lambda job, r: print(r, flush=True))
     except Stop as e:
         print('중단:', e, file=sys.stderr)
         return e.code

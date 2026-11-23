@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
 # 재현 시험 진입점. 턴 목록의 턴마다 조건 A·B 의 답을 생성하고, 두 답을 순서 교차로 판정한다.
-# 사용: eval_replay.sh <턴 목록> <조건 A> <조건 B> [--now]
+# 사용: eval_replay.sh <턴 목록> <조건 A> <조건 B>
 #   턴 목록은 턴 ID 한 줄씩인 파일이다(evals/replay/turns-<이름>.txt). 조건 정의와 절차는 evals/replay/README.md.
 #   답은 <DC_EVAL_HOME>/replay/<이름>/, 판정은 <DC_EVAL_HOME>/calib/<이름>/ 에 쓴다(DC_EVAL_HOME 기본 %USERPROFILE%\.dc-eval).
-#   --now 는 평일 09:00~18:00 에도 실행한다(사용자가 지금 하라고 한 때만 붙인다).
 # 같은 턴·같은 조건의 답과 같은 쌍의 판정은 다시 만들지 않는다. 집계는 eval_replay_report.sh 가 한다.
 set -euo pipefail
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 . "$HERE/scripts/_json_valid.sh"
 . "$HERE/scripts/_eval_env.sh"
-NOW=()
-ARGS=()
-for a in "$@"; do [ "$a" = --now ] && NOW=(--now) || ARGS+=("$a"); done
-[ "${#ARGS[@]}" -eq 3 ] || { sed -n '3,6p' "$0" | sed 's/^# //' >&2; exit 2; }
+ARGS=("$@")
+[ "${#ARGS[@]}" -eq 3 ] || { sed -n '3,5p' "$0" | sed 's/^# //' >&2; exit 2; }
 LIST="${ARGS[0]}"; A="${ARGS[1]}"; B="${ARGS[2]}"
 [ -f "$LIST" ] || { echo "ERROR: 턴 목록 $LIST 이 없다." >&2; exit 2; }
 NAME="$(basename "$LIST" .txt)"; NAME="${NAME#turns-}"
@@ -27,8 +24,8 @@ py() { json_run 'import runpy,sys; p=sys.argv[1]; sys.argv=[p]+sys.argv[2:]; run
 py "$HERE/scripts/backup_sessions.py" "$LIST" || echo "경고: 세션 파일을 찾지 못한 턴은 생성하지 못한다(위 목록)." >&2
 for c in "$A" "$B"; do
   echo "[생성 $c → $ANS]"
-  py "$HERE/scripts/_replay.py" "$ANS" "$c" "$LIST" ${NOW[@]+"${NOW[@]}"}
+  py "$HERE/scripts/_replay.py" "$ANS" "$c" "$LIST"
 done
 echo "[판정 $A·$B → $JD]"
-py "$HERE/scripts/_judge.py" judge "$ANS" "$JD" "$A" "$B" "$LIST" ${NOW[@]+"${NOW[@]}"}
+py "$HERE/scripts/_judge.py" judge "$ANS" "$JD" "$A" "$B" "$LIST"
 echo "집계: bash scripts/eval_replay_report.sh '$JD' $A $B"

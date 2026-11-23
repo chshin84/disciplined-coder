@@ -13,7 +13,7 @@ cls 대신 error 를 남기고, 다음 실행에서 다시 판정한다. 판정 
 claude-opus-5-5 밖의 모델이 있거나 한 조건에 리비전이 둘 이상이면 경고하고 1 로 끝난다.
 판독 파일은 {"<idx>:<A>:<B>": <사용자 점수 -2~2>} 다(side_by_side.py 페이지의 「결과 복사」).
 
-사용: python _judge.py judge <답 폴더> <판정 폴더> <A> <B> <턴 목록> [--now]
+사용: python _judge.py judge <답 폴더> <판정 폴더> <A> <B> <턴 목록>
       python _judge.py report <판정 폴더> <A> <B> <턴 목록> <답 폴더> <금지어 pairs> <금지어 excl> [--viol <위반 폴더>] [--reading <판독 파일>]"""
 import json
 import math
@@ -173,13 +173,10 @@ def result(A, B, ab, ba):
 
 
 def judge_main(argv):
-    force = '--now' in argv
-    argv = [a for a in argv if a != '--now']
     if len(argv) != 5:
         print(__doc__.rsplit('사용:', 1)[1])
         return 2
     ans_dir, out_dir, ca, cb, tl = argv
-    R.guard_office_hours(force)
     ids = R.read_ids(tl)
     os.makedirs(out_dir, exist_ok=True)
     tools = ca.endswith('-tools') or cb.endswith('-tools')
@@ -206,7 +203,7 @@ def judge_main(argv):
             print(i, r.get('cls') or 'ERROR ' + str(r['error'])[:120], r.get('s1'), r.get('s2'), flush=True)
 
     try:
-        R.pool([(i, o) for i, o in jobs], lambda i, o: one(*pairs[i], o, tools), on, force)
+        R.pool([(i, o) for i, o in jobs], lambda i, o: one(*pairs[i], o, tools), on)
     except R.Stop as e:
         print('중단:', e, file=sys.stderr)
         return e.code
