@@ -1,6 +1,6 @@
 ---
 name: nested-orchestration
-description: 사용자가 작업을 나눠 맡기라고 하거나, 각각 plan 이 필요한 큰 작업이 둘 이상이라 서브 세션에 나눠 맡길 때 연다.
+description: 사용자가 작업 분할·위임을 요청하거나, 각각 plan이 필요한 큰 작업 둘 이상을 서브 세션에 나눠 맡길 때 열어라.
 ---
 # nested-orchestration — 워크스트림으로 나눠 맡기는 3층 오케스트레이션
 

@@ -1,6 +1,6 @@
 ---
 name: review-llm-calls
-description: 제품 코드가 런타임에 LLM을 호출하는 기능을 만들거나 고칠 때 연다.
+description: 제품 코드의 런타임 LLM 호출 기능을 구현하거나 수정할 때 열어라.
 ---
 # review-llm-calls — 런타임 LLM 검증 호출자
 

@@ -1,6 +1,6 @@
 ---
 name: citation-verifier
-description: 인용 추출 검증자다. URL 하나의 원문을 열어 주장마다 접근·존재·구절을 판정한다. 호출 절차가 이름으로 지정할 때만 실행한다.
+description: URL 하나의 원문을 열어 인용 주장마다 접근·존재·구절을 판정하는 추출 검증자다. 호출 절차가 이름으로 지정할 때만 실행한다.
 tools: WebFetch, Read
 model: claude-haiku-5-5
 effort: high

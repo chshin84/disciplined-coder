@@ -1,6 +1,6 @@
 ---
 name: researching-prior-art
-description: 선행연구·선행 사례·prior art를 찾아 달라거나 "이걸 이미 누가 해봤나"·"쓸 만한 도구가 있나"·"이 결정의 근거를 찾아 달라"고 할 때 연다.
+description: 선행연구·선행 사례·prior art를 요청하거나 "이걸 이미 누가 해봤나"·"쓸 만한 도구가 있나"·"이 결정의 근거를 찾아 달라"고 할 때 열어라.
 ---
 # researching-prior-art — 선행연구 스킬
 

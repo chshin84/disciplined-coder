@@ -1,6 +1,6 @@
 ---
 name: lens-grounding
-description: LLM 출력이나 문서의 주장과 형식을 호출자가 넘긴 출처·코드·형식 계약과 대조해 다른 점만 내는 대조 렌즈. 누락·모순·근거 없음·불일치와 형식·스키마·제약 위반을 찾는다. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
+description: 대조 렌즈다. LLM 출력과 문서의 주장·형식을 호출자가 넘긴 출처·코드·형식 계약과 대조해 다른 점만 보고한다. 누락·모순·근거 없음·불일치와 형식·스키마·제약 위반을 찾는다. 실행 전에 `lens-review`를 Read하라.
 tools: Read, Grep, Glob
 model: opus
 ---

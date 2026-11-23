@@ -1,5 +1,5 @@
 ---
-description: 지금 이 PC에 적용되어 있는 디시플린 원칙 전문을 그대로 보여준다(PC 전역 agent-principles.md — 디시플린 에이전트원칙의 사본이다).
+description: 이 PC에 적용 중인 디시플린 에이전트원칙 사본(PC 전역 agent-principles.md)의 전문을 그대로 보여 준다.
 ---
 
 먼저 설정 홈을 도출하라. 경로를 짐작하지 말고 아래를 실행해 받은 값을 쓰라. 홈 경로가 서로 다른 PC에서는

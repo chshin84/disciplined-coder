@@ -1,6 +1,6 @@
 ---
 name: lens-readability
-description: 남에게 전달할 문서와 렌더링 화면을 맥락 없는 독자로 읽어 이해가 멈추는 곳과 AI 티 문체, 화면의 배치·겹침·잘림·대비·분량을 공격하고 고친 문장을 제안하는 독자 렌즈. spec·plan 에는 적용하지 않는다. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
+description: 독자 렌즈다. 남에게 전달할 문서와 렌더링 화면을 맥락 없이 처음 읽으며 이해가 멈추는 곳, AI 티 문체, 화면의 배치·겹침·잘림·대비·분량을 공격하고 수정 문장을 제안한다. spec·plan에는 적용하지 마라. 실행 전에 `lens-review`를 Read하라.
 tools: Read, mcp__plugin_playwright_playwright__browser_navigate, mcp__plugin_playwright_playwright__browser_take_screenshot, mcp__plugin_playwright_playwright__browser_snapshot
 model: opus
 ---

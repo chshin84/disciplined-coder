@@ -1,6 +1,6 @@
 ---
 name: domain-readme
-description: 사용자용 README를 쓰거나 고칠 때, 절 순서나 배지·목차·스크린샷을 넣을지 정할 때, README에서 내용을 뺄 때 연다.
+description: 사용자용 README를 작성·수정하거나, 절 순서와 배지·목차·스크린샷 포함 여부를 정하거나, 내용을 뺄 때 열어라.
 ---
 # domain-readme — 사용자용 README를 쓰는 법
 

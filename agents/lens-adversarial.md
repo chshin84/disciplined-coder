@@ -1,6 +1,6 @@
 ---
 name: lens-adversarial
-description: 설계 문서나 코드·실험 결과에서 실패 모드·과설계·비가역·완화할 위험과 내부 모순·커버리지 공백·이름 드리프트·스코프를 공격적으로 찾는 설계 결함 렌즈. 실행하는 쪽은 먼저 `lens-review` 를 Read 한다.
+description: 설계 결함 렌즈다. 설계 문서·코드·실험 결과를 공격적으로 검토해 실패 모드·과설계·비가역·완화할 위험·내부 모순·커버리지 공백·이름 드리프트·스코프를 찾는다. 실행 전에 `lens-review`를 Read하라.
 tools: Read, Grep, Glob
 model: opus
 ---

@@ -1,6 +1,6 @@
 ---
 name: citation-judge
-description: 인용 판정 에이전트다. 추출 검증자가 옮긴 구절로 주장의 수치·조건, 방향, 범위를 판정한다. 호출 절차가 이름으로 지정할 때만 실행한다.
+description: 추출 검증자가 옮긴 구절로 인용 주장의 수치·조건, 방향, 범위를 판정한다. 호출 절차가 이름으로 지정할 때만 실행한다.
 tools: Read
 model: claude-opus-5-5
 effort: medium

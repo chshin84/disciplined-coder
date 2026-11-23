@@ -1,6 +1,6 @@
 ---
 name: researcher
-description: 웹을 탐색해 출처를 모으고 검증을 통과한 행으로 근거 지도를 만드는 연구자다. 호출 절차가 이름으로 지정할 때만 실행한다.
+description: 웹을 탐색해 출처를 모으고 검증을 통과한 행으로 근거 지도를 만든다. 호출 절차가 이름으로 지정할 때만 실행한다.
 tools: WebSearch, WebFetch, Read, Grep, Glob
 maxTurns: 20
 ---
