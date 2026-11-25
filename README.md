@@ -108,7 +108,7 @@ Claude 가 설계 문서나 작업 계획 문서를 새로 쓰면, 답을 마치
 <details>
 <summary><b>/show-principles 에 원칙이 나오지 않을 때</b></summary>
 
-**설치 범위** — 플러그인이 한 프로젝트에만 설치되어 이 PC 전체(user 범위)에 적용되지 않았습니다. 터미널에서 `claude plugin install disciplined-coder@chshin-tools --scope user` 로 다시 설치합니다.
+**설치 범위** — 플러그인이 한 프로젝트에만 설치되어 이 PC 전체(`--scope user`)에 적용되지 않았습니다. 터미널에서 `claude plugin install disciplined-coder@chshin-tools --scope user` 로 다시 설치합니다.
 
 **준비 단계 오류** — 플러그인은 세션을 시작할 때마다 원칙 사본을 만들고 `~/.claude/CLAUDE.md` 에 연결하는 준비 단계를 자동으로 실행합니다. 이 단계의 결과는 Claude 에게 전달되므로, Claude 에게 세션 시작 알림의 `ERROR` 줄을 보여 달라고 요청합니다. `ERROR` 가 있으면 새 세션을 열고, 또 나오면 그 메시지를 이슈로 올립니다.
 
@@ -146,7 +146,7 @@ claude plugin uninstall disciplined-coder@chshin-tools
 claude plugin marketplace remove chshin-tools
 ```
 
-삭제한 뒤에도 PC 전역 폴더 `~/.claude/disciplined-coder/` 와 `~/.claude/CLAUDE.md` 안의 연결 블록은 남습니다. 연결 블록은 `# BEGIN disciplined-coder (managed — do not edit)` 줄부터 `# END disciplined-coder (managed — do not edit)` 줄까지입니다. 이 블록을 지우고 폴더를 삭제하면 원칙이 더 이상 적용되지 않습니다. 플러그인이 남아 있으면 다음 세션에서 둘 다 다시 만들어지므로, 플러그인을 먼저 삭제합니다.
+삭제한 뒤에도 PC 전역 폴더 `~/.claude/disciplined-coder/` 와 `~/.claude/CLAUDE.md` 안의 연결 블록은 남습니다. 연결 블록은 `# BEGIN disciplined-coder (managed — do not edit)` 줄부터 `# END disciplined-coder (managed — do not edit)` 줄까지입니다. 이 블록을 지우고 폴더를 삭제하면 원칙이 적용되지 않습니다. 플러그인이 남아 있으면 다음 세션에서 둘 다 다시 만들어지므로, 플러그인을 먼저 삭제합니다.
 
 </details>
 
