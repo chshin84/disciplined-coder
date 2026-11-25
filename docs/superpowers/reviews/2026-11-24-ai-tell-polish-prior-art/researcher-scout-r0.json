@@ -1,0 +1,98 @@
+{
+ "search_status": "ok",
+ "queries": [
+  "self-refine vs cross-model critique LLM writing style fluency improvement",
+  "linguistic features distinguishing LLM-generated Korean text from human writing",
+  "MQM error annotation then LLM post-editing translation refinement",
+  "LLM-as-judge self-preference bias position bias verbosity bias pairwise comparison",
+  "reducing AI-like writing style humanizing LLM text edit preserving meaning",
+  "translationese reduction LLM Korean naturalness post-editing",
+  "\"slop\" LLM writing patterns detection over-represented phrases antislop"
+ ],
+ "clusters": [
+  {
+   "topic": "자기 교정(self-refine)과 다른 모델 비평의 효과 차이",
+   "sources": [
+    "https://arxiv.org/pdf/2402.11436",
+    "https://aclanthology.org/2026.acl-long.268.pdf",
+    "https://arxiv.org/html/2510.24469v1",
+    "https://arxiv.org/pdf/2310.18679",
+    "https://arxiv.org/pdf/2501.14492"
+   ],
+   "note": "자기 교정은 유창성·이해도를 올리지만 전체 품질은 덜 올리고, 모델이 자기 문체를 선호하는 자기 편향이 교정 과정에서 커진다는 보고(Pride and Prejudice)가 있다. 번역 교정 연구는 유창성·문체 개선은 크고 정확성 개선은 작다고 보고한다. 별도 비평 모델을 쓰는 틀(PerFine, N-Critics)은 있으나, 문체 과제에서 자기 교정과 타 모델 교열을 직접 맞비교한 연구는 이번 검색에서 찾지 못했다."
+  },
+  {
+   "topic": "한국어 LLM 생성문의 언어 특징(탐지 연구)",
+   "sources": [
+    "https://aclanthology.org/2025.acl-long.1030",
+    "https://arxiv.org/html/2503.00032v4",
+    "https://arxiv.org/pdf/2610.22940",
+    "https://arxiv.org/pdf/2608.28986"
+   ],
+   "note": "KatFishNet(ACL 2025)은 띄어쓰기 패턴, 품사 조합 다양성, 쉼표 사용을 사람 글과의 차이로 제시한다. 후속 사전 공개 논문은 47개 특징 분류(문장 길이 균일성, 일반적 연어 선택 등)를 제시한다. 탐지 목적이라 퇴고 지침으로 옮길 때는 특징이 고칠 대상인지 따로 판단해야 한다."
+  },
+  {
+   "topic": "영어권 AI 문체(slop) 패턴 목록과 측정",
+   "sources": [
+    "https://arxiv.org/abs/2510.15061",
+    "https://arxiv.org/html/2509.19163v2",
+    "https://github.com/sam-paech/slop-score",
+    "https://arxiv.org/pdf/2409.14509",
+    "https://arxiv.org/abs/2605.30526"
+   ],
+   "note": "Antislop은 사람 글 대비 과다 출현 n-gram으로 패턴 지문을 만들고 생성 중 억제한다. 'Measuring AI Slop'은 구간 단위 주석 분류를 만들고 추론 모델도 slop 을 스스로 잘 찾지 못한다고 보고한다. LAMP(2409.14509)는 전문 작가가 7범주 분류로 1,057문단을 교열했고, 전문가는 자동 편집보다 사람 편집을 선호했다. PASTA는 사후 학습 방향을 디코딩 중 제거하는 모델 내부 방법이라 외부 퇴고와 메커니즘이 다르다."
+  },
+  {
+   "topic": "오류 구간 주석 뒤 그 구간만 고치는 후편집",
+   "sources": [
+    "https://arxiv.org/html/2409.14335v2",
+    "https://arxiv.org/html/2404.07851v2",
+    "https://aclanthology.org/2026.wmt-main.25/"
+   ],
+   "note": "MQM-APE는 오류 분석, 오류별 후편집, 쌍 비교 품질 검증의 3단계를 같은 LLM으로 실행한다. Ki와 Carpuat(2024)은 MQM 세부 피드백으로 후편집하면 번역투가 주로 줄고 출력이 더 자연스러워졌다고 보고한다. MELT(WMT 2026)는 한국어를 포함한 5개 언어에서 번역투를 5차원으로 정의하고 3단계 검증 관문과 다중 에이전트 토론으로 의미 보존과 자기 편향을 다루며, 검증 단계가 품질 기여가 가장 컸다고 보고한다."
+  },
+  {
+   "topic": "번역투 감소와 반복 정제",
+   "sources": [
+    "https://arxiv.org/html/2503.04369",
+    "https://arxiv.org/html/2306.03856v2",
+    "https://sfb1102.uni-saarland.de/sfbunisb/uploads/2024/07/eamt24.pdf",
+    "https://arxiv.org/pdf/2304.11501"
+   ],
+   "note": "LLM 번역투의 원인을 지도 학습 데이터에서 찾은 연구, 반복 정제가 원어민 평가에서 유창성을 올렸다는 연구, 언어 지식을 넣은 프롬프트로 '덜 번역된' 판을 만드는 연구가 있다. 원문이 있는 번역 과제라 원문 없는 퇴고에 옮길 때 차이가 있다."
+  },
+  {
+   "topic": "LLM 판정자의 편향(순서·길이·자기 선호·문체)",
+   "sources": [
+    "https://arxiv.org/pdf/2410.21819",
+    "https://arxiv.org/html/2410.02736v2",
+    "https://arxiv.org/html/2604.23178",
+    "https://arxiv.org/pdf/2608.18091",
+    "https://arxiv.org/pdf/2412.05579"
+   ],
+   "note": "순서 편향은 순서를 바꿔 두 번 판정해 평균하는 대처가 표준이며, 최근 재현 연구는 현행 모델에서 순서 편향이 작다고 보고한다. 길이 편향은 길이 통제 승률로 보정한다. 자기 선호 편향은 다른 계열 판정자로 완화하며, 한 연구는 문체 편향이 가장 크다고 보고한다. 문체 개선을 판정할 때 문체 편향 자체가 측정 대상과 겹치는 점이 한계다."
+  }
+ ],
+ "subquestion_candidates": [
+  {
+   "scope": "문체·유창성 퇴고에서 생성 모델과 다른 모델이 교열할 때와 같은 모델이 스스로 고칠 때의 효과 차이, 그리고 자기 편향이 교정에서 커지는지",
+   "basis": "자기 교정의 자기 편향 증폭 보고(2402.11436)와 별도 비평 모델 틀(PerFine, N-Critics)은 있으나 문체 과제의 직접 맞비교는 이번 검색에서 찾지 못했다. 사용자의 Gemini 교열 결과를 일반화할 근거가 이 하위 질문에 걸려 있다"
+  },
+  {
+   "scope": "한국어(와 다른 비영어) LLM 산출물이 사람 글과 다른 언어 특징 목록과, 그 특징 중 퇴고 대상으로 쓸 수 있는 특징",
+   "basis": "KatFishNet, 47특징 분류 사전 공개 논문, MELT의 '영어 구조 모방' 결론이 있고, 영어권 slop 분류(Antislop, LAMP 7범주)와 비교할 수 있다"
+  },
+  {
+   "scope": "문제 구간을 먼저 목록화·주석한 뒤 그 구간만 고치는 2단계 편집과 검증 관문(의미 보존 검사)의 효과",
+   "basis": "MQM-APE, Ki와 Carpuat(2024), MELT가 모두 주석 뒤 수정과 검증 단계를 두며 MELT는 검증 단계의 기여가 가장 컸다고 보고한다"
+  },
+  {
+   "scope": "사람 전문가 편집과 자동 편집의 결과 차이, 그리고 LLM이 AI 문체 구간을 스스로 찾는 능력의 한계",
+   "basis": "LAMP에서 전문가가 자동 편집보다 사람 편집을 선호했고, 'Measuring AI Slop'은 추론 모델도 slop 탐지가 불안정하다고 보고해 적대적 목록화 단계의 신뢰도와 사람 판독 병행 여부에 직접 관련된다"
+  },
+  {
+   "scope": "문체 개선을 쌍 비교 LLM 판정으로 측정할 때의 순서·길이·자기 선호·문체 편향과 보정 방법",
+   "basis": "순서 교환 평균, 길이 통제 승률, 다른 계열 판정자가 표준 대처로 보고되고, 문체 편향이 가장 크다는 보고가 있어 판정자 계열 선택에 영향을 준다"
+  }
+ ]
+}

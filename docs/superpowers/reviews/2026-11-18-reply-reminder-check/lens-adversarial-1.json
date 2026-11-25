@@ -1,0 +1,13 @@
+{"lens":"lens-adversarial","mode":"artifact","note":"렌즈 보고의 지적 칸 요지. 전문은 세션 기록에 있다.","issues":[
+{"type":"contradiction","where":"제안 항목 3","counterpart":"docs/domain-korean.md: 설정에는 AX 블록, 원칙, 금지어 목록, Concise 출력 스타일을 실어 실제 환경과 맞췄다."},
+{"type":"contradiction","where":"제안 항목 2","counterpart":"docs/domain-korean.md: 형태 지시 세 줄을 메시지마다 붙임(약칭 풀기, 한 건만 묻기, 묻지 않은 정정 빼기)"},
+{"type":"contradiction","where":"제안 비용 문장","counterpart":"docs/domain-discipline.md: 판정 비용은 약 26.3달러다. 답 생성은 구독 한도로 실행했고 API 단가로 환산하면 약 104달러다."},
+{"type":"contradiction","where":"제안 채택 기준","counterpart":"CLAUDE.md: 채택은 숨긴 턴 세트에서 개선 턴이 악화 턴보다 많고 한쪽 부호 검정 p<0.05 이며 지적 없던 턴에서 악화가 늘지 않을 때다."},
+{"type":"gap","where":"제안 턴 세트","counterpart":"docs/domain-discipline.md: 두 번째 숨긴 세트는 남은 데이터로 만들 수 없어 새 세션이 쌓인 뒤 다시 뽑는다."},
+{"type":"contradiction","where":"제안 감독자 문구 조건","counterpart":"spec 2026-11-13: 빼는 문구는 \"감독자\" 지칭과 결론·바뀐 것·`정할 일`·남은 위험 네 항목 보고"},
+{"type":"gap","where":"제안 셋째 줄 삭제","counterpart":"scripts/test_docs_drift.sh: check \"리마인더에 원칙의 묻는 조건 낱말이 모두 있다\""},
+{"type":"gap","where":"제안 항목 1","counterpart":"docs/domain-discipline.md: 판정자는 지적한 턴에서 v2 가 덜 묻고 더 단정해 정정받은 전제를 다시 꺼내거나 사용자가 말한 범위를 좁힌다고 보았다."},
+{"type":"contradiction","where":"hooks/reply_reminder_userpromptsubmit.sh 23행","counterpart":"agent-principles.md ROLES: 지시한 방법보다 나은 방법이 보이면 바꾸기 전에 제안하고 ... 지시한 방법이 실패하거나 손실을 낼 것이 보이면 진행하지 말고 먼저 알려라."},
+{"type":"contradiction","where":"hooks/reply_reminder_userpromptsubmit.sh 21행","counterpart":"agent-principles.md ANSWER-SCOPE: 결과가 사용자의 다음 결정 재료이면 그 결정에 필요한 수치와 근거까지 써라."},
+{"type":"drift","where":"hooks/reply_reminder_userpromptsubmit.sh 10-11행","counterpart":"docs/domain-korean.md: 리마인더 둘째 줄도 같은 낱말로 맞췄다. 측정은 하지 않았고"},
+{"type":"gap","where":"hooks/reply_reminder_userpromptsubmit.sh 8-9행","counterpart":"scripts/test_docs_drift.sh: 셋째 줄 묻는 조건 낱말만 대조"}]}

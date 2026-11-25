@@ -1,0 +1,295 @@
+{
+ "agent": "researching-prior-art",
+ "mode": "survey",
+ "subquestion_id": "S2",
+ "search_status": "ok",
+ "queries": [
+  "Korean LLM-generated text detection linguistic features",
+  "translationese features machine-generated text non-English stylometric differences human",
+  "\"slop\" LLM text taxonomy repetitive phrases measurement humans annotate",
+  "Wikipedia signs of AI writing field guide",
+  "LLM Korean naturalness translationese benchmark unnatural expressions evaluation",
+  "Japanese LLM-generated text stylometric features human comparison function words",
+  "챗GPT 한국어 글 특징 번역투 말투 티 나는 표현"
+ ],
+ "read": "[\"https://aclanthology.org/2025.acl-long.1030\", \"https://arxiv.org/html/2503.00032v4\", \"https://arxiv.org/html/2503.00032v4 (offset 100000, Appendix O)\", \"https://arxiv.org/pdf/2610.22940 (1~5페이지)\", \"https://arxiv.org/pdf/2608.17399 (1~2, 7~9페이지)\", \"https://arxiv.org/html/2509.19163v2\", \"https://arxiv.org/html/2503.04369\", \"https://arxiv.org/pdf/2410.15956.pdf (1~2페이지)\", \"https://pmc.ncbi.nlm.nih.gov/articles/PMC12558491/\", \"https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing\"]",
+ "issues": [
+  {
+   "where": "대조 대상의 '문제 구절 목록대로만 고치기' 단계에서 목록 항목이 쉼표 빈도 같은 분포 특징일 때",
+   "type": "known-failure",
+   "claim": "대조 대상이 쉼표 사용처럼 분포로만 드러나는 특징을 목록에 올리고 모델에게 사람처럼 고치라고 지시하면, 선행 사례에서 확인된 실패 원인(모델이 생각하는 사람다운 쉼표 사용이 실제 사람 분포와 다름)이 남는다. 대조 대상은 이 특징을 고친 뒤 사람 글 분포와 비교하는 측정을 두지 않았다",
+   "prior_claim": "KatFishNet 연구의 부록 O 에서 Solar 모델에게 사람의 쉼표 사용을 흉내 내도록 지시해 다시 쓰게 했으나 탐지 성능은 수필에서 97.57 에서 90.83 으로 조금 내렸을 뿐이고 시는 62.65 에서 75.91, 논문 초록은 78.99 에서 80.69 로 오히려 올랐다. 저자들은 모델이 생각하는 사람다운 쉼표 사용이 실제 사람 글과 맞지 않기 때문일 수 있다고 적었다",
+   "consequence": "목록에 분포 특징이 들어가면 고친 판이 사람 글 분포에 다가갔는지 확인되지 않은 채 효과가 있다고 기록될 수 있다",
+   "evidence": "arxiv.org/html/2503.00032v4 부록 O 표(Original/Revised/Change). 축 차이: 선행 사례의 목적은 탐지기 강건성 검사이고 평가는 탐지 AUROC 이며, 대조 대상의 목적은 읽는 사람의 어색함 제거이고 평가는 쌍 비교 판정이다. 메커니즘은 '모델에게 지시해 고쳐 쓰기'라는 점만 같다",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2503.00032v4",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  }
+ ],
+ "evidence_map": [
+  {
+   "case": "KatFishNet: 한국어 LLM 생성 글 탐지(띄어쓰기·품사 조합·쉼표)",
+   "url": "https://arxiv.org/html/2503.00032v4",
+   "axes": {
+    "purpose": {
+     "prior": "한국어 LLM 생성 글을 사람 글과 구별하는 탐지",
+     "same": false,
+     "note": "탐지가 목적이고 퇴고가 아니다. 다만 퇴고 대상 특징 후보를 준다"
+    },
+    "mechanism": {
+     "prior": "띄어쓰기 비율, 품사 n-gram 다양성, 쉼표 사용 특징으로 분류기 학습",
+     "same": false,
+     "note": "고쳐 쓰기 없이 특징 측정과 분류만 한다. 대조 대상의 '불변 조건 기계 측정' 구성요소와만 측정 방식이 닮았다"
+    },
+    "evaluation": {
+     "prior": "AUROC, 생성 모델 바꿔 분포 밖 시험",
+     "same": false,
+     "note": "쌍 비교 판정이 아니다"
+    },
+    "target": {
+     "prior": "한국어 수필·시·논문 초록, GPT-4o·Solar·Qwen2·Llama3.1 출력",
+     "same": false,
+     "note": "한국어라는 점은 같으나 업무 지시문·보고서가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 → ACL 2025 논문(arXiv HTML)",
+   "adoption": "참고",
+   "bearing": "LLM 한국어 글은 사람보다 쉼표를 훨씬 자주 쓰고(수필에서 쉼표가 든 문장 약 61% 대 26%) 띄어쓰기를 규칙대로 지키며 품사 구조가 덜 다양하다. 쉼표 빈도는 기계로 측정할 수 있으므로 퇴고 대상 목록과 측정 항목 후보로 쓸 수 있다. 다만 장르 차이가 크고(시는 차이 작음) 탐지 신호가 곧 읽는 사람의 어색함은 아니다"
+  },
+  {
+   "case": "KoLingProbe: 다섯 언어 층위 47개 한국어 특징 탐지(편향 통제 벤치마크)",
+   "url": "https://arxiv.org/pdf/2610.22940",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 생성 글과 LLM 수정 글을 사람 글과 구별",
+     "same": false,
+     "note": "탐지 목적. LLM 이 사람 글을 교정·윤문·재서술한 글도 대상으로 삼은 점은 대조 대상의 교열 단계와 관련 있다"
+    },
+    "mechanism": {
+     "prior": "음운·형태·통사·의미·화용 층위별 특징으로 하위 탐지기를 만들고 메타 학습기로 결합",
+     "same": false,
+     "note": "고쳐 쓰기 없음"
+    },
+    "evaluation": {
+     "prior": "AUROC, macro-F1, FPR 1% 에서의 TPR, 오타 잡음 강건성",
+     "same": false,
+     "note": "쌍 비교 판정이 아니다"
+    },
+    "target": {
+     "prior": "한국어 수필·논문 초록·신문 사설, GPT-4o·Claude-Sonnet-4.6·Solar-Pro3·Qwen2.5·Mistral 출력",
+     "same": false,
+     "note": "한국어이고 Claude 계열 출력을 포함하나 지시문이 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv PDF",
+   "adoption": "참고",
+   "bearing": "퇴고 목록 후보 특징을 층위별로 준다. LLM 은 맞춤법대로 발음과 표기를 맞추고, 격조사와 어미를 덜 쓰며, 문장 길이가 고르고(엔트로피 낮음), 연어가 일반적이며, 격식체 한 가지로 수렴하고 격식 담화 표지를 과용하며 문장 끝이 반복된다. 문장 길이 분포와 문장 끝 다양성은 기계 측정이 가능하다. 또 LLM 이 사람 글을 교정만 해도 탐지 가능한 흔적이 남는다(LLM 수정 대 사람 글 평균 AUROC 74.0)는 결과는 다른 모델로 교열하는 단계도 새 흔적을 넣을 수 있음을 보여 준다"
+  },
+  {
+   "case": "다국어 LLM 생성 글의 번역투 조사(영·독·서·그리스·파슈토)",
+   "url": "https://arxiv.org/pdf/2608.17399",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 이 비영어로 직접 쓴 글이 번역투를 띠는지 측정",
+     "same": false,
+     "note": "측정 목적이고 퇴고가 아니다"
+    },
+    "mechanism": {
+     "prior": "번역문/원문 분류기와 기능어 빈도 등 개별 지표 ANOVA, 일부 언어 사람 주석",
+     "same": false,
+     "note": "고쳐 쓰기 없음"
+    },
+    "evaluation": {
+     "prior": "분류기가 번역문으로 판정한 비율, 특징 가중치",
+     "same": false,
+     "note": "쌍 비교 아님"
+    },
+    "target": {
+     "prior": "Gemini·Llama 생성 글, 한국어 없음",
+     "same": false,
+     "note": "한국어가 빠져 있어 옮겨 쓸 때 언어 차이를 감안해야 한다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv PDF(COLM 2026 게재 표기)",
+   "adoption": "참고",
+   "bearing": "비영어 생성 글에서 번역투가 영어보다 높게 나온다(독일어 Gemini 60.2%, Llama 37.6% 가 번역문으로 분류). 모델은 드물고 눈에 띄는 번역 표지는 피하지만 자주 쓰는 기능어의 분포는 번역문 쪽으로 기운다고 보고했다. 금지어처럼 눈에 띄는 표현만 잡는 목록은 고빈도 기능어 분포의 차이를 놓칠 수 있다는 근거다"
+  },
+  {
+   "case": "LLM 의 영어 억양: 다국어 LLM 출력의 어휘·통사 자연스러움 지표",
+   "url": "https://arxiv.org/pdf/2410.15956.pdf",
+   "axes": {
+    "purpose": {
+     "prior": "비영어 LLM 출력의 자연스러움 평가와 개선",
+     "same": false,
+     "note": "자연스러움 향상이라는 목적은 가깝지만 학습(DPO)으로 모델을 바꾸는 방식이고 산출물 퇴고가 아니다"
+    },
+    "mechanism": {
+     "prior": "사람 글과 LLM 출력의 어휘·통사 분포를 말뭉치 수준에서 비교, 인위로 망가뜨린 응답과 사람 응답으로 선호 학습",
+     "same": false,
+     "note": "산출물 단위 교열이 아니다"
+    },
+    "evaluation": {
+     "prior": "말뭉치 수준 자연스러움 지표와 일반 벤치마크 성능",
+     "same": false,
+     "note": "쌍 비교 판정이 아니다"
+    },
+    "target": {
+     "prior": "영어·프랑스어·중국어",
+     "same": false,
+     "note": "한국어 없음"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv PDF 1~2페이지만 읽음",
+   "adoption": "참고",
+   "bearing": "비영어 LLM 출력이 영어식 어휘·문법을 띤다는 전제를 지지한다. 한국어 번역투를 퇴고 대상의 한 묶음으로 두는 방향을 지지하나, 결과 수치는 읽지 못해 효과 크기는 확인하지 못했다"
+  },
+  {
+   "case": "Lost in Literalism: LLM 번역의 번역투 구간 주석과 윤문",
+   "url": "https://arxiv.org/html/2503.04369",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 번역의 부자연스러운 직역 줄이기",
+     "same": false,
+     "note": "자연스러움 개선이라는 목적은 같으나 번역 과제에 한정된다"
+    },
+    "mechanism": {
+     "prior": "전문 번역가가 부자연스러운 구간을 표시(TSR), LLM 으로 학습 데이터 또는 추론 출력을 윤문, 혼잡도로 걸러냄",
+     "same": false,
+     "note": "구간 표시 후 고친다는 점은 대조 대상의 '문제 구절 목록화 후 고치기'와 닮았으나 목록대로만 고치는 제약이나 구조 고정은 없다"
+    },
+    "evaluation": {
+     "prior": "번역투 구간 비율, 사람 순위 매기기, 혼잡도, COMET-QE",
+     "same": false,
+     "note": "사람 순위 비교가 있어 쌍 비교와 가깝지만 같지 않다"
+    },
+    "target": {
+     "prior": "영→중, 독→영 문서 번역",
+     "same": false,
+     "note": "한국어 아님, 번역 과제"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 → ACL 2025 논문(arXiv HTML)",
+   "adoption": "참고",
+   "bearing": "LLM 번역의 45~51% 에 번역투가 있었고, GPT-4 자기 윤문으로 43% 에서 25% 로 줄었다. 추론 시점 윤문은 학습 데이터 윤문보다 효과가 작았다. 산출물 단위로 LLM 이 다시 다듬는 방식이 효과는 있으나 번역투를 다 없애지는 못한다는 근거다. 사람 주석의 부자연스러운 구간 비율이 혼잡도와 양의 상관을 보였다는 결과는 자동 측정 보조 지표 후보를 준다"
+  },
+  {
+   "case": "Measuring AI Slop: 영어 AI 저품질 글의 분류 체계와 주석",
+   "url": "https://arxiv.org/html/2509.19163v2",
+   "axes": {
+    "purpose": {
+     "prior": "영어 'slop' 을 정의하고 측정",
+     "same": false,
+     "note": "측정 목적, 퇴고 아님"
+    },
+    "mechanism": {
+     "prior": "전문가 면담으로 만든 7개 코드(밀도·관련성·사실성·편향·반복·틀에 박힘·일관성·유창성·장황함·어휘 난도·어조)로 구간 주석",
+     "same": false,
+     "note": "문제 구간을 표시하는 점만 대조 대상의 목록화 단계와 닮았다"
+    },
+    "evaluation": {
+     "prior": "주석자 일치도, LLM 판정과 사람 판정의 일치",
+     "same": false,
+     "note": "쌍 비교 아님"
+    },
+    "target": {
+     "prior": "영어 뉴스 기사와 질의응답 문단",
+     "same": false,
+     "note": "영어만 다룸"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 → arXiv HTML",
+   "adoption": "참고",
+   "bearing": "GPT-5·DeepSeek-V3·o3-mini 판정은 사람 판정과 카파 0 근처였고 사람보다 훨씬 적게 표시했다(3~8% 대 34%). 구간 표시 재현율도 0.08~0.12 였다. LLM 에게 문제 구절을 목록화시키는 단계는 놓치는 구절이 많을 수 있으므로, 목록화를 적대적으로 하는 설계와 사람 판독 병행을 지지한다. 영어 결과라 한국어로 옮길 때 차이를 감안해야 한다"
+  },
+  {
+   "case": "위키백과 'Signs of AI writing' 관찰 목록",
+   "url": "https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing",
+   "axes": {
+    "purpose": {
+     "prior": "위키백과 편집자가 공개되지 않은 AI 생성 글을 알아보도록 돕는 관찰 목록",
+     "same": false,
+     "note": "알아보기 목적이고 퇴고 표준이 아니다"
+    },
+    "mechanism": {
+     "prior": "과장된 의미 부여, AI 어휘, 계사 회피('serves as'), 부정 병렬, 세 항목 나열, 마크다운·굵은 글씨 과다, 챗봇 말투 잔재 등 범주별 사례",
+     "same": false,
+     "note": "기계 측정이나 고쳐 쓰기 절차가 없다"
+    },
+    "evaluation": {
+     "prior": "편집자 경험에 기댄 관찰이며 정량 평가 없음",
+     "same": false,
+     "note": "쌍 비교 아님"
+    },
+    "target": {
+     "prior": "영어 위키백과 문서",
+     "same": false,
+     "note": "영어 어휘 목록이라 한국어에 그대로 쓰기 어렵다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "blog",
+   "source_level": "2차",
+   "route": "웹 검색(보도) → 원문 페이지",
+   "adoption": "참고",
+   "bearing": "영어권 AI 문체 분류의 대표 사례로 한국어 특징 목록과 비교할 범주(과장, 계사 회피, 서식 과다, 담화 표지)를 준다. 페이지는 '이 징후를 고칠 문제로만 다루지 말라, 탐지만 어려워진다'고 경고한다. 표면 구절만 고치는 퇴고가 내용 문제(과장, 근거 없는 귀속)를 남길 수 있다는 지적이므로, 목록에 표현 문제와 내용 문제를 구분해 두는 방향을 지지한다"
+  },
+  {
+   "case": "일본어 LLM 7종과 사람 글의 문체 계량 비교 및 사람 판별 실험",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12558491/",
+   "axes": {
+    "purpose": {
+     "prior": "일본어 LLM 글을 문체 계량으로 구별할 수 있는지와 사람이 구별할 수 있는지 확인",
+     "same": false,
+     "note": "탐지와 사람 판별 측정이 목적"
+    },
+    "mechanism": {
+     "prior": "구 패턴, 품사 바이그램, 기능어 유니그램 빈도로 랜덤 포레스트 분류, 403명 판별 실험",
+     "same": false,
+     "note": "고쳐 쓰기 없음"
+    },
+    "evaluation": {
+     "prior": "분류 정확도 99.8%, 사람 판별 정답률",
+     "same": false,
+     "note": "쌍 비교 아님"
+    },
+    "target": {
+     "prior": "일본어 공공 의견문, GPT-4o·o1·Claude3.5·Gemini·Copilot·Llama3.1·Perplexity",
+     "same": false,
+     "note": "교착어라는 점에서 한국어와 가깝지만 언어가 다르다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 → PMC 본문",
+   "adoption": "참고",
+   "bearing": "기능어·품사 분포로는 기계가 거의 완벽히 구별하지만 사람은 우연 수준이었다(사람 글을 사람으로 본 비율 45.2%). 대조 대상의 기준이 '읽는 사람이 어색함을 느끼지 않음'이면 탐지기 특징을 모두 없애는 것을 목표로 삼을 필요는 없고, 사람 판독이나 쌍 비교 판정이 맞는 평가라는 방향을 지지한다. 다만 이 논문은 특징별 증감 방향을 보고하지 않아 퇴고 목록 항목으로 바로 옮기지는 못한다"
+  }
+ ],
+ "saturation": "3",
+ "not_found": "[\"한국어 번역투(영어식 직역 구문) 가운데 LLM 출력에 특히 많은 항목을 정량으로 정리한 연구: 한국어 검색에서 번역 활용법 블로그만 나왔고 체계적 목록은 찾지 못했다. 국립국어원 등 표준 번역투 목록은 이번 도구 예산 안에서 찾지 않았다\", \"한국어 업무 문서·지시문 장르의 LLM 문체 특징 연구: 찾은 한국어 연구는 수필·시·논문 초록·사설만 다룬다\", \"탐지 특징을 고친 뒤 사람 독자가 덜 어색하다고 느꼈는지 측정한 한국어 연구: 찾지 못했다\", \"중국어 LLM 출력 특징 연구: 영어 억양 논문이 중국어를 다루지만 결과 페이지를 읽지 못했다\"]",
+ "disclosures": "[\"도구 호출이 22회로 지시한 20회를 넘었다. PDF 본문 추출 실패로 저장 파일을 다시 읽느라 호출이 늘었다\", \"arXiv 2410.15956 은 1~2페이지만 읽어 결과 수치를 확인하지 못했다. outcome 을 '판정 못 함'으로 두었다\", \"arXiv 2610.22940 은 1~5페이지만 읽었고 부록의 47개 특징 전체 목록은 보지 못했다\", \"위키백과 페이지는 앞 100000자만 읽었다\", \"KoLingProbe 의 LLM 수정 대 사람 글 AUROC 74.0 은 표 3 의 평균 열을 읽은 값이며, 다른 모델 교열이 흔적을 넣는다는 해석은 내 추론(derived)이다\", \"탐지 연구의 특징 차이가 곧 읽는 사람의 어색함이라는 연결은 어느 출처도 직접 측정하지 않았다\"]",
+ "notes": "탐색 방법: 짧고 넓은 검색어로 시작해 한국어 탐지 연구 → 비영어 번역투 연구 → 영어권 AI 문체 분류 → 일본어 비교 순으로 좁혔고, 찾은 한국어 논문(KoLing)이 인용한 선행(KatFishNet)과 그 부록을 따라갔다. 체크리스트는 전이(KatFishNet 부록 O)만 이슈로 올렸고, 기준선·붐빔은 이 하위 질문 범위(특징 조사)에 맞지 않아 쓰지 않았다. intended_use 기준으로 탐지 정확도 자체보다 퇴고 목록 항목과 기계 측정 가능성, 사람 판독과의 관계를 우선했다. 뺀 근거: Antislop·slop-forensics(영어 과용 구절 빈도, 생성 시점 억제 샘플러라 산출물 퇴고와 메커니즘이 멀고 열지 않음), 한국어 벤치마크(ICML 2026, KO-BENCH; 평가셋 자연스러움이라 산출물 특징이 아님), SemEval 한영 번역(오역 중심), 영-아랍·영-태국 번역 문체 연구(번역 과제이며 한국어와 거리가 멂), 한국어 번역 활용 블로그(체계적 특징 없음). 더 확인할 사항: (1) 국립국어원 등의 한국어 번역투 표준 목록과 이미 쓰는 직역 구문 정규식의 대조, (2) 2410.15956 결과 절의 프랑스어·중국어 수치, (3) KoLing 부록 C 의 47개 특징 중 업무 문서에 측정 가능한 항목."
+}

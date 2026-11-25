@@ -1,0 +1,328 @@
+{
+ "agent": "researching-prior-art",
+ "mode": "survey",
+ "subquestion_id": "S4",
+ "search_status": "ok",
+ "queries": [
+  "span-level annotation AI slop text LLM detect problematic spans",
+  "writers edit LLM-generated text idiosyncrasies dataset automated editing vs expert edits",
+  "AI-Slop to AI-Polish edit-based writing rewards writing quality reward model expert edits",
+  "LLMs fail to recognize their own stylistic idiosyncrasies self-correction writing style evaluation",
+  "Antislop framework suppress repetitive patterns language models overused phrases",
+  "multilingual dataset human edits of LLM-generated text non-English stylistic artifacts annotation",
+  "LLM error span annotation translation MQM precision compared to human annotators",
+  "large language models overcorrection grammatical error correction minimal edits fluency rewrites human references",
+  "Korean LLM generated text translationese unnatural style human evaluation post-editing",
+  "LLM 한국어 번역투 문체 교정 평가 연구"
+ ],
+ "read": "[\"https://arxiv.org/html/2509.19163v2\", \"https://arxiv.org/html/2409.14509v5\", \"https://arxiv.org/html/2504.07532v3\", \"https://arxiv.org/abs/2608.27855\", \"https://arxiv.org/abs/2511.17153\", \"https://arxiv.org/html/2504.08697v4\", \"https://arxiv.org/html/2605.13624\", \"https://arxiv.org/abs/2601.19913\", \"https://arxiv.org/abs/2603.08450\", \"https://scholar.kyobobook.co.kr/article/detail/4010069958158\"]",
+ "issues": [
+  {
+   "where": "대조 대상의 '문제 구절을 적대적으로 목록화' 단계",
+   "type": "refuted-premise",
+   "claim": "대조 대상은 교열 모델이 AI 투 구간을 목록으로 찾아낼 수 있다고 전제한다. 선행 결과는 추론 모델도 사람 전문가가 표시한 AI 투 구간을 거의 찾지 못했다고 보고하므로, 목록의 재현율과 정밀도를 사람 표본과 대조해 확인하지 않으면 이 전제는 검증되지 않은 상태다.",
+   "prior_claim": "전문 교열자 3명이 뉴스 기사와 질의응답 지문에 AI 슬롭(slop) 구간을 단어 단위로 표시했고, 교열자끼리의 구간 정밀도는 0.65~0.80이었다. GPT-5 의 영점(zero-shot) 구간 추출은 문자 단위 정밀도 약 0.08~0.14, 재현율 약 0.11~0.12였고 예시 5개를 넣어도 거의 달라지지 않았다. 미세조정한 7B 모델이 F1 0.26으로 더 나았지만 저자들은 두 방법 모두 성능이 낮고 LLM 구간과 사람 구간의 겹침이 작다고 결론지었다.",
+   "consequence": "목록에 오르지 않은 AI 투 구간은 '목록대로만 고친다' 규칙 때문에 그대로 남는다. 그 누락률을 지금 측정하는 장치가 대조 대상에 없다.",
+   "evidence": "https://arxiv.org/html/2509.19163v2 본문의 LLM 구간 추출 결과와 결론. 네 축 차이: 목적(슬롭 측정)과 평가(사람 주석 대비 구간 겹침)는 대조 대상의 탐지 단계와 비슷하지만, 대상 언어가 영어 뉴스·질의응답이고 대조 대상처럼 생성 모델과 다른 모델이 적대적 지시로 목록을 만드는 설정은 시험하지 않았다. 논문 본문과 표 7의 GPT-5 수치가 서로 다르다고 읽혔다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2509.19163v2",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "대조 대상의 '목록대로 고치는' 재작성 단계",
+   "type": "known-failure",
+   "claim": "대조 대상도 재작성을 LLM 이 맡으므로, 선행 사례에서 관측된 상투구를 다른 상투구로 바꾸는 실패와 구체성 없는 일반 묘사를 추가하는 실패가 남을 수 있다. 금지어 목록에 없는 새 상투구는 기계 검사에 잡히지 않는다.",
+   "prior_claim": "전문 작가 18명이 LLM 문단 1,057개를 편집한 연구에서 LLM 탐지 단계의 일반 정밀도는 최고 0.46으로 전문가끼리의 0.57보다 낮았다. 그러나 작가가 고른 구간으로 재작성만 한 파이프라인과 자동 탐지 후 재작성한 파이프라인의 선호 순위가 같아(둘 다 1.99), 저자들은 탐지가 아니라 재작성이 병목이라고 결론지었다. 선호 순위는 작가 편집 > LLM 편집 > 원본이었고, LLM 편집은 상투구를 다른 상투구로 바꾸거나 일반적인 세부 묘사를 추가하는 실패를 보였다.",
+   "consequence": "목록에 오른 구간을 고친 결과가 다시 AI 투가 되는 구간이 생기며, 이 재발을 확인하는 단계가 재작성 뒤에 있는지는 대상 설명에 나오지 않는다.",
+   "evidence": "https://arxiv.org/html/2409.14509v5 6.1(탐지)·6.2(재작성)·6.4(질적 분석)와 선호 평가 결과. 네 축 차이: 메커니즘(탐지와 재작성 분리, 목록 기반 재작성)은 대조 대상과 비슷하지만, 편집 모델이 생성 모델과 같은 GPT-4o 였고(저자들도 최적이 아니라고 인정), 대상은 영어 문학·창작 논픽션이며 구조·식별자 고정 같은 불변 조건 측정은 없다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2409.14509v5",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "대조 대상의 '쌍 비교 판정으로 효과 확인' 단계",
+   "type": "known-failure",
+   "claim": "대조 대상이 쌍 비교 판정을 LLM 판정자에게 맡기면, 선행 결과가 보인 대로 범용 LLM 판정자의 글 품질 쌍 판정은 우연 수준에 가까울 수 있다. 사람 판독으로 판정자를 보정하는 절차가 없으면 효과 판정의 신뢰도가 확인되지 않는다.",
+   "prior_claim": "다섯 가지 글쓰기 선호 데이터를 묶은 글 품질 벤치마크 4,729건에서 영점 LLM 판정자는 우연(50%) 근처였다(GPT-4o 40.9%, o1 51.7%, DeepSeek-R1 46.0%, 가장 높은 o3 64.3%). 전문가 편집 쌍으로 학습한 보상 모델은 74.3%였다. 보상 모델로 편집 후보를 골라도 저자들은 결과가 전문가 수준에 한참 못 미친다고 적었다.",
+   "consequence": "LLM 판정자의 점수만으로 퇴고 방법을 채택하면 실제로는 개선이 없는 버전이 채택되거나 개선된 버전이 기각될 수 있다.",
+   "evidence": "https://arxiv.org/html/2504.07532v3 의 판정자 정확도 표와 한계 서술. 네 축 차이: 평가 축(쌍 비교)은 대조 대상과 같지만, 대상은 영어 창작 글이고 판정 모델이 Opus 계열이 아니며, 대조 대상처럼 순서를 바꿔 두 번 판정하는 절차를 쓰지 않았다. 사용자의 기존 측정(Opus 판정이 개선을 과소평가해 사람 판독을 병행)과 방향은 일치하지만 그 측정 자체는 이 조사 범위 밖이다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2504.07532v3",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  }
+ ],
+ "evidence_map": [
+  {
+   "case": "AI 슬롭 구간 측정(전문 교열자 구간 주석과 LLM 구간 추출 비교)",
+   "url": "https://arxiv.org/html/2509.19163v2",
+   "axes": {
+    "purpose": {
+     "prior": "AI 슬롭을 정의하고 구간 단위로 측정",
+     "same": false,
+     "note": "대조 대상은 퇴고로 없애는 것이 목적이고, 이 연구는 측정까지만 한다. 대조 대상의 탐지 단계와만 같다"
+    },
+    "mechanism": {
+     "prior": "전문가 인터뷰로 분류 체계를 만들고 교열자가 구간 표시, LLM 영점·소수 예시·미세조정 추출을 비교",
+     "same": false,
+     "note": "적대적 목록화, 다른 모델 교열, 목록 기반 재작성은 없다"
+    },
+    "evaluation": {
+     "prior": "사람 주석 대비 문자 단위 구간 정밀도·재현율, 이진 판정 κ",
+     "same": false,
+     "note": "대조 대상은 쌍 비교 판정으로 결과 글을 평가한다"
+    },
+    "target": {
+     "prior": "영어 뉴스 기사 213편, 질의응답 지문 123편",
+     "same": false,
+     "note": "한국어가 아니고 지시문·보고서 산출물도 아니다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 본문",
+   "adoption": "참고",
+   "bearing": "LLM 단독 목록화의 재현율이 낮다는 근거로, 목록 단계에 사람 표본 대조나 보조 신호(금지어·정규식)를 함께 두는 안을 강화한다. 영어·뉴스 대상이라 수치를 한국어에 그대로 옮기기는 어렵다"
+  },
+  {
+   "case": "전문 작가 편집 말뭉치와 탐지 후 재작성 파이프라인",
+   "url": "https://arxiv.org/html/2409.14509v5",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 글의 특이 문체를 편집으로 줄여 사람 글에 가깝게 함",
+     "same": true,
+     "note": "AI 투 문체 제거라는 목적이 같다"
+    },
+    "mechanism": {
+     "prior": "7범주 분류 체계, 소수 예시로 문제 구간 탐지 후 재작성(탐지와 재작성 분리), 편집 모델은 생성 모델과 같은 GPT-4o",
+     "same": false,
+     "note": "탐지·재작성 분리는 같지만 편집 모델이 생성 모델과 같고, 구조·식별자 고정과 불변 조건 기계 측정이 없다"
+    },
+    "evaluation": {
+     "prior": "전문 작가 600건 순위 판정, 탐지 구간 정밀도",
+     "same": false,
+     "note": "사람 순위 판정이며 LLM 쌍 비교 판정이 아니다"
+    },
+    "target": {
+     "prior": "영어 문학 소설·창작 논픽션 문단",
+     "same": false,
+     "note": "언어와 장르가 다르다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 본문",
+   "adoption": "참고",
+   "bearing": "탐지는 병목이 아니고 재작성 품질이 병목이라는 결과는 재작성 모델 선택(다른 모델, Gemini 계열이 다듬은 버전이 가장 좋았다는 기존 측정)에 무게를 싣는다. 사람 편집이 여전히 LLM 편집보다 선호되어 사람 판독 단계를 남기는 안을 지지한다"
+  },
+  {
+   "case": "편집 기반 글 품질 보상 모델과 시험 시점 편집 선택",
+   "url": "https://arxiv.org/html/2504.07532v3",
+   "axes": {
+    "purpose": {
+     "prior": "편집 쌍으로 글 품질을 판정하고 편집 후보를 골라 품질 개선",
+     "same": false,
+     "note": "판정자 구축이 중심이고 퇴고 절차 자체가 목적은 아니다"
+    },
+    "mechanism": {
+     "prior": "전문가 편집 쌍으로 학습한 보상 모델, 여러 편집 후보 생성 후 선택",
+     "same": false,
+     "note": "목록 기반 재작성과 불변 조건 측정이 없다"
+    },
+    "evaluation": {
+     "prior": "4,729건 선호 벤치마크 정확도, 작가 9명 순위 판정",
+     "same": false,
+     "note": "쌍 비교라는 점은 같지만 사람 판정과 학습된 판정자 중심이다"
+    },
+    "target": {
+     "prior": "주로 영어 소설, 논픽션·마케팅에서는 일치도 낮음",
+     "same": false,
+     "note": "언어와 장르가 다르다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 본문",
+   "adoption": "참고",
+   "bearing": "범용 LLM 판정자가 글 품질 쌍 판정에서 우연 수준에 가깝다는 결과는 효과 확인을 LLM 판정만으로 끝내지 않고 사람 판독을 병행하는 안을 지지한다"
+  },
+  {
+   "case": "LLM 구간 주석자와 사람 주석자 비교(데이터-텍스트, 번역 오류, 선전 기법)",
+   "url": "https://arxiv.org/html/2504.08697v4",
+   "axes": {
+    "purpose": {
+     "prior": "구간 주석 작업을 LLM 이 사람 대신 할 수 있는지 확인",
+     "same": false,
+     "note": "AI 투 문체가 아니라 일반 구간 주석이다. 대조 대상의 목록화 단계와만 관련된다"
+    },
+    "mechanism": {
+     "prior": "상세 지침으로 LLM 이 구간과 범주를 표시, 추론 모델·소수 예시·사고 연쇄 비교",
+     "same": false,
+     "note": "재작성 단계가 없다"
+    },
+    "evaluation": {
+     "prior": "사람과의 주석자 간 일치도(γ, F1), 수작업 정답 검토",
+     "same": false,
+     "note": "결과 글의 쌍 비교가 아니다"
+    },
+    "target": {
+     "prior": "데이터-텍스트 출력, 기계 번역, 선전 문서",
+     "same": false,
+     "note": "문체 판정은 구간 주석에 잘 맞지 않는다고 저자들이 한계로 적었다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 본문",
+   "adoption": "참고",
+   "bearing": "LLM 목록화 단계에는 상세 지침을 주고 소수 예시에 기대지 말며 전문가 표본으로 먼저 검증하라는 권고가, 적대적 목록화를 쓰되 사람 표본 대조를 붙이는 안을 지지한다. 문체 판정에는 구간 주석이 맞지 않는다는 한계 서술은 목록화 단계의 효용을 낮추는 방향이다"
+  },
+  {
+   "case": "편집 단위 다수결로 과교정을 줄이는 LLM 문법 교정(한국어 포함 7개 언어)",
+   "url": "https://arxiv.org/html/2605.13624",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 문법 교정의 과교정(멀쩡한 구간 재작성) 감소",
+     "same": false,
+     "note": "문체가 아니라 문법 오류 교정이지만, 내용을 바꾸지 않는 최소 편집이라는 기준이 대조 대상의 불변 조건과 겹친다"
+    },
+    "mechanism": {
+     "prior": "같은 모델에서 후보 8개를 뽑아 여러 후보에 반복된 편집만 남김",
+     "same": false,
+     "note": "다른 모델 교열이나 적대적 목록화가 아니라 표본 간 합의로 편집을 거른다"
+    },
+    "evaluation": {
+     "prior": "정답 편집 대비 F0.5·정밀도",
+     "same": false,
+     "note": "쌍 비교 판정이 아니다"
+    },
+    "target": {
+     "prior": "학습자 작문 벤치마크 9종, 한국어 학습자 데이터 포함",
+     "same": false,
+     "note": "한국어 학습자 데이터에서는 점수가 오히려 내려갔다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 본문",
+   "adoption": "참고",
+   "bearing": "'목록대로만 고친다'처럼 편집 범위를 제한하는 방향을 지지하는 근거이며, 편집 후보 간 합의로 편집을 거르는 단순 방법이 비교 대상 기준선이 될 수 있음을 보인다. 한국어 학습자 데이터에서 하락한 결과는 한국어로 옮길 때 효과를 따로 확인해야 함을 뜻한다"
+  },
+  {
+   "case": "한국어 학습자 오류에 대한 LLM 교정과 모어 화자 교정 비교",
+   "url": "https://scholar.kyobobook.co.kr/article/detail/4010069958158",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 의 한국어 교정 능력을 모어 화자 교정과 비교",
+     "same": false,
+     "note": "AI 투 제거가 아니라 학습자 오류 교정이다"
+    },
+    "mechanism": {
+     "prior": "LLM 과 사람이 같은 작문을 교정하고 문장 단위 비교",
+     "same": false,
+     "note": "목록화·다른 모델 교열·불변 조건 측정이 없다"
+    },
+    "evaluation": {
+     "prior": "문장 단위 코사인 유사도(평균 약 0.8, 약 40% 완전 일치)와 질적 차이 분석",
+     "same": false,
+     "note": "쌍 비교 판정이 아니다"
+    },
+    "target": {
+     "prior": "국립국어원 학습자 말뭉치 고급 학습자 작문 100편",
+     "same": false,
+     "note": "한국어라는 점만 같고 LLM 산출물이 아니라 사람 학습자 글이다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 국내 학술지 서지 페이지(초록)",
+   "adoption": "참고",
+   "bearing": "LLM 한국어 교정이 문체 일관성·화계·피동 구문·연어에서 사람과 다르다는 결과는, 한국어 퇴고에서 화계와 피동을 기계 검사나 판독 항목으로 고정하는 안을 지지한다. 초록만 확인했고 사용 모델은 확인하지 못했다"
+  },
+  {
+   "case": "과다 사용 패턴 프로파일링과 역추적 샘플러·토큰 선호 최적화(Antislop)",
+   "url": "https://arxiv.org/pdf/2510.15061",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 이 과다 사용하는 반복 표현 억제",
+     "same": true,
+     "note": "AI 투 표현 제거라는 목적은 같다"
+    },
+    "mechanism": {
+     "prior": "사람 글 대비 과다 출현 패턴을 자동 추출해 금지 목록을 만들고 생성 시점 역추적 또는 미세조정으로 억제",
+     "same": false,
+     "note": "사후 퇴고가 아니라 생성 단계 개입이다. 금지어 목록 구성만 대조 대상의 기존 검사와 겹친다"
+    },
+    "evaluation": {
+     "prior": "패턴 감소율, 일반 벤치마크·창작 글 품질 유지",
+     "same": false,
+     "note": "쌍 비교 사람 판정이 아니며 저자들이 사람 평가 재현을 후속 과제로 남겼다"
+    },
+    "target": {
+     "prior": "주로 영어 창작 글",
+     "same": false,
+     "note": "언어와 장르가 다르다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 결과(ICLR 2026 채택 표시) — 본문은 검색 요약으로만 확인",
+   "adoption": "참고",
+   "bearing": "금지어 목록을 사람 글 대비 과다 출현 빈도로 자동 갱신하는 방법이 있다는 근거로, 기존 금지어 검사를 보강하는 방향이다. 이 출처는 직접 열지 않았으므로 단독 근거로 쓰기 어렵다"
+  },
+  {
+   "case": "영어-스웨덴어 번역투 문장과 관용 표현 쌍 데이터셋",
+   "url": "https://arxiv.org/abs/2603.08450",
+   "axes": {
+    "purpose": {
+     "prior": "언어 모델이 번역투와 관용 표현 중 무엇을 선호하는지 측정",
+     "same": false,
+     "note": "제거가 아니라 선호 측정이다"
+    },
+    "mechanism": {
+     "prior": "번역투 문장과 관용 대안 쌍, 오류 태그와 설명",
+     "same": false,
+     "note": "퇴고 절차가 없다"
+    },
+    "evaluation": {
+     "prior": "모델의 쌍 선호",
+     "same": false,
+     "note": "쌍 비교라는 형식은 비슷하지만 판정 대상이 모델 자신의 선호다"
+    },
+    "target": {
+     "prior": "스웨덴어 번역문",
+     "same": false,
+     "note": "영어가 아닌 언어라는 점만 같다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "소형 다국어 모델이 번역투 표현을 더 선호한다는 결과는 소형 모델을 문체 채점에 쓰지 않는 기존 결정과 같은 방향이다"
+  }
+ ],
+ "saturation": "4",
+ "not_found": "[\"한국어 LLM 산출물에 AI 투 구간을 사람 전문가가 표시한 공개 데이터셋은 찾지 못했다. 검색 결과의 한국어 자료는 학습자 오류 교정 비교와 사람의 저자 판별 연구뿐이었다. 국내 학술 DB(KCI 등)는 이번 검색에서 직접 검색하지 않았다\", \"생성 모델과 다른 모델이 교열한 결과와 같은 모델이 자기 글을 교열한 결과를 직접 비교한 연구는 찾지 못했다. 작가 편집 연구의 저자들이 다른 모델이 나을 수 있다고만 적었다\", \"적대적 지시로 문제 구절 목록을 만들 때 재현율이 올라가는지 시험한 연구는 찾지 못했다\", \"번역 품질 구간 주석(MQM)에서 LLM 과 사람의 일치도를 다룬 2026년 연구들(arXiv 2610.10918, 2605.24904 등)은 검색 결과에만 보였고 열지 않아 근거로 쓰지 않았다\"]",
+ "disclosures": "[\"Antislop 논문은 본문을 열지 않고 검색 요약으로만 확인했다. 근거 지도 행의 opened 정보가 없으므로 단독 근거로 쓰지 마라\", \"AI 슬롭 측정 논문은 본문 서술과 표 7의 GPT-5·미세조정 모델 수치가 서로 다르게 읽혔다. 방향(낮은 겹침)은 일치한다\", \"작가 편집 연구의 선호 결과는 120000자 이후 본문 요약으로 확인했고 퍼센트 값(작가 편집 65% 선호)은 요약 모델이 읽은 값이다\", \"한국어 교정 비교 연구는 서지 페이지 초록만 확인했다\", \"열어 본 연구 대부분이 영어 창작·뉴스 대상이라 한국어 지시문·보고서로 옮길 때 수치가 유지되는지는 확인하지 못했다\"]",
+ "notes": "탐색 방법은 짧고 넓은 영어 검색어로 시작해 좁혀 가기와, 찾은 핵심 논문(작가 편집 말뭉치)에서 후속 연구(편집 기반 보상 모델)로 이어 가는 인용 따라가기를 썼고, 마지막에 한국어·비영어 자료를 따로 찾았다. 결정 기준(읽는 사람이 어색함을 느끼지 않음, 내용·구조 불변, 에이전트 자율 실행)에 맞춰 탐지 한계, 재작성 병목, 판정자 신뢰도, 과교정(내용 변경) 근거를 우선했다. 문서 단위 생성 여부 탐지만 다룬 자료(다국어 탐지 벤치마크, 혼합 저자 탐지, AI 편집 문체 지문 연구 arXiv 2608.27855)는 하위 질문의 제외 범위라 근거 지도에서 뺐다. 기계 번역 사후 편집 데이터셋(arXiv 2511.17153)은 LLM 산출물이 아니라 기계 번역 출력 대상이고 사람 편집과의 직접 비교 수치가 초록에 없어 뺐다. 제약에 있는 기존 측정(다른 모델 다듬기 효과, 내용 목록 재작성 무효, 금지어·정규식 검사, 소형 모델 채점 부적합)은 다시 찾지 않았다. 더 확인할 사항: 국내 학술 DB 에서 번역투·문체 교정·LLM 조합 검색으로 한국어 구간 주석 자료가 있는지, 그리고 작가 편집 연구의 저장소(salesforce/creativity_eval)에 범주별 탐지 정밀도가 있는지 확인하면 목록화 단계의 범주 설계에 쓸 수 있다."
+}

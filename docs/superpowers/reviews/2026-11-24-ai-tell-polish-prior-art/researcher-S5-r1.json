@@ -1,0 +1,493 @@
+{
+ "search_status": "ok",
+ "queries": [
+  "LLM-as-a-judge position bias verbosity bias self-enhancement swap positions",
+  "LLM evaluators recognize and favor their own generations self-preference",
+  "length-controlled AlpacaEval debiasing automatic evaluators",
+  "Chatbot Arena style control markdown length disentangle style substance",
+  "replacing judges with juries panel of diverse LLM evaluators intra-model bias",
+  "multilingual LLM-as-a-judge reliability non-English consistency Korean evaluation",
+  "AI-AI bias large language models favor LLM-generated text over human-written",
+  "LLM judge creative writing quality agreement with human experts pairwise benchmark"
+ ],
+ "issues": [
+  {
+   "where": "효과 확인 단계(쌍 비교 LLM 판정)",
+   "type": "known-failure",
+   "claim": "대조 대상은 AI 투를 줄인 판과 원래 판을 LLM 판정자가 쌍 비교한다. AI 투가 남은 원래 판이 판정자에게 더 선호될 위험이 판정 설계에 남아 있으며, 사람 판독과 비교한 보정이 판정 단계 정의에 명시되어 있지 않다.",
+   "prior_claim": "Laurito 등은 LLM 기반 비서가 사람이 쓴 설명과 LLM 이 쓴 설명 중 하나를 고르는 이항 선택 실험(상품·논문·영화)에서 LLM 이 쓴 설명을 일관되게 선호했다고 보고했다.",
+   "consequence": "AI 투를 줄인 판이 실제로 더 자연스러워도 LLM 판정자는 원래 판을 고를 수 있어, 쌍 비교 판정의 개선 수가 실제 개선보다 적게 나온다. 개선 판이 기각될 수 있다.",
+   "evidence": "arXiv 2407.12856 초록: 'consistent tendency for LLM-based AIs to prefer LLM-presented options'. 선행 사례의 목적은 AI 대 사람 차별 측정이고 대상은 영어 설명문이라 네 축 모두 대조 대상과 다르다. 전이는 판정 단계에만 해당한다(derived).",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2407.12856",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "효과 확인 단계(쌍 비교 LLM 판정)",
+   "type": "known-failure",
+   "claim": "AI 투를 없앤 문장은 생성 모델이 익숙해하는 표현에서 멀어지므로 판정 모델 기준 혼란도(perplexity)가 오를 수 있다. 대조 대상의 판정 설계는 혼란도 차이를 통제하지 않는다.",
+   "prior_claim": "Wataoka 등은 LLM 판정자가 혼란도가 낮은 출력에 사람 평가자보다 훨씬 높은 점수를 주었고, 이 경향은 자기 생성 여부와 무관했다고 보고했다. GPT-4 에서 유의한 자기 선호 편향을 측정했다.",
+   "consequence": "판정자가 익숙한 문체(AI 투)를 선호해, 퇴고 판의 개선이 과소평가된다.",
+   "evidence": "arXiv 2410.21819 초록: LLM evaluators assign significantly higher evaluations to outputs with lower perplexity than human evaluators, regardless of whether the outputs were self-generated. 목적은 편향 측정이고 퇴고가 아니므로 목적·메커니즘 축이 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2410.21819",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "효과 확인 단계(한국어 판정)",
+   "type": "known-failure",
+   "claim": "대조 대상은 한국어 산출물의 문체 개선을 LLM 판정 하나로 확인한다. 다국어 판정의 일관성이 낮다는 선행 결과가 한국어 판정에도 적용될 수 있다.",
+   "prior_claim": "Fu 와 Liu 는 5개 계열 모델을 25개 언어, 5개 과제에서 시험해 언어 사이 판정 일관성이 평균 Fleiss' Kappa 약 0.3 으로 낮고, 모델 크기와 다국어 학습이 일관성을 직접 높이지 않았으며, 앙상블 전략이 일관성을 높였다고 보고했다.",
+   "consequence": "단일 판정자의 한국어 문체 판정은 같은 쌍에서도 흔들릴 수 있어, 숨긴 턴 세트의 부호 검정 결과가 판정자 잡음에 좌우될 수 있다.",
+   "evidence": "arXiv 2505.12201 초록. 평가 대상이 문체가 아니라 과제 정답 판정 중심이라 평가·대상 축이 다르다. 판정 일관성 측정이 한국어 문체 판정에 그대로 옮겨지는지는 확인하지 못했다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2505.12201",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "효과 확인 단계(판정자 계열 선택)",
+   "type": "known-failure",
+   "claim": "대조 대상은 교열 모델을 생성 모델과 다르게 두지만, 판정자 계열을 생성 모델·교열 모델과 다르게 두라는 조건은 명시하지 않는다. 판정자가 한쪽 판의 생성 계열과 같으면 자기 선호가 판정에 섞인다.",
+   "prior_claim": "Panickssery 등은 GPT-4 와 Llama 2 가 자기 텍스트를 다른 LLM·사람의 텍스트와 비자명한 정확도로 구분하며, 미세조정 실험에서 자기 인식 능력과 자기 선호 편향 강도가 선형 상관을 보였다고 보고했다.",
+   "consequence": "판정자가 원래 판의 생성 모델과 같은 계열이면 원래 판 쪽으로, 교열 모델과 같은 계열이면 교열 판 쪽으로 판정이 기울어, 개선 크기가 판정자 선택에 따라 달라진다.",
+   "evidence": "arXiv 2404.13076 초록: 'linear correlation between self-recognition capability and the strength of self-preference bias'. 목적·메커니즘은 대조 대상과 다르고 판정 단계 구성요소만 겹친다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2404.13076",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  }
+ ],
+ "evidence_map": [
+  {
+   "case": "MT-Bench 와 Chatbot Arena 의 LLM 판정자 연구",
+   "url": "https://arxiv.org/abs/2306.05685",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 을 사람 선호의 대리 판정자로 쓸 수 있는지 검증",
+     "same": false,
+     "note": "퇴고 방법이 아니라 판정자 검증이 목적이다. 대조 대상의 효과 확인 단계와만 겹친다"
+    },
+    "mechanism": {
+     "prior": "GPT-4 등 강한 LLM 이 쌍 비교·단일 점수로 판정",
+     "same": false,
+     "note": "교열·목록화 단계가 없다"
+    },
+    "evaluation": {
+     "prior": "사람 선호와의 일치율(80% 이상)로 판정자 평가, 위치·장황함·자기 강화 편향 분석",
+     "same": false,
+     "note": "쌍 비교 판정이라는 형식만 같고, 판정자 자체를 평가한다"
+    },
+    "target": {
+     "prior": "영어 다중 턴 대화 응답",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "쌍 비교 LLM 판정 자체는 사람 선호와 사람끼리 일치율 수준으로 맞는다는 근거로, 쌍 비교 판정을 백본에 두는 쪽을 지지한다. 다만 위치·장황함·자기 강화 편향을 함께 보고했으므로 보정 없이 쓰는 안은 약해진다. 한국어 문체로 옮길 근거는 아니다"
+  },
+  {
+   "case": "LLM 은 공정한 평가자가 아니다(위치 편향과 보정)",
+   "url": "https://arxiv.org/abs/2305.17926",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 판정자의 위치 편향 측정과 보정",
+     "same": false,
+     "note": "퇴고 방법이 아니다. 효과 확인 단계의 보정 방법과만 겹친다"
+    },
+    "mechanism": {
+     "prior": "다중 근거 보정, 순서를 바꾼 결과를 합치는 균형 위치 보정, 어려운 예만 사람에게 넘기는 보정",
+     "same": false,
+     "note": "판정 보정 기법이며 교열 메커니즘은 없다"
+    },
+    "evaluation": {
+     "prior": "사람이 단 승패 주석과의 일치",
+     "same": false,
+     "note": "쌍 비교 판정 형식만 같다"
+    },
+    "target": {
+     "prior": "영어 Vicuna 벤치마크 응답",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "흡수",
+   "bearing": "순서만 바꿔도 순위가 뒤집힐 수 있다(ChatGPT 판정에서 Vicuna-13B 가 80문항 중 66개 승리)는 결과로, 순서를 바꿔 두 번 판정해 합치는 방식을 필수로 두는 쪽을 지지한다. 판정이 갈리는 어려운 쌍만 사람 판독으로 넘기는 방식도 근거가 된다"
+  },
+  {
+   "case": "쌍 비교 LLM 판정의 위치 편향 체계적 조사",
+   "url": "https://arxiv.org/abs/2406.07791",
+   "axes": {
+    "purpose": {
+     "prior": "쌍 비교 판정의 위치 편향 요인 분석",
+     "same": false,
+     "note": "판정 단계와만 겹친다"
+    },
+    "mechanism": {
+     "prior": "반복 안정성·위치 일관성·선호 공정성 지표로 판정자·과제별 편향 측정",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "위치 일관성 지표",
+     "same": false,
+     "note": "판정자 평가이며 퇴고 효과 측정이 아니다"
+    },
+    "target": {
+     "prior": "영어 벤치마크 과제",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "위치 편향이 두 후보의 품질 차이에 크게 좌우된다는 결과로, 문체 차이가 작은 퇴고 쌍일수록 순서 교환 판정의 불일치가 커질 수 있음을 시사한다(derived). 순서 교환 결과가 갈린 쌍을 동점으로 처리하거나 사람 판독으로 보내는 규칙을 지지한다"
+  },
+  {
+   "case": "LLM 평가자의 자기 인식과 자기 선호",
+   "url": "https://arxiv.org/abs/2404.13076",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 평가자의 자기 선호 편향과 원인 규명",
+     "same": false,
+     "note": "판정자 선택과만 겹친다"
+    },
+    "mechanism": {
+     "prior": "자기 인식 능력을 미세조정으로 바꾸며 자기 선호 강도와의 상관 측정",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "사람이 같은 품질로 본 출력에 대한 판정자 점수 차",
+     "same": false,
+     "note": "판정자 평가다"
+    },
+    "target": {
+     "prior": "영어 텍스트(초록에서 과제명 확인 못 함)",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "peer-reviewed",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록과 NeurIPS 2024 구두발표 목록",
+   "adoption": "참고",
+   "bearing": "판정자를 원래 판의 생성 모델·교열 모델 모두와 다른 계열로 두는 안을 지지한다. 판정자가 원래 판 생성 계열과 같으면 자기 선호는 교열 판에 불리하게 작용하므로, 그 조건에서 나온 개선은 보수적 추정이 된다(derived)"
+  },
+  {
+   "case": "혼란도에 뿌리를 둔 자기 선호 편향",
+   "url": "https://arxiv.org/abs/2410.21819",
+   "axes": {
+    "purpose": {
+     "prior": "자기 선호 편향의 정량 지표와 원인 분석",
+     "same": false,
+     "note": "판정 편향 분석이다"
+    },
+    "mechanism": {
+     "prior": "판정자 기준 혼란도와 점수의 관계 분석",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "LLM 점수와 사람 점수의 차이를 혼란도 구간별로 비교",
+     "same": false,
+     "note": "판정자 평가다"
+    },
+    "target": {
+     "prior": "LLM 응답(영어 중심)",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "AI 투를 줄인 판은 판정자에게 낯선 문장일 수 있어 LLM 판정만 쓰는 안을 약하게 하고, 사람 판독 병행 또는 판정자 기준 혼란도 차이를 함께 기록하는 안을 지지한다(derived)"
+  },
+  {
+   "case": "길이 통제 AlpacaEval",
+   "url": "https://arxiv.org/abs/2404.04475",
+   "axes": {
+    "purpose": {
+     "prior": "자동 판정자의 길이 편향 제거",
+     "same": false,
+     "note": "판정 보정과만 겹친다"
+    },
+    "mechanism": {
+     "prior": "길이 차이를 매개변수로 둔 일반화 선형 모형을 맞추고 길이 차이를 0 으로 둔 반사실 선호 계산",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "Chatbot Arena 순위와의 스피어만 상관(0.94 에서 0.98), 장황함 조작에 대한 강건성",
+     "same": false,
+     "note": "벤치마크 순위 평가이며 쌍 하나의 문체 판정이 아니다"
+    },
+    "target": {
+     "prior": "영어 지시 따르기 응답",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "퇴고로 답 길이가 바뀌면 판정이 길이에 끌릴 수 있으므로, 길이를 불변 조건으로 기계 측정하거나 판정 결과를 길이 차이로 회귀 보정하는 안을 지지한다. 회귀 보정은 표본이 많은 벤치마크용이라 턴 수십 개 규모에서는 길이를 불변 조건으로 묶는 쪽이 옮겨 쓰기 쉽다(derived)"
+  },
+  {
+   "case": "Chatbot Arena 문체 통제",
+   "url": "https://lmsys.org/blog/2024-08-28-style-control",
+   "axes": {
+    "purpose": {
+     "prior": "사람 투표 순위에서 문체와 내용을 분리",
+     "same": false,
+     "note": "판정 보정과만 겹친다. 판정자는 사람이다"
+    },
+    "mechanism": {
+     "prior": "Bradley-Terry 회귀에 길이·머리글 수·굵은 글씨 수·목록 수의 정규화 차이를 문체 계수로 추가",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "문체 통제 전후 순위 변화",
+     "same": false,
+     "note": "관측 연구라고 저자가 한계를 밝혔다"
+    },
+    "target": {
+     "prior": "다국어가 섞인 영어 중심 대화 응답",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "vendor",
+   "source_level": "1차",
+   "route": "웹 검색 후 LMSYS 블로그",
+   "adoption": "참고",
+   "bearing": "문체 요인 중 길이가 지배적이고 마크다운 요인은 2차라는 결과로, 퇴고 판정에서 먼저 통제할 변수로 길이를 고르는 안을 지지한다. 구조(머리글·목록 수)를 고정하는 대조 대상의 불변 조건과도 방향이 맞다"
+  },
+  {
+   "case": "판정자 대신 배심원단(PoLL)",
+   "url": "https://arxiv.org/abs/2404.18796",
+   "axes": {
+    "purpose": {
+     "prior": "단일 대형 판정자의 비용과 모델 내부 편향 줄이기",
+     "same": false,
+     "note": "판정자 구성과만 겹친다"
+    },
+    "mechanism": {
+     "prior": "서로 다른 계열의 소형 모델 여러 개가 독립 점수를 내고 투표로 합침",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "3개 판정 설정, 6개 데이터셋에서 단일 대형 판정자보다 사람 판정과 더 잘 맞음, 비용 7배 이상 절감",
+     "same": false,
+     "note": "영어 과제 정답·품질 판정이며 문체 판정이 아니다"
+    },
+    "target": {
+     "prior": "영어 질의응답 등",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "다른 계열 판정자를 섞는 안을 지지한다. 다만 이 프로젝트 제약에서 소형 모델은 한국어 문체 채점에 부적합하다고 측정했으므로, 소형 모델 배심원단을 그대로 옮기기는 어렵고 대형 모델 여러 계열로 구성하는 변형만 근거가 된다(derived)"
+  },
+  {
+   "case": "문체가 내용을 이긴다(다차원 Elo)",
+   "url": "https://arxiv.org/abs/2307.03025",
+   "axes": {
+    "purpose": {
+     "prior": "사람·LLM 평가자의 문체 편향 측정과 보정",
+     "same": false,
+     "note": "판정 단계와만 겹친다"
+    },
+    "mechanism": {
+     "prior": "의도적으로 결함을 넣은 답으로 편향 측정, 품질 차원을 나눠 따로 매기는 다차원 Elo(MERS)",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "평가자가 사실 오류가 있는 답을 너무 짧거나 문법 오류가 있는 답보다 선호했는지",
+     "same": false,
+     "note": "판정자 평가다"
+    },
+    "target": {
+     "prior": "영어 기계 생성 답",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "문체 판정 하나에 내용 보존까지 맡기면 판정자가 매끄러운 문장을 내용 훼손보다 크게 본다는 근거로, 내용·구조 보존은 기계 측정 불변 조건으로 분리하고 판정자에게는 문체만 묻는 대조 대상의 분리 설계를 지지한다. MERS 는 LLM 판정에서만 유의한 개선을 보였다"
+  },
+  {
+   "case": "AI 대 AI 편향",
+   "url": "https://arxiv.org/abs/2407.12856",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 이 LLM 작성 텍스트를 선호하는지 측정",
+     "same": false,
+     "note": "판정 단계와만 겹친다"
+    },
+    "mechanism": {
+     "prior": "고용 차별 연구 형식의 이항 선택 실험",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "LLM 선호가 사람 선호를 넘는 정도",
+     "same": false,
+     "note": "판정자 평가다"
+    },
+    "target": {
+     "prior": "영어 상품·논문·영화 설명",
+     "same": false,
+     "note": "한국어 문체가 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "AI 투 제거 효과를 LLM 판정만으로 확인하는 안을 약하게 한다. 사람 판독으로 판정자를 보정하거나, 애매한 쌍을 사람 판독으로 넘기는 안을 지지한다"
+  },
+  {
+   "case": "다국어 LLM 판정자의 신뢰도",
+   "url": "https://arxiv.org/abs/2505.12201",
+   "axes": {
+    "purpose": {
+     "prior": "다국어 판정의 언어 간 일관성 측정",
+     "same": false,
+     "note": "판정 단계와만 겹친다"
+    },
+    "mechanism": {
+     "prior": "병렬 데이터에서 5개 계열 모델의 판정을 비교, 앙상블 전략 제안",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "Fleiss' Kappa 평균 약 0.3",
+     "same": false,
+     "note": "언어 간 판정 일치 평가다"
+    },
+    "target": {
+     "prior": "25개 언어, 5개 과제(한국어 포함 여부는 검색 요약에만 있고 초록에서 확인 못 함)",
+     "same": false,
+     "note": "문체 판정이 아니다"
+    }
+   },
+   "outcome": "실패",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "한국어 판정을 단일 판정자 한 번에 맡기는 안을 약하게 하고, 판정자 앙상블이나 순서 교환 반복 판정을 지지한다"
+  },
+  {
+   "case": "한국어·영어 판정자 메타평가(KUDGE)",
+   "url": "https://arxiv.org/abs/2409.11239",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 판정자와 보상 모델의 한국어 평가 능력 측정",
+     "same": false,
+     "note": "판정 단계와만 겹친다"
+    },
+    "mechanism": {
+     "prior": "사람 주석이 달린 한국어·영어 메타평가 데이터셋으로 판정자 비교",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "사람 주석과의 일치, 오류 검출 여부",
+     "same": false,
+     "note": "문체보다 사실 오류·문화 왜곡·원치 않는 언어 검출을 본다"
+    },
+    "target": {
+     "prior": "한국어·영어 응답",
+     "same": false,
+     "note": "언어는 같지만 문체 퇴고 산출물이 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "영어 평가 능력이 한국어 평가 능력을 언어 능숙도보다 크게 좌우한다는 결과로, 한국어 문체 판정자도 영어 판정 성능이 높은 대형 모델을 고르는 안을 지지한다. 판정자가 원치 않는 언어를 잘 벌하지 못한다는 결과는 영어 단어 섞임 같은 문체 결함을 기계 검사로 분리하는 안을 지지한다"
+  },
+  {
+   "case": "LitBench 창작 글 평가 벤치마크",
+   "url": "https://arxiv.org/abs/2507.00769",
+   "axes": {
+    "purpose": {
+     "prior": "창작 글의 쌍 비교 자동 평가 신뢰도 확인",
+     "same": false,
+     "note": "판정 단계와만 겹친다"
+    },
+    "mechanism": {
+     "prior": "사람 선호 쌍으로 기성 판정자 비교, Bradley-Terry·생성형 보상 모델 학습",
+     "same": false,
+     "note": "교열 메커니즘이 없다"
+    },
+    "evaluation": {
+     "prior": "사람 선호와의 일치율(기성 판정자 최고 Claude-3.7-Sonnet 73%, 학습한 보상 모델 78%)",
+     "same": false,
+     "note": "사람 선호 일치로 판정자를 평가한다"
+    },
+    "target": {
+     "prior": "영어 Reddit 단편 소설",
+     "same": false,
+     "note": "한국어 업무 문서가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "kind": "preprint",
+   "source_level": "1차",
+   "route": "웹 검색 후 arXiv 초록",
+   "adoption": "참고",
+   "bearing": "글쓰기 품질에서 기성 판정자와 사람의 일치가 70%대에 머문다는 근거로, 판정 결과만으로 채택하지 않고 사람 판독 표본으로 판정자 일치율을 먼저 확인하는 안을 지지한다"
+  }
+ ]
+}

@@ -1,0 +1,302 @@
+{
+ "search_status": "ok",
+ "queries": [
+  "guiding LLM post-editing with MQM error annotations",
+  "translate estimate refine self-correction error span LLM translation",
+  "LLM grammatical error correction over-correction minimal edit fluency",
+  "Can AI writing be salvaged idiosyncrasies LLM-generated text expert edits span-level",
+  "PoCO post-correction overcorrection grammatical error correction LLM results",
+  "LLM editing \"meaning preservation\" verification step rewrite reject edits semantic drift",
+  "Korean LLM post-editing error annotation naturalness translationese refinement"
+ ],
+ "issues": [
+  {
+   "where": "2단계 편집 중 '문제 구절 목록화 후 목록대로만 고침' 단계의 기준선",
+   "type": "weak-baseline",
+   "claim": "대조 대상의 구절 목록 기반 수정은 목록 없이 '이 글을 다듬어라'만 주는 일반 지시 후편집과 같은 모델·같은 산출물에서 비교되지 않았다.",
+   "prior_claim": "Ki와 Carpuat(Findings of NAACL 2024)는 LLaMA-2에 MQM 오류 주석을 주고 기계번역을 후편집하게 했다. 프롬프팅만으로는 세밀한 오류 구간 피드백이 일반 피드백보다 낫다는 이득이 분명하지 않았고, 10-shot에서는 피드백 종류별 BLEU·COMET 차이가 거의 사라졌다. 세밀한 피드백의 이득은 미세조정을 한 뒤에야 BLEU 4~6점 차로 나타났다.",
+   "consequence": "대조 대상이 구절 목록 작성 단계에 드는 비용(적대적 목록화 호출)을 정당화하려면, 프롬프팅만 쓰는 조건에서는 일반 다듬기 지시와 차이가 없을 수 있다는 선행 결과가 있다. 이 프로젝트 시험에서 가장 좋았던 판이 Gemini의 일반 다듬기였다는 제약과도 맞물린다.",
+   "evidence": "arxiv.org/html/2404.07851v2 본문: 'the benefits of fine-grained feedback are not clear'(초록 v2), 프롬프팅에서 세밀한 피드백의 이득이 제한적이고 미세조정 시에만 generic 대비 BLEU 약 4~6점 우위. 네 축 대조: 목적(번역 오류 수정)·대상(영·중·독·러 번역)·평가(BLEU·TER·COMET·소규모 인간 평가)가 다르고, 메커니즘 중 '주석 뒤 후편집' 구성요소만 같다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2404.07851v2",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "이미 맞는 구절까지 손대는 과잉 편집",
+   "type": "known-failure",
+   "claim": "대조 대상은 구조와 식별자를 고정하고 불변 조건을 기계로 측정하지만, 이미 자연스러운 구절을 문체 때문에 바꾸는 과잉 편집은 그 기계 측정에 잡히지 않을 수 있다.",
+   "prior_claim": "Ki와 Carpuat의 실험에서 LLM이 이미 맞는 번역을 후편집하면 자동 지표가 약간 떨어졌고, 저자들은 그 원인을 오류 수정이 아닌 문체 편집으로 보았다. 영-러 인간 평가에서는 일부 평가자가 미세조정 출력이 원문의 뉘앙스를 잃었다고 지적했다.",
+   "consequence": "목록에 오른 구절이 실제로는 문제가 없을 때 그 구절을 고치면 품질이 떨어지는 경로가 남아 있다. 구조·식별자 불변 검사는 이 품질 하락을 검출하지 않는다.",
+   "evidence": "arxiv.org/html/2404.07851v2 제한점 절: 'When the model post-edits already-correct outputs, automatic metrics drop slightly', 영-러 150건 중 약 40건이 불일치 쪽. 번역 대상이라 목적·대상 축이 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2404.07851v2",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "적대적 문제 구절 목록화 단계의 정밀도",
+   "type": "known-failure",
+   "claim": "대조 대상은 문제 구절을 적대적으로(많이 찾도록) 목록화하므로, LLM 탐지기가 구간을 과다 생성하는 알려진 경향이 그대로 남는다.",
+   "prior_claim": "Chakrabarty·Laban·Wu(CHI 2025)는 LLM 생성 문단의 문체 결함(상투구, 불필요한 설명 등 7범주)을 구간 단위로 탐지하게 했다. LLM은 구간을 과다 생성하는 경향이 있어 저자들은 재현율 대신 정밀도로 평가했고, 최고 일반 정밀도는 0.46(Claude-3.5-Sonnet, GPT-4o, 5-shot)으로 전문가 간 일치 0.57보다 낮았다. 범주까지 맞힌 정밀도는 약 0.21이었다.",
+   "consequence": "목록의 절반가량이 전문가가 문제로 보지 않는 구절일 수 있고, '목록대로만 고친다'는 규칙은 그 구절들을 고치게 만든다. 목록에서 거짓 양성을 걸러내는 단계가 없으면 과잉 편집이 생긴다.",
+   "evidence": "arxiv.org/html/2409.14509v5 탐지 결과 절: General Precision 최고 0.46 대 전문가 0.57, Categorical Precision 약 0.21 대 0.23, 'LLMs tend to over-generate spans'. 대상은 영어 창작 문단이라 대상 축이 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2409.14509v5",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "목록대로 고치는 재작성 단계",
+   "type": "known-failure",
+   "claim": "대조 대상은 탐지(목록화)를 적대적으로 강화하는 데 무게를 두지만, 선행 연구에서는 재작성 단계가 품질의 병목이었고 고친 구절이 새 AI 투 표현으로 바뀌는 실패가 있었다. 대조 대상의 기계 측정 불변 조건(구조·식별자)은 이 실패를 검출하지 않는다.",
+   "prior_claim": "같은 연구에서 전문가가 표시한 구간(oracle)으로 고친 조건과 자동 탐지 구간으로 고친 조건의 선호 순위가 거의 같았고(평균 순위 약 2.0), 저자들은 탐지보다 재작성 모듈이 품질을 제한한다고 결론지었다. 정성 분석에서 LLM은 상투구를 다른 상투구로 바꾸기도 했고, '구체성 부족' 범주는 거의 고치지 못했다.",
+   "consequence": "목록을 더 잘 만들어도 고치는 모델의 문체 습관이 그대로면 효과가 제한된다. 고친 구절에 새로 생긴 AI 투 표현을 다시 검사하는 단계가 없으면 이 경로가 남는다.",
+   "evidence": "arxiv.org/html/2409.14509v5 6.2~6.4절과 선호 연구: oracle 대 자동 조건 'almost identically', 'LLMs sometimes replace clichés with other clichés'. 이 연구는 생성·탐지·재작성을 모두 GPT-4o 한 모델로 했으므로 '다른 모델이 교열' 축이 다르다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2409.14509v5",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "다른 모델이 교열하는 설계와 반복 퇴고",
+   "type": "known-failure",
+   "claim": "대조 대상은 생성 모델과 다른 모델이 교열하는 것을 전제로 하지만, 교차 모델 교정이 언어쌍에 따라 오히려 품질을 낮춘 선행 결과가 있고, 퇴고를 여러 번 반복하면 점수가 떨어졌다.",
+   "prior_claim": "TEaR(Translate-Estimate-Refine, Findings of NAACL 2025)에서 다른 모델이 교정한 조건은 언어쌍과 원 번역 모델에 따라 결과가 갈렸다. GPT-3.5 번역을 Claude-2가 교정하면 영-러는 COMET +2.84였지만 영-독은 -1.14였고, Claude-2 번역은 대체로 자기 교정이 더 나았다. GPT-3.5로 한 번을 넘겨 반복하면 지표가 대체로 떨어졌다.",
+   "consequence": "다른 모델이 교열하면 항상 낫다는 전제는 조건부로만 성립한다. 교열 모델 조합과 반복 횟수를 산출물 종류마다 쌍 비교로 확인하지 않으면 일부 산출물에서 품질이 떨어진다.",
+   "evidence": "arxiv.org/html/2402.16379v3 Table 6(교차 모델 교정), Table 12·부록 D(반복 시 하락). 번역 품질(COMET·BLEU·MQM)이 평가 축이라 목적·평가·대상 축이 다르고, 메커니즘 중 '오류 추정 후 교정' 구성요소만 같다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/html/2402.16379v3",
+     "kind": "peer-reviewed",
+     "opened": true
+    }
+   ]
+  },
+  {
+   "where": "의미 보존의 기계 측정 범위",
+   "type": "known-failure",
+   "claim": "대조 대상의 기계 측정 불변 조건은 구조와 식별자를 고정하지만, 주장의 확신 수준처럼 구조·식별자 밖에서 바뀌는 의미 변화는 측정하지 않는다.",
+   "prior_claim": "'From May to Is' 연구는 의미를 보존하라는 재작성에서 LM 출력의 최대 75%가 주장의 확신 수준을 바꾸었고, 대부분 모델이 확신을 높이는 쪽으로 1.5~2배 더 자주 바꾸었다고 보고했다. 의료 문서에서 claude-haiku-4.5는 1회 재작성에서 20%, 5회 반복에서 40%의 확신 증가를 보였다. 프롬프트 개입은 왜곡을 줄였으나 없애지 못했다.",
+   "consequence": "AI 투 퇴고 과정에서 '~할 수 있다'가 '~이다'로 바뀌는 식의 의미 변화가 구조·식별자 검사를 통과한 채 남을 수 있다. 근거·검증 문서를 다루는 사용자 업무에서 이 변화는 내용 변경에 해당한다.",
+   "evidence": "arxiv.org/abs/2606.07951 초록. 목적(확신 왜곡 측정)과 메커니즘(일반 재작성)이 달라, 대조 대상과 같은 사례가 아니라 검증 관문이 빠뜨리는 변화 종류의 근거로만 쓴다.",
+   "citations": [
+    {
+     "url": "https://arxiv.org/abs/2606.07951",
+     "kind": "preprint",
+     "opened": true
+    }
+   ]
+  }
+ ],
+ "evidence_map": [
+  {
+   "case": "MQM 오류 주석으로 유도한 LLM 기계번역 후편집 (Ki & Carpuat)",
+   "url": "https://arxiv.org/html/2404.07851v2",
+   "axes": {
+    "purpose": {
+     "prior": "기계번역 오류를 고쳐 번역 품질을 높인다",
+     "same": false,
+     "note": "문체(AI 투) 제거가 아니라 번역 오류 수정이 목적이다. 다만 저자들은 주석 기반 후편집이 목표 언어에서 더 자연스러운 출력을 낳았다고 보고했다"
+    },
+    "mechanism": {
+     "prior": "오류 구간 주석(사람·xCOMET·InstructScore)을 프롬프트에 넣고 LLaMA-2가 후편집, 일부는 미세조정",
+     "same": false,
+     "note": "'주석 뒤 후편집' 구성요소만 같다. 적대적 목록화, 다른 모델 교열, 구조 고정, 기계 불변 검사는 없다"
+    },
+    "evaluation": {
+     "prior": "TER·BLEU·COMET 자동 지표와 언어쌍당 50건 인간 평가(알파 0.42~0.53)",
+     "same": false,
+     "note": "쌍 비교 판정이 아니라 참조 기반 지표와 소규모 평정"
+    },
+    "target": {
+     "prior": "중-영, 영-독, 영-러 번역 문장",
+     "same": false,
+     "note": "한국어 LLM 산출물이 아니다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "bearing": "프롬프팅만 쓰면 오류 구간 목록의 이득이 일반 다듬기 지시보다 분명하지 않았으므로, 구절 목록 단계를 백본에 넣기 전에 '목록 없는 다듬기'와 쌍 비교하는 쪽으로 움직인다. 이미 맞는 구절을 고치면 지표가 떨어진 결과는 목록의 거짓 양성 걸러내기 단계를 지지한다"
+  },
+  {
+   "case": "MQM-APE: 오류 주석자·후편집자·쌍 비교 검증자 세 역할 (Lu et al.)",
+   "url": "https://arxiv.org/html/2409.14335v2",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 번역 평가기의 오류 주석 품질을 높인다",
+     "same": false,
+     "note": "목적은 평가(오류 주석) 정확도이고, 후편집 산출물 자체가 목적은 아니다"
+    },
+    "mechanism": {
+     "prior": "같은 LLM이 오류 구간을 찾고, 오류마다 한 번씩 고친 뒤, 고친 판과 원본을 쌍 비교해 품질이 오르지 않은 오류를 버린다",
+     "same": false,
+     "note": "'구간 목록 → 구간별 수정 → 쌍 비교 검증으로 수정 채택' 구조가 대조 대상의 목록화·수정·쌍 비교와 가장 가깝다. 다만 한 모델이 세 역할을 다 하고 구조·식별자 고정은 없다"
+    },
+    "evaluation": {
+     "prior": "WMT22·IndicMT에서 사람 판정과의 쌍 정확도, 오류 구간 정밀도",
+     "same": false,
+     "note": "쌍 비교를 수정 채택 관문으로 쓰지만, 방법 전체의 효과는 메타평가 지표로 측정했다"
+    },
+    "target": {
+     "prior": "영-독, 영-러, 중-영과 인도 저자원 언어 4종 번역",
+     "same": false,
+     "note": "영어가 아닌 언어를 포함하지만 한국어·문체 대상은 아니다"
+    }
+   },
+   "outcome": "성공",
+   "bearing": "수정 하나하나를 원본과 쌍 비교해 개선이 없는 수정을 버리는 관문이 8개 LLM 모두에서 구간 정밀도를 올렸고, 무작위로 오류를 버리는 조건은 오히려 나빠졌다. 목록대로 고친 뒤 구절 단위 쌍 비교로 수정을 채택·기각하는 검증 관문을 백본에 넣는 쪽을 지지한다. 비용은 생성 토큰 약 2배"
+  },
+  {
+   "case": "TEaR: 번역·오류 추정·교정 자기 교정 틀 (Feng et al.)",
+   "url": "https://arxiv.org/html/2402.16379v3",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 번역 품질을 자기 피드백으로 높인다",
+     "same": false,
+     "note": "번역 품질 개선이 목적"
+    },
+    "mechanism": {
+     "prior": "MQM 형식으로 오류를 심각도별로 표시한 뒤 그 피드백으로 교정, 교차 모델 교정 조건 포함",
+     "same": false,
+     "note": "'오류 목록 후 교정'과 '다른 모델 교정' 구성요소가 같다. 목록대로만 고치는 제약과 구조 고정은 없다"
+    },
+    "evaluation": {
+     "prior": "COMET·BLEU 자동 지표와 MQM 점수, 추정 품질의 인간 선호",
+     "same": false,
+     "note": "쌍 비교 판정이 아니다"
+    },
+    "target": {
+     "prior": "WMT23 등 16개 번역 방향",
+     "same": false,
+     "note": "번역 문장"
+    }
+   },
+   "outcome": "판정 못 함",
+   "bearing": "오류 표시 없이 제안만 받는 기준선(SCoT)보다 평균 COMET +2.24로 나아 목록화 단계를 지지하지만, 교차 모델 교정이 언어쌍에 따라 -1.14까지 떨어지고 한 번 넘게 반복하면 하락했다. 교열 모델 조합을 고정 전제로 두지 말고 쌍 비교로 확인하며, 퇴고는 1회로 제한하는 쪽으로 움직인다"
+  },
+  {
+   "case": "LLM 생성 문단의 문체 결함 구간 탐지 후 구간만 재작성 (Chakrabarty, Laban, Wu, CHI 2025)",
+   "url": "https://arxiv.org/html/2409.14509v5",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 글의 문체 결함(상투구, 불필요한 설명, 구체성 부족 등 7범주)을 줄여 사람 글에 가깝게 한다",
+     "same": true,
+     "note": "AI 투 문체 제거와 목적이 같다"
+    },
+    "mechanism": {
+     "prior": "few-shot으로 문제 구간과 범주를 추출한 뒤 범주별 프롬프트로 그 구간만 고쳐 원문에 끼워 넣는다. 생성·탐지·재작성 모두 GPT-4o",
+     "same": false,
+     "note": "'구간 목록 후 그 구간만 수정' 구성요소가 같다. 다른 모델 교열, 적대적 목록화, 기계 불변 검사가 없다"
+    },
+    "evaluation": {
+     "prior": "전문가 12명이 원문·전문가 편집·LLM 편집 세 판을 순위 매김(600건, Kendall W 0.505), Wilcoxon 검정",
+     "same": false,
+     "note": "세 판 순위 비교라 쌍 비교와 가깝지만 같지 않다"
+    },
+    "target": {
+     "prior": "영어 창작 문단",
+     "same": false,
+     "note": "한국어·업무 문서가 아니다"
+    }
+   },
+   "outcome": "성공",
+   "bearing": "구간만 고친 LLM 편집이 원문보다 유의하게 선호되어(평균 순위 2.0 대 2.5) 2단계 편집 백본을 지지한다. 다만 전문가 구간과 자동 구간의 결과가 같아 병목은 재작성 단계였고, LLM이 상투구를 상투구로 바꿨으므로, 목록화를 강화하기보다 고친 구절을 다시 검사하는 단계와 교열 모델 선택에 무게를 두는 쪽으로 움직인다"
+  },
+  {
+   "case": "LLM 문법 교정의 편집 단위 다수결로 과잉 교정 완화 (Goto, Sakai, Watanabe)",
+   "url": "https://arxiv.org/abs/2605.13624",
+   "axes": {
+    "purpose": {
+     "prior": "LLM 문법 교정의 과잉 교정을 줄인다",
+     "same": false,
+     "note": "문법 오류 교정이 목적이고 문체 제거가 아니다"
+    },
+    "mechanism": {
+     "prior": "한 LLM에서 후보 교정을 여러 개 만들고 편집 단위로 투표해 반복 등장한 편집만 남긴다",
+     "same": false,
+     "note": "최소 편집 제약을 지키는 장치라는 점만 같다. 목록화·쌍 비교 판정은 없다"
+    },
+    "evaluation": {
+     "prior": "9개 문법 교정 벤치마크에서 탐욕·MBR 복호와 비교",
+     "same": false,
+     "note": "참조 기반 교정 지표"
+    },
+    "target": {
+     "prior": "영어·체코어·독일어·우크라이나어·한국어·힌디어·루마니아어 문장",
+     "same": false,
+     "note": "한국어를 포함하지만 학습자 문장 교정이다"
+    }
+   },
+   "outcome": "성공",
+   "bearing": "초록 수준 근거로, 여러 번 뽑은 편집 중 반복된 편집만 채택하면 지시문에 덜 흔들리고 과잉 편집이 줄었다. 적대적 목록의 거짓 양성을 걸러낼 대안으로 '여러 번 목록화해 겹치는 구절만 고치기'를 후보에 올리는 쪽으로 움직인다. 본문 표는 PDF를 읽지 못해 확인하지 못했다"
+  },
+  {
+   "case": "의미 보존 재작성에서 확신 수준 왜곡 ('From May to Is')",
+   "url": "https://arxiv.org/abs/2606.07951",
+   "axes": {
+    "purpose": {
+     "prior": "LM 재작성이 주장의 확신 수준을 바꾸는지 측정한다",
+     "same": false,
+     "note": "퇴고 방법이 아니라 재작성 부작용 측정이 목적"
+    },
+    "mechanism": {
+     "prior": "의미를 보존하라는 일반 재작성과 반복 재작성, 프롬프트 개입",
+     "same": false,
+     "note": "구간 목록·구조 고정이 없는 일반 재작성"
+    },
+    "evaluation": {
+     "prior": "사람 판단과 맞춘 LM 기반 확신 측정 지표",
+     "same": false,
+     "note": "쌍 비교가 아니다"
+    },
+    "target": {
+     "prior": "과학·의료 소통 문장",
+     "same": false,
+     "note": "한국어가 아니다"
+    }
+   },
+   "outcome": "실패",
+   "bearing": "네 축이 모두 달라 단독 근거로 쓰지 않는다. 구조·식별자 고정만으로는 확신 수준 같은 의미 변화를 잡지 못한다는 보조 근거로, 검증 관문에 '원문과 확신·한정 표현이 같은가'를 쌍 비교 판정 항목으로 넣는 쪽으로 움직인다"
+  },
+  {
+   "case": "LLM 문서 단위 자동 후편집 비교 (Kim & Kim)",
+   "url": "https://arxiv.org/abs/2601.19410",
+   "axes": {
+    "purpose": {
+     "prior": "LLM이 문서 맥락을 받으면 후편집이 나아지는지 확인한다",
+     "same": false,
+     "note": "번역 후편집이 목적"
+    },
+    "mechanism": {
+     "prior": "단순 문서 단위 one-shot 프롬프팅으로 상용·공개 모델 비교",
+     "same": false,
+     "note": "목록화·검증 관문이 없다"
+    },
+    "evaluation": {
+     "prior": "자동 지표와 인간 평가",
+     "same": false,
+     "note": "저자들은 자동 지표가 질적 개선을 잡지 못해 인간 평가가 필요하다고 했다"
+    },
+    "target": {
+     "prior": "번역 문서(언어쌍은 초록에서 확인하지 못함)",
+     "same": false,
+     "note": "한국어 포함 여부를 확인하지 못했다"
+    }
+   },
+   "outcome": "판정 못 함",
+   "bearing": "네 축이 모두 달라 단독 근거로 쓰지 않는다. 상용 모델이 단순 프롬프트로 사람 수준 후편집에 도달했고 자동 지표가 개선을 못 잡았다는 결과는, 효과 확인을 자동 지표가 아닌 쌍 비교 판정으로 두는 대조 대상의 평가 설계와 방향이 같다"
+  }
+ ]
+}
