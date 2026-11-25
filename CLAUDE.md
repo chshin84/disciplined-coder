@@ -32,7 +32,7 @@
 
 채택은 숨긴 턴 세트에서 개선 턴이 악화 턴보다 많고 한쪽 부호 검정 p<0.05 이며 지적 없던 턴에서 악화가 늘지 않을 때다. 그 뒤 판정이 애매하거나 악화가 큰 10~20쌍을 사용자 판독으로 확인하고, 판독이 판정과 다르면 판독을 따른다.
 
-실행은 `bash scripts/eval_replay.sh <턴 목록> <조건 A> <조건 B>`, 집계는 `bash scripts/eval_replay_report.sh <판정 폴더> <조건 A> <조건 B>` 이고, 조건 정의와 절차·실행 제약은 `evals/replay/README.md` 에 있다. 대화 원문과 답은 저장소 밖 `%USERPROFILE%\.dc-eval\` 에 둔다. 시험할지는 예상 비용과 함께 먼저 제안한다. 원칙 작업의 생성과 판정은 Opus 5.5 만 쓴다(2026-11-02 사용자 지시).
+실행은 `bash scripts/eval_replay.sh <턴 목록> <조건 A> <조건 B>`, 집계는 `bash scripts/eval_replay_report.sh <판정 폴더> <조건 A> <조건 B>` 이고, 조건 정의와 절차·실행 제약은 `evals/replay/README.md` 에 있다. 대화 원문과 답은 저장소 밖 `%USERPROFILE%\.dc-eval\` 에 둔다. 시험할지는 예상 비용과 함께 먼저 제안한다. 원칙 작업은 초안을 Opus 5.5 로 쓰고 문체 다듬기를 Gemini 4 Neon 으로 하며, 판정은 Opus 5.5 가 Fable 5.2 로 만든 판정 기준(`%USERPROFILE%\.dc-eval\fable-judge\criteria.json`)으로 하기를 권장한다(2026-11-25 사용자 지시, 2026-11-02 의 Opus 5.5 만 쓰는 규칙을 대체).
 
 **판독 페이지** — 사용자에게 답의 판독을 받는 페이지와 좌우 비교 페이지의 형식은 `side-by-side` 스킬이 소유한다.
 
